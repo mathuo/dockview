@@ -23,12 +23,15 @@ type Doc = {
     kind: 'accessor' | 'property' | 'method';
     pieces: string[];
 };
+
+type DocJson = {
+    kind: string;
+    metadata?: Doc;
+    children: Doc[];
+};
+
 type DocsJson = {
-    [index: string]: {
-        kind: string;
-        metadata?: Doc;
-        children: Doc[];
-    };
+    [index: string]: DocJson;
 };
 
 export const Text = (props: { content: DocsContent[] }) => {
@@ -81,19 +84,64 @@ export const Markdown = (props: { children: string }) => {
     return <span>{props.children}</span>;
 };
 
+const ClassPiece = (props: { value: DocJson; name: string }) => {
+    let code = `interface ${props.name} {\n`;
+
+    code += props.value.children
+        .map((child) => {
+            switch (child.kind) {
+                case 'accessor':
+                    return `\t${child.name}: ${child.code};`;
+                case 'method':
+                    return `\t${child.name}${child.code};`;
+                default:
+                    return null;
+            }
+        })
+        .filter(Boolean)
+        .join('\n');
+
+    code += `\n}`;
+
+    return <CodeBlock language="tsx">{code}</CodeBlock>;
+};
+
+const InterfacePiece = (props: { value: DocJson; name: string }) => {
+    let code = `interface ${props.name} {\n`;
+
+    code += props.value.children
+        .map((child) => {
+            switch (child.kind) {
+                case 'property':
+                    return `\t${child.name}: ${child.code};`;
+                default:
+                    return null;
+            }
+        })
+        .join('\n');
+
+    code += `\n}`;
+
+    return <CodeBlock language="tsx">{code}</CodeBlock>;
+};
+
 const Piece = (props: { piece: string }) => {
     const item = docsJson[props.piece];
 
     if (!item) {
-        return;
+        return null;
+    }
+
+    if (item.kind === 'class') {
+        return <ClassPiece name={props.piece} value={item} />;
     }
 
     if (item.kind === 'interface') {
-        return;
+        return <InterfacePiece name={props.piece} value={item} />;
     }
 
     if (!item.metadata?.code) {
-        return;
+        return null;
     }
 
     return <CodeBlock language="tsx">{item.metadata.code}</CodeBlock>;

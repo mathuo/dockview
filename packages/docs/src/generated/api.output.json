@@ -14,9 +14,7 @@
         "metadata": {
             "name": "Sizing",
             "code": "InvisibleSizing | SplitSizing | DistributeSizing",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "LayoutPriority": {
@@ -149,7 +147,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "T"
                 ]
             },
             {
@@ -171,7 +170,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "T"
                 ]
             },
             {
@@ -247,7 +247,7 @@
                 "pieces": []
             },
             {
-                "name": "onDidMaxmizedGroupChange",
+                "name": "onDidMaximizedGroupChange",
                 "code": "Event<void>",
                 "kind": "accessor",
                 "pieces": [
@@ -598,7 +598,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -782,6 +783,7 @@
                     ]
                 },
                 "pieces": [
+                    "DockviewGroupPanel",
                     "Event"
                 ]
             },
@@ -798,7 +800,8 @@
                     ]
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "IDockviewPanel"
                 ]
             },
             {
@@ -814,6 +817,7 @@
                     ]
                 },
                 "pieces": [
+                    "DockviewDidDropEvent",
                     "Event"
                 ]
             },
@@ -858,7 +862,7 @@
                 ]
             },
             {
-                "name": "onDidMaxmizedGroupChange",
+                "name": "onDidMaximizedGroupChange",
                 "code": "Event<void>",
                 "kind": "accessor",
                 "pieces": [
@@ -878,6 +882,7 @@
                     ]
                 },
                 "pieces": [
+                    "DockviewGroupPanel",
                     "Event"
                 ]
             },
@@ -894,7 +899,8 @@
                     ]
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "IDockviewPanel"
                 ]
             },
             {
@@ -905,12 +911,21 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked before a group is dragged. Exposed for custom Drag'n'Drop functionality."
+                            "text": "Invoked before a group is dragged.\n\nCalling "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`event.nativeEvent.preventDefault()`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " will prevent the group drag starting."
                         }
                     ]
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "GroupDragEvent"
                 ]
             },
             {
@@ -921,12 +936,21 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked before a panel is dragged. Exposed for custom Drag'n'Drop functionality."
+                            "text": "Invoked before a panel is dragged.\n\nCalling "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`event.nativeEvent.preventDefault()`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " will prevent the panel drag starting."
                         }
                     ]
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "TabDragEvent"
                 ]
             },
             {
@@ -950,6 +974,7 @@
                     ]
                 },
                 "pieces": [
+                    "DockviewWillDropEvent",
                     "Event"
                 ]
             },
@@ -957,8 +982,25 @@
                 "name": "onWillShowOverlay",
                 "code": "Event<WillShowOverlayLocationEvent>",
                 "kind": "accessor",
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked before an overlay is shown indicating a drop target.\n\nCalling "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`event.preventDefault()`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " will prevent the overlay being shown and prevent\nthe any subsequent drop event."
+                        }
+                    ]
+                },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "WillShowOverlayLocationEvent"
                 ]
             },
             {
@@ -1062,7 +1104,8 @@
                 "pieces": [
                     "AddPanelOptions",
                     "IDockviewPanel",
-                    "Parameters"
+                    "Parameters",
+                    "T"
                 ]
             },
             {
@@ -1353,6 +1396,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewGroupPanel",
                     "Emitter"
                 ]
             },
@@ -1409,6 +1453,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewGroupPanel",
                     "Event"
                 ]
             },
@@ -1420,6 +1465,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewGroupPanel",
                     "Event"
                 ]
             },
@@ -1431,7 +1477,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "IDockviewPanel"
                 ]
             },
             {
@@ -1442,6 +1489,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewDidDropEvent",
                     "Event"
                 ]
             },
@@ -1475,6 +1523,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewGroupPanel",
                     "Event"
                 ]
             },
@@ -1486,6 +1535,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewGroupPanel",
                     "Event"
                 ]
             },
@@ -1497,7 +1547,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "IDockviewPanel"
                 ]
             },
             {
@@ -1508,7 +1559,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "GroupDragEvent"
                 ]
             },
             {
@@ -1519,7 +1571,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "TabDragEvent"
                 ]
             },
             {
@@ -1530,6 +1583,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewWillDropEvent",
                     "Event"
                 ]
             },
@@ -1541,7 +1595,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "WillShowOverlayLocationEvent"
                 ]
             },
             {
@@ -1634,7 +1689,7 @@
                 "pieces": []
             },
             {
-                "name": "onDidMaxmizedGroupChange",
+                "name": "onDidMaximizedGroupChange",
                 "code": "Event<void>",
                 "kind": "accessor",
                 "pieces": [
@@ -1716,7 +1771,8 @@
                 "pieces": [
                     "AddPanelOptions",
                     "DockviewPanel",
-                    "Parameters"
+                    "Parameters",
+                    "T"
                 ]
             },
             {
@@ -1770,7 +1826,7 @@
             },
             {
                 "name": "doRemoveGroup",
-                "code": "(group: DockviewGroupPanel, options?: { skipActive?: boolean, skipDispose?: boolean, skipPopoutAssociated?: boolean }): DockviewGroupPanel",
+                "code": "(group: DockviewGroupPanel, options?: { skipActive?: boolean, skipDispose?: boolean, skipPopoutAssociated?: boolean, skipPopoutReturn?: boolean }): DockviewGroupPanel",
                 "kind": "method",
                 "pieces": [
                     "DockviewGroupPanel"
@@ -1898,7 +1954,7 @@
             },
             {
                 "name": "removeGroup",
-                "code": "(group: DockviewGroupPanel, options?: { skipActive?: boolean, skipDispose?: boolean }): void",
+                "code": "(group: DockviewGroupPanel, options?: { skipActive?: boolean, skipDispose?: boolean, skipPopoutAssociated?: boolean, skipPopoutReturn?: boolean }): void",
                 "kind": "method",
                 "pieces": [
                     "DockviewGroupPanel"
@@ -2089,7 +2145,8 @@
                 "code": "Event<Emitter.T>",
                 "kind": "accessor",
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "T"
                 ]
             },
             {
@@ -2378,7 +2435,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -2408,6 +2466,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewGroupChangeEvent",
                     "Event"
                 ]
             },
@@ -2419,6 +2478,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewGroupChangeEvent",
                     "Event"
                 ]
             },
@@ -2441,6 +2501,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewDidDropEvent",
                     "Event"
                 ]
             },
@@ -2452,6 +2513,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewGroupChangeEvent",
                     "Event"
                 ]
             },
@@ -2463,7 +2525,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "GroupDragEvent"
                 ]
             },
             {
@@ -2474,7 +2537,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "GroupMoveEvent"
                 ]
             },
             {
@@ -2485,7 +2549,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "TabDragEvent"
                 ]
             },
             {
@@ -2496,6 +2561,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewWillDropEvent",
                     "Event"
                 ]
             },
@@ -2507,7 +2573,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "WillShowOverlayLocationEvent"
                 ]
             },
             {
@@ -2604,10 +2671,10 @@
             },
             {
                 "name": "canDisplayOverlay",
-                "code": "(event: DragEvent, position: Position, target: DockviewDropTargets): boolean",
+                "code": "(event: DragEvent, position: Position, target: DockviewGroupDropLocation): boolean",
                 "kind": "method",
                 "pieces": [
-                    "DockviewDropTargets",
+                    "DockviewGroupDropLocation",
                     "Position"
                 ]
             },
@@ -2742,7 +2809,8 @@
                 "code": "(_params: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             },
             {
@@ -2908,7 +2976,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             },
             {
@@ -3091,7 +3160,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PaneviewDropEvent"
                 ]
             },
             {
@@ -3279,7 +3349,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -3313,7 +3384,7 @@
                 ]
             },
             {
-                "name": "onDidMaxmizedNodeChange",
+                "name": "onDidMaximizedNodeChange",
                 "code": "Event<void>",
                 "kind": "property",
                 "flags": {
@@ -3417,7 +3488,8 @@
                 "kind": "method",
                 "pieces": [
                     "IViewDeserializer",
-                    "SerializedGridview"
+                    "SerializedGridview",
+                    "T"
                 ]
             },
             {
@@ -3438,7 +3510,8 @@
                 "kind": "method",
                 "pieces": [
                     "GridBranchNode",
-                    "GridNode"
+                    "GridNode",
+                    "IGridView"
                 ]
             },
             {
@@ -3648,7 +3721,9 @@
                     ]
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "GridviewPanelApi",
+                    "IGridviewPanel"
                 ]
             },
             {
@@ -3704,7 +3779,9 @@
                     ]
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "GridviewPanelApi",
+                    "IGridviewPanel"
                 ]
             },
             {
@@ -3765,8 +3842,10 @@
                 },
                 "pieces": [
                     "AddComponentOptions",
+                    "GridviewPanelApi",
                     "IGridviewPanel",
-                    "Parameters"
+                    "Parameters",
+                    "T"
                 ]
             },
             {
@@ -3870,6 +3949,7 @@
                     ]
                 },
                 "pieces": [
+                    "GridviewPanelApi",
                     "IGridviewPanel"
                 ]
             },
@@ -3886,6 +3966,7 @@
                     ]
                 },
                 "pieces": [
+                    "GridviewPanelApi",
                     "IGridviewPanel"
                 ]
             },
@@ -3955,7 +4036,9 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Emitter"
+                    "Emitter",
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -4000,7 +4083,9 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -4011,7 +4096,9 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -4044,7 +4131,9 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -4055,7 +4144,9 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -4137,7 +4228,7 @@
                 "pieces": []
             },
             {
-                "name": "onDidMaxmizedGroupChange",
+                "name": "onDidMaximizedGroupChange",
                 "code": "Event<void>",
                 "kind": "accessor",
                 "pieces": [
@@ -4184,8 +4275,10 @@
                 "kind": "method",
                 "pieces": [
                     "AddComponentOptions",
+                    "GridviewPanelApi",
                     "IGridviewPanel",
-                    "Parameters"
+                    "Parameters",
+                    "T"
                 ]
             },
             {
@@ -4205,7 +4298,8 @@
                 "code": "(group: GridviewPanel<GridviewPanelApiImpl>, location: number[], size?: number): void",
                 "kind": "method",
                 "pieces": [
-                    "GridviewPanel"
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -4213,7 +4307,8 @@
                 "code": "(group: GridviewPanel<GridviewPanelApiImpl>, options?: { skipActive?: boolean, skipDispose?: boolean }): GridviewPanel<GridviewPanelApiImpl>",
                 "kind": "method",
                 "pieces": [
-                    "GridviewPanel"
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -4259,7 +4354,8 @@
                 "code": "(panel: GridviewPanel<GridviewPanelApiImpl>): boolean",
                 "kind": "method",
                 "pieces": [
-                    "GridviewPanel"
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -4267,7 +4363,8 @@
                 "code": "(panel: GridviewPanel<GridviewPanelApiImpl>): boolean",
                 "kind": "method",
                 "pieces": [
-                    "GridviewPanel"
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -4281,7 +4378,8 @@
                 "code": "(panel: GridviewPanel<GridviewPanelApiImpl>): void",
                 "kind": "method",
                 "pieces": [
-                    "GridviewPanel"
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -4298,7 +4396,8 @@
                 "code": "(panel: GridviewPanel<GridviewPanelApiImpl>, options: { direction: Direction, reference: string, size?: number }): void",
                 "kind": "method",
                 "pieces": [
-                    "GridviewPanel"
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -4322,7 +4421,8 @@
                 "code": "(group: GridviewPanel<GridviewPanelApiImpl>): void",
                 "kind": "method",
                 "pieces": [
-                    "GridviewPanel"
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -4330,7 +4430,8 @@
                 "code": "(panel: GridviewPanel<GridviewPanelApiImpl>): void",
                 "kind": "method",
                 "pieces": [
-                    "GridviewPanel"
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -4338,7 +4439,8 @@
                 "code": "(panel: GridviewPanel<GridviewPanelApiImpl>): void",
                 "kind": "method",
                 "pieces": [
-                    "GridviewPanel"
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -4346,7 +4448,8 @@
                 "code": "(panel: GridviewPanel<GridviewPanelApiImpl>, visible: boolean): void",
                 "kind": "method",
                 "pieces": [
-                    "GridviewPanel"
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -4596,7 +4699,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -4641,7 +4745,8 @@
                 "code": "<T>(): LocalSelectionTransfer<T>",
                 "kind": "method",
                 "pieces": [
-                    "LocalSelectionTransfer"
+                    "LocalSelectionTransfer",
+                    "T"
                 ]
             }
         ]
@@ -4746,7 +4851,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PaneviewDropEvent"
                 ]
             },
             {
@@ -4934,7 +5040,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -5051,7 +5158,8 @@
                 "code": "Event<PaneviewPanel>",
                 "kind": "accessor",
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PaneviewPanel"
                 ]
             },
             {
@@ -5059,7 +5167,8 @@
                 "code": "Event<PaneviewPanel>",
                 "kind": "accessor",
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PaneviewPanel"
                 ]
             },
             {
@@ -5199,7 +5308,8 @@
                     ]
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "IPaneviewPanel"
                 ]
             },
             {
@@ -5215,7 +5325,8 @@
                     ]
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PaneviewDropEvent"
                 ]
             },
             {
@@ -5271,7 +5382,8 @@
                     ]
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "IPaneviewPanel"
                 ]
             },
             {
@@ -5317,7 +5429,8 @@
                 "pieces": [
                     "AddPaneviewComponentOptions",
                     "IPaneviewPanel",
-                    "Parameters"
+                    "Parameters",
+                    "T"
                 ]
             },
             {
@@ -5472,7 +5585,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PaneviewPanel"
                 ]
             },
             {
@@ -5483,7 +5597,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PaneviewDropEvent"
                 ]
             },
             {
@@ -5516,7 +5631,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PaneviewPanel"
                 ]
             },
             {
@@ -5602,7 +5718,8 @@
                 "pieces": [
                     "AddPaneviewComponentOptions",
                     "IPaneviewPanel",
-                    "Parameters"
+                    "Parameters",
+                    "T"
                 ]
             },
             {
@@ -5950,7 +6067,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -5971,7 +6089,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "IView"
                 ]
             },
             {
@@ -5982,7 +6101,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "IView"
                 ]
             },
             {
@@ -6229,7 +6349,8 @@
                     ]
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "IView"
                 ]
             },
             {
@@ -6285,7 +6406,8 @@
                     ]
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "IView"
                 ]
             },
             {
@@ -6347,7 +6469,8 @@
                 "pieces": [
                     "AddSplitviewComponentOptions",
                     "ISplitviewPanel",
-                    "Parameters"
+                    "Parameters",
+                    "T"
                 ]
             },
             {
@@ -6518,7 +6641,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "IView"
                 ]
             },
             {
@@ -6551,7 +6675,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "IView"
                 ]
             },
             {
@@ -6645,7 +6770,8 @@
                 "pieces": [
                     "AddSplitviewComponentOptions",
                     "Parameters",
-                    "SplitviewPanel"
+                    "SplitviewPanel",
+                    "T"
                 ]
             },
             {
@@ -6932,7 +7058,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -6975,6 +7102,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DroptargetEvent",
                     "Event"
                 ]
             },
@@ -6986,7 +7114,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "WillShowOverlayEvent"
                 ]
             },
             {
@@ -7038,6 +7167,50 @@
                 "pieces": [
                     "ITabRenderer"
                 ]
+            }
+        ]
+    },
+    "WillShowOverlayLocationEvent": {
+        "kind": "class",
+        "children": [
+            {
+                "name": "constructor",
+                "code": "",
+                "pieces": []
+            },
+            {
+                "name": "defaultPrevented",
+                "code": "boolean",
+                "kind": "accessor",
+                "pieces": []
+            },
+            {
+                "name": "kind",
+                "code": "DockviewGroupDropLocation",
+                "kind": "accessor",
+                "pieces": [
+                    "DockviewGroupDropLocation"
+                ]
+            },
+            {
+                "name": "nativeEvent",
+                "code": "DragEvent",
+                "kind": "accessor",
+                "pieces": []
+            },
+            {
+                "name": "position",
+                "code": "Position",
+                "kind": "accessor",
+                "pieces": [
+                    "Position"
+                ]
+            },
+            {
+                "name": "preventDefault",
+                "code": "(): void",
+                "kind": "method",
+                "pieces": []
             }
         ]
     },
@@ -7818,11 +7991,11 @@
             },
             {
                 "name": "target",
-                "code": "DockviewDropTargets",
+                "code": "DockviewGroupDropLocation",
                 "kind": "property",
                 "flags": {},
                 "pieces": [
-                    "DockviewDropTargets"
+                    "DockviewGroupDropLocation"
                 ]
             }
         ]
@@ -7967,6 +8140,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "ActiveEvent",
                     "Event"
                 ]
             },
@@ -7978,7 +8152,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "GridConstraintChangeEvent"
                 ]
             },
             {
@@ -7989,7 +8164,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PanelDimensionChangeEvent"
                 ]
             },
             {
@@ -8000,7 +8176,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "FocusEvent"
                 ]
             },
             {
@@ -8011,7 +8188,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "HiddenEvent"
                 ]
             },
             {
@@ -8022,6 +8200,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewGroupPanelFloatingChangeEvent",
                     "Event"
                 ]
             },
@@ -8033,7 +8212,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "VisibilityEvent"
                 ]
             },
             {
@@ -8044,7 +8224,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "WillFocusEvent"
                 ]
             },
             {
@@ -8062,6 +8243,12 @@
                         }
                     ]
                 },
+                "pieces": []
+            },
+            {
+                "name": "close",
+                "code": "(): void",
+                "kind": "method",
                 "pieces": []
             },
             {
@@ -8294,6 +8481,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "ActiveEvent",
                     "Event"
                 ]
             },
@@ -8305,6 +8493,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "ActiveGroupEvent",
                     "Event"
                 ]
             },
@@ -8316,7 +8505,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PanelDimensionChangeEvent"
                 ]
             },
             {
@@ -8327,7 +8517,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "FocusEvent"
                 ]
             },
             {
@@ -8338,7 +8529,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "GroupChangedEvent"
                 ]
             },
             {
@@ -8349,7 +8541,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "HiddenEvent"
                 ]
             },
             {
@@ -8360,6 +8553,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewGroupPanelFloatingChangeEvent",
                     "Event"
                 ]
             },
@@ -8371,7 +8565,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "RendererChangedEvent"
                 ]
             },
             {
@@ -8382,7 +8577,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "VisibilityEvent"
                 ]
             },
             {
@@ -8393,7 +8589,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "WillFocusEvent"
                 ]
             },
             {
@@ -8816,7 +9013,9 @@
                     "isOptional": true
                 },
                 "pieces": [
-                    "FrameworkFactory"
+                    "FrameworkFactory",
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -8873,7 +9072,8 @@
                 "kind": "property",
                 "flags": {},
                 "pieces": [
-                    "BaseGrid"
+                    "BaseGrid",
+                    "IGridPanelView"
                 ]
             },
             {
@@ -9063,6 +9263,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "ActiveEvent",
                     "Event"
                 ]
             },
@@ -9074,7 +9275,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "GridConstraintChangeEvent"
                 ]
             },
             {
@@ -9085,7 +9287,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PanelDimensionChangeEvent"
                 ]
             },
             {
@@ -9096,7 +9299,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "FocusEvent"
                 ]
             },
             {
@@ -9107,7 +9311,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "HiddenEvent"
                 ]
             },
             {
@@ -9118,7 +9323,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "VisibilityEvent"
                 ]
             },
             {
@@ -9129,7 +9335,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "WillFocusEvent"
                 ]
             },
             {
@@ -9327,7 +9534,8 @@
                 "kind": "property",
                 "flags": {},
                 "pieces": [
-                    "FrameworkFactory"
+                    "FrameworkFactory",
+                    "IContentRenderer"
                 ]
             },
             {
@@ -9336,7 +9544,8 @@
                 "kind": "property",
                 "flags": {},
                 "pieces": [
-                    "FrameworkFactory"
+                    "FrameworkFactory",
+                    "ITabRenderer"
                 ]
             },
             {
@@ -9345,7 +9554,8 @@
                 "kind": "property",
                 "flags": {},
                 "pieces": [
-                    "FrameworkFactory"
+                    "FrameworkFactory",
+                    "IWatermarkRenderer"
                 ]
             }
         ]
@@ -9609,7 +9819,7 @@
                 ]
             },
             {
-                "name": "onDidMaxmizedGroupChange",
+                "name": "onDidMaximizedGroupChange",
                 "code": "Event<void>",
                 "kind": "property",
                 "flags": {
@@ -9921,7 +10131,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -10063,6 +10274,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewGroupPanel",
                     "Event"
                 ]
             },
@@ -10074,7 +10286,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "IDockviewPanel"
                 ]
             },
             {
@@ -10085,6 +10298,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewDidDropEvent",
                     "Event"
                 ]
             },
@@ -10111,7 +10325,7 @@
                 ]
             },
             {
-                "name": "onDidMaxmizedGroupChange",
+                "name": "onDidMaximizedGroupChange",
                 "code": "Event<void>",
                 "kind": "property",
                 "flags": {
@@ -10129,6 +10343,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewGroupPanel",
                     "Event"
                 ]
             },
@@ -10140,7 +10355,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "IDockviewPanel"
                 ]
             },
             {
@@ -10151,7 +10367,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "GroupDragEvent"
                 ]
             },
             {
@@ -10162,7 +10379,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "TabDragEvent"
                 ]
             },
             {
@@ -10173,6 +10391,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewWillDropEvent",
                     "Event"
                 ]
             },
@@ -10184,14 +10403,17 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "WillShowOverlayLocationEvent"
                 ]
             },
             {
                 "name": "options",
                 "code": "DockviewComponentOptions",
                 "kind": "property",
-                "flags": {},
+                "flags": {
+                    "isReadonly": true
+                },
                 "pieces": [
                     "DockviewComponentOptions"
                 ]
@@ -10271,7 +10493,8 @@
                 "pieces": [
                     "AddPanelOptions",
                     "IDockviewPanel",
-                    "Parameters"
+                    "Parameters",
+                    "T"
                 ]
             },
             {
@@ -10614,7 +10837,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -10700,6 +10924,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewGroupChangeEvent",
                     "Event"
                 ]
             },
@@ -10711,6 +10936,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewGroupChangeEvent",
                     "Event"
                 ]
             },
@@ -10722,6 +10948,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewDidDropEvent",
                     "Event"
                 ]
             },
@@ -10733,6 +10960,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewGroupChangeEvent",
                     "Event"
                 ]
             },
@@ -10744,7 +10972,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "GroupMoveEvent"
                 ]
             },
             {
@@ -10755,6 +10984,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "DockviewWillDropEvent",
                     "Event"
                 ]
             },
@@ -10785,10 +11015,10 @@
             },
             {
                 "name": "canDisplayOverlay",
-                "code": "(event: DragEvent, position: Position, target: DockviewDropTargets): boolean",
+                "code": "(event: DragEvent, position: Position, target: DockviewGroupDropLocation): boolean",
                 "kind": "method",
                 "pieces": [
-                    "DockviewDropTargets",
+                    "DockviewGroupDropLocation",
                     "Position"
                 ]
             },
@@ -10885,7 +11115,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -11005,7 +11236,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             },
             {
@@ -11188,7 +11420,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -11344,7 +11577,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -11555,7 +11789,9 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -11581,7 +11817,7 @@
                 ]
             },
             {
-                "name": "onDidMaxmizedGroupChange",
+                "name": "onDidMaximizedGroupChange",
                 "code": "Event<void>",
                 "kind": "property",
                 "flags": {
@@ -11599,7 +11835,9 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -11637,8 +11875,10 @@
                 "kind": "method",
                 "pieces": [
                     "AddComponentOptions",
+                    "GridviewPanelApi",
                     "IGridviewPanel",
-                    "Parameters"
+                    "Parameters",
+                    "T"
                 ]
             },
             {
@@ -11684,7 +11924,8 @@
                 "code": "(panel: GridviewPanel<GridviewPanelApiImpl>): boolean",
                 "kind": "method",
                 "pieces": [
-                    "GridviewPanel"
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -11692,7 +11933,8 @@
                 "code": "(panel: GridviewPanel<GridviewPanelApiImpl>): boolean",
                 "kind": "method",
                 "pieces": [
-                    "GridviewPanel"
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -11706,7 +11948,8 @@
                 "code": "(panel: GridviewPanel<GridviewPanelApiImpl>): void",
                 "kind": "method",
                 "pieces": [
-                    "GridviewPanel"
+                    "GridviewPanel",
+                    "GridviewPanelApiImpl"
                 ]
             },
             {
@@ -11714,6 +11957,7 @@
                 "code": "(panel: IGridviewPanel<GridviewPanelApi>, options: { direction: Direction, reference: string, size?: number }): void",
                 "kind": "method",
                 "pieces": [
+                    "GridviewPanelApi",
                     "IGridviewPanel"
                 ]
             },
@@ -11722,6 +11966,7 @@
                 "code": "(panel: IGridviewPanel<GridviewPanelApi>, sizing?: InvisibleSizing | SplitSizing | DistributeSizing): void",
                 "kind": "method",
                 "pieces": [
+                    "GridviewPanelApi",
                     "IGridviewPanel"
                 ]
             },
@@ -11730,6 +11975,7 @@
                 "code": "(panel: IGridviewPanel<GridviewPanelApi>): void",
                 "kind": "method",
                 "pieces": [
+                    "GridviewPanelApi",
                     "IGridviewPanel"
                 ]
             },
@@ -11738,6 +11984,7 @@
                 "code": "(panel: IGridviewPanel<GridviewPanelApi>, visible: boolean): void",
                 "kind": "method",
                 "pieces": [
+                    "GridviewPanelApi",
                     "IGridviewPanel"
                 ]
             },
@@ -11878,7 +12125,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -11998,7 +12246,8 @@
                 "code": "(params: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -12035,7 +12284,8 @@
                 "code": "(params: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -12090,7 +12340,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -12249,7 +12500,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PaneviewPanel"
                 ]
             },
             {
@@ -12260,7 +12512,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PaneviewDropEvent"
                 ]
             },
             {
@@ -12293,7 +12546,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PaneviewPanel"
                 ]
             },
             {
@@ -12332,7 +12586,8 @@
                 "pieces": [
                     "AddPaneviewComponentOptions",
                     "IPaneviewPanel",
-                    "Parameters"
+                    "Parameters",
+                    "T"
                 ]
             },
             {
@@ -12519,7 +12774,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -12660,7 +12916,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "IView"
                 ]
             },
             {
@@ -12691,7 +12948,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "IView"
                 ]
             },
             {
@@ -12730,7 +12988,8 @@
                 "pieces": [
                     "AddSplitviewComponentOptions",
                     "ISplitviewPanel",
-                    "Parameters"
+                    "Parameters",
+                    "T"
                 ]
             },
             {
@@ -12917,7 +13176,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -12986,7 +13246,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             }
         ]
@@ -13153,7 +13414,8 @@
                 "code": "(event: PanelUpdateEvent<Parameters>): void",
                 "kind": "method",
                 "pieces": [
-                    "PanelUpdateEvent"
+                    "PanelUpdateEvent",
+                    "Parameters"
                 ]
             },
             {
@@ -13494,6 +13756,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "ActiveEvent",
                     "Event"
                 ]
             },
@@ -13505,7 +13768,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PanelDimensionChangeEvent"
                 ]
             },
             {
@@ -13516,7 +13780,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "FocusEvent"
                 ]
             },
             {
@@ -13527,7 +13792,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "HiddenEvent"
                 ]
             },
             {
@@ -13538,7 +13804,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "VisibilityEvent"
                 ]
             },
             {
@@ -13549,7 +13816,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "WillFocusEvent"
                 ]
             },
             {
@@ -14083,6 +14351,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "ActiveEvent",
                     "Event"
                 ]
             },
@@ -14094,7 +14363,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PanelConstraintChangeEvent"
                 ]
             },
             {
@@ -14105,7 +14375,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PanelDimensionChangeEvent"
                 ]
             },
             {
@@ -14116,7 +14387,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "ExpansionEvent"
                 ]
             },
             {
@@ -14127,7 +14399,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "FocusEvent"
                 ]
             },
             {
@@ -14138,7 +14411,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "HiddenEvent"
                 ]
             },
             {
@@ -14149,7 +14423,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "VisibilityEvent"
                 ]
             },
             {
@@ -14182,7 +14457,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "WillFocusEvent"
                 ]
             },
             {
@@ -14404,7 +14680,8 @@
                 "kind": "property",
                 "flags": {},
                 "pieces": [
-                    "SerializedGridObject"
+                    "SerializedGridObject",
+                    "T"
                 ]
             },
             {
@@ -14434,6 +14711,7 @@
                 "kind": "property",
                 "flags": {},
                 "pieces": [
+                    "GridPanelViewState",
                     "SerializedGridview"
                 ]
             }
@@ -14799,7 +15077,8 @@
                     "isOptional": true
                 },
                 "pieces": [
-                    "FrameworkFactory"
+                    "FrameworkFactory",
+                    "SplitviewPanel"
                 ]
             },
             {
@@ -14957,6 +15236,7 @@
                     "isReadonly": true
                 },
                 "pieces": [
+                    "ActiveEvent",
                     "Event"
                 ]
             },
@@ -14968,7 +15248,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PanelConstraintChangeEvent"
                 ]
             },
             {
@@ -14979,7 +15260,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "PanelDimensionChangeEvent"
                 ]
             },
             {
@@ -14990,7 +15272,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "FocusEvent"
                 ]
             },
             {
@@ -15001,7 +15284,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "HiddenEvent"
                 ]
             },
             {
@@ -15012,7 +15296,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "VisibilityEvent"
                 ]
             },
             {
@@ -15023,7 +15308,8 @@
                     "isReadonly": true
                 },
                 "pieces": [
-                    "Event"
+                    "Event",
+                    "WillFocusEvent"
                 ]
             },
             {
@@ -15228,38 +15514,13 @@
             }
         ]
     },
-    "WillShowOverlayLocationEvent": {
-        "kind": "interface",
-        "children": [
-            {
-                "name": "event",
-                "code": "WillShowOverlayEvent",
-                "kind": "property",
-                "flags": {},
-                "pieces": [
-                    "WillShowOverlayEvent"
-                ]
-            },
-            {
-                "name": "kind",
-                "code": "DockviewGroupDropLocation",
-                "kind": "property",
-                "flags": {},
-                "pieces": [
-                    "DockviewGroupDropLocation"
-                ]
-            }
-        ]
-    },
     "AddGroupOptions": {
         "kind": "typeAlias",
         "children": [],
         "metadata": {
             "name": "AddGroupOptions",
             "code": "GroupOptions & AbsolutePosition | AddGroupOptionsWithPanel | AddGroupOptionsWithGroup",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "AddPanelOptions": {
@@ -15268,9 +15529,7 @@
         "metadata": {
             "name": "AddPanelOptions",
             "code": "Partial<AddPanelOptionsUnion> & { component: string, id: string, params?: P, renderer?: DockviewPanelRenderer, tabComponent?: string, title?: string }",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "AddPanelPositionOptions": {
@@ -15279,9 +15538,7 @@
         "metadata": {
             "name": "AddPanelPositionOptions",
             "code": "AbsolutePosition | RelativeGroup | RelativePanel",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "ComponentConstructor": {
@@ -15290,9 +15547,7 @@
         "metadata": {
             "name": "ComponentConstructor",
             "code": "",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "Direction": {
@@ -15301,9 +15556,7 @@
         "metadata": {
             "name": "Direction",
             "code": "'within' | 'below' | 'above' | 'right' | 'left'",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "DistributeSizing": {
@@ -15312,9 +15565,7 @@
         "metadata": {
             "name": "DistributeSizing",
             "code": "{ type: 'distribute' }",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "DockviewComponentUpdateOptions": {
@@ -15323,20 +15574,7 @@
         "metadata": {
             "name": "DockviewComponentUpdateOptions",
             "code": "Pick<DockviewComponentOptions, 'disableDnd' | 'rootOverlayModel' | 'floatingGroupBounds' | 'disableFloatingGroups' | 'createPrefixHeaderActionsElement' | 'createRightHeaderActionsElement' | 'createLeftHeaderActionsElement' | 'defaultTabComponent' | 'watermarkFrameworkComponent' | 'showDndOverlay' | 'frameworkTabComponents' | 'tabComponents' | 'frameworkComponents' | 'components' | 'orientation'>",
-            "pieces": [
-                null
-            ]
-        }
-    },
-    "DockviewDropTargets": {
-        "kind": "typeAlias",
-        "children": [],
-        "metadata": {
-            "name": "DockviewDropTargets",
-            "code": "'edge' | 'tabContainer' | 'panel' | 'tab'",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "DockviewGroupDropLocation": {
@@ -15344,10 +15582,8 @@
         "children": [],
         "metadata": {
             "name": "DockviewGroupDropLocation",
-            "code": "'content' | 'header_space' | 'tab'",
-            "pieces": [
-                null
-            ]
+            "code": "'edge' | 'content' | 'header_space' | 'tab'",
+            "pieces": []
         }
     },
     "DockviewGroupLocation": {
@@ -15356,9 +15592,7 @@
         "metadata": {
             "name": "DockviewGroupLocation",
             "code": "{ getWindow: (): Window, type: 'popout' } | { type: 'floating' } | { type: 'grid' }",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "DockviewGroupPanelLocked": {
@@ -15367,9 +15601,7 @@
         "metadata": {
             "name": "DockviewGroupPanelLocked",
             "code": "'no-drop-target' | boolean",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "DockviewPanelRenderer": {
@@ -15378,9 +15610,7 @@
         "metadata": {
             "name": "DockviewPanelRenderer",
             "code": "'always' | 'onlyWhenVisibile'",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "DroptargetOverlayModel": {
@@ -15389,9 +15619,7 @@
         "metadata": {
             "name": "DroptargetOverlayModel",
             "code": "{ activationSize?: MeasuredValue, size?: MeasuredValue }",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "GridNode": {
@@ -15400,9 +15628,7 @@
         "metadata": {
             "name": "GridNode",
             "code": "GridBranchNode<T> | GridLeafNode<T>",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "GridviewComponentUpdateOptions": {
@@ -15411,9 +15637,7 @@
         "metadata": {
             "name": "GridviewComponentUpdateOptions",
             "code": "Pick<GridviewComponentOptions, 'frameworkComponents' | 'components' | 'orientation'>",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "IDockviewGroupPanelPublic": {
@@ -15433,9 +15657,7 @@
         "metadata": {
             "name": "ISerializedNode",
             "code": "ISerializedBranchNode | ISerializedLeafNode",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "InvisibleSizing": {
@@ -15444,9 +15666,7 @@
         "metadata": {
             "name": "InvisibleSizing",
             "code": "{ cachedVisibleSize: number, type: 'invisible' }",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "MeasuredValue": {
@@ -15455,9 +15675,7 @@
         "metadata": {
             "name": "MeasuredValue",
             "code": "{ type: 'percentage' | 'pixels', value: number }",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "Position": {
@@ -15466,9 +15684,7 @@
         "metadata": {
             "name": "Position",
             "code": "'center' | 'right' | 'left' | 'bottom' | 'top'",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "SplitSizing": {
@@ -15477,9 +15693,7 @@
         "metadata": {
             "name": "SplitSizing",
             "code": "{ index: number, type: 'split' }",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "SplitviewComponentUpdateOptions": {
@@ -15488,9 +15702,7 @@
         "metadata": {
             "name": "SplitviewComponentUpdateOptions",
             "code": "Pick<SplitviewComponentOptions, 'frameworkComponents' | 'components' | 'orientation'>",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "createComponent": {
@@ -15500,12 +15712,8 @@
             "name": "createComponent",
             "code": "<T>(id: string, componentName?: string, components: , frameworkComponents: , createFrameworkComponent?: FrameworkFactory<T>, fallback?: (): T): T",
             "pieces": [
-                null,
-                null,
-                null,
-                null,
+                "T",
                 "FrameworkFactory",
-                null,
                 "T"
             ]
         }
@@ -15540,10 +15748,7 @@
         "metadata": {
             "name": "getGridLocation",
             "code": "(element: HTMLElement): number[]",
-            "pieces": [
-                null,
-                null
-            ]
+            "pieces": []
         }
     },
     "getLocationOrientation": {
@@ -15554,7 +15759,6 @@
             "code": "(rootOrientation: Orientation, location: number[]): Orientation",
             "pieces": [
                 "Orientation",
-                null,
                 "Orientation"
             ]
         }
@@ -15565,9 +15769,7 @@
         "metadata": {
             "name": "getPaneData",
             "code": "(): undefined | PaneTransfer",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "getPanelData": {
@@ -15576,9 +15778,7 @@
         "metadata": {
             "name": "getPanelData",
             "code": "(): undefined | PanelTransfer",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "getRelativeLocation": {
@@ -15589,9 +15789,7 @@
             "code": "(rootOrientation: Orientation, location: number[], direction: Position): number[]",
             "pieces": [
                 "Orientation",
-                null,
-                "Position",
-                null
+                "Position"
             ]
         }
     },
@@ -15601,10 +15799,7 @@
         "metadata": {
             "name": "indexInParent",
             "code": "(element: HTMLElement): number",
-            "pieces": [
-                null,
-                null
-            ]
+            "pieces": []
         }
     },
     "isGridBranchNode": {
@@ -15615,8 +15810,8 @@
             "code": "<T extends IGridView>(node: GridNode<T>): node is GridBranchNode<T>",
             "pieces": [
                 "IGridView",
-                "GridNode",
-                null
+                "T",
+                "GridNode"
             ]
         }
     },
@@ -15627,8 +15822,7 @@
             "name": "isGroupOptionsWithGroup",
             "code": "(data: AddGroupOptions): data is AddGroupOptionsWithGroup",
             "pieces": [
-                "AddGroupOptions",
-                null
+                "AddGroupOptions"
             ]
         }
     },
@@ -15639,8 +15833,7 @@
             "name": "isGroupOptionsWithPanel",
             "code": "(data: AddGroupOptions): data is AddGroupOptionsWithPanel",
             "pieces": [
-                "AddGroupOptions",
-                null
+                "AddGroupOptions"
             ]
         }
     },
@@ -15651,8 +15844,7 @@
             "name": "isPanelOptionsWithGroup",
             "code": "(data: AddPanelPositionOptions): data is RelativeGroup",
             "pieces": [
-                "AddPanelPositionOptions",
-                null
+                "AddPanelPositionOptions"
             ]
         }
     },
@@ -15663,8 +15855,7 @@
             "name": "isPanelOptionsWithPanel",
             "code": "(data: AddPanelPositionOptions): data is RelativePanel",
             "pieces": [
-                "AddPanelPositionOptions",
-                null
+                "AddPanelPositionOptions"
             ]
         }
     },
@@ -15675,8 +15866,7 @@
             "name": "orthogonal",
             "code": "(orientation: Orientation): Orientation",
             "pieces": [
-                "Orientation",
-                null
+                "Orientation"
             ]
         }
     },
@@ -16434,9 +16624,7 @@
         "metadata": {
             "name": "IDockviewDefaultTabProps",
             "code": "{ closeActionOverride?: (): void, hideClose?: boolean } & React.DOMAttributes<HTMLDivElement> & IDockviewPanelHeaderProps",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "IDockviewPanelHeaderProps": {
@@ -16445,9 +16633,7 @@
         "metadata": {
             "name": "IDockviewPanelHeaderProps",
             "code": "IGroupPanelBaseProps<T>",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "IDockviewPanelProps": {
@@ -16456,9 +16642,7 @@
         "metadata": {
             "name": "IDockviewPanelProps",
             "code": "IGroupPanelBaseProps<T>",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     },
     "ReactPartContext": {
@@ -16695,16 +16879,13 @@
             }
         ]
     },
-    "isReactElement": {
+    "isReactComponent": {
         "kind": "function",
         "children": [],
         "metadata": {
-            "name": "isReactElement",
-            "code": "(element: unknown): element is React.ReactElement<any,  | (props: any, deprecatedLegacyContext?: any): React.ReactNode | string>",
-            "pieces": [
-                null,
-                null
-            ]
+            "name": "isReactComponent",
+            "code": "(component: any): boolean",
+            "pieces": []
         }
     },
     "usePortalsLifecycle": {
@@ -16713,9 +16894,7 @@
         "metadata": {
             "name": "usePortalsLifecycle",
             "code": "(): [React.ReactPortal[],(portal: React.ReactPortal): IDisposable]",
-            "pieces": [
-                null
-            ]
+            "pieces": []
         }
     }
 }

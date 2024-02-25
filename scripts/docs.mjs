@@ -106,10 +106,15 @@ function parseType(obj) {
 }
 
 function extractPiecesFromType(obj) {
+    const result = [];
     if (obj.type === 'reference' && obj.package?.startsWith('dockview-')) {
-        return obj.name;
+        if (Array.isArray(obj.typeArguments)) {
+            result.push(...obj.typeArguments.flatMap(extractPiecesFromType));
+        }
+
+        result.push(obj.name);
     }
-    return null;
+    return result;
 }
 
 function parse(data) {
@@ -154,7 +159,7 @@ function parse(data) {
             };
         case ReflectionKind.Property: // 1024
             code += parseType(data.type);
-            pieces.push(extractPiecesFromType(data.type));
+            pieces.push(...extractPiecesFromType(data.type));
 
             return {
                 name,
@@ -174,7 +179,7 @@ function parse(data) {
             code += ': ';
 
             code += parseType(data.type);
-            pieces.push(extractPiecesFromType(data.type));
+            pieces.push(...extractPiecesFromType(data.type));
 
             return {
                 name,
@@ -222,13 +227,15 @@ function parse(data) {
                     if (typeParameter.type) {
                         type += ` extends ${parseType(typeParameter.type)}`;
 
-                        pieces.push(extractPiecesFromType(typeParameter.type));
+                        pieces.push(
+                            ...extractPiecesFromType(typeParameter.type)
+                        );
                     }
 
                     if (typeParameter.default) {
                         type += ` = ${typeParameter.default.name}`;
                         pieces.push(
-                            extractPiecesFromType(typeParameter.default)
+                            ...extractPiecesFromType(typeParameter.default)
                         );
                     }
 
@@ -251,7 +258,7 @@ function parse(data) {
             code += '): ';
 
             code += parseType(data.type);
-            pieces.push(extractPiecesFromType(data.type));
+            pieces.push(...extractPiecesFromType(data.type));
 
             return {
                 name,
@@ -261,7 +268,7 @@ function parse(data) {
             };
         case ReflectionKind.GetSignature: // 524288
             code += parseType(data.type);
-            pieces.push(extractPiecesFromType(data.type));
+            pieces.push(...extractPiecesFromType(data.type));
 
             return {
                 name,
@@ -327,13 +334,15 @@ function parse(data) {
                     if (typeParameter.type) {
                         type += ` extends ${parseType(typeParameter.type)}`;
 
-                        pieces.push(extractPiecesFromType(typeParameter.type));
+                        pieces.push(
+                            ...extractPiecesFromType(typeParameter.type)
+                        );
                     }
 
                     if (typeParameter.default) {
                         type += ` = ${typeParameter.default.name}`;
                         pieces.push(
-                            extractPiecesFromType(typeParameter.default)
+                            ...extractPiecesFromType(typeParameter.default)
                         );
                     }
 
@@ -342,7 +351,7 @@ function parse(data) {
             }
 
             code += parseType(data.type);
-            pieces.push(extractPiecesFromType(data.type));
+            pieces.push(...extractPiecesFromType(data.type));
 
             return {
                 name,
