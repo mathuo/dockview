@@ -4,9 +4,9 @@ import { themeConfig } from '../config/theme.config';
 import ExampleFrame from '../components/ui/exampleFrame';
 
 export default function Popout() {
-    const [theme, setTheme] = React.useState<string>(
-        new URLSearchParams(location.search).get('theme') ?? themeConfig[3].id
-    );
+    // const [theme, setTheme] = React.useState<string>(
+    //     new URLSearchParams(location.search).get('theme') ?? themeConfig[3].id
+    // );
 
     return (
         <Layout noFooter={true}>
@@ -32,7 +32,7 @@ export default function Popout() {
                             url.searchParams.set('theme', event.target.value);
                             window.location.href = url.toString();
                         }}
-                        value={theme}
+                        // value={theme}
                     >
                         {themeConfig.map((theme) => {
                             return <option>{theme.id}</option>;
@@ -41,7 +41,7 @@ export default function Popout() {
                 </div>
 
                 <ExampleFrame
-                    theme={theme}
+                    // theme={theme}
                     framework="react"
                     height="100%"
                     id="dockview/demo-dockview"
