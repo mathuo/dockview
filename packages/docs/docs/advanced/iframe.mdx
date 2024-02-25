@@ -1,0 +1,30 @@
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import DockviewWithIFrames from '@site/sandboxes/iframe-dockview/src/app';
+
+# iframes
+
+iframes reload when repositioned within the DOM which can cause issues.
+
+iFrames required special attention because of a particular behaviour in how iFrames render:
+
+> Re-parenting an iFrame will reload the contents of the iFrame or the rephrase this, moving an iFrame within the DOM will cause a reload of its contents.
+
+You can find many examples of discussions on this. Two reputable forums for example are linked [here](https://bugzilla.mozilla.org/show_bug.cgi?id=254144) and [here](https://github.com/whatwg/html/issues/5484).
+
+To ensure iFrames work as expected you should render them in panels with `renderer: 'always'` to ensure they are never removed from the DOM, alternatively set the defaultRenderer to `always`.
+
+> See the [Panel Rendering](/core/panels/rendering.mdx) section for more information of render modes.
+
+```tsx title="Example of a panel using an alternative renderer"
+api.addPanel({
+  id: 'my_panel_id',
+  component: 'my_component',
+  renderer: 'always',
+});
+        ```
+
+<MultiFrameworkContainer
+    sandboxId="iframe-dockview"
+    height={600}
+    react={DockviewWithIFrames}
+/>

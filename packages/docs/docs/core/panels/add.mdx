@@ -1,0 +1,167 @@
+---
+title: Adding Panels
+sidebar_position: 1
+---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+import LiveExample from '@site/src/components/ui/exampleFrame';
+
+This section describes how to add a new panel and the options you can provide.
+
+
+Panels can be added through the dock api.
+
+<DocRef declaration="DockviewApi" methods={['addPanel']} />
+
+## Opening a Basic Panel
+
+To open a panel requires a unique `id` and the name of the `component` to render.
+
+```ts
+const panel: IDockviewPanel = api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+});
+```
+
+> See [Overview](/docs/core/overview) to register components.
+
+## Providing a Panel Title
+
+:::warning
+Registering and updating the title using these built-in variables only works for the default tab renderer.
+If you use a custom tab render you can optionally access these variables to render the title, or you can take
+your own approach to rendering a tab title.
+:::
+
+Use `title` to provide a custom title for the panel. If no `title` is provided then the dock will render `id` in the tab.
+
+```tsx
+api.addPanel({
+    id: 'panel_1',
+    component: 'my_component',
+    title: 'my_custom_title',
+});
+```
+
+```tsx
+api.setTitle('my_new_custom_title');
+```
+
+<LiveExample framework="react" id="dockview/update-title" height={250}/>
+
+## Provide a custom Tab renderer
+
+:::info
+You can override the default tab renderer through the [Options](/docs/api/dockview/options).
+:::
+
+To render a custom tab component you should specify the `tabComponent`.
+
+```ts
+const panel: IDockviewPanel = api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+    tabComponent: 'my_tab_component',
+});
+```
+
+> See [Tabs](/docs/core/panels/tabs) to learn how to register tab components.
+
+## Provide custom Parameters
+
+Using the `params` option you can specific a simple object that is accessible in both the panel and tab renderer.
+To update these parameters after the panel has been created see [Update Panel](/docs/core/panels/update).
+
+```ts
+const panel: IDockviewPanel = api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+    params: {
+        myCustomKey: 'my_custom_value',
+    },
+});
+```
+
+## Rendering
+
+See [Panel Rendering](/docs/core/panels/rendering).
+
+## Positioning the Panel
+
+You can position a panel relative to an existing panel, group using `direction`. If you do not provide a reference panel
+or group then the panel will be positioned to the edge of the dock in the specified direction.
+
+#### Relative to another Panel
+
+```ts
+const panel2: IDockviewPanel = api.addPanel({
+    id: 'panel_2',
+    component: 'default',
+    position: {
+      referencePanel: 'panel_1',
+      direction: 'above'
+    }
+});
+
+api.addPanel({
+    id: 'panel_3',
+    component: 'default',
+    position: {
+      referencePanel: panel2,
+      direction: 'above'
+    }
+});
+```
+
+#### Relative to another Group
+
+```ts
+const panel2: IDockviewPanel = api.addPanel({
+    id: 'panel_2',
+    component: 'default',
+    position: {
+      referenceGroup: 'panel_1',
+      direction: 'left'
+    }
+});
+
+const panel = api.addPanel({
+    id: 'panel_2',
+    component: 'default',
+    position: {
+      referenceGroup: panel2.group,
+      direction: 'left'
+    }
+});
+```
+
+#### Relative to the container
+
+```ts
+const panel = api.addPanel({
+    id: 'panel_2',
+    component: 'default',
+    position: {
+      direction: 'right'
+    }
+});
+```
+
+### Floating
+
+You should specific the `floating` option which can be either `true` or an object describing the position of the floating group.
+
+```ts
+api.addPanel({
+    id: 'panel_1',
+    component: 'default',
+    floating: true,
+});
+
+api.addPanel({
+    id: 'panel_2',
+    component: 'default',
+    floating: { x: 10, y: 10, width: 300, height: 300 },
+});
+```

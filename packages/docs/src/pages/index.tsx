@@ -8,51 +8,42 @@ import { Introduction } from '../components/HomepageFeatures/introduction';
 import styles from './index.module.css';
 import './index.scss';
 
-function HomepageHeader2() {
-    const { siteConfig } = useDocusaurusContext();
-    return (
-        <header className={clsx('hero hero--primary', styles.heroBanner)}>
-            <div className="container homepage">
-                <img src={useBaseUrl('/img/dockview_logo.svg')} />
-                <h1 className="hero__title">{siteConfig.title}</h1>
-                {/* <div className="badge-container">
-                            <img src="https://badge.fury.io/js/dockview.svg" />
-                            <img src="https://github.com/mathuo/dockview/workflows/CI/badge.svg" />
-                            <img src="https://sonarcloud.io/api/project_badges/measure?project=mathuo_dockview&metric=coverage" />
-                            <img src="https://sonarcloud.io/api/project_badges/measure?project=mathuo_dockview&metric=alert_status" />
-                        </div> */}
-                <p className="hero__subtitle">{siteConfig.tagline}</p>
-                <div className={styles.buttons}>
-                    <Link
-                        className="button button--secondary button--lg"
-                        to={useBaseUrl('docs/')}
-                    >
-                        Get Started
-                    </Link>
-                    <Link
-                        className="button button--secondary button--lg"
-                        to={'#live-demo'}
-                    >
-                        Live Demo
-                    </Link>
-                </div>
-            </div>
-        </header>
-    );
-}
-
 export default function Home(): JSX.Element {
     const { siteConfig } = useDocusaurusContext();
     return (
-        <Layout
-            title={`${siteConfig.tagline}`}
-            description={`${siteConfig.description}`}
-        >
-            <HomepageHeader2 />
-
-            <main className="container">
-                <Introduction />
-            </main>
+        <Layout title={`${siteConfig.tagline}`}>
+            <div className="home-page">
+                <main>
+                    <div className="container">
+                        <div className="splashscreen">
+                            <div className="splashscreen-title">
+                                <h1>Fully Featured Docking Layout Manager</h1>
+                                <h2>
+                                    Zero dependency layout managment and docking
+                                    controls
+                                </h2>
+                            </div>
+                            <div className="splashscreen-video">
+                                <img src={useBaseUrl('/img/Animation.gif')} />
+                                <Link to="/demo">
+                                    <button>Go To Live Demo</button>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        style={{
+                            backgroundColor: '#020c18',
+                            padding: '20px 0px',
+                        }}
+                    >
+                        <div className="container"></div>
+                    </div>
+                    <div className="container">
+                        <Introduction />
+                    </div>
+                </main>
+            </div>
         </Layout>
     );
 }

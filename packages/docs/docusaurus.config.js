@@ -3,7 +3,26 @@
 
 const { themes } = require('prism-react-renderer');
 const lightCodeTheme = themes.nightOwlLight;
-const darkCodeTheme = themes.vsDark;
+const darkCodeTheme = themes.palenight;
+
+// dracula
+// duotoneDark
+// duotoneLight
+// github
+// jettwaveDark
+// jettwaveLight
+// nightOwl
+// nightOwlLight
+// oceanicNext
+// okaidia
+// oneDark
+// oneLight
+// palenight
+// shadesOfPurple
+// synthwave84
+// ultramin
+// vsDark
+// vsLight
 
 const path = require('path');
 
@@ -101,7 +120,7 @@ const config = {
                         'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
                 },
                 theme: {
-                    customCss: require.resolve('./src/css/custom.css'),
+                    customCss: require.resolve('./src/css/custom.scss'),
                 },
                 gtag: process.env.CI
                     ? {
@@ -137,6 +156,11 @@ const config = {
                     ].join(' ,'),
                 },
             ],
+            docs: {
+                sidebar: {
+                    autoCollapseCategories: true,
+                },
+            },
             navbar: {
                 title: 'Dockview',
                 logo: {
@@ -146,24 +170,33 @@ const config = {
                 items: [
                     {
                         type: 'doc',
-                        docId: 'index',
+                        docId: 'overview/getStarted/installation',
                         position: 'left',
                         label: 'Docs',
                     },
-                    { to: '/blog', label: 'Blog', position: 'left' },
                     {
-                        to: 'https://dockview.dev/typedocs',
-                        label: 'TSDoc',
+                        type: 'docSidebar',
                         position: 'left',
+                        sidebarId: 'api',
+                        label: 'API',
                     },
+                    { to: '/blog', label: 'Blog', position: 'left' },
+                    { to: '/demo', label: 'Demo', position: 'left' },
+                    // {
+                    //     to: 'https://dockview.dev/typedocs',
+                    //     label: 'TSDoc',
+                    //     position: 'left',
+                    // },
+
                     {
                         type: 'docsVersionDropdown',
                         position: 'right',
                     },
                     {
                         href: 'https://github.com/mathuo/dockview',
-                        label: 'GitHub',
                         position: 'right',
+                        className: 'header-github-link',
+                        'aria-label': 'GitHub repository',
                     },
                 ],
             },
@@ -226,6 +259,9 @@ const config = {
             announcementBar: {
                 id: 'announcementBar', // Increment on change
                 content: `⭐️ If you like Dockview, give it a star on <a target="_blank" rel="noopener noreferrer" href="https://github.com/mathuo/dockview">GitHub</a>`,
+            },
+            tableOfContents: {
+                maxHeadingLevel: 5,
             },
         }),
 };

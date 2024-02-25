@@ -1,0 +1,43 @@
+---
+title: Saving State
+---
+
+
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import LiveExample from '@site/src/components/ui/exampleFrame';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+This section describes how to serialize a dockview instance.
+
+<DocRef declaration="DockviewApi" methods={['toJSON', 'onDidLayoutChange']} />
+
+To retrieve the current state of the dock call `toJSON()`.
+You can listen to the event `onDidlayoutChange` to determine when the layout has changed.
+
+```tsx
+const [api, setApi] = React.useState<DockviewApi>();
+
+React.useEffect(() => {
+  if(!api) {
+    return;
+  }
+
+  const disposable = api.onDidLayoutChange(() => {
+    const layout: SerializedDockview = api.toJSON();
+    localStorage.setItem('my_layout', JSON.stringify(layout));
+  });
+
+  return () => disposable.dispose();
+}, [api]);
+
+const onReady = (event: DockviewReadyEvent) => {
+  setApi(event.api);
+}
+
+return <DockviewComponent onReady={onReady}/>
+```
+
+# Live Example
+
+<LiveExample framework="react" id="dockview/layout"/>
+

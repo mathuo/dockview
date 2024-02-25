@@ -1,0 +1,78 @@
+---
+title: Get Started
+sidebar_position: 0
+---
+
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+
+import SimpleDockview from '@site/sandboxes/simple-dockview/src/app';
+import DockviewExampleApp from '@site/sandboxes/example-app-dockview/src/app';
+import { attach as attachSimpleDockview } from '@site/sandboxes/javascript/simple-dockview/src/app';
+
+
+<MultiFrameworkContainer
+    sandboxId="example-app-dockview"
+    react={DockviewExampleApp}
+/>
+
+
+## Introduction
+
+Dockview is an abstraction built on top of [Gridviews](./gridview) where each view is a container of many tabbed panels.
+
+<MultiFrameworkContainer
+    sandboxId="simple-dockview"
+    react={SimpleDockview}
+    typescript={attachSimpleDockview}
+/>
+
+<br />
+
+> You can access the panels associated group through the `panel.group` variable.
+> The group will always be defined and will change if a panel is moved into another group.
+
+
+## Dockview API
+
+The Dockview API is exposed both at the `onReady` event and on each panel through `props.containerApi`.
+Through this API you can control general features of the component and access all added panels.
+
+```tsx title="Dockview API via Panel component"
+const MyComponent = (props: IDockviewPanelProps<{ title: string }>) => {
+    // props.containerApi...
+
+    return <div>{`My first panel has the title: ${props.params.title}`}</div>;
+};
+```
+
+```tsx title="Dockview API via the onReady callback"
+const onReady = (event: DockviewReadyEvent) => {
+    // event.api...
+};
+```
+
+## Dockview Panel API
+
+```tsx
+const MyComponent = (props: IDockviewPanelProps<{ title: string }>) => {
+    // props.api...
+
+    return <div>{`My first panel has the title: ${props.params.title}`}</div>;
+};
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

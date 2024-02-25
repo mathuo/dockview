@@ -1,0 +1,69 @@
+---
+sidebar_position: 1
+description: Theming Dockview Components
+title: Theme
+---
+
+
+import { CSSVariablesTable, ThemeTable } from '@site/src/components/cssVariables';
+
+Theming is controlled through CSS and is highly customizable.
+
+Firstly, you should import `dockview.css`:
+
+<FrameworkSpecific framework='JavaScript'>
+```css
+@import './node_modules/dockview-core/dist/styles/dockview.css';
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='React'>
+```css
+@import './node_modules/dockview/dist/styles/dockview.css';
+```
+</FrameworkSpecific>
+
+
+
+## Provided themes
+
+`dockview` comes with a number of themes which are all CSS classes and can be found [here](https://github.com/mathuo/dockview/blob/master/packages/dockview-core/src/theme.scss).
+To use a `dockview` theme the CSS must encapsulate the component. The current list of themes is:
+
+<ThemeTable/>
+
+:::info
+The source code for all themes can be found [here](https://github.com/mathuo/dockview/blob/master/packages/dockview-core/src/theme.scss).
+:::
+
+## Customizing Theme
+
+The provided themes are controlled primarily through a long list of CSS variables which can be modified by the user either entirely for a new theme
+or partial for a modification to an existing theme.
+
+<CSSVariablesTable />
+
+## Extending Theme
+
+You can extends existing themes or create new themes.
+
+As an example if you wanted to extend the **dockview-theme-abyss** theme to dislay a within the tabs container you
+may try:
+
+
+```css
+.dockview-theme-abyss {
+  .groupview {
+      &.active-group {
+          > .tabs-and-actions-container {
+              border-bottom: 2px solid var(--dv-activegroup-visiblepanel-tab-background-color);
+          }
+      }
+      &.inactive-group {
+          > .tabs-and-actions-container {
+              border-bottom: 2px solid var(--dv-inactivegroup-visiblepanel-tab-background-color);
+          }
+      }
+  }
+}
+```

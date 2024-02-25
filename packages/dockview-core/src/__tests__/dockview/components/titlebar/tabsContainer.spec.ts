@@ -43,23 +43,23 @@ describe('tabsContainer', () => {
 
         const emptySpace = cut.element
             .getElementsByClassName('void-container')
-            .item(0);
+            .item(0)
 
-        if (!emptySpace) {
+        if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
             () => 100
         );
 
-        fireEvent.dragEnter(emptySpace);
-        fireEvent.dragOver(emptySpace);
+        fireEvent.dragEnter(emptySpace!);
+        fireEvent.dragOver(emptySpace!);
 
-        expect(groupView.canDisplayOverlay).toBeCalled();
+        expect(groupView.canDisplayOverlay).toHaveBeenCalled();
 
         expect(
             cut.element.getElementsByClassName('drop-target-dropzone').length
@@ -102,14 +102,14 @@ describe('tabsContainer', () => {
             .getElementsByClassName('void-container')
             .item(0);
 
-        if (!emptySpace) {
+        if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -124,10 +124,10 @@ describe('tabsContainer', () => {
             PanelTransfer.prototype
         );
 
-        fireEvent.dragEnter(emptySpace);
-        fireEvent.dragOver(emptySpace);
+        fireEvent.dragEnter(emptySpace!);
+        fireEvent.dragOver(emptySpace!);
 
-        expect(groupView.canDisplayOverlay).toBeCalledTimes(0);
+        expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(0);
 
         expect(
             cut.element.getElementsByClassName('drop-target-dropzone').length
@@ -173,14 +173,14 @@ describe('tabsContainer', () => {
             .getElementsByClassName('void-container')
             .item(0);
 
-        if (!emptySpace) {
+        if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -189,10 +189,10 @@ describe('tabsContainer', () => {
             PanelTransfer.prototype
         );
 
-        fireEvent.dragEnter(emptySpace);
-        fireEvent.dragOver(emptySpace);
+        fireEvent.dragEnter(emptySpace!);
+        fireEvent.dragOver(emptySpace!);
 
-        expect(groupView.canDisplayOverlay).toBeCalledTimes(0);
+        expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(0);
 
         expect(
             cut.element.getElementsByClassName('drop-target-dropzone').length
@@ -238,14 +238,14 @@ describe('tabsContainer', () => {
             .getElementsByClassName('void-container')
             .item(0);
 
-        if (!emptySpace) {
+        if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -254,10 +254,10 @@ describe('tabsContainer', () => {
             PanelTransfer.prototype
         );
 
-        fireEvent.dragEnter(emptySpace);
-        fireEvent.dragOver(emptySpace);
+        fireEvent.dragEnter(emptySpace!);
+        fireEvent.dragOver(emptySpace!);
 
-        expect(groupView.canDisplayOverlay).toBeCalledTimes(0);
+        expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(0);
 
         expect(
             cut.element.getElementsByClassName('drop-target-dropzone').length
@@ -302,14 +302,14 @@ describe('tabsContainer', () => {
             .getElementsByClassName('void-container')
             .item(0);
 
-        if (!emptySpace) {
+        if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -324,10 +324,10 @@ describe('tabsContainer', () => {
             PanelTransfer.prototype
         );
 
-        fireEvent.dragEnter(emptySpace);
-        fireEvent.dragOver(emptySpace);
+        fireEvent.dragEnter(emptySpace!);
+        fireEvent.dragOver(emptySpace!);
 
-        expect(groupView.canDisplayOverlay).toBeCalledTimes(1);
+        expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(1);
 
         expect(
             cut.element.getElementsByClassName('drop-target-dropzone').length
@@ -507,7 +507,7 @@ describe('tabsContainer', () => {
         const eventPreventDefaultSpy = jest.spyOn(event, 'preventDefault');
         fireEvent(container, event);
 
-        expect(accessor.addFloatingGroup).toBeCalledWith(
+        expect(accessor.addFloatingGroup).toHaveBeenCalledWith(
             groupPanel,
             {
                 x: 100,
@@ -567,15 +567,15 @@ describe('tabsContainer', () => {
         const eventPreventDefaultSpy = jest.spyOn(event, 'preventDefault');
         fireEvent(container, event);
 
-        expect(accessor.addFloatingGroup).toBeCalledTimes(0);
-        expect(eventPreventDefaultSpy).toBeCalledTimes(0);
+        expect(accessor.addFloatingGroup).toHaveBeenCalledTimes(0);
+        expect(eventPreventDefaultSpy).toHaveBeenCalledTimes(0);
 
         const event2 = new KeyboardEvent('mousedown', { shiftKey: false });
         const eventPreventDefaultSpy2 = jest.spyOn(event2, 'preventDefault');
         fireEvent(container, event2);
 
-        expect(accessor.addFloatingGroup).toBeCalledTimes(0);
-        expect(eventPreventDefaultSpy2).toBeCalledTimes(0);
+        expect(accessor.addFloatingGroup).toHaveBeenCalledTimes(0);
+        expect(eventPreventDefaultSpy2).toHaveBeenCalledTimes(0);
     });
 
     test('that selecting a tab with shift down will move that tab into a new floating group', () => {

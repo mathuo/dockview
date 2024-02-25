@@ -1,0 +1,31 @@
+---
+title: Watermark
+---
+
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+import LiveExample from '@site/src/components/ui/exampleFrame';
+
+When there is nothing else to display.
+
+When the dock is empty or a group has no panels (an empty group) you can render some fallback
+content which is refered to as a `watermark`. Both are controlled through the same provided component.
+
+## Options
+
+The following properties can be set to configure the behaviours of floating groups.
+
+<FrameworkSpecific framework='React'>
+  <DocRef declaration="IDockviewReactProps" methods={['watermarkComponent']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+  <DocRef declaration="DockviewComponentOptions"
+  methods={['watermarkComponent', 'watermarkFrameworkComponent', 'frameworkComponentFactory']}
+  />
+</FrameworkSpecific>
+
+## Live Examples
+
+<LiveExample framework="react" id="dockview/watermark"/>

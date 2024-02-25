@@ -1,0 +1,43 @@
+---
+title: Group Controls
+---
+
+import LiveExample from '@site/src/components/ui/exampleFrame';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+This section describes how you can customize the header component of each group.
+
+<FrameworkSpecific framework='React'>
+  <DocRef declaration="IDockviewReactProps" methods={['leftHeaderActionsComponent', 'rightHeaderActionsComponent', 'prefixHeaderActionsComponent']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+  <DocRef declaration="DockviewComponentOptions"
+    methods={['createLeftHeaderActionsElement', 'createRightHeaderActionsElement', 'createPrefixHeaderActionsElement']} />
+</FrameworkSpecific>
+
+
+```tsx
+const LeftComponent = (props: IDockviewHeaderActionsProps) => {
+    return <div>{/** content */}</div>;
+};
+
+const RightComponent = (props: IDockviewHeaderActionsProps) => {
+       return <div>{/** content */}</div>;
+};
+
+const PrefixComponent = (props: IDockviewHeaderActionsProps) => {
+    return <div>{/** content */}</div>;
+};
+
+return <DockviewReact
+  leftHeaderActionsComponent={LeftComponent}
+  rightHeaderActionsComponent={RightComponent}
+  prefixHeaderActionsComponent={PrefixComponent}
+/>;
+```
+
+## Live Example
+
+<LiveExample framework="react" id="dockview/group-actions"/>
+

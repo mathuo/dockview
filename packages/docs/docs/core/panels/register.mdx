@@ -1,0 +1,45 @@
+---
+title: Registering Panels
+sidebar_position: 0
+---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+
+This section describes how to register a panel.
+
+You can register panels through the dock  [option](/docs/api/dockview/options) `components`.
+
+<FrameworkSpecific framework='React'>
+  <DocRef declaration="IDockviewReactProps" methods={['components']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+  <DocRef declaration="DockviewComponentOptions" methods={['components']} />
+</FrameworkSpecific>
+
+
+<FrameworkSpecific framework='React'>
+```tsx
+const components = {
+  component_1: (props: IDockviewPanelProps) => {
+    const api: DockviewPanelApi  = props.api;
+    const groupApi: DockviewGroupPanelApi  = props.group.api;
+    const containerApi: DockviewApi  = props.containerApi;
+
+    return <div>{/** logic */}</div>
+  },
+  component_2: (props: IDockviewPanelProps) => {
+    return <div>{/** logic */}</div>
+  }
+}
+
+return <DockviewReact components={components}/>
+```
+</FrameworkSpecific>
+
+
+Each panel has an [api](/docs/api/dockview/panelApi) which is used to control specific
+features on that individual panel.
+The panel also has access the [group api](/docs/api/dockview/groupApi) and the container
+[api](/docs/api/dockview/overview).

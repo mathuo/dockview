@@ -7,15 +7,15 @@ import { MultiFrameworkContainer } from '@site/src/components/ui/container';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-import DockviewPersistence from '@site/sandboxes/layout-dockview/src/app';
+// import DockviewPersistence from '@site/sandboxes/layout-dockview/src/app';
 import SimpleDockview from '@site/sandboxes/simple-dockview/src/app';
 import ResizeDockview from '@site/sandboxes/resize-dockview/src/app';
-import DockviewWatermark from '@site/sandboxes/watermark-dockview/src/app';
-import DockviewConstraints from '@site/sandboxes/constraints-dockview/src/app';
+// import DockviewWatermark from '@site/sandboxes/watermark-dockview/src/app';
+// import DockviewConstraints from '@site/sandboxes/constraints-dockview/src/app';
 import DndDockview from '@site/sandboxes/dnd-dockview/src/app';
 import NestedDockview from '@site/sandboxes/nested-dockview/src/app';
 import EventsDockview from '@site/sandboxes/events-dockview/src/app';
-import DockviewGroupControl from '@site/sandboxes/headeractions-dockview/src/app';
+// import DockviewGroupControl from '@site/sandboxes/headeractions-dockview/src/app';
 import CustomHeadersDockview from '@site/sandboxes/customheader-dockview/src/app';
 import DockviewNative from '@site/sandboxes/fullwidthtab-dockview/src/app';
 import DockviewNative2 from '@site/sandboxes/nativeapp-dockview/src/app';
@@ -25,13 +25,13 @@ import DockviewExternalDnd from '@site/sandboxes/externaldnd-dockview/src/app';
 import DockviewResizeContainer from '@site/sandboxes/resizecontainer-dockview/src/app';
 import DockviewTabheight from '@site/sandboxes/tabheight-dockview/src/app';
 import DockviewWithIFrames from '@site/sandboxes/iframe-dockview/src/app';
-import DockviewFloating from '@site/sandboxes/floatinggroup-dockview/src/app';
+// import DockviewFloating from '@site/sandboxes/floatinggroup-dockview/src/app';
 import DockviewLockedGroup from '@site/sandboxes/lockedgroup-dockview/src/app';
 import DockviewKeyboard from '@site/sandboxes/keyboard-dockview/src/app';
-import DockviewPopoutGroup from '@site/sandboxes/popoutgroup-dockview/src/app';
-import DockviewMaximizeGroup from '@site/sandboxes/maximizegroup-dockview/src/app';
-import DockviewRenderMode from '@site/sandboxes/rendermode-dockview/src/app';
-import DockviewScrollbars from '@site/sandboxes/scrollbars-dockview/src/app';
+// import DockviewPopoutGroup from '@site/sandboxes/popoutgroup-dockview/src/app';
+// import DockviewMaximizeGroup from '@site/sandboxes/maximizegroup-dockview/src/app';
+// import DockviewRenderMode from '@site/sandboxes/rendermode-dockview/src/app';
+// import DockviewScrollbars from '@site/sandboxes/scrollbars-dockview/src/app';
 
 import DockviewFocus from '@site/sandboxes/focus-dockview/src/app';
 
@@ -199,10 +199,10 @@ const onReady = (event: DockviewReadyEvent) => {
 Here is an example using the above code loading from and saving to localStorage.
 If you refresh the page you should notice your layout is loaded as you left it.
 
-<MultiFrameworkContainer
+{/* <MultiFrameworkContainer
     sandboxId="layout-dockview"
     react={DockviewPersistence}
-/>
+/> */}
 
 ## Scrollbars
 
@@ -215,10 +215,10 @@ The following container three views:
 - **Panel 3**: Sets `height: 100%` and defines an inner component with `overflow: auto` to enable the scrollbars.
 
 
-<MultiFrameworkContainer
+{/* <MultiFrameworkContainer
     sandboxId="scrollbars-dockview"
     react={DockviewScrollbars}
-/>
+/> */}
 
 ## Resizing
 
@@ -264,10 +264,10 @@ When the dockview is empty you may want to display some fallback content, this i
 By default there the watermark has no content but you can provide as a prop to `DockviewReact` a `watermarkComponent`
 which will be rendered when there are no panels or groups.
 
-<MultiFrameworkContainer
+{/* <MultiFrameworkContainer
     sandboxId="watermark-dockview"
     react={DockviewWatermark}
-/>
+/> */}
 
 ## Drag And Drop
 
@@ -402,11 +402,11 @@ You can control the bounding box of floating groups through the optional `floati
 -   `{minimumHeightWithinViewport?: number, minimumWidthWithinViewport?: number}` sets the respective dimension minimums that must appears within the docks viewport
 -   If no options are provided the defaults of `100px` minimum height and width within the viewport are set.
 
-<MultiFrameworkContainer
+{/* <MultiFrameworkContainer
     height={600}
     sandboxId="floatinggroup-dockview"
     react={DockviewFloating}
-/>
+/> */}
 
 ## Popout Groups
 
@@ -447,11 +447,11 @@ const group = props.containerApi.addGroup();
 props.group.api.moveTo({ group });
 ```
 
-<MultiFrameworkContainer
+{/* <MultiFrameworkContainer
     height={600}
     sandboxId="popoutgroup-dockview"
     react={DockviewPopoutGroup}
-/>
+/> */}
 
 ## Maximized Groups
 
@@ -486,11 +486,11 @@ const result: boolean = api.isMaxmized();
 api.exitMaximized();
 ```
 
-<MultiFrameworkContainer
+{/* <MultiFrameworkContainer
     height={600}
     sandboxId="maximizegroup-dockview"
     react={DockviewMaximizeGroup}
-/>
+/> */}
 
 
 ## Panels
@@ -663,11 +663,11 @@ This design allows for maximum performance at some cost.
 - `always` mode. In this mode when panels become hidden the HTMLElement is not destroyed so all DOM state such as scrollbar positions will be maintained. This is implemented by rendering each panel as an absolutely positioned
 HTMLElement and hidden the HTMLElement with `display: none` when it should be hidden.
 
-<MultiFrameworkContainer
+{/* <MultiFrameworkContainer
     height={500}
     sandboxId="rendermode-dockview"
     react={DockviewRenderMode}
-/>
+/> */}
 
 ####
 
@@ -937,10 +937,10 @@ const RightHeaderActionsComponent = (props: IDockviewHeaderActionsProps) => {
 };
 ```
 
-<MultiFrameworkContainer
+{/* <MultiFrameworkContainer
     sandboxId="groupcontrol-dockview"
     react={DockviewGroupControl}
-/>
+/> */}
 
 ### Constraints
 
@@ -954,11 +954,11 @@ api.group.api.setConstraints(...)
 > If you specific a constraint on a group and move a panel within that group to another group it will no
 > longer be subject to those constraints since those constraints were on the group and not on the individual panel.
 
-<MultiFrameworkContainer
+{/* <MultiFrameworkContainer
     height={500}
     sandboxId="constraints-dockview"
     react={DockviewConstraints}
-/>
+/> */}
 
 
 ## iFrames

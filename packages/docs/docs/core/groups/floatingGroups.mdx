@@ -1,0 +1,79 @@
+---
+title: Floating Groups
+---
+
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import LiveExample from '@site/src/components/ui/exampleFrame';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+This section describes floating groups.
+
+:::info
+Floating groups **cannot** be maximized. Calling maximize function on groups in these states will have no effect.
+:::
+
+Dockview has built-in support for floating groups. Each floating container can contain a single group with many panels
+and you can have as many floating containers as needed. You cannot dock multiple groups together in the same floating container.
+
+## Options
+
+The following properties can be set to configure the behaviours of floating groups.
+
+<FrameworkSpecific framework='React'>
+  <DocRef declaration="IDockviewReactProps" methods={['floatingGroupBounds', 'disableFloatingGroups']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+  <DocRef declaration="DockviewComponentOptions" methods={['floatingGroupBounds', 'disableFloatingGroups']} />
+</FrameworkSpecific>
+
+You can control the bounding box of floating groups through the optional `floatingGroupBounds` options:
+
+-   `boundedWithinViewport` will force the entire floating group to be bounded within the docks viewport.
+-   `{minimumHeightWithinViewport?: number, minimumWidthWithinViewport?: number}` sets the respective dimension minimums that must appears within the docks viewport
+-   If no options are provided the defaults of `100px` minimum height and width within the viewport are set.
+
+
+## API
+
+The following properties can be used to create floating groups
+
+<DocRef declaration="DockviewApi" methods={['addFloatingGroup']} />
+
+:::info
+`addFloatingGroup` only accepts existing panels and groups. See [Addding Panels](/docs/core/panels/add) on how to firstly add panels.
+:::
+
+
+Floating groups can be programatically added through the dockview `api` method `api.addFloatingGroup(...)`.
+
+## Panel and Group API
+
+<DocRef declaration="DockviewPanelApi" methods={['location', 'onDidLocationChange']} />
+
+You can check whether a group is floating via the `group.api.location` property. See examples for full code.
+
+
+## Working with Floating Groups
+
+<h4>Float an existing tab by holding `shift` whilst interacting with the tab</h4>
+
+<div style={{display:' flex', justifyContent: 'center'}}>
+  <img style={{ height: '200px' }} src={useBaseUrl('/img/float_add.svg')} />
+</div>
+
+<h4>Move a floating tab by holding `shift` whilst moving the cursor or dragging the empty header space</h4>
+
+<div style={{display:' flex', justifyContent: 'center'}}>
+  <img style={{ height: '200px' }} src={useBaseUrl('/img/float_move.svg')} />
+</div>
+
+<h4>Move an entire floating group by holding `shift` whilst dragging the empty header space</h4>
+
+<div style={{display:' flex', justifyContent: 'center'}}>
+  <img style={{ height: '200px' }} src={useBaseUrl('/img/float_group.svg')} />
+</div>
+
+## Live Example
+
+<LiveExample framework="react" id="dockview/floating-groups"/>

@@ -1,0 +1,44 @@
+---
+title: 'Overview'
+sidebar_position: 0
+---
+
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import DndDockview from '@site/sandboxes/dnd-dockview/src/app';
+import DockviewExternalDnd from '@site/sandboxes/externaldnd-dockview/src/app';
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+Dockview supports a wide variety of built-in Drag and Drop possibilities.
+
+<h4>Position a tab between two other tabs</h4>
+
+<div style={{display:' flex', justifyContent: 'center'}}>
+  <img style={{ height: '50px' }} src={useBaseUrl('/img/add_to_tab.svg')} />
+</div>
+
+<h4>Position a tab at the end of a list of tabs</h4>
+
+<div style={{display:' flex', justifyContent: 'center'}}>
+  <img style={{ height: '50px' }} src={useBaseUrl('/img/add_to_empty_space.svg')} />
+</div>
+
+<h4>Merge one group with another group</h4>
+
+<div style={{display:' flex', justifyContent: 'center'}}>
+  <img style={{ height: '50px' }} src={useBaseUrl('/img/add_to_group.svg')} />
+</div>
+
+<h4>Move both Tabs and Groups in relation to another group</h4>
+
+
+<div style={{display:' flex', justifyContent: 'center'}}>
+  <img style={{ height: '300px' }} src={useBaseUrl('/img/drop_positions.svg')} />
+</div>
+
+<h4>Move both Tabs and Groups in relation to the container</h4>
+
+<div style={{display:' flex', justifyContent: 'center'}}>
+  <img style={{ height: '300px' }} src={useBaseUrl('/img/magnet_drop_positions.svg')} />
+</div>

@@ -31,3 +31,100 @@
         margin: 0px 20px;
     }
 }
+
+.home-page {
+    //  display: flex;
+    //  justify-content: center;
+    // padding-top: 100px;
+    // padding-bottom: 50px;
+
+    .splashscreen {
+        display: grid;
+        grid-auto-flow: row;
+        grid-gap: 40px;
+        padding-top: 100px;
+        padding-bottom: 50px;
+
+        .splashscreen-title {
+            h1 {
+                font-size: 54px;
+            }
+
+            h2 {
+                font-size: 26px;
+            }
+        }
+
+        .splashscreen-video {
+            position: relative;
+
+            button {
+                display: none;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                padding: 20px;
+                border-radius: 10px;
+                font-size: 1.2em;
+                background-color: dodgerblue;
+                margin: 0px;
+                border: none;
+                cursor: pointer;
+                opacity: 0.8;
+            }
+
+            &:hover {
+                button {
+                    background-color: rgb(27, 122, 218);
+                }
+            }
+
+            &:hover {
+                button {
+                    display: block;
+                }
+            }
+
+            img {
+                pointer-events: none;
+                user-select: none;
+                width: 100%;
+                border-radius: 8px;
+            }
+        }
+    }
+
+    @media screen and (min-width: 1020px) {
+        .splashscreen {
+            grid-auto-flow: column;
+
+            .splashscreen-title {
+                width: 400px;
+
+                h1 {
+                    font-size: min(54px, 3vw);
+                }
+
+                h2 {
+                    font-size: min(26px, 2vw);
+                }
+            }
+
+            .splashscreen-video {
+                img {
+                    min-width: 600px;
+                    max-width: 800px;
+                }
+            }
+        }
+    }
+}
+
+.key-features-list {
+    padding: 20px;
+    display: inline-block;
+    border: 4px solid #141d2c;
+    color: #aeb5c2;
+    border-radius: 20px;
+}

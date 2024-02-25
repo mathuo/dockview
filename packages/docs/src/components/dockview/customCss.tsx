@@ -1,4 +1,4 @@
-import {
+ import {
     DockviewReact,
     DockviewReadyEvent,
     IDockviewPanelProps,

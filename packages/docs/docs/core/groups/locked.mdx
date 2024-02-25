@@ -1,0 +1,27 @@
+---
+title: Locked Groups
+---
+
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import DockviewLockedGroup from '@site/sandboxes/lockedgroup-dockview/src/app';
+
+## Locked group
+
+Locking a group will disable all drop events for this group ensuring no additional panels can be added to the group through drop events.
+You can still add groups to a locked panel programatically using the API though.
+
+```tsx
+panel.group.locked = true;
+
+// Or
+
+panel.group.locked = 'no-drop-target';
+```
+
+Use `true` to keep drop zones top, right, bottom, left for the group. Use `no-drop-target` to disable all drop zones. For you to get a
+better understanding of what this means, try and drag the panels in the example below to the locked groups.
+
+<MultiFrameworkContainer
+    sandboxId="lockedgroup-dockview"
+    react={DockviewLockedGroup}
+/>

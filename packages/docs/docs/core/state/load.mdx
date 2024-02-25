@@ -1,0 +1,47 @@
+---
+title: Loading State
+---
+
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import LiveExample from '@site/src/components/ui/exampleFrame';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+This section described loading a dock layout.
+
+<DocRef declaration="DockviewApi" methods={['fromJSON', 'onDidLayoutFromJSON']} />
+
+## Load A Layout
+
+To load a layout you should a pass a valid object to `fromJSON`. If you try to load an invalid or corrupted layout the dock will throw an Error and the dock will reset gracefully ready
+for another attempt with a valid object.
+
+You could load a previously saved layout from local storage for example.
+
+```tsx
+const onReady = (event: DockviewReadyEvent) => {
+    let success = false;
+
+    const mySerializedLayout = localStorage.getItem('my_layout');
+
+    if (mySerializedLayout) {
+        try {
+            const layout = JSON.parse(mySerializedLayout);
+            event.api.fromJSON(layout);
+            success = true;
+        } catch (err) {
+            // log the error
+        }
+    }
+
+    if (!success) {
+        // perhap load a default layout?
+    }
+};
+
+return <DockviewComponent onReady={onReady}/>;
+```
+
+# Live Example
+
+<LiveExample framework="react" id="dockview/layout"/>
+

@@ -1,0 +1,29 @@
+---
+title: Remove Panel
+sidebar_position: 4
+---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+This section describes multiple ways to remove a panel.
+
+## Remove a Panel using the Panel API
+
+<DocRef declaration="DockviewPanelApi" methods={["close"]}/>
+
+Calling `close` on the panel API is the easiest way to close a panel through code.
+
+```ts
+panel.api.close();
+```
+
+## Remove a Panel using the API
+<DocRef declaration="DockviewApi" methods={["removePanel"]}/>
+
+Firstly, you can retrieve a reference to the panel given it's id and then you can
+pass that reference into `removePanel` to remove the panel.
+
+```ts
+const panel: IDockviewPanel = api.getPanel('myPanel');
+api.removePanel(panel);
+```

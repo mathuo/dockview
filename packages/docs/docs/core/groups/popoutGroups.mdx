@@ -1,0 +1,60 @@
+---
+title: Popout Windows
+---
+
+import LiveExample from '@site/src/components/ui/exampleFrame';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+This section describes have to create popout windows.
+
+:::info
+Popout groups **cannot** be maximized. Calling maximize function on groups in these states will have no effect.
+:::
+
+<DocRef declaration="DockviewApi" methods={['addPopoutGroup']} />
+
+Dockview has built-in support for opening groups in new Windows.
+Each popout window can contain a single group with many panels and you can have as many popout
+windows as needed. You cannot dock multiple groups together in the same window.
+
+Popout windows require your website to have a blank `.html` page that can be used, by default this is set to `/popout.html` but
+can be configured to match requirements.
+
+```tsx
+api.addPopoutGroup(
+  group,
+  // the second arguments (options) is optional
+  {
+    popoutUrl:"/popout.html",
+    box: { left: 0, top: 0, height: 200, width: 300 }
+  });
+```
+
+> If you do not provide `options.popoutUrl` a default of `/popout.html` is used and if `options.box` is not provided
+the view will be places according to it's currently position.
+
+From within a panel you may say
+
+```tsx
+props.containerApi.addPopoutGroup(props.api.group);
+```
+
+## Closing the Popout Group
+
+To programatically move the popout group back into the main grid you can use the `moveTo` method in many ways, one of the following would suffice
+
+```tsx
+// option 1: add absolutely to the right-side of the grid
+props.group.api.moveTo({ position: 'right' });
+
+// option 2: create a new group and move the contents of the popout group to it
+const group = props.containerApi.addGroup();
+props.group.api.moveTo({ group });
+```
+
+Alternatively, if the user closes the Window the group the dock will make a best attempt to place it back
+in it's original location within the grid. If the dock cannot determine the original location it will
+choose a new location.
+
+
+<LiveExample framework="react" id="dockview/popout-group"/>

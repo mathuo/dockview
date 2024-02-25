@@ -1,0 +1,40 @@
+---
+title: Resizing
+---
+
+This section describes how to programatically resize a panel.
+
+import LiveExample from '@site/src/components/ui/exampleFrame';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+<DocRef declaration="DockviewPanelApi" methods={['height', 'width', 'setSize', 'onDidDimensionsChange']} />
+
+
+
+## Panel Resizing
+
+Each dock contains groups and each group contains panels.
+Logically a user may want to resize a panel but this really translates to resizing the group which contains that panel.
+
+The panel resize methods are repeats of the same resize methods found on the group.
+
+```tsx
+// it's mandatory to provide either a height or a width, providing both is optional
+props.api.setSize({
+    height: 100,
+    width: 200,
+});
+
+/**
+ * you could also resize the panels group, although not recommended due to the
+ * clunky syntax it does achieve the same result
+ */
+props.api.group.api.setSize({
+    height: 100,
+    width: 200,
+});
+```
+
+You can see an example invoking both approaches below.
+
+<LiveExample framework="react" id="dockview/resize"/>

@@ -1,0 +1,140 @@
+---
+title: Tabs
+sidebar_position: 2
+---
+
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import CustomHeadersDockview from '@site/sandboxes/customheader-dockview/src/app';
+import DockviewNative from '@site/sandboxes/fullwidthtab-dockview/src/app';
+import { attach as attachNativeDockview } from '@site/sandboxes/javascript/fullwidthtab-dockview/src/app';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+This section describes how to implement custom tab renderers
+
+## Register a Tab Component
+
+<FrameworkSpecific framework='React'>
+```tsx
+const components = {
+  tab_1: (props: IDockviewPanelHeaderProps) => {
+    const api: DockviewPanelApi  = props.api;
+    const containerApi: DockviewApi  = props.containerApi;
+
+    return <div>{/** logic */}</div>
+  },
+  tab_2: (props: IDockviewPanelHeaderProps) => {
+    return <div>{/** logic */}</div>
+  }
+};
+
+return <DockviewReact tabComponents={tabComponents}/>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+not implemented
+</FrameworkSpecific>
+
+
+## Default Tab Renderer
+
+<FrameworkSpecific framework='React'>
+```jsx
+const CustomTabRenderer = (props: IDockviewPanelHeaderProps) => {
+  const api: DockviewPanelApi  = props.api;
+  const containerApi: DockviewApi  = props.containerApi;
+
+  return <div>{/** logic */}</div>
+}
+
+return <DockviewReact defaultTabRenderer={CustomTabRenderer}/>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+not implemented
+</FrameworkSpecific>
+
+## Accessing Custom Panel Parameters
+
+You can provide a generic type that matches the structure of the epxected custom panels parameters
+to provide type-hints for the panel parameters which can be accessed via the `params` option.
+
+<FrameworkSpecific framework='React'>
+```jsx
+type MyParameters = { my_value: number };
+
+const MyTab = (props: IDockviewPanelHeaderProps<MyParameters>) => {
+  const value: number = props.params.my_value;
+  return <div>{/** logic */}</div>
+}
+```
+</FrameworkSpecific>
+
+
+## Extend the Default Tab Implementation
+
+If you only want to make minor changes to the tab rendering you may be able to use the
+default implementation as a base. This could include:
+- Hiding the close button
+- Attaching additional event listeners
+
+
+<FrameworkSpecific framework='React'>
+```tsx
+import { IDockviewPanelHeaderProps, DockviewDefaultTab } from 'dockview';
+
+const MyCustomTab = (props: IDockviewPanelHeaderProps) => {
+    const onContextMenu = (event: React.MouseEvent) => {
+        event.preventDefault();
+        alert('context menu');
+    };
+    return <DockviewDefaultTab onContextMenu={onContextMenu} hideClose={true} {...props} />;
+};
+```
+</FrameworkSpecific>
+
+As a simple example the below attaches a custom event handler for the context menu on all tabs as a default tab renderer
+
+The below example uses a custom tab renderer to reigster a popover when the user right clicked on a tab.
+This still makes use of the `DockviewDefaultTab` since it's only a minor change.
+
+<MultiFrameworkContainer
+    sandboxId="customheader-dockview"
+    react={CustomHeadersDockview}
+/>
+
+## Full Width Tab
+
+When a group has only one single tab you may want that tab to take the full width.
+
+<FrameworkSpecific framework='React'>
+  <DocRef declaration="IDockviewReactProps" methods={['singleTabMode']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+  <DocRef declaration="DockviewComponentOptions" methods={['singleTabMode']} />
+</FrameworkSpecific>
+
+```tsx
+return <DockviewReactComponent singleTabMode="fullwidth" />
+```
+
+<MultiFrameworkContainer
+    sandboxId="fullwidthtab-dockview"
+    react={DockviewNative}
+    typescript={attachNativeDockview}
+/>
+
+import DockviewTabheight from '@site/sandboxes/tabheight-dockview/src/app';
+import { attach as attachTabHeightDockview } from '@site/sandboxes/javascript/tabheight-dockview/src/app';
+
+## Tab Height
+
+Tab height can be controlled through CSS.
+
+<MultiFrameworkContainer
+    sandboxId="tabheight-dockview"
+    react={DockviewTabheight}
+    typescript={attachTabHeightDockview}
+/>

@@ -1,0 +1,132 @@
+---
+title: Rendering Panels
+sidebar_postiion: 5
+---
+
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import RenderingDockview from '@site/sandboxes/rendering-dockview/src/app';
+
+import LiveExample from '@site/src/components/ui/exampleFrame';
+
+
+Rendering type is an important consideration when creating your application and whether your panels should be destroyed when hidden.
+
+:::info
+If you are looking for information on how to render **iframes** in Dockview please go the the [iframes](/docs/advanced/iframe) section.
+:::
+
+When a panel is selected all other panels in that group are not visible. The API does expose methods to determine whether your panel is visible or not
+and the panel instance only ever destroyed when removed however the question still remains, what to do with the partial DOM tree that makes up your panel and there are two options the dock can take:
+
+1. (*onlyWhenVisible*) Remove the element from the DOM tree to make space for the new panel.
+
+This will cause the element to loss any DOM-specific state such as scrollbar position and if you measure the size of any elements during this time you will mostly like see both a width and height of 0px,
+this is also true for any active ResizeObservers.
+
+```ts
+api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+    renderer: 'always'
+});
+```
+
+2. (*always*) Keep the DOM tree alive but hide it in order to allow the select panels content to show.
+
+This approach will maintain any DOM-sepcific state you had and is essential if you require the native scrollbar position to be preserved.
+
+```ts
+api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+    renderer: 'onlyWhenVisible'
+});
+```
+
+Both are valid use-cases therefore the dock allows you to choose your rendering mode, the default however is the first option since this is the most memory efficient solution.
+
+> You can change the `defaultRenderer` in the Dock [Options](/docs/api/dockview/options).
+
+:::info
+The panel instance is only ever destroyed when it is removed from the dock allowing you to still run code associated with the panel when it is not visible.
+The renderer only affects what happens to the DOM element.
+:::
+
+## Choose a Render Mode
+
+```ts
+api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+    renderer: 'always'
+});
+
+api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+    renderer: 'onlyWhenVisible'
+});
+```
+
+## Live Example
+
+<LiveExample framework="react" id="dockview/render-mode"/>
+
+
+By default `DockviewReact` only adds to the DOM those panels that are visible,
+if a panel is not the active tab and not shown the contents of the hidden panel will be removed from the DOM.
+
+When a panel is in `onlyWhenVisible` render mode this only affects the contents within the DOM. The lifecycle of that panel instance is still maintained.
+The React Components associated with each panel are only created once and will always exist for as long as the panel exists, hidden or not.
+
+> e.g. This means that any hooks in those components will run whether the panel is visible or not which may lead to excessive background work depending
+> on the panels implementation.
+
+You can listen to the visiblity state of the panel and write additional logic to optimize your application if required, although this is an advanced case.
+
+If you wanted to unmount the React Components when the panel is not visible you could create a Higher-Order-Component that listens to the panels
+visiblity state and only renders the panel when visible.
+
+```tsx title="Only rendering the React Component when the panel is visible, otherwise rendering a null React Component"
+import { IDockviewPanelProps } from 'dockview';
+import * as React from 'react';
+
+function RenderWhenVisible(
+    component: React.FunctionComponent<IDockviewPanelProps>
+) {
+    const HigherOrderComponent = (props: IDockviewPanelProps) => {
+        const [visible, setVisible] = React.useState<boolean>(
+            props.api.isVisible
+        );
+
+        React.useEffect(() => {
+            const disposable = props.api.onDidVisibilityChange((event) =>
+                setVisible(event.isVisible)
+            );
+
+            return () => {
+                disposable.dispose();
+            };
+        }, [props.api]);
+
+        if (!visible) {
+            return null;
+        }
+
+        return React.createElement(component, props);
+    };
+    return HigherOrderComponent;
+}
+```
+
+```tsx
+const components = { default: RenderWhenVisible(MyComponent) };
+```
+
+Toggling the checkbox you can see that when you only render those panels which are visible the underling React component is destroyed when it becomes hidden and re-created when it becomes visible.
+
+
+<MultiFrameworkContainer
+    sandboxId="rendering-dockview"
+    react={RenderingDockview}
+/>
