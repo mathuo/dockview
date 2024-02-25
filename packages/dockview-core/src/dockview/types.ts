@@ -7,8 +7,6 @@ import { Optional } from '../types';
 import { DockviewGroupPanel, IDockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelRenderer } from '../overlayRenderContainer';
 
-export type DockviewDropTargets = 'tab' | 'panel' | 'tabContainer' | 'edge';
-
 export interface HeaderPartInitParameters {
     title: string;
 }

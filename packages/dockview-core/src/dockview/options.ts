@@ -6,7 +6,6 @@ import {
     ITabRenderer,
     WatermarkConstructor,
     IWatermarkRenderer,
-    DockviewDropTargets,
 } from './types';
 import { Parameters } from '../panel/types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
@@ -14,7 +13,7 @@ import { ISplitviewStyles, Orientation } from '../splitview/splitview';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
 import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
-import { GroupOptions } from './dockviewGroupPanelModel';
+import { DockviewGroupDropLocation, GroupOptions } from './dockviewGroupPanelModel';
 import { IDockviewPanel } from './dockviewPanel';
 import {
     ComponentConstructor,
@@ -65,7 +64,7 @@ export interface ViewFactoryData {
 
 export interface DockviewDndOverlayEvent {
     nativeEvent: DragEvent;
-    target: DockviewDropTargets;
+    target: DockviewGroupDropLocation;
     position: Position;
     group?: DockviewGroupPanel;
     getData: () => PanelTransfer | undefined;

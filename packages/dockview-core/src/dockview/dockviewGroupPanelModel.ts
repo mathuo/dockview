@@ -23,7 +23,7 @@ import {
     TabDragEvent,
     TabsContainer,
 } from './components/titlebar/tabsContainer';
-import { DockviewDropTargets, IWatermarkRenderer } from './types';
+import { IWatermarkRenderer } from './types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
 import { IHeaderActionsRenderer } from './options';
@@ -175,7 +175,7 @@ export interface IDockviewGroupPanelModel extends IPanel {
     canDisplayOverlay(
         event: DragEvent,
         position: Position,
-        target: DockviewDropTargets
+        target: DockviewGroupDropLocation
     ): boolean;
 }
 
@@ -924,7 +924,7 @@ export class DockviewGroupPanelModel
     canDisplayOverlay(
         event: DragEvent,
         position: Position,
-        target: DockviewDropTargets
+        target: DockviewGroupDropLocation
     ): boolean {
         // custom overlay handler
         if (this.accessor.options.showDndOverlay) {
