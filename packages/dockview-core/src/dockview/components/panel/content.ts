@@ -94,7 +94,7 @@ export class ContentContainer
                     return !groupHasOnePanelAndIsActiveDragElement;
                 }
 
-                return this.group.canDisplayOverlay(event, position, 'panel');
+                return this.group.canDisplayOverlay(event, position, 'content');
             },
         });
 

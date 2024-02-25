@@ -47,9 +47,12 @@ const Component = (props: { theme?: string }) => {
                 e.nativeEvent.preventDefault();
             }),
             api.onWillShowOverlay((e) => {
+                console.log(e);
+
                 if (!disableOverlay) {
                     return;
                 }
+
                 e.preventDefault();
             }),
 
@@ -67,7 +70,7 @@ const Component = (props: { theme?: string }) => {
                 disposable.dispose();
             });
         };
-    }, [api, disablePanelDrag, disableGroupDrag]);
+    }, [api, disablePanelDrag, disableGroupDrag, disableOverlay]);
 
     const onReady = (event: DockviewReadyEvent) => {
         setApi(event.api);

@@ -67,7 +67,11 @@ export class VoidContainer extends CompositeDisposable {
                     return last(this.group.panels)?.id !== data.panelId;
                 }
 
-                return group.model.canDisplayOverlay(event, position, 'panel');
+                return group.model.canDisplayOverlay(
+                    event,
+                    position,
+                    'header_space'
+                );
             },
         });
 
