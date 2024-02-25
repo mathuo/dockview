@@ -1,4 +1,5 @@
-import { Emitter } from 'dockview-core/dist/cjs/events';
+import BrowserOnly from '@docusaurus/BrowserOnly';
+import { DockviewEmitter } from 'dockview';
 import * as React from 'react';
 
 const frameworks = [
@@ -7,11 +8,7 @@ const frameworks = [
     { value: 'Angular', label: 'Angular' },
 ];
 
-const activeFrameworkGlobal = new Emitter<string>({ replay: true });
-
-activeFrameworkGlobal.fire(
-    localStorage.getItem('dv-docs-framework') ?? frameworks[0].value
-);
+const activeFrameworkGlobal = new DockviewEmitter<string>({ replay: true });
 
 function useActiveFramework(): [string, (value: string) => void] {
     const [value, setValue] = React.useState<string>(
@@ -22,6 +19,10 @@ function useActiveFramework(): [string, (value: string) => void] {
         const disposable = activeFrameworkGlobal.event((value) => [
             setValue(value),
         ]);
+
+        activeFrameworkGlobal.fire(
+            localStorage.getItem('dv-docs-framework') ?? frameworks[0].value
+        );
 
         return () => {
             disposable.dispose();
@@ -37,16 +38,7 @@ function useActiveFramework(): [string, (value: string) => void] {
     return [value, setter];
 }
 
-export const Header = (props: { title: string }) => {
-    return (
-        <header>
-            <h1>{props.title}</h1>
-            <FrameworkSelector />
-        </header>
-    );
-};
-
-export const FrameworkSelector = () => {
+const FrameworkSelector1 = () => {
     const [activeFramework, setActiveFramework] = useActiveFramework();
 
     const onChange = (event: React.ChangeEvent<HTMLSelectElement>) => [
@@ -64,7 +56,11 @@ export const FrameworkSelector = () => {
     );
 };
 
-export const FrameworkSpecific = (props: {
+export const FrameworkSelector = () => {
+    return <BrowserOnly>{() => <FrameworkSelector1 />}</BrowserOnly>;
+};
+
+const FrameworkSpecific1 = (props: {
     framework: string;
     children: React.ReactNode;
 }) => {
@@ -75,4 +71,11 @@ export const FrameworkSpecific = (props: {
     }
 
     return null;
+};
+
+export const FrameworkSpecific = (props: {
+    framework: string;
+    children: React.ReactNode;
+}) => {
+    return <BrowserOnly>{() => <FrameworkSpecific1 {...props} />}</BrowserOnly>;
 };
