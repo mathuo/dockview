@@ -2,6 +2,8 @@ import * as React from 'react';
 import CodeBlock from '@theme/CodeBlock';
 import './docRef.scss';
 
+
+
 export interface DocRefProps {
     declaration: string;
     methods?: string[];
@@ -16,12 +18,18 @@ type DocsComment = {
     summary?: DocsContent[];
     blockTags?: DocsTag[];
 };
+
+type Piece = {
+    kind: 'return' | 'paramter' | 'signature' | 'typearg' | 'typearg_default';
+    value: string;
+};
+
 type Doc = {
     name: string;
     code: string;
     comment?: DocsComment;
     kind: 'accessor' | 'property' | 'method';
-    pieces: string[];
+    pieces: Piece[];
 };
 
 type DocJson = {
