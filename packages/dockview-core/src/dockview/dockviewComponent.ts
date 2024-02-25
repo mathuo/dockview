@@ -568,6 +568,19 @@ export class DockviewComponent
         });
 
         this.addDisposables(
+            this._rootDropTarget,
+            this._rootDropTarget.onWillShowOverlay((event) => {
+                if (this.gridview.length > 0 && event.position === 'center') {
+                    // option only available when no panels in primary grid
+                    return;
+                }
+
+                this._onWillShowOverlay.fire(
+                    new WillShowOverlayLocationEvent(event, {
+                        kind: 'edge',
+                    })
+                );
+            }),
             this._rootDropTarget.onDrop((event) => {
                 const willDropEvent = new DockviewWillDropEvent({
                     nativeEvent: event.nativeEvent,
@@ -576,7 +589,7 @@ export class DockviewComponent
                     api: this._api,
                     group: undefined,
                     getData: getPanelData,
-                    kind: 'content',
+                    kind: 'edge',
                 });
 
                 this._onWillDrop.fire(willDropEvent);

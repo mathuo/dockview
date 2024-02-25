@@ -125,7 +125,11 @@ export interface IHeader {
 
 export type DockviewGroupPanelLocked = boolean | 'no-drop-target';
 
-export type DockviewGroupDropLocation = 'tab' | 'header_space' | 'content';
+export type DockviewGroupDropLocation =
+    | 'tab'
+    | 'header_space'
+    | 'content'
+    | 'edge';
 
 export interface IDockviewGroupPanelModel extends IPanel {
     readonly isActive: boolean;
