@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdockview_docs=self.webpackChunkdockview_docs||[]).push([[5189],{763:e=>{e.exports=JSON.parse('{"title":"Components","slug":"/category/components","permalink":"/docs/next/category/components","navigation":{"previous":{"title":"Theme","permalink":"/docs/next/theme"},"next":{"title":"Dockview","permalink":"/docs/next/components/dockview"}}}')}}]);

@@ -4,10 +4,78 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Tue, 23 Jan 2024 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Wed, 28 Feb 2024 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 1.10.0]]></title>
+            <link>https://dockview.dev/blog/dockview-1.10.0-release</link>
+            <guid>https://dockview.dev/blog/dockview-1.10.0-release</guid>
+            <pubDate>Wed, 28 Feb 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference to docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference to docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.10.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<ul>
+<li>New Documentation Website <a href="https://github.com/mathuo/dockview/issues/475" target="_blank" rel="noopener noreferrer">#475</a>
+<ul>
+<li>Documentation website improved to cater for growing libary</li>
+</ul>
+</li>
+<li>Panel Gaps <a href="https://github.com/mathuo/dockview/issues/447" target="_blank" rel="noopener noreferrer">#447</a>
+<ul>
+<li>CSS Variable <code>--dv-group-gap-size</code> exposed.</li>
+</ul>
+</li>
+<li>Locked Dock <a href="https://github.com/mathuo/dockview/issues/460" target="_blank" rel="noopener noreferrer">#460</a>
+<ul>
+<li><code>locked</code> option prevents all user resizing of dock.</li>
+</ul>
+</li>
+<li>Enhance Window Popout <a href="https://github.com/mathuo/dockview/issues/469" target="_blank" rel="noopener noreferrer">#469</a>
+<ul>
+<li>Numerous improved to Window popouts including replacement of window to original location
+when popout is closed.</li>
+</ul>
+</li>
+<li>Enhance Events <a href="https://github.com/mathuo/dockview/issues/479" target="_blank" rel="noopener noreferrer">#479</a></li>
+<li>Drag and Drop Events <a href="https://github.com/mathuo/dockview/issues/395" target="_blank" rel="noopener noreferrer">#395</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.10.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Drop Target Scaling <a href="https://github.com/mathuo/dockview/issues/448" target="_blank" rel="noopener noreferrer">#448</a>
+<ul>
+<li>Drop target overlays are no longer scaled with <code>transform</code> which allows for better CSS customization.</li>
+</ul>
+</li>
+<li>Bug: Popout <code>always</code> rendeing mode <a href="https://github.com/mathuo/dockview/issues/486" target="_blank" rel="noopener noreferrer">#486</a>
+<ul>
+<li><code>always</code> render mode now works in Popout Windows too.</li>
+</ul>
+</li>
+<li>Bug: React Component Support <a href="https://github.com/mathuo/dockview/issues/498" target="_blank" rel="noopener noreferrer">#498</a>
+<ul>
+<li>Support components wrapped with <code>React.memo(...)</code> passed in <code>components</code> option.</li>
+</ul>
+</li>
+<li>Bug: Remove Source Maps <a href="https://github.com/mathuo/dockview/issues/509" target="_blank" rel="noopener noreferrer">#509</a>
+<ul>
+<li>Source maps do not currently work. They have been removed and will be re-evaluated for a later release.</li>
+</ul>
+</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.10.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
+<ul>
+<li>Bug: Typo <a href="https://github.com/mathuo/dockview/issues/495" target="_blank" rel="noopener noreferrer">#495</a>
+<ul>
+<li>Rename <code>onDidMaxmizedNodeChange</code> to <code>onDidMaximizedNodeChange</code></li>
+<li>Rename <code>exitMaxmizedGroup</code> to <code>exitMaximizedGroup</code></li>
+<li>Rename <code>onDidMaxmizedGroupChange</code> to <code>onDidMaximizedGroupChange</code></li>
+</ul>
+</li>
+</ul>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 1.9.2]]></title>
             <link>https://dockview.dev/blog/dockview-1.9.2-release</link>
@@ -475,31 +543,6 @@ If you feel anything is missing or unclear please let me know.</p>
 <li>Various doc enhancements @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a></li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.5.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 1.4.3]]></title>
-            <link>https://dockview.dev/blog/dockview-1.4.3-release</link>
-            <guid>https://dockview.dev/blog/dockview-1.4.3-release</guid>
-            <pubDate>Thu, 26 May 2022 00:00:00 GMT</pubDate>
-            <description><![CDATA[🚀 Features]]></description>
-            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.4.3-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<ul>
-<li>Small adjusted to behaviours of default paneview header componnet <a href="https://github.com/mathuo/dockview/pull/116" target="_blank" rel="noopener noreferrer">#116</a> <a href="https://github.com/mathuo/dockview/pull/120" target="_blank" rel="noopener noreferrer">#120</a></li>
-<li>Improved support for external dnd events in the dockview component. <code>showDndOverlay</code> prop on <code>DockviewReact</code> exposes more parameters to interact with <a href="https://github.com/mathuo/dockview/pull/110" target="_blank" rel="noopener noreferrer">#110</a></li>
-<li>Improved to underlying events exposes through all components <a href="https://github.com/mathuo/dockview/pull/114" target="_blank" rel="noopener noreferrer">#114</a></li>
-<li>Add .clear() to the component APIs providing an easy way to clear a layout <a href="https://github.com/mathuo/dockview/pull/119" target="_blank" rel="noopener noreferrer">#119</a></li>
-<li>Udate orientation via componnet APIs is now working correctly <a href="https://github.com/mathuo/dockview/pull/119" target="_blank" rel="noopener noreferrer">#119</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.4.3-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Documentation enhancements <a href="https://github.com/mathuo/dockview/pull/101" target="_blank" rel="noopener noreferrer">#101</a></li>
-<li>Move documentation to <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.4.3-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
-<ul>
-<li>Fix typo by renaming <code>onDidLayoutfromJSON</code> to <code>onDidLayoutFromJSON</code> in dockview component api <a href="https://github.com/mathuo/dockview/pull/112/files" target="_blank" rel="noopener noreferrer">#112</a></li>
-</ul>]]></content:encoded>
             <category>release</category>
         </item>
     </channel>
