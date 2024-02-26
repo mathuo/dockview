@@ -57,6 +57,21 @@ export function firstLevel(value: TypeSystem.Type | null) {
         return value.signature.flatMap(firstLevel);
     }
 
+    if (value.kind === 'constructor') {
+        return [];
+    }
+
+    if (value.kind === 'typeLiteral') {
+        const result = [];
+        if (value.properties) {
+            result.push(...value.properties.flatMap(firstLevel));
+        }
+        if (value.signatures) {
+            result.push(...value.signatures.flatMap(firstLevel));
+        }
+        return result;
+    }
+
     if (value.kind === 'callSignature') {
         const result = [];
 
@@ -65,7 +80,7 @@ export function firstLevel(value: TypeSystem.Type | null) {
             ...value.typeParameters.flatMap((_) => {
                 return [...firstLevelTypes(_.extends)];
             }),
-            ...value.parameters.map(firstLevel)
+            ...value.parameters.flatMap(firstLevel)
         );
 
         return result;
