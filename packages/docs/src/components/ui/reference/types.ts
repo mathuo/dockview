@@ -154,6 +154,11 @@ export function codify(value: TypeSystem.Type | null) {
 
     if (value.kind === 'property') {
         let code = '';
+
+        if (value.flags.isProtected) {
+            code += 'protected ';
+        }
+
         if (value.flags.isReadonly) {
             code += 'readonly ';
         }
@@ -222,6 +227,18 @@ export function codify(value: TypeSystem.Type | null) {
         return '';
     }
 
+    if (value.kind === 'interface') {
+        return `interface ${value.name} { ${value.children
+            .map(codify)
+            .join(',')} }`;
+    }
+
+    if (value.kind === 'class') {
+        return `interface ${value.name} { ${value.children
+            .map(codify)
+            .join(',')} }`;
+    }
+
     console.log('unreachable', value);
     throw new Error(`unreachable`);
 }
@@ -266,6 +283,13 @@ export namespace TypeSystem {
         comment?: Comment;
     };
 
+    export type Function = {
+        name: string;
+        kind: 'function';
+        signature: TypeSystem.CallSignature;
+        comment?: Comment;
+    };
+
     export type Property = {
         kind: 'property';
         name: string;
@@ -298,6 +322,13 @@ export namespace TypeSystem {
     export type Class = {
         name: string;
         kind: 'class';
+        children: TypeSystem.Type[];
+        comment?: Comment;
+    };
+
+    export type Interface = {
+        name: string;
+        kind: 'interface';
         children: TypeSystem.Type[];
         comment?: Comment;
     };
@@ -342,7 +373,9 @@ export namespace TypeSystem {
         | TypeSystem.Constructor
         | TypeSystem.ConstructorSignature
         | TypeSystem.TypeLiteral
-        | TypeSystem.Parameter;
+        | TypeSystem.Parameter
+        | TypeSystem.Interface
+        | TypeSystem.Function;
 }
 
 export namespace TypeDescriptor {

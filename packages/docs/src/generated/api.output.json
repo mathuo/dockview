@@ -31,6 +31,7 @@
         "kind": "typeAlias"
     },
     "LayoutPriority": {
+        "name": "LayoutPriority",
         "kind": "enum",
         "children": [
             {
@@ -51,6 +52,7 @@
         ]
     },
     "Orientation": {
+        "name": "Orientation",
         "kind": "enum",
         "children": [
             {
@@ -66,6 +68,7 @@
         ]
     },
     "SashState": {
+        "name": "SashState",
         "kind": "enum",
         "children": [
             {
@@ -91,6 +94,7 @@
         ]
     },
     "BaseGrid": {
+        "name": "BaseGrid",
         "kind": "class",
         "children": [
             {
@@ -1123,6 +1127,7 @@
         ]
     },
     "ContentContainer": {
+        "name": "ContentContainer",
         "kind": "class",
         "children": [
             {
@@ -1437,6 +1442,7 @@
         ]
     },
     "DefaultDockviewDeserialzier": {
+        "name": "DefaultDockviewDeserialzier",
         "kind": "class",
         "children": [
             {
@@ -1487,6 +1493,7 @@
         ]
     },
     "DefaultTab": {
+        "name": "DefaultTab",
         "kind": "class",
         "children": [
             {
@@ -1753,6 +1760,7 @@
         ]
     },
     "DockviewApi": {
+        "name": "DockviewApi",
         "kind": "class",
         "children": [
             {
@@ -2307,7 +2315,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked before a group is dragged.\r\n\r\nCalling "
+                                "text": "Invoked before a group is dragged.\n\nCalling "
                             },
                             {
                                 "kind": "code",
@@ -2345,7 +2353,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked before a panel is dragged.\r\n\r\nCalling "
+                                "text": "Invoked before a panel is dragged.\n\nCalling "
                             },
                             {
                                 "kind": "code",
@@ -2383,7 +2391,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\r\nprevent the event from occuring using the standard "
+                                "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\nprevent the event from occuring using the standard "
                             },
                             {
                                 "kind": "code",
@@ -2391,7 +2399,7 @@
                             },
                             {
                                 "kind": "text",
-                                "text": " syntax.\r\n\r\nPreventing certain events may causes unexpected behaviours, use carefully."
+                                "text": " syntax.\n\nPreventing certain events may causes unexpected behaviours, use carefully."
                             }
                         ]
                     },
@@ -2421,7 +2429,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked before an overlay is shown indicating a drop target.\r\n\r\nCalling "
+                                "text": "Invoked before an overlay is shown indicating a drop target.\n\nCalling "
                             },
                             {
                                 "kind": "code",
@@ -2429,7 +2437,7 @@
                             },
                             {
                                 "kind": "text",
-                                "text": " will prevent the overlay being shown and prevent\r\nthe any subsequent drop event."
+                                "text": " will prevent the overlay being shown and prevent\nthe any subsequent drop event."
                             }
                         ]
                     },
@@ -3515,6 +3523,7 @@
         ]
     },
     "DockviewComponent": {
+        "name": "DockviewComponent",
         "kind": "class",
         "children": [
             {
@@ -5954,6 +5963,7 @@
         ]
     },
     "DockviewCompositeDisposable": {
+        "name": "DockviewCompositeDisposable",
         "kind": "class",
         "children": [
             {
@@ -6028,6 +6038,7 @@
         ]
     },
     "DockviewDidDropEvent": {
+        "name": "DockviewDidDropEvent",
         "kind": "class",
         "children": [
             {
@@ -6191,6 +6202,7 @@
         ]
     },
     "DockviewEmitter": {
+        "name": "DockviewEmitter",
         "kind": "class",
         "children": [
             {
@@ -6351,6 +6363,7 @@
         ]
     },
     "DockviewGroupPanel": {
+        "name": "DockviewGroupPanel",
         "kind": "class",
         "children": [
             {
@@ -7039,6 +7052,7 @@
         ]
     },
     "DockviewGroupPanelModel": {
+        "name": "DockviewGroupPanelModel",
         "kind": "class",
         "children": [
             {
@@ -8259,6 +8273,7 @@
         ]
     },
     "DockviewMutableDisposable": {
+        "name": "DockviewMutableDisposable",
         "kind": "class",
         "children": [
             {
@@ -8287,6 +8302,7 @@
         ]
     },
     "DockviewPanel": {
+        "name": "DockviewPanel",
         "kind": "class",
         "children": [
             {
@@ -8747,6 +8763,7 @@
         ]
     },
     "DockviewWillDropEvent": {
+        "name": "DockviewWillDropEvent",
         "kind": "class",
         "children": [
             {
@@ -8925,6 +8942,7 @@
         ]
     },
     "DraggablePaneviewPanel": {
+        "name": "DraggablePaneviewPanel",
         "kind": "class",
         "children": [
             {
@@ -9659,6 +9677,7 @@
         ]
     },
     "Gridview": {
+        "name": "Gridview",
         "kind": "class",
         "children": [
             {
@@ -10170,7 +10189,7 @@
                             "summary": [
                                 {
                                     "kind": "text",
-                                    "text": "If the root is orientated as a VERTICAL node then nest the existing root within a new HORIZIONTAL root node\r\nIf the root is orientated as a HORIZONTAL node then nest the existing root within a new VERITCAL root node"
+                                    "text": "If the root is orientated as a VERTICAL node then nest the existing root within a new HORIZIONTAL root node\nIf the root is orientated as a HORIZONTAL node then nest the existing root within a new VERITCAL root node"
                                 }
                             ]
                         },
@@ -10603,6 +10622,7 @@
         ]
     },
     "GridviewApi": {
+        "name": "GridviewApi",
         "kind": "class",
         "children": [
             {
@@ -11449,6 +11469,7 @@
         ]
     },
     "GridviewComponent": {
+        "name": "GridviewComponent",
         "kind": "class",
         "children": [
             {
@@ -13095,6 +13116,7 @@
         ]
     },
     "GridviewPanel": {
+        "name": "GridviewPanel",
         "kind": "class",
         "children": [
             {
@@ -13666,6 +13688,7 @@
         ]
     },
     "LocalSelectionTransfer": {
+        "name": "LocalSelectionTransfer",
         "kind": "class",
         "children": [
             {
@@ -13850,6 +13873,7 @@
         ]
     },
     "PaneFramework": {
+        "name": "PaneFramework",
         "kind": "class",
         "children": [
             {
@@ -14584,6 +14608,7 @@
         ]
     },
     "PaneTransfer": {
+        "name": "PaneTransfer",
         "kind": "class",
         "children": [
             {
@@ -14620,6 +14645,7 @@
         ]
     },
     "PanelTransfer": {
+        "name": "PanelTransfer",
         "kind": "class",
         "children": [
             {
@@ -14677,6 +14703,7 @@
         ]
     },
     "Paneview": {
+        "name": "Paneview",
         "kind": "class",
         "children": [
             {
@@ -15139,6 +15166,7 @@
         ]
     },
     "PaneviewApi": {
+        "name": "PaneviewApi",
         "kind": "class",
         "children": [
             {
@@ -15779,6 +15807,7 @@
         ]
     },
     "PaneviewComponent": {
+        "name": "PaneviewComponent",
         "kind": "class",
         "children": [
             {
@@ -16406,6 +16435,7 @@
         ]
     },
     "PaneviewPanel": {
+        "name": "PaneviewPanel",
         "kind": "class",
         "children": [
             {
@@ -17120,6 +17150,7 @@
         ]
     },
     "Splitview": {
+        "name": "Splitview",
         "kind": "class",
         "children": [
             {
@@ -17842,6 +17873,7 @@
         ]
     },
     "SplitviewApi": {
+        "name": "SplitviewApi",
         "kind": "class",
         "children": [
             {
@@ -17977,7 +18009,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked whenever any aspect of the layout changes.\r\nIf listening to this event it may be worth debouncing ouputs."
+                                "text": "Invoked whenever any aspect of the layout changes.\nIf listening to this event it may be worth debouncing ouputs."
                             }
                         ]
                     },
@@ -18441,7 +18473,7 @@
                                 },
                                 {
                                     "kind": "text",
-                                    "text": " method\r\nfor the subsequent resize."
+                                    "text": " method\nfor the subsequent resize."
                                 }
                             ]
                         },
@@ -18559,6 +18591,7 @@
         ]
     },
     "SplitviewComponent": {
+        "name": "SplitviewComponent",
         "kind": "class",
         "children": [
             {
@@ -19282,6 +19315,7 @@
         ]
     },
     "SplitviewPanel": {
+        "name": "SplitviewPanel",
         "kind": "class",
         "children": [
             {
@@ -19926,6 +19960,7 @@
         ]
     },
     "Tab": {
+        "name": "Tab",
         "kind": "class",
         "children": [
             {
@@ -20166,6 +20201,7 @@
         ]
     },
     "WillShowOverlayLocationEvent": {
+        "name": "WillShowOverlayLocationEvent",
         "kind": "class",
         "children": [
             {
@@ -20253,6 +20289,7 @@
         ]
     },
     "ActiveEvent": {
+        "name": "ActiveEvent",
         "kind": "interface",
         "children": [
             {
@@ -20270,6 +20307,7 @@
         ]
     },
     "AddComponentOptions": {
+        "name": "AddComponentOptions",
         "kind": "interface",
         "children": [
             {
@@ -20463,6 +20501,7 @@
         ]
     },
     "AddPaneviewComponentOptions": {
+        "name": "AddPaneviewComponentOptions",
         "kind": "interface",
         "children": [
             {
@@ -20584,6 +20623,7 @@
         ]
     },
     "AddSplitviewComponentOptions": {
+        "name": "AddSplitviewComponentOptions",
         "kind": "interface",
         "children": [
             {
@@ -20711,6 +20751,7 @@
         ]
     },
     "BaseComponentOptions": {
+        "name": "BaseComponentOptions",
         "kind": "interface",
         "children": [
             {
@@ -20802,6 +20843,7 @@
         ]
     },
     "BaseGridOptions": {
+        "name": "BaseGridOptions",
         "kind": "interface",
         "children": [
             {
@@ -20885,6 +20927,7 @@
         ]
     },
     "CommonApi": {
+        "name": "CommonApi",
         "kind": "interface",
         "children": [
             {
@@ -21075,6 +21118,7 @@
         ]
     },
     "DockviewComponentOptions": {
+        "name": "DockviewComponentOptions",
         "kind": "interface",
         "children": [
             {
@@ -21577,6 +21621,7 @@
         ]
     },
     "DockviewDndOverlayEvent": {
+        "name": "DockviewDndOverlayEvent",
         "kind": "interface",
         "children": [
             {
@@ -21665,6 +21710,7 @@
         ]
     },
     "DockviewGroupChangeEvent": {
+        "name": "DockviewGroupChangeEvent",
         "kind": "interface",
         "children": [
             {
@@ -21683,6 +21729,7 @@
         ]
     },
     "DockviewGroupPanelApi": {
+        "name": "DockviewGroupPanelApi",
         "kind": "interface",
         "children": [
             {
@@ -22224,6 +22271,7 @@
         ]
     },
     "DockviewGroupPanelFloatingChangeEvent": {
+        "name": "DockviewGroupPanelFloatingChangeEvent",
         "kind": "interface",
         "children": [
             {
@@ -22242,6 +22290,7 @@
         ]
     },
     "DockviewPanelApi": {
+        "name": "DockviewPanelApi",
         "kind": "interface",
         "children": [
             {
@@ -22920,6 +22969,7 @@
         ]
     },
     "DockviewRenderFunctions": {
+        "name": "DockviewRenderFunctions",
         "kind": "interface",
         "children": [
             {
@@ -22989,6 +23039,7 @@
         ]
     },
     "ExpansionEvent": {
+        "name": "ExpansionEvent",
         "kind": "interface",
         "children": [
             {
@@ -23006,6 +23057,7 @@
         ]
     },
     "FocusEvent": {
+        "name": "FocusEvent",
         "kind": "interface",
         "children": [
             {
@@ -23023,6 +23075,7 @@
         ]
     },
     "FrameworkFactory": {
+        "name": "FrameworkFactory",
         "kind": "interface",
         "children": [
             {
@@ -23085,6 +23138,7 @@
         ]
     },
     "GridBranchNode": {
+        "name": "GridBranchNode",
         "kind": "interface",
         "children": [
             {
@@ -23152,6 +23206,7 @@
         ]
     },
     "GridConstraintChangeEvent": {
+        "name": "GridConstraintChangeEvent",
         "kind": "interface",
         "children": [
             {
@@ -23209,6 +23264,7 @@
         ]
     },
     "GridLeafNode": {
+        "name": "GridLeafNode",
         "kind": "interface",
         "children": [
             {
@@ -23287,6 +23343,7 @@
         ]
     },
     "GridPanelViewState": {
+        "name": "GridPanelViewState",
         "kind": "interface",
         "children": [
             {
@@ -23418,6 +23475,7 @@
         ]
     },
     "GridviewComponentOptions": {
+        "name": "GridviewComponentOptions",
         "kind": "interface",
         "children": [
             {
@@ -23539,6 +23597,7 @@
         ]
     },
     "GridviewInitParameters": {
+        "name": "GridviewInitParameters",
         "kind": "interface",
         "children": [
             {
@@ -23673,6 +23732,7 @@
         ]
     },
     "GridviewPanelApi": {
+        "name": "GridviewPanelApi",
         "kind": "interface",
         "children": [
             {
@@ -24007,6 +24067,7 @@
         ]
     },
     "GroupDragEvent": {
+        "name": "GroupDragEvent",
         "kind": "interface",
         "children": [
             {
@@ -24038,6 +24099,7 @@
         ]
     },
     "GroupOptions": {
+        "name": "GroupOptions",
         "kind": "interface",
         "children": [
             {
@@ -24131,6 +24193,7 @@
         ]
     },
     "GroupPanelContentPartInitParameters": {
+        "name": "GroupPanelContentPartInitParameters",
         "kind": "interface",
         "children": [
             {
@@ -24190,6 +24253,7 @@
         ]
     },
     "GroupPanelFrameworkComponentFactory": {
+        "name": "GroupPanelFrameworkComponentFactory",
         "kind": "interface",
         "children": [
             {
@@ -24249,6 +24313,7 @@
         ]
     },
     "GroupPanelPartInitParameters": {
+        "name": "GroupPanelPartInitParameters",
         "kind": "interface",
         "children": [
             {
@@ -24297,6 +24362,7 @@
         ]
     },
     "GroupPanelViewState": {
+        "name": "GroupPanelViewState",
         "kind": "interface",
         "children": [
             {
@@ -24381,6 +24447,7 @@
         ]
     },
     "GroupviewPanelState": {
+        "name": "GroupviewPanelState",
         "kind": "interface",
         "children": [
             {
@@ -24467,6 +24534,7 @@
         ]
     },
     "HeaderPartInitParameters": {
+        "name": "HeaderPartInitParameters",
         "kind": "interface",
         "children": [
             {
@@ -24482,6 +24550,7 @@
         ]
     },
     "IBaseGrid": {
+        "name": "IBaseGrid",
         "kind": "interface",
         "children": [
             {
@@ -24988,6 +25057,7 @@
         ]
     },
     "IBaseView": {
+        "name": "IBaseView",
         "kind": "interface",
         "children": [
             {
@@ -25080,6 +25150,7 @@
         ]
     },
     "IContentContainer": {
+        "name": "IContentContainer",
         "kind": "interface",
         "children": [
             {
@@ -25362,6 +25433,7 @@
         ]
     },
     "IContentRenderer": {
+        "name": "IContentRenderer",
         "kind": "interface",
         "children": [
             {
@@ -25587,6 +25659,7 @@
         ]
     },
     "IDockviewComponent": {
+        "name": "IDockviewComponent",
         "kind": "interface",
         "children": [
             {
@@ -27225,6 +27298,7 @@
         ]
     },
     "IDockviewDisposable": {
+        "name": "IDockviewDisposable",
         "kind": "interface",
         "children": [
             {
@@ -27257,6 +27331,7 @@
         ]
     },
     "IDockviewGroupPanel": {
+        "name": "IDockviewGroupPanel",
         "kind": "interface",
         "children": [
             {
@@ -27569,6 +27644,7 @@
         ]
     },
     "IDockviewGroupPanelModel": {
+        "name": "IDockviewGroupPanelModel",
         "kind": "interface",
         "children": [
             {
@@ -28465,6 +28541,7 @@
         ]
     },
     "IDockviewPanel": {
+        "name": "IDockviewPanel",
         "kind": "interface",
         "children": [
             {
@@ -28832,6 +28909,7 @@
         ]
     },
     "IFrameworkPart": {
+        "name": "IFrameworkPart",
         "kind": "interface",
         "children": [
             {
@@ -28893,6 +28971,7 @@
         ]
     },
     "IGridPanelComponentView": {
+        "name": "IGridPanelComponentView",
         "kind": "interface",
         "children": [
             {
@@ -29310,6 +29389,7 @@
         ]
     },
     "IGridPanelView": {
+        "name": "IGridPanelView",
         "kind": "interface",
         "children": [
             {
@@ -29718,6 +29798,7 @@
         ]
     },
     "IGridView": {
+        "name": "IGridView",
         "kind": "interface",
         "children": [
             {
@@ -29964,6 +30045,7 @@
         ]
     },
     "IGridviewComponent": {
+        "name": "IGridviewComponent",
         "kind": "interface",
         "children": [
             {
@@ -30925,6 +31007,7 @@
         ]
     },
     "IGridviewPanel": {
+        "name": "IGridviewPanel",
         "kind": "interface",
         "children": [
             {
@@ -31166,6 +31249,7 @@
         ]
     },
     "IGroupPanelInitParameters": {
+        "name": "IGroupPanelInitParameters",
         "kind": "interface",
         "children": [
             {
@@ -31192,6 +31276,7 @@
         ]
     },
     "IHeader": {
+        "name": "IHeader",
         "kind": "interface",
         "children": [
             {
@@ -31207,6 +31292,7 @@
         ]
     },
     "IHeaderActionsRenderer": {
+        "name": "IHeaderActionsRenderer",
         "kind": "interface",
         "children": [
             {
@@ -31308,6 +31394,7 @@
         ]
     },
     "INodeDescriptor": {
+        "name": "INodeDescriptor",
         "kind": "interface",
         "children": [
             {
@@ -31336,6 +31423,7 @@
         ]
     },
     "IPaneBodyPart": {
+        "name": "IPaneBodyPart",
         "kind": "interface",
         "children": [
             {
@@ -31446,6 +31534,7 @@
         ]
     },
     "IPaneHeaderPart": {
+        "name": "IPaneHeaderPart",
         "kind": "interface",
         "children": [
             {
@@ -31556,6 +31645,7 @@
         ]
     },
     "IPanel": {
+        "name": "IPanel",
         "kind": "interface",
         "children": [
             {
@@ -31738,6 +31828,7 @@
         ]
     },
     "IPanelDeserializer": {
+        "name": "IPanelDeserializer",
         "kind": "interface",
         "children": [
             {
@@ -31783,6 +31874,7 @@
         ]
     },
     "IPaneview": {
+        "name": "IPaneview",
         "kind": "interface",
         "children": [
             {
@@ -32029,6 +32121,7 @@
         ]
     },
     "IPaneviewComponent": {
+        "name": "IPaneviewComponent",
         "kind": "interface",
         "children": [
             {
@@ -32556,6 +32649,7 @@
         ]
     },
     "IPaneviewPanel": {
+        "name": "IPaneviewPanel",
         "kind": "interface",
         "children": [
             {
@@ -32808,6 +32902,7 @@
         ]
     },
     "ISerializedBranchNode": {
+        "name": "ISerializedBranchNode",
         "kind": "interface",
         "children": [
             {
@@ -32846,6 +32941,7 @@
         ]
     },
     "ISerializedLeafNode": {
+        "name": "ISerializedLeafNode",
         "kind": "interface",
         "children": [
             {
@@ -32894,6 +32990,7 @@
         ]
     },
     "ISplitViewDescriptor": {
+        "name": "ISplitViewDescriptor",
         "kind": "interface",
         "children": [
             {
@@ -32961,6 +33058,7 @@
         ]
     },
     "ISplitviewComponent": {
+        "name": "ISplitviewComponent",
         "kind": "interface",
         "children": [
             {
@@ -33529,6 +33627,7 @@
         ]
     },
     "ISplitviewPanel": {
+        "name": "ISplitviewPanel",
         "kind": "interface",
         "children": [
             {
@@ -33758,6 +33857,7 @@
         ]
     },
     "ISplitviewStyles": {
+        "name": "ISplitviewStyles",
         "kind": "interface",
         "children": [
             {
@@ -33773,6 +33873,7 @@
         ]
     },
     "ITabRenderer": {
+        "name": "ITabRenderer",
         "kind": "interface",
         "children": [
             {
@@ -33958,6 +34059,7 @@
         ]
     },
     "IView": {
+        "name": "IView",
         "kind": "interface",
         "children": [
             {
@@ -34187,6 +34289,7 @@
         ]
     },
     "IViewDeserializer": {
+        "name": "IViewDeserializer",
         "kind": "interface",
         "children": [
             {
@@ -34237,6 +34340,7 @@
         ]
     },
     "IViewSize": {
+        "name": "IViewSize",
         "kind": "interface",
         "children": [
             {
@@ -34266,6 +34370,7 @@
         ]
     },
     "IWatermarkRenderer": {
+        "name": "IWatermarkRenderer",
         "kind": "interface",
         "children": [
             {
@@ -34498,6 +34603,7 @@
         ]
     },
     "MovementOptions": {
+        "name": "MovementOptions",
         "kind": "interface",
         "children": [
             {
@@ -34528,6 +34634,7 @@
         ]
     },
     "MovementOptions2": {
+        "name": "MovementOptions2",
         "kind": "interface",
         "children": [
             {
@@ -34546,6 +34653,7 @@
         ]
     },
     "PanePanelComponentInitParameter": {
+        "name": "PanePanelComponentInitParameter",
         "kind": "interface",
         "children": [
             {
@@ -34630,6 +34738,7 @@
         ]
     },
     "PanePanelInitParameter": {
+        "name": "PanePanelInitParameter",
         "kind": "interface",
         "children": [
             {
@@ -34703,6 +34812,7 @@
         ]
     },
     "PanePanelViewState": {
+        "name": "PanePanelViewState",
         "kind": "interface",
         "children": [
             {
@@ -34768,6 +34878,7 @@
         ]
     },
     "PanelApi": {
+        "name": "PanelApi",
         "kind": "interface",
         "children": [
             {
@@ -35024,6 +35135,7 @@
         ]
     },
     "PanelConstraintChangeEvent": {
+        "name": "PanelConstraintChangeEvent",
         "kind": "interface",
         "children": [
             {
@@ -35055,6 +35167,7 @@
         ]
     },
     "PanelDimensionChangeEvent": {
+        "name": "PanelDimensionChangeEvent",
         "kind": "interface",
         "children": [
             {
@@ -35084,6 +35197,7 @@
         ]
     },
     "PanelInitParameters": {
+        "name": "PanelInitParameters",
         "kind": "interface",
         "children": [
             {
@@ -35100,6 +35214,7 @@
         ]
     },
     "PanelOptions": {
+        "name": "PanelOptions",
         "kind": "interface",
         "children": [
             {
@@ -35163,6 +35278,7 @@
         ]
     },
     "PanelReference": {
+        "name": "PanelReference",
         "kind": "interface",
         "children": [
             {
@@ -35252,6 +35368,7 @@
         ]
     },
     "PanelSizeEvent": {
+        "name": "PanelSizeEvent",
         "kind": "interface",
         "children": [
             {
@@ -35269,6 +35386,7 @@
         ]
     },
     "PanelUpdateEvent": {
+        "name": "PanelUpdateEvent",
         "kind": "interface",
         "children": [
             {
@@ -35293,6 +35411,7 @@
         ]
     },
     "PanelViewInitParameters": {
+        "name": "PanelViewInitParameters",
         "kind": "interface",
         "children": [
             {
@@ -35384,6 +35503,7 @@
         ]
     },
     "PaneviewComponentOptions": {
+        "name": "PaneviewComponentOptions",
         "kind": "interface",
         "children": [
             {
@@ -35582,6 +35702,7 @@
         ]
     },
     "PaneviewDndOverlayEvent": {
+        "name": "PaneviewDndOverlayEvent",
         "kind": "interface",
         "children": [
             {
@@ -35646,6 +35767,7 @@
         ]
     },
     "PaneviewDropEvent": {
+        "name": "PaneviewDropEvent",
         "kind": "interface",
         "children": [
             {
@@ -35736,6 +35858,7 @@
         ]
     },
     "PaneviewPanelApi": {
+        "name": "PaneviewPanelApi",
         "kind": "interface",
         "children": [
             {
@@ -36183,6 +36306,7 @@
         "kind": "interface"
     },
     "RendererChangedEvent": {
+        "name": "RendererChangedEvent",
         "kind": "interface",
         "children": [
             {
@@ -36201,6 +36325,7 @@
         ]
     },
     "SerializedDockview": {
+        "name": "SerializedDockview",
         "kind": "interface",
         "children": [
             {
@@ -36337,6 +36462,7 @@
         ]
     },
     "SerializedFloatingGroup": {
+        "name": "SerializedFloatingGroup",
         "kind": "interface",
         "children": [
             {
@@ -36364,6 +36490,7 @@
         ]
     },
     "SerializedGridObject": {
+        "name": "SerializedGridObject",
         "kind": "interface",
         "children": [
             {
@@ -36443,6 +36570,7 @@
         ]
     },
     "SerializedGridview": {
+        "name": "SerializedGridview",
         "kind": "interface",
         "children": [
             {
@@ -36498,6 +36626,7 @@
         ]
     },
     "SerializedGridviewComponent": {
+        "name": "SerializedGridviewComponent",
         "kind": "interface",
         "children": [
             {
@@ -36533,6 +36662,7 @@
         ]
     },
     "SerializedPaneview": {
+        "name": "SerializedPaneview",
         "kind": "interface",
         "children": [
             {
@@ -36562,6 +36692,7 @@
         ]
     },
     "SerializedPaneviewPanel": {
+        "name": "SerializedPaneviewPanel",
         "kind": "interface",
         "children": [
             {
@@ -36727,6 +36858,7 @@
         ]
     },
     "SerializedPopoutGroup": {
+        "name": "SerializedPopoutGroup",
         "kind": "interface",
         "children": [
             {
@@ -36774,6 +36906,7 @@
         ]
     },
     "SerializedSplitview": {
+        "name": "SerializedSplitview",
         "kind": "interface",
         "children": [
             {
@@ -36826,6 +36959,7 @@
         ]
     },
     "SerializedSplitviewPanel": {
+        "name": "SerializedSplitviewPanel",
         "kind": "interface",
         "children": [
             {
@@ -36892,6 +37026,7 @@
         ]
     },
     "SerializedSplitviewPanelData": {
+        "name": "SerializedSplitviewPanelData",
         "kind": "interface",
         "children": [
             {
@@ -36957,6 +37092,7 @@
         ]
     },
     "SizeEvent": {
+        "name": "SizeEvent",
         "kind": "interface",
         "children": [
             {
@@ -36988,6 +37124,7 @@
         ]
     },
     "SplitViewOptions": {
+        "name": "SplitViewOptions",
         "kind": "interface",
         "children": [
             {
@@ -37047,6 +37184,7 @@
         ]
     },
     "SplitviewComponentOptions": {
+        "name": "SplitviewComponentOptions",
         "kind": "interface",
         "children": [
             {
@@ -37181,6 +37319,7 @@
         ]
     },
     "SplitviewPanelApi": {
+        "name": "SplitviewPanelApi",
         "kind": "interface",
         "children": [
             {
@@ -37515,6 +37654,7 @@
         ]
     },
     "TabContextMenuEvent": {
+        "name": "TabContextMenuEvent",
         "kind": "interface",
         "children": [
             {
@@ -37553,6 +37693,7 @@
         ]
     },
     "TabDragEvent": {
+        "name": "TabDragEvent",
         "kind": "interface",
         "children": [
             {
@@ -37584,6 +37725,7 @@
         ]
     },
     "TitleEvent": {
+        "name": "TitleEvent",
         "kind": "interface",
         "children": [
             {
@@ -37601,6 +37743,7 @@
         ]
     },
     "ViewFactoryData": {
+        "name": "ViewFactoryData",
         "kind": "interface",
         "children": [
             {
@@ -37628,6 +37771,7 @@
         ]
     },
     "VisibilityEvent": {
+        "name": "VisibilityEvent",
         "kind": "interface",
         "children": [
             {
@@ -37645,6 +37789,7 @@
         ]
     },
     "WatermarkConstructor": {
+        "name": "WatermarkConstructor",
         "kind": "interface",
         "children": [
             {
@@ -37655,6 +37800,7 @@
         ]
     },
     "WatermarkPartInitParameters": {
+        "name": "WatermarkPartInitParameters",
         "kind": "interface",
         "children": [
             {
@@ -37671,6 +37817,7 @@
         ]
     },
     "WatermarkRendererInitParameters": {
+        "name": "WatermarkRendererInitParameters",
         "kind": "interface",
         "children": [
             {
@@ -38651,7 +38798,7 @@
                 "summary": [
                     {
                         "kind": "text",
-                        "text": "Find the grid location of a specific DOM element by traversing the parent\r\nchain and finding each child index on the way.\r\n\r\nThis will break as soon as DOM structures of the Splitview or Gridview change."
+                        "text": "Find the grid location of a specific DOM element by traversing the parent\nchain and finding each child index on the way.\n\nThis will break as soon as DOM structures of the Splitview or Gridview change."
                     }
                 ]
             },
@@ -39121,6 +39268,7 @@
         "kind": "function"
     },
     "ReactPart": {
+        "name": "ReactPart",
         "kind": "class",
         "children": [
             {
@@ -39181,6 +39329,7 @@
         ]
     },
     "DockviewReadyEvent": {
+        "name": "DockviewReadyEvent",
         "kind": "interface",
         "children": [
             {
@@ -39197,6 +39346,7 @@
         ]
     },
     "GridviewReadyEvent": {
+        "name": "GridviewReadyEvent",
         "kind": "interface",
         "children": [
             {
@@ -39213,6 +39363,7 @@
         ]
     },
     "IDockviewHeaderActionsProps": {
+        "name": "IDockviewHeaderActionsProps",
         "kind": "interface",
         "children": [
             {
@@ -39295,6 +39446,7 @@
         ]
     },
     "IDockviewReactProps": {
+        "name": "IDockviewReactProps",
         "kind": "interface",
         "children": [
             {
@@ -39799,6 +39951,7 @@
         ]
     },
     "IGridviewPanelProps": {
+        "name": "IGridviewPanelProps",
         "kind": "interface",
         "children": [
             {
@@ -39838,6 +39991,7 @@
         ]
     },
     "IGridviewReactProps": {
+        "name": "IGridviewReactProps",
         "kind": "interface",
         "children": [
             {
@@ -39976,6 +40130,7 @@
         ]
     },
     "IGroupPanelBaseProps": {
+        "name": "IGroupPanelBaseProps",
         "kind": "interface",
         "children": [
             {
@@ -40015,6 +40170,7 @@
         ]
     },
     "IPaneviewPanelProps": {
+        "name": "IPaneviewPanelProps",
         "kind": "interface",
         "children": [
             {
@@ -40064,6 +40220,7 @@
         ]
     },
     "IPaneviewReactProps": {
+        "name": "IPaneviewReactProps",
         "kind": "interface",
         "children": [
             {
@@ -40262,6 +40419,7 @@
         ]
     },
     "ISplitviewPanelProps": {
+        "name": "ISplitviewPanelProps",
         "kind": "interface",
         "children": [
             {
@@ -40301,6 +40459,7 @@
         ]
     },
     "ISplitviewReactProps": {
+        "name": "ISplitviewReactProps",
         "kind": "interface",
         "children": [
             {
@@ -40439,6 +40598,7 @@
         ]
     },
     "IWatermarkPanelProps": {
+        "name": "IWatermarkPanelProps",
         "kind": "interface",
         "children": [
             {
@@ -40500,6 +40660,7 @@
         "kind": "interface"
     },
     "PanelParameters": {
+        "name": "PanelParameters",
         "kind": "interface",
         "children": [
             {
@@ -40517,6 +40678,7 @@
         ]
     },
     "PaneviewReadyEvent": {
+        "name": "PaneviewReadyEvent",
         "kind": "interface",
         "children": [
             {
@@ -40533,6 +40695,7 @@
         ]
     },
     "ReactPortalStore": {
+        "name": "ReactPortalStore",
         "kind": "interface",
         "children": [
             {
@@ -40577,6 +40740,7 @@
         ]
     },
     "SplitviewReadyEvent": {
+        "name": "SplitviewReadyEvent",
         "kind": "interface",
         "children": [
             {
@@ -40715,6 +40879,7 @@
         "kind": "variable"
     },
     "DockviewDefaultTab": {
+        "name": "DockviewDefaultTab",
         "kind": "function",
         "children": [
             {
@@ -40795,6 +40960,7 @@
         ]
     },
     "DockviewReact": {
+        "name": "DockviewReact",
         "kind": "function",
         "children": [
             {
@@ -40902,6 +41068,7 @@
         ]
     },
     "GridviewReact": {
+        "name": "GridviewReact",
         "kind": "function",
         "children": [
             {
@@ -41009,6 +41176,7 @@
         ]
     },
     "PaneviewReact": {
+        "name": "PaneviewReact",
         "kind": "function",
         "children": [
             {
@@ -41116,6 +41284,7 @@
         ]
     },
     "SplitviewReact": {
+        "name": "SplitviewReact",
         "kind": "function",
         "children": [
             {
@@ -41257,7 +41426,7 @@
                 "summary": [
                     {
                         "kind": "text",
-                        "text": "A React Hook that returns an array of portals to be rendered by the user of this hook\r\nand a disposable function to add a portal. Calling dispose removes this portal from the\r\nportal array"
+                        "text": "A React Hook that returns an array of portals to be rendered by the user of this hook\nand a disposable function to add a portal. Calling dispose removes this portal from the\nportal array"
                     }
                 ]
             },

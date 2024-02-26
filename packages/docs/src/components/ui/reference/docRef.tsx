@@ -43,8 +43,26 @@ type DocsJson = {
 
 const newJson = docsJson_ as ExportedTypeFile;
 
-// console.log('test', (newJson['DockviewApi'] as any).children);
-console.log('test', firstLevel((newJson['DockviewApi'] as any).children[29]));
+console.log(newJson);
+
+export const DocumentRef = (props: { value: TypeSystem.Type }) => {
+    if (!props.value) {
+        return null;
+    }
+
+    switch (props.value.kind) {
+        case 'typealias':
+            return codify(props.value);
+        case 'interface':
+            return codify(props.value);
+        case 'class':
+            return codify(props.value);
+        case 'function':
+            return codify(props.value);
+        default:
+            return <div>{'error'}</div>;
+    }
+};
 
 export const Text = (props: { content: DocsContent[] }) => {
     return (
@@ -94,69 +112,6 @@ export const Summary = (props: { summary: DocsComment }) => {
 
 export const Markdown = (props: { children: string }) => {
     return <span>{props.children}</span>;
-};
-
-const ClassPiece = (props: { value: DocJson; name: string }) => {
-    let code = `interface ${props.name} {\n`;
-
-    code += props.value.children
-        .map((child) => {
-            switch (child.kind) {
-                case 'accessor':
-                    return `\t${child.name}: ${child.code};`;
-                case 'method':
-                    return `\t${child.name}${child.code};`;
-                default:
-                    return null;
-            }
-        })
-        .filter(Boolean)
-        .join('\n');
-
-    code += `\n}`;
-
-    return <CodeBlock language="tsx">{code}</CodeBlock>;
-};
-
-const InterfacePiece = (props: { value: DocJson; name: string }) => {
-    let code = `interface ${props.name} {\n`;
-
-    code += props.value.children
-        .map((child) => {
-            switch (child.kind) {
-                case 'property':
-                    return `\t${child.name}: ${child.code};`;
-                default:
-                    return null;
-            }
-        })
-        .join('\n');
-
-    code += `\n}`;
-
-    return <CodeBlock language="tsx">{code}</CodeBlock>;
-};
-
-const Piece = (props: { piece: string }) => {
-    const item = docsJson[props.piece];
-
-    if (!item) {
-        return null;
-    }
-
-    if (item.kind === 'class') {
-        return <ClassPiece name={props.piece} value={item} />;
-    }
-
-    if (item.kind === 'interface') {
-        return <InterfacePiece name={props.piece} value={item} />;
-    }
-
-    if (!item.metadata?.code) {
-        return null;
-    }
-
-    return <CodeBlock language="tsx">{item.metadata.code}</CodeBlock>;
 };
 
 const Row = (props: { doc: TypeSystem.Type }) => {
@@ -259,7 +214,7 @@ export const DocRef = (props: DocRefProps) => {
                             <div>
                                 {firstLevel(doc).map((x) => (
                                     <span style={{ padding: '0px 2px' }}>
-                                        {x}
+                                        <DocumentRef value={newJson[x]} />
                                     </span>
                                 ))}
                             </div>
