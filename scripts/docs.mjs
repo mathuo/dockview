@@ -118,14 +118,37 @@ function parseComplexType(obj) {
         case 'literal':
             return { type: obj.type, value: obj.name };
         case 'reflection':
-            return parse(obj.declaration);
-        case 'reference':
+            return { type: obj.type, value: parse(obj.declaration) };
+        case 'reference': {
+            if (obj.refersToTypeParameter) {
+                return {
+                    type: obj.type,
+                    value: obj.name,
+                    source: obj.package,
+                    refersToTypeParameter: true,
+                };
+            }
+
+            if (obj.qualifiedName) {
+                return {
+                    type: obj.type,
+                    value: obj.qualifiedName,
+                    source: obj.sourceFileName
+                        ? obj.sourceFileName.startsWith('packages/dockview')
+                            ? 'dockview'
+                            : 'external'
+                        : obj.package,
+                    typeArguments: obj.typeArguments?.map(parseComplexType),
+                };
+            }
+
             return {
                 type: obj.type,
-                value: `${obj.qualifiedName ?? obj.name}${parseTypeArguments(
-                    obj
-                )}`,
+                value: obj.name,
+                source: obj.package,
+                typeArguments: obj.typeArguments?.map(parseComplexType),
             };
+        }
         case 'array':
             return {
                 type: obj.type,
@@ -133,7 +156,7 @@ function parseComplexType(obj) {
             };
         case 'intersection':
             return {
-                type: 'and',
+                type: obj.type,
                 values: obj.types.map(parseComplexType).reverse(),
             };
         case 'predicate':
@@ -271,14 +294,30 @@ function parse(data) {
                     .join(', ');
                 code += ` }`;
 
-                result.type = 'object';
-                result.value = data.children.map(parse);
+                result.properties = data.children.map((_) => {
+                    const result = parse(_);
+
+                    if (result.kind !== 'property') {
+                        throw new Error(`invalid ${result.kind}`);
+                    }
+
+                    return result;
+                });
             }
 
             if (Array.isArray(data.signatures)) {
-                const signatures = data.signatures.map((signature) =>
-                    parse(signature)
-                );
+                const signatures = data.signatures.map((signature) => {
+                    const result = parse(signature);
+
+                    if (
+                        result.kind !== 'callSignature' &&
+                        result.kind !== 'constructorSignature'
+                    ) {
+                        throw new Error(`invalid ${result.kind}`);
+                    }
+
+                    return result;
+                });
                 code += signatures
                     .map((signature) => signature.code)
                     .join(', ');
@@ -288,8 +327,7 @@ function parse(data) {
                     throw new Error('anc');
                 }
 
-                result.type = 'signatures';
-                result.value = signatures;
+                result.signatures = signatures;
             }
 
             return {
@@ -297,7 +335,8 @@ function parse(data) {
                 code,
                 // pieces,
                 kind: 'typeLiteral',
-                result,
+                properties: result.properties,
+                signatures: result.signatures,
             };
         case ReflectionKind.CallSignature: // 4096
             const typeParameters = [];
