@@ -32,6 +32,7 @@
     },
     "LayoutPriority": {
         "kind": "enum",
+        "name": "LayoutPriority",
         "children": [
             {
                 "name": "High",
@@ -52,6 +53,7 @@
     },
     "Orientation": {
         "kind": "enum",
+        "name": "Orientation",
         "children": [
             {
                 "name": "HORIZONTAL",
@@ -67,6 +69,7 @@
     },
     "SashState": {
         "kind": "enum",
+        "name": "SashState",
         "children": [
             {
                 "name": "DISABLED",
@@ -92,6 +95,7 @@
     },
     "BaseGrid": {
         "kind": "class",
+        "name": "BaseGrid",
         "children": [
             {
                 "name": "constructor",
@@ -1124,6 +1128,7 @@
     },
     "ContentContainer": {
         "kind": "class",
+        "name": "ContentContainer",
         "children": [
             {
                 "name": "constructor",
@@ -1438,6 +1443,7 @@
     },
     "DefaultDockviewDeserialzier": {
         "kind": "class",
+        "name": "DefaultDockviewDeserialzier",
         "children": [
             {
                 "name": "constructor",
@@ -1488,6 +1494,7 @@
     },
     "DefaultTab": {
         "kind": "class",
+        "name": "DefaultTab",
         "children": [
             {
                 "name": "constructor",
@@ -1754,6 +1761,7 @@
     },
     "DockviewApi": {
         "kind": "class",
+        "name": "DockviewApi",
         "children": [
             {
                 "name": "constructor",
@@ -3516,6 +3524,7 @@
     },
     "DockviewComponent": {
         "kind": "class",
+        "name": "DockviewComponent",
         "children": [
             {
                 "name": "constructor",
@@ -5955,6 +5964,7 @@
     },
     "DockviewCompositeDisposable": {
         "kind": "class",
+        "name": "DockviewCompositeDisposable",
         "children": [
             {
                 "name": "constructor",
@@ -6029,6 +6039,7 @@
     },
     "DockviewDidDropEvent": {
         "kind": "class",
+        "name": "DockviewDidDropEvent",
         "children": [
             {
                 "name": "constructor",
@@ -6192,6 +6203,7 @@
     },
     "DockviewEmitter": {
         "kind": "class",
+        "name": "DockviewEmitter",
         "children": [
             {
                 "name": "constructor",
@@ -6352,6 +6364,7 @@
     },
     "DockviewGroupPanel": {
         "kind": "class",
+        "name": "DockviewGroupPanel",
         "children": [
             {
                 "name": "constructor",
@@ -7040,6 +7053,7 @@
     },
     "DockviewGroupPanelModel": {
         "kind": "class",
+        "name": "DockviewGroupPanelModel",
         "children": [
             {
                 "name": "constructor",
@@ -8260,6 +8274,7 @@
     },
     "DockviewMutableDisposable": {
         "kind": "class",
+        "name": "DockviewMutableDisposable",
         "children": [
             {
                 "name": "constructor",
@@ -8288,6 +8303,7 @@
     },
     "DockviewPanel": {
         "kind": "class",
+        "name": "DockviewPanel",
         "children": [
             {
                 "name": "constructor",
@@ -8748,6 +8764,7 @@
     },
     "DockviewWillDropEvent": {
         "kind": "class",
+        "name": "DockviewWillDropEvent",
         "children": [
             {
                 "name": "constructor",
@@ -8926,6 +8943,7 @@
     },
     "DraggablePaneviewPanel": {
         "kind": "class",
+        "name": "DraggablePaneviewPanel",
         "children": [
             {
                 "name": "constructor",
@@ -9660,6 +9678,7 @@
     },
     "Gridview": {
         "kind": "class",
+        "name": "Gridview",
         "children": [
             {
                 "name": "constructor",
@@ -10604,6 +10623,7 @@
     },
     "GridviewApi": {
         "kind": "class",
+        "name": "GridviewApi",
         "children": [
             {
                 "name": "constructor",
@@ -11450,6 +11470,7 @@
     },
     "GridviewComponent": {
         "kind": "class",
+        "name": "GridviewComponent",
         "children": [
             {
                 "name": "constructor",
@@ -13096,6 +13117,7 @@
     },
     "GridviewPanel": {
         "kind": "class",
+        "name": "GridviewPanel",
         "children": [
             {
                 "name": "constructor",
@@ -13667,6 +13689,7 @@
     },
     "LocalSelectionTransfer": {
         "kind": "class",
+        "name": "LocalSelectionTransfer",
         "children": [
             {
                 "name": "clearData",
@@ -13851,6 +13874,7 @@
     },
     "PaneFramework": {
         "kind": "class",
+        "name": "PaneFramework",
         "children": [
             {
                 "name": "constructor",
@@ -14585,6 +14609,7 @@
     },
     "PaneTransfer": {
         "kind": "class",
+        "name": "PaneTransfer",
         "children": [
             {
                 "name": "constructor",
@@ -14621,6 +14646,7 @@
     },
     "PanelTransfer": {
         "kind": "class",
+        "name": "PanelTransfer",
         "children": [
             {
                 "name": "constructor",
@@ -14652,7 +14678,8 @@
                             "value": "string"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": null
                         }
                     ]
                 },
@@ -14678,6 +14705,7 @@
     },
     "Paneview": {
         "kind": "class",
+        "name": "Paneview",
         "children": [
             {
                 "name": "constructor",
@@ -15140,6 +15168,7 @@
     },
     "PaneviewApi": {
         "kind": "class",
+        "name": "PaneviewApi",
         "children": [
             {
                 "name": "constructor",
@@ -15780,6 +15809,7 @@
     },
     "PaneviewComponent": {
         "kind": "class",
+        "name": "PaneviewComponent",
         "children": [
             {
                 "name": "constructor",
@@ -16407,6 +16437,7 @@
     },
     "PaneviewPanel": {
         "kind": "class",
+        "name": "PaneviewPanel",
         "children": [
             {
                 "name": "constructor",
@@ -17121,6 +17152,7 @@
     },
     "Splitview": {
         "kind": "class",
+        "name": "Splitview",
         "children": [
             {
                 "name": "constructor",
@@ -17843,6 +17875,7 @@
     },
     "SplitviewApi": {
         "kind": "class",
+        "name": "SplitviewApi",
         "children": [
             {
                 "name": "constructor",
@@ -18560,6 +18593,7 @@
     },
     "SplitviewComponent": {
         "kind": "class",
+        "name": "SplitviewComponent",
         "children": [
             {
                 "name": "constructor",
@@ -19283,6 +19317,7 @@
     },
     "SplitviewPanel": {
         "kind": "class",
+        "name": "SplitviewPanel",
         "children": [
             {
                 "name": "constructor",
@@ -19927,6 +19962,7 @@
     },
     "Tab": {
         "kind": "class",
+        "name": "Tab",
         "children": [
             {
                 "name": "constructor",
@@ -20167,6 +20203,7 @@
     },
     "WillShowOverlayLocationEvent": {
         "kind": "class",
+        "name": "WillShowOverlayLocationEvent",
         "children": [
             {
                 "name": "constructor",
@@ -20254,6 +20291,7 @@
     },
     "ActiveEvent": {
         "kind": "interface",
+        "name": "ActiveEvent",
         "children": [
             {
                 "name": "isActive",
@@ -20271,6 +20309,7 @@
     },
     "AddComponentOptions": {
         "kind": "interface",
+        "name": "AddComponentOptions",
         "children": [
             {
                 "name": "component",
@@ -20464,6 +20503,7 @@
     },
     "AddPaneviewComponentOptions": {
         "kind": "interface",
+        "name": "AddPaneviewComponentOptions",
         "children": [
             {
                 "name": "component",
@@ -20585,6 +20625,7 @@
     },
     "AddSplitviewComponentOptions": {
         "kind": "interface",
+        "name": "AddSplitviewComponentOptions",
         "children": [
             {
                 "name": "component",
@@ -20712,6 +20753,7 @@
     },
     "BaseComponentOptions": {
         "kind": "interface",
+        "name": "BaseComponentOptions",
         "children": [
             {
                 "name": "component",
@@ -20803,6 +20845,7 @@
     },
     "BaseGridOptions": {
         "kind": "interface",
+        "name": "BaseGridOptions",
         "children": [
             {
                 "name": "disableAutoResizing",
@@ -20886,6 +20929,7 @@
     },
     "CommonApi": {
         "kind": "interface",
+        "name": "CommonApi",
         "children": [
             {
                 "name": "height",
@@ -21076,6 +21120,7 @@
     },
     "DockviewComponentOptions": {
         "kind": "interface",
+        "name": "DockviewComponentOptions",
         "children": [
             {
                 "name": "components",
@@ -21236,10 +21281,12 @@
                     "type": "or",
                     "values": [
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "always"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "onlyWhenVisibile"
                         }
                     ]
                 },
@@ -21303,7 +21350,8 @@
                     "type": "or",
                     "values": [
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "boundedWithinViewport"
                         },
                         {
                             "type": "reflection",
@@ -21509,10 +21557,12 @@
                     "type": "or",
                     "values": [
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "default"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "fullwidth"
                         }
                     ]
                 },
@@ -21578,6 +21628,7 @@
     },
     "DockviewDndOverlayEvent": {
         "kind": "interface",
+        "name": "DockviewDndOverlayEvent",
         "children": [
             {
                 "name": "getData",
@@ -21666,6 +21717,7 @@
     },
     "DockviewGroupChangeEvent": {
         "kind": "interface",
+        "name": "DockviewGroupChangeEvent",
         "children": [
             {
                 "name": "panel",
@@ -21684,6 +21736,7 @@
     },
     "DockviewGroupPanelApi": {
         "kind": "interface",
+        "name": "DockviewGroupPanelApi",
         "children": [
             {
                 "name": "height",
@@ -22081,19 +22134,24 @@
                                                     "type": "or",
                                                     "values": [
                                                         {
-                                                            "type": "literal"
+                                                            "type": "literal",
+                                                            "value": "right"
                                                         },
                                                         {
-                                                            "type": "literal"
+                                                            "type": "literal",
+                                                            "value": "bottom"
                                                         },
                                                         {
-                                                            "type": "literal"
+                                                            "type": "literal",
+                                                            "value": "top"
                                                         },
                                                         {
-                                                            "type": "literal"
+                                                            "type": "literal",
+                                                            "value": "left"
                                                         },
                                                         {
-                                                            "type": "literal"
+                                                            "type": "literal",
+                                                            "value": "center"
                                                         }
                                                     ]
                                                 },
@@ -22225,6 +22283,7 @@
     },
     "DockviewGroupPanelFloatingChangeEvent": {
         "kind": "interface",
+        "name": "DockviewGroupPanelFloatingChangeEvent",
         "children": [
             {
                 "name": "location",
@@ -22243,6 +22302,7 @@
     },
     "DockviewPanelApi": {
         "kind": "interface",
+        "name": "DockviewPanelApi",
         "children": [
             {
                 "name": "group",
@@ -22749,19 +22809,24 @@
                                                     "type": "or",
                                                     "values": [
                                                         {
-                                                            "type": "literal"
+                                                            "type": "literal",
+                                                            "value": "right"
                                                         },
                                                         {
-                                                            "type": "literal"
+                                                            "type": "literal",
+                                                            "value": "bottom"
                                                         },
                                                         {
-                                                            "type": "literal"
+                                                            "type": "literal",
+                                                            "value": "top"
                                                         },
                                                         {
-                                                            "type": "literal"
+                                                            "type": "literal",
+                                                            "value": "left"
                                                         },
                                                         {
-                                                            "type": "literal"
+                                                            "type": "literal",
+                                                            "value": "center"
                                                         }
                                                     ]
                                                 },
@@ -22921,6 +22986,7 @@
     },
     "DockviewRenderFunctions": {
         "kind": "interface",
+        "name": "DockviewRenderFunctions",
         "children": [
             {
                 "name": "components",
@@ -22990,6 +23056,7 @@
     },
     "ExpansionEvent": {
         "kind": "interface",
+        "name": "ExpansionEvent",
         "children": [
             {
                 "name": "isExpanded",
@@ -23007,6 +23074,7 @@
     },
     "FocusEvent": {
         "kind": "interface",
+        "name": "FocusEvent",
         "children": [
             {
                 "name": "isFocused",
@@ -23024,6 +23092,7 @@
     },
     "FrameworkFactory": {
         "kind": "interface",
+        "name": "FrameworkFactory",
         "children": [
             {
                 "name": "createComponent",
@@ -23086,6 +23155,7 @@
     },
     "GridBranchNode": {
         "kind": "interface",
+        "name": "GridBranchNode",
         "children": [
             {
                 "name": "box",
@@ -23153,6 +23223,7 @@
     },
     "GridConstraintChangeEvent": {
         "kind": "interface",
+        "name": "GridConstraintChangeEvent",
         "children": [
             {
                 "name": "maximumHeight",
@@ -23210,6 +23281,7 @@
     },
     "GridLeafNode": {
         "kind": "interface",
+        "name": "GridLeafNode",
         "children": [
             {
                 "name": "box",
@@ -23288,6 +23360,7 @@
     },
     "GridPanelViewState": {
         "kind": "interface",
+        "name": "GridPanelViewState",
         "children": [
             {
                 "name": "component",
@@ -23419,6 +23492,7 @@
     },
     "GridviewComponentOptions": {
         "kind": "interface",
+        "name": "GridviewComponentOptions",
         "children": [
             {
                 "name": "components",
@@ -23540,6 +23614,7 @@
     },
     "GridviewInitParameters": {
         "kind": "interface",
+        "name": "GridviewInitParameters",
         "children": [
             {
                 "name": "accessor",
@@ -23674,6 +23749,7 @@
     },
     "GridviewPanelApi": {
         "kind": "interface",
+        "name": "GridviewPanelApi",
         "children": [
             {
                 "name": "height",
@@ -24008,6 +24084,7 @@
     },
     "GroupDragEvent": {
         "kind": "interface",
+        "name": "GroupDragEvent",
         "children": [
             {
                 "name": "group",
@@ -24039,6 +24116,7 @@
     },
     "GroupOptions": {
         "kind": "interface",
+        "name": "GroupOptions",
         "children": [
             {
                 "name": "activePanel",
@@ -24087,7 +24165,8 @@
                     "type": "or",
                     "values": [
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "no-drop-target"
                         },
                         {
                             "type": "intrinsic",
@@ -24132,6 +24211,7 @@
     },
     "GroupPanelContentPartInitParameters": {
         "kind": "interface",
+        "name": "GroupPanelContentPartInitParameters",
         "children": [
             {
                 "name": "api",
@@ -24191,6 +24271,7 @@
     },
     "GroupPanelFrameworkComponentFactory": {
         "kind": "interface",
+        "name": "GroupPanelFrameworkComponentFactory",
         "children": [
             {
                 "name": "content",
@@ -24250,6 +24331,7 @@
     },
     "GroupPanelPartInitParameters": {
         "kind": "interface",
+        "name": "GroupPanelPartInitParameters",
         "children": [
             {
                 "name": "api",
@@ -24298,6 +24380,7 @@
     },
     "GroupPanelViewState": {
         "kind": "interface",
+        "name": "GroupPanelViewState",
         "children": [
             {
                 "name": "activeView",
@@ -24341,7 +24424,8 @@
                     "type": "or",
                     "values": [
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "no-drop-target"
                         },
                         {
                             "type": "intrinsic",
@@ -24382,6 +24466,7 @@
     },
     "GroupviewPanelState": {
         "kind": "interface",
+        "name": "GroupviewPanelState",
         "children": [
             {
                 "name": "contentComponent",
@@ -24429,10 +24514,12 @@
                     "type": "or",
                     "values": [
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "always"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "onlyWhenVisibile"
                         }
                     ]
                 },
@@ -24468,6 +24555,7 @@
     },
     "HeaderPartInitParameters": {
         "kind": "interface",
+        "name": "HeaderPartInitParameters",
         "children": [
             {
                 "name": "title",
@@ -24483,6 +24571,7 @@
     },
     "IBaseGrid": {
         "kind": "interface",
+        "name": "IBaseGrid",
         "children": [
             {
                 "name": "activeGroup",
@@ -24989,34 +25078,8 @@
     },
     "IBaseView": {
         "kind": "interface",
+        "name": "IBaseView",
         "children": [
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
             {
                 "name": "maximumSize",
                 "code": "number",
@@ -25076,41 +25139,33 @@
                 "flags": {
                     "isOptional": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             }
         ]
     },
     "IContentContainer": {
         "kind": "interface",
+        "name": "IContentContainer",
         "children": [
             {
                 "name": "closePanel",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
-            {
-                "name": "dispose",
                 "code": "(): void",
                 "kind": "property",
                 "type": {
@@ -25231,6 +25286,24 @@
                     }
                 },
                 "flags": {}
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "hide",
@@ -25363,36 +25436,8 @@
     },
     "IContentRenderer": {
         "kind": "interface",
+        "name": "IContentRenderer",
         "children": [
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {
-                    "isOptional": true
-                }
-            },
             {
                 "name": "element",
                 "code": "HTMLElement",
@@ -25445,6 +25490,24 @@
                     "isOptional": true,
                     "isReadonly": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "focus",
@@ -25588,6 +25651,7 @@
     },
     "IDockviewComponent": {
         "kind": "interface",
+        "name": "IDockviewComponent",
         "children": [
             {
                 "name": "activeGroup",
@@ -27226,38 +27290,31 @@
     },
     "IDockviewDisposable": {
         "kind": "interface",
+        "name": "IDockviewDisposable",
         "children": [
             {
                 "name": "dispose",
                 "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
                         "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
+                        "kind": "callSignature"
                     }
-                },
-                "flags": {}
+                ]
             }
         ]
     },
     "IDockviewGroupPanel": {
         "kind": "interface",
+        "name": "IDockviewGroupPanel",
         "children": [
             {
                 "name": "activePanel",
@@ -27570,6 +27627,7 @@
     },
     "IDockviewGroupPanelModel": {
         "kind": "interface",
+        "name": "IDockviewGroupPanelModel",
         "children": [
             {
                 "name": "activePanel",
@@ -27592,33 +27650,6 @@
                 "flags": {
                     "isReadonly": true
                 }
-            },
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
             },
             {
                 "name": "header",
@@ -28035,6 +28066,24 @@
                             "value": "boolean"
                         },
                         "code": "(panel: IDockviewPanel): boolean",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -28466,6 +28515,7 @@
     },
     "IDockviewPanel": {
         "kind": "interface",
+        "name": "IDockviewPanel",
         "children": [
             {
                 "name": "api",
@@ -28479,33 +28529,6 @@
                 "flags": {
                     "isReadonly": true
                 }
-            },
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
             },
             {
                 "name": "group",
@@ -28587,6 +28610,24 @@
                 "flags": {
                     "isReadonly": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "focus",
@@ -28833,33 +28874,25 @@
     },
     "IFrameworkPart": {
         "kind": "interface",
+        "name": "IFrameworkPart",
         "children": [
             {
                 "name": "dispose",
                 "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
                         "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
+                        "kind": "callSignature"
                     }
-                },
-                "flags": {}
+                ]
             },
             {
                 "name": "update",
@@ -28894,34 +28927,8 @@
     },
     "IGridPanelComponentView": {
         "kind": "interface",
+        "name": "IGridPanelComponentView",
         "children": [
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
             {
                 "name": "element",
                 "code": "HTMLElement",
@@ -29113,6 +29120,24 @@
                 "flags": {
                     "isOptional": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "focus",
@@ -29311,34 +29336,8 @@
     },
     "IGridPanelView": {
         "kind": "interface",
+        "name": "IGridPanelView",
         "children": [
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
             {
                 "name": "element",
                 "code": "HTMLElement",
@@ -29492,6 +29491,24 @@
                 "flags": {
                     "isOptional": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "focus",
@@ -29719,6 +29736,7 @@
     },
     "IGridView": {
         "kind": "interface",
+        "name": "IGridView",
         "children": [
             {
                 "name": "element",
@@ -29965,6 +29983,7 @@
     },
     "IGridviewComponent": {
         "kind": "interface",
+        "name": "IGridviewComponent",
         "children": [
             {
                 "name": "activeGroup",
@@ -30926,6 +30945,7 @@
     },
     "IGridviewPanel": {
         "kind": "interface",
+        "name": "IGridviewPanel",
         "children": [
             {
                 "name": "api",
@@ -31167,6 +31187,7 @@
     },
     "IGroupPanelInitParameters": {
         "kind": "interface",
+        "name": "IGroupPanelInitParameters",
         "children": [
             {
                 "name": "params",
@@ -31193,6 +31214,7 @@
     },
     "IHeader": {
         "kind": "interface",
+        "name": "IHeader",
         "children": [
             {
                 "name": "hidden",
@@ -31208,34 +31230,8 @@
     },
     "IHeaderActionsRenderer": {
         "kind": "interface",
+        "name": "IHeaderActionsRenderer",
         "children": [
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
             {
                 "name": "element",
                 "code": "HTMLElement",
@@ -31248,6 +31244,24 @@
                 "flags": {
                     "isReadonly": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "init",
@@ -31309,6 +31323,7 @@
     },
     "INodeDescriptor": {
         "kind": "interface",
+        "name": "INodeDescriptor",
         "children": [
             {
                 "name": "node",
@@ -31337,34 +31352,8 @@
     },
     "IPaneBodyPart": {
         "kind": "interface",
+        "name": "IPaneBodyPart",
         "children": [
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
             {
                 "name": "element",
                 "code": "HTMLElement",
@@ -31377,6 +31366,24 @@
                 "flags": {
                     "isReadonly": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "init",
@@ -31447,34 +31454,8 @@
     },
     "IPaneHeaderPart": {
         "kind": "interface",
+        "name": "IPaneHeaderPart",
         "children": [
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
             {
                 "name": "element",
                 "code": "HTMLElement",
@@ -31487,6 +31468,24 @@
                 "flags": {
                     "isReadonly": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "init",
@@ -31557,34 +31556,8 @@
     },
     "IPanel": {
         "kind": "interface",
+        "name": "IPanel",
         "children": [
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
             {
                 "name": "id",
                 "code": "string",
@@ -31596,6 +31569,24 @@
                 "flags": {
                     "isReadonly": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "focus",
@@ -31739,6 +31730,7 @@
     },
     "IPanelDeserializer": {
         "kind": "interface",
+        "name": "IPanelDeserializer",
         "children": [
             {
                 "name": "fromJSON",
@@ -31784,34 +31776,8 @@
     },
     "IPaneview": {
         "kind": "interface",
+        "name": "IPaneview",
         "children": [
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
             {
                 "name": "element",
                 "code": "DocumentFragment | HTMLElement",
@@ -31962,6 +31928,24 @@
                 }
             },
             {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
                 "name": "layout",
                 "code": "(size: number, orthogonalSize: number): void",
                 "kind": "method",
@@ -32030,34 +32014,8 @@
     },
     "IPaneviewComponent": {
         "kind": "interface",
+        "name": "IPaneviewComponent",
         "children": [
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
             {
                 "name": "height",
                 "code": "number",
@@ -32299,6 +32257,24 @@
                 "signature": [
                     {
                         "name": "clear",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
                         "typeParameters": [],
                         "parameters": [],
                         "returnType": {
@@ -32557,6 +32533,7 @@
     },
     "IPaneviewPanel": {
         "kind": "interface",
+        "name": "IPaneviewPanel",
         "children": [
             {
                 "name": "api",
@@ -32809,6 +32786,7 @@
     },
     "ISerializedBranchNode": {
         "kind": "interface",
+        "name": "ISerializedBranchNode",
         "children": [
             {
                 "name": "data",
@@ -32839,7 +32817,8 @@
                 "code": "'branch'",
                 "kind": "property",
                 "type": {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "branch"
                 },
                 "flags": {}
             }
@@ -32847,6 +32826,7 @@
     },
     "ISerializedLeafNode": {
         "kind": "interface",
+        "name": "ISerializedLeafNode",
         "children": [
             {
                 "name": "data",
@@ -32875,7 +32855,8 @@
                 "code": "'leaf'",
                 "kind": "property",
                 "type": {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "leaf"
                 },
                 "flags": {}
             },
@@ -32895,6 +32876,7 @@
     },
     "ISplitViewDescriptor": {
         "kind": "interface",
+        "name": "ISplitViewDescriptor",
         "children": [
             {
                 "name": "size",
@@ -32962,34 +32944,8 @@
     },
     "ISplitviewComponent": {
         "kind": "interface",
+        "name": "ISplitviewComponent",
         "children": [
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
             {
                 "name": "height",
                 "code": "number",
@@ -33209,6 +33165,24 @@
                 "signature": [
                     {
                         "name": "clear",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
                         "typeParameters": [],
                         "parameters": [],
                         "returnType": {
@@ -33530,6 +33504,7 @@
     },
     "ISplitviewPanel": {
         "kind": "interface",
+        "name": "ISplitviewPanel",
         "children": [
             {
                 "name": "api",
@@ -33759,6 +33734,7 @@
     },
     "ISplitviewStyles": {
         "kind": "interface",
+        "name": "ISplitviewStyles",
         "children": [
             {
                 "name": "separatorBorder",
@@ -33774,36 +33750,8 @@
     },
     "ITabRenderer": {
         "kind": "interface",
+        "name": "ITabRenderer",
         "children": [
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {
-                    "isOptional": true
-                }
-            },
             {
                 "name": "element",
                 "code": "HTMLElement",
@@ -33816,6 +33764,24 @@
                 "flags": {
                     "isReadonly": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "focus",
@@ -33959,34 +33925,8 @@
     },
     "IView": {
         "kind": "interface",
+        "name": "IView",
         "children": [
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
             {
                 "name": "element",
                 "code": "DocumentFragment | HTMLElement",
@@ -34120,6 +34060,24 @@
                 }
             },
             {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
                 "name": "layout",
                 "code": "(size: number, orthogonalSize: number): void",
                 "kind": "method",
@@ -34188,6 +34146,7 @@
     },
     "IViewDeserializer": {
         "kind": "interface",
+        "name": "IViewDeserializer",
         "children": [
             {
                 "name": "fromJSON",
@@ -34238,6 +34197,7 @@
     },
     "IViewSize": {
         "kind": "interface",
+        "name": "IViewSize",
         "children": [
             {
                 "name": "height",
@@ -34267,36 +34227,8 @@
     },
     "IWatermarkRenderer": {
         "kind": "interface",
+        "name": "IWatermarkRenderer",
         "children": [
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {
-                    "isOptional": true
-                }
-            },
             {
                 "name": "element",
                 "code": "HTMLElement",
@@ -34347,6 +34279,24 @@
                     }
                 },
                 "flags": {}
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "focus",
@@ -34499,6 +34449,7 @@
     },
     "MovementOptions": {
         "kind": "interface",
+        "name": "MovementOptions",
         "children": [
             {
                 "name": "group",
@@ -34529,6 +34480,7 @@
     },
     "MovementOptions2": {
         "kind": "interface",
+        "name": "MovementOptions2",
         "children": [
             {
                 "name": "group",
@@ -34547,6 +34499,7 @@
     },
     "PanePanelComponentInitParameter": {
         "kind": "interface",
+        "name": "PanePanelComponentInitParameter",
         "children": [
             {
                 "name": "api",
@@ -34631,6 +34584,7 @@
     },
     "PanePanelInitParameter": {
         "kind": "interface",
+        "name": "PanePanelInitParameter",
         "children": [
             {
                 "name": "containerApi",
@@ -34704,6 +34658,7 @@
     },
     "PanePanelViewState": {
         "kind": "interface",
+        "name": "PanePanelViewState",
         "children": [
             {
                 "name": "component",
@@ -34769,6 +34724,7 @@
     },
     "PanelApi": {
         "kind": "interface",
+        "name": "PanelApi",
         "children": [
             {
                 "name": "height",
@@ -35025,6 +34981,7 @@
     },
     "PanelConstraintChangeEvent": {
         "kind": "interface",
+        "name": "PanelConstraintChangeEvent",
         "children": [
             {
                 "name": "maximumSize",
@@ -35056,6 +35013,7 @@
     },
     "PanelDimensionChangeEvent": {
         "kind": "interface",
+        "name": "PanelDimensionChangeEvent",
         "children": [
             {
                 "name": "height",
@@ -35085,6 +35043,7 @@
     },
     "PanelInitParameters": {
         "kind": "interface",
+        "name": "PanelInitParameters",
         "children": [
             {
                 "name": "params",
@@ -35101,6 +35060,7 @@
     },
     "PanelOptions": {
         "kind": "interface",
+        "name": "PanelOptions",
         "children": [
             {
                 "name": "component",
@@ -35164,6 +35124,7 @@
     },
     "PanelReference": {
         "kind": "interface",
+        "name": "PanelReference",
         "children": [
             {
                 "name": "remove",
@@ -35253,6 +35214,7 @@
     },
     "PanelSizeEvent": {
         "kind": "interface",
+        "name": "PanelSizeEvent",
         "children": [
             {
                 "name": "size",
@@ -35270,6 +35232,7 @@
     },
     "PanelUpdateEvent": {
         "kind": "interface",
+        "name": "PanelUpdateEvent",
         "children": [
             {
                 "name": "params",
@@ -35294,6 +35257,7 @@
     },
     "PanelViewInitParameters": {
         "kind": "interface",
+        "name": "PanelViewInitParameters",
         "children": [
             {
                 "name": "accessor",
@@ -35385,6 +35349,7 @@
     },
     "PaneviewComponentOptions": {
         "kind": "interface",
+        "name": "PaneviewComponentOptions",
         "children": [
             {
                 "name": "components",
@@ -35583,6 +35548,7 @@
     },
     "PaneviewDndOverlayEvent": {
         "kind": "interface",
+        "name": "PaneviewDndOverlayEvent",
         "children": [
             {
                 "name": "getData",
@@ -35647,6 +35613,7 @@
     },
     "PaneviewDropEvent": {
         "kind": "interface",
+        "name": "PaneviewDropEvent",
         "children": [
             {
                 "name": "api",
@@ -35737,6 +35704,7 @@
     },
     "PaneviewPanelApi": {
         "kind": "interface",
+        "name": "PaneviewPanelApi",
         "children": [
             {
                 "name": "height",
@@ -36184,6 +36152,7 @@
     },
     "RendererChangedEvent": {
         "kind": "interface",
+        "name": "RendererChangedEvent",
         "children": [
             {
                 "name": "renderer",
@@ -36202,6 +36171,7 @@
     },
     "SerializedDockview": {
         "kind": "interface",
+        "name": "SerializedDockview",
         "children": [
             {
                 "name": "activeGroup",
@@ -36338,6 +36308,7 @@
     },
     "SerializedFloatingGroup": {
         "kind": "interface",
+        "name": "SerializedFloatingGroup",
         "children": [
             {
                 "name": "data",
@@ -36365,6 +36336,7 @@
     },
     "SerializedGridObject": {
         "kind": "interface",
+        "name": "SerializedGridObject",
         "children": [
             {
                 "name": "data",
@@ -36419,10 +36391,12 @@
                     "type": "or",
                     "values": [
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "branch"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "leaf"
                         }
                     ]
                 },
@@ -36444,6 +36418,7 @@
     },
     "SerializedGridview": {
         "kind": "interface",
+        "name": "SerializedGridview",
         "children": [
             {
                 "name": "height",
@@ -36499,6 +36474,7 @@
     },
     "SerializedGridviewComponent": {
         "kind": "interface",
+        "name": "SerializedGridviewComponent",
         "children": [
             {
                 "name": "activePanel",
@@ -36534,6 +36510,7 @@
     },
     "SerializedPaneview": {
         "kind": "interface",
+        "name": "SerializedPaneview",
         "children": [
             {
                 "name": "size",
@@ -36563,6 +36540,7 @@
     },
     "SerializedPaneviewPanel": {
         "kind": "interface",
+        "name": "SerializedPaneviewPanel",
         "children": [
             {
                 "name": "data",
@@ -36728,6 +36706,7 @@
     },
     "SerializedPopoutGroup": {
         "kind": "interface",
+        "name": "SerializedPopoutGroup",
         "children": [
             {
                 "name": "data",
@@ -36765,7 +36744,8 @@
                             "source": "dockview-core"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": null
                         }
                     ]
                 },
@@ -36775,6 +36755,7 @@
     },
     "SerializedSplitview": {
         "kind": "interface",
+        "name": "SerializedSplitview",
         "children": [
             {
                 "name": "activeView",
@@ -36827,6 +36808,7 @@
     },
     "SerializedSplitviewPanel": {
         "kind": "interface",
+        "name": "SerializedSplitviewPanel",
         "children": [
             {
                 "name": "data",
@@ -36893,6 +36875,7 @@
     },
     "SerializedSplitviewPanelData": {
         "kind": "interface",
+        "name": "SerializedSplitviewPanelData",
         "children": [
             {
                 "name": "component",
@@ -36958,6 +36941,7 @@
     },
     "SizeEvent": {
         "kind": "interface",
+        "name": "SizeEvent",
         "children": [
             {
                 "name": "height",
@@ -36989,6 +36973,7 @@
     },
     "SplitViewOptions": {
         "kind": "interface",
+        "name": "SplitViewOptions",
         "children": [
             {
                 "name": "descriptor",
@@ -37048,6 +37033,7 @@
     },
     "SplitviewComponentOptions": {
         "kind": "interface",
+        "name": "SplitviewComponentOptions",
         "children": [
             {
                 "name": "components",
@@ -37182,6 +37168,7 @@
     },
     "SplitviewPanelApi": {
         "kind": "interface",
+        "name": "SplitviewPanelApi",
         "children": [
             {
                 "name": "height",
@@ -37516,6 +37503,7 @@
     },
     "TabContextMenuEvent": {
         "kind": "interface",
+        "name": "TabContextMenuEvent",
         "children": [
             {
                 "name": "api",
@@ -37554,6 +37542,7 @@
     },
     "TabDragEvent": {
         "kind": "interface",
+        "name": "TabDragEvent",
         "children": [
             {
                 "name": "nativeEvent",
@@ -37585,6 +37574,7 @@
     },
     "TitleEvent": {
         "kind": "interface",
+        "name": "TitleEvent",
         "children": [
             {
                 "name": "title",
@@ -37602,6 +37592,7 @@
     },
     "ViewFactoryData": {
         "kind": "interface",
+        "name": "ViewFactoryData",
         "children": [
             {
                 "name": "content",
@@ -37629,6 +37620,7 @@
     },
     "VisibilityEvent": {
         "kind": "interface",
+        "name": "VisibilityEvent",
         "children": [
             {
                 "name": "isVisible",
@@ -37646,6 +37638,7 @@
     },
     "WatermarkConstructor": {
         "kind": "interface",
+        "name": "WatermarkConstructor",
         "children": [
             {
                 "name": "constructor",
@@ -37656,6 +37649,7 @@
     },
     "WatermarkPartInitParameters": {
         "kind": "interface",
+        "name": "WatermarkPartInitParameters",
         "children": [
             {
                 "name": "accessor",
@@ -37672,6 +37666,7 @@
     },
     "WatermarkRendererInitParameters": {
         "kind": "interface",
+        "name": "WatermarkRendererInitParameters",
         "children": [
             {
                 "name": "containerApi",
@@ -37894,19 +37889,24 @@
             "type": "or",
             "values": [
                 {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "within"
                 },
                 {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "below"
                 },
                 {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "above"
                 },
                 {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "right"
                 },
                 {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "left"
                 }
             ]
         },
@@ -37928,7 +37928,8 @@
                         "code": "'distribute'",
                         "kind": "property",
                         "type": {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "distribute"
                         },
                         "flags": {}
                     }
@@ -37955,49 +37956,64 @@
                     "type": "or",
                     "values": [
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "disableDnd"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "rootOverlayModel"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "floatingGroupBounds"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "disableFloatingGroups"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "createPrefixHeaderActionsElement"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "createRightHeaderActionsElement"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "createLeftHeaderActionsElement"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "defaultTabComponent"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "watermarkFrameworkComponent"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "showDndOverlay"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "frameworkTabComponents"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "tabComponents"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "frameworkComponents"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "components"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "orientation"
                         }
                     ]
                 }
@@ -38013,16 +38029,20 @@
             "type": "or",
             "values": [
                 {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "edge"
                 },
                 {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "content"
                 },
                 {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "header_space"
                 },
                 {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "tab"
                 }
             ]
         },
@@ -38075,7 +38095,8 @@
                                 "code": "'popout'",
                                 "kind": "property",
                                 "type": {
-                                    "type": "literal"
+                                    "type": "literal",
+                                    "value": "popout"
                                 },
                                 "flags": {}
                             }
@@ -38094,7 +38115,8 @@
                                 "code": "'floating'",
                                 "kind": "property",
                                 "type": {
-                                    "type": "literal"
+                                    "type": "literal",
+                                    "value": "floating"
                                 },
                                 "flags": {}
                             }
@@ -38113,7 +38135,8 @@
                                 "code": "'grid'",
                                 "kind": "property",
                                 "type": {
-                                    "type": "literal"
+                                    "type": "literal",
+                                    "value": "grid"
                                 },
                                 "flags": {}
                             }
@@ -38132,7 +38155,8 @@
             "type": "or",
             "values": [
                 {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "no-drop-target"
                 },
                 {
                     "type": "intrinsic",
@@ -38150,10 +38174,12 @@
             "type": "or",
             "values": [
                 {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "always"
                 },
                 {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "onlyWhenVisibile"
                 }
             ]
         },
@@ -38256,13 +38282,16 @@
                     "type": "or",
                     "values": [
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "frameworkComponents"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "components"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "orientation"
                         }
                     ]
                 }
@@ -38328,7 +38357,8 @@
                         "code": "'invisible'",
                         "kind": "property",
                         "type": {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "invisible"
                         },
                         "flags": {}
                     }
@@ -38356,10 +38386,12 @@
                             "type": "or",
                             "values": [
                                 {
-                                    "type": "literal"
+                                    "type": "literal",
+                                    "value": "percentage"
                                 },
                                 {
-                                    "type": "literal"
+                                    "type": "literal",
+                                    "value": "pixels"
                                 }
                             ]
                         },
@@ -38388,19 +38420,24 @@
             "type": "or",
             "values": [
                 {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "center"
                 },
                 {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "right"
                 },
                 {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "left"
                 },
                 {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "bottom"
                 },
                 {
-                    "type": "literal"
+                    "type": "literal",
+                    "value": "top"
                 }
             ]
         },
@@ -38432,7 +38469,8 @@
                         "code": "'split'",
                         "kind": "property",
                         "type": {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "split"
                         },
                         "flags": {}
                     }
@@ -38459,13 +38497,16 @@
                     "type": "or",
                     "values": [
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "frameworkComponents"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "components"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "orientation"
                         }
                     ]
                 }
@@ -39122,6 +39163,7 @@
     },
     "ReactPart": {
         "kind": "class",
+        "name": "ReactPart",
         "children": [
             {
                 "name": "constructor",
@@ -39182,6 +39224,7 @@
     },
     "DockviewReadyEvent": {
         "kind": "interface",
+        "name": "DockviewReadyEvent",
         "children": [
             {
                 "name": "api",
@@ -39198,6 +39241,7 @@
     },
     "GridviewReadyEvent": {
         "kind": "interface",
+        "name": "GridviewReadyEvent",
         "children": [
             {
                 "name": "api",
@@ -39214,6 +39258,7 @@
     },
     "IDockviewHeaderActionsProps": {
         "kind": "interface",
+        "name": "IDockviewHeaderActionsProps",
         "children": [
             {
                 "name": "activePanel",
@@ -39296,6 +39341,7 @@
     },
     "IDockviewReactProps": {
         "kind": "interface",
+        "name": "IDockviewReactProps",
         "children": [
             {
                 "name": "className",
@@ -39353,10 +39399,12 @@
                     "type": "or",
                     "values": [
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "always"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "onlyWhenVisibile"
                         }
                     ]
                 },
@@ -39434,7 +39482,8 @@
                     "type": "or",
                     "values": [
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "boundedWithinViewport"
                         },
                         {
                             "type": "reflection",
@@ -39739,10 +39788,12 @@
                     "type": "or",
                     "values": [
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "default"
                         },
                         {
-                            "type": "literal"
+                            "type": "literal",
+                            "value": "fullwidth"
                         }
                     ]
                 },
@@ -39800,6 +39851,7 @@
     },
     "IGridviewPanelProps": {
         "kind": "interface",
+        "name": "IGridviewPanelProps",
         "children": [
             {
                 "name": "api",
@@ -39839,6 +39891,7 @@
     },
     "IGridviewReactProps": {
         "kind": "interface",
+        "name": "IGridviewReactProps",
         "children": [
             {
                 "name": "className",
@@ -39977,6 +40030,7 @@
     },
     "IGroupPanelBaseProps": {
         "kind": "interface",
+        "name": "IGroupPanelBaseProps",
         "children": [
             {
                 "name": "api",
@@ -40016,6 +40070,7 @@
     },
     "IPaneviewPanelProps": {
         "kind": "interface",
+        "name": "IPaneviewPanelProps",
         "children": [
             {
                 "name": "api",
@@ -40065,6 +40120,7 @@
     },
     "IPaneviewReactProps": {
         "kind": "interface",
+        "name": "IPaneviewReactProps",
         "children": [
             {
                 "name": "className",
@@ -40263,6 +40319,7 @@
     },
     "ISplitviewPanelProps": {
         "kind": "interface",
+        "name": "ISplitviewPanelProps",
         "children": [
             {
                 "name": "api",
@@ -40302,6 +40359,7 @@
     },
     "ISplitviewReactProps": {
         "kind": "interface",
+        "name": "ISplitviewReactProps",
         "children": [
             {
                 "name": "className",
@@ -40440,6 +40498,7 @@
     },
     "IWatermarkPanelProps": {
         "kind": "interface",
+        "name": "IWatermarkPanelProps",
         "children": [
             {
                 "name": "close",
@@ -40501,6 +40560,7 @@
     },
     "PanelParameters": {
         "kind": "interface",
+        "name": "PanelParameters",
         "children": [
             {
                 "name": "params",
@@ -40518,6 +40578,7 @@
     },
     "PaneviewReadyEvent": {
         "kind": "interface",
+        "name": "PaneviewReadyEvent",
         "children": [
             {
                 "name": "api",
@@ -40534,6 +40595,7 @@
     },
     "ReactPortalStore": {
         "kind": "interface",
+        "name": "ReactPortalStore",
         "children": [
             {
                 "name": "addPortal",
@@ -40578,6 +40640,7 @@
     },
     "SplitviewReadyEvent": {
         "kind": "interface",
+        "name": "SplitviewReadyEvent",
         "children": [
             {
                 "name": "api",
@@ -40716,6 +40779,7 @@
     },
     "DockviewDefaultTab": {
         "kind": "function",
+        "name": "DockviewDefaultTab",
         "children": [
             {
                 "name": "contextTypes",
@@ -40796,6 +40860,7 @@
     },
     "DockviewReact": {
         "kind": "function",
+        "name": "DockviewReact",
         "children": [
             {
                 "name": "$$typeof",
@@ -40903,6 +40968,7 @@
     },
     "GridviewReact": {
         "kind": "function",
+        "name": "GridviewReact",
         "children": [
             {
                 "name": "$$typeof",
@@ -41010,6 +41076,7 @@
     },
     "PaneviewReact": {
         "kind": "function",
+        "name": "PaneviewReact",
         "children": [
             {
                 "name": "$$typeof",
@@ -41117,6 +41184,7 @@
     },
     "SplitviewReact": {
         "kind": "function",
+        "name": "SplitviewReact",
         "children": [
             {
                 "name": "$$typeof",

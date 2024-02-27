@@ -113,10 +113,9 @@ function parseComplexType(obj) {
                 values: obj.types.map(parseComplexType).reverse(),
             };
         case 'intrinsic':
-        case 'literal':
             return { type: obj.type, value: obj.name };
         case 'literal':
-            return { type: obj.type, value: obj.name };
+            return { type: obj.type, value: obj.value };
         case 'reflection':
             return { type: obj.type, value: parse(obj.declaration) };
         case 'reference': {
@@ -576,6 +575,7 @@ function createDocument(declarations) {
 
         documentation[name] = {
             ...metadata,
+            name,
             children: [],
         };
 

@@ -192,7 +192,7 @@ export const DocRef = (props: DocRefProps) => {
 
     const filteredDocs = React.useMemo(
         () =>
-            docs.kind === 'class'
+            docs.kind === 'class' || docs.kind === 'interface'
                 ? docs.children.filter((child) => {
                       if (
                           props.methods &&
@@ -217,13 +217,13 @@ export const DocRef = (props: DocRefProps) => {
                     return (
                         <>
                             <Row key={i} doc={doc} />
-                            {/* <div>
+                            {/* <th colSpan={2}>
                                 {firstLevel(doc).map((x) => (
                                     <span style={{ padding: '0px 2px' }}>
                                         <DocumentRef value={newJson[x]} />
                                     </span>
                                 ))}
-                            </div> */}
+                            </th> */}
                             {/* {doc.pieces?.map((piece) => (
                                 <tr>
                                     <th colSpan={2}>

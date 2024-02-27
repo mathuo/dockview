@@ -41,60 +41,51 @@ export function firstLevelTypes(value: TypeDescriptor.Type | null) {
 }
 
 export function firstLevel(value: TypeSystem.Type | null) {
-    if (!value) {
-        return [];
+    const results: string[] = [];
+
+    switch (value.kind) {
+        case null:
+            break;
+        case 'property':
+            results.push(...firstLevelTypes(value.type));
+            break;
+        case 'accessor':
+            results.push(...firstLevelTypes(value.value.returnType));
+            break;
+        case 'method':
+            results.push(...value.signature.flatMap(firstLevel));
+            break;
+        case 'constructor':
+            break;
+        case 'typeLiteral':
+            if (value.properties) {
+                results.push(...value.properties.flatMap(firstLevel));
+            }
+            if (value.signatures) {
+                results.push(...value.signatures.flatMap(firstLevel));
+            }
+            break;
+        case 'callSignature':
+            results.push(
+                ...firstLevelTypes(value.returnType),
+                ...value.typeParameters.flatMap((_) => {
+                    return [...firstLevelTypes(_.extends)];
+                }),
+                ...value.parameters.flatMap(firstLevel)
+            );
+            break;
+        case 'parameter':
+            results.push(...firstLevelTypes(value.type));
+            break;
+        default:
+            console.log('test', value);
+            throw new Error('unreachable');
     }
 
-    if (value.kind === 'property') {
-        return firstLevelTypes(value.type);
-    }
-
-    if (value.kind === 'accessor') {
-        return firstLevelTypes(value.value.returnType);
-    }
-
-    if (value.kind === 'method') {
-        return value.signature.flatMap(firstLevel);
-    }
-
-    if (value.kind === 'constructor') {
-        return [];
-    }
-
-    if (value.kind === 'typeLiteral') {
-        const result = [];
-        if (value.properties) {
-            result.push(...value.properties.flatMap(firstLevel));
-        }
-        if (value.signatures) {
-            result.push(...value.signatures.flatMap(firstLevel));
-        }
-        return result;
-    }
-
-    if (value.kind === 'callSignature') {
-        const result = [];
-
-        result.push(
-            ...firstLevelTypes(value.returnType),
-            ...value.typeParameters.flatMap((_) => {
-                return [...firstLevelTypes(_.extends)];
-            }),
-            ...value.parameters.flatMap(firstLevel)
-        );
-
-        return result;
-    }
-
-    if (value.kind === 'parameter') {
-        return firstLevelTypes(value.type);
-    }
-
-    console.log('test', value);
-    throw new Error('unreachable');
+    return Array.from(new Set(results));
 }
 
-export function codifyType(value: TypeDescriptor.Type | null) {
+export function codifyType(value: TypeDescriptor.Type | null, tabs = 0) {
     if (!value) {
         return null;
     }
@@ -134,7 +125,7 @@ export function codifyType(value: TypeDescriptor.Type | null) {
             return `${value.value}`;
         }
         case 'reflection':
-            return codify(value.value);
+            return codify(value.value, tabs);
         case 'tuple':
             return `[${value.value.map(codifyType).join(', ')}]`;
         default:
@@ -142,18 +133,20 @@ export function codifyType(value: TypeDescriptor.Type | null) {
     }
 }
 
-export function codify(value: TypeSystem.Type | null) {
+export function codify(value: TypeSystem.Type | null, tabs = 0) {
     if (!value) {
         return null;
     }
 
     if (value.kind === 'accessor') {
         const signature = value.value;
-        return `${signature.name}: ${codifyType(signature.returnType)}`;
+        return `${'\t'.repeat(tabs)}${signature.name}: ${codifyType(
+            signature.returnType
+        )}`;
     }
 
     if (value.kind === 'property') {
-        let code = '';
+        let code = '\t'.repeat(tabs);
 
         if (value.flags.isProtected) {
             code += 'protected ';
@@ -167,12 +160,14 @@ export function codify(value: TypeSystem.Type | null) {
             code += '?';
         }
 
-        code += `: ${codifyType(value.type)}`;
+        code += `: ${codifyType(value.type, tabs + 1)}`;
         return code;
     }
 
     if (value.kind === 'method') {
-        return value.signature.map(codify).join('\n');
+        return `${'\t'.repeat(tabs)}${value.name}${value.signature
+            .map(codify)
+            .join('\n')}`;
     }
 
     if (value.kind === 'callSignature') {
@@ -201,7 +196,7 @@ export function codify(value: TypeSystem.Type | null) {
 
         code += value.parameters
             .map((parameter) => {
-                return codify(parameter);
+                return codify(parameter, tabs + 1);
             })
             .join(', ');
 
@@ -211,12 +206,14 @@ export function codify(value: TypeSystem.Type | null) {
     }
 
     if (value.kind === 'parameter') {
-        return `${value.name}: ${codifyType(value.type)}`;
+        return `${value.name}: ${codifyType(value.type, tabs + 1)}`;
     }
 
     if (value.kind === 'typeLiteral') {
         if (value.properties) {
-            return `{\n${value.properties.map(codify).join(',\n')}\n}`;
+            return `{\n${value.properties
+                .map((_) => codify(_, tabs))
+                .join(',\n')}\n${'\t'.repeat(Math.max(0, tabs - 1))}}`;
         }
         if (value.signatures) {
             return value.signatures.map(codify).join('\n');
@@ -229,14 +226,15 @@ export function codify(value: TypeSystem.Type | null) {
 
     if (value.kind === 'interface') {
         return `interface ${value.name} {\n${value.children
-            .map(codify)
-            .join(',\n')}\n}`;
+            .map((_) => codify(_, tabs + 1))
+            .join(';\n')};\n}`;
     }
 
     if (value.kind === 'class') {
         return `interface ${value.name} {\n${value.children
-            .map(codify)
-            .join(',\n')}\n}`;
+            .filter((_) => _.kind !== 'constructor')
+            .map((_) => codify(_, tabs + 1))
+            .join(';\n')};\n}`;
     }
 
     if (value.kind === 'typeAlias') {
