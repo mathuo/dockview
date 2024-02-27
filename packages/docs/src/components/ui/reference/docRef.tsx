@@ -43,25 +43,31 @@ type DocsJson = {
 
 const newJson = docsJson_ as ExportedTypeFile;
 
-console.log(newJson);
-
 export const DocumentRef = (props: { value: TypeSystem.Type }) => {
-    if (!props.value) {
+    const code = React.useMemo(() => {
+        if (!props.value) {
+            return null;
+        }
+
+        switch (props.value.kind) {
+            case 'typeAlias':
+                return codify(props.value);
+            case 'interface':
+                return codify(props.value);
+            case 'class':
+                return codify(props.value);
+            case 'function':
+                return codify(props.value);
+            default:
+                return null;
+        }
+    }, [props.value]);
+
+    if (!code) {
         return null;
     }
 
-    switch (props.value.kind) {
-        case 'typealias':
-            return codify(props.value);
-        case 'interface':
-            return codify(props.value);
-        case 'class':
-            return codify(props.value);
-        case 'function':
-            return codify(props.value);
-        default:
-            return <div>{'error'}</div>;
-    }
+    return <CodeBlock language="tsx">{code}</CodeBlock>;
 };
 
 export const Text = (props: { content: DocsContent[] }) => {
@@ -211,13 +217,13 @@ export const DocRef = (props: DocRefProps) => {
                     return (
                         <>
                             <Row key={i} doc={doc} />
-                            <div>
+                            {/* <div>
                                 {firstLevel(doc).map((x) => (
                                     <span style={{ padding: '0px 2px' }}>
                                         <DocumentRef value={newJson[x]} />
                                     </span>
                                 ))}
-                            </div>
+                            </div> */}
                             {/* {doc.pieces?.map((piece) => (
                                 <tr>
                                     <th colSpan={2}>

@@ -216,7 +216,7 @@ export function codify(value: TypeSystem.Type | null) {
 
     if (value.kind === 'typeLiteral') {
         if (value.properties) {
-            return `{ ${value.properties.map(codify).join(', ')} }`;
+            return `{\n${value.properties.map(codify).join(',\n')}\n}`;
         }
         if (value.signatures) {
             return value.signatures.map(codify).join('\n');
@@ -228,15 +228,19 @@ export function codify(value: TypeSystem.Type | null) {
     }
 
     if (value.kind === 'interface') {
-        return `interface ${value.name} { ${value.children
+        return `interface ${value.name} {\n${value.children
             .map(codify)
-            .join(',')} }`;
+            .join(',\n')}\n}`;
     }
 
     if (value.kind === 'class') {
-        return `interface ${value.name} { ${value.children
+        return `interface ${value.name} {\n${value.children
             .map(codify)
-            .join(',')} }`;
+            .join(',\n')}\n}`;
+    }
+
+    if (value.kind === 'typeAlias') {
+        return `type ${value.name} = ${codifyType(value.type)}`;
     }
 
     console.log('unreachable', value);
@@ -300,7 +304,7 @@ export namespace TypeSystem {
 
     export type TypeAlias = {
         name: string;
-        kind: 'typealias';
+        kind: 'typeAlias';
         typeParameters: TypeSystem.TypeParameter[];
         type: TypeDescriptor.Type;
         comment?: Comment;
