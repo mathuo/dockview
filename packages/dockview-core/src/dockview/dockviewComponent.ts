@@ -65,6 +65,7 @@ import {
     OverlayRenderContainer,
 } from '../overlayRenderContainer';
 import { PopoutWindow } from '../popoutWindow';
+import { TitleEvent } from '../api/dockviewPanelApi';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     activationSize: { type: 'pixels', value: 10 },
@@ -360,6 +361,14 @@ export class DockviewComponent
     private readonly _onDidAddPanel = new Emitter<IDockviewPanel>();
     readonly onDidAddPanel: Event<IDockviewPanel> = this._onDidAddPanel.event;
 
+    private readonly _onDidPanelTitleChange = new Emitter<TitleEvent>();
+    readonly onDidPanelTitleChange: Event<TitleEvent> =
+        this._onDidPanelTitleChange.event;
+
+    private readonly _onDidPanelParametersChange = new Emitter<Parameters>();
+    readonly onDidPanelParametersChange: Event<Parameters> =
+        this._onDidPanelParametersChange.event;
+
     private readonly _onDidLayoutFromJSON = new Emitter<void>();
     readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutFromJSON.event;
 
@@ -486,7 +495,9 @@ export class DockviewComponent
             Event.any(
                 this.onDidAddPanel,
                 this.onDidRemovePanel,
-                this.onDidActivePanelChange
+                this.onDidActivePanelChange,
+                this.onDidPanelTitleChange,
+                this.onDidPanelParametersChange
             )(() => {
                 this._bufferOnDidLayoutChange.fire();
             }),
@@ -2175,6 +2186,12 @@ export class DockviewComponent
                     if (this._onDidActivePanelChange.value !== event.panel) {
                         this._onDidActivePanelChange.fire(event.panel);
                     }
+                }),
+                view.model.onDidPanelTitleChange((event) => {
+                    this._onDidPanelTitleChange.fire(event);
+                }),
+                view.model.onDidPanelParametersChange((event) => {
+                    this._onDidPanelParametersChange.fire(event);
                 })
             );
 

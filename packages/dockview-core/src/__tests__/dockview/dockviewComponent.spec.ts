@@ -8,7 +8,7 @@ import { PanelUpdateEvent } from '../../panel/types';
 import { Orientation } from '../../splitview/splitview';
 import { CompositeDisposable } from '../../lifecycle';
 import { Emitter } from '../../events';
-import { IDockviewPanel } from '../../dockview/dockviewPanel';
+import { DockviewPanel, IDockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import { fireEvent } from '@testing-library/dom';
 import { getPanelData } from '../../dnd/dataTransfer';
@@ -4594,6 +4594,80 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.isActive).toBeTruthy();
             expect(panel2.api.isActive).toBeFalsy();
             expect(panel2.group.api.isActive).toBeFalsy();
+        });
+    });
+
+    describe('that emits onDidLayoutChange', () => {
+        let dockview: DockviewComponent;
+        let panel1: DockviewPanel;
+
+        beforeEach(() => {
+            jest.useFakeTimers();
+
+            dockview = new DockviewComponent({
+                parentElement: container,
+                components: {
+                    default: PanelContentPartTest,
+                },
+                tabComponents: {
+                    test_tab_id: PanelTabPartTest,
+                },
+                orientation: Orientation.HORIZONTAL,
+            });
+
+            panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+        });
+
+        afterEach(() => {
+            jest.runAllTimers();
+            jest.useRealTimers();
+        });
+
+        test('that emits onDidPanelTitleChange and onDidLayoutChange when the panel set a title', () => {
+            const container = document.createElement('div');
+
+            const didPanelTitleChangeHandler = jest.fn();
+            const { dispose: disposeDidPanelTitleChangeHandler } =
+                dockview.onDidPanelTitleChange(didPanelTitleChangeHandler);
+
+            const didLayoutChangeHandler = jest.fn();
+            const { dispose: disposeDidLayoutChangeHandler } =
+                dockview.onDidLayoutChange(didLayoutChangeHandler);
+
+            panel1.setTitle('new title');
+
+            jest.runAllTimers();
+
+            expect(didPanelTitleChangeHandler).toHaveBeenCalledTimes(1);
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(1);
+
+            disposeDidPanelTitleChangeHandler();
+            disposeDidLayoutChangeHandler();
+        });
+
+        test('that emits onDidPanelParametersChange and onDidLayoutChange when the panel updates parameters', () => {
+            const didPanelParametersChangeHandler = jest.fn();
+            const { dispose: disposeDidPanelParametersChangeHandler } =
+                dockview.onDidPanelParametersChange(
+                    didPanelParametersChangeHandler
+                );
+
+            const didLayoutChangeHandler = jest.fn();
+            const { dispose: disposeDidLayoutChangeHandler } =
+                dockview.onDidLayoutChange(didLayoutChangeHandler);
+
+            panel1.api.updateParameters({ keyA: 'valueA' });
+
+            jest.runAllTimers();
+
+            expect(didPanelParametersChangeHandler).toHaveBeenCalledTimes(1);
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(1);
+
+            disposeDidPanelParametersChangeHandler();
+            disposeDidLayoutChangeHandler();
         });
     });
 });
