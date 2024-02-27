@@ -247,7 +247,7 @@
                 "pieces": []
             },
             {
-                "name": "onDidMaxmizedGroupChange",
+                "name": "onDidMaximizedGroupChange",
                 "code": "Event<void>",
                 "kind": "accessor",
                 "pieces": [
@@ -858,7 +858,7 @@
                 ]
             },
             {
-                "name": "onDidMaxmizedGroupChange",
+                "name": "onDidMaximizedGroupChange",
                 "code": "Event<void>",
                 "kind": "accessor",
                 "pieces": [
@@ -1634,7 +1634,7 @@
                 "pieces": []
             },
             {
-                "name": "onDidMaxmizedGroupChange",
+                "name": "onDidMaximizedGroupChange",
                 "code": "Event<void>",
                 "kind": "accessor",
                 "pieces": [
@@ -1770,7 +1770,7 @@
             },
             {
                 "name": "doRemoveGroup",
-                "code": "(group: DockviewGroupPanel, options?: { skipActive?: boolean, skipDispose?: boolean, skipPopoutAssociated?: boolean }): DockviewGroupPanel",
+                "code": "(group: DockviewGroupPanel, options?: { skipActive?: boolean, skipDispose?: boolean, skipPopoutAssociated?: boolean, skipPopoutReturn?: boolean }): DockviewGroupPanel",
                 "kind": "method",
                 "pieces": [
                     "DockviewGroupPanel"
@@ -1898,7 +1898,7 @@
             },
             {
                 "name": "removeGroup",
-                "code": "(group: DockviewGroupPanel, options?: { skipActive?: boolean, skipDispose?: boolean }): void",
+                "code": "(group: DockviewGroupPanel, options?: { skipActive?: boolean, skipDispose?: boolean, skipPopoutAssociated?: boolean, skipPopoutReturn?: boolean }): void",
                 "kind": "method",
                 "pieces": [
                     "DockviewGroupPanel"
@@ -2604,10 +2604,10 @@
             },
             {
                 "name": "canDisplayOverlay",
-                "code": "(event: DragEvent, position: Position, target: DockviewDropTargets): boolean",
+                "code": "(event: DragEvent, position: Position, target: DockviewGroupDropLocation): boolean",
                 "kind": "method",
                 "pieces": [
-                    "DockviewDropTargets",
+                    "DockviewGroupDropLocation",
                     "Position"
                 ]
             },
@@ -3313,7 +3313,7 @@
                 ]
             },
             {
-                "name": "onDidMaxmizedNodeChange",
+                "name": "onDidMaximizedNodeChange",
                 "code": "Event<void>",
                 "kind": "property",
                 "flags": {
@@ -4137,7 +4137,7 @@
                 "pieces": []
             },
             {
-                "name": "onDidMaxmizedGroupChange",
+                "name": "onDidMaximizedGroupChange",
                 "code": "Event<void>",
                 "kind": "accessor",
                 "pieces": [
@@ -7041,6 +7041,50 @@
             }
         ]
     },
+    "WillShowOverlayLocationEvent": {
+        "kind": "class",
+        "children": [
+            {
+                "name": "constructor",
+                "code": "",
+                "pieces": []
+            },
+            {
+                "name": "defaultPrevented",
+                "code": "boolean",
+                "kind": "accessor",
+                "pieces": []
+            },
+            {
+                "name": "kind",
+                "code": "DockviewGroupDropLocation",
+                "kind": "accessor",
+                "pieces": [
+                    "DockviewGroupDropLocation"
+                ]
+            },
+            {
+                "name": "nativeEvent",
+                "code": "DragEvent",
+                "kind": "accessor",
+                "pieces": []
+            },
+            {
+                "name": "position",
+                "code": "Position",
+                "kind": "accessor",
+                "pieces": [
+                    "Position"
+                ]
+            },
+            {
+                "name": "preventDefault",
+                "code": "(): void",
+                "kind": "method",
+                "pieces": []
+            }
+        ]
+    },
     "ActiveEvent": {
         "kind": "interface",
         "children": [
@@ -7593,7 +7637,7 @@
             },
             {
                 "name": "defaultRenderer",
-                "code": "'always' | 'onlyWhenVisibile'",
+                "code": "'always' | 'onlyWhenVisible'",
                 "kind": "property",
                 "flags": {
                     "isOptional": true
@@ -7818,11 +7862,11 @@
             },
             {
                 "name": "target",
-                "code": "DockviewDropTargets",
+                "code": "DockviewGroupDropLocation",
                 "kind": "property",
                 "flags": {},
                 "pieces": [
-                    "DockviewDropTargets"
+                    "DockviewGroupDropLocation"
                 ]
             }
         ]
@@ -8062,6 +8106,12 @@
                         }
                     ]
                 },
+                "pieces": []
+            },
+            {
+                "name": "close",
+                "code": "(): void",
+                "kind": "method",
                 "pieces": []
             },
             {
@@ -9474,7 +9524,7 @@
             },
             {
                 "name": "renderer",
-                "code": "'always' | 'onlyWhenVisibile'",
+                "code": "'always' | 'onlyWhenVisible'",
                 "kind": "property",
                 "flags": {
                     "isOptional": true
@@ -9609,7 +9659,7 @@
                 ]
             },
             {
-                "name": "onDidMaxmizedGroupChange",
+                "name": "onDidMaximizedGroupChange",
                 "code": "Event<void>",
                 "kind": "property",
                 "flags": {
@@ -10111,7 +10161,7 @@
                 ]
             },
             {
-                "name": "onDidMaxmizedGroupChange",
+                "name": "onDidMaximizedGroupChange",
                 "code": "Event<void>",
                 "kind": "property",
                 "flags": {
@@ -10191,7 +10241,9 @@
                 "name": "options",
                 "code": "DockviewComponentOptions",
                 "kind": "property",
-                "flags": {},
+                "flags": {
+                    "isReadonly": true
+                },
                 "pieces": [
                     "DockviewComponentOptions"
                 ]
@@ -10785,10 +10837,10 @@
             },
             {
                 "name": "canDisplayOverlay",
-                "code": "(event: DragEvent, position: Position, target: DockviewDropTargets): boolean",
+                "code": "(event: DragEvent, position: Position, target: DockviewGroupDropLocation): boolean",
                 "kind": "method",
                 "pieces": [
-                    "DockviewDropTargets",
+                    "DockviewGroupDropLocation",
                     "Position"
                 ]
             },
@@ -11581,7 +11633,7 @@
                 ]
             },
             {
-                "name": "onDidMaxmizedGroupChange",
+                "name": "onDidMaximizedGroupChange",
                 "code": "Event<void>",
                 "kind": "property",
                 "flags": {
@@ -15228,29 +15280,6 @@
             }
         ]
     },
-    "WillShowOverlayLocationEvent": {
-        "kind": "interface",
-        "children": [
-            {
-                "name": "event",
-                "code": "WillShowOverlayEvent",
-                "kind": "property",
-                "flags": {},
-                "pieces": [
-                    "WillShowOverlayEvent"
-                ]
-            },
-            {
-                "name": "kind",
-                "code": "DockviewGroupDropLocation",
-                "kind": "property",
-                "flags": {},
-                "pieces": [
-                    "DockviewGroupDropLocation"
-                ]
-            }
-        ]
-    },
     "AddGroupOptions": {
         "kind": "typeAlias",
         "children": [],
@@ -15328,23 +15357,12 @@
             ]
         }
     },
-    "DockviewDropTargets": {
-        "kind": "typeAlias",
-        "children": [],
-        "metadata": {
-            "name": "DockviewDropTargets",
-            "code": "'edge' | 'tabContainer' | 'panel' | 'tab'",
-            "pieces": [
-                null
-            ]
-        }
-    },
     "DockviewGroupDropLocation": {
         "kind": "typeAlias",
         "children": [],
         "metadata": {
             "name": "DockviewGroupDropLocation",
-            "code": "'content' | 'header_space' | 'tab'",
+            "code": "'edge' | 'content' | 'header_space' | 'tab'",
             "pieces": [
                 null
             ]
@@ -15377,7 +15395,7 @@
         "children": [],
         "metadata": {
             "name": "DockviewPanelRenderer",
-            "code": "'always' | 'onlyWhenVisibile'",
+            "code": "'always' | 'onlyWhenVisible'",
             "pieces": [
                 null
             ]
@@ -15837,7 +15855,7 @@
             },
             {
                 "name": "defaultRenderer",
-                "code": "'always' | 'onlyWhenVisibile'",
+                "code": "'always' | 'onlyWhenVisible'",
                 "kind": "property",
                 "flags": {
                     "isOptional": true
@@ -16695,12 +16713,12 @@
             }
         ]
     },
-    "isReactElement": {
+    "isReactComponent": {
         "kind": "function",
         "children": [],
         "metadata": {
-            "name": "isReactElement",
-            "code": "(element: unknown): element is React.ReactElement<any,  | (props: any, deprecatedLegacyContext?: any): React.ReactNode | string>",
+            "name": "isReactComponent",
+            "code": "(component: any): boolean",
             "pieces": [
                 null,
                 null

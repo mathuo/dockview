@@ -30,7 +30,7 @@ describe('dockviewPanel', () => {
         const model = <IDockviewPanelModel>new panelModelMock();
 
         const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         });
 
         let latestTitle: string | undefined = undefined;
@@ -77,7 +77,7 @@ describe('dockviewPanel', () => {
         const model = <IDockviewPanelModel>new panelModelMock();
 
         const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         });
 
         cut.init({ title: 'myTitle', params: {} });
@@ -114,7 +114,7 @@ describe('dockviewPanel', () => {
         const model = <IDockviewPanelModel>new panelModelMock();
 
         const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         });
 
         cut.init({ params: {}, title: 'title' });
@@ -148,7 +148,7 @@ describe('dockviewPanel', () => {
         const model = <IDockviewPanelModel>new panelModelMock();
 
         const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         });
 
         expect(cut.params).toEqual(undefined);
@@ -186,7 +186,7 @@ describe('dockviewPanel', () => {
         const model = <IDockviewPanelModel>new panelModelMock();
 
         const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         });
 
         cut.api.setSize({ height: 123, width: 456 });
@@ -219,7 +219,7 @@ describe('dockviewPanel', () => {
         const model = <IDockviewPanelModel>new panelModelMock();
 
         const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         });
 
         cut.init({ params: { a: '1', b: '2' }, title: 'A title' });

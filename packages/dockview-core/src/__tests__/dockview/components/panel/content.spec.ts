@@ -68,7 +68,7 @@ describe('contentContainer', () => {
 
         const cut = new ContentContainer(
             fromPartial<DockviewComponent>({
-                renderer: 'onlyWhenVisibile',
+                renderer: 'onlyWhenVisible',
                 overlayRenderContainer,
             }),
             fromPartial<DockviewGroupPanelModel>({
@@ -91,7 +91,7 @@ describe('contentContainer', () => {
             view: {
                 content: contentRenderer,
             },
-            api: { renderer: 'onlyWhenVisibile' },
+            api: { renderer: 'onlyWhenVisible' },
         });
 
         cut.openPanel(panel as IDockviewPanel);
@@ -126,7 +126,7 @@ describe('contentContainer', () => {
             view: {
                 content: contentRenderer2,
             } as Partial<IDockviewPanelModel>,
-            api: { renderer: 'onlyWhenVisibile' },
+            api: { renderer: 'onlyWhenVisible' },
         } as Partial<IDockviewPanel>;
 
         cut.openPanel(panel2 as IDockviewPanel);
@@ -153,7 +153,7 @@ describe('contentContainer', () => {
         disposable.dispose();
     });
 
-    test("that panels renderered as 'onlyWhenVisibile' are removed when closed", () => {
+    test("that panels renderered as 'onlyWhenVisible' are removed when closed", () => {
         const overlayRenderContainer = fromPartial<OverlayRenderContainer>({
             detatch: jest.fn(),
         });
@@ -169,14 +169,14 @@ describe('contentContainer', () => {
 
         const panel1 = fromPartial<IDockviewPanel>({
             api: {
-                renderer: 'onlyWhenVisibile',
+                renderer: 'onlyWhenVisible',
             },
             view: { content: new TestContentRenderer('panel_1') },
         });
 
         const panel2 = fromPartial<IDockviewPanel>({
             api: {
-                renderer: 'onlyWhenVisibile',
+                renderer: 'onlyWhenVisible',
             },
             view: { content: new TestContentRenderer('panel_2') },
         });

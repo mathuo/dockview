@@ -132,7 +132,7 @@ export class ContentContainer
         let container: HTMLElement;
 
         switch (panel.api.renderer) {
-            case 'onlyWhenVisibile':
+            case 'onlyWhenVisible':
                 this.group.renderContainer.detatch(panel);
                 if (this.panel) {
                     if (doRender) {
@@ -198,7 +198,7 @@ export class ContentContainer
 
     public closePanel(): void {
         if (this.panel) {
-            if (this.panel.api.renderer === 'onlyWhenVisibile') {
+            if (this.panel.api.renderer === 'onlyWhenVisible') {
                 this.panel.view.content.element.parentElement?.removeChild(
                     this.panel.view.content.element
                 );

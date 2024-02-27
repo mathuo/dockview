@@ -266,13 +266,13 @@ describe('dockviewGroupPanelModel', () => {
 
     test('panel events are captured during de-serialization', () => {
         const panel1 = new TestPanel('panel1', {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         } as any);
         const panel2 = new TestPanel('panel2', {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         } as any);
         const panel3 = new TestPanel('panel3', {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         } as any);
 
         const groupview2 = new DockviewGroupPanel(dockview, 'groupview-2', {
@@ -358,13 +358,13 @@ describe('dockviewGroupPanelModel', () => {
         );
 
         const panel1 = new TestPanel('panel1', {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         } as any);
         const panel2 = new TestPanel('panel2', {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         } as any);
         const panel3 = new TestPanel('panel3', {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         } as any);
 
         expect(events.length).toBe(0);
@@ -444,13 +444,13 @@ describe('dockviewGroupPanelModel', () => {
 
     test('moveToPrevious and moveToNext', () => {
         const panel1 = new TestPanel('panel1', {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         } as any);
         const panel2 = new TestPanel('panel2', {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         } as any);
         const panel3 = new TestPanel('panel3', {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         } as any);
 
         groupview.model.openPanel(panel1);
@@ -496,13 +496,13 @@ describe('dockviewGroupPanelModel', () => {
 
     test('closeAllPanels with panels', () => {
         const panel1 = new TestPanel('panel1', {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         } as any);
         const panel2 = new TestPanel('panel2', {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         } as any);
         const panel3 = new TestPanel('panel3', {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         } as any);
 
         groupview.model.openPanel(panel1);
@@ -609,7 +609,7 @@ describe('dockviewGroupPanelModel', () => {
             .item(0)!.childNodes;
 
         const panel1 = new TestPanel('id_1', {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         } as any);
 
         cut.openPanel(panel1);
@@ -617,7 +617,7 @@ describe('dockviewGroupPanelModel', () => {
         expect(contentContainer.item(0)).toBe(panel1.view.content.element);
 
         const panel2 = new TestPanel('id_2', {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         } as any);
 
         cut.openPanel(panel2);
@@ -625,7 +625,7 @@ describe('dockviewGroupPanelModel', () => {
         expect(contentContainer.item(0)).toBe(panel2.view.content.element);
 
         const panel3 = new TestPanel('id_2', {
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
         } as any);
 
         cut.openPanel(panel3, { skipSetActive: true });
@@ -836,7 +836,7 @@ describe('dockviewGroupPanelModel', () => {
 
         cut.openPanel(
             new TestPanel('panel1', {
-                renderer: 'onlyWhenVisibile',
+                renderer: 'onlyWhenVisible',
             } as any)
         );
 
@@ -910,12 +910,12 @@ describe('dockviewGroupPanelModel', () => {
 
         cut.openPanel(
             new TestPanel('panel1', {
-                renderer: 'onlyWhenVisibile',
+                renderer: 'onlyWhenVisible',
             } as any)
         );
         cut.openPanel(
             new TestPanel('panel2', {
-                renderer: 'onlyWhenVisibile',
+                renderer: 'onlyWhenVisible',
             } as any)
         );
 
@@ -989,12 +989,12 @@ describe('dockviewGroupPanelModel', () => {
 
         cut.openPanel(
             new TestPanel('panel1', {
-                renderer: 'onlyWhenVisibile',
+                renderer: 'onlyWhenVisible',
             } as any)
         );
         cut.openPanel(
             new TestPanel('panel2', {
-                renderer: 'onlyWhenVisibile',
+                renderer: 'onlyWhenVisible',
             } as any)
         );
 
@@ -1099,7 +1099,7 @@ describe('dockviewGroupPanelModel', () => {
 
         cut.openPanel(
             new TestPanel('panel1', {
-                renderer: 'onlyWhenVisibile',
+                renderer: 'onlyWhenVisible',
             } as any)
         );
 
@@ -1113,7 +1113,7 @@ describe('dockviewGroupPanelModel', () => {
 
         cut.openPanel(
             new TestPanel('panel2', {
-                renderer: 'onlyWhenVisibile',
+                renderer: 'onlyWhenVisible',
             } as any)
         );
 
@@ -1135,7 +1135,7 @@ describe('dockviewGroupPanelModel', () => {
 
         cut.openPanel(
             new TestPanel('panel1', {
-                renderer: 'onlyWhenVisibile',
+                renderer: 'onlyWhenVisible',
             } as any)
         );
 
