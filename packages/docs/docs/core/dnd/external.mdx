@@ -1,0 +1,31 @@
+---
+title: 'External Dnd Events'
+sidebar_position: 3
+---
+
+External Dnd events can be intercepted through a number of utilities.
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+import LiveExample from '@site/src/components/ui/exampleFrame';
+
+<DocRef declaration="DockviewApi"
+  methods={['onDidDrop']}
+/>
+
+
+<FrameworkSpecific framework='React'>
+  <DocRef declaration="IDockviewReactProps" methods={['showDndOverlay']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+  <DocRef declaration="DockviewComponentOptions"
+  methods={['showDndOverlay']}
+  />
+</FrameworkSpecific>
+
+
+## Intercepting Drag Events
+
+You can intercept drag events to attach your own metadata using the `onWillDragPanel` and `onWillDragGroup` api methods.
+
+<LiveExample framework='react' id="dockview/dnd-external" />
