@@ -181,6 +181,9 @@ const DockviewDemo = (props: { theme?: string }) => {
                 display: 'flex',
                 flexDirection: 'column',
                 flexGrow: 1,
+                padding: '8px',
+                backgroundColor: 'rgba(0,0,50,0.25)',
+                borderRadius: '8px',
             }}
         >
             <div>
