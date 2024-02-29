@@ -11,7 +11,7 @@ export const nextId = (() => {
 export function defaultConfig(api: DockviewApi) {
     const panel1 = api.addPanel({
         id: 'panel_1',
-        component: 'iframe',
+        component: 'default',
         renderer: 'always',
         title: 'Panel 1',
     });
