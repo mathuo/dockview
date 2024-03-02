@@ -15809,6 +15809,43 @@
                         "kind": "callSignature"
                     }
                 ]
+            },
+            {
+                "name": "setViewVisible",
+                "code": "(index: number, visible: boolean): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "setViewVisible",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "index",
+                                "code": "index: number",
+                                "type": {
+                                    "type": "intrinsic",
+                                    "value": "number"
+                                },
+                                "kind": "parameter"
+                            },
+                            {
+                                "name": "visible",
+                                "code": "visible: boolean",
+                                "type": {
+                                    "type": "intrinsic",
+                                    "value": "boolean"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(index: number, visible: boolean): void",
+                        "kind": "callSignature"
+                    }
+                ]
             }
         ]
     },
@@ -17196,6 +17233,44 @@
                             "value": "void"
                         },
                         "code": "(panel: PaneviewPanel): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "setVisible",
+                "code": "(panel: PaneviewPanel, visible: boolean): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "setVisible",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "panel",
+                                "code": "panel: PaneviewPanel",
+                                "type": {
+                                    "type": "reference",
+                                    "value": "PaneviewPanel",
+                                    "source": "dockview-core"
+                                },
+                                "kind": "parameter"
+                            },
+                            {
+                                "name": "visible",
+                                "code": "visible: boolean",
+                                "type": {
+                                    "type": "intrinsic",
+                                    "value": "boolean"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(panel: PaneviewPanel, visible: boolean): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -20198,7 +20273,7 @@
             },
             {
                 "name": "setActive",
-                "code": "(view: SplitviewPanel, skipFocus?: boolean): void",
+                "code": "(panel: SplitviewPanel, skipFocus?: boolean): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -20206,8 +20281,8 @@
                         "typeParameters": [],
                         "parameters": [
                             {
-                                "name": "view",
-                                "code": "view: SplitviewPanel",
+                                "name": "panel",
+                                "code": "panel: SplitviewPanel",
                                 "type": {
                                     "type": "reference",
                                     "value": "SplitviewPanel",
@@ -20229,7 +20304,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(view: SplitviewPanel, skipFocus?: boolean): void",
+                        "code": "(panel: SplitviewPanel, skipFocus?: boolean): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -22833,26 +22908,6 @@
                 }
             },
             {
-                "name": "isHidden",
-                "code": "boolean",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "boolean"
-                },
-                "flags": {
-                    "isReadonly": true
-                },
-                "comment": {
-                    "summary": [
-                        {
-                            "kind": "text",
-                            "text": "Whether the panel is hidden"
-                        }
-                    ]
-                }
-            },
-            {
                 "name": "isVisible",
                 "code": "boolean",
                 "kind": "property",
@@ -22957,26 +23012,6 @@
                         {
                             "type": "reference",
                             "value": "FocusEvent",
-                            "source": "dockview-core"
-                        }
-                    ]
-                },
-                "flags": {
-                    "isReadonly": true
-                }
-            },
-            {
-                "name": "onDidHiddenChange",
-                "code": "Event<HiddenEvent>",
-                "kind": "property",
-                "type": {
-                    "type": "reference",
-                    "value": "Event",
-                    "source": "dockview-core",
-                    "typeArguments": [
-                        {
-                            "type": "reference",
-                            "value": "HiddenEvent",
                             "source": "dockview-core"
                         }
                     ]
@@ -23329,6 +23364,34 @@
                 ]
             },
             {
+                "name": "setVisible",
+                "code": "(isVisible: boolean): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "setVisible",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "isVisible",
+                                "code": "isVisible: boolean",
+                                "type": {
+                                    "type": "intrinsic",
+                                    "value": "boolean"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(isVisible: boolean): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
                 "name": "updateParameters",
                 "code": "(parameters: Parameters): void",
                 "kind": "method",
@@ -23488,26 +23551,6 @@
                 }
             },
             {
-                "name": "isHidden",
-                "code": "boolean",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "boolean"
-                },
-                "flags": {
-                    "isReadonly": true
-                },
-                "comment": {
-                    "summary": [
-                        {
-                            "kind": "text",
-                            "text": "Whether the panel is hidden"
-                        }
-                    ]
-                }
-            },
-            {
                 "name": "isVisible",
                 "code": "boolean",
                 "kind": "property",
@@ -23632,26 +23675,6 @@
                         {
                             "type": "reference",
                             "value": "GroupChangedEvent",
-                            "source": "dockview-core"
-                        }
-                    ]
-                },
-                "flags": {
-                    "isReadonly": true
-                }
-            },
-            {
-                "name": "onDidHiddenChange",
-                "code": "Event<HiddenEvent>",
-                "kind": "property",
-                "type": {
-                    "type": "reference",
-                    "value": "Event",
-                    "source": "dockview-core",
-                    "typeArguments": [
-                        {
-                            "type": "reference",
-                            "value": "HiddenEvent",
                             "source": "dockview-core"
                         }
                     ]
@@ -24974,26 +24997,6 @@
                 }
             },
             {
-                "name": "isHidden",
-                "code": "boolean",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "boolean"
-                },
-                "flags": {
-                    "isReadonly": true
-                },
-                "comment": {
-                    "summary": [
-                        {
-                            "kind": "text",
-                            "text": "Whether the panel is hidden"
-                        }
-                    ]
-                }
-            },
-            {
                 "name": "isVisible",
                 "code": "boolean",
                 "kind": "property",
@@ -25085,26 +25088,6 @@
                         {
                             "type": "reference",
                             "value": "FocusEvent",
-                            "source": "dockview-core"
-                        }
-                    ]
-                },
-                "flags": {
-                    "isReadonly": true
-                }
-            },
-            {
-                "name": "onDidHiddenChange",
-                "code": "Event<HiddenEvent>",
-                "kind": "property",
-                "type": {
-                    "type": "reference",
-                    "value": "Event",
-                    "source": "dockview-core",
-                    "typeArguments": [
-                        {
-                            "type": "reference",
-                            "value": "HiddenEvent",
                             "source": "dockview-core"
                         }
                     ]
@@ -25245,6 +25228,34 @@
                             "value": "void"
                         },
                         "code": "(event: SizeEvent): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "setVisible",
+                "code": "(isVisible: boolean): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "setVisible",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "isVisible",
+                                "code": "isVisible: boolean",
+                                "type": {
+                                    "type": "intrinsic",
+                                    "value": "boolean"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(isVisible: boolean): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -26279,33 +26290,6 @@
         "name": "IBaseView",
         "children": [
             {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
-            {
                 "name": "maximumSize",
                 "code": "number",
                 "kind": "property",
@@ -26364,6 +26348,24 @@
                 "flags": {
                     "isOptional": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             }
         ]
     },
@@ -26373,33 +26375,6 @@
         "children": [
             {
                 "name": "closePanel",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
-            {
-                "name": "dispose",
                 "code": "(): void",
                 "kind": "property",
                 "type": {
@@ -26520,6 +26495,24 @@
                     }
                 },
                 "flags": {}
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "hide",
@@ -26655,35 +26648,6 @@
         "name": "IContentRenderer",
         "children": [
             {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {
-                    "isOptional": true
-                }
-            },
-            {
                 "name": "element",
                 "code": "HTMLElement",
                 "kind": "property",
@@ -26735,6 +26699,24 @@
                     "isOptional": true,
                     "isReadonly": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "focus",
@@ -28522,29 +28504,20 @@
             {
                 "name": "dispose",
                 "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
                         "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
+                        "kind": "callSignature"
                     }
-                },
-                "flags": {}
+                ]
             }
         ]
     },
@@ -28886,33 +28859,6 @@
                 "flags": {
                     "isReadonly": true
                 }
-            },
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
             },
             {
                 "name": "header",
@@ -29329,6 +29275,24 @@
                             "value": "boolean"
                         },
                         "code": "(panel: IDockviewPanel): boolean",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -29776,33 +29740,6 @@
                 }
             },
             {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
-            {
                 "name": "group",
                 "code": "DockviewGroupPanel",
                 "kind": "property",
@@ -29882,6 +29819,24 @@
                 "flags": {
                     "isReadonly": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "focus",
@@ -30133,29 +30088,20 @@
             {
                 "name": "dispose",
                 "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
                         "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
+                        "kind": "callSignature"
                     }
-                },
-                "flags": {}
+                ]
             },
             {
                 "name": "update",
@@ -30192,33 +30138,6 @@
         "kind": "interface",
         "name": "IGridPanelComponentView",
         "children": [
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
             {
                 "name": "element",
                 "code": "HTMLElement",
@@ -30410,6 +30329,24 @@
                 "flags": {
                     "isOptional": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "focus",
@@ -30611,33 +30548,6 @@
         "name": "IGridPanelView",
         "children": [
             {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
-            {
                 "name": "element",
                 "code": "HTMLElement",
                 "kind": "property",
@@ -30790,6 +30700,24 @@
                 "flags": {
                     "isOptional": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "focus",
@@ -32514,33 +32442,6 @@
         "name": "IHeaderActionsRenderer",
         "children": [
             {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
-            {
                 "name": "element",
                 "code": "HTMLElement",
                 "kind": "property",
@@ -32552,6 +32453,24 @@
                 "flags": {
                     "isReadonly": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "init",
@@ -32645,33 +32564,6 @@
         "name": "IPaneBodyPart",
         "children": [
             {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
-            {
                 "name": "element",
                 "code": "HTMLElement",
                 "kind": "property",
@@ -32683,6 +32575,24 @@
                 "flags": {
                     "isReadonly": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "init",
@@ -32756,33 +32666,6 @@
         "name": "IPaneHeaderPart",
         "children": [
             {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
-            {
                 "name": "element",
                 "code": "HTMLElement",
                 "kind": "property",
@@ -32794,6 +32677,24 @@
                 "flags": {
                     "isReadonly": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "init",
@@ -32867,33 +32768,6 @@
         "name": "IPanel",
         "children": [
             {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
-            {
                 "name": "id",
                 "code": "string",
                 "kind": "property",
@@ -32904,6 +32778,24 @@
                 "flags": {
                     "isReadonly": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "focus",
@@ -33096,33 +32988,6 @@
         "name": "IPaneview",
         "children": [
             {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
-            {
                 "name": "element",
                 "code": "DocumentFragment | HTMLElement",
                 "kind": "property",
@@ -33272,6 +33137,24 @@
                 }
             },
             {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
                 "name": "layout",
                 "code": "(size: number, orthogonalSize: number): void",
                 "kind": "method",
@@ -33342,33 +33225,6 @@
         "kind": "interface",
         "name": "IPaneviewComponent",
         "children": [
-            {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
             {
                 "name": "height",
                 "code": "number",
@@ -33622,6 +33478,24 @@
                 ]
             },
             {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
                 "name": "focus",
                 "code": "(): void",
                 "kind": "method",
@@ -33805,6 +33679,44 @@
                             "value": "void"
                         },
                         "code": "(panel: IPaneviewPanel): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "setVisible",
+                "code": "(panel: IPaneviewPanel, visible: boolean): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "setVisible",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "panel",
+                                "code": "panel: IPaneviewPanel",
+                                "type": {
+                                    "type": "reference",
+                                    "value": "IPaneviewPanel",
+                                    "source": "dockview-core"
+                                },
+                                "kind": "parameter"
+                            },
+                            {
+                                "name": "visible",
+                                "code": "visible: boolean",
+                                "type": {
+                                    "type": "intrinsic",
+                                    "value": "boolean"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(panel: IPaneviewPanel, visible: boolean): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -34282,33 +34194,6 @@
         "name": "ISplitviewComponent",
         "children": [
             {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
-            {
                 "name": "height",
                 "code": "number",
                 "kind": "property",
@@ -34527,6 +34412,24 @@
                 "signature": [
                     {
                         "name": "clear",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
                         "typeParameters": [],
                         "parameters": [],
                         "returnType": {
@@ -35097,35 +35000,6 @@
         "name": "ITabRenderer",
         "children": [
             {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {
-                    "isOptional": true
-                }
-            },
-            {
                 "name": "element",
                 "code": "HTMLElement",
                 "kind": "property",
@@ -35137,6 +35011,24 @@
                 "flags": {
                     "isReadonly": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "focus",
@@ -35283,33 +35175,6 @@
         "name": "IView",
         "children": [
             {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
-            {
                 "name": "element",
                 "code": "DocumentFragment | HTMLElement",
                 "kind": "property",
@@ -35440,6 +35305,24 @@
                 "flags": {
                     "isOptional": true
                 }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "layout",
@@ -35594,35 +35477,6 @@
         "name": "IWatermarkRenderer",
         "children": [
             {
-                "name": "dispose",
-                "code": "(): void",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): void",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "void"
-                                },
-                                "code": "(): void",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {
-                    "isOptional": true
-                }
-            },
-            {
                 "name": "element",
                 "code": "HTMLElement",
                 "kind": "property",
@@ -35672,6 +35526,24 @@
                     }
                 },
                 "flags": {}
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "focus",
@@ -35877,6 +35749,17 @@
         "name": "PanePanelComponentInitParameter",
         "children": [
             {
+                "name": "accessor",
+                "code": "PaneviewComponent",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "PaneviewComponent",
+                    "source": "dockview-core"
+                },
+                "flags": {}
+            },
+            {
                 "name": "api",
                 "code": "PaneviewPanelApiImpl",
                 "kind": "property",
@@ -35961,6 +35844,17 @@
         "kind": "interface",
         "name": "PanePanelInitParameter",
         "children": [
+            {
+                "name": "accessor",
+                "code": "PaneviewComponent",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "PaneviewComponent",
+                    "source": "dockview-core"
+                },
+                "flags": {}
+            },
             {
                 "name": "containerApi",
                 "code": "PaneviewApi",
@@ -36182,26 +36076,6 @@
                 }
             },
             {
-                "name": "isHidden",
-                "code": "boolean",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "boolean"
-                },
-                "flags": {
-                    "isReadonly": true
-                },
-                "comment": {
-                    "summary": [
-                        {
-                            "kind": "text",
-                            "text": "Whether the panel is hidden"
-                        }
-                    ]
-                }
-            },
-            {
                 "name": "isVisible",
                 "code": "boolean",
                 "kind": "property",
@@ -36273,26 +36147,6 @@
                         {
                             "type": "reference",
                             "value": "FocusEvent",
-                            "source": "dockview-core"
-                        }
-                    ]
-                },
-                "flags": {
-                    "isReadonly": true
-                }
-            },
-            {
-                "name": "onDidHiddenChange",
-                "code": "Event<HiddenEvent>",
-                "kind": "property",
-                "type": {
-                    "type": "reference",
-                    "value": "Event",
-                    "source": "dockview-core",
-                    "typeArguments": [
-                        {
-                            "type": "reference",
-                            "value": "HiddenEvent",
                             "source": "dockview-core"
                         }
                     ]
@@ -36375,6 +36229,34 @@
                             "value": "void"
                         },
                         "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "setVisible",
+                "code": "(isVisible: boolean): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "setVisible",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "isVisible",
+                                "code": "isVisible: boolean",
+                                "type": {
+                                    "type": "intrinsic",
+                                    "value": "boolean"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(isVisible: boolean): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -37230,26 +37112,6 @@
                 }
             },
             {
-                "name": "isHidden",
-                "code": "boolean",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "boolean"
-                },
-                "flags": {
-                    "isReadonly": true
-                },
-                "comment": {
-                    "summary": [
-                        {
-                            "kind": "text",
-                            "text": "Whether the panel is hidden"
-                        }
-                    ]
-                }
-            },
-            {
                 "name": "isVisible",
                 "code": "boolean",
                 "kind": "property",
@@ -37361,26 +37223,6 @@
                         {
                             "type": "reference",
                             "value": "FocusEvent",
-                            "source": "dockview-core"
-                        }
-                    ]
-                },
-                "flags": {
-                    "isReadonly": true
-                }
-            },
-            {
-                "name": "onDidHiddenChange",
-                "code": "Event<HiddenEvent>",
-                "kind": "property",
-                "type": {
-                    "type": "reference",
-                    "value": "Event",
-                    "source": "dockview-core",
-                    "typeArguments": [
-                        {
-                            "type": "reference",
-                            "value": "HiddenEvent",
                             "source": "dockview-core"
                         }
                     ]
@@ -37589,6 +37431,34 @@
                             "value": "void"
                         },
                         "code": "(event: PanelSizeEvent): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "setVisible",
+                "code": "(isVisible: boolean): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "setVisible",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "isVisible",
+                                "code": "isVisible: boolean",
+                                "type": {
+                                    "type": "intrinsic",
+                                    "value": "boolean"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(isVisible: boolean): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -38738,26 +38608,6 @@
                 }
             },
             {
-                "name": "isHidden",
-                "code": "boolean",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "boolean"
-                },
-                "flags": {
-                    "isReadonly": true
-                },
-                "comment": {
-                    "summary": [
-                        {
-                            "kind": "text",
-                            "text": "Whether the panel is hidden"
-                        }
-                    ]
-                }
-            },
-            {
                 "name": "isVisible",
                 "code": "boolean",
                 "kind": "property",
@@ -38849,26 +38699,6 @@
                         {
                             "type": "reference",
                             "value": "FocusEvent",
-                            "source": "dockview-core"
-                        }
-                    ]
-                },
-                "flags": {
-                    "isReadonly": true
-                }
-            },
-            {
-                "name": "onDidHiddenChange",
-                "code": "Event<HiddenEvent>",
-                "kind": "property",
-                "type": {
-                    "type": "reference",
-                    "value": "Event",
-                    "source": "dockview-core",
-                    "typeArguments": [
-                        {
-                            "type": "reference",
-                            "value": "HiddenEvent",
                             "source": "dockview-core"
                         }
                     ]
@@ -39009,6 +38839,34 @@
                             "value": "void"
                         },
                         "code": "(event: PanelSizeEvent): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "setVisible",
+                "code": "(isVisible: boolean): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "setVisible",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "isVisible",
+                                "code": "isVisible: boolean",
+                                "type": {
+                                    "type": "intrinsic",
+                                    "value": "boolean"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(isVisible: boolean): void",
                         "kind": "callSignature"
                     }
                 ]
