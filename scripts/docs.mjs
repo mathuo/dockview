@@ -602,7 +602,7 @@ function createDocument(declarations) {
                             .filter(Boolean)
                             .sort();
                         delete output.pieces;
-                        delete output.comment;
+                        // delete output.comment;
 
                         documentation[name].children.push(output);
                     }

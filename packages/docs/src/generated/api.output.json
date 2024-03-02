@@ -1798,6 +1798,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Active group object."
+                        }
+                    ]
                 }
             },
             {
@@ -1830,6 +1838,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Active panel object."
+                        }
+                    ]
                 }
             },
             {
@@ -1856,6 +1872,14 @@
                             "source": "dockview-core"
                         }
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "All group objects."
+                        }
+                    ]
                 }
             },
             {
@@ -1878,6 +1902,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Height of the component."
+                        }
+                    ]
                 }
             },
             {
@@ -1900,6 +1932,14 @@
                         "type": "intrinsic",
                         "value": "string"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The unique identifier for this instance. Used to manage scope of Drag'n'Drop events."
+                        }
+                    ]
                 }
             },
             {
@@ -1922,6 +1962,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Maximum height of the component."
+                        }
+                    ]
                 }
             },
             {
@@ -1944,6 +1992,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Maximum width of the component."
+                        }
+                    ]
                 }
             },
             {
@@ -1966,6 +2022,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Minimum height of the component."
+                        }
+                    ]
                 }
             },
             {
@@ -1988,6 +2052,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Minimum width of the component."
+                        }
+                    ]
                 }
             },
             {
@@ -2027,6 +2099,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when the active group changes. May be undefined if no group is active."
+                        }
+                    ]
                 }
             },
             {
@@ -2066,6 +2146,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when the active panel changes. May be undefined if no panel is active."
+                        }
+                    ]
                 }
             },
             {
@@ -2096,6 +2184,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when a group is added. May be called multiple times when moving groups."
+                        }
+                    ]
                 }
             },
             {
@@ -2126,6 +2222,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when a panel is added. May be called multiple times when moving panels."
+                        }
+                    ]
                 }
             },
             {
@@ -2156,6 +2260,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when a Drag'n'Drop event occurs that the component was unable to handle. Exposed for custom Drag'n'Drop functionality."
+                        }
+                    ]
                 }
             },
             {
@@ -2185,6 +2297,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when any layout change occures, an aggregation of many events."
+                        }
+                    ]
                 }
             },
             {
@@ -2222,6 +2342,22 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked after a layout is deserialzied using the "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`fromJSON`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " method."
+                        }
+                    ]
                 }
             },
             {
@@ -2273,6 +2409,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when a group is removed. May be called multiple times when moving groups."
+                        }
+                    ]
                 }
             },
             {
@@ -2303,6 +2447,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when a panel is removed. May be called multiple times when moving panels."
+                        }
+                    ]
                 }
             },
             {
@@ -2341,6 +2493,22 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked before a group is dragged.\n\nCalling "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`event.nativeEvent.preventDefault()`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " will prevent the group drag starting."
+                        }
+                    ]
                 }
             },
             {
@@ -2379,6 +2547,22 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked before a panel is dragged.\n\nCalling "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`event.nativeEvent.preventDefault()`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " will prevent the panel drag starting."
+                        }
+                    ]
                 }
             },
             {
@@ -2417,6 +2601,22 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\nprevent the event from occuring using the standard "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`preventDefault()`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " syntax.\n\nPreventing certain events may causes unexpected behaviours, use carefully."
+                        }
+                    ]
                 }
             },
             {
@@ -2455,6 +2655,22 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked before an overlay is shown indicating a drop target.\n\nCalling "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`event.preventDefault()`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " will prevent the overlay being shown and prevent\nthe any subsequent drop event."
+                        }
+                    ]
                 }
             },
             {
@@ -2481,6 +2697,14 @@
                             "source": "dockview-core"
                         }
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "All panel objects."
+                        }
+                    ]
                 }
             },
             {
@@ -2503,6 +2727,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Total number of groups."
+                        }
+                    ]
                 }
             },
             {
@@ -2525,6 +2757,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Total number of panels."
+                        }
+                    ]
                 }
             },
             {
@@ -2547,6 +2787,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Width of the component."
+                        }
+                    ]
                 }
             },
             {
@@ -2629,7 +2877,15 @@
                         "code": "(item: IDockviewPanel | DockviewGroupPanel, coord?: { x: number, y: number }): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Add a floating group"
+                        }
+                    ]
+                }
             },
             {
                 "name": "addGroup",
@@ -2712,7 +2968,15 @@
                         "code": "(options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition): DockviewGroupPanel",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Add a group and return the created object."
+                        }
+                    ]
+                }
             },
             {
                 "name": "addPanel",
@@ -2767,7 +3031,15 @@
                         "code": "<T extends object = Parameters>(options: AddPanelOptions<T>): IDockviewPanel",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Add a panel and return the created object."
+                        }
+                    ]
+                }
             },
             {
                 "name": "addPopoutGroup",
@@ -2993,7 +3265,15 @@
                         "code": "(item: IDockviewPanel | DockviewGroupPanel, options?: { onDidOpen?: (event: { id: string, window: Window }): void, onWillClose?: (event: { id: string, window: Window }): void, popoutUrl?: string, position?: Box }): Promise<void>",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Add a popout group in a new Window"
+                        }
+                    ]
+                }
             },
             {
                 "name": "clear",
@@ -3019,7 +3299,15 @@
                         "code": "(): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Reset the component back to an empty and default state."
+                        }
+                    ]
+                }
             },
             {
                 "name": "closeAllGroups",
@@ -3045,7 +3333,15 @@
                         "code": "(): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Close all groups and panels."
+                        }
+                    ]
+                }
             },
             {
                 "name": "exitMaximizedGroup",
@@ -3089,7 +3385,15 @@
                         "code": "(): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Focus the component. Will try to focus an active panel if one exists."
+                        }
+                    ]
+                }
             },
             {
                 "name": "fromJSON",
@@ -3126,7 +3430,15 @@
                         "code": "(data: SerializedDockview): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Create a component from a serialized object."
+                        }
+                    ]
+                }
             },
             {
                 "name": "getGroup",
@@ -3180,7 +3492,23 @@
                         "code": "(id: string): DockviewGroupPanel | undefined",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Get a group object given a "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`string`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " id. May return undefined."
+                        }
+                    ]
+                }
             },
             {
                 "name": "getPanel",
@@ -3242,7 +3570,31 @@
                         "code": "(id: string): IDockviewPanel | undefined",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Get a panel object given a "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`string`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " id. May return "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`undefined`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": "."
+                        }
+                    ]
+                }
             },
             {
                 "name": "hasMaximizedGroup",
@@ -3314,7 +3666,15 @@
                         "code": "(width: number, height: number, force: boolean): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Force resize the component to an exact width and height. Read about auto-resizing before using."
+                        }
+                    ]
+                }
             },
             {
                 "name": "maximizeGroup",
@@ -3380,7 +3740,15 @@
                         "code": "(options?: MovementOptions): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Move the focus progmatically to the next panel or group."
+                        }
+                    ]
+                }
             },
             {
                 "name": "moveToPrevious",
@@ -3417,7 +3785,15 @@
                         "code": "(options?: MovementOptions): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Move the focus progmatically to the previous panel or group."
+                        }
+                    ]
+                }
             },
             {
                 "name": "removeGroup",
@@ -3454,7 +3830,15 @@
                         "code": "(group: IDockviewGroupPanel): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Remove a group and any panels within the group."
+                        }
+                    ]
+                }
             },
             {
                 "name": "removePanel",
@@ -3491,7 +3875,15 @@
                         "code": "(panel: IDockviewPanel): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Remove a panel given the panel object."
+                        }
+                    ]
+                }
             },
             {
                 "name": "toJSON",
@@ -3518,7 +3910,15 @@
                         "code": "(): SerializedDockview",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Create a serialized object of the current component."
+                        }
+                    ]
+                }
             }
         ]
     },
@@ -5929,7 +6329,26 @@
                         "code": "(): SerializedDockview",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Serialize the current state of the layout"
+                        }
+                    ],
+                    "blockTags": [
+                        {
+                            "tag": "@returns",
+                            "content": [
+                                {
+                                    "kind": "text",
+                                    "text": "A JSON respresentation of the layout"
+                                }
+                            ]
+                        }
+                    ]
+                }
             },
             {
                 "name": "updateOptions",
@@ -10202,7 +10621,15 @@
                         "code": "(): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "If the root is orientated as a VERTICAL node then nest the existing root within a new HORIZIONTAL root node\nIf the root is orientated as a HORIZONTAL node then nest the existing root within a new VERITCAL root node"
+                        }
+                    ]
+                }
             },
             {
                 "name": "isViewVisible",
@@ -10650,6 +11077,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Height of the component."
+                        }
+                    ]
                 }
             },
             {
@@ -10672,6 +11107,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Maximum height of the component."
+                        }
+                    ]
                 }
             },
             {
@@ -10694,6 +11137,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Maximum width of the component."
+                        }
+                    ]
                 }
             },
             {
@@ -10716,6 +11167,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Minimum height of the component."
+                        }
+                    ]
                 }
             },
             {
@@ -10738,6 +11197,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Minimum width of the component."
+                        }
+                    ]
                 }
             },
             {
@@ -10784,6 +11251,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when the active panel changes. May be undefined if no panel is active."
+                        }
+                    ]
                 }
             },
             {
@@ -10821,6 +11296,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when a panel is added. May be called multiple times when moving panels."
+                        }
+                    ]
                 }
             },
             {
@@ -10850,6 +11333,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when any layout change occures, an aggregation of many events."
+                        }
+                    ]
                 }
             },
             {
@@ -10887,6 +11378,22 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked after a layout is deserialzied using the "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`fromJSON`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " method."
+                        }
+                    ]
                 }
             },
             {
@@ -10924,6 +11431,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when a panel is removed. May be called multiple times when moving panels."
+                        }
+                    ]
                 }
             },
             {
@@ -10947,6 +11462,14 @@
                         "value": "Orientation",
                         "source": "dockview-core"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Current orientation. Can be changed after initialization."
+                        }
+                    ]
                 }
             },
             {
@@ -10980,6 +11503,14 @@
                             ]
                         }
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "All panel objects."
+                        }
+                    ]
                 }
             },
             {
@@ -11002,6 +11533,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Width of the component."
+                        }
+                    ]
                 }
             },
             {
@@ -11064,7 +11603,15 @@
                         "code": "<T extends object = Parameters>(options: AddComponentOptions<T>): IGridviewPanel<GridviewPanelApi>",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Add a panel and return the created object."
+                        }
+                    ]
+                }
             },
             {
                 "name": "clear",
@@ -11090,7 +11637,15 @@
                         "code": "(): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Reset the component back to an empty and default state."
+                        }
+                    ]
+                }
             },
             {
                 "name": "focus",
@@ -11116,7 +11671,15 @@
                         "code": "(): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Focus the component. Will try to focus an active panel if one exists."
+                        }
+                    ]
+                }
             },
             {
                 "name": "fromJSON",
@@ -11153,7 +11716,15 @@
                         "code": "(data: SerializedGridviewComponent): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Create a component from a serialized object."
+                        }
+                    ]
+                }
             },
             {
                 "name": "getPanel",
@@ -11222,7 +11793,31 @@
                         "code": "(id: string): IGridviewPanel<GridviewPanelApi> | undefined",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Get a panel object given a "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`string`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " id. May return "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`undefined`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": "."
+                        }
+                    ]
+                }
             },
             {
                 "name": "layout",
@@ -11276,7 +11871,15 @@
                         "code": "(width: number, height: number, force: boolean): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Force resize the component to an exact width and height. Read about auto-resizing before using."
+                        }
+                    ]
+                }
             },
             {
                 "name": "movePanel",
@@ -11368,7 +11971,15 @@
                         "code": "(panel: IGridviewPanel<GridviewPanelApi>, options: { direction: Direction, reference: string, size?: number }): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Move a panel in a particular direction relative to another panel."
+                        }
+                    ]
+                }
             },
             {
                 "name": "removePanel",
@@ -11437,7 +12048,15 @@
                         "code": "(panel: IGridviewPanel<GridviewPanelApi>, sizing?: InvisibleSizing | SplitSizing | DistributeSizing): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Remove a panel given the panel object."
+                        }
+                    ]
+                }
             },
             {
                 "name": "toJSON",
@@ -11464,7 +12083,15 @@
                         "code": "(): SerializedGridviewComponent",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Create a serialized object of the current component."
+                        }
+                    ]
+                }
             }
         ]
     },
@@ -13075,7 +13702,26 @@
                         "code": "(): SerializedGridviewComponent",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Serialize the current state of the layout"
+                        }
+                    ],
+                    "blockTags": [
+                        {
+                            "tag": "@returns",
+                            "content": [
+                                {
+                                    "kind": "text",
+                                    "text": "A JSON respresentation of the layout"
+                                }
+                            ]
+                        }
+                    ]
+                }
             },
             {
                 "name": "updateOptions",
@@ -15195,6 +15841,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Height of the component."
+                        }
+                    ]
                 }
             },
             {
@@ -15217,6 +15871,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The maximum size the component can reach where size is measured in the direction of orientation provided."
+                        }
+                    ]
                 }
             },
             {
@@ -15239,6 +15901,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The minimum size  the component can reach where size is measured in the direction of orientation provided."
+                        }
+                    ]
                 }
             },
             {
@@ -15269,6 +15939,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when a panel is added. May be called multiple times when moving panels."
+                        }
+                    ]
                 }
             },
             {
@@ -15299,6 +15977,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when a Drag'n'Drop event occurs that the component was unable to handle. Exposed for custom Drag'n'Drop functionality."
+                        }
+                    ]
                 }
             },
             {
@@ -15328,6 +16014,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when any layout change occures, an aggregation of many events."
+                        }
+                    ]
                 }
             },
             {
@@ -15365,6 +16059,22 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked after a layout is deserialzied using the "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`fromJSON`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " method."
+                        }
+                    ]
                 }
             },
             {
@@ -15395,6 +16105,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when a panel is removed. May be called multiple times when moving panels."
+                        }
+                    ]
                 }
             },
             {
@@ -15421,6 +16139,14 @@
                             "source": "dockview-core"
                         }
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "All panel objects."
+                        }
+                    ]
                 }
             },
             {
@@ -15443,6 +16169,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Width of the component."
+                        }
+                    ]
                 }
             },
             {
@@ -15498,7 +16232,15 @@
                         "code": "<T extends object = Parameters>(options: AddPaneviewComponentOptions<T>): IPaneviewPanel",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Add a panel and return the created object."
+                        }
+                    ]
+                }
             },
             {
                 "name": "clear",
@@ -15524,7 +16266,15 @@
                         "code": "(): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Reset the component back to an empty and default state."
+                        }
+                    ]
+                }
             },
             {
                 "name": "focus",
@@ -15550,7 +16300,15 @@
                         "code": "(): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Focus the component. Will try to focus an active panel if one exists."
+                        }
+                    ]
+                }
             },
             {
                 "name": "fromJSON",
@@ -15587,7 +16345,15 @@
                         "code": "(data: SerializedPaneview): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Create a component from a serialized object."
+                        }
+                    ]
+                }
             },
             {
                 "name": "getPanel",
@@ -15649,7 +16415,31 @@
                         "code": "(id: string): IPaneviewPanel | undefined",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Get a panel object given a "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`string`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " id. May return "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`undefined`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": "."
+                        }
+                    ]
+                }
             },
             {
                 "name": "layout",
@@ -15694,7 +16484,15 @@
                         "code": "(width: number, height: number): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Force resize the component to an exact width and height. Read about auto-resizing before using."
+                        }
+                    ]
+                }
             },
             {
                 "name": "movePanel",
@@ -15739,7 +16537,15 @@
                         "code": "(from: number, to: number): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Move a panel given it's current and desired index."
+                        }
+                    ]
+                }
             },
             {
                 "name": "removePanel",
@@ -15776,7 +16582,15 @@
                         "code": "(panel: IPaneviewPanel): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Remove a panel given the panel object."
+                        }
+                    ]
+                }
             },
             {
                 "name": "toJSON",
@@ -15803,7 +16617,15 @@
                         "code": "(): SerializedPaneview",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Create a serialized object of the current component."
+                        }
+                    ]
+                }
             }
         ]
     },
@@ -17902,6 +18724,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Height of the component."
+                        }
+                    ]
                 }
             },
             {
@@ -17924,6 +18754,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The current number of panels."
+                        }
+                    ]
                 }
             },
             {
@@ -17946,6 +18784,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The maximum size the component can reach where size is measured in the direction of orientation provided."
+                        }
+                    ]
                 }
             },
             {
@@ -17968,6 +18814,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The minimum size  the component can reach where size is measured in the direction of orientation provided."
+                        }
+                    ]
                 }
             },
             {
@@ -17998,6 +18852,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when a view is added."
+                        }
+                    ]
                 }
             },
             {
@@ -18027,6 +18889,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked whenever any aspect of the layout changes.\nIf listening to this event it may be worth debouncing ouputs."
+                        }
+                    ]
                 }
             },
             {
@@ -18064,6 +18934,22 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked after a layout is loaded through the "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`fromJSON`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " method."
+                        }
+                    ]
                 }
             },
             {
@@ -18094,6 +18980,14 @@
                             }
                         ]
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Invoked when a view is removed."
+                        }
+                    ]
                 }
             },
             {
@@ -18117,6 +19011,14 @@
                         "value": "Orientation",
                         "source": "dockview-core"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The current orientation of the component."
+                        }
+                    ]
                 }
             },
             {
@@ -18143,6 +19045,14 @@
                             "source": "dockview-core"
                         }
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The list of current panels."
+                        }
+                    ]
                 }
             },
             {
@@ -18165,6 +19075,14 @@
                         "type": "intrinsic",
                         "value": "number"
                     }
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Width of the component."
+                        }
+                    ]
                 }
             },
             {
@@ -18220,7 +19138,15 @@
                         "code": "<T extends object = Parameters>(options: AddSplitviewComponentOptions<T>): ISplitviewPanel",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Add a new panel and return the created instance."
+                        }
+                    ]
+                }
             },
             {
                 "name": "clear",
@@ -18246,7 +19172,15 @@
                         "code": "(): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Remove all panels and clear the component."
+                        }
+                    ]
+                }
             },
             {
                 "name": "focus",
@@ -18272,7 +19206,15 @@
                         "code": "(): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Focus the component."
+                        }
+                    ]
+                }
             },
             {
                 "name": "fromJSON",
@@ -18309,7 +19251,15 @@
                         "code": "(data: SerializedSplitview): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Deserialize a layout to built a splitivew."
+                        }
+                    ]
+                }
             },
             {
                 "name": "getPanel",
@@ -18363,7 +19313,23 @@
                         "code": "(id: string): ISplitviewPanel | undefined",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Get the reference to a panel given it's "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`string`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " id."
+                        }
+                    ]
+                }
             },
             {
                 "name": "layout",
@@ -18408,7 +19374,15 @@
                         "code": "(width: number, height: number): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Layout the panel with a width and height."
+                        }
+                    ]
+                }
             },
             {
                 "name": "movePanel",
@@ -18453,7 +19427,15 @@
                         "code": "(from: number, to: number): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Move a panel given it's current and desired index."
+                        }
+                    ]
+                }
             },
             {
                 "name": "removePanel",
@@ -18523,7 +19505,23 @@
                         "code": "(panel: ISplitviewPanel, sizing?: InvisibleSizing | SplitSizing | DistributeSizing): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Removes an existing panel and optionally provide a "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`Sizing`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " method\nfor the subsequent resize."
+                        }
+                    ]
+                }
             },
             {
                 "name": "toJSON",
@@ -18550,7 +19548,15 @@
                         "code": "(): SerializedSplitview",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Serialize a layout"
+                        }
+                    ]
+                }
             },
             {
                 "name": "updateOptions",
@@ -18587,7 +19593,15 @@
                         "code": "(options: SplitviewComponentUpdateOptions): void",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Update configuratable options."
+                        }
+                    ]
+                }
             }
         ]
     },
@@ -21748,6 +22762,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The panel height in pixels"
+                        }
+                    ]
                 }
             },
             {
@@ -21760,6 +22782,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The id of the panel that would have been assigned when the panel was created"
+                        }
+                    ]
                 }
             },
             {
@@ -21772,6 +22802,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is the actively selected panel"
+                        }
+                    ]
                 }
             },
             {
@@ -21784,6 +22822,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel holds the current focus"
+                        }
+                    ]
                 }
             },
             {
@@ -21796,6 +22842,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is hidden"
+                        }
+                    ]
                 }
             },
             {
@@ -21808,6 +22862,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is visible"
+                        }
+                    ]
                 }
             },
             {
@@ -21993,6 +23055,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The panel width in pixels"
+                        }
+                    ]
                 }
             },
             {
@@ -22056,7 +23126,15 @@
                         "code": "(): Window",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "If you require the Window object"
+                        }
+                    ]
+                }
             },
             {
                 "name": "isMaximized",
@@ -22327,6 +23405,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The panel height in pixels"
+                        }
+                    ]
                 }
             },
             {
@@ -22339,6 +23425,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The id of the panel that would have been assigned when the panel was created"
+                        }
+                    ]
                 }
             },
             {
@@ -22351,6 +23445,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is the actively selected panel"
+                        }
+                    ]
                 }
             },
             {
@@ -22363,6 +23465,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel holds the current focus"
+                        }
+                    ]
                 }
             },
             {
@@ -22387,6 +23497,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is hidden"
+                        }
+                    ]
                 }
             },
             {
@@ -22399,6 +23517,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is visible"
+                        }
+                    ]
                 }
             },
             {
@@ -22658,6 +23784,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The panel width in pixels"
+                        }
+                    ]
                 }
             },
             {
@@ -22721,7 +23855,15 @@
                         "code": "(): Window",
                         "kind": "callSignature"
                     }
-                ]
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "If you require the Window object"
+                        }
+                    ]
+                }
             },
             {
                 "name": "isMaximized",
@@ -23761,6 +24903,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The panel height in pixels"
+                        }
+                    ]
                 }
             },
             {
@@ -23773,6 +24923,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The id of the panel that would have been assigned when the panel was created"
+                        }
+                    ]
                 }
             },
             {
@@ -23785,6 +24943,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is the actively selected panel"
+                        }
+                    ]
                 }
             },
             {
@@ -23797,6 +24963,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel holds the current focus"
+                        }
+                    ]
                 }
             },
             {
@@ -23809,6 +24983,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is hidden"
+                        }
+                    ]
                 }
             },
             {
@@ -23821,6 +25003,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is visible"
+                        }
+                    ]
                 }
             },
             {
@@ -23973,6 +25163,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The panel width in pixels"
+                        }
+                    ]
                 }
             },
             {
@@ -34913,6 +36111,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The panel height in pixels"
+                        }
+                    ]
                 }
             },
             {
@@ -34925,6 +36131,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The id of the panel that would have been assigned when the panel was created"
+                        }
+                    ]
                 }
             },
             {
@@ -34937,6 +36151,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is the actively selected panel"
+                        }
+                    ]
                 }
             },
             {
@@ -34949,6 +36171,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel holds the current focus"
+                        }
+                    ]
                 }
             },
             {
@@ -34961,6 +36191,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is hidden"
+                        }
+                    ]
                 }
             },
             {
@@ -34973,6 +36211,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is visible"
+                        }
+                    ]
                 }
             },
             {
@@ -35105,6 +36351,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The panel width in pixels"
+                        }
+                    ]
                 }
             },
             {
@@ -35893,6 +37147,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The panel height in pixels"
+                        }
+                    ]
                 }
             },
             {
@@ -35905,6 +37167,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The id of the panel that would have been assigned when the panel was created"
+                        }
+                    ]
                 }
             },
             {
@@ -35917,6 +37187,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is the actively selected panel"
+                        }
+                    ]
                 }
             },
             {
@@ -35941,6 +37219,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel holds the current focus"
+                        }
+                    ]
                 }
             },
             {
@@ -35953,6 +37239,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is hidden"
+                        }
+                    ]
                 }
             },
             {
@@ -35965,6 +37259,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is visible"
+                        }
+                    ]
                 }
             },
             {
@@ -36177,6 +37479,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The panel width in pixels"
+                        }
+                    ]
                 }
             },
             {
@@ -37357,6 +38667,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The panel height in pixels"
+                        }
+                    ]
                 }
             },
             {
@@ -37369,6 +38687,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The id of the panel that would have been assigned when the panel was created"
+                        }
+                    ]
                 }
             },
             {
@@ -37381,6 +38707,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is the actively selected panel"
+                        }
+                    ]
                 }
             },
             {
@@ -37393,6 +38727,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel holds the current focus"
+                        }
+                    ]
                 }
             },
             {
@@ -37405,6 +38747,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is hidden"
+                        }
+                    ]
                 }
             },
             {
@@ -37417,6 +38767,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether the panel is visible"
+                        }
+                    ]
                 }
             },
             {
@@ -37569,6 +38927,14 @@
                 },
                 "flags": {
                     "isReadonly": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The panel width in pixels"
+                        }
+                    ]
                 }
             },
             {
