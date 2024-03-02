@@ -28,7 +28,7 @@ const components = {
                     position: 'relative',
                 }}
             >
-                <Table data={metadata} />
+                {/* <Table data={metadata} /> */}
                 <span
                     style={{
                         position: 'absolute',
@@ -68,8 +68,20 @@ const headerComponents = {
     },
 };
 
+const colors = [
+    'rgba(255,0,0,0.2)',
+    'rgba(0,255,0,0.2)',
+    'rgba(0,0,255,0.2)',
+    'rgba(255,255,0,0.2)',
+    'rgba(0,255,255,0.2)',
+    'rgba(255,0,255,0.2)',
+];
+let count = 0;
+
 const DockviewDemo = (props: { theme?: string }) => {
-    const [logLines, setLogLines] = React.useState<any[]>([]);
+    const [logLines, setLogLines] = React.useState<
+        { text: string; timestamp?: Date; backgroundColor?: string }[]
+    >([]);
 
     const [panels, setPanels] = React.useState<string[]>([]);
     const [groups, setGroups] = React.useState<string[]>([]);
@@ -78,16 +90,39 @@ const DockviewDemo = (props: { theme?: string }) => {
     const [activePanel, setActivePanel] = React.useState<string>();
     const [activeGroup, setActiveGroup] = React.useState<string>();
 
+    const [pending, setPending] = React.useState<
+        { text: string; timestamp?: Date }[]
+    >([]);
+
+    const addLogLine = (message: string) => {
+        setPending((line) => [
+            { text: message, timestamp: new Date() },
+            ...line,
+        ]);
+    };
+
+    React.useLayoutEffect(() => {
+        if (pending.length === 0) {
+            return;
+        }
+        const color = colors[count++ % colors.length];
+        setLogLines((lines) => [
+            ...pending.map((_) => ({ ..._, backgroundColor: color })),
+            ...lines,
+        ]);
+        setPending([]);
+    }, [pending]);
+
     const onReady = (event: DockviewReadyEvent) => {
         setApi(event.api);
 
         event.api.onDidAddPanel((event) => {
             setPanels((_) => [..._, event.id]);
-            setLogLines((line) => [`Panel Added ${event.id}`, ...line]);
+            addLogLine(`Panel Added ${event.id}`);
         });
         event.api.onDidActivePanelChange((event) => {
             setActivePanel(event?.id);
-            setLogLines((line) => [`Panel Activated ${event?.id}`, ...line]);
+            addLogLine(`Panel Activated ${event?.id}`);
         });
         event.api.onDidRemovePanel((event) => {
             setPanels((_) => {
@@ -99,12 +134,12 @@ const DockviewDemo = (props: { theme?: string }) => {
 
                 return next;
             });
-            setLogLines((line) => [`Panel Removed ${event.id}`, ...line]);
+            addLogLine(`Panel Removed ${event.id}`);
         });
 
         event.api.onDidAddGroup((event) => {
             setGroups((_) => [..._, event.id]);
-            setLogLines((line) => [`Group Added ${event.id}`, ...line]);
+            addLogLine(`Group Added ${event.id}`);
         });
 
         event.api.onDidRemoveGroup((event) => {
@@ -117,12 +152,12 @@ const DockviewDemo = (props: { theme?: string }) => {
 
                 return next;
             });
-            setLogLines((line) => [`Group Removed ${event.id}`, ...line]);
+            addLogLine(`Group Removed ${event.id}`);
         });
 
         event.api.onDidActiveGroupChange((event) => {
             setActiveGroup(event?.id);
-            setLogLines((line) => [`Group Activated ${event?.id}`, ...line]);
+            addLogLine(`Group Activated ${event?.id}`);
         });
 
         const state = localStorage.getItem('dv-demo-state');
@@ -146,6 +181,9 @@ const DockviewDemo = (props: { theme?: string }) => {
                 display: 'flex',
                 flexDirection: 'column',
                 flexGrow: 1,
+                padding: '8px',
+                backgroundColor: 'rgba(0,0,50,0.25)',
+                borderRadius: '8px',
             }}
         >
             <div>
@@ -167,6 +205,7 @@ const DockviewDemo = (props: { theme?: string }) => {
                     overflow: 'hidden',
                     // flexBasis: 0
                     height: 0,
+                    display: 'flex',
                 }}
             >
                 <DockviewReact
@@ -178,33 +217,62 @@ const DockviewDemo = (props: { theme?: string }) => {
                     onReady={onReady}
                     className={props.theme || 'dockview-theme-abyss'}
                 />
-            </div>
-            <div
-                style={{
-                    height: '200px',
-                    backgroundColor: 'black',
-                    color: 'white',
-                    overflow: 'auto',
-                }}
-            >
-                {logLines.map((line, i) => {
-                    return (
-                        <div key={i}>
-                            <span
+                <div
+                    style={{
+                        // height: '200px',
+                        width: '300px',
+                        backgroundColor: 'black',
+                        color: 'white',
+                        overflow: 'auto',
+                    }}
+                >
+                    {logLines.map((line, i) => {
+                        return (
+                            <div
                                 style={{
-                                    display: 'inline-block',
-                                    width: '30px',
-                                    color: 'gray',
-                                    borderRight: '1px solid gray',
-                                    marginRight: '4px',
+                                    height: '30px',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    fontSize: '13px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    backgroundColor: line.backgroundColor,
                                 }}
+                                key={i}
                             >
-                                {logLines.length - i}
-                            </span>
-                            <span>{line}</span>
-                        </div>
-                    );
-                })}
+                                <span
+                                    style={{
+                                        display: 'inline-block',
+                                        width: '20px',
+                                        color: 'gray',
+                                        borderRight: '1px solid gray',
+                                        marginRight: '4px',
+                                        paddingLeft: '2px',
+                                        height: '100%',
+                                    }}
+                                >
+                                    {logLines.length - i}
+                                </span>
+                                <span>
+                                    {line.timestamp && (
+                                        <span
+                                            style={{
+                                                fontSize: '0.7em',
+                                                padding: '0px 2px',
+                                            }}
+                                        >
+                                            {line.timestamp
+                                                .toISOString()
+                                                .substring(11, 23)}
+                                        </span>
+                                    )}
+                                    <span>{line.text}</span>
+                                </span>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );

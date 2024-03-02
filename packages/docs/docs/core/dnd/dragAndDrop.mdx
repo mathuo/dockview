@@ -5,7 +5,6 @@ sidebar_position: 1
 
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import { MultiFrameworkContainer } from '@site/src/components/ui/container';
-import DndDockview from '@site/sandboxes/dnd-dockview/src/app';
 import DockviewExternalDnd from '@site/sandboxes/externaldnd-dockview/src/app';
 import LiveExample from '@site/src/components/ui/exampleFrame';
 
@@ -16,7 +15,7 @@ The dock makes heavy use of drag and drop functionalities.
 <DocRef declaration="DockviewApi"
   methods={[
     'onWillDragPanel', 'onWillDragGroup',
-    'onWillDrop', 'onDidDrop', 'onWillShowOverlay'
+    'onWillDrop', 'onWillShowOverlay'
   ]}
   />
 
@@ -78,12 +77,6 @@ return (
     />
 );
 ```
-
-## Intercepting Drag Events
-
-You can intercept drag events to attach your own metadata using the `onWillDragPanel` and `onWillDragGroup` api methods.
-
-<MultiFrameworkContainer sandboxId="dnd-dockview" react={DndDockview} />
 
 ## Third Party Dnd Libraries
 
