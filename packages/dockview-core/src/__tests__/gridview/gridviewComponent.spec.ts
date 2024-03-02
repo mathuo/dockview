@@ -2700,4 +2700,35 @@ describe('gridview', () => {
 
         expect(gridview.disableResizing).toBeTruthy();
     });
+
+    test('that setVisible toggles visiblity', () => {
+        const gridview = new GridviewComponent({
+            parentElement: container,
+            proportionalLayout: true,
+            orientation: Orientation.HORIZONTAL,
+            components: { default: TestGridview },
+            disableAutoResizing: true,
+        });
+        gridview.layout(1000, 1000);
+
+        const panel1 = gridview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        const panel2 = gridview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        expect(panel1.api.isVisible).toBeTruthy();
+        expect(panel2.api.isVisible).toBeTruthy();
+
+        panel1.api.setVisible(false);
+        expect(panel1.api.isVisible).toBeFalsy();
+        expect(panel2.api.isVisible).toBeTruthy();
+
+        panel1.api.setVisible(true);
+        expect(panel1.api.isVisible).toBeTruthy();
+        expect(panel2.api.isVisible).toBeTruthy();
+    });
 });

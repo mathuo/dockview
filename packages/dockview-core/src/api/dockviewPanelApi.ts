@@ -99,41 +99,14 @@ export class DockviewPanelApiImpl
     }
 
     set group(value: DockviewGroupPanel) {
-        const isOldGroupActive = this.isGroupActive;
+        const oldGroup = this._group;
 
         if (this._group !== value) {
             this._group = value;
 
             this._onDidGroupChange.fire({});
 
-            let _trackGroupActive = isOldGroupActive; // prevent duplicate events with same state
-
-            this.groupEventsDisposable.value = new CompositeDisposable(
-                this.group.api.onDidLocationChange((event) => {
-                    if (this.group !== this.panel.group) {
-                        return;
-                    }
-                    this._onDidLocationChange.fire(event);
-                }),
-                this.group.api.onDidActiveChange(() => {
-                    if (this.group !== this.panel.group) {
-                        return;
-                    }
-
-                    if (_trackGroupActive !== this.isGroupActive) {
-                        _trackGroupActive = this.isGroupActive;
-                        this._onDidActiveGroupChange.fire({
-                            isActive: this.isGroupActive,
-                        });
-                    }
-                })
-            );
-
-            // if (this.isGroupActive !== isOldGroupActive) {
-            //     this._onDidActiveGroupChange.fire({
-            //         isActive: this.isGroupActive,
-            //     });
-            // }
+            this.setupGroupEventListeners(oldGroup);
 
             this._onDidLocationChange.fire({
                 location: this.group.api.location,
@@ -155,6 +128,7 @@ export class DockviewPanelApiImpl
         this.initialize(panel);
 
         this._group = group;
+        this.setupGroupEventListeners();
 
         this.addDisposables(
             this.groupEventsDisposable,
@@ -207,5 +181,41 @@ export class DockviewPanelApiImpl
 
     exitMaximized(): void {
         this.group.api.exitMaximized();
+    }
+
+    private setupGroupEventListeners(previousGroup?: DockviewGroupPanel) {
+        let _trackGroupActive = previousGroup?.isActive ?? false; // prevent duplicate events with same state
+
+        this.groupEventsDisposable.value = new CompositeDisposable(
+            this.group.api.onDidVisibilityChange((event) => {
+                if (!event.isVisible && this.isVisible) {
+                    this._onDidVisibilityChange.fire(event);
+                } else if (
+                    event.isVisible &&
+                    !this.isVisible &&
+                    this.group.model.isPanelActive(this.panel)
+                ) {
+                    this._onDidVisibilityChange.fire(event);
+                }
+            }),
+            this.group.api.onDidLocationChange((event) => {
+                if (this.group !== this.panel.group) {
+                    return;
+                }
+                this._onDidLocationChange.fire(event);
+            }),
+            this.group.api.onDidActiveChange(() => {
+                if (this.group !== this.panel.group) {
+                    return;
+                }
+
+                if (_trackGroupActive !== this.isGroupActive) {
+                    _trackGroupActive = this.isGroupActive;
+                    this._onDidActiveGroupChange.fire({
+                        isActive: this.isGroupActive,
+                    });
+                }
+            })
+        );
     }
 }

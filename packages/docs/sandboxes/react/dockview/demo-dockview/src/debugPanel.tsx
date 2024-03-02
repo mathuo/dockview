@@ -14,10 +14,6 @@ export interface PanelApiMetadata {
         value: boolean;
         count: number;
     };
-    isHidden: {
-        value: boolean;
-        count: number;
-    };
     renderer: {
         value: DockviewPanelRenderer;
         count: number;
@@ -69,7 +65,6 @@ export function usePanelApiMetadata(api: DockviewPanelApi): PanelApiMetadata {
     const [state, setState] = React.useState<PanelApiMetadata>({
         isActive: { value: api.isActive, count: 0 },
         isVisible: { value: api.isVisible, count: 0 },
-        isHidden: { value: api.isHidden, count: 0 },
         renderer: { value: api.renderer, count: 0 },
         isGroupActive: { value: api.isGroupActive, count: 0 },
         groupChanged: { count: 0 },
@@ -125,15 +120,6 @@ export function usePanelApiMetadata(api: DockviewPanelApi): PanelApiMetadata {
                 },
             }));
         });
-        const d6 = api.onDidHiddenChange((event) => {
-            setState((_) => ({
-                ..._,
-                isHidden: {
-                    value: event.isHidden,
-                    count: _.isHidden.count + 1,
-                },
-            }));
-        });
         const d7 = api.onDidLocationChange((event) => {
             setState((_) => ({
                 ..._,
@@ -168,7 +154,6 @@ export function usePanelApiMetadata(api: DockviewPanelApi): PanelApiMetadata {
             d3.dispose();
             d4.dispose();
             d5.dispose();
-            d6.dispose();
             d7.dispose();
             d8.dispose();
             d9.dispose();

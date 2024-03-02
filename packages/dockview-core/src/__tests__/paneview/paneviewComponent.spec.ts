@@ -514,4 +514,38 @@ describe('componentPaneview', () => {
 
         expect(paneview.disableResizing).toBeTruthy();
     });
+
+    test('that setVisible toggles visiblity', () => {
+        const paneview = new PaneviewComponent({
+            parentElement: container,
+            components: {
+                default: TestPanel,
+            },
+            disableAutoResizing: true,
+        });
+
+        paneview.layout(1000, 1000);
+
+        const panel1 = paneview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            title: 'panel1',
+        });
+        const panel2 = paneview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            title: 'panel2',
+        });
+
+        expect(panel1.api.isVisible).toBeTruthy();
+        expect(panel2.api.isVisible).toBeTruthy();
+
+        panel1.api.setVisible(false);
+        expect(panel1.api.isVisible).toBeFalsy();
+        expect(panel2.api.isVisible).toBeTruthy();
+
+        panel1.api.setVisible(true);
+        expect(panel1.api.isVisible).toBeTruthy();
+        expect(panel2.api.isVisible).toBeTruthy();
+    });
 });
