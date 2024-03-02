@@ -15,6 +15,7 @@ import {
     Parameters,
 } from '../panel/types';
 import { IView, Orientation } from '../splitview/splitview';
+import { PaneviewComponent } from './paneviewComponent';
 
 export interface PanePanelViewState extends BasePanelViewState {
     headerComponent?: string;
@@ -27,6 +28,7 @@ export interface PanePanelInitParameter extends PanelInitParameters {
     isExpanded?: boolean;
     title: string;
     containerApi: PaneviewApi;
+    accessor: PaneviewComponent;
 }
 
 export interface PanePanelComponentInitParameter
@@ -176,6 +178,11 @@ export abstract class PaneviewPanel
         this.element.classList.add('pane');
 
         this.addDisposables(
+            this.api.onWillVisibilityChange((event) => {
+                const { isVisible } = event;
+                const { accessor } = this._params as PanePanelInitParameter;
+                accessor.setVisible(this, isVisible);
+            }),
             this.api.onDidSizeChange((event) => {
                 this._onDidChange.fire({ size: event.size });
             }),

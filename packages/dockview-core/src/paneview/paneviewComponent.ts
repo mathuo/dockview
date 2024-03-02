@@ -125,6 +125,7 @@ export interface IPaneviewComponent extends IDisposable {
     getPanel(id: string): IPaneviewPanel | undefined;
     movePanel(from: number, to: number): void;
     updateOptions(options: Partial<PaneviewComponentOptions>): void;
+    setVisible(panel: IPaneviewPanel, visible: boolean): void;
     clear(): void;
 }
 
@@ -226,6 +227,11 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
         this.addDisposables(this._disposable);
     }
 
+    setVisible(panel: PaneviewPanel, visible: boolean): void {
+        const index = this.panels.indexOf(panel);
+        this.paneview.setViewVisible(index, visible);
+    }
+
     focus(): void {
         //noop
     }
@@ -296,6 +302,7 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
             isExpanded: options.isExpanded,
             title: options.title,
             containerApi: new PaneviewApi(this),
+            accessor: this,
         });
 
         this.paneview.addPane(view, size, index);
@@ -430,6 +437,7 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
                             title: data.title,
                             isExpanded: !!view.expanded,
                             containerApi: new PaneviewApi(this),
+                            accessor: this,
                         });
                         panel.orientation = this.paneview.orientation;
                     });
