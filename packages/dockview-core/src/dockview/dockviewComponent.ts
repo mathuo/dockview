@@ -674,7 +674,7 @@ export class DockviewComponent
             options?.overridePopoutGroup?.id ?? this.getNextGroupId(); //item.id;
 
         if (itemToPopout.api.location.type === 'grid') {
-            itemToPopout.api.setHidden(true);
+            itemToPopout.api.setVisible(false);
         }
 
         const _window = new PopoutWindow(
@@ -749,7 +749,7 @@ export class DockviewComponent
 
                     switch (referenceLocation) {
                         case 'grid':
-                            referenceGroup.api.setHidden(true);
+                            referenceGroup.api.setVisible(false);
                             break;
                         case 'floating':
                         case 'popout':
@@ -821,8 +821,8 @@ export class DockviewComponent
                                 })
                             );
 
-                            if (referenceGroup.api.isHidden) {
-                                referenceGroup.api.setHidden(false);
+                            if (!referenceGroup.api.isVisible) {
+                                referenceGroup.api.setVisible(true);
                             }
 
                             if (this.getPanel(group.id)) {
@@ -1596,7 +1596,7 @@ export class DockviewComponent
     private updateWatermark(): void {
         if (
             this.groups.filter(
-                (x) => x.api.location.type === 'grid' && !x.api.isHidden
+                (x) => x.api.location.type === 'grid' && x.api.isVisible
             ).length === 0
         ) {
             if (!this.watermark) {

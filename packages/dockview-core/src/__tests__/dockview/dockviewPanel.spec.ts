@@ -3,6 +3,7 @@ import { DockviewApi } from '../../api/component.api';
 import { DockviewPanel } from '../../dockview/dockviewPanel';
 import { IDockviewPanelModel } from '../../dockview/dockviewPanelModel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
+import { fromPartial } from '@total-typescript/shoehorn';
 
 describe('dockviewPanel', () => {
     test('update title', () => {
@@ -14,9 +15,7 @@ describe('dockviewPanel', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return {} as any;
         });
-        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
-            return {} as any;
-        });
+
         const panelModelMock = jest.fn<Partial<IDockviewPanelModel>, []>(() => {
             return {
                 update: jest.fn(),
@@ -26,7 +25,13 @@ describe('dockviewPanel', () => {
 
         const api = new dockviewApiMock();
         const accessor = new accessorMock();
-        const group = new groupMock();
+        const group = fromPartial<DockviewGroupPanel>({
+            api: {
+                onDidVisibilityChange: jest.fn(),
+                onDidLocationChange: jest.fn(),
+                onDidActiveChange: jest.fn(),
+            },
+        });
         const model = <IDockviewPanelModel>new panelModelMock();
 
         const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
@@ -61,9 +66,6 @@ describe('dockviewPanel', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return {} as any;
         });
-        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
-            return {} as any;
-        });
         const panelModelMock = jest.fn<Partial<IDockviewPanelModel>, []>(() => {
             return {
                 update: jest.fn(),
@@ -73,7 +75,13 @@ describe('dockviewPanel', () => {
 
         const api = new dockviewApiMock();
         const accessor = new accessorMock();
-        const group = new groupMock();
+        const group = fromPartial<DockviewGroupPanel>({
+            api: {
+                onDidVisibilityChange: jest.fn(),
+                onDidLocationChange: jest.fn(),
+                onDidActiveChange: jest.fn(),
+            },
+        });
         const model = <IDockviewPanelModel>new panelModelMock();
 
         const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
@@ -97,9 +105,6 @@ describe('dockviewPanel', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return {} as any;
         });
-        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
-            return {} as any;
-        });
         const panelModelMock = jest.fn<Partial<IDockviewPanelModel>, []>(() => {
             return {
                 update: jest.fn(),
@@ -110,7 +115,19 @@ describe('dockviewPanel', () => {
 
         const api = new dockviewApiMock();
         const accessor = new accessorMock();
-        const group = new groupMock();
+        const group = fromPartial<DockviewGroupPanel>({
+            api: {
+                onDidVisibilityChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+                onDidLocationChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+                onDidActiveChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+            },
+        });
         const model = <IDockviewPanelModel>new panelModelMock();
 
         const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
@@ -131,9 +148,6 @@ describe('dockviewPanel', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return {} as any;
         });
-        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
-            return {} as any;
-        });
         const panelModelMock = jest.fn<Partial<IDockviewPanelModel>, []>(() => {
             return {
                 update: jest.fn(),
@@ -144,7 +158,13 @@ describe('dockviewPanel', () => {
 
         const api = new dockviewApiMock();
         const accessor = new accessorMock();
-        const group = new groupMock();
+        const group = fromPartial<DockviewGroupPanel>({
+            api: {
+                onDidVisibilityChange: jest.fn(),
+                onDidLocationChange: jest.fn(),
+                onDidActiveChange: jest.fn(),
+            },
+        });
         const model = <IDockviewPanelModel>new panelModelMock();
 
         const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
@@ -165,13 +185,6 @@ describe('dockviewPanel', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return {} as any;
         });
-        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
-            return {
-                api: {
-                    setSize: jest.fn(),
-                },
-            } as any;
-        });
         const panelModelMock = jest.fn<Partial<IDockviewPanelModel>, []>(() => {
             return {
                 update: jest.fn(),
@@ -182,7 +195,14 @@ describe('dockviewPanel', () => {
 
         const api = new dockviewApiMock();
         const accessor = new accessorMock();
-        const group = new groupMock();
+        const group = fromPartial<DockviewGroupPanel>({
+            api: {
+                onDidVisibilityChange: jest.fn(),
+                onDidLocationChange: jest.fn(),
+                onDidActiveChange: jest.fn(),
+                setSize: jest.fn(),
+            },
+        });
         const model = <IDockviewPanelModel>new panelModelMock();
 
         const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
@@ -202,9 +222,6 @@ describe('dockviewPanel', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return {} as any;
         });
-        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
-            return {} as any;
-        });
         const panelModelMock = jest.fn<Partial<IDockviewPanelModel>, []>(() => {
             return {
                 update: jest.fn(),
@@ -215,7 +232,13 @@ describe('dockviewPanel', () => {
 
         const api = new dockviewApiMock();
         const accessor = new accessorMock();
-        const group = new groupMock();
+        const group = fromPartial<DockviewGroupPanel>({
+            api: {
+                onDidVisibilityChange: jest.fn(),
+                onDidLocationChange: jest.fn(),
+                onDidActiveChange: jest.fn(),
+            },
+        });
         const model = <IDockviewPanelModel>new panelModelMock();
 
         const cut = new DockviewPanel('fake-id', accessor, api, group, model, {

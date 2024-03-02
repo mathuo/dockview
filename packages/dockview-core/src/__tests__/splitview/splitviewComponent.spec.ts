@@ -617,4 +617,36 @@ describe('componentSplitview', () => {
 
         expect(splitview.disableResizing).toBeTruthy();
     });
+
+    test('that setVisible toggles visiblity', () => {
+        const splitview = new SplitviewComponent({
+            parentElement: container,
+            orientation: Orientation.HORIZONTAL,
+            components: {
+                default: TestPanel,
+            },
+        });
+
+        splitview.layout(1000, 1000);
+
+        const panel1 = splitview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        const panel2 = splitview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        expect(panel1.api.isVisible).toBeTruthy();
+        expect(panel2.api.isVisible).toBeTruthy();
+
+        panel1.api.setVisible(false);
+        expect(panel1.api.isVisible).toBeFalsy();
+        expect(panel2.api.isVisible).toBeTruthy();
+
+        panel1.api.setVisible(true);
+        expect(panel1.api.isVisible).toBeTruthy();
+        expect(panel2.api.isVisible).toBeTruthy();
+    });
 });

@@ -158,11 +158,11 @@ export abstract class GridviewPanel<
         this.api.initialize(this); // TODO: required to by-pass 'super before this' requirement
 
         this.addDisposables(
-            this.api.onDidHiddenChange((event) => {
-                const { isHidden } = event;
+            this.api.onWillVisibilityChange((event) => {
+                const { isVisible } = event;
                 const { accessor } = this._params as GridviewInitParameters;
 
-                accessor.setVisible(this, !isHidden);
+                accessor.setVisible(this, isVisible);
             }),
             this.api.onActiveChange(() => {
                 const { accessor } = this._params as GridviewInitParameters;
