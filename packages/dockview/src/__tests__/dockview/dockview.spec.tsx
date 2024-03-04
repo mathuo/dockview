@@ -1,16 +1,19 @@
 import * as React from 'react';
 import { act, render, waitFor } from '@testing-library/react';
-import { DockviewApi, IDockviewPanel } from 'dockview-core';
 import {
-    IDockviewPanelProps,
-    DockviewReact,
+    DockviewApi,
     DockviewReadyEvent,
-} from '../../dockview/dockview';
-import { PanelCollection } from '../../types';
+    IDockviewPanel,
+    IDockviewPanelProps,
+} from 'dockview-core';
+import { DockviewReact } from '../../dockview/dockview';
 import { setMockRefElement } from '../__test_utils__/utils';
 
 describe('gridview react', () => {
-    let components: PanelCollection<IDockviewPanelProps>;
+    let components: Record<
+        string,
+        React.FunctionComponent<IDockviewPanelProps>
+    >;
 
     beforeEach(() => {
         components = {

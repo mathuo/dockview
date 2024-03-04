@@ -157,9 +157,6 @@ export class ContentContainer
         }
 
         if (doRender) {
-            const _onDidFocus = panel.view.content.onDidFocus;
-            const _onDidBlur = panel.view.content.onDidBlur;
-
             const focusTracker = trackFocus(container);
             const disposable = new CompositeDisposable();
 
@@ -168,17 +165,6 @@ export class ContentContainer
                 focusTracker.onDidFocus(() => this._onDidFocus.fire()),
                 focusTracker.onDidBlur(() => this._onDidBlur.fire())
             );
-
-            if (_onDidFocus) {
-                disposable.addDisposables(
-                    _onDidFocus(() => this._onDidFocus.fire())
-                );
-            }
-            if (_onDidBlur) {
-                disposable.addDisposables(
-                    _onDidBlur(() => this._onDidBlur.fire())
-                );
-            }
 
             this.disposable.value = disposable;
         }

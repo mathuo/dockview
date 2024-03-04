@@ -12,7 +12,7 @@ import {
 } from '../dnd/droptarget';
 import { tail, sequenceEquals, remove } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
-import { CompositeDisposable, Disposable, IDisposable } from '../lifecycle';
+import { CompositeDisposable, Disposable } from '../lifecycle';
 import { Event, Emitter, addDisposableWindowListener } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import { IWatermarkRenderer, GroupviewPanelState } from './types';
@@ -23,6 +23,9 @@ import {
     AddGroupOptions,
     AddPanelOptions,
     DockviewComponentOptions,
+    DockviewDndOverlayEvent,
+    DockviewOptions,
+    DockviewUnhandledDragOverEvent,
     isGroupOptionsWithGroup,
     isGroupOptionsWithPanel,
     isPanelOptionsWithGroup,
@@ -232,25 +235,6 @@ function typeValidate(data: SerializedDockview): void {
     typeValidate2(grid.root, '.grid.root');
 }
 
-export type DockviewComponentUpdateOptions = Pick<
-    DockviewComponentOptions,
-    | 'orientation'
-    | 'components'
-    | 'frameworkComponents'
-    | 'tabComponents'
-    | 'frameworkTabComponents'
-    | 'showDndOverlay'
-    | 'watermarkFrameworkComponent'
-    | 'defaultTabComponent'
-    | 'createLeftHeaderActionsElement'
-    | 'createRightHeaderActionsElement'
-    | 'createPrefixHeaderActionsElement'
-    | 'disableFloatingGroups'
-    | 'floatingGroupBounds'
-    | 'rootOverlayModel'
-    | 'disableDnd'
->;
-
 type MoveGroupOptions = {
     from: { group: DockviewGroupPanel };
     to: { group: DockviewGroupPanel; position: Position };
@@ -285,8 +269,9 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
     readonly onDidAddGroup: Event<DockviewGroupPanel>;
     readonly onDidActiveGroupChange: Event<DockviewGroupPanel | undefined>;
+    readonly onUnhandledDragOverEvent: Event<DockviewDndOverlayEvent>;
     readonly options: DockviewComponentOptions;
-    updateOptions(options: DockviewComponentUpdateOptions): void;
+    updateOptions(options: DockviewOptions): void;
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void;
     moveGroup(options: MoveGroupOptions): void;
     doSetGroupActive: (group: DockviewGroupPanel, skipFocus?: boolean) => void;
@@ -352,6 +337,11 @@ export class DockviewComponent
         new Emitter<WillShowOverlayLocationEvent>();
     readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent> =
         this._onWillShowOverlay.event;
+
+    private readonly _onUnhandledDragOverEvent =
+        new Emitter<DockviewDndOverlayEvent>();
+    readonly onUnhandledDragOverEvent: Event<DockviewDndOverlayEvent> =
+        this._onUnhandledDragOverEvent.event;
 
     private readonly _onDidRemovePanel = new Emitter<IDockviewPanel>();
     readonly onDidRemovePanel: Event<IDockviewPanel> =
@@ -431,8 +421,10 @@ export class DockviewComponent
     constructor(options: DockviewComponentOptions) {
         super({
             proportionalLayout: true,
-            orientation: options.orientation ?? Orientation.HORIZONTAL,
-            styles: options.styles,
+            orientation: Orientation.HORIZONTAL,
+            styles: options.hideBorders
+                ? { separatorBorder: 'transparent' }
+                : undefined,
             parentElement: options.parentElement,
             disableAutoResizing: options.disableAutoResizing,
             locked: options.locked,
@@ -462,6 +454,7 @@ export class DockviewComponent
             this._onDidAddGroup,
             this._onDidRemoveGroup,
             this._onDidActiveGroupChange,
+            this._onUnhandledDragOverEvent,
             this.onDidAdd((event) => {
                 if (!this._moving) {
                     this._onDidAddGroup.fire(event);
@@ -542,25 +535,25 @@ export class DockviewComponent
                     return true;
                 }
 
-                if (this.options.showDndOverlay) {
-                    if (position === 'center' && this.gridview.length !== 0) {
-                        /**
-                         * for external events only show the four-corner drag overlays, disable
-                         * the center position so that external drag events can fall through to the group
-                         * and panel drop target handlers
-                         */
-                        return false;
-                    }
-
-                    return this.options.showDndOverlay({
-                        nativeEvent: event,
-                        position: position,
-                        target: 'edge',
-                        getData: getPanelData,
-                    });
+                if (position === 'center' && this.gridview.length !== 0) {
+                    /**
+                     * for external events only show the four-corner drag overlays, disable
+                     * the center position so that external drag events can fall through to the group
+                     * and panel drop target handlers
+                     */
+                    return false;
                 }
 
-                return false;
+                const firedEvent = new DockviewUnhandledDragOverEvent(
+                    event,
+                    'edge',
+                    position,
+                    getPanelData
+                );
+
+                this._onUnhandledDragOverEvent.fire(firedEvent);
+
+                return firedEvent.isAccepted;
             },
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
             overlayModel:
@@ -1043,10 +1036,7 @@ export class DockviewComponent
         }
     }
 
-    updateOptions(options: DockviewComponentUpdateOptions): void {
-        const changed_orientation =
-            typeof options.orientation === 'string' &&
-            this.gridview.orientation !== options.orientation;
+    updateOptions(options: Partial<DockviewComponentOptions>): void {
         const changed_floatingGroupBounds =
             options.floatingGroupBounds !== undefined &&
             options.floatingGroupBounds !== this.options.floatingGroupBounds;
@@ -1056,10 +1046,6 @@ export class DockviewComponent
             options.rootOverlayModel !== this.options.rootOverlayModel;
 
         this._options = { ...this.options, ...options };
-
-        if (changed_orientation) {
-            this.gridview.orientation = options.orientation!;
-        }
 
         if (changed_floatingGroupBounds) {
             for (const group of this._floatingGroups) {
@@ -2152,6 +2138,9 @@ export class DockviewComponent
                     }
 
                     this._onWillShowOverlay.fire(event);
+                }),
+                view.model.onUnhandledDragOverEvent((event) => {
+                    this._onUnhandledDragOverEvent.fire(event);
                 }),
                 view.model.onDidAddPanel((event) => {
                     if (this._moving) {

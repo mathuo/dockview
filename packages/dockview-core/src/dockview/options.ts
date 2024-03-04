@@ -9,25 +9,24 @@ import {
 } from './types';
 import { Parameters } from '../panel/types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
-import { ISplitviewStyles, Orientation } from '../splitview/splitview';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
 import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
-import { DockviewGroupDropLocation, GroupOptions } from './dockviewGroupPanelModel';
+import {
+    DockviewGroupDropLocation,
+    GroupOptions,
+} from './dockviewGroupPanelModel';
 import { IDockviewPanel } from './dockviewPanel';
 import {
     ComponentConstructor,
     FrameworkFactory,
 } from '../panel/componentFactory';
-import { DockviewGroupPanelApi } from '../api/dockviewGroupPanelApi';
 import { DockviewPanelRenderer } from '../overlayRenderContainer';
+import { IGroupHeaderProps } from './framework';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
-    init(params: {
-        containerApi: DockviewApi;
-        api: DockviewGroupPanelApi;
-    }): void;
+    init(params: IGroupHeaderProps): void;
 }
 
 export interface GroupPanelFrameworkComponentFactory {
@@ -42,54 +41,15 @@ export interface TabContextMenuEvent {
     panel: IDockviewPanel;
 }
 
-export interface DockviewRenderFunctions {
-    tabComponents?: {
-        [componentName: string]: ComponentConstructor<ITabRenderer>;
-    };
-    components?: {
-        [componentName: string]: ComponentConstructor<IContentRenderer>;
-    };
-    frameworkTabComponents?: {
-        [componentName: string]: any;
-    };
-    frameworkComponents?: {
-        [componentName: string]: any;
-    };
-}
-
 export interface ViewFactoryData {
     content: string;
     tab?: string;
 }
 
-export interface DockviewDndOverlayEvent {
-    nativeEvent: DragEvent;
-    target: DockviewGroupDropLocation;
-    position: Position;
-    group?: DockviewGroupPanel;
-    getData: () => PanelTransfer | undefined;
-}
-
-export interface DockviewComponentOptions extends DockviewRenderFunctions {
+export interface DockviewOptions {
     disableAutoResizing?: boolean;
-    watermarkComponent?: WatermarkConstructor;
-    watermarkFrameworkComponent?: any;
-    frameworkComponentFactory?: GroupPanelFrameworkComponentFactory;
-    orientation?: Orientation;
-    styles?: ISplitviewStyles;
-    defaultTabComponent?: string;
-    showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
-    createRightHeaderActionsElement?: (
-        group: DockviewGroupPanel
-    ) => IHeaderActionsRenderer;
-    createLeftHeaderActionsElement?: (
-        group: DockviewGroupPanel
-    ) => IHeaderActionsRenderer;
-    createPrefixHeaderActionsElement?: (
-        group: DockviewGroupPanel
-    ) => IHeaderActionsRenderer;
+    hideBorders?: boolean;
     singleTabMode?: 'fullwidth' | 'default';
-    parentElement: HTMLElement;
     disableFloatingGroups?: boolean;
     floatingGroupBounds?:
         | 'boundedWithinViewport'
@@ -104,6 +64,108 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     locked?: boolean;
     disableDnd?: boolean;
 }
+
+export interface DockviewDndOverlayEvent {
+    nativeEvent: DragEvent;
+    target: DockviewGroupDropLocation;
+    position: Position;
+    group?: DockviewGroupPanel;
+    getData: () => PanelTransfer | undefined;
+    //
+    isAccepted: boolean;
+    accept(): void;
+}
+
+export class DockviewUnhandledDragOverEvent implements DockviewDndOverlayEvent {
+    private _isAccepted = false;
+
+    get isAccepted(): boolean {
+        return this._isAccepted;
+    }
+
+    constructor(
+        readonly nativeEvent: DragEvent,
+        readonly target: DockviewGroupDropLocation,
+        readonly position: Position,
+        readonly getData: () => PanelTransfer | undefined,
+        readonly group?: DockviewGroupPanel
+    ) {}
+
+    accept(): void {
+        this._isAccepted = true;
+    }
+}
+
+export interface DockviewEvents {
+    // noop
+}
+
+export const PROPERTY_KEYS: (keyof DockviewOptions)[] = (() => {
+    /**
+     * by readong the keys from an empty value object TypeScript will error
+     * when we add or remove new properties to `DockviewOptions`
+     */
+    const properties: Record<keyof DockviewOptions, undefined> = {
+        disableAutoResizing: undefined,
+        hideBorders: undefined,
+        singleTabMode: undefined,
+        disableFloatingGroups: undefined,
+        floatingGroupBounds: undefined,
+        popoutUrl: undefined,
+        defaultRenderer: undefined,
+        debug: undefined,
+        rootOverlayModel: undefined,
+        locked: undefined,
+        disableDnd: undefined,
+    };
+
+    return Object.keys(properties) as (keyof DockviewOptions)[];
+})();
+
+export const EVENT_KEYS: (keyof DockviewEvents)[] = (() => {
+    /**
+     * by readong the keys from an empty value object TypeScript will error
+     * when we add or remove new properties to `DockviewOptions`
+     */
+    const properties: Record<keyof DockviewEvents, undefined> = {
+        showDndOverlay: undefined,
+    };
+
+    return Object.keys(properties) as (keyof DockviewEvents)[];
+})();
+
+export interface DockviewFrameworkOptions {
+    headerRightActionComponent?: (
+        group: DockviewGroupPanel
+    ) => IHeaderActionsRenderer;
+    headerLeftActionComponent?: (
+        group: DockviewGroupPanel
+    ) => IHeaderActionsRenderer;
+    headerPrefixActionComponent?: (
+        group: DockviewGroupPanel
+    ) => IHeaderActionsRenderer;
+    tabComponents?: {
+        [componentName: string]: ComponentConstructor<ITabRenderer>;
+    };
+    components?: {
+        [componentName: string]: ComponentConstructor<IContentRenderer>;
+    };
+    frameworkTabComponents?: {
+        [componentName: string]: any;
+    };
+    frameworkComponents?: {
+        [componentName: string]: any;
+    };
+    parentElement: HTMLElement;
+    defaultTabComponent?: string;
+    watermarkComponent?: WatermarkConstructor;
+    watermarkFrameworkComponent?: any;
+    frameworkComponentFactory?: GroupPanelFrameworkComponentFactory;
+}
+
+export type DockviewComponentOptions = DockviewOptions &
+    DockviewEvents &
+    DockviewFrameworkOptions;
 
 export interface PanelOptions<P extends object = Parameters> {
     component: string;

@@ -642,7 +642,6 @@ describe('dockviewGroupPanelModel', () => {
             return {
                 id: 'testcomponentid',
                 options: {
-                    showDndOverlay: jest.fn(),
                     parentElement: document.createElement('div'),
                 },
                 getPanel: jest.fn(),
@@ -650,6 +649,7 @@ describe('dockviewGroupPanelModel', () => {
                 onDidRemovePanel: jest.fn(),
             };
         });
+
         const accessor = new accessorMock() as DockviewComponent;
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
             () => {
@@ -678,6 +678,12 @@ describe('dockviewGroupPanelModel', () => {
             {},
             new groupPanelMock() as DockviewGroupPanel
         );
+
+        let counter = 0;
+
+        cut.onUnhandledDragOverEvent(() => {
+            counter++;
+        });
 
         const element = container
             .getElementsByClassName('content-container')
@@ -691,7 +697,7 @@ describe('dockviewGroupPanelModel', () => {
         fireEvent.dragEnter(element);
         fireEvent.dragOver(element);
 
-        expect(accessor.options.showDndOverlay).toBeCalledTimes(1);
+        expect(counter).toBe(1);
 
         expect(
             element.getElementsByClassName('drop-target-dropzone').length
@@ -703,7 +709,6 @@ describe('dockviewGroupPanelModel', () => {
             return {
                 id: 'testcomponentid',
                 options: {
-                    showDndOverlay: () => true,
                     parentElement: document.createElement('div'),
                 },
                 getPanel: jest.fn(),
@@ -739,6 +744,10 @@ describe('dockviewGroupPanelModel', () => {
             {},
             new groupPanelMock() as DockviewGroupPanel
         );
+
+        cut.onUnhandledDragOverEvent((e) => {
+            e.accept();
+        });
 
         const element = container
             .getElementsByClassName('content-container')
@@ -795,7 +804,6 @@ describe('dockviewGroupPanelModel', () => {
             return {
                 id: 'testcomponentid',
                 options: {
-                    showDndOverlay: jest.fn(),
                     parentElement: document.createElement('div'),
                 },
                 getPanel: jest.fn(),
@@ -833,6 +841,12 @@ describe('dockviewGroupPanelModel', () => {
             {},
             new groupPanelMock() as DockviewGroupPanel
         );
+
+        let counter = 0;
+
+        cut.onUnhandledDragOverEvent(() => {
+            counter++;
+        });
 
         cut.openPanel(
             new TestPanel('panel1', {
@@ -857,7 +871,7 @@ describe('dockviewGroupPanelModel', () => {
         fireEvent.dragEnter(element);
         fireEvent.dragOver(element);
 
-        expect(accessor.options.showDndOverlay).toBeCalledTimes(0);
+        expect(counter).toBe(0);
 
         expect(
             element.getElementsByClassName('drop-target-dropzone').length
@@ -869,7 +883,6 @@ describe('dockviewGroupPanelModel', () => {
             return {
                 id: 'testcomponentid',
                 options: {
-                    showDndOverlay: jest.fn(),
                     parentElement: document.createElement('div'),
                 },
                 getPanel: jest.fn(),
@@ -907,6 +920,12 @@ describe('dockviewGroupPanelModel', () => {
             {},
             new groupPanelMock() as DockviewGroupPanel
         );
+
+        let counter = 0;
+
+        cut.onUnhandledDragOverEvent(() => {
+            counter++;
+        });
 
         cut.openPanel(
             new TestPanel('panel1', {
@@ -936,7 +955,7 @@ describe('dockviewGroupPanelModel', () => {
         fireEvent.dragEnter(element);
         fireEvent.dragOver(element);
 
-        expect(accessor.options.showDndOverlay).toBeCalledTimes(0);
+        expect(counter).toBe(0);
 
         expect(
             element.getElementsByClassName('drop-target-dropzone').length
@@ -948,7 +967,6 @@ describe('dockviewGroupPanelModel', () => {
             return {
                 id: 'testcomponentid',
                 options: {
-                    showDndOverlay: jest.fn(),
                     parentElement: document.createElement('div'),
                 },
                 getPanel: jest.fn(),
@@ -986,6 +1004,12 @@ describe('dockviewGroupPanelModel', () => {
             {},
             new groupPanelMock() as DockviewGroupPanel
         );
+
+        let counter = 0;
+
+        cut.onUnhandledDragOverEvent(() => {
+            counter++;
+        });
 
         cut.openPanel(
             new TestPanel('panel1', {
@@ -1015,7 +1039,7 @@ describe('dockviewGroupPanelModel', () => {
         fireEvent.dragEnter(element);
         fireEvent.dragOver(element);
 
-        expect(accessor.options.showDndOverlay).toBeCalledTimes(1);
+        expect(counter).toBe(1);
 
         expect(
             element.getElementsByClassName('drop-target-dropzone').length
