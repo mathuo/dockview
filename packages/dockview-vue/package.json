@@ -1,0 +1,61 @@
+{
+  "name": "dockview-vue",
+  "version": "0.0.0-beta-0",
+  "description": "Zero dependency layout manager supporting tabs, grids and splitviews with ReactJS support",
+  "keywords": [
+    "splitview",
+    "split-view",
+    "gridview",
+    "grid-view",
+    "dockview",
+    "dock-view",
+    "grid",
+    "tabs",
+    "layout",
+    "layout manager",
+    "dock layout",
+    "dock",
+    "docking",
+    "splitter",
+    "drag-and-drop",
+    "drag",
+    "drop",
+    "react",
+    "react-component"
+  ],
+  "main": "dist/dockview-vue.umd.js",
+  "module": "dist/dockview-vue.es.js",
+  "types": "dist/types/index.d.ts",
+  "homepage": "https://github.com/mathuo/dockview",
+  "bugs": {
+    "url": "https://github.com/mathuo/dockview/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mathuo/dockview.git"
+  },
+  "license": "MIT",
+  "author": "https://github.com/mathuo",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build-only": "vite build",
+    "build": "npm run build:package && npm run build:bundles",
+    "build:bundles": "rollup -c",
+    "build:cjs": "cross-env ../../node_modules/.bin/vue-tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
+    "build:css": "gulp sass",
+    "build:esm": "cross-env ../../node_modules/.bin/vue-tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
+    "build:package": "npm run build-only && npm run build:types",
+    "clean": "rimraf dist/ .build/ .rollup.cache/",
+    "prepublishOnly": "npm run rebuild && npm run test",
+    "rebuild": "npm run clean && npm run build",
+    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview",
+    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage",
+    "build:types": "vue-tsc --project tsconfig.build-types.json --declaration --emitDeclarationOnly --outDir dist/types "
+  },
+  "dependencies": {
+    "dockview-core": "^1.10.1"
+  }
+}

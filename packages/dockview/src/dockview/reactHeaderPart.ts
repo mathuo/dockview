@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { ReactPart, ReactPortalStore } from '../react';
-import { IGroupPanelBaseProps } from './dockview';
 import {
     PanelUpdateEvent,
     ITabRenderer,
     GroupPanelPartInitParameters,
+    IGroupPanelBaseProps,
 } from 'dockview-core';
 
 export class ReactPanelHeaderPart implements ITabRenderer {

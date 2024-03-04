@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { act, render, waitFor } from '@testing-library/react';
-import { DockviewApi, IDockviewPanel } from 'dockview-core';
 import {
+    DockviewApi,
+    IDockviewPanel,
     IDockviewPanelProps,
-    DockviewReact,
-    DockviewReadyEvent,
-} from '../../dockview/dockview';
+} from 'dockview-core';
+import { DockviewReact, DockviewReadyEvent } from '../../dockview/dockview';
 import { PanelCollection } from '../../types';
 import { setMockRefElement } from '../__test_utils__/utils';
 

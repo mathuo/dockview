@@ -23,19 +23,27 @@ export {
 export * from './paneview/paneview';
 export * from './gridview/gridview';
 export { GridviewComponentOptions } from './gridview/options';
-export * from './dockview/dockviewGroupPanelModel';
 export * from './gridview/baseComponentGridview';
 
 export * from './paneview/draggablePaneviewPanel';
 
 export * from './dockview/components/panel/content';
 export * from './dockview/components/tab/tab';
+export * from './dockview/dockviewGroupPanelModel';
 export {
     TabDragEvent,
     GroupDragEvent,
 } from './dockview/components/titlebar/tabsContainer';
 export * from './dockview/types';
 export * from './dockview/dockviewGroupPanel';
+export {
+    IGroupPanelBaseProps,
+    IDockviewPanelHeaderProps,
+    IDockviewPanelProps,
+    IDockviewHeaderActionsProps,
+    IGroupHeaderProps,
+    IWatermarkPanelProps,
+} from './dockview/framework';
 
 export * from './dockview/options';
 export * from './dockview/dockviewPanel';

@@ -2039,8 +2039,7 @@ describe('dockviewComponent', () => {
             },
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
-            },
-            orientation: Orientation.HORIZONTAL,
+            }
         });
 
         dockview.layout(1000, 1000);
@@ -2146,8 +2145,7 @@ describe('dockviewComponent', () => {
             },
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
-            },
-            orientation: Orientation.HORIZONTAL,
+            }
         });
 
         dockview.layout(1000, 1000);
@@ -2288,8 +2286,7 @@ describe('dockviewComponent', () => {
             },
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
-            },
-            orientation: Orientation.HORIZONTAL,
+            }
         });
 
         dockview.layout(1000, 1000);
@@ -2417,8 +2414,7 @@ describe('dockviewComponent', () => {
             },
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
-            },
-            orientation: Orientation.HORIZONTAL,
+            }
         });
 
         dockview.layout(1000, 1000);
@@ -2467,66 +2463,6 @@ describe('dockviewComponent', () => {
         });
     });
 
-    test('orthogonal realigment #5', () => {
-        const container = document.createElement('div');
-
-        const dockview = new DockviewComponent({
-            parentElement: container,
-            components: {
-                default: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
-            },
-            orientation: Orientation.VERTICAL,
-        });
-
-        dockview.layout(1000, 1000);
-
-        expect(dockview.orientation).toBe(Orientation.VERTICAL);
-
-        dockview.addPanel({
-            id: 'panel1',
-            component: 'default',
-            position: {
-                direction: 'left',
-            },
-        });
-
-        expect(dockview.orientation).toBe(Orientation.HORIZONTAL);
-
-        expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
-            activeGroup: '1',
-            grid: {
-                root: {
-                    type: 'branch',
-                    data: [
-                        {
-                            type: 'leaf',
-                            data: {
-                                views: ['panel1'],
-                                id: '1',
-                                activeView: 'panel1',
-                            },
-                            size: 1000,
-                        },
-                    ],
-                    size: 1000,
-                },
-                height: 1000,
-                width: 1000,
-                orientation: Orientation.HORIZONTAL,
-            },
-            panels: {
-                panel1: {
-                    id: 'panel1',
-                    contentComponent: 'default',
-                    title: 'panel1',
-                },
-            },
-        });
-    });
-
     test('that a empty component has no groups', () => {
         const container = document.createElement('div');
 
@@ -2538,7 +2474,6 @@ describe('dockviewComponent', () => {
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
             },
-            orientation: Orientation.HORIZONTAL,
         });
 
         expect(dockview.groups.length).toBe(0);
@@ -2555,7 +2490,6 @@ describe('dockviewComponent', () => {
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
             },
-            orientation: Orientation.HORIZONTAL,
         });
 
         expect(dockview.groups.length).toBe(0);
@@ -2595,7 +2529,6 @@ describe('dockviewComponent', () => {
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
             },
-            orientation: Orientation.HORIZONTAL,
         });
 
         expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
@@ -2624,7 +2557,6 @@ describe('dockviewComponent', () => {
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
             },
-            orientation: Orientation.HORIZONTAL,
         });
 
         dockview.layout(100, 100);
@@ -2711,7 +2643,6 @@ describe('dockviewComponent', () => {
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
             },
-            orientation: Orientation.HORIZONTAL,
         });
 
         dockview.layout(100, 100);
@@ -2774,7 +2705,6 @@ describe('dockviewComponent', () => {
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
             },
-            orientation: Orientation.HORIZONTAL,
         });
 
         expect(dockview.orientation).toBe(Orientation.HORIZONTAL);
@@ -2865,7 +2795,6 @@ describe('dockviewComponent', () => {
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
             },
-            orientation: Orientation.HORIZONTAL,
         });
 
         dockview.layout(1000, 500);
@@ -2897,7 +2826,6 @@ describe('dockviewComponent', () => {
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
             },
-            orientation: Orientation.HORIZONTAL,
         });
 
         dockview.layout(1000, 500);
@@ -2932,7 +2860,6 @@ describe('dockviewComponent', () => {
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
             },
-            orientation: Orientation.HORIZONTAL,
             showDndOverlay: showDndOverlay,
         });
 
@@ -3086,7 +3013,6 @@ describe('dockviewComponent', () => {
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
             },
-            orientation: Orientation.HORIZONTAL,
         });
 
         dockview.layout(1000, 500);
@@ -3126,7 +3052,6 @@ describe('dockviewComponent', () => {
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
             },
-            orientation: Orientation.HORIZONTAL,
         });
 
         dockview.layout(1000, 500);
@@ -3167,7 +3092,6 @@ describe('dockviewComponent', () => {
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
             },
-            orientation: Orientation.HORIZONTAL,
         });
 
         dockview.layout(1000, 500);
@@ -3257,7 +3181,6 @@ describe('dockviewComponent', () => {
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
             },
-            orientation: Orientation.HORIZONTAL,
         });
 
         dockview.layout(1000, 500);
@@ -3380,7 +3303,6 @@ describe('dockviewComponent', () => {
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
             },
-            orientation: Orientation.HORIZONTAL,
         });
 
         expect(dockview.disableResizing).toBeFalsy();
@@ -3398,7 +3320,6 @@ describe('dockviewComponent', () => {
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
             },
-            orientation: Orientation.HORIZONTAL,
             disableAutoResizing: true,
         });
 
@@ -3417,7 +3338,6 @@ describe('dockviewComponent', () => {
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
                 },
-                orientation: Orientation.HORIZONTAL,
             });
 
             dockview.layout(1000, 500);
@@ -3445,7 +3365,6 @@ describe('dockviewComponent', () => {
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
                 },
-                orientation: Orientation.HORIZONTAL,
             });
 
             dockview.layout(1000, 500);
@@ -3488,7 +3407,6 @@ describe('dockviewComponent', () => {
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
                 },
-                orientation: Orientation.HORIZONTAL,
             });
 
             dockview.layout(1000, 500);
@@ -3531,7 +3449,6 @@ describe('dockviewComponent', () => {
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
                 },
-                orientation: Orientation.HORIZONTAL,
             });
 
             dockview.layout(1000, 500);
@@ -3582,7 +3499,6 @@ describe('dockviewComponent', () => {
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
                 },
-                orientation: Orientation.HORIZONTAL,
             });
 
             dockview.layout(1000, 500);
@@ -3633,7 +3549,6 @@ describe('dockviewComponent', () => {
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
                 },
-                orientation: Orientation.HORIZONTAL,
             });
 
             dockview.layout(1000, 500);
@@ -3684,7 +3599,6 @@ describe('dockviewComponent', () => {
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
                 },
-                orientation: Orientation.HORIZONTAL,
             });
 
             dockview.layout(1000, 500);
@@ -3743,7 +3657,6 @@ describe('dockviewComponent', () => {
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
                 },
-                orientation: Orientation.HORIZONTAL,
             });
 
             dockview.layout(1000, 500);
@@ -3786,7 +3699,6 @@ describe('dockviewComponent', () => {
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
                 },
-                orientation: Orientation.HORIZONTAL,
             });
 
             dockview.layout(1000, 500);
@@ -3829,7 +3741,6 @@ describe('dockviewComponent', () => {
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
                 },
-                orientation: Orientation.HORIZONTAL,
             });
 
             dockview.layout(1000, 500);
@@ -3880,7 +3791,6 @@ describe('dockviewComponent', () => {
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
                 },
-                orientation: Orientation.HORIZONTAL,
             });
 
             dockview.layout(1000, 500);
@@ -3931,7 +3841,6 @@ describe('dockviewComponent', () => {
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
                 },
-                orientation: Orientation.HORIZONTAL,
             });
 
             dockview.layout(1000, 500);
@@ -3982,7 +3891,6 @@ describe('dockviewComponent', () => {
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
                 },
-                orientation: Orientation.HORIZONTAL,
             });
 
             dockview.layout(1000, 500);
@@ -4041,7 +3949,6 @@ describe('dockviewComponent', () => {
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
                 },
-                orientation: Orientation.HORIZONTAL,
             });
 
             dockview.layout(1000, 500);
@@ -4092,7 +3999,6 @@ describe('dockviewComponent', () => {
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
                 },
-                orientation: Orientation.HORIZONTAL,
             });
 
             dockview.layout(1000, 500);
@@ -4141,8 +4047,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                },
-                orientation: Orientation.HORIZONTAL,
+                }
             });
 
             dockview.layout(1000, 500);
@@ -4192,8 +4097,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                },
-                orientation: Orientation.HORIZONTAL,
+                }
             });
 
             dockview.layout(1000, 500);
@@ -4242,8 +4146,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                },
-                orientation: Orientation.HORIZONTAL,
+                }
             });
 
             dockview.layout(1000, 500);
@@ -4282,8 +4185,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                },
-                orientation: Orientation.HORIZONTAL,
+                }
             });
 
             dockview.layout(1000, 500);
@@ -4321,8 +4223,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                },
-                orientation: Orientation.HORIZONTAL,
+                }
             });
 
             dockview.layout(1000, 500);
@@ -4361,8 +4262,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                },
-                orientation: Orientation.HORIZONTAL,
+                }
             });
 
             dockview.layout(1000, 500);
@@ -4422,8 +4322,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                },
-                orientation: Orientation.HORIZONTAL,
+                }
             });
 
             dockview.layout(1000, 500);
@@ -4461,8 +4360,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                },
-                orientation: Orientation.HORIZONTAL,
+                }
             });
 
             dockview.layout(1000, 500);
@@ -4494,8 +4392,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                },
-                orientation: Orientation.HORIZONTAL,
+                }
             });
 
             dockview.layout(1000, 500);
@@ -4567,8 +4464,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                },
-                orientation: Orientation.HORIZONTAL,
+                }
             });
 
             dockview.layout(1000, 500);
@@ -4608,8 +4504,7 @@ describe('dockviewComponent', () => {
             },
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
-            },
-            orientation: Orientation.HORIZONTAL,
+            }
         });
         const api = new DockviewApi(dockview);
 

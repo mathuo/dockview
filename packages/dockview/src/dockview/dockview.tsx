@@ -2,28 +2,30 @@ import * as React from 'react';
 import {
     DockviewComponent,
     DockviewWillDropEvent,
-    DockviewDndOverlayEvent,
     GroupPanelFrameworkComponentFactory,
-    DockviewPanelApi,
     DockviewApi,
     IContentRenderer,
     ITabRenderer,
     DockviewGroupPanel,
     IHeaderActionsRenderer,
-    DockviewPanelRenderer,
-    DroptargetOverlayModel,
     DockviewDidDropEvent,
+    IWatermarkPanelProps,
+    IDockviewHeaderActionsProps,
+    IDockviewPanelHeaderProps,
+    IDockviewPanelProps,
+    DockviewOptions,
+    PROPERTY_KEYS,
+    DockviewComponentOptions,
+    DockviewFrameworkOptions,
+    IDockviewDisposable,
+    DockviewDndOverlayEvent,
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
 
 import { ReactPortalStore, usePortalsLifecycle } from '../react';
-import { IWatermarkPanelProps, ReactWatermarkPart } from './reactWatermarkPart';
-import { PanelCollection, PanelParameters } from '../types';
-import {
-    IDockviewHeaderActionsProps,
-    ReactHeaderActionsRendererPart,
-} from './headerActionsRenderer';
+import { ReactWatermarkPart } from './reactWatermarkPart';
+import { ReactHeaderActionsRendererPart } from './headerActionsRenderer';
 
 function createGroupControlElement(
     component: React.FunctionComponent<IDockviewHeaderActionsProps> | undefined,
@@ -40,54 +42,82 @@ function createGroupControlElement(
         : undefined;
 }
 
-export interface IGroupPanelBaseProps<T extends { [index: string]: any } = any>
-    extends PanelParameters<T> {
-    api: DockviewPanelApi;
-    containerApi: DockviewApi;
-}
-
-export type IDockviewPanelHeaderProps<
-    T extends { [index: string]: any } = any
-> = IGroupPanelBaseProps<T>;
-
-export type IDockviewPanelProps<T extends { [index: string]: any } = any> =
-    IGroupPanelBaseProps<T>;
+const DEFAULT_REACT_TAB = 'props.defaultTabComponent';
 
 export interface DockviewReadyEvent {
     api: DockviewApi;
 }
 
-export interface IDockviewReactProps {
+export interface IDockviewReactProps extends DockviewOptions {
+    className?: string;
     onReady: (event: DockviewReadyEvent) => void;
-    components: PanelCollection<IDockviewPanelProps>;
-    tabComponents?: PanelCollection<IDockviewPanelHeaderProps>;
-    watermarkComponent?: React.FunctionComponent<IWatermarkPanelProps>;
     onDidDrop?: (event: DockviewDidDropEvent) => void;
     onWillDrop?: (event: DockviewWillDropEvent) => void;
-    showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
-    hideBorders?: boolean;
-    className?: string;
-    disableAutoResizing?: boolean;
+    components: Record<string, React.FunctionComponent<IDockviewPanelProps>>;
+    tabComponents?: Record<
+        string,
+        React.FunctionComponent<IDockviewPanelHeaderProps>
+    >;
+    watermarkComponent?: React.FunctionComponent<IWatermarkPanelProps>;
     defaultTabComponent?: React.FunctionComponent<IDockviewPanelHeaderProps>;
     rightHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
     leftHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
     prefixHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
-    singleTabMode?: 'fullwidth' | 'default';
-    disableFloatingGroups?: boolean;
-    floatingGroupBounds?:
-        | 'boundedWithinViewport'
-        | {
-              minimumHeightWithinViewport?: number;
-              minimumWidthWithinViewport?: number;
-          };
-    debug?: boolean;
-    defaultRenderer?: DockviewPanelRenderer;
-    rootOverlayModel?: DroptargetOverlayModel;
-    locked?: boolean;
-    disableDnd?: boolean;
+    //
+    showDndOverlay: (event: DockviewDndOverlayEvent) => boolean;
 }
 
-const DEFAULT_REACT_TAB = 'props.defaultTabComponent';
+function extractCoreOptions(props: IDockviewReactProps): DockviewOptions {
+    const coreOptions = (PROPERTY_KEYS as (keyof DockviewOptions)[]).reduce(
+        (obj, key) => {
+            obj[key] = props[key] as any;
+            return obj;
+        },
+        {} as Partial<DockviewComponentOptions>
+    );
+
+    return coreOptions as DockviewOptions;
+}
+
+function createFrameworkFactory(
+    addPortal: (portal: React.ReactPortal) => IDockviewDisposable
+): GroupPanelFrameworkComponentFactory {
+    return {
+        content: {
+            createComponent: (
+                _id: string,
+                componentId: string,
+                component: React.FunctionComponent<IDockviewPanelProps>
+            ): IContentRenderer => {
+                return new ReactPanelContentPart(componentId, component, {
+                    addPortal,
+                });
+            },
+        },
+        tab: {
+            createComponent: (
+                _id: string,
+                componentId: string,
+                component: React.FunctionComponent<IDockviewPanelHeaderProps>
+            ): ITabRenderer => {
+                return new ReactPanelHeaderPart(componentId, component, {
+                    addPortal,
+                });
+            },
+        },
+        watermark: {
+            createComponent: (
+                _id: string,
+                componentId: string,
+                component: React.FunctionComponent<{}>
+            ) => {
+                return new ReactWatermarkPart(componentId, component, {
+                    addPortal,
+                });
+            },
+        },
+    };
+}
 
 export const DockviewReact = React.forwardRef(
     (props: IDockviewReactProps, ref: React.ForwardedRef<HTMLDivElement>) => {
@@ -97,56 +127,31 @@ export const DockviewReact = React.forwardRef(
 
         React.useImperativeHandle(ref, () => domRef.current!, []);
 
+        const prevProps = React.useRef<Partial<IDockviewReactProps>>({});
+
+        React.useEffect(() => {
+            const changes: Partial<DockviewOptions> = {};
+
+            Object.keys(PROPERTY_KEYS).forEach((propKey) => {
+                const key = propKey as keyof DockviewOptions;
+                const propValue = props[key];
+
+                if (propValue !== prevProps.current[key]) {
+                    changes[key] = propValue as any;
+                }
+            });
+
+            if (dockviewRef.current) {
+                dockviewRef.current.updateOptions(changes);
+            } else {
+                // not yet fully initialized
+            }
+        }, PROPERTY_KEYS.map((key) => props[key]).filter(Boolean));
+
         React.useEffect(() => {
             if (!domRef.current) {
-                return () => {
-                    // noop
-                };
+                return;
             }
-
-            const factory: GroupPanelFrameworkComponentFactory = {
-                content: {
-                    createComponent: (
-                        _id: string,
-                        componentId: string,
-                        component: React.FunctionComponent<IDockviewPanelProps>
-                    ): IContentRenderer => {
-                        return new ReactPanelContentPart(
-                            componentId,
-                            component,
-                            {
-                                addPortal,
-                            }
-                        );
-                    },
-                },
-                tab: {
-                    createComponent: (
-                        _id: string,
-                        componentId: string,
-                        component: React.FunctionComponent<IDockviewPanelHeaderProps>
-                    ): ITabRenderer => {
-                        return new ReactPanelHeaderPart(
-                            componentId,
-                            component,
-                            {
-                                addPortal,
-                            }
-                        );
-                    },
-                },
-                watermark: {
-                    createComponent: (
-                        _id: string,
-                        componentId: string,
-                        component: React.FunctionComponent<{}>
-                    ) => {
-                        return new ReactWatermarkPart(componentId, component, {
-                            addPortal,
-                        });
-                    },
-                },
-            };
 
             const frameworkTabComponents = props.tabComponents ?? {};
 
@@ -155,40 +160,32 @@ export const DockviewReact = React.forwardRef(
                     props.defaultTabComponent;
             }
 
-            const dockview = new DockviewComponent({
-                parentElement: domRef.current,
-                frameworkComponentFactory: factory,
-                frameworkComponents: props.components,
-                disableAutoResizing: props.disableAutoResizing,
-                frameworkTabComponents,
-                watermarkFrameworkComponent: props.watermarkComponent,
-                defaultTabComponent: props.defaultTabComponent
-                    ? DEFAULT_REACT_TAB
-                    : undefined,
-                styles: props.hideBorders
-                    ? { separatorBorder: 'transparent' }
-                    : undefined,
-                showDndOverlay: props.showDndOverlay,
-                createLeftHeaderActionsElement: createGroupControlElement(
+            const frameworkOptions: DockviewFrameworkOptions = {
+                headerLeftActionComponent: createGroupControlElement(
                     props.leftHeaderActionsComponent,
                     { addPortal }
                 ),
-                createRightHeaderActionsElement: createGroupControlElement(
+                headerRightActionComponent: createGroupControlElement(
                     props.rightHeaderActionsComponent,
                     { addPortal }
                 ),
-                createPrefixHeaderActionsElement: createGroupControlElement(
+                headerPrefixActionComponent: createGroupControlElement(
                     props.prefixHeaderActionsComponent,
                     { addPortal }
                 ),
-                singleTabMode: props.singleTabMode,
-                disableFloatingGroups: props.disableFloatingGroups,
-                floatingGroupBounds: props.floatingGroupBounds,
-                defaultRenderer: props.defaultRenderer,
-                debug: props.debug,
-                rootOverlayModel: props.rootOverlayModel,
-                locked: props.locked,
-                disableDnd: props.disableDnd,
+                frameworkTabComponents,
+                frameworkComponents: props.components,
+                frameworkComponentFactory: createFrameworkFactory(addPortal),
+                parentElement: domRef.current,
+                defaultTabComponent: props.defaultTabComponent
+                    ? DEFAULT_REACT_TAB
+                    : undefined,
+                watermarkFrameworkComponent: props.watermarkComponent,
+            };
+
+            const dockview = new DockviewComponent({
+                ...extractCoreOptions(props),
+                ...frameworkOptions,
             });
 
             const { clientWidth, clientHeight } = domRef.current;
@@ -207,24 +204,6 @@ export const DockviewReact = React.forwardRef(
 
         React.useEffect(() => {
             if (!dockviewRef.current) {
-                return;
-            }
-
-            dockviewRef.current.locked = !!props.locked;
-        }, [props.locked]);
-
-        React.useEffect(() => {
-            if (!dockviewRef.current) {
-                return;
-            }
-
-            dockviewRef.current.updateOptions({
-                disableDnd: props.disableDnd,
-            });
-        }, [props.disableDnd]);
-
-        React.useEffect(() => {
-            if (!dockviewRef.current) {
                 return () => {
                     // noop
                 };
@@ -240,6 +219,26 @@ export const DockviewReact = React.forwardRef(
                 disposable.dispose();
             };
         }, [props.onDidDrop]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return () => {
+                    // noop
+                };
+            }
+
+            const disposable = dockviewRef.current.onUnhandledDragOverEvent(
+                (event) => {
+                    if (props.showDndOverlay(event)) {
+                        event.accept();
+                    }
+                }
+            );
+
+            return () => {
+                disposable.dispose();
+            };
+        }, [props.showDndOverlay]);
 
         React.useEffect(() => {
             if (!dockviewRef.current) {
@@ -273,15 +272,6 @@ export const DockviewReact = React.forwardRef(
                 return;
             }
             dockviewRef.current.updateOptions({
-                floatingGroupBounds: props.floatingGroupBounds,
-            });
-        }, [props.floatingGroupBounds]);
-
-        React.useEffect(() => {
-            if (!dockviewRef.current) {
-                return;
-            }
-            dockviewRef.current.updateOptions({
                 watermarkFrameworkComponent: props.watermarkComponent,
             });
         }, [props.watermarkComponent]);
@@ -291,27 +281,9 @@ export const DockviewReact = React.forwardRef(
                 return;
             }
             dockviewRef.current.updateOptions({
-                showDndOverlay: props.showDndOverlay,
-            });
-        }, [props.showDndOverlay]);
-
-        React.useEffect(() => {
-            if (!dockviewRef.current) {
-                return;
-            }
-            dockviewRef.current.updateOptions({
                 frameworkTabComponents: props.tabComponents,
             });
         }, [props.tabComponents]);
-
-        React.useEffect(() => {
-            if (!dockviewRef.current) {
-                return;
-            }
-            dockviewRef.current.updateOptions({
-                disableFloatingGroups: props.disableFloatingGroups,
-            });
-        }, [props.disableFloatingGroups]);
 
         React.useEffect(() => {
             if (!dockviewRef.current) {
@@ -338,7 +310,7 @@ export const DockviewReact = React.forwardRef(
                 return;
             }
             dockviewRef.current.updateOptions({
-                createRightHeaderActionsElement: createGroupControlElement(
+                headerRightActionComponent: createGroupControlElement(
                     props.rightHeaderActionsComponent,
                     { addPortal }
                 ),
@@ -350,7 +322,7 @@ export const DockviewReact = React.forwardRef(
                 return;
             }
             dockviewRef.current.updateOptions({
-                createLeftHeaderActionsElement: createGroupControlElement(
+                headerLeftActionComponent: createGroupControlElement(
                     props.leftHeaderActionsComponent,
                     { addPortal }
                 ),
@@ -362,16 +334,7 @@ export const DockviewReact = React.forwardRef(
                 return;
             }
             dockviewRef.current.updateOptions({
-                rootOverlayModel: props.rootOverlayModel,
-            });
-        }, [props.rootOverlayModel]);
-
-        React.useEffect(() => {
-            if (!dockviewRef.current) {
-                return;
-            }
-            dockviewRef.current.updateOptions({
-                createPrefixHeaderActionsElement: createGroupControlElement(
+                headerRightActionComponent: createGroupControlElement(
                     props.prefixHeaderActionsComponent,
                     { addPortal }
                 ),
