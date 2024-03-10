@@ -36,3 +36,7 @@ export interface IWatermarkPanelProps {
     containerApi: DockviewApi;
     group?: IDockviewGroupPanel;
 }
+
+export interface DockviewReadyEvent {
+    api: DockviewApi;
+}

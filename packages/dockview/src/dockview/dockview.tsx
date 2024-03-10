@@ -19,6 +19,7 @@ import {
     DockviewFrameworkOptions,
     IDockviewDisposable,
     DockviewDndOverlayEvent,
+    DockviewReadyEvent,
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
@@ -44,27 +45,23 @@ function createGroupControlElement(
 
 const DEFAULT_REACT_TAB = 'props.defaultTabComponent';
 
-export interface DockviewReadyEvent {
-    api: DockviewApi;
-}
-
 export interface IDockviewReactProps extends DockviewOptions {
     className?: string;
-    onReady: (event: DockviewReadyEvent) => void;
-    onDidDrop?: (event: DockviewDidDropEvent) => void;
-    onWillDrop?: (event: DockviewWillDropEvent) => void;
-    components: Record<string, React.FunctionComponent<IDockviewPanelProps>>;
     tabComponents?: Record<
         string,
         React.FunctionComponent<IDockviewPanelHeaderProps>
     >;
+    components: Record<string, React.FunctionComponent<IDockviewPanelProps>>;
     watermarkComponent?: React.FunctionComponent<IWatermarkPanelProps>;
     defaultTabComponent?: React.FunctionComponent<IDockviewPanelHeaderProps>;
     rightHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
     leftHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
     prefixHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
     //
-    showDndOverlay: (event: DockviewDndOverlayEvent) => boolean;
+    onReady: (event: DockviewReadyEvent) => void;
+    onDidDrop?: (event: DockviewDidDropEvent) => void;
+    onWillDrop?: (event: DockviewWillDropEvent) => void;
+    showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
 }
 
 function extractCoreOptions(props: IDockviewReactProps): DockviewOptions {
@@ -229,7 +226,7 @@ export const DockviewReact = React.forwardRef(
 
             const disposable = dockviewRef.current.onUnhandledDragOverEvent(
                 (event) => {
-                    if (props.showDndOverlay(event)) {
+                    if (props.showDndOverlay?.(event)) {
                         event.accept();
                     }
                 }
@@ -280,15 +277,6 @@ export const DockviewReact = React.forwardRef(
             if (!dockviewRef.current) {
                 return;
             }
-            dockviewRef.current.updateOptions({
-                frameworkTabComponents: props.tabComponents,
-            });
-        }, [props.tabComponents]);
-
-        React.useEffect(() => {
-            if (!dockviewRef.current) {
-                return;
-            }
 
             const frameworkTabComponents = props.tabComponents ?? {};
 
@@ -303,7 +291,7 @@ export const DockviewReact = React.forwardRef(
                     : undefined,
                 frameworkTabComponents,
             });
-        }, [props.defaultTabComponent]);
+        }, [props.tabComponents, props.defaultTabComponent]);
 
         React.useEffect(() => {
             if (!dockviewRef.current) {

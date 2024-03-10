@@ -43,6 +43,7 @@ export {
     IDockviewHeaderActionsProps,
     IGroupHeaderProps,
     IWatermarkPanelProps,
+    DockviewReadyEvent,
 } from './dockview/framework';
 
 export * from './dockview/options';

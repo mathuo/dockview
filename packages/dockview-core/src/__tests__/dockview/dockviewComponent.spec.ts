@@ -18,6 +18,7 @@ import {
 } from '../../dockview/components/titlebar/tabsContainer';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewApi } from '../../api/component.api';
+import { DockviewDndOverlayEvent } from '../../dockview/options';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
@@ -2039,7 +2040,7 @@ describe('dockviewComponent', () => {
             },
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
-            }
+            },
         });
 
         dockview.layout(1000, 1000);
@@ -2145,7 +2146,7 @@ describe('dockviewComponent', () => {
             },
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
-            }
+            },
         });
 
         dockview.layout(1000, 1000);
@@ -2286,7 +2287,7 @@ describe('dockviewComponent', () => {
             },
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
-            }
+            },
         });
 
         dockview.layout(1000, 1000);
@@ -2414,7 +2415,7 @@ describe('dockviewComponent', () => {
             },
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
-            }
+            },
         });
 
         dockview.layout(1000, 1000);
@@ -2850,8 +2851,6 @@ describe('dockviewComponent', () => {
     test('that external dnd events do not trigger the top-level center dnd target unless empty', () => {
         const container = document.createElement('div');
 
-        const showDndOverlay = jest.fn().mockReturnValue(true);
-
         const dockview = new DockviewComponent({
             parentElement: container,
             components: {
@@ -2860,7 +2859,13 @@ describe('dockviewComponent', () => {
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
             },
-            showDndOverlay: showDndOverlay,
+        });
+
+        let events: DockviewDndOverlayEvent[] = [];
+
+        dockview.onUnhandledDragOverEvent((e) => {
+            events.push(e);
+            e.accept();
         });
 
         dockview.layout(1000, 500);
@@ -2900,13 +2905,11 @@ describe('dockviewComponent', () => {
         });
         fireEvent(dockview.element, eventLeft);
 
-        expect(showDndOverlay).toHaveBeenCalledWith({
-            nativeEvent: eventLeft,
-            position: 'left',
-            target: 'edge',
-            getData: getPanelData,
-        });
-        expect(showDndOverlay).toBeCalledTimes(1);
+        expect(events[0].nativeEvent).toBe(eventLeft);
+        expect(events[0].position).toBe('left');
+        expect(events[0].target).toBe('edge');
+        expect(events[0].getData).toBe(getPanelData);
+        expect(events.length).toBe(1);
 
         // right
 
@@ -2919,13 +2922,11 @@ describe('dockviewComponent', () => {
         });
         fireEvent(dockview.element, eventRight);
 
-        expect(showDndOverlay).toHaveBeenCalledWith({
-            nativeEvent: eventRight,
-            position: 'right',
-            target: 'edge',
-            getData: getPanelData,
-        });
-        expect(showDndOverlay).toBeCalledTimes(2);
+        expect(events[1].nativeEvent).toBe(eventRight);
+        expect(events[1].position).toBe('right');
+        expect(events[1].target).toBe('edge');
+        expect(events[1].getData).toBe(getPanelData);
+        expect(events.length).toBe(2);
 
         // top
 
@@ -2938,13 +2939,11 @@ describe('dockviewComponent', () => {
         });
         fireEvent(dockview.element, eventTop);
 
-        expect(showDndOverlay).toHaveBeenCalledWith({
-            nativeEvent: eventTop,
-            position: 'top',
-            target: 'edge',
-            getData: getPanelData,
-        });
-        expect(showDndOverlay).toBeCalledTimes(3);
+        expect(events[2].nativeEvent).toBe(eventTop);
+        expect(events[2].position).toBe('top');
+        expect(events[2].target).toBe('edge');
+        expect(events[2].getData).toBe(getPanelData);
+        expect(events.length).toBe(3);
 
         // top
 
@@ -2957,13 +2956,11 @@ describe('dockviewComponent', () => {
         });
         fireEvent(dockview.element, eventBottom);
 
-        expect(showDndOverlay).toHaveBeenCalledWith({
-            nativeEvent: eventBottom,
-            position: 'bottom',
-            target: 'edge',
-            getData: getPanelData,
-        });
-        expect(showDndOverlay).toBeCalledTimes(4);
+        expect(events[3].nativeEvent).toBe(eventBottom);
+        expect(events[3].position).toBe('bottom');
+        expect(events[3].target).toBe('edge');
+        expect(events[3].getData).toBe(getPanelData);
+        expect(events.length).toBe(4);
 
         // center
 
@@ -2977,7 +2974,7 @@ describe('dockviewComponent', () => {
         fireEvent(dockview.element, eventCenter);
 
         // expect not to be called for center
-        expect(showDndOverlay).toBeCalledTimes(4);
+        expect(events.length).toBe(4);
 
         dockview.removePanel(panel1);
         dockview.removePanel(panel2);
@@ -2993,13 +2990,11 @@ describe('dockviewComponent', () => {
         });
         fireEvent(dockview.element, eventCenter2);
 
-        expect(showDndOverlay).toHaveBeenCalledWith({
-            nativeEvent: eventTop,
-            position: 'center',
-            target: 'edge',
-            getData: getPanelData,
-        });
-        expect(showDndOverlay).toBeCalledTimes(5);
+        expect(events[4].nativeEvent).toBe(eventCenter2);
+        expect(events[4].position).toBe('center');
+        expect(events[4].target).toBe('edge');
+        expect(events[4].getData).toBe(getPanelData);
+        expect(events.length).toBe(5);
     });
 
     test('that dragging a tab triggers onWillDragPanel', () => {
@@ -4047,7 +4042,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                }
+                },
             });
 
             dockview.layout(1000, 500);
@@ -4097,7 +4092,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                }
+                },
             });
 
             dockview.layout(1000, 500);
@@ -4146,7 +4141,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                }
+                },
             });
 
             dockview.layout(1000, 500);
@@ -4185,7 +4180,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                }
+                },
             });
 
             dockview.layout(1000, 500);
@@ -4223,7 +4218,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                }
+                },
             });
 
             dockview.layout(1000, 500);
@@ -4262,7 +4257,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                }
+                },
             });
 
             dockview.layout(1000, 500);
@@ -4322,7 +4317,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                }
+                },
             });
 
             dockview.layout(1000, 500);
@@ -4360,7 +4355,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                }
+                },
             });
 
             dockview.layout(1000, 500);
@@ -4392,7 +4387,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                }
+                },
             });
 
             dockview.layout(1000, 500);
@@ -4464,7 +4459,7 @@ describe('dockviewComponent', () => {
                 },
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
-                }
+                },
             });
 
             dockview.layout(1000, 500);
@@ -4504,7 +4499,7 @@ describe('dockviewComponent', () => {
             },
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
-            }
+            },
         });
         const api = new DockviewApi(dockview);
 
