@@ -209,20 +209,20 @@ export class SplitviewComponent
         this.splitview.setViewVisible(index, visible);
     }
 
-    setActive(view: SplitviewPanel, skipFocus?: boolean): void {
-        this._activePanel = view;
+    setActive(panel: SplitviewPanel, skipFocus?: boolean): void {
+        this._activePanel = panel;
 
         this.panels
-            .filter((v) => v !== view)
+            .filter((v) => v !== panel)
             .forEach((v) => {
                 v.api._onDidActiveChange.fire({ isActive: false });
                 if (!skipFocus) {
                     v.focus();
                 }
             });
-        view.api._onDidActiveChange.fire({ isActive: true });
+        panel.api._onDidActiveChange.fire({ isActive: true });
         if (!skipFocus) {
-            view.focus();
+            panel.focus();
         }
     }
 

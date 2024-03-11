@@ -1,6 +1,7 @@
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import { DockviewEmitter } from 'dockview';
 import * as React from 'react';
+import { IS_PROD } from '../flags';
 
 const frameworks = [
     { value: 'JavaScript', label: 'JavaScript' },
@@ -35,7 +36,7 @@ function useActiveFramework(): [string, (value: string) => void] {
         activeFrameworkGlobal.fire(value);
     }, []);
 
-    return [value, setter];
+    return [IS_PROD ? frameworks[1].value : value, setter];
 }
 
 const FrameworkSelector1 = () => {
@@ -44,6 +45,10 @@ const FrameworkSelector1 = () => {
     const onChange = (event: React.ChangeEvent<HTMLSelectElement>) => [
         setActiveFramework(event.target.value),
     ];
+
+    if (IS_PROD) {
+        return null;
+    }
 
     return (
         <select onChange={onChange} value={activeFramework}>

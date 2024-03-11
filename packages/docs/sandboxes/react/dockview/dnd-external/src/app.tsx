@@ -1,7 +1,7 @@
 import {
     DockviewApi,
     DockviewDndOverlayEvent,
-    DockviewDropEvent,
+    DockviewDidDropEvent,
     DockviewReact,
     DockviewReadyEvent,
     IDockviewPanelProps,
@@ -123,7 +123,7 @@ const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
         setApi(event.api);
     };
 
-    const onDidDrop = (event: DockviewDropEvent) => {
+    const onDidDrop = (event: DockviewDidDropEvent) => {
         event.api.addPanel({
             id: 'test',
             component: 'default',

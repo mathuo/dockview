@@ -2,6 +2,7 @@ import { DockviewPanelApiImpl } from '../../api/dockviewPanelApi';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { DockviewPanel, IDockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
+import { fromPartial } from '@total-typescript/shoehorn';
 
 describe('groupPanelApi', () => {
     test('title', () => {
@@ -17,12 +18,15 @@ describe('groupPanelApi', () => {
                 setTitle: jest.fn(),
             } as any;
         });
-        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
-            return {} as any;
-        });
 
         const panel = new panelMock();
-        const group = new groupMock();
+        const group = fromPartial<DockviewGroupPanel>({
+            api: {
+                onDidVisibilityChange: jest.fn(),
+                onDidLocationChange: jest.fn(),
+                onDidActiveChange: jest.fn(),
+            },
+        });
 
         const cut = new DockviewPanelApiImpl(
             panel,

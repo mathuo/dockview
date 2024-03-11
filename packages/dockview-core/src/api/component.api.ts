@@ -667,21 +667,29 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     /**
+     * Invoked before an overlay is shown indicating a drop target.
      *
+     * Calling `event.preventDefault()` will prevent the overlay being shown and prevent
+     * the any subsequent drop event.
      */
     get onWillShowOverlay(): Event<WillShowOverlayLocationEvent> {
         return this.component.onWillShowOverlay;
     }
 
     /**
-     * Invoked before a group is dragged. Exposed for custom Drag'n'Drop functionality.
+     * Invoked before a group is dragged.
+     *
+     * Calling `event.nativeEvent.preventDefault()` will prevent the group drag starting.
+     *
      */
     get onWillDragGroup(): Event<GroupDragEvent> {
         return this.component.onWillDragGroup;
     }
 
     /**
-     * Invoked before a panel is dragged. Exposed for custom Drag'n'Drop functionality.
+     * Invoked before a panel is dragged.
+     *
+     * Calling `event.nativeEvent.preventDefault()` will prevent the panel drag starting.
      */
     get onWillDragPanel(): Event<TabDragEvent> {
         return this.component.onWillDragPanel;

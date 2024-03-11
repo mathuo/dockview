@@ -17,6 +17,7 @@ import {
     TabDragEvent,
 } from '../../dockview/components/titlebar/tabsContainer';
 import { fromPartial } from '@total-typescript/shoehorn';
+import { DockviewApi } from '../../api/component.api';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
@@ -4669,5 +4670,114 @@ describe('dockviewComponent', () => {
             disposeDidPanelParametersChangeHandler();
             disposeDidLayoutChangeHandler();
         });
+    });
+
+    test('that setVisible toggles visiblity', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+        const api = new DockviewApi(dockview);
+
+        dockview.layout(1000, 1000);
+
+        const panel1 = api.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        const panel2 = api.addPanel({
+            id: 'panel2',
+            component: 'default',
+            position: { referencePanel: panel1, direction: 'within' },
+        });
+
+        const panel3 = api.addPanel({
+            id: 'panel3',
+            component: 'default',
+            position: { referencePanel: panel1, direction: 'right' },
+        });
+
+        const panel4 = api.addPanel({
+            id: 'panel4',
+            component: 'default',
+            position: { referencePanel: panel3, direction: 'within' },
+        });
+
+        expect(api.groups.length).toBe(2);
+        expect(panel1.group).toBe(panel2.group);
+        expect(panel3.group).toBe(panel4.group);
+
+        expect(panel1.group.api.isVisible).toBeTruthy();
+        expect(panel2.group.api.isVisible).toBeTruthy();
+        expect(panel3.group.api.isVisible).toBeTruthy();
+        expect(panel4.group.api.isVisible).toBeTruthy();
+
+        expect(panel1.api.isVisible).toBeFalsy();
+        expect(panel2.api.isVisible).toBeTruthy();
+        expect(panel3.api.isVisible).toBeFalsy();
+        expect(panel4.api.isVisible).toBeTruthy();
+
+        // case #1
+        panel1.group.api.setVisible(false);
+
+        expect(panel1.group.api.isVisible).toBeFalsy();
+        expect(panel2.group.api.isVisible).toBeFalsy();
+        expect(panel3.group.api.isVisible).toBeTruthy();
+        expect(panel4.group.api.isVisible).toBeTruthy();
+
+        expect(panel1.api.isVisible).toBeFalsy();
+        expect(panel2.api.isVisible).toBeFalsy();
+        expect(panel3.api.isVisible).toBeFalsy();
+        expect(panel4.api.isVisible).toBeTruthy();
+
+        // case #2
+
+        panel3.group.api.setVisible(false);
+
+        expect(panel1.group.api.isVisible).toBeFalsy();
+        expect(panel2.group.api.isVisible).toBeFalsy();
+        expect(panel3.group.api.isVisible).toBeFalsy();
+        expect(panel4.group.api.isVisible).toBeFalsy();
+
+        expect(panel1.api.isVisible).toBeFalsy();
+        expect(panel2.api.isVisible).toBeFalsy();
+        expect(panel3.api.isVisible).toBeFalsy();
+        expect(panel4.api.isVisible).toBeFalsy();
+
+        // case #2
+
+        panel3.group.api.setVisible(true);
+
+        expect(panel1.group.api.isVisible).toBeFalsy();
+        expect(panel2.group.api.isVisible).toBeFalsy();
+        expect(panel3.group.api.isVisible).toBeTruthy();
+        expect(panel4.group.api.isVisible).toBeTruthy();
+
+        expect(panel1.api.isVisible).toBeFalsy();
+        expect(panel2.api.isVisible).toBeFalsy();
+        expect(panel3.api.isVisible).toBeFalsy();
+        expect(panel4.api.isVisible).toBeTruthy();
+
+        // case #2
+
+        panel1.group.api.setVisible(true);
+
+        expect(panel1.group.api.isVisible).toBeTruthy();
+        expect(panel2.group.api.isVisible).toBeTruthy();
+        expect(panel3.group.api.isVisible).toBeTruthy();
+        expect(panel4.group.api.isVisible).toBeTruthy();
+
+        expect(panel1.api.isVisible).toBeFalsy();
+        expect(panel2.api.isVisible).toBeTruthy();
+        expect(panel3.api.isVisible).toBeFalsy();
+        expect(panel4.api.isVisible).toBeTruthy();
     });
 });

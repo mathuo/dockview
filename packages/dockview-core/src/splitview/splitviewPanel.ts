@@ -89,10 +89,10 @@ export abstract class SplitviewPanel
 
         this.addDisposables(
             this._onDidChange,
-            this.api.onDidHiddenChange((event) => {
-                const { isHidden } = event;
+            this.api.onWillVisibilityChange((event) => {
+                const { isVisible } = event;
                 const { accessor } = this._params as PanelViewInitParameters;
-                accessor.setVisible(this, !isHidden);
+                accessor.setVisible(this, isVisible);
             }),
             this.api.onActiveChange(() => {
                 const { accessor } = this._params as PanelViewInitParameters;

@@ -8,6 +8,7 @@ export interface DocRefProps {
 }
 
 import docsJson_ from '../../../generated/api.output.json';
+import { ExportedTypeFile, TypeSystem, codify, firstLevel } from './types';
 const docsJson = docsJson_ as any as DocsJson;
 
 type DocsContent = { kind: string; text: string; tag?: string };
@@ -16,19 +17,57 @@ type DocsComment = {
     summary?: DocsContent[];
     blockTags?: DocsTag[];
 };
+
+type Piece = {
+    kind: 'return' | 'paramter' | 'signature' | 'typearg' | 'typearg_default';
+    value: string;
+};
+
 type Doc = {
     name: string;
     code: string;
     comment?: DocsComment;
     kind: 'accessor' | 'property' | 'method';
-    pieces: string[];
+    pieces: Piece[];
 };
+
+type DocJson = {
+    kind: string;
+    metadata?: Doc;
+    children: Doc[];
+};
+
 type DocsJson = {
-    [index: string]: {
-        kind: string;
-        metadata?: Doc;
-        children: Doc[];
-    };
+    [index: string]: DocJson;
+};
+
+const newJson = docsJson_ as ExportedTypeFile;
+
+export const DocumentRef = (props: { value: TypeSystem.Type }) => {
+    const code = React.useMemo(() => {
+        if (!props.value) {
+            return null;
+        }
+
+        switch (props.value.kind) {
+            case 'typeAlias':
+                return codify(props.value);
+            case 'interface':
+                return codify(props.value);
+            case 'class':
+                return codify(props.value);
+            case 'function':
+                return codify(props.value);
+            default:
+                return null;
+        }
+    }, [props.value]);
+
+    if (!code) {
+        return null;
+    }
+
+    return <CodeBlock language="tsx">{code}</CodeBlock>;
 };
 
 export const Text = (props: { content: DocsContent[] }) => {
@@ -81,25 +120,11 @@ export const Markdown = (props: { children: string }) => {
     return <span>{props.children}</span>;
 };
 
-const Piece = (props: { piece: string }) => {
-    const item = docsJson[props.piece];
-
-    if (!item) {
-        return;
-    }
-
-    if (item.kind === 'interface') {
-        return;
-    }
-
-    if (!item.metadata?.code) {
-        return;
-    }
-
-    return <CodeBlock language="tsx">{item.metadata.code}</CodeBlock>;
-};
-
-const Row = (props: { doc: Doc }) => {
+const Row = (props: { doc: TypeSystem.Type }) => {
+    const comment =
+        props.doc.kind === 'accessor'
+            ? props.doc.value.comment
+            : props.doc.comment;
     return (
         <tr>
             <th
@@ -151,12 +176,8 @@ const Row = (props: { doc: Doc }) => {
             <th style={{ width: '60%' }}>
                 {/* <div>{'-'}</div> */}
                 <div>
-                    <div>
-                        {props.doc.comment && (
-                            <Summary summary={props.doc.comment} />
-                        )}
-                    </div>
-                    <CodeBlock language="tsx">{props.doc.code}</CodeBlock>
+                    <div>{comment && <Summary summary={comment} />}</div>
+                    <CodeBlock language="tsx">{codify(props.doc)}</CodeBlock>
                 </div>
             </th>
         </tr>
@@ -165,18 +186,23 @@ const Row = (props: { doc: Doc }) => {
 
 export const DocRef = (props: DocRefProps) => {
     const docs = React.useMemo(
-        () => (docsJson as DocsJson)[props.declaration],
+        () => newJson[props.declaration],
         [props.declaration]
     );
 
     const filteredDocs = React.useMemo(
         () =>
-            docs?.children?.filter((child) => {
-                if (props.methods && !props.methods.includes(child.name)) {
-                    return false;
-                }
-                return true;
-            }),
+            docs.kind === 'class' || docs.kind === 'interface'
+                ? docs.children.filter((child) => {
+                      if (
+                          props.methods &&
+                          !props.methods.includes(child.name)
+                      ) {
+                          return false;
+                      }
+                      return true;
+                  })
+                : [],
         [docs]
     );
 
@@ -191,6 +217,13 @@ export const DocRef = (props: DocRefProps) => {
                     return (
                         <>
                             <Row key={i} doc={doc} />
+                            {/* <th colSpan={2}>
+                                {firstLevel(doc).map((x) => (
+                                    <span style={{ padding: '0px 2px' }}>
+                                        <DocumentRef value={newJson[x]} />
+                                    </span>
+                                ))}
+                            </th> */}
                             {/* {doc.pieces?.map((piece) => (
                                 <tr>
                                     <th colSpan={2}>
