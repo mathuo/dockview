@@ -68,6 +68,7 @@ import {
     OverlayRenderContainer,
 } from '../overlayRenderContainer';
 import { PopoutWindow } from '../popoutWindow';
+import { TitleEvent } from '../api/dockviewPanelApi';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     activationSize: { type: 'pixels', value: 10 },
@@ -2164,6 +2165,12 @@ export class DockviewComponent
                     if (this._onDidActivePanelChange.value !== event.panel) {
                         this._onDidActivePanelChange.fire(event.panel);
                     }
+                }),
+                Event.any(
+                    view.model.onDidPanelTitleChange,
+                    view.model.onDidPanelParametersChange
+                )(() => {
+                    this._bufferOnDidLayoutChange.fire();
                 })
             );
 
@@ -2193,6 +2200,8 @@ export class DockviewComponent
 
         const panel = new DockviewPanel(
             options.id,
+            contentComponent,
+            tabComponent,
             this,
             this._api,
             group,

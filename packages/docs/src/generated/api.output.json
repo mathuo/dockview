@@ -7581,6 +7581,46 @@
                 }
             },
             {
+                "name": "onDidPanelParametersChange",
+                "code": "Event<Parameters>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "Parameters",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "onDidPanelTitleChange",
+                "code": "Event<TitleEvent>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "TitleEvent",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "onDidRemovePanel",
                 "code": "Event<DockviewGroupChangeEvent>",
                 "kind": "property",
@@ -23041,6 +23081,26 @@
                 }
             },
             {
+                "name": "onDidParametersChange",
+                "code": "Event<Parameters>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "Parameters",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "onDidVisibilityChange",
                 "code": "Event<VisibilityEvent>",
                 "kind": "property",
@@ -23132,6 +23192,36 @@
                             "value": "void"
                         },
                         "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "getParameters",
+                "code": "<T extends Parameters = Parameters>(): T",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "getParameters",
+                        "typeParameters": [
+                            {
+                                "name": "T",
+                                "extends": {
+                                    "type": "reference",
+                                    "value": "Parameters",
+                                    "source": "dockview-core"
+                                },
+                                "default": "Parameters"
+                            }
+                        ],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "reference",
+                            "value": "T",
+                            "source": "dockview-core",
+                            "refersToTypeParameter": true
+                        },
+                        "code": "<T extends Parameters = Parameters>(): T",
                         "kind": "callSignature"
                     }
                 ]
@@ -23704,6 +23794,26 @@
                 }
             },
             {
+                "name": "onDidParametersChange",
+                "code": "Event<Parameters>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "Parameters",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "onDidRendererChange",
                 "code": "Event<RendererChangedEvent>",
                 "kind": "property",
@@ -23715,6 +23825,26 @@
                         {
                             "type": "reference",
                             "value": "RendererChangedEvent",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "onDidTitleChange",
+                "code": "Event<TitleEvent>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "TitleEvent",
                             "source": "dockview-core"
                         }
                     ]
@@ -23849,6 +23979,36 @@
                             "value": "void"
                         },
                         "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "getParameters",
+                "code": "<T extends Parameters = Parameters>(): T",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "getParameters",
+                        "typeParameters": [
+                            {
+                                "name": "T",
+                                "extends": {
+                                    "type": "reference",
+                                    "value": "Parameters",
+                                    "source": "dockview-core"
+                                },
+                                "default": "Parameters"
+                            }
+                        ],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "reference",
+                            "value": "T",
+                            "source": "dockview-core",
+                            "refersToTypeParameter": true
+                        },
+                        "code": "<T extends Parameters = Parameters>(): T",
                         "kind": "callSignature"
                     }
                 ]
@@ -25097,6 +25257,26 @@
                 }
             },
             {
+                "name": "onDidParametersChange",
+                "code": "Event<Parameters>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "Parameters",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "onDidVisibilityChange",
                 "code": "Event<VisibilityEvent>",
                 "kind": "property",
@@ -25155,6 +25335,36 @@
                         }
                     ]
                 }
+            },
+            {
+                "name": "getParameters",
+                "code": "<T extends Parameters = Parameters>(): T",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "getParameters",
+                        "typeParameters": [
+                            {
+                                "name": "T",
+                                "extends": {
+                                    "type": "reference",
+                                    "value": "Parameters",
+                                    "source": "dockview-core"
+                                },
+                                "default": "Parameters"
+                            }
+                        ],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "reference",
+                            "value": "T",
+                            "source": "dockview-core",
+                            "refersToTypeParameter": true
+                        },
+                        "code": "<T extends Parameters = Parameters>(): T",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "setActive",
@@ -36156,6 +36366,26 @@
                 }
             },
             {
+                "name": "onDidParametersChange",
+                "code": "Event<Parameters>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "Parameters",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "onDidVisibilityChange",
                 "code": "Event<VisibilityEvent>",
                 "kind": "property",
@@ -36214,6 +36444,36 @@
                         }
                     ]
                 }
+            },
+            {
+                "name": "getParameters",
+                "code": "<T extends Parameters = Parameters>(): T",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "getParameters",
+                        "typeParameters": [
+                            {
+                                "name": "T",
+                                "extends": {
+                                    "type": "reference",
+                                    "value": "Parameters",
+                                    "source": "dockview-core"
+                                },
+                                "default": "Parameters"
+                            }
+                        ],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "reference",
+                            "value": "T",
+                            "source": "dockview-core",
+                            "refersToTypeParameter": true
+                        },
+                        "code": "<T extends Parameters = Parameters>(): T",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "setActive",
@@ -37232,6 +37492,26 @@
                 }
             },
             {
+                "name": "onDidParametersChange",
+                "code": "Event<Parameters>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "Parameters",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "onDidVisibilityChange",
                 "code": "Event<VisibilityEvent>",
                 "kind": "property",
@@ -37330,6 +37610,36 @@
                         }
                     ]
                 }
+            },
+            {
+                "name": "getParameters",
+                "code": "<T extends Parameters = Parameters>(): T",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "getParameters",
+                        "typeParameters": [
+                            {
+                                "name": "T",
+                                "extends": {
+                                    "type": "reference",
+                                    "value": "Parameters",
+                                    "source": "dockview-core"
+                                },
+                                "default": "Parameters"
+                            }
+                        ],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "reference",
+                            "value": "T",
+                            "source": "dockview-core",
+                            "refersToTypeParameter": true
+                        },
+                        "code": "<T extends Parameters = Parameters>(): T",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "setActive",
@@ -38708,6 +39018,26 @@
                 }
             },
             {
+                "name": "onDidParametersChange",
+                "code": "Event<Parameters>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "Parameters",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "onDidVisibilityChange",
                 "code": "Event<VisibilityEvent>",
                 "kind": "property",
@@ -38766,6 +39096,36 @@
                         }
                     ]
                 }
+            },
+            {
+                "name": "getParameters",
+                "code": "<T extends Parameters = Parameters>(): T",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "getParameters",
+                        "typeParameters": [
+                            {
+                                "name": "T",
+                                "extends": {
+                                    "type": "reference",
+                                    "value": "Parameters",
+                                    "source": "dockview-core"
+                                },
+                                "default": "Parameters"
+                            }
+                        ],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "reference",
+                            "value": "T",
+                            "source": "dockview-core",
+                            "refersToTypeParameter": true
+                        },
+                        "code": "<T extends Parameters = Parameters>(): T",
+                        "kind": "callSignature"
+                    }
+                ]
             },
             {
                 "name": "setActive",

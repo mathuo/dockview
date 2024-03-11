@@ -9,19 +9,40 @@ import {
 } from '../../dockview/types';
 import { PanelUpdateEvent, Parameters } from '../../panel/types';
 import {
+    DockviewGroupLocation,
     DockviewGroupPanelModel,
     GroupOptions,
 } from '../../dockview/dockviewGroupPanelModel';
 import { fireEvent } from '@testing-library/dom';
 import { LocalSelectionTransfer, PanelTransfer } from '../../dnd/dataTransfer';
 import { CompositeDisposable } from '../../lifecycle';
-import { DockviewPanelApi } from '../../api/dockviewPanelApi';
+import {
+    ActiveGroupEvent,
+    DockviewPanelApi,
+    GroupChangedEvent,
+    RendererChangedEvent,
+} from '../../api/dockviewPanelApi';
 import { IDockviewPanel } from '../../dockview/dockviewPanel';
 import { IDockviewPanelModel } from '../../dockview/dockviewPanelModel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import { WatermarkRendererInitParameters } from '../../dockview/types';
 import { createOffsetDragOverEvent } from '../__test_utils__/utils';
-import { OverlayRenderContainer } from '../../overlayRenderContainer';
+import {
+    DockviewPanelRenderer,
+    OverlayRenderContainer,
+} from '../../overlayRenderContainer';
+import { DockviewGroupPanelFloatingChangeEvent } from '../../api/dockviewGroupPanelApi';
+import { SizeEvent } from '../../api/gridviewPanelApi';
+import {
+    PanelDimensionChangeEvent,
+    FocusEvent,
+    VisibilityEvent,
+    ActiveEvent,
+    WillFocusEvent,
+} from '../../api/panelApi';
+import { Position } from '../../dnd/droptarget';
+import { Emitter, Event } from '../../events';
+import { fromPartial } from '@total-typescript/shoehorn';
 
 enum GroupChangeKind2 {
     ADD_PANEL,
@@ -240,11 +261,19 @@ describe('dockviewGroupPanelModel', () => {
     let removePanelMock: jest.Mock;
     let removeGroupMock: jest.Mock;
 
+    let panelApi: DockviewPanelApi;
+
     beforeEach(() => {
         removePanelMock = jest.fn();
         removeGroupMock = jest.fn();
 
         options = {};
+
+        panelApi = fromPartial<DockviewPanelApi>({
+            renderer: 'onlyWhenVisibile',
+            onDidTitleChange: new Emitter().event,
+            onDidParametersChange: new Emitter().event,
+        });
 
         dockview = (<Partial<DockviewComponent>>{
             options: { parentElement: document.createElement('div') },
@@ -265,15 +294,9 @@ describe('dockviewGroupPanelModel', () => {
     });
 
     test('panel events are captured during de-serialization', () => {
-        const panel1 = new TestPanel('panel1', {
-            renderer: 'onlyWhenVisibile',
-        } as any);
-        const panel2 = new TestPanel('panel2', {
-            renderer: 'onlyWhenVisibile',
-        } as any);
-        const panel3 = new TestPanel('panel3', {
-            renderer: 'onlyWhenVisibile',
-        } as any);
+        const panel1 = new TestPanel('panel1', panelApi);
+        const panel2 = new TestPanel('panel2', panelApi);
+        const panel3 = new TestPanel('panel3', panelApi);
 
         const groupview2 = new DockviewGroupPanel(dockview, 'groupview-2', {
             panels: [panel1, panel2, panel3],
@@ -357,15 +380,9 @@ describe('dockviewGroupPanelModel', () => {
             })
         );
 
-        const panel1 = new TestPanel('panel1', {
-            renderer: 'onlyWhenVisibile',
-        } as any);
-        const panel2 = new TestPanel('panel2', {
-            renderer: 'onlyWhenVisibile',
-        } as any);
-        const panel3 = new TestPanel('panel3', {
-            renderer: 'onlyWhenVisibile',
-        } as any);
+        const panel1 = new TestPanel('panel1', panelApi);
+        const panel2 = new TestPanel('panel2', panelApi);
+        const panel3 = new TestPanel('panel3', panelApi);
 
         expect(events.length).toBe(0);
 
@@ -443,15 +460,9 @@ describe('dockviewGroupPanelModel', () => {
     });
 
     test('moveToPrevious and moveToNext', () => {
-        const panel1 = new TestPanel('panel1', {
-            renderer: 'onlyWhenVisibile',
-        } as any);
-        const panel2 = new TestPanel('panel2', {
-            renderer: 'onlyWhenVisibile',
-        } as any);
-        const panel3 = new TestPanel('panel3', {
-            renderer: 'onlyWhenVisibile',
-        } as any);
+        const panel1 = new TestPanel('panel1', panelApi);
+        const panel2 = new TestPanel('panel2', panelApi);
+        const panel3 = new TestPanel('panel3', panelApi);
 
         groupview.model.openPanel(panel1);
         groupview.model.openPanel(panel2);
@@ -495,15 +506,9 @@ describe('dockviewGroupPanelModel', () => {
     });
 
     test('closeAllPanels with panels', () => {
-        const panel1 = new TestPanel('panel1', {
-            renderer: 'onlyWhenVisibile',
-        } as any);
-        const panel2 = new TestPanel('panel2', {
-            renderer: 'onlyWhenVisibile',
-        } as any);
-        const panel3 = new TestPanel('panel3', {
-            renderer: 'onlyWhenVisibile',
-        } as any);
+        const panel1 = new TestPanel('panel1', panelApi);
+        const panel2 = new TestPanel('panel2', panelApi);
+        const panel3 = new TestPanel('panel3', panelApi);
 
         groupview.model.openPanel(panel1);
         groupview.model.openPanel(panel2);
@@ -608,25 +613,19 @@ describe('dockviewGroupPanelModel', () => {
             .getElementsByClassName('content-container')
             .item(0)!.childNodes;
 
-        const panel1 = new TestPanel('id_1', {
-            renderer: 'onlyWhenVisibile',
-        } as any);
+        const panel1 = new TestPanel('id_1', panelApi);
 
         cut.openPanel(panel1);
         expect(contentContainer.length).toBe(1);
         expect(contentContainer.item(0)).toBe(panel1.view.content.element);
 
-        const panel2 = new TestPanel('id_2', {
-            renderer: 'onlyWhenVisibile',
-        } as any);
+        const panel2 = new TestPanel('id_2', panelApi);
 
         cut.openPanel(panel2);
         expect(contentContainer.length).toBe(1);
         expect(contentContainer.item(0)).toBe(panel2.view.content.element);
 
-        const panel3 = new TestPanel('id_2', {
-            renderer: 'onlyWhenVisibile',
-        } as any);
+        const panel3 = new TestPanel('id_2', panelApi);
 
         cut.openPanel(panel3, { skipSetActive: true });
         expect(contentContainer.length).toBe(1);
@@ -848,11 +847,7 @@ describe('dockviewGroupPanelModel', () => {
             counter++;
         });
 
-        cut.openPanel(
-            new TestPanel('panel1', {
-                renderer: 'onlyWhenVisibile',
-            } as any)
-        );
+        cut.openPanel(new TestPanel('panel1', panelApi));
 
         const element = container
             .getElementsByClassName('content-container')
@@ -927,16 +922,8 @@ describe('dockviewGroupPanelModel', () => {
             counter++;
         });
 
-        cut.openPanel(
-            new TestPanel('panel1', {
-                renderer: 'onlyWhenVisibile',
-            } as any)
-        );
-        cut.openPanel(
-            new TestPanel('panel2', {
-                renderer: 'onlyWhenVisibile',
-            } as any)
-        );
+        cut.openPanel(new TestPanel('panel1', panelApi));
+        cut.openPanel(new TestPanel('panel2', panelApi));
 
         const element = container
             .getElementsByClassName('content-container')
@@ -1011,16 +998,8 @@ describe('dockviewGroupPanelModel', () => {
             counter++;
         });
 
-        cut.openPanel(
-            new TestPanel('panel1', {
-                renderer: 'onlyWhenVisibile',
-            } as any)
-        );
-        cut.openPanel(
-            new TestPanel('panel2', {
-                renderer: 'onlyWhenVisibile',
-            } as any)
-        );
+        cut.openPanel(new TestPanel('panel1', panelApi));
+        cut.openPanel(new TestPanel('panel2', panelApi));
 
         const element = container
             .getElementsByClassName('content-container')
@@ -1121,11 +1100,7 @@ describe('dockviewGroupPanelModel', () => {
             container.getElementsByClassName('watermark-test-container').length
         ).toBe(1);
 
-        cut.openPanel(
-            new TestPanel('panel1', {
-                renderer: 'onlyWhenVisibile',
-            } as any)
-        );
+        cut.openPanel(new TestPanel('panel1', panelApi));
 
         expect(
             container.getElementsByClassName('watermark-test-container').length
@@ -1135,11 +1110,7 @@ describe('dockviewGroupPanelModel', () => {
                 .length
         ).toBe(1);
 
-        cut.openPanel(
-            new TestPanel('panel2', {
-                renderer: 'onlyWhenVisibile',
-            } as any)
-        );
+        cut.openPanel(new TestPanel('panel2', panelApi));
 
         expect(
             container.getElementsByClassName('watermark-test-container').length
@@ -1157,11 +1128,7 @@ describe('dockviewGroupPanelModel', () => {
             container.getElementsByClassName('watermark-test-container').length
         ).toBe(1);
 
-        cut.openPanel(
-            new TestPanel('panel1', {
-                renderer: 'onlyWhenVisibile',
-            } as any)
-        );
+        cut.openPanel(new TestPanel('panel1', panelApi));
 
         expect(
             container.getElementsByClassName('watermark-test-container').length

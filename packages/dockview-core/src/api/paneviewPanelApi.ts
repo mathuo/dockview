@@ -35,8 +35,8 @@ export class PaneviewPanelApiImpl
         this._pane = pane;
     }
 
-    constructor(id: string) {
-        super(id);
+    constructor(id: string, component: string) {
+        super(id, component);
 
         this.addDisposables(
             this._onDidExpansionChange,

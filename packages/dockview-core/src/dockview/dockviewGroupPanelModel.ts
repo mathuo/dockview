@@ -11,8 +11,13 @@ import {
     IDockviewEvent,
 } from '../events';
 import { IViewSize } from '../gridview/gridview';
-import { CompositeDisposable } from '../lifecycle';
-import { IPanel, PanelInitParameters, PanelUpdateEvent } from '../panel/types';
+import { CompositeDisposable, IDisposable } from '../lifecycle';
+import {
+    IPanel,
+    PanelInitParameters,
+    PanelUpdateEvent,
+    Parameters,
+} from '../panel/types';
 import {
     ContentContainer,
     IContentContainer,
@@ -32,6 +37,7 @@ import {
     IHeaderActionsRenderer,
 } from './options';
 import { OverlayRenderContainer } from '../overlayRenderContainer';
+import { TitleEvent } from '../api/dockviewPanelApi';
 
 interface GroupMoveEvent {
     groupId: string;
@@ -249,6 +255,7 @@ export class DockviewGroupPanelModel
     private _height = 0;
 
     private _panels: IDockviewPanel[] = [];
+    private readonly _panelDisposables = new Map<string, IDisposable>();
 
     private readonly _onMove = new Emitter<GroupMoveEvent>();
     readonly onMove: Event<GroupMoveEvent> = this._onMove.event;
@@ -274,6 +281,14 @@ export class DockviewGroupPanelModel
     private readonly _onDidAddPanel = new Emitter<DockviewGroupChangeEvent>();
     readonly onDidAddPanel: Event<DockviewGroupChangeEvent> =
         this._onDidAddPanel.event;
+
+    private readonly _onDidPanelTitleChange = new Emitter<TitleEvent>();
+    readonly onDidPanelTitleChange: Event<TitleEvent> =
+        this._onDidPanelTitleChange.event;
+
+    private readonly _onDidPanelParametersChange = new Emitter<Parameters>();
+    readonly onDidPanelParametersChange: Event<Parameters> =
+        this._onDidPanelParametersChange.event;
 
     private readonly _onDidRemovePanel =
         new Emitter<DockviewGroupChangeEvent>();
@@ -836,6 +851,12 @@ export class DockviewGroupPanelModel
             );
         }
 
+        const disposable = this._panelDisposables.get(panel.id);
+        if (disposable) {
+            disposable.dispose();
+            this._panelDisposables.delete(panel.id);
+        }
+
         this._onDidRemovePanel.fire({ panel });
     }
 
@@ -865,6 +886,18 @@ export class DockviewGroupPanelModel
 
         this.updateMru(panel);
         this.panels.splice(index, 0, panel);
+
+        this._panelDisposables.set(
+            panel.id,
+            new CompositeDisposable(
+                panel.api.onDidTitleChange((event) =>
+                    this._onDidPanelTitleChange.fire(event)
+                ),
+                panel.api.onDidParametersChange((event) =>
+                    this._onDidPanelParametersChange.fire(event)
+                )
+            )
+        );
 
         this._onDidAddPanel.fire({ panel });
     }

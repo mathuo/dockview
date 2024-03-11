@@ -83,7 +83,7 @@ export abstract class SplitviewPanel
     }
 
     constructor(id: string, componentName: string) {
-        super(id, componentName, new SplitviewPanelApiImpl(id));
+        super(id, componentName, new SplitviewPanelApiImpl(id, componentName));
 
         this.api.initialize(this);
 
