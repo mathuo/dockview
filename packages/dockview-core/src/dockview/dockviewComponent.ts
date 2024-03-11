@@ -2204,6 +2204,8 @@ export class DockviewComponent
 
         const panel = new DockviewPanel(
             options.id,
+            contentComponent,
+            tabComponent,
             this,
             this._api,
             group,

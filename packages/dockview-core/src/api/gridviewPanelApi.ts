@@ -44,8 +44,8 @@ export class GridviewPanelApiImpl
     private readonly _onDidSizeChange = new Emitter<SizeEvent>();
     readonly onDidSizeChange: Event<SizeEvent> = this._onDidSizeChange.event;
 
-    constructor(id: string, panel?: IPanel) {
-        super(id);
+    constructor(id: string, component: string, panel?: IPanel) {
+        super(id, component);
 
         this.addDisposables(
             this._onDidConstraintsChangeInternal,

@@ -49,6 +49,8 @@ export class DefaultDockviewDeserialzier implements IPanelDeserializer {
 
         const panel = new DockviewPanel(
             panelId,
+            contentComponent,
+            tabComponent,
             this.accessor,
             new DockviewApi(this.accessor),
             group,

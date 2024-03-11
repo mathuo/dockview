@@ -121,7 +121,7 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
         return this._height;
     }
 
-    constructor(readonly id: string) {
+    constructor(readonly id: string, readonly component: string) {
         super();
 
         this.addDisposables(

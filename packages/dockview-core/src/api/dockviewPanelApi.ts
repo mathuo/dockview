@@ -62,6 +62,7 @@ export class DockviewPanelApiImpl
     implements DockviewPanelApi
 {
     private _group: DockviewGroupPanel;
+    private _tabComponent: string | undefined;
 
     readonly _onDidTitleChange = new Emitter<TitleEvent>();
     readonly onDidTitleChange = this._onDidTitleChange.event;
@@ -118,12 +119,20 @@ export class DockviewPanelApiImpl
         return this._group;
     }
 
+    get tabComponent(): string | undefined {
+        return this._tabComponent;
+    }
+
     constructor(
         private panel: DockviewPanel,
         group: DockviewGroupPanel,
-        private readonly accessor: DockviewComponent
+        private readonly accessor: DockviewComponent,
+        component: string,
+        tabComponent?: string
     ) {
-        super(panel.id);
+        super(panel.id, component);
+
+        this._tabComponent = tabComponent;
 
         this.initialize(panel);
 
