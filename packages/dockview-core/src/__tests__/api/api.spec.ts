@@ -5,7 +5,7 @@ describe('api', () => {
     let api: PanelApiImpl;
 
     beforeEach(() => {
-        api = new PanelApiImpl('dummy_id');
+        api = new PanelApiImpl('dummy_id', 'fake-component');
     });
 
     test('updateParameters', () => {

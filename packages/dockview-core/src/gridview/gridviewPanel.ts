@@ -140,7 +140,7 @@ export abstract class GridviewPanel<
         },
         api?: T
     ) {
-        super(id, component, api ?? <T>new GridviewPanelApiImpl(id));
+        super(id, component, api ?? <T>new GridviewPanelApiImpl(id, component));
 
         if (typeof options?.minimumWidth === 'number') {
             this._minimumWidth = options.minimumWidth;

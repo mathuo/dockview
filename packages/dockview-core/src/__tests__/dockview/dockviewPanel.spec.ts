@@ -34,9 +34,18 @@ describe('dockviewPanel', () => {
         });
         const model = <IDockviewPanelModel>new panelModelMock();
 
-        const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
-            renderer: 'onlyWhenVisibile',
-        });
+        const cut = new DockviewPanel(
+            'fake-id',
+            'fake-component',
+            undefined,
+            accessor,
+            api,
+            group,
+            model,
+            {
+                renderer: 'onlyWhenVisibile',
+            }
+        );
 
         let latestTitle: string | undefined = undefined;
 
@@ -84,9 +93,18 @@ describe('dockviewPanel', () => {
         });
         const model = <IDockviewPanelModel>new panelModelMock();
 
-        const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
-            renderer: 'onlyWhenVisibile',
-        });
+        const cut = new DockviewPanel(
+            'fake-id',
+            'fake-component',
+            undefined,
+            accessor,
+            api,
+            group,
+            model,
+            {
+                renderer: 'onlyWhenVisibile',
+            }
+        );
 
         cut.init({ title: 'myTitle', params: {} });
         expect(cut.title).toBe('myTitle');
@@ -130,9 +148,18 @@ describe('dockviewPanel', () => {
         });
         const model = <IDockviewPanelModel>new panelModelMock();
 
-        const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
-            renderer: 'onlyWhenVisibile',
-        });
+        const cut = new DockviewPanel(
+            'fake-id',
+            'fake-component',
+            undefined,
+            accessor,
+            api,
+            group,
+            model,
+            {
+                renderer: 'onlyWhenVisibile',
+            }
+        );
 
         cut.init({ params: {}, title: 'title' });
 
@@ -167,9 +194,18 @@ describe('dockviewPanel', () => {
         });
         const model = <IDockviewPanelModel>new panelModelMock();
 
-        const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
-            renderer: 'onlyWhenVisibile',
-        });
+        const cut = new DockviewPanel(
+            'fake-id',
+            'fake-component',
+            undefined,
+            accessor,
+            api,
+            group,
+            model,
+            {
+                renderer: 'onlyWhenVisibile',
+            }
+        );
 
         expect(cut.params).toEqual(undefined);
 
@@ -205,9 +241,18 @@ describe('dockviewPanel', () => {
         });
         const model = <IDockviewPanelModel>new panelModelMock();
 
-        const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
-            renderer: 'onlyWhenVisibile',
-        });
+        const cut = new DockviewPanel(
+            'fake-id',
+            'fake-component',
+            undefined,
+            accessor,
+            api,
+            group,
+            model,
+            {
+                renderer: 'onlyWhenVisibile',
+            }
+        );
 
         cut.api.setSize({ height: 123, width: 456 });
 
@@ -241,9 +286,18 @@ describe('dockviewPanel', () => {
         });
         const model = <IDockviewPanelModel>new panelModelMock();
 
-        const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
-            renderer: 'onlyWhenVisibile',
-        });
+        const cut = new DockviewPanel(
+            'fake-id',
+            'fake-component',
+            undefined,
+            accessor,
+            api,
+            group,
+            model,
+            {
+                renderer: 'onlyWhenVisibile',
+            }
+        );
 
         cut.init({ params: { a: '1', b: '2' }, title: 'A title' });
         expect(cut.params).toEqual({ a: '1', b: '2' });
