@@ -31,7 +31,8 @@ describe('groupPanelApi', () => {
         const cut = new DockviewPanelApiImpl(
             panel,
             group,
-            <DockviewComponent>accessor
+            <DockviewComponent>accessor,
+            'fake-component'
         );
 
         cut.setTitle('test_title');
@@ -59,7 +60,8 @@ describe('groupPanelApi', () => {
         const cut = new DockviewPanelApiImpl(
             <DockviewPanel>groupPanel,
             <DockviewGroupPanel>groupViewPanel,
-            <DockviewComponent>accessor
+            <DockviewComponent>accessor,
+            'fake-component'
         );
 
         cut.updateParameters({ keyA: 'valueA' });
@@ -89,7 +91,8 @@ describe('groupPanelApi', () => {
         const cut = new DockviewPanelApiImpl(
             <DockviewPanel>groupPanel,
             <DockviewGroupPanel>groupViewPanel,
-            <DockviewComponent>accessor
+            <DockviewComponent>accessor,
+            'fake-component'
         );
 
         let events = 0;

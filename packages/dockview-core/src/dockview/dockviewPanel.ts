@@ -58,6 +58,8 @@ export class DockviewPanel
 
     constructor(
         public readonly id: string,
+        component: string,
+        tabComponent: string | undefined,
         private readonly accessor: DockviewComponent,
         private readonly containerApi: DockviewApi,
         group: DockviewGroupPanel,
@@ -68,7 +70,13 @@ export class DockviewPanel
         this._renderer = options.renderer;
         this._group = group;
 
-        this.api = new DockviewPanelApiImpl(this, this._group, accessor);
+        this.api = new DockviewPanelApiImpl(
+            this,
+            this._group,
+            accessor,
+            component,
+            tabComponent
+        );
 
         this.addDisposables(
             this.api.onActiveChange(() => {

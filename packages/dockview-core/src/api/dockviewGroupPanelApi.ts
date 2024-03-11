@@ -42,7 +42,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     }
 
     constructor(id: string, private readonly accessor: DockviewComponent) {
-        super(id);
+        super(id, '__dockviewgroup__');
 
         this.addDisposables(this._onDidLocationChange);
     }
