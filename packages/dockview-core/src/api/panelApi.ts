@@ -24,6 +24,7 @@ export interface PanelApi {
     readonly onDidFocusChange: Event<FocusEvent>;
     readonly onDidVisibilityChange: Event<VisibilityEvent>;
     readonly onDidActiveChange: Event<ActiveEvent>;
+    readonly onDidParametersChange: Event<Parameters>;
     setActive(): void;
     setVisible(isVisible: boolean): void;
     updateParameters(parameters: Parameters): void;
@@ -53,6 +54,8 @@ export interface PanelApi {
     readonly height: number;
 
     readonly onWillFocus: Event<WillFocusEvent>;
+
+    getParameters<T extends Parameters = Parameters>(): T;
 }
 
 export class WillFocusEvent extends DockviewEvent {
@@ -70,6 +73,7 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
     private _isVisible = true;
     private _width = 0;
     private _height = 0;
+    private _parameters: Parameters = {};
 
     private readonly panelUpdatesDisposable = new MutableDisposable();
 
@@ -97,9 +101,9 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
     readonly _onActiveChange = new Emitter<void>();
     readonly onActiveChange: Event<void> = this._onActiveChange.event;
 
-    readonly _onUpdateParameters = new Emitter<Parameters>();
-    readonly onUpdateParameters: Event<Parameters> =
-        this._onUpdateParameters.event;
+    readonly _onDidParametersChange = new Emitter<Parameters>();
+    readonly onDidParametersChange: Event<Parameters> =
+        this._onDidParametersChange.event;
 
     get isFocused(): boolean {
         return this._isFocused;
@@ -145,16 +149,20 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
             this._onDidActiveChange,
             this._onWillFocus,
             this._onActiveChange,
-            this._onUpdateParameters,
             this._onWillFocus,
             this._onWillVisibilityChange,
-            this._onUpdateParameters
+            this._onDidParametersChange
         );
     }
 
+    getParameters<T extends Parameters = Parameters>(): T {
+        return this._parameters as T;
+    }
+
     public initialize(panel: IPanel): void {
-        this.panelUpdatesDisposable.value = this._onUpdateParameters.event(
+        this.panelUpdatesDisposable.value = this._onDidParametersChange.event(
             (parameters) => {
+                this._parameters = parameters;
                 panel.update({
                     params: parameters,
                 });
@@ -171,6 +179,6 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
     }
 
     updateParameters(parameters: Parameters): void {
-        this._onUpdateParameters.fire(parameters);
+        this._onDidParametersChange.fire(parameters);
     }
 }

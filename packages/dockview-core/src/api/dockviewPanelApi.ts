@@ -37,6 +37,7 @@ export interface DockviewPanelApi
     readonly title: string | undefined;
     readonly onDidActiveGroupChange: Event<ActiveGroupEvent>;
     readonly onDidGroupChange: Event<GroupChangedEvent>;
+    readonly onDidTitleChange: Event<TitleEvent>;
     readonly onDidRendererChange: Event<RendererChangedEvent>;
     readonly location: DockviewGroupLocation;
     readonly onDidLocationChange: Event<DockviewGroupPanelFloatingChangeEvent>;
