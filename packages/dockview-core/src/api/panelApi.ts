@@ -24,6 +24,8 @@ export interface PanelApi {
     readonly onDidFocusChange: Event<FocusEvent>;
     readonly onDidVisibilityChange: Event<VisibilityEvent>;
     readonly onDidActiveChange: Event<ActiveEvent>;
+    readonly onDidHiddenChange: Event<HiddenEvent>;
+    readonly onUpdateParameters: Event<Parameters>;
     setActive(): void;
     setVisible(isVisible: boolean): void;
     updateParameters(parameters: Parameters): void;
@@ -145,7 +147,6 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
             this._onDidActiveChange,
             this._onWillFocus,
             this._onActiveChange,
-            this._onUpdateParameters,
             this._onWillFocus,
             this._onWillVisibilityChange,
             this._onUpdateParameters
