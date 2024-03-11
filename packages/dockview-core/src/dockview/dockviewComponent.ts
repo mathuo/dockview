@@ -361,14 +361,6 @@ export class DockviewComponent
     private readonly _onDidAddPanel = new Emitter<IDockviewPanel>();
     readonly onDidAddPanel: Event<IDockviewPanel> = this._onDidAddPanel.event;
 
-    private readonly _onDidPanelTitleChange = new Emitter<TitleEvent>();
-    readonly onDidPanelTitleChange: Event<TitleEvent> =
-        this._onDidPanelTitleChange.event;
-
-    private readonly _onDidPanelParametersChange = new Emitter<Parameters>();
-    readonly onDidPanelParametersChange: Event<Parameters> =
-        this._onDidPanelParametersChange.event;
-
     private readonly _onDidLayoutFromJSON = new Emitter<void>();
     readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutFromJSON.event;
 
@@ -495,9 +487,7 @@ export class DockviewComponent
             Event.any(
                 this.onDidAddPanel,
                 this.onDidRemovePanel,
-                this.onDidActivePanelChange,
-                this.onDidPanelTitleChange,
-                this.onDidPanelParametersChange
+                this.onDidActivePanelChange
             )(() => {
                 this._bufferOnDidLayoutChange.fire();
             }),
@@ -2187,11 +2177,11 @@ export class DockviewComponent
                         this._onDidActivePanelChange.fire(event.panel);
                     }
                 }),
-                view.model.onDidPanelTitleChange((event) => {
-                    this._onDidPanelTitleChange.fire(event);
-                }),
-                view.model.onDidPanelParametersChange((event) => {
-                    this._onDidPanelParametersChange.fire(event);
+                Event.any(
+                    view.model.onDidPanelTitleChange,
+                    view.model.onDidPanelParametersChange
+                )(() => {
+                    this._bufferOnDidLayoutChange.fire();
                 })
             );
 

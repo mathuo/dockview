@@ -38,11 +38,11 @@ import {
     FocusEvent,
     VisibilityEvent,
     ActiveEvent,
-    HiddenEvent,
     WillFocusEvent,
 } from '../../api/panelApi';
 import { Position } from '../../dnd/droptarget';
 import { Emitter, Event } from '../../events';
+import { fromPartial } from '@total-typescript/shoehorn';
 
 enum GroupChangeKind2 {
     ADD_PANEL,
@@ -269,11 +269,11 @@ describe('dockviewGroupPanelModel', () => {
 
         options = {};
 
-        panelApi = {
+        panelApi = fromPartial<DockviewPanelApi>({
             renderer: 'onlyWhenVisibile',
             onDidTitleChange: new Emitter().event,
-            onUpdateParameters: new Emitter().event,
-        } as DockviewPanelApi;
+            onDidParametersChange: new Emitter().event,
+        });
 
         dockview = (<Partial<DockviewComponent>>{
             options: { parentElement: document.createElement('div') },

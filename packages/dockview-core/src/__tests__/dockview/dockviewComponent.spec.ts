@@ -4628,12 +4628,6 @@ describe('dockviewComponent', () => {
         });
 
         test('that emits onDidPanelTitleChange and onDidLayoutChange when the panel set a title', () => {
-            const container = document.createElement('div');
-
-            const didPanelTitleChangeHandler = jest.fn();
-            const { dispose: disposeDidPanelTitleChangeHandler } =
-                dockview.onDidPanelTitleChange(didPanelTitleChangeHandler);
-
             const didLayoutChangeHandler = jest.fn();
             const { dispose: disposeDidLayoutChangeHandler } =
                 dockview.onDidLayoutChange(didLayoutChangeHandler);
@@ -4642,20 +4636,12 @@ describe('dockviewComponent', () => {
 
             jest.runAllTimers();
 
-            expect(didPanelTitleChangeHandler).toHaveBeenCalledTimes(1);
             expect(didLayoutChangeHandler).toHaveBeenCalledTimes(1);
 
-            disposeDidPanelTitleChangeHandler();
             disposeDidLayoutChangeHandler();
         });
 
         test('that emits onDidPanelParametersChange and onDidLayoutChange when the panel updates parameters', () => {
-            const didPanelParametersChangeHandler = jest.fn();
-            const { dispose: disposeDidPanelParametersChangeHandler } =
-                dockview.onDidPanelParametersChange(
-                    didPanelParametersChangeHandler
-                );
-
             const didLayoutChangeHandler = jest.fn();
             const { dispose: disposeDidLayoutChangeHandler } =
                 dockview.onDidLayoutChange(didLayoutChangeHandler);
@@ -4664,10 +4650,8 @@ describe('dockviewComponent', () => {
 
             jest.runAllTimers();
 
-            expect(didPanelParametersChangeHandler).toHaveBeenCalledTimes(1);
             expect(didLayoutChangeHandler).toHaveBeenCalledTimes(1);
 
-            disposeDidPanelParametersChangeHandler();
             disposeDidLayoutChangeHandler();
         });
     });

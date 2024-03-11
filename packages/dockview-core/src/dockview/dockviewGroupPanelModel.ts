@@ -239,8 +239,6 @@ export class DockviewGroupPanelModel
     private _leftHeaderActions: IHeaderActionsRenderer | undefined;
     private _prefixHeaderActions: IHeaderActionsRenderer | undefined;
 
-    private _panelDisposables = new Map<string, IDisposable[]>();
-
     private _location: DockviewGroupLocation = { type: 'grid' };
 
     private mostRecentlyUsed: IDockviewPanel[] = [];
@@ -253,6 +251,7 @@ export class DockviewGroupPanelModel
     private _height = 0;
 
     private _panels: IDockviewPanel[] = [];
+    private readonly _panelDisposables = new Map<string, IDisposable>();
 
     private readonly _onMove = new Emitter<GroupMoveEvent>();
     readonly onMove: Event<GroupMoveEvent> = this._onMove.event;
@@ -842,11 +841,11 @@ export class DockviewGroupPanelModel
             );
         }
 
-        const panelDisposables = this._panelDisposables.get(panel.id);
-
-        this._panelDisposables.delete(panel.id);
-
-        panelDisposables?.forEach(({ dispose }) => dispose());
+        const disposable = this._panelDisposables.get(panel.id);
+        if (disposable) {
+            disposable.dispose();
+            this._panelDisposables.delete(panel.id);
+        }
 
         this._onDidRemovePanel.fire({ panel });
     }
@@ -878,14 +877,17 @@ export class DockviewGroupPanelModel
         this.updateMru(panel);
         this.panels.splice(index, 0, panel);
 
-        this._panelDisposables.set(panel.id, [
-            panel.api.onDidTitleChange((event) =>
-                this._onDidPanelTitleChange.fire(event)
-            ),
-            panel.api.onUpdateParameters((event) =>
-                this._onDidPanelParametersChange.fire(event)
-            ),
-        ]);
+        this._panelDisposables.set(
+            panel.id,
+            new CompositeDisposable(
+                panel.api.onDidTitleChange((event) =>
+                    this._onDidPanelTitleChange.fire(event)
+                ),
+                panel.api.onDidParametersChange((event) =>
+                    this._onDidPanelParametersChange.fire(event)
+                )
+            )
+        );
 
         this._onDidAddPanel.fire({ panel });
     }
