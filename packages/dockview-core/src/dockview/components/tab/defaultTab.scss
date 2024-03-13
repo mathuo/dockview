@@ -28,29 +28,33 @@
     }
 
     &.dv-tab-dragging {
-        .tab-action {
+        .dv-default-tab-action {
             background-color: var(--dv-activegroup-visiblepanel-tab-color);
         }
     }
 
-    &.active-tab > .default-tab {
-        .tab-action {
-            visibility: visible;
-        }
-    }
-
-    &.inactive-tab > .default-tab {
-        .tab-action {
-            visibility: hidden;
-        }
-        &:hover {
-            .tab-action {
+    &.active-tab {
+        .dv-default-tab {
+            .dv-default-tab-action {
                 visibility: visible;
             }
         }
     }
 
-    .default-tab {
+    &.inactive-tab {
+        .dv-default-tab {
+            .dv-default-tab-action {
+                visibility: hidden;
+            }
+            &:hover {
+                .dv-default-tab-action {
+                    visibility: visible;
+                }
+            }
+        }
+    }
+
+    .dv-default-tab {
         position: relative;
         height: 100%;
         display: flex;
@@ -60,33 +64,21 @@
         white-space: nowrap;
         text-overflow: elipsis;
 
-        .tab-content {
+        .dv-default-tab-content {
             padding: 0px 8px;
             flex-grow: 1;
         }
 
-        .action-container {
-            text-align: right;
+        .dv-default-tab-action {
+            padding: 4px;
             display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
 
-            .tab-list {
-                display: flex;
-                padding: 0px;
-                margin: 0px;
-                justify-content: flex-end;
-
-                .tab-action {
-                    padding: 4px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    box-sizing: border-box;
-
-                    &:hover {
-                        border-radius: 2px;
-                        background-color: var(--dv-icon-hover-background-color);
-                    }
-                }
+            &:hover {
+                border-radius: 2px;
+                background-color: var(--dv-icon-hover-background-color);
             }
         }
     }

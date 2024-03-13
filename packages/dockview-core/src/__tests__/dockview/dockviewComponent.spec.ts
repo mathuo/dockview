@@ -2015,7 +2015,7 @@ describe('dockviewComponent', () => {
         expect(viewQuery.length).toBe(2);
 
         const viewQuery2 = group.element.querySelectorAll(
-            '.groupview > .tabs-and-actions-container > .tabs-container > .tab > .default-tab'
+            '.groupview > .tabs-and-actions-container > .tabs-container > .tab > .dv-default-tab'
         );
         expect(viewQuery2.length).toBe(1);
 

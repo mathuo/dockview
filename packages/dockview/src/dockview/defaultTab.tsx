@@ -52,15 +52,15 @@ export const DockviewDefaultTab: React.FunctionComponent<
 
     return (
         <div
-            data-testid="dockview-default-tab"
+            data-testid="dockview-dv-default-tab"
             {...rest}
             onClick={onClick}
-            className="dockview-react-tab"
+            className="dv-default-tab"
         >
-            <span className="dockview-react-tab-title">{api.title}</span>
+            <span className="dv-default-tab-content">{api.title}</span>
             {!hideClose && (
                 <div
-                    className="dv-react-tab-close-btn"
+                    className="dv-default-tab-action"
                     onMouseDown={onMouseDown}
                     onClick={onClose}
                 >
