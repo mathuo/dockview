@@ -1,6 +1,13 @@
 const gulp = require('gulp');
-const buildfile = require('../../scripts/build');
+const gulpSass = require('gulp-dart-sass');
+const concat = require('gulp-concat');
 
-buildfile.init();
+gulp.task('sass', () => {
+    return gulp
+        .src('./src/**/*.scss')
+        .pipe(gulpSass().on('error', gulpSass.logError))
+        .pipe(concat('dockview.css'))
+        .pipe(gulp.dest('./dist/styles/'));
+});
 
 gulp.task('run', gulp.series(['sass']));

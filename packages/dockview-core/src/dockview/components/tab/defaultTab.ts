@@ -8,8 +8,6 @@ import { createCloseButton } from '../../../svg';
 export class DefaultTab extends CompositeDisposable implements ITabRenderer {
     private _element: HTMLElement;
     private _content: HTMLElement;
-    private _actionContainer: HTMLElement;
-    private _list: HTMLElement;
     private action: HTMLElement;
     //
     private params: GroupPanelPartInitParameters = {} as any;
@@ -22,29 +20,21 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         super();
 
         this._element = document.createElement('div');
-        this._element.className = 'default-tab';
+        this._element.className = 'dv-default-tab';
         //
         this._content = document.createElement('div');
-        this._content.className = 'tab-content';
-        //
-        this._actionContainer = document.createElement('div');
-        this._actionContainer.className = 'action-container';
-        //
-        this._list = document.createElement('ul');
-        this._list.className = 'tab-list';
-        //
+        this._content.className = 'dv-default-tab-content';
+
         this.action = document.createElement('div');
-        this.action.className = 'tab-action';
+        this.action.className = 'dv-default-tab-action';
         this.action.appendChild(createCloseButton());
 
         //
         this._element.appendChild(this._content);
-        this._element.appendChild(this._actionContainer);
-        this._actionContainer.appendChild(this._list);
-        this._list.appendChild(this.action);
+        this._element.appendChild(this.action);
         //
         this.addDisposables(
-            addDisposableListener(this._actionContainer, 'mousedown', (ev) => {
+            addDisposableListener(this.action, 'mousedown', (ev) => {
                 ev.preventDefault();
             })
         );
