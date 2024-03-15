@@ -25,6 +25,8 @@ export class ReactWatermarkPart implements IWatermarkRenderer {
     ) {
         this._element = document.createElement('div');
         this._element.className = 'dockview-react-part';
+        this._element.style.height = '100%';
+        this._element.style.width = '100%';
     }
 
     init(parameters: WatermarkRendererInitParameters): void {

@@ -1,6 +1,6 @@
 {
   "name": "dockview",
-  "version": "1.10.1",
+  "version": "1.10.2",
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
   "keywords": [
     "splitview",
@@ -44,7 +44,7 @@
     "build": "npm run build:package && npm run build:bundles",
     "build:bundles": "rollup -c",
     "build:cjs": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
-    "build:css": "gulp sass",
+    "build:css": "node scripts/copy-css.js",
     "build:esm": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
     "build:package": "npm run build:cjs && npm run build:esm && npm run build:css",
     "clean": "rimraf dist/ .build/ .rollup.cache/",
@@ -54,6 +54,6 @@
     "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage"
   },
   "dependencies": {
-    "dockview-core": "^1.10.1"
+    "dockview-core": "^1.10.2"
   }
 }

@@ -18,8 +18,8 @@ describe('defaultTab', () => {
             />
         );
 
-        const element = await screen.getByTestId('dockview-default-tab');
-        expect(element.querySelector('.dv-react-tab-close-btn')).toBeTruthy();
+        const element = await screen.getByTestId('dockview-dv-default-tab');
+        expect(element.querySelector('.dv-default-tab-action')).toBeTruthy();
     });
 
     test('that title is displayed', async () => {
@@ -37,9 +37,9 @@ describe('defaultTab', () => {
             />
         );
 
-        const element = await screen.getByTestId('dockview-default-tab');
+        const element = await screen.getByTestId('dockview-dv-default-tab');
         expect(
-            element.querySelector('.dockview-react-tab-title')?.textContent
+            element.querySelector('.dv-default-tab-content')?.textContent
         ).toBe('test_title');
     });
 
@@ -57,8 +57,8 @@ describe('defaultTab', () => {
             />
         );
 
-        const element = await screen.getByTestId('dockview-default-tab');
-        expect(element.querySelector('.dv-react-tab-close-btn')).toBeNull();
+        const element = await screen.getByTestId('dockview-dv-default-tab');
+        expect(element.querySelector('.dv-default-tab-action')).toBeNull();
     });
 
     test('that settings closeActionOverride skips api.close()', async () => {
@@ -79,9 +79,9 @@ describe('defaultTab', () => {
             />
         );
 
-        const element = await screen.getByTestId('dockview-default-tab');
+        const element = await screen.getByTestId('dockview-dv-default-tab');
         const btn = element.querySelector(
-            '.dv-react-tab-close-btn'
+            '.dv-default-tab-action'
         ) as HTMLElement;
         fireEvent.click(btn);
 
@@ -104,9 +104,9 @@ describe('defaultTab', () => {
             />
         );
 
-        const element = await screen.getByTestId('dockview-default-tab');
+        const element = await screen.getByTestId('dockview-dv-default-tab');
         const btn = element.querySelector(
-            '.dv-react-tab-close-btn'
+            '.dv-default-tab-action'
         ) as HTMLElement;
         fireEvent.click(btn);
 
@@ -127,8 +127,8 @@ describe('defaultTab', () => {
             />
         );
 
-        const element = await screen.getByTestId('dockview-default-tab');
-        expect(element.querySelector('.dv-react-tab-close-btn')).toBeTruthy();
+        const element = await screen.getByTestId('dockview-dv-default-tab');
+        expect(element.querySelector('.dv-default-tab-action')).toBeTruthy();
     });
 
     test('that mouseDown on close button prevents panel becoming active', async () => {
@@ -146,9 +146,9 @@ describe('defaultTab', () => {
             />
         );
 
-        const element = await screen.getByTestId('dockview-default-tab');
+        const element = await screen.getByTestId('dockview-dv-default-tab');
         const btn = element.querySelector(
-            '.dv-react-tab-close-btn'
+            '.dv-default-tab-action'
         ) as HTMLElement;
 
         fireEvent.mouseDown(btn);
