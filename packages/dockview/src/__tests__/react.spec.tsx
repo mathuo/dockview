@@ -1,5 +1,5 @@
 import { ReactPart, isReactComponent } from '../react';
-import * as React from 'react';
+import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 
 interface TestInterface {

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { act, render, waitFor } from '@testing-library/react';
 import { SplitviewApi, Orientation, ISplitviewPanel } from 'dockview-core';
 import {
