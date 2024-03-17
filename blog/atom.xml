@@ -2,11 +2,76 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dockview.dev/blog</id>
     <title>Dockview Blog</title>
-    <updated>2024-03-03T00:00:00.000Z</updated>
+    <updated>2024-03-17T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dockview.dev/blog"/>
     <subtitle>Dockview Blog</subtitle>
     <icon>https://dockview.dev/img/dockview_logo.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Dockview 1.11.0]]></title>
+        <id>https://dockview.dev/blog/dockview-1.11.0-release</id>
+        <link href="https://dockview.dev/blog/dockview-1.11.0-release"/>
+        <updated>2024-03-17T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
+        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.11.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>
+<p>Adjust <code>React</code> imports <a href="https://github.com/mathuo/dockview/pull/556" target="_blank" rel="noopener noreferrer">#556</a></p>
+<ul>
+<li>Rename <code>import * as React from 'react'</code> to <code>import React from 'react'</code></li>
+<li>Rename <code>import * as ReactDOM from 'react-dom'</code> to <code>import ReactDOM from 'react-dom'</code></li>
+<li>This is preperation work for supporting multiple framworks (Vue, Angular etc...)</li>
+</ul>
+</li>
+<li>
+<p>Only export CSS from <code>dockview-core</code> <a href="https://github.com/mathuo/dockview/pull/553" target="_blank" rel="noopener noreferrer">#553</a></p>
+<ul>
+<li>All required CSS is now found in <code>dockview-core</code> only. <code>dockview</code> (React) specific CSS has been removed and made compatible with CSS in <code>dockview-core</code>. This is preperation work for supporting multiple framworks (Vue, Angular etc...)</li>
+<li>For compatibility reasons <code>dockview-core</code> CSS continues to be re-exported through <code>dockview</code>.</li>
+<li>Class name changes as follows:<!-- -->
+<ul>
+<li><code>tab-action</code> to <code>dv-default-tab-action</code></li>
+<li><code>default-tab</code> to <code>dv-default-tab</code></li>
+<li><code>tab-content</code> to <code>dv-default-tab-content</code></li>
+<li><code>dockview-react-tab</code> to <code>dv-default-tab</code></li>
+<li><code>dockview-react-tab-title</code> to <code>dv-default-tab-content</code></li>
+<li><code>dv-react-tab-close-btn</code> to <code>dv-default-tab-action</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>]]></content>
+        <category label="release" term="release"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Dockview 1.10.2]]></title>
+        <id>https://dockview.dev/blog/dockview-1.10.2-release</id>
+        <link href="https://dockview.dev/blog/dockview-1.10.2-release"/>
+        <updated>2024-03-15T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Please reference to docs @ dockview.dev.]]></summary>
+        <content type="html"><![CDATA[<p>Please reference to docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.10.2-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<ul>
+<li>
+<p>Expose panel data <a href="https://github.com/mathuo/dockview/issues/542" target="_blank" rel="noopener noreferrer">#526</a></p>
+<ul>
+<li>Add <code>component</code> property to panel api</li>
+<li>Add <code>tabComponent</code> property to dock panel api</li>
+</ul>
+</li>
+<li>
+<p>Enhance panel parameters and title changing logic <a href="https://github.com/mathuo/dockview/issues/504" target="_blank" rel="noopener noreferrer">#504</a></p>
+<ul>
+<li>Parameter and title changing events will now trigger <code>onDidLayoutChange</code></li>
+<li>Add <code>getParameters()</code> method to panel api</li>
+<li>Add <code>onDidTitleChange</code> event to dock panel api</li>
+<li>Add <code>onDidParametersChange</code> event to panel api</li>
+</ul>
+</li>
+</ul>]]></content>
+        <category label="release" term="release"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Dockview 1.10.1]]></title>
         <id>https://dockview.dev/blog/dockview-1.10.1-release</id>
@@ -487,40 +552,6 @@ If you feel anything is missing or unclear please let me know.</p>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.6.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
 <ul>
 <li>addEmptyGroup renamed to addGroup</li>
-</ul>]]></content>
-        <category label="release" term="release"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Dockview 1.5.2]]></title>
-        <id>https://dockview.dev/blog/dockview-1.5.2-release</id>
-        <link href="https://dockview.dev/blog/dockview-1.5.2-release"/>
-        <updated>2022-10-04T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[🚀 Features]]></summary>
-        <content type="html"><![CDATA[<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.5.2-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.5.2-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Fix resizing panels via api methods <a href="https://github.com/mathuo/dockview/pull/157" target="_blank" rel="noopener noreferrer">#157</a></li>
-<li>Various doc enhancements @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.5.2-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content>
-        <category label="release" term="release"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Dockview 1.5.1]]></title>
-        <id>https://dockview.dev/blog/dockview-1.5.1-release</id>
-        <link href="https://dockview.dev/blog/dockview-1.5.1-release"/>
-        <updated>2022-07-23T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[🚀 Features]]></summary>
-        <content type="html"><![CDATA[<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.5.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.5.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Fix <code>.params</code> method on dockview panels to return the user provided panel params <a href="https://github.com/mathuo/dockview/pull/144" target="_blank" rel="noopener noreferrer">#144</a></li>
-<li>Various doc enhancements @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.5.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
-<ul>
-<li>Remove <code>onTabContextMenu</code> from <code>DockviewReact</code> to simplify library. As an alternative provide onContextMenu listeners in a custom tab. <a href="https://github.com/mathuo/dockview/pull/127" target="_blank" rel="noopener noreferrer">#127</a></li>
-<li>Remove <code>suppressClosable</code> flag for <code>DockviewReact</code> panels to simplify library. As an alternative manage the features of a tab such as it's ability to be closed using a custom tab <a href="https://github.com/mathuo/dockview/pull/146" target="_blank" rel="noopener noreferrer">#146</a></li>
 </ul>]]></content>
         <category label="release" term="release"/>
     </entry>
