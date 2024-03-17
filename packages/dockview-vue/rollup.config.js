@@ -5,6 +5,7 @@ const typescript = require('@rollup/plugin-typescript');
 const terser = require('@rollup/plugin-terser');
 const postcss = require('rollup-plugin-postcss');
 const nodeResolve = require('@rollup/plugin-node-resolve');
+const vue = require('@vitejs/plugin-vue');
 
 const { name, version, homepage, license } = require('./package.json');
 const main = join(__dirname, './scripts/rollupEntryTarget.ts');
@@ -63,9 +64,11 @@ function createBundle(format, options) {
         nodeResolve({
             include: ['node_modules/dockview-core/**'],
         }),
+
         typescript({
-            tsconfig: 'tsconfig.esm.json',
+            tsconfig: 'tsconfig.config.json',
         }),
+        vue({}),
     ];
 
     if (isMinified) {

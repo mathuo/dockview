@@ -3,12 +3,13 @@
   "version": "1.11.0",
   "private": true,
   "scripts": {
-    "build": "docusaurus build",
+    "build": "npm run create-templates && docusaurus build",
     "clear": "docusaurus clear",
     "start": "docusaurus start",
     "swizzle": "docusaurus swizzle @docusaurus/theme-classic",
     "docs:version": "docusaurus docs:version",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "create-templates": "node scripts/buildTemplates.mjs"
   },
   "browserslist": {
     "production": [

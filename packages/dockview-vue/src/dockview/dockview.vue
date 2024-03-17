@@ -262,6 +262,7 @@ onMounted(() => {
         defaultTabComponent: props.defaultTabComponent
             ? DEFAULT_REACT_TAB
             : undefined,
+        watermarkFrameworkComponent:props.watermarkComponent
     };
 
     const dockview = new DockviewComponent({

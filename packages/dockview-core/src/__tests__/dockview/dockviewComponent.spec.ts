@@ -4504,7 +4504,6 @@ describe('dockviewComponent', () => {
                 tabComponents: {
                     test_tab_id: PanelTabPartTest,
                 },
-                orientation: Orientation.HORIZONTAL,
             });
 
             panel1 = dockview.addPanel({

@@ -96,10 +96,6 @@ export class DockviewUnhandledDragOverEvent implements DockviewDndOverlayEvent {
     }
 }
 
-export interface DockviewEvents {
-    // noop
-}
-
 export const PROPERTY_KEYS: (keyof DockviewOptions)[] = (() => {
     /**
      * by readong the keys from an empty value object TypeScript will error
@@ -120,18 +116,6 @@ export const PROPERTY_KEYS: (keyof DockviewOptions)[] = (() => {
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];
-})();
-
-export const EVENT_KEYS: (keyof DockviewEvents)[] = (() => {
-    /**
-     * by readong the keys from an empty value object TypeScript will error
-     * when we add or remove new properties to `DockviewOptions`
-     */
-    const properties: Record<keyof DockviewEvents, undefined> = {
-        showDndOverlay: undefined,
-    };
-
-    return Object.keys(properties) as (keyof DockviewEvents)[];
 })();
 
 export interface DockviewFrameworkOptions {
@@ -164,7 +148,6 @@ export interface DockviewFrameworkOptions {
 }
 
 export type DockviewComponentOptions = DockviewOptions &
-    DockviewEvents &
     DockviewFrameworkOptions;
 
 export interface PanelOptions<P extends object = Parameters> {

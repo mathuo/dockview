@@ -61,6 +61,9 @@ export interface IDockviewReactProps extends DockviewOptions {
     onReady: (event: DockviewReadyEvent) => void;
     onDidDrop?: (event: DockviewDidDropEvent) => void;
     onWillDrop?: (event: DockviewWillDropEvent) => void;
+    /**
+     * @deprecated use `api.onUnhandledDragOverEvent` instead. This will be removed in the next release.
+     */
     showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
 }
 

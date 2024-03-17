@@ -76,6 +76,8 @@ export class VueContentRenderer implements IContentRenderer {
     constructor(private readonly component: VueComponent) {
         this._element = document.createElement('div');
         this.element.className = 'dv-vue-part';
+        this.element.style.height = '100%';
+        this.element.style.width = '100%';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
@@ -121,6 +123,8 @@ export class VueTabRenderer implements ITabRenderer {
     constructor(private readonly component: VueComponent) {
         this._element = document.createElement('div');
         this.element.className = 'dv-vue-part';
+        this.element.style.height = '100%';
+        this.element.style.width = '100%';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
@@ -162,6 +166,8 @@ export class VueWatermarkRenderer implements IWatermarkRenderer {
     constructor(private readonly component: VueComponent) {
         this._element = document.createElement('div');
         this.element.className = 'dv-vue-part';
+        this.element.style.height = '100%';
+        this.element.style.width = '100%';
     }
 
     init(parameters: WatermarkRendererInitParameters): void {
