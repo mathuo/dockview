@@ -1,5 +1,5 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { IFrameworkPart, IDockviewDisposable, Parameters } from 'dockview-core';
 
 export interface ReactPortalStore {
@@ -192,12 +192,11 @@ export const usePortalsLifecycle: PortalLifecycleHook = () => {
     return [portals, addPortal];
 };
 
-
 export function isReactComponent(component: any): boolean {
-  /**
-   * Yes, we could use "react-is" but that would introduce an unwanted peer dependency
-   * so for now we will check in a rather crude fashion...
-   */
+    /**
+     * Yes, we could use "react-is" but that would introduce an unwanted peer dependency
+     * so for now we will check in a rather crude fashion...
+     */
     return (
         typeof component === 'function' /** Functional Componnts */ ||
         !!(component as React.ExoticComponent)

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { DockviewDefaultTab } from '../../dockview/defaultTab';
-import * as React from 'react';
+import React from 'react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewApi, DockviewPanelApi } from 'dockview-core';
 
