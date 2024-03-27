@@ -5,6 +5,7 @@ import {
 import {
     AddGroupOptions,
     AddPanelOptions,
+    DockviewDndOverlayEvent,
     MovementOptions,
 } from '../dockview/options';
 import { Parameters } from '../panel/types';
@@ -693,6 +694,10 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     get onWillDragPanel(): Event<TabDragEvent> {
         return this.component.onWillDragPanel;
+    }
+
+    get onUnhandledDragOverEvent(): Event<DockviewDndOverlayEvent> {
+        return this.component.onUnhandledDragOverEvent;
     }
 
     /**

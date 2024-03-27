@@ -68,9 +68,10 @@ export function positionToDirection(position: Position): Direction {
 
 export type Position = 'top' | 'bottom' | 'left' | 'right' | 'center';
 
-export type CanDisplayOverlay =
-    | boolean
-    | ((dragEvent: DragEvent, state: Position) => boolean);
+export type CanDisplayOverlay = (
+    dragEvent: DragEvent,
+    state: Position
+) => boolean;
 
 export type MeasuredValue = { value: number; type: 'pixels' | 'percentage' };
 
@@ -170,6 +171,11 @@ export class Droptarget extends CompositeDisposable {
                     return;
                 }
 
+                if (!this.options.canDisplayOverlay(e, quadrant)) {
+                    this.removeDropTarget();
+                    return;
+                }
+
                 const willShowOverlayEvent = new WillShowOverlayEvent({
                     nativeEvent: e,
                     position: quadrant,
@@ -182,16 +188,6 @@ export class Droptarget extends CompositeDisposable {
                 this._onWillShowOverlay.fire(willShowOverlayEvent);
 
                 if (willShowOverlayEvent.defaultPrevented) {
-                    this.removeDropTarget();
-                    return;
-                }
-
-                if (typeof this.options.canDisplayOverlay === 'boolean') {
-                    if (!this.options.canDisplayOverlay) {
-                        this.removeDropTarget();
-                        return;
-                    }
-                } else if (!this.options.canDisplayOverlay(e, quadrant)) {
                     this.removeDropTarget();
                     return;
                 }

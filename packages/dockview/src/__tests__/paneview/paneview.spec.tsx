@@ -6,11 +6,13 @@ import {
     PaneviewReact,
     PaneviewReadyEvent,
 } from '../../paneview/paneview';
-import { PanelCollection } from '../../types';
 import { setMockRefElement } from '../__test_utils__/utils';
 
 describe('gridview react', () => {
-    let components: PanelCollection<IPaneviewPanelProps>;
+    let components: Record<
+        string,
+        React.FunctionComponent<IPaneviewPanelProps>
+    >;
 
     beforeEach(() => {
         components = {

@@ -1,0 +1,82 @@
+<html lang="en">
+
+<head>
+  <title>Vue 3 example</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&amp;display=swap"
+    rel="stylesheet" />
+  <style media="only screen">
+    html,
+    body,
+    #app {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      box-sizing: border-box;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    html {
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: 0;
+      overflow: auto;
+    }
+
+    body {
+      padding: 16px;
+      overflow: auto;
+      background-color: transparent;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <my-component> </my-component>
+  </div>
+  <object id="loading-spinner" style="
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(0.75);
+            " type="image/svg+xml" data="https://dockview.dev/img/dockview_logo.svg" aria-label="loading"></object>
+  <script id="loading-script">
+    (function () {
+      const cleanupLoading = () => {
+        if (
+          document.querySelector(
+            '.dv-loaded'
+          )
+        ) {
+          document.querySelector('#loading-spinner').remove();
+          document.querySelector('#loading-script').remove();
+        } else {
+          requestAnimationFrame(() => cleanupLoading());
+        }
+      };
+
+      cleanupLoading();
+    })();
+  </script>
+  <script>
+    var systemJsMap = {
+      "dockview": "https://cdn.jsdelivr.net/npm/dockview@0.0.0-experimental-09edbdd-20240316",
+      "dockview-core": "https://cdn.jsdelivr.net/npm/dockview-core@0.0.0-experimental-09edbdd-20240316"
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/systemjs@0.19.47/dist/system.js"></script>
+  <script src="/examples/dockview/simple/systemjs.config.js"></script>
+  <script>
+    System.import(
+      '/examples/dockview/simple/index.tsx'
+    ).catch(function (err) {
+      console.error(err);
+    });
+  </script>
+</body>
+
+</html>

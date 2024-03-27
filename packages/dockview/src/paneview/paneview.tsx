@@ -9,7 +9,7 @@ import {
 } from 'dockview-core';
 import { usePortalsLifecycle } from '../react';
 import { PanePanelSection } from './view';
-import { PanelCollection, PanelParameters } from '../types';
+import { PanelParameters } from '../types';
 
 export interface PaneviewReadyEvent {
     api: PaneviewApi;
@@ -24,8 +24,11 @@ export interface IPaneviewPanelProps<T extends { [index: string]: any } = any>
 
 export interface IPaneviewReactProps {
     onReady: (event: PaneviewReadyEvent) => void;
-    components: PanelCollection<IPaneviewPanelProps>;
-    headerComponents?: PanelCollection<IPaneviewPanelProps>;
+    components: Record<string, React.FunctionComponent<IPaneviewPanelProps>>;
+    headerComponents?: Record<
+        string,
+        React.FunctionComponent<IPaneviewPanelProps>
+    >;
     className?: string;
     disableAutoResizing?: boolean;
     disableDnd?: boolean;

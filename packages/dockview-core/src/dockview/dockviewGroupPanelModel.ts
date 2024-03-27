@@ -31,7 +31,11 @@ import {
 import { IWatermarkRenderer } from './types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
-import { IHeaderActionsRenderer } from './options';
+import {
+    DockviewDndOverlayEvent,
+    DockviewUnhandledDragOverEvent,
+    IHeaderActionsRenderer,
+} from './options';
 import { OverlayRenderContainer } from '../overlayRenderContainer';
 import { TitleEvent } from '../api/dockviewPanelApi';
 
@@ -296,6 +300,11 @@ export class DockviewGroupPanelModel
     readonly onDidActivePanelChange: Event<DockviewGroupChangeEvent> =
         this._onDidActivePanelChange.event;
 
+    private readonly _onUnhandledDragOverEvent =
+        new Emitter<DockviewDndOverlayEvent>();
+    readonly onUnhandledDragOverEvent: Event<DockviewDndOverlayEvent> =
+        this._onUnhandledDragOverEvent.event;
+
     private readonly _api: DockviewApi;
 
     get element(): HTMLElement {
@@ -473,7 +482,8 @@ export class DockviewGroupPanelModel
             this._onWillDrop,
             this._onDidAddPanel,
             this._onDidRemovePanel,
-            this._onDidActivePanelChange
+            this._onDidActivePanelChange,
+            this._onUnhandledDragOverEvent
         );
     }
 
@@ -518,9 +528,9 @@ export class DockviewGroupPanelModel
         this.setActive(this.isActive, true);
         this.updateContainer();
 
-        if (this.accessor.options.createRightHeaderActionsElement) {
+        if (this.accessor.options.headerRightActionComponent) {
             this._rightHeaderActions =
-                this.accessor.options.createRightHeaderActionsElement(
+                this.accessor.options.headerRightActionComponent(
                     this.groupPanel
                 );
             this.addDisposables(this._rightHeaderActions);
@@ -533,9 +543,9 @@ export class DockviewGroupPanelModel
             );
         }
 
-        if (this.accessor.options.createLeftHeaderActionsElement) {
+        if (this.accessor.options.headerLeftActionComponent) {
             this._leftHeaderActions =
-                this.accessor.options.createLeftHeaderActionsElement(
+                this.accessor.options.headerLeftActionComponent(
                     this.groupPanel
                 );
             this.addDisposables(this._leftHeaderActions);
@@ -548,9 +558,9 @@ export class DockviewGroupPanelModel
             );
         }
 
-        if (this.accessor.options.createPrefixHeaderActionsElement) {
+        if (this.accessor.options.headerPrefixActionComponent) {
             this._prefixHeaderActions =
-                this.accessor.options.createPrefixHeaderActionsElement(
+                this.accessor.options.headerPrefixActionComponent(
                     this.groupPanel
                 );
             this.addDisposables(this._prefixHeaderActions);
@@ -959,17 +969,17 @@ export class DockviewGroupPanelModel
         position: Position,
         target: DockviewGroupDropLocation
     ): boolean {
-        // custom overlay handler
-        if (this.accessor.options.showDndOverlay) {
-            return this.accessor.options.showDndOverlay({
-                nativeEvent: event,
-                target,
-                group: this.accessor.getPanel(this.id)!,
-                position,
-                getData: getPanelData,
-            });
-        }
-        return false;
+        const firedEvent = new DockviewUnhandledDragOverEvent(
+            event,
+            target,
+            position,
+            getPanelData,
+            this.accessor.getPanel(this.id)!
+        );
+
+        this._onUnhandledDragOverEvent.fire(firedEvent);
+
+        return firedEvent.isAccepted;
     }
 
     private handleDropEvent(

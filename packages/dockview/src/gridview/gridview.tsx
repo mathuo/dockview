@@ -8,8 +8,7 @@ import {
 } from 'dockview-core';
 import { ReactGridPanelView } from './view';
 import { usePortalsLifecycle } from '../react';
-import { PanelCollection, PanelParameters } from '../types';
-
+import { PanelParameters } from '../types';
 export interface GridviewReadyEvent {
     api: GridviewApi;
 }
@@ -23,7 +22,7 @@ export interface IGridviewPanelProps<T extends { [index: string]: any } = any>
 export interface IGridviewReactProps {
     orientation?: Orientation;
     onReady: (event: GridviewReadyEvent) => void;
-    components: PanelCollection<IGridviewPanelProps>;
+    components: Record<string, React.FunctionComponent<IGridviewPanelProps>>;
     hideBorders?: boolean;
     className?: string;
     proportionalLayout?: boolean;

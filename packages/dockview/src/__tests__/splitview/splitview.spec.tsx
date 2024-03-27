@@ -6,11 +6,13 @@ import {
     SplitviewReact,
     SplitviewReadyEvent,
 } from '../../splitview/splitview';
-import { PanelCollection } from '../../types';
 import { setMockRefElement } from '../__test_utils__/utils';
 
 describe('splitview react', () => {
-    let components: PanelCollection<ISplitviewPanelProps>;
+    let components: Record<
+        string,
+        React.FunctionComponent<ISplitviewPanelProps>
+    >;
 
     beforeEach(() => {
         components = {

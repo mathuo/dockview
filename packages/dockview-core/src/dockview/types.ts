@@ -18,11 +18,6 @@ export interface GroupPanelPartInitParameters
     containerApi: DockviewApi;
 }
 
-export interface GroupPanelContentPartInitParameters
-    extends GroupPanelPartInitParameters {
-    tab: ITabRenderer;
-}
-
 export interface WatermarkRendererInitParameters {
     containerApi: DockviewApi;
     group?: IDockviewGroupPanel;
@@ -31,7 +26,7 @@ export interface WatermarkRendererInitParameters {
 export interface IWatermarkRenderer
     extends Optional<
         Omit<IPanel, 'id' | 'init'>,
-        'dispose' | 'update' | 'layout' | 'toJSON'
+        'dispose' | 'update' | 'layout' | 'toJSON' | 'focus'
     > {
     readonly element: HTMLElement;
     init: (params: WatermarkRendererInitParameters) => void;
@@ -41,7 +36,7 @@ export interface IWatermarkRenderer
 export interface ITabRenderer
     extends Optional<
         Omit<IPanel, 'id'>,
-        'dispose' | 'update' | 'layout' | 'toJSON'
+        'dispose' | 'update' | 'layout' | 'toJSON' | 'focus'
     > {
     readonly element: HTMLElement;
     init(parameters: GroupPanelPartInitParameters): void;
@@ -50,12 +45,10 @@ export interface ITabRenderer
 export interface IContentRenderer
     extends Optional<
         Omit<IPanel, 'id'>,
-        'dispose' | 'update' | 'layout' | 'toJSON'
+        'dispose' | 'update' | 'layout' | 'toJSON' | 'focus'
     > {
     readonly element: HTMLElement;
-    readonly onDidFocus?: Event<void>;
-    readonly onDidBlur?: Event<void>;
-    init(parameters: GroupPanelContentPartInitParameters): void;
+    init(parameters: GroupPanelPartInitParameters): void;
 }
 
 // watermark component

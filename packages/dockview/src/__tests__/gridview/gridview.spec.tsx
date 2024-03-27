@@ -6,11 +6,13 @@ import {
     GridviewReact,
     GridviewReadyEvent,
 } from '../../gridview/gridview';
-import { PanelCollection } from '../../types';
 import { setMockRefElement } from '../__test_utils__/utils';
 
 describe('gridview react', () => {
-    let components: PanelCollection<IGridviewPanelProps>;
+    let components:   Record<
+        string,
+        React.FunctionComponent<IGridviewPanelProps>
+    >
 
     beforeEach(() => {
         components = {

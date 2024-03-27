@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Vue example</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&amp;display=swap"
+    rel="stylesheet" />
+  <style media="only screen">
+    html,
+    body,
+    #app {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      box-sizing: border-box;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    html {
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: 0;
+      overflow: auto;
+    }
+
+    body {
+      padding: 16px;
+      overflow: auto;
+      background-color: transparent;
+    }
+  </style>
+  <script type="systemjs-importmap">
+      {
+        "imports": {
+          "dockview": "https://cdn.jsdelivr.net/npm/dockview@0.0.0-experimental-b09ab48-20240316/dist/dockview.esm.js",
+          "dockview/": "https://cdn.jsdelivr.net/npm/dockview@0.0.0-experimental-b09ab48-20240316/",
+          "react": "https://esm.sh/react@18.2.0",
+          "react-dom": "https://esm.sh/react-dom@18.2.0"
+        }
+      }
+    </script>
+  <script src="https://cdn.jsdelivr.net/npm/systemjs@6.8.0/dist/system.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/systemjs-babel@0.3.2/dist/systemjs-babel.js"></script>
+  <script>
+    async function importCSSStyleSheet(uri) {
+
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = uri;
+      document.head.appendChild(link);
+      console.log('add link')
+
+      // const styles = (await import(uri)).default;
+
+      // const el = document.createElement('style');
+      // el.type = 'text/css';
+
+      // el.innerHTML = Array.from(styles.cssRules)
+      //     .map((x) => x.cssText)
+      //     .join(' ');
+
+      // document.head.appendChild(el);
+    }
+
+
+    System.onload = function (err, id, deps, isErrSource) {
+      console.log(id);
+      if (id.endsWith('.css') && !err) {
+          importCSSStyleSheet(id);
+
+        // const module = System.get(id);
+        // console.log(module);
+        // const styles = module?.default;
+        // if (styles) {
+        //   // importCSSStyleSheet(styles);
+        //   document.adoptedStyleSheets = [...document.adoptedStyleSheets, styles];
+        // }
+      }
+    };
+  </script>
+
+</head>
+
+<body>
+  <div id="app">
+    <script type="systemjs-module" src="import:./main.tsx"></script>
+  </div>
+  <object id="loading-spinner" style="
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.75);
+      " type="image/svg+xml" data="https://dockview.dev/img/dockview_logo.svg" aria-label="loading"></object>
+  <script id="loading-script">
+    (function () {
+      const cleanupLoading = () => {
+        if (
+          document.querySelector(
+            '.dv-loaded'
+          )
+        ) {
+          document.querySelector('#loading-spinner').remove();
+          document.querySelector('#loading-script').remove();
+        } else {
+          requestAnimationFrame(() => cleanupLoading());
+        }
+      };
+
+      cleanupLoading();
+    })();
+  </script>
+
+</body>
+
+</html>

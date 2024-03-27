@@ -44,7 +44,7 @@ export class DockviewPanelModel implements IDockviewPanelModel {
     }
 
     init(params: GroupPanelPartInitParameters): void {
-        this.content.init({ ...params, tab: this.tab });
+        this.content.init(params);
         this.tab.init(params);
     }
 
