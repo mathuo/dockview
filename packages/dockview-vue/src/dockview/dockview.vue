@@ -270,6 +270,9 @@ onMounted(() => {
         ...frameworkOptions,
     });
 
+    const { clientWidth, clientHeight } = el.value;
+    dockview.layout(clientWidth, clientHeight);
+
     instance.value = dockview;
     emit('ready', { api: new DockviewApi(dockview) });
 });

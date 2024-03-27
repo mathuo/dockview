@@ -142,7 +142,7 @@ const App = defineComponent({
         Panel,
         Tab,
     },
-    setup() {
+    data() {
         return {
             components: {
                 default: Panel,

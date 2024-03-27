@@ -9,9 +9,5 @@ const rootElement = document.getElementById('app');
 if (rootElement) {
     const root = ReactDOMClient.createRoot(rootElement);
 
-    root.render(
-        <div className="app">
-            <App />
-        </div>
-    );
+    root.render(<App />);
 }

@@ -2,6 +2,7 @@ import 'dockview-core/dist/styles/dockview.css';
 import { PropType, createApp, defineComponent } from 'vue';
 import { DockviewVue } from 'dockview-vue';
 import {
+    DockviewApi,
     DockviewReadyEvent,
     IDockviewPanelProps,
 } from 'dockview-core';
@@ -24,18 +25,10 @@ const Panel = defineComponent({
     },
     data() {
         return {
-            value: '',
             title: '',
         };
     },
-    methods: {
-        onChangeTitle() {
-            this.api.setTitle(this.value);
-        },
-        updateTitle(title: string) {
-            this.title = title;
-        },
-    },
+
     mounted() {
         const disposable = this.api.onDidTitleChange(() => {
             this.title = this.api.title;
@@ -48,21 +41,15 @@ const Panel = defineComponent({
     },
 
     template: `
-    <div style="height:100%;padding:20px;">
-      <div>
-        <span style="color:grey;">props.api.title=</span>
+      <div style="height:100%;padding:20px;">
         <span style="color:white;">{{ title }}</span>
-      </div>
-      <input v-model="value"/>
-      <button @click="onChangeTitle">Change</button>
-    </div>`,
+      </div>`,
 });
 
 const App = defineComponent({
     name: 'App',
     components: {
         'dockview-vue': DockviewVue,
-        Panel,
     },
     data() {
         return {
@@ -73,32 +60,33 @@ const App = defineComponent({
     },
     methods: {
         onReady(event: DockviewReadyEvent) {
-            const panel = event.api.addPanel({
+            event.api.addPanel({
                 id: 'panel_1',
                 component: 'default',
-                title: 'Panel 1',
             });
-
             event.api.addPanel({
                 id: 'panel_2',
                 component: 'default',
-                title: 'Panel 2',
-                position: { referencePanel: panel },
+                position: {
+                    direction: 'right',
+                    referencePanel: 'panel_1',
+                },
             });
-
-            const panel3 = event.api.addPanel({
+            event.api.addPanel({
                 id: 'panel_3',
                 component: 'default',
-                title: 'Panel 3',
-
-                position: { referencePanel: panel, direction: 'right' },
+                position: {
+                    direction: 'below',
+                    referencePanel: 'panel_1',
+                },
             });
-
             event.api.addPanel({
                 id: 'panel_4',
                 component: 'default',
-                title: 'Panel 4',
-                position: { referencePanel: panel3 },
+            });
+            event.api.addPanel({
+                id: 'panel_5',
+                component: 'default',
             });
         },
     },
@@ -108,6 +96,7 @@ const App = defineComponent({
         class="dockview-theme-abyss"
         @ready="onReady"
         :components="components"
+        :locked=true
       </dockview-vue>`,
 });
 

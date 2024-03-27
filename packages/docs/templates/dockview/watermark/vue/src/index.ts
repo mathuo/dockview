@@ -83,9 +83,6 @@ const App = defineComponent({
         Panel,
     },
     data() {
-        return { api: null as DockviewApi | null };
-    },
-    setup() {
         return {
             components: {
                 default: Panel,
@@ -102,8 +99,6 @@ const App = defineComponent({
             this.api.addGroup();
         },
         onReady(event: DockviewReadyEvent) {
-            console.log('ready');
-
             event.api.fromJSON({
                 grid: {
                     orientation: Orientation.HORIZONTAL,
@@ -113,8 +108,6 @@ const App = defineComponent({
                 },
                 panels: {},
             });
-
-            this.api = event.api;
         },
     },
     template: `

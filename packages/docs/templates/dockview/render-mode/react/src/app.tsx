@@ -54,9 +54,9 @@ const components = {
                         <button
                             onClick={() => {
                                 setMode(
-                                    mode === 'onlyWhenVisibile'
+                                    mode === 'onlyWhenVisible'
                                         ? 'always'
-                                        : 'onlyWhenVisibile'
+                                        : 'onlyWhenVisible'
                                 );
                             }}
                         >

@@ -53,7 +53,7 @@ export const App: React.FC = (props: { theme?: string }) => {
             position: { referencePanel: 'panel_1', direction: 'right' },
         });
 
-        const panel5 = event.api.addPanel({
+        event.api.addPanel({
             id: 'panel_5',
             component: 'default',
             params: {
@@ -61,9 +61,6 @@ export const App: React.FC = (props: { theme?: string }) => {
             },
             position: { referencePanel: 'panel_3', direction: 'right' },
         });
-
-        // panel5.group!.model.header.hidden = true;
-        // panel5.group!.model.locked = true;
 
         event.api.addPanel({
             id: 'panel_6',

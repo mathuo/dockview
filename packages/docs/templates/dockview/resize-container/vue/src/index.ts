@@ -1,11 +1,7 @@
 import 'dockview-core/dist/styles/dockview.css';
 import { PropType, createApp, defineComponent } from 'vue';
 import { DockviewVue } from 'dockview-vue';
-import {
-    DockviewApi,
-    DockviewReadyEvent,
-    IDockviewPanelProps,
-} from 'dockview-core';
+import { DockviewReadyEvent, IDockviewPanelProps } from 'dockview-core';
 
 const Panel = defineComponent({
     name: 'Panel',
@@ -50,66 +46,101 @@ const App = defineComponent({
         'dockview-vue': DockviewVue,
         Panel,
     },
-    setup() {
+    data() {
         return {
             components: {
                 default: Panel,
             },
+            value: 50,
         };
-    },
-    data() {
-        return { api: null as DockviewApi | null };
-    },
-    watch: {
-        api(newValue, oldValue) {
-            if (!newValue) {
-                return;
-            }
-
-            const disposable = newValue.onWillShowOverlay((e) => {
-                if (e.kind === 'header_space' || e.kind === 'tab') {
-                    return;
-                }
-                e.preventDefault();
-            });
-
-            return () => {
-                disposable.dispose();
-            };
-        },
     },
     methods: {
         onReady(event: DockviewReadyEvent) {
-            event.api.addPanel({
+            const panel = event.api.addPanel({
                 id: 'panel_1',
                 component: 'default',
+                params: {
+                    title: 'Panel 1',
+                },
             });
+
+            panel.group.locked = true;
+            panel.group.header.hidden = true;
+
             event.api.addPanel({
                 id: 'panel_2',
                 component: 'default',
+                params: {
+                    title: 'Panel 2',
+                },
             });
+
             event.api.addPanel({
                 id: 'panel_3',
                 component: 'default',
+                params: {
+                    title: 'Panel 3',
+                },
             });
+
             event.api.addPanel({
                 id: 'panel_4',
                 component: 'default',
+                params: {
+                    title: 'Panel 4',
+                },
+                position: { referencePanel: 'panel_1', direction: 'right' },
             });
+
             event.api.addPanel({
                 id: 'panel_5',
                 component: 'default',
+                params: {
+                    title: 'Panel 5',
+                },
+                position: { referencePanel: 'panel_3', direction: 'right' },
+            });
+
+            event.api.addPanel({
+                id: 'panel_6',
+                component: 'default',
+                params: {
+                    title: 'Panel 6',
+                },
+                position: { referencePanel: 'panel_5', direction: 'below' },
+            });
+
+            event.api.addPanel({
+                id: 'panel_7',
+                component: 'default',
+                params: {
+                    title: 'Panel 7',
+                },
+                position: { referencePanel: 'panel_6', direction: 'right' },
             });
         },
     },
+    computed: {
+        styleObject() {
+            return {
+                height: `${this.value}%`,
+                width: `${this.value}%`,
+            };
+        },
+    },
     template: `
-      <dockview-vue
-        style="width:100%;height:100%"
-        class="dockview-theme-abyss"
-        @ready="onReady"
-        :components="components"
-        :disableFloatingGroups=true
-      </dockview-vue>`,
+      <div style="height:100%;display:flex;flex-direction:column;">
+        <input v-model="value" type="range" min="1" max="100"></input>
+        <div :style="styleObject">
+          <dockview-vue
+            style="width:100%;height:100%"
+            class="dockview-theme-abyss"
+            @ready="onReady"
+            :components="components"
+            :disableFloatingGroups=true
+          </dockview-vue>
+        </div>
+      </div>`,
 });
 
 const app = createApp(App);
