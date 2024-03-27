@@ -270,7 +270,7 @@ describe('dockviewGroupPanelModel', () => {
         options = {};
 
         panelApi = fromPartial<DockviewPanelApi>({
-            renderer: 'onlyWhenVisibile',
+            renderer: 'onlyWhenVisible',
             onDidTitleChange: new Emitter().event,
             onDidParametersChange: new Emitter().event,
         });

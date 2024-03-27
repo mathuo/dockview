@@ -43,7 +43,7 @@ describe('dockviewPanel', () => {
             group,
             model,
             {
-                renderer: 'onlyWhenVisibile',
+                renderer: 'onlyWhenVisible',
             }
         );
 
@@ -102,7 +102,7 @@ describe('dockviewPanel', () => {
             group,
             model,
             {
-                renderer: 'onlyWhenVisibile',
+                renderer: 'onlyWhenVisible',
             }
         );
 
@@ -157,7 +157,7 @@ describe('dockviewPanel', () => {
             group,
             model,
             {
-                renderer: 'onlyWhenVisibile',
+                renderer: 'onlyWhenVisible',
             }
         );
 
@@ -203,7 +203,7 @@ describe('dockviewPanel', () => {
             group,
             model,
             {
-                renderer: 'onlyWhenVisibile',
+                renderer: 'onlyWhenVisible',
             }
         );
 
@@ -250,7 +250,7 @@ describe('dockviewPanel', () => {
             group,
             model,
             {
-                renderer: 'onlyWhenVisibile',
+                renderer: 'onlyWhenVisible',
             }
         );
 
@@ -295,7 +295,7 @@ describe('dockviewPanel', () => {
             group,
             model,
             {
-                renderer: 'onlyWhenVisibile',
+                renderer: 'onlyWhenVisible',
             }
         );
 
