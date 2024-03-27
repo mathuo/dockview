@@ -1,9 +1,8 @@
 import type {
-    DockviewApi,
     DockviewGroupPanel,
-    DockviewGroupPanelApi,
     GroupPanelPartInitParameters,
     IContentRenderer,
+    IGroupHeaderProps,
     IHeaderActionsRenderer,
     ITabRenderer,
     IWatermarkRenderer,
@@ -18,6 +17,7 @@ import {
     cloneVNode,
     mergeProps,
     type DefineComponent,
+    type ComponentInternalInstance,
 } from 'vue';
 
 export type ComponentInterface = ComponentOptionsBase<
@@ -45,16 +45,22 @@ export type VueComponent<T = any> = DefineComponent<T>;
  */
 export function mountVueComponent<T extends Record<string, any>>(
     component: VueComponent<T>,
+    parent: ComponentInternalInstance,
     props: T,
     element: HTMLElement
 ) {
-    let vNode = createVNode(component, props);
+    let vNode = createVNode(component, Object.freeze(props));
+
+    vNode.appContext = parent.appContext;
 
     render(vNode, element);
 
+    let runningProps = props;
+
     return {
         update: (newProps: any) => {
-            vNode = cloneVNode(vNode, mergeProps(props, newProps));
+            runningProps = { ...props, newProps };
+            vNode = cloneVNode(vNode, Object.freeze(runningProps));
             render(vNode, element);
         },
         dispose: () => {
@@ -73,7 +79,10 @@ export class VueContentRenderer implements IContentRenderer {
         return this._element;
     }
 
-    constructor(private readonly component: VueComponent) {
+    constructor(
+        private readonly component: VueComponent,
+        private readonly parent: ComponentInternalInstance
+    ) {
         this._element = document.createElement('div');
         this.element.className = 'dv-vue-part';
         this.element.style.height = '100%';
@@ -90,6 +99,7 @@ export class VueContentRenderer implements IContentRenderer {
         this._renderDisposable?.dispose();
         this._renderDisposable = mountVueComponent(
             this.component,
+            this.parent,
             props,
             this.element
         );
@@ -120,7 +130,10 @@ export class VueTabRenderer implements ITabRenderer {
         return this._element;
     }
 
-    constructor(private readonly component: VueComponent) {
+    constructor(
+        private readonly component: VueComponent,
+        private readonly parent: ComponentInternalInstance
+    ) {
         this._element = document.createElement('div');
         this.element.className = 'dv-vue-part';
         this.element.style.height = '100%';
@@ -137,6 +150,7 @@ export class VueTabRenderer implements ITabRenderer {
         this._renderDisposable?.dispose();
         this._renderDisposable = mountVueComponent(
             this.component,
+            this.parent,
             props,
             this.element
         );
@@ -163,7 +177,10 @@ export class VueWatermarkRenderer implements IWatermarkRenderer {
         return this._element;
     }
 
-    constructor(private readonly component: VueComponent) {
+    constructor(
+        private readonly component: VueComponent,
+        private readonly parent: ComponentInternalInstance
+    ) {
         this._element = document.createElement('div');
         this.element.className = 'dv-vue-part';
         this.element.style.height = '100%';
@@ -179,6 +196,7 @@ export class VueWatermarkRenderer implements IWatermarkRenderer {
         this._renderDisposable?.dispose();
         this._renderDisposable = mountVueComponent(
             this.component,
+            this.parent,
             props,
             this.element
         );
@@ -211,32 +229,27 @@ export class VueHeaderActionsRenderer implements IHeaderActionsRenderer {
 
     constructor(
         private readonly component: VueComponent,
+        private readonly parent: ComponentInternalInstance,
         group: DockviewGroupPanel
     ) {
         this._element = document.createElement('div');
         this.element.className = 'dv-vue-header-action-part';
+        this._element.style.width = '100%';
+        this._element.style.height = '100%';
     }
 
-    init(params: {
-        containerApi: DockviewApi;
-        api: DockviewGroupPanelApi;
-    }): void {
-        console.log('meeee', this.component);
-        const props = {
-            api: params.api,
-            containerApi: params.containerApi,
-        };
-
+    init(params: IGroupHeaderProps): void {
+        console.log(params);
         this._renderDisposable?.dispose();
         this._renderDisposable = mountVueComponent(
             this.component,
-            props,
+            this.parent,
+            { ...params },
             this.element
         );
     }
 
     dispose(): void {
-        console.log('dispose');
         this._renderDisposable?.dispose();
     }
 }

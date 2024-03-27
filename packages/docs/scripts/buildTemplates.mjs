@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import * as path from 'path';
+import { argv } from 'process';
 
 import { fileURLToPath } from 'url';
 
@@ -8,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REACT_VERSION = '18.2.0';
 const VUE_VERSION = '3.4.21';
 const DOCKVIEW_VERSION = '1.11.0';
-const USE_LOCAL_CDN = true;
+const USE_LOCAL_CDN = argv.slice(2).includes('--local');
 
 const local = 'http://localhost:1111';
 
@@ -35,7 +36,7 @@ const DOCKVIEW_CDN = {
             'dockview-vue': `${local}/dockview-vue/dist/dockview-vue.es.js`,
         },
     },
-    js: {
+    typescript: {
         remote: {
             'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/dist/dockview-core.esm.js`,
             'dockview-core/': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/`,
@@ -57,8 +58,9 @@ const IMPORTS_PATHS = {
     vue: {
         vue: `https://cdn.jsdelivr.net/npm/vue@${VUE_VERSION}/dist/vue.esm-browser.js`,
         '@vue/reactivity': `https://esm.sh/@vue/reactivity@${VUE_VERSION}`,
+        'vue-sfc-loader': `https://cdn.jsdelivr.net/npm/vue3-sfc-loader@0.9.5/dist/vue3-sfc-loader.js`,
     },
-    js: {},
+    typescript: {},
     angular: {},
 };
 
@@ -82,7 +84,7 @@ const input_dir = path.join(__dirname, '../templates');
 const output = path.join(__dirname, '../static/templates');
 
 const COMPONENTS = ['dockview'];
-const FRAMEWORKS = ['react', 'vue'];
+const FRAMEWORKS = ['react', 'vue', 'typescript'];
 
 const list = [];
 

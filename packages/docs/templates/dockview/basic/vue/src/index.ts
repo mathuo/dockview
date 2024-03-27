@@ -36,7 +36,7 @@ const App = defineComponent({
         'dockview-vue': DockviewVue,
         Panel,
     },
-    setup() {
+    data() {
         return {
             components: {
                 panel: Panel,
@@ -45,8 +45,6 @@ const App = defineComponent({
     },
     methods: {
         onReady(event: DockviewReadyEvent) {
-            console.log('ready');
-
             event.api.addPanel({
                 id: 'panel_1',
                 component: 'panel',

@@ -11,7 +11,7 @@ const frameworks = [
 
 const activeFrameworkGlobal = new DockviewEmitter<string>({ replay: true });
 
-function useActiveFramework(): [string, (value: string) => void] {
+export function useActiveFramework(): [string, (value: string) => void] {
     const [value, setValue] = React.useState<string>(
         localStorage.getItem('dv-docs-framework') ?? frameworks[0].value
     );

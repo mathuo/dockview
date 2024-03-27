@@ -4,10 +4,9 @@ sidebar_position: 0
 ---
 
 import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import { CodeRunner } from '@site/src/components/ui/codeRunner';
 
-import SimpleDockview from '@site/sandboxes/simple-dockview/src/app';
 import DockviewExampleApp from '@site/sandboxes/example-app-dockview/src/app';
-import { attach as attachSimpleDockview } from '@site/sandboxes/javascript/simple-dockview/src/app';
 
 
 <MultiFrameworkContainer
@@ -20,11 +19,7 @@ import { attach as attachSimpleDockview } from '@site/sandboxes/javascript/simpl
 
 Dockview is an abstraction built on top of [Gridviews](./gridview) where each view is a container of many tabbed panels.
 
-<MultiFrameworkContainer
-    sandboxId="simple-dockview"
-    react={SimpleDockview}
-    typescript={attachSimpleDockview}
-/>
+<CodeRunner id="dockview/basic"/>
 
 <br />
 
@@ -60,19 +55,3 @@ const MyComponent = (props: IDockviewPanelProps<{ title: string }>) => {
     return <div>{`My first panel has the title: ${props.params.title}`}</div>;
 };
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

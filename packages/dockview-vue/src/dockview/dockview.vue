@@ -21,6 +21,9 @@ import {
     defineEmits,
     watch,
     onBeforeUnmount,
+    markRaw,
+    toRaw,
+    getCurrentInstance,
 } from 'vue';
 import {
     VueContentRenderer,
@@ -75,10 +78,17 @@ function extractCoreOptions(props: IDockviewVueProps): DockviewOptions {
 }
 
 const emit = defineEmits<VueEvents>();
+
+
+/**
+ * Anything here that is a Vue.js component should not be reactive
+ * i.e. markRaw(toRaw(...))
+ */
 const props = defineProps<IDockviewVueProps>();
 
 const el = ref<HTMLElement | null>(null);
 const instance = ref<DockviewComponent | null>(null);
+
 
 PROPERTY_KEYS.forEach((coreOptionKey) => {
     watch(
@@ -141,6 +151,7 @@ watch(
                     ? (group) => {
                           return new VueHeaderActionsRenderer(
                               newValue as VueComponent,
+                              getCurrentInstance()!,
                               group
                           );
                       }
@@ -159,6 +170,7 @@ watch(
                     ? (group) => {
                           return new VueHeaderActionsRenderer(
                               newValue as VueComponent,
+                              getCurrentInstance()!,
                               group
                           );
                       }
@@ -176,7 +188,7 @@ watch(
                 headerPrefixActionComponent: newValue
                     ? (group) => {
                           return new VueHeaderActionsRenderer(
-                              newValue as VueComponent,
+                              newValue as VueComponent,getCurrentInstance()!,
                               group
                           );
                       }
@@ -206,7 +218,7 @@ onMounted(() => {
                     componentId: string,
                     component: any
                 ): IContentRenderer => {
-                    return new VueContentRenderer(component);
+                    return new VueContentRenderer(component,getCurrentInstance()!);
                 },
             },
             tab: {
@@ -215,7 +227,7 @@ onMounted(() => {
                     componentId: string,
                     component: any
                 ): ITabRenderer => {
-                    return new VueTabRenderer(component);
+                    return new VueTabRenderer(component,getCurrentInstance()!);
                 },
             },
             watermark: {
@@ -224,7 +236,7 @@ onMounted(() => {
                     componentId: string,
                     component: any
                 ): IWatermarkRenderer => {
-                    return new VueWatermarkRenderer(component);
+                    return new VueWatermarkRenderer(component,getCurrentInstance()!);
                 },
             },
             // action: {
@@ -238,7 +250,7 @@ onMounted(() => {
         headerLeftActionComponent: props.leftHeaderActionsComponent
             ? (group) => {
                   return new VueHeaderActionsRenderer(
-                      props.leftHeaderActionsComponent as VueComponent,
+                      props.leftHeaderActionsComponent as VueComponent,getCurrentInstance()!,
                       group
                   );
               }
@@ -246,7 +258,7 @@ onMounted(() => {
         headerPrefixActionComponent: props.prefixHeaderActionsComponent
             ? (group) => {
                   return new VueHeaderActionsRenderer(
-                      props.prefixHeaderActionsComponent as VueComponent,
+                      props.prefixHeaderActionsComponent as VueComponent,getCurrentInstance()!,
                       group
                   );
               }
@@ -254,7 +266,7 @@ onMounted(() => {
         headerRightActionComponent: props.rightHeaderActionsComponent
             ? (group) => {
                   return new VueHeaderActionsRenderer(
-                      props.rightHeaderActionsComponent as VueComponent,
+                      props.rightHeaderActionsComponent as VueComponent,getCurrentInstance()!,
                       group
                   );
               }
@@ -270,7 +282,25 @@ onMounted(() => {
         ...frameworkOptions,
     });
 
-    instance.value = dockview;
+    const { clientWidth, clientHeight } = el.value;
+    dockview.layout(clientWidth, clientHeight);
+
+    /**
+     * !!! THIS IS VERY IMPORTANT
+     *
+     * Since we store a reference to `DockviewComponent` within the Vue.js world Vue.js will 'deeply Proxyify' the object
+     * since this is how Vue.js does its reactivity magic.
+     *
+     * We do not want Vue.js to touch the `DockviewComponent` reference since it does not need to be reactive in accordance
+     * to the Vue.js reactivity model and since `DockviewComponent` is written in plain TypeScript allowing Vue.js
+     * to proxify the reference will cause all kinds of unexpected issues
+     *
+     * @see https://vuejs.org/guide/extras/reactivity-in-depth.html
+     * @see https://vuejs.org/api/reactivity-advanced.html#markraw
+     */
+    instance.value = markRaw(dockview);
+
+
     emit('ready', { api: new DockviewApi(dockview) });
 });
 

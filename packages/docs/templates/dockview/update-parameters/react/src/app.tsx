@@ -29,7 +29,7 @@ const components = {
         }, [running]);
 
         return (
-            <div style={{ height: '100%', padding: '20px', color: 'white' }}>
+            <div style={{ padding: '20px', color: 'white' }}>
                 <div>{props.api.title}</div>
                 <button onClick={() => setRunning(!running)}>
                     {running ? 'Stop' : 'Start'}

@@ -84,12 +84,10 @@ const App = defineComponent({
                 id: 'panel_1',
                 component: 'default',
             });
-
             event.api.addPanel({
                 id: 'panel_2',
                 component: 'default',
             });
-
             event.api.addPanel({
                 id: 'panel_3',
                 component: 'default',
@@ -102,8 +100,6 @@ const App = defineComponent({
                 id: 'panel_5',
                 component: 'default',
             });
-
-            this.api = event.api;
         },
     },
     template: `

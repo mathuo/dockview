@@ -48,15 +48,14 @@ const components = {
                     }}
                 >
                     <div>{props.api.title}</div>
-                    <input />
                     <div>
                         {mode}
                         <button
                             onClick={() => {
                                 setMode(
-                                    mode === 'onlyWhenVisibile'
+                                    mode === 'onlyWhenVisible'
                                         ? 'always'
-                                        : 'onlyWhenVisibile'
+                                        : 'onlyWhenVisible'
                                 );
                             }}
                         >

@@ -1039,11 +1039,11 @@ export class DockviewComponent
 
     updateOptions(options: Partial<DockviewComponentOptions>): void {
         const changed_floatingGroupBounds =
-            options.floatingGroupBounds !== undefined &&
+            'floatingGroupBounds' in options &&
             options.floatingGroupBounds !== this.options.floatingGroupBounds;
 
         const changed_rootOverlayOptions =
-            options.rootOverlayModel !== undefined &&
+            'rootOverlayModel' in options &&
             options.rootOverlayModel !== this.options.rootOverlayModel;
 
         this._options = { ...this.options, ...options };
