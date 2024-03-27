@@ -1,7 +1,10 @@
 import 'dockview-core/dist/styles/dockview.css';
 import { PropType, createApp, defineComponent } from 'vue';
 import { DockviewVue } from 'dockview-vue';
-import { DockviewReadyEvent, IDockviewPanelProps } from 'dockview-core';
+import {
+    DockviewReadyEvent,
+    IDockviewPanelProps,
+} from 'dockview-core';
 
 const Panel = defineComponent({
     name: 'Panel',
@@ -61,7 +64,7 @@ const App = defineComponent({
         'dockview-vue': DockviewVue,
         Panel,
     },
-    setup() {
+    data() {
         return {
             components: {
                 default: Panel,

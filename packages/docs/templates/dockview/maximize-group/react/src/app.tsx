@@ -7,7 +7,35 @@ import {
     SerializedDockview,
 } from 'dockview';
 import React from 'react';
-import { Icon } from './utils.tsx';
+
+const Icon = (props: {
+    icon: string;
+    title?: string;
+    onClick?: (event: React.MouseEvent) => void;
+}) => {
+    return (
+        <div
+            title={props.title}
+            style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '30px',
+                height: '100%',
+
+                fontSize: '18px',
+            }}
+            onClick={props.onClick}
+        >
+            <span
+                style={{ fontSize: 'inherit', cursor: 'pointer' }}
+                className="material-symbols-outlined"
+            >
+                {props.icon}
+            </span>
+        </div>
+    );
+};
 
 const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {
@@ -24,14 +52,6 @@ const components = {
         );
     },
 };
-
-const counter = (() => {
-    let i = 0;
-
-    return {
-        next: () => ++i,
-    };
-})();
 
 function loadDefaultLayout(api: DockviewApi) {
     api.addPanel({

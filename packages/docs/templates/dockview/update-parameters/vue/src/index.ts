@@ -25,31 +25,13 @@ const Panel = defineComponent({
     },
     data() {
         return {
-            running: false,
-            title: '',
+            isRunning: false,
+            title: null,
         };
     },
     methods: {
-        onClick() {
-            this.running = !this.running;
-        },
-    },
-    watch: {
-        running(newValue, oldValue) {
-            if (!newValue) {
-                return;
-            }
-
-            console.log('interval');
-
-            const interval = setInterval(() => {
-                this.api.updateParameters({ myValue: Date.now() });
-            }, 1000);
-            this.api.updateParameters({ myValue: Date.now() });
-
-            return () => {
-                clearInterval(interval);
-            };
+        toggle() {
+            this.isRunning = !this.isRunning;
         },
     },
     mounted() {
@@ -62,57 +44,8 @@ const Panel = defineComponent({
             disposable.dispose();
         };
     },
-    template: `
-    <div style="height:100%;padding:20px;color:white;">
-      <div>{{title}}</div>
-      <button v-if="running" @click="onClick">Stop</button>
-      <button v-if="!running" @click="onClick">Start</button>
-      <span>{{title}}</span>
-    </div>`,
-});
-
-interface CustomParams {
-    myValue: number;
-}
-
-const Tab = defineComponent({
-    name: 'Tab',
-    props: {
-        api: {
-            type: Object as PropType<
-                IDockviewPanelHeaderProps<CustomParams>['api']
-            >,
-            required: true,
-        },
-        containerApi: {
-            type: Object as PropType<
-                IDockviewPanelHeaderProps<CustomParams>['containerApi']
-            >,
-            required: true,
-        },
-        params: {
-            type: Object as PropType<
-                IDockviewPanelHeaderProps<CustomParams>['params']
-            >,
-            required: true,
-        },
-    },
-    data() {
-        return {
-            myValue: this.params.myValue,
-            title: '',
-        };
-    },
-    methods: {
-        onClick() {
-            this.running = !this.running;
-        },
-    },
     watch: {
-        params(newValue, oldValue) {
-            this.myValue = newValue.myValue;
-        },
-        running(newValue, oldValue) {
+        isRunning(newValue, oldValue) {
             if (!newValue) {
                 return;
             }
@@ -127,12 +60,58 @@ const Tab = defineComponent({
             };
         },
     },
-
     template: `
-      <div>
-        <div>custom tab: {{title}}</div>
-        <span>value: {{myValue}}</span>
+      <div style="height:100%;color:white;">
+        <div>{{title}}</div>
+        <button v-if="!isRunning" @click="toggle">Start</button>
+        <button v-if="isRunning" @click="toggle">Stop</button>
       </div>`,
+});
+
+const Tab = defineComponent({
+    name: 'Tab',
+    props: {
+        api: {
+            type: Object as PropType<IDockviewPanelHeaderProps['api']>,
+            required: true,
+        },
+        containerApi: {
+            type: Object as PropType<IDockviewPanelHeaderProps['containerApi']>,
+            required: true,
+        },
+        params: {
+            type: Object as PropType<IDockviewPanelHeaderProps['params']>,
+            required: true,
+        },
+    },
+    data() {
+        return {
+            title: '',
+            value: null,
+        };
+    },
+    mounted() {
+        const disposable = this.api.onDidTitleChange(() => {
+            this.title = this.api.title;
+        });
+
+        const disposable2 = this.api.onDidParametersChange(() => {
+            this.value = this.params.myValue;
+        });
+
+        this.title = this.api.title;
+        this.value = this.params.myValue;
+
+        return () => {
+            disposable.dispose();
+            disposable2.dispose();
+        };
+    },
+    template: `
+    <div>
+      <div>custom tab: {{title}}</div>
+      <div>value: {{value}}</div>
+    </div>`,
 });
 
 const App = defineComponent({
@@ -140,9 +119,8 @@ const App = defineComponent({
     components: {
         'dockview-vue': DockviewVue,
         Panel,
-        Tab,
     },
-    setup() {
+    data() {
         return {
             components: {
                 default: Panel,

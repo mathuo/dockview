@@ -537,6 +537,7 @@ export class DockviewGroupPanelModel
             this._rightHeaderActions.init({
                 containerApi: this._api,
                 api: this.groupPanel.api,
+                group: this.groupPanel,
             });
             this.tabsContainer.setRightActionsElement(
                 this._rightHeaderActions.element
@@ -552,6 +553,7 @@ export class DockviewGroupPanelModel
             this._leftHeaderActions.init({
                 containerApi: this._api,
                 api: this.groupPanel.api,
+                group: this.groupPanel,
             });
             this.tabsContainer.setLeftActionsElement(
                 this._leftHeaderActions.element
@@ -567,6 +569,7 @@ export class DockviewGroupPanelModel
             this._prefixHeaderActions.init({
                 containerApi: this._api,
                 api: this.groupPanel.api,
+                group: this.groupPanel,
             });
             this.tabsContainer.setPrefixActionsElement(
                 this._prefixHeaderActions.element
@@ -845,10 +848,8 @@ export class DockviewGroupPanelModel
         this._panels.splice(index, 1);
 
         if (this.mostRecentlyUsed.includes(panel)) {
-            this.mostRecentlyUsed.splice(
-                this.mostRecentlyUsed.indexOf(panel),
-                1
-            );
+            const index = this.mostRecentlyUsed.indexOf(panel);
+            this.mostRecentlyUsed.splice(index, 1);
         }
 
         const disposable = this._panelDisposables.get(panel.id);

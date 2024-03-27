@@ -129,24 +129,29 @@ export const DockviewReact = React.forwardRef(
 
         const prevProps = React.useRef<Partial<IDockviewReactProps>>({});
 
-        React.useEffect(() => {
-            const changes: Partial<DockviewOptions> = {};
+        React.useEffect(
+            () => {
+                const changes: Partial<DockviewOptions> = {};
 
-            Object.keys(PROPERTY_KEYS).forEach((propKey) => {
-                const key = propKey as keyof DockviewOptions;
-                const propValue = props[key];
+                PROPERTY_KEYS.forEach((propKey) => {
+                    const key = propKey as keyof DockviewOptions;
+                    const propValue = props[key];
 
-                if (propValue !== prevProps.current[key]) {
-                    changes[key] = propValue as any;
+                    if (propValue !== prevProps.current[key]) {
+                        changes[key] = propValue as any;
+                    }
+                });
+
+                if (dockviewRef.current) {
+                    dockviewRef.current.updateOptions(changes);
+                } else {
+                    // not yet fully initialized
                 }
-            });
 
-            if (dockviewRef.current) {
-                dockviewRef.current.updateOptions(changes);
-            } else {
-                // not yet fully initialized
-            }
-        }, PROPERTY_KEYS.map((key) => props[key]).filter(Boolean));
+                prevProps.current = props;
+            },
+            PROPERTY_KEYS.map((key) => props[key])
+        );
 
         React.useEffect(() => {
             if (!domRef.current) {

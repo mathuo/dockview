@@ -4,7 +4,7 @@ sidebar_position: 2
 ---
 
 import { MultiFrameworkContainer } from '@site/src/components/ui/container';
-import CustomHeadersDockview from '@site/sandboxes/customheader-dockview/src/app';
+import { CodeRunner } from '@site/src/components/ui/codeRunner';
 import DockviewNative from '@site/sandboxes/fullwidthtab-dockview/src/app';
 import { attach as attachNativeDockview } from '@site/sandboxes/javascript/fullwidthtab-dockview/src/app';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
@@ -99,10 +99,7 @@ As a simple example the below attaches a custom event handler for the context me
 The below example uses a custom tab renderer to reigster a popover when the user right clicked on a tab.
 This still makes use of the `DockviewDefaultTab` since it's only a minor change.
 
-<MultiFrameworkContainer
-    sandboxId="customheader-dockview"
-    react={CustomHeadersDockview}
-/>
+<CodeRunner id="dockview/custom-header"/>
 
 ## Full Width Tab
 
@@ -126,15 +123,7 @@ return <DockviewReactComponent singleTabMode="fullwidth" />
     typescript={attachNativeDockview}
 />
 
-import DockviewTabheight from '@site/sandboxes/tabheight-dockview/src/app';
-import { attach as attachTabHeightDockview } from '@site/sandboxes/javascript/tabheight-dockview/src/app';
-
 ## Tab Height
 
 Tab height can be controlled through CSS.
 
-<MultiFrameworkContainer
-    sandboxId="tabheight-dockview"
-    react={DockviewTabheight}
-    typescript={attachTabHeightDockview}
-/>

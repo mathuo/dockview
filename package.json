@@ -47,6 +47,7 @@
     "@typescript-eslint/parser": "^6.17.0",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/tsconfig": "^0.5.1",
+    "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
     "eslint": "^8.56.0",
     "fs-extra": "^11.2.0",
@@ -71,6 +72,7 @@
     "typescript": "^5.3.3",
     "vite": "^5.1.5",
     "vue": "^3.4.21",
+    "vue-sfc-loader": "^0.1.0",
     "vue-tsc": "^2.0.5"
   },
   "engines": {

@@ -30,6 +30,7 @@ export interface IDockviewHeaderActionsProps {
 export interface IGroupHeaderProps {
     api: DockviewGroupPanelApi;
     containerApi: DockviewApi;
+    group: IDockviewGroupPanel;
 }
 
 export interface IWatermarkPanelProps {

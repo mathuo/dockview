@@ -4,10 +4,8 @@ sidebar_postiion: 5
 ---
 
 import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import { CodeRunner } from '@site/src/components/ui/codeRunner';
 import RenderingDockview from '@site/sandboxes/rendering-dockview/src/app';
-
-import LiveExample from '@site/src/components/ui/exampleFrame';
-
 
 Rendering type is an important consideration when creating your application and whether your panels should be destroyed when hidden.
 
@@ -70,7 +68,7 @@ api.addPanel({
 
 ## Live Example
 
-<LiveExample framework="react" id="dockview/render-mode"/>
+<CodeRunner id="dockview/render-mode"/>
 
 
 By default `DockviewReact` only adds to the DOM those panels that are visible,
@@ -130,3 +128,4 @@ Toggling the checkbox you can see that when you only render those panels which a
     sandboxId="rendering-dockview"
     react={RenderingDockview}
 />
+

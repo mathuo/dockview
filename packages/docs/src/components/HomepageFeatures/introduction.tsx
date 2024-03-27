@@ -3,7 +3,6 @@ import HomepageFeatures from '.';
 import { BrowserHeader } from '../ui/browserHeader';
 import { MultiFrameworkContainer } from '../ui/container';
 import * as React from 'react';
-// import DockviewDemo from '@site/sandboxes/demo-dockview/src/app';
 import DockviewDemo2 from '@site/sandboxes/dockview-app/src/app';
 
 export const Introduction = () => {
@@ -25,11 +24,6 @@ export const Introduction = () => {
             </div>
             <div style={{ padding: '20px' }}>
                 <BrowserHeader />
-                {/* <MultiFrameworkContainer
-                    height={750}
-                    sandboxId="demo-dockview"
-                    react={DockviewDemo}
-                /> */}
             </div>
             <div style={{ padding: '20px' }}>
                 <BrowserHeader />

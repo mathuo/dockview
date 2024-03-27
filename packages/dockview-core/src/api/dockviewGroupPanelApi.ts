@@ -1,12 +1,17 @@
 import { Position, positionToDirection } from '../dnd/droptarget';
 import { DockviewComponent } from '../dockview/dockviewComponent';
 import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
-import { DockviewGroupLocation } from '../dockview/dockviewGroupPanelModel';
+import {
+    DockviewGroupChangeEvent,
+    DockviewGroupLocation,
+} from '../dockview/dockviewGroupPanelModel';
 import { Emitter, Event } from '../events';
+import { MutableDisposable } from '../lifecycle';
 import { GridviewPanelApi, GridviewPanelApiImpl } from './gridviewPanelApi';
 
 export interface DockviewGroupPanelApi extends GridviewPanelApi {
     readonly onDidLocationChange: Event<DockviewGroupPanelFloatingChangeEvent>;
+    readonly onDidActivePanelChange: Event<DockviewGroupChangeEvent>;
     readonly location: DockviewGroupLocation;
     /**
      * If you require the Window object
@@ -27,12 +32,18 @@ export interface DockviewGroupPanelFloatingChangeEvent {
 const NOT_INITIALIZED_MESSAGE = 'DockviewGroupPanelApiImpl not initialized';
 
 export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
+    private readonly _mutableDisposable = new MutableDisposable();
+
     private _group: DockviewGroupPanel | undefined;
 
     readonly _onDidLocationChange =
         new Emitter<DockviewGroupPanelFloatingChangeEvent>();
     readonly onDidLocationChange: Event<DockviewGroupPanelFloatingChangeEvent> =
         this._onDidLocationChange.event;
+
+    private readonly _onDidActivePanelChange =
+        new Emitter<DockviewGroupChangeEvent>();
+    readonly onDidActivePanelChange = this._onDidActivePanelChange.event;
 
     get location(): DockviewGroupLocation {
         if (!this._group) {
@@ -44,7 +55,11 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     constructor(id: string, private readonly accessor: DockviewComponent) {
         super(id, '__dockviewgroup__');
 
-        this.addDisposables(this._onDidLocationChange);
+        this.addDisposables(
+            this._onDidLocationChange,
+            this._onDidActivePanelChange,
+            this._mutableDisposable
+        );
     }
 
     close(): void {
@@ -116,5 +131,19 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
 
     initialize(group: DockviewGroupPanel): void {
         this._group = group;
+
+        /**
+         * TODO: Annoying initialization order caveat
+         *
+         * Due to the order on initialization we know that the model isn't defined until later in the same stack-frame of setup.
+         * By queuing a microtask we can ensure the setup is completed within the same stack-frame, but after everything else has
+         * finished ensuring the `model` is defined.
+         */
+        queueMicrotask(() => {
+            this._mutableDisposable.value =
+                this._group!.model.onDidActivePanelChange((event) => {
+                    this._onDidActivePanelChange.fire(event);
+                });
+        });
     }
 }
