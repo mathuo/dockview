@@ -15,6 +15,7 @@ import {
     DockviewGroupDropLocation,
     WillShowOverlayLocationEvent,
 } from '../../dockviewGroupPanelModel';
+import { getPanelData } from '../../../dnd/dataTransfer';
 
 export interface TabDropIndexEvent {
     readonly event: DragEvent;
@@ -247,6 +248,10 @@ export class TabsContainer
                 this._onWillShowOverlay.fire(
                     new WillShowOverlayLocationEvent(event, {
                         kind: 'header_space',
+                        panel: this.group.activePanel,
+                        api: this.accessor.api,
+                        group: this.group,
+                        getData: getPanelData,
                     })
                 );
             }),
@@ -408,7 +413,13 @@ export class TabsContainer
             }),
             tab.onWillShowOverlay((event) => {
                 this._onWillShowOverlay.fire(
-                    new WillShowOverlayLocationEvent(event, { kind: 'tab' })
+                    new WillShowOverlayLocationEvent(event, {
+                        kind: 'tab',
+                        panel: this.group.activePanel,
+                        api: this.accessor.api,
+                        group: this.group,
+                        getData: getPanelData,
+                    })
                 );
             })
         );
