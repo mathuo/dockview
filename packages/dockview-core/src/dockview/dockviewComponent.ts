@@ -429,6 +429,10 @@ export class DockviewComponent
         return this.options.defaultRenderer ?? 'onlyWhenVisible';
     }
 
+    get api(): DockviewApi {
+        return this._api;
+    }
+
     constructor(options: DockviewComponentOptions) {
         super({
             proportionalLayout: true,
@@ -579,6 +583,10 @@ export class DockviewComponent
                 this._onWillShowOverlay.fire(
                     new WillShowOverlayLocationEvent(event, {
                         kind: 'edge',
+                        panel: undefined,
+                        api: this._api,
+                        group: undefined,
+                        getData: getPanelData,
                     })
                 );
             }),
