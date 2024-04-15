@@ -31,6 +31,12 @@ export interface DockviewPanelApi
         // omit properties that do not make sense here
         'setVisible' | 'onDidConstraintsChange' | 'setConstraints'
     > {
+    /**
+     * The id of the tab component renderer
+     *
+     * Undefined if no custom tab renderer is provided
+     */
+    readonly tabComponent: string | undefined;
     readonly group: DockviewGroupPanel;
     readonly isGroupActive: boolean;
     readonly renderer: DockviewPanelRenderer;

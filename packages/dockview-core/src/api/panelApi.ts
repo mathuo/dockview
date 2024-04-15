@@ -29,6 +29,10 @@ export interface PanelApi {
     setVisible(isVisible: boolean): void;
     updateParameters(parameters: Parameters): void;
     /**
+     * The id of the component renderer
+     */
+    readonly component: string;
+    /**
      * The id of the panel that would have been assigned when the panel was created
      */
     readonly id: string;
