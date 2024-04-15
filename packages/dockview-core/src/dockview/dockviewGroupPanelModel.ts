@@ -194,13 +194,9 @@ export type DockviewGroupLocation =
     | { type: 'floating' }
     | { type: 'popout'; getWindow: () => Window };
 
-type A = typeof WillShowOverlayEvent;
-
 export class WillShowOverlayLocationEvent implements IDockviewEvent {
-    private _kind: DockviewGroupDropLocation;
-
     get kind(): DockviewGroupDropLocation {
-        return this._kind;
+        return this.options.kind;
     }
 
     get nativeEvent(): DragEvent {
@@ -215,18 +211,36 @@ export class WillShowOverlayLocationEvent implements IDockviewEvent {
         return this.event.defaultPrevented;
     }
 
+    get panel(): IDockviewPanel | undefined {
+        return this.options.panel;
+    }
+
+    get api(): DockviewApi {
+        return this.options.api;
+    }
+
+    get group(): DockviewGroupPanel | undefined {
+        return this.options.group;
+    }
+
     preventDefault(): void {
         this.event.preventDefault();
     }
 
+    getData(): PanelTransfer | undefined {
+        return this.options.getData();
+    }
+
     constructor(
         private readonly event: WillShowOverlayEvent,
-        options: {
+        private readonly options: {
             kind: DockviewGroupDropLocation;
+            panel: IDockviewPanel | undefined;
+            api: DockviewApi;
+            group: DockviewGroupPanel | undefined;
+            getData: () => PanelTransfer | undefined;
         }
-    ) {
-        this._kind = options.kind;
-    }
+    ) {}
 }
 
 export class DockviewGroupPanelModel
@@ -473,6 +487,10 @@ export class DockviewGroupPanelModel
                 this._onWillShowOverlay.fire(
                     new WillShowOverlayLocationEvent(event, {
                         kind: 'content',
+                        panel: this.activePanel,
+                        api: this._api,
+                        group: this.groupPanel,
+                        getData: getPanelData,
                     })
                 );
             }),
