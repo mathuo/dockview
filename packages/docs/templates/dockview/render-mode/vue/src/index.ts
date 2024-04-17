@@ -6,16 +6,8 @@ import { DockviewReadyEvent, IDockviewPanelProps } from 'dockview-core';
 const Panel = defineComponent({
     name: 'Panel',
     props: {
-        api: {
-            type: Object as PropType<IDockviewPanelProps['api']>,
-            required: true,
-        },
-        containerApi: {
-            type: Object as PropType<IDockviewPanelProps['containerApi']>,
-            required: true,
-        },
         params: {
-            type: Object as PropType<IDockviewPanelProps['params']>,
+            type: Object as PropType<IDockviewPanelProps>,
             required: true,
         },
     },
@@ -27,18 +19,18 @@ const Panel = defineComponent({
     },
     methods: {
         onToggleRenderMode() {
-            this.api.setRenderer(
-                this.api.renderer === 'onlyWhenVisible'
+            this.params.api.setRenderer(
+                this.params.api.renderer === 'onlyWhenVisible'
                     ? 'always'
                     : 'onlyWhenVisible'
             );
         },
     },
     mounted() {
-        const disposable = this.api.onDidTitleChange(() => {
+        const disposable = this.params.api.onDidTitleChange(() => {
             this.title = this.api.title;
         });
-        const disposable2 = this.api.onDidRendererChange((event) => {
+        const disposable2 = this.params.api.onDidRendererChange((event) => {
             this.renderer = event.renderer;
         });
 

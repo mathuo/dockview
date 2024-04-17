@@ -4,9 +4,10 @@ import * as React from 'react';
 import { IS_PROD } from '../flags';
 
 const frameworks = [
-    { value: 'JavaScript', label: 'JavaScript' },
+    // { value: 'JavaScript', label: 'JavaScript' },
     { value: 'React', label: 'React' },
-    { value: 'Angular', label: 'Angular' },
+    { value: 'Vue', label: 'Vue' },
+    // { value: 'Angular', label: 'Angular' },
 ];
 
 const activeFrameworkGlobal = new DockviewEmitter<string>({ replay: true });
@@ -36,7 +37,7 @@ export function useActiveFramework(): [string, (value: string) => void] {
         activeFrameworkGlobal.fire(value);
     }, []);
 
-    return [IS_PROD ? frameworks[1].value : value, setter];
+    return [IS_PROD ? frameworks[0].value : value, setter];
 }
 
 const FrameworkSelector1 = () => {

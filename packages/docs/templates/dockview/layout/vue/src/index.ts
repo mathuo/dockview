@@ -65,18 +65,8 @@ const MaterialIcon = defineComponent({
 const LeftAction = defineComponent({
     name: 'LeftAction',
     props: {
-        containerApi: {
-            type: Object as PropType<
-                IDockviewHeaderActionsProps['containerApi']
-            >,
-            required: true,
-        },
-        api: {
-            type: Object as PropType<IDockviewHeaderActionsProps['api']>,
-            required: true,
-        },
-        group: {
-            type: Object as PropType<IDockviewHeaderActionsProps['group']>,
+        params: {
+            type: Object as PropType<IDockviewHeaderActionsProps>,
             required: true,
         },
     },
@@ -85,7 +75,7 @@ const LeftAction = defineComponent({
     },
     methods: {
         onClick() {
-            this.containerApi.addPanel({
+            this.params.containerApi.addPanel({
                 id: (++panelCount).toString(),
                 title: `Tab ${panelCount}`,
                 component: 'default',
@@ -101,16 +91,8 @@ const LeftAction = defineComponent({
 const Panel = defineComponent({
     name: 'Panel',
     props: {
-        api: {
-            type: Object as PropType<IDockviewPanelProps['api']>,
-            required: true,
-        },
-        containerApi: {
-            type: Object as PropType<IDockviewPanelProps['containerApi']>,
-            required: true,
-        },
         params: {
-            type: Object as PropType<IDockviewPanelProps['params']>,
+            type: Object as PropType<IDockviewPanelProps>,
             required: true,
         },
     },
@@ -120,7 +102,7 @@ const Panel = defineComponent({
         };
     },
     mounted() {
-        const disposable = this.api.onDidTitleChange(() => {
+        const disposable = this.params.api.onDidTitleChange(() => {
             this.title = this.api.title;
         });
         this.title = this.api.title;

@@ -2,9 +2,12 @@ import type {
     DockviewGroupPanel,
     GroupPanelPartInitParameters,
     IContentRenderer,
+    IDockviewPanelHeaderProps,
+    IDockviewPanelProps,
     IGroupHeaderProps,
     IHeaderActionsRenderer,
     ITabRenderer,
+    IWatermarkPanelProps,
     IWatermarkRenderer,
     PanelUpdateEvent,
     Parameters,
@@ -15,7 +18,6 @@ import {
     type ComponentOptionsBase,
     render,
     cloneVNode,
-    mergeProps,
     type DefineComponent,
     type ComponentInternalInstance,
 } from 'vue';
@@ -32,6 +34,26 @@ export type ComponentInterface = ComponentOptionsBase<
 >;
 
 export type VueComponent<T = any> = DefineComponent<T>;
+
+export function findComponent(parent: ComponentInternalInstance, name: string) {
+    let instance = parent as any;
+    let component = null;
+
+    while (!component && instance.parent) {
+        component = instance.components?.[name];
+        instance = instance.parent;
+    }
+
+    if (!component) {
+        component = parent.appContext.components?.[name];
+    }
+
+    if (!component) {
+        throw new Error(`Failed to find Vue Component ${name}`);
+    }
+
+    return component;
+}
 
 /**
  * TODO List
@@ -90,7 +112,7 @@ export class VueContentRenderer implements IContentRenderer {
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
-        const props = {
+        const props: IDockviewPanelProps = {
             params: parameters.params,
             api: parameters.api,
             containerApi: parameters.containerApi,
@@ -100,7 +122,7 @@ export class VueContentRenderer implements IContentRenderer {
         this._renderDisposable = mountVueComponent(
             this.component,
             this.parent,
-            props,
+            { params: props },
             this.element
         );
     }
@@ -141,7 +163,7 @@ export class VueTabRenderer implements ITabRenderer {
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
-        const props = {
+        const props: IDockviewPanelHeaderProps = {
             params: parameters.params,
             api: parameters.api,
             containerApi: parameters.containerApi,
@@ -151,7 +173,7 @@ export class VueTabRenderer implements ITabRenderer {
         this._renderDisposable = mountVueComponent(
             this.component,
             this.parent,
-            props,
+            { params: props },
             this.element
         );
     }
@@ -188,7 +210,7 @@ export class VueWatermarkRenderer implements IWatermarkRenderer {
     }
 
     init(parameters: WatermarkRendererInitParameters): void {
-        const props = {
+        const props: IWatermarkPanelProps = {
             group: parameters.group,
             containerApi: parameters.containerApi,
         };
@@ -197,7 +219,7 @@ export class VueWatermarkRenderer implements IWatermarkRenderer {
         this._renderDisposable = mountVueComponent(
             this.component,
             this.parent,
-            props,
+            { params: props },
             this.element
         );
     }
@@ -238,13 +260,12 @@ export class VueHeaderActionsRenderer implements IHeaderActionsRenderer {
         this._element.style.height = '100%';
     }
 
-    init(params: IGroupHeaderProps): void {
-        console.log(params);
+    init(props: IGroupHeaderProps): void {
         this._renderDisposable?.dispose();
         this._renderDisposable = mountVueComponent(
             this.component,
             this.parent,
-            { ...params },
+            { params: props },
             this.element
         );
     }

@@ -300,6 +300,8 @@ onMounted(() => {
      */
     instance.value = markRaw(dockview);
 
+    console.log(getCurrentInstance())
+
 
     emit('ready', { api: new DockviewApi(dockview) });
 });

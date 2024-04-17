@@ -48,18 +48,8 @@ const MaterialIcon = defineComponent({
 const LeftAction = defineComponent({
     name: 'LeftAction',
     props: {
-        containerApi: {
-            type: Object as PropType<
-                IDockviewHeaderActionsProps['containerApi']
-            >,
-            required: true,
-        },
-        api: {
-            type: Object as PropType<IDockviewHeaderActionsProps['api']>,
-            required: true,
-        },
-        group: {
-            type: Object as PropType<IDockviewHeaderActionsProps['group']>,
+        params: {
+            type: Object as PropType<IDockviewHeaderActionsProps>,
             required: true,
         },
     },
@@ -68,7 +58,7 @@ const LeftAction = defineComponent({
     },
     methods: {
         onClick() {
-            this.containerApi.addPanel({
+            this.params.containerApi.addPanel({
                 id: (++panelCount).toString(),
                 title: `Tab ${panelCount}`,
                 component: 'default',
@@ -84,18 +74,8 @@ const LeftAction = defineComponent({
 const RightAction = defineComponent({
     name: 'RightAction',
     props: {
-        containerApi: {
-            type: Object as PropType<
-                IDockviewHeaderActionsProps['containerApi']
-            >,
-            required: true,
-        },
-        api: {
-            type: Object as PropType<IDockviewHeaderActionsProps['api']>,
-            required: true,
-        },
-        group: {
-            type: Object as PropType<IDockviewHeaderActionsProps['group']>,
+        params: {
+            type: Object as PropType<IDockviewHeaderActionsProps>,
             required: true,
         },
     },
@@ -104,23 +84,25 @@ const RightAction = defineComponent({
     },
     data() {
         return {
-            floating: this.api.location.type === 'floating',
+            floating: this.params.api.location.type === 'floating',
         };
     },
     methods: {
         onClick() {
             if (this.floating) {
-                const group = this.containerApi.addGroup();
+                const group = this.params.containerApi.addGroup();
                 this.group.api.moveTo({ group });
             } else {
-                this.containerApi.addFloatingGroup(this.group);
+                this.containerApi.addFloatingGroup(this.params.group);
             }
         },
     },
     mounted() {
-        const disposable = this.group.api.onDidLocationChange((event) => {
-            this.floating = event.location.type === 'floating';
-        });
+        const disposable = this.params.group.api.onDidLocationChange(
+            (event) => {
+                this.floating = event.location.type === 'floating';
+            }
+        );
 
         return () => {
             disposable.dispose();
@@ -136,16 +118,8 @@ const RightAction = defineComponent({
 const Panel = defineComponent({
     name: 'Panel',
     props: {
-        api: {
-            type: Object as PropType<IDockviewPanelProps['api']>,
-            required: true,
-        },
-        containerApi: {
-            type: Object as PropType<IDockviewPanelProps['containerApi']>,
-            required: true,
-        },
         params: {
-            type: Object as PropType<IDockviewPanelProps['params']>,
+            type: Object as PropType<IDockviewPanelProps>,
             required: true,
         },
     },
@@ -155,10 +129,10 @@ const Panel = defineComponent({
         };
     },
     mounted() {
-        const disposable = this.api.onDidTitleChange(() => {
-            this.title = this.api.title;
+        const disposable = this.params.api.onDidTitleChange(() => {
+            this.title = this.params.api.title;
         });
-        this.title = this.api.title;
+        this.title = this.params.api.title;
 
         return () => {
             disposable.dispose();

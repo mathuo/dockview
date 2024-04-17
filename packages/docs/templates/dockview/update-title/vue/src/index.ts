@@ -1,24 +1,13 @@
 import 'dockview-core/dist/styles/dockview.css';
 import { PropType, createApp, defineComponent } from 'vue';
 import { DockviewVue } from 'dockview-vue';
-import {
-    DockviewReadyEvent,
-    IDockviewPanelProps,
-} from 'dockview-core';
+import { DockviewReadyEvent, IDockviewPanelProps } from 'dockview-core';
 
 const Panel = defineComponent({
     name: 'Panel',
     props: {
-        api: {
-            type: Object as PropType<IDockviewPanelProps['api']>,
-            required: true,
-        },
-        containerApi: {
-            type: Object as PropType<IDockviewPanelProps['containerApi']>,
-            required: true,
-        },
         params: {
-            type: Object as PropType<IDockviewPanelProps['params']>,
+            type: Object as PropType<IDockviewPanelProps>,
             required: true,
         },
     },
@@ -30,7 +19,7 @@ const Panel = defineComponent({
     },
     methods: {
         onChangeTitle() {
-            this.api.setTitle(this.value);
+            this.params.api.setTitle(this.value);
         },
         updateTitle(title: string) {
             this.title = title;

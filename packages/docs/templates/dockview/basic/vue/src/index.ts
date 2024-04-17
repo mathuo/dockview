@@ -6,22 +6,14 @@ import { DockviewReadyEvent, IDockviewPanelProps } from 'dockview-core';
 const Panel = defineComponent({
     name: 'Panel',
     props: {
-        api: {
-            type: Object as PropType<IDockviewPanelProps['api']>,
-            required: true,
-        },
-        containerApi: {
-            type: Object as PropType<IDockviewPanelProps['containerApi']>,
-            required: true,
-        },
         params: {
-            type: Object as PropType<IDockviewPanelProps['params']>,
+            type: Object as PropType<IDockviewPanelProps>,
             required: true,
         },
     },
     setup(props) {
         return {
-            title: props.api.title,
+            title: props.params.api.title,
         };
     },
     template: `

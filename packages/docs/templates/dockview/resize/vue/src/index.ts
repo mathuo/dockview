@@ -7,16 +7,8 @@ import './resize.css';
 const Panel = defineComponent({
     name: 'Panel',
     props: {
-        api: {
-            type: Object as PropType<IDockviewPanelProps['api']>,
-            required: true,
-        },
-        containerApi: {
-            type: Object as PropType<IDockviewPanelProps['containerApi']>,
-            required: true,
-        },
         params: {
-            type: Object as PropType<IDockviewPanelProps['params']>,
+            type: Object as PropType<IDockviewPanelProps>,
             required: true,
         },
     },
@@ -29,20 +21,20 @@ const Panel = defineComponent({
     },
     methods: {
         onResizeGroupWidth() {
-            this.api.group.api.setSize({ width: this.width });
+            this.params.api.group.api.setSize({ width: this.width });
         },
         onResizePanelWidth() {
-            this.api.setSize({ width: this.width });
+            this.params.api.setSize({ width: this.width });
         },
         onResizeGroupHeight() {
-            this.api.group.api.setSize({ height: this.height });
+            this.params.api.group.api.setSize({ height: this.height });
         },
         onResizePanelHeight() {
-            this.api.setSize({ height: this.height });
+            this.params.api.setSize({ height: this.height });
         },
     },
     mounted() {
-        const disposable = this.api.onDidTitleChange(() => {
+        const disposable = this.params.api.onDidTitleChange(() => {
             this.title = this.api.title;
         });
         this.title = this.api.title;

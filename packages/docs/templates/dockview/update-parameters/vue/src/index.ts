@@ -10,16 +10,8 @@ import {
 const Panel = defineComponent({
     name: 'Panel',
     props: {
-        api: {
-            type: Object as PropType<IDockviewPanelProps['api']>,
-            required: true,
-        },
-        containerApi: {
-            type: Object as PropType<IDockviewPanelProps['containerApi']>,
-            required: true,
-        },
         params: {
-            type: Object as PropType<IDockviewPanelProps['params']>,
+            type: Object as PropType<IDockviewPanelProps>,
             required: true,
         },
     },
@@ -51,9 +43,9 @@ const Panel = defineComponent({
             }
 
             const interval = setInterval(() => {
-                this.api.updateParameters({ myValue: Date.now() });
+                this.params.api.updateParameters({ myValue: Date.now() });
             }, 1000);
-            this.api.updateParameters({ myValue: Date.now() });
+            this.params.api.updateParameters({ myValue: Date.now() });
 
             return () => {
                 clearInterval(interval);
@@ -71,16 +63,8 @@ const Panel = defineComponent({
 const Tab = defineComponent({
     name: 'Tab',
     props: {
-        api: {
-            type: Object as PropType<IDockviewPanelHeaderProps['api']>,
-            required: true,
-        },
-        containerApi: {
-            type: Object as PropType<IDockviewPanelHeaderProps['containerApi']>,
-            required: true,
-        },
         params: {
-            type: Object as PropType<IDockviewPanelHeaderProps['params']>,
+            type: Object as PropType<IDockviewPanelHeaderProps>,
             required: true,
         },
     },
@@ -91,11 +75,11 @@ const Tab = defineComponent({
         };
     },
     mounted() {
-        const disposable = this.api.onDidTitleChange(() => {
+        const disposable = this.params.api.onDidTitleChange(() => {
             this.title = this.api.title;
         });
 
-        const disposable2 = this.api.onDidParametersChange(() => {
+        const disposable2 = this.params.api.onDidParametersChange(() => {
             this.value = this.params.myValue;
         });
 
