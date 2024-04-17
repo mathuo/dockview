@@ -4764,4 +4764,147 @@ describe('dockviewComponent', () => {
         expect(panel3.api.isVisible).toBeFalsy();
         expect(panel4.api.isVisible).toBeTruthy();
     });
+
+    describe('addPanel', () => {
+        test('that can add panel', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent({
+                parentElement: container,
+                components: {
+                    default: PanelContentPartTest,
+                },
+            });
+            const api = new DockviewApi(dockview);
+
+            dockview.layout(1000, 1000);
+
+            const panel1 = api.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+            expect(api.activePanel).toBe(panel1);
+
+            api.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                inactive: true,
+            });
+            expect(api.activePanel).toBe(panel1);
+        });
+
+        test('that can add panel with absolute direction', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent({
+                parentElement: container,
+                components: {
+                    default: PanelContentPartTest,
+                },
+            });
+            const api = new DockviewApi(dockview);
+
+            dockview.layout(1000, 1000);
+
+            const panel1 = api.addPanel({
+                id: 'panel_1',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            expect(api.activePanel).toBe(panel1);
+
+            api.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: { direction: 'right' },
+                inactive: true,
+            });
+            expect(api.activePanel).toBe(panel1);
+        });
+
+        test('that can add floating panel', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent({
+                parentElement: container,
+                components: {
+                    default: PanelContentPartTest,
+                },
+            });
+            const api = new DockviewApi(dockview);
+
+            dockview.layout(1000, 1000);
+
+            const panel1 = api.addPanel({
+                id: 'panel_1',
+                component: 'default',
+                floating: true,
+            });
+            expect(api.activePanel).toBe(panel1);
+
+            api.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                floating: true,
+                inactive: true,
+            });
+            expect(api.activePanel).toBe(panel1);
+        });
+
+        test('that can add panel positional to another (within)', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent({
+                parentElement: container,
+                components: {
+                    default: PanelContentPartTest,
+                },
+            });
+            const api = new DockviewApi(dockview);
+
+            dockview.layout(1000, 1000);
+
+            const panel1 = api.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+            expect(api.activePanel).toBe(panel1);
+
+            api.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: { direction: 'within', referencePanel: panel1 },
+                inactive: true,
+            });
+            expect(api.activePanel).toBe(panel1);
+        });
+
+        test('that can add panel positional to another (not within)', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent({
+                parentElement: container,
+                components: {
+                    default: PanelContentPartTest,
+                },
+            });
+            const api = new DockviewApi(dockview);
+
+            dockview.layout(1000, 1000);
+
+            const panel1 = api.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+            expect(api.activePanel).toBe(panel1);
+
+            api.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: { direction: 'right', referencePanel: panel1 },
+                inactive: true,
+            });
+            expect(api.activePanel).toBe(panel1);
+        });
+    });
 });

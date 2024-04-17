@@ -13,7 +13,10 @@ import { ISplitviewStyles, Orientation } from '../splitview/splitview';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
 import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
-import { DockviewGroupDropLocation, GroupOptions } from './dockviewGroupPanelModel';
+import {
+    DockviewGroupDropLocation,
+    GroupOptions,
+} from './dockviewGroupPanelModel';
 import { IDockviewPanel } from './dockviewPanel';
 import {
     ComponentConstructor,
@@ -171,11 +174,36 @@ type AddPanelOptionsUnion = AddPanelFloatingGroupUnion | AddPanelPositionUnion;
 
 export type AddPanelOptions<P extends object = Parameters> = {
     params?: P;
+    /**
+     * The unique id for the panel
+     */
     id: string;
+    /**
+     * The title for the panel which can be accessed within both the tab and component.
+     *
+     * If using the default tab renderer this title will be displayed in the tab.
+     */
     title?: string;
+    /**
+     * The id of the component renderer
+     */
     component: string;
+    /**
+     * The id of the tab componnet renderer
+     */
     tabComponent?: string;
+    /**
+     * The rendering mode of the panel.
+     *
+     * This dictates what happens to the HTML of the panel when it is hidden.
+     */
     renderer?: DockviewPanelRenderer;
+    /**
+     * If true then add the panel without setting it as the active panel.
+     *
+     * Defaults to `false` which forces newly added panels to become active.
+     */
+    inactive?: boolean;
 } & Partial<AddPanelOptionsUnion>;
 
 type AddGroupOptionsWithPanel = {
