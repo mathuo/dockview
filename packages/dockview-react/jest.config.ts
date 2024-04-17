@@ -4,7 +4,7 @@ const config: JestConfigWithTsJest = {
     preset: 'ts-jest',
     roots: ['<rootDir>/packages/dockview-react'],
     modulePaths: ['<rootDir>/packages/dockview-react/src'],
-    displayName: { name: 'dockview', color: 'blue' },
+    displayName: { name: 'dockview-react', color: 'blue' },
     rootDir: '../../',
     collectCoverageFrom: [
         '<rootDir>/packages/dockview-react/src/**/*.{js,jsx,ts,tsx}',

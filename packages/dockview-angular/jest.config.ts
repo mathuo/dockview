@@ -4,7 +4,7 @@ const config: JestConfigWithTsJest = {
     preset: 'ts-jest',
     roots: ['<rootDir>/packages/dockview-angular'],
     modulePaths: ['<rootDir>/packages/dockview-angular/src'],
-    displayName: { name: 'dockview', color: 'blue' },
+    displayName: { name: 'dockview-angular', color: 'blue' },
     rootDir: '../../',
     collectCoverageFrom: [
         '<rootDir>/packages/dockview-angular/src/**/*.{js,jsx,ts,tsx}',
