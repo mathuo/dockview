@@ -22,6 +22,13 @@ export const _CodeRunner = (props: {
             />
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <CodeSandbox url={sandboxUrl} />
+                <a
+                    target="#blank"
+                    href={path}
+                    className="material-symbols-outlined"
+                >
+                    open_in_new
+                </a>
             </div>
         </div>
     );
