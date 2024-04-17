@@ -1,12 +1,12 @@
 import React from 'react';
 import { ReactPart, ReactPortalStore } from '../react';
-import { IDockviewPanelProps } from '../dockview/dockview';
 import {
     DockviewEmitter,
     DockviewEvent,
     PanelUpdateEvent,
     IContentRenderer,
-    GroupPanelContentPartInitParameters,
+    GroupPanelPartInitParameters,
+    IDockviewPanelProps,
 } from 'dockview-core';
 
 export class ReactPanelContentPart implements IContentRenderer {
@@ -38,7 +38,7 @@ export class ReactPanelContentPart implements IContentRenderer {
         // TODO
     }
 
-    public init(parameters: GroupPanelContentPartInitParameters): void {
+    public init(parameters: GroupPanelPartInitParameters): void {
         this.part = new ReactPart(
             this.element,
             this.reactPortalStore,

@@ -1,0 +1,10 @@
+// tsconfig.build-types.json
+{
+    "include": ["src/**/*"],
+    "exclude": [
+        "node_modules",
+        "**/*.cy.ts",
+        "**/*.spec.ts",
+        "**/__tests__/**/*"
+    ]
+}

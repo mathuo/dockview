@@ -7,7 +7,7 @@ import {
     Orientation,
 } from 'dockview-core';
 import { usePortalsLifecycle } from '../react';
-import { PanelCollection, PanelParameters } from '../types';
+import { PanelParameters } from '../types';
 import { ReactPanelView } from './view';
 
 export interface SplitviewReadyEvent {
@@ -23,7 +23,7 @@ export interface ISplitviewPanelProps<T extends { [index: string]: any } = any>
 export interface ISplitviewReactProps {
     orientation?: Orientation;
     onReady: (event: SplitviewReadyEvent) => void;
-    components: PanelCollection<ISplitviewPanelProps>;
+    components: Record<string, React.FunctionComponent<ISplitviewPanelProps>>;
     proportionalLayout?: boolean;
     hideBorders?: boolean;
     className?: string;

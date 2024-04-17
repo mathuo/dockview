@@ -45,6 +45,9 @@
     "@types/react-dom": "^18.2.18",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "@typescript-eslint/parser": "^6.17.0",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/tsconfig": "^0.5.1",
+    "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
     "eslint": "^8.56.0",
     "fs-extra": "^11.2.0",
@@ -66,9 +69,16 @@
     "ts-node": "^10.9.2",
     "tslib": "^2.6.2",
     "typedoc": "^0.25.6",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vite": "^5.1.5",
+    "vue": "^3.4.21",
+    "vue-sfc-loader": "^0.1.0",
+    "vue-tsc": "^2.0.5"
   },
   "engines": {
     "node": ">=18.0"
+  },
+  "dependencies": {
+    "ag-grid-vue3": "^31.1.1"
   }
 }

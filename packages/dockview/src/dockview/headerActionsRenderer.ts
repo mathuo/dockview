@@ -1,25 +1,17 @@
 import React from 'react';
 import { ReactPart, ReactPortalStore } from '../react';
 import {
-    IDockviewPanel,
     DockviewCompositeDisposable,
     DockviewMutableDisposable,
     DockviewApi,
     DockviewGroupPanel,
     DockviewGroupPanelApi,
     PanelUpdateEvent,
+    IHeaderActionsRenderer,
+    IDockviewHeaderActionsProps,
 } from 'dockview-core';
 
-export interface IDockviewHeaderActionsProps {
-    api: DockviewGroupPanelApi;
-    containerApi: DockviewApi;
-    panels: IDockviewPanel[];
-    activePanel: IDockviewPanel | undefined;
-    isGroupActive: boolean;
-    group: DockviewGroupPanel;
-}
-
-export class ReactHeaderActionsRendererPart {
+export class ReactHeaderActionsRendererPart implements IHeaderActionsRenderer {
     private mutableDisposable = new DockviewMutableDisposable();
     private _element: HTMLElement;
     private _part?: ReactPart<IDockviewHeaderActionsProps>;
@@ -30,10 +22,6 @@ export class ReactHeaderActionsRendererPart {
 
     get part(): ReactPart<IDockviewHeaderActionsProps> | undefined {
         return this._part;
-    }
-
-    get group(): DockviewGroupPanel {
-        return this._group;
     }
 
     constructor(
@@ -47,11 +35,7 @@ export class ReactHeaderActionsRendererPart {
         this._element.style.width = '100%';
     }
 
-    focus(): void {
-        // TODO
-    }
-
-    public init(parameters: {
+    init(parameters: {
         containerApi: DockviewApi;
         api: DockviewGroupPanelApi;
     }): void {
@@ -85,13 +69,13 @@ export class ReactHeaderActionsRendererPart {
         );
     }
 
-    public update(event: PanelUpdateEvent): void {
-        this._part?.update(event.params);
-    }
-
-    public dispose(): void {
+    dispose(): void {
         this.mutableDisposable.dispose();
         this._part?.dispose();
+    }
+
+    update(event: PanelUpdateEvent): void {
+        this._part?.update(event.params);
     }
 
     private updatePanels(): void {

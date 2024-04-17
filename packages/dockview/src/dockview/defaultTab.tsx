@@ -1,6 +1,6 @@
 import React from 'react';
-import { IDockviewPanelHeaderProps } from './dockview';
 import { CloseButton } from '../svg';
+import { IDockviewPanelHeaderProps } from 'dockview-core';
 
 export type IDockviewDefaultTabProps = IDockviewPanelHeaderProps &
     React.DOMAttributes<HTMLDivElement> & {

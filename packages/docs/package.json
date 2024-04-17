@@ -3,12 +3,15 @@
   "version": "1.12.0",
   "private": true,
   "scripts": {
-    "build": "docusaurus build",
+    "build": "npm run create-templates && docusaurus build",
     "clear": "docusaurus clear",
-    "start": "docusaurus start",
+    "start": "concurrently \"docusaurus start\" \"npm run start-esm-server\"",
+    "start-esm-server": "node web-server/index.mjs",
     "swizzle": "docusaurus swizzle @docusaurus/theme-classic",
     "docs:version": "docusaurus docs:version",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "create-templates": "node scripts/buildTemplates.mjs",
+    "create-templates:local": "node scripts/buildTemplates.mjs --local"
   },
   "browserslist": {
     "production": [
