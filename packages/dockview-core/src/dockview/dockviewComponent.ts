@@ -979,7 +979,7 @@ export class DockviewComponent
                 // this is either a resize or a move
                 // to inform the panels .layout(...) the group with it's current size
                 // don't care about resize since the above watcher handles that
-                group.layout(group.height, group.width);
+                group.layout(group.width, group.height);
             }),
             overlay.onDidChangeEnd(() => {
                 this._bufferOnDidLayoutChange.fire();
