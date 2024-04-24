@@ -38,13 +38,7 @@ const App = defineComponent({
     name: 'App',
     components: {
         'dockview-vue': DockviewVue,
-    },
-    data() {
-        return {
-            components: {
-                default: Panel,
-            },
-        };
+        default: Panel,
     },
     methods: {
         onReady(event: DockviewReadyEvent) {
@@ -83,7 +77,6 @@ const App = defineComponent({
         style="width:100%;height:100%"
         class="dockview-theme-abyss"
         @ready="onReady"
-        :components="components"
         :locked=true
       </dockview-vue>`,
 });

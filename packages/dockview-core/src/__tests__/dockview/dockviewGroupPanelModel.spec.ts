@@ -275,7 +275,7 @@ describe('dockviewGroupPanelModel', () => {
             onDidParametersChange: new Emitter().event,
         });
 
-        dockview = (<Partial<DockviewComponent>>{
+        dockview = fromPartial<DockviewComponent>({
             options: { parentElement: document.createElement('div') },
             createWatermarkComponent: () => new Watermark(),
             doSetGroupActive: jest.fn(),
@@ -287,7 +287,7 @@ describe('dockviewGroupPanelModel', () => {
             overlayRenderContainer: new OverlayRenderContainer(
                 document.createElement('div')
             ),
-        }) as DockviewComponent;
+        });
 
         groupview = new DockviewGroupPanel(dockview, 'groupview-1', options);
         groupview.initialize();
@@ -529,8 +529,13 @@ describe('dockviewGroupPanelModel', () => {
     test('that group is set on panel during onDidAddPanel event', () => {
         const cut = new DockviewComponent({
             parentElement: document.createElement('div'),
-            components: {
-                component: TestContentPart,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'component':
+                        return new TestContentPart(options.id);
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -545,8 +550,13 @@ describe('dockviewGroupPanelModel', () => {
     test('toJSON() default', () => {
         const dockviewComponent = new DockviewComponent({
             parentElement: document.createElement('div'),
-            components: {
-                component: TestContentPart,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'component':
+                        return new TestContentPart(options.id);
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -568,8 +578,13 @@ describe('dockviewGroupPanelModel', () => {
     test('toJSON() locked and hideHeader', () => {
         const dockviewComponent = new DockviewComponent({
             parentElement: document.createElement('div'),
-            components: {
-                component: TestContentPart,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'component':
+                        return new TestContentPart(options.id);
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -596,8 +611,13 @@ describe('dockviewGroupPanelModel', () => {
     test("that openPanel with skipSetActive doesn't set panel to active", () => {
         const dockviewComponent = new DockviewComponent({
             parentElement: document.createElement('div'),
-            components: {
-                component: TestContentPart,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'component':
+                        return new TestContentPart(options.id);
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -637,19 +657,16 @@ describe('dockviewGroupPanelModel', () => {
     });
 
     test('that should not show drop target is external event', () => {
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-                options: {
-                    parentElement: document.createElement('div'),
-                },
-                getPanel: jest.fn(),
-                onDidAddPanel: jest.fn(),
-                onDidRemovePanel: jest.fn(),
-            };
+        const accessor = fromPartial<DockviewComponent>({
+            id: 'testcomponentid',
+            options: {
+                parentElement: document.createElement('div'),
+            },
+            getPanel: jest.fn(),
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
         });
 
-        const accessor = new accessorMock() as DockviewComponent;
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
             () => {
                 return {
@@ -704,18 +721,16 @@ describe('dockviewGroupPanelModel', () => {
     });
 
     test('that the .locked behaviour is as', () => {
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-                options: {
-                    parentElement: document.createElement('div'),
-                },
-                getPanel: jest.fn(),
-                onDidAddPanel: jest.fn(),
-                onDidRemovePanel: jest.fn(),
-            };
+        const accessor = fromPartial<DockviewComponent>({
+            id: 'testcomponentid',
+            options: {
+                parentElement: document.createElement('div'),
+            },
+            getPanel: jest.fn(),
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
         });
-        const accessor = new accessorMock() as DockviewComponent;
+
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
             () => {
                 return {
@@ -799,22 +814,20 @@ describe('dockviewGroupPanelModel', () => {
     });
 
     test('that should not show drop target if dropping on self', () => {
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-                options: {
-                    parentElement: document.createElement('div'),
-                },
-                getPanel: jest.fn(),
-                doSetGroupActive: jest.fn(),
-                onDidAddPanel: jest.fn(),
-                onDidRemovePanel: jest.fn(),
-                overlayRenderContainer: new OverlayRenderContainer(
-                    document.createElement('div')
-                ),
-            };
+        const accessor = fromPartial<DockviewComponent>({
+            id: 'testcomponentid',
+            options: {
+                parentElement: document.createElement('div'),
+            },
+            getPanel: jest.fn(),
+            doSetGroupActive: jest.fn(),
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
+            overlayRenderContainer: new OverlayRenderContainer(
+                document.createElement('div')
+            ),
         });
-        const accessor = new accessorMock() as DockviewComponent;
+
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
             () => {
                 return {
@@ -874,22 +887,20 @@ describe('dockviewGroupPanelModel', () => {
     });
 
     test('that should not allow drop when dropping on self for same component id', () => {
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-                options: {
-                    parentElement: document.createElement('div'),
-                },
-                getPanel: jest.fn(),
-                doSetGroupActive: jest.fn(),
-                onDidAddPanel: jest.fn(),
-                onDidRemovePanel: jest.fn(),
-                overlayRenderContainer: new OverlayRenderContainer(
-                    document.createElement('div')
-                ),
-            };
+        const accessor = fromPartial<DockviewComponent>({
+            id: 'testcomponentid',
+            options: {
+                parentElement: document.createElement('div'),
+            },
+            getPanel: jest.fn(),
+            doSetGroupActive: jest.fn(),
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
+            overlayRenderContainer: new OverlayRenderContainer(
+                document.createElement('div')
+            ),
         });
-        const accessor = new accessorMock() as DockviewComponent;
+
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
             () => {
                 return {
@@ -950,22 +961,20 @@ describe('dockviewGroupPanelModel', () => {
     });
 
     test('that should not allow drop when not dropping for different component id', () => {
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-                options: {
-                    parentElement: document.createElement('div'),
-                },
-                getPanel: jest.fn(),
-                doSetGroupActive: jest.fn(),
-                onDidAddPanel: jest.fn(),
-                onDidRemovePanel: jest.fn(),
-                overlayRenderContainer: new OverlayRenderContainer(
-                    document.createElement('div')
-                ),
-            };
+        const accessor = fromPartial<DockviewComponent>({
+            id: 'testcomponentid',
+            options: {
+                parentElement: document.createElement('div'),
+            },
+            getPanel: jest.fn(),
+            doSetGroupActive: jest.fn(),
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
+            overlayRenderContainer: new OverlayRenderContainer(
+                document.createElement('div')
+            ),
         });
-        const accessor = new accessorMock() as DockviewComponent;
+
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
             () => {
                 return {

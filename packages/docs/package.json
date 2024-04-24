@@ -10,8 +10,8 @@
     "swizzle": "docusaurus swizzle @docusaurus/theme-classic",
     "docs:version": "docusaurus docs:version",
     "typecheck": "tsc",
-    "create-templates": "node scripts/buildTemplates.mjs",
-    "create-templates:local": "node scripts/buildTemplates.mjs --local"
+    "build-templates": "node scripts/buildTemplates.mjs",
+    "build-templates:local": "node scripts/buildTemplates.mjs --local"
   },
   "browserslist": {
     "production": [

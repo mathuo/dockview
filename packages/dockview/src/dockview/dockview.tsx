@@ -168,26 +168,51 @@ export const DockviewReact = React.forwardRef(
             }
 
             const frameworkOptions: DockviewFrameworkOptions = {
-                headerLeftActionComponent: createGroupControlElement(
+                createLeftHeaderActionComponent: createGroupControlElement(
                     props.leftHeaderActionsComponent,
                     { addPortal }
                 ),
-                headerRightActionComponent: createGroupControlElement(
+                createRightHeaderActionComponent: createGroupControlElement(
                     props.rightHeaderActionsComponent,
                     { addPortal }
                 ),
-                headerPrefixActionComponent: createGroupControlElement(
+                createPrefixHeaderActionComponent: createGroupControlElement(
                     props.prefixHeaderActionsComponent,
                     { addPortal }
                 ),
-                frameworkTabComponents,
-                frameworkComponents: props.components,
-                frameworkComponentFactory: createFrameworkFactory(addPortal),
+                createComponent: (options) => {
+                    return new ReactPanelContentPart(
+                        options.id,
+                        props.components[options.name],
+                        {
+                            addPortal,
+                        }
+                    );
+                },
+                createTabComponent(options) {
+                    return new ReactPanelHeaderPart(
+                        options.id,
+                        frameworkTabComponents[options.name],
+                        {
+                            addPortal,
+                        }
+                    );
+                },
+                createWatermarkComponent: props.watermarkComponent
+                    ? () => {
+                          return new ReactWatermarkPart(
+                              'watermark',
+                              props.watermarkComponent!,
+                              {
+                                  addPortal,
+                              }
+                          );
+                      }
+                    : undefined,
                 parentElement: domRef.current,
                 defaultTabComponent: props.defaultTabComponent
                     ? DEFAULT_REACT_TAB
                     : undefined,
-                watermarkFrameworkComponent: props.watermarkComponent,
             };
 
             const dockview = new DockviewComponent({
@@ -269,19 +294,19 @@ export const DockviewReact = React.forwardRef(
             if (!dockviewRef.current) {
                 return;
             }
+
             dockviewRef.current.updateOptions({
-                frameworkComponents: props.components,
+                createComponent: (options) => {
+                    return new ReactPanelContentPart(
+                        options.id,
+                        props.components[options.name],
+                        {
+                            addPortal,
+                        }
+                    );
+                },
             });
         }, [props.components]);
-
-        React.useEffect(() => {
-            if (!dockviewRef.current) {
-                return;
-            }
-            dockviewRef.current.updateOptions({
-                watermarkFrameworkComponent: props.watermarkComponent,
-            });
-        }, [props.watermarkComponent]);
 
         React.useEffect(() => {
             if (!dockviewRef.current) {
@@ -299,7 +324,15 @@ export const DockviewReact = React.forwardRef(
                 defaultTabComponent: props.defaultTabComponent
                     ? DEFAULT_REACT_TAB
                     : undefined,
-                frameworkTabComponents,
+                createTabComponent(options) {
+                    return new ReactPanelHeaderPart(
+                        options.id,
+                        frameworkTabComponents[options.name],
+                        {
+                            addPortal,
+                        }
+                    );
+                },
             });
         }, [props.tabComponents, props.defaultTabComponent]);
 
@@ -307,8 +340,28 @@ export const DockviewReact = React.forwardRef(
             if (!dockviewRef.current) {
                 return;
             }
+
             dockviewRef.current.updateOptions({
-                headerRightActionComponent: createGroupControlElement(
+                createWatermarkComponent: props.watermarkComponent
+                    ? () => {
+                          return new ReactWatermarkPart(
+                              'watermark',
+                              props.watermarkComponent!,
+                              {
+                                  addPortal,
+                              }
+                          );
+                      }
+                    : undefined,
+            });
+        }, [props.watermarkComponent]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+            dockviewRef.current.updateOptions({
+                createRightHeaderActionComponent: createGroupControlElement(
                     props.rightHeaderActionsComponent,
                     { addPortal }
                 ),
@@ -320,7 +373,7 @@ export const DockviewReact = React.forwardRef(
                 return;
             }
             dockviewRef.current.updateOptions({
-                headerLeftActionComponent: createGroupControlElement(
+                createLeftHeaderActionComponent: createGroupControlElement(
                     props.leftHeaderActionsComponent,
                     { addPortal }
                 ),
@@ -332,7 +385,7 @@ export const DockviewReact = React.forwardRef(
                 return;
             }
             dockviewRef.current.updateOptions({
-                headerRightActionComponent: createGroupControlElement(
+                createPrefixHeaderActionComponent: createGroupControlElement(
                     props.prefixHeaderActionsComponent,
                     { addPortal }
                 ),

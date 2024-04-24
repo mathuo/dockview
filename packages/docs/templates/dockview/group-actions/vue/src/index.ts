@@ -120,20 +120,10 @@ const App = defineComponent({
     name: 'App',
     components: {
         'dockview-vue': DockviewVue,
-        Panel,
-        LeftAction,
-        RightAction,
-        PrefixAction,
-    },
-    data() {
-        return {
-            components: {
-                default: Panel,
-            },
-            leftAction: LeftAction,
-            rightAction: RightAction,
-            prefixAction: PrefixAction,
-        };
+        default: Panel,
+        leftAction: LeftAction,
+        rightAction: RightAction,
+        prefixAction: PrefixAction,
     },
     methods: {
         onReady(event: DockviewReadyEvent) {
@@ -167,10 +157,9 @@ const App = defineComponent({
         style="width:100%;height:100%"
         class="dockview-theme-abyss"
         @ready="onReady"
-        :components="components"
-        :leftHeaderActionsComponent="leftAction"
-        :rightHeaderActionsComponent="rightAction"
-        :prefixHeaderActionsComponent="prefixAction"
+        leftHeaderActionsComponent="leftAction"
+        rightHeaderActionsComponent="rightAction"
+        prefixHeaderActionsComponent="prefixAction"
       </dockview-vue>`,
 });
 

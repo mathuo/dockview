@@ -36,15 +36,7 @@ const InnerDockview = defineComponent({
     name: 'App',
     components: {
         'dockview-vue': DockviewVue,
-        Panel,
-    },
-    data() {
-        return {
-            components: {
-                default: Panel,
-                innerDockview: InnerDockview,
-            },
-        };
+        default: Panel,
     },
     methods: {
         onReady(event: DockviewReadyEvent) {
@@ -68,7 +60,6 @@ const InnerDockview = defineComponent({
     <dockview-vue
       style="width:100%;height:100%"
       class="dockview-theme-abyss"
-      :components="components"
       @ready="onReady"
     </dockview-vue>`,
 });
@@ -77,16 +68,8 @@ const App = defineComponent({
     name: 'App',
     components: {
         'dockview-vue': DockviewVue,
-        Panel,
-        InnerDockview,
-    },
-    data() {
-        return {
-            components: {
-                default: Panel,
-                innerDockview: InnerDockview,
-            },
-        };
+        default: Panel,
+        innerDockview: InnerDockview,
     },
     methods: {
         onReady(event: DockviewReadyEvent) {
@@ -111,7 +94,6 @@ const App = defineComponent({
       <dockview-vue
         style="width:100%;height:100%"
         class="dockview-theme-abyss"
-        :components="components"
         @ready="onReady"
       </dockview-vue>`,
 });

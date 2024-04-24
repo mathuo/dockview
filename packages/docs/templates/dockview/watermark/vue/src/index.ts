@@ -68,14 +68,11 @@ const App = defineComponent({
     name: 'App',
     components: {
         'dockview-vue': DockviewVue,
-        Panel,
+        default: Panel,
+        watermarkComponent: WatermarkPanel,
     },
     data() {
         return {
-            components: {
-                default: Panel,
-            },
-            watermarkComponent: WatermarkPanel,
             api: null as DockviewApi | null,
         };
     },
@@ -109,8 +106,7 @@ const App = defineComponent({
           style="width:100%;height:100%"
           class="dockview-theme-abyss"
           @ready="onReady"
-          :components="components"
-          :watermarkComponent="watermarkComponent"
+          watermarkComponent="watermarkComponent"
         >
         </dockview-vue>
       </div>`,

@@ -18,7 +18,6 @@ import { Watermark } from './components/watermark/watermark';
 import { IWatermarkRenderer, GroupviewPanelState } from './types';
 import { sequentialNumberGenerator } from '../math';
 import { DefaultDockviewDeserialzier } from './deserializer';
-import { createComponent } from '../panel/componentFactory';
 import {
     AddGroupOptions,
     AddPanelOptions,
@@ -68,7 +67,6 @@ import {
     OverlayRenderContainer,
 } from '../overlayRenderContainer';
 import { PopoutWindow } from '../popoutWindow';
-import { TitleEvent } from '../api/dockviewPanelApi';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     activationSize: { type: 'pixels', value: 10 },
@@ -502,25 +500,6 @@ export class DockviewComponent
         );
 
         this._options = options;
-
-        if (!this.options.components) {
-            this.options.components = {};
-        }
-        if (!this.options.frameworkComponents) {
-            this.options.frameworkComponents = {};
-        }
-        if (!this.options.frameworkTabComponents) {
-            this.options.frameworkTabComponents = {};
-        }
-        if (!this.options.tabComponents) {
-            this.options.tabComponents = {};
-        }
-        if (
-            !this.options.watermarkComponent &&
-            !this.options.watermarkFrameworkComponent
-        ) {
-            this.options.watermarkComponent = Watermark;
-        }
 
         this._rootDropTarget = new Droptarget(this.element, {
             canDisplayOverlay: (event, position) => {
@@ -1575,17 +1554,10 @@ export class DockviewComponent
     }
 
     createWatermarkComponent(): IWatermarkRenderer {
-        return createComponent(
-            'watermark-id',
-            'watermark-name',
-            this.options.watermarkComponent
-                ? { 'watermark-name': this.options.watermarkComponent }
-                : {},
-            this.options.watermarkFrameworkComponent
-                ? { 'watermark-name': this.options.watermarkFrameworkComponent }
-                : {},
-            this.options.frameworkComponentFactory?.watermark
-        );
+        if (this.options.createWatermarkComponent) {
+            return this.options.createWatermarkComponent();
+        }
+        return new Watermark();
     }
 
     private updateWatermark(): void {

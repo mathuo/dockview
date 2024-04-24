@@ -103,8 +103,16 @@ describe('dockviewComponent', () => {
 
         dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -1225,7 +1233,25 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: { default: PanelContentPartTest },
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+            createTabComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelTabPartTest(options.id, options.name);
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
         });
 
         dockview.layout(500, 1000);
@@ -1250,7 +1276,25 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: { default: PanelContentPartTest },
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+            createTabComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelTabPartTest(options.id, options.name);
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
         });
 
         dockview.layout(500, 1000);
@@ -1285,7 +1329,25 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: { default: PanelContentPartTest },
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+            createTabComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelTabPartTest(options.id, options.name);
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
         });
 
         dockview.layout(500, 1000);
@@ -1310,8 +1372,24 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+            createTabComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelTabPartTest(options.id, options.name);
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -1350,8 +1428,24 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+            createTabComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelTabPartTest(options.id, options.name);
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -1390,8 +1484,24 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+            createTabComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelTabPartTest(options.id, options.name);
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -1428,8 +1538,24 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+            createTabComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelTabPartTest(options.id, options.name);
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -1463,8 +1589,24 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+            createTabComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelTabPartTest(options.id, options.name);
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -1498,8 +1640,24 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+            createTabComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelTabPartTest(options.id, options.name);
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -1543,7 +1701,25 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: { default: PanelContentPartTest },
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+            createTabComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelTabPartTest(options.id, options.name);
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
         });
 
         dockview.layout(500, 1000);
@@ -1753,8 +1929,16 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
         dockview.fromJSON({
@@ -1839,11 +2023,24 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+            createTabComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelTabPartTest(options.id, options.name);
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -1891,7 +2088,7 @@ describe('dockviewComponent', () => {
                 panel2: {
                     id: 'panel2',
                     contentComponent: 'default',
-                    tabComponent: 'test_tab_id',
+                    tabComponent: 'default',
                     title: 'panel2',
                 },
             },
@@ -1937,7 +2134,7 @@ describe('dockviewComponent', () => {
                 panel2: {
                     id: 'panel2',
                     contentComponent: 'default',
-                    tabComponent: 'test_tab_id',
+                    tabComponent: 'default',
                     title: 'panel2',
                 },
             },
@@ -1949,11 +2146,24 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+            createTabComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelTabPartTest(options.id, options.name);
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
         dockview.fromJSON({
@@ -1997,7 +2207,7 @@ describe('dockviewComponent', () => {
                 panel2: {
                     id: 'panel2',
                     contentComponent: 'default',
-                    tabComponent: 'test_tab_id',
+                    tabComponent: 'default',
                     title: 'panel2',
                 },
                 panel3: {
@@ -2035,11 +2245,16 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -2141,11 +2356,17 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -2282,11 +2503,17 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -2410,11 +2637,17 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -2469,11 +2702,17 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -2485,11 +2724,17 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -2524,11 +2769,16 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -2552,11 +2802,16 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -2638,11 +2893,16 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -2700,11 +2960,16 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -2790,11 +3055,16 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -2821,11 +3091,16 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -2853,11 +3128,16 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -3002,11 +3282,16 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -3041,11 +3326,16 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -3080,12 +3370,17 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                panelA: PanelContentPartTest,
-                panelB: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'panelA':
+                    case 'panelB':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported panel '${options.name}'`);
+                }
             },
         });
 
@@ -3152,9 +3447,7 @@ describe('dockviewComponent', () => {
                 },
                 activeGroup: '1',
             });
-        }).toThrow(
-            "Cannot create 'panelB', no component 'somethingBad' provided"
-        );
+        }).toThrow("unsupported panel 'somethingBad'");
 
         expect(dockview.groups.length).toBe(0);
         expect(dockview.panels.length).toBe(0);
@@ -3169,12 +3462,17 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                panelA: PanelContentPartTest,
-                panelB: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'panelA':
+                    case 'panelB':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported panel '${options.name}'`);
+                }
             },
         });
 
@@ -3273,7 +3571,7 @@ describe('dockviewComponent', () => {
                 },
                 activeGroup: '1',
             });
-        }).toThrow("Cannot create 'panelC', no component 'panelC' provided");
+        }).toThrow("unsupported panel 'panelC'");
 
         expect(dockview.groups.length).toBe(0);
         expect(dockview.panels.length).toBe(0);
@@ -3291,12 +3589,17 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                panelA: PanelContentPartTest,
-                panelB: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'panelA':
+                    case 'panelB':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
 
@@ -3308,12 +3611,17 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                panelA: PanelContentPartTest,
-                panelB: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'panelA':
+                    case 'panelB':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
             disableAutoResizing: true,
         });
@@ -3327,11 +3635,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -3354,11 +3667,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -3396,11 +3714,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -3438,11 +3761,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -3488,11 +3816,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -3538,11 +3871,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -3588,11 +3926,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -3646,11 +3989,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -3688,11 +4036,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -3730,11 +4083,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -3780,11 +4138,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -3830,11 +4193,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -3880,11 +4248,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -3938,11 +4311,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -3988,11 +4366,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -4037,11 +4420,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -4087,11 +4475,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -4136,11 +4529,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -4175,11 +4573,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -4213,11 +4616,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -4252,11 +4660,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -4312,11 +4725,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -4350,11 +4768,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -4382,11 +4805,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -4454,11 +4882,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -4498,11 +4931,16 @@ describe('dockviewComponent', () => {
 
             dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
 
@@ -4551,11 +4989,16 @@ describe('dockviewComponent', () => {
 
         const dockview = new DockviewComponent({
             parentElement: container,
-            components: {
-                default: PanelContentPartTest,
-            },
-            tabComponents: {
-                test_tab_id: PanelTabPartTest,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
             },
         });
         const api = new DockviewApi(dockview);

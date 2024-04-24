@@ -35,11 +35,14 @@ export type ComponentInterface = ComponentOptionsBase<
 
 export type VueComponent<T = any> = DefineComponent<T>;
 
-export function findComponent(parent: ComponentInternalInstance, name: string) {
+export function findComponent(
+    parent: ComponentInternalInstance,
+    name: string
+): VueComponent | null {
     let instance = parent as any;
     let component = null;
 
-    while (!component && instance.parent) {
+    while (!component && instance) {
         component = instance.components?.[name];
         instance = instance.parent;
     }
@@ -49,7 +52,7 @@ export function findComponent(parent: ComponentInternalInstance, name: string) {
     }
 
     if (!component) {
-        throw new Error(`Failed to find Vue Component ${name}`);
+        throw new Error(`Failed to find Vue Component '${name}'`);
     }
 
     return component;

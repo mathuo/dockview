@@ -51,15 +51,9 @@ const App = defineComponent({
     name: 'App',
     components: {
         'dockview-vue': DockviewVue,
-    },
-    data() {
-        return {
-            components: {
-                fixedHeightContainer: FixedHeightContainer,
-                overflowContainer: OverflowContainer,
-                userDefinedOverflowContainer: UserDefinedOverflowContainer,
-            },
-        };
+        fixedHeightContainer: FixedHeightContainer,
+        overflowContainer: OverflowContainer,
+        userDefinedOverflowContainer: UserDefinedOverflowContainer,
     },
     methods: {
         onReady(event: DockviewReadyEvent) {
@@ -89,7 +83,6 @@ const App = defineComponent({
         style="width:100%;height:100%"
         class="dockview-theme-abyss"
         @ready="onReady"
-        :components="components"
         :disableFloatingGroups=true
       </dockview-vue>`,
 });

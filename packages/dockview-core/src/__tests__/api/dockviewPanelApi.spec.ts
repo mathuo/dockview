@@ -1,16 +1,16 @@
 import { DockviewPanelApiImpl } from '../../api/dockviewPanelApi';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
-import { DockviewPanel, IDockviewPanel } from '../../dockview/dockviewPanel';
+import { DockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import { fromPartial } from '@total-typescript/shoehorn';
 
 describe('groupPanelApi', () => {
     test('title', () => {
-        const accessor: Partial<DockviewComponent> = {
+        const accessor = fromPartial<DockviewComponent>({
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: { parentElement: document.createElement('div') },
-        };
+        });
 
         const panelMock = jest.fn<DockviewPanel, []>(() => {
             return {
@@ -46,11 +46,12 @@ describe('groupPanelApi', () => {
             update: jest.fn(),
         };
 
-        const accessor: Partial<DockviewComponent> = {
+        const accessor = fromPartial<DockviewComponent>({
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: { parentElement: document.createElement('div') },
-        };
+        });
+
         const groupViewPanel = new DockviewGroupPanel(
             <DockviewComponent>accessor,
             '',
@@ -77,11 +78,12 @@ describe('groupPanelApi', () => {
             id: 'test_id',
         };
 
-        const accessor: Partial<DockviewComponent> = {
+        const accessor = fromPartial<DockviewComponent>({
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: { parentElement: document.createElement('div') },
-        };
+        });
+
         const groupViewPanel = new DockviewGroupPanel(
             <DockviewComponent>accessor,
             '',

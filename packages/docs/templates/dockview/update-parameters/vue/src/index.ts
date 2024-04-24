@@ -103,23 +103,15 @@ const App = defineComponent({
     components: {
         'dockview-vue': DockviewVue,
         Panel,
-    },
-    data() {
-        return {
-            components: {
-                default: Panel,
-            },
-            tabComponents: {
-                default: Tab,
-            },
-        };
+        defaultPanel: Panel,
+        defaultTab: Tab,
     },
     methods: {
         onReady(event: DockviewReadyEvent) {
             event.api.addPanel({
                 id: 'panel_1',
-                component: 'default',
-                tabComponent: 'default',
+                component: 'defaultPanel',
+                tabComponent: 'defaultTab',
                 params: {
                     myValue: Date.now(),
                 },
@@ -127,8 +119,8 @@ const App = defineComponent({
 
             event.api.addPanel({
                 id: 'panel_2',
-                component: 'default',
-                tabComponent: 'default',
+                component: 'defaultPanel',
+                tabComponent: 'defaultTab',
                 params: {
                     myValue: Date.now(),
                 },
@@ -140,8 +132,6 @@ const App = defineComponent({
         style="width:100%;height:100%"
         class="dockview-theme-abyss"
         @ready="onReady"
-        :components="components"
-        :tabComponents="tabComponents"
       </dockview-vue>`,
 });
 

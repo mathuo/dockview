@@ -36,13 +36,10 @@ const App = defineComponent({
     name: 'App',
     components: {
         'dockview-vue': DockviewVue,
-        Panel,
+        default: Panel,
     },
     data() {
         return {
-            components: {
-                default: Panel,
-            },
             value: 50,
         };
     },
@@ -128,7 +125,6 @@ const App = defineComponent({
             style="width:100%;height:100%"
             class="dockview-theme-abyss"
             @ready="onReady"
-            :components="components"
             :disableFloatingGroups=true
           </dockview-vue>
         </div>

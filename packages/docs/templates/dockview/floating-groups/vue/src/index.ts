@@ -148,17 +148,12 @@ const App = defineComponent({
     name: 'App',
     components: {
         'dockview-vue': DockviewVue,
-        Panel,
-        LeftAction,
-        RightAction,
+        default: Panel,
+        leftAction: LeftAction,
+        rightAction: RightAction,
     },
     data() {
         return {
-            components: {
-                default: Panel,
-            },
-            leftAction: LeftAction,
-            rightAction: RightAction,
             api: null as DockviewApi | null,
             bounds: undefined,
             disableFloatingGroups: false,
@@ -220,11 +215,9 @@ const App = defineComponent({
           style="width:100%;height:100%"
           class="dockview-theme-abyss"
           @ready="onReady"
-          :components="components"
           :floatingGroupBounds="bounds"
-          :leftHeaderActionsComponent="leftAction"
-          :rightHeaderActionsComponent="rightAction"
-          :prefixHeaderActionsComponent="prefixAction"
+          leftHeaderActionsComponent="leftAction"
+          rightHeaderActionsComponent="rightAction"
           :disableFloatingGroups="disableFloatingGroups"
         </dockview-vue>
       </div>
