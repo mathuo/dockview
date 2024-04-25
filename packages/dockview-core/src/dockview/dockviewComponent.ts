@@ -1439,8 +1439,15 @@ export class DockviewComponent
                 );
 
                 const panel = this.createPanel(options, group);
-                group.model.openPanel(panel);
-                this.doSetGroupAndPanelActive(group);
+                group.model.openPanel(panel, {
+                    skipSetActive: options.inactive,
+                    skipSetGroupActive: options.inactive,
+                });
+
+                if (!options.inactive) {
+                    this.doSetGroupAndPanelActive(group);
+                }
+
                 return panel;
             }
         } else {
@@ -1472,14 +1479,23 @@ export class DockviewComponent
 
                 panel = this.createPanel(options, group);
 
-                group.model.openPanel(panel);
+                group.model.openPanel(panel, {
+                    skipSetActive: options.inactive,
+                    skipSetGroupActive: options.inactive,
+                });
             } else if (
                 referenceGroup.api.location.type === 'floating' ||
                 target === 'center'
             ) {
                 panel = this.createPanel(options, referenceGroup);
-                referenceGroup.model.openPanel(panel);
-                this.doSetGroupAndPanelActive(referenceGroup);
+                referenceGroup.model.openPanel(panel, {
+                    skipSetActive: options.inactive,
+                    skipSetGroupActive: options.inactive,
+                });
+
+                if (!options.inactive) {
+                    this.doSetGroupAndPanelActive(referenceGroup);
+                }
             } else {
                 const location = getGridLocation(referenceGroup.element);
                 const relativeLocation = getRelativeLocation(
@@ -1489,32 +1505,47 @@ export class DockviewComponent
                 );
                 const group = this.createGroupAtLocation(relativeLocation);
                 panel = this.createPanel(options, group);
-                group.model.openPanel(panel);
-                this.doSetGroupAndPanelActive(group);
+                group.model.openPanel(panel, {
+                    skipSetActive: options.inactive,
+                    skipSetGroupActive: options.inactive,
+                });
+
+                if (!options.inactive) {
+                    this.doSetGroupAndPanelActive(group);
+                }
             }
         } else if (options.floating) {
             const group = this.createGroup();
             this._onDidAddGroup.fire(group);
 
-            const o =
+            const coordinates =
                 typeof options.floating === 'object' &&
                 options.floating !== null
                     ? options.floating
                     : {};
 
-            this.addFloatingGroup(group, o, {
+            this.addFloatingGroup(group, coordinates, {
                 inDragMode: false,
                 skipRemoveGroup: true,
                 skipActiveGroup: true,
             });
 
             panel = this.createPanel(options, group);
-            group.model.openPanel(panel);
+            group.model.openPanel(panel, {
+                skipSetActive: options.inactive,
+                skipSetGroupActive: options.inactive,
+            });
         } else {
             const group = this.createGroupAtLocation();
             panel = this.createPanel(options, group);
-            group.model.openPanel(panel);
-            this.doSetGroupAndPanelActive(group);
+            group.model.openPanel(panel, {
+                skipSetActive: options.inactive,
+                skipSetGroupActive: options.inactive,
+            });
+
+            if (!options.inactive) {
+                this.doSetGroupAndPanelActive(group);
+            }
         }
 
         return panel;
