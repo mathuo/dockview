@@ -5279,4 +5279,56 @@ describe('dockviewComponent', () => {
             expect(api.activePanel).toBe(panel1);
         });
     });
+
+    describe('events flow', () => {
+        test('that floating a panel should not call an additional addPanel event', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent({
+                parentElement: container,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            const api = new DockviewApi(dockview);
+
+            dockview.layout(1000, 1000);
+
+            let addPanelCount = 0;
+            let addGroupCount = 0;
+
+            api.onDidAddPanel((event) => {
+                addPanelCount++;
+            });
+            api.onDidAddGroup((event) => {
+                addGroupCount++;
+            });
+
+            api.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+            const panel2 = api.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: { referencePanel: 'panel_1' },
+            });
+
+            expect(addPanelCount).toBe(2);
+            expect(addGroupCount).toBe(1);
+
+            api.addFloatingGroup(panel2);
+
+            expect(addPanelCount).toBe(2);
+            expect(addGroupCount).toBe(2);
+        });
+    });
 });
