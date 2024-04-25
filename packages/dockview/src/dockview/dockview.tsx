@@ -2,7 +2,6 @@ import React from 'react';
 import {
     DockviewComponent,
     DockviewWillDropEvent,
-    GroupPanelFrameworkComponentFactory,
     DockviewApi,
     IContentRenderer,
     ITabRenderer,
@@ -79,46 +78,6 @@ function extractCoreOptions(props: IDockviewReactProps): DockviewOptions {
     );
 
     return coreOptions as DockviewOptions;
-}
-
-function createFrameworkFactory(
-    addPortal: (portal: React.ReactPortal) => IDockviewDisposable
-): GroupPanelFrameworkComponentFactory {
-    return {
-        content: {
-            createComponent: (
-                _id: string,
-                componentId: string,
-                component: React.FunctionComponent<IDockviewPanelProps>
-            ): IContentRenderer => {
-                return new ReactPanelContentPart(componentId, component, {
-                    addPortal,
-                });
-            },
-        },
-        tab: {
-            createComponent: (
-                _id: string,
-                componentId: string,
-                component: React.FunctionComponent<IDockviewPanelHeaderProps>
-            ): ITabRenderer => {
-                return new ReactPanelHeaderPart(componentId, component, {
-                    addPortal,
-                });
-            },
-        },
-        watermark: {
-            createComponent: (
-                _id: string,
-                componentId: string,
-                component: React.FunctionComponent<{}>
-            ) => {
-                return new ReactWatermarkPart(componentId, component, {
-                    addPortal,
-                });
-            },
-        },
-    };
 }
 
 export const DockviewReact = React.forwardRef(
