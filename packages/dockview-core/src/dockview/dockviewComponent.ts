@@ -857,7 +857,9 @@ export class DockviewComponent
                 })
             );
 
-            group.model.openPanel(item, { skipSetGroupActive: true });
+            this.movingLock(() =>
+                group.model.openPanel(item, { skipSetGroupActive: true })
+            );
         } else {
             group = item;
 
