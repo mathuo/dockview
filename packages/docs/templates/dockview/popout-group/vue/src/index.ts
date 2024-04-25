@@ -48,18 +48,8 @@ const MaterialIcon = defineComponent({
 const LeftAction = defineComponent({
     name: 'LeftAction',
     props: {
-        containerApi: {
-            type: Object as PropType<
-                IDockviewHeaderActionsProps['containerApi']
-            >,
-            required: true,
-        },
-        api: {
-            type: Object as PropType<IDockviewHeaderActionsProps['api']>,
-            required: true,
-        },
-        group: {
-            type: Object as PropType<IDockviewHeaderActionsProps['group']>,
+        params: {
+            type: Object as PropType<IDockviewHeaderActionsProps>,
             required: true,
         },
     },
@@ -68,7 +58,7 @@ const LeftAction = defineComponent({
     },
     methods: {
         onClick() {
-            this.containerApi.addPanel({
+            this.params.containerApi.addPanel({
                 id: (++panelCount).toString(),
                 title: `Tab ${panelCount}`,
                 component: 'default',
@@ -84,18 +74,8 @@ const LeftAction = defineComponent({
 const RightAction = defineComponent({
     name: 'RightAction',
     props: {
-        containerApi: {
-            type: Object as PropType<
-                IDockviewHeaderActionsProps['containerApi']
-            >,
-            required: true,
-        },
-        api: {
-            type: Object as PropType<IDockviewHeaderActionsProps['api']>,
-            required: true,
-        },
-        group: {
-            type: Object as PropType<IDockviewHeaderActionsProps['group']>,
+        params: {
+            type: Object as PropType<IDockviewHeaderActionsProps>,
             required: true,
         },
     },
@@ -104,25 +84,27 @@ const RightAction = defineComponent({
     },
     data() {
         return {
-            isPopout: this.api.location.type === 'popout',
+            isPopout: this.params.api.location.type === 'popout',
         };
     },
     methods: {
         onClick() {
             if (this.isPopout) {
-                const group = this.containerApi.addGroup();
+                const group = this.params.containerApi.addGroup();
                 this.group.api.moveTo({ group });
             } else {
-                this.containerApi.addPopoutGroup(this.group, {
+                this.params.containerApi.addPopoutGroup(this.params.group, {
                     popoutUrl: '/popout/index.html',
                 });
             }
         },
     },
     mounted() {
-        const disposable = this.group.api.onDidLocationChange((event) => {
-            this.isPopout = event.location.type === 'popout';
-        });
+        const disposable = this.params.group.api.onDidLocationChange(
+            (event) => {
+                this.isPopout = event.location.type === 'popout';
+            }
+        );
 
         return () => {
             disposable.dispose();
@@ -138,16 +120,8 @@ const RightAction = defineComponent({
 const Panel = defineComponent({
     name: 'Panel',
     props: {
-        api: {
-            type: Object as PropType<IDockviewPanelProps['api']>,
-            required: true,
-        },
-        containerApi: {
-            type: Object as PropType<IDockviewPanelProps['containerApi']>,
-            required: true,
-        },
         params: {
-            type: Object as PropType<IDockviewPanelProps['params']>,
+            type: Object as PropType<IDockviewPanelProps>,
             required: true,
         },
     },
@@ -157,7 +131,7 @@ const Panel = defineComponent({
         };
     },
     mounted() {
-        const disposable = this.api.onDidTitleChange(() => {
+        const disposable = this.params.api.onDidTitleChange(() => {
             this.title = this.api.title;
         });
         this.title = this.api.title;
@@ -176,17 +150,12 @@ const App = defineComponent({
     name: 'App',
     components: {
         'dockview-vue': DockviewVue,
-        Panel,
-        LeftAction,
-        RightAction,
+        default: Panel,
+        leftAction: LeftAction,
+        rightAction: RightAction,
     },
     data() {
         return {
-            components: {
-                default: Panel,
-            },
-            leftAction: LeftAction,
-            rightAction: RightAction,
             api: null as DockviewApi | null,
             bounds: undefined,
             disableFloatingGroups: false,
@@ -248,11 +217,10 @@ const App = defineComponent({
           style="width:100%;height:100%"
           class="dockview-theme-abyss"
           @ready="onReady"
-          :components="components"
           :floatingGroupBounds="bounds"
-          :leftHeaderActionsComponent="leftAction"
-          :rightHeaderActionsComponent="rightAction"
-          :prefixHeaderActionsComponent="prefixAction"
+          leftHeaderActionsComponent="leftAction"
+          rightHeaderActionsComponent="rightAction"
+          prefixHeaderActionsComponent="prefixAction"
           :disableFloatingGroups="disableFloatingGroups"
         </dockview-vue>
       </div>

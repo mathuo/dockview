@@ -12,16 +12,8 @@ import {
 const Panel = defineComponent({
     name: 'Panel',
     props: {
-        api: {
-            type: Object as PropType<IDockviewPanelProps['api']>,
-            required: true,
-        },
-        containerApi: {
-            type: Object as PropType<IDockviewPanelProps['containerApi']>,
-            required: true,
-        },
         params: {
-            type: Object as PropType<IDockviewPanelProps['params']>,
+            type: Object as PropType<IDockviewPanelProps>,
             required: true,
         },
     },
@@ -37,27 +29,23 @@ const Panel = defineComponent({
 const WatermarkPanel = defineComponent({
     name: 'Panel',
     props: {
-        group: {
-            type: Object as PropType<IWatermarkPanelProps['group']>,
-            required: true,
-        },
-        containerApi: {
-            type: Object as PropType<IWatermarkPanelProps['containerApi']>,
+        params: {
+            type: Object as PropType<IWatermarkPanelProps>,
             required: true,
         },
     },
     setup(props) {
-        return { isGroup: props.containerApi.groups.length > 0 };
+        return { isGroup: props.params.containerApi.groups.length > 0 };
     },
     methods: {
         onAddNewPanel() {
-            this.containerApi.addPanel({
+            this.params.containerApi.addPanel({
                 id: Date.now().toString(),
                 component: 'default',
             });
         },
         onCloseGroup() {
-            this.group?.api.close();
+            this.params.group?.api.close();
         },
     },
     template: `
@@ -80,18 +68,16 @@ const App = defineComponent({
     name: 'App',
     components: {
         'dockview-vue': DockviewVue,
-        Panel,
+        default: Panel,
+        watermarkComponent: WatermarkPanel,
     },
     data() {
         return {
-            components: {
-                default: Panel,
-            },
-            watermarkComponent: WatermarkPanel,
+            api: null as DockviewApi | null,
         };
     },
     methods: {
-        onClick(event: MouseEvent) {
+        onClick() {
             if (!this.api) {
                 return;
             }
@@ -99,6 +85,7 @@ const App = defineComponent({
             this.api.addGroup();
         },
         onReady(event: DockviewReadyEvent) {
+            this.api = event.api;
             event.api.fromJSON({
                 grid: {
                     orientation: Orientation.HORIZONTAL,
@@ -119,8 +106,7 @@ const App = defineComponent({
           style="width:100%;height:100%"
           class="dockview-theme-abyss"
           @ready="onReady"
-          :components="components"
-          :watermarkComponent="watermarkComponent"
+          watermarkComponent="watermarkComponent"
         >
         </dockview-vue>
       </div>`,

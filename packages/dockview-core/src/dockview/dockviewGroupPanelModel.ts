@@ -546,9 +546,9 @@ export class DockviewGroupPanelModel
         this.setActive(this.isActive, true);
         this.updateContainer();
 
-        if (this.accessor.options.headerRightActionComponent) {
+        if (this.accessor.options.createRightHeaderActionComponent) {
             this._rightHeaderActions =
-                this.accessor.options.headerRightActionComponent(
+                this.accessor.options.createRightHeaderActionComponent(
                     this.groupPanel
                 );
             this.addDisposables(this._rightHeaderActions);
@@ -562,9 +562,9 @@ export class DockviewGroupPanelModel
             );
         }
 
-        if (this.accessor.options.headerLeftActionComponent) {
+        if (this.accessor.options.createLeftHeaderActionComponent) {
             this._leftHeaderActions =
-                this.accessor.options.headerLeftActionComponent(
+                this.accessor.options.createLeftHeaderActionComponent(
                     this.groupPanel
                 );
             this.addDisposables(this._leftHeaderActions);
@@ -578,9 +578,9 @@ export class DockviewGroupPanelModel
             );
         }
 
-        if (this.accessor.options.headerPrefixActionComponent) {
+        if (this.accessor.options.createPrefixHeaderActionComponent) {
             this._prefixHeaderActions =
-                this.accessor.options.headerPrefixActionComponent(
+                this.accessor.options.createPrefixHeaderActionComponent(
                     this.groupPanel
                 );
             this.addDisposables(this._prefixHeaderActions);

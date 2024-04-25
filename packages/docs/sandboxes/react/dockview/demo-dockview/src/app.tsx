@@ -188,16 +188,20 @@ const DockviewDemo = (props: { theme?: string }) => {
         >
             <div>
                 <GridActions api={api} />
-                <PanelActions
-                    api={api}
-                    panels={panels}
-                    activePanel={activePanel}
-                />
-                <GroupActions
-                    api={api}
-                    groups={groups}
-                    activeGroup={activeGroup}
-                />
+                {api && (
+                    <PanelActions
+                        api={api}
+                        panels={panels}
+                        activePanel={activePanel}
+                    />
+                )}
+                {api && (
+                    <GroupActions
+                        api={api}
+                        groups={groups}
+                        activeGroup={activeGroup}
+                    />
+                )}
             </div>
             <div
                 style={{

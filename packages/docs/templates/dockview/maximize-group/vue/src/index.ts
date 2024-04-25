@@ -47,14 +47,8 @@ const MaterialIcon = defineComponent({
 const LeftAction = defineComponent({
     name: 'LeftAction',
     props: {
-        containerApi: {
-            type: Object as PropType<
-                IDockviewHeaderActionsProps['containerApi']
-            >,
-            required: true,
-        },
-        group: {
-            type: Object as PropType<IDockviewHeaderActionsProps['group']>,
+        params: {
+            type: Object as PropType<IDockviewHeaderActionsProps>,
             required: true,
         },
     },
@@ -63,11 +57,11 @@ const LeftAction = defineComponent({
     },
     methods: {
         onClick() {
-            this.containerApi.addPanel({
+            this.parmas.containerApi.addPanel({
                 id: (++panelCount).toString(),
                 title: `Tab ${panelCount}`,
                 component: 'default',
-                position: { referenceGroup: this.group },
+                position: { referenceGroup: this.params.group },
             });
         },
     },
@@ -80,18 +74,8 @@ const LeftAction = defineComponent({
 const RightAction = defineComponent({
     name: 'RightAction',
     props: {
-        containerApi: {
-            type: Object as PropType<
-                IDockviewHeaderActionsProps['containerApi']
-            >,
-            required: true,
-        },
-        api: {
-            type: Object as PropType<IDockviewHeaderActionsProps['api']>,
-            required: true,
-        },
-        group: {
-            type: Object as PropType<IDockviewHeaderActionsProps['group']>,
+        params: {
+            type: Object as PropType<IDockviewHeaderActionsProps>,
             required: true,
         },
     },
@@ -101,9 +85,11 @@ const RightAction = defineComponent({
         };
     },
     mounted() {
-        const disposable = this.containerApi.onDidMaximizedGroupChange(() => {
-            this.maximized = this.api.isMaximized();
-        });
+        const disposable = this.params.containerApi.onDidMaximizedGroupChange(
+            () => {
+                this.maximized = this.api.isMaximized();
+            }
+        );
 
         this.maximized = this.api.isMaximized();
 
@@ -133,16 +119,8 @@ const RightAction = defineComponent({
 const Panel = defineComponent({
     name: 'Panel',
     props: {
-        api: {
-            type: Object as PropType<IDockviewPanelProps['api']>,
-            required: true,
-        },
-        containerApi: {
-            type: Object as PropType<IDockviewPanelProps['containerApi']>,
-            required: true,
-        },
         params: {
-            type: Object as PropType<IDockviewPanelProps['params']>,
+            type: Object as PropType<IDockviewPanelProps>,
             required: true,
         },
     },
@@ -153,7 +131,7 @@ const Panel = defineComponent({
     },
 
     mounted() {
-        const disposable = this.api.onDidTitleChange(() => {
+        const disposable = this.params.api.onDidTitleChange(() => {
             this.title = this.api.title;
         });
         this.title = this.api.title;
@@ -172,18 +150,9 @@ const App = defineComponent({
     name: 'App',
     components: {
         'dockview-vue': DockviewVue,
-        Panel,
-        LeftAction,
-        RightAction,
-    },
-    data() {
-        return {
-            components: {
-                default: Panel,
-            },
-            leftAction: LeftAction,
-            rightAction: RightAction,
-        };
+        default: Panel,
+        leftAction: LeftAction,
+        rightAction: RightAction,
     },
     methods: {
         onReady(event: DockviewReadyEvent) {
@@ -230,9 +199,8 @@ const App = defineComponent({
         style="width:100%;height:100%"
         class="dockview-theme-abyss"
         @ready="onReady"
-        :components="components"
-        :leftHeaderActionsComponent="leftAction"
-        :rightHeaderActionsComponent="rightAction"
+        leftHeaderActionsComponent="leftAction"
+        rightHeaderActionsComponent="rightAction"
       </dockview-vue>`,
 });
 

@@ -30,23 +30,19 @@ import {
     VueHeaderActionsRenderer,
     VueTabRenderer,
     VueWatermarkRenderer,
-    type VueComponent,
+    findComponent,
 } from '../utils';
 
 interface VueProps {
-    components: Record<string, VueComponent<IDockviewPanelProps>>;
-    tabComponents?: Record<string, VueComponent<IDockviewPanelHeaderProps>>;
-    watermarkComponent?: VueComponent<IWatermarkPanelProps>;
-    defaultTabComponent?: VueComponent<IDockviewPanelHeaderProps>;
-    rightHeaderActionsComponent?: VueComponent<IGroupPanelBaseProps>;
-    leftHeaderActionsComponent?: VueComponent<IGroupPanelBaseProps>;
-    prefixHeaderActionsComponent?: VueComponent<IGroupPanelBaseProps>;
+    watermarkComponent?: string;
+    defaultTabComponent?: string;
+    rightHeaderActionsComponent?: string;
+    leftHeaderActionsComponent?: string;
+    prefixHeaderActionsComponent?: string;
 }
 
 const VUE_PROPERTIES = (() => {
     const _value: Record<keyof VueProps, undefined> = {
-        components: undefined,
-        tabComponents: undefined,
         watermarkComponent: undefined,
         defaultTabComponent: undefined,
         rightHeaderActionsComponent: undefined,
@@ -60,8 +56,6 @@ const VUE_PROPERTIES = (() => {
 type VueEvents = {
     ready: [event: DockviewReadyEvent];
 };
-
-const DEFAULT_REACT_TAB = 'props.defaultTabComponent';
 
 export type IDockviewVueProps = DockviewOptions & VueProps;
 
@@ -79,7 +73,6 @@ function extractCoreOptions(props: IDockviewVueProps): DockviewOptions {
 
 const emit = defineEmits<VueEvents>();
 
-
 /**
  * Anything here that is a Vue.js component should not be reactive
  * i.e. markRaw(toRaw(...))
@@ -88,7 +81,6 @@ const props = defineProps<IDockviewVueProps>();
 
 const el = ref<HTMLElement | null>(null);
 const instance = ref<DockviewComponent | null>(null);
-
 
 PROPERTY_KEYS.forEach((coreOptionKey) => {
     watch(
@@ -101,180 +93,87 @@ PROPERTY_KEYS.forEach((coreOptionKey) => {
     );
 });
 
-watch(
-    () => props.components,
-    (newValue, oldValue) => {
-        if (instance.value) {
-            instance.value.updateOptions({ frameworkComponents: newValue });
-        }
-    }
-);
-
-watch(
-    () => [props.tabComponents, props.defaultTabComponent],
-    ([newTabComponents, newDefaultTabComponent], oldValue) => {
-        if (instance.value) {
-            const frameworkTabComponents = newTabComponents ?? {};
-
-            if (newDefaultTabComponent) {
-                frameworkTabComponents[DEFAULT_REACT_TAB] =
-                    newDefaultTabComponent;
-            }
-
-            instance.value.updateOptions({
-                defaultTabComponent: newDefaultTabComponent
-                    ? DEFAULT_REACT_TAB
-                    : undefined,
-                frameworkTabComponents,
-            });
-        }
-    }
-);
-
-watch(
-    () => props.watermarkComponent,
-    (newValue, oldValue) => {
-        if (instance.value) {
-            instance.value.updateOptions({
-                watermarkFrameworkComponent: newValue,
-            });
-        }
-    }
-);
-
-watch(
-    () => props.leftHeaderActionsComponent,
-    (newValue, oldValue) => {
-        if (instance.value) {
-            instance.value.updateOptions({
-                headerLeftActionComponent: newValue
-                    ? (group) => {
-                          return new VueHeaderActionsRenderer(
-                              newValue as VueComponent,
-                              getCurrentInstance()!,
-                              group
-                          );
-                      }
-                    : undefined,
-            });
-        }
-    }
-);
-
-watch(
-    () => props.rightHeaderActionsComponent,
-    (newValue, oldValue) => {
-        if (instance.value) {
-            instance.value.updateOptions({
-                headerRightActionComponent: newValue
-                    ? (group) => {
-                          return new VueHeaderActionsRenderer(
-                              newValue as VueComponent,
-                              getCurrentInstance()!,
-                              group
-                          );
-                      }
-                    : undefined,
-            });
-        }
-    }
-);
-
-watch(
-    () => props.prefixHeaderActionsComponent,
-    (newValue, oldValue) => {
-        if (instance.value) {
-            instance.value.updateOptions({
-                headerPrefixActionComponent: newValue
-                    ? (group) => {
-                          return new VueHeaderActionsRenderer(
-                              newValue as VueComponent,getCurrentInstance()!,
-                              group
-                          );
-                      }
-                    : undefined,
-            });
-        }
-    }
-);
-
 onMounted(() => {
     if (!el.value) {
         throw new Error('element is not mounted');
     }
 
-    const frameworkTabComponents = props.tabComponents ?? {};
-
-    if (props.defaultTabComponent) {
-        frameworkTabComponents[DEFAULT_REACT_TAB] = props.defaultTabComponent;
-    }
-
     const frameworkOptions: DockviewFrameworkOptions = {
         parentElement: el.value,
-        frameworkComponentFactory: {
-            content: {
-                createComponent: (
-                    id: string,
-                    componentId: string,
-                    component: any
-                ): IContentRenderer => {
-                    return new VueContentRenderer(component,getCurrentInstance()!);
-                },
-            },
-            tab: {
-                createComponent: (
-                    id: string,
-                    componentId: string,
-                    component: any
-                ): ITabRenderer => {
-                    return new VueTabRenderer(component,getCurrentInstance()!);
-                },
-            },
-            watermark: {
-                createComponent: (
-                    id: string,
-                    componentId: string,
-                    component: any
-                ): IWatermarkRenderer => {
-                    return new VueWatermarkRenderer(component,getCurrentInstance()!);
-                },
-            },
-            // action: {
-            //   createComponent: (id: string, componentId: string, component: any): IWatermarkRenderer => {
-            //     return new VueHeaderActionRenderer(component)
-            //   }
-            // }
+        createComponent(options) {
+            const component = findComponent(
+                getCurrentInstance()!,
+                options.name
+            );
+            return new VueContentRenderer(component!, getCurrentInstance()!);
         },
-        frameworkComponents: props.components,
-        frameworkTabComponents,
-        headerLeftActionComponent: props.leftHeaderActionsComponent
+        createTabComponent(options) {
+            let component = findComponent(getCurrentInstance()!, options.name);
+
+            if (!component && props.defaultTabComponent) {
+                component = findComponent(
+                    getCurrentInstance()!,
+                    props.defaultTabComponent
+                );
+            }
+
+            if (component) {
+                return new VueTabRenderer(component, getCurrentInstance()!);
+            }
+            return undefined;
+        },
+        createWatermarkComponent: props.watermarkComponent
+            ? () => {
+                  const component = findComponent(
+                      getCurrentInstance()!,
+                      props.watermarkComponent!
+                  );
+
+                  return new VueWatermarkRenderer(
+                      component!,
+                      getCurrentInstance()!
+                  );
+              }
+            : undefined,
+        createLeftHeaderActionComponent: props.leftHeaderActionsComponent
             ? (group) => {
+                  const component = findComponent(
+                      getCurrentInstance()!,
+                      props.leftHeaderActionsComponent!
+                  );
                   return new VueHeaderActionsRenderer(
-                      props.leftHeaderActionsComponent as VueComponent,getCurrentInstance()!,
+                      component!,
+                      getCurrentInstance()!,
                       group
                   );
               }
             : undefined,
-        headerPrefixActionComponent: props.prefixHeaderActionsComponent
+        createPrefixHeaderActionComponent: props.prefixHeaderActionsComponent
             ? (group) => {
+                  const component = findComponent(
+                      getCurrentInstance()!,
+                      props.prefixHeaderActionsComponent!
+                  );
                   return new VueHeaderActionsRenderer(
-                      props.prefixHeaderActionsComponent as VueComponent,getCurrentInstance()!,
+                      component!,
+                      getCurrentInstance()!,
                       group
                   );
               }
             : undefined,
-        headerRightActionComponent: props.rightHeaderActionsComponent
+        createRightHeaderActionComponent: props.rightHeaderActionsComponent
             ? (group) => {
+                  const component = findComponent(
+                      getCurrentInstance()!,
+                      props.rightHeaderActionsComponent!
+                  );
                   return new VueHeaderActionsRenderer(
-                      props.rightHeaderActionsComponent as VueComponent,getCurrentInstance()!,
+                      component!,
+                      getCurrentInstance()!,
                       group
                   );
               }
             : undefined,
-        defaultTabComponent: props.defaultTabComponent
-            ? DEFAULT_REACT_TAB
-            : undefined,
-        watermarkFrameworkComponent:props.watermarkComponent
     };
 
     const dockview = new DockviewComponent({
@@ -300,6 +199,7 @@ onMounted(() => {
      */
     instance.value = markRaw(dockview);
 
+    console.log(getCurrentInstance());
 
     emit('ready', { api: new DockviewApi(dockview) });
 });

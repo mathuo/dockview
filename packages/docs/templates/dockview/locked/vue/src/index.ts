@@ -1,25 +1,13 @@
 import 'dockview-core/dist/styles/dockview.css';
 import { PropType, createApp, defineComponent } from 'vue';
 import { DockviewVue } from 'dockview-vue';
-import {
-    DockviewApi,
-    DockviewReadyEvent,
-    IDockviewPanelProps,
-} from 'dockview-core';
+import { DockviewReadyEvent, IDockviewPanelProps } from 'dockview-core';
 
 const Panel = defineComponent({
     name: 'Panel',
     props: {
-        api: {
-            type: Object as PropType<IDockviewPanelProps['api']>,
-            required: true,
-        },
-        containerApi: {
-            type: Object as PropType<IDockviewPanelProps['containerApi']>,
-            required: true,
-        },
         params: {
-            type: Object as PropType<IDockviewPanelProps['params']>,
+            type: Object as PropType<IDockviewPanelProps>,
             required: true,
         },
     },
@@ -30,7 +18,7 @@ const Panel = defineComponent({
     },
 
     mounted() {
-        const disposable = this.api.onDidTitleChange(() => {
+        const disposable = this.params.api.onDidTitleChange(() => {
             this.title = this.api.title;
         });
         this.title = this.api.title;
@@ -50,13 +38,7 @@ const App = defineComponent({
     name: 'App',
     components: {
         'dockview-vue': DockviewVue,
-    },
-    data() {
-        return {
-            components: {
-                default: Panel,
-            },
-        };
+        default: Panel,
     },
     methods: {
         onReady(event: DockviewReadyEvent) {
@@ -95,7 +77,6 @@ const App = defineComponent({
         style="width:100%;height:100%"
         class="dockview-theme-abyss"
         @ready="onReady"
-        :components="components"
         :locked=true
       </dockview-vue>`,
 });

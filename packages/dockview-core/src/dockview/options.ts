@@ -1,12 +1,7 @@
 import { DockviewApi } from '../api/component.api';
 import { Direction } from '../gridview/baseComponentGridview';
 import { IGridView } from '../gridview/gridview';
-import {
-    IContentRenderer,
-    ITabRenderer,
-    WatermarkConstructor,
-    IWatermarkRenderer,
-} from './types';
+import { IContentRenderer, ITabRenderer, IWatermarkRenderer } from './types';
 import { Parameters } from '../panel/types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { PanelTransfer } from '../dnd/dataTransfer';
@@ -17,22 +12,12 @@ import {
     GroupOptions,
 } from './dockviewGroupPanelModel';
 import { IDockviewPanel } from './dockviewPanel';
-import {
-    ComponentConstructor,
-    FrameworkFactory,
-} from '../panel/componentFactory';
 import { DockviewPanelRenderer } from '../overlayRenderContainer';
 import { IGroupHeaderProps } from './framework';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
     init(params: IGroupHeaderProps): void;
-}
-
-export interface GroupPanelFrameworkComponentFactory {
-    content: FrameworkFactory<IContentRenderer>;
-    tab: FrameworkFactory<ITabRenderer>;
-    watermark: FrameworkFactory<IWatermarkRenderer>;
 }
 
 export interface TabContextMenuEvent {
@@ -119,32 +104,26 @@ export const PROPERTY_KEYS: (keyof DockviewOptions)[] = (() => {
 })();
 
 export interface DockviewFrameworkOptions {
-    headerRightActionComponent?: (
-        group: DockviewGroupPanel
-    ) => IHeaderActionsRenderer;
-    headerLeftActionComponent?: (
-        group: DockviewGroupPanel
-    ) => IHeaderActionsRenderer;
-    headerPrefixActionComponent?: (
-        group: DockviewGroupPanel
-    ) => IHeaderActionsRenderer;
-    tabComponents?: {
-        [componentName: string]: ComponentConstructor<ITabRenderer>;
-    };
-    components?: {
-        [componentName: string]: ComponentConstructor<IContentRenderer>;
-    };
-    frameworkTabComponents?: {
-        [componentName: string]: any;
-    };
-    frameworkComponents?: {
-        [componentName: string]: any;
-    };
     parentElement: HTMLElement;
     defaultTabComponent?: string;
-    watermarkComponent?: WatermarkConstructor;
-    watermarkFrameworkComponent?: any;
-    frameworkComponentFactory?: GroupPanelFrameworkComponentFactory;
+    createRightHeaderActionComponent?: (
+        group: DockviewGroupPanel
+    ) => IHeaderActionsRenderer;
+    createLeftHeaderActionComponent?: (
+        group: DockviewGroupPanel
+    ) => IHeaderActionsRenderer;
+    createPrefixHeaderActionComponent?: (
+        group: DockviewGroupPanel
+    ) => IHeaderActionsRenderer;
+    createTabComponent?: (options: {
+        id: string;
+        name: string;
+    }) => ITabRenderer | undefined;
+    createComponent: (options: {
+        id: string;
+        name: string;
+    }) => IContentRenderer;
+    createWatermarkComponent?: () => IWatermarkRenderer;
 }
 
 export type DockviewComponentOptions = DockviewOptions &

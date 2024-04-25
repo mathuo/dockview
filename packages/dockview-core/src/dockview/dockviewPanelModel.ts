@@ -6,7 +6,6 @@ import {
 } from './types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDisposable } from '../lifecycle';
-import { createComponent } from '../panel/componentFactory';
 import { IDockviewComponent } from './dockviewComponent';
 import { PanelUpdateEvent } from '../panel/types';
 
@@ -73,39 +72,37 @@ export class DockviewPanelModel implements IDockviewPanelModel {
         id: string,
         componentName: string
     ): IContentRenderer {
-        return createComponent(
+        return this.accessor.options.createComponent({
             id,
-            componentName,
-            this.accessor.options.components ?? {},
-            this.accessor.options.frameworkComponents,
-            this.accessor.options.frameworkComponentFactory?.content
-        );
+            name: componentName,
+        });
     }
 
     private createTabComponent(
         id: string,
         componentName?: string
     ): ITabRenderer {
-        if (componentName) {
-            return createComponent(
-                id,
-                componentName,
-                this.accessor.options.tabComponents,
-                this.accessor.options.frameworkTabComponents,
-                this.accessor.options.frameworkComponentFactory?.tab,
-                () => new DefaultTab()
+        const name = componentName ?? this.accessor.options.defaultTabComponent;
+
+        if (name) {
+            if (this.accessor.options.createTabComponent) {
+                const component = this.accessor.options.createTabComponent({
+                    id,
+                    name,
+                });
+
+                if (component) {
+                    return component;
+                } else {
+                    return new DefaultTab();
+                }
+            }
+
+            console.warn(
+                `dockview: tabComponent '${componentName}' was not found. falling back to the default tab.`
             );
-        } else if (this.accessor.options.defaultTabComponent) {
-            return createComponent(
-                id,
-                this.accessor.options.defaultTabComponent,
-                this.accessor.options.tabComponents,
-                this.accessor.options.frameworkTabComponents,
-                this.accessor.options.frameworkComponentFactory?.tab,
-                () => new DefaultTab()
-            );
-        } else {
-            return new DefaultTab();
         }
+
+        return new DefaultTab();
     }
 }

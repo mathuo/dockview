@@ -6,9 +6,15 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+const { version } = JSON.parse(
+    fs.readFileSync(
+        path.join(__dirname, '..', '..', 'dockview', 'package.json')
+    )
+);
+
 const REACT_VERSION = '18.2.0';
 const VUE_VERSION = '3.4.21';
-const DOCKVIEW_VERSION = '1.11.0';
+const DOCKVIEW_VERSION = version;
 const USE_LOCAL_CDN = argv.slice(2).includes('--local');
 
 const local = 'http://localhost:1111';
@@ -107,7 +113,7 @@ for (const component of COMPONENTS) {
                 path.join(output, component, folder, framework, 'src')
             );
             const template = createIndexHTML({
-                title: 'React App',
+                title: `Dockview | ${folder} ${framework}`,
                 app:
                     framework === 'react'
                         ? './src/index.tsx'

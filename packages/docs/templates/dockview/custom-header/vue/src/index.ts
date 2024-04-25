@@ -10,16 +10,8 @@ import {
 const Panel = defineComponent({
     name: 'Panel',
     props: {
-        api: {
-            type: Object as PropType<IDockviewPanelProps['api']>,
-            required: true,
-        },
-        containerApi: {
-            type: Object as PropType<IDockviewPanelProps['containerApi']>,
-            required: true,
-        },
         params: {
-            type: Object as PropType<IDockviewPanelProps['params']>,
+            type: Object as PropType<IDockviewPanelProps>,
             required: true,
         },
     },
@@ -43,9 +35,9 @@ const Panel = defineComponent({
             console.log('interval');
 
             const interval = setInterval(() => {
-                this.api.updateParameters({ myValue: Date.now() });
+                this.params.api.updateParameters({ myValue: Date.now() });
             }, 1000);
-            this.api.updateParameters({ myValue: Date.now() });
+            this.parmas.api.updateParameters({ myValue: Date.now() });
 
             return () => {
                 clearInterval(interval);
@@ -53,10 +45,10 @@ const Panel = defineComponent({
         },
     },
     mounted() {
-        const disposable = this.api.onDidTitleChange(() => {
-            this.title = this.api.title;
+        const disposable = this.params.api.onDidTitleChange(() => {
+            this.title = this.params.api.title;
         });
-        this.title = this.api.title;
+        this.title = this.params.api.title;
 
         return () => {
             disposable.dispose();
@@ -78,28 +70,14 @@ interface CustomParams {
 const Tab = defineComponent({
     name: 'Tab',
     props: {
-        api: {
-            type: Object as PropType<
-                IDockviewPanelHeaderProps<CustomParams>['api']
-            >,
-            required: true,
-        },
-        containerApi: {
-            type: Object as PropType<
-                IDockviewPanelHeaderProps<CustomParams>['containerApi']
-            >,
-            required: true,
-        },
         params: {
-            type: Object as PropType<
-                IDockviewPanelHeaderProps<CustomParams>['params']
-            >,
+            type: Object as PropType<IDockviewPanelHeaderProps<CustomParams>>,
             required: true,
         },
     },
     data() {
         return {
-            myValue: this.params.myValue,
+            myValue: this.params.params.myValue,
             title: '',
         };
     },
@@ -118,9 +96,9 @@ const Tab = defineComponent({
             }
 
             const interval = setInterval(() => {
-                this.api.updateParameters({ myValue: Date.now() });
+                this.params.api.updateParameters({ myValue: Date.now() });
             }, 1000);
-            this.api.updateParameters({ myValue: Date.now() });
+            this.params.api.updateParameters({ myValue: Date.now() });
 
             return () => {
                 clearInterval(interval);
@@ -139,25 +117,15 @@ const App = defineComponent({
     name: 'App',
     components: {
         'dockview-vue': DockviewVue,
-        Panel,
-        Tab,
-    },
-    data() {
-        return {
-            components: {
-                default: Panel,
-            },
-            tabComponents: {
-                default: Tab,
-            },
-        };
+        defaultPanel: Panel,
+        defaultTab: Tab,
     },
     methods: {
         onReady(event: DockviewReadyEvent) {
             event.api.addPanel({
                 id: 'panel_1',
-                component: 'default',
-                tabComponent: 'default',
+                component: 'defaultPanel',
+                tabComponent: 'defaultTab',
                 params: {
                     myValue: Date.now(),
                 },
@@ -165,8 +133,8 @@ const App = defineComponent({
 
             event.api.addPanel({
                 id: 'panel_2',
-                component: 'default',
-                tabComponent: 'default',
+                component: 'defaultPanel',
+                tabComponent: 'defaultTab',
                 params: {
                     myValue: Date.now(),
                 },
@@ -178,8 +146,6 @@ const App = defineComponent({
         style="width:100%;height:100%"
         class="dockview-theme-abyss"
         @ready="onReady"
-        :components="components"
-        :tabComponents="tabComponents"
       </dockview-vue>`,
 });
 

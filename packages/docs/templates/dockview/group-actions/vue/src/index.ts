@@ -2,7 +2,6 @@ import 'dockview-core/dist/styles/dockview.css';
 import { PropType, createApp, defineComponent } from 'vue';
 import { DockviewVue } from 'dockview-vue';
 import {
-    DockviewGroupPanelApi,
     DockviewReadyEvent,
     IDockviewHeaderActionsProps,
     IDockviewPanelProps,
@@ -12,18 +11,8 @@ import './app.css';
 const LeftAction = defineComponent({
     name: 'LeftAction',
     props: {
-        containerApi: {
-            type: Object as PropType<
-                IDockviewHeaderActionsProps['containerApi']
-            >,
-            required: true,
-        },
-        api: {
-            type: Object as PropType<IDockviewHeaderActionsProps['api']>,
-            required: true,
-        },
-        group: {
-            type: Object as PropType<IDockviewHeaderActionsProps['group']>,
+        params: {
+            type: Object as PropType<IDockviewHeaderActionsProps>,
             required: true,
         },
     },
@@ -33,11 +22,11 @@ const LeftAction = defineComponent({
         };
     },
     mounted() {
-        const disposable = this.api.onDidActivePanelChange((event) => {
+        const disposable = this.params.api.onDidActivePanelChange((event) => {
             this.activePanel = event.panel.id;
         });
 
-        this.activePanel = this.group.activePanel.id;
+        this.activePanel = this.params.group.activePanel.id;
 
         return () => {
             disposable.dispose();
@@ -54,18 +43,8 @@ const LeftAction = defineComponent({
 const RightAction = defineComponent({
     name: 'RightAction',
     props: {
-        containerApi: {
-            type: Object as PropType<
-                IDockviewHeaderActionsProps['containerApi']
-            >,
-            required: true,
-        },
-        api: {
-            type: Object as PropType<IDockviewHeaderActionsProps['api']>,
-            required: true,
-        },
-        group: {
-            type: Object as PropType<IDockviewHeaderActionsProps['group']>,
+        params: {
+            type: Object as PropType<IDockviewHeaderActionsProps>,
             required: true,
         },
     },
@@ -75,7 +54,7 @@ const RightAction = defineComponent({
         };
     },
     mounted() {
-        const disposable = this.api.onDidActiveChange((event) => {
+        const disposable = this.params.api.onDidActiveChange((event) => {
             this.isGroupActive = event.isActive;
         });
 
@@ -99,14 +78,8 @@ const RightAction = defineComponent({
 const PrefixAction = defineComponent({
     name: 'PrefixAction',
     props: {
-        containerApi: {
-            type: Object as PropType<
-                IDockviewHeaderActionsProps['containerApi']
-            >,
-            required: true,
-        },
-        group: {
-            type: Object as PropType<IDockviewHeaderActionsProps['group']>,
+        params: {
+            type: Object as PropType<IDockviewHeaderActionsProps>,
             required: true,
         },
     },
@@ -116,16 +89,8 @@ const PrefixAction = defineComponent({
 const Panel = defineComponent({
     name: 'Panel',
     props: {
-        api: {
-            type: Object as PropType<IDockviewPanelProps['api']>,
-            required: true,
-        },
-        containerApi: {
-            type: Object as PropType<IDockviewPanelProps['containerApi']>,
-            required: true,
-        },
         params: {
-            type: Object as PropType<IDockviewPanelProps['params']>,
+            type: Object as PropType<IDockviewPanelProps>,
             required: true,
         },
     },
@@ -136,10 +101,10 @@ const Panel = defineComponent({
     },
 
     mounted() {
-        const disposable = this.api.onDidTitleChange(() => {
-            this.title = this.api.title;
+        const disposable = this.params.api.onDidTitleChange(() => {
+            this.title = this.params.api.title;
         });
-        this.title = this.api.title;
+        this.title = this.params.api.title;
 
         return () => {
             disposable.dispose();
@@ -155,20 +120,10 @@ const App = defineComponent({
     name: 'App',
     components: {
         'dockview-vue': DockviewVue,
-        Panel,
-        LeftAction,
-        RightAction,
-        PrefixAction,
-    },
-    data() {
-        return {
-            components: {
-                default: Panel,
-            },
-            leftAction: LeftAction,
-            rightAction: RightAction,
-            prefixAction: PrefixAction,
-        };
+        default: Panel,
+        leftAction: LeftAction,
+        rightAction: RightAction,
+        prefixAction: PrefixAction,
     },
     methods: {
         onReady(event: DockviewReadyEvent) {
@@ -202,10 +157,9 @@ const App = defineComponent({
         style="width:100%;height:100%"
         class="dockview-theme-abyss"
         @ready="onReady"
-        :components="components"
-        :leftHeaderActionsComponent="leftAction"
-        :rightHeaderActionsComponent="rightAction"
-        :prefixHeaderActionsComponent="prefixAction"
+        leftHeaderActionsComponent="leftAction"
+        rightHeaderActionsComponent="rightAction"
+        prefixHeaderActionsComponent="prefixAction"
       </dockview-vue>`,
 });
 
