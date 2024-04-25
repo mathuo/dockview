@@ -5103,8 +5103,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
             const api = new DockviewApi(dockview);
@@ -5130,8 +5138,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
             const api = new DockviewApi(dockview);
@@ -5159,8 +5175,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
             const api = new DockviewApi(dockview);
@@ -5188,8 +5212,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
             const api = new DockviewApi(dockview);
@@ -5216,8 +5248,16 @@ describe('dockviewComponent', () => {
 
             const dockview = new DockviewComponent({
                 parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
                 },
             });
             const api = new DockviewApi(dockview);
