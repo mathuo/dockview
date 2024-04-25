@@ -34,11 +34,12 @@ export const GridActions = (props: { api?: DockviewApi }) => {
         }
     };
 
-    const onAddPanel = () => {
+    const onAddPanel = (options?: { inactive: boolean }) => {
         props.api?.addPanel({
             id: `id_${Date.now().toString()}`,
             component: 'default',
             title: `Tab ${nextId()}`,
+            inactive: options?.inactive,
         });
     };
 
@@ -48,8 +49,14 @@ export const GridActions = (props: { api?: DockviewApi }) => {
 
     return (
         <div className="action-container">
-            <button className="text-button" onClick={onAddPanel}>
+            <button className="text-button" onClick={() => onAddPanel()}>
                 Add Panel
+            </button>
+            <button
+                className="text-button"
+                onClick={() => onAddPanel({ inactive: true })}
+            >
+                Add Inactive Panel
             </button>
             <button className="text-button" onClick={onAddGroup}>
                 Add Group
