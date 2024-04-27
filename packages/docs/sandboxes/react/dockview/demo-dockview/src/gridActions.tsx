@@ -2,7 +2,11 @@ import { DockviewApi } from 'dockview';
 import * as React from 'react';
 import { defaultConfig, nextId } from './defaultLayout';
 
-export const GridActions = (props: { api?: DockviewApi }) => {
+export const GridActions = (props: {
+    api?: DockviewApi;
+    hasCustomWatermark: boolean;
+    toggleCustomWatermark: () => void;
+}) => {
     const onClear = () => {
         props.api?.clear();
     };
@@ -61,6 +65,18 @@ export const GridActions = (props: { api?: DockviewApi }) => {
             <button className="text-button" onClick={onAddGroup}>
                 Add Group
             </button>
+            <span className="button-action">
+                <button
+                    className={
+                        props.hasCustomWatermark
+                            ? 'demo-button selected'
+                            : 'demo-button'
+                    }
+                    onClick={props.toggleCustomWatermark}
+                >
+                    Use Custom Watermark
+                </button>
+            </span>
             <button className="text-button" onClick={onClear}>
                 Clear
             </button>

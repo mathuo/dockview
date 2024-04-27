@@ -78,6 +78,10 @@ const colors = [
 ];
 let count = 0;
 
+const WatermarkComponent = () => {
+    return <div>custom watermark</div>;
+};
+
 const DockviewDemo = (props: { theme?: string }) => {
     const [logLines, setLogLines] = React.useState<
         { text: string; timestamp?: Date; backgroundColor?: string }[]
@@ -174,6 +178,8 @@ const DockviewDemo = (props: { theme?: string }) => {
         defaultConfig(event.api);
     };
 
+    const [watermark, setWatermark] = React.useState<boolean>(false);
+
     return (
         <div
             style={{
@@ -187,7 +193,11 @@ const DockviewDemo = (props: { theme?: string }) => {
             }}
         >
             <div>
-                <GridActions api={api} />
+                <GridActions
+                    api={api}
+                    toggleCustomWatermark={() => setWatermark(!watermark)}
+                    hasCustomWatermark={watermark}
+                />
                 {api && (
                     <PanelActions
                         api={api}
@@ -218,6 +228,9 @@ const DockviewDemo = (props: { theme?: string }) => {
                     rightHeaderActionsComponent={RightControls}
                     leftHeaderActionsComponent={LeftControls}
                     prefixHeaderActionsComponent={PrefixHeaderControls}
+                    watermarkComponent={
+                        watermark ? WatermarkComponent : undefined
+                    }
                     onReady={onReady}
                     className={props.theme || 'dockview-theme-abyss'}
                 />
