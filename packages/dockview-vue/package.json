@@ -1,6 +1,6 @@
 {
   "name": "dockview-vue",
-  "version": "0.0.0-beta-0",
+  "version": "1.13.0",
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
   "keywords": [
     "splitview",
@@ -56,6 +56,6 @@
     "build:types": "vue-tsc --project tsconfig.build-types.json --declaration --emitDeclarationOnly --outDir dist/types "
   },
   "dependencies": {
-    "dockview-core": "^1.10.1"
+    "dockview-core": "^1.13.0"
   }
 }

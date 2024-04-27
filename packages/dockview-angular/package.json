@@ -1,6 +1,6 @@
 {
   "name": "dockview-angular",
-  "version": "0.0.0-beta-0",
+  "version": "1.13.0",
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
   "keywords": [
     "splitview",
@@ -54,6 +54,6 @@
     "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage"
   },
   "dependencies": {
-    "dockview-core": "^1.10.1"
+    "dockview-core": "^1.13.0"
   }
 }
