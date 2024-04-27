@@ -5,15 +5,11 @@ import BrowserOnly from '@docusaurus/BrowserOnly';
 const BASE_SANDBOX_URL =
     'https://codesandbox.io/s/github/mathuo/dockview/tree/master/packages/docs';
 
-export const _CodeRunner = (props: {
-    id: string;
-    framework: string;
-    height: number;
-}) => {
-    useActiveFramework();
+export const _CodeRunner = (props: { id: string; height: number }) => {
+    const [framework] = useActiveFramework();
 
-    const sandboxUrl = `${BASE_SANDBOX_URL}/templates/${props.id}/${props.framework}`;
-    const path = `/templates/${props.id}/${props.framework}/index.html`;
+    const sandboxUrl = `${BASE_SANDBOX_URL}/templates/${props.id}/${framework}`;
+    const path = `/templates/${props.id}/${framework}/index.html`;
     return (
         <div>
             <iframe
@@ -35,15 +31,7 @@ export const _CodeRunner = (props: {
 };
 
 export const CodeRunner = (props: { id: string; height: number }) => {
-    const [framework] = useActiveFramework();
-
-    return (
-        <BrowserOnly>
-            {() => (
-                <_CodeRunner {...props} framework={framework.toLowerCase()} />
-            )}
-        </BrowserOnly>
-    );
+    return <BrowserOnly>{() => <_CodeRunner {...props} />}</BrowserOnly>;
 };
 
 const CodeSandbox = (props: { url: string }) => {

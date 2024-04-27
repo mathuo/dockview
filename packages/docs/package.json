@@ -3,7 +3,7 @@
   "version": "1.13.0",
   "private": true,
   "scripts": {
-    "build": "npm run create-templates && docusaurus build",
+    "build": "npm run build-templates && docusaurus build",
     "clear": "docusaurus clear",
     "start": "concurrently \"docusaurus start\" \"npm run start-esm-server\"",
     "start-esm-server": "node web-server/index.mjs",
