@@ -14,7 +14,7 @@ const { version } = JSON.parse(
 
 const REACT_VERSION = '18.2.0';
 const VUE_VERSION = '3.4.21';
-const DOCKVIEW_VERSION = version;
+const DOCKVIEW_VERSION = 'latest'; // version;
 const USE_LOCAL_CDN = argv.slice(2).includes('--local');
 
 const local = 'http://localhost:1111';

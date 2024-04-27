@@ -8,8 +8,10 @@ const BASE_SANDBOX_URL =
 export const _CodeRunner = (props: { id: string; height: number }) => {
     const [framework] = useActiveFramework();
 
-    const sandboxUrl = `${BASE_SANDBOX_URL}/templates/${props.id}/${framework}`;
-    const path = `/templates/${props.id}/${framework}/index.html`;
+    const sandboxUrl = `${BASE_SANDBOX_URL}/templates/${
+        props.id
+    }/${framework.toLowerCase()}`;
+    const path = `/templates/${props.id}/${framework.toLowerCase()}/index.html`;
     return (
         <div>
             <iframe
