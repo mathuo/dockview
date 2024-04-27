@@ -7,7 +7,7 @@ const PanelAction = (props: {
     panelId: string;
 }) => {
     const onClick = () => {
-        props.api?.getPanel(props.panelId)?.focus();
+        props.api.getPanel(props.panelId)?.focus();
     };
     return (
         <div className="button-action">
@@ -27,9 +27,9 @@ const PanelAction = (props: {
                 <button
                     className="demo-icon-button"
                     onClick={() => {
-                        const panel = props.api?.getPanel(props.panelId);
+                        const panel = props.api.getPanel(props.panelId);
                         if (panel) {
-                            props.api?.addFloatingGroup(panel);
+                            props.api.addFloatingGroup(panel);
                         }
                     }}
                 >
@@ -38,9 +38,9 @@ const PanelAction = (props: {
                 <button
                     className="demo-icon-button"
                     onClick={() => {
-                        const panel = props.api?.getPanel(props.panelId);
+                        const panel = props.api.getPanel(props.panelId);
                         if (panel) {
-                            props.api?.addPopoutGroup(panel);
+                            props.api.addPopoutGroup(panel);
                         }
                     }}
                 >
@@ -51,7 +51,7 @@ const PanelAction = (props: {
                 <button
                     className="demo-icon-button"
                     onClick={() => {
-                        const panel = props.api?.getPanel(props.panelId);
+                        const panel = props.api.getPanel(props.panelId);
                         panel?.api.close();
                     }}
                 >

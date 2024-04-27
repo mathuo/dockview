@@ -1418,7 +1418,7 @@ export class DockviewComponent
 
                 if (!referencePanel) {
                     throw new Error(
-                        `referencePanel ${options.position.referencePanel} does not exist`
+                        `referencePanel '${options.position.referencePanel}' does not exist`
                     );
                 }
 
@@ -1432,7 +1432,7 @@ export class DockviewComponent
 
                 if (!referenceGroup) {
                     throw new Error(
-                        `referencePanel ${options.position.referenceGroup} does not exist`
+                        `referenceGroup '${options.position.referenceGroup}' does not exist`
                     );
                 }
             } else {
