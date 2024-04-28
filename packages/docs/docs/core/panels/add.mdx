@@ -21,8 +21,11 @@ To open a panel requires a unique `id` and the name of the `component` to render
 const panel: IDockviewPanel = api.addPanel({
     id: 'my_unique_panel_id',
     component: 'my_component',
+    // optionally set `inactive: true` to prevent the added panel becoming active automatically
+    inactive: true
 });
 ```
+
 
 > See [Overview](/docs/core/overview) to register components.
 
