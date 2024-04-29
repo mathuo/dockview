@@ -56,6 +56,7 @@ export interface GroupOptions extends CoreGroupOptions {
     readonly panels?: IDockviewPanel[];
     readonly activePanel?: IDockviewPanel;
     readonly id?: string;
+    readonly preferredSize?: number;
 }
 
 export interface GroupPanelViewState extends CoreGroupOptions {

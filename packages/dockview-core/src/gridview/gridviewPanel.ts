@@ -13,7 +13,7 @@ import {
     GridviewPanelApi,
     GridviewPanelApiImpl,
 } from '../api/gridviewPanelApi';
-import { LayoutPriority } from '../splitview/splitview';
+import { EnhancedLayoutPriority } from '../splitview/splitview';
 import { Emitter, Event } from '../events';
 import { IViewSize } from './gridview';
 import { BaseGrid, IGridPanelView } from './baseComponentGridview';
@@ -23,7 +23,7 @@ export interface GridviewInitParameters extends PanelInitParameters {
     maximumWidth?: number;
     minimumHeight?: number;
     maximumHeight?: number;
-    priority?: LayoutPriority;
+    priority?: EnhancedLayoutPriority;
     snap?: boolean;
     accessor: BaseGrid<IGridPanelView>;
     isVisible?: boolean;
@@ -35,7 +35,7 @@ export interface IGridviewPanel<T extends GridviewPanelApi = GridviewPanelApi>
     readonly maximumWidth: number;
     readonly minimumHeight: number;
     readonly maximumHeight: number;
-    readonly priority: LayoutPriority | undefined;
+    readonly priority: EnhancedLayoutPriority | undefined;
     readonly snap: boolean;
 }
 
@@ -54,14 +54,14 @@ export abstract class GridviewPanel<
     private _minimumHeight: FunctionOrValue<number> = 0;
     private _maximumWidth: FunctionOrValue<number> = Number.MAX_SAFE_INTEGER;
     private _maximumHeight: FunctionOrValue<number> = Number.MAX_SAFE_INTEGER;
-    private _priority?: LayoutPriority;
+    protected _priority?: EnhancedLayoutPriority;
     private _snap = false;
 
     private readonly _onDidChange = new Emitter<IViewSize | undefined>();
     readonly onDidChange: Event<IViewSize | undefined> =
         this._onDidChange.event;
 
-    get priority(): LayoutPriority | undefined {
+    get priority(): EnhancedLayoutPriority | undefined {
         return this._priority;
     }
 
@@ -270,5 +270,5 @@ export interface GridPanelViewState extends BasePanelViewState {
     minimumWidth?: number;
     maximumWidth?: number;
     snap?: boolean;
-    priority?: LayoutPriority;
+    priority?: EnhancedLayoutPriority;
 }

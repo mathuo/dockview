@@ -1,6 +1,6 @@
 import { IDisposable } from '../lifecycle';
 import { clamp } from '../math';
-import { IView, LayoutPriority } from './splitview';
+import { IView, EnhancedLayoutPriority } from './splitview';
 
 export class ViewItem {
     private _size: number;
@@ -36,7 +36,7 @@ export class ViewItem {
         return this.view.maximumSize;
     }
 
-    get priority(): LayoutPriority | undefined {
+    get priority(): EnhancedLayoutPriority | undefined {
         return this.view.priority;
     }
     get snap(): boolean {

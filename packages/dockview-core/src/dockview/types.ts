@@ -75,5 +75,7 @@ export interface GroupviewPanelState {
     tabComponent?: string;
     title?: string;
     renderer?: DockviewPanelRenderer;
+    priority?: number;
+    preferredSize?: number;
     params?: { [key: string]: any };
 }

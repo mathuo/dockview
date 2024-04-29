@@ -1,5 +1,5 @@
 import { IPanel, PanelInitParameters } from '../panel/types';
-import { IView, SplitViewOptions, LayoutPriority } from './splitview';
+import { IView, SplitViewOptions, EnhancedLayoutPriority } from './splitview';
 import { SplitviewPanel } from './splitviewPanel';
 import { SplitviewComponent } from './splitviewComponent';
 import {
@@ -11,7 +11,7 @@ export interface PanelViewInitParameters extends PanelInitParameters {
     minimumSize?: number;
     maximumSize?: number;
     snap?: boolean;
-    priority?: LayoutPriority;
+    priority?: EnhancedLayoutPriority;
     accessor: SplitviewComponent;
 }
 

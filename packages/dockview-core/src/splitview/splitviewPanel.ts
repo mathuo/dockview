@@ -4,13 +4,13 @@ import {
     BasePanelViewExported,
 } from '../gridview/basePanelView';
 import { SplitviewPanelApiImpl } from '../api/splitviewPanelApi';
-import { LayoutPriority, Orientation } from './splitview';
+import { EnhancedLayoutPriority, Orientation } from './splitview';
 import { FunctionOrValue } from '../types';
 import { Emitter, Event } from '../events';
 
 export interface ISplitviewPanel
     extends BasePanelViewExported<SplitviewPanelApiImpl> {
-    readonly priority: LayoutPriority | undefined;
+    readonly priority: EnhancedLayoutPriority | undefined;
     readonly minimumSize: number;
     readonly maximumSize: number;
     readonly snap: boolean;
@@ -26,7 +26,7 @@ export abstract class SplitviewPanel
 
     private _minimumSize: FunctionOrValue<number> = 0;
     private _maximumSize: FunctionOrValue<number> = Number.POSITIVE_INFINITY;
-    private _priority?: LayoutPriority;
+    private _priority?: EnhancedLayoutPriority;
     private _snap = false;
 
     private _orientation?: Orientation;
@@ -38,7 +38,7 @@ export abstract class SplitviewPanel
     readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
         this._onDidChange.event;
 
-    get priority(): LayoutPriority | undefined {
+    get priority(): EnhancedLayoutPriority | undefined {
         return this._priority;
     }
 

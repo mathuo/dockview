@@ -2,17 +2,18 @@ import { Emitter } from '../../events';
 import { CompositeDisposable } from '../../lifecycle';
 import {
     IView,
-    LayoutPriority,
+    EnhancedLayoutPriority,
     Orientation,
     Sizing,
     Splitview,
+    LayoutPriority,
 } from '../../splitview/splitview';
 import { fireEvent } from '@testing-library/dom';
 class Testview implements IView {
     private _element: HTMLElement = document.createElement('div');
     private _size = 0;
     private _orthogonalSize = 0;
-    private _priority: LayoutPriority | undefined;
+    private _priority: EnhancedLayoutPriority | undefined;
 
     private readonly _onDidChange = new Emitter<{
         size?: number;
@@ -54,7 +55,7 @@ class Testview implements IView {
     constructor(
         private _minimumSize: number,
         private _maxiumSize: number,
-        priority?: LayoutPriority
+        priority?: EnhancedLayoutPriority
     ) {
         this._priority = priority;
     }
