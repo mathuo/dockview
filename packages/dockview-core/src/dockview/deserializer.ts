@@ -57,6 +57,7 @@ export class DefaultDockviewDeserialzier implements IPanelDeserializer {
             view,
             {
                 renderer: panelData.renderer,
+                priority: panelData.priority,
             }
         );
 

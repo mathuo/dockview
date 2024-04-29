@@ -2219,7 +2219,7 @@ export class DockviewComponent
             this._api,
             group,
             view,
-            { renderer: options.renderer }
+            { renderer: options.renderer, priority: options.priority }
         );
 
         panel.init({

@@ -225,6 +225,10 @@ export type AddPanelOptions<P extends object = Parameters> = {
      * Defaults to `false` which forces newly added panels to become active.
      */
     inactive?: boolean;
+    /**
+     * Panel resizing priority
+     */
+    priority?: number;
 } & Partial<AddPanelOptionsUnion>;
 
 type AddGroupOptionsWithPanel = {

@@ -5,7 +5,7 @@
 
 import {
     ISplitviewStyles,
-    LayoutPriority,
+    EnhancedLayoutPriority,
     Orientation,
     Sizing,
 } from '../splitview/splitview';
@@ -171,7 +171,7 @@ export interface IGridView {
     readonly maximumWidth: number;
     readonly minimumHeight: number;
     readonly maximumHeight: number;
-    priority?: LayoutPriority;
+    priority?: EnhancedLayoutPriority;
     layout(width: number, height: number): void;
     toJSON(): object;
     fromJSON?(json: object): void;

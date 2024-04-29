@@ -39,6 +39,7 @@ export class DockviewPanel
     private _params?: Parameters;
     private _title: string | undefined;
     private _renderer: DockviewPanelRenderer | undefined;
+    private _priority: number | undefined;
 
     get params(): Parameters | undefined {
         return this._params;
@@ -56,6 +57,10 @@ export class DockviewPanel
         return this._renderer ?? this.accessor.renderer;
     }
 
+    get priority(): number {
+        return this._priority ?? 0;
+    }
+
     constructor(
         public readonly id: string,
         component: string,
@@ -64,10 +69,11 @@ export class DockviewPanel
         private readonly containerApi: DockviewApi,
         group: DockviewGroupPanel,
         readonly view: IDockviewPanelModel,
-        options: { renderer?: DockviewPanelRenderer }
+        options: { renderer?: DockviewPanelRenderer; priority?: number }
     ) {
         super();
         this._renderer = options.renderer;
+        this._priority = options.priority;
         this._group = group;
 
         this.api = new DockviewPanelApiImpl(
@@ -129,6 +135,7 @@ export class DockviewPanel
                     : undefined,
             title: this.title,
             renderer: this._renderer,
+            priority: this._priority,
         };
     }
 

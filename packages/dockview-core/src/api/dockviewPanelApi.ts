@@ -130,6 +130,10 @@ export class DockviewPanelApiImpl
         return this._tabComponent;
     }
 
+    get priority(): number {
+        return this.panel.priority;
+    }
+
     constructor(
         private panel: DockviewPanel,
         group: DockviewGroupPanel,

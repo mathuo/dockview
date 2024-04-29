@@ -8,8 +8,10 @@ import {
     Splitview,
     Orientation,
     Sizing,
-    LayoutPriority,
+    EnhancedLayoutPriority,
     ISplitviewStyles,
+    LayoutPriority,
+    layoutPriorityAsNumber,
 } from '../splitview/splitview';
 import { Emitter, Event } from '../events';
 import { INodeDescriptor } from './gridview';
@@ -111,7 +113,7 @@ export class BranchNode extends CompositeDisposable implements IView {
             : this.maximumOrthogonalSize;
     }
 
-    get priority(): LayoutPriority {
+    get priority(): EnhancedLayoutPriority {
         if (this.children.length === 0) {
             return LayoutPriority.Normal;
         }
@@ -122,10 +124,25 @@ export class BranchNode extends CompositeDisposable implements IView {
                 : c.priority
         );
 
-        if (priorities.some((p) => p === LayoutPriority.High)) {
-            return LayoutPriority.High;
-        } else if (priorities.some((p) => p === LayoutPriority.Low)) {
-            return LayoutPriority.Low;
+        let max: number | undefined;
+        let min: number | undefined;
+
+        for (const p of priorities) {
+            const i = layoutPriorityAsNumber(p);
+            if (i > 0) {
+                max = max === undefined ? i : Math.max(max, i);
+            }
+            if (i < 0) {
+                min = min === undefined ? i : Math.min(min, i);
+            }
+        }
+
+        if (typeof max === 'number') {
+            return max;
+        }
+
+        if (typeof min === 'number') {
+            return min;
         }
 
         return LayoutPriority.Normal;
