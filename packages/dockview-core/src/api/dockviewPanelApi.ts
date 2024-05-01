@@ -40,7 +40,8 @@ export interface DockviewPanelApi
     readonly group: DockviewGroupPanel;
     readonly isGroupActive: boolean;
     readonly renderer: DockviewPanelRenderer;
-    readonly preferredSize: number | undefined;
+    readonly preferredWidth: number | undefined;
+    readonly preferredHeight: number | undefined;
     readonly title: string | undefined;
     readonly onDidActiveGroupChange: Event<ActiveGroupEvent>;
     readonly onDidGroupChange: Event<GroupChangedEvent>;
@@ -107,8 +108,12 @@ export class DockviewPanelApiImpl
         return this.panel.renderer;
     }
 
-    get preferredSize(): number | undefined {
-        return this.panel.preferredSize;
+    get preferredHeight(): number | undefined {
+        return this.panel.preferredHeight;
+    }
+
+    get preferredWidth(): number | undefined {
+        return this.panel.preferredWidth;
     }
 
     set group(value: DockviewGroupPanel) {

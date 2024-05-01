@@ -229,7 +229,8 @@ export type AddPanelOptions<P extends object = Parameters> = {
      * Panel resizing priority
      */
     priority?: number;
-    preferredSize?: number;
+    preferredWidth?: number;
+    preferredHeight?: number;
 } & Partial<AddPanelOptionsUnion>;
 
 type AddGroupOptionsWithPanel = {

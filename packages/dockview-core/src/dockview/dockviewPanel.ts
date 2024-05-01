@@ -40,7 +40,8 @@ export class DockviewPanel
     private _title: string | undefined;
     private _renderer: DockviewPanelRenderer | undefined;
     private _priority: number | undefined;
-    private _preferredSize: number | undefined;
+    private _preferredWidth: number | undefined;
+    private _preferredHeight: number | undefined;
 
     get params(): Parameters | undefined {
         return this._params;
@@ -58,9 +59,13 @@ export class DockviewPanel
         return this._renderer ?? this.accessor.renderer;
     }
 
-    get preferredSize(): number | undefined {
-        return this._preferredSize;
+    get preferredWidth(): number | undefined {
+        return this._preferredWidth;
     }
+
+    get preferredHeight(): number | undefined {
+      return this._preferredHeight;
+  }
 
     get priority(): number {
         return this._priority ?? 0;
@@ -77,13 +82,15 @@ export class DockviewPanel
         options: {
             renderer?: DockviewPanelRenderer;
             priority?: number;
-            preferredSize?: number;
+            preferredWidth?: number;
+            preferredHeight?: number;
         }
     ) {
         super();
         this._renderer = options.renderer;
         this._priority = options.priority;
-        this._preferredSize = options.preferredSize;
+        this._preferredWidth = options.preferredWidth;
+        this._preferredHeight = options.preferredHeight;
         this._group = group;
 
         this.api = new DockviewPanelApiImpl(

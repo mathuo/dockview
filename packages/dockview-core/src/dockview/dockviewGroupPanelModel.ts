@@ -38,6 +38,7 @@ import {
 } from './options';
 import { OverlayRenderContainer } from '../overlayRenderContainer';
 import { TitleEvent } from '../api/dockviewPanelApi';
+import { readonly } from 'vue';
 
 interface GroupMoveEvent {
     groupId: string;
@@ -56,7 +57,8 @@ export interface GroupOptions extends CoreGroupOptions {
     readonly panels?: IDockviewPanel[];
     readonly activePanel?: IDockviewPanel;
     readonly id?: string;
-    readonly preferredSize?: number;
+    readonly preferredWidth?: number;
+    readonly preferredHeight?: number;
 }
 
 export interface GroupPanelViewState extends CoreGroupOptions {

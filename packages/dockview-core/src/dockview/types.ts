@@ -76,6 +76,7 @@ export interface GroupviewPanelState {
     title?: string;
     renderer?: DockviewPanelRenderer;
     priority?: number;
-    preferredSize?: number;
+    preferredWidth?: number;
+    preferredHeight?: number;
     params?: { [key: string]: any };
 }
