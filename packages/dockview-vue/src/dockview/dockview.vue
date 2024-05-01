@@ -2,13 +2,6 @@
 import {
     DockviewApi,
     DockviewComponent,
-    type IContentRenderer,
-    type ITabRenderer,
-    type IWatermarkRenderer,
-    type IDockviewPanelProps,
-    type IDockviewPanelHeaderProps,
-    type IGroupPanelBaseProps,
-    type IWatermarkPanelProps,
     type DockviewOptions,
     PROPERTY_KEYS,
     type DockviewFrameworkOptions,
@@ -22,7 +15,6 @@ import {
     watch,
     onBeforeUnmount,
     markRaw,
-    toRaw,
     getCurrentInstance,
 } from 'vue';
 import {
@@ -40,18 +32,6 @@ interface VueProps {
     leftHeaderActionsComponent?: string;
     prefixHeaderActionsComponent?: string;
 }
-
-const VUE_PROPERTIES = (() => {
-    const _value: Record<keyof VueProps, undefined> = {
-        watermarkComponent: undefined,
-        defaultTabComponent: undefined,
-        rightHeaderActionsComponent: undefined,
-        leftHeaderActionsComponent: undefined,
-        prefixHeaderActionsComponent: undefined,
-    };
-
-    return Object.keys(_value) as (keyof VueProps)[];
-})();
 
 type VueEvents = {
     ready: [event: DockviewReadyEvent];
@@ -73,10 +53,6 @@ function extractCoreOptions(props: IDockviewVueProps): DockviewOptions {
 
 const emit = defineEmits<VueEvents>();
 
-/**
- * Anything here that is a Vue.js component should not be reactive
- * i.e. markRaw(toRaw(...))
- */
 const props = defineProps<IDockviewVueProps>();
 
 const el = ref<HTMLElement | null>(null);
