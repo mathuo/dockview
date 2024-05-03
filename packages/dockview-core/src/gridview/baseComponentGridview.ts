@@ -1,4 +1,4 @@
-import { Emitter, Event, TickDelayedEvent } from '../events';
+import { Emitter, Event, AsapEvent } from '../events';
 import { getGridLocation, Gridview, IGridView } from './gridview';
 import { Position } from '../dnd/droptarget';
 import { Disposable, IValueDisposable } from '../lifecycle';
@@ -92,7 +92,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
     readonly onDidActiveChange: Event<T | undefined> =
         this._onDidActiveChange.event;
 
-    protected readonly _bufferOnDidLayoutChange = new TickDelayedEvent();
+    protected readonly _bufferOnDidLayoutChange = new AsapEvent();
 
     get id(): string {
         return this._id;
