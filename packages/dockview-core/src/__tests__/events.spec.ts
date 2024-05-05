@@ -1,4 +1,5 @@
 import {
+    AsapEvent,
     Emitter,
     Event,
     addDisposableListener,
@@ -79,6 +80,41 @@ describe('events', () => {
             expect(value).toBe(1);
 
             stream.dispose();
+        });
+    });
+
+    describe('asapEvent', () => {
+        test('that asapEvents fire once per event-loop-cycle', () => {
+            jest.useFakeTimers();
+
+            const event = new AsapEvent();
+
+            let preFireCount = 0;
+            let postFireCount = 0;
+
+            event.onEvent(() => {
+                preFireCount++;
+            });
+
+            for (let i = 0; i < 100; i++) {
+                event.fire();
+            }
+
+            /**
+             * check that subscribing after the events have fired but before the event-loop cycle completes
+             * results in no event fires.
+             */
+            event.onEvent((e) => {
+                postFireCount++;
+            });
+
+            expect(preFireCount).toBe(0);
+            expect(postFireCount).toBe(0);
+
+            jest.runAllTimers();
+
+            expect(preFireCount).toBe(1);
+            expect(postFireCount).toBe(0);
         });
     });
 

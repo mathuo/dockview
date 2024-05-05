@@ -1,4 +1,4 @@
-import { Emitter, Event, TickDelayedEvent } from '../events';
+import { Emitter, Event, AsapEvent } from '../events';
 import { getGridLocation, Gridview, IGridView } from './gridview';
 import { Position } from '../dnd/droptarget';
 import { Disposable, IValueDisposable } from '../lifecycle';
@@ -76,11 +76,8 @@ export abstract class BaseGrid<T extends IGridPanelView>
     private readonly _id = nextLayoutId.next();
     protected readonly _groups = new Map<string, IValueDisposable<T>>();
     protected readonly gridview: Gridview;
-    //
-    protected _activeGroup: T | undefined;
 
-    private _onDidLayoutChange = new Emitter<void>();
-    readonly onDidLayoutChange = this._onDidLayoutChange.event;
+    protected _activeGroup: T | undefined;
 
     private readonly _onDidRemove = new Emitter<T>();
     readonly onDidRemove: Event<T> = this._onDidRemove.event;
@@ -92,7 +89,9 @@ export abstract class BaseGrid<T extends IGridPanelView>
     readonly onDidActiveChange: Event<T | undefined> =
         this._onDidActiveChange.event;
 
-    protected readonly _bufferOnDidLayoutChange = new TickDelayedEvent();
+    protected readonly _bufferOnDidLayoutChange = new AsapEvent();
+    readonly onDidLayoutChange: Event<void> =
+        this._bufferOnDidLayoutChange.onEvent;
 
     get id(): string {
         return this._id;
@@ -172,9 +171,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
             )(() => {
                 this._bufferOnDidLayoutChange.fire();
             }),
-            this._bufferOnDidLayoutChange.onEvent(() => {
-                this._onDidLayoutChange.fire();
-            }),
             this._bufferOnDidLayoutChange
         );
     }
@@ -187,7 +183,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     public setVisible(panel: T, visible: boolean): void {
         this.gridview.setViewVisible(getGridLocation(panel.element), visible);
-        this._onDidLayoutChange.fire();
+        this._bufferOnDidLayoutChange.fire();
     }
 
     public isVisible(panel: T): boolean {
@@ -330,7 +326,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this._onDidActiveChange.dispose();
         this._onDidAdd.dispose();
         this._onDidRemove.dispose();
-        this._onDidLayoutChange.dispose();
 
         for (const group of this.groups) {
             group.dispose();
