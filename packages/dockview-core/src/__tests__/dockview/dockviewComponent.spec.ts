@@ -5331,4 +5331,58 @@ describe('dockviewComponent', () => {
             expect(addGroupCount).toBe(2);
         });
     });
+
+    test('that `onDidLayoutChange` only subscribes to events after initial subscription time', () => {
+        jest.useFakeTimers();
+
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+        const api = new DockviewApi(dockview);
+
+        dockview.layout(1000, 1000);
+
+        let a = 0;
+
+        api.onDidLayoutChange((e) => {
+            a++;
+        });
+
+        api.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+        api.addPanel({
+            id: 'panel_2',
+            component: 'default',
+        });
+        api.addPanel({
+            id: 'panel_3',
+            component: 'default',
+        });
+
+        let b = 0;
+
+        api.onDidLayoutChange((e) => {
+            b++;
+        });
+
+        jest.runAllTicks();
+
+        expect(a).toBe(1);
+        expect(b).toBe(0);
+    });
 });
