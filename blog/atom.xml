@@ -2,11 +2,32 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dockview.dev/blog</id>
     <title>Dockview Blog</title>
-    <updated>2024-04-27T00:00:00.000Z</updated>
+    <updated>2024-05-05T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dockview.dev/blog"/>
     <subtitle>Dockview Blog</subtitle>
     <icon>https://dockview.dev/img/dockview_logo.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Dockview 1.13.1]]></title>
+        <id>https://dockview.dev/blog/dockview-1.13.1-release</id>
+        <link href="https://dockview.dev/blog/dockview-1.13.1-release"/>
+        <updated>2024-05-05T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
+        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.13.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>
+<p>Bug: fix duplicate group added when adding group with absolute position <a href="https://github.com/mathuo/dockview/issues/596" target="_blank" rel="noopener noreferrer">#596</a></p>
+</li>
+<li>
+<p>Bug: Adjust onDidLayoutChange behaviour <a href="https://github.com/mathuo/dockview/issues/597" target="_blank" rel="noopener noreferrer">#597</a></p>
+<ul>
+<li><code>onDidLayoutChange</code> is an aggregation of events that constitute a layout change. Previously these events were aggregated and the events were then fired once through a <code>setTimeout(..., 0)</code> approach. This has been altered to fire on a <code>queueMicrotask</code> event and will only subscribe to events that happen after the event is subscribed to, previously you may have recieved events yet to fire on the <code>setTimeout</code> function but within the same event-loop cycle which was a bug.</li>
+</ul>
+</li>
+</ul>]]></content>
+        <category label="release" term="release"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Dockview 1.13.0]]></title>
         <id>https://dockview.dev/blog/dockview-1.13.0-release</id>
@@ -542,32 +563,6 @@ If you feel anything is missing or unclear please let me know.</p>
 <li>Fix bug with panel resize drag elements <a href="https://github.com/mathuo/dockview/issues/249" target="_blank" rel="noopener noreferrer">#249</a></li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.7.2-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content>
-        <category label="release" term="release"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Dockview 1.7.1]]></title>
-        <id>https://dockview.dev/blog/dockview-1.7.1-release</id>
-        <link href="https://dockview.dev/blog/dockview-1.7.1-release"/>
-        <updated>2023-04-11T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Please reference to docs @ dockview.dev.]]></summary>
-        <content type="html"><![CDATA[<p>Please reference to docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.
-If you feel anything is missing or unclear please let me know.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.7.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<ul>
-<li>Resize observer <a href="https://github.com/mathuo/dockview/pull/227" target="_blank" rel="noopener noreferrer">#227</a></li>
-<li>Minor type fix <a href="https://github.com/mathuo/dockview/pull/237" target="_blank" rel="noopener noreferrer">#237</a></li>
-<li>Fix close button on default watermark <a href="https://github.com/mathuo/dockview/pull/225" target="_blank" rel="noopener noreferrer">#225</a></li>
-<li>Fix edge-case bug when dropping a panel on far corners <a href="https://github.com/mathuo/dockview/pull/243" target="_blank" rel="noopener noreferrer">#243</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.7.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Additional documentation and examples <a href="https://github.com/mathuo/dockview/pull/217" target="_blank" rel="noopener noreferrer">#217</a> <a href="https://github.com/mathuo/dockview/pull/221" target="_blank" rel="noopener noreferrer">#221</a> <a href="https://github.com/mathuo/dockview/pull/228" target="_blank" rel="noopener noreferrer">#228</a> <a href="https://github.com/mathuo/dockview/pull/229" target="_blank" rel="noopener noreferrer">#229</a> <a href="https://github.com/mathuo/dockview/pull/240" target="_blank" rel="noopener noreferrer">#240</a> <a href="https://github.com/mathuo/dockview/pull/241" target="_blank" rel="noopener noreferrer">#241</a></li>
-<li>Adjust build configurations <a href="https://github.com/mathuo/dockview/pull/223" target="_blank" rel="noopener noreferrer">#223</a> <a href="https://github.com/mathuo/dockview/pull/235" target="_blank" rel="noopener noreferrer">#235</a> <a href="https://github.com/mathuo/dockview/pull/244" target="_blank" rel="noopener noreferrer">#244</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.7.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
-<ul>
-<li>Remove tab height control as prop to <code>DockviewReact</code> component. Please control via CSS instead, see docs for tab height. <a href="https://github.com/mathuo/dockview/pull/236" target="_blank" rel="noopener noreferrer">#236</a></li>
-</ul>]]></content>
         <category label="release" term="release"/>
     </entry>
 </feed>
