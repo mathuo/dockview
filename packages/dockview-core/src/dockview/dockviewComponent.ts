@@ -371,8 +371,6 @@ export class DockviewComponent
     }[] = [];
     private readonly _rootDropTarget: Droptarget;
 
-    private _ignoreEvents = 0;
-
     private readonly _onDidRemoveGroup = new Emitter<DockviewGroupPanel>();
     readonly onDidRemoveGroup: Event<DockviewGroupPanel> =
         this._onDidRemoveGroup.event;
@@ -588,7 +586,19 @@ export class DockviewComponent
                             panelId: data.panelId ?? undefined,
                         },
                         to: {
-                            group: this.orthogonalize(event.position),
+                            group: this.orthogonalize(
+                                event.position,
+                                data.panelId
+                                    ? {
+                                          width: this.getGroupPanel(
+                                              data.panelId
+                                          )?.api.preferredWidth,
+                                          height: this.getGroupPanel(
+                                              data.panelId
+                                          )?.api.preferredHeight,
+                                      }
+                                    : undefined
+                            ),
                             position: 'center',
                         },
                     });
@@ -991,7 +1001,13 @@ export class DockviewComponent
         this.updateWatermark();
     }
 
-    private orthogonalize(position: Position): DockviewGroupPanel {
+    private orthogonalize(
+        position: Position,
+        options?: {
+            width?: number;
+            height?: number;
+        }
+    ): DockviewGroupPanel {
         switch (position) {
             case 'top':
             case 'bottom':
@@ -1017,10 +1033,13 @@ export class DockviewComponent
             case 'top':
             case 'left':
             case 'center':
-                return this.createGroupAtLocation([0]); // insert into first position
+                return this.createGroupAtLocation([0], options); // insert into first position
             case 'bottom':
             case 'right':
-                return this.createGroupAtLocation([this.gridview.length]); // insert into last position
+                return this.createGroupAtLocation(
+                    [this.gridview.length],
+                    options
+                ); // insert into last position
             default:
                 throw new Error(`unsupported position ${position}`);
         }
@@ -1437,7 +1456,11 @@ export class DockviewComponent
                 }
             } else {
                 const group = this.orthogonalize(
-                    directionToPosition(<Direction>options.position.direction)
+                    directionToPosition(<Direction>options.position.direction),
+                    {
+                        width: options.preferredWidth,
+                        height: options.preferredHeight,
+                    }
                 );
 
                 const panel = this.createPanel(options, group);
@@ -1505,7 +1528,14 @@ export class DockviewComponent
                     location,
                     target
                 );
-                const group = this.createGroupAtLocation(relativeLocation);
+                const group = this.createGroupAtLocation(
+                    relativeLocation,
+
+                    {
+                        width: options.preferredWidth,
+                        height: options.preferredHeight,
+                    }
+                );
                 panel = this.createPanel(options, group);
                 group.model.openPanel(panel, {
                     skipSetActive: options.inactive,
@@ -1538,7 +1568,10 @@ export class DockviewComponent
                 skipSetGroupActive: options.inactive,
             });
         } else {
-            const group = this.createGroupAtLocation();
+            const group = this.createGroupAtLocation(undefined, {
+                width: options.preferredWidth,
+                height: options.preferredHeight,
+            });
             panel = this.createPanel(options, group);
             group.model.openPanel(panel, {
                 skipSetActive: options.inactive,
@@ -1657,7 +1690,11 @@ export class DockviewComponent
                 }
             } else {
                 const group = this.orthogonalize(
-                    directionToPosition(<Direction>options.direction)
+                    directionToPosition(<Direction>options.direction),
+                    {
+                        width: options.preferredWidth,
+                        height: options.preferredHeight,
+                    }
                 );
                 if (!options.skipSetActive) {
                     this.doSetGroupAndPanelActive(group);
@@ -1944,7 +1981,16 @@ export class DockviewComponent
                     updatedReferenceLocation,
                     destinationTarget
                 );
-                this.movingLock(() => this.doAddGroup(targetGroup, location));
+                this.movingLock(() =>
+                    this.doAddGroup(
+                        targetGroup,
+                        location,
+                        this.gridview.predictOrientation(location) ===
+                            Orientation.HORIZONTAL
+                            ? targetGroup.activePanel?.api.preferredWidth
+                            : targetGroup.activePanel?.api.preferredHeight
+                    )
+                );
                 this.doSetGroupAndPanelActive(targetGroup);
             } else {
                 /**
@@ -1969,7 +2015,10 @@ export class DockviewComponent
                     destinationTarget
                 );
 
-                const group = this.createGroupAtLocation(dropLocation);
+                const group = this.createGroupAtLocation(dropLocation, {
+                    width: removedPanel.api.preferredWidth,
+                    height: removedPanel.api.preferredHeight,
+                });
                 this.movingLock(() =>
                     group.model.openPanel(removedPanel, {
                         skipSetGroupActive: true,
@@ -2221,7 +2270,12 @@ export class DockviewComponent
             this._api,
             group,
             view,
-            { renderer: options.renderer }
+            {
+                renderer: options.renderer,
+                priority: options.priority,
+                preferredWidth: options.preferredWidth,
+                preferredHeight: options.preferredHeight,
+            }
         );
 
         panel.init({
@@ -2233,10 +2287,18 @@ export class DockviewComponent
     }
 
     private createGroupAtLocation(
-        location: number[] = [0]
+        location: number[] = [0],
+        options?: { width?: number; height?: number }
     ): DockviewGroupPanel {
         const group = this.createGroup();
-        this.doAddGroup(group, location);
+
+        const size =
+            this.gridview.predictOrientation(location) ===
+            Orientation.HORIZONTAL
+                ? options?.width
+                : options?.height;
+
+        this.doAddGroup(group, location, size);
         return group;
     }
 

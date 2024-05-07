@@ -13,6 +13,7 @@ import {
     DockviewGroupPanelApi,
     DockviewGroupPanelApiImpl,
 } from '../api/dockviewGroupPanelApi';
+import { EnhancedLayoutPriority, LayoutPriority } from '../splitview/splitview';
 
 const MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH = 100;
 const MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT = 100;
@@ -60,6 +61,16 @@ export class DockviewGroupPanel
 
     get header(): IHeader {
         return this._model.header;
+    }
+
+    get priority(): EnhancedLayoutPriority | undefined {
+        const activePanel = this.model.activePanel;
+
+        if (!activePanel) {
+            return LayoutPriority.Normal;
+        }
+
+        return activePanel.api.priority;
     }
 
     constructor(

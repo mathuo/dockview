@@ -11,7 +11,11 @@ import {
     PanelUpdateEvent,
     Parameters,
 } from '../../panel/types';
-import { LayoutPriority, Orientation } from '../../splitview/splitview';
+import {
+    EnhancedLayoutPriority,
+    LayoutPriority,
+    Orientation,
+} from '../../splitview/splitview';
 
 class TestPanel implements IGridPanelView {
     _onDidChange = new Emitter<IViewSize | undefined>();
@@ -32,7 +36,7 @@ class TestPanel implements IGridPanelView {
         public readonly maximumWidth: number,
         public readonly minimumHeight: number,
         public readonly maximumHeight: number,
-        public priority: LayoutPriority,
+        public priority: EnhancedLayoutPriority,
         public snap: boolean
     ) {}
 

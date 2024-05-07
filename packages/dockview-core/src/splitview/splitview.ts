@@ -44,11 +44,29 @@ export enum LayoutPriority {
     Normal = 'normal', // view is offered space in view order
 }
 
+export type EnhancedLayoutPriority = LayoutPriority | number;
+
+export function layoutPriorityAsNumber(
+    priority: EnhancedLayoutPriority | undefined
+): number {
+    switch (priority) {
+        case LayoutPriority.High:
+            return Number.MAX_SAFE_INTEGER;
+        case LayoutPriority.Low:
+            return Number.MIN_SAFE_INTEGER;
+        case LayoutPriority.Normal:
+        case undefined:
+            return 0;
+        default:
+            return priority;
+    }
+}
+
 export interface IBaseView extends IDisposable {
     minimumSize: number;
     maximumSize: number;
     snap?: boolean;
-    priority?: LayoutPriority;
+    priority?: EnhancedLayoutPriority;
 }
 
 export interface IView extends IBaseView {
@@ -318,15 +336,8 @@ export class Splitview {
         }
 
         const indexes = range(this.viewItems.length).filter((i) => i !== index);
-        const lowPriorityIndexes = [
-            ...indexes.filter(
-                (i) => this.viewItems[i].priority === LayoutPriority.Low
-            ),
-            index,
-        ];
-        const highPriorityIndexes = indexes.filter(
-            (i) => this.viewItems[i].priority === LayoutPriority.High
-        );
+        const { lowPriorityIndexes, highPriorityIndexes } =
+            this.calculateIndexPriorities(indexes);
 
         const item = this.viewItems[index];
         size = Math.round(size);
@@ -337,7 +348,7 @@ export class Splitview {
         );
 
         item.size = size;
-        this.relayout(lowPriorityIndexes, highPriorityIndexes);
+        this.relayout([...lowPriorityIndexes, index], highPriorityIndexes);
     }
 
     public getViews<T extends IView>(): T[] {
@@ -357,15 +368,8 @@ export class Splitview {
         item.size = size;
 
         const indexes = range(this.viewItems.length).filter((i) => i !== index);
-        const lowPriorityIndexes = [
-            ...indexes.filter(
-                (i) => this.viewItems[i].priority === LayoutPriority.Low
-            ),
-            index,
-        ];
-        const highPriorityIndexes = indexes.filter(
-            (i) => this.viewItems[i].priority === LayoutPriority.High
-        );
+        const { lowPriorityIndexes, highPriorityIndexes } =
+            this.calculateIndexPriorities(indexes);
 
         /**
          * add this view we are changing to the low-index list since we have determined the size
@@ -610,12 +614,9 @@ export class Splitview {
         }
 
         const indexes = range(this.viewItems.length);
-        const lowPriorityIndexes = indexes.filter(
-            (i) => this.viewItems[i].priority === LayoutPriority.Low
-        );
-        const highPriorityIndexes = indexes.filter(
-            (i) => this.viewItems[i].priority === LayoutPriority.High
-        );
+
+        const { lowPriorityIndexes, highPriorityIndexes } =
+            this.calculateIndexPriorities(indexes);
 
         this.relayout(lowPriorityIndexes, highPriorityIndexes);
     }
@@ -675,12 +676,8 @@ export class Splitview {
 
         if (!this.proportions) {
             const indexes = range(this.viewItems.length);
-            const lowPriorityIndexes = indexes.filter(
-                (i) => this.viewItems[i].priority === LayoutPriority.Low
-            );
-            const highPriorityIndexes = indexes.filter(
-                (i) => this.viewItems[i].priority === LayoutPriority.High
-            );
+            const { lowPriorityIndexes, highPriorityIndexes } =
+                this.calculateIndexPriorities(indexes);
 
             this.resize(
                 this.viewItems.length - 1,
@@ -744,12 +741,8 @@ export class Splitview {
         let emptyDelta = this.size - contentSize;
 
         const indexes = range(this.viewItems.length - 1, -1);
-        const lowPriorityIndexes = indexes.filter(
-            (i) => this.viewItems[i].priority === LayoutPriority.Low
-        );
-        const highPriorityIndexes = indexes.filter(
-            (i) => this.viewItems[i].priority === LayoutPriority.High
-        );
+        const { lowPriorityIndexes, highPriorityIndexes } =
+            this.calculateIndexPriorities(indexes);
 
         for (const index of highPriorityIndexes) {
             pushToStart(indexes, index);
@@ -1083,6 +1076,25 @@ export class Splitview {
                 : 'vertical';
         element.className = `split-view-container ${orientationClassname}`;
         return element;
+    }
+
+    private calculateIndexPriorities(indexes: number[]): {
+        lowPriorityIndexes: number[];
+        highPriorityIndexes: number[];
+    } {
+        const priorityIndexes = indexes
+            .map((i) => [i, layoutPriorityAsNumber(this.viewItems[i].priority)])
+            .sort((a, b) => a[1] - b[1]);
+
+        const lowPriorityIndexes = priorityIndexes
+            .filter(([_, p]) => p < 0)
+            .map(([i]) => i)
+            .reverse();
+        const highPriorityIndexes = priorityIndexes
+            .filter(([_, p]) => p > 0)
+            .map(([i]) => i);
+
+        return { lowPriorityIndexes, highPriorityIndexes };
     }
 
     public dispose(): void {

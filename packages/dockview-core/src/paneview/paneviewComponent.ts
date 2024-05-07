@@ -6,7 +6,11 @@ import {
     IDisposable,
     MutableDisposable,
 } from '../lifecycle';
-import { LayoutPriority, Orientation, Sizing } from '../splitview/splitview';
+import {
+    EnhancedLayoutPriority,
+    Orientation,
+    Sizing,
+} from '../splitview/splitview';
 import { PaneviewComponentOptions } from './options';
 import { Paneview } from './paneview';
 import {
@@ -35,7 +39,7 @@ export interface PaneviewDndOverlayEvent {
 
 export interface SerializedPaneviewPanel {
     snap?: boolean;
-    priority?: LayoutPriority;
+    priority?: EnhancedLayoutPriority;
     minimumSize?: number;
     maximumSize?: number;
     data: {

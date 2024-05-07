@@ -5,7 +5,7 @@
 
 import {
     ISplitviewStyles,
-    LayoutPriority,
+    EnhancedLayoutPriority,
     Orientation,
     Sizing,
 } from '../splitview/splitview';
@@ -171,7 +171,7 @@ export interface IGridView {
     readonly maximumWidth: number;
     readonly minimumHeight: number;
     readonly maximumHeight: number;
-    priority?: LayoutPriority;
+    priority?: EnhancedLayoutPriority;
     layout(width: number, height: number): void;
     toJSON(): object;
     fromJSON?(json: object): void;
@@ -738,6 +738,18 @@ export class Gridview implements IDisposable {
         }
 
         parent.moveChild(from, to);
+    }
+
+    predictOrientation(location: number[]): Orientation {
+        const [rest, index] = tail(location);
+        const [pathToParent, parent] = this.getNode(rest);
+
+        if (parent instanceof BranchNode) {
+            return parent.orientation;
+        } else {
+            const [grandParent, ..._] = [...pathToParent].reverse();
+            return orthogonal(grandParent.orientation);
+        }
     }
 
     public addView(
