@@ -1620,8 +1620,6 @@ export class DockviewComponent
     }
 
     addGroup(options?: AddGroupOptions): DockviewGroupPanel {
-        const group = this.createGroup(options);
-
         if (options) {
             let referenceGroup: DockviewGroupPanel | undefined;
 
@@ -1675,12 +1673,16 @@ export class DockviewComponent
                 location,
                 target
             );
+
+            const group = this.createGroup(options);
             this.doAddGroup(group, relativeLocation);
             if (!options.skipSetActive) {
                 this.doSetGroupAndPanelActive(group);
             }
             return group;
         } else {
+            const group = this.createGroup(options);
+
             this.doAddGroup(group);
             this.doSetGroupAndPanelActive(group);
             return group;

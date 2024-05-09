@@ -5331,4 +5331,102 @@ describe('dockviewComponent', () => {
             expect(addGroupCount).toBe(2);
         });
     });
+
+    test('that `onDidLayoutChange` only subscribes to events after initial subscription time', () => {
+        jest.useFakeTimers();
+
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+        const api = new DockviewApi(dockview);
+
+        dockview.layout(1000, 1000);
+
+        let a = 0;
+
+        api.onDidLayoutChange((e) => {
+            a++;
+        });
+
+        api.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+        api.addPanel({
+            id: 'panel_2',
+            component: 'default',
+        });
+        api.addPanel({
+            id: 'panel_3',
+            component: 'default',
+        });
+
+        let b = 0;
+
+        api.onDidLayoutChange((e) => {
+            b++;
+        });
+
+        jest.runAllTicks();
+
+        expect(a).toBe(1);
+        expect(b).toBe(0);
+    });
+
+    test('addGroup with absolute position', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+        const api = new DockviewApi(dockview);
+
+        dockview.layout(1000, 1000);
+
+        api.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+        api.addPanel({
+            id: 'panel_2',
+            component: 'default',
+        });
+        const panel3 = api.addPanel({
+            id: 'panel_3',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+
+        expect(api.panels.length).toBe(3);
+        expect(api.groups.length).toBe(2);
+
+        api.addGroup({ direction: 'left' });
+
+        expect(api.panels.length).toBe(3);
+        expect(api.groups.length).toBe(3);
+    });
 });
