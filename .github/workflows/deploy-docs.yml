@@ -27,6 +27,8 @@ jobs:
             - run: npm run build
               working-directory: packages/dockview
             - run: npm run build
+              working-directory: packages/dockview-vue
+            - run: npm run build
               working-directory: packages/docs
             - run: npm run docs
               working-directory: .

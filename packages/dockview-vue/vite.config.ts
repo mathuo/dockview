@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue';
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [vue()],
+
     build: {
         minify: false,
         lib: {
@@ -13,6 +14,7 @@ export default defineConfig({
             name: 'dockview-vue',
             // the name of the output files when the build is run
             fileName: (format) => `dockview-vue.${format}.js`,
+            formats: ['es', 'umd', 'cjs'],
         },
         rollupOptions: {
             // make sure to externalize deps that shouldn't be bundled
