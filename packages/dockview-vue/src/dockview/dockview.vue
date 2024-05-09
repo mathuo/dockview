@@ -18,9 +18,8 @@ import {
     getCurrentInstance,
 } from 'vue';
 import {
-    VueContentRenderer,
     VueHeaderActionsRenderer,
-    VueTabRenderer,
+    VueRenderer,
     VueWatermarkRenderer,
     findComponent,
 } from '../utils';
@@ -81,7 +80,7 @@ onMounted(() => {
                 getCurrentInstance()!,
                 options.name
             );
-            return new VueContentRenderer(component!, getCurrentInstance()!);
+            return new VueRenderer(component!, getCurrentInstance()!);
         },
         createTabComponent(options) {
             let component = findComponent(getCurrentInstance()!, options.name);
@@ -94,7 +93,7 @@ onMounted(() => {
             }
 
             if (component) {
-                return new VueTabRenderer(component, getCurrentInstance()!);
+                return new VueRenderer(component, getCurrentInstance()!);
             }
             return undefined;
         },
@@ -174,8 +173,6 @@ onMounted(() => {
      * @see https://vuejs.org/api/reactivity-advanced.html#markraw
      */
     instance.value = markRaw(dockview);
-
-    console.log(getCurrentInstance());
 
     emit('ready', { api: new DockviewApi(dockview) });
 });

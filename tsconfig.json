@@ -6,6 +6,9 @@
         },
         {
             "path": "./packages/dockview-core"
+        },
+        {
+            "path": "./packages/dockview-vue"
         }
     ]
 }

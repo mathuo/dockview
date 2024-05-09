@@ -31,6 +31,32 @@ return <DockviewReact tabComponents={tabComponents}/>
 ```
 </FrameworkSpecific>
 
+<FrameworkSpecific framework='Vue'>
+```tsx
+const App = {
+    name: 'App',
+    components: {
+        'component_1': VueComponent1,
+        'tab_1': VueComponent2,
+    },
+    methods: {
+        onReady(event: DockviewReadyEvent) {
+            event.api.addPanel({
+                id: 'panel_1',
+                component: 'component_1',
+                tabComponent: 'tab_1'
+            });
+        },
+    },
+    template: `
+      <dockview-vue
+        @ready="onReady"
+      >
+      </dockview-vue>`,
+};
+```
+</FrameworkSpecific>
+
 <FrameworkSpecific framework='JavaScript'>
 not implemented
 </FrameworkSpecific>
@@ -48,6 +74,32 @@ const CustomTabRenderer = (props: IDockviewPanelHeaderProps) => {
 }
 
 return <DockviewReact defaultTabRenderer={CustomTabRenderer}/>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Vue'>
+```tsx
+const App = {
+    name: 'App',
+    components: {
+        'component_1': VueComponent1,
+        'tab_1': VueComponent2,
+    },
+    methods: {
+        onReady(event: DockviewReadyEvent) {
+            event.api.addPanel({
+                id: 'panel_1',
+                component: 'component_1',
+            });
+        },
+    },
+    template: `
+      <dockview-vue
+        @ready="onReady"
+        :defaultTabRenderer='tab_1'
+      >
+      </dockview-vue>`,
+};
 ```
 </FrameworkSpecific>
 

@@ -1,5 +1,7 @@
 import type {
+    DockviewApi,
     DockviewGroupPanel,
+    DockviewPanelApi,
     GroupPanelPartInitParameters,
     IContentRenderer,
     IDockviewPanelHeaderProps,
@@ -84,8 +86,8 @@ export function mountVueComponent<T extends Record<string, any>>(
 
     return {
         update: (newProps: any) => {
-            runningProps = { ...props, newProps };
-            vNode = cloneVNode(vNode, Object.freeze(runningProps));
+            runningProps = { ...props, ...newProps };
+            vNode = cloneVNode(vNode, runningProps);
             render(vNode, element);
         },
         dispose: () => {
@@ -94,11 +96,13 @@ export function mountVueComponent<T extends Record<string, any>>(
     };
 }
 
-export class VueContentRenderer implements IContentRenderer {
+export class VueRenderer implements ITabRenderer, IContentRenderer {
     private _element: HTMLElement;
     private _renderDisposable:
         | { update: (props: any) => void; dispose: () => void }
         | undefined;
+    private _api: DockviewPanelApi | undefined;
+    private _containerApi: DockviewApi | undefined;
 
     get element(): HTMLElement {
         return this._element;
@@ -115,57 +119,9 @@ export class VueContentRenderer implements IContentRenderer {
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
-        const props: IDockviewPanelProps = {
-            params: parameters.params,
-            api: parameters.api,
-            containerApi: parameters.containerApi,
-        };
+        this._api = parameters.api;
+        this._containerApi = parameters.containerApi;
 
-        this._renderDisposable?.dispose();
-        this._renderDisposable = mountVueComponent(
-            this.component,
-            this.parent,
-            { params: props },
-            this.element
-        );
-    }
-
-    update(event: PanelUpdateEvent<Parameters>): void {
-        const params = event.params;
-        // TODO: handle prop updates somehow?
-        this._renderDisposable?.update(params);
-    }
-
-    focus(): void {
-        //  TODO: make optional on interface
-    }
-
-    dispose(): void {
-        this._renderDisposable?.dispose();
-    }
-}
-
-export class VueTabRenderer implements ITabRenderer {
-    private _element: HTMLElement;
-    private _renderDisposable:
-        | { update: (props: any) => void; dispose: () => void }
-        | undefined;
-
-    get element(): HTMLElement {
-        return this._element;
-    }
-
-    constructor(
-        private readonly component: VueComponent,
-        private readonly parent: ComponentInternalInstance
-    ) {
-        this._element = document.createElement('div');
-        this.element.className = 'dv-vue-part';
-        this.element.style.height = '100%';
-        this.element.style.width = '100%';
-    }
-
-    init(parameters: GroupPanelPartInitParameters): void {
         const props: IDockviewPanelHeaderProps = {
             params: parameters.params,
             api: parameters.api,
@@ -182,9 +138,19 @@ export class VueTabRenderer implements ITabRenderer {
     }
 
     update(event: PanelUpdateEvent<Parameters>): void {
+        if (!this._api || !this._containerApi) {
+            return;
+        }
+
         const params = event.params;
         // TODO: handle prop updates somehow?
-        this._renderDisposable?.update(params);
+        this._renderDisposable?.update({
+            params: {
+                params: params,
+                api: this._api,
+                containerApi: this._containerApi,
+            },
+        });
     }
 
     dispose(): void {
@@ -232,9 +198,7 @@ export class VueWatermarkRenderer implements IWatermarkRenderer {
     }
 
     update(event: PanelUpdateEvent<Parameters>): void {
-        const params = event.params;
-        // TODO: handle prop updates somehow?
-        this._renderDisposable?.update(params);
+        // noop
     }
 
     dispose(): void {

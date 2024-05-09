@@ -3,8 +3,6 @@ import {
     DockviewComponent,
     DockviewWillDropEvent,
     DockviewApi,
-    IContentRenderer,
-    ITabRenderer,
     DockviewGroupPanel,
     IHeaderActionsRenderer,
     DockviewDidDropEvent,
@@ -16,7 +14,6 @@ import {
     PROPERTY_KEYS,
     DockviewComponentOptions,
     DockviewFrameworkOptions,
-    IDockviewDisposable,
     DockviewDndOverlayEvent,
     DockviewReadyEvent,
 } from 'dockview-core';
