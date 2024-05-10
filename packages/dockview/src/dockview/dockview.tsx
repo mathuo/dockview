@@ -19,7 +19,6 @@ import {
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
-
 import { ReactPortalStore, usePortalsLifecycle } from '../react';
 import { ReactWatermarkPart } from './reactWatermarkPart';
 import { ReactHeaderActionsRendererPart } from './headerActionsRenderer';

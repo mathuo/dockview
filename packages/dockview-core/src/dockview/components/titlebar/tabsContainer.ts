@@ -10,11 +10,7 @@ import { VoidContainer } from './voidContainer';
 import { toggleClass } from '../../../dom';
 import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
-import { WillShowOverlayEvent } from '../../../dnd/droptarget';
-import {
-    DockviewGroupDropLocation,
-    WillShowOverlayLocationEvent,
-} from '../../dockviewGroupPanelModel';
+import { WillShowOverlayLocationEvent } from '../../dockviewGroupPanelModel';
 import { getPanelData } from '../../../dnd/dataTransfer';
 
 export interface TabDropIndexEvent {

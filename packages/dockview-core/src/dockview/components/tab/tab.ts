@@ -12,7 +12,6 @@ import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import {
     DroptargetEvent,
     Droptarget,
-    Position,
     WillShowOverlayEvent,
 } from '../../../dnd/droptarget';
 import { DragHandler } from '../../../dnd/abstractDragHandler';

@@ -1,5 +1,5 @@
-import { IPanel, PanelInitParameters } from '../panel/types';
-import { IView, SplitViewOptions, LayoutPriority } from './splitview';
+import { PanelInitParameters } from '../panel/types';
+import { SplitViewOptions, LayoutPriority } from './splitview';
 import { SplitviewPanel } from './splitviewPanel';
 import { SplitviewComponent } from './splitviewComponent';
 import {
