@@ -5,7 +5,6 @@ import type {
     GroupPanelPartInitParameters,
     IContentRenderer,
     IDockviewPanelHeaderProps,
-    IDockviewPanelProps,
     IGroupHeaderProps,
     IHeaderActionsRenderer,
     ITabRenderer,
@@ -61,12 +60,6 @@ export function findComponent(
 }
 
 /**
- * TODO List
- *
- * 1. handle vue context-ish stuff (appContext? provides?)
- *
- *
- *
  * @see https://vuejs.org/api/render-function.html#clonevnode
  * @see https://vuejs.org/api/render-function.html#mergeprops
  */
@@ -96,27 +89,33 @@ export function mountVueComponent<T extends Record<string, any>>(
     };
 }
 
-export class VueRenderer implements ITabRenderer, IContentRenderer {
-    private _element: HTMLElement;
-    private _renderDisposable:
-        | { update: (props: any) => void; dispose: () => void }
-        | undefined;
-    private _api: DockviewPanelApi | undefined;
-    private _containerApi: DockviewApi | undefined;
+abstract class AbstractVueRenderer {
+    protected readonly _element: HTMLElement;
 
     get element(): HTMLElement {
         return this._element;
     }
 
     constructor(
-        private readonly component: VueComponent,
-        private readonly parent: ComponentInternalInstance
+        protected readonly component: VueComponent,
+        protected readonly parent: ComponentInternalInstance
     ) {
         this._element = document.createElement('div');
         this.element.className = 'dv-vue-part';
         this.element.style.height = '100%';
         this.element.style.width = '100%';
     }
+}
+
+export class VueRenderer
+    extends AbstractVueRenderer
+    implements ITabRenderer, IContentRenderer
+{
+    private _renderDisposable:
+        | { update: (props: any) => void; dispose: () => void }
+        | undefined;
+    private _api: DockviewPanelApi | undefined;
+    private _containerApi: DockviewApi | undefined;
 
     init(parameters: GroupPanelPartInitParameters): void {
         this._api = parameters.api;
@@ -143,7 +142,6 @@ export class VueRenderer implements ITabRenderer, IContentRenderer {
         }
 
         const params = event.params;
-        // TODO: handle prop updates somehow?
         this._renderDisposable?.update({
             params: {
                 params: params,
@@ -158,24 +156,16 @@ export class VueRenderer implements ITabRenderer, IContentRenderer {
     }
 }
 
-export class VueWatermarkRenderer implements IWatermarkRenderer {
-    private _element: HTMLElement;
+export class VueWatermarkRenderer
+    extends AbstractVueRenderer
+    implements IWatermarkRenderer
+{
     private _renderDisposable:
         | { update: (props: any) => void; dispose: () => void }
         | undefined;
 
     get element(): HTMLElement {
         return this._element;
-    }
-
-    constructor(
-        private readonly component: VueComponent,
-        private readonly parent: ComponentInternalInstance
-    ) {
-        this._element = document.createElement('div');
-        this.element.className = 'dv-vue-part';
-        this.element.style.height = '100%';
-        this.element.style.width = '100%';
     }
 
     init(parameters: WatermarkRendererInitParameters): void {
@@ -206,8 +196,10 @@ export class VueWatermarkRenderer implements IWatermarkRenderer {
     }
 }
 
-export class VueHeaderActionsRenderer implements IHeaderActionsRenderer {
-    private _element: HTMLElement;
+export class VueHeaderActionsRenderer
+    extends AbstractVueRenderer
+    implements IHeaderActionsRenderer
+{
     private _renderDisposable:
         | { update: (props: any) => void; dispose: () => void }
         | undefined;
@@ -217,14 +209,11 @@ export class VueHeaderActionsRenderer implements IHeaderActionsRenderer {
     }
 
     constructor(
-        private readonly component: VueComponent,
-        private readonly parent: ComponentInternalInstance,
+        component: VueComponent,
+        parent: ComponentInternalInstance,
         group: DockviewGroupPanel
     ) {
-        this._element = document.createElement('div');
-        this.element.className = 'dv-vue-header-action-part';
-        this._element.style.width = '100%';
-        this._element.style.height = '100%';
+        super(component, parent);
     }
 
     init(props: IGroupHeaderProps): void {
