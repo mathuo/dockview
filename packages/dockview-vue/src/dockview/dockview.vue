@@ -2,13 +2,6 @@
 import {
     DockviewApi,
     DockviewComponent,
-    type IContentRenderer,
-    type ITabRenderer,
-    type IWatermarkRenderer,
-    type IDockviewPanelProps,
-    type IDockviewPanelHeaderProps,
-    type IGroupPanelBaseProps,
-    type IWatermarkPanelProps,
     type DockviewOptions,
     PROPERTY_KEYS,
     type DockviewFrameworkOptions,
@@ -22,13 +15,11 @@ import {
     watch,
     onBeforeUnmount,
     markRaw,
-    toRaw,
     getCurrentInstance,
 } from 'vue';
 import {
-    VueContentRenderer,
     VueHeaderActionsRenderer,
-    VueTabRenderer,
+    VueRenderer,
     VueWatermarkRenderer,
     findComponent,
 } from '../utils';
@@ -40,18 +31,6 @@ interface VueProps {
     leftHeaderActionsComponent?: string;
     prefixHeaderActionsComponent?: string;
 }
-
-const VUE_PROPERTIES = (() => {
-    const _value: Record<keyof VueProps, undefined> = {
-        watermarkComponent: undefined,
-        defaultTabComponent: undefined,
-        rightHeaderActionsComponent: undefined,
-        leftHeaderActionsComponent: undefined,
-        prefixHeaderActionsComponent: undefined,
-    };
-
-    return Object.keys(_value) as (keyof VueProps)[];
-})();
 
 type VueEvents = {
     ready: [event: DockviewReadyEvent];
@@ -73,10 +52,6 @@ function extractCoreOptions(props: IDockviewVueProps): DockviewOptions {
 
 const emit = defineEmits<VueEvents>();
 
-/**
- * Anything here that is a Vue.js component should not be reactive
- * i.e. markRaw(toRaw(...))
- */
 const props = defineProps<IDockviewVueProps>();
 
 const el = ref<HTMLElement | null>(null);
@@ -105,7 +80,7 @@ onMounted(() => {
                 getCurrentInstance()!,
                 options.name
             );
-            return new VueContentRenderer(component!, getCurrentInstance()!);
+            return new VueRenderer(component!, getCurrentInstance()!);
         },
         createTabComponent(options) {
             let component = findComponent(getCurrentInstance()!, options.name);
@@ -118,7 +93,7 @@ onMounted(() => {
             }
 
             if (component) {
-                return new VueTabRenderer(component, getCurrentInstance()!);
+                return new VueRenderer(component, getCurrentInstance()!);
             }
             return undefined;
         },
@@ -198,8 +173,6 @@ onMounted(() => {
      * @see https://vuejs.org/api/reactivity-advanced.html#markraw
      */
     instance.value = markRaw(dockview);
-
-    console.log(getCurrentInstance());
 
     emit('ready', { api: new DockviewApi(dockview) });
 });

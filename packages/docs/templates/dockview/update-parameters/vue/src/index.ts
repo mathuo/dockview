@@ -27,7 +27,7 @@ const Panel = defineComponent({
         },
     },
     mounted() {
-        const disposable = this.api.onDidTitleChange(() => {
+        const disposable = this.params.api.onDidTitleChange(() => {
             this.title = this.api.title;
         });
         this.title = this.api.title;
@@ -64,14 +64,16 @@ const Tab = defineComponent({
     name: 'Tab',
     props: {
         params: {
-            type: Object as PropType<IDockviewPanelHeaderProps>,
+            type: Object as PropType<
+                IDockviewPanelHeaderProps<{ myValue: number }>
+            >,
             required: true,
         },
     },
     data() {
         return {
             title: '',
-            value: null,
+            value: this.params.params.myValue,
         };
     },
     mounted() {
@@ -80,11 +82,12 @@ const Tab = defineComponent({
         });
 
         const disposable2 = this.params.api.onDidParametersChange(() => {
-            this.value = this.params.myValue;
+            console.log(this.params);
+            this.value = this.params.params.myValue;
         });
 
         this.title = this.api.title;
-        this.value = this.params.myValue;
+        this.value = this.params.params.myValue;
 
         return () => {
             disposable.dispose();

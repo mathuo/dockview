@@ -1,8 +1,5 @@
 import { PanelInitParameters } from '../panel/types';
-import {
-    GridviewComponent,
-    IGridPanelComponentView,
-} from './gridviewComponent';
+import { IGridPanelComponentView } from './gridviewComponent';
 import { FunctionOrValue } from '../types';
 import {
     BasePanelView,

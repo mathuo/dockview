@@ -41,19 +41,14 @@
     "README.md"
   ],
   "scripts": {
-    "build-only": "vite build",
-    "build": "npm run build:package",
-    "build:bundles": "rollup -c",
-    "build:cjs": "cross-env ../../node_modules/.bin/vue-tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
-    "build:css": "gulp sass",
-    "build:esm": "cross-env ../../node_modules/.bin/vue-tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
-    "build:package": "npm run build-only && npm run build:types",
+    "build:js": "vite build",
+    "build:types": "vue-tsc --project tsconfig.build-types.json --declaration --emitDeclarationOnly --outDir dist/types",
+    "build": "npm run build:js && npm run build:types",
     "clean": "rimraf dist/ .build/ .rollup.cache/",
     "prepublishOnly": "npm run rebuild && npm run test",
     "rebuild": "npm run clean && npm run build",
-    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview",
-    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage",
-    "build:types": "vue-tsc --project tsconfig.build-types.json --declaration --emitDeclarationOnly --outDir dist/types "
+    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-vue",
+    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-vue --coverage"
   },
   "dependencies": {
     "dockview-core": "^1.13.1"

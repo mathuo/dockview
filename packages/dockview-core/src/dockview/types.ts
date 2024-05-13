@@ -2,7 +2,6 @@ import { IDockviewComponent } from './dockviewComponent';
 import { DockviewPanelApi } from '../api/dockviewPanelApi';
 import { PanelInitParameters, IPanel } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
-import { Event } from '../events';
 import { Optional } from '../types';
 import { DockviewGroupPanel, IDockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelRenderer } from '../overlayRenderContainer';
