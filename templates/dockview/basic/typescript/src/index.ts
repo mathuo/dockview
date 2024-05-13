@@ -15,7 +15,6 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-
         this._element.style.color = 'white';
     }
 
@@ -28,7 +27,12 @@ document.getElementById('app').className = 'dockview-theme-abyss';
 
 const dockview = new DockviewComponent({
     parentElement: document.getElementById('app'),
-    components: { default: Panel },
+    createComponent: (options) => {
+        switch (options.name) {
+            case 'default':
+                return new Panel();
+        }
+    },
 });
 
 const api = new DockviewApi(dockview);
