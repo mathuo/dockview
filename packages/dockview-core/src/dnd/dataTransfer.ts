@@ -1,4 +1,8 @@
-class TransferObject {}
+class TransferObject {
+    constructor() {
+        // intentionally empty class
+    }
+}
 
 export class PanelTransfer extends TransferObject {
     constructor(

@@ -204,13 +204,14 @@ export class DockviewPanelApiImpl
 
         this.groupEventsDisposable.value = new CompositeDisposable(
             this.group.api.onDidVisibilityChange((event) => {
-                if (!event.isVisible && this.isVisible) {
-                    this._onDidVisibilityChange.fire(event);
-                } else if (
-                    event.isVisible &&
-                    !this.isVisible &&
-                    this.group.model.isPanelActive(this.panel)
-                ) {
+                const hasBecomeHidden = !event.isVisible && this.isVisible;
+                const hasBecomeVisible = event.isVisible && !this.isVisible;
+
+                const isActivePanel = this.group.model.isPanelActive(
+                    this.panel
+                );
+
+                if (hasBecomeHidden || (hasBecomeVisible && isActivePanel)) {
                     this._onDidVisibilityChange.fire(event);
                 }
             }),

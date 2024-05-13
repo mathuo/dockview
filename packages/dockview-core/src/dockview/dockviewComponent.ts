@@ -652,7 +652,7 @@ export class DockviewComponent
         const box: Box = getBox();
 
         const groupId =
-            options?.overridePopoutGroup?.id ?? this.getNextGroupId(); //item.id;
+            options?.overridePopoutGroup?.id ?? this.getNextGroupId();
 
         if (itemToPopout.api.location.type === 'grid') {
             itemToPopout.api.setVisible(false);
@@ -811,17 +811,15 @@ export class DockviewComponent
                                     skipPopoutAssociated: true,
                                 });
                             }
-                        } else {
-                            if (this.getPanel(group.id)) {
-                                const removedGroup = this.doRemoveGroup(group, {
-                                    skipDispose: true,
-                                    skipActive: true,
-                                });
-                                removedGroup.model.renderContainer =
-                                    this.overlayRenderContainer;
-                                removedGroup.model.location = { type: 'grid' };
-                                returnedGroup = removedGroup;
-                            }
+                        } else if (this.getPanel(group.id)) {
+                            const removedGroup = this.doRemoveGroup(group, {
+                                skipDispose: true,
+                                skipActive: true,
+                            });
+                            removedGroup.model.renderContainer =
+                                this.overlayRenderContainer;
+                            removedGroup.model.location = { type: 'grid' };
+                            returnedGroup = removedGroup;
                         }
                     })
                 );
@@ -894,7 +892,7 @@ export class DockviewComponent
                     this.doRemoveGroup(item, {
                         skipDispose: true,
                         skipPopoutReturn: true,
-                        skipPopoutAssociated: !!popoutReferenceGroup,
+                        skipPopoutAssociated: false,
                     });
                 }
             }
@@ -1372,7 +1370,6 @@ export class DockviewComponent
         const groups = Array.from(this._groups.values()).map((_) => _.value);
 
         const hasActiveGroup = !!this.activeGroup;
-        const hasActivePanel = !!this.activePanel;
 
         for (const group of groups) {
             // remove the group will automatically remove the panels
