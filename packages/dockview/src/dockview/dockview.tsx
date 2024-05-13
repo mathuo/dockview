@@ -63,15 +63,12 @@ export interface IDockviewReactProps extends DockviewOptions {
 }
 
 function extractCoreOptions(props: IDockviewReactProps): DockviewOptions {
-    const coreOptions = (PROPERTY_KEYS as (keyof DockviewOptions)[]).reduce(
-        (obj, key) => {
-            if (key in props) {
-                obj[key] = props[key] as any;
-            }
-            return obj;
-        },
-        {} as Partial<DockviewComponentOptions>
-    );
+    const coreOptions = PROPERTY_KEYS.reduce((obj, key) => {
+        if (key in props) {
+            obj[key] = props[key] as any;
+        }
+        return obj;
+    }, {} as Partial<DockviewComponentOptions>);
 
     return coreOptions as DockviewOptions;
 }
@@ -91,7 +88,7 @@ export const DockviewReact = React.forwardRef(
                 const changes: Partial<DockviewOptions> = {};
 
                 PROPERTY_KEYS.forEach((propKey) => {
-                    const key = propKey as keyof DockviewOptions;
+                    const key = propKey;
                     const propValue = props[key];
 
                     if (key in props && propValue !== prevProps.current[key]) {
