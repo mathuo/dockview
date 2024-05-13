@@ -137,13 +137,6 @@ export class DockviewPanel
 
         if (didTitleChange) {
             this._title = title;
-
-            this.view.update({
-                params: {
-                    params: this._params,
-                    title: this.title,
-                },
-            });
             this.api._onDidTitleChange.fire({ title });
         }
     }
@@ -178,10 +171,7 @@ export class DockviewPanel
 
         // update the view with the updated props
         this.view.update({
-            params: {
-                params: this._params,
-                title: this.title,
-            },
+            params: this._params,
         });
     }
 

@@ -7,24 +7,8 @@ import { fromPartial } from '@total-typescript/shoehorn';
 
 describe('dockviewPanel', () => {
     test('update title', () => {
-        const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
-            return {
-                onDidActiveChange: jest.fn(),
-            } as any;
-        });
-        const accessorMock = jest.fn<DockviewComponent, []>(() => {
-            return {} as any;
-        });
-
-        const panelModelMock = jest.fn<Partial<IDockviewPanelModel>, []>(() => {
-            return {
-                update: jest.fn(),
-                init: jest.fn(),
-            };
-        });
-
-        const api = new dockviewApiMock();
-        const accessor = new accessorMock();
+        const api = fromPartial<DockviewApi>({});
+        const accessor = fromPartial<DockviewComponent>({});
         const group = fromPartial<DockviewGroupPanel>({
             api: {
                 onDidVisibilityChange: jest.fn(),
@@ -32,7 +16,11 @@ describe('dockviewPanel', () => {
                 onDidActiveChange: jest.fn(),
             },
         });
-        const model = <IDockviewPanelModel>new panelModelMock();
+        const model = fromPartial<IDockviewPanelModel>({
+            update: jest.fn(),
+            init: jest.fn(),
+            dispose: jest.fn(),
+        });
 
         const cut = new DockviewPanel(
             'fake-id',
@@ -67,23 +55,8 @@ describe('dockviewPanel', () => {
     });
 
     test('that .setTitle updates the title', () => {
-        const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
-            return {
-                onDidActiveChange: jest.fn(),
-            } as any;
-        });
-        const accessorMock = jest.fn<DockviewComponent, []>(() => {
-            return {} as any;
-        });
-        const panelModelMock = jest.fn<Partial<IDockviewPanelModel>, []>(() => {
-            return {
-                update: jest.fn(),
-                init: jest.fn(),
-            };
-        });
-
-        const api = new dockviewApiMock();
-        const accessor = new accessorMock();
+        const api = fromPartial<DockviewApi>({});
+        const accessor = fromPartial<DockviewComponent>({});
         const group = fromPartial<DockviewGroupPanel>({
             api: {
                 onDidVisibilityChange: jest.fn(),
@@ -91,7 +64,10 @@ describe('dockviewPanel', () => {
                 onDidActiveChange: jest.fn(),
             },
         });
-        const model = <IDockviewPanelModel>new panelModelMock();
+        const model = fromPartial<IDockviewPanelModel>({
+            update: jest.fn(),
+            init: jest.fn(),
+        });
 
         const cut = new DockviewPanel(
             'fake-id',
@@ -117,22 +93,8 @@ describe('dockviewPanel', () => {
     });
 
     test('dispose cleanup', () => {
-        const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
-            return {} as any;
-        });
-        const accessorMock = jest.fn<DockviewComponent, []>(() => {
-            return {} as any;
-        });
-        const panelModelMock = jest.fn<Partial<IDockviewPanelModel>, []>(() => {
-            return {
-                update: jest.fn(),
-                init: jest.fn(),
-                dispose: jest.fn(),
-            };
-        });
-
-        const api = new dockviewApiMock();
-        const accessor = new accessorMock();
+        const api = fromPartial<DockviewApi>({});
+        const accessor = fromPartial<DockviewComponent>({});
         const group = fromPartial<DockviewGroupPanel>({
             api: {
                 onDidVisibilityChange: jest
@@ -146,7 +108,11 @@ describe('dockviewPanel', () => {
                     .mockReturnValue({ dispose: jest.fn() }),
             },
         });
-        const model = <IDockviewPanelModel>new panelModelMock();
+        const model = fromPartial<IDockviewPanelModel>({
+            update: jest.fn(),
+            init: jest.fn(),
+            dispose: jest.fn(),
+        });
 
         const cut = new DockviewPanel(
             'fake-id',
@@ -169,22 +135,8 @@ describe('dockviewPanel', () => {
     });
 
     test('get params', () => {
-        const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
-            return {} as any;
-        });
-        const accessorMock = jest.fn<DockviewComponent, []>(() => {
-            return {} as any;
-        });
-        const panelModelMock = jest.fn<Partial<IDockviewPanelModel>, []>(() => {
-            return {
-                update: jest.fn(),
-                init: jest.fn(),
-                dispose: jest.fn(),
-            };
-        });
-
-        const api = new dockviewApiMock();
-        const accessor = new accessorMock();
+        const api = fromPartial<DockviewApi>({});
+        const accessor = fromPartial<DockviewComponent>({});
         const group = fromPartial<DockviewGroupPanel>({
             api: {
                 onDidVisibilityChange: jest.fn(),
@@ -192,7 +144,11 @@ describe('dockviewPanel', () => {
                 onDidActiveChange: jest.fn(),
             },
         });
-        const model = <IDockviewPanelModel>new panelModelMock();
+        const model = fromPartial<IDockviewPanelModel>({
+            update: jest.fn(),
+            init: jest.fn(),
+            dispose: jest.fn(),
+        });
 
         const cut = new DockviewPanel(
             'fake-id',
@@ -215,22 +171,8 @@ describe('dockviewPanel', () => {
     });
 
     test('setSize propagates to underlying group', () => {
-        const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
-            return {} as any;
-        });
-        const accessorMock = jest.fn<DockviewComponent, []>(() => {
-            return {} as any;
-        });
-        const panelModelMock = jest.fn<Partial<IDockviewPanelModel>, []>(() => {
-            return {
-                update: jest.fn(),
-                init: jest.fn(),
-                dispose: jest.fn(),
-            };
-        });
-
-        const api = new dockviewApiMock();
-        const accessor = new accessorMock();
+        const api = fromPartial<DockviewApi>({});
+        const accessor = fromPartial<DockviewComponent>({});
         const group = fromPartial<DockviewGroupPanel>({
             api: {
                 onDidVisibilityChange: jest.fn(),
@@ -239,7 +181,11 @@ describe('dockviewPanel', () => {
                 setSize: jest.fn(),
             },
         });
-        const model = <IDockviewPanelModel>new panelModelMock();
+        const model = fromPartial<IDockviewPanelModel>({
+            update: jest.fn(),
+            init: jest.fn(),
+            dispose: jest.fn(),
+        });
 
         const cut = new DockviewPanel(
             'fake-id',
@@ -256,27 +202,16 @@ describe('dockviewPanel', () => {
 
         cut.api.setSize({ height: 123, width: 456 });
 
-        expect(group.api.setSize).toBeCalledWith({ height: 123, width: 456 });
-        expect(group.api.setSize).toBeCalledTimes(1);
+        expect(group.api.setSize).toHaveBeenCalledWith({
+            height: 123,
+            width: 456,
+        });
+        expect(group.api.setSize).toHaveBeenCalledTimes(1);
     });
 
     test('updateParameter', () => {
-        const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
-            return {} as any;
-        });
-        const accessorMock = jest.fn<DockviewComponent, []>(() => {
-            return {} as any;
-        });
-        const panelModelMock = jest.fn<Partial<IDockviewPanelModel>, []>(() => {
-            return {
-                update: jest.fn(),
-                init: jest.fn(),
-                dispose: jest.fn(),
-            };
-        });
-
-        const api = new dockviewApiMock();
-        const accessor = new accessorMock();
+        const api = fromPartial<DockviewApi>({});
+        const accessor = fromPartial<DockviewComponent>({});
         const group = fromPartial<DockviewGroupPanel>({
             api: {
                 onDidVisibilityChange: jest.fn(),
@@ -284,7 +219,11 @@ describe('dockviewPanel', () => {
                 onDidActiveChange: jest.fn(),
             },
         });
-        const model = <IDockviewPanelModel>new panelModelMock();
+        const model = fromPartial<IDockviewPanelModel>({
+            update: jest.fn(),
+            init: jest.fn(),
+            dispose: jest.fn(),
+        });
 
         const cut = new DockviewPanel(
             'fake-id',
@@ -305,6 +244,9 @@ describe('dockviewPanel', () => {
         // update 'a' and add 'c'
         cut.update({ params: { a: '-1', c: '3' } });
         expect(cut.params).toEqual({ a: '-1', b: '2', c: '3' });
+        expect(model.update).toHaveBeenCalledWith({
+            params: { a: '-1', b: '2', c: '3' },
+        });
 
         cut.update({ params: { d: '4', e: '5', f: '6' } });
         expect(cut.params).toEqual({
@@ -314,6 +256,9 @@ describe('dockviewPanel', () => {
             d: '4',
             e: '5',
             f: '6',
+        });
+        expect(model.update).toHaveBeenCalledWith({
+            params: { a: '-1', b: '2', c: '3', d: '4', e: '5', f: '6' },
         });
 
         cut.update({
@@ -334,6 +279,9 @@ describe('dockviewPanel', () => {
             e: null,
             g: '',
             h: null,
+        });
+        expect(model.update).toHaveBeenCalledWith({
+            params: { a: '-1', b: '2', c: '3', d: '', e: null, g: '', h: null },
         });
     });
 });

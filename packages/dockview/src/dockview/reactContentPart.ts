@@ -52,7 +52,7 @@ export class ReactPanelContentPart implements IContentRenderer {
     }
 
     public update(event: PanelUpdateEvent) {
-        this.part?.update(event.params);
+        this.part?.update({ params: event.params });
     }
 
     public layout(_width: number, _height: number): void {
