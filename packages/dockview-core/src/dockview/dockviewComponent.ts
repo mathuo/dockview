@@ -828,7 +828,7 @@ export class DockviewComponent
                 this.updateWatermark();
             })
             .catch((err) => {
-                console.error(err);
+                console.error('dockview: failed to create popout window', err);
             });
     }
 
@@ -2104,7 +2104,7 @@ export class DockviewComponent
 
         if (id && this._groups.has(options.id!)) {
             console.warn(
-                `Duplicate group id ${options?.id}. reassigning group id to avoid errors`
+                `dockview: Duplicate group id ${options?.id}. reassigning group id to avoid errors`
             );
             id = undefined;
         }
