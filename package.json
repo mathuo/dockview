@@ -16,7 +16,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "lerna run build --scope '{dockview-core,dockview,dockview-vue}'",
+    "build": "lerna run build --scope '{dockview-core,dockview,dockview-vue,dockview-react}'",
     "clean": "lerna run clean",
     "docs": "typedoc",
     "generate-docs": "node scripts/docs.mjs",
