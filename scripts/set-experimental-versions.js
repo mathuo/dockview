@@ -50,7 +50,7 @@ fs.writeFileSync(
 
 // dockview
 
-const depPackages = ['dockview', 'dockview-vue'];
+const depPackages = ['dockview', 'dockview-vue', 'dockview-react'];
 
 for (const depPackage of depPackages) {
     const dockviewPath = path.join(

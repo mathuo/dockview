@@ -9,6 +9,12 @@
         },
         {
             "path": "./packages/dockview-vue"
+        },
+        {
+            "path": "./packages/dockview-react"
+        },
+        {
+            "path": "./packages/dockview-angular"
         }
     ]
 }
