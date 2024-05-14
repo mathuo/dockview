@@ -69,7 +69,7 @@ class Stacktrace {
     private constructor(readonly value: string) {}
 
     print(): void {
-        console.warn(this.value);
+        console.warn('dockview: stacktrace', this.value);
     }
 }
 
@@ -124,7 +124,7 @@ export class Emitter<T> implements IDisposable {
                             this._listeners.splice(index, 1);
                         } else if (Emitter.ENABLE_TRACKING) {
                             // console.warn(
-                            //     `Listener already disposed`,
+                            //     `dockview: listener already disposed`,
                             //     Stacktrace.create().print()
                             // );
                         }
@@ -158,7 +158,10 @@ export class Emitter<T> implements IDisposable {
                     queueMicrotask(() => {
                         // don't check until stack of execution is completed to allow for out-of-order disposals within the same execution block
                         for (const listener of this._listeners) {
-                            console.warn(listener.stacktrace?.print());
+                            console.warn(
+                                'dockview: stacktrace',
+                                listener.stacktrace?.print()
+                            );
                         }
                     });
                 }
