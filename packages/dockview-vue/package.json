@@ -43,7 +43,8 @@
   "scripts": {
     "build:js": "vite build",
     "build:types": "vue-tsc --project tsconfig.build-types.json --declaration --emitDeclarationOnly --outDir dist/types",
-    "build": "npm run build:js && npm run build:types",
+    "build:css": "node scripts/copy-css.js",
+    "build": "npm run build:js && npm run build:types && npm run build:css",
     "clean": "rimraf dist/ .build/ .rollup.cache/",
     "prepublishOnly": "npm run rebuild && npm run test",
     "rebuild": "npm run clean && npm run build",
