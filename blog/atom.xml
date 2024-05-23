@@ -2,11 +2,29 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dockview.dev/blog</id>
     <title>Dockview Blog</title>
-    <updated>2024-05-05T00:00:00.000Z</updated>
+    <updated>2024-05-23T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dockview.dev/blog"/>
     <subtitle>Dockview Blog</subtitle>
     <icon>https://dockview.dev/img/dockview_logo.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Dockview 1.14.0]]></title>
+        <id>https://dockview.dev/blog/dockview-1.14.0-release</id>
+        <link href="https://dockview.dev/blog/dockview-1.14.0-release"/>
+        <updated>2024-05-23T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
+        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.14.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<ul>
+<li>Progess towards Vue.js integration <a href="https://github.com/mathuo/dockview/issues/562" target="_blank" rel="noopener noreferrer">#562</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.14.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Internal Changes <a href="https://github.com/mathuo/dockview/issues/601" target="_blank" rel="noopener noreferrer">#601</a></li>
+<li>Internal Changes <a href="https://github.com/mathuo/dockview/issues/603" target="_blank" rel="noopener noreferrer">#603</a></li>
+</ul>]]></content>
+        <category label="release" term="release"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Dockview 1.13.1]]></title>
         <id>https://dockview.dev/blog/dockview-1.13.1-release</id>
@@ -547,22 +565,6 @@ when popout is closed.</li>
 <li>Fix bug custom params named 'title' conflicting with built-in tab 'title' object <a href="https://github.com/mathuo/dockview/issues/258" target="_blank" rel="noopener noreferrer">#258</a></li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.7.3-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content>
-        <category label="release" term="release"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Dockview 1.7.2]]></title>
-        <id>https://dockview.dev/blog/dockview-1.7.2-release</id>
-        <link href="https://dockview.dev/blog/dockview-1.7.2-release"/>
-        <updated>2023-05-07T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Please reference to docs @ dockview.dev.]]></summary>
-        <content type="html"><![CDATA[<p>Please reference to docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.
-If you feel anything is missing or unclear please let me know.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.7.2-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.7.2-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Fix bug with panel resize drag elements <a href="https://github.com/mathuo/dockview/issues/249" target="_blank" rel="noopener noreferrer">#249</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.7.2-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content>
         <category label="release" term="release"/>
     </entry>
 </feed>
