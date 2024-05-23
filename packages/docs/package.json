@@ -1,6 +1,6 @@
 {
   "name": "dockview-docs",
-  "version": "1.13.1",
+  "version": "1.14.0",
   "private": true,
   "scripts": {
     "build": "npm run build-templates && docusaurus build",
@@ -37,7 +37,7 @@
     "ag-grid-react": "^31.0.2",
     "axios": "^1.6.3",
     "clsx": "^2.1.0",
-    "dockview": "^1.13.1",
+    "dockview": "^1.14.0",
     "prism-react-renderer": "^2.3.1",
     "react-dnd": "^16.0.1",
     "react-laag": "^2.0.5",
