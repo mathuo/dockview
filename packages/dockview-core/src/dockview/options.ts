@@ -187,7 +187,7 @@ type AddPanelFloatingGroupUnion = {
 };
 
 type AddPanelPositionUnion = {
-    floating: false | never;
+    floating: false;
     position: AddPanelPositionOptions;
 };
 

@@ -1,6 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { IFrameworkPart, IDockviewDisposable, Parameters } from 'dockview-core';
+import {
+    DockviewDisposable,
+    IFrameworkPart,
+    IDockviewDisposable,
+    Parameters,
+} from 'dockview-core';
 
 export interface ReactPortalStore {
     addPortal: (portal: React.ReactPortal) => IDockviewDisposable;
@@ -174,19 +179,15 @@ export const usePortalsLifecycle: PortalLifecycleHook = () => {
     const addPortal = React.useCallback((portal: React.ReactPortal) => {
         setPortals((existingPortals) => [...existingPortals, portal]);
         let disposed = false;
-        return {
-            dispose: () => {
-                if (disposed) {
-                    throw new Error(
-                        'invalid operation: resource already disposed'
-                    );
-                }
-                disposed = true;
-                setPortals((existingPortals) =>
-                    existingPortals.filter((p) => p !== portal)
-                );
-            },
-        };
+        return DockviewDisposable.from(() => {
+            if (disposed) {
+                throw new Error('invalid operation: resource already disposed');
+            }
+            disposed = true;
+            setPortals((existingPortals) =>
+                existingPortals.filter((p) => p !== portal)
+            );
+        });
     }, []);
 
     return [portals, addPortal];

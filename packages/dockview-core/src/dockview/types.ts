@@ -1,4 +1,3 @@
-import { IDockviewComponent } from './dockviewComponent';
 import { DockviewPanelApi } from '../api/dockviewPanelApi';
 import { PanelInitParameters, IPanel } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
@@ -22,45 +21,35 @@ export interface WatermarkRendererInitParameters {
     group?: IDockviewGroupPanel;
 }
 
+type RendererMethodOptionalList =
+    | 'dispose'
+    | 'update'
+    | 'layout'
+    | 'toJSON'
+    | 'focus';
+
 export interface IWatermarkRenderer
-    extends Optional<
-        Omit<IPanel, 'id' | 'init'>,
-        'dispose' | 'update' | 'layout' | 'toJSON' | 'focus'
-    > {
+    extends Optional<Omit<IPanel, 'id' | 'init'>, RendererMethodOptionalList> {
     readonly element: HTMLElement;
     init: (params: WatermarkRendererInitParameters) => void;
     updateParentGroup(group: DockviewGroupPanel, visible: boolean): void;
 }
 
 export interface ITabRenderer
-    extends Optional<
-        Omit<IPanel, 'id'>,
-        'dispose' | 'update' | 'layout' | 'toJSON' | 'focus'
-    > {
+    extends Optional<Omit<IPanel, 'id'>, RendererMethodOptionalList> {
     readonly element: HTMLElement;
     init(parameters: GroupPanelPartInitParameters): void;
 }
 
 export interface IContentRenderer
-    extends Optional<
-        Omit<IPanel, 'id'>,
-        'dispose' | 'update' | 'layout' | 'toJSON' | 'focus'
-    > {
+    extends Optional<Omit<IPanel, 'id'>, RendererMethodOptionalList> {
     readonly element: HTMLElement;
     init(parameters: GroupPanelPartInitParameters): void;
 }
 
 // watermark component
 
-export interface WatermarkPartInitParameters {
-    accessor: IDockviewComponent;
-}
-
 // constructors
-
-export interface WatermarkConstructor {
-    new (): IWatermarkRenderer;
-}
 
 export interface IGroupPanelInitParameters
     extends PanelInitParameters,
