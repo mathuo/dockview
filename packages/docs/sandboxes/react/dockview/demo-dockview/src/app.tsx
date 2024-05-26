@@ -26,6 +26,7 @@ const components = {
                     overflow: 'auto',
                     color: 'white',
                     position: 'relative',
+                    // border: '5px dashed purple',
                 }}
             >
                 {/* <Table data={metadata} /> */}
@@ -144,6 +145,10 @@ const DockviewDemo = (props: { theme?: string }) => {
         event.api.onDidAddGroup((event) => {
             setGroups((_) => [..._, event.id]);
             addLogLine(`Group Added ${event.id}`);
+        });
+
+        event.api.onDidMovePanel((event) => {
+            addLogLine(`Panel Moved ${event.panel.id}`);
         });
 
         event.api.onDidRemoveGroup((event) => {

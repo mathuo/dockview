@@ -934,6 +934,9 @@ describe('dockviewComponent', () => {
             }),
             dockview.onDidActivePanelChange((panel) => {
                 events.push({ type: 'ACTIVE_PANEL', panel });
+            }),
+            dockview.onDidMovePanel(({ panel }) => {
+                events.push({ type: 'MOVE_PANEL', panel });
             })
         );
 
@@ -1016,7 +1019,10 @@ describe('dockviewComponent', () => {
             to: { group: panel2.group, position: 'center' },
         });
 
-        expect(events).toEqual([{ type: 'ACTIVE_GROUP', group: panel2.group }]);
+        expect(events).toEqual([
+            { type: 'ACTIVE_GROUP', group: panel2.group },
+            { type: 'MOVE_PANEL', panel: panel5 },
+        ]);
 
         events = [];
 
@@ -1030,6 +1036,7 @@ describe('dockviewComponent', () => {
         expect(events).toEqual([
             { type: 'REMOVE_GROUP', group: groupReferenceBeforeMove },
             { type: 'ACTIVE_PANEL', panel: panel4 },
+            { type: 'MOVE_PANEL', panel: panel4 },
         ]);
 
         for (const panel of dockview.panels) {
@@ -1771,6 +1778,7 @@ describe('dockviewComponent', () => {
         let addPanel: IDockviewPanel[] = [];
         let removePanel: IDockviewPanel[] = [];
         let activePanel: (IDockviewPanel | undefined)[] = [];
+        let movedPanels: IDockviewPanel[] = [];
         let layoutChange = 0;
         let layoutChangeFromJson = 0;
 
@@ -1792,6 +1800,9 @@ describe('dockviewComponent', () => {
             }),
             dockview.onDidActivePanelChange((event) => {
                 activePanel.push(event);
+            }),
+            dockview.onDidMovePanel((event) => {
+                movedPanels.push(event.panel);
             }),
             dockview.onDidLayoutChange(() => {
                 layoutChange++;
@@ -1884,6 +1895,7 @@ describe('dockviewComponent', () => {
         expect(addPanel.length).toBe(5);
         expect(removePanel.length).toBe(0);
         expect(activePanel.length).toBe(1);
+        expect(movedPanels.length).toBe(0);
         expect(layoutChange).toBe(1);
         expect(layoutChangeFromJson).toBe(1);
 
@@ -1918,6 +1930,7 @@ describe('dockviewComponent', () => {
         expect(addPanel.length).toBe(0);
         expect(removePanel.length).toBe(5);
         expect(activePanel.length).toBe(1);
+        expect(movedPanels.length).toBe(0);
         expect(layoutChange).toBe(1);
         expect(layoutChangeFromJson).toBe(1);
 
@@ -4924,7 +4937,6 @@ describe('dockviewComponent', () => {
 
     describe('that emits onDidLayoutChange', () => {
         let dockview: DockviewComponent;
-        let panel1: DockviewPanel;
 
         beforeEach(() => {
             jest.useFakeTimers();
@@ -4943,11 +4955,6 @@ describe('dockviewComponent', () => {
                     }
                 },
             });
-
-            panel1 = dockview.addPanel({
-                id: 'panel_1',
-                component: 'default',
-            });
         });
 
         afterEach(() => {
@@ -4955,7 +4962,63 @@ describe('dockviewComponent', () => {
             jest.useRealTimers();
         });
 
+        test('when panels or groups change', () => {
+            const didLayoutChangeHandler = jest.fn();
+            dockview.onDidLayoutChange(didLayoutChangeHandler);
+
+            // add panel
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: { referenceGroup: panel1.group },
+            });
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(1);
+
+            // add group
+            const group = dockview.addGroup();
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(2);
+
+            // remove group
+            group.api.close();
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(3);
+
+            // active panel
+            panel1.api.setActive();
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(4);
+
+            // move panel
+            dockview.moveGroupOrPanel({
+                from: {
+                    groupId: panel1.group.api.id,
+                    panelId: panel1.api.id,
+                },
+                to: {
+                    group: panel1.group,
+                    position: 'center',
+                    index: 1,
+                },
+            });
+
+            // remove panel
+            panel2.api.close();
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(5);
+        });
+
         test('that emits onDidPanelTitleChange and onDidLayoutChange when the panel set a title', () => {
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
             const didLayoutChangeHandler = jest.fn();
             const { dispose: disposeDidLayoutChangeHandler } =
                 dockview.onDidLayoutChange(didLayoutChangeHandler);
@@ -4970,6 +5033,11 @@ describe('dockviewComponent', () => {
         });
 
         test('that emits onDidPanelParametersChange and onDidLayoutChange when the panel updates parameters', () => {
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
             const didLayoutChangeHandler = jest.fn();
             const { dispose: disposeDidLayoutChangeHandler } =
                 dockview.onDidLayoutChange(didLayoutChangeHandler);
