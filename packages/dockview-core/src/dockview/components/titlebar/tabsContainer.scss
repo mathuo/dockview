@@ -11,23 +11,29 @@
     }
 
     &.dv-single-tab.dv-full-width-single-tab {
-      .tabs-container {
-          flex-grow: 1;
-
-          .tab {
+        .tabs-container {
             flex-grow: 1;
-          }
-      }
 
-      .void-container {
-        flex-grow: 0;
-      }
+            .tab {
+                flex-grow: 1;
+            }
+        }
+
+        .void-container {
+            flex-grow: 0;
+        }
     }
 
     .void-container {
         display: flex;
         flex-grow: 1;
         cursor: grab;
+    }
+
+    .dv-tabs-list {
+        display: flex;
+        overflow-x: overlay;
+        overflow-y: hidden;
     }
 
     .tabs-container {
