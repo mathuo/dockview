@@ -42,7 +42,8 @@ function flipNode<T extends Node>(
             node.styles,
             size,
             orthogonalSize,
-            node.disabled
+            node.disabled,
+            node.margin
         );
 
         let totalSize = 0;
@@ -275,6 +276,7 @@ export class Gridview implements IDisposable {
 
     private _root: BranchNode | undefined;
     private _locked = false;
+    private _margin = 0;
     private _maximizedNode:
         | { leaf: LeafNode; hiddenOnMaximize: LeafNode[] }
         | undefined = undefined;
@@ -354,6 +356,15 @@ export class Gridview implements IDisposable {
                 branch.push(...node.children);
             }
         }
+    }
+
+    get margin(): number {
+        return this._margin;
+    }
+
+    set margin(value: number) {
+        this._margin = value;
+        this.root.margin = value;
     }
 
     maximizedView(): IGridView | undefined {
@@ -466,7 +477,8 @@ export class Gridview implements IDisposable {
             this.styles,
             this.root.size,
             this.root.orthogonalSize,
-            this._locked
+            this.locked,
+            this.margin
         );
     }
 
@@ -527,7 +539,8 @@ export class Gridview implements IDisposable {
                 this.styles,
                 node.size, // <- orthogonal size - flips at each depth
                 orthogonalSize, // <- size - flips at each depth,
-                this._locked,
+                this.locked,
+                this.margin,
                 children
             );
         } else {
@@ -580,7 +593,8 @@ export class Gridview implements IDisposable {
             this.styles,
             this.root.orthogonalSize,
             this.root.size,
-            this._locked
+            this.locked,
+            this.margin
         );
 
         if (oldRoot.children.length === 0) {
@@ -686,17 +700,24 @@ export class Gridview implements IDisposable {
     constructor(
         readonly proportionalLayout: boolean,
         readonly styles: ISplitviewStyles | undefined,
-        orientation: Orientation
+        orientation: Orientation,
+        locked?: boolean,
+        margin?: number
     ) {
         this.element = document.createElement('div');
         this.element.className = 'grid-view';
+
+        this._locked = locked ?? false;
+        this._margin = margin ?? 0;
+
         this.root = new BranchNode(
             orientation,
             proportionalLayout,
             styles,
             0,
             0,
-            this._locked
+            this.locked,
+            this.margin
         );
     }
 
@@ -781,7 +802,8 @@ export class Gridview implements IDisposable {
                 this.styles,
                 parent.size,
                 parent.orthogonalSize,
-                this._locked
+                this.locked,
+                this.margin
             );
             grandParent.addChild(newParent, parent.size, parentIndex);
 

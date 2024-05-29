@@ -870,4 +870,8 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     ): Promise<void> {
         return this.component.addPopoutGroup(item, options);
     }
+
+    setGap(gap: number | undefined): void {
+        this.component.updateOptions({ gap });
+    }
 }

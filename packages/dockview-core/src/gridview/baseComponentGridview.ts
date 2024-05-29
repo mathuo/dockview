@@ -35,6 +35,7 @@ export interface BaseGridOptions {
     readonly parentElement: HTMLElement;
     readonly disableAutoResizing?: boolean;
     readonly locked?: boolean;
+    readonly margin?: number;
 }
 
 export interface IGridPanelView extends IGridView, IPanel {
@@ -148,7 +149,9 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.gridview = new Gridview(
             !!options.proportionalLayout,
             options.styles,
-            options.orientation
+            options.orientation,
+            options.locked,
+            options.margin
         );
 
         this.gridview.locked = !!options.locked;

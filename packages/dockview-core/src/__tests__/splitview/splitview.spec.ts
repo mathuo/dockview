@@ -772,4 +772,26 @@ describe('splitview', () => {
         view1.fireChangeEvent({ size: 300 });
         expect([view1.size, view2.size, view3.size]).toEqual([300, 300, 300]);
     });
+
+    test('that margins are applied to view sizing', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: false,
+            margin: 24,
+        });
+        splitview.layout(924, 500);
+
+        const view1 = new Testview(0, 1000);
+        const view2 = new Testview(0, 1000, LayoutPriority.High);
+        const view3 = new Testview(0, 1000);
+
+        splitview.addView(view1);
+        expect([view1.size]).toEqual([924]);
+
+        splitview.addView(view2);
+        expect([view1.size, view2.size]).toEqual([450, 450]); // 450 + 24 + 450  = 924
+
+        splitview.addView(view3);
+        expect([view1.size, view2.size, view3.size]).toEqual([292, 292, 292]); // 292 + 24 + 292 + 24 + 292 = 924
+    });
 });
