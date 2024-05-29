@@ -229,8 +229,6 @@
 }
 
 @mixin dockview-design-replit-mixin {
-    --dv-group-gap-size: 3px;
-
     .dv-resize-container:has(> .groupview) {
         border-radius: 8px;
     }
