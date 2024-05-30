@@ -35,11 +35,13 @@ const DOCKVIEW_CDN = {
             'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/dist/dockview-core.esm.js`,
             'dockview-core/': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/`,
             'dockview-vue': `https://cdn.jsdelivr.net/npm/dockview-vue@${DOCKVIEW_VERSION}/dist/dockview-vue.es.js`,
+            'dockview-vue/': `https://cdn.jsdelivr.net/npm/dockview-vue@${DOCKVIEW_VERSION}/`,
         },
         local: {
             'dockview-core': `${local}/dockview-core/dist/dockview-core.esm.js`,
             'dockview-core/': `${local}/dockview-core/`,
             'dockview-vue': `${local}/dockview-vue/dist/dockview-vue.es.js`,
+            'dockview-vue/': `${local}/dockview-vue/`,
         },
     },
     typescript: {
