@@ -1,11 +1,12 @@
-import 'dockview-core/dist/styles/dockview.css';
-import { Prop, PropType, createApp, defineComponent } from 'vue';
-import { DockviewVue } from 'dockview-vue';
+import 'dockview-vue/dist/styles/dockview.css';
+import { PropType, createApp, defineComponent } from 'vue';
+
 import {
+    DockviewVue,
     DockviewReadyEvent,
     IDockviewHeaderActionsProps,
     IDockviewPanelProps,
-} from 'dockview-core';
+} from 'dockview-vue';
 
 let panelCount = 0;
 

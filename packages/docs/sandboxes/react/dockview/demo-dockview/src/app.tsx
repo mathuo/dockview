@@ -26,6 +26,7 @@ const components = {
                     overflow: 'auto',
                     color: 'white',
                     position: 'relative',
+                    border: 'var(--demo-border)',
                 }}
             >
                 {/* <Table data={metadata} /> */}
@@ -180,6 +181,19 @@ const DockviewDemo = (props: { theme?: string }) => {
 
     const [watermark, setWatermark] = React.useState<boolean>(false);
 
+    const [gapCheck, setGapCheck] = React.useState<boolean>(false);
+
+    const css = React.useMemo(() => {
+        if (!gapCheck) {
+            return {};
+        }
+
+        return {
+            '--dv-group-gap-size': '0.5rem',
+            '--demo-border': '5px dashed purple',
+        } as React.CSSProperties;
+    }, [gapCheck]);
+
     return (
         <div
             style={{
@@ -190,6 +204,7 @@ const DockviewDemo = (props: { theme?: string }) => {
                 padding: '8px',
                 backgroundColor: 'rgba(0,0,50,0.25)',
                 borderRadius: '8px',
+                ...css,
             }}
         >
             <div>
@@ -212,6 +227,15 @@ const DockviewDemo = (props: { theme?: string }) => {
                         activeGroup={activeGroup}
                     />
                 )}
+                {/* <div>
+                    <button
+                        onClick={() => {
+                            setGapCheck(!gapCheck);
+                        }}
+                    >
+                        {gapCheck ? 'Disable Gap Check' : 'Enable Gap Check'}
+                    </button>
+                </div> */}
             </div>
             <div
                 style={{
