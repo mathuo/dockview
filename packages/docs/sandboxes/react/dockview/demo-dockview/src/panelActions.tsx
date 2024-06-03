@@ -33,8 +33,8 @@ const PanelAction = (props: {
                                 position: {
                                     width: 400,
                                     height: 300,
-                                    bottom: 20,
-                                    right: 20,
+                                    bottom: 50,
+                                    right: 50,
                                 }
                             });
                         }

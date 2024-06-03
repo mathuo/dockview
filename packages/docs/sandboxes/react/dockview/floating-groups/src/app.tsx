@@ -84,7 +84,7 @@ function addFloatingPanel2(api: DockviewApi) {
         id: (++panelCount).toString(),
         title: `Tab ${panelCount}`,
         component: 'default',
-        floating: { width: 250, height: 150, x: 50, y: 50 },
+        floating: { width: 250, height: 150, left: 50, top: 50 },
     });
 }
 
@@ -217,9 +217,8 @@ export const DockviewPersistence = (props: { theme?: string }) => {
                         setDisableFloatingGroups((x) => !x);
                     }}
                 >
-                    {`${
-                        disableFloatingGroups ? 'Enable' : 'Disable'
-                    } floating groups`}
+                    {`${disableFloatingGroups ? 'Enable' : 'Disable'
+                        } floating groups`}
                 </button>
             </div>
             <div
@@ -275,7 +274,14 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
             const group = props.containerApi.addGroup();
             props.group.api.moveTo({ group });
         } else {
-            props.containerApi.addFloatingGroup(props.group);
+            props.containerApi.addFloatingGroup(props.group, undefined, {
+                position: {
+                    width: 400,
+                    height: 300,
+                    bottom: 50,
+                    right: 50,
+                }
+            });
         }
     };
 

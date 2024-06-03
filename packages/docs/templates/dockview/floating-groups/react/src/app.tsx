@@ -209,9 +209,8 @@ export const DockviewPersistence = (props: { theme?: string }) => {
                         setDisableFloatingGroups((x) => !x);
                     }}
                 >
-                    {`${
-                        disableFloatingGroups ? 'Enable' : 'Disable'
-                    } floating groups`}
+                    {`${disableFloatingGroups ? 'Enable' : 'Disable'
+                        } floating groups`}
                 </button>
             </div>
             <div
@@ -265,7 +264,14 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
             const group = props.containerApi.addGroup();
             props.group.api.moveTo({ group });
         } else {
-            props.containerApi.addFloatingGroup(props.group);
+            props.containerApi.addFloatingGroup(props.group, undefined, {
+                position: {
+                    width: 400,
+                    height: 300,
+                    bottom: 50,
+                    right: 50,
+                }
+            });
         }
     };
 
