@@ -8,3 +8,7 @@ export interface Box {
     height: number;
     width: number;
 }
+
+export type AnchoredBox =
+    ({ top: number, height: number } | { bottom: number, height: number }) &
+    ({ left: number, width: number } | { right: number, width: number });
