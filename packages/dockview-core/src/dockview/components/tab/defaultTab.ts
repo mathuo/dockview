@@ -1,16 +1,13 @@
 import { CompositeDisposable } from '../../../lifecycle';
 import { ITabRenderer, GroupPanelPartInitParameters } from '../../types';
 import { addDisposableListener } from '../../../events';
-import { PanelUpdateEvent } from '../../../panel/types';
-import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { createCloseButton } from '../../../svg';
 
 export class DefaultTab extends CompositeDisposable implements ITabRenderer {
     private _element: HTMLElement;
     private _content: HTMLElement;
     private action: HTMLElement;
-    //
-    private params: GroupPanelPartInitParameters = {} as any;
+    private _title: string | undefined;
 
     get element(): HTMLElement {
         return this._element;
@@ -21,7 +18,7 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
 
         this._element = document.createElement('div');
         this._element.className = 'dv-default-tab';
-        //
+
         this._content = document.createElement('div');
         this._content.className = 'dv-default-tab-content';
 
@@ -29,10 +26,9 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         this.action.className = 'dv-default-tab-action';
         this.action.appendChild(createCloseButton());
 
-        //
         this._element.appendChild(this._content);
         this._element.appendChild(this.action);
-        //
+
         this.addDisposables(
             addDisposableListener(this.action, 'mousedown', (ev) => {
                 ev.preventDefault();
@@ -42,40 +38,33 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         this.render();
     }
 
-    public update(event: PanelUpdateEvent): void {
-        this.params = { ...this.params, ...event.params };
+    init(params: GroupPanelPartInitParameters): void {
+        this._title = params.title;
+
+        this.addDisposables(
+            params.api.onDidTitleChange((event) => {
+                this._title = event.title;
+                this.render();
+            }),
+            addDisposableListener(this.action, 'mousedown', (ev) => {
+                ev.preventDefault();
+            }),
+            addDisposableListener(this.action, 'click', (ev) => {
+                if (ev.defaultPrevented) {
+                    return;
+                }
+
+                ev.preventDefault();
+                params.api.close();
+            })
+        );
+
         this.render();
-    }
-
-    focus(): void {
-        //noop
-    }
-
-    public init(params: GroupPanelPartInitParameters): void {
-        this.params = params;
-        this._content.textContent = params.title;
-
-        addDisposableListener(this.action, 'click', (ev) => {
-            ev.preventDefault(); //
-            this.params.api.close();
-        });
-    }
-
-    onGroupChange(_group: DockviewGroupPanel): void {
-        this.render();
-    }
-
-    onPanelVisibleChange(_isPanelVisible: boolean): void {
-        this.render();
-    }
-
-    public layout(_width: number, _height: number): void {
-        // noop
     }
 
     private render(): void {
-        if (this._content.textContent !== this.params.title) {
-            this._content.textContent = this.params.title;
+        if (this._content.textContent !== this._title) {
+            this._content.textContent = this._title ?? '';
         }
     }
 }
