@@ -274,7 +274,9 @@ export class DockviewComponent
 
     private readonly _onDidMovePanel = new Emitter<{
         panel: IDockviewPanel;
+        from: DockviewGroupPanel;
     }>();
+    readonly onDidMovePanel = this._onDidMovePanel.event;
 
     private readonly _floatingGroups: DockviewFloatingGroupPanel[] = [];
     private readonly _popoutGroups: {
@@ -1797,6 +1799,7 @@ export class DockviewComponent
 
             this._onDidMovePanel.fire({
                 panel: removedPanel,
+                from: sourceGroup,
             });
         } else {
             /**
@@ -1921,10 +1924,6 @@ export class DockviewComponent
             });
 
             this.doSetGroupAndPanelActive(to);
-
-            panels.forEach((panel) => {
-                this._onDidMovePanel.fire({ panel });
-            });
         } else {
             switch (from.api.location.type) {
                 case 'grid':
@@ -1959,11 +1958,11 @@ export class DockviewComponent
             );
 
             this.gridview.addView(from, Sizing.Distribute, dropLocation);
-
-            from.panels.forEach((panel) => {
-                this._onDidMovePanel.fire({ panel });
-            });
         }
+
+        from.panels.forEach((panel) => {
+            this._onDidMovePanel.fire({ panel, from });
+        });
     }
 
     override doSetGroupActive(group: DockviewGroupPanel | undefined): void {
