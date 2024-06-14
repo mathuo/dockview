@@ -14,6 +14,7 @@ import {
 import { IDockviewPanel } from './dockviewPanel';
 import { DockviewPanelRenderer } from '../overlayRenderContainer';
 import { IGroupHeaderProps } from './framework';
+import { AnchoredBox } from '../types';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -37,11 +38,11 @@ export interface DockviewOptions {
     singleTabMode?: 'fullwidth' | 'default';
     disableFloatingGroups?: boolean;
     floatingGroupBounds?:
-        | 'boundedWithinViewport'
-        | {
-              minimumHeightWithinViewport?: number;
-              minimumWidthWithinViewport?: number;
-          };
+    | 'boundedWithinViewport'
+    | {
+        minimumHeightWithinViewport?: number;
+        minimumWidthWithinViewport?: number;
+    };
     popoutUrl?: string;
     defaultRenderer?: DockviewPanelRenderer;
     debug?: boolean;
@@ -74,7 +75,7 @@ export class DockviewUnhandledDragOverEvent implements DockviewDndOverlayEvent {
         readonly position: Position,
         readonly getData: () => PanelTransfer | undefined,
         readonly group?: DockviewGroupPanel
-    ) {}
+    ) { }
 
     accept(): void {
         this._isAccepted = true;
@@ -176,13 +177,8 @@ export function isPanelOptionsWithGroup(
 
 type AddPanelFloatingGroupUnion = {
     floating:
-        | {
-              height?: number;
-              width?: number;
-              x?: number;
-              y?: number;
-          }
-        | true;
+    | Partial<AnchoredBox>
+    | true;
     position: never;
 };
 

@@ -42,7 +42,7 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from '../dockview/components/titlebar/tabsContainer';
-import { Box } from '../types';
+import { AnchoredBox, Box } from '../types';
 import {
     DockviewDidDropEvent,
     DockviewWillDropEvent,
@@ -139,7 +139,7 @@ export class SplitviewApi implements CommonApi<SerializedSplitview> {
         return this.component.onDidRemoveView;
     }
 
-    constructor(private readonly component: ISplitviewComponent) {}
+    constructor(private readonly component: ISplitviewComponent) { }
 
     /**
      * Update configuratable options.
@@ -295,7 +295,7 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
         return emitter.event;
     }
 
-    constructor(private readonly component: IPaneviewComponent) {}
+    constructor(private readonly component: IPaneviewComponent) { }
 
     /**
      * Remove a panel given the panel object.
@@ -459,7 +459,7 @@ export class GridviewApi implements CommonApi<SerializedGridviewComponent> {
         this.component.updateOptions({ orientation: value });
     }
 
-    constructor(private readonly component: IGridviewComponent) {}
+    constructor(private readonly component: IGridviewComponent) { }
 
     /**
      *  Focus the component. Will try to focus an active panel if one exists.
@@ -728,7 +728,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.activeGroup;
     }
 
-    constructor(private readonly component: IDockviewComponent) {}
+    constructor(private readonly component: IDockviewComponent) { }
 
     /**
      *  Focus the component. Will try to focus an active panel if one exists.
@@ -800,9 +800,15 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     addFloatingGroup(
         item: IDockviewPanel | DockviewGroupPanel,
-        coord?: { x: number; y: number }
+        coord?: { x: number; y: number },
+        options?: {
+            position?: AnchoredBox;
+            skipRemoveGroup?: boolean;
+            inDragMode?: boolean;
+            skipActiveGroup?: boolean;
+        }
     ): void {
-        return this.component.addFloatingGroup(item, coord);
+        return this.component.addFloatingGroup(item, coord, options);
     }
 
     /**
