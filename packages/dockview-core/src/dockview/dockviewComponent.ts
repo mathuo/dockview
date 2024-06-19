@@ -1008,7 +1008,7 @@ export class DockviewComponent
                             this.options.floatingGroupBounds?.minimumWidthWithinViewport;
                 }
 
-                group.overlay.setBounds({});
+                group.overlay.setBounds();
             }
         }
 

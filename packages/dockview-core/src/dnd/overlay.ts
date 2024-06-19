@@ -40,6 +40,9 @@ export class Overlay extends CompositeDisposable {
     private static MINIMUM_HEIGHT = 20;
     private static MINIMUM_WIDTH = 20;
 
+    private verticalAlignment: 'top' | 'bottom' | undefined;
+    private horiziontalAlignment: 'left' | 'right' | undefined;
+
     set minimumInViewportWidth(value: number | undefined) {
         this.options.minimumInViewportWidth = value;
     }
@@ -78,10 +81,10 @@ export class Overlay extends CompositeDisposable {
         this.setBounds({
             height: this.options.height,
             width: this.options.width,
-            ...("top" in this.options && { top: this.options.top }),
-            ...("bottom" in this.options && { bottom: this.options.bottom }),
-            ...("left" in this.options && { left: this.options.left }),
-            ...("right" in this.options && { right: this.options.right })
+            ...('top' in this.options && { top: this.options.top }),
+            ...('bottom' in this.options && { bottom: this.options.bottom }),
+            ...('left' in this.options && { left: this.options.left }),
+            ...('right' in this.options && { right: this.options.right }),
         });
     }
 
@@ -92,21 +95,25 @@ export class Overlay extends CompositeDisposable {
         if (typeof bounds.width === 'number') {
             this._element.style.width = `${bounds.width}px`;
         }
-        if ("top" in bounds && typeof bounds.top === 'number') {
+        if ('top' in bounds && typeof bounds.top === 'number') {
             this._element.style.top = `${bounds.top}px`;
-            this._element.style.bottom = "auto";
+            this._element.style.bottom = 'auto';
+            this.verticalAlignment = 'top';
         }
-        if ("bottom" in bounds && typeof bounds.bottom === 'number') {
+        if ('bottom' in bounds && typeof bounds.bottom === 'number') {
             this._element.style.bottom = `${bounds.bottom}px`;
-            this._element.style.top = "auto";
+            this._element.style.top = 'auto';
+            this.verticalAlignment = 'bottom';
         }
-        if ("left" in bounds && typeof bounds.left === 'number') {
+        if ('left' in bounds && typeof bounds.left === 'number') {
             this._element.style.left = `${bounds.left}px`;
-            this._element.style.right = "auto";
+            this._element.style.right = 'auto';
+            this.horiziontalAlignment = 'left';
         }
-        if ("right" in bounds && typeof bounds.right === 'number') {
+        if ('right' in bounds && typeof bounds.right === 'number') {
             this._element.style.right = `${bounds.right}px`;
-            this._element.style.left = "auto";
+            this._element.style.left = 'auto';
+            this.horiziontalAlignment = 'right';
         }
 
         const containerRect = this.options.container.getBoundingClientRect();
@@ -120,44 +127,44 @@ export class Overlay extends CompositeDisposable {
         // a minimum height of minimumViewportHeight must be inside the viewport
         const yOffset = Math.max(0, this.getMinimumHeight(overlayRect.height));
 
-        if ("top" in bounds && typeof bounds.top === 'number') {
+        if (this.verticalAlignment === 'top') {
             const top = clamp(
                 overlayRect.top - containerRect.top,
                 -yOffset,
                 Math.max(0, containerRect.height - overlayRect.height + yOffset)
             );
             this._element.style.top = `${top}px`;
-            this._element.style.bottom = "auto";
+            this._element.style.bottom = 'auto';
         }
 
-        if ("bottom" in bounds && typeof bounds.bottom === 'number') {
+        if (this.verticalAlignment === 'bottom') {
             const bottom = clamp(
                 containerRect.bottom - overlayRect.bottom,
                 -yOffset,
                 Math.max(0, containerRect.height - overlayRect.height + yOffset)
             );
             this._element.style.bottom = `${bottom}px`;
-            this._element.style.top = "auto";
+            this._element.style.top = 'auto';
         }
 
-        if ("left" in bounds && typeof bounds.left === 'number') {
+        if (this.horiziontalAlignment === 'left') {
             const left = clamp(
                 overlayRect.left - containerRect.left,
                 -xOffset,
                 Math.max(0, containerRect.width - overlayRect.width + xOffset)
             );
             this._element.style.left = `${left}px`;
-            this._element.style.right = "auto";
+            this._element.style.right = 'auto';
         }
 
-        if ("right" in bounds && typeof bounds.right === 'number') {
+        if (this.horiziontalAlignment === 'right') {
             const right = clamp(
                 containerRect.right - overlayRect.right,
                 -xOffset,
                 Math.max(0, containerRect.width - overlayRect.width + xOffset)
             );
             this._element.style.right = `${right}px`;
-            this._element.style.left = "auto";
+            this._element.style.left = 'auto';
         }
 
         this._onDidChange.fire();
@@ -169,17 +176,17 @@ export class Overlay extends CompositeDisposable {
 
         const result: any = {};
 
-        if (this._element.style.top !== "auto") {
+        if (this.verticalAlignment === 'top') {
             result.top = parseFloat(this._element.style.top);
-        } else if (this._element.style.bottom !== "auto") {
+        } else if (this.verticalAlignment === 'bottom') {
             result.bottom = parseFloat(this._element.style.bottom);
         } else {
             result.top = element.top - container.top;
         }
 
-        if (this._element.style.left !== "auto") {
+        if (this.horiziontalAlignment === 'left') {
             result.left = parseFloat(this._element.style.left);
-        } else if (this._element.style.right !== "auto") {
+        } else if (this.horiziontalAlignment === 'right') {
             result.right = parseFloat(this._element.style.right);
         } else {
             result.left = element.left - container.left;
@@ -256,7 +263,10 @@ export class Overlay extends CompositeDisposable {
                     );
 
                     const bottom = clamp(
-                        offset.y - y + containerRect.height - overlayRect.height,
+                        offset.y -
+                            y +
+                            containerRect.height -
+                            overlayRect.height,
                         -yOffset,
                         Math.max(
                             0,
@@ -437,13 +447,15 @@ export class Overlay extends CompositeDisposable {
                                 startPosition!.originalY +
                                     startPosition!.originalHeight >
                                     containerRect.height
-                                    ? this.getMinimumHeight(containerRect.height)
+                                    ? this.getMinimumHeight(
+                                          containerRect.height
+                                      )
                                     : Math.max(
-                                        0,
-                                        startPosition!.originalY +
-                                        startPosition!.originalHeight -
-                                        Overlay.MINIMUM_HEIGHT
-                                    )
+                                          0,
+                                          startPosition!.originalY +
+                                              startPosition!.originalHeight -
+                                              Overlay.MINIMUM_HEIGHT
+                                      )
                             );
 
                             height =
@@ -465,7 +477,7 @@ export class Overlay extends CompositeDisposable {
                                     typeof this.options
                                         .minimumInViewportHeight === 'number'
                                     ? -top +
-                                    this.options.minimumInViewportHeight
+                                          this.options.minimumInViewportHeight
                                     : Overlay.MINIMUM_HEIGHT,
                                 Number.MAX_VALUE
                             );
@@ -482,11 +494,11 @@ export class Overlay extends CompositeDisposable {
                                     containerRect.width
                                     ? this.getMinimumWidth(containerRect.width)
                                     : Math.max(
-                                        0,
-                                        startPosition!.originalX +
-                                        startPosition!.originalWidth -
-                                        Overlay.MINIMUM_WIDTH
-                                    )
+                                          0,
+                                          startPosition!.originalX +
+                                              startPosition!.originalWidth -
+                                              Overlay.MINIMUM_WIDTH
+                                      )
                             );
 
                             width =
@@ -508,7 +520,7 @@ export class Overlay extends CompositeDisposable {
                                     typeof this.options
                                         .minimumInViewportWidth === 'number'
                                     ? -left +
-                                    this.options.minimumInViewportWidth
+                                          this.options.minimumInViewportWidth
                                     : Overlay.MINIMUM_WIDTH,
                                 Number.MAX_VALUE
                             );

@@ -1,11 +1,31 @@
 import { Overlay } from '../../dnd/overlay';
 
-const mockGetBoundingClientRect = ({ left, top, height, width }: { left: number, top: number, height: number, width: number }) => {
-    const result = { left, top, height, width, right: left + width, bottom: top + height, x: left, y: top };
+const mockGetBoundingClientRect = ({
+    left,
+    top,
+    height,
+    width,
+}: {
+    left: number;
+    top: number;
+    height: number;
+    width: number;
+}) => {
+    const result = {
+        left,
+        top,
+        height,
+        width,
+        right: left + width,
+        bottom: top + height,
+        x: left,
+        y: top,
+    };
     return {
-        ...result, toJSON: () => (result)
-    }
-}
+        ...result,
+        toJSON: () => result,
+    };
+};
 
 describe('overlay', () => {
     test('toJSON, top left', () => {
@@ -30,13 +50,25 @@ describe('overlay', () => {
             container.childNodes.item(0) as HTMLElement,
             'getBoundingClientRect'
         ).mockImplementation(() => {
-            return mockGetBoundingClientRect({ left: 80, top: 100, width: 40, height: 50 });
+            return mockGetBoundingClientRect({
+                left: 80,
+                top: 100,
+                width: 40,
+                height: 50,
+            });
         });
         jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
             () => {
-                return mockGetBoundingClientRect({ left: 20, top: 30, width: 100, height: 100 });
+                return mockGetBoundingClientRect({
+                    left: 20,
+                    top: 30,
+                    width: 100,
+                    height: 100,
+                });
             }
         );
+
+        cut.setBounds();
 
         expect(cut.toJSON()).toEqual({
             top: 70,
@@ -68,13 +100,25 @@ describe('overlay', () => {
             container.childNodes.item(0) as HTMLElement,
             'getBoundingClientRect'
         ).mockImplementation(() => {
-            return mockGetBoundingClientRect({ left: 80, top: 100, width: 40, height: 50 });
+            return mockGetBoundingClientRect({
+                left: 80,
+                top: 100,
+                width: 40,
+                height: 50,
+            });
         });
         jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
             () => {
-                return mockGetBoundingClientRect({ left: 20, top: 30, width: 100, height: 100 });
+                return mockGetBoundingClientRect({
+                    left: 20,
+                    top: 30,
+                    width: 100,
+                    height: 100,
+                });
             }
         );
+
+        cut.setBounds();
 
         expect(cut.toJSON()).toEqual({
             bottom: -20,
@@ -106,13 +150,25 @@ describe('overlay', () => {
             container.childNodes.item(0) as HTMLElement,
             'getBoundingClientRect'
         ).mockImplementation(() => {
-            return mockGetBoundingClientRect({ left: 80, top: 100, width: 40, height: 50 });
+            return mockGetBoundingClientRect({
+                left: 80,
+                top: 100,
+                width: 40,
+                height: 50,
+            });
         });
         jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
             () => {
-                return mockGetBoundingClientRect({ left: 20, top: 30, width: 100, height: 100 });
+                return mockGetBoundingClientRect({
+                    left: 20,
+                    top: 30,
+                    width: 100,
+                    height: 100,
+                });
             }
         );
+
+        cut.setBounds();
 
         expect(cut.toJSON()).toEqual({
             top: 70,
@@ -144,13 +200,25 @@ describe('overlay', () => {
             container.childNodes.item(0) as HTMLElement,
             'getBoundingClientRect'
         ).mockImplementation(() => {
-            return mockGetBoundingClientRect({ left: 80, top: 100, width: 40, height: 50 });
+            return mockGetBoundingClientRect({
+                left: 80,
+                top: 100,
+                width: 40,
+                height: 50,
+            });
         });
         jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
             () => {
-                return mockGetBoundingClientRect({ left: 20, top: 30, width: 100, height: 100 });
+                return mockGetBoundingClientRect({
+                    left: 20,
+                    top: 30,
+                    width: 100,
+                    height: 100,
+                });
             }
         );
+
+        cut.setBounds();
 
         expect(cut.toJSON()).toEqual({
             bottom: -20,
@@ -184,11 +252,21 @@ describe('overlay', () => {
         expect(element).toBeTruthy();
 
         jest.spyOn(element, 'getBoundingClientRect').mockImplementation(() => {
-            return mockGetBoundingClientRect({ left: 300, top: 400, width: 200, height: 100 });
+            return mockGetBoundingClientRect({
+                left: 300,
+                top: 400,
+                width: 200,
+                height: 100,
+            });
         });
         jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
             () => {
-                return mockGetBoundingClientRect({ left: 0, top: 0, width: 1000, height: 1000 });
+                return mockGetBoundingClientRect({
+                    left: 0,
+                    top: 0,
+                    width: 1000,
+                    height: 1000,
+                });
             }
         );
 
@@ -224,11 +302,21 @@ describe('overlay', () => {
         expect(element).toBeTruthy();
 
         jest.spyOn(element, 'getBoundingClientRect').mockImplementation(() => {
-            return mockGetBoundingClientRect({ left: 500, top: 500, width: 200, height: 100 });
+            return mockGetBoundingClientRect({
+                left: 500,
+                top: 500,
+                width: 200,
+                height: 100,
+            });
         });
         jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
             () => {
-                return mockGetBoundingClientRect({ left: 0, top: 0, width: 1000, height: 1000 });
+                return mockGetBoundingClientRect({
+                    left: 0,
+                    top: 0,
+                    width: 1000,
+                    height: 1000,
+                });
             }
         );
 

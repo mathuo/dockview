@@ -9,6 +9,12 @@ export interface Box {
     width: number;
 }
 
-export type AnchoredBox =
-    ({ top: number, height: number } | { bottom: number, height: number }) &
-    ({ left: number, width: number } | { right: number, width: number });
+type TopLeft = { top: number; left: number };
+type TopRight = { top: number; right: number };
+type BottomLeft = { bottom: number; left: number };
+type BottomRight = { bottom: number; right: number };
+
+type AnchorPosition = TopLeft | TopRight | BottomLeft | BottomRight;
+type Size = { width: number; height: number };
+
+export type AnchoredBox = Size & AnchorPosition;
