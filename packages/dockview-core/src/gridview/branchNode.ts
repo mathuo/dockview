@@ -139,6 +139,20 @@ export class BranchNode extends CompositeDisposable implements IView {
         this.splitview.disabled = value;
     }
 
+    get margin(): number {
+        return this.splitview.margin;
+    }
+
+    set margin(value: number) {
+        this.splitview.margin = value;
+
+        this.children.forEach((child) => {
+            if (child instanceof BranchNode) {
+                child.margin = value;
+            }
+        });
+    }
+
     constructor(
         readonly orientation: Orientation,
         readonly proportionalLayout: boolean,
@@ -146,6 +160,7 @@ export class BranchNode extends CompositeDisposable implements IView {
         size: number,
         orthogonalSize: number,
         disabled: boolean,
+        margin: number | undefined,
         childDescriptors?: INodeDescriptor[]
     ) {
         super();
@@ -160,6 +175,7 @@ export class BranchNode extends CompositeDisposable implements IView {
                 orientation: this.orientation,
                 proportionalLayout,
                 styles,
+                margin,
             });
             this.splitview.layout(this.size, this.orthogonalSize);
         } else {
@@ -184,6 +200,7 @@ export class BranchNode extends CompositeDisposable implements IView {
                 descriptor,
                 proportionalLayout,
                 styles,
+                margin,
             });
         }
 

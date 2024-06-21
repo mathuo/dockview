@@ -9,10 +9,10 @@ import {
 import { setMockRefElement } from '../__test_utils__/utils';
 
 describe('gridview react', () => {
-    let components:   Record<
+    let components: Record<
         string,
         React.FunctionComponent<IGridviewPanelProps>
-    >
+    >;
 
     beforeEach(() => {
         components = {

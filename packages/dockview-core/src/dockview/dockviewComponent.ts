@@ -345,6 +345,7 @@ export class DockviewComponent
             parentElement: options.parentElement,
             disableAutoResizing: options.disableAutoResizing,
             locked: options.locked,
+            margin: options.gap,
         });
 
         const gready = document.createElement('div');
@@ -975,6 +976,14 @@ export class DockviewComponent
 
         if (changed_rootOverlayOptions) {
             this._rootDropTarget.setOverlayModel(options.rootOverlayModel!);
+        }
+
+        if (this.gridview.margin !== 0 && options.gap === undefined) {
+            this.gridview.margin = 0;
+        }
+
+        if (typeof options.gap === 'number') {
+            this.gridview.margin = options.gap;
         }
 
         this.layout(this.gridview.width, this.gridview.height, true);
