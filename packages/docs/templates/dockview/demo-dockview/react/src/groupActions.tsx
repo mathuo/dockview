@@ -32,13 +32,13 @@ export const GroupActions = (props: {
                                 onClick={() => {
                                     const panel = props.api?.getGroup(x);
                                     if (panel) {
-                                        props.api?.addFloatingGroup(panel, undefined, {
+                                        props.api?.addFloatingGroup(panel, {
                                             position: {
                                                 width: 400,
                                                 height: 300,
                                                 bottom: 50,
                                                 right: 50,
-                                            }
+                                            },
                                         });
                                     }
                                 }}

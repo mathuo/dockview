@@ -65,13 +65,13 @@ const GroupAction = (props: {
                     }
                     onClick={() => {
                         if (group) {
-                            props.api.addFloatingGroup(group, undefined, {
+                            props.api.addFloatingGroup(group, {
                                 position: {
                                     width: 400,
                                     height: 300,
                                     top: 50,
                                     right: 50,
-                                }
+                                },
                             });
                         }
                     }}

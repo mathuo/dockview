@@ -264,7 +264,7 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
             const group = props.containerApi.addGroup();
             props.group.api.moveTo({ group });
         } else {
-            props.containerApi.addFloatingGroup(props.group, undefined, {
+            props.containerApi.addFloatingGroup(props.group, {
                 position: {
                     width: 400,
                     height: 300,

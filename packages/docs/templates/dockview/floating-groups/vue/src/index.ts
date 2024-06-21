@@ -93,13 +93,13 @@ const RightAction = defineComponent({
                 const group = this.params.containerApi.addGroup();
                 this.group.api.moveTo({ group });
             } else {
-                this.containerApi.addFloatingGroup(this.params.group, undefined, {
+                this.containerApi.addFloatingGroup(this.params.group, {
                     position: {
                         width: 400,
                         height: 300,
                         bottom: 50,
                         right: 50,
-                    }
+                    },
                 });
             }
         },
