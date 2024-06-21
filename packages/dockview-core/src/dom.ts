@@ -253,3 +253,7 @@ export function isInDocument(element: Element): boolean {
 
     return false;
 }
+
+export function addTestId(element: HTMLElement, id: string): void {
+    element.setAttribute('data-testid', id);
+}

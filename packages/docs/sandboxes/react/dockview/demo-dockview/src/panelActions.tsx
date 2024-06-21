@@ -1,4 +1,5 @@
-import { DockviewApi } from 'dockview';
+import { DockviewApi, IDockviewPanel } from 'dockview';
+import * as React from 'react';
 
 const PanelAction = (props: {
     panels: string[];
@@ -9,6 +10,50 @@ const PanelAction = (props: {
     const onClick = () => {
         props.api.getPanel(props.panelId)?.focus();
     };
+
+    React.useEffect(() => {
+        const panel = props.api.getPanel(props.panelId);
+        if (panel) {
+            const disposable = panel.api.onDidVisibilityChange((event) => {
+                setVisible(event.isVisible);
+            });
+            setVisible(panel.api.isVisible);
+
+            return () => {
+                disposable.dispose();
+            };
+        }
+    }, [props.api, props.panelId]);
+
+    const [panel, setPanel] = React.useState<IDockviewPanel | undefined>(
+        undefined
+    );
+
+    React.useEffect(() => {
+        const list = [
+            props.api.onDidLayoutFromJSON(() => {
+                setPanel(props.api.getPanel(props.panelId));
+            }),
+        ];
+
+        if (panel) {
+            const disposable = panel.api.onDidVisibilityChange((event) => {
+                setVisible(event.isVisible);
+            });
+            setVisible(panel.api.isVisible);
+
+            list.push(disposable);
+        }
+
+        setPanel(props.api.getPanel(props.panelId));
+
+        return () => {
+            list.forEach((l) => l.dispose());
+        };
+    }, [props.api, props.panelId]);
+
+    const [visible, setVisible] = React.useState<boolean>(true);
+
     return (
         <div className="button-action">
             <div style={{ display: 'flex' }}>
@@ -56,6 +101,15 @@ const PanelAction = (props: {
                     }}
                 >
                     <span className="material-symbols-outlined">close</span>
+                </button>
+                <button
+                    title="Panel visiblity cannot be edited manually."
+                    disabled={true}
+                    className="demo-icon-button"
+                >
+                    <span className="material-symbols-outlined">
+                        {visible ? 'visibility' : 'visibility_off'}
+                    </span>
                 </button>
             </div>
         </div>
