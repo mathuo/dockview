@@ -57,7 +57,7 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
-import { Box } from '../types';
+import { AnchoredBox, Box } from '../types';
 import {
     DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
     DEFAULT_FLOATING_GROUP_POSITION,
@@ -126,7 +126,7 @@ export interface PanelReference {
 
 export interface SerializedFloatingGroup {
     data: GroupPanelViewState;
-    position: Box;
+    position: AnchoredBox;
 }
 
 export interface SerializedPopoutGroup {
@@ -164,6 +164,17 @@ type MoveGroupOrPanelOptions = {
         index?: number;
     };
 };
+
+export interface FloatingGroupOptions {
+    x?: number;
+    y?: number;
+    height?: number;
+    width?: number;
+    position?: AnchoredBox;
+    skipRemoveGroup?: boolean;
+    inDragMode?: boolean;
+    skipActiveGroup?: boolean;
+}
 
 export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly activePanel: IDockviewPanel | undefined;
@@ -208,7 +219,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     //
     addFloatingGroup(
         item: IDockviewPanel | DockviewGroupPanel,
-        coord?: { x: number; y: number }
+        options?: FloatingGroupOptions
     ): void;
     addPopoutGroup(
         item: IDockviewPanel | DockviewGroupPanel,
@@ -751,12 +762,7 @@ export class DockviewComponent
 
     addFloatingGroup(
         item: DockviewPanel | DockviewGroupPanel,
-        coord?: { x?: number; y?: number; height?: number; width?: number },
-        options?: {
-            skipRemoveGroup?: boolean;
-            inDragMode: boolean;
-            skipActiveGroup?: boolean;
-        }
+        options?: FloatingGroupOptions
     ): void {
         let group: DockviewGroupPanel;
 
@@ -817,22 +823,62 @@ export class DockviewComponent
 
         group.model.location = { type: 'floating' };
 
-        const overlayLeft =
-            typeof coord?.x === 'number'
-                ? Math.max(coord.x, 0)
-                : DEFAULT_FLOATING_GROUP_POSITION.left;
-        const overlayTop =
-            typeof coord?.y === 'number'
-                ? Math.max(coord.y, 0)
-                : DEFAULT_FLOATING_GROUP_POSITION.top;
+        function getAnchoredBox(): AnchoredBox {
+            if (options?.position) {
+                const result: any = {};
+                if ('left' in options.position) {
+                    result.left = Math.max(options.position.left, 0);
+                } else if ('right' in options.position) {
+                    result.right = Math.max(options.position.right, 0);
+                } else {
+                    result.left = DEFAULT_FLOATING_GROUP_POSITION.left;
+                }
+                if ('top' in options.position) {
+                    result.top = Math.max(options.position.top, 0);
+                } else if ('bottom' in options.position) {
+                    result.bottom = Math.max(options.position.bottom, 0);
+                } else {
+                    result.top = DEFAULT_FLOATING_GROUP_POSITION.top;
+                }
+                if ('width' in options.position) {
+                    result.width = Math.max(options.position.width, 0);
+                } else {
+                    result.width = DEFAULT_FLOATING_GROUP_POSITION.width;
+                }
+                if ('height' in options.position) {
+                    result.height = Math.max(options.position.height, 0);
+                } else {
+                    result.height = DEFAULT_FLOATING_GROUP_POSITION.height;
+                }
+                return result as AnchoredBox;
+            }
+
+            return {
+                left:
+                    typeof options?.x === 'number'
+                        ? Math.max(options.x, 0)
+                        : DEFAULT_FLOATING_GROUP_POSITION.left,
+                top:
+                    typeof options?.y === 'number'
+                        ? Math.max(options.y, 0)
+                        : DEFAULT_FLOATING_GROUP_POSITION.top,
+                width:
+                    typeof options?.width === 'number'
+                        ? Math.max(options.width, 0)
+                        : DEFAULT_FLOATING_GROUP_POSITION.width,
+                height:
+                    typeof options?.height === 'number'
+                        ? Math.max(options.height, 0)
+                        : DEFAULT_FLOATING_GROUP_POSITION.height,
+            };
+        }
+
+        const anchoredBox = getAnchoredBox();
 
         const overlay = new Overlay({
             container: this.gridview.element,
             content: group.element,
-            height: coord?.height ?? 300,
-            width: coord?.width ?? 300,
-            left: overlayLeft,
-            top: overlayTop,
+            ...anchoredBox,
             minimumInViewportWidth:
                 this.options.floatingGroupBounds === 'boundedWithinViewport'
                     ? undefined
@@ -972,7 +1018,7 @@ export class DockviewComponent
                             this.options.floatingGroupBounds?.minimumWidthWithinViewport;
                 }
 
-                group.overlay.setBounds({});
+                group.overlay.setBounds();
             }
         }
 
@@ -1195,16 +1241,11 @@ export class DockviewComponent
 
                 const group = createGroupFromSerializedState(data);
 
-                this.addFloatingGroup(
-                    group,
-                    {
-                        x: position.left,
-                        y: position.top,
-                        height: position.height,
-                        width: position.width,
-                    },
-                    { skipRemoveGroup: true, inDragMode: false }
-                );
+                this.addFloatingGroup(group, {
+                    position: position,
+                    skipRemoveGroup: true,
+                    inDragMode: false,
+                });
             }
 
             const serializedPopoutGroups = data.popoutGroups ?? [];
@@ -1387,7 +1428,8 @@ export class DockviewComponent
                         ? options.floating
                         : {};
 
-                this.addFloatingGroup(group, o, {
+                this.addFloatingGroup(group, {
+                    ...o,
                     inDragMode: false,
                     skipRemoveGroup: true,
                     skipActiveGroup: true,
@@ -1440,7 +1482,8 @@ export class DockviewComponent
                     ? options.floating
                     : {};
 
-            this.addFloatingGroup(group, coordinates, {
+            this.addFloatingGroup(group, {
+                ...coordinates,
                 inDragMode: false,
                 skipRemoveGroup: true,
                 skipActiveGroup: true,

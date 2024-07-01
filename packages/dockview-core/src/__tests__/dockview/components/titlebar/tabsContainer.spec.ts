@@ -490,14 +490,11 @@ describe('tabsContainer', () => {
         const eventPreventDefaultSpy = jest.spyOn(event, 'preventDefault');
         fireEvent(container, event);
 
-        expect(accessor.addFloatingGroup).toHaveBeenCalledWith(
-            groupPanel,
-            {
-                x: 100,
-                y: 60,
-            },
-            { inDragMode: true }
-        );
+        expect(accessor.addFloatingGroup).toHaveBeenCalledWith(groupPanel, {
+            x: 100,
+            y: 60,
+            inDragMode: true,
+        });
         expect(accessor.addFloatingGroup).toHaveBeenCalledTimes(1);
         expect(eventPreventDefaultSpy).toHaveBeenCalledTimes(1);
 

@@ -1,4 +1,5 @@
 import {
+    FloatingGroupOptions,
     IDockviewComponent,
     SerializedDockview,
 } from '../dockview/dockviewComponent';
@@ -42,7 +43,7 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from '../dockview/components/titlebar/tabsContainer';
-import { Box } from '../types';
+import { AnchoredBox, Box } from '../types';
 import {
     DockviewDidDropEvent,
     DockviewWillDropEvent,
@@ -800,9 +801,9 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     addFloatingGroup(
         item: IDockviewPanel | DockviewGroupPanel,
-        coord?: { x: number; y: number }
+        options?: FloatingGroupOptions
     ): void {
-        return this.component.addFloatingGroup(item, coord);
+        return this.component.addFloatingGroup(item, options);
     }
 
     /**

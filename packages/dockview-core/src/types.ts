@@ -8,3 +8,13 @@ export interface Box {
     height: number;
     width: number;
 }
+
+type TopLeft = { top: number; left: number };
+type TopRight = { top: number; right: number };
+type BottomLeft = { bottom: number; left: number };
+type BottomRight = { bottom: number; right: number };
+
+type AnchorPosition = TopLeft | TopRight | BottomLeft | BottomRight;
+type Size = { width: number; height: number };
+
+export type AnchoredBox = Size & AnchorPosition;
