@@ -51,7 +51,7 @@ import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
 import { Parameters } from '../panel/types';
 import { Overlay } from '../dnd/overlay';
-import { toggleClass, watchElementResize } from '../dom';
+import { addTestId, toggleClass, watchElementResize } from '../dom';
 import { DockviewFloatingGroupPanel } from './dockviewFloatingGroupPanel';
 import {
     GroupDragEvent,
@@ -372,6 +372,9 @@ export class DockviewComponent
             this._onDidRemoveGroup,
             this._onDidActiveGroupChange,
             this._onUnhandledDragOverEvent,
+            this.onDidViewVisibilityChangeMicroTaskQueue(() => {
+                this.updateWatermark();
+            }),
             this.onDidAdd((event) => {
                 if (!this._moving) {
                     this._onDidAddGroup.fire(event);
@@ -1519,6 +1522,7 @@ export class DockviewComponent
 
                 const watermarkContainer = document.createElement('div');
                 watermarkContainer.className = 'dv-watermark-container';
+                addTestId(watermarkContainer, 'watermark-component');
                 watermarkContainer.appendChild(this.watermark.element);
 
                 this.gridview.element.appendChild(watermarkContainer);

@@ -77,6 +77,11 @@
             border: none;
             cursor: pointer;
 
+            &:disabled {
+                color: gray;
+                cursor: help;
+            }
+
             span {
                 font-size: 16px;
             }

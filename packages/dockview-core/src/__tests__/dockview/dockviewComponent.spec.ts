@@ -10,7 +10,7 @@ import { CompositeDisposable } from '../../lifecycle';
 import { Emitter } from '../../events';
 import { DockviewPanel, IDockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
-import { fireEvent } from '@testing-library/dom';
+import { fireEvent, getByTestId, queryByTestId } from '@testing-library/dom';
 import { getPanelData } from '../../dnd/dataTransfer';
 import {
     GroupDragEvent,
@@ -5097,6 +5097,60 @@ describe('dockviewComponent', () => {
         expect(panel4.api.isVisible).toBeTruthy();
     });
 
+    test('setVisible #1', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+        const api = new DockviewApi(dockview);
+
+        dockview.layout(1000, 1000);
+
+        const panel1 = api.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        const panel2 = api.addPanel({
+            id: 'panel2',
+            component: 'default',
+            position: { referencePanel: panel1, direction: 'below' },
+        });
+
+        const panel3 = api.addPanel({
+            id: 'panel3',
+            component: 'default',
+            position: { referencePanel: panel1, direction: 'below' },
+        });
+
+        expect(api.groups.length).toBe(3);
+
+        panel1.group.api.setVisible(false);
+        panel2.group.api.setVisible(false);
+        panel3.group.api.setVisible(false);
+
+        expect(panel1.group.api.isVisible).toBeFalsy();
+        expect(panel2.group.api.isVisible).toBeFalsy();
+        expect(panel3.group.api.isVisible).toBeFalsy();
+
+        panel1.group.api.setVisible(true);
+
+        expect(panel1.group.api.isVisible).toBeTruthy();
+        expect(panel2.group.api.isVisible).toBeFalsy();
+        expect(panel3.group.api.isVisible).toBeFalsy();
+    });
+
     describe('addPanel', () => {
         test('that can add panel', () => {
             const container = document.createElement('div');
@@ -5428,5 +5482,58 @@ describe('dockviewComponent', () => {
 
         expect(api.panels.length).toBe(3);
         expect(api.groups.length).toBe(3);
+    });
+
+    test('that watermark appears when all views are not visible', () => {
+        jest.useFakeTimers();
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+        const api = new DockviewApi(dockview);
+
+        dockview.layout(1000, 1000);
+
+        const panel1 = api.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+        const panel2 = api.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            position: {
+                direction: 'right',
+            },
+        });
+
+        let query = queryByTestId(container, 'watermark-component');
+        expect(query).toBeFalsy();
+
+        panel1.group.api.setVisible(false);
+        jest.runAllTicks(); // visibility events check fires on microtask-queue
+        query = queryByTestId(container, 'watermark-component');
+        expect(query).toBeFalsy();
+
+        panel2.group.api.setVisible(false);
+        jest.runAllTicks(); // visibility events check fires on microtask-queue
+        query = queryByTestId(container, 'watermark-component');
+        expect(query).toBeTruthy();
+
+        panel1.group.api.setVisible(true);
+        jest.runAllTicks(); // visibility events check fires on microtask-queue
+        query = queryByTestId(container, 'watermark-component');
+        expect(query).toBeFalsy();
     });
 });

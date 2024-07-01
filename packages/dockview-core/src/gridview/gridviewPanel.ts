@@ -126,6 +126,10 @@ export abstract class GridviewPanel<
         return this.api.isActive;
     }
 
+    get isVisible(): boolean {
+        return this.api.isVisible;
+    }
+
     constructor(
         id: string,
         component: string,

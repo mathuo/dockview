@@ -1,6 +1,10 @@
 export const clamp = (value: number, min: number, max: number): number => {
     if (min > max) {
-        throw new Error(`${min} > ${max} is an invalid condition`);
+        /**
+         * caveat: an error should be thrown here if this was a proper `clamp` function but we need to handle
+         * cases where `min` > `max` and in those cases return `min`.
+         */
+        return min;
     }
     return Math.min(max, Math.max(value, min));
 };

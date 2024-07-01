@@ -171,6 +171,7 @@ export interface IGridView {
     readonly maximumWidth: number;
     readonly minimumHeight: number;
     readonly maximumHeight: number;
+    readonly isVisible: boolean;
     priority?: LayoutPriority;
     layout(width: number, height: number): void;
     toJSON(): object;
@@ -286,6 +287,9 @@ export class Gridview implements IDisposable {
     }>();
     readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
         this._onDidChange.event;
+
+    private readonly _onDidViewVisibilityChange = new Emitter<void>();
+    readonly onDidViewVisibilityChange = this._onDidViewVisibilityChange.event;
 
     private readonly _onDidMaximizedNodeChange = new Emitter<void>();
     readonly onDidMaximizedNodeChange = this._onDidMaximizedNodeChange.event;
@@ -453,6 +457,8 @@ export class Gridview implements IDisposable {
         this.disposable.dispose();
         this._onDidChange.dispose();
         this._onDidMaximizedNodeChange.dispose();
+        this._onDidViewVisibilityChange.dispose();
+
         this.root.dispose();
         this._maximizedNode = undefined;
         this.element.remove();
@@ -531,12 +537,12 @@ export class Gridview implements IDisposable {
                 children
             );
         } else {
-            result = new LeafNode(
-                deserializer.fromJSON(node),
-                orientation,
-                orthogonalSize,
-                node.size
-            );
+            const view = deserializer.fromJSON(node);
+            if (typeof node.visible === 'boolean') {
+                view.setVisible?.(node.visible);
+            }
+
+            result = new LeafNode(view, orientation, orthogonalSize, node.size);
         }
 
         return result;
@@ -722,6 +728,8 @@ export class Gridview implements IDisposable {
         if (!(parent instanceof BranchNode)) {
             throw new Error('Invalid from location');
         }
+
+        this._onDidViewVisibilityChange.fire();
 
         parent.setChildVisible(index, visible);
     }
