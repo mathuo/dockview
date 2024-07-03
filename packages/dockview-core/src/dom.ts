@@ -6,6 +6,36 @@ import {
 } from './events';
 import { IDisposable, CompositeDisposable } from './lifecycle';
 
+export interface OverflowEvent {
+    hasScrollX: boolean;
+    hasScrollY: boolean;
+}
+
+export class OverflowObserver extends CompositeDisposable {
+    private readonly _onDidChange = new Emitter<OverflowEvent>();
+    readonly onDidChange = this._onDidChange.event;
+
+    private _value: OverflowEvent | null = null;
+
+    constructor(el: HTMLElement) {
+        super();
+
+        this.addDisposables(
+            this._onDidChange,
+            watchElementResize(el, (entry) => {
+                const hasScrollX =
+                    entry.target.scrollWidth > entry.target.clientWidth;
+
+                const hasScrollY =
+                    entry.target.scrollHeight > entry.target.clientHeight;
+
+                this._value = { hasScrollX, hasScrollY };
+                this._onDidChange.fire(this._value);
+            })
+        );
+    }
+}
+
 export function watchElementResize(
     element: HTMLElement,
     cb: (entry: ResizeObserverEntry) => void
