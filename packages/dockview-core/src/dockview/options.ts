@@ -49,6 +49,7 @@ export interface DockviewOptions {
     rootOverlayModel?: DroptargetOverlayModel;
     locked?: boolean;
     disableDnd?: boolean;
+    gap?: number;
 }
 
 export interface DockviewDndOverlayEvent {
@@ -99,6 +100,7 @@ export const PROPERTY_KEYS: (keyof DockviewOptions)[] = (() => {
         rootOverlayModel: undefined,
         locked: undefined,
         disableDnd: undefined,
+        gap: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];

@@ -14,41 +14,6 @@
     .dv-overlay-render-container {
         position: relative;
     }
-
-    .split-view-container {
-        &.horizontal {
-            > .view-container > .view {
-                &:not(:last-child) {
-                    .groupview {
-                        border-right: var(--dv-group-gap-size) solid transparent;
-                    }
-                }
-
-                &:not(:first-child) {
-                    .groupview {
-                        border-left: var(--dv-group-gap-size) solid transparent;
-                    }
-                }
-            }
-        }
-
-        &.vertical {
-            > .view-container > .view {
-                &:not(:last-child) {
-                    .groupview {
-                        border-bottom: var(--dv-group-gap-size) solid
-                            transparent;
-                    }
-                }
-
-                &:not(:first-child) {
-                    .groupview {
-                        border-top: var(--dv-group-gap-size) solid transparent;
-                    }
-                }
-            }
-        }
-    }
 }
 
 .groupview {

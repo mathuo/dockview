@@ -52,6 +52,12 @@ export const GridActions = (props: {
         props.api?.addGroup();
     };
 
+    const [gap, setGap] = React.useState(0);
+
+    React.useEffect(() => {
+        props.api?.setGap(gap);
+    }, [gap, props.api]);
+
     return (
         <div className="action-container">
             <button className="text-button" onClick={() => onAddPanel()}>
@@ -90,6 +96,18 @@ export const GridActions = (props: {
             <button className="text-button" onClick={onReset}>
                 Reset
             </button>
+            <span style={{ flexGrow: 1 }} />
+            <div style={{ display: 'flex' }}>
+                <span style={{ paddingRight: '4px' }}>Gap</span>
+                <input
+                    type="number"
+                    min={0}
+                    max={20}
+                    step={1}
+                    value={gap}
+                    onChange={(event) => setGap(Number(event.target.value))}
+                />
+            </div>
         </div>
     );
 };
