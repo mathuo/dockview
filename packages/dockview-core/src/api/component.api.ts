@@ -1,6 +1,7 @@
 import {
     FloatingGroupOptions,
     IDockviewComponent,
+    MovePanelEvent,
     SerializedDockview,
 } from '../dockview/dockviewComponent';
 import {
@@ -635,6 +636,10 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     get onDidRemovePanel(): Event<IDockviewPanel> {
         return this.component.onDidRemovePanel;
+    }
+
+    get onDidMovePanel(): Event<MovePanelEvent> {
+        return this.component.onDidMovePanel;
     }
 
     /**
