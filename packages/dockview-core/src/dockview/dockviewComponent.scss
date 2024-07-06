@@ -19,11 +19,15 @@
         &.horizontal {
             > .view-container > .view {
                 &:not(:last-child) {
-                    border-right: var(--dv-group-gap-size) solid transparent;
+                    .groupview {
+                        border-right: var(--dv-group-gap-size) solid transparent;
+                    }
                 }
 
                 &:not(:first-child) {
-                    border-left: var(--dv-group-gap-size) solid transparent;
+                    .groupview {
+                        border-left: var(--dv-group-gap-size) solid transparent;
+                    }
                 }
             }
         }
@@ -31,11 +35,16 @@
         &.vertical {
             > .view-container > .view {
                 &:not(:last-child) {
-                    border-bottom: var(--dv-group-gap-size) solid transparent;
+                    .groupview {
+                        border-bottom: var(--dv-group-gap-size) solid
+                            transparent;
+                    }
                 }
 
                 &:not(:first-child) {
-                    border-top: var(--dv-group-gap-size) solid transparent;
+                    .groupview {
+                        border-top: var(--dv-group-gap-size) solid transparent;
+                    }
                 }
             }
         }

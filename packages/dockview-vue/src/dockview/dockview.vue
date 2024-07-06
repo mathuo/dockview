@@ -70,55 +70,61 @@ PROPERTY_KEYS.forEach((coreOptionKey) => {
 
 onMounted(() => {
     if (!el.value) {
-        throw new Error('element is not mounted');
+        throw new Error('dockview-vue: element is not mounted');
+    }
+
+    const inst = getCurrentInstance();
+
+    if(!inst) {
+      throw new Error('dockview-vue: getCurrentInstance() returned null')
     }
 
     const frameworkOptions: DockviewFrameworkOptions = {
         parentElement: el.value,
         createComponent(options) {
             const component = findComponent(
-                getCurrentInstance()!,
+                inst,
                 options.name
             );
-            return new VueRenderer(component!, getCurrentInstance()!);
+            return new VueRenderer(component!, inst);
         },
         createTabComponent(options) {
-            let component = findComponent(getCurrentInstance()!, options.name);
+            let component = findComponent(inst, options.name);
 
             if (!component && props.defaultTabComponent) {
                 component = findComponent(
-                    getCurrentInstance()!,
+                    inst,
                     props.defaultTabComponent
                 );
             }
 
             if (component) {
-                return new VueRenderer(component, getCurrentInstance()!);
+                return new VueRenderer(component, inst);
             }
             return undefined;
         },
         createWatermarkComponent: props.watermarkComponent
             ? () => {
                   const component = findComponent(
-                      getCurrentInstance()!,
+                      inst,
                       props.watermarkComponent!
                   );
 
                   return new VueWatermarkRenderer(
                       component!,
-                      getCurrentInstance()!
+                      inst
                   );
               }
             : undefined,
         createLeftHeaderActionComponent: props.leftHeaderActionsComponent
             ? (group) => {
                   const component = findComponent(
-                      getCurrentInstance()!,
+                      inst,
                       props.leftHeaderActionsComponent!
                   );
                   return new VueHeaderActionsRenderer(
                       component!,
-                      getCurrentInstance()!,
+                      inst,
                       group
                   );
               }
@@ -126,12 +132,12 @@ onMounted(() => {
         createPrefixHeaderActionComponent: props.prefixHeaderActionsComponent
             ? (group) => {
                   const component = findComponent(
-                      getCurrentInstance()!,
+                      inst,
                       props.prefixHeaderActionsComponent!
                   );
                   return new VueHeaderActionsRenderer(
                       component!,
-                      getCurrentInstance()!,
+                      inst,
                       group
                   );
               }
@@ -139,12 +145,12 @@ onMounted(() => {
         createRightHeaderActionComponent: props.rightHeaderActionsComponent
             ? (group) => {
                   const component = findComponent(
-                      getCurrentInstance()!,
+                      inst,
                       props.rightHeaderActionsComponent!
                   );
                   return new VueHeaderActionsRenderer(
                       component!,
-                      getCurrentInstance()!,
+                      inst,
                       group
                   );
               }

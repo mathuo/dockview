@@ -8,10 +8,8 @@ describe('math', () => {
             expect(clamp(55, 40, 50)).toBe(50);
         });
 
-        it('should throw an error if min > max', () => {
-            expect(() => clamp(55, 50, 40)).toThrow(
-                '50 > 40 is an invalid condition'
-            );
+        it('if min > max return min', () => {
+            expect(clamp(55, 50, 40)).toBe(50);
         });
     });
 

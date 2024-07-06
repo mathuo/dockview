@@ -1,12 +1,12 @@
-import 'dockview-core/dist/styles/dockview.css';
+import 'dockview-vue/dist/styles/dockview.css';
 import { PropType, createApp, defineComponent } from 'vue';
-import { DockviewVue } from 'dockview-vue';
 import {
+    DockviewVue,
     DockviewApi,
     DockviewReadyEvent,
     IDockviewHeaderActionsProps,
     IDockviewPanelProps,
-} from 'dockview-core';
+} from 'dockview-vue';
 
 let panelCount = 0;
 
@@ -93,7 +93,14 @@ const RightAction = defineComponent({
                 const group = this.params.containerApi.addGroup();
                 this.group.api.moveTo({ group });
             } else {
-                this.containerApi.addFloatingGroup(this.params.group);
+                this.containerApi.addFloatingGroup(this.params.group, {
+                    position: {
+                        width: 400,
+                        height: 300,
+                        bottom: 50,
+                        right: 50,
+                    },
+                });
             }
         },
     },

@@ -270,14 +270,11 @@ export class TabsContainer
                         const { top: rootTop, left: rootLeft } =
                             this.accessor.element.getBoundingClientRect();
 
-                        this.accessor.addFloatingGroup(
-                            this.group,
-                            {
-                                x: left - rootLeft + 20,
-                                y: top - rootTop + 20,
-                            },
-                            { inDragMode: true }
-                        );
+                        this.accessor.addFloatingGroup(this.group, {
+                            x: left - rootLeft + 20,
+                            y: top - rootTop + 20,
+                            inDragMode: true,
+                        });
                     }
                 }
             ),
@@ -380,14 +377,11 @@ export class TabsContainer
                     const { top: rootTop, left: rootLeft } =
                         this.accessor.element.getBoundingClientRect();
 
-                    this.accessor.addFloatingGroup(
-                        panel as DockviewPanel,
-                        {
-                            x: left - rootLeft,
-                            y: top - rootTop,
-                        },
-                        { inDragMode: true }
-                    );
+                    this.accessor.addFloatingGroup(panel as DockviewPanel, {
+                        x: left - rootLeft,
+                        y: top - rootTop,
+                        inDragMode: true,
+                    });
                     return;
                 }
 

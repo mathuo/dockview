@@ -93,6 +93,10 @@ export abstract class BaseGrid<T extends IGridPanelView>
     readonly onDidLayoutChange: Event<void> =
         this._bufferOnDidLayoutChange.onEvent;
 
+    private readonly _onDidViewVisibilityChangeMicroTaskQueue = new AsapEvent();
+    readonly onDidViewVisibilityChangeMicroTaskQueue =
+        this._onDidViewVisibilityChangeMicroTaskQueue.onEvent;
+
     get id(): string {
         return this._id;
     }
@@ -158,6 +162,12 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.layout(0, 0, true); // set some elements height/widths
 
         this.addDisposables(
+            this.gridview.onDidViewVisibilityChange(() =>
+                this._onDidViewVisibilityChangeMicroTaskQueue.fire()
+            ),
+            this.onDidViewVisibilityChangeMicroTaskQueue(() => {
+                this.layout(this.width, this.height, true);
+            }),
             Disposable.from(() => {
                 this.element.parentElement?.removeChild(this.element);
             }),

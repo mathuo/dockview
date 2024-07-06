@@ -33,9 +33,12 @@ export class BranchNode extends CompositeDisposable implements IView {
     readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
         this._onDidChange.event;
 
-    private readonly _onDidVisibilityChange = new Emitter<boolean>();
-    readonly onDidVisibilityChange: Event<boolean> =
-        this._onDidVisibilityChange.event;
+    private readonly _onDidVisibilityChange = new Emitter<{
+        visible: boolean;
+    }>();
+    readonly onDidVisibilityChange: Event<{
+        visible: boolean;
+    }> = this._onDidVisibilityChange.event;
 
     get width(): number {
         return this.orientation === Orientation.HORIZONTAL
@@ -200,10 +203,8 @@ export class BranchNode extends CompositeDisposable implements IView {
         this.setupChildrenEvents();
     }
 
-    setVisible(visible: boolean): void {
-        for (const child of this.children) {
-            child.setVisible(visible);
-        }
+    setVisible(_visible: boolean): void {
+        // noop
     }
 
     isChildVisible(index: number): boolean {
@@ -224,7 +225,9 @@ export class BranchNode extends CompositeDisposable implements IView {
         }
 
         const wereAllChildrenHidden = this.splitview.contentSize === 0;
+
         this.splitview.setViewVisible(index, visible);
+        // }
         const areAllChildrenHidden = this.splitview.contentSize === 0;
 
         // If all children are hidden then the parent should hide the entire splitview
@@ -233,7 +236,7 @@ export class BranchNode extends CompositeDisposable implements IView {
             (visible && wereAllChildrenHidden) ||
             (!visible && areAllChildrenHidden)
         ) {
-            this._onDidVisibilityChange.fire(visible);
+            this._onDidVisibilityChange.fire({ visible });
         }
     }
 
@@ -335,7 +338,7 @@ export class BranchNode extends CompositeDisposable implements IView {
             }),
             ...this.children.map((c, i) => {
                 if (c instanceof BranchNode) {
-                    return c.onDidVisibilityChange((visible) => {
+                    return c.onDidVisibilityChange(({ visible }) => {
                         this.setChildVisible(i, visible);
                     });
                 }
