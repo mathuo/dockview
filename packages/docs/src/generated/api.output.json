@@ -1,59 +1,4 @@
 {
-    "DockviewDisposable": {
-        "kind": "namespace",
-        "name": "DockviewDisposable",
-        "children": [
-            {
-                "name": "NONE",
-                "code": "",
-                "kind": "variable"
-            },
-            {
-                "name": "from",
-                "code": "(func: (): void): IDisposable",
-                "signature": {
-                    "name": "from",
-                    "typeParameters": [],
-                    "parameters": [
-                        {
-                            "name": "func",
-                            "code": "func: (): void",
-                            "type": {
-                                "type": "reflection",
-                                "value": {
-                                    "name": "__type",
-                                    "code": "(): void",
-                                    "kind": "typeLiteral",
-                                    "signatures": [
-                                        {
-                                            "name": "__type",
-                                            "typeParameters": [],
-                                            "parameters": [],
-                                            "returnType": {
-                                                "type": "intrinsic",
-                                                "value": "void"
-                                            },
-                                            "code": "(): void",
-                                            "kind": "callSignature"
-                                        }
-                                    ]
-                                }
-                            },
-                            "kind": "parameter"
-                        }
-                    ],
-                    "returnType": {
-                        "type": "reference",
-                        "value": "IDisposable",
-                        "source": "dockview-core"
-                    },
-                    "code": "(func: (): void): IDisposable",
-                    "kind": "callSignature"
-                },
-                "kind": "function"
-            }
-        ]
-    },
     "DockviewEvent": {
         "name": "DockviewEvent",
         "code": "",
@@ -2544,7 +2489,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked before a group is dragged.\n\nCalling "
+                                "text": "Invoked before a group is dragged.\r\n\r\nCalling "
                             },
                             {
                                 "kind": "code",
@@ -2575,7 +2520,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked before a group is dragged.\n\nCalling "
+                            "text": "Invoked before a group is dragged.\r\n\r\nCalling "
                         },
                         {
                             "kind": "code",
@@ -2598,7 +2543,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked before a panel is dragged.\n\nCalling "
+                                "text": "Invoked before a panel is dragged.\r\n\r\nCalling "
                             },
                             {
                                 "kind": "code",
@@ -2629,7 +2574,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked before a panel is dragged.\n\nCalling "
+                            "text": "Invoked before a panel is dragged.\r\n\r\nCalling "
                         },
                         {
                             "kind": "code",
@@ -2652,7 +2597,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\nprevent the event from occuring using the standard "
+                                "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\r\nprevent the event from occuring using the standard "
                             },
                             {
                                 "kind": "code",
@@ -2660,7 +2605,7 @@
                             },
                             {
                                 "kind": "text",
-                                "text": " syntax.\n\nPreventing certain events may causes unexpected behaviours, use carefully."
+                                "text": " syntax.\r\n\r\nPreventing certain events may causes unexpected behaviours, use carefully."
                             }
                         ]
                     },
@@ -2683,7 +2628,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\nprevent the event from occuring using the standard "
+                            "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\r\nprevent the event from occuring using the standard "
                         },
                         {
                             "kind": "code",
@@ -2691,7 +2636,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": " syntax.\n\nPreventing certain events may causes unexpected behaviours, use carefully."
+                            "text": " syntax.\r\n\r\nPreventing certain events may causes unexpected behaviours, use carefully."
                         }
                     ]
                 }
@@ -2706,7 +2651,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked before an overlay is shown indicating a drop target.\n\nCalling "
+                                "text": "Invoked before an overlay is shown indicating a drop target.\r\n\r\nCalling "
                             },
                             {
                                 "kind": "code",
@@ -2714,7 +2659,7 @@
                             },
                             {
                                 "kind": "text",
-                                "text": " will prevent the overlay being shown and prevent\nthe any subsequent drop event."
+                                "text": " will prevent the overlay being shown and prevent\r\nthe any subsequent drop event."
                             }
                         ]
                     },
@@ -2737,7 +2682,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked before an overlay is shown indicating a drop target.\n\nCalling "
+                            "text": "Invoked before an overlay is shown indicating a drop target.\r\n\r\nCalling "
                         },
                         {
                             "kind": "code",
@@ -2745,7 +2690,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": " will prevent the overlay being shown and prevent\nthe any subsequent drop event."
+                            "text": " will prevent the overlay being shown and prevent\r\nthe any subsequent drop event."
                         }
                     ]
                 }
@@ -2876,7 +2821,7 @@
             },
             {
                 "name": "addFloatingGroup",
-                "code": "(item: IDockviewPanel | DockviewGroupPanel, coord?: { x: number, y: number }, options?: { inDragMode?: boolean, position?: { right: number, width: number } & { bottom: number, height: number } | { left: number, width: number } & { bottom: number, height: number } | { right: number, width: number } & { height: number, top: number } | { left: number, width: number } & { height: number, top: number }, skipActiveGroup?: boolean, skipRemoveGroup?: boolean }): void",
+                "code": "(item: IDockviewPanel | DockviewGroupPanel, coord?: { x: number, y: number }): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -2945,337 +2890,13 @@
                                     }
                                 },
                                 "kind": "parameter"
-                            },
-                            {
-                                "name": "options",
-                                "code": "options?: { inDragMode?: boolean, position?: { right: number, width: number } & { bottom: number, height: number } | { left: number, width: number } & { bottom: number, height: number } | { right: number, width: number } & { height: number, top: number } | { left: number, width: number } & { height: number, top: number }, skipActiveGroup?: boolean, skipRemoveGroup?: boolean }",
-                                "type": {
-                                    "type": "reflection",
-                                    "value": {
-                                        "name": "__type",
-                                        "code": "{ inDragMode?: boolean, position?: { right: number, width: number } & { bottom: number, height: number } | { left: number, width: number } & { bottom: number, height: number } | { right: number, width: number } & { height: number, top: number } | { left: number, width: number } & { height: number, top: number }, skipActiveGroup?: boolean, skipRemoveGroup?: boolean }",
-                                        "kind": "typeLiteral",
-                                        "properties": [
-                                            {
-                                                "name": "inDragMode",
-                                                "code": "boolean",
-                                                "kind": "property",
-                                                "type": {
-                                                    "type": "intrinsic",
-                                                    "value": "boolean"
-                                                },
-                                                "flags": {
-                                                    "isOptional": true
-                                                }
-                                            },
-                                            {
-                                                "name": "position",
-                                                "code": "{ right: number, width: number } & { bottom: number, height: number } | { left: number, width: number } & { bottom: number, height: number } | { right: number, width: number } & { height: number, top: number } | { left: number, width: number } & { height: number, top: number }",
-                                                "kind": "property",
-                                                "type": {
-                                                    "type": "or",
-                                                    "values": [
-                                                        {
-                                                            "type": "intersection",
-                                                            "values": [
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ right: number, width: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "right",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "width",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ bottom: number, height: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "bottom",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "height",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "intersection",
-                                                            "values": [
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ left: number, width: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "left",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "width",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ bottom: number, height: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "bottom",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "height",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "intersection",
-                                                            "values": [
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ right: number, width: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "right",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "width",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ height: number, top: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "height",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "top",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "intersection",
-                                                            "values": [
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ left: number, width: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "left",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "width",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ height: number, top: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "height",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "top",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                },
-                                                "flags": {
-                                                    "isOptional": true
-                                                }
-                                            },
-                                            {
-                                                "name": "skipActiveGroup",
-                                                "code": "boolean",
-                                                "kind": "property",
-                                                "type": {
-                                                    "type": "intrinsic",
-                                                    "value": "boolean"
-                                                },
-                                                "flags": {
-                                                    "isOptional": true
-                                                }
-                                            },
-                                            {
-                                                "name": "skipRemoveGroup",
-                                                "code": "boolean",
-                                                "kind": "property",
-                                                "type": {
-                                                    "type": "intrinsic",
-                                                    "value": "boolean"
-                                                },
-                                                "flags": {
-                                                    "isOptional": true
-                                                }
-                                            }
-                                        ]
-                                    }
-                                },
-                                "kind": "parameter"
                             }
                         ],
                         "returnType": {
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(item: IDockviewPanel | DockviewGroupPanel, coord?: { x: number, y: number }, options?: { inDragMode?: boolean, position?: { right: number, width: number } & { bottom: number, height: number } | { left: number, width: number } & { bottom: number, height: number } | { right: number, width: number } & { height: number, top: number } | { left: number, width: number } & { height: number, top: number }, skipActiveGroup?: boolean, skipRemoveGroup?: boolean }): void",
+                        "code": "(item: IDockviewPanel | DockviewGroupPanel, coord?: { x: number, y: number }): void",
                         "kind": "callSignature"
                     }
                 ],
@@ -5197,7 +4818,7 @@
             },
             {
                 "name": "addFloatingGroup",
-                "code": "(item: DockviewPanel | DockviewGroupPanel, coord?: { height?: number, width?: number, x?: number, y?: number }, options?: { inDragMode: boolean, position?: { right: number, width: number } & { bottom: number, height: number } | { left: number, width: number } & { bottom: number, height: number } | { right: number, width: number } & { height: number, top: number } | { left: number, width: number } & { height: number, top: number }, skipActiveGroup?: boolean, skipRemoveGroup?: boolean }): void",
+                "code": "(item: DockviewPanel | DockviewGroupPanel, coord?: { height?: number, width?: number, x?: number, y?: number }, options?: { inDragMode: boolean, skipActiveGroup?: boolean, skipRemoveGroup?: boolean }): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -5289,12 +4910,12 @@
                             },
                             {
                                 "name": "options",
-                                "code": "options?: { inDragMode: boolean, position?: { right: number, width: number } & { bottom: number, height: number } | { left: number, width: number } & { bottom: number, height: number } | { right: number, width: number } & { height: number, top: number } | { left: number, width: number } & { height: number, top: number }, skipActiveGroup?: boolean, skipRemoveGroup?: boolean }",
+                                "code": "options?: { inDragMode: boolean, skipActiveGroup?: boolean, skipRemoveGroup?: boolean }",
                                 "type": {
                                     "type": "reflection",
                                     "value": {
                                         "name": "__type",
-                                        "code": "{ inDragMode: boolean, position?: { right: number, width: number } & { bottom: number, height: number } | { left: number, width: number } & { bottom: number, height: number } | { right: number, width: number } & { height: number, top: number } | { left: number, width: number } & { height: number, top: number }, skipActiveGroup?: boolean, skipRemoveGroup?: boolean }",
+                                        "code": "{ inDragMode: boolean, skipActiveGroup?: boolean, skipRemoveGroup?: boolean }",
                                         "kind": "typeLiteral",
                                         "properties": [
                                             {
@@ -5306,279 +4927,6 @@
                                                     "value": "boolean"
                                                 },
                                                 "flags": {}
-                                            },
-                                            {
-                                                "name": "position",
-                                                "code": "{ right: number, width: number } & { bottom: number, height: number } | { left: number, width: number } & { bottom: number, height: number } | { right: number, width: number } & { height: number, top: number } | { left: number, width: number } & { height: number, top: number }",
-                                                "kind": "property",
-                                                "type": {
-                                                    "type": "or",
-                                                    "values": [
-                                                        {
-                                                            "type": "intersection",
-                                                            "values": [
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ right: number, width: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "right",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "width",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ bottom: number, height: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "bottom",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "height",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "intersection",
-                                                            "values": [
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ left: number, width: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "left",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "width",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ bottom: number, height: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "bottom",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "height",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "intersection",
-                                                            "values": [
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ right: number, width: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "right",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "width",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ height: number, top: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "height",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "top",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "intersection",
-                                                            "values": [
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ left: number, width: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "left",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "width",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ height: number, top: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "height",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "top",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                },
-                                                "flags": {
-                                                    "isOptional": true
-                                                }
                                             },
                                             {
                                                 "name": "skipActiveGroup",
@@ -5614,7 +4962,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(item: DockviewPanel | DockviewGroupPanel, coord?: { height?: number, width?: number, x?: number, y?: number }, options?: { inDragMode: boolean, position?: { right: number, width: number } & { bottom: number, height: number } | { left: number, width: number } & { bottom: number, height: number } | { right: number, width: number } & { height: number, top: number } | { left: number, width: number } & { height: number, top: number }, skipActiveGroup?: boolean, skipRemoveGroup?: boolean }): void",
+                        "code": "(item: DockviewPanel | DockviewGroupPanel, coord?: { height?: number, width?: number, x?: number, y?: number }, options?: { inDragMode: boolean, skipActiveGroup?: boolean, skipRemoveGroup?: boolean }): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -11519,7 +10867,7 @@
                             "summary": [
                                 {
                                     "kind": "text",
-                                    "text": "If the root is orientated as a VERTICAL node then nest the existing root within a new HORIZIONTAL root node\nIf the root is orientated as a HORIZONTAL node then nest the existing root within a new VERITCAL root node"
+                                    "text": "If the root is orientated as a VERTICAL node then nest the existing root within a new HORIZIONTAL root node\r\nIf the root is orientated as a HORIZONTAL node then nest the existing root within a new VERITCAL root node"
                                 }
                             ]
                         },
@@ -11537,7 +10885,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "If the root is orientated as a VERTICAL node then nest the existing root within a new HORIZIONTAL root node\nIf the root is orientated as a HORIZONTAL node then nest the existing root within a new VERITCAL root node"
+                            "text": "If the root is orientated as a VERTICAL node then nest the existing root within a new HORIZIONTAL root node\r\nIf the root is orientated as a HORIZONTAL node then nest the existing root within a new VERITCAL root node"
                         }
                     ]
                 }
@@ -19858,7 +19206,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked whenever any aspect of the layout changes.\nIf listening to this event it may be worth debouncing ouputs."
+                                "text": "Invoked whenever any aspect of the layout changes.\r\nIf listening to this event it may be worth debouncing ouputs."
                             }
                         ]
                     },
@@ -19880,7 +19228,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked whenever any aspect of the layout changes.\nIf listening to this event it may be worth debouncing ouputs."
+                            "text": "Invoked whenever any aspect of the layout changes.\r\nIf listening to this event it may be worth debouncing ouputs."
                         }
                     ]
                 }
@@ -20442,7 +19790,7 @@
                                 },
                                 {
                                     "kind": "text",
-                                    "text": " method\nfor the subsequent resize."
+                                    "text": " method\r\nfor the subsequent resize."
                                 }
                             ]
                         },
@@ -20504,7 +19852,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": " method\nfor the subsequent resize."
+                            "text": " method\r\nfor the subsequent resize."
                         }
                     ]
                 }
@@ -24989,7 +24337,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "The id of the tab component renderer\n\nUndefined if no custom tab renderer is provided"
+                            "text": "The id of the tab component renderer\r\n\r\nUndefined if no custom tab renderer is provided"
                         }
                     ]
                 }
@@ -28639,7 +27987,7 @@
             },
             {
                 "name": "addFloatingGroup",
-                "code": "(item: IDockviewPanel | DockviewGroupPanel, coord?: { x: number, y: number }, options?: { position?: { right: number, width: number } & { bottom: number, height: number } | { left: number, width: number } & { bottom: number, height: number } | { right: number, width: number } & { height: number, top: number } | { left: number, width: number } & { height: number, top: number } }): void",
+                "code": "(item: IDockviewPanel | DockviewGroupPanel, coord?: { x: number, y: number }): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -28700,301 +28048,13 @@
                                     }
                                 },
                                 "kind": "parameter"
-                            },
-                            {
-                                "name": "options",
-                                "code": "options?: { position?: { right: number, width: number } & { bottom: number, height: number } | { left: number, width: number } & { bottom: number, height: number } | { right: number, width: number } & { height: number, top: number } | { left: number, width: number } & { height: number, top: number } }",
-                                "type": {
-                                    "type": "reflection",
-                                    "value": {
-                                        "name": "__type",
-                                        "code": "{ position?: { right: number, width: number } & { bottom: number, height: number } | { left: number, width: number } & { bottom: number, height: number } | { right: number, width: number } & { height: number, top: number } | { left: number, width: number } & { height: number, top: number } }",
-                                        "kind": "typeLiteral",
-                                        "properties": [
-                                            {
-                                                "name": "position",
-                                                "code": "{ right: number, width: number } & { bottom: number, height: number } | { left: number, width: number } & { bottom: number, height: number } | { right: number, width: number } & { height: number, top: number } | { left: number, width: number } & { height: number, top: number }",
-                                                "kind": "property",
-                                                "type": {
-                                                    "type": "or",
-                                                    "values": [
-                                                        {
-                                                            "type": "intersection",
-                                                            "values": [
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ right: number, width: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "right",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "width",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ bottom: number, height: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "bottom",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "height",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "intersection",
-                                                            "values": [
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ left: number, width: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "left",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "width",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ bottom: number, height: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "bottom",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "height",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "intersection",
-                                                            "values": [
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ right: number, width: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "right",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "width",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ height: number, top: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "height",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "top",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "intersection",
-                                                            "values": [
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ left: number, width: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "left",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "width",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "type": "reflection",
-                                                                    "value": {
-                                                                        "name": "__type",
-                                                                        "code": "{ height: number, top: number }",
-                                                                        "kind": "typeLiteral",
-                                                                        "properties": [
-                                                                            {
-                                                                                "name": "height",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            },
-                                                                            {
-                                                                                "name": "top",
-                                                                                "code": "number",
-                                                                                "kind": "property",
-                                                                                "type": {
-                                                                                    "type": "intrinsic",
-                                                                                    "value": "number"
-                                                                                },
-                                                                                "flags": {}
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                },
-                                                "flags": {
-                                                    "isOptional": true
-                                                }
-                                            }
-                                        ]
-                                    }
-                                },
-                                "kind": "parameter"
                             }
                         ],
                         "returnType": {
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(item: IDockviewPanel | DockviewGroupPanel, coord?: { x: number, y: number }, options?: { position?: { right: number, width: number } & { bottom: number, height: number } | { left: number, width: number } & { bottom: number, height: number } | { right: number, width: number } & { height: number, top: number } | { left: number, width: number } & { height: number, top: number } }): void",
+                        "code": "(item: IDockviewPanel | DockviewGroupPanel, coord?: { x: number, y: number }): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -39398,11 +38458,11 @@
             },
             {
                 "name": "position",
-                "code": "AnchoredBox",
+                "code": "Box",
                 "kind": "property",
                 "type": {
                     "type": "reference",
-                    "value": "AnchoredBox",
+                    "value": "Box",
                     "source": "dockview-core"
                 },
                 "flags": {}
@@ -40825,6 +39885,34 @@
             }
         ]
     },
+    "WatermarkConstructor": {
+        "kind": "interface",
+        "name": "WatermarkConstructor",
+        "children": [
+            {
+                "name": "constructor",
+                "kind": "constructor",
+                "code": ""
+            }
+        ]
+    },
+    "WatermarkPartInitParameters": {
+        "kind": "interface",
+        "name": "WatermarkPartInitParameters",
+        "children": [
+            {
+                "name": "accessor",
+                "code": "IDockviewComponent",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "IDockviewComponent",
+                    "source": "dockview-core"
+                },
+                "flags": {}
+            }
+        ]
+    },
     "WatermarkRendererInitParameters": {
         "kind": "interface",
         "name": "WatermarkRendererInitParameters",
@@ -40968,7 +40056,7 @@
                                     "summary": [
                                         {
                                             "kind": "text",
-                                            "text": "If true then add the panel without setting it as the active panel.\n\nDefaults to "
+                                            "text": "If true then add the panel without setting it as the active panel.\r\n\r\nDefaults to "
                                         },
                                         {
                                             "kind": "code",
@@ -41011,7 +40099,7 @@
                                     "summary": [
                                         {
                                             "kind": "text",
-                                            "text": "The rendering mode of the panel.\n\nThis dictates what happens to the HTML of the panel when it is hidden."
+                                            "text": "The rendering mode of the panel.\r\n\r\nThis dictates what happens to the HTML of the panel when it is hidden."
                                         }
                                     ]
                                 }
@@ -41051,7 +40139,7 @@
                                     "summary": [
                                         {
                                             "kind": "text",
-                                            "text": "The title for the panel which can be accessed within both the tab and component.\n\nIf using the default tab renderer this title will be displayed in the tab."
+                                            "text": "The title for the panel which can be accessed within both the tab and component.\r\n\r\nIf using the default tab renderer this title will be displayed in the tab."
                                         }
                                     ]
                                 }
@@ -41902,7 +40990,7 @@
                 "summary": [
                     {
                         "kind": "text",
-                        "text": "Find the grid location of a specific DOM element by traversing the parent\nchain and finding each child index on the way.\n\nThis will break as soon as DOM structures of the Splitview or Gridview change."
+                        "text": "Find the grid location of a specific DOM element by traversing the parent\r\nchain and finding each child index on the way.\r\n\r\nThis will break as soon as DOM structures of the Splitview or Gridview change."
                     }
                 ]
             },
@@ -44209,7 +43297,7 @@
                 "summary": [
                     {
                         "kind": "text",
-                        "text": "A React Hook that returns an array of portals to be rendered by the user of this hook\nand a disposable function to add a portal. Calling dispose removes this portal from the\nportal array"
+                        "text": "A React Hook that returns an array of portals to be rendered by the user of this hook\r\nand a disposable function to add a portal. Calling dispose removes this portal from the\r\nportal array"
                     }
                 ]
             },
