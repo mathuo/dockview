@@ -98,11 +98,12 @@ export const GridActions = (props: {
             </button>
             <span style={{ flexGrow: 1 }} />
             <div style={{ display: 'flex' }}>
-                <span style={{ paddingRight: '4px' }}>Gap</span>
+                <span style={{ paddingRight: '4px' }}>Group Gap</span>
                 <input
+                    style={{ width: 40 }}
                     type="number"
                     min={0}
-                    max={20}
+                    max={99}
                     step={1}
                     value={gap}
                     onChange={(event) => setGap(Number(event.target.value))}

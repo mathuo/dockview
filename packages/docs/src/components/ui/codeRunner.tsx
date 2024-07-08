@@ -10,8 +10,10 @@ export const _CodeRunner = (props: { id: string; height: number }) => {
 
     const sandboxUrl = `${BASE_SANDBOX_URL}/templates/${
         props.id
-    }/${framework.toLowerCase()}`;
-    const path = `/templates/${props.id}/${framework.toLowerCase()}/index.html`;
+    }/${framework.label.toLowerCase()}`;
+    const path = `/templates/${
+        props.id
+    }/${framework.value.toLowerCase()}/index.html`;
     return (
         <div>
             <iframe

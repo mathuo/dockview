@@ -1,18 +1,27 @@
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import { DockviewEmitter } from 'dockview';
 import * as React from 'react';
-import { IS_PROD } from '../flags';
+import './frameworkSpecific.css';
 
-const frameworks = [
-    // { value: 'JavaScript', label: 'JavaScript' },
-    { value: 'React', label: 'React' },
-    { value: 'Vue', label: 'Vue' },
+export interface FrameworkDescriptor {
+    value: string;
+    label: string;
+    icon: string;
+}
+
+const frameworks: FrameworkDescriptor[] = [
+    // { value: 'JavaScript', label: 'JavaScript', icon: 'img/js-icon.svg' },
+    { value: 'React', label: 'React', icon: 'img/react-icon.svg' },
+    { value: 'Vue', label: 'Vue', icon: 'img/vue-icon.svg' },
     // { value: 'Angular', label: 'Angular' },
 ];
 
 const activeFrameworkGlobal = new DockviewEmitter<string>({ replay: true });
 
-export function useActiveFramework(): [string, (value: string) => void] {
+export function useActiveFramework(): [
+    FrameworkDescriptor,
+    (value: string) => void
+] {
     const [value, setValue] = React.useState<string>(
         localStorage.getItem('dv-docs-framework') ?? frameworks[0].value
     );
@@ -37,8 +46,13 @@ export function useActiveFramework(): [string, (value: string) => void] {
         activeFrameworkGlobal.fire(value);
     }, []);
 
-    return [IS_PROD ? frameworks[0].value : value, setter];
+    const option = frameworks.find((_) => _.value === value);
+
+    return [option, setter];
 }
+
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 const FrameworkSelector1 = () => {
     const [activeFramework, setActiveFramework] = useActiveFramework();
@@ -47,18 +61,48 @@ const FrameworkSelector1 = () => {
         setActiveFramework(event.target.value),
     ];
 
-    if (IS_PROD) {
-        return null;
-    }
-
     return (
-        <select onChange={onChange} value={activeFramework}>
-            {frameworks.map((framework) => {
-                return (
-                    <option value={framework.value}>{framework.label}</option>
-                );
-            })}
-        </select>
+        <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild={true}>
+                <div className="framework-menu-item-select">
+                    <span style={{ padding: '0px 8px' }}>
+                        {activeFramework.label}
+                    </span>
+                    <img
+                        width={20}
+                        height={20}
+                        src={useBaseUrl(activeFramework.icon)}
+                        style={{ marginRight: '8px' }}
+                    />
+                </div>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content
+                side="bottom"
+                align="end"
+                sideOffset={10}
+                className="DropdownMenuContent"
+            >
+                {frameworks.map((framework) => {
+                    return (
+                        <DropdownMenu.Item
+                            onClick={() => setActiveFramework(framework.label)}
+                            className="DropdownMenuItem"
+                        >
+                            <div className="framework-menu-item">
+                                <span style={{ paddingRight: '8px' }}>
+                                    {framework.label}
+                                </span>
+                                <img
+                                    width={20}
+                                    height={20}
+                                    src={useBaseUrl(framework.icon)}
+                                />
+                            </div>
+                        </DropdownMenu.Item>
+                    );
+                })}
+            </DropdownMenu.Content>
+        </DropdownMenu.Root>
     );
 };
 
@@ -72,7 +116,7 @@ const FrameworkSpecific1 = (props: {
 }) => {
     const [activeFramework] = useActiveFramework();
 
-    if (activeFramework === props.framework) {
+    if (activeFramework.value === props.framework) {
         return props.children;
     }
 
