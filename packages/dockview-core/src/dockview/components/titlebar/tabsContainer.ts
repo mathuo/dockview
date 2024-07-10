@@ -10,11 +10,7 @@ import { VoidContainer } from './voidContainer';
 import { toggleClass } from '../../../dom';
 import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
-import { WillShowOverlayEvent } from '../../../dnd/droptarget';
-import {
-    DockviewGroupDropLocation,
-    WillShowOverlayLocationEvent,
-} from '../../dockviewGroupPanelModel';
+import { WillShowOverlayLocationEvent } from '../../dockviewGroupPanelModel';
 import { getPanelData } from '../../../dnd/dataTransfer';
 
 export interface TabDropIndexEvent {
@@ -274,14 +270,11 @@ export class TabsContainer
                         const { top: rootTop, left: rootLeft } =
                             this.accessor.element.getBoundingClientRect();
 
-                        this.accessor.addFloatingGroup(
-                            this.group,
-                            {
-                                x: left - rootLeft + 20,
-                                y: top - rootTop + 20,
-                            },
-                            { inDragMode: true }
-                        );
+                        this.accessor.addFloatingGroup(this.group, {
+                            x: left - rootLeft + 20,
+                            y: top - rootTop + 20,
+                            inDragMode: true,
+                        });
                     }
                 }
             ),
@@ -384,14 +377,11 @@ export class TabsContainer
                     const { top: rootTop, left: rootLeft } =
                         this.accessor.element.getBoundingClientRect();
 
-                    this.accessor.addFloatingGroup(
-                        panel as DockviewPanel,
-                        {
-                            x: left - rootLeft,
-                            y: top - rootTop,
-                        },
-                        { inDragMode: true }
-                    );
+                    this.accessor.addFloatingGroup(panel as DockviewPanel, {
+                        x: left - rootLeft,
+                        y: top - rootTop,
+                        inDragMode: true,
+                    });
                     return;
                 }
 

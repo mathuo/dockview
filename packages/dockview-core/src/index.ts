@@ -1,14 +1,16 @@
 export * from './dnd/dataTransfer';
 
 /**
- * Events, Emitters and Disposables are very common concepts that most codebases will contain.
- * We export them with a 'Dockview' prefix here to prevent accidental use by others.
+ * Events, Emitters and Disposables are very common concepts that many codebases will contain, however we need
+ * to export them for dockview framework packages to use.
+ * To be a good citizen these are exported with a `Dockview` prefix to prevent accidental use by others.
  */
 export { Emitter as DockviewEmitter, Event as DockviewEvent } from './events';
 export {
     IDisposable as IDockviewDisposable,
     MutableDisposable as DockviewMutableDisposable,
     CompositeDisposable as DockviewCompositeDisposable,
+    Disposable as DockviewDisposable,
 } from './lifecycle';
 
 export * from './panel/types';

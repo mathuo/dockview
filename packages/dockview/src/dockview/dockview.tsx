@@ -3,8 +3,6 @@ import {
     DockviewComponent,
     DockviewWillDropEvent,
     DockviewApi,
-    IContentRenderer,
-    ITabRenderer,
     DockviewGroupPanel,
     IHeaderActionsRenderer,
     DockviewDidDropEvent,
@@ -16,13 +14,11 @@ import {
     PROPERTY_KEYS,
     DockviewComponentOptions,
     DockviewFrameworkOptions,
-    IDockviewDisposable,
     DockviewDndOverlayEvent,
     DockviewReadyEvent,
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
-
 import { ReactPortalStore, usePortalsLifecycle } from '../react';
 import { ReactWatermarkPart } from './reactWatermarkPart';
 import { ReactHeaderActionsRendererPart } from './headerActionsRenderer';
@@ -67,15 +63,12 @@ export interface IDockviewReactProps extends DockviewOptions {
 }
 
 function extractCoreOptions(props: IDockviewReactProps): DockviewOptions {
-    const coreOptions = (PROPERTY_KEYS as (keyof DockviewOptions)[]).reduce(
-        (obj, key) => {
-            if (key in props) {
-                obj[key] = props[key] as any;
-            }
-            return obj;
-        },
-        {} as Partial<DockviewComponentOptions>
-    );
+    const coreOptions = PROPERTY_KEYS.reduce((obj, key) => {
+        if (key in props) {
+            obj[key] = props[key] as any;
+        }
+        return obj;
+    }, {} as Partial<DockviewComponentOptions>);
 
     return coreOptions as DockviewOptions;
 }
@@ -95,7 +88,7 @@ export const DockviewReact = React.forwardRef(
                 const changes: Partial<DockviewOptions> = {};
 
                 PROPERTY_KEYS.forEach((propKey) => {
-                    const key = propKey as keyof DockviewOptions;
+                    const key = propKey;
                     const propValue = props[key];
 
                     if (key in props && propValue !== prevProps.current[key]) {

@@ -3,15 +3,17 @@ import { useActiveFramework } from '../frameworkSpecific';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 
 const BASE_SANDBOX_URL =
-    'https://codesandbox.io/s/github/mathuo/dockview/tree/master/packages/docs';
+    'https://codesandbox.io/s/github/mathuo/dockview/tree/gh-pages';
 
 export const _CodeRunner = (props: { id: string; height: number }) => {
     const [framework] = useActiveFramework();
 
     const sandboxUrl = `${BASE_SANDBOX_URL}/templates/${
         props.id
-    }/${framework.toLowerCase()}`;
-    const path = `/templates/${props.id}/${framework.toLowerCase()}/index.html`;
+    }/${framework.label.toLowerCase()}`;
+    const path = `/templates/${
+        props.id
+    }/${framework.value.toLowerCase()}/index.html`;
     return (
         <div>
             <iframe

@@ -1,4 +1,4 @@
-import { Emitter, Event, TickDelayedEvent } from '../events';
+import { Emitter, Event, AsapEvent } from '../events';
 import { getGridLocation, Gridview, IGridView } from './gridview';
 import { Position } from '../dnd/droptarget';
 import { Disposable, IValueDisposable } from '../lifecycle';
@@ -35,6 +35,7 @@ export interface BaseGridOptions {
     readonly parentElement: HTMLElement;
     readonly disableAutoResizing?: boolean;
     readonly locked?: boolean;
+    readonly margin?: number;
 }
 
 export interface IGridPanelView extends IGridView, IPanel {
@@ -76,11 +77,8 @@ export abstract class BaseGrid<T extends IGridPanelView>
     private readonly _id = nextLayoutId.next();
     protected readonly _groups = new Map<string, IValueDisposable<T>>();
     protected readonly gridview: Gridview;
-    //
-    protected _activeGroup: T | undefined;
 
-    private _onDidLayoutChange = new Emitter<void>();
-    readonly onDidLayoutChange = this._onDidLayoutChange.event;
+    protected _activeGroup: T | undefined;
 
     private readonly _onDidRemove = new Emitter<T>();
     readonly onDidRemove: Event<T> = this._onDidRemove.event;
@@ -92,7 +90,13 @@ export abstract class BaseGrid<T extends IGridPanelView>
     readonly onDidActiveChange: Event<T | undefined> =
         this._onDidActiveChange.event;
 
-    protected readonly _bufferOnDidLayoutChange = new TickDelayedEvent();
+    protected readonly _bufferOnDidLayoutChange = new AsapEvent();
+    readonly onDidLayoutChange: Event<void> =
+        this._bufferOnDidLayoutChange.onEvent;
+
+    private readonly _onDidViewVisibilityChangeMicroTaskQueue = new AsapEvent();
+    readonly onDidViewVisibilityChangeMicroTaskQueue =
+        this._onDidViewVisibilityChangeMicroTaskQueue.onEvent;
 
     get id(): string {
         return this._id;
@@ -149,7 +153,9 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.gridview = new Gridview(
             !!options.proportionalLayout,
             options.styles,
-            options.orientation
+            options.orientation,
+            options.locked,
+            options.margin
         );
 
         this.gridview.locked = !!options.locked;
@@ -159,6 +165,12 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.layout(0, 0, true); // set some elements height/widths
 
         this.addDisposables(
+            this.gridview.onDidViewVisibilityChange(() =>
+                this._onDidViewVisibilityChangeMicroTaskQueue.fire()
+            ),
+            this.onDidViewVisibilityChangeMicroTaskQueue(() => {
+                this.layout(this.width, this.height, true);
+            }),
             Disposable.from(() => {
                 this.element.parentElement?.removeChild(this.element);
             }),
@@ -172,9 +184,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
             )(() => {
                 this._bufferOnDidLayoutChange.fire();
             }),
-            this._bufferOnDidLayoutChange.onEvent(() => {
-                this._onDidLayoutChange.fire();
-            }),
             this._bufferOnDidLayoutChange
         );
     }
@@ -187,7 +196,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     public setVisible(panel: T, visible: boolean): void {
         this.gridview.setViewVisible(getGridLocation(panel.element), visible);
-        this._onDidLayoutChange.fire();
+        this._bufferOnDidLayoutChange.fire();
     }
 
     public isVisible(panel: T): boolean {
@@ -330,7 +339,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this._onDidActiveChange.dispose();
         this._onDidAdd.dispose();
         this._onDidRemove.dispose();
-        this._onDidLayoutChange.dispose();
 
         for (const group of this.groups) {
             group.dispose();

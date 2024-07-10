@@ -1,5 +1,7 @@
 import {
+    FloatingGroupOptions,
     IDockviewComponent,
+    MovePanelEvent,
     SerializedDockview,
 } from '../dockview/dockviewComponent';
 import {
@@ -42,7 +44,7 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from '../dockview/components/titlebar/tabsContainer';
-import { Box } from '../types';
+import { AnchoredBox, Box } from '../types';
 import {
     DockviewDidDropEvent,
     DockviewWillDropEvent,
@@ -636,6 +638,10 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.onDidRemovePanel;
     }
 
+    get onDidMovePanel(): Event<MovePanelEvent> {
+        return this.component.onDidMovePanel;
+    }
+
     /**
      * Invoked after a layout is deserialzied using the `fromJSON` method.
      */
@@ -800,9 +806,9 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     addFloatingGroup(
         item: IDockviewPanel | DockviewGroupPanel,
-        coord?: { x: number; y: number }
+        options?: FloatingGroupOptions
     ): void {
-        return this.component.addFloatingGroup(item, coord);
+        return this.component.addFloatingGroup(item, options);
     }
 
     /**
@@ -869,5 +875,9 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         }
     ): Promise<void> {
         return this.component.addPopoutGroup(item, options);
+    }
+
+    setGap(gap: number | undefined): void {
+        this.component.updateOptions({ gap });
     }
 }

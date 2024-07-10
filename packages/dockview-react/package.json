@@ -1,6 +1,6 @@
 {
   "name": "dockview-react",
-  "version": "1.13.0",
+  "version": "1.15.0",
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
   "keywords": [
     "splitview",
@@ -44,16 +44,16 @@
     "build": "npm run build:package && npm run build:bundles",
     "build:bundles": "rollup -c",
     "build:cjs": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
-    "build:css": "gulp sass",
+    "build:css": "node scripts/copy-css.js",
     "build:esm": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
     "build:package": "npm run build:cjs && npm run build:esm && npm run build:css",
     "clean": "rimraf dist/ .build/ .rollup.cache/",
     "prepublishOnly": "npm run rebuild && npm run test",
     "rebuild": "npm run clean && npm run build",
-    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview",
-    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage"
+    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-react",
+    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-react --coverage"
   },
   "dependencies": {
-    "dockview": "^1.13.0"
+    "dockview": "^1.15.0"
   }
 }

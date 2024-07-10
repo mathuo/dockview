@@ -22,12 +22,21 @@ function onReady(event: DockviewReadyEvent) {
 ```
 </FrameworkSpecific>
 
-
-<FrameworkSpecific framework='JavaScript'>
+<FrameworkSpecific framework='Vue'>
 ```tsx
-const component = new DockviewComponent({
-  /** options */
-});
+const App = {
+    name: 'App',
+    methods: {
+        onReady(event: DockviewReadyEvent) {
+          const api: DockviewApi = event.api;
+        },
+    },
+    template: `
+      <dockview-vue
+        @ready="onReady"
+      >
+      </dockview-vue>`,
+};
 ```
 </FrameworkSpecific>
 

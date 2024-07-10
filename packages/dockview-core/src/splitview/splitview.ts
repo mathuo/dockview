@@ -36,6 +36,7 @@ export interface SplitViewOptions {
     readonly descriptor?: ISplitViewDescriptor;
     readonly proportionalLayout?: boolean;
     readonly styles?: ISplitviewStyles;
+    readonly margin?: number;
 }
 
 export enum LayoutPriority {
@@ -128,6 +129,7 @@ export class Splitview {
     private _startSnappingEnabled = true;
     private _endSnappingEnabled = true;
     private _disabled = false;
+    private _margin = 0;
 
     private readonly _onDidSashEnd = new Emitter<void>();
     readonly onDidSashEnd = this._onDidSashEnd.event;
@@ -229,12 +231,22 @@ export class Splitview {
         toggleClass(this.element, 'dv-splitview-disabled', value);
     }
 
+    get margin(): number {
+        return this._margin;
+    }
+
+    set margin(value: number) {
+        this._margin = value;
+    }
+
     constructor(
         private readonly container: HTMLElement,
         options: SplitViewOptions
     ) {
         this._orientation = options.orientation;
         this.element = this.createContainer();
+
+        this.margin = options.margin ?? 0;
 
         this.proportionalLayout =
             options.proportionalLayout === undefined
@@ -309,11 +321,7 @@ export class Splitview {
             throw new Error('Index out of bounds');
         }
 
-        toggleClass(this.container, 'visible', visible);
-
         const viewItem = this.viewItems[index];
-
-        toggleClass(this.container, 'visible', visible);
 
         viewItem.setVisible(visible, viewItem.size);
 
@@ -778,18 +786,39 @@ export class Splitview {
         }
     }
 
+    /**
+     * Margin explain:
+     *
+     * For `n` views in a splitview there will be `n-1` margins `m`.
+     *
+     * To fit the margins each view must reduce in size by `(m * (n - 1)) / n`.
+     *
+     * For each view `i` the offet must be adjusted by `m * i/(n - 1)`.
+     */
     private layoutViews(): void {
         this._contentSize = this.viewItems.reduce((r, i) => r + i.size, 0);
-        let sum = 0;
-        const x: number[] = [];
 
         this.updateSashEnablement();
 
-        for (let i = 0; i < this.viewItems.length - 1; i++) {
-            sum += this.viewItems[i].size;
-            x.push(sum);
+        if (this.viewItems.length === 0) {
+            return;
+        }
 
-            const offset = Math.min(Math.max(0, sum - 2), this.size - 4);
+        const sashCount = this.viewItems.length - 1;
+        const marginReducedSize =
+            (this.margin * sashCount) / this.viewItems.length;
+
+        let totalLeftOffset = 0;
+        const viewLeftOffsets: number[] = [];
+
+        for (let i = 0; i < this.viewItems.length - 1; i++) {
+            totalLeftOffset += this.viewItems[i].size;
+            viewLeftOffsets.push(totalLeftOffset);
+
+            const offset = Math.min(
+                Math.max(0, totalLeftOffset - 2),
+                this.size - this.margin
+            );
 
             if (this._orientation === Orientation.HORIZONTAL) {
                 this.sashes[i].container.style.left = `${offset}px`;
@@ -801,20 +830,30 @@ export class Splitview {
             }
         }
         this.viewItems.forEach((view, i) => {
+            const size = view.size - marginReducedSize;
+            const offset =
+                i === 0
+                    ? 0
+                    : viewLeftOffsets[i - 1] +
+                      (i / sashCount) * marginReducedSize;
+
             if (this._orientation === Orientation.HORIZONTAL) {
-                view.container.style.width = `${view.size}px`;
-                view.container.style.left = i == 0 ? '0px' : `${x[i - 1]}px`;
+                view.container.style.width = `${size}px`;
+                view.container.style.left = `${offset}px`;
                 view.container.style.top = '';
                 view.container.style.height = '';
             }
             if (this._orientation === Orientation.VERTICAL) {
-                view.container.style.height = `${view.size}px`;
-                view.container.style.top = i == 0 ? '0px' : `${x[i - 1]}px`;
+                view.container.style.height = `${size}px`;
+                view.container.style.top = `${offset}px`;
                 view.container.style.width = '';
                 view.container.style.left = '';
             }
 
-            view.view.layout(view.size, this._orthogonalSize);
+            view.view.layout(
+                view.size - marginReducedSize,
+                this._orthogonalSize
+            );
         });
     }
 

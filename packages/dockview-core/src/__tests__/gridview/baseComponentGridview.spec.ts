@@ -21,13 +21,9 @@ class TestPanel implements IGridPanelView {
     _onDidChange = new Emitter<IViewSize | undefined>();
     readonly onDidChange = this._onDidChange.event;
 
-    get isActive(): boolean {
-        return true;
-    }
-
-    get params(): Parameters {
-        return {};
-    }
+    isVisible: boolean = true;
+    isActive: boolean = true;
+    params: Parameters = {};
 
     constructor(
         public readonly id: string,

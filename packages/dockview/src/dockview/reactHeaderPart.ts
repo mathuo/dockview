@@ -44,7 +44,7 @@ export class ReactPanelHeaderPart implements ITabRenderer {
     }
 
     public update(event: PanelUpdateEvent): void {
-        this.part?.update(event.params);
+        this.part?.update({ params: event.params });
     }
 
     public layout(_width: number, _height: number): void {

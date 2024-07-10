@@ -24,6 +24,7 @@ export const GridActions = (props: {
 
     const onSave = () => {
         if (props.api) {
+            console.log(props.api.toJSON());
             localStorage.setItem(
                 'dv-demo-state',
                 JSON.stringify(props.api.toJSON())
@@ -52,6 +53,12 @@ export const GridActions = (props: {
     const onAddGroup = () => {
         props.api?.addGroup();
     };
+
+    const [gap, setGap] = React.useState(0);
+
+    React.useEffect(() => {
+        props.api?.setGap(gap);
+    }, [gap, props.api]);
 
     return (
         <div className="action-container">
@@ -91,6 +98,19 @@ export const GridActions = (props: {
             <button className="text-button" onClick={onReset}>
                 Reset
             </button>
+            <span style={{ flexGrow: 1 }} />
+            <div style={{ display: 'flex' }}>
+                <span style={{ paddingRight: '4px' }}>Group Gap</span>
+                <input
+                    style={{ width: 40 }}
+                    type="number"
+                    min={0}
+                    max={99}
+                    step={1}
+                    value={gap}
+                    onChange={(event) => setGap(Number(event.target.value))}
+                />
+            </div>
         </div>
     );
 };

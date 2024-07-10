@@ -14,7 +14,7 @@ export function defaultConfig(api: DockviewApi) {
         id: 'panel_1',
         component: 'default',
         renderer: 'always',
-        title: 'Panel 1',
+        title: 'Panel 1'
     });
 
     api.addPanel({

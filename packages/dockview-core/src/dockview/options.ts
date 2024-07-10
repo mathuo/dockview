@@ -14,6 +14,7 @@ import {
 import { IDockviewPanel } from './dockviewPanel';
 import { DockviewPanelRenderer } from '../overlayRenderContainer';
 import { IGroupHeaderProps } from './framework';
+import { AnchoredBox } from '../types';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -32,6 +33,10 @@ export interface ViewFactoryData {
 }
 
 export interface DockviewOptions {
+    /**
+     * Disable the auto-resizing which is controlled through a `ResizeObserver`.
+     * Call `.layout(width, height)` to manually resize the container.
+     */
     disableAutoResizing?: boolean;
     hideBorders?: boolean;
     singleTabMode?: 'fullwidth' | 'default';
@@ -48,6 +53,10 @@ export interface DockviewOptions {
     rootOverlayModel?: DroptargetOverlayModel;
     locked?: boolean;
     disableDnd?: boolean;
+    /**
+     * Pixel gap between groups
+     */
+    gap?: number;
 }
 
 export interface DockviewDndOverlayEvent {
@@ -98,6 +107,7 @@ export const PROPERTY_KEYS: (keyof DockviewOptions)[] = (() => {
         rootOverlayModel: undefined,
         locked: undefined,
         disableDnd: undefined,
+        gap: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];
@@ -175,19 +185,12 @@ export function isPanelOptionsWithGroup(
 }
 
 type AddPanelFloatingGroupUnion = {
-    floating:
-        | {
-              height?: number;
-              width?: number;
-              x?: number;
-              y?: number;
-          }
-        | true;
+    floating: Partial<AnchoredBox> | true;
     position: never;
 };
 
 type AddPanelPositionUnion = {
-    floating: false | never;
+    floating: false;
     position: AddPanelPositionOptions;
 };
 

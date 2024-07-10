@@ -10,7 +10,7 @@ import { CompositeDisposable } from '../../lifecycle';
 import { Emitter } from '../../events';
 import { DockviewPanel, IDockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
-import { fireEvent } from '@testing-library/dom';
+import { fireEvent, getByTestId, queryByTestId } from '@testing-library/dom';
 import { getPanelData } from '../../dnd/dataTransfer';
 import {
     GroupDragEvent,
@@ -934,6 +934,9 @@ describe('dockviewComponent', () => {
             }),
             dockview.onDidActivePanelChange((panel) => {
                 events.push({ type: 'ACTIVE_PANEL', panel });
+            }),
+            dockview.onDidMovePanel(({ panel }) => {
+                events.push({ type: 'MOVE_PANEL', panel });
             })
         );
 
@@ -1016,7 +1019,10 @@ describe('dockviewComponent', () => {
             to: { group: panel2.group, position: 'center' },
         });
 
-        expect(events).toEqual([{ type: 'ACTIVE_GROUP', group: panel2.group }]);
+        expect(events).toEqual([
+            { type: 'ACTIVE_GROUP', group: panel2.group },
+            { type: 'MOVE_PANEL', panel: panel5 },
+        ]);
 
         events = [];
 
@@ -1030,6 +1036,7 @@ describe('dockviewComponent', () => {
         expect(events).toEqual([
             { type: 'REMOVE_GROUP', group: groupReferenceBeforeMove },
             { type: 'ACTIVE_PANEL', panel: panel4 },
+            { type: 'MOVE_PANEL', panel: panel4 },
         ]);
 
         for (const panel of dockview.panels) {
@@ -1771,6 +1778,7 @@ describe('dockviewComponent', () => {
         let addPanel: IDockviewPanel[] = [];
         let removePanel: IDockviewPanel[] = [];
         let activePanel: (IDockviewPanel | undefined)[] = [];
+        let movedPanels: IDockviewPanel[] = [];
         let layoutChange = 0;
         let layoutChangeFromJson = 0;
 
@@ -1792,6 +1800,9 @@ describe('dockviewComponent', () => {
             }),
             dockview.onDidActivePanelChange((event) => {
                 activePanel.push(event);
+            }),
+            dockview.onDidMovePanel((event) => {
+                movedPanels.push(event.panel);
             }),
             dockview.onDidLayoutChange(() => {
                 layoutChange++;
@@ -1884,6 +1895,7 @@ describe('dockviewComponent', () => {
         expect(addPanel.length).toBe(5);
         expect(removePanel.length).toBe(0);
         expect(activePanel.length).toBe(1);
+        expect(movedPanels.length).toBe(0);
         expect(layoutChange).toBe(1);
         expect(layoutChangeFromJson).toBe(1);
 
@@ -1918,6 +1930,7 @@ describe('dockviewComponent', () => {
         expect(addPanel.length).toBe(0);
         expect(removePanel.length).toBe(5);
         expect(activePanel.length).toBe(1);
+        expect(movedPanels.length).toBe(0);
         expect(layoutChange).toBe(1);
         expect(layoutChangeFromJson).toBe(1);
 
@@ -4924,7 +4937,6 @@ describe('dockviewComponent', () => {
 
     describe('that emits onDidLayoutChange', () => {
         let dockview: DockviewComponent;
-        let panel1: DockviewPanel;
 
         beforeEach(() => {
             jest.useFakeTimers();
@@ -4943,11 +4955,6 @@ describe('dockviewComponent', () => {
                     }
                 },
             });
-
-            panel1 = dockview.addPanel({
-                id: 'panel_1',
-                component: 'default',
-            });
         });
 
         afterEach(() => {
@@ -4955,7 +4962,63 @@ describe('dockviewComponent', () => {
             jest.useRealTimers();
         });
 
+        test('when panels or groups change', () => {
+            const didLayoutChangeHandler = jest.fn();
+            dockview.onDidLayoutChange(didLayoutChangeHandler);
+
+            // add panel
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: { referenceGroup: panel1.group },
+            });
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(1);
+
+            // add group
+            const group = dockview.addGroup();
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(2);
+
+            // remove group
+            group.api.close();
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(3);
+
+            // active panel
+            panel1.api.setActive();
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(4);
+
+            // move panel
+            dockview.moveGroupOrPanel({
+                from: {
+                    groupId: panel1.group.api.id,
+                    panelId: panel1.api.id,
+                },
+                to: {
+                    group: panel1.group,
+                    position: 'center',
+                    index: 1,
+                },
+            });
+
+            // remove panel
+            panel2.api.close();
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(5);
+        });
+
         test('that emits onDidPanelTitleChange and onDidLayoutChange when the panel set a title', () => {
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
             const didLayoutChangeHandler = jest.fn();
             const { dispose: disposeDidLayoutChangeHandler } =
                 dockview.onDidLayoutChange(didLayoutChangeHandler);
@@ -4970,6 +5033,11 @@ describe('dockviewComponent', () => {
         });
 
         test('that emits onDidPanelParametersChange and onDidLayoutChange when the panel updates parameters', () => {
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
             const didLayoutChangeHandler = jest.fn();
             const { dispose: disposeDidLayoutChangeHandler } =
                 dockview.onDidLayoutChange(didLayoutChangeHandler);
@@ -5095,6 +5163,60 @@ describe('dockviewComponent', () => {
         expect(panel2.api.isVisible).toBeTruthy();
         expect(panel3.api.isVisible).toBeFalsy();
         expect(panel4.api.isVisible).toBeTruthy();
+    });
+
+    test('setVisible #1', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+        const api = new DockviewApi(dockview);
+
+        dockview.layout(1000, 1000);
+
+        const panel1 = api.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        const panel2 = api.addPanel({
+            id: 'panel2',
+            component: 'default',
+            position: { referencePanel: panel1, direction: 'below' },
+        });
+
+        const panel3 = api.addPanel({
+            id: 'panel3',
+            component: 'default',
+            position: { referencePanel: panel1, direction: 'below' },
+        });
+
+        expect(api.groups.length).toBe(3);
+
+        panel1.group.api.setVisible(false);
+        panel2.group.api.setVisible(false);
+        panel3.group.api.setVisible(false);
+
+        expect(panel1.group.api.isVisible).toBeFalsy();
+        expect(panel2.group.api.isVisible).toBeFalsy();
+        expect(panel3.group.api.isVisible).toBeFalsy();
+
+        panel1.group.api.setVisible(true);
+
+        expect(panel1.group.api.isVisible).toBeTruthy();
+        expect(panel2.group.api.isVisible).toBeFalsy();
+        expect(panel3.group.api.isVisible).toBeFalsy();
     });
 
     describe('addPanel', () => {
@@ -5330,5 +5452,156 @@ describe('dockviewComponent', () => {
             expect(addPanelCount).toBe(2);
             expect(addGroupCount).toBe(2);
         });
+    });
+
+    test('that `onDidLayoutChange` only subscribes to events after initial subscription time', () => {
+        jest.useFakeTimers();
+
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+        const api = new DockviewApi(dockview);
+
+        dockview.layout(1000, 1000);
+
+        let a = 0;
+
+        api.onDidLayoutChange((e) => {
+            a++;
+        });
+
+        api.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+        api.addPanel({
+            id: 'panel_2',
+            component: 'default',
+        });
+        api.addPanel({
+            id: 'panel_3',
+            component: 'default',
+        });
+
+        let b = 0;
+
+        api.onDidLayoutChange((e) => {
+            b++;
+        });
+
+        jest.runAllTicks();
+
+        expect(a).toBe(1);
+        expect(b).toBe(0);
+    });
+
+    test('addGroup with absolute position', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+        const api = new DockviewApi(dockview);
+
+        dockview.layout(1000, 1000);
+
+        api.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+        api.addPanel({
+            id: 'panel_2',
+            component: 'default',
+        });
+        const panel3 = api.addPanel({
+            id: 'panel_3',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+
+        expect(api.panels.length).toBe(3);
+        expect(api.groups.length).toBe(2);
+
+        api.addGroup({ direction: 'left' });
+
+        expect(api.panels.length).toBe(3);
+        expect(api.groups.length).toBe(3);
+    });
+
+    test('that watermark appears when all views are not visible', () => {
+        jest.useFakeTimers();
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+        const api = new DockviewApi(dockview);
+
+        dockview.layout(1000, 1000);
+
+        const panel1 = api.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+        const panel2 = api.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            position: {
+                direction: 'right',
+            },
+        });
+
+        let query = queryByTestId(container, 'watermark-component');
+        expect(query).toBeFalsy();
+
+        panel1.group.api.setVisible(false);
+        jest.runAllTicks(); // visibility events check fires on microtask-queue
+        query = queryByTestId(container, 'watermark-component');
+        expect(query).toBeFalsy();
+
+        panel2.group.api.setVisible(false);
+        jest.runAllTicks(); // visibility events check fires on microtask-queue
+        query = queryByTestId(container, 'watermark-component');
+        expect(query).toBeTruthy();
+
+        panel1.group.api.setVisible(true);
+        jest.runAllTicks(); // visibility events check fires on microtask-queue
+        query = queryByTestId(container, 'watermark-component');
+        expect(query).toBeFalsy();
     });
 });

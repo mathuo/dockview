@@ -42,7 +42,8 @@ function flipNode<T extends Node>(
             node.styles,
             size,
             orthogonalSize,
-            node.disabled
+            node.disabled,
+            node.margin
         );
 
         let totalSize = 0;
@@ -172,6 +173,7 @@ export interface IGridView {
     readonly minimumHeight: number;
     readonly maximumHeight: number;
     priority?: EnhancedLayoutPriority;
+    readonly isVisible: boolean;
     layout(width: number, height: number): void;
     toJSON(): object;
     fromJSON?(json: object): void;
@@ -275,6 +277,7 @@ export class Gridview implements IDisposable {
 
     private _root: BranchNode | undefined;
     private _locked = false;
+    private _margin = 0;
     private _maximizedNode:
         | { leaf: LeafNode; hiddenOnMaximize: LeafNode[] }
         | undefined = undefined;
@@ -286,6 +289,9 @@ export class Gridview implements IDisposable {
     }>();
     readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
         this._onDidChange.event;
+
+    private readonly _onDidViewVisibilityChange = new Emitter<void>();
+    readonly onDidViewVisibilityChange = this._onDidViewVisibilityChange.event;
 
     private readonly _onDidMaximizedNodeChange = new Emitter<void>();
     readonly onDidMaximizedNodeChange = this._onDidMaximizedNodeChange.event;
@@ -354,6 +360,15 @@ export class Gridview implements IDisposable {
                 branch.push(...node.children);
             }
         }
+    }
+
+    get margin(): number {
+        return this._margin;
+    }
+
+    set margin(value: number) {
+        this._margin = value;
+        this.root.margin = value;
     }
 
     maximizedView(): IGridView | undefined {
@@ -453,6 +468,8 @@ export class Gridview implements IDisposable {
         this.disposable.dispose();
         this._onDidChange.dispose();
         this._onDidMaximizedNodeChange.dispose();
+        this._onDidViewVisibilityChange.dispose();
+
         this.root.dispose();
         this._maximizedNode = undefined;
         this.element.remove();
@@ -466,7 +483,8 @@ export class Gridview implements IDisposable {
             this.styles,
             this.root.size,
             this.root.orthogonalSize,
-            this._locked
+            this.locked,
+            this.margin
         );
     }
 
@@ -527,16 +545,17 @@ export class Gridview implements IDisposable {
                 this.styles,
                 node.size, // <- orthogonal size - flips at each depth
                 orthogonalSize, // <- size - flips at each depth,
-                this._locked,
+                this.locked,
+                this.margin,
                 children
             );
         } else {
-            result = new LeafNode(
-                deserializer.fromJSON(node),
-                orientation,
-                orthogonalSize,
-                node.size
-            );
+            const view = deserializer.fromJSON(node);
+            if (typeof node.visible === 'boolean') {
+                view.setVisible?.(node.visible);
+            }
+
+            result = new LeafNode(view, orientation, orthogonalSize, node.size);
         }
 
         return result;
@@ -580,7 +599,8 @@ export class Gridview implements IDisposable {
             this.styles,
             this.root.orthogonalSize,
             this.root.size,
-            this._locked
+            this.locked,
+            this.margin
         );
 
         if (oldRoot.children.length === 0) {
@@ -686,17 +706,24 @@ export class Gridview implements IDisposable {
     constructor(
         readonly proportionalLayout: boolean,
         readonly styles: ISplitviewStyles | undefined,
-        orientation: Orientation
+        orientation: Orientation,
+        locked?: boolean,
+        margin?: number
     ) {
         this.element = document.createElement('div');
         this.element.className = 'grid-view';
+
+        this._locked = locked ?? false;
+        this._margin = margin ?? 0;
+
         this.root = new BranchNode(
             orientation,
             proportionalLayout,
             styles,
             0,
             0,
-            this._locked
+            this.locked,
+            this.margin
         );
     }
 
@@ -722,6 +749,8 @@ export class Gridview implements IDisposable {
         if (!(parent instanceof BranchNode)) {
             throw new Error('Invalid from location');
         }
+
+        this._onDidViewVisibilityChange.fire();
 
         parent.setChildVisible(index, visible);
     }
@@ -793,7 +822,8 @@ export class Gridview implements IDisposable {
                 this.styles,
                 parent.size,
                 parent.orthogonalSize,
-                this._locked
+                this.locked,
+                this.margin
             );
             grandParent.addChild(newParent, parent.size, parentIndex);
 

@@ -26,6 +26,7 @@ const components = {
                     overflow: 'auto',
                     color: 'white',
                     position: 'relative',
+                    // border: '5px dashed purple',
                 }}
             >
                 {/* <Table data={metadata} /> */}
@@ -146,6 +147,10 @@ const DockviewDemo = (props: { theme?: string }) => {
             addLogLine(`Group Added ${event.id}`);
         });
 
+        event.api.onDidMovePanel((event) => {
+            addLogLine(`Panel Moved ${event.panel.id}`);
+        });
+
         event.api.onDidRemoveGroup((event) => {
             setGroups((_) => {
                 const next = [..._];
@@ -180,6 +185,21 @@ const DockviewDemo = (props: { theme?: string }) => {
 
     const [watermark, setWatermark] = React.useState<boolean>(false);
 
+    const [gapCheck, setGapCheck] = React.useState<boolean>(false);
+
+    const css = React.useMemo(() => {
+        if (!gapCheck) {
+            return {};
+        }
+
+        return {
+            '--dv-group-gap-size': '0.5rem',
+            '--demo-border': '5px dashed purple',
+        } as React.CSSProperties;
+    }, [gapCheck]);
+
+    const [showLogs, setShowLogs] = React.useState<boolean>(false);
+
     return (
         <div
             style={{
@@ -190,6 +210,7 @@ const DockviewDemo = (props: { theme?: string }) => {
                 padding: '8px',
                 backgroundColor: 'rgba(0,0,50,0.25)',
                 borderRadius: '8px',
+                ...css,
             }}
         >
             <div>
@@ -212,84 +233,128 @@ const DockviewDemo = (props: { theme?: string }) => {
                         activeGroup={activeGroup}
                     />
                 )}
+                {/* <div>
+                    <button
+                        onClick={() => {
+                            setGapCheck(!gapCheck);
+                        }}
+                    >
+                        {gapCheck ? 'Disable Gap Check' : 'Enable Gap Check'}
+                    </button>
+                </div> */}
+            </div>
+            <div
+                className="action-container"
+                style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    alignItems: 'center',
+                    padding: '4px',
+                }}
+            >
+                <button
+                    onClick={() => {
+                        setShowLogs(!showLogs);
+                    }}
+                >
+                    <span style={{ paddingRight: '4px' }}>
+                        {`${showLogs ? 'Hide' : 'Show'} Events Log`}
+                    </span>
+                    <span className="material-symbols-outlined">terminal</span>
+                </button>
             </div>
             <div
                 style={{
                     flexGrow: 1,
-                    overflow: 'hidden',
-                    // flexBasis: 0
                     height: 0,
                     display: 'flex',
                 }}
             >
-                <DockviewReact
-                    components={components}
-                    defaultTabComponent={headerComponents.default}
-                    rightHeaderActionsComponent={RightControls}
-                    leftHeaderActionsComponent={LeftControls}
-                    prefixHeaderActionsComponent={PrefixHeaderControls}
-                    watermarkComponent={
-                        watermark ? WatermarkComponent : undefined
-                    }
-                    onReady={onReady}
-                    className={props.theme || 'dockview-theme-abyss'}
-                />
                 <div
                     style={{
-                        // height: '200px',
-                        width: '300px',
-                        backgroundColor: 'black',
-                        color: 'white',
-                        overflow: 'auto',
+                        flexGrow: 1,
+                        overflow: 'hidden',
+                        height: '100%',
+                        display: 'flex',
                     }}
                 >
-                    {logLines.map((line, i) => {
-                        return (
-                            <div
-                                style={{
-                                    height: '30px',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    fontSize: '13px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    backgroundColor: line.backgroundColor,
-                                }}
-                                key={i}
-                            >
-                                <span
-                                    style={{
-                                        display: 'inline-block',
-                                        width: '20px',
-                                        color: 'gray',
-                                        borderRight: '1px solid gray',
-                                        marginRight: '4px',
-                                        paddingLeft: '2px',
-                                        height: '100%',
-                                    }}
-                                >
-                                    {logLines.length - i}
-                                </span>
-                                <span>
-                                    {line.timestamp && (
-                                        <span
-                                            style={{
-                                                fontSize: '0.7em',
-                                                padding: '0px 2px',
-                                            }}
-                                        >
-                                            {line.timestamp
-                                                .toISOString()
-                                                .substring(11, 23)}
-                                        </span>
-                                    )}
-                                    <span>{line.text}</span>
-                                </span>
-                            </div>
-                        );
-                    })}
+                    <DockviewReact
+                        components={components}
+                        defaultTabComponent={headerComponents.default}
+                        rightHeaderActionsComponent={RightControls}
+                        leftHeaderActionsComponent={LeftControls}
+                        prefixHeaderActionsComponent={PrefixHeaderControls}
+                        watermarkComponent={
+                            watermark ? WatermarkComponent : undefined
+                        }
+                        onReady={onReady}
+                        className={props.theme || 'dockview-theme-abyss'}
+                    />
                 </div>
+
+                {showLogs && (
+                    <div
+                        style={{
+                            width: '400px',
+                            backgroundColor: 'black',
+                            color: 'white',
+                            overflow: 'auto',
+                            fontFamily: 'monospace',
+                            marginLeft: '10px',
+                            flexShrink: 0,
+                        }}
+                    >
+                        {logLines.map((line, i) => {
+                            return (
+                                <div
+                                    style={{
+                                        height: '30px',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                        fontSize: '13px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+
+                                        backgroundColor: line.backgroundColor,
+                                    }}
+                                    key={i}
+                                >
+                                    <span
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            minWidth: '20px',
+                                            maxWidth: '20px',
+                                            color: 'gray',
+                                            borderRight: '1px solid gray',
+                                            marginRight: '4px',
+                                            paddingLeft: '4px',
+                                            height: '100%',
+                                        }}
+                                    >
+                                        {logLines.length - i}
+                                    </span>
+                                    <span>
+                                        {line.timestamp && (
+                                            <span
+                                                style={{
+                                                    fontSize: '0.7em',
+                                                    padding: '0px 2px',
+                                                }}
+                                            >
+                                                {line.timestamp
+                                                    .toISOString()
+                                                    .substring(11, 23)}
+                                            </span>
+                                        )}
+                                        <span>{line.text}</span>
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
         </div>
     );

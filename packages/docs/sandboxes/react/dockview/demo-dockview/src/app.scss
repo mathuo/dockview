@@ -15,6 +15,8 @@
     }
 }
 
+
+
 .data-table {
     table {
         font-size: 11px;
@@ -76,6 +78,11 @@
             padding: 0px 4px;
             border: none;
             cursor: pointer;
+
+            &:disabled {
+                color: gray;
+                cursor: help;
+            }
 
             span {
                 font-size: 16px;

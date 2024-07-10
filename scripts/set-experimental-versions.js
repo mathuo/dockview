@@ -50,22 +50,35 @@ fs.writeFileSync(
 
 // dockview
 
-const dockviewPath = path.join(rootDir, 'packages', 'dockview', 'package.json');
-const dockviewPackageJson = JSON.parse(
-    fs.readFileSync(dockviewPath).toString()
-);
+const depPackages = ['dockview', 'dockview-vue', 'dockview-react'];
 
-dockviewPackageJson.version = version;
-dockviewPackageJson.dependencies['dockview-core'] = dockviewPackageJson.version;
+for (const depPackage of depPackages) {
+    const dockviewPath = path.join(
+        rootDir,
+        'packages',
+        depPackage,
+        'package.json'
+    );
+    const dockviewPackageJson = JSON.parse(
+        fs.readFileSync(dockviewPath).toString()
+    );
 
-fs.writeFileSync(dockviewPath, JSON.stringify(dockviewPackageJson, null, 4));
+    dockviewPackageJson.version = version;
+    dockviewPackageJson.dependencies['dockview-core'] =
+        dockviewPackageJson.version;
 
-// sanity check
+    fs.writeFileSync(
+        dockviewPath,
+        JSON.stringify(dockviewPackageJson, null, 4)
+    );
 
-const dvCore = JSON.parse(fs.readFileSync(dockviewCorePath).toString());
-const dv = JSON.parse(fs.readFileSync(dockviewPath).toString());
+    // sanity check
 
-console.log(`dockview-core version: ${dvCore.version}`);
-console.log(
-    `dockview version: ${dv.version} dockview-core dependency version: ${dv.dependencies['dockview-core']}`
-);
+    const dvCore = JSON.parse(fs.readFileSync(dockviewCorePath).toString());
+    const dv = JSON.parse(fs.readFileSync(dockviewPath).toString());
+
+    console.log(`dockview-core version: ${dvCore.version}`);
+    console.log(
+        `${depPackage} version: ${dv.version} dockview-core dependency version: ${dv.dependencies['dockview-core']}`
+    );
+}

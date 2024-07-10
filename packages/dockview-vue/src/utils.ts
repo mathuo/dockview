@@ -1,9 +1,10 @@
 import type {
+    DockviewApi,
     DockviewGroupPanel,
+    DockviewPanelApi,
     GroupPanelPartInitParameters,
     IContentRenderer,
     IDockviewPanelHeaderProps,
-    IDockviewPanelProps,
     IGroupHeaderProps,
     IHeaderActionsRenderer,
     ITabRenderer,
@@ -59,12 +60,6 @@ export function findComponent(
 }
 
 /**
- * TODO List
- *
- * 1. handle vue context-ish stuff (appContext? provides?)
- *
- *
- *
  * @see https://vuejs.org/api/render-function.html#clonevnode
  * @see https://vuejs.org/api/render-function.html#mergeprops
  */
@@ -84,8 +79,8 @@ export function mountVueComponent<T extends Record<string, any>>(
 
     return {
         update: (newProps: any) => {
-            runningProps = { ...props, newProps };
-            vNode = cloneVNode(vNode, Object.freeze(runningProps));
+            runningProps = { ...props, ...newProps };
+            vNode = cloneVNode(vNode, runningProps);
             render(vNode, element);
         },
         dispose: () => {
@@ -94,78 +89,38 @@ export function mountVueComponent<T extends Record<string, any>>(
     };
 }
 
-export class VueContentRenderer implements IContentRenderer {
-    private _element: HTMLElement;
-    private _renderDisposable:
-        | { update: (props: any) => void; dispose: () => void }
-        | undefined;
+abstract class AbstractVueRenderer {
+    protected readonly _element: HTMLElement;
 
     get element(): HTMLElement {
         return this._element;
     }
 
     constructor(
-        private readonly component: VueComponent,
-        private readonly parent: ComponentInternalInstance
+        protected readonly component: VueComponent,
+        protected readonly parent: ComponentInternalInstance
     ) {
         this._element = document.createElement('div');
         this.element.className = 'dv-vue-part';
         this.element.style.height = '100%';
         this.element.style.width = '100%';
-    }
-
-    init(parameters: GroupPanelPartInitParameters): void {
-        const props: IDockviewPanelProps = {
-            params: parameters.params,
-            api: parameters.api,
-            containerApi: parameters.containerApi,
-        };
-
-        this._renderDisposable?.dispose();
-        this._renderDisposable = mountVueComponent(
-            this.component,
-            this.parent,
-            { params: props },
-            this.element
-        );
-    }
-
-    update(event: PanelUpdateEvent<Parameters>): void {
-        const params = event.params;
-        // TODO: handle prop updates somehow?
-        this._renderDisposable?.update(params);
-    }
-
-    focus(): void {
-        //  TODO: make optional on interface
-    }
-
-    dispose(): void {
-        this._renderDisposable?.dispose();
     }
 }
 
-export class VueTabRenderer implements ITabRenderer {
-    private _element: HTMLElement;
+export class VueRenderer
+    extends AbstractVueRenderer
+    implements ITabRenderer, IContentRenderer
+{
     private _renderDisposable:
         | { update: (props: any) => void; dispose: () => void }
         | undefined;
-
-    get element(): HTMLElement {
-        return this._element;
-    }
-
-    constructor(
-        private readonly component: VueComponent,
-        private readonly parent: ComponentInternalInstance
-    ) {
-        this._element = document.createElement('div');
-        this.element.className = 'dv-vue-part';
-        this.element.style.height = '100%';
-        this.element.style.width = '100%';
-    }
+    private _api: DockviewPanelApi | undefined;
+    private _containerApi: DockviewApi | undefined;
 
     init(parameters: GroupPanelPartInitParameters): void {
+        this._api = parameters.api;
+        this._containerApi = parameters.containerApi;
+
         const props: IDockviewPanelHeaderProps = {
             params: parameters.params,
             api: parameters.api,
@@ -182,9 +137,18 @@ export class VueTabRenderer implements ITabRenderer {
     }
 
     update(event: PanelUpdateEvent<Parameters>): void {
+        if (!this._api || !this._containerApi) {
+            return;
+        }
+
         const params = event.params;
-        // TODO: handle prop updates somehow?
-        this._renderDisposable?.update(params);
+        this._renderDisposable?.update({
+            params: {
+                params: params,
+                api: this._api,
+                containerApi: this._containerApi,
+            },
+        });
     }
 
     dispose(): void {
@@ -192,24 +156,16 @@ export class VueTabRenderer implements ITabRenderer {
     }
 }
 
-export class VueWatermarkRenderer implements IWatermarkRenderer {
-    private _element: HTMLElement;
+export class VueWatermarkRenderer
+    extends AbstractVueRenderer
+    implements IWatermarkRenderer
+{
     private _renderDisposable:
         | { update: (props: any) => void; dispose: () => void }
         | undefined;
 
     get element(): HTMLElement {
         return this._element;
-    }
-
-    constructor(
-        private readonly component: VueComponent,
-        private readonly parent: ComponentInternalInstance
-    ) {
-        this._element = document.createElement('div');
-        this.element.className = 'dv-vue-part';
-        this.element.style.height = '100%';
-        this.element.style.width = '100%';
     }
 
     init(parameters: WatermarkRendererInitParameters): void {
@@ -232,9 +188,7 @@ export class VueWatermarkRenderer implements IWatermarkRenderer {
     }
 
     update(event: PanelUpdateEvent<Parameters>): void {
-        const params = event.params;
-        // TODO: handle prop updates somehow?
-        this._renderDisposable?.update(params);
+        // noop
     }
 
     dispose(): void {
@@ -242,8 +196,10 @@ export class VueWatermarkRenderer implements IWatermarkRenderer {
     }
 }
 
-export class VueHeaderActionsRenderer implements IHeaderActionsRenderer {
-    private _element: HTMLElement;
+export class VueHeaderActionsRenderer
+    extends AbstractVueRenderer
+    implements IHeaderActionsRenderer
+{
     private _renderDisposable:
         | { update: (props: any) => void; dispose: () => void }
         | undefined;
@@ -253,14 +209,11 @@ export class VueHeaderActionsRenderer implements IHeaderActionsRenderer {
     }
 
     constructor(
-        private readonly component: VueComponent,
-        private readonly parent: ComponentInternalInstance,
+        component: VueComponent,
+        parent: ComponentInternalInstance,
         group: DockviewGroupPanel
     ) {
-        this._element = document.createElement('div');
-        this.element.className = 'dv-vue-header-action-part';
-        this._element.style.width = '100%';
-        this._element.style.height = '100%';
+        super(component, parent);
     }
 
     init(props: IGroupHeaderProps): void {

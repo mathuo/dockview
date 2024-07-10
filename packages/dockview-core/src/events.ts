@@ -69,7 +69,7 @@ class Stacktrace {
     private constructor(readonly value: string) {}
 
     print(): void {
-        console.warn(this.value);
+        console.warn('dockview: stacktrace', this.value);
     }
 }
 
@@ -124,7 +124,7 @@ export class Emitter<T> implements IDisposable {
                             this._listeners.splice(index, 1);
                         } else if (Emitter.ENABLE_TRACKING) {
                             // console.warn(
-                            //     `Listener already disposed`,
+                            //     `dockview: listener already disposed`,
                             //     Stacktrace.create().print()
                             // );
                         }
@@ -158,7 +158,10 @@ export class Emitter<T> implements IDisposable {
                     queueMicrotask(() => {
                         // don't check until stack of execution is completed to allow for out-of-order disposals within the same execution block
                         for (const listener of this._listeners) {
-                            console.warn(listener.stacktrace?.print());
+                            console.warn(
+                                'dockview: stacktrace',
+                                listener.stacktrace?.print()
+                            );
                         }
                     });
                 }
@@ -203,19 +206,53 @@ export function addDisposableListener<K extends keyof HTMLElementEventMap>(
     };
 }
 
-export class TickDelayedEvent implements IDisposable {
-    private timer: any;
-
+/**
+ *
+ * Event Emitter that fires events from a Microtask callback, only one event will fire per event-loop cycle.
+ *
+ * It's kind of like using an `asapScheduler` in RxJs with additional logic to only fire once per event-loop cycle.
+ * This implementation exists to avoid external dependencies.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/queueMicrotask
+ * @see https://rxjs.dev/api/index/const/asapScheduler
+ */
+export class AsapEvent implements IDisposable {
     private readonly _onFired = new Emitter<void>();
-    readonly onEvent = this._onFired.event;
+    private _currentFireCount = 0;
+    private _queued = false;
+
+    readonly onEvent: Event<void> = (e) => {
+        /**
+         * when the event is first subscribed to take note of the current fire count
+         */
+        const fireCountAtTimeOfEventSubscription = this._currentFireCount;
+
+        return this._onFired.event(() => {
+            /**
+             * if the current fire count is greater than the fire count at event subscription
+             * then the event has been fired since we subscribed and it's ok to "on_next" the event.
+             *
+             * if the count is not greater then what we are recieving is an event from the microtask
+             * queue that was triggered before we actually subscribed and therfore we should ignore it.
+             */
+            if (this._currentFireCount > fireCountAtTimeOfEventSubscription) {
+                e();
+            }
+        });
+    };
 
     fire(): void {
-        if (this.timer) {
-            clearTimeout(this.timer);
+        this._currentFireCount++;
+
+        if (this._queued) {
+            return;
         }
-        this.timer = setTimeout(() => {
+
+        this._queued = true;
+
+        queueMicrotask(() => {
+            this._queued = false;
             this._onFired.fire();
-            clearTimeout(this.timer);
         });
     }
 

@@ -1,6 +1,8 @@
 {
   "packages": [
     "packages/dockview-core",
+    "packages/dockview-vue",
+    "packages/dockview-react",
     "packages/dockview"
   ],
   "sandboxes": [

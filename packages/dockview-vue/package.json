@@ -1,6 +1,6 @@
 {
   "name": "dockview-vue",
-  "version": "1.13.0",
+  "version": "1.15.0",
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
   "keywords": [
     "splitview",
@@ -41,21 +41,17 @@
     "README.md"
   ],
   "scripts": {
-    "build-only": "vite build",
-    "build": "npm run build:package",
-    "build:bundles": "rollup -c",
-    "build:cjs": "cross-env ../../node_modules/.bin/vue-tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
-    "build:css": "gulp sass",
-    "build:esm": "cross-env ../../node_modules/.bin/vue-tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
-    "build:package": "npm run build-only && npm run build:types",
+    "build:js": "vite build",
+    "build:types": "vue-tsc --project tsconfig.build-types.json --declaration --emitDeclarationOnly --outDir dist/types",
+    "build:css": "node scripts/copy-css.js",
+    "build": "npm run build:js && npm run build:types && npm run build:css",
     "clean": "rimraf dist/ .build/ .rollup.cache/",
     "prepublishOnly": "npm run rebuild && npm run test",
     "rebuild": "npm run clean && npm run build",
-    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview",
-    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage",
-    "build:types": "vue-tsc --project tsconfig.build-types.json --declaration --emitDeclarationOnly --outDir dist/types "
+    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-vue",
+    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-vue --coverage"
   },
   "dependencies": {
-    "dockview-core": "^1.13.0"
+    "dockview-core": "^1.15.0"
   }
 }

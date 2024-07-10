@@ -2,17 +2,9 @@
 import {
     DockviewApi,
     DockviewComponent,
-    type IContentRenderer,
-    type ITabRenderer,
-    type IWatermarkRenderer,
-    type IDockviewPanelProps,
-    type IDockviewPanelHeaderProps,
-    type IGroupPanelBaseProps,
-    type IWatermarkPanelProps,
     type DockviewOptions,
     PROPERTY_KEYS,
     type DockviewFrameworkOptions,
-    type DockviewReadyEvent,
 } from 'dockview-core';
 import {
     ref,
@@ -22,42 +14,15 @@ import {
     watch,
     onBeforeUnmount,
     markRaw,
-    toRaw,
     getCurrentInstance,
 } from 'vue';
 import {
-    VueContentRenderer,
     VueHeaderActionsRenderer,
-    VueTabRenderer,
+    VueRenderer,
     VueWatermarkRenderer,
     findComponent,
 } from '../utils';
-
-interface VueProps {
-    watermarkComponent?: string;
-    defaultTabComponent?: string;
-    rightHeaderActionsComponent?: string;
-    leftHeaderActionsComponent?: string;
-    prefixHeaderActionsComponent?: string;
-}
-
-const VUE_PROPERTIES = (() => {
-    const _value: Record<keyof VueProps, undefined> = {
-        watermarkComponent: undefined,
-        defaultTabComponent: undefined,
-        rightHeaderActionsComponent: undefined,
-        leftHeaderActionsComponent: undefined,
-        prefixHeaderActionsComponent: undefined,
-    };
-
-    return Object.keys(_value) as (keyof VueProps)[];
-})();
-
-type VueEvents = {
-    ready: [event: DockviewReadyEvent];
-};
-
-export type IDockviewVueProps = DockviewOptions & VueProps;
+import type { IDockviewVueProps, VueEvents } from './types';
 
 function extractCoreOptions(props: IDockviewVueProps): DockviewOptions {
     const coreOptions = (PROPERTY_KEYS as (keyof DockviewOptions)[]).reduce(
@@ -73,10 +38,6 @@ function extractCoreOptions(props: IDockviewVueProps): DockviewOptions {
 
 const emit = defineEmits<VueEvents>();
 
-/**
- * Anything here that is a Vue.js component should not be reactive
- * i.e. markRaw(toRaw(...))
- */
 const props = defineProps<IDockviewVueProps>();
 
 const el = ref<HTMLElement | null>(null);
@@ -95,55 +56,61 @@ PROPERTY_KEYS.forEach((coreOptionKey) => {
 
 onMounted(() => {
     if (!el.value) {
-        throw new Error('element is not mounted');
+        throw new Error('dockview-vue: element is not mounted');
+    }
+
+    const inst = getCurrentInstance();
+
+    if(!inst) {
+      throw new Error('dockview-vue: getCurrentInstance() returned null')
     }
 
     const frameworkOptions: DockviewFrameworkOptions = {
         parentElement: el.value,
         createComponent(options) {
             const component = findComponent(
-                getCurrentInstance()!,
+                inst,
                 options.name
             );
-            return new VueContentRenderer(component!, getCurrentInstance()!);
+            return new VueRenderer(component!, inst);
         },
         createTabComponent(options) {
-            let component = findComponent(getCurrentInstance()!, options.name);
+            let component = findComponent(inst, options.name);
 
             if (!component && props.defaultTabComponent) {
                 component = findComponent(
-                    getCurrentInstance()!,
+                    inst,
                     props.defaultTabComponent
                 );
             }
 
             if (component) {
-                return new VueTabRenderer(component, getCurrentInstance()!);
+                return new VueRenderer(component, inst);
             }
             return undefined;
         },
         createWatermarkComponent: props.watermarkComponent
             ? () => {
                   const component = findComponent(
-                      getCurrentInstance()!,
+                      inst,
                       props.watermarkComponent!
                   );
 
                   return new VueWatermarkRenderer(
                       component!,
-                      getCurrentInstance()!
+                      inst
                   );
               }
             : undefined,
         createLeftHeaderActionComponent: props.leftHeaderActionsComponent
             ? (group) => {
                   const component = findComponent(
-                      getCurrentInstance()!,
+                      inst,
                       props.leftHeaderActionsComponent!
                   );
                   return new VueHeaderActionsRenderer(
                       component!,
-                      getCurrentInstance()!,
+                      inst,
                       group
                   );
               }
@@ -151,12 +118,12 @@ onMounted(() => {
         createPrefixHeaderActionComponent: props.prefixHeaderActionsComponent
             ? (group) => {
                   const component = findComponent(
-                      getCurrentInstance()!,
+                      inst,
                       props.prefixHeaderActionsComponent!
                   );
                   return new VueHeaderActionsRenderer(
                       component!,
-                      getCurrentInstance()!,
+                      inst,
                       group
                   );
               }
@@ -164,12 +131,12 @@ onMounted(() => {
         createRightHeaderActionComponent: props.rightHeaderActionsComponent
             ? (group) => {
                   const component = findComponent(
-                      getCurrentInstance()!,
+                      inst,
                       props.rightHeaderActionsComponent!
                   );
                   return new VueHeaderActionsRenderer(
                       component!,
-                      getCurrentInstance()!,
+                      inst,
                       group
                   );
               }
@@ -198,8 +165,6 @@ onMounted(() => {
      * @see https://vuejs.org/api/reactivity-advanced.html#markraw
      */
     instance.value = markRaw(dockview);
-
-    console.log(getCurrentInstance());
 
     emit('ready', { api: new DockviewApi(dockview) });
 });

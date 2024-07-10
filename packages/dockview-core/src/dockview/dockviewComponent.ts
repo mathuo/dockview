@@ -51,13 +51,13 @@ import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
 import { Parameters } from '../panel/types';
 import { Overlay } from '../dnd/overlay';
-import { toggleClass, watchElementResize } from '../dom';
+import { addTestId, toggleClass, watchElementResize } from '../dom';
 import { DockviewFloatingGroupPanel } from './dockviewFloatingGroupPanel';
 import {
     GroupDragEvent,
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
-import { Box } from '../types';
+import { AnchoredBox, Box } from '../types';
 import {
     DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
     DEFAULT_FLOATING_GROUP_POSITION,
@@ -126,7 +126,7 @@ export interface PanelReference {
 
 export interface SerializedFloatingGroup {
     data: GroupPanelViewState;
-    position: Box;
+    position: AnchoredBox;
 }
 
 export interface SerializedPopoutGroup {
@@ -148,90 +148,9 @@ export interface SerializedDockview {
     popoutGroups?: SerializedPopoutGroup[];
 }
 
-function typeValidate3(data: GroupPanelViewState, path: string): void {
-    if (typeof data.id !== 'string') {
-        throw new Error(`${path}.id must be a string`);
-    }
-
-    if (
-        typeof data.activeView !== 'string' ||
-        typeof data.activeView !== 'undefined'
-    ) {
-        throw new Error(`${path}.activeView must be a string of undefined`);
-    }
-}
-
-function typeValidate2(
-    data: SerializedGridObject<GroupPanelViewState>,
-    path: string
-): void {
-    if (typeof data.size !== 'number' && typeof data.size !== 'undefined') {
-        throw new Error(`${path}.size must be a number or undefined`);
-    }
-
-    if (
-        typeof data.visible !== 'boolean' &&
-        typeof data.visible !== 'undefined'
-    ) {
-        throw new Error(`${path}.visible must be a boolean or undefined`);
-    }
-
-    if (data.type === 'leaf') {
-        if (
-            typeof data.data !== 'object' ||
-            data.data === null ||
-            Array.isArray(data.data)
-        ) {
-            throw new Error('object must be a non-null object');
-        }
-
-        typeValidate3(data.data, `${path}.data`);
-    } else if (data.type === 'branch') {
-        if (!Array.isArray(data.data)) {
-            throw new Error(`${path}.data must be an array`);
-        }
-    } else {
-        throw new Error(`${path}.type must be onew of {'branch', 'leaf'}`);
-    }
-}
-
-function typeValidate(data: SerializedDockview): void {
-    if (typeof data !== 'object' || data === null) {
-        throw new Error('object must be a non-null object');
-    }
-
-    const { grid, panels, activeGroup, floatingGroups } = data;
-
-    if (typeof grid !== 'object' || grid === null) {
-        throw new Error("'.grid' must be a non-null object");
-    }
-
-    if (typeof grid.height !== 'number') {
-        throw new Error("'.grid.height' must be a number");
-    }
-
-    if (typeof grid.width !== 'number') {
-        throw new Error("'.grid.width' must be a number");
-    }
-
-    if (typeof grid.root !== 'object' || grid.root === null) {
-        throw new Error("'.grid.root' must be a non-null object");
-    }
-
-    if (grid.root.type !== 'branch') {
-        throw new Error(".grid.root.type must be of type 'branch'");
-    }
-
-    if (
-        grid.orientation !== Orientation.HORIZONTAL &&
-        grid.orientation !== Orientation.VERTICAL
-    ) {
-        throw new Error(
-            `'.grid.width' must be one of {${Orientation.HORIZONTAL}, ${Orientation.VERTICAL}}`
-        );
-    }
-
-    typeValidate2(grid.root, '.grid.root');
+export interface MovePanelEvent {
+    panel: IDockviewPanel;
+    from: DockviewGroupPanel;
 }
 
 type MoveGroupOptions = {
@@ -251,6 +170,17 @@ type MoveGroupOrPanelOptions = {
     };
 };
 
+export interface FloatingGroupOptions {
+    x?: number;
+    y?: number;
+    height?: number;
+    width?: number;
+    position?: AnchoredBox;
+    skipRemoveGroup?: boolean;
+    inDragMode?: boolean;
+    skipActiveGroup?: boolean;
+}
+
 export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly activePanel: IDockviewPanel | undefined;
     readonly totalPanels: number;
@@ -269,6 +199,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidAddGroup: Event<DockviewGroupPanel>;
     readonly onDidActiveGroupChange: Event<DockviewGroupPanel | undefined>;
     readonly onUnhandledDragOverEvent: Event<DockviewDndOverlayEvent>;
+    readonly onDidMovePanel: Event<MovePanelEvent>;
     readonly options: DockviewComponentOptions;
     updateOptions(options: DockviewOptions): void;
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void;
@@ -294,7 +225,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     //
     addFloatingGroup(
         item: IDockviewPanel | DockviewGroupPanel,
-        coord?: { x: number; y: number }
+        options?: FloatingGroupOptions
     ): void;
     addPopoutGroup(
         item: IDockviewPanel | DockviewGroupPanel,
@@ -358,9 +289,8 @@ export class DockviewComponent
     readonly onDidActivePanelChange: Event<IDockviewPanel | undefined> =
         this._onDidActivePanelChange.event;
 
-    private readonly _onDidMovePanel = new Emitter<{
-        panel: IDockviewPanel;
-    }>();
+    private readonly _onDidMovePanel = new Emitter<MovePanelEvent>();
+    readonly onDidMovePanel = this._onDidMovePanel.event;
 
     private readonly _floatingGroups: DockviewFloatingGroupPanel[] = [];
     private readonly _popoutGroups: {
@@ -429,6 +359,7 @@ export class DockviewComponent
             parentElement: options.parentElement,
             disableAutoResizing: options.disableAutoResizing,
             locked: options.locked,
+            margin: options.gap,
         });
 
         const gready = document.createElement('div');
@@ -456,6 +387,9 @@ export class DockviewComponent
             this._onDidRemoveGroup,
             this._onDidActiveGroupChange,
             this._onUnhandledDragOverEvent,
+            this.onDidViewVisibilityChangeMicroTaskQueue(() => {
+                this.updateWatermark();
+            }),
             this.onDidAdd((event) => {
                 if (!this._moving) {
                     this._onDidAddGroup.fire(event);
@@ -477,9 +411,12 @@ export class DockviewComponent
             )(() => {
                 this.updateWatermark();
             }),
-            Event.any(
+            Event.any<unknown>(
                 this.onDidAddPanel,
                 this.onDidRemovePanel,
+                this.onDidAddGroup,
+                this.onDidRemove,
+                this.onDidMovePanel,
                 this.onDidActivePanelChange
             )(() => {
                 this._bufferOnDidLayoutChange.fire();
@@ -662,7 +599,7 @@ export class DockviewComponent
         const box: Box = getBox();
 
         const groupId =
-            options?.overridePopoutGroup?.id ?? this.getNextGroupId(); //item.id;
+            options?.overridePopoutGroup?.id ?? this.getNextGroupId();
 
         if (itemToPopout.api.location.type === 'grid') {
             itemToPopout.api.setVisible(false);
@@ -821,17 +758,15 @@ export class DockviewComponent
                                     skipPopoutAssociated: true,
                                 });
                             }
-                        } else {
-                            if (this.getPanel(group.id)) {
-                                const removedGroup = this.doRemoveGroup(group, {
-                                    skipDispose: true,
-                                    skipActive: true,
-                                });
-                                removedGroup.model.renderContainer =
-                                    this.overlayRenderContainer;
-                                removedGroup.model.location = { type: 'grid' };
-                                returnedGroup = removedGroup;
-                            }
+                        } else if (this.getPanel(group.id)) {
+                            const removedGroup = this.doRemoveGroup(group, {
+                                skipDispose: true,
+                                skipActive: true,
+                            });
+                            removedGroup.model.renderContainer =
+                                this.overlayRenderContainer;
+                            removedGroup.model.location = { type: 'grid' };
+                            returnedGroup = removedGroup;
                         }
                     })
                 );
@@ -840,18 +775,13 @@ export class DockviewComponent
                 this.updateWatermark();
             })
             .catch((err) => {
-                console.error(err);
+                console.error('dockview: failed to create popout window', err);
             });
     }
 
     addFloatingGroup(
         item: DockviewPanel | DockviewGroupPanel,
-        coord?: { x?: number; y?: number; height?: number; width?: number },
-        options?: {
-            skipRemoveGroup?: boolean;
-            inDragMode: boolean;
-            skipActiveGroup?: boolean;
-        }
+        options?: FloatingGroupOptions
     ): void {
         let group: DockviewGroupPanel;
 
@@ -904,7 +834,7 @@ export class DockviewComponent
                     this.doRemoveGroup(item, {
                         skipDispose: true,
                         skipPopoutReturn: true,
-                        skipPopoutAssociated: !!popoutReferenceGroup,
+                        skipPopoutAssociated: false,
                     });
                 }
             }
@@ -912,22 +842,62 @@ export class DockviewComponent
 
         group.model.location = { type: 'floating' };
 
-        const overlayLeft =
-            typeof coord?.x === 'number'
-                ? Math.max(coord.x, 0)
-                : DEFAULT_FLOATING_GROUP_POSITION.left;
-        const overlayTop =
-            typeof coord?.y === 'number'
-                ? Math.max(coord.y, 0)
-                : DEFAULT_FLOATING_GROUP_POSITION.top;
+        function getAnchoredBox(): AnchoredBox {
+            if (options?.position) {
+                const result: any = {};
+                if ('left' in options.position) {
+                    result.left = Math.max(options.position.left, 0);
+                } else if ('right' in options.position) {
+                    result.right = Math.max(options.position.right, 0);
+                } else {
+                    result.left = DEFAULT_FLOATING_GROUP_POSITION.left;
+                }
+                if ('top' in options.position) {
+                    result.top = Math.max(options.position.top, 0);
+                } else if ('bottom' in options.position) {
+                    result.bottom = Math.max(options.position.bottom, 0);
+                } else {
+                    result.top = DEFAULT_FLOATING_GROUP_POSITION.top;
+                }
+                if ('width' in options.position) {
+                    result.width = Math.max(options.position.width, 0);
+                } else {
+                    result.width = DEFAULT_FLOATING_GROUP_POSITION.width;
+                }
+                if ('height' in options.position) {
+                    result.height = Math.max(options.position.height, 0);
+                } else {
+                    result.height = DEFAULT_FLOATING_GROUP_POSITION.height;
+                }
+                return result as AnchoredBox;
+            }
+
+            return {
+                left:
+                    typeof options?.x === 'number'
+                        ? Math.max(options.x, 0)
+                        : DEFAULT_FLOATING_GROUP_POSITION.left,
+                top:
+                    typeof options?.y === 'number'
+                        ? Math.max(options.y, 0)
+                        : DEFAULT_FLOATING_GROUP_POSITION.top,
+                width:
+                    typeof options?.width === 'number'
+                        ? Math.max(options.width, 0)
+                        : DEFAULT_FLOATING_GROUP_POSITION.width,
+                height:
+                    typeof options?.height === 'number'
+                        ? Math.max(options.height, 0)
+                        : DEFAULT_FLOATING_GROUP_POSITION.height,
+            };
+        }
+
+        const anchoredBox = getAnchoredBox();
 
         const overlay = new Overlay({
             container: this.gridview.element,
             content: group.element,
-            height: coord?.height ?? 300,
-            width: coord?.width ?? 300,
-            left: overlayLeft,
-            top: overlayTop,
+            ...anchoredBox,
             minimumInViewportWidth:
                 this.options.floatingGroupBounds === 'boundedWithinViewport'
                     ? undefined
@@ -1076,12 +1046,20 @@ export class DockviewComponent
                             this.options.floatingGroupBounds?.minimumWidthWithinViewport;
                 }
 
-                group.overlay.setBounds({});
+                group.overlay.setBounds();
             }
         }
 
         if (changed_rootOverlayOptions) {
             this._rootDropTarget.setOverlayModel(options.rootOverlayModel!);
+        }
+
+        if (this.gridview.margin !== 0 && options.gap === undefined) {
+            this.gridview.margin = 0;
+        }
+
+        if (typeof options.gap === 'number') {
+            this.gridview.margin = options.gap;
         }
 
         this.layout(this.gridview.width, this.gridview.height, true);
@@ -1299,16 +1277,11 @@ export class DockviewComponent
 
                 const group = createGroupFromSerializedState(data);
 
-                this.addFloatingGroup(
-                    group,
-                    {
-                        x: position.left,
-                        y: position.top,
-                        height: position.height,
-                        width: position.width,
-                    },
-                    { skipRemoveGroup: true, inDragMode: false }
-                );
+                this.addFloatingGroup(group, {
+                    position: position,
+                    skipRemoveGroup: true,
+                    inDragMode: false,
+                });
             }
 
             const serializedPopoutGroups = data.popoutGroups ?? [];
@@ -1391,7 +1364,6 @@ export class DockviewComponent
         const groups = Array.from(this._groups.values()).map((_) => _.value);
 
         const hasActiveGroup = !!this.activeGroup;
-        const hasActivePanel = !!this.activePanel;
 
         for (const group of groups) {
             // remove the group will automatically remove the panels
@@ -1496,7 +1468,8 @@ export class DockviewComponent
                         ? options.floating
                         : {};
 
-                this.addFloatingGroup(group, o, {
+                this.addFloatingGroup(group, {
+                    ...o,
                     inDragMode: false,
                     skipRemoveGroup: true,
                     skipActiveGroup: true,
@@ -1556,7 +1529,8 @@ export class DockviewComponent
                     ? options.floating
                     : {};
 
-            this.addFloatingGroup(group, coordinates, {
+            this.addFloatingGroup(group, {
+                ...coordinates,
                 inDragMode: false,
                 skipRemoveGroup: true,
                 skipActiveGroup: true,
@@ -1641,6 +1615,7 @@ export class DockviewComponent
 
                 const watermarkContainer = document.createElement('div');
                 watermarkContainer.className = 'dv-watermark-container';
+                addTestId(watermarkContainer, 'watermark-component');
                 watermarkContainer.appendChild(this.watermark.element);
 
                 this.gridview.element.appendChild(watermarkContainer);
@@ -1653,8 +1628,6 @@ export class DockviewComponent
     }
 
     addGroup(options?: AddGroupOptions): DockviewGroupPanel {
-        const group = this.createGroup(options);
-
         if (options) {
             let referenceGroup: DockviewGroupPanel | undefined;
 
@@ -1712,12 +1685,16 @@ export class DockviewComponent
                 location,
                 target
             );
+
+            const group = this.createGroup(options);
             this.doAddGroup(group, relativeLocation);
             if (!options.skipSetActive) {
                 this.doSetGroupAndPanelActive(group);
             }
             return group;
         } else {
+            const group = this.createGroup(options);
+
             this.doAddGroup(group);
             this.doSetGroupAndPanelActive(group);
             return group;
@@ -1921,6 +1898,7 @@ export class DockviewComponent
 
             this._onDidMovePanel.fire({
                 panel: removedPanel,
+                from: sourceGroup,
             });
         } else {
             /**
@@ -1957,6 +1935,12 @@ export class DockviewComponent
                         // if a group has one tab - we are essentially moving the 'group'
                         // which is equivalent to swapping two views in this case
                         this.gridview.moveView(sourceParentLocation, from, to);
+
+                        this._onDidMovePanel.fire({
+                            panel: this.getGroupPanel(sourceItemId)!,
+                            from: sourceGroup,
+                        });
+
                         return;
                     }
                 }
@@ -1990,6 +1974,11 @@ export class DockviewComponent
                     )
                 );
                 this.doSetGroupAndPanelActive(targetGroup);
+
+                this._onDidMovePanel.fire({
+                    panel: this.getGroupPanel(sourceItemId)!,
+                    from: sourceGroup,
+                });
             } else {
                 /**
                  * The group we are removing from has many panels, we need to remove the panels we are moving,
@@ -2023,6 +2012,11 @@ export class DockviewComponent
                     })
                 );
                 this.doSetGroupAndPanelActive(group);
+
+                this._onDidMovePanel.fire({
+                    panel: removedPanel,
+                    from: sourceGroup,
+                });
             }
         }
     }
@@ -2057,10 +2051,6 @@ export class DockviewComponent
             });
 
             this.doSetGroupAndPanelActive(to);
-
-            panels.forEach((panel) => {
-                this._onDidMovePanel.fire({ panel });
-            });
         } else {
             switch (from.api.location.type) {
                 case 'grid':
@@ -2095,11 +2085,11 @@ export class DockviewComponent
             );
 
             this.gridview.addView(from, Sizing.Distribute, dropLocation);
-
-            from.panels.forEach((panel) => {
-                this._onDidMovePanel.fire({ panel });
-            });
         }
+
+        from.panels.forEach((panel) => {
+            this._onDidMovePanel.fire({ panel, from });
+        });
     }
 
     override doSetGroupActive(group: DockviewGroupPanel | undefined): void {
@@ -2154,7 +2144,7 @@ export class DockviewComponent
 
         if (id && this._groups.has(options.id!)) {
             console.warn(
-                `Duplicate group id ${options?.id}. reassigning group id to avoid errors`
+                `dockview: Duplicate group id ${options?.id}. reassigning group id to avoid errors`
             );
             id = undefined;
         }

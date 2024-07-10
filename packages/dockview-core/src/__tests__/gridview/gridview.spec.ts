@@ -5,6 +5,7 @@ import {
     IGridView,
     IViewSize,
     SerializedGridview,
+    getGridLocation,
     orthogonal,
 } from '../../gridview/gridview';
 import { Orientation, Sizing } from '../../splitview/splitview';
@@ -18,7 +19,7 @@ class MockGridview implements IGridView {
         IViewSize | undefined
     >().event;
     element: HTMLElement = document.createElement('div');
-
+    isVisible: boolean = true;
     width: number = 0;
     height: number = 0;
 
@@ -1104,5 +1105,103 @@ describe('gridview', () => {
         );
 
         expect(gridview.hasMaximizedView()).toBeFalsy();
+    });
+
+    test('visibility check', () => {
+        const gridview = new Gridview(
+            true,
+            { separatorBorder: '' },
+            Orientation.HORIZONTAL
+        );
+        gridview.layout(1000, 1000);
+
+        const view1 = new MockGridview('1');
+        const view2 = new MockGridview('2');
+        const view3 = new MockGridview('3');
+        const view4 = new MockGridview('4');
+        const view5 = new MockGridview('5');
+        const view6 = new MockGridview('6');
+
+        gridview.addView(view1, Sizing.Distribute, [0]);
+        gridview.addView(view2, Sizing.Distribute, [1]);
+        gridview.addView(view3, Sizing.Distribute, [1, 1]);
+        gridview.addView(view4, Sizing.Distribute, [1, 1, 0]);
+        gridview.addView(view5, Sizing.Distribute, [1, 1, 0, 0]);
+        gridview.addView(view6, Sizing.Distribute, [1, 1, 0, 0, 0]);
+
+        /**
+         *   _____________________________________________
+         *  |                     |                       |
+         *  |                     |           2           |
+         *  |                     |                       |
+         *  |          1          |_______________________|
+         *  |                     |         |      4      |
+         *  |                     |    3    |_____________|
+         *  |                     |         |   5  |   6  |
+         *  |_____________________|_________|______|______|
+         */
+
+        function assertVisibility(visibility: boolean[]) {
+            expect(gridview.isViewVisible(getGridLocation(view1.element))).toBe(
+                visibility[0]
+            );
+            expect(gridview.isViewVisible(getGridLocation(view2.element))).toBe(
+                visibility[1]
+            );
+            expect(gridview.isViewVisible(getGridLocation(view3.element))).toBe(
+                visibility[2]
+            );
+            expect(gridview.isViewVisible(getGridLocation(view4.element))).toBe(
+                visibility[3]
+            );
+            expect(gridview.isViewVisible(getGridLocation(view5.element))).toBe(
+                visibility[4]
+            );
+            expect(gridview.isViewVisible(getGridLocation(view6.element))).toBe(
+                visibility[5]
+            );
+        }
+
+        // hide each view one by one
+
+        assertVisibility([true, true, true, true, true, true]);
+
+        gridview.setViewVisible(getGridLocation(view5.element), false);
+        assertVisibility([true, true, true, true, false, true]);
+
+        gridview.setViewVisible(getGridLocation(view4.element), false);
+        assertVisibility([true, true, true, false, false, true]);
+
+        gridview.setViewVisible(getGridLocation(view1.element), false);
+        assertVisibility([false, true, true, false, false, true]);
+
+        gridview.setViewVisible(getGridLocation(view2.element), false);
+        assertVisibility([false, false, true, false, false, true]);
+
+        gridview.setViewVisible(getGridLocation(view3.element), false);
+        assertVisibility([false, false, false, false, false, true]);
+
+        gridview.setViewVisible(getGridLocation(view6.element), false);
+        assertVisibility([false, false, false, false, false, false]);
+
+        // un-hide each view one by one
+
+        gridview.setViewVisible(getGridLocation(view1.element), true);
+        assertVisibility([true, false, false, false, false, false]);
+
+        gridview.setViewVisible(getGridLocation(view5.element), true);
+        assertVisibility([true, false, false, false, true, false]);
+
+        gridview.setViewVisible(getGridLocation(view6.element), true);
+        assertVisibility([true, false, false, false, true, true]);
+
+        gridview.setViewVisible(getGridLocation(view2.element), true);
+        assertVisibility([true, true, false, false, true, true]);
+
+        gridview.setViewVisible(getGridLocation(view3.element), true);
+        assertVisibility([true, true, true, false, true, true]);
+
+        gridview.setViewVisible(getGridLocation(view4.element), true);
+        assertVisibility([true, true, true, true, true, true]);
     });
 });

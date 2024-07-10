@@ -28,8 +28,7 @@ export interface DockviewGroupPanelFloatingChangeEvent {
     readonly location: DockviewGroupLocation;
 }
 
-// TODO find a better way to initialize and avoid needing null checks
-const NOT_INITIALIZED_MESSAGE = 'DockviewGroupPanelApiImpl not initialized';
+const NOT_INITIALIZED_MESSAGE = 'dockview: DockviewGroupPanelApiImpl not initialized';
 
 export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     private readonly _mutableDisposable = new MutableDisposable();
@@ -130,15 +129,16 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     }
 
     initialize(group: DockviewGroupPanel): void {
-        this._group = group;
-
         /**
-         * TODO: Annoying initialization order caveat
+         * TODO: Annoying initialization order caveat, find a better way to initialize and avoid needing null checks
          *
          * Due to the order on initialization we know that the model isn't defined until later in the same stack-frame of setup.
          * By queuing a microtask we can ensure the setup is completed within the same stack-frame, but after everything else has
          * finished ensuring the `model` is defined.
          */
+
+        this._group = group;
+
         queueMicrotask(() => {
             this._mutableDisposable.value =
                 this._group!.model.onDidActivePanelChange((event) => {

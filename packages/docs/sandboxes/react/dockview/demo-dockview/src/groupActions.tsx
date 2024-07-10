@@ -1,4 +1,8 @@
-import { DockviewApi, DockviewGroupLocation } from 'dockview';
+import {
+    DockviewApi,
+    DockviewGroupLocation,
+    DockviewGroupPanel,
+} from 'dockview';
 import * as React from 'react';
 
 const GroupAction = (props: {
@@ -12,14 +16,27 @@ const GroupAction = (props: {
     };
 
     const isActive = props.activeGroup === props.groupId;
-    const group = React.useMemo(
-        () => props.api.getGroup(props.groupId),
-        [props.api, props.groupId]
+
+    const [group, setGroup] = React.useState<DockviewGroupPanel | undefined>(
+        undefined
     );
+
+    React.useEffect(() => {
+        const disposable = props.api.onDidLayoutFromJSON(() => {
+            setGroup(props.api.getGroup(props.groupId));
+        });
+
+        setGroup(props.api.getGroup(props.groupId));
+
+        return () => {
+            disposable.dispose();
+        };
+    }, [props.api, props.groupId]);
 
     const [location, setLocation] =
         React.useState<DockviewGroupLocation | null>(null);
     const [isMaximized, setIsMaximized] = React.useState<boolean>(false);
+    const [isVisible, setIsVisible] = React.useState<boolean>(true);
 
     React.useEffect(() => {
         if (!group) {
@@ -35,12 +52,18 @@ const GroupAction = (props: {
             setIsMaximized(group.api.isMaximized());
         });
 
+        const disposable3 = group.api.onDidVisibilityChange(() => {
+            setIsVisible(group.api.isVisible);
+        });
+
         setLocation(group.api.location);
         setIsMaximized(group.api.isMaximized());
+        setIsVisible(group.api.isVisible);
 
         return () => {
             disposable.dispose();
             disposable2.dispose();
+            disposable3.dispose();
         };
     }, [group]);
 
@@ -65,7 +88,14 @@ const GroupAction = (props: {
                     }
                     onClick={() => {
                         if (group) {
-                            props.api.addFloatingGroup(group);
+                            props.api.addFloatingGroup(group, {
+                                position: {
+                                    width: 400,
+                                    height: 300,
+                                    top: 50,
+                                    right: 50,
+                                },
+                            });
                         }
                     }}
                 >
@@ -105,6 +135,23 @@ const GroupAction = (props: {
                 >
                     <span className="material-symbols-outlined">
                         fullscreen
+                    </span>
+                </button>
+                <button
+                    className="demo-icon-button"
+                    onClick={() => {
+                        console.log(group);
+                        if (group) {
+                            if (group.api.isVisible) {
+                                group.api.setVisible(false);
+                            } else {
+                                group.api.setVisible(true);
+                            }
+                        }
+                    }}
+                >
+                    <span className="material-symbols-outlined">
+                        {isVisible ? 'visibility' : 'visibility_off'}
                     </span>
                 </button>
                 <button

@@ -996,7 +996,7 @@ export class DockviewGroupPanelModel
             target,
             position,
             getPanelData,
-            this.accessor.getPanel(this.id)!
+            this.accessor.getPanel(this.id)
         );
 
         this._onUnhandledDragOverEvent.fire(firedEvent);

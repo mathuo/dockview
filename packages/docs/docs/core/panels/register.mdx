@@ -39,6 +39,37 @@ return <DockviewReact components={components}/>
 </FrameworkSpecific>
 
 
+<FrameworkSpecific framework='Vue'>
+```tsx
+const App = {
+    name: 'App',
+    components: {
+        'component_1': VueComponent1,
+        'component_2': VueComponent2,
+    },
+    methods: {
+        onReady(event: DockviewReadyEvent) {
+            event.api.addPanel({
+                id: 'panel_1',
+                component: 'component_1'
+            });
+
+               event.api.addPanel({
+                id: 'panel_2',
+                component: 'component_2'
+            });
+        },
+    },
+    template: `
+      <dockview-vue
+        @ready="onReady"
+      >
+      </dockview-vue>`,
+};
+```
+</FrameworkSpecific>
+
+
 Each panel has an [api](/docs/api/dockview/panelApi) which is used to control specific
 features on that individual panel.
 The panel also has access the [group api](/docs/api/dockview/groupApi) and the container

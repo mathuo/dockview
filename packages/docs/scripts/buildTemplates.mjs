@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import * as path from 'path';
 import { argv } from 'process';
+import { execSync } from 'child_process';
 
 import { fileURLToPath } from 'url';
 
@@ -14,7 +15,7 @@ const { version } = JSON.parse(
 
 const REACT_VERSION = '18.2.0';
 const VUE_VERSION = '3.4.21';
-const DOCKVIEW_VERSION = 'latest'; // version;
+const DOCKVIEW_VERSION = version; //'latest';;
 const USE_LOCAL_CDN = argv.slice(2).includes('--local');
 
 const local = 'http://localhost:1111';
@@ -35,11 +36,13 @@ const DOCKVIEW_CDN = {
             'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/dist/dockview-core.esm.js`,
             'dockview-core/': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/`,
             'dockview-vue': `https://cdn.jsdelivr.net/npm/dockview-vue@${DOCKVIEW_VERSION}/dist/dockview-vue.es.js`,
+            'dockview-vue/': `https://cdn.jsdelivr.net/npm/dockview-vue@${DOCKVIEW_VERSION}/`,
         },
         local: {
             'dockview-core': `${local}/dockview-core/dist/dockview-core.esm.js`,
             'dockview-core/': `${local}/dockview-core/`,
             'dockview-vue': `${local}/dockview-vue/dist/dockview-vue.es.js`,
+            'dockview-vue/': `${local}/dockview-vue/`,
         },
     },
     typescript: {
