@@ -65,8 +65,10 @@ const dockviewCore = content.children.find(
     (child) => child.name === 'dockview-core'
 );
 const dockview = content.children.find((child) => child.name === 'dockview');
+const dockviewVue = content.children.find((child) => child.name === 'dockview-vue');
 
-const declarations = [dockviewCore, dockview]
+
+const declarations = [dockviewCore, dockview, dockviewVue]
     .flatMap(
         (item) => item.children
         // .filter((child) => DOCUMENT_LIST.includes(child.name))
@@ -100,6 +102,8 @@ function parseType(obj) {
             return `${obj.name} is ${parseType(obj.targetType)}`;
         case 'tuple':
             return `[${obj.elements.map(parseType)}]`;
+        case 'namedTupleMember':
+            return `[${obj.name}: ${parseType(obj.element)}]`;
         default:
             throw new Error(`unhandled type ${obj.type}`);
     }
@@ -169,6 +173,11 @@ function parseComplexType(obj) {
                 type: obj.type,
                 values: obj.elements.map(parseComplexType),
             };
+        case 'namedTupleMember':
+          return {
+            type: obj.type,
+            values: parseComplexType(obj.element),
+          };
         default:
             throw new Error(`unhandled type ${obj.type}`);
     }
@@ -559,59 +568,73 @@ function parseDeclarationMetadata(declaration) {
 function createDocument(declarations) {
     const documentation = {};
 
+    function parseDeclaration(declaration) {
+      const { children, name, extendedTypes } = declaration;
+
+      /**
+       * 4: Namespace
+       * 8: Enum
+       * 64: Function
+       * 128: Class
+       * 256: Interface
+       * 2097152: TypeAlias
+       */
+
+      const metadata = parseDeclarationMetadata(declaration);
+
+      documentation[name] = {
+          ...metadata,
+          name,
+          children: [],
+          extends: []
+      };
+
+      if (!children) {
+          documentation[name] = {
+              ...parse(declaration),
+          };
+          // documentation[name].metadata = parse(declaration);
+      }
+
+      if (children) {
+          for (const child of children) {
+              try {
+                  const { flags } = child;
+
+                  if (flags.isPrivate) {
+                      continue;
+                  }
+
+                  const output = parse(child);
+
+                  if (output) {
+                      output.pieces = Array.from(new Set(output.pieces))
+                          .filter(Boolean)
+                          .sort();
+                      delete output.pieces;
+                      // delete output.comment;
+
+                      documentation[name].children.push(output);
+                  }
+              } catch (err) {
+                  console.error('error', err, JSON.stringify(child, null, 4));
+                  process.exit(-1);
+              }
+          }
+      }
+
+      if(extendedTypes) {
+        for(const extendedType of extendedTypes) {
+          if(extendedType.package && extendedType.package.startsWith("dockview")) {
+            documentation[name].extends.push(extendedType.name);
+          }
+        }
+
+      }
+    }
+
     for (const declaration of declarations) {
-        const { children, name } = declaration;
-
-        /**
-         * 4: Namespace
-         * 8: Enum
-         * 64: Function
-         * 128: Class
-         * 256: Interface
-         * 2097152: TypeAlias
-         */
-
-        const metadata = parseDeclarationMetadata(declaration);
-
-        documentation[name] = {
-            ...metadata,
-            name,
-            children: [],
-        };
-
-        if (!children) {
-            documentation[name] = {
-                ...parse(declaration),
-            };
-            // documentation[name].metadata = parse(declaration);
-        }
-
-        if (children) {
-            for (const child of children) {
-                try {
-                    const { flags } = child;
-
-                    if (flags.isPrivate) {
-                        continue;
-                    }
-
-                    const output = parse(child);
-
-                    if (output) {
-                        output.pieces = Array.from(new Set(output.pieces))
-                            .filter(Boolean)
-                            .sort();
-                        delete output.pieces;
-                        // delete output.comment;
-
-                        documentation[name].children.push(output);
-                    }
-                } catch (err) {
-                    console.error('error', err, JSON.stringify(child, null, 4));
-                    process.exit(-1);
-                }
-            }
-        }
+      parseDeclaration(declaration);
     }
 
     return documentation;

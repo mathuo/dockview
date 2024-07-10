@@ -325,6 +325,7 @@ export namespace TypeSystem {
         name: string;
         kind: 'class';
         children: TypeSystem.Type[];
+        extends: string[];
         comment?: Comment;
     };
 
@@ -333,6 +334,7 @@ export namespace TypeSystem {
         kind: 'interface';
         children: TypeSystem.Type[];
         comment?: Comment;
+        extends: string[];
     };
 
     export type Parameter = {

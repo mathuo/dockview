@@ -33,22 +33,29 @@ export interface ViewFactoryData {
 }
 
 export interface DockviewOptions {
+    /**
+     * Disable the auto-resizing which is controlled through a `ResizeObserver`.
+     * Call `.layout(width, height)` to manually resize the container.
+     */
     disableAutoResizing?: boolean;
     hideBorders?: boolean;
     singleTabMode?: 'fullwidth' | 'default';
     disableFloatingGroups?: boolean;
     floatingGroupBounds?:
-    | 'boundedWithinViewport'
-    | {
-        minimumHeightWithinViewport?: number;
-        minimumWidthWithinViewport?: number;
-    };
+        | 'boundedWithinViewport'
+        | {
+              minimumHeightWithinViewport?: number;
+              minimumWidthWithinViewport?: number;
+          };
     popoutUrl?: string;
     defaultRenderer?: DockviewPanelRenderer;
     debug?: boolean;
     rootOverlayModel?: DroptargetOverlayModel;
     locked?: boolean;
     disableDnd?: boolean;
+    /**
+     * Pixel gap between groups
+     */
     gap?: number;
 }
 
@@ -76,7 +83,7 @@ export class DockviewUnhandledDragOverEvent implements DockviewDndOverlayEvent {
         readonly position: Position,
         readonly getData: () => PanelTransfer | undefined,
         readonly group?: DockviewGroupPanel
-    ) { }
+    ) {}
 
     accept(): void {
         this._isAccepted = true;
@@ -178,9 +185,7 @@ export function isPanelOptionsWithGroup(
 }
 
 type AddPanelFloatingGroupUnion = {
-    floating:
-    | Partial<AnchoredBox>
-    | true;
+    floating: Partial<AnchoredBox> | true;
     position: never;
 };
 

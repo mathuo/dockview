@@ -111,7 +111,7 @@ export const Summary = (props: { summary: DocsComment }) => {
     return (
         <div>
             <Text content={props.summary.summary ?? []} />
-            {/* <Tags tags={props.summary.blockTags ?? []} /> */}
+            <Tags tags={props.summary.blockTags ?? []} />
         </div>
     );
 };
@@ -184,6 +184,34 @@ const Row = (props: { doc: TypeSystem.Type }) => {
     );
 };
 
+function filter(docs: TypeSystem.Type, methods: string[]) {
+    if (docs.kind === 'typeAlias') {
+        if (docs.type.type === 'intersection') {
+            return docs.type.values
+                .map((value) => newJson[(value as any).value])
+                .map((v) => filter(v, methods))
+                .flat();
+        }
+    }
+
+    if (docs.kind === 'class' || docs.kind === 'interface') {
+        const extended = docs.extends.flatMap((name) =>
+            filter(newJson[name], methods)
+        );
+
+        return extended.concat(
+            docs.children.filter((child) => {
+                if (methods && !methods.includes(child.name)) {
+                    return false;
+                }
+                return true;
+            })
+        );
+    }
+
+    return [];
+}
+
 export const DocRef = (props: DocRefProps) => {
     const docs = React.useMemo(
         () => newJson[props.declaration],
@@ -191,18 +219,7 @@ export const DocRef = (props: DocRefProps) => {
     );
 
     const filteredDocs = React.useMemo(
-        () =>
-            docs.kind === 'class' || docs.kind === 'interface'
-                ? docs.children.filter((child) => {
-                      if (
-                          props.methods &&
-                          !props.methods.includes(child.name)
-                      ) {
-                          return false;
-                      }
-                      return true;
-                  })
-                : [],
+        () => filter(docs, props.methods),
         [docs]
     );
 

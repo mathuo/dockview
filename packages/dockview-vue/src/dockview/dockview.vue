@@ -5,7 +5,6 @@ import {
     type DockviewOptions,
     PROPERTY_KEYS,
     type DockviewFrameworkOptions,
-    type DockviewReadyEvent,
 } from 'dockview-core';
 import {
     ref,
@@ -23,20 +22,7 @@ import {
     VueWatermarkRenderer,
     findComponent,
 } from '../utils';
-
-interface VueProps {
-    watermarkComponent?: string;
-    defaultTabComponent?: string;
-    rightHeaderActionsComponent?: string;
-    leftHeaderActionsComponent?: string;
-    prefixHeaderActionsComponent?: string;
-}
-
-type VueEvents = {
-    ready: [event: DockviewReadyEvent];
-};
-
-export type IDockviewVueProps = DockviewOptions & VueProps;
+import type { IDockviewVueProps, VueEvents } from './types';
 
 function extractCoreOptions(props: IDockviewVueProps): DockviewOptions {
     const coreOptions = (PROPERTY_KEYS as (keyof DockviewOptions)[]).reduce(
