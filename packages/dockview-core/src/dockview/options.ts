@@ -234,6 +234,10 @@ export type AddPanelOptions<P extends object = Parameters> = {
     priority?: number;
     preferredWidth?: number;
     preferredHeight?: number;
+    minimumWidth?: number;
+    minimumHeight?: number;
+    maximumWidth?: number;
+    maximumHeight?: number;
 } & Partial<AddPanelOptionsUnion>;
 
 type AddGroupOptionsWithPanel = {

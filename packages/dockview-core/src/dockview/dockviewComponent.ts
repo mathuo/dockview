@@ -2263,6 +2263,10 @@ export class DockviewComponent
                 priority: options.priority,
                 preferredWidth: options.preferredWidth,
                 preferredHeight: options.preferredHeight,
+                minimumWidth: options.minimumWidth,
+                minimumHeight: options.minimumHeight,
+                maximumWidth: options.maximumWidth,
+                maximumHeight: options.maximumHeight,
             }
         );
 
