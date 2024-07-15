@@ -5604,4 +5604,37 @@ describe('dockviewComponent', () => {
         query = queryByTestId(container, 'watermark-component');
         expect(query).toBeFalsy();
     });
+
+    describe('updateOptions', () => {
+        test('gap', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent({
+                parentElement: container,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                gap: 6,
+            });
+
+            expect(dockview.gap).toBe(6);
+
+            dockview.updateOptions({ gap: 10 });
+            expect(dockview.gap).toBe(10);
+
+            dockview.updateOptions({});
+            expect(dockview.gap).toBe(10);
+
+            dockview.updateOptions({ gap: 15 });
+            expect(dockview.gap).toBe(15);
+        });
+    });
 });

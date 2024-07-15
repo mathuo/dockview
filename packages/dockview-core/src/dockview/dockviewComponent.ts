@@ -186,6 +186,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly totalPanels: number;
     readonly panels: IDockviewPanel[];
     readonly orientation: Orientation;
+    readonly gap: number;
     readonly onDidDrop: Event<DockviewDidDropEvent>;
     readonly onWillDrop: Event<DockviewWillDropEvent>;
     readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent>;
@@ -347,6 +348,10 @@ export class DockviewComponent
 
     get api(): DockviewApi {
         return this._api;
+    }
+
+    get gap(): number {
+        return this.gridview.margin;
     }
 
     constructor(options: DockviewComponentOptions) {
@@ -1033,7 +1038,11 @@ export class DockviewComponent
             this._rootDropTarget.setOverlayModel(options.rootOverlayModel!);
         }
 
-        if (this.gridview.margin !== 0 && options.gap === undefined) {
+        if (
+            //  if explicitly set as `undefined`
+            'gap' in options &&
+            options.gap === undefined
+        ) {
             this.gridview.margin = 0;
         }
 
