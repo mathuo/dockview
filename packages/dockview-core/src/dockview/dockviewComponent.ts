@@ -57,7 +57,7 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
-import { AnchoredBox, Box } from '../types';
+import { AnchoredBox, AnchorPosition, Box } from '../types';
 import {
     DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
     DEFAULT_FLOATING_GROUP_POSITION,
@@ -175,7 +175,10 @@ export interface FloatingGroupOptions {
     y?: number;
     height?: number;
     width?: number;
-    position?: AnchoredBox;
+    position?: AnchorPosition;
+}
+
+export interface FloatingGroupOptionsInternal extends FloatingGroupOptions {
     skipRemoveGroup?: boolean;
     inDragMode?: boolean;
     skipActiveGroup?: boolean;
@@ -769,7 +772,7 @@ export class DockviewComponent
 
     addFloatingGroup(
         item: DockviewPanel | DockviewGroupPanel,
-        options?: FloatingGroupOptions
+        options?: FloatingGroupOptionsInternal
     ): void {
         let group: DockviewGroupPanel;
 
@@ -833,6 +836,7 @@ export class DockviewComponent
         function getAnchoredBox(): AnchoredBox {
             if (options?.position) {
                 const result: any = {};
+
                 if ('left' in options.position) {
                     result.left = Math.max(options.position.left, 0);
                 } else if ('right' in options.position) {
@@ -847,13 +851,13 @@ export class DockviewComponent
                 } else {
                     result.top = DEFAULT_FLOATING_GROUP_POSITION.top;
                 }
-                if ('width' in options.position) {
-                    result.width = Math.max(options.position.width, 0);
+                if (typeof options.width === 'number') {
+                    result.width = Math.max(options.width, 0);
                 } else {
                     result.width = DEFAULT_FLOATING_GROUP_POSITION.width;
                 }
-                if ('height' in options.position) {
-                    result.height = Math.max(options.position.height, 0);
+                if (typeof options.height === 'number') {
+                    result.height = Math.max(options.height, 0);
                 } else {
                     result.height = DEFAULT_FLOATING_GROUP_POSITION.height;
                 }
@@ -1437,14 +1441,14 @@ export class DockviewComponent
                 const group = this.createGroup();
                 this._onDidAddGroup.fire(group);
 
-                const o =
+                const floatingGroupOptions =
                     typeof options.floating === 'object' &&
                     options.floating !== null
                         ? options.floating
                         : {};
 
                 this.addFloatingGroup(group, {
-                    ...o,
+                    ...floatingGroupOptions,
                     inDragMode: false,
                     skipRemoveGroup: true,
                     skipActiveGroup: true,
