@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-    DockviewComponent,
     DockviewWillDropEvent,
     DockviewApi,
     DockviewGroupPanel,
@@ -16,6 +15,7 @@ import {
     DockviewFrameworkOptions,
     DockviewDndOverlayEvent,
     DockviewReadyEvent,
+    createDockview,
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
@@ -76,7 +76,7 @@ function extractCoreOptions(props: IDockviewReactProps): DockviewOptions {
 export const DockviewReact = React.forwardRef(
     (props: IDockviewReactProps, ref: React.ForwardedRef<HTMLDivElement>) => {
         const domRef = React.useRef<HTMLDivElement>(null);
-        const dockviewRef = React.useRef<DockviewComponent>();
+        const dockviewRef = React.useRef<DockviewApi>();
         const [portals, addPortal] = usePortalsLifecycle();
 
         React.useImperativeHandle(ref, () => domRef.current!, []);
@@ -161,28 +161,27 @@ export const DockviewReact = React.forwardRef(
                           );
                       }
                     : undefined,
-                parentElement: domRef.current,
                 defaultTabComponent: props.defaultTabComponent
                     ? DEFAULT_REACT_TAB
                     : undefined,
             };
 
-            const dockview = new DockviewComponent({
+            const api = createDockview(domRef.current, {
                 ...extractCoreOptions(props),
                 ...frameworkOptions,
             });
 
             const { clientWidth, clientHeight } = domRef.current;
-            dockview.layout(clientWidth, clientHeight);
+            api.layout(clientWidth, clientHeight);
 
             if (props.onReady) {
-                props.onReady({ api: new DockviewApi(dockview) });
+                props.onReady({ api });
             }
 
-            dockviewRef.current = dockview;
+            dockviewRef.current = api;
 
             return () => {
-                dockview.dispose();
+                api.dispose();
             };
         }, []);
 

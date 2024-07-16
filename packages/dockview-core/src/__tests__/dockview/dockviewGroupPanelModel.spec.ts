@@ -276,7 +276,7 @@ describe('dockviewGroupPanelModel', () => {
         });
 
         dockview = fromPartial<DockviewComponent>({
-            options: { parentElement: document.createElement('div') },
+            options: {},
             createWatermarkComponent: () => new Watermark(),
             doSetGroupActive: jest.fn(),
             id: 'dockview-1',
@@ -527,8 +527,7 @@ describe('dockviewGroupPanelModel', () => {
     });
 
     test('that group is set on panel during onDidAddPanel event', () => {
-        const cut = new DockviewComponent({
-            parentElement: document.createElement('div'),
+        const cut = new DockviewComponent(document.createElement('div'), {
             createComponent(options) {
                 switch (options.name) {
                     case 'component':
@@ -548,17 +547,19 @@ describe('dockviewGroupPanelModel', () => {
     });
 
     test('toJSON() default', () => {
-        const dockviewComponent = new DockviewComponent({
-            parentElement: document.createElement('div'),
-            createComponent(options) {
-                switch (options.name) {
-                    case 'component':
-                        return new TestContentPart(options.id);
-                    default:
-                        throw new Error(`unsupported`);
-                }
-            },
-        });
+        const dockviewComponent = new DockviewComponent(
+            document.createElement('div'),
+            {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'component':
+                            return new TestContentPart(options.id);
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            }
+        );
 
         const cut = new DockviewGroupPanelModel(
             document.createElement('div'),
@@ -576,17 +577,19 @@ describe('dockviewGroupPanelModel', () => {
     });
 
     test('toJSON() locked and hideHeader', () => {
-        const dockviewComponent = new DockviewComponent({
-            parentElement: document.createElement('div'),
-            createComponent(options) {
-                switch (options.name) {
-                    case 'component':
-                        return new TestContentPart(options.id);
-                    default:
-                        throw new Error(`unsupported`);
-                }
-            },
-        });
+        const dockviewComponent = new DockviewComponent(
+            document.createElement('div'),
+            {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'component':
+                            return new TestContentPart(options.id);
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            }
+        );
 
         const cut = new DockviewGroupPanelModel(
             document.createElement('div'),
@@ -609,17 +612,19 @@ describe('dockviewGroupPanelModel', () => {
     });
 
     test("that openPanel with skipSetActive doesn't set panel to active", () => {
-        const dockviewComponent = new DockviewComponent({
-            parentElement: document.createElement('div'),
-            createComponent(options) {
-                switch (options.name) {
-                    case 'component':
-                        return new TestContentPart(options.id);
-                    default:
-                        throw new Error(`unsupported`);
-                }
-            },
-        });
+        const dockviewComponent = new DockviewComponent(
+            document.createElement('div'),
+            {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'component':
+                            return new TestContentPart(options.id);
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            }
+        );
 
         const groupviewContainer = document.createElement('div');
         const cut = new DockviewGroupPanelModel(
@@ -659,9 +664,7 @@ describe('dockviewGroupPanelModel', () => {
     test('that should not show drop target is external event', () => {
         const accessor = fromPartial<DockviewComponent>({
             id: 'testcomponentid',
-            options: {
-                parentElement: document.createElement('div'),
-            },
+            options: {},
             getPanel: jest.fn(),
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
@@ -723,9 +726,7 @@ describe('dockviewGroupPanelModel', () => {
     test('that the .locked behaviour is as', () => {
         const accessor = fromPartial<DockviewComponent>({
             id: 'testcomponentid',
-            options: {
-                parentElement: document.createElement('div'),
-            },
+            options: {},
             getPanel: jest.fn(),
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
@@ -816,9 +817,7 @@ describe('dockviewGroupPanelModel', () => {
     test('that should not show drop target if dropping on self', () => {
         const accessor = fromPartial<DockviewComponent>({
             id: 'testcomponentid',
-            options: {
-                parentElement: document.createElement('div'),
-            },
+            options: {},
             getPanel: jest.fn(),
             doSetGroupActive: jest.fn(),
             onDidAddPanel: jest.fn(),
@@ -889,9 +888,7 @@ describe('dockviewGroupPanelModel', () => {
     test('that should not allow drop when dropping on self for same component id', () => {
         const accessor = fromPartial<DockviewComponent>({
             id: 'testcomponentid',
-            options: {
-                parentElement: document.createElement('div'),
-            },
+            options: {},
             getPanel: jest.fn(),
             doSetGroupActive: jest.fn(),
             onDidAddPanel: jest.fn(),
@@ -963,9 +960,7 @@ describe('dockviewGroupPanelModel', () => {
     test('that should not allow drop when not dropping for different component id', () => {
         const accessor = fromPartial<DockviewComponent>({
             id: 'testcomponentid',
-            options: {
-                parentElement: document.createElement('div'),
-            },
+            options: {},
             getPanel: jest.fn(),
             doSetGroupActive: jest.fn(),
             onDidAddPanel: jest.fn(),

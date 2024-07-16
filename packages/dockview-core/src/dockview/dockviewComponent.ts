@@ -357,17 +357,18 @@ export class DockviewComponent
         return this.gridview.margin;
     }
 
-    constructor(options: DockviewComponentOptions) {
+    constructor(parentElement: HTMLElement, options: DockviewComponentOptions) {
         super({
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
             styles: options.hideBorders
                 ? { separatorBorder: 'transparent' }
                 : undefined,
-            parentElement: options.parentElement,
+            parentElement: parentElement,
             disableAutoResizing: options.disableAutoResizing,
             locked: options.locked,
             margin: options.gap,
+            className: options.className,
         });
 
         const gready = document.createElement('div');
