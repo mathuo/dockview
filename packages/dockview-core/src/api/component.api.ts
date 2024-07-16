@@ -596,6 +596,10 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.totalPanels;
     }
 
+    get gap(): number {
+        return this.component.gap;
+    }
+
     /**
      * Invoked when the active group changes. May be undefined if no group is active.
      */
