@@ -568,7 +568,7 @@ export class DockviewComponent
             itemToPopout instanceof DockviewPanel &&
             itemToPopout.group.size === 1
         ) {
-            return this.addPopoutGroup(itemToPopout.group);
+            return this.addPopoutGroup(itemToPopout.group, options);
         }
 
         const theme = getDockviewTheme(this.gridview.element);
