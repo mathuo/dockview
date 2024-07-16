@@ -4,10 +4,25 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Fri, 12 Jul 2024 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 16 Jul 2024 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 1.15.1]]></title>
+            <link>https://dockview.dev/blog/dockview-1.15.1-release</link>
+            <guid>https://dockview.dev/blog/dockview-1.15.1-release</guid>
+            <pubDate>Tue, 16 Jul 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.15.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Fix typing when adding panels with <code>floating</code> options <a href="https://github.com/mathuo/dockview/issues/647" target="_blank" rel="noopener noreferrer">#647</a></li>
+<li>Bug: Fix <code>gap</code> property <a href="https://github.com/mathuo/dockview/pull/649" target="_blank" rel="noopener noreferrer">#649</a></li>
+<li>Bug: Group option not passed through correctly for popout groups <a href="https://github.com/mathuo/dockview/issues/650" target="_blank" rel="noopener noreferrer">#650</a></li>
+</ul>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 1.15.0]]></title>
             <link>https://dockview.dev/blog/dockview-1.15.0-release</link>
@@ -546,25 +561,6 @@ when popout is closed.</li>
 <ul>
 <li><code>groupControlComponent</code> renamed to <code>rightHeaderActionsComponent</code> <a href="https://github.com/mathuo/dockview/pull/264" target="_blank" rel="noopener noreferrer">#264</a></li>
 </ul>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 1.7.6]]></title>
-            <link>https://dockview.dev/blog/dockview-1.7.6-release</link>
-            <guid>https://dockview.dev/blog/dockview-1.7.6-release</guid>
-            <pubDate>Sun, 18 Jun 2023 00:00:00 GMT</pubDate>
-            <description><![CDATA[Please reference to docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference to docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.7.6-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<ul>
-<li>Touch support for resize handles <a href="https://github.com/mathuo/dockview/pull/278" target="_blank" rel="noopener noreferrer">#278</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.7.6-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Internal cleanup <a href="https://github.com/mathuo/dockview/pull/275" target="_blank" rel="noopener noreferrer">#275</a></li>
-<li>iframe docs <a href="https://github.com/mathuo/dockview/pull/273" target="_blank" rel="noopener noreferrer">#273</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.7.6-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
     </channel>
