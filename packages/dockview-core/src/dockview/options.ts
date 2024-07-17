@@ -15,6 +15,7 @@ import { IDockviewPanel } from './dockviewPanel';
 import { DockviewPanelRenderer } from '../overlayRenderContainer';
 import { IGroupHeaderProps } from './framework';
 import { AnchoredBox } from '../types';
+import { FloatingGroupOptions } from './dockviewComponent';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -185,7 +186,7 @@ export function isPanelOptionsWithGroup(
 }
 
 type AddPanelFloatingGroupUnion = {
-    floating: Partial<AnchoredBox> | true;
+    floating: Partial<FloatingGroupOptions> | true;
     position: never;
 };
 
