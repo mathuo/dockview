@@ -328,7 +328,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     public layout(width: number, height: number, forceResize?: boolean): void {
         const different =
-            forceResize ?? (width !== this.width || height !== this.height);
+            forceResize || width !== this.width || height !== this.height;
 
         if (!different) {
             return;
