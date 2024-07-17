@@ -19,10 +19,10 @@ export interface IDockviewPanel extends IDisposable, IPanel {
     readonly api: DockviewPanelApi;
     readonly title: string | undefined;
     readonly params: Parameters | undefined;
-    readonly minimumWidth: number | undefined;
-    readonly minimumHeight: number | undefined;
-    readonly maximumWidth: number | undefined;
-    readonly maximumHeight: number | undefined;
+    readonly minimumWidth?: number;
+    readonly minimumHeight?: number;
+    readonly maximumWidth?: number;
+    readonly maximumHeight?: number;
     updateParentGroup(
         group: DockviewGroupPanel,
         options?: { skipSetActive?: boolean }
