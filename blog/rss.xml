@@ -4,10 +4,23 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Tue, 16 Jul 2024 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Wed, 17 Jul 2024 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 1.15.2]]></title>
+            <link>https://dockview.dev/blog/dockview-1.15.2-release</link>
+            <guid>https://dockview.dev/blog/dockview-1.15.2-release</guid>
+            <pubDate>Wed, 17 Jul 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.15.2-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Calling layout with <code>force=false</code> was preventing layout calls <a href="https://github.com/mathuo/dockview/issues/654" target="_blank" rel="noopener noreferrer">#654</a></li>
+</ul>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 1.15.1]]></title>
             <link>https://dockview.dev/blog/dockview-1.15.1-release</link>
@@ -539,28 +552,6 @@ when popout is closed.</li>
 <li>Fix regression related to external dnd events <a href="https://github.com/mathuo/dockview/issues/311" target="_blank" rel="noopener noreferrer">#311</a></li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.8.2-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 1.8.0]]></title>
-            <link>https://dockview.dev/blog/dockview-1.8.0-release</link>
-            <guid>https://dockview.dev/blog/dockview-1.8.0-release</guid>
-            <pubDate>Sun, 23 Jul 2023 00:00:00 GMT</pubDate>
-            <description><![CDATA[Please reference to docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference to docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.8.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<ul>
-<li>Support for Floating Groups <a href="https://github.com/mathuo/dockview/pull/262" target="_blank" rel="noopener noreferrer">#262</a></li>
-<li>Left hand header changes <a href="https://github.com/mathuo/dockview/pull/264" target="_blank" rel="noopener noreferrer">#264</a></li>
-<li>Retain layout size <a href="https://github.com/mathuo/dockview/pull/285" target="_blank" rel="noopener noreferrer">#285</a></li>
-<li>Expose <code>removePanel</code> <a href="https://github.com/mathuo/dockview/issues/293" target="_blank" rel="noopener noreferrer">#293</a></li>
-<li>Additional themes</li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.8.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.8.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
-<ul>
-<li><code>groupControlComponent</code> renamed to <code>rightHeaderActionsComponent</code> <a href="https://github.com/mathuo/dockview/pull/264" target="_blank" rel="noopener noreferrer">#264</a></li>
-</ul>]]></content:encoded>
             <category>release</category>
         </item>
     </channel>
