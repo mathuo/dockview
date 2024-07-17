@@ -66,6 +66,8 @@ class TestPanel implements IGridPanelView {
 }
 
 class ClassUnderTest extends BaseGrid<TestPanel> {
+    readonly gridview = this.gridview;
+
     constructor(options: BaseGridOptions) {
         super(options);
     }
@@ -103,6 +105,31 @@ class ClassUnderTest extends BaseGrid<TestPanel> {
 }
 
 describe('baseComponentGridview', () => {
+    test('that .layout(...) force flag works', () => {
+        const cut = new ClassUnderTest({
+            parentElement: document.createElement('div'),
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: true,
+        });
+
+        const spy = jest.spyOn(cut.gridview, 'layout');
+
+        cut.layout(100, 100);
+        expect(spy).toHaveBeenCalledTimes(1);
+
+        cut.layout(100, 100, false);
+        expect(spy).toHaveBeenCalledTimes(1);
+
+        cut.layout(100, 100, true);
+        expect(spy).toHaveBeenCalledTimes(2);
+
+        cut.layout(150, 150, false);
+        expect(spy).toHaveBeenCalledTimes(3);
+
+        cut.layout(150, 150, true);
+        expect(spy).toHaveBeenCalledTimes(4);
+    });
+
     test('can add group', () => {
         const cut = new ClassUnderTest({
             parentElement: document.createElement('div'),
