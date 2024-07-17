@@ -359,7 +359,7 @@ export class DockviewComponent
 
     constructor(options: DockviewComponentOptions) {
         super({
-            proportionalLayout: true,
+            proportionalLayout: false,
             orientation: Orientation.HORIZONTAL,
             styles: options.hideBorders
                 ? { separatorBorder: 'transparent' }
@@ -537,10 +537,10 @@ export class DockviewComponent
                                     ? {
                                           width: this.getGroupPanel(
                                               data.panelId
-                                          )?.api.preferredWidth,
+                                          )?.api.width,
                                           height: this.getGroupPanel(
                                               data.panelId
-                                          )?.api.preferredHeight,
+                                          )?.api.height,
                                       }
                                     : undefined
                             ),
@@ -1958,6 +1958,8 @@ export class DockviewComponent
                     }
                 }
 
+                const { width, height } = sourceGroup.api;
+
                 // source group will become empty so delete the group
                 const targetGroup = this.movingLock(() =>
                     this.doRemoveGroup(sourceGroup, {
@@ -1976,14 +1978,18 @@ export class DockviewComponent
                     updatedReferenceLocation,
                     destinationTarget
                 );
+
+                const isHorizontalPrediction =
+                    this.gridview.predictOrientation(location) ===
+                    Orientation.HORIZONTAL;
+
                 this.movingLock(() =>
                     this.doAddGroup(
                         targetGroup,
                         location,
-                        this.gridview.predictOrientation(location) ===
-                            Orientation.HORIZONTAL
-                            ? targetGroup.activePanel?.api.preferredWidth
-                            : targetGroup.activePanel?.api.preferredHeight
+                        'split-after'
+                        // isHorizontalPrediction ? width : height
+                        // 'split'
                     )
                 );
                 this.doSetGroupAndPanelActive(targetGroup);
@@ -2015,10 +2021,19 @@ export class DockviewComponent
                     destinationTarget
                 );
 
-                const group = this.createGroupAtLocation(dropLocation, {
-                    width: removedPanel.api.preferredWidth,
-                    height: removedPanel.api.preferredHeight,
-                });
+                const isSameGroup =
+                    options.from.groupId === options.to.group.id;
+
+                const group = this.createGroupAtLocation(
+                    dropLocation,
+                    'split-after'
+                    // isSameGroup
+                    //     ? undefined
+                    //     : {
+                    //           width: removedPanel.api.width,
+                    //           // height: removedPanel.api.height,
+                    //       }
+                );
                 this.movingLock(() =>
                     group.model.openPanel(removedPanel, {
                         skipSetGroupActive: true,
@@ -2097,7 +2112,16 @@ export class DockviewComponent
                 target
             );
 
-            this.gridview.addView(from, Sizing.Distribute, dropLocation);
+            const isHorizontalPrediction =
+                this.gridview.predictOrientation(dropLocation) ===
+                Orientation.HORIZONTAL;
+
+            this.gridview.addView(
+                from,
+                isHorizontalPrediction ? from.api.width : from.api.height,
+                // Sizing.Distribute
+                dropLocation
+            );
         }
 
         from.panels.forEach((panel) => {
@@ -2293,15 +2317,20 @@ export class DockviewComponent
 
     private createGroupAtLocation(
         location: number[] = [0],
-        options?: { width?: number; height?: number }
+        options?:
+            | { width?: number; height?: number }
+            | 'split-before'
+            | 'split-after'
     ): DockviewGroupPanel {
         const group = this.createGroup();
 
         const size =
-            this.gridview.predictOrientation(location) ===
-            Orientation.HORIZONTAL
-                ? options?.width
-                : options?.height;
+            typeof options !== 'string'
+                ? this.gridview.predictOrientation(location) ===
+                  Orientation.HORIZONTAL
+                    ? options?.width
+                    : options?.height
+                : options;
 
         this.doAddGroup(group, location, size);
         return group;

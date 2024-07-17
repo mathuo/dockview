@@ -338,12 +338,12 @@ export class BranchNode extends CompositeDisposable implements IView {
         return this.splitview.getViewCachedVisibleSize(index);
     }
 
-    public removeChild(index: number, sizing?: Sizing): Node {
+    public removeChild(index: number, sizing?: Sizing, skipLayout?:boolean): Node {
         if (index < 0 || index >= this.children.length) {
             throw new Error('Invalid index');
         }
 
-        this.splitview.removeView(index, sizing);
+        this.splitview.removeView(index, sizing, skipLayout);
         return this._removeChild(index);
     }
 

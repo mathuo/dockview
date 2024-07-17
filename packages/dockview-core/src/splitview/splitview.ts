@@ -10,7 +10,7 @@ import {
     getElementsByTagName,
 } from '../dom';
 import { Event, Emitter } from '../events';
-import { pushToStart, pushToEnd, firstIndex } from '../array';
+import { pushToStart, pushToEnd, firstIndex, last } from '../array';
 import { range, clamp } from '../math';
 import { ViewItem } from './viewItem';
 import { IDisposable } from '../lifecycle';
@@ -91,14 +91,14 @@ interface ISashDragSnapState {
 type ViewItemSize = number | { cachedVisibleSize: number };
 
 export type DistributeSizing = { type: 'distribute' };
-export type SplitSizing = { type: 'split'; index: number };
+export type SplitSizing = { type: 'split'; index: number; preOrder: boolean };
 export type InvisibleSizing = { type: 'invisible'; cachedVisibleSize: number };
 export type Sizing = DistributeSizing | SplitSizing | InvisibleSizing;
 
 export namespace Sizing {
     export const Distribute: DistributeSizing = { type: 'distribute' };
-    export function Split(index: number): SplitSizing {
-        return { type: 'split', index };
+    export function Split(index: number, preOrder: boolean): SplitSizing {
+        return { type: 'split', index, preOrder };
     }
     export function Invisible(cachedVisibleSize: number): InvisibleSizing {
         return { type: 'invisible', cachedVisibleSize };
@@ -331,8 +331,11 @@ export class Splitview {
     }
 
     getViewSize(index: number): number {
-        if (index < 0 || index >= this.viewItems.length) {
-            return -1;
+        if (index < 0) {
+            return this.viewItems[0].size;
+        }
+        if (index >= this.viewItems.length) {
+            return last(this.viewItems)?.size ?? -1;
         }
 
         return this.viewItems[index].size;
@@ -537,12 +540,19 @@ export class Splitview {
                             : event.clientY;
                     const delta = current - start;
 
+                    const indexes = range(this.viewItems.length);
+
+                    const { lowPriorityIndexes, highPriorityIndexes } =
+                        this.calculateIndexPriorities(indexes);
+
                     this.resize(
                         sashIndex,
                         delta,
                         sizes,
-                        undefined,
-                        undefined,
+                        lowPriorityIndexes,
+                        highPriorityIndexes,
+                        // undefined,
+                        // undefined,
                         minDelta,
                         maxDelta,
                         snapBefore,
@@ -589,8 +599,14 @@ export class Splitview {
             this.sashes.push(sashItem);
         }
 
+        let highPriorityIndexes: number[] | undefined;
+
+        if (typeof size !== 'number' && size.type === 'split') {
+            highPriorityIndexes = [size.index];
+        }
+
         if (!skipLayout) {
-            this.relayout([index]);
+            this.relayout([index], highPriorityIndexes);
         }
 
         if (

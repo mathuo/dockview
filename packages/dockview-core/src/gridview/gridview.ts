@@ -834,9 +834,9 @@ export class Gridview implements IDisposable {
             );
             newParent.addChild(newSibling, newSiblingSize, 0);
 
-            if (typeof size !== 'number' && size.type === 'split') {
-                size = { type: 'split', index: 0 };
-            }
+            // if (typeof size !== 'number' && size.type === 'split') {
+            //     size = { type: 'split', index: 0 };
+            // }
 
             const node = new LeafNode(
                 view,

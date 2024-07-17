@@ -7,6 +7,7 @@ import { ISplitviewStyles, Orientation, Sizing } from '../splitview/splitview';
 import { IPanel } from '../panel/types';
 import { MovementOptions2 } from '../dockview/options';
 import { Resizable } from '../resizable';
+import { tail } from '../array';
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -151,7 +152,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         options.parentElement.appendChild(this.element);
 
         this.gridview = new Gridview(
-            !!options.proportionalLayout,
+            options.proportionalLayout,
             options.styles,
             options.orientation,
             options.locked,
@@ -227,9 +228,21 @@ export abstract class BaseGrid<T extends IGridPanelView>
     protected doAddGroup(
         group: T,
         location: number[] = [0],
-        size?: number
+        size?: number | 'split-before' | 'split-after'
     ): void {
-        this.gridview.addView(group, size ?? Sizing.Distribute, location);
+        const [rest, index] = tail(location);
+
+        let _size: Sizing | number;
+
+        if (size === 'split-after') {
+            _size = Sizing.Split(Math.max(0, index - 1), false);
+        } else if (size === 'split-before') {
+            _size = Sizing.Split(Math.max(0, index - 1), true);
+        } else {
+            _size = size ?? Sizing.Distribute;
+        }
+
+        this.gridview.addView(group, _size, location);
 
         this._onDidAdd.fire(group);
     }
@@ -244,7 +257,10 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
         const item = this._groups.get(group.id);
 
-        const view = this.gridview.remove(group, Sizing.Distribute);
+        const view = this.gridview.remove(
+            group
+            //Sizing.Distribute
+        );
 
         if (item && !options?.skipDispose) {
             item.disposable.dispose();
