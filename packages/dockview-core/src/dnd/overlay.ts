@@ -1,4 +1,6 @@
 import {
+    applyOnlyToThisElement,
+    disableIframePointEvents,
     getElementsByTagName,
     quasiDefaultPrevented,
     toggleClass,
@@ -13,20 +15,7 @@ import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { clamp } from '../math';
 import { AnchoredBox } from '../types';
 
-const bringElementToFront = (() => {
-    let previous: HTMLElement | null = null;
-
-    function pushToTop(element: HTMLElement) {
-        if (previous !== element && previous !== null) {
-            toggleClass(previous, 'dv-bring-to-front', false);
-        }
-
-        toggleClass(element, 'dv-bring-to-front', true);
-        previous = element;
-    }
-
-    return pushToTop;
-})();
+const bringElementToFront = applyOnlyToThisElement('dv-bring-to-front');
 
 export class Overlay extends CompositeDisposable {
     private _element: HTMLElement = document.createElement('div');
@@ -86,6 +75,10 @@ export class Overlay extends CompositeDisposable {
             ...('left' in this.options && { left: this.options.left }),
             ...('right' in this.options && { right: this.options.right }),
         });
+    }
+
+    bringToFront(): void {
+        bringElementToFront.update(this._element);
     }
 
     setBounds(bounds: Partial<AnchoredBox> = {}): void {
@@ -207,21 +200,12 @@ export class Overlay extends CompositeDisposable {
         const track = () => {
             let offset: { x: number; y: number } | null = null;
 
-            const iframes = [
-                ...getElementsByTagName('iframe'),
-                ...getElementsByTagName('webview'),
-            ];
-
-            for (const iframe of iframes) {
-                iframe.style.pointerEvents = 'none';
-            }
+            const iframes = disableIframePointEvents();
 
             move.value = new CompositeDisposable(
                 {
                     dispose: () => {
-                        for (const iframe of iframes) {
-                            iframe.style.pointerEvents = 'auto';
-                        }
+                        iframes.release();
                     },
                 },
                 addDisposableWindowListener(window, 'mousemove', (e) => {
@@ -362,13 +346,13 @@ export class Overlay extends CompositeDisposable {
                 this.options.content,
                 'mousedown',
                 () => {
-                    bringElementToFront(this._element);
+                    bringElementToFront.update(this._element);
                 },
                 true
             )
         );
 
-        bringElementToFront(this._element);
+        bringElementToFront.update(this._element);
 
         if (options.inDragMode) {
             track();
@@ -404,14 +388,7 @@ export class Overlay extends CompositeDisposable {
                     originalWidth: number;
                 } | null = null;
 
-                const iframes = [
-                    ...getElementsByTagName('iframe'),
-                    ...getElementsByTagName('webview'),
-                ];
-
-                for (const iframe of iframes) {
-                    iframe.style.pointerEvents = 'none';
-                }
+                const iframes = disableIframePointEvents();
 
                 move.value = new CompositeDisposable(
                     addDisposableWindowListener(window, 'mousemove', (e) => {
@@ -582,9 +559,7 @@ export class Overlay extends CompositeDisposable {
                     }),
                     {
                         dispose: () => {
-                            for (const iframe of iframes) {
-                                iframe.style.pointerEvents = 'auto';
-                            }
+                            iframes.release();
                         },
                     },
                     addDisposableWindowListener(window, 'mouseup', () => {

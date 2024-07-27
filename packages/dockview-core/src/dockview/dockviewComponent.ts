@@ -927,10 +927,17 @@ export class DockviewComponent
             overlay
         );
 
-        const disposable = watchElementResize(group.element, (entry) => {
-            const { width, height } = entry.contentRect;
-            group.layout(width, height); // let the group know it's size is changing so it can fire events to the panel
-        });
+        const disposable = new CompositeDisposable(
+            group.api.onDidActiveChange((event) => {
+                if (event.isActive) {
+                    overlay.bringToFront();
+                }
+            }),
+            watchElementResize(group.element, (entry) => {
+                const { width, height } = entry.contentRect;
+                group.layout(width, height); // let the group know it's size is changing so it can fire events to the panel
+            })
+        );
 
         floatingGroupPanel.addDisposables(
             overlay.onDidChange(() => {

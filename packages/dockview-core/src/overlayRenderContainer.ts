@@ -1,6 +1,10 @@
 import { DragAndDropObserver } from './dnd/dnd';
 import { Droptarget } from './dnd/droptarget';
-import { getDomNodePagePosition, toggleClass } from './dom';
+import {
+    applyOnlyToThisElement,
+    getDomNodePagePosition,
+    toggleClass,
+} from './dom';
 import { CompositeDisposable, Disposable, IDisposable } from './lifecycle';
 import { IDockviewPanel } from './dockview/dockviewPanel';
 
@@ -16,6 +20,8 @@ function createFocusableElement(): HTMLDivElement {
     element.tabIndex = -1;
     return element;
 }
+
+const bringElementToFront = applyOnlyToThisElement('dv-active');
 
 export class OverlayRenderContainer extends CompositeDisposable {
     private readonly map: Record<
@@ -148,6 +154,16 @@ export class OverlayRenderContainer extends CompositeDisposable {
                 }
 
                 resize();
+            }),
+            panel.api.onDidActiveGroupChange(() => {
+                // toggleClass(
+                //     focusContainer,
+                //     'dv-active',
+                //     panel.api.isGroupActive
+                // );
+                if (panel.api.isGroupActive) {
+                    bringElementToFront.update(focusContainer);
+                }
             })
         );
 

@@ -4,7 +4,11 @@
     height: 100%;
 
     &.dv-render-overlay-float {
-        z-index: 999;
+        z-index: 998;
+
+        &.dv-render-overlay-active {
+          z-index: 1000;
+        }
     }
 }
 

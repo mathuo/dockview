@@ -3,7 +3,12 @@ import {
     IDisposable,
     MutableDisposable,
 } from '../../../lifecycle';
-import { Emitter, Event } from '../../../events';
+import {
+    addDisposableListener,
+    addDisposableWindowListener,
+    Emitter,
+    Event,
+} from '../../../events';
 import { trackFocus } from '../../../dom';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
