@@ -825,7 +825,7 @@ export class Splitview {
             viewLeftOffsets.push(totalLeftOffset);
 
             const offset = Math.min(
-                Math.max(0, totalLeftOffset - 2),
+                Math.max(0, totalLeftOffset - (1 + this.margin) / 2),
                 this.size - this.margin
             );
 
