@@ -811,9 +811,10 @@ export class Splitview {
             return;
         }
 
-        const sashCount = this.viewItems.length - 1;
-        const marginReducedSize =
-            (this.margin * sashCount) / this.viewItems.length;
+        const visibleViewItemCount = this.viewItems.filter((i) => i.visible).length
+
+        const sashCount = visibleViewItemCount - 1
+        const marginReducedSize = (this.margin * sashCount) / visibleViewItemCount
 
         let totalLeftOffset = 0;
         const viewLeftOffsets: number[] = [];
