@@ -819,6 +819,7 @@ export class Splitview {
         let totalLeftOffset = 0;
         const viewLeftOffsets: number[] = [];
 
+        // Calc sashes style
         for (let i = 0; i < this.viewItems.length - 1; i++) {
             totalLeftOffset += this.viewItems[i].size;
             viewLeftOffsets.push(totalLeftOffset);
@@ -837,10 +838,12 @@ export class Splitview {
                 this.sashes[i].container.style.top = `${offset}px`;
             }
         }
+
+        // Calc views style
         this.viewItems.forEach((view, i) => {
             const size = view.size - marginReducedSize;
             const offset =
-                i === 0
+                i === 0 || sashCount === 0
                     ? 0
                     : viewLeftOffsets[i - 1] +
                       (i / sashCount) * marginReducedSize;
