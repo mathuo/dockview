@@ -1271,6 +1271,8 @@ export class DockviewComponent
 
                 this.addFloatingGroup(group, {
                     position: position,
+                    width: position.width,
+                    height: position.height,
                     skipRemoveGroup: true,
                     inDragMode: false,
                 });
