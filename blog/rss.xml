@@ -4,10 +4,24 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Wed, 17 Jul 2024 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Thu, 01 Aug 2024 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 1.15.3]]></title>
+            <link>https://dockview.dev/blog/dockview-1.15.3-release</link>
+            <guid>https://dockview.dev/blog/dockview-1.15.3-release</guid>
+            <pubDate>Thu, 01 Aug 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.15.3-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: CSS typo <a href="https://github.com/mathuo/dockview/issues/671" target="_blank" rel="noopener noreferrer">#671</a></li>
+<li>Bug: Floating groups fromJSON(...) incorrect sizes <a href="https://github.com/mathuo/dockview/issues/668" target="_blank" rel="noopener noreferrer">#668</a></li>
+</ul>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 1.15.2]]></title>
             <link>https://dockview.dev/blog/dockview-1.15.2-release</link>
@@ -537,21 +551,6 @@ when popout is closed.</li>
 <li>Bug: Close button on tab shouldn't bring panel to active state <a href="https://github.com/mathuo/dockview/issues/330" target="_blank" rel="noopener noreferrer">#330</a></li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.8.3-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 1.8.2]]></title>
-            <link>https://dockview.dev/blog/dockview-1.8.2-release</link>
-            <guid>https://dockview.dev/blog/dockview-1.8.2-release</guid>
-            <pubDate>Mon, 24 Jul 2023 00:00:00 GMT</pubDate>
-            <description><![CDATA[Please reference to docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference to docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.8.2-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.8.2-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Fix regression related to external dnd events <a href="https://github.com/mathuo/dockview/issues/311" target="_blank" rel="noopener noreferrer">#311</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.8.2-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
     </channel>
