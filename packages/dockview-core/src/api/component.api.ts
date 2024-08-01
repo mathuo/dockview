@@ -44,7 +44,7 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from '../dockview/components/titlebar/tabsContainer';
-import { AnchoredBox, Box } from '../types';
+import { Box } from '../types';
 import {
     DockviewDidDropEvent,
     DockviewWillDropEvent,

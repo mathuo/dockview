@@ -5,7 +5,7 @@ import {
 } from '../lifecycle';
 import {
     IView,
-    LayoutPriority,
+    EnhancedLayoutPriority,
     Orientation,
     Sizing,
     Splitview,
@@ -27,7 +27,7 @@ export interface SerializedSplitviewPanelData {
 
 export interface SerializedSplitviewPanel {
     snap?: boolean;
-    priority?: LayoutPriority;
+    priority?: EnhancedLayoutPriority;
     data: SerializedSplitviewPanelData;
     size: number;
 }

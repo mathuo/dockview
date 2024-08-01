@@ -1,5 +1,5 @@
 import { IDisposable } from '../lifecycle';
-import { LayoutPriority } from '../splitview/splitview';
+import { EnhancedLayoutPriority } from '../splitview/splitview';
 
 /**
  * A key-value object of anything that is a valid JavaScript Object.
@@ -34,6 +34,6 @@ export interface BaseComponentOptions<T extends object = Parameters> {
     component: string;
     params?: T;
     snap?: boolean;
-    priority?: LayoutPriority;
+    priority?: EnhancedLayoutPriority;
     size?: number;
 }

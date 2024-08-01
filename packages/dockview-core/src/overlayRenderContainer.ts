@@ -148,8 +148,19 @@ export class OverlayRenderContainer extends CompositeDisposable {
                 }
 
                 resize();
+            }),
+            panel.api.onDidActiveGroupChange((event) => {
+                if (event.isActive) {
+                    this.map[panel.api.id].element.style.zIndex = '1000';
+                } else {
+                    this.map[panel.api.id].element.style.zIndex = '';
+                }
             })
         );
+
+        if (panel.api.isActive) {
+            this.map[panel.api.id].element.style.zIndex = '1000';
+        }
 
         this.map[panel.api.id].destroy = Disposable.from(() => {
             if (panel.view.content.element.parentElement === focusContainer) {

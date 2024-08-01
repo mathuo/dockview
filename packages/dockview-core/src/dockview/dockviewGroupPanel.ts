@@ -7,12 +7,17 @@ import {
     IHeader,
     DockviewGroupPanelLocked,
 } from './dockviewGroupPanelModel';
-import { GridviewPanel, IGridviewPanel } from '../gridview/gridviewPanel';
+import {
+    Contraints,
+    GridviewPanel,
+    IGridviewPanel,
+} from '../gridview/gridviewPanel';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 import {
     DockviewGroupPanelApi,
     DockviewGroupPanelApiImpl,
 } from '../api/dockviewGroupPanelApi';
+import { EnhancedLayoutPriority, LayoutPriority } from '../splitview/splitview';
 
 const MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH = 100;
 const MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT = 100;
@@ -62,6 +67,48 @@ export class DockviewGroupPanel
         return this._model.header;
     }
 
+    get priority(): EnhancedLayoutPriority | undefined {
+        const activePanel = this.model.activePanel;
+
+        if (!activePanel) {
+            return LayoutPriority.Normal;
+        }
+
+        return activePanel.api.priority;
+    }
+
+    get minimumWidth(): number {
+        const sizes = this.panels
+            .filter((panel) => typeof panel.minimumWidth === 'number')
+            .map((panel) => panel.minimumWidth) as number[];
+
+        return sizes.length > 0 ? Math.max(...sizes) : 100;
+    }
+
+    get minimumHeight(): number {
+        const sizes = this.panels
+            .filter((panel) => typeof panel.minimumHeight === 'number')
+            .map((panel) => panel.minimumHeight) as number[];
+
+        return sizes.length > 0 ? Math.max(...sizes) : 100;
+    }
+
+    get maximumWidth(): number {
+        const sizes = this.panels
+            .filter((panel) => typeof panel.maximumWidth === 'number')
+            .map((panel) => panel.maximumWidth) as number[];
+
+        return sizes.length > 0 ? Math.min(...sizes) : Number.MAX_SAFE_INTEGER;
+    }
+
+    get maximumHeight(): number {
+        const sizes = this.panels
+            .filter((panel) => typeof panel.maximumHeight === 'number')
+            .map((panel) => panel.maximumHeight) as number[];
+
+        return sizes.length > 0 ? Math.min(...sizes) : Number.MAX_SAFE_INTEGER;
+    }
+
     constructor(
         accessor: DockviewComponent,
         id: string,
@@ -71,8 +118,14 @@ export class DockviewGroupPanel
             id,
             'groupview_default',
             {
-                minimumHeight: MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT,
-                minimumWidth: MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH,
+                minimumHeight:
+                    options.constraints?.minimumHeight ??
+                    MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT,
+                minimumWidth:
+                    options.constraints?.maximumHeight ??
+                    MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH,
+                maximumHeight: options.constraints?.maximumHeight,
+                maximumWidth: options.constraints?.maximumWidth,
             },
             new DockviewGroupPanelApiImpl(id, accessor)
         );

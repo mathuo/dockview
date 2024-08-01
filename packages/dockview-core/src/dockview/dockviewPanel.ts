@@ -11,6 +11,7 @@ import { IDockviewPanelModel } from './dockviewPanelModel';
 import { DockviewComponent } from './dockviewComponent';
 import { DockviewPanelRenderer } from '../overlayRenderContainer';
 import { WillFocusEvent } from '../api/panelApi';
+import { Contraints } from '../gridview/gridviewPanel';
 
 export interface IDockviewPanel extends IDisposable, IPanel {
     readonly view: IDockviewPanelModel;
@@ -18,6 +19,10 @@ export interface IDockviewPanel extends IDisposable, IPanel {
     readonly api: DockviewPanelApi;
     readonly title: string | undefined;
     readonly params: Parameters | undefined;
+    readonly minimumWidth?: number;
+    readonly minimumHeight?: number;
+    readonly maximumWidth?: number;
+    readonly maximumHeight?: number;
     updateParentGroup(
         group: DockviewGroupPanel,
         options?: { skipSetActive?: boolean }
@@ -39,6 +44,14 @@ export class DockviewPanel
     private _params?: Parameters;
     private _title: string | undefined;
     private _renderer: DockviewPanelRenderer | undefined;
+    private _priority: number | undefined;
+
+    private _preferredWidth: number | undefined;
+    private _preferredHeight: number | undefined;
+    private _minimumWidth: number | undefined;
+    private _minimumHeight: number | undefined;
+    private _maximumWidth: number | undefined;
+    private _maximumHeight: number | undefined;
 
     get params(): Parameters | undefined {
         return this._params;
@@ -56,6 +69,34 @@ export class DockviewPanel
         return this._renderer ?? this.accessor.renderer;
     }
 
+    get preferredWidth(): number | undefined {
+        return this._preferredWidth;
+    }
+
+    get preferredHeight(): number | undefined {
+        return this._preferredHeight;
+    }
+
+    get minimumWidth(): number | undefined {
+        return this._minimumWidth;
+    }
+
+    get minimumHeight(): number | undefined {
+        return this._minimumHeight;
+    }
+
+    get maximumWidth(): number | undefined {
+        return this._maximumWidth;
+    }
+
+    get maximumHeight(): number | undefined {
+        return this._maximumHeight;
+    }
+
+    get priority(): number {
+        return this._priority ?? 0;
+    }
+
     constructor(
         public readonly id: string,
         component: string,
@@ -64,10 +105,24 @@ export class DockviewPanel
         private readonly containerApi: DockviewApi,
         group: DockviewGroupPanel,
         readonly view: IDockviewPanelModel,
-        options: { renderer?: DockviewPanelRenderer }
+        options: {
+            renderer?: DockviewPanelRenderer;
+            priority?: number;
+            preferredWidth?: number;
+            preferredHeight?: number;
+        } & Partial<Contraints>
     ) {
         super();
         this._renderer = options.renderer;
+        this._priority = options.priority;
+        this._preferredWidth = options.preferredWidth;
+        this._preferredHeight = options.preferredHeight;
+
+        this._minimumWidth = options.minimumWidth;
+        this._minimumHeight = options.minimumHeight;
+        this._maximumWidth = options.maximumWidth;
+        this._maximumHeight = options.maximumHeight;
+
         this._group = group;
 
         this.api = new DockviewPanelApiImpl(
@@ -129,6 +184,7 @@ export class DockviewPanel
                     : undefined,
             title: this.title,
             renderer: this._renderer,
+            priority: this._priority,
         };
     }
 

@@ -45,6 +45,8 @@ export const GridActions = (props: {
             component: 'default',
             title: `Tab ${nextId()}`,
             inactive: options?.inactive,
+            preferredWidth: 200,
+            preferredHeight: 400,
         });
     };
 

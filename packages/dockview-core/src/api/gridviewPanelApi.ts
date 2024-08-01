@@ -1,5 +1,7 @@
 import { Emitter, Event } from '../events';
+import { GridviewPanel } from '../gridview/gridviewPanel';
 import { IPanel } from '../panel/types';
+import { layoutPriorityAsNumber } from '../splitview/splitview';
 import { FunctionOrValue } from '../types';
 import { PanelApiImpl, PanelApi } from './panelApi';
 
@@ -26,6 +28,7 @@ export interface GridviewPanelApi extends PanelApi {
     readonly onDidConstraintsChange: Event<GridConstraintChangeEvent>;
     setConstraints(value: GridConstraintChangeEvent2): void;
     setSize(event: SizeEvent): void;
+    readonly priority: number;
 }
 
 export class GridviewPanelApiImpl
@@ -44,7 +47,17 @@ export class GridviewPanelApiImpl
     private readonly _onDidSizeChange = new Emitter<SizeEvent>();
     readonly onDidSizeChange: Event<SizeEvent> = this._onDidSizeChange.event;
 
-    constructor(id: string, component: string, panel?: IPanel) {
+    get priority(): number {
+        return this.gridPanel?.priority
+            ? layoutPriorityAsNumber(this.gridPanel.priority)
+            : 0;
+    }
+
+    constructor(
+        id: string,
+        component: string,
+        private readonly gridPanel?: GridviewPanel
+    ) {
         super(id, component);
 
         this.addDisposables(
@@ -53,8 +66,8 @@ export class GridviewPanelApiImpl
             this._onDidSizeChange
         );
 
-        if (panel) {
-            this.initialize(panel);
+        if (gridPanel) {
+            this.initialize(gridPanel);
         }
     }
 
