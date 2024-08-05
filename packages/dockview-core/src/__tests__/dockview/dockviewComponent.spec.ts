@@ -4716,6 +4716,61 @@ describe('dockviewComponent', () => {
             expect(dockview.panels.length).toBe(2);
         });
 
+        test('remove all panels from popout group', async () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent({
+                parentElement: container,
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            const panel3 = dockview.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                position: { referencePanel: panel2 },
+            });
+
+            await dockview.addPopoutGroup(panel2.group);
+
+            expect(panel1.group.api.location.type).toBe('grid');
+            expect(panel2.group.api.location.type).toBe('popout');
+            expect(panel3.group.api.location.type).toBe('popout');
+
+            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups.length).toBe(3); // includes one hidden group
+
+            panel2.api.moveTo({ group: panel1.group, position: 'left' });
+            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups.length).toBe(4);
+
+            panel3.api.moveTo({ group: panel1.group, position: 'left' });
+            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups.length).toBe(3);
+        });
+
         test('that can remove a popout group', async () => {
             const container = document.createElement('div');
 
