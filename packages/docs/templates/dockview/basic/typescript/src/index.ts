@@ -1,7 +1,6 @@
 import 'dockview-core/dist/styles/dockview.css';
 import {
-    DockviewApi,
-    DockviewComponent,
+    createDockview,
     GroupPanelPartInitParameters,
     IContentRenderer,
 } from 'dockview-core';
@@ -23,10 +22,8 @@ class Panel implements IContentRenderer {
     }
 }
 
-document.getElementById('app').className = 'dockview-theme-abyss';
-
-const dockview = new DockviewComponent({
-    parentElement: document.getElementById('app'),
+const api = createDockview(document.getElementById('app'), {
+    className: 'dockview-theme-abyss',
     createComponent: (options) => {
         switch (options.name) {
             case 'default':
@@ -34,8 +31,6 @@ const dockview = new DockviewComponent({
         }
     },
 });
-
-const api = new DockviewApi(dockview);
 
 api.addPanel({
     id: 'panel_1',

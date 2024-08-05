@@ -54,6 +54,7 @@ export interface DockviewOptions {
     rootOverlayModel?: DroptargetOverlayModel;
     locked?: boolean;
     disableDnd?: boolean;
+    className?: string;
     /**
      * Pixel gap between groups
      */
@@ -109,13 +110,13 @@ export const PROPERTY_KEYS: (keyof DockviewOptions)[] = (() => {
         locked: undefined,
         disableDnd: undefined,
         gap: undefined,
+        className: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];
 })();
 
 export interface DockviewFrameworkOptions {
-    parentElement: HTMLElement;
     defaultTabComponent?: string;
     createRightHeaderActionComponent?: (
         group: DockviewGroupPanel

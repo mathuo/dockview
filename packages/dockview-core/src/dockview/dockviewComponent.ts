@@ -357,17 +357,18 @@ export class DockviewComponent
         return this.gridview.margin;
     }
 
-    constructor(options: DockviewComponentOptions) {
+    constructor(parentElement: HTMLElement, options: DockviewComponentOptions) {
         super({
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
             styles: options.hideBorders
                 ? { separatorBorder: 'transparent' }
                 : undefined,
-            parentElement: options.parentElement,
+            parentElement: parentElement,
             disableAutoResizing: options.disableAutoResizing,
             locked: options.locked,
             margin: options.gap,
+            className: options.className,
         });
 
         const gready = document.createElement('div');
@@ -1278,6 +1279,8 @@ export class DockviewComponent
 
                 this.addFloatingGroup(group, {
                     position: position,
+                    width: position.width,
+                    height: position.height,
                     skipRemoveGroup: true,
                     inDragMode: false,
                 });
@@ -1771,6 +1774,8 @@ export class DockviewComponent
                     this._onDidRemoveGroup.fire(group);
                 }
 
+                remove(this._popoutGroups, selectedGroup);
+
                 const removedGroup = selectedGroup.disposable.dispose();
 
                 if (!options?.skipPopoutReturn && removedGroup) {
@@ -1924,6 +1929,47 @@ export class DockviewComponent
 
                         return;
                     }
+                }
+
+                if (sourceGroup.api.location.type === 'popout') {
+                    /**
+                     * the source group is a popout group with a single panel
+                     *
+                     * 1. remove the panel from the group without triggering any events
+                     * 2. remove the popout group
+                     * 3. create a new group at the requested location and add that panel
+                     */
+
+                    const popoutGroup = this._popoutGroups.find(
+                        (group) => group.popoutGroup === sourceGroup
+                    )!;
+
+                    const removedPanel: IDockviewPanel | undefined =
+                        this.movingLock(() =>
+                            popoutGroup.popoutGroup.model.removePanel(
+                                popoutGroup.popoutGroup.panels[0],
+                                {
+                                    skipSetActive: true,
+                                    skipSetActiveGroup: true,
+                                }
+                            )
+                        );
+
+                    this.doRemoveGroup(sourceGroup, { skipActive: true });
+
+                    const newGroup = this.createGroupAtLocation(targetLocation);
+                    this.movingLock(() =>
+                        newGroup.model.openPanel(removedPanel!, {
+                            skipSetActive: true,
+                        })
+                    );
+                    this.doSetGroupAndPanelActive(newGroup);
+
+                    this._onDidMovePanel.fire({
+                        panel: this.getGroupPanel(sourceItemId)!,
+                        from: sourceGroup,
+                    });
+                    return;
                 }
 
                 // source group will become empty so delete the group

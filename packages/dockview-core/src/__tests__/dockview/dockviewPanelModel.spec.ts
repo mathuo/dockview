@@ -30,7 +30,6 @@ describe('dockviewGroupPanel', () => {
 
         accessorMock = fromPartial<DockviewComponent>({
             options: {
-                parentElement: document.createElement('div'),
                 createComponent(options) {
                     switch (options.name) {
                         case 'contentComponent':
@@ -84,7 +83,6 @@ describe('dockviewGroupPanel', () => {
     test('that the default tab is created', () => {
         accessorMock = fromPartial<DockviewComponent>({
             options: {
-                parentElement: document.createElement('div'),
                 createComponent(options) {
                     switch (options.name) {
                         case 'contentComponent':
@@ -117,7 +115,6 @@ describe('dockviewGroupPanel', () => {
     test('that the provided default tab is chosen when no implementation is provided', () => {
         accessorMock = fromPartial<DockviewComponent>({
             options: {
-                parentElement: document.createElement('div'),
                 defaultTabComponent: 'tabComponent',
                 createComponent(options) {
                     switch (options.name) {
@@ -150,7 +147,6 @@ describe('dockviewGroupPanel', () => {
     test('that is library default tab instance is created when no alternative exists', () => {
         accessorMock = fromPartial<DockviewComponent>({
             options: {
-                parentElement: document.createElement('div'),
                 createComponent(options) {
                     switch (options.name) {
                         case 'contentComponent':
@@ -174,7 +170,6 @@ describe('dockviewGroupPanel', () => {
     test('that the default content is created', () => {
         accessorMock = fromPartial<DockviewComponent>({
             options: {
-                parentElement: document.createElement('div'),
                 createComponent(options) {
                     switch (options.name) {
                         case 'contentComponent':

@@ -1,10 +1,9 @@
 import React from 'react';
 import {
-    GridviewComponent,
-    IGridviewComponent,
     GridviewPanelApi,
     Orientation,
     GridviewApi,
+    createGridview,
 } from 'dockview-core';
 import { ReactGridPanelView } from './view';
 import { usePortalsLifecycle } from '../react';
@@ -32,7 +31,7 @@ export interface IGridviewReactProps {
 export const GridviewReact = React.forwardRef(
     (props: IGridviewReactProps, ref: React.ForwardedRef<HTMLDivElement>) => {
         const domRef = React.useRef<HTMLDivElement>(null);
-        const gridviewRef = React.useRef<IGridviewComponent>();
+        const gridviewRef = React.useRef<GridviewApi>();
         const [portals, addPortal] = usePortalsLifecycle();
 
         React.useImperativeHandle(ref, () => domRef.current!, []);
@@ -44,8 +43,7 @@ export const GridviewReact = React.forwardRef(
                 };
             }
 
-            const gridview = new GridviewComponent({
-                parentElement: domRef.current,
+            const api = createGridview(domRef.current, {
                 disableAutoResizing: props.disableAutoResizing,
                 proportionalLayout:
                     typeof props.proportionalLayout === 'boolean'
@@ -71,16 +69,16 @@ export const GridviewReact = React.forwardRef(
             });
 
             const { clientWidth, clientHeight } = domRef.current;
-            gridview.layout(clientWidth, clientHeight);
+            api.layout(clientWidth, clientHeight);
 
             if (props.onReady) {
-                props.onReady({ api: new GridviewApi(gridview) });
+                props.onReady({ api });
             }
 
-            gridviewRef.current = gridview;
+            gridviewRef.current = api;
 
             return () => {
-                gridview.dispose();
+                api.dispose();
             };
         }, []);
 
