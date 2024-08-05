@@ -155,16 +155,24 @@ const panel = api.addPanel({
 
 You should specific the `floating` option which can be either `true` or an object describing the position of the floating group.
 
+:::info
+The `position` property of the `floating` object accepts combinations of `top`, `left`, `bottom` and `right`.
+:::
+
 ```ts
 api.addPanel({
     id: 'panel_1',
     component: 'default',
-    floating: true,
+    floating: true
 });
 
 api.addPanel({
-    id: 'panel_2',
-    component: 'default',
-    floating: { left: 10, top: 10, width: 300, height: 300 },
+  id: 'panel_2',
+  component: 'default',
+  floating: {
+      position: { left: 10, top: 10 },
+      width: 300,
+      height: 300
+  }
 });
 ```
