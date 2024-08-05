@@ -9,7 +9,7 @@ describe('groupPanelApi', () => {
         const accessor = fromPartial<DockviewComponent>({
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
-            options: { parentElement: document.createElement('div') },
+            options: {},
         });
 
         const panelMock = jest.fn<DockviewPanel, []>(() => {
@@ -49,7 +49,7 @@ describe('groupPanelApi', () => {
         const accessor = fromPartial<DockviewComponent>({
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
-            options: { parentElement: document.createElement('div') },
+            options: {},
         });
 
         const groupViewPanel = new DockviewGroupPanel(
@@ -81,7 +81,7 @@ describe('groupPanelApi', () => {
         const accessor = fromPartial<DockviewComponent>({
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
-            options: { parentElement: document.createElement('div') },
+            options: {},
         });
 
         const groupViewPanel = new DockviewGroupPanel(

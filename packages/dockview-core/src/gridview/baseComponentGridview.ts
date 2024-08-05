@@ -1,7 +1,7 @@
 import { Emitter, Event, AsapEvent } from '../events';
 import { getGridLocation, Gridview, IGridView } from './gridview';
 import { Position } from '../dnd/droptarget';
-import { Disposable, IValueDisposable } from '../lifecycle';
+import { Disposable, IDisposable, IValueDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
 import { ISplitviewStyles, Orientation, Sizing } from '../splitview/splitview';
 import { IPanel } from '../panel/types';
@@ -36,6 +36,7 @@ export interface BaseGridOptions {
     readonly disableAutoResizing?: boolean;
     readonly locked?: boolean;
     readonly margin?: number;
+    readonly className?: string;
 }
 
 export interface IGridPanelView extends IGridView, IPanel {
@@ -43,7 +44,7 @@ export interface IGridPanelView extends IGridView, IPanel {
     readonly isActive: boolean;
 }
 
-export interface IBaseGrid<T extends IGridPanelView> {
+export interface IBaseGrid<T extends IGridPanelView> extends IDisposable {
     readonly element: HTMLElement;
     readonly id: string;
     readonly width: number;
@@ -147,6 +148,10 @@ export abstract class BaseGrid<T extends IGridPanelView>
         super(document.createElement('div'), options.disableAutoResizing);
         this.element.style.height = '100%';
         this.element.style.width = '100%';
+
+        if (typeof options.className === 'string') {
+            this.element.classList.add(options.className);
+        }
 
         options.parentElement.appendChild(this.element);
 

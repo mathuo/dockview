@@ -157,8 +157,15 @@ export class SplitviewComponent
             : this.splitview.orthogonalSize;
     }
 
-    constructor(options: SplitviewComponentOptions) {
-        super(options.parentElement, options.disableAutoResizing);
+    constructor(
+        parentElement: HTMLElement,
+        options: SplitviewComponentOptions
+    ) {
+        super(parentElement, options.disableAutoResizing);
+
+        if (typeof options.className === 'string') {
+            this.element.classList.add(options.className);
+        }
 
         this._options = options;
 

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {
     DockviewApi,
-    DockviewComponent,
     type DockviewOptions,
     PROPERTY_KEYS,
     type DockviewFrameworkOptions,
+createDockview,
 } from 'dockview-core';
 import {
     ref,
@@ -41,7 +41,7 @@ const emit = defineEmits<VueEvents>();
 const props = defineProps<IDockviewVueProps>();
 
 const el = ref<HTMLElement | null>(null);
-const instance = ref<DockviewComponent | null>(null);
+const instance = ref<DockviewApi | null>(null);
 
 PROPERTY_KEYS.forEach((coreOptionKey) => {
     watch(
@@ -66,7 +66,6 @@ onMounted(() => {
     }
 
     const frameworkOptions: DockviewFrameworkOptions = {
-        parentElement: el.value,
         createComponent(options) {
             const component = findComponent(
                 inst,
@@ -143,13 +142,13 @@ onMounted(() => {
             : undefined,
     };
 
-    const dockview = new DockviewComponent({
+    const api = createDockview(el.value, {
         ...extractCoreOptions(props),
         ...frameworkOptions,
     });
 
     const { clientWidth, clientHeight } = el.value;
-    dockview.layout(clientWidth, clientHeight);
+    api.layout(clientWidth, clientHeight);
 
     /**
      * !!! THIS IS VERY IMPORTANT
@@ -164,9 +163,9 @@ onMounted(() => {
      * @see https://vuejs.org/guide/extras/reactivity-in-depth.html
      * @see https://vuejs.org/api/reactivity-advanced.html#markraw
      */
-    instance.value = markRaw(dockview);
+    instance.value = markRaw(api);
 
-    emit('ready', { api: new DockviewApi(dockview) });
+    emit('ready', { api});
 });
 
 onBeforeUnmount(() => {

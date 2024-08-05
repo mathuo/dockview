@@ -1,11 +1,10 @@
 import React from 'react';
 import {
     PaneviewPanelApi,
-    PaneviewComponent,
-    IPaneviewComponent,
     PaneviewDndOverlayEvent,
     PaneviewApi,
     PaneviewDropEvent,
+    createPaneview,
 } from 'dockview-core';
 import { usePortalsLifecycle } from '../react';
 import { PanePanelSection } from './view';
@@ -39,7 +38,7 @@ export interface IPaneviewReactProps {
 export const PaneviewReact = React.forwardRef(
     (props: IPaneviewReactProps, ref: React.ForwardedRef<HTMLDivElement>) => {
         const domRef = React.useRef<HTMLDivElement>(null);
-        const paneviewRef = React.useRef<IPaneviewComponent>();
+        const paneviewRef = React.useRef<PaneviewApi>();
         const [portals, addPortal] = usePortalsLifecycle();
 
         React.useImperativeHandle(ref, () => domRef.current!, []);
@@ -54,8 +53,7 @@ export const PaneviewReact = React.forwardRef(
                     addPortal,
                 });
 
-            const paneview = new PaneviewComponent({
-                parentElement: domRef.current!,
+            const api = createPaneview(domRef.current!, {
                 disableAutoResizing: props.disableAutoResizing,
                 frameworkComponents: props.components,
                 components: {},
@@ -73,19 +71,17 @@ export const PaneviewReact = React.forwardRef(
                 showDndOverlay: props.showDndOverlay,
             });
 
-            const api = new PaneviewApi(paneview);
-
             const { clientWidth, clientHeight } = domRef.current!;
-            paneview.layout(clientWidth, clientHeight);
+            api.layout(clientWidth, clientHeight);
 
             if (props.onReady) {
                 props.onReady({ api });
             }
 
-            paneviewRef.current = paneview;
+            paneviewRef.current = api;
 
             return () => {
-                paneview.dispose();
+                api.dispose();
             };
         }, []);
 
@@ -114,13 +110,13 @@ export const PaneviewReact = React.forwardRef(
                 };
             }
 
-            const paneview = paneviewRef.current;
+            const api = paneviewRef.current;
 
-            const disposable = paneview.onDidDrop((event) => {
+            const disposable = api.onDidDrop((event) => {
                 if (props.onDidDrop) {
                     props.onDidDrop({
                         ...event,
-                        api: new PaneviewApi(paneview),
+                        api,
                     });
                 }
             });

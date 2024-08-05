@@ -119,13 +119,14 @@ export class GridviewComponent
         this._deserializer = value;
     }
 
-    constructor(options: GridviewComponentOptions) {
+    constructor(parentElement: HTMLElement, options: GridviewComponentOptions) {
         super({
-            parentElement: options.parentElement,
+            parentElement: parentElement,
             proportionalLayout: options.proportionalLayout,
             orientation: options.orientation,
             styles: options.styles,
             disableAutoResizing: options.disableAutoResizing,
+            className: options.className,
         });
 
         this._options = options;
