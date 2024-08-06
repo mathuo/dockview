@@ -30,7 +30,7 @@ import { createOffsetDragOverEvent } from '../__test_utils__/utils';
 import {
     DockviewPanelRenderer,
     OverlayRenderContainer,
-} from '../../overlayRenderContainer';
+} from '../../overlay/overlayRenderContainer';
 import { DockviewGroupPanelFloatingChangeEvent } from '../../api/dockviewGroupPanelApi';
 import { SizeEvent } from '../../api/gridviewPanelApi';
 import {
@@ -285,7 +285,8 @@ describe('dockviewGroupPanelModel', () => {
             onDidAddPanel: () => ({ dispose: jest.fn() }),
             onDidRemovePanel: () => ({ dispose: jest.fn() }),
             overlayRenderContainer: new OverlayRenderContainer(
-                document.createElement('div')
+                document.createElement('div'),
+                fromPartial<DockviewComponent>({})
             ),
         });
 
@@ -823,7 +824,8 @@ describe('dockviewGroupPanelModel', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             overlayRenderContainer: new OverlayRenderContainer(
-                document.createElement('div')
+                document.createElement('div'),
+                fromPartial<DockviewComponent>({})
             ),
         });
 
@@ -894,7 +896,8 @@ describe('dockviewGroupPanelModel', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             overlayRenderContainer: new OverlayRenderContainer(
-                document.createElement('div')
+                document.createElement('div'),
+                fromPartial<DockviewComponent>({})
             ),
         });
 
@@ -966,7 +969,8 @@ describe('dockviewGroupPanelModel', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             overlayRenderContainer: new OverlayRenderContainer(
-                document.createElement('div')
+                document.createElement('div'),
+                fromPartial<DockviewComponent>({})
             ),
         });
 

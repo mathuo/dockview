@@ -36,7 +36,7 @@ import {
     DockviewUnhandledDragOverEvent,
     IHeaderActionsRenderer,
 } from './options';
-import { OverlayRenderContainer } from '../overlayRenderContainer';
+import { OverlayRenderContainer } from '../overlay/overlayRenderContainer';
 import { TitleEvent } from '../api/dockviewPanelApi';
 
 interface GroupMoveEvent {

@@ -50,7 +50,7 @@ import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
 import { Parameters } from '../panel/types';
-import { Overlay } from '../dnd/overlay';
+import { Overlay } from '../overlay/overlay';
 import { addTestId, toggleClass, watchElementResize } from '../dom';
 import { DockviewFloatingGroupPanel } from './dockviewFloatingGroupPanel';
 import {
@@ -65,7 +65,7 @@ import {
 import {
     DockviewPanelRenderer,
     OverlayRenderContainer,
-} from '../overlayRenderContainer';
+} from '../overlay/overlayRenderContainer';
 import { PopoutWindow } from '../popoutWindow';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
@@ -845,8 +845,6 @@ export class DockviewComponent
             }
         }
 
-        group.model.location = { type: 'floating' };
-
         function getAnchoredBox(): AnchoredBox {
             if (options?.position) {
                 const result: any = {};
@@ -968,14 +966,16 @@ export class DockviewComponent
                 dispose: () => {
                     disposable.dispose();
 
-                    group.model.location = { type: 'grid' };
                     remove(this._floatingGroups, floatingGroupPanel);
+                    group.model.location = { type: 'grid' };
                     this.updateWatermark();
                 },
             }
         );
 
         this._floatingGroups.push(floatingGroupPanel);
+
+        group.model.location = { type: 'floating' };
 
         if (!options?.skipActiveGroup) {
             this.doSetGroupAndPanelActive(group);
