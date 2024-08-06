@@ -4719,8 +4719,7 @@ describe('dockviewComponent', () => {
         test('remove all panels from popout group', async () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
