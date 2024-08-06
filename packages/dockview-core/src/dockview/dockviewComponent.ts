@@ -357,6 +357,10 @@ export class DockviewComponent
         return this.gridview.margin;
     }
 
+    get floatingGroups(): DockviewFloatingGroupPanel[] {
+        return this._floatingGroups;
+    }
+
     constructor(parentElement: HTMLElement, options: DockviewComponentOptions) {
         super({
             proportionalLayout: true,
@@ -371,11 +375,14 @@ export class DockviewComponent
             className: options.className,
         });
 
-        const gready = document.createElement('div');
-        gready.className = 'dv-overlay-render-container';
-        this.gridview.element.appendChild(gready);
+        // const gready = document.createElement('div');
+        // gready.className = 'dv-overlay-render-container';
+        // this.gridview.element.appendChild(gready);
 
-        this.overlayRenderContainer = new OverlayRenderContainer(gready);
+        this.overlayRenderContainer = new OverlayRenderContainer(
+            this.gridview.element,
+            this
+        );
 
         toggleClass(this.gridview.element, 'dv-dockview', true);
         toggleClass(this.element, 'dv-debug', !!options.debug);
@@ -639,7 +646,8 @@ export class DockviewComponent
                 gready.className = 'dv-overlay-render-container';
 
                 const overlayRenderContainer = new OverlayRenderContainer(
-                    gready
+                    gready,
+                    this
                 );
 
                 const referenceGroup =

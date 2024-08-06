@@ -278,21 +278,3 @@ export function disableIframePointEvents() {
         },
     };
 }
-
-export function applyOnlyToThisElement(className: string): {
-    update: (element: HTMLElement) => void;
-} {
-    let previous: WeakRef<HTMLElement> | null;
-
-    return {
-        update: (element: HTMLElement): void => {
-            const ref = previous?.deref();
-            if (ref !== element && ref !== undefined) {
-                toggleClass(ref, className, false);
-            }
-
-            toggleClass(element, className, true);
-            previous = new WeakRef(element);
-        },
-    };
-}

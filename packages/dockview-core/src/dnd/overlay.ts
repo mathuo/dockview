@@ -1,7 +1,5 @@
 import {
-    applyOnlyToThisElement,
     disableIframePointEvents,
-    getElementsByTagName,
     quasiDefaultPrevented,
     toggleClass,
 } from '../dom';
@@ -15,7 +13,36 @@ import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { clamp } from '../math';
 import { AnchoredBox } from '../types';
 
-const bringElementToFront = applyOnlyToThisElement('dv-bring-to-front');
+export const DEFAULT_OVERLAY_Z_INDEX = 999;
+
+class AriaLevelTracker {
+    private _orderedList: HTMLElement[] = [];
+
+    push(element: HTMLElement): void {
+        this._orderedList = [
+            ...this._orderedList.filter((item) => item !== element),
+            element,
+        ];
+
+        this.update();
+    }
+
+    destroy(element: HTMLElement): void {
+        this._orderedList = this._orderedList.filter(
+            (item) => item !== element
+        );
+        this.update();
+    }
+
+    private update(): void {
+        for (let i = 0; i < this._orderedList.length; i++) {
+            this._orderedList[i].setAttribute('aria-level', `${i}`);
+            this._orderedList[i].style.zIndex = `${DEFAULT_OVERLAY_Z_INDEX + i * 2}`;
+        }
+    }
+}
+
+const arialLevelTracker = new AriaLevelTracker();
 
 export class Overlay extends CompositeDisposable {
     private _element: HTMLElement = document.createElement('div');
@@ -38,6 +65,10 @@ export class Overlay extends CompositeDisposable {
 
     set minimumInViewportHeight(value: number | undefined) {
         this.options.minimumInViewportHeight = value;
+    }
+
+    get element(): HTMLElement {
+        return this._element;
     }
 
     constructor(
@@ -75,10 +106,12 @@ export class Overlay extends CompositeDisposable {
             ...('left' in this.options && { left: this.options.left }),
             ...('right' in this.options && { right: this.options.right }),
         });
+
+        arialLevelTracker.push(this._element);
     }
 
     bringToFront(): void {
-        bringElementToFront.update(this._element);
+        arialLevelTracker.push(this._element);
     }
 
     setBounds(bounds: Partial<AnchoredBox> = {}): void {
@@ -346,13 +379,11 @@ export class Overlay extends CompositeDisposable {
                 this.options.content,
                 'mousedown',
                 () => {
-                    bringElementToFront.update(this._element);
+                    arialLevelTracker.push(this._element);
                 },
                 true
             )
         );
-
-        bringElementToFront.update(this._element);
 
         if (options.inDragMode) {
             track();
@@ -586,6 +617,7 @@ export class Overlay extends CompositeDisposable {
     }
 
     override dispose(): void {
+        arialLevelTracker.destroy(this._element);
         this._element.remove();
         super.dispose();
     }
