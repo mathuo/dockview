@@ -72,6 +72,10 @@ export function mountVueComponent<T extends Record<string, any>>(
     let vNode = createVNode(component, Object.freeze(props));
 
     vNode.appContext = parent.appContext;
+    vNode.appContext.provides = {
+        ...(vNode.appContext.provides ? vNode.appContext.provides : {}),
+        ...((parent as any).provides ? (parent as any).provides : {}),
+    };
 
     render(vNode, element);
 
