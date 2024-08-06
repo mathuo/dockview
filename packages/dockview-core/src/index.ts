@@ -64,7 +64,7 @@ export * from './splitview/splitviewPanel';
 export * from './paneview/paneviewPanel';
 export * from './dockview/types';
 
-export { DockviewPanelRenderer } from './overlayRenderContainer';
+export { DockviewPanelRenderer } from './overlay/overlayRenderContainer';
 
 export {
     Position,

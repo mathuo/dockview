@@ -259,11 +259,12 @@ export function addTestId(element: HTMLElement, id: string): void {
 }
 
 export function disableIframePointEvents() {
-    const iframes = [
+    const iframes: HTMLElement[] = [
         ...getElementsByTagName('iframe'),
         ...getElementsByTagName('webview'),
     ];
-    const original = new Map<HTMLElement, string>();
+
+    const original = new WeakMap<HTMLElement, string>(); // don't hold onto HTMLElement references longer than required
 
     for (const iframe of iframes) {
         original.set(iframe, iframe.style.pointerEvents);
@@ -275,6 +276,7 @@ export function disableIframePointEvents() {
             for (const iframe of iframes) {
                 iframe.style.pointerEvents = original.get(iframe) ?? 'auto';
             }
+            iframes.splice(0, iframes.length); // don't hold onto HTMLElement references longer than required
         },
     };
 }

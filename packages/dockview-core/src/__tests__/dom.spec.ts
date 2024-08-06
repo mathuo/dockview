@@ -1,4 +1,5 @@
 import {
+    disableIframePointEvents,
     isInDocument,
     quasiDefaultPrevented,
     quasiPreventDefault,
@@ -44,5 +45,39 @@ describe('dom', () => {
         shadow.appendChild(el2);
 
         expect(isInDocument(el2)).toBeTruthy();
+    });
+
+    test('disableIframePointEvents', () => {
+        const el1 = document.createElement('iframe');
+        const el2 = document.createElement('iframe');
+        const el3 = document.createElement('webview');
+        const el4 = document.createElement('webview');
+
+        document.body.appendChild(el1);
+        document.body.appendChild(el2);
+        document.body.appendChild(el3);
+        document.body.appendChild(el4);
+
+        el1.style.pointerEvents = 'inherit';
+        el3.style.pointerEvents = 'inherit';
+
+        expect(el1.style.pointerEvents).toBe('inherit');
+        expect(el2.style.pointerEvents).toBe('');
+        expect(el3.style.pointerEvents).toBe('inherit');
+        expect(el4.style.pointerEvents).toBe('');
+
+        const f = disableIframePointEvents();
+
+        expect(el1.style.pointerEvents).toBe('none');
+        expect(el2.style.pointerEvents).toBe('none');
+        expect(el3.style.pointerEvents).toBe('none');
+        expect(el4.style.pointerEvents).toBe('none');
+
+        f.release();
+
+        expect(el1.style.pointerEvents).toBe('inherit');
+        expect(el2.style.pointerEvents).toBe('');
+        expect(el3.style.pointerEvents).toBe('inherit');
+        expect(el4.style.pointerEvents).toBe('');
     });
 });

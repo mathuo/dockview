@@ -1,15 +1,15 @@
-import { DragAndDropObserver } from './dnd/dnd';
-import { Droptarget } from './dnd/droptarget';
-import { getDomNodePagePosition, toggleClass } from './dom';
+import { DragAndDropObserver } from '../dnd/dnd';
+import { Droptarget } from '../dnd/droptarget';
+import { getDomNodePagePosition, toggleClass } from '../dom';
 import {
     CompositeDisposable,
     Disposable,
     IDisposable,
     MutableDisposable,
-} from './lifecycle';
-import { IDockviewPanel } from './dockview/dockviewPanel';
-import { DockviewComponent } from './dockview/dockviewComponent';
-import { DEFAULT_OVERLAY_Z_INDEX } from './dnd/overlay';
+} from '../lifecycle';
+import { IDockviewPanel } from '../dockview/dockviewPanel';
+import { DockviewComponent } from '../dockview/dockviewComponent';
+import { DEFAULT_OVERLAY_Z_INDEX } from './overlay';
 
 export type DockviewPanelRenderer = 'onlyWhenVisible' | 'always';
 
@@ -164,11 +164,6 @@ export class OverlayRenderContainer extends CompositeDisposable {
             }),
             panel.api.onDidLocationChange((event) => {
                 const isFloating = event.location.type === 'floating';
-
-                /**
-                 * Whilst floating the z-index must sync with the floating
-                 * groups z-index
-                 */
 
                 if (isFloating) {
                     queueMicrotask(() => {
