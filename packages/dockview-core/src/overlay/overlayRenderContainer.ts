@@ -1,8 +1,15 @@
-import { DragAndDropObserver } from './dnd/dnd';
-import { Droptarget } from './dnd/droptarget';
-import { getDomNodePagePosition, toggleClass } from './dom';
-import { CompositeDisposable, Disposable, IDisposable } from './lifecycle';
-import { IDockviewPanel } from './dockview/dockviewPanel';
+import { DragAndDropObserver } from '../dnd/dnd';
+import { Droptarget } from '../dnd/droptarget';
+import { getDomNodePagePosition, toggleClass } from '../dom';
+import {
+    CompositeDisposable,
+    Disposable,
+    IDisposable,
+    MutableDisposable,
+} from '../lifecycle';
+import { IDockviewPanel } from '../dockview/dockviewPanel';
+import { DockviewComponent } from '../dockview/dockviewComponent';
+import { DEFAULT_OVERLAY_Z_INDEX } from './overlay';
 
 export type DockviewPanelRenderer = 'onlyWhenVisible' | 'always';
 
@@ -30,7 +37,10 @@ export class OverlayRenderContainer extends CompositeDisposable {
 
     private _disposed = false;
 
-    constructor(private readonly element: HTMLElement) {
+    constructor(
+        readonly element: HTMLElement,
+        readonly accessor: DockviewComponent
+    ) {
         super();
 
         this.addDisposables(
@@ -108,7 +118,10 @@ export class OverlayRenderContainer extends CompositeDisposable {
             focusContainer.style.display = panel.api.isVisible ? '' : 'none';
         };
 
+        const observerDisposable = new MutableDisposable();
+
         const disposable = new CompositeDisposable(
+            observerDisposable,
             /**
              * since container is positioned absoutely we must explicitly forward
              * the dnd events for the expect behaviours to continue to occur in terms of dnd
@@ -148,6 +161,49 @@ export class OverlayRenderContainer extends CompositeDisposable {
                 }
 
                 resize();
+            }),
+            panel.api.onDidLocationChange((event) => {
+                const isFloating = event.location.type === 'floating';
+
+                if (isFloating) {
+                    queueMicrotask(() => {
+                        const floatingGroup = this.accessor.floatingGroups.find(
+                            (group) => group.group === panel.api.group
+                        );
+
+                        if (!floatingGroup) {
+                            return;
+                        }
+
+                        const element = floatingGroup.overlay.element;
+
+                        const update = () => {
+                            const level = Number(
+                                element.getAttribute('aria-level')
+                            );
+                            focusContainer.style.zIndex = `${
+                                DEFAULT_OVERLAY_Z_INDEX + level * 2 + 1
+                            }`;
+                        };
+
+                        const observer = new MutationObserver(() => {
+                            update();
+                        });
+
+                        observerDisposable.value = Disposable.from(() =>
+                            observer.disconnect()
+                        );
+
+                        observer.observe(element, {
+                            attributeFilter: ['aria-level'],
+                            attributes: true,
+                        });
+
+                        update();
+                    });
+                } else {
+                    focusContainer.style.zIndex = ''; // reset the z-index, perhaps CSS will take over here
+                }
             })
         );
 

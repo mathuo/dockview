@@ -257,3 +257,24 @@ export function isInDocument(element: Element): boolean {
 export function addTestId(element: HTMLElement, id: string): void {
     element.setAttribute('data-testid', id);
 }
+
+export function disableIframePointEvents() {
+    const iframes = [
+        ...getElementsByTagName('iframe'),
+        ...getElementsByTagName('webview'),
+    ];
+    const original = new Map<HTMLElement, string>();
+
+    for (const iframe of iframes) {
+        original.set(iframe, iframe.style.pointerEvents);
+        iframe.style.pointerEvents = 'none';
+    }
+
+    return {
+        release: () => {
+            for (const iframe of iframes) {
+                iframe.style.pointerEvents = original.get(iframe) ?? 'auto';
+            }
+        },
+    };
+}

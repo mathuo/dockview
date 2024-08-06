@@ -1,5 +1,4 @@
 import { fireEvent } from '@testing-library/dom';
-import { Emitter, Event } from '../../../../events';
 import { ContentContainer } from '../../../../dockview/components/panel/content';
 import {
     GroupPanelPartInitParameters,
@@ -10,9 +9,9 @@ import { PanelUpdateEvent } from '../../../../panel/types';
 import { IDockviewPanel } from '../../../../dockview/dockviewPanel';
 import { IDockviewPanelModel } from '../../../../dockview/dockviewPanelModel';
 import { DockviewComponent } from '../../../../dockview/dockviewComponent';
-import { OverlayRenderContainer } from '../../../../overlayRenderContainer';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewGroupPanelModel } from '../../../../dockview/dockviewGroupPanelModel';
+import { OverlayRenderContainer } from '../../../../overlay/overlayRenderContainer';
 
 class TestContentRenderer
     extends CompositeDisposable
@@ -58,7 +57,8 @@ describe('contentContainer', () => {
         const disposable = new CompositeDisposable();
 
         const overlayRenderContainer = new OverlayRenderContainer(
-            document.createElement('div')
+            document.createElement('div'),
+            fromPartial<DockviewComponent>({})
         );
 
         const cut = new ContentContainer(

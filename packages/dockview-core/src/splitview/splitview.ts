@@ -8,6 +8,7 @@ import {
     addClasses,
     toggleClass,
     getElementsByTagName,
+    disableIframePointEvents,
 } from '../dom';
 import { Event, Emitter } from '../events';
 import { pushToStart, pushToEnd, firstIndex } from '../array';
@@ -437,14 +438,7 @@ export class Splitview {
                     item.enabled = false;
                 }
 
-                const iframes = [
-                    ...getElementsByTagName('iframe'),
-                    ...getElementsByTagName('webview'),
-                ];
-
-                for (const iframe of iframes) {
-                    iframe.style.pointerEvents = 'none';
-                }
+                const iframes = disableIframePointEvents();
 
                 const start =
                     this._orientation === Orientation.HORIZONTAL
@@ -553,9 +547,7 @@ export class Splitview {
                         item.enabled = true;
                     }
 
-                    for (const iframe of iframes) {
-                        iframe.style.pointerEvents = 'auto';
-                    }
+                    iframes.release();
 
                     this.saveProportions();
 

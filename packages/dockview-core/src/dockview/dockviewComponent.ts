@@ -50,7 +50,7 @@ import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
 import { Parameters } from '../panel/types';
-import { Overlay } from '../dnd/overlay';
+import { Overlay } from '../overlay/overlay';
 import { addTestId, toggleClass, watchElementResize } from '../dom';
 import { DockviewFloatingGroupPanel } from './dockviewFloatingGroupPanel';
 import {
@@ -65,7 +65,7 @@ import {
 import {
     DockviewPanelRenderer,
     OverlayRenderContainer,
-} from '../overlayRenderContainer';
+} from '../overlay/overlayRenderContainer';
 import { PopoutWindow } from '../popoutWindow';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
@@ -357,6 +357,10 @@ export class DockviewComponent
         return this.gridview.margin;
     }
 
+    get floatingGroups(): DockviewFloatingGroupPanel[] {
+        return this._floatingGroups;
+    }
+
     constructor(parentElement: HTMLElement, options: DockviewComponentOptions) {
         super({
             proportionalLayout: true,
@@ -371,11 +375,14 @@ export class DockviewComponent
             className: options.className,
         });
 
-        const gready = document.createElement('div');
-        gready.className = 'dv-overlay-render-container';
-        this.gridview.element.appendChild(gready);
+        // const gready = document.createElement('div');
+        // gready.className = 'dv-overlay-render-container';
+        // this.gridview.element.appendChild(gready);
 
-        this.overlayRenderContainer = new OverlayRenderContainer(gready);
+        this.overlayRenderContainer = new OverlayRenderContainer(
+            this.gridview.element,
+            this
+        );
 
         toggleClass(this.gridview.element, 'dv-dockview', true);
         toggleClass(this.element, 'dv-debug', !!options.debug);
@@ -639,7 +646,8 @@ export class DockviewComponent
                 gready.className = 'dv-overlay-render-container';
 
                 const overlayRenderContainer = new OverlayRenderContainer(
-                    gready
+                    gready,
+                    this
                 );
 
                 const referenceGroup =
@@ -837,8 +845,6 @@ export class DockviewComponent
             }
         }
 
-        group.model.location = { type: 'floating' };
-
         function getAnchoredBox(): AnchoredBox {
             if (options?.position) {
                 const result: any = {};
@@ -928,10 +934,17 @@ export class DockviewComponent
             overlay
         );
 
-        const disposable = watchElementResize(group.element, (entry) => {
-            const { width, height } = entry.contentRect;
-            group.layout(width, height); // let the group know it's size is changing so it can fire events to the panel
-        });
+        const disposable = new CompositeDisposable(
+            group.api.onDidActiveChange((event) => {
+                if (event.isActive) {
+                    overlay.bringToFront();
+                }
+            }),
+            watchElementResize(group.element, (entry) => {
+                const { width, height } = entry.contentRect;
+                group.layout(width, height); // let the group know it's size is changing so it can fire events to the panel
+            })
+        );
 
         floatingGroupPanel.addDisposables(
             overlay.onDidChange(() => {
@@ -953,14 +966,16 @@ export class DockviewComponent
                 dispose: () => {
                     disposable.dispose();
 
-                    group.model.location = { type: 'grid' };
                     remove(this._floatingGroups, floatingGroupPanel);
+                    group.model.location = { type: 'grid' };
                     this.updateWatermark();
                 },
             }
         );
 
         this._floatingGroups.push(floatingGroupPanel);
+
+        group.model.location = { type: 'floating' };
 
         if (!options?.skipActiveGroup) {
             this.doSetGroupAndPanelActive(group);

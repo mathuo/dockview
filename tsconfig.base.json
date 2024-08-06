@@ -20,6 +20,8 @@
             "ES2017.String",
             "ES2018.Promise",
             "ES2019",
+            "ES2020",
+            "ES2021",
             "DOM"
         ]
     },

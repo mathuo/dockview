@@ -1,9 +1,13 @@
-import { Droptarget } from '../dnd/droptarget';
-import { IDockviewPanel } from '../dockview/dockviewPanel';
-import { Emitter } from '../events';
-import { IRenderable, OverlayRenderContainer } from '../overlayRenderContainer';
+import { Droptarget } from '../../dnd/droptarget';
+import { IDockviewPanel } from '../../dockview/dockviewPanel';
+import { Emitter } from '../../events';
+import {
+    IRenderable,
+    OverlayRenderContainer,
+} from '../../overlay/overlayRenderContainer';
 import { fromPartial } from '@total-typescript/shoehorn';
-import { Writable, exhaustMicrotaskQueue } from './__test_utils__/utils';
+import { Writable, exhaustMicrotaskQueue } from '../__test_utils__/utils';
+import { DockviewComponent } from '../../dockview/dockviewComponent';
 
 describe('overlayRenderContainer', () => {
     let referenceContainer: IRenderable;
@@ -18,7 +22,10 @@ describe('overlayRenderContainer', () => {
             dropTarget: fromPartial<Droptarget>({}),
         };
 
-        cut = new OverlayRenderContainer(parentContainer);
+        cut = new OverlayRenderContainer(
+            parentContainer,
+            fromPartial<DockviewComponent>({})
+        );
     });
 
     test('that attach(...) and detach(...) mutate the DOM as expected', () => {
@@ -26,12 +33,14 @@ describe('overlayRenderContainer', () => {
 
         const onDidVisibilityChange = new Emitter<any>();
         const onDidDimensionsChange = new Emitter<any>();
+        const onDidLocationChange = new Emitter<any>();
 
         const panel = fromPartial<IDockviewPanel>({
             api: {
                 id: 'test_panel_id',
                 onDidVisibilityChange: onDidVisibilityChange.event,
                 onDidDimensionsChange: onDidDimensionsChange.event,
+                onDidLocationChange: onDidLocationChange.event,
                 isVisible: true,
             },
             view: {
@@ -62,12 +71,14 @@ describe('overlayRenderContainer', () => {
 
         const onDidVisibilityChange = new Emitter<any>();
         const onDidDimensionsChange = new Emitter<any>();
+        const onDidLocationChange = new Emitter<any>();
 
         const panel = fromPartial<IDockviewPanel>({
             api: {
                 id: 'test_panel_id',
                 onDidVisibilityChange: onDidVisibilityChange.event,
                 onDidDimensionsChange: onDidDimensionsChange.event,
+                onDidLocationChange: onDidLocationChange.event,
                 isVisible: true,
             },
             view: {

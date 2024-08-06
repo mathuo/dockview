@@ -36,7 +36,7 @@ import {
     DockviewUnhandledDragOverEvent,
     IHeaderActionsRenderer,
 } from './options';
-import { OverlayRenderContainer } from '../overlayRenderContainer';
+import { OverlayRenderContainer } from '../overlay/overlayRenderContainer';
 import { TitleEvent } from '../api/dockviewPanelApi';
 
 interface GroupMoveEvent {
@@ -964,7 +964,7 @@ export class DockviewGroupPanelModel
             });
             this.watermark = watermark;
 
-            addDisposableListener(this.watermark.element, 'click', () => {
+            addDisposableListener(this.watermark.element, 'pointerdown', () => {
                 if (!this.isActive) {
                     this.accessor.doSetGroupActive(this.groupPanel);
                 }

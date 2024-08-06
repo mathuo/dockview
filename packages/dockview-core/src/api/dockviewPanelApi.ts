@@ -5,7 +5,7 @@ import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { DockviewPanel } from '../dockview/dockviewPanel';
 import { DockviewComponent } from '../dockview/dockviewComponent';
 import { Position } from '../dnd/droptarget';
-import { DockviewPanelRenderer } from '../overlayRenderContainer';
+import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
 import { DockviewGroupPanelFloatingChangeEvent } from './dockviewGroupPanelApi';
 import { DockviewGroupLocation } from '../dockview/dockviewGroupPanelModel';
 

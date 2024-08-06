@@ -1,4 +1,4 @@
-import { getElementsByTagName } from '../dom';
+import { disableIframePointEvents, getElementsByTagName } from '../dom';
 import { addDisposableListener, Emitter } from '../events';
 import {
     CompositeDisposable,
@@ -40,22 +40,13 @@ export abstract class DragHandler extends CompositeDisposable {
                     return;
                 }
 
-                const iframes = [
-                    ...getElementsByTagName('iframe'),
-                    ...getElementsByTagName('webview'),
-                ];
+                const iframes = disableIframePointEvents();
 
                 this.pointerEventsDisposable.value = {
                     dispose: () => {
-                        for (const iframe of iframes) {
-                            iframe.style.pointerEvents = 'auto';
-                        }
+                        iframes.release();
                     },
                 };
-
-                for (const iframe of iframes) {
-                    iframe.style.pointerEvents = 'none';
-                }
 
                 this.el.classList.add('dv-dragged');
                 setTimeout(() => this.el.classList.remove('dv-dragged'), 0);

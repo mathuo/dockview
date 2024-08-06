@@ -70,8 +70,8 @@ describe('abstractDragHandler', () => {
         expect(span.style.pointerEvents).toBeFalsy();
 
         fireEvent.dragEnd(element);
-        expect(iframe.style.pointerEvents).toBe('auto');
-        expect(webview.style.pointerEvents).toBe('auto');
+        expect(iframe.style.pointerEvents).toBe('');
+        expect(webview.style.pointerEvents).toBe('');
         expect(span.style.pointerEvents).toBeFalsy();
 
         handler.dispose();
@@ -114,8 +114,8 @@ describe('abstractDragHandler', () => {
         expect(span.style.pointerEvents).toBeFalsy();
 
         handler.dispose();
-        expect(iframe.style.pointerEvents).toBe('auto');
-        expect(webview.style.pointerEvents).toBe('auto');
+        expect(iframe.style.pointerEvents).toBe('');
+        expect(webview.style.pointerEvents).toBe('');
         expect(span.style.pointerEvents).toBeFalsy();
     });
 
@@ -172,7 +172,7 @@ describe('abstractDragHandler', () => {
         const event = new Event('dragstart');
         const spy = jest.spyOn(event, 'preventDefault');
         fireEvent(element, event);
-        expect(spy).toBeCalledTimes(0);
+        expect(spy).toHaveBeenCalledTimes(0);
 
         handler.dispose();
     });
