@@ -811,19 +811,21 @@ export class Splitview {
             return;
         }
 
-        const sashCount = this.viewItems.length - 1;
-        const marginReducedSize =
-            (this.margin * sashCount) / this.viewItems.length;
+        const visibleViewItemCount = this.viewItems.filter((i) => i.visible).length
+
+        const sashCount = visibleViewItemCount - 1
+        const marginReducedSize = (this.margin * sashCount) / visibleViewItemCount
 
         let totalLeftOffset = 0;
         const viewLeftOffsets: number[] = [];
 
+        // Calc sashes style
         for (let i = 0; i < this.viewItems.length - 1; i++) {
             totalLeftOffset += this.viewItems[i].size;
             viewLeftOffsets.push(totalLeftOffset);
 
             const offset = Math.min(
-                Math.max(0, totalLeftOffset - 2),
+                Math.max(0, totalLeftOffset - (1 + this.margin) / 2),
                 this.size - this.margin
             );
 
@@ -836,10 +838,12 @@ export class Splitview {
                 this.sashes[i].container.style.top = `${offset}px`;
             }
         }
+
+        // Calc views style
         this.viewItems.forEach((view, i) => {
             const size = view.size - marginReducedSize;
             const offset =
-                i === 0
+                i === 0 || sashCount === 0
                     ? 0
                     : viewLeftOffsets[i - 1] +
                       (i / sashCount) * marginReducedSize;
