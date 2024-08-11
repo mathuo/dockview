@@ -811,43 +811,69 @@ export class Splitview {
             return;
         }
 
-        const sashCount = this.viewItems.length - 1;
+        const visibleViewItems = this.viewItems.filter((i) => i.visible);
+
+        const sashCount = Math.max(0, visibleViewItems.length - 1);
         const marginReducedSize =
-            (this.margin * sashCount) / this.viewItems.length;
+            (this.margin * sashCount) / Math.max(1, visibleViewItems.length);
 
         let totalLeftOffset = 0;
         const viewLeftOffsets: number[] = [];
 
-        for (let i = 0; i < this.viewItems.length - 1; i++) {
+        const sashWidth = 4; // hardcoded in css
+
+        const runningVisiblePanelCount = this.viewItems.reduce(
+            (arr, viewItem, i) => {
+                const flag = viewItem.visible ? 1 : 0;
+                if (i === 0) {
+                    arr.push(flag);
+                } else {
+                    arr.push(arr[i - 1] + flag);
+                }
+
+                return arr;
+            },
+            [] as number[]
+        );
+
+        // calculate both view and cash positions
+        this.viewItems.forEach((view, i) => {
             totalLeftOffset += this.viewItems[i].size;
             viewLeftOffsets.push(totalLeftOffset);
 
-            const offset = Math.min(
-                Math.max(0, totalLeftOffset - 2),
-                this.size - this.margin
-            );
+            const size = view.visible ? view.size - marginReducedSize : 0;
 
-            if (this._orientation === Orientation.HORIZONTAL) {
-                this.sashes[i].container.style.left = `${offset}px`;
-                this.sashes[i].container.style.top = `0px`;
-            }
-            if (this._orientation === Orientation.VERTICAL) {
-                this.sashes[i].container.style.left = `0px`;
-                this.sashes[i].container.style.top = `${offset}px`;
-            }
-        }
-        this.viewItems.forEach((view, i) => {
-            const size = view.size - marginReducedSize;
+            const visiblePanelsBeforeThisView = Math.max(0, runningVisiblePanelCount[i] - 1);
+
             const offset =
-                i === 0
+                i === 0 || visiblePanelsBeforeThisView === 0
                     ? 0
                     : viewLeftOffsets[i - 1] +
-                      (i / sashCount) * marginReducedSize;
+                      (visiblePanelsBeforeThisView / sashCount) * marginReducedSize;
+
+            if (i < this.viewItems.length - 1) {
+                // calculate sash position
+                const newSize = view.visible
+                    ? offset + size - sashWidth / 2 + this.margin / 2
+                    : offset;
+
+                if (this._orientation === Orientation.HORIZONTAL) {
+                    this.sashes[i].container.style.left = `${newSize}px`;
+                    this.sashes[i].container.style.top = `0px`;
+                }
+                if (this._orientation === Orientation.VERTICAL) {
+                    this.sashes[i].container.style.left = `0px`;
+                    this.sashes[i].container.style.top = `${newSize}px`;
+                }
+            }
+
+            // calculate view position
 
             if (this._orientation === Orientation.HORIZONTAL) {
                 view.container.style.width = `${size}px`;
                 view.container.style.left = `${offset}px`;
                 view.container.style.top = '';
+
                 view.container.style.height = '';
             }
             if (this._orientation === Orientation.VERTICAL) {
