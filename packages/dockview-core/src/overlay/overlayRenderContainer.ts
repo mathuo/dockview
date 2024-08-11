@@ -120,6 +120,48 @@ export class OverlayRenderContainer extends CompositeDisposable {
 
         const observerDisposable = new MutableDisposable();
 
+        const correctLayerPosition = () => {
+            if (panel.api.location.type === 'floating') {
+                queueMicrotask(() => {
+                    const floatingGroup = this.accessor.floatingGroups.find(
+                        (group) => group.group === panel.api.group
+                    );
+
+                    if (!floatingGroup) {
+                        return;
+                    }
+
+                    const element = floatingGroup.overlay.element;
+
+                    const update = () => {
+                        const level = Number(
+                            element.getAttribute('aria-level')
+                        );
+                        focusContainer.style.zIndex = `${
+                            DEFAULT_OVERLAY_Z_INDEX + level * 2 + 1
+                        }`;
+                    };
+
+                    const observer = new MutationObserver(() => {
+                        update();
+                    });
+
+                    observerDisposable.value = Disposable.from(() =>
+                        observer.disconnect()
+                    );
+
+                    observer.observe(element, {
+                        attributeFilter: ['aria-level'],
+                        attributes: true,
+                    });
+
+                    update();
+                });
+            } else {
+                focusContainer.style.zIndex = ''; // reset the z-index, perhaps CSS will take over here
+            }
+        };
+
         const disposable = new CompositeDisposable(
             observerDisposable,
             /**
@@ -147,7 +189,7 @@ export class OverlayRenderContainer extends CompositeDisposable {
                 },
             }),
 
-            panel.api.onDidVisibilityChange((event) => {
+            panel.api.onDidVisibilityChange(() => {
                 /**
                  * Control the visibility of the content, however even when not visible (display: none)
                  * the content is still maintained within the DOM hence DOM specific attributes
@@ -162,48 +204,8 @@ export class OverlayRenderContainer extends CompositeDisposable {
 
                 resize();
             }),
-            panel.api.onDidLocationChange((event) => {
-                const isFloating = event.location.type === 'floating';
-
-                if (isFloating) {
-                    queueMicrotask(() => {
-                        const floatingGroup = this.accessor.floatingGroups.find(
-                            (group) => group.group === panel.api.group
-                        );
-
-                        if (!floatingGroup) {
-                            return;
-                        }
-
-                        const element = floatingGroup.overlay.element;
-
-                        const update = () => {
-                            const level = Number(
-                                element.getAttribute('aria-level')
-                            );
-                            focusContainer.style.zIndex = `${
-                                DEFAULT_OVERLAY_Z_INDEX + level * 2 + 1
-                            }`;
-                        };
-
-                        const observer = new MutationObserver(() => {
-                            update();
-                        });
-
-                        observerDisposable.value = Disposable.from(() =>
-                            observer.disconnect()
-                        );
-
-                        observer.observe(element, {
-                            attributeFilter: ['aria-level'],
-                            attributes: true,
-                        });
-
-                        update();
-                    });
-                } else {
-                    focusContainer.style.zIndex = ''; // reset the z-index, perhaps CSS will take over here
-                }
+            panel.api.onDidLocationChange(() => {
+                correctLayerPosition();
             })
         );
 
@@ -214,6 +216,8 @@ export class OverlayRenderContainer extends CompositeDisposable {
 
             focusContainer.parentElement?.removeChild(focusContainer);
         });
+
+        correctLayerPosition();
 
         queueMicrotask(() => {
             if (this.isDisposed) {

@@ -87,7 +87,7 @@ export class DockviewPanel
                 // you are actually just resizing the panels parent which is the group
                 this.group.api.setSize(event);
             }),
-            this.api.onDidRendererChange((event) => {
+            this.api.onDidRendererChange(() => {
                 this.group.model.rerender(this);
             })
         );
