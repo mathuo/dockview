@@ -44,3 +44,30 @@ export function createOffsetDragOverEvent(params: {
 export function exhaustMicrotaskQueue(): Promise<void> {
     return new Promise<void>((resolve) => resolve());
 }
+
+export const mockGetBoundingClientRect = ({
+    left,
+    top,
+    height,
+    width,
+}: {
+    left: number;
+    top: number;
+    height: number;
+    width: number;
+}) => {
+    const result = {
+        left,
+        top,
+        height,
+        width,
+        right: left + width,
+        bottom: top + height,
+        x: left,
+        y: top,
+    };
+    return {
+        ...result,
+        toJSON: () => result,
+    };
+};

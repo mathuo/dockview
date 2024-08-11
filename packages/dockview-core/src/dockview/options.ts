@@ -12,7 +12,7 @@ import {
     GroupOptions,
 } from './dockviewGroupPanelModel';
 import { IDockviewPanel } from './dockviewPanel';
-import { DockviewPanelRenderer } from '../overlayRenderContainer';
+import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
 import { IGroupHeaderProps } from './framework';
 import { AnchoredBox } from '../types';
 import { FloatingGroupOptions } from './dockviewComponent';

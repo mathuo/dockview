@@ -1,31 +1,5 @@
-import { Overlay } from '../../dnd/overlay';
-
-const mockGetBoundingClientRect = ({
-    left,
-    top,
-    height,
-    width,
-}: {
-    left: number;
-    top: number;
-    height: number;
-    width: number;
-}) => {
-    const result = {
-        left,
-        top,
-        height,
-        width,
-        right: left + width,
-        bottom: top + height,
-        x: left,
-        y: top,
-    };
-    return {
-        ...result,
-        toJSON: () => result,
-    };
-};
+import { Overlay } from '../../overlay/overlay';
+import { mockGetBoundingClientRect } from '../__test_utils__/utils';
 
 describe('overlay', () => {
     test('toJSON, top left', () => {
@@ -76,6 +50,8 @@ describe('overlay', () => {
             width: 40,
             height: 50,
         });
+
+        cut.dispose();
     });
 
     test('toJSON, bottom right', () => {
@@ -126,6 +102,8 @@ describe('overlay', () => {
             width: 40,
             height: 50,
         });
+
+        cut.dispose();
     });
 
     test('that out-of-bounds dimensions are fixed, top left', () => {
@@ -176,6 +154,8 @@ describe('overlay', () => {
             width: 40,
             height: 50,
         });
+
+        cut.dispose();
     });
 
     test('that out-of-bounds dimensions are fixed, bottom right', () => {
@@ -226,6 +206,8 @@ describe('overlay', () => {
             width: 40,
             height: 50,
         });
+
+        cut.dispose();
     });
 
     test('setBounds, top left', () => {
@@ -276,6 +258,8 @@ describe('overlay', () => {
         expect(element.style.width).toBe('200px');
         expect(element.style.left).toBe('300px');
         expect(element.style.top).toBe('400px');
+
+        cut.dispose();
     });
 
     test('setBounds, bottom right', () => {
@@ -326,6 +310,8 @@ describe('overlay', () => {
         expect(element.style.width).toBe('200px');
         expect(element.style.right).toBe('300px');
         expect(element.style.bottom).toBe('400px');
+
+        cut.dispose();
     });
 
     test('that the resize handles are added', () => {
@@ -363,5 +349,67 @@ describe('overlay', () => {
         ).toBeTruthy();
 
         cut.dispose();
+    });
+
+    test('aria-level attributes and corresponding z-index', () => {
+        const container = document.createElement('div');
+        const content = document.createElement('div');
+
+        const createOverlay = () =>
+            new Overlay({
+                height: 500,
+                width: 500,
+                left: 100,
+                top: 200,
+                minimumInViewportWidth: 0,
+                minimumInViewportHeight: 0,
+                container,
+                content,
+            });
+
+        const overlay1 = createOverlay();
+
+        expect(overlay1.element.getAttribute('aria-level')).toBe('0');
+        expect(overlay1.element.style.zIndex).toBe('999');
+
+        const overlay2 = createOverlay();
+        const overlay3 = createOverlay();
+
+        expect(overlay1.element.getAttribute('aria-level')).toBe('0');
+        expect(overlay2.element.getAttribute('aria-level')).toBe('1');
+        expect(overlay3.element.getAttribute('aria-level')).toBe('2');
+        expect(overlay1.element.style.zIndex).toBe('999');
+        expect(overlay2.element.style.zIndex).toBe('1001');
+        expect(overlay3.element.style.zIndex).toBe('1003');
+
+        overlay2.bringToFront();
+
+        expect(overlay1.element.getAttribute('aria-level')).toBe('0');
+        expect(overlay2.element.getAttribute('aria-level')).toBe('2');
+        expect(overlay3.element.getAttribute('aria-level')).toBe('1');
+        expect(overlay1.element.style.zIndex).toBe('999');
+        expect(overlay2.element.style.zIndex).toBe('1003');
+        expect(overlay3.element.style.zIndex).toBe('1001');
+
+        overlay1.bringToFront();
+
+        expect(overlay1.element.getAttribute('aria-level')).toBe('2');
+        expect(overlay2.element.getAttribute('aria-level')).toBe('1');
+        expect(overlay3.element.getAttribute('aria-level')).toBe('0');
+        expect(overlay1.element.style.zIndex).toBe('1003');
+        expect(overlay2.element.style.zIndex).toBe('1001');
+        expect(overlay3.element.style.zIndex).toBe('999');
+
+        overlay2.dispose();
+
+        expect(overlay1.element.getAttribute('aria-level')).toBe('1');
+        expect(overlay3.element.getAttribute('aria-level')).toBe('0');
+        expect(overlay1.element.style.zIndex).toBe('1001');
+        expect(overlay3.element.style.zIndex).toBe('999');
+
+        overlay1.dispose();
+
+        expect(overlay3.element.getAttribute('aria-level')).toBe('0');
+        expect(overlay3.element.style.zIndex).toBe('999');
     });
 });
