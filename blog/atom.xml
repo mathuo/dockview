@@ -2,11 +2,56 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dockview.dev/blog</id>
     <title>Dockview Blog</title>
-    <updated>2024-08-01T00:00:00.000Z</updated>
+    <updated>2024-08-13T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dockview.dev/blog"/>
     <subtitle>Dockview Blog</subtitle>
     <icon>https://dockview.dev/img/dockview_logo.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Dockview 1.16.1]]></title>
+        <id>https://dockview.dev/blog/dockview-1.16.1-release</id>
+        <link href="https://dockview.dev/blog/dockview-1.16.1-release"/>
+        <updated>2024-08-13T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
+        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.16.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Multiple classNames in single string not accepted <a href="https://github.com/mathuo/dockview/issues/684" target="_blank" rel="noopener noreferrer">#684</a></li>
+</ul>]]></content>
+        <category label="release" term="release"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Dockview 1.16.0]]></title>
+        <id>https://dockview.dev/blog/dockview-1.16.0-release</id>
+        <link href="https://dockview.dev/blog/dockview-1.16.0-release"/>
+        <updated>2024-08-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
+        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.16.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<ul>
+<li>Vanilla TypeScript Support <a href="https://github.com/mathuo/dockview/pull/652" target="_blank" rel="noopener noreferrer">#652</a>
+<ul>
+<li>Expose <code>createDockview</code>, <code>createGridview</code>, <code>createPaneview</code> and <code>createSplitview</code> which should be used rather than <code>DockviewComponent</code>, <code>GridviewComponent</code>, <code>SplitviewComponent</code>, <code>PaneviewComponent</code></li>
+</ul>
+</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.16.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Floating z-index positions for <code>always</code> rendered panels <a href="https://github.com/mathuo/dockview/issues/679" target="_blank" rel="noopener noreferrer">#679</a></li>
+<li>Bug: Resize handle position when <code>gap</code> size is defined <a href="https://github.com/mathuo/dockview/pull/682" target="_blank" rel="noopener noreferrer">#682</a> <a href="https://github.com/mathuo/dockview/pull/667" target="_blank" rel="noopener noreferrer">#667</a></li>
+<li>Bug: Popout group incorrectly disposed when single remaining panel is removed <a href="https://github.com/mathuo/dockview/pull/662" target="_blank" rel="noopener noreferrer">#662</a></li>
+<li>Documentation <a href="https://github.com/mathuo/dockview/pull/678" target="_blank" rel="noopener noreferrer">#678</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.16.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
+<ul>
+<li>Vanilla TypeScript Support <a href="https://github.com/mathuo/dockview/pull/652" target="_blank" rel="noopener noreferrer">#652</a>
+<ul>
+<li><code>DockviewComponent</code>, <code>GridviewComponent</code>, <code>SplitviewComponent</code>, <code>PaneviewComponent</code> constructor signature changes from <code>(options)</code> to <code>(parentElement, options)</code> removing <code>parentElement</code> from <code>options</code>.</li>
+</ul>
+</li>
+</ul>]]></content>
+        <category label="release" term="release"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Dockview 1.15.3]]></title>
         <id>https://dockview.dev/blog/dockview-1.15.3-release</id>
@@ -492,64 +537,6 @@ when popout is closed.</li>
 </li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.8.4-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content>
-        <category label="release" term="release"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Dockview 1.8.5]]></title>
-        <id>https://dockview.dev/blog/dockview-1.8.5-release</id>
-        <link href="https://dockview.dev/blog/dockview-1.8.5-release"/>
-        <updated>2023-10-06T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Please reference to docs @ dockview.dev.]]></summary>
-        <content type="html"><![CDATA[<p>Please reference to docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.8.5-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.8.5-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>
-<p>Update project dependencies <a href="https://github.com/mathuo/dockview/issues/371" target="_blank" rel="noopener noreferrer">#371</a></p>
-</li>
-<li>
-<p>Reduce sonar technical debt <a href="https://github.com/mathuo/dockview/issues/373" target="_blank" rel="noopener noreferrer">#373</a></p>
-</li>
-<li>
-<p>Migrate library publishing to Github Actions <a href="https://github.com/mathuo/dockview/issues/366" target="_blank" rel="noopener noreferrer">#366</a></p>
-</li>
-<li>
-<p>Bug: Fix disableAutoResizing flag for React components <a href="https://github.com/mathuo/dockview/issues/376" target="_blank" rel="noopener noreferrer">#376</a></p>
-</li>
-<li>
-<p>Bug: Fire correct events for floating groups <a href="https://github.com/mathuo/dockview/issues/380" target="_blank" rel="noopener noreferrer">#380</a></p>
-</li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.8.5-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content>
-        <category label="release" term="release"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Dockview 1.8.3]]></title>
-        <id>https://dockview.dev/blog/dockview-1.8.3-release</id>
-        <link href="https://dockview.dev/blog/dockview-1.8.3-release"/>
-        <updated>2023-09-17T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Please reference to docs @ dockview.dev.]]></summary>
-        <content type="html"><![CDATA[<p>Please reference to docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.8.3-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<ul>
-<li>
-<p>Additional to DockviewDefaultTab component <a href="https://github.com/mathuo/dockview/issues/321" target="_blank" rel="noopener noreferrer">#321</a></p>
-</li>
-<li>
-<p>Additional group drop target options <a href="https://github.com/mathuo/dockview/issues/316" target="_blank" rel="noopener noreferrer">#316</a></p>
-</li>
-<li>
-<p>Intercept events to attach custom DataTransfer object to tabs <a href="https://github.com/mathuo/dockview/issues/299" target="_blank" rel="noopener noreferrer">#299</a></p>
-</li>
-<li>
-<p>Floating groups viewport overflow options <a href="https://github.com/mathuo/dockview/issues/326" target="_blank" rel="noopener noreferrer">#326</a></p>
-</li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.8.3-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Bug: Close button on tab shouldn't bring panel to active state <a href="https://github.com/mathuo/dockview/issues/330" target="_blank" rel="noopener noreferrer">#330</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.8.3-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content>
         <category label="release" term="release"/>
     </entry>
 </feed>
