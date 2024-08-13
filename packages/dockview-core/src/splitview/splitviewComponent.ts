@@ -9,6 +9,7 @@ import {
     Orientation,
     Sizing,
     Splitview,
+    SplitViewOptions,
 } from './splitview';
 import { SplitviewComponentOptions } from './options';
 import { BaseComponentOptions, Parameters } from '../panel/types';
@@ -16,6 +17,7 @@ import { Emitter, Event } from '../events';
 import { SplitviewPanel, ISplitviewPanel } from './splitviewPanel';
 import { createComponent } from '../panel/componentFactory';
 import { Resizable } from '../resizable';
+import { toggleClass } from '../dom';
 
 export interface SerializedSplitviewPanelData {
     id: string;
@@ -46,11 +48,6 @@ export interface AddSplitviewComponentOptions<T extends Parameters = Parameters>
     maximumSize?: number;
 }
 
-export type SplitviewComponentUpdateOptions = Pick<
-    SplitviewComponentOptions,
-    'orientation' | 'components' | 'frameworkComponents'
->;
-
 export interface ISplitviewComponent extends IDisposable {
     readonly minimumSize: number;
     readonly maximumSize: number;
@@ -62,7 +59,7 @@ export interface ISplitviewComponent extends IDisposable {
     readonly onDidRemoveView: Event<IView>;
     readonly onDidLayoutFromJSON: Event<void>;
     readonly panels: SplitviewPanel[];
-    updateOptions(options: Partial<SplitviewComponentUpdateOptions>): void;
+    updateOptions(options: Partial<SplitViewOptions>): void;
     addPanel<T extends object = Parameters>(
         options: AddSplitviewComponentOptions<T>
     ): ISplitviewPanel;
@@ -102,6 +99,8 @@ export class SplitviewComponent
 
     private readonly _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
+
+    private classNames: string[] = [];
 
     get panels(): SplitviewPanel[] {
         return this.splitview.getViews();
@@ -163,8 +162,10 @@ export class SplitviewComponent
     ) {
         super(parentElement, options.disableAutoResizing);
 
-        if (typeof options.className === 'string') {
-            this.element.classList.add(options.className);
+        this.classNames = options.className?.split(' ') ?? [];
+
+        for (const className of this.classNames) {
+            toggleClass(this.element, className, true);
         }
 
         this._options = options;
@@ -186,7 +187,17 @@ export class SplitviewComponent
         );
     }
 
-    updateOptions(options: Partial<SplitviewComponentUpdateOptions>): void {
+    updateOptions(options: Partial<SplitviewComponentOptions>): void {
+        if ('className' in options) {
+            for (const className of this.classNames) {
+                toggleClass(this.element, className, false);
+            }
+            this.classNames = options.className?.split(' ') ?? [];
+            for (const className of this.classNames) {
+                toggleClass(this.element, className, true);
+            }
+        }
+
         const hasOrientationChanged =
             typeof options.orientation === 'string' &&
             this.options.orientation !== options.orientation;

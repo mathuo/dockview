@@ -631,4 +631,20 @@ describe('componentSplitview', () => {
         expect(panel1.api.isVisible).toBeTruthy();
         expect(panel2.api.isVisible).toBeTruthy();
     });
+
+    test('update className', () => {
+        const splitview = new SplitviewComponent(container, {
+            orientation: Orientation.HORIZONTAL,
+            components: {
+                default: TestPanel,
+            },
+            className: 'test-a test-b',
+        });
+
+        expect(splitview.element.className).toBe('container test-a test-b');
+
+        splitview.updateOptions({ className: 'test-b test-c' });
+
+        expect(splitview.element.className).toBe('container test-b test-c');
+    });
 });

@@ -24,6 +24,7 @@ import { sequentialNumberGenerator } from '../math';
 import { PaneTransfer } from '../dnd/dataTransfer';
 import { Resizable } from '../resizable';
 import { Parameters } from '../panel/types';
+import { toggleClass } from '../dom';
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -151,6 +152,8 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
     private readonly _onDidRemoveView = new Emitter<PaneviewPanel>();
     readonly onDidRemoveView = this._onDidRemoveView.event;
 
+    private classNames: string[] = [];
+
     get id(): string {
         return this._id;
     }
@@ -202,10 +205,6 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
     constructor(parentElement: HTMLElement, options: PaneviewComponentOptions) {
         super(parentElement, options.disableAutoResizing);
 
-        if (typeof options.className === 'string') {
-            this.element.classList.add(options.className);
-        }
-
         this.addDisposables(
             this._onDidLayoutChange,
             this._onDidLayoutfromJSON,
@@ -213,6 +212,12 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
             this._onDidAddView,
             this._onDidRemoveView
         );
+
+        this.classNames = options.className?.split(' ') ?? [];
+
+        for (const className of this.classNames) {
+            toggleClass(this.element, className, true);
+        }
 
         this._options = options;
 
@@ -241,6 +246,16 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
     }
 
     updateOptions(options: Partial<PaneviewComponentOptions>): void {
+        if ('className' in options) {
+            for (const className of this.classNames) {
+                toggleClass(this.element, className, false);
+            }
+            this.classNames = options.className?.split(' ') ?? [];
+            for (const className of this.classNames) {
+                toggleClass(this.element, className, true);
+            }
+        }
+
         this._options = { ...this.options, ...options };
     }
 

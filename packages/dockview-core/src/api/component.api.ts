@@ -15,7 +15,6 @@ import { Parameters } from '../panel/types';
 import { Direction } from '../gridview/baseComponentGridview';
 import {
     AddComponentOptions,
-    GridviewComponentUpdateOptions,
     IGridviewComponent,
     SerializedGridviewComponent,
 } from '../gridview/gridviewComponent';
@@ -31,7 +30,6 @@ import {
     AddSplitviewComponentOptions,
     ISplitviewComponent,
     SerializedSplitview,
-    SplitviewComponentUpdateOptions,
 } from '../splitview/splitviewComponent';
 import { IView, Orientation, Sizing } from '../splitview/splitview';
 import { ISplitviewPanel } from '../splitview/splitviewPanel';
@@ -46,13 +44,15 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from '../dockview/components/titlebar/tabsContainer';
-import { AnchoredBox, Box } from '../types';
+import { Box } from '../types';
 import {
     DockviewDidDropEvent,
     DockviewWillDropEvent,
     WillShowOverlayLocationEvent,
 } from '../dockview/dockviewGroupPanelModel';
 import { PaneviewComponentOptions } from '../paneview/options';
+import { SplitviewComponentOptions } from '../splitview/options';
+import { GridviewComponentOptions } from '../gridview/options';
 
 export interface CommonApi<T = any> {
     readonly height: number;
@@ -214,7 +214,7 @@ export class SplitviewApi implements CommonApi<SerializedSplitview> {
     /**
      * Update configuratable options.
      */
-    updateOptions(options: Partial<SplitviewComponentUpdateOptions>): void {
+    updateOptions(options: Partial<SplitviewComponentOptions>): void {
         this.component.updateOptions(options);
     }
 
@@ -556,7 +556,7 @@ export class GridviewApi implements CommonApi<SerializedGridviewComponent> {
         this.component.clear();
     }
 
-    updateOptions(options: Partial<GridviewComponentUpdateOptions>) {
+    updateOptions(options: Partial<GridviewComponentOptions>) {
         this.component.updateOptions(options);
     }
 

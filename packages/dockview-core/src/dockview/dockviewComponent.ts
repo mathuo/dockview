@@ -1019,7 +1019,9 @@ export class DockviewComponent
         }
     }
 
-    updateOptions(options: Partial<DockviewComponentOptions>): void {
+    override updateOptions(options: Partial<DockviewComponentOptions>): void {
+        super.updateOptions(options);
+
         const changed_floatingGroupBounds =
             'floatingGroupBounds' in options &&
             options.floatingGroupBounds !== this.options.floatingGroupBounds;
@@ -1106,7 +1108,7 @@ export class DockviewComponent
             if (!this.activeGroup) {
                 return;
             }
-            options.group = this.activeGroup;
+          options.group = this.activeGroup;
         }
 
         if (options.includePanel && options.group) {
