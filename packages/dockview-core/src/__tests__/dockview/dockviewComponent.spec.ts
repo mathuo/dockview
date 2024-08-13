@@ -118,6 +118,28 @@ describe('dockviewComponent', () => {
         window.open = jest.fn(); // not implemented by jest
     });
 
+    test('update className', () => {
+        dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+            className: 'test-a test-b',
+        });
+        expect(dockview.element.className).toBe('test-a test-b');
+
+        dockview.updateOptions({ className: 'test-b test-c' });
+
+        expect(dockview.element.className).toBe('test-b test-c');
+    });
+
     // describe('memory leakage', () => {
     //     beforeEach(() => {
     //         window.open = () => fromPartial<Window>({

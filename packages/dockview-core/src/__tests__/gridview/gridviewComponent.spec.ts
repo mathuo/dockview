@@ -32,6 +32,21 @@ describe('gridview', () => {
         container = document.createElement('div');
     });
 
+    test('update className', () => {
+        const gridview = new GridviewComponent(container, {
+            proportionalLayout: false,
+            orientation: Orientation.VERTICAL,
+            components: { default: TestGridview },
+            className: 'test-a test-b',
+        });
+
+        expect(gridview.element.className).toBe('test-a test-b');
+
+        gridview.updateOptions({ className: 'test-b test-c' });
+
+        expect(gridview.element.className).toBe('test-b test-c');
+    });
+
     test('added views are visible by default', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: false,

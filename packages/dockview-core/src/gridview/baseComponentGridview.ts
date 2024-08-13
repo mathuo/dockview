@@ -7,6 +7,7 @@ import { ISplitviewStyles, Orientation, Sizing } from '../splitview/splitview';
 import { IPanel } from '../panel/types';
 import { MovementOptions2 } from '../dockview/options';
 import { Resizable } from '../resizable';
+import { toggleClass } from '../dom';
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -99,6 +100,8 @@ export abstract class BaseGrid<T extends IGridPanelView>
     readonly onDidViewVisibilityChangeMicroTaskQueue =
         this._onDidViewVisibilityChangeMicroTaskQueue.onEvent;
 
+    private classNames: string[] = [];
+
     get id(): string {
         return this._id;
     }
@@ -149,8 +152,10 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.element.style.height = '100%';
         this.element.style.width = '100%';
 
-        if (typeof options.className === 'string') {
-            this.element.classList.add(options.className);
+        this.classNames = options.className?.split(' ') ?? [];
+
+        for (const className of this.classNames) {
+            toggleClass(this.element, className, true);
         }
 
         options.parentElement.appendChild(this.element);
@@ -206,6 +211,18 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     public isVisible(panel: T): boolean {
         return this.gridview.isViewVisible(getGridLocation(panel.element));
+    }
+
+    updateOptions(options: Partial<BaseGridOptions>) {
+        if ('className' in options) {
+            for (const className of this.classNames) {
+                toggleClass(this.element, className, false);
+            }
+            this.classNames = options.className?.split(' ') ?? [];
+            for (const className of this.classNames) {
+                toggleClass(this.element, className, true);
+            }
+        }
     }
 
     maximizeGroup(panel: T): void {

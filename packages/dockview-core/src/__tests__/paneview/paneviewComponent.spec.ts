@@ -537,4 +537,20 @@ describe('componentPaneview', () => {
         expect(panel1.api.isVisible).toBeTruthy();
         expect(panel2.api.isVisible).toBeTruthy();
     });
+
+    test('update className', () => {
+        const paneview = new PaneviewComponent(container, {
+            components: {
+                default: TestPanel,
+            },
+            disableAutoResizing: true,
+            className: 'test-a test-b',
+        });
+
+        expect(paneview.element.className).toBe('container test-a test-b');
+
+        paneview.updateOptions({ className: 'test-b test-c' });
+
+        expect(paneview.element.className).toBe('container test-b test-c');
+    });
 });
