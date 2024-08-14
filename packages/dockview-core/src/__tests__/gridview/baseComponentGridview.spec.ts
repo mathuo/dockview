@@ -68,8 +68,8 @@ class TestPanel implements IGridPanelView {
 class ClassUnderTest extends BaseGrid<TestPanel> {
     readonly gridview = this.gridview;
 
-    constructor(options: BaseGridOptions) {
-        super(options);
+    constructor(parentElement: HTMLElement, options: BaseGridOptions) {
+        super(parentElement, options);
     }
 
     doRemoveGroup(
@@ -106,8 +106,7 @@ class ClassUnderTest extends BaseGrid<TestPanel> {
 
 describe('baseComponentGridview', () => {
     test('that .layout(...) force flag works', () => {
-        const cut = new ClassUnderTest({
-            parentElement: document.createElement('div'),
+        const cut = new ClassUnderTest(document.createElement('div'), {
             orientation: Orientation.HORIZONTAL,
             proportionalLayout: true,
         });
@@ -131,8 +130,7 @@ describe('baseComponentGridview', () => {
     });
 
     test('can add group', () => {
-        const cut = new ClassUnderTest({
-            parentElement: document.createElement('div'),
+        const cut = new ClassUnderTest(document.createElement('div'), {
             orientation: Orientation.HORIZONTAL,
             proportionalLayout: true,
         });

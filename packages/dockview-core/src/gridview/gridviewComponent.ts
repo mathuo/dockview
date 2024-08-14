@@ -115,8 +115,7 @@ export class GridviewComponent
     }
 
     constructor(parentElement: HTMLElement, options: GridviewComponentOptions) {
-        super({
-            parentElement: parentElement,
+        super(parentElement, {
             proportionalLayout: options.proportionalLayout,
             orientation: options.orientation,
             styles: options.styles,

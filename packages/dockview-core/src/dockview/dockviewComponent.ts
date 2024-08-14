@@ -51,7 +51,12 @@ import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
 import { Parameters } from '../panel/types';
 import { Overlay } from '../overlay/overlay';
-import { addTestId, toggleClass, watchElementResize } from '../dom';
+import {
+    addTestId,
+    getDockviewTheme,
+    toggleClass,
+    watchElementResize,
+} from '../dom';
 import { DockviewFloatingGroupPanel } from './dockviewFloatingGroupPanel';
 import {
     GroupDragEvent,
@@ -90,33 +95,6 @@ function moveGroupWithoutDestroying(options: {
             skipSetGroupActive: true,
         });
     });
-}
-
-function getDockviewTheme(element: HTMLElement): string | undefined {
-    function toClassList(element: HTMLElement) {
-        const list: string[] = [];
-
-        for (let i = 0; i < element.classList.length; i++) {
-            list.push(element.classList.item(i)!);
-        }
-
-        return list;
-    }
-
-    let theme: string | undefined = undefined;
-    let parent: HTMLElement | null = element;
-
-    while (parent !== null) {
-        theme = toClassList(parent).find((cls) =>
-            cls.startsWith('dockview-theme-')
-        );
-        if (typeof theme === 'string') {
-            break;
-        }
-        parent = parent.parentElement;
-    }
-
-    return theme;
 }
 
 export interface PanelReference {
@@ -362,22 +340,17 @@ export class DockviewComponent
     }
 
     constructor(parentElement: HTMLElement, options: DockviewComponentOptions) {
-        super({
+        super(parentElement, {
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
             styles: options.hideBorders
                 ? { separatorBorder: 'transparent' }
                 : undefined,
-            parentElement: parentElement,
             disableAutoResizing: options.disableAutoResizing,
             locked: options.locked,
             margin: options.gap,
             className: options.className,
         });
-
-        // const gready = document.createElement('div');
-        // gready.className = 'dv-overlay-render-container';
-        // this.gridview.element.appendChild(gready);
 
         this.overlayRenderContainer = new OverlayRenderContainer(
             this.gridview.element,
@@ -1022,19 +995,9 @@ export class DockviewComponent
     override updateOptions(options: Partial<DockviewComponentOptions>): void {
         super.updateOptions(options);
 
-        const changed_floatingGroupBounds =
-            'floatingGroupBounds' in options &&
-            options.floatingGroupBounds !== this.options.floatingGroupBounds;
-
-        const changed_rootOverlayOptions =
-            'rootOverlayModel' in options &&
-            options.rootOverlayModel !== this.options.rootOverlayModel;
-
-        this._options = { ...this.options, ...options };
-
-        if (changed_floatingGroupBounds) {
+        if ('floatingGroupBounds' in options) {
             for (const group of this._floatingGroups) {
-                switch (this.options.floatingGroupBounds) {
+                switch (options.floatingGroupBounds) {
                     case 'boundedWithinViewport':
                         group.overlay.minimumInViewportHeight = undefined;
                         group.overlay.minimumInViewportWidth = undefined;
@@ -1047,30 +1010,26 @@ export class DockviewComponent
                         break;
                     default:
                         group.overlay.minimumInViewportHeight =
-                            this.options.floatingGroupBounds?.minimumHeightWithinViewport;
+                            options.floatingGroupBounds?.minimumHeightWithinViewport;
                         group.overlay.minimumInViewportWidth =
-                            this.options.floatingGroupBounds?.minimumWidthWithinViewport;
+                            options.floatingGroupBounds?.minimumWidthWithinViewport;
                 }
 
                 group.overlay.setBounds();
             }
         }
 
-        if (changed_rootOverlayOptions) {
-            this._rootDropTarget.setOverlayModel(options.rootOverlayModel!);
+        if ('rootOverlayModel' in options) {
+            this._rootDropTarget.setOverlayModel(
+                options.rootOverlayModel ?? DEFAULT_ROOT_OVERLAY_MODEL
+            );
         }
 
-        if (
-            //  if explicitly set as `undefined`
-            'gap' in options &&
-            options.gap === undefined
-        ) {
-            this.gridview.margin = 0;
+        if ('gap' in options) {
+            this.gridview.margin = options.gap ?? 0;
         }
 
-        if (typeof options.gap === 'number') {
-            this.gridview.margin = options.gap;
-        }
+        this._options = { ...this.options, ...options };
 
         this.layout(this.gridview.width, this.gridview.height, true);
     }
@@ -1108,7 +1067,7 @@ export class DockviewComponent
             if (!this.activeGroup) {
                 return;
             }
-          options.group = this.activeGroup;
+            options.group = this.activeGroup;
         }
 
         if (options.includePanel && options.group) {
