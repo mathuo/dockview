@@ -55,7 +55,7 @@ export class ContentContainer
     ) {
         super();
         this._element = document.createElement('div');
-        this._element.className = 'content-container';
+        this._element.className = 'dv-content-container';
         this._element.tabIndex = -1;
 
         this.addDisposables(this._onDidFocus, this._onDidBlur);

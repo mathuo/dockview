@@ -16,7 +16,7 @@ describe('watermark', () => {
         cut.init({ containerApi: api });
         cut.updateParentGroup(group, true);
 
-        const closeEl = cut.element.querySelector('.close-action')!;
+        const closeEl = cut.element.querySelector('.dv-close-action')!;
 
         expect(closeEl).toBeTruthy();
 

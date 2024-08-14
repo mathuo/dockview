@@ -537,13 +537,13 @@ describe('dockviewComponent', () => {
         });
 
         let viewQuery = container.querySelectorAll(
-            '.branch-node > .split-view-container > .view-container > .view'
+            '.dv-branch-node > .dv-split-view-container > .dv-view-container > .dv-view'
         );
 
         expect(viewQuery.length).toBe(1);
 
         viewQuery = container.querySelectorAll(
-            '.branch-node > .split-view-container > .view-container > .view:nth-child(1) >.groupview > .content-container > .testpanel-panel2'
+            '.dv-branch-node > .dv-split-view-container > .dv-view-container > .dv-view:nth-child(1) >.dv-groupview > .dv-content-container > .testpanel-panel2'
         );
 
         expect(viewQuery.length).toBe(1);
@@ -555,19 +555,19 @@ describe('dockviewComponent', () => {
         });
 
         viewQuery = container.querySelectorAll(
-            '.branch-node > .split-view-container > .view-container > .view'
+            '.dv-branch-node > .dv-split-view-container > .dv-view-container > .dv-view'
         );
 
         expect(viewQuery.length).toBe(2);
 
         viewQuery = container.querySelectorAll(
-            '.branch-node > .split-view-container > .view-container > .view:nth-child(1) >.groupview > .content-container > .testpanel-panel2'
+            '.dv-branch-node > .dv-split-view-container > .dv-view-container > .dv-view:nth-child(1) >.dv-groupview > .dv-content-container > .testpanel-panel2'
         );
 
         expect(viewQuery.length).toBe(1);
 
         viewQuery = container.querySelectorAll(
-            '.branch-node > .split-view-container > .view-container > .view:nth-child(2) >.groupview > .content-container > .testpanel-panel1'
+            '.dv-branch-node > .dv-split-view-container > .dv-view-container > .dv-view:nth-child(2) >.dv-groupview > .dv-content-container > .testpanel-panel1'
         );
 
         expect(viewQuery.length).toBe(1);
@@ -2242,17 +2242,17 @@ describe('dockviewComponent', () => {
         const group = dockview.getGroupPanel('panel2')!.api.group;
 
         const viewQuery = group.element.querySelectorAll(
-            '.groupview > .tabs-and-actions-container > .tabs-container > .tab'
+            '.dv-groupview > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab'
         );
         expect(viewQuery.length).toBe(2);
 
         const viewQuery2 = group.element.querySelectorAll(
-            '.groupview > .tabs-and-actions-container > .tabs-container > .tab > .dv-default-tab'
+            '.dv-groupview > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab > .dv-default-tab'
         );
         expect(viewQuery2.length).toBe(1);
 
         const viewQuery3 = group.element.querySelectorAll(
-            '.groupview > .tabs-and-actions-container > .tabs-container > .tab > .panel-tab-part-panel2'
+            '.dv-groupview > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab > .panel-tab-part-panel2'
         );
         expect(viewQuery3.length).toBe(1);
     });
@@ -2920,21 +2920,21 @@ describe('dockviewComponent', () => {
             component: 'default',
         });
 
-        expect(dockview.element.querySelectorAll('.view').length).toBe(1);
+        expect(dockview.element.querySelectorAll('.dv-view').length).toBe(1);
 
         const panel2 = dockview.addPanel({
             id: 'panel2',
             component: 'default',
         });
 
-        expect(dockview.element.querySelectorAll('.view').length).toBe(1);
+        expect(dockview.element.querySelectorAll('.dv-view').length).toBe(1);
 
         const panel3 = dockview.addPanel({
             id: 'panel3',
             component: 'default',
         });
 
-        expect(dockview.element.querySelectorAll('.view').length).toBe(1);
+        expect(dockview.element.querySelectorAll('.dv-view').length).toBe(1);
 
         dockview.moveGroupOrPanel({
             from: { groupId: panel3.group.id, panelId: panel3.id },
@@ -2942,7 +2942,7 @@ describe('dockviewComponent', () => {
         });
 
         expect(dockview.groups.length).toBe(2);
-        expect(dockview.element.querySelectorAll('.view').length).toBe(2);
+        expect(dockview.element.querySelectorAll('.dv-view').length).toBe(2);
 
         dockview.moveGroupOrPanel({
             from: { groupId: panel2.group.id, panelId: panel2.id },
@@ -2950,7 +2950,7 @@ describe('dockviewComponent', () => {
         });
 
         expect(dockview.groups.length).toBe(3);
-        expect(dockview.element.querySelectorAll('.view').length).toBe(4);
+        expect(dockview.element.querySelectorAll('.dv-view').length).toBe(4);
 
         dockview.moveGroupOrPanel({
             from: { groupId: panel1.group.id, panelId: panel1.id },
@@ -2959,7 +2959,7 @@ describe('dockviewComponent', () => {
 
         expect(dockview.groups.length).toBe(2);
 
-        expect(dockview.element.querySelectorAll('.view').length).toBe(2);
+        expect(dockview.element.querySelectorAll('.dv-view').length).toBe(2);
     });
 
     test('that fromJSON layouts are resized to the current dimensions', async () => {
@@ -3081,13 +3081,15 @@ describe('dockviewComponent', () => {
         });
 
         expect(
-            dockview.element.querySelectorAll('.view-container > .view').length
+            dockview.element.querySelectorAll('.dv-view-container > .dv-view')
+                .length
         ).toBe(1);
 
         dockview.addFloatingGroup(panel1);
 
         expect(
-            dockview.element.querySelectorAll('.view-container > .view').length
+            dockview.element.querySelectorAll('.dv-view-container > .dv-view')
+                .length
         ).toBe(0);
     });
 
@@ -3314,7 +3316,7 @@ describe('dockviewComponent', () => {
             groupDragEvents.push(event);
         });
 
-        const el = dockview.element.querySelector('.tab')!;
+        const el = dockview.element.querySelector('.dv-tab')!;
         expect(el).toBeTruthy();
 
         fireEvent.dragStart(el);
@@ -3357,7 +3359,7 @@ describe('dockviewComponent', () => {
             groupDragEvents.push(event);
         });
 
-        const el = dockview.element.querySelector('.void-container')!;
+        const el = dockview.element.querySelector('.dv-void-container')!;
         expect(el).toBeTruthy();
 
         fireEvent.dragStart(el);
@@ -3386,7 +3388,7 @@ describe('dockviewComponent', () => {
 
         dockview.layout(1000, 500);
 
-        let el = dockview.element.querySelector('.view-container');
+        let el = dockview.element.querySelector('.dv-view-container');
         expect(el).toBeTruthy();
         expect(el!.childNodes.length).toBe(0);
 
@@ -3398,7 +3400,7 @@ describe('dockviewComponent', () => {
         expect(dockview.groups.length).toBe(1);
         expect(dockview.panels.length).toBe(1);
 
-        el = dockview.element.querySelector('.view-container');
+        el = dockview.element.querySelector('.dv-view-container');
         expect(el).toBeTruthy();
         expect(el!.childNodes.length).toBeGreaterThan(0);
 
@@ -3452,7 +3454,7 @@ describe('dockviewComponent', () => {
         expect(dockview.groups.length).toBe(0);
         expect(dockview.panels.length).toBe(0);
 
-        el = dockview.element.querySelector('.view-container');
+        el = dockview.element.querySelector('.dv-view-container');
         expect(el).toBeTruthy();
         expect(el!.childNodes.length).toBe(0);
     });
@@ -3477,7 +3479,7 @@ describe('dockviewComponent', () => {
 
         dockview.layout(1000, 500);
 
-        let el = dockview.element.querySelector('.view-container');
+        let el = dockview.element.querySelector('.dv-view-container');
         expect(el).toBeTruthy();
         expect(el!.childNodes.length).toBe(0);
 
@@ -3498,7 +3500,7 @@ describe('dockviewComponent', () => {
         el = dockview.element.querySelector('.dv-resize-container');
         expect(el).toBeTruthy();
 
-        el = dockview.element.querySelector('.view-container');
+        el = dockview.element.querySelector('.dv-view-container');
         expect(el).toBeTruthy();
         expect(el!.childNodes.length).toBeGreaterThan(0);
 
@@ -3578,7 +3580,7 @@ describe('dockviewComponent', () => {
         el = dockview.element.querySelector('.dv-resize-container');
         expect(el).toBeFalsy();
 
-        el = dockview.element.querySelector('.view-container');
+        el = dockview.element.querySelector('.dv-view-container');
         expect(el).toBeTruthy();
         expect(el!.childNodes.length).toBe(0);
     });

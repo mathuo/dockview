@@ -176,7 +176,7 @@ export class TabsContainer
         super();
 
         this._element = document.createElement('div');
-        this._element.className = 'tabs-and-actions-container';
+        this._element.className = 'dv-tabs-and-actions-container';
 
         toggleClass(
             this._element,
@@ -185,16 +185,16 @@ export class TabsContainer
         );
 
         this.rightActionsContainer = document.createElement('div');
-        this.rightActionsContainer.className = 'right-actions-container';
+        this.rightActionsContainer.className = 'dv-right-actions-container';
 
         this.leftActionsContainer = document.createElement('div');
-        this.leftActionsContainer.className = 'left-actions-container';
+        this.leftActionsContainer.className = 'dv-left-actions-container';
 
         this.preActionsContainer = document.createElement('div');
-        this.preActionsContainer.className = 'pre-actions-container';
+        this.preActionsContainer.className = 'dv-pre-actions-container';
 
         this.tabContainer = document.createElement('div');
-        this.tabContainer.className = 'tabs-container';
+        this.tabContainer.className = 'dv-tabs-container';
 
         this.voidContainer = new VoidContainer(this.accessor, this.group);
 

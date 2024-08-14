@@ -496,12 +496,12 @@ describe('dockviewGroupPanelModel', () => {
 
     test('default', () => {
         let viewQuery = groupview.element.querySelectorAll(
-            '.groupview > .tabs-and-actions-container'
+            '.dv-groupview > .dv-tabs-and-actions-container'
         );
         expect(viewQuery).toBeTruthy();
 
         viewQuery = groupview.element.querySelectorAll(
-            '.groupview > .content-container'
+            '.dv-groupview > .dv-content-container'
         );
         expect(viewQuery).toBeTruthy();
     });
@@ -636,7 +636,7 @@ describe('dockviewGroupPanelModel', () => {
             null as any
         );
         const contentContainer = groupviewContainer
-            .getElementsByClassName('content-container')
+            .getElementsByClassName('dv-content-container')
             .item(0)!.childNodes;
 
         const panel1 = new TestPanel('id_1', panelApi);
@@ -706,7 +706,7 @@ describe('dockviewGroupPanelModel', () => {
         });
 
         const element = container
-            .getElementsByClassName('content-container')
+            .getElementsByClassName('dv-content-container')
             .item(0)!;
 
         jest.spyOn(element, 'clientHeight', 'get').mockImplementation(
@@ -720,7 +720,7 @@ describe('dockviewGroupPanelModel', () => {
         expect(counter).toBe(1);
 
         expect(
-            element.getElementsByClassName('drop-target-dropzone').length
+            element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(0);
     });
 
@@ -766,7 +766,7 @@ describe('dockviewGroupPanelModel', () => {
         });
 
         const element = container
-            .getElementsByClassName('content-container')
+            .getElementsByClassName('dv-content-container')
             .item(0)!;
 
         jest.spyOn(element, 'clientHeight', 'get').mockImplementation(
@@ -786,7 +786,7 @@ describe('dockviewGroupPanelModel', () => {
         cut.locked = false;
         run(10);
         expect(
-            element.getElementsByClassName('drop-target-dropzone').length
+            element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(1);
         fireEvent.dragEnd(element);
 
@@ -794,7 +794,7 @@ describe('dockviewGroupPanelModel', () => {
         cut.locked = 'no-drop-target';
         run(10);
         expect(
-            element.getElementsByClassName('drop-target-dropzone').length
+            element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(0);
         fireEvent.dragEnd(element);
 
@@ -802,7 +802,7 @@ describe('dockviewGroupPanelModel', () => {
         cut.locked = true;
         run(10);
         expect(
-            element.getElementsByClassName('drop-target-dropzone').length
+            element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(1);
         fireEvent.dragEnd(element);
 
@@ -810,7 +810,7 @@ describe('dockviewGroupPanelModel', () => {
         cut.locked = true;
         run(25);
         expect(
-            element.getElementsByClassName('drop-target-dropzone').length
+            element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(0);
         fireEvent.dragEnd(element);
     });
@@ -864,7 +864,7 @@ describe('dockviewGroupPanelModel', () => {
         cut.openPanel(new TestPanel('panel1', panelApi));
 
         const element = container
-            .getElementsByClassName('content-container')
+            .getElementsByClassName('dv-content-container')
             .item(0)!;
 
         jest.spyOn(element, 'clientHeight', 'get').mockImplementation(
@@ -883,7 +883,7 @@ describe('dockviewGroupPanelModel', () => {
         expect(counter).toBe(0);
 
         expect(
-            element.getElementsByClassName('drop-target-dropzone').length
+            element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(0);
     });
 
@@ -937,7 +937,7 @@ describe('dockviewGroupPanelModel', () => {
         cut.openPanel(new TestPanel('panel2', panelApi));
 
         const element = container
-            .getElementsByClassName('content-container')
+            .getElementsByClassName('dv-content-container')
             .item(0)!;
 
         jest.spyOn(element, 'clientHeight', 'get').mockImplementation(
@@ -956,7 +956,7 @@ describe('dockviewGroupPanelModel', () => {
         expect(counter).toBe(0);
 
         expect(
-            element.getElementsByClassName('drop-target-dropzone').length
+            element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(0);
     });
 
@@ -1010,7 +1010,7 @@ describe('dockviewGroupPanelModel', () => {
         cut.openPanel(new TestPanel('panel2', panelApi));
 
         const element = container
-            .getElementsByClassName('content-container')
+            .getElementsByClassName('dv-content-container')
             .item(0)!;
 
         jest.spyOn(element, 'clientHeight', 'get').mockImplementation(
@@ -1029,7 +1029,7 @@ describe('dockviewGroupPanelModel', () => {
         expect(counter).toBe(1);
 
         expect(
-            element.getElementsByClassName('drop-target-dropzone').length
+            element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(0);
     });
 
@@ -1114,7 +1114,7 @@ describe('dockviewGroupPanelModel', () => {
             container.getElementsByClassName('watermark-test-container').length
         ).toBe(0);
         expect(
-            container.getElementsByClassName('tabs-and-actions-container')
+            container.getElementsByClassName('dv-tabs-and-actions-container')
                 .length
         ).toBe(1);
 

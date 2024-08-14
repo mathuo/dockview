@@ -40,7 +40,7 @@ describe('tabsContainer', () => {
         const cut = new TabsContainer(accessor, groupPanel);
 
         const emptySpace = cut.element
-            .getElementsByClassName('void-container')
+            .getElementsByClassName('dv-void-container')
             .item(0);
 
         if (!emptySpace!) {
@@ -60,7 +60,7 @@ describe('tabsContainer', () => {
         expect(groupView.canDisplayOverlay).toHaveBeenCalled();
 
         expect(
-            cut.element.getElementsByClassName('drop-target-dropzone').length
+            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(0);
     });
 
@@ -95,7 +95,7 @@ describe('tabsContainer', () => {
         const cut = new TabsContainer(accessor, groupPanel);
 
         const emptySpace = cut.element
-            .getElementsByClassName('void-container')
+            .getElementsByClassName('dv-void-container')
             .item(0);
 
         if (!emptySpace!) {
@@ -126,7 +126,7 @@ describe('tabsContainer', () => {
         expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(0);
 
         expect(
-            cut.element.getElementsByClassName('drop-target-dropzone').length
+            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(1);
     });
 
@@ -164,7 +164,7 @@ describe('tabsContainer', () => {
         cut.openPanel(new TestPanel('panel2', jest.fn() as any));
 
         const emptySpace = cut.element
-            .getElementsByClassName('void-container')
+            .getElementsByClassName('dv-void-container')
             .item(0);
 
         if (!emptySpace!) {
@@ -189,7 +189,7 @@ describe('tabsContainer', () => {
         expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(0);
 
         expect(
-            cut.element.getElementsByClassName('drop-target-dropzone').length
+            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(1);
     });
 
@@ -227,7 +227,7 @@ describe('tabsContainer', () => {
         cut.openPanel(new TestPanel('panel2', jest.fn() as any));
 
         const emptySpace = cut.element
-            .getElementsByClassName('void-container')
+            .getElementsByClassName('dv-void-container')
             .item(0);
 
         if (!emptySpace!) {
@@ -252,7 +252,7 @@ describe('tabsContainer', () => {
         expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(0);
 
         expect(
-            cut.element.getElementsByClassName('drop-target-dropzone').length
+            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(1);
     });
 
@@ -289,7 +289,7 @@ describe('tabsContainer', () => {
         cut.openPanel(new TestPanel('panel2', jest.fn() as any));
 
         const emptySpace = cut.element
-            .getElementsByClassName('void-container')
+            .getElementsByClassName('dv-void-container')
             .item(0);
 
         if (!emptySpace!) {
@@ -320,7 +320,7 @@ describe('tabsContainer', () => {
         expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(1);
 
         expect(
-            cut.element.getElementsByClassName('drop-target-dropzone').length
+            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(0);
     });
 
@@ -341,7 +341,7 @@ describe('tabsContainer', () => {
         const cut = new TabsContainer(accessor, groupPanel);
 
         let query = cut.element.querySelectorAll(
-            '.tabs-and-actions-container > .left-actions-container'
+            '.dv-tabs-and-actions-container > .dv-left-actions-container'
         );
 
         expect(query.length).toBe(1);
@@ -354,7 +354,7 @@ describe('tabsContainer', () => {
         cut.setLeftActionsElement(left);
 
         query = cut.element.querySelectorAll(
-            '.tabs-and-actions-container > .left-actions-container'
+            '.dv-tabs-and-actions-container > .dv-left-actions-container'
         );
         expect(query.length).toBe(1);
         expect(query[0].children.item(0)?.className).toBe(
@@ -369,7 +369,7 @@ describe('tabsContainer', () => {
         cut.setLeftActionsElement(left2);
 
         query = cut.element.querySelectorAll(
-            '.tabs-and-actions-container > .left-actions-container'
+            '.dv-tabs-and-actions-container > .dv-left-actions-container'
         );
         expect(query.length).toBe(1);
         expect(query[0].children.item(0)?.className).toBe(
@@ -381,7 +381,7 @@ describe('tabsContainer', () => {
 
         cut.setLeftActionsElement(undefined);
         query = cut.element.querySelectorAll(
-            '.tabs-and-actions-container > .left-actions-container'
+            '.dv-tabs-and-actions-container > .dv-left-actions-container'
         );
 
         expect(query.length).toBe(1);
@@ -405,7 +405,7 @@ describe('tabsContainer', () => {
         const cut = new TabsContainer(accessor, groupPanel);
 
         let query = cut.element.querySelectorAll(
-            '.tabs-and-actions-container > .right-actions-container'
+            '.dv-tabs-and-actions-container > .dv-right-actions-container'
         );
 
         expect(query.length).toBe(1);
@@ -418,7 +418,7 @@ describe('tabsContainer', () => {
         cut.setRightActionsElement(right);
 
         query = cut.element.querySelectorAll(
-            '.tabs-and-actions-container > .right-actions-container'
+            '.dv-tabs-and-actions-container > .dv-right-actions-container'
         );
         expect(query.length).toBe(1);
         expect(query[0].children.item(0)?.className).toBe(
@@ -433,7 +433,7 @@ describe('tabsContainer', () => {
         cut.setRightActionsElement(right2);
 
         query = cut.element.querySelectorAll(
-            '.tabs-and-actions-container > .right-actions-container'
+            '.dv-tabs-and-actions-container > .dv-right-actions-container'
         );
         expect(query.length).toBe(1);
         expect(query[0].children.item(0)?.className).toBe(
@@ -445,7 +445,7 @@ describe('tabsContainer', () => {
 
         cut.setRightActionsElement(undefined);
         query = cut.element.querySelectorAll(
-            '.tabs-and-actions-container > .right-actions-container'
+            '.dv-tabs-and-actions-container > .dv-right-actions-container'
         );
 
         expect(query.length).toBe(1);
@@ -471,7 +471,7 @@ describe('tabsContainer', () => {
 
         const cut = new TabsContainer(accessor, groupPanel);
 
-        const container = cut.element.querySelector('.void-container')!;
+        const container = cut.element.querySelector('.dv-void-container')!;
         expect(container).toBeTruthy();
 
         jest.spyOn(cut.element, 'getBoundingClientRect').mockImplementation(
@@ -525,7 +525,7 @@ describe('tabsContainer', () => {
 
         const cut = new TabsContainer(accessor, groupPanel);
 
-        const container = cut.element.querySelector('.void-container')!;
+        const container = cut.element.querySelector('.dv-void-container')!;
         expect(container).toBeTruthy();
 
         jest.spyOn(cut.element, 'getBoundingClientRect').mockImplementation(
@@ -592,7 +592,7 @@ describe('tabsContainer', () => {
         const panel = createPanel('test_id');
         cut.openPanel(panel);
 
-        const el = cut.element.querySelector('.tab')!;
+        const el = cut.element.querySelector('.dv-tab')!;
         expect(el).toBeTruthy();
 
         const event = new KeyboardEvent('mousedown', { shiftKey: true });
@@ -651,14 +651,14 @@ describe('tabsContainer', () => {
         const panel = new panelMock('test_id');
         cut.openPanel(panel);
 
-        let result = cut.element.querySelector('.pre-actions-container');
+        let result = cut.element.querySelector('.dv-pre-actions-container');
         expect(result).toBeTruthy();
         expect(result!.childNodes.length).toBe(0);
 
         const actions = document.createElement('div');
         cut.setPrefixActionsElement(actions);
 
-        result = cut.element.querySelector('.pre-actions-container');
+        result = cut.element.querySelector('.dv-pre-actions-container');
         expect(result).toBeTruthy();
         expect(result!.childNodes.length).toBe(1);
         expect(result!.childNodes.item(0)).toBe(actions);
@@ -666,14 +666,14 @@ describe('tabsContainer', () => {
         const updatedActions = document.createElement('div');
         cut.setPrefixActionsElement(updatedActions);
 
-        result = cut.element.querySelector('.pre-actions-container');
+        result = cut.element.querySelector('.dv-pre-actions-container');
         expect(result).toBeTruthy();
         expect(result!.childNodes.length).toBe(1);
         expect(result!.childNodes.item(0)).toBe(updatedActions);
 
         cut.setPrefixActionsElement(undefined);
 
-        result = cut.element.querySelector('.pre-actions-container');
+        result = cut.element.querySelector('.dv-pre-actions-container');
         expect(result).toBeTruthy();
         expect(result!.childNodes.length).toBe(0);
     });
@@ -718,14 +718,14 @@ describe('tabsContainer', () => {
         const panel = new panelMock('test_id');
         cut.openPanel(panel);
 
-        let result = cut.element.querySelector('.left-actions-container');
+        let result = cut.element.querySelector('.dv-left-actions-container');
         expect(result).toBeTruthy();
         expect(result!.childNodes.length).toBe(0);
 
         const actions = document.createElement('div');
         cut.setLeftActionsElement(actions);
 
-        result = cut.element.querySelector('.left-actions-container');
+        result = cut.element.querySelector('.dv-left-actions-container');
         expect(result).toBeTruthy();
         expect(result!.childNodes.length).toBe(1);
         expect(result!.childNodes.item(0)).toBe(actions);
@@ -733,14 +733,14 @@ describe('tabsContainer', () => {
         const updatedActions = document.createElement('div');
         cut.setLeftActionsElement(updatedActions);
 
-        result = cut.element.querySelector('.left-actions-container');
+        result = cut.element.querySelector('.dv-left-actions-container');
         expect(result).toBeTruthy();
         expect(result!.childNodes.length).toBe(1);
         expect(result!.childNodes.item(0)).toBe(updatedActions);
 
         cut.setLeftActionsElement(undefined);
 
-        result = cut.element.querySelector('.left-actions-container');
+        result = cut.element.querySelector('.dv-left-actions-container');
         expect(result).toBeTruthy();
         expect(result!.childNodes.length).toBe(0);
     });
@@ -785,14 +785,14 @@ describe('tabsContainer', () => {
         const panel = new panelMock('test_id');
         cut.openPanel(panel);
 
-        let result = cut.element.querySelector('.right-actions-container');
+        let result = cut.element.querySelector('.dv-right-actions-container');
         expect(result).toBeTruthy();
         expect(result!.childNodes.length).toBe(0);
 
         const actions = document.createElement('div');
         cut.setRightActionsElement(actions);
 
-        result = cut.element.querySelector('.right-actions-container');
+        result = cut.element.querySelector('.dv-right-actions-container');
         expect(result).toBeTruthy();
         expect(result!.childNodes.length).toBe(1);
         expect(result!.childNodes.item(0)).toBe(actions);
@@ -800,14 +800,14 @@ describe('tabsContainer', () => {
         const updatedActions = document.createElement('div');
         cut.setRightActionsElement(updatedActions);
 
-        result = cut.element.querySelector('.right-actions-container');
+        result = cut.element.querySelector('.dv-right-actions-container');
         expect(result).toBeTruthy();
         expect(result!.childNodes.length).toBe(1);
         expect(result!.childNodes.item(0)).toBe(updatedActions);
 
         cut.setRightActionsElement(undefined);
 
-        result = cut.element.querySelector('.right-actions-container');
+        result = cut.element.querySelector('.dv-right-actions-container');
         expect(result).toBeTruthy();
         expect(result!.childNodes.length).toBe(0);
     });
