@@ -14,7 +14,6 @@ describe('watermark', () => {
         const group = jest.fn() as any;
 
         cut.init({ containerApi: api });
-        cut.updateParentGroup(group, true);
 
         const closeEl = cut.element.querySelector('.close-action')!;
 

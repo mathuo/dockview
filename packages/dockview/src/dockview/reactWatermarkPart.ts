@@ -57,13 +57,6 @@ export class ReactWatermarkPart implements IWatermarkRenderer {
         // noop - retrieval from api
     }
 
-    updateParentGroup(
-        _group: DockviewGroupPanel,
-        _isPanelVisible: boolean
-    ): void {
-        // noop
-    }
-
     dispose(): void {
         this.part?.dispose();
     }

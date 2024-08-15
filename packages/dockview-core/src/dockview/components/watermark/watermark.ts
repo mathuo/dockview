@@ -78,10 +78,7 @@ export class Watermark
         this.render();
     }
 
-    updateParentGroup(group: DockviewGroupPanel, _visible: boolean): void {
-        this._group = group;
-        this.render();
-    }
+ 
 
     dispose(): void {
         super.dispose();
