@@ -5,8 +5,7 @@ import {
 import { addDisposableListener } from '../../../events';
 import { toggleClass } from '../../../dom';
 import { CompositeDisposable } from '../../../lifecycle';
-import { DockviewGroupPanel } from '../../dockviewGroupPanel';
-import { PanelUpdateEvent } from '../../../panel/types';
+import { IDockviewGroupPanel } from '../../dockviewGroupPanel';
 import { createCloseButton } from '../../../svg';
 import { DockviewApi } from '../../../api/component.api';
 
@@ -15,7 +14,7 @@ export class Watermark
     implements IWatermarkRenderer
 {
     private _element: HTMLElement;
-    private _group: DockviewGroupPanel | undefined;
+    private _group: IDockviewGroupPanel | undefined;
     private _api: DockviewApi | undefined;
 
     get element(): HTMLElement {
@@ -52,8 +51,9 @@ export class Watermark
         title.appendChild(actionsContainer);
 
         this.addDisposables(
-            addDisposableListener(closeAnchor, 'click', (ev) => {
-                ev.preventDefault();
+            addDisposableListener(closeAnchor, 'click', (event: MouseEvent) => {
+                event.preventDefault();
+
                 if (this._group) {
                     this._api?.removeGroup(this._group);
                 }
@@ -61,27 +61,10 @@ export class Watermark
         );
     }
 
-    update(_event: PanelUpdateEvent): void {
-        // noop
-    }
-
-    focus(): void {
-        // noop
-    }
-
-    layout(_width: number, _height: number): void {
-        // noop
-    }
-
     init(_params: WatermarkRendererInitParameters): void {
         this._api = _params.containerApi;
+        this._group = _params.group;
         this.render();
-    }
-
- 
-
-    dispose(): void {
-        super.dispose();
     }
 
     private render(): void {
