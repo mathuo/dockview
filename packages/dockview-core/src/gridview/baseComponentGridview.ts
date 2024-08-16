@@ -7,7 +7,7 @@ import { ISplitviewStyles, Orientation, Sizing } from '../splitview/splitview';
 import { IPanel } from '../panel/types';
 import { MovementOptions2 } from '../dockview/options';
 import { Resizable } from '../resizable';
-import { toggleClass } from '../dom';
+import { Classnames, toggleClass } from '../dom';
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -33,7 +33,6 @@ export interface BaseGridOptions {
     readonly proportionalLayout: boolean;
     readonly orientation: Orientation;
     readonly styles?: ISplitviewStyles;
-    readonly parentElement: HTMLElement;
     readonly disableAutoResizing?: boolean;
     readonly locked?: boolean;
     readonly margin?: number;
@@ -100,7 +99,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
     readonly onDidViewVisibilityChangeMicroTaskQueue =
         this._onDidViewVisibilityChangeMicroTaskQueue.onEvent;
 
-    private classNames: string[] = [];
+    private readonly _classNames: Classnames;
 
     get id(): string {
         return this._id;
@@ -147,18 +146,15 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.gridview.locked = value;
     }
 
-    constructor(options: BaseGridOptions) {
+    constructor(parentElement: HTMLElement, options: BaseGridOptions) {
         super(document.createElement('div'), options.disableAutoResizing);
         this.element.style.height = '100%';
         this.element.style.width = '100%';
 
-        this.classNames = options.className?.split(' ') ?? [];
+        this._classNames = new Classnames(this.element);
+        this._classNames.setClassNames(options.className ?? '');
 
-        for (const className of this.classNames) {
-            toggleClass(this.element, className, true);
-        }
-
-        options.parentElement.appendChild(this.element);
+        parentElement.appendChild(this.element);
 
         this.gridview = new Gridview(
             !!options.proportionalLayout,
@@ -214,14 +210,26 @@ export abstract class BaseGrid<T extends IGridPanelView>
     }
 
     updateOptions(options: Partial<BaseGridOptions>) {
+        if (typeof options.proportionalLayout === 'boolean') {
+            // this.gridview.proportionalLayout = options.proportionalLayout; // not supported
+        }
+        if (options.orientation) {
+            this.gridview.orientation = options.orientation;
+        }
+        if ('styles' in options) {
+            // this.gridview.styles = options.styles; // not supported
+        }
+        if ('disableResizing' in options) {
+            this.disableResizing = options.disableAutoResizing ?? false;
+        }
+        if ('locked' in options) {
+            this.locked = options.locked ?? false;
+        }
+        if ('margin' in options) {
+            this.gridview.margin = options.margin ?? 0;
+        }
         if ('className' in options) {
-            for (const className of this.classNames) {
-                toggleClass(this.element, className, false);
-            }
-            this.classNames = options.className?.split(' ') ?? [];
-            for (const className of this.classNames) {
-                toggleClass(this.element, className, true);
-            }
+            this._classNames.setClassNames(options.className ?? '');
         }
     }
 

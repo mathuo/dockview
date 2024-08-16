@@ -17,7 +17,7 @@ import { Emitter, Event } from '../events';
 import { SplitviewPanel, ISplitviewPanel } from './splitviewPanel';
 import { createComponent } from '../panel/componentFactory';
 import { Resizable } from '../resizable';
-import { toggleClass } from '../dom';
+import { Classnames, toggleClass } from '../dom';
 
 export interface SerializedSplitviewPanelData {
     id: string;
@@ -100,7 +100,7 @@ export class SplitviewComponent
     private readonly _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
 
-    private classNames: string[] = [];
+    private readonly _classNames: Classnames;
 
     get panels(): SplitviewPanel[] {
         return this.splitview.getViews();
@@ -162,11 +162,8 @@ export class SplitviewComponent
     ) {
         super(parentElement, options.disableAutoResizing);
 
-        this.classNames = options.className?.split(' ') ?? [];
-
-        for (const className of this.classNames) {
-            toggleClass(this.element, className, true);
-        }
+        this._classNames = new Classnames(this.element);
+        this._classNames.setClassNames(options.className ?? '');
 
         this._options = options;
 
@@ -189,24 +186,18 @@ export class SplitviewComponent
 
     updateOptions(options: Partial<SplitviewComponentOptions>): void {
         if ('className' in options) {
-            for (const className of this.classNames) {
-                toggleClass(this.element, className, false);
-            }
-            this.classNames = options.className?.split(' ') ?? [];
-            for (const className of this.classNames) {
-                toggleClass(this.element, className, true);
-            }
+            this._classNames.setClassNames(options.className ?? '');
         }
 
-        const hasOrientationChanged =
-            typeof options.orientation === 'string' &&
-            this.options.orientation !== options.orientation;
+        if ('disableResizing' in options) {
+            this.disableResizing = options.disableAutoResizing ?? false;
+        }
 
-        this._options = { ...this.options, ...options };
-
-        if (hasOrientationChanged) {
+        if (typeof options.orientation === 'string') {
             this.splitview.orientation = options.orientation!;
         }
+
+        this._options = { ...this.options, ...options };
 
         this.splitview.layout(
             this.splitview.size,

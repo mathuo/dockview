@@ -972,8 +972,6 @@ export class DockviewGroupPanelModel
 
             this.tabsContainer.hide();
             this.contentContainer.element.appendChild(this.watermark.element);
-
-            this.watermark.updateParentGroup(this.groupPanel, true);
         }
         if (!this.isEmpty && this.watermark) {
             this.watermark.element.remove();

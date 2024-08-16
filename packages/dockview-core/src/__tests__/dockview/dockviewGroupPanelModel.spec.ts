@@ -116,10 +116,6 @@ class Watermark implements IWatermarkRenderer {
         return {};
     }
 
-    updateParentGroup() {
-        //
-    }
-
     dispose() {
         //
     }

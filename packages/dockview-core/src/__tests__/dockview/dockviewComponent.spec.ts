@@ -8,9 +8,9 @@ import { PanelUpdateEvent } from '../../panel/types';
 import { Orientation } from '../../splitview/splitview';
 import { CompositeDisposable } from '../../lifecycle';
 import { Emitter } from '../../events';
-import { DockviewPanel, IDockviewPanel } from '../../dockview/dockviewPanel';
+import {  IDockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
-import { fireEvent, getByTestId, queryByTestId } from '@testing-library/dom';
+import { fireEvent, queryByTestId } from '@testing-library/dom';
 import { getPanelData } from '../../dnd/dataTransfer';
 import {
     GroupDragEvent,

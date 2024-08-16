@@ -183,10 +183,6 @@ export class VueWatermarkRenderer
         );
     }
 
-    updateParentGroup(group: DockviewGroupPanel, visible: boolean): void {
-        // TODO: make optional on interface
-    }
-
     update(event: PanelUpdateEvent<Parameters>): void {
         // noop
     }
