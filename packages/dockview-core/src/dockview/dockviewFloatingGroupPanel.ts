@@ -1,4 +1,4 @@
-import { Overlay } from '../dnd/overlay';
+import { Overlay } from '../overlay/overlay';
 import { CompositeDisposable } from '../lifecycle';
 import { AnchoredBox } from '../types';
 import { DockviewGroupPanel, IDockviewGroupPanel } from './dockviewGroupPanel';
@@ -10,7 +10,8 @@ export interface IDockviewFloatingGroupPanel {
 
 export class DockviewFloatingGroupPanel
     extends CompositeDisposable
-    implements IDockviewFloatingGroupPanel {
+    implements IDockviewFloatingGroupPanel
+{
     constructor(readonly group: DockviewGroupPanel, readonly overlay: Overlay) {
         super();
         this.addDisposables(overlay);

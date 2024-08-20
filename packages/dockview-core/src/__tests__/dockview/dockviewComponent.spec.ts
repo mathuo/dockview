@@ -8,9 +8,9 @@ import { PanelUpdateEvent } from '../../panel/types';
 import { Orientation } from '../../splitview/splitview';
 import { CompositeDisposable } from '../../lifecycle';
 import { Emitter } from '../../events';
-import { DockviewPanel, IDockviewPanel } from '../../dockview/dockviewPanel';
+import {  IDockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
-import { fireEvent, getByTestId, queryByTestId } from '@testing-library/dom';
+import { fireEvent, queryByTestId } from '@testing-library/dom';
 import { getPanelData } from '../../dnd/dataTransfer';
 import {
     GroupDragEvent,
@@ -101,8 +101,7 @@ describe('dockviewComponent', () => {
     beforeEach(() => {
         container = document.createElement('div');
 
-        dockview = new DockviewComponent({
-            parentElement: container,
+        dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -117,6 +116,28 @@ describe('dockviewComponent', () => {
         });
 
         window.open = jest.fn(); // not implemented by jest
+    });
+
+    test('update className', () => {
+        dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+            className: 'test-a test-b',
+        });
+        expect(dockview.element.className).toBe('test-a test-b');
+
+        dockview.updateOptions({ className: 'test-b test-c' });
+
+        expect(dockview.element.className).toBe('test-b test-c');
     });
 
     // describe('memory leakage', () => {
@@ -1238,8 +1259,7 @@ describe('dockviewComponent', () => {
     test('panel is disposed of when closed', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -1281,8 +1301,7 @@ describe('dockviewComponent', () => {
     test('can add panel of same id if already removed', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -1334,8 +1353,7 @@ describe('dockviewComponent', () => {
     test('panel is disposed of when removed', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -1377,8 +1395,7 @@ describe('dockviewComponent', () => {
     test('panel is not disposed of when moved to a new group', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -1433,8 +1450,7 @@ describe('dockviewComponent', () => {
     test('panel is not disposed of when moved within another group', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -1489,8 +1505,7 @@ describe('dockviewComponent', () => {
     test('panel is not disposed of when moved within another group', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -1543,8 +1558,7 @@ describe('dockviewComponent', () => {
     test('panel is disposed of when group is disposed', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -1594,8 +1608,7 @@ describe('dockviewComponent', () => {
     test('panel is disposed of when component is disposed', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -1645,8 +1658,7 @@ describe('dockviewComponent', () => {
     test('panel is disposed of when from JSON is called', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -1706,8 +1718,7 @@ describe('dockviewComponent', () => {
     test('move entire group into another group', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -1940,8 +1951,7 @@ describe('dockviewComponent', () => {
     test('load a layout with a non-existant tab id', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -2034,8 +2044,7 @@ describe('dockviewComponent', () => {
     test('load and persist layout with custom tab header', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -2157,8 +2166,7 @@ describe('dockviewComponent', () => {
     test('#2', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -2256,8 +2264,7 @@ describe('dockviewComponent', () => {
     test('orthogonal realigment #1', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -2367,9 +2374,7 @@ describe('dockviewComponent', () => {
     test('orthogonal realigment #2', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
-
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -2514,9 +2519,7 @@ describe('dockviewComponent', () => {
     test('orthogonal realigment #3', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
-
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -2648,9 +2651,7 @@ describe('dockviewComponent', () => {
     test('orthogonal realigment #4', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
-
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -2713,9 +2714,7 @@ describe('dockviewComponent', () => {
     test('that a empty component has no groups', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
-
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -2735,9 +2734,7 @@ describe('dockviewComponent', () => {
     test('that deserializing an empty layout has zero groups and a watermark', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
-
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -2780,8 +2777,7 @@ describe('dockviewComponent', () => {
     test('empty', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -2813,8 +2809,7 @@ describe('dockviewComponent', () => {
     test('that title and params.title do not conflict', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -2904,8 +2899,7 @@ describe('dockviewComponent', () => {
     test('check dockview component is rendering to the DOM as expected', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -2971,8 +2965,7 @@ describe('dockviewComponent', () => {
     test('that fromJSON layouts are resized to the current dimensions', async () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -3066,8 +3059,7 @@ describe('dockviewComponent', () => {
     test('that moving the last panel to be floating should leave an empty gridview', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -3102,8 +3094,7 @@ describe('dockviewComponent', () => {
     test('that api.setSize applies to the overlay for floating panels', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -3139,8 +3130,7 @@ describe('dockviewComponent', () => {
     test('that external dnd events do not trigger the top-level center dnd target unless empty', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -3293,8 +3283,7 @@ describe('dockviewComponent', () => {
     test('that dragging a tab triggers onWillDragPanel', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -3337,8 +3326,7 @@ describe('dockviewComponent', () => {
     test('that dragging a group triggers onWillDragGroup', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -3381,8 +3369,7 @@ describe('dockviewComponent', () => {
     test('corrupt layout: bad inline view', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'panelA':
@@ -3473,8 +3460,7 @@ describe('dockviewComponent', () => {
     test('corrupt layout: bad floating view', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'panelA':
@@ -3600,8 +3586,7 @@ describe('dockviewComponent', () => {
     test('that disableAutoResizing is false by default', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'panelA':
@@ -3622,8 +3607,7 @@ describe('dockviewComponent', () => {
     test('that disableAutoResizing can be enabled', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'panelA':
@@ -3646,8 +3630,7 @@ describe('dockviewComponent', () => {
         test('that a floating group can be removed', async () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -3678,8 +3661,7 @@ describe('dockviewComponent', () => {
         test('move a floating group of one tab to a new fixed group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -3725,8 +3707,7 @@ describe('dockviewComponent', () => {
         test('move a floating group of one tab to an existing fixed group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -3772,8 +3753,7 @@ describe('dockviewComponent', () => {
         test('move a floating group of one tab to an existing floating group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -3827,8 +3807,7 @@ describe('dockviewComponent', () => {
         test('move a floating group of many tabs to a new fixed group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -3882,8 +3861,7 @@ describe('dockviewComponent', () => {
         test('move a floating group of many tabs to an existing fixed group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -3937,8 +3915,7 @@ describe('dockviewComponent', () => {
         test('move a floating group of many tabs to an existing floating group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4000,8 +3977,7 @@ describe('dockviewComponent', () => {
         test('move a floating tab of one tab to a new fixed group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4047,8 +4023,7 @@ describe('dockviewComponent', () => {
         test('move a floating tab of one tab to an existing fixed group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4094,8 +4069,7 @@ describe('dockviewComponent', () => {
         test('move a floating tab of one tab to an existing floating group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4149,8 +4123,7 @@ describe('dockviewComponent', () => {
         test('move a floating tab of many tabs to a new fixed group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4204,8 +4177,7 @@ describe('dockviewComponent', () => {
         test('move a floating tab of many tabs to an existing fixed group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4259,8 +4231,7 @@ describe('dockviewComponent', () => {
         test('move a floating tab of many tabs to an existing floating group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4322,8 +4293,7 @@ describe('dockviewComponent', () => {
         test('move a fixed tab of one tab to an existing floating group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4377,8 +4347,7 @@ describe('dockviewComponent', () => {
         test('move a fixed tab of many tabs to an existing floating group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4431,8 +4400,7 @@ describe('dockviewComponent', () => {
         test('move a fixed group of one tab to an existing floating group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4486,8 +4454,7 @@ describe('dockviewComponent', () => {
         test('move a fixed group of many tabs to an existing floating group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4540,8 +4507,7 @@ describe('dockviewComponent', () => {
         test('move a fixed tab of one tab to a new floating group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4584,8 +4550,7 @@ describe('dockviewComponent', () => {
         test('move a fixed tab of many tabs to a new floating group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4627,8 +4592,7 @@ describe('dockviewComponent', () => {
         test('move a fixed group of one tab to a new floating group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4671,8 +4635,7 @@ describe('dockviewComponent', () => {
         test('move a fixed group of many tabs to a new floating group', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4736,8 +4699,7 @@ describe('dockviewComponent', () => {
         test('add a popout group', async () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4776,11 +4738,64 @@ describe('dockviewComponent', () => {
             expect(dockview.panels.length).toBe(2);
         });
 
+        test('remove all panels from popout group', async () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            const panel3 = dockview.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                position: { referencePanel: panel2 },
+            });
+
+            await dockview.addPopoutGroup(panel2.group);
+
+            expect(panel1.group.api.location.type).toBe('grid');
+            expect(panel2.group.api.location.type).toBe('popout');
+            expect(panel3.group.api.location.type).toBe('popout');
+
+            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups.length).toBe(3); // includes one hidden group
+
+            panel2.api.moveTo({ group: panel1.group, position: 'left' });
+            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups.length).toBe(4);
+
+            panel3.api.moveTo({ group: panel1.group, position: 'left' });
+            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups.length).toBe(3);
+        });
+
         test('that can remove a popout group', async () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4816,8 +4831,7 @@ describe('dockviewComponent', () => {
         test('move from fixed to popout group and back', async () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4893,8 +4907,7 @@ describe('dockviewComponent', () => {
         test('that a maximzied group is set to active', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -4941,8 +4954,7 @@ describe('dockviewComponent', () => {
         beforeEach(() => {
             jest.useFakeTimers();
 
-            dockview = new DockviewComponent({
-                parentElement: container,
+            dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -5055,8 +5067,7 @@ describe('dockviewComponent', () => {
     test('that setVisible toggles visiblity', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -5168,8 +5179,7 @@ describe('dockviewComponent', () => {
     test('setVisible #1', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -5223,8 +5233,7 @@ describe('dockviewComponent', () => {
         test('that can add panel', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -5258,8 +5267,7 @@ describe('dockviewComponent', () => {
         test('that can add panel with absolute direction', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -5295,8 +5303,7 @@ describe('dockviewComponent', () => {
         test('that can add floating panel', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -5332,8 +5339,7 @@ describe('dockviewComponent', () => {
         test('that can add panel positional to another (within)', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -5368,8 +5374,7 @@ describe('dockviewComponent', () => {
         test('that can add panel positional to another (not within)', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -5406,8 +5411,7 @@ describe('dockviewComponent', () => {
         test('that floating a panel should not call an additional addPanel event', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -5459,8 +5463,7 @@ describe('dockviewComponent', () => {
 
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -5511,8 +5514,7 @@ describe('dockviewComponent', () => {
     test('addGroup with absolute position', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -5556,8 +5558,7 @@ describe('dockviewComponent', () => {
         jest.useFakeTimers();
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent({
-            parentElement: container,
+        const dockview = new DockviewComponent(container, {
             createComponent(options) {
                 switch (options.name) {
                     case 'default':
@@ -5609,8 +5610,7 @@ describe('dockviewComponent', () => {
         test('gap', () => {
             const container = document.createElement('div');
 
-            const dockview = new DockviewComponent({
-                parentElement: container,
+            const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':

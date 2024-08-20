@@ -16,7 +16,7 @@ describe('tabsContainer', () => {
         const accessor = fromPartial<DockviewComponent>({
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
-            options: { parentElement: document.createElement('div') },
+            options: {},
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -69,7 +69,7 @@ describe('tabsContainer', () => {
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
-            options: { parentElement: document.createElement('div') },
+            options: {},
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -135,7 +135,7 @@ describe('tabsContainer', () => {
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
-            options: { parentElement: document.createElement('div') },
+            options: {},
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -198,7 +198,7 @@ describe('tabsContainer', () => {
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
-            options: { parentElement: document.createElement('div') },
+            options: {},
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -261,7 +261,7 @@ describe('tabsContainer', () => {
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
-            options: { parentElement: document.createElement('div') },
+            options: {},
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -329,7 +329,7 @@ describe('tabsContainer', () => {
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
-            options: { parentElement: document.createElement('div') },
+            options: {},
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -393,7 +393,7 @@ describe('tabsContainer', () => {
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
-            options: { parentElement: document.createElement('div') },
+            options: {},
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -454,7 +454,7 @@ describe('tabsContainer', () => {
 
     test('that a tab will become floating when clicked if not floating and shift is selected', () => {
         const accessor = fromPartial<DockviewComponent>({
-            options: { parentElement: document.createElement('div') },
+            options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             element: document.createElement('div'),
@@ -508,7 +508,7 @@ describe('tabsContainer', () => {
 
     test('that a tab that is already floating cannot be floated again', () => {
         const accessor = fromPartial<DockviewComponent>({
-            options: { parentElement: document.createElement('div') },
+            options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             element: document.createElement('div'),
@@ -557,7 +557,7 @@ describe('tabsContainer', () => {
 
     test('that selecting a tab with shift down will move that tab into a new floating group', () => {
         const accessor = fromPartial<DockviewComponent>({
-            options: { parentElement: document.createElement('div') },
+            options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             element: document.createElement('div'),
@@ -613,7 +613,7 @@ describe('tabsContainer', () => {
 
     test('pre header actions', () => {
         const accessor = fromPartial<DockviewComponent>({
-            options: { parentElement: document.createElement('div') },
+            options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             element: document.createElement('div'),
@@ -680,7 +680,7 @@ describe('tabsContainer', () => {
 
     test('left header actions', () => {
         const accessor = fromPartial<DockviewComponent>({
-            options: { parentElement: document.createElement('div') },
+            options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             element: document.createElement('div'),
@@ -747,7 +747,7 @@ describe('tabsContainer', () => {
 
     test('right header actions', () => {
         const accessor = fromPartial<DockviewComponent>({
-            options: { parentElement: document.createElement('div') },
+            options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             element: document.createElement('div'),

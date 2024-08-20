@@ -7,6 +7,7 @@ import {
 import {
     AddGroupOptions,
     AddPanelOptions,
+    DockviewComponentOptions,
     DockviewDndOverlayEvent,
     MovementOptions,
 } from '../dockview/options';
@@ -29,7 +30,6 @@ import {
     AddSplitviewComponentOptions,
     ISplitviewComponent,
     SerializedSplitview,
-    SplitviewComponentUpdateOptions,
 } from '../splitview/splitviewComponent';
 import { IView, Orientation, Sizing } from '../splitview/splitview';
 import { ISplitviewPanel } from '../splitview/splitviewPanel';
@@ -50,6 +50,9 @@ import {
     DockviewWillDropEvent,
     WillShowOverlayLocationEvent,
 } from '../dockview/dockviewGroupPanelModel';
+import { PaneviewComponentOptions } from '../paneview/options';
+import { SplitviewComponentOptions } from '../splitview/options';
+import { GridviewComponentOptions } from '../gridview/options';
 
 export interface CommonApi<T = any> {
     readonly height: number;
@@ -61,6 +64,7 @@ export interface CommonApi<T = any> {
     fromJSON(data: T): void;
     toJSON(): T;
     clear(): void;
+    dispose(): void;
 }
 
 export class SplitviewApi implements CommonApi<SerializedSplitview> {
@@ -144,13 +148,6 @@ export class SplitviewApi implements CommonApi<SerializedSplitview> {
     constructor(private readonly component: ISplitviewComponent) {}
 
     /**
-     * Update configuratable options.
-     */
-    updateOptions(options: SplitviewComponentUpdateOptions): void {
-        this.component.updateOptions(options);
-    }
-
-    /**
      * Removes an existing panel and optionally provide a `Sizing` method
      * for the subsequent resize.
      */
@@ -212,6 +209,20 @@ export class SplitviewApi implements CommonApi<SerializedSplitview> {
      */
     clear(): void {
         this.component.clear();
+    }
+
+    /**
+     * Update configuratable options.
+     */
+    updateOptions(options: Partial<SplitviewComponentOptions>): void {
+        this.component.updateOptions(options);
+    }
+
+    /**
+     * Release resources and teardown component. Do not call when using framework versions of dockview.
+     */
+    dispose(): void {
+        this.component.dispose();
     }
 }
 
@@ -362,6 +373,20 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
      */
     clear(): void {
         this.component.clear();
+    }
+
+    /**
+     * Update configuratable options.
+     */
+    updateOptions(options: Partial<PaneviewComponentOptions>): void {
+        this.component.updateOptions(options);
+    }
+
+    /**
+     * Release resources and teardown component. Do not call when using framework versions of dockview.
+     */
+    dispose(): void {
+        this.component.dispose();
     }
 }
 
@@ -529,6 +554,17 @@ export class GridviewApi implements CommonApi<SerializedGridviewComponent> {
      */
     clear(): void {
         this.component.clear();
+    }
+
+    updateOptions(options: Partial<GridviewComponentOptions>) {
+        this.component.updateOptions(options);
+    }
+
+    /**
+     * Release resources and teardown component. Do not call when using framework versions of dockview.
+     */
+    dispose(): void {
+        this.component.dispose();
     }
 }
 
@@ -883,5 +919,16 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     setGap(gap: number | undefined): void {
         this.component.updateOptions({ gap });
+    }
+
+    updateOptions(options: Partial<DockviewComponentOptions>) {
+        this.component.updateOptions(options);
+    }
+
+    /**
+     * Release resources and teardown component. Do not call when using framework versions of dockview.
+     */
+    dispose(): void {
+        this.component.dispose();
     }
 }

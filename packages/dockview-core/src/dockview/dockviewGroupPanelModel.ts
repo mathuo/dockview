@@ -36,7 +36,7 @@ import {
     DockviewUnhandledDragOverEvent,
     IHeaderActionsRenderer,
 } from './options';
-import { OverlayRenderContainer } from '../overlayRenderContainer';
+import { OverlayRenderContainer } from '../overlay/overlayRenderContainer';
 import { TitleEvent } from '../api/dockviewPanelApi';
 import { Contraints } from '../gridview/gridviewPanel';
 
@@ -968,7 +968,7 @@ export class DockviewGroupPanelModel
             });
             this.watermark = watermark;
 
-            addDisposableListener(this.watermark.element, 'click', () => {
+            addDisposableListener(this.watermark.element, 'pointerdown', () => {
                 if (!this.isActive) {
                     this.accessor.doSetGroupActive(this.groupPanel);
                 }
@@ -976,8 +976,6 @@ export class DockviewGroupPanelModel
 
             this.tabsContainer.hide();
             this.contentContainer.element.appendChild(this.watermark.element);
-
-            this.watermark.updateParentGroup(this.groupPanel, true);
         }
         if (!this.isEmpty && this.watermark) {
             this.watermark.element.remove();

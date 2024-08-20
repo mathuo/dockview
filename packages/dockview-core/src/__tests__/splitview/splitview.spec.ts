@@ -783,8 +783,9 @@ describe('splitview', () => {
         splitview.layout(924, 500);
 
         const view1 = new Testview(0, 1000);
-        const view2 = new Testview(0, 1000, LayoutPriority.High);
+        const view2 = new Testview(0, 1000);
         const view3 = new Testview(0, 1000);
+        const view4 = new Testview(0, 1000);
 
         splitview.addView(view1);
         expect([view1.size]).toEqual([924]);
@@ -794,5 +795,108 @@ describe('splitview', () => {
 
         splitview.addView(view3);
         expect([view1.size, view2.size, view3.size]).toEqual([292, 292, 292]); // 292 + 24 + 292 + 24 + 292 = 924
+
+        splitview.addView(view4);
+        expect([view1.size, view2.size, view3.size, view4.size]).toEqual([
+            213, 213, 213, 213,
+        ]); // 213 + 24 + 213 + 24 + 213 + 24 + 213 = 924
+
+        let viewQuery = Array.from(
+            container
+                .querySelectorAll(
+                    '.split-view-container > .view-container > .view'
+                )
+                .entries()
+        )
+            .map(([i, e]) => e as HTMLElement)
+            .map((e) => ({
+                left: e.style.left,
+                top: e.style.top,
+                height: e.style.height,
+                width: e.style.width,
+            }));
+
+        let sashQuery = Array.from(
+            container
+                .querySelectorAll(
+                    '.split-view-container > .sash-container > .sash'
+                )
+                .entries()
+        )
+            .map(([i, e]) => e as HTMLElement)
+            .map((e) => ({
+                left: e.style.left,
+                top: e.style.top,
+            }));
+
+        // check HTMLElement positions since these are the ones that really matter
+
+        expect(viewQuery).toEqual([
+            { left: '0px', top: '', width: '213px', height: '' },
+            // 213 + 24 = 237
+            { left: '237px', top: '', width: '213px', height: '' },
+            // 237 + 213 + 24 = 474
+            { left: '474px', top: '', width: '213px', height: '' },
+            // 474 + 213 + 24 = 474
+            { left: '711px', top: '', width: '213px', height: '' },
+            // 711 + 213 = 924
+        ]);
+
+        // 924 / 4 = 231 view size
+        // 231 - (24*3/4) = 213 margin adjusted view size
+        // 213 - 4/2 + 24/2 = 223
+        expect(sashQuery).toEqual([
+            // 213 - 4/2 + 24/2 = 223
+            { left: '223px', top: '0px' },
+            // 213 + 24 + 213 = 450
+            // 450 - 4/2 + 24/2 = 460
+            { left: '460px', top: '0px' },
+            // 213 + 24 + 213 + 24 + 213 = 687
+            // 687 - 4/2 + 24/2 = 697
+            { left: '697px', top: '0px' },
+        ]);
+
+        splitview.setViewVisible(0, false);
+
+        viewQuery = Array.from(
+            container
+                .querySelectorAll(
+                    '.split-view-container > .view-container > .view'
+                )
+                .entries()
+        )
+            .map(([i, e]) => e as HTMLElement)
+            .map((e) => ({
+                left: e.style.left,
+                top: e.style.top,
+                height: e.style.height,
+                width: e.style.width,
+            }));
+
+        sashQuery = Array.from(
+            container
+                .querySelectorAll(
+                    '.split-view-container > .sash-container > .sash'
+                )
+                .entries()
+        )
+            .map(([i, e]) => e as HTMLElement)
+            .map((e) => ({
+                left: e.style.left,
+                top: e.style.top,
+            }));
+
+        expect(viewQuery).toEqual([
+            { left: '0px', top: '', width: '0px', height: '' },
+            { left: '0px', top: '', width: '215px', height: '' },
+            { left: '239px', top: '', width: '215px', height: '' },
+            { left: '478px', top: '', width: '446px', height: '' },
+        ]);
+
+        expect(sashQuery).toEqual([
+            { left: '0px', top: '0px' },
+            { left: '225px', top: '0px' },
+            { left: '464px', top: '0px' },
+        ]);
     });
 });

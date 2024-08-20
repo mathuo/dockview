@@ -49,15 +49,10 @@ export interface IGridPanelComponentView extends IGridPanelView {
     init: (params: GridviewInitParameters) => void;
 }
 
-export type GridviewComponentUpdateOptions = Pick<
-    GridviewComponentOptions,
-    'orientation' | 'components' | 'frameworkComponents'
->;
-
 export interface IGridviewComponent extends IBaseGrid<GridviewPanel> {
     readonly orientation: Orientation;
     readonly onDidLayoutFromJSON: Event<void>;
-    updateOptions(options: Partial<GridviewComponentUpdateOptions>): void;
+    updateOptions(options: Partial<GridviewComponentOptions>): void;
     addPanel<T extends object = Parameters>(
         options: AddComponentOptions<T>
     ): IGridviewPanel;
@@ -119,13 +114,13 @@ export class GridviewComponent
         this._deserializer = value;
     }
 
-    constructor(options: GridviewComponentOptions) {
-        super({
-            parentElement: options.parentElement,
+    constructor(parentElement: HTMLElement, options: GridviewComponentOptions) {
+        super(parentElement, {
             proportionalLayout: options.proportionalLayout,
             orientation: options.orientation,
             styles: options.styles,
             disableAutoResizing: options.disableAutoResizing,
+            className: options.className,
         });
 
         this._options = options;
@@ -153,7 +148,9 @@ export class GridviewComponent
         }
     }
 
-    updateOptions(options: Partial<GridviewComponentUpdateOptions>): void {
+    override updateOptions(options: Partial<GridviewComponentOptions>): void {
+        super.updateOptions(options);
+
         const hasOrientationChanged =
             typeof options.orientation === 'string' &&
             this.gridview.orientation !== options.orientation;

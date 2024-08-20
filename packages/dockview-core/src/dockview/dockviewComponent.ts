@@ -50,8 +50,13 @@ import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
 import { Parameters } from '../panel/types';
-import { Overlay } from '../dnd/overlay';
-import { addTestId, toggleClass, watchElementResize } from '../dom';
+import { Overlay } from '../overlay/overlay';
+import {
+    addTestId,
+    getDockviewTheme,
+    toggleClass,
+    watchElementResize,
+} from '../dom';
 import { DockviewFloatingGroupPanel } from './dockviewFloatingGroupPanel';
 import {
     GroupDragEvent,
@@ -65,7 +70,7 @@ import {
 import {
     DockviewPanelRenderer,
     OverlayRenderContainer,
-} from '../overlayRenderContainer';
+} from '../overlay/overlayRenderContainer';
 import { PopoutWindow } from '../popoutWindow';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
@@ -90,33 +95,6 @@ function moveGroupWithoutDestroying(options: {
             skipSetGroupActive: true,
         });
     });
-}
-
-function getDockviewTheme(element: HTMLElement): string | undefined {
-    function toClassList(element: HTMLElement) {
-        const list: string[] = [];
-
-        for (let i = 0; i < element.classList.length; i++) {
-            list.push(element.classList.item(i)!);
-        }
-
-        return list;
-    }
-
-    let theme: string | undefined = undefined;
-    let parent: HTMLElement | null = element;
-
-    while (parent !== null) {
-        theme = toClassList(parent).find((cls) =>
-            cls.startsWith('dockview-theme-')
-        );
-        if (typeof theme === 'string') {
-            break;
-        }
-        parent = parent.parentElement;
-    }
-
-    return theme;
 }
 
 export interface PanelReference {
@@ -357,24 +335,27 @@ export class DockviewComponent
         return this.gridview.margin;
     }
 
-    constructor(options: DockviewComponentOptions) {
-        super({
-            proportionalLayout: false,
+    get floatingGroups(): DockviewFloatingGroupPanel[] {
+        return this._floatingGroups;
+    }
+
+    constructor(parentElement: HTMLElement, options: DockviewComponentOptions) {
+        super(parentElement, {
+            proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
             styles: options.hideBorders
                 ? { separatorBorder: 'transparent' }
                 : undefined,
-            parentElement: options.parentElement,
             disableAutoResizing: options.disableAutoResizing,
             locked: options.locked,
             margin: options.gap,
+            className: options.className,
         });
 
-        const gready = document.createElement('div');
-        gready.className = 'dv-overlay-render-container';
-        this.gridview.element.appendChild(gready);
-
-        this.overlayRenderContainer = new OverlayRenderContainer(gready);
+        this.overlayRenderContainer = new OverlayRenderContainer(
+            this.gridview.element,
+            this
+        );
 
         toggleClass(this.gridview.element, 'dv-dockview', true);
         toggleClass(this.element, 'dv-debug', !!options.debug);
@@ -650,7 +631,8 @@ export class DockviewComponent
                 gready.className = 'dv-overlay-render-container';
 
                 const overlayRenderContainer = new OverlayRenderContainer(
-                    gready
+                    gready,
+                    this
                 );
 
                 const referenceGroup =
@@ -848,8 +830,6 @@ export class DockviewComponent
             }
         }
 
-        group.model.location = { type: 'floating' };
-
         function getAnchoredBox(): AnchoredBox {
             if (options?.position) {
                 const result: any = {};
@@ -939,10 +919,17 @@ export class DockviewComponent
             overlay
         );
 
-        const disposable = watchElementResize(group.element, (entry) => {
-            const { width, height } = entry.contentRect;
-            group.layout(width, height); // let the group know it's size is changing so it can fire events to the panel
-        });
+        const disposable = new CompositeDisposable(
+            group.api.onDidActiveChange((event) => {
+                if (event.isActive) {
+                    overlay.bringToFront();
+                }
+            }),
+            watchElementResize(group.element, (entry) => {
+                const { width, height } = entry.contentRect;
+                group.layout(width, height); // let the group know it's size is changing so it can fire events to the panel
+            })
+        );
 
         floatingGroupPanel.addDisposables(
             overlay.onDidChange(() => {
@@ -964,14 +951,16 @@ export class DockviewComponent
                 dispose: () => {
                     disposable.dispose();
 
-                    group.model.location = { type: 'grid' };
                     remove(this._floatingGroups, floatingGroupPanel);
+                    group.model.location = { type: 'grid' };
                     this.updateWatermark();
                 },
             }
         );
 
         this._floatingGroups.push(floatingGroupPanel);
+
+        group.model.location = { type: 'floating' };
 
         if (!options?.skipActiveGroup) {
             this.doSetGroupAndPanelActive(group);
@@ -1024,20 +1013,12 @@ export class DockviewComponent
         }
     }
 
-    updateOptions(options: Partial<DockviewComponentOptions>): void {
-        const changed_floatingGroupBounds =
-            'floatingGroupBounds' in options &&
-            options.floatingGroupBounds !== this.options.floatingGroupBounds;
+    override updateOptions(options: Partial<DockviewComponentOptions>): void {
+        super.updateOptions(options);
 
-        const changed_rootOverlayOptions =
-            'rootOverlayModel' in options &&
-            options.rootOverlayModel !== this.options.rootOverlayModel;
-
-        this._options = { ...this.options, ...options };
-
-        if (changed_floatingGroupBounds) {
+        if ('floatingGroupBounds' in options) {
             for (const group of this._floatingGroups) {
-                switch (this.options.floatingGroupBounds) {
+                switch (options.floatingGroupBounds) {
                     case 'boundedWithinViewport':
                         group.overlay.minimumInViewportHeight = undefined;
                         group.overlay.minimumInViewportWidth = undefined;
@@ -1050,30 +1031,26 @@ export class DockviewComponent
                         break;
                     default:
                         group.overlay.minimumInViewportHeight =
-                            this.options.floatingGroupBounds?.minimumHeightWithinViewport;
+                            options.floatingGroupBounds?.minimumHeightWithinViewport;
                         group.overlay.minimumInViewportWidth =
-                            this.options.floatingGroupBounds?.minimumWidthWithinViewport;
+                            options.floatingGroupBounds?.minimumWidthWithinViewport;
                 }
 
                 group.overlay.setBounds();
             }
         }
 
-        if (changed_rootOverlayOptions) {
-            this._rootDropTarget.setOverlayModel(options.rootOverlayModel!);
+        if ('rootOverlayModel' in options) {
+            this._rootDropTarget.setOverlayModel(
+                options.rootOverlayModel ?? DEFAULT_ROOT_OVERLAY_MODEL
+            );
         }
 
-        if (
-            //  if explicitly set as `undefined`
-            'gap' in options &&
-            options.gap === undefined
-        ) {
-            this.gridview.margin = 0;
+        if ('gap' in options) {
+            this.gridview.margin = options.gap ?? 0;
         }
 
-        if (typeof options.gap === 'number') {
-            this.gridview.margin = options.gap;
-        }
+        this._options = { ...this.options, ...options };
 
         this.layout(this.gridview.width, this.gridview.height, true);
     }
@@ -1292,6 +1269,8 @@ export class DockviewComponent
 
                 this.addFloatingGroup(group, {
                     position: position,
+                    width: position.width,
+                    height: position.height,
                     skipRemoveGroup: true,
                     inDragMode: false,
                 });
@@ -1803,6 +1782,8 @@ export class DockviewComponent
                     this._onDidRemoveGroup.fire(group);
                 }
 
+                remove(this._popoutGroups, selectedGroup);
+
                 const removedGroup = selectedGroup.disposable.dispose();
 
                 if (!options?.skipPopoutReturn && removedGroup) {
@@ -1958,7 +1939,46 @@ export class DockviewComponent
                     }
                 }
 
-                const { width, height } = sourceGroup.api;
+                if (sourceGroup.api.location.type === 'popout') {
+                    /**
+                     * the source group is a popout group with a single panel
+                     *
+                     * 1. remove the panel from the group without triggering any events
+                     * 2. remove the popout group
+                     * 3. create a new group at the requested location and add that panel
+                     */
+
+                    const popoutGroup = this._popoutGroups.find(
+                        (group) => group.popoutGroup === sourceGroup
+                    )!;
+
+                    const removedPanel: IDockviewPanel | undefined =
+                        this.movingLock(() =>
+                            popoutGroup.popoutGroup.model.removePanel(
+                                popoutGroup.popoutGroup.panels[0],
+                                {
+                                    skipSetActive: true,
+                                    skipSetActiveGroup: true,
+                                }
+                            )
+                        );
+
+                    this.doRemoveGroup(sourceGroup, { skipActive: true });
+
+                    const newGroup = this.createGroupAtLocation(targetLocation);
+                    this.movingLock(() =>
+                        newGroup.model.openPanel(removedPanel!, {
+                            skipSetActive: true,
+                        })
+                    );
+                    this.doSetGroupAndPanelActive(newGroup);
+
+                    this._onDidMovePanel.fire({
+                        panel: this.getGroupPanel(sourceItemId)!,
+                        from: sourceGroup,
+                    });
+                    return;
+                }
 
                 // source group will become empty so delete the group
                 const targetGroup = this.movingLock(() =>

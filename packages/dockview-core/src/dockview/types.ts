@@ -3,7 +3,7 @@ import { PanelInitParameters, IPanel } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
 import { Optional } from '../types';
 import { DockviewGroupPanel, IDockviewGroupPanel } from './dockviewGroupPanel';
-import { DockviewPanelRenderer } from '../overlayRenderContainer';
+import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
 
 export interface HeaderPartInitParameters {
     title: string;
@@ -32,7 +32,6 @@ export interface IWatermarkRenderer
     extends Optional<Omit<IPanel, 'id' | 'init'>, RendererMethodOptionalList> {
     readonly element: HTMLElement;
     init: (params: WatermarkRendererInitParameters) => void;
-    updateParentGroup(group: DockviewGroupPanel, visible: boolean): void;
 }
 
 export interface ITabRenderer

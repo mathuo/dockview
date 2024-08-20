@@ -1,13 +1,14 @@
 import { Emitter, Event, AsapEvent } from '../events';
 import { getGridLocation, Gridview, IGridView } from './gridview';
 import { Position } from '../dnd/droptarget';
-import { Disposable, IValueDisposable } from '../lifecycle';
+import { Disposable, IDisposable, IValueDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
 import { ISplitviewStyles, Orientation, Sizing } from '../splitview/splitview';
 import { IPanel } from '../panel/types';
 import { MovementOptions2 } from '../dockview/options';
 import { Resizable } from '../resizable';
 import { tail } from '../array';
+import { Classnames } from '../dom';
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -33,10 +34,10 @@ export interface BaseGridOptions {
     readonly proportionalLayout: boolean;
     readonly orientation: Orientation;
     readonly styles?: ISplitviewStyles;
-    readonly parentElement: HTMLElement;
     readonly disableAutoResizing?: boolean;
     readonly locked?: boolean;
     readonly margin?: number;
+    readonly className?: string;
 }
 
 export interface IGridPanelView extends IGridView, IPanel {
@@ -44,7 +45,7 @@ export interface IGridPanelView extends IGridView, IPanel {
     readonly isActive: boolean;
 }
 
-export interface IBaseGrid<T extends IGridPanelView> {
+export interface IBaseGrid<T extends IGridPanelView> extends IDisposable {
     readonly element: HTMLElement;
     readonly id: string;
     readonly width: number;
@@ -99,6 +100,8 @@ export abstract class BaseGrid<T extends IGridPanelView>
     readonly onDidViewVisibilityChangeMicroTaskQueue =
         this._onDidViewVisibilityChangeMicroTaskQueue.onEvent;
 
+    private readonly _classNames: Classnames;
+
     get id(): string {
         return this._id;
     }
@@ -144,12 +147,15 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.gridview.locked = value;
     }
 
-    constructor(options: BaseGridOptions) {
+    constructor(parentElement: HTMLElement, options: BaseGridOptions) {
         super(document.createElement('div'), options.disableAutoResizing);
         this.element.style.height = '100%';
         this.element.style.width = '100%';
 
-        options.parentElement.appendChild(this.element);
+        this._classNames = new Classnames(this.element);
+        this._classNames.setClassNames(options.className ?? '');
+
+        parentElement.appendChild(this.element);
 
         this.gridview = new Gridview(
             options.proportionalLayout,
@@ -202,6 +208,30 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     public isVisible(panel: T): boolean {
         return this.gridview.isViewVisible(getGridLocation(panel.element));
+    }
+
+    updateOptions(options: Partial<BaseGridOptions>) {
+        if (typeof options.proportionalLayout === 'boolean') {
+            // this.gridview.proportionalLayout = options.proportionalLayout; // not supported
+        }
+        if (options.orientation) {
+            this.gridview.orientation = options.orientation;
+        }
+        if ('styles' in options) {
+            // this.gridview.styles = options.styles; // not supported
+        }
+        if ('disableResizing' in options) {
+            this.disableResizing = options.disableAutoResizing ?? false;
+        }
+        if ('locked' in options) {
+            this.locked = options.locked ?? false;
+        }
+        if ('margin' in options) {
+            this.gridview.margin = options.margin ?? 0;
+        }
+        if ('className' in options) {
+            this._classNames.setClassNames(options.className ?? '');
+        }
     }
 
     maximizeGroup(panel: T): void {
@@ -339,7 +369,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     public layout(width: number, height: number, forceResize?: boolean): void {
         const different =
-            forceResize ?? (width !== this.width || height !== this.height);
+            forceResize || width !== this.width || height !== this.height;
 
         if (!different) {
             return;

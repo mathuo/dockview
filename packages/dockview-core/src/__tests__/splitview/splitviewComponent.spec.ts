@@ -29,8 +29,7 @@ describe('componentSplitview', () => {
     test('event leakage', () => {
         Emitter.setLeakageMonitorEnabled(true);
 
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
             components: {
                 testPanel: TestPanel,
@@ -66,8 +65,7 @@ describe('componentSplitview', () => {
     });
 
     test('remove panel', () => {
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
             components: {
                 testPanel: TestPanel,
@@ -102,8 +100,7 @@ describe('componentSplitview', () => {
     });
 
     test('horizontal dimensions', () => {
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
             components: {
                 testPanel: TestPanel,
@@ -116,8 +113,7 @@ describe('componentSplitview', () => {
     });
 
     test('vertical dimensions', () => {
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
             components: {
                 testPanel: TestPanel,
@@ -130,8 +126,7 @@ describe('componentSplitview', () => {
     });
 
     test('api resize', () => {
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
             components: {
                 testPanel: TestPanel,
@@ -183,8 +178,7 @@ describe('componentSplitview', () => {
     });
 
     test('api', () => {
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
             components: {
                 testPanel: TestPanel,
@@ -225,8 +219,7 @@ describe('componentSplitview', () => {
     test('vertical panels', () => {
         const disposables = new CompositeDisposable();
 
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
             components: {
                 testPanel: TestPanel,
@@ -277,8 +270,7 @@ describe('componentSplitview', () => {
     test('horizontal panels', () => {
         const disposables = new CompositeDisposable();
 
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
             components: {
                 testPanel: TestPanel,
@@ -327,8 +319,7 @@ describe('componentSplitview', () => {
     });
 
     test('serialization', () => {
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
             components: {
                 testPanel: TestPanel,
@@ -382,8 +373,7 @@ describe('componentSplitview', () => {
     });
 
     test('toJSON shouldnt fire any layout events', () => {
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
             components: {
                 testPanel: TestPanel,
@@ -414,8 +404,7 @@ describe('componentSplitview', () => {
     test('dispose of splitviewComponent', () => {
         expect(container.childNodes.length).toBe(0);
 
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
             components: {
                 testPanel: TestPanel,
@@ -441,8 +430,7 @@ describe('componentSplitview', () => {
     });
 
     test('panel is disposed of when component is disposed', () => {
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
             components: {
                 default: TestPanel,
@@ -473,8 +461,7 @@ describe('componentSplitview', () => {
     });
 
     test('panel is disposed of when removed', () => {
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
             components: {
                 default: TestPanel,
@@ -505,8 +492,7 @@ describe('componentSplitview', () => {
     });
 
     test('panel is disposed of when fromJSON is called', () => {
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
             components: {
                 default: TestPanel,
@@ -541,8 +527,7 @@ describe('componentSplitview', () => {
     });
 
     test('that fromJSON layouts are resized to the current dimensions', async () => {
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
             components: {
                 testPanel: TestPanel,
@@ -594,8 +579,7 @@ describe('componentSplitview', () => {
     });
 
     test('that disableAutoResizing is false by default', () => {
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
             components: {
                 testPanel: TestPanel,
@@ -606,8 +590,7 @@ describe('componentSplitview', () => {
     });
 
     test('that disableAutoResizing can be enabled', () => {
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
             components: {
                 testPanel: TestPanel,
@@ -619,8 +602,7 @@ describe('componentSplitview', () => {
     });
 
     test('that setVisible toggles visiblity', () => {
-        const splitview = new SplitviewComponent({
-            parentElement: container,
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
             components: {
                 default: TestPanel,
@@ -648,5 +630,21 @@ describe('componentSplitview', () => {
         panel1.api.setVisible(true);
         expect(panel1.api.isVisible).toBeTruthy();
         expect(panel2.api.isVisible).toBeTruthy();
+    });
+
+    test('update className', () => {
+        const splitview = new SplitviewComponent(container, {
+            orientation: Orientation.HORIZONTAL,
+            components: {
+                default: TestPanel,
+            },
+            className: 'test-a test-b',
+        });
+
+        expect(splitview.element.className).toBe('container test-a test-b');
+
+        splitview.updateOptions({ className: 'test-b test-c' });
+
+        expect(splitview.element.className).toBe('container test-b test-c');
     });
 });

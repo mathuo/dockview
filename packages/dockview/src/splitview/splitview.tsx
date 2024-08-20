@@ -2,9 +2,8 @@ import React from 'react';
 import {
     SplitviewApi,
     SplitviewPanelApi,
-    ISplitviewComponent,
-    SplitviewComponent,
     Orientation,
+    createSplitview,
 } from 'dockview-core';
 import { usePortalsLifecycle } from '../react';
 import { PanelParameters } from '../types';
@@ -33,14 +32,13 @@ export interface ISplitviewReactProps {
 export const SplitviewReact = React.forwardRef(
     (props: ISplitviewReactProps, ref: React.ForwardedRef<HTMLDivElement>) => {
         const domRef = React.useRef<HTMLDivElement>(null);
-        const splitviewRef = React.useRef<ISplitviewComponent>();
+        const splitviewRef = React.useRef<SplitviewApi>();
         const [portals, addPortal] = usePortalsLifecycle();
 
         React.useImperativeHandle(ref, () => domRef.current!, []);
 
         React.useEffect(() => {
-            const splitview = new SplitviewComponent({
-                parentElement: domRef.current!,
+            const api = createSplitview(domRef.current!, {
                 disableAutoResizing: props.disableAutoResizing,
                 orientation: props.orientation ?? Orientation.HORIZONTAL,
                 frameworkComponents: props.components,
@@ -65,16 +63,16 @@ export const SplitviewReact = React.forwardRef(
             });
 
             const { clientWidth, clientHeight } = domRef.current!;
-            splitview.layout(clientWidth, clientHeight);
+            api.layout(clientWidth, clientHeight);
 
             if (props.onReady) {
-                props.onReady({ api: new SplitviewApi(splitview) });
+                props.onReady({ api });
             }
 
-            splitviewRef.current = splitview;
+            splitviewRef.current = api;
 
             return () => {
-                splitview.dispose();
+                api.dispose();
             };
         }, []);
 

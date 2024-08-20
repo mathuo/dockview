@@ -1,8 +1,15 @@
-import { DragAndDropObserver } from './dnd/dnd';
-import { Droptarget } from './dnd/droptarget';
-import { getDomNodePagePosition, toggleClass } from './dom';
-import { CompositeDisposable, Disposable, IDisposable } from './lifecycle';
-import { IDockviewPanel } from './dockview/dockviewPanel';
+import { DragAndDropObserver } from '../dnd/dnd';
+import { Droptarget } from '../dnd/droptarget';
+import { getDomNodePagePosition, toggleClass } from '../dom';
+import {
+    CompositeDisposable,
+    Disposable,
+    IDisposable,
+    MutableDisposable,
+} from '../lifecycle';
+import { IDockviewPanel } from '../dockview/dockviewPanel';
+import { DockviewComponent } from '../dockview/dockviewComponent';
+import { DEFAULT_OVERLAY_Z_INDEX } from './overlay';
 
 export type DockviewPanelRenderer = 'onlyWhenVisible' | 'always';
 
@@ -30,7 +37,10 @@ export class OverlayRenderContainer extends CompositeDisposable {
 
     private _disposed = false;
 
-    constructor(private readonly element: HTMLElement) {
+    constructor(
+        readonly element: HTMLElement,
+        readonly accessor: DockviewComponent
+    ) {
         super();
 
         this.addDisposables(
@@ -108,7 +118,52 @@ export class OverlayRenderContainer extends CompositeDisposable {
             focusContainer.style.display = panel.api.isVisible ? '' : 'none';
         };
 
+        const observerDisposable = new MutableDisposable();
+
+        const correctLayerPosition = () => {
+            if (panel.api.location.type === 'floating') {
+                queueMicrotask(() => {
+                    const floatingGroup = this.accessor.floatingGroups.find(
+                        (group) => group.group === panel.api.group
+                    );
+
+                    if (!floatingGroup) {
+                        return;
+                    }
+
+                    const element = floatingGroup.overlay.element;
+
+                    const update = () => {
+                        const level = Number(
+                            element.getAttribute('aria-level')
+                        );
+                        focusContainer.style.zIndex = `${
+                            DEFAULT_OVERLAY_Z_INDEX + level * 2 + 1
+                        }`;
+                    };
+
+                    const observer = new MutationObserver(() => {
+                        update();
+                    });
+
+                    observerDisposable.value = Disposable.from(() =>
+                        observer.disconnect()
+                    );
+
+                    observer.observe(element, {
+                        attributeFilter: ['aria-level'],
+                        attributes: true,
+                    });
+
+                    update();
+                });
+            } else {
+                focusContainer.style.zIndex = ''; // reset the z-index, perhaps CSS will take over here
+            }
+        };
+
         const disposable = new CompositeDisposable(
+            observerDisposable,
             /**
              * since container is positioned absoutely we must explicitly forward
              * the dnd events for the expect behaviours to continue to occur in terms of dnd
@@ -134,7 +189,7 @@ export class OverlayRenderContainer extends CompositeDisposable {
                 },
             }),
 
-            panel.api.onDidVisibilityChange((event) => {
+            panel.api.onDidVisibilityChange(() => {
                 /**
                  * Control the visibility of the content, however even when not visible (display: none)
                  * the content is still maintained within the DOM hence DOM specific attributes
@@ -149,12 +204,8 @@ export class OverlayRenderContainer extends CompositeDisposable {
 
                 resize();
             }),
-            panel.api.onDidActiveGroupChange((event) => {
-                if (event.isActive) {
-                    this.map[panel.api.id].element.style.zIndex = '1000';
-                } else {
-                    this.map[panel.api.id].element.style.zIndex = '';
-                }
+            panel.api.onDidLocationChange(() => {
+                correctLayerPosition();
             })
         );
 
@@ -169,6 +220,8 @@ export class OverlayRenderContainer extends CompositeDisposable {
 
             focusContainer.parentElement?.removeChild(focusContainer);
         });
+
+        correctLayerPosition();
 
         queueMicrotask(() => {
             if (this.isDisposed) {

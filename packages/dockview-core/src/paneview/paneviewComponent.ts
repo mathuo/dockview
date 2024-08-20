@@ -28,6 +28,7 @@ import { sequentialNumberGenerator } from '../math';
 import { PaneTransfer } from '../dnd/dataTransfer';
 import { Resizable } from '../resizable';
 import { Parameters } from '../panel/types';
+import { Classnames, toggleClass } from '../dom';
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -155,6 +156,8 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
     private readonly _onDidRemoveView = new Emitter<PaneviewPanel>();
     readonly onDidRemoveView = this._onDidRemoveView.event;
 
+    private readonly _classNames: Classnames;
+
     get id(): string {
         return this._id;
     }
@@ -203,8 +206,8 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
         return this._options;
     }
 
-    constructor(options: PaneviewComponentOptions) {
-        super(options.parentElement, options.disableAutoResizing);
+    constructor(parentElement: HTMLElement, options: PaneviewComponentOptions) {
+        super(parentElement, options.disableAutoResizing);
 
         this.addDisposables(
             this._onDidLayoutChange,
@@ -213,6 +216,9 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
             this._onDidAddView,
             this._onDidRemoveView
         );
+
+        this._classNames = new Classnames(this.element);
+        this._classNames.setClassNames(options.className ?? '');
 
         this._options = options;
 
@@ -241,6 +247,14 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
     }
 
     updateOptions(options: Partial<PaneviewComponentOptions>): void {
+        if ('className' in options) {
+            this._classNames.setClassNames(options.className ?? '');
+        }
+
+        if ('disableResizing' in options) {
+            this.disableResizing = options.disableAutoResizing ?? false;
+        }
+
         this._options = { ...this.options, ...options };
     }
 

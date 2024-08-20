@@ -9,7 +9,7 @@ import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { IPanel, PanelUpdateEvent, Parameters } from '../panel/types';
 import { IDockviewPanelModel } from './dockviewPanelModel';
 import { DockviewComponent } from './dockviewComponent';
-import { DockviewPanelRenderer } from '../overlayRenderContainer';
+import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
 import { WillFocusEvent } from '../api/panelApi';
 import { Contraints } from '../gridview/gridviewPanel';
 
@@ -142,7 +142,7 @@ export class DockviewPanel
                 // you are actually just resizing the panels parent which is the group
                 this.group.api.setSize(event);
             }),
-            this.api.onDidRendererChange((event) => {
+            this.api.onDidRendererChange(() => {
                 this.group.model.rerender(this);
             })
         );

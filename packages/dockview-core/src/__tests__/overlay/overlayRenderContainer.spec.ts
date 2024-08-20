@@ -1,14 +1,18 @@
-import { Droptarget } from '../dnd/droptarget';
-import { IDockviewPanel } from '../dockview/dockviewPanel';
-import { Emitter } from '../events';
-import { IRenderable, OverlayRenderContainer } from '../overlayRenderContainer';
+import { Droptarget } from '../../dnd/droptarget';
+import { IDockviewPanel } from '../../dockview/dockviewPanel';
+import { Emitter } from '../../events';
+import {
+    IRenderable,
+    OverlayRenderContainer,
+} from '../../overlay/overlayRenderContainer';
 import { fromPartial } from '@total-typescript/shoehorn';
-import { Writable, exhaustMicrotaskQueue } from './__test_utils__/utils';
+import { Writable, exhaustMicrotaskQueue } from '../__test_utils__/utils';
+import { DockviewComponent } from '../../dockview/dockviewComponent';
+import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 
 describe('overlayRenderContainer', () => {
     let referenceContainer: IRenderable;
     let parentContainer: HTMLElement;
-    let cut: OverlayRenderContainer;
 
     beforeEach(() => {
         parentContainer = document.createElement('div');
@@ -17,22 +21,28 @@ describe('overlayRenderContainer', () => {
             element: document.createElement('div'),
             dropTarget: fromPartial<Droptarget>({}),
         };
-
-        cut = new OverlayRenderContainer(parentContainer);
     });
 
     test('that attach(...) and detach(...) mutate the DOM as expected', () => {
+        const cut = new OverlayRenderContainer(
+            parentContainer,
+            fromPartial<DockviewComponent>({})
+        );
+
         const panelContentEl = document.createElement('div');
 
         const onDidVisibilityChange = new Emitter<any>();
         const onDidDimensionsChange = new Emitter<any>();
+        const onDidLocationChange = new Emitter<any>();
 
         const panel = fromPartial<IDockviewPanel>({
             api: {
                 id: 'test_panel_id',
                 onDidVisibilityChange: onDidVisibilityChange.event,
                 onDidDimensionsChange: onDidDimensionsChange.event,
+                onDidLocationChange: onDidLocationChange.event,
                 isVisible: true,
+                location: { type: 'grid' },
             },
             view: {
                 content: {
@@ -58,17 +68,25 @@ describe('overlayRenderContainer', () => {
     });
 
     test('add a view that is not currently in the DOM', async () => {
+        const cut = new OverlayRenderContainer(
+            parentContainer,
+            fromPartial<DockviewComponent>({})
+        );
+
         const panelContentEl = document.createElement('div');
 
         const onDidVisibilityChange = new Emitter<any>();
         const onDidDimensionsChange = new Emitter<any>();
+        const onDidLocationChange = new Emitter<any>();
 
         const panel = fromPartial<IDockviewPanel>({
             api: {
                 id: 'test_panel_id',
                 onDidVisibilityChange: onDidVisibilityChange.event,
                 onDidDimensionsChange: onDidDimensionsChange.event,
+                onDidLocationChange: onDidLocationChange.event,
                 isVisible: true,
+                location: { type: 'grid' },
             },
             view: {
                 content: {
@@ -185,5 +203,61 @@ describe('overlayRenderContainer', () => {
         expect(
             referenceContainer.element.getBoundingClientRect
         ).toHaveBeenCalledTimes(3);
+    });
+
+    test('related z-index from `aria-level` set on floating panels', async () => {
+        const group = fromPartial<DockviewGroupPanel>({});
+
+        const element = document.createElement('div');
+        element.setAttribute('aria-level', '2');
+        const spy = jest.spyOn(element, 'getAttribute');
+
+        const accessor = fromPartial<DockviewComponent>({
+            floatingGroups: [
+                {
+                    group,
+                    overlay: {
+                        element,
+                    },
+                },
+            ],
+        });
+
+        const cut = new OverlayRenderContainer(parentContainer, accessor);
+
+        const panelContentEl = document.createElement('div');
+
+        const onDidVisibilityChange = new Emitter<any>();
+        const onDidDimensionsChange = new Emitter<any>();
+        const onDidLocationChange = new Emitter<any>();
+
+        const panel = fromPartial<IDockviewPanel>({
+            api: {
+                id: 'test_panel_id',
+                onDidVisibilityChange: onDidVisibilityChange.event,
+                onDidDimensionsChange: onDidDimensionsChange.event,
+                onDidLocationChange: onDidLocationChange.event,
+                isVisible: true,
+                group,
+                location: { type: 'floating' },
+            },
+            view: {
+                content: {
+                    element: panelContentEl,
+                },
+            },
+            group: {
+                api: {
+                    location: { type: 'floating' },
+                },
+            },
+        });
+
+        cut.attach({ panel, referenceContainer });
+
+        await exhaustMicrotaskQueue();
+
+        expect(spy).toHaveBeenCalledWith('aria-level');
+        expect(panelContentEl.parentElement!.style.zIndex).toBe('1004');
     });
 });

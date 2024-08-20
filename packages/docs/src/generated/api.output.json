@@ -1201,6 +1201,42 @@
                         "kind": "callSignature"
                     }
                 ]
+            },
+            {
+                "name": "updateOptions",
+                "code": "(options: Partial<BaseGridOptions>): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "updateOptions",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "options",
+                                "code": "options: Partial<BaseGridOptions>",
+                                "type": {
+                                    "type": "reference",
+                                    "value": "Partial",
+                                    "source": "typescript",
+                                    "typeArguments": [
+                                        {
+                                            "type": "reference",
+                                            "value": "BaseGridOptions",
+                                            "source": "dockview-core"
+                                        }
+                                    ]
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(options: Partial<BaseGridOptions>): void",
+                        "kind": "callSignature"
+                    }
+                ]
             }
         ],
         "extends": [
@@ -1786,6 +1822,20 @@
                             "text": "Active panel object."
                         }
                     ]
+                }
+            },
+            {
+                "name": "gap",
+                "code": "number",
+                "kind": "accessor",
+                "value": {
+                    "name": "gap",
+                    "code": "number",
+                    "kind": "getSignature",
+                    "returnType": {
+                        "type": "intrinsic",
+                        "value": "number"
+                    }
                 }
             },
             {
@@ -2848,7 +2898,7 @@
             },
             {
                 "name": "addGroup",
-                "code": "(options?: AddGroupOptions): DockviewGroupPanel",
+                "code": "(options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition): DockviewGroupPanel",
                 "kind": "method",
                 "signature": [
                     {
@@ -2865,11 +2915,56 @@
                         "parameters": [
                             {
                                 "name": "options",
-                                "code": "options?: AddGroupOptions",
+                                "code": "options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition",
                                 "type": {
-                                    "type": "reference",
-                                    "value": "AddGroupOptions",
-                                    "source": "dockview-core"
+                                    "type": "or",
+                                    "values": [
+                                        {
+                                            "type": "intersection",
+                                            "values": [
+                                                {
+                                                    "type": "reference",
+                                                    "value": "GroupOptions",
+                                                    "source": "dockview-core"
+                                                },
+                                                {
+                                                    "type": "reference",
+                                                    "value": "AddGroupOptionsWithPanel",
+                                                    "source": "dockview-core"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "type": "intersection",
+                                            "values": [
+                                                {
+                                                    "type": "reference",
+                                                    "value": "GroupOptions",
+                                                    "source": "dockview-core"
+                                                },
+                                                {
+                                                    "type": "reference",
+                                                    "value": "AddGroupOptionsWithGroup",
+                                                    "source": "dockview-core"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "type": "intersection",
+                                            "values": [
+                                                {
+                                                    "type": "reference",
+                                                    "value": "GroupOptions",
+                                                    "source": "dockview-core"
+                                                },
+                                                {
+                                                    "type": "reference",
+                                                    "value": "AbsolutePosition",
+                                                    "source": "dockview-core"
+                                                }
+                                            ]
+                                        }
+                                    ]
                                 },
                                 "kind": "parameter"
                             }
@@ -2879,7 +2974,7 @@
                             "value": "DockviewGroupPanel",
                             "source": "dockview-core"
                         },
-                        "code": "(options?: AddGroupOptions): DockviewGroupPanel",
+                        "code": "(options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition): DockviewGroupPanel",
                         "kind": "callSignature"
                     }
                 ],
@@ -3253,6 +3348,40 @@
                         {
                             "kind": "text",
                             "text": "Close all groups and panels."
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "comment": {
+                            "summary": [
+                                {
+                                    "kind": "text",
+                                    "text": "Release resources and teardown component. Do not call when using framework versions of dockview."
+                                }
+                            ]
+                        },
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Release resources and teardown component. Do not call when using framework versions of dockview."
                         }
                     ]
                 }
@@ -3870,6 +3999,42 @@
                         }
                     ]
                 }
+            },
+            {
+                "name": "updateOptions",
+                "code": "(options: Partial<DockviewComponentOptions>): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "updateOptions",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "options",
+                                "code": "options: Partial<DockviewComponentOptions>",
+                                "type": {
+                                    "type": "reference",
+                                    "value": "Partial",
+                                    "source": "typescript",
+                                    "typeArguments": [
+                                        {
+                                            "type": "reference",
+                                            "value": "DockviewComponentOptions",
+                                            "source": "dockview-core"
+                                        }
+                                    ]
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(options: Partial<DockviewComponentOptions>): void",
+                        "kind": "callSignature"
+                    }
+                ]
             }
         ],
         "extends": []
@@ -4497,6 +4662,38 @@
                 }
             },
             {
+                "name": "floatingGroups",
+                "code": "DockviewFloatingGroupPanel[]",
+                "kind": "accessor",
+                "value": {
+                    "name": "floatingGroups",
+                    "code": "DockviewFloatingGroupPanel[]",
+                    "kind": "getSignature",
+                    "returnType": {
+                        "type": "array",
+                        "value": {
+                            "type": "reference",
+                            "value": "DockviewFloatingGroupPanel",
+                            "source": "dockview-core"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "gap",
+                "code": "number",
+                "kind": "accessor",
+                "value": {
+                    "name": "gap",
+                    "code": "number",
+                    "kind": "getSignature",
+                    "returnType": {
+                        "type": "intrinsic",
+                        "value": "number"
+                    }
+                }
+            },
+            {
                 "name": "groups",
                 "code": "BaseGrid.T[]",
                 "kind": "accessor",
@@ -4787,7 +4984,7 @@
             },
             {
                 "name": "addFloatingGroup",
-                "code": "(item: DockviewPanel | DockviewGroupPanel, options?: FloatingGroupOptions): void",
+                "code": "(item: DockviewPanel | DockviewGroupPanel, options?: FloatingGroupOptionsInternal): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -4816,10 +5013,10 @@
                             },
                             {
                                 "name": "options",
-                                "code": "options?: FloatingGroupOptions",
+                                "code": "options?: FloatingGroupOptionsInternal",
                                 "type": {
                                     "type": "reference",
-                                    "value": "FloatingGroupOptions",
+                                    "value": "FloatingGroupOptionsInternal",
                                     "source": "dockview-core"
                                 },
                                 "kind": "parameter"
@@ -4829,14 +5026,14 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(item: DockviewPanel | DockviewGroupPanel, options?: FloatingGroupOptions): void",
+                        "code": "(item: DockviewPanel | DockviewGroupPanel, options?: FloatingGroupOptionsInternal): void",
                         "kind": "callSignature"
                     }
                 ]
             },
             {
                 "name": "addGroup",
-                "code": "(options?: AddGroupOptions): DockviewGroupPanel",
+                "code": "(options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition): DockviewGroupPanel",
                 "kind": "method",
                 "signature": [
                     {
@@ -4845,11 +5042,56 @@
                         "parameters": [
                             {
                                 "name": "options",
-                                "code": "options?: AddGroupOptions",
+                                "code": "options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition",
                                 "type": {
-                                    "type": "reference",
-                                    "value": "AddGroupOptions",
-                                    "source": "dockview-core"
+                                    "type": "or",
+                                    "values": [
+                                        {
+                                            "type": "intersection",
+                                            "values": [
+                                                {
+                                                    "type": "reference",
+                                                    "value": "GroupOptions",
+                                                    "source": "dockview-core"
+                                                },
+                                                {
+                                                    "type": "reference",
+                                                    "value": "AddGroupOptionsWithPanel",
+                                                    "source": "dockview-core"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "type": "intersection",
+                                            "values": [
+                                                {
+                                                    "type": "reference",
+                                                    "value": "GroupOptions",
+                                                    "source": "dockview-core"
+                                                },
+                                                {
+                                                    "type": "reference",
+                                                    "value": "AddGroupOptionsWithGroup",
+                                                    "source": "dockview-core"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "type": "intersection",
+                                            "values": [
+                                                {
+                                                    "type": "reference",
+                                                    "value": "GroupOptions",
+                                                    "source": "dockview-core"
+                                                },
+                                                {
+                                                    "type": "reference",
+                                                    "value": "AbsolutePosition",
+                                                    "source": "dockview-core"
+                                                }
+                                            ]
+                                        }
+                                    ]
                                 },
                                 "kind": "parameter"
                             }
@@ -4859,7 +5101,7 @@
                             "value": "DockviewGroupPanel",
                             "source": "dockview-core"
                         },
-                        "code": "(options?: AddGroupOptions): DockviewGroupPanel",
+                        "code": "(options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition): DockviewGroupPanel",
                         "kind": "callSignature"
                     }
                 ]
@@ -7021,18 +7263,28 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority | undefined",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low | undefined",
                 "kind": "accessor",
                 "value": {
                     "name": "priority",
-                    "code": "LayoutPriority | undefined",
+                    "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low | undefined",
                     "kind": "getSignature",
                     "returnType": {
                         "type": "or",
                         "values": [
                             {
                                 "type": "reference",
-                                "value": "LayoutPriority",
+                                "value": "LayoutPriority.Normal",
+                                "source": "dockview-core"
+                            },
+                            {
+                                "type": "reference",
+                                "value": "LayoutPriority.High",
+                                "source": "dockview-core"
+                            },
+                            {
+                                "type": "reference",
+                                "value": "LayoutPriority.Low",
                                 "source": "dockview-core"
                             },
                             {
@@ -10491,7 +10743,7 @@
             },
             {
                 "name": "addView",
-                "code": "(view: IGridView, size: Sizing | number, location: number[]): void",
+                "code": "(view: IGridView, size: InvisibleSizing | SplitSizing | DistributeSizing | number, location: number[]): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -10510,13 +10762,23 @@
                             },
                             {
                                 "name": "size",
-                                "code": "size: Sizing | number",
+                                "code": "size: InvisibleSizing | SplitSizing | DistributeSizing | number",
                                 "type": {
                                     "type": "or",
                                     "values": [
                                         {
                                             "type": "reference",
-                                            "value": "Sizing",
+                                            "value": "InvisibleSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "SplitSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "DistributeSizing",
                                             "source": "dockview-core"
                                         },
                                         {
@@ -10544,7 +10806,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(view: IGridView, size: Sizing | number, location: number[]): void",
+                        "code": "(view: IGridView, size: InvisibleSizing | SplitSizing | DistributeSizing | number, location: number[]): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -11004,7 +11266,7 @@
             },
             {
                 "name": "remove",
-                "code": "(view: IGridView, sizing?: Sizing): IGridView",
+                "code": "(view: IGridView, sizing?: InvisibleSizing | SplitSizing | DistributeSizing): IGridView",
                 "kind": "method",
                 "signature": [
                     {
@@ -11023,11 +11285,26 @@
                             },
                             {
                                 "name": "sizing",
-                                "code": "sizing?: Sizing",
+                                "code": "sizing?: InvisibleSizing | SplitSizing | DistributeSizing",
                                 "type": {
-                                    "type": "reference",
-                                    "value": "Sizing",
-                                    "source": "dockview-core"
+                                    "type": "or",
+                                    "values": [
+                                        {
+                                            "type": "reference",
+                                            "value": "InvisibleSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "SplitSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "DistributeSizing",
+                                            "source": "dockview-core"
+                                        }
+                                    ]
                                 },
                                 "kind": "parameter"
                             }
@@ -11037,14 +11314,14 @@
                             "value": "IGridView",
                             "source": "dockview-core"
                         },
-                        "code": "(view: IGridView, sizing?: Sizing): IGridView",
+                        "code": "(view: IGridView, sizing?: InvisibleSizing | SplitSizing | DistributeSizing): IGridView",
                         "kind": "callSignature"
                     }
                 ]
             },
             {
                 "name": "removeView",
-                "code": "(location: number[], sizing?: Sizing): IGridView",
+                "code": "(location: number[], sizing?: InvisibleSizing | SplitSizing | DistributeSizing): IGridView",
                 "kind": "method",
                 "signature": [
                     {
@@ -11065,11 +11342,26 @@
                             },
                             {
                                 "name": "sizing",
-                                "code": "sizing?: Sizing",
+                                "code": "sizing?: InvisibleSizing | SplitSizing | DistributeSizing",
                                 "type": {
-                                    "type": "reference",
-                                    "value": "Sizing",
-                                    "source": "dockview-core"
+                                    "type": "or",
+                                    "values": [
+                                        {
+                                            "type": "reference",
+                                            "value": "InvisibleSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "SplitSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "DistributeSizing",
+                                            "source": "dockview-core"
+                                        }
+                                    ]
                                 },
                                 "kind": "parameter"
                             }
@@ -11079,7 +11371,7 @@
                             "value": "IGridView",
                             "source": "dockview-core"
                         },
-                        "code": "(location: number[], sizing?: Sizing): IGridView",
+                        "code": "(location: number[], sizing?: InvisibleSizing | SplitSizing | DistributeSizing): IGridView",
                         "kind": "callSignature"
                     }
                 ]
@@ -11752,6 +12044,40 @@
                 }
             },
             {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "comment": {
+                            "summary": [
+                                {
+                                    "kind": "text",
+                                    "text": "Release resources and teardown component. Do not call when using framework versions of dockview."
+                                }
+                            ]
+                        },
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Release resources and teardown component. Do not call when using framework versions of dockview."
+                        }
+                    ]
+                }
+            },
+            {
                 "name": "focus",
                 "code": "(): void",
                 "kind": "method",
@@ -12087,7 +12413,7 @@
             },
             {
                 "name": "removePanel",
-                "code": "(panel: IGridviewPanel<GridviewPanelApi>, sizing?: Sizing): void",
+                "code": "(panel: IGridviewPanel<GridviewPanelApi>, sizing?: InvisibleSizing | SplitSizing | DistributeSizing): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -12121,11 +12447,26 @@
                             },
                             {
                                 "name": "sizing",
-                                "code": "sizing?: Sizing",
+                                "code": "sizing?: InvisibleSizing | SplitSizing | DistributeSizing",
                                 "type": {
-                                    "type": "reference",
-                                    "value": "Sizing",
-                                    "source": "dockview-core"
+                                    "type": "or",
+                                    "values": [
+                                        {
+                                            "type": "reference",
+                                            "value": "InvisibleSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "SplitSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "DistributeSizing",
+                                            "source": "dockview-core"
+                                        }
+                                    ]
                                 },
                                 "kind": "parameter"
                             }
@@ -12134,7 +12475,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(panel: IGridviewPanel<GridviewPanelApi>, sizing?: Sizing): void",
+                        "code": "(panel: IGridviewPanel<GridviewPanelApi>, sizing?: InvisibleSizing | SplitSizing | DistributeSizing): void",
                         "kind": "callSignature"
                     }
                 ],
@@ -12181,6 +12522,42 @@
                         }
                     ]
                 }
+            },
+            {
+                "name": "updateOptions",
+                "code": "(options: Partial<GridviewComponentOptions>): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "updateOptions",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "options",
+                                "code": "options: Partial<GridviewComponentOptions>",
+                                "type": {
+                                    "type": "reference",
+                                    "value": "Partial",
+                                    "source": "typescript",
+                                    "typeArguments": [
+                                        {
+                                            "type": "reference",
+                                            "value": "GridviewComponentOptions",
+                                            "source": "dockview-core"
+                                        }
+                                    ]
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(options: Partial<GridviewComponentOptions>): void",
+                        "kind": "callSignature"
+                    }
+                ]
             }
         ],
         "extends": []
@@ -13834,7 +14211,7 @@
             },
             {
                 "name": "updateOptions",
-                "code": "(options: Partial<GridviewComponentUpdateOptions>): void",
+                "code": "(options: Partial<GridviewComponentOptions>): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -13843,7 +14220,7 @@
                         "parameters": [
                             {
                                 "name": "options",
-                                "code": "options: Partial<GridviewComponentUpdateOptions>",
+                                "code": "options: Partial<GridviewComponentOptions>",
                                 "type": {
                                     "type": "reference",
                                     "value": "Partial",
@@ -13851,7 +14228,7 @@
                                     "typeArguments": [
                                         {
                                             "type": "reference",
-                                            "value": "GridviewComponentUpdateOptions",
+                                            "value": "GridviewComponentOptions",
                                             "source": "dockview-core"
                                         }
                                     ]
@@ -13863,7 +14240,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(options: Partial<GridviewComponentUpdateOptions>): void",
+                        "code": "(options: Partial<GridviewComponentOptions>): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -14133,18 +14510,28 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority | undefined",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low | undefined",
                 "kind": "accessor",
                 "value": {
                     "name": "priority",
-                    "code": "LayoutPriority | undefined",
+                    "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low | undefined",
                     "kind": "getSignature",
                     "returnType": {
                         "type": "or",
                         "values": [
                             {
                                 "type": "reference",
-                                "value": "LayoutPriority",
+                                "value": "LayoutPriority.Normal",
+                                "source": "dockview-core"
+                            },
+                            {
+                                "type": "reference",
+                                "value": "LayoutPriority.High",
+                                "source": "dockview-core"
+                            },
+                            {
+                                "type": "reference",
+                                "value": "LayoutPriority.Low",
                                 "source": "dockview-core"
                             },
                             {
@@ -15669,7 +16056,7 @@
             },
             {
                 "name": "addPane",
-                "code": "(pane: PaneviewPanel, size?: Sizing | number, index: number, skipLayout: boolean): void",
+                "code": "(pane: PaneviewPanel, size?: InvisibleSizing | SplitSizing | DistributeSizing | number, index: number, skipLayout: boolean): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -15688,13 +16075,23 @@
                             },
                             {
                                 "name": "size",
-                                "code": "size?: Sizing | number",
+                                "code": "size?: InvisibleSizing | SplitSizing | DistributeSizing | number",
                                 "type": {
                                     "type": "or",
                                     "values": [
                                         {
                                             "type": "reference",
-                                            "value": "Sizing",
+                                            "value": "InvisibleSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "SplitSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "DistributeSizing",
                                             "source": "dockview-core"
                                         },
                                         {
@@ -15728,7 +16125,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(pane: PaneviewPanel, size?: Sizing | number, index: number, skipLayout: boolean): void",
+                        "code": "(pane: PaneviewPanel, size?: InvisibleSizing | SplitSizing | DistributeSizing | number, index: number, skipLayout: boolean): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -16436,6 +16833,40 @@
                 }
             },
             {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "comment": {
+                            "summary": [
+                                {
+                                    "kind": "text",
+                                    "text": "Release resources and teardown component. Do not call when using framework versions of dockview."
+                                }
+                            ]
+                        },
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Release resources and teardown component. Do not call when using framework versions of dockview."
+                        }
+                    ]
+                }
+            },
+            {
                 "name": "focus",
                 "code": "(): void",
                 "kind": "method",
@@ -16782,6 +17213,58 @@
                         {
                             "kind": "text",
                             "text": "Create a serialized object of the current component."
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "updateOptions",
+                "code": "(options: Partial<PaneviewComponentOptions>): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "updateOptions",
+                        "comment": {
+                            "summary": [
+                                {
+                                    "kind": "text",
+                                    "text": "Update configuratable options."
+                                }
+                            ]
+                        },
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "options",
+                                "code": "options: Partial<PaneviewComponentOptions>",
+                                "type": {
+                                    "type": "reference",
+                                    "value": "Partial",
+                                    "source": "typescript",
+                                    "typeArguments": [
+                                        {
+                                            "type": "reference",
+                                            "value": "PaneviewComponentOptions",
+                                            "source": "dockview-core"
+                                        }
+                                    ]
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(options: Partial<PaneviewComponentOptions>): void",
+                        "kind": "callSignature"
+                    }
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Update configuratable options."
                         }
                     ]
                 }
@@ -18436,7 +18919,7 @@
             },
             {
                 "name": "addView",
-                "code": "(view: IView, size: Sizing | number, index: number, skipLayout?: boolean): void",
+                "code": "(view: IView, size: InvisibleSizing | SplitSizing | DistributeSizing | number, index: number, skipLayout?: boolean): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -18455,13 +18938,23 @@
                             },
                             {
                                 "name": "size",
-                                "code": "size: Sizing | number",
+                                "code": "size: InvisibleSizing | SplitSizing | DistributeSizing | number",
                                 "type": {
                                     "type": "or",
                                     "values": [
                                         {
                                             "type": "reference",
-                                            "value": "Sizing",
+                                            "value": "InvisibleSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "SplitSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "DistributeSizing",
                                             "source": "dockview-core"
                                         },
                                         {
@@ -18495,7 +18988,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(view: IView, size: Sizing | number, index: number, skipLayout?: boolean): void",
+                        "code": "(view: IView, size: InvisibleSizing | SplitSizing | DistributeSizing | number, index: number, skipLayout?: boolean): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -18737,7 +19230,7 @@
             },
             {
                 "name": "removeView",
-                "code": "(index: number, sizing?: Sizing, skipLayout: boolean): IView",
+                "code": "(index: number, sizing?: InvisibleSizing | SplitSizing | DistributeSizing, skipLayout: boolean): IView",
                 "kind": "method",
                 "signature": [
                     {
@@ -18755,11 +19248,26 @@
                             },
                             {
                                 "name": "sizing",
-                                "code": "sizing?: Sizing",
+                                "code": "sizing?: InvisibleSizing | SplitSizing | DistributeSizing",
                                 "type": {
-                                    "type": "reference",
-                                    "value": "Sizing",
-                                    "source": "dockview-core"
+                                    "type": "or",
+                                    "values": [
+                                        {
+                                            "type": "reference",
+                                            "value": "InvisibleSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "SplitSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "DistributeSizing",
+                                            "source": "dockview-core"
+                                        }
+                                    ]
                                 },
                                 "kind": "parameter"
                             },
@@ -18778,7 +19286,7 @@
                             "value": "IView",
                             "source": "dockview-core"
                         },
-                        "code": "(index: number, sizing?: Sizing, skipLayout: boolean): IView",
+                        "code": "(index: number, sizing?: InvisibleSizing | SplitSizing | DistributeSizing, skipLayout: boolean): IView",
                         "kind": "callSignature"
                     }
                 ]
@@ -19377,6 +19885,40 @@
                 }
             },
             {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "comment": {
+                            "summary": [
+                                {
+                                    "kind": "text",
+                                    "text": "Release resources and teardown component. Do not call when using framework versions of dockview."
+                                }
+                            ]
+                        },
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Release resources and teardown component. Do not call when using framework versions of dockview."
+                        }
+                    ]
+                }
+            },
+            {
                 "name": "focus",
                 "code": "(): void",
                 "kind": "method",
@@ -19633,7 +20175,7 @@
             },
             {
                 "name": "removePanel",
-                "code": "(panel: ISplitviewPanel, sizing?: Sizing): void",
+                "code": "(panel: ISplitviewPanel, sizing?: InvisibleSizing | SplitSizing | DistributeSizing): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -19668,11 +20210,26 @@
                             },
                             {
                                 "name": "sizing",
-                                "code": "sizing?: Sizing",
+                                "code": "sizing?: InvisibleSizing | SplitSizing | DistributeSizing",
                                 "type": {
-                                    "type": "reference",
-                                    "value": "Sizing",
-                                    "source": "dockview-core"
+                                    "type": "or",
+                                    "values": [
+                                        {
+                                            "type": "reference",
+                                            "value": "InvisibleSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "SplitSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "DistributeSizing",
+                                            "source": "dockview-core"
+                                        }
+                                    ]
                                 },
                                 "kind": "parameter"
                             }
@@ -19681,7 +20238,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(panel: ISplitviewPanel, sizing?: Sizing): void",
+                        "code": "(panel: ISplitviewPanel, sizing?: InvisibleSizing | SplitSizing | DistributeSizing): void",
                         "kind": "callSignature"
                     }
                 ],
@@ -19739,7 +20296,7 @@
             },
             {
                 "name": "updateOptions",
-                "code": "(options: SplitviewComponentUpdateOptions): void",
+                "code": "(options: Partial<SplitviewComponentOptions>): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -19756,11 +20313,18 @@
                         "parameters": [
                             {
                                 "name": "options",
-                                "code": "options: SplitviewComponentUpdateOptions",
+                                "code": "options: Partial<SplitviewComponentOptions>",
                                 "type": {
                                     "type": "reference",
-                                    "value": "SplitviewComponentUpdateOptions",
-                                    "source": "dockview-core"
+                                    "value": "Partial",
+                                    "source": "typescript",
+                                    "typeArguments": [
+                                        {
+                                            "type": "reference",
+                                            "value": "SplitviewComponentOptions",
+                                            "source": "dockview-core"
+                                        }
+                                    ]
                                 },
                                 "kind": "parameter"
                             }
@@ -19769,7 +20333,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(options: SplitviewComponentUpdateOptions): void",
+                        "code": "(options: Partial<SplitviewComponentOptions>): void",
                         "kind": "callSignature"
                     }
                 ],
@@ -20324,7 +20888,7 @@
             },
             {
                 "name": "removePanel",
-                "code": "(panel: SplitviewPanel, sizing?: Sizing): void",
+                "code": "(panel: SplitviewPanel, sizing?: InvisibleSizing | SplitSizing | DistributeSizing): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -20343,11 +20907,26 @@
                             },
                             {
                                 "name": "sizing",
-                                "code": "sizing?: Sizing",
+                                "code": "sizing?: InvisibleSizing | SplitSizing | DistributeSizing",
                                 "type": {
-                                    "type": "reference",
-                                    "value": "Sizing",
-                                    "source": "dockview-core"
+                                    "type": "or",
+                                    "values": [
+                                        {
+                                            "type": "reference",
+                                            "value": "InvisibleSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "SplitSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "DistributeSizing",
+                                            "source": "dockview-core"
+                                        }
+                                    ]
                                 },
                                 "kind": "parameter"
                             }
@@ -20356,7 +20935,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(panel: SplitviewPanel, sizing?: Sizing): void",
+                        "code": "(panel: SplitviewPanel, sizing?: InvisibleSizing | SplitSizing | DistributeSizing): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -20458,7 +21037,7 @@
             },
             {
                 "name": "updateOptions",
-                "code": "(options: Partial<SplitviewComponentUpdateOptions>): void",
+                "code": "(options: Partial<SplitviewComponentOptions>): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -20467,7 +21046,7 @@
                         "parameters": [
                             {
                                 "name": "options",
-                                "code": "options: Partial<SplitviewComponentUpdateOptions>",
+                                "code": "options: Partial<SplitviewComponentOptions>",
                                 "type": {
                                     "type": "reference",
                                     "value": "Partial",
@@ -20475,7 +21054,7 @@
                                     "typeArguments": [
                                         {
                                             "type": "reference",
-                                            "value": "SplitviewComponentUpdateOptions",
+                                            "value": "SplitviewComponentOptions",
                                             "source": "dockview-core"
                                         }
                                     ]
@@ -20487,7 +21066,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(options: Partial<SplitviewComponentUpdateOptions>): void",
+                        "code": "(options: Partial<SplitviewComponentOptions>): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -20735,18 +21314,28 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority | undefined",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low | undefined",
                 "kind": "accessor",
                 "value": {
                     "name": "priority",
-                    "code": "LayoutPriority | undefined",
+                    "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low | undefined",
                     "kind": "getSignature",
                     "returnType": {
                         "type": "or",
                         "values": [
                             {
                                 "type": "reference",
-                                "value": "LayoutPriority",
+                                "value": "LayoutPriority.Normal",
+                                "source": "dockview-core"
+                            },
+                            {
+                                "type": "reference",
+                                "value": "LayoutPriority.High",
+                                "source": "dockview-core"
+                            },
+                            {
+                                "type": "reference",
+                                "value": "LayoutPriority.Low",
                                 "source": "dockview-core"
                             },
                             {
@@ -21720,12 +22309,27 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "LayoutPriority",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Normal",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.High",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Low",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -21959,12 +22563,27 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "LayoutPriority",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Normal",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.High",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Low",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -22039,12 +22658,27 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "LayoutPriority",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Normal",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.High",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Low",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -22081,6 +22715,19 @@
         "kind": "interface",
         "name": "BaseGridOptions",
         "children": [
+            {
+                "name": "className",
+                "code": "string",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "string"
+                },
+                "flags": {
+                    "isOptional": true,
+                    "isReadonly": true
+                }
+            },
             {
                 "name": "disableAutoResizing",
                 "code": "boolean",
@@ -22248,6 +22895,24 @@
                 "signature": [
                     {
                         "name": "clear",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
                         "typeParameters": [],
                         "parameters": [],
                         "returnType": {
@@ -22792,17 +23457,6 @@
                 "flags": {
                     "isOptional": true
                 }
-            },
-            {
-                "name": "parentElement",
-                "code": "HTMLElement",
-                "kind": "property",
-                "type": {
-                    "type": "reference",
-                    "value": "HTMLElement",
-                    "source": "typescript"
-                },
-                "flags": {}
             }
         ],
         "extends": []
@@ -23303,7 +23957,7 @@
             },
             {
                 "name": "moveTo",
-                "code": "(options: { group?: DockviewGroupPanel, position?: Position }): void",
+                "code": "(options: { group?: DockviewGroupPanel, position?: 'right' | 'bottom' | 'top' | 'left' | 'center' }): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -23312,12 +23966,12 @@
                         "parameters": [
                             {
                                 "name": "options",
-                                "code": "options: { group?: DockviewGroupPanel, position?: Position }",
+                                "code": "options: { group?: DockviewGroupPanel, position?: 'right' | 'bottom' | 'top' | 'left' | 'center' }",
                                 "type": {
                                     "type": "reflection",
                                     "value": {
                                         "name": "__type",
-                                        "code": "{ group?: DockviewGroupPanel, position?: Position }",
+                                        "code": "{ group?: DockviewGroupPanel, position?: 'right' | 'bottom' | 'top' | 'left' | 'center' }",
                                         "kind": "typeLiteral",
                                         "properties": [
                                             {
@@ -23335,12 +23989,32 @@
                                             },
                                             {
                                                 "name": "position",
-                                                "code": "Position",
+                                                "code": "'right' | 'bottom' | 'top' | 'left' | 'center'",
                                                 "kind": "property",
                                                 "type": {
-                                                    "type": "reference",
-                                                    "value": "Position",
-                                                    "source": "dockview-core"
+                                                    "type": "or",
+                                                    "values": [
+                                                        {
+                                                            "type": "literal",
+                                                            "value": "right"
+                                                        },
+                                                        {
+                                                            "type": "literal",
+                                                            "value": "bottom"
+                                                        },
+                                                        {
+                                                            "type": "literal",
+                                                            "value": "top"
+                                                        },
+                                                        {
+                                                            "type": "literal",
+                                                            "value": "left"
+                                                        },
+                                                        {
+                                                            "type": "literal",
+                                                            "value": "center"
+                                                        }
+                                                    ]
                                                 },
                                                 "flags": {
                                                     "isOptional": true
@@ -23356,7 +24030,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(options: { group?: DockviewGroupPanel, position?: Position }): void",
+                        "code": "(options: { group?: DockviewGroupPanel, position?: 'right' | 'bottom' | 'top' | 'left' | 'center' }): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -23524,6 +24198,18 @@
         "name": "DockviewOptions",
         "children": [
             {
+                "name": "className",
+                "code": "string",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "string"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
                 "name": "debug",
                 "code": "boolean",
                 "kind": "property",
@@ -23537,12 +24223,20 @@
             },
             {
                 "name": "defaultRenderer",
-                "code": "DockviewPanelRenderer",
+                "code": "'always' | 'onlyWhenVisible'",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "DockviewPanelRenderer",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "literal",
+                            "value": "always"
+                        },
+                        {
+                            "type": "literal",
+                            "value": "onlyWhenVisible"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -23571,7 +24265,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": ".\nCall "
+                            "text": ".\r\nCall "
                         },
                         {
                             "kind": "code",
@@ -24356,7 +25050,7 @@
             },
             {
                 "name": "moveTo",
-                "code": "(options: { group: DockviewGroupPanel, index?: number, position?: Position }): void",
+                "code": "(options: { group: DockviewGroupPanel, index?: number, position?: 'right' | 'bottom' | 'top' | 'left' | 'center' }): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -24365,12 +25059,12 @@
                         "parameters": [
                             {
                                 "name": "options",
-                                "code": "options: { group: DockviewGroupPanel, index?: number, position?: Position }",
+                                "code": "options: { group: DockviewGroupPanel, index?: number, position?: 'right' | 'bottom' | 'top' | 'left' | 'center' }",
                                 "type": {
                                     "type": "reflection",
                                     "value": {
                                         "name": "__type",
-                                        "code": "{ group: DockviewGroupPanel, index?: number, position?: Position }",
+                                        "code": "{ group: DockviewGroupPanel, index?: number, position?: 'right' | 'bottom' | 'top' | 'left' | 'center' }",
                                         "kind": "typeLiteral",
                                         "properties": [
                                             {
@@ -24398,12 +25092,32 @@
                                             },
                                             {
                                                 "name": "position",
-                                                "code": "Position",
+                                                "code": "'right' | 'bottom' | 'top' | 'left' | 'center'",
                                                 "kind": "property",
                                                 "type": {
-                                                    "type": "reference",
-                                                    "value": "Position",
-                                                    "source": "dockview-core"
+                                                    "type": "or",
+                                                    "values": [
+                                                        {
+                                                            "type": "literal",
+                                                            "value": "right"
+                                                        },
+                                                        {
+                                                            "type": "literal",
+                                                            "value": "bottom"
+                                                        },
+                                                        {
+                                                            "type": "literal",
+                                                            "value": "top"
+                                                        },
+                                                        {
+                                                            "type": "literal",
+                                                            "value": "left"
+                                                        },
+                                                        {
+                                                            "type": "literal",
+                                                            "value": "center"
+                                                        }
+                                                    ]
                                                 },
                                                 "flags": {
                                                     "isOptional": true
@@ -24419,7 +25133,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(options: { group: DockviewGroupPanel, index?: number, position?: Position }): void",
+                        "code": "(options: { group: DockviewGroupPanel, index?: number, position?: 'right' | 'bottom' | 'top' | 'left' | 'center' }): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -24614,6 +25328,94 @@
                 }
             },
             {
+                "name": "position",
+                "code": "BottomRight | BottomLeft | TopRight | TopLeft",
+                "kind": "property",
+                "type": {
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "BottomRight",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "BottomLeft",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "TopRight",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "TopLeft",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "width",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "x",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "y",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            }
+        ],
+        "extends": []
+    },
+    "FloatingGroupOptionsInternal": {
+        "kind": "interface",
+        "name": "FloatingGroupOptionsInternal",
+        "children": [
+            {
+                "name": "height",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
                 "name": "inDragMode",
                 "code": "boolean",
                 "kind": "property",
@@ -24627,12 +25429,32 @@
             },
             {
                 "name": "position",
-                "code": "AnchoredBox",
+                "code": "BottomRight | BottomLeft | TopRight | TopLeft",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "AnchoredBox",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "BottomRight",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "BottomLeft",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "TopRight",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "TopLeft",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -24699,7 +25521,9 @@
                 }
             }
         ],
-        "extends": []
+        "extends": [
+            "FloatingGroupOptions"
+        ]
     },
     "FocusEvent": {
         "kind": "interface",
@@ -25084,12 +25908,27 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "LayoutPriority",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Normal",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.High",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Low",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -25116,6 +25955,18 @@
         "kind": "interface",
         "name": "GridviewComponentOptions",
         "children": [
+            {
+                "name": "className",
+                "code": "string",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "string"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
             {
                 "name": "components",
                 "code": "",
@@ -25195,17 +26046,6 @@
                     "type": "reference",
                     "value": "Orientation",
                     "source": "dockview-core"
-                },
-                "flags": {}
-            },
-            {
-                "name": "parentElement",
-                "code": "HTMLElement",
-                "kind": "property",
-                "type": {
-                    "type": "reference",
-                    "value": "HTMLElement",
-                    "source": "typescript"
                 },
                 "flags": {}
             },
@@ -25330,12 +26170,27 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "LayoutPriority",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Normal",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.High",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Low",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -25888,12 +26743,20 @@
             },
             {
                 "name": "locked",
-                "code": "DockviewGroupPanelLocked",
+                "code": "'no-drop-target' | boolean",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "DockviewGroupPanelLocked",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "literal",
+                            "value": "no-drop-target"
+                        },
+                        {
+                            "type": "intrinsic",
+                            "value": "boolean"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -26026,12 +26889,20 @@
             },
             {
                 "name": "locked",
-                "code": "DockviewGroupPanelLocked",
+                "code": "'no-drop-target' | boolean",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "DockviewGroupPanelLocked",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "literal",
+                            "value": "no-drop-target"
+                        },
+                        {
+                            "type": "intrinsic",
+                            "value": "boolean"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -26111,12 +26982,20 @@
             },
             {
                 "name": "renderer",
-                "code": "DockviewPanelRenderer",
+                "code": "'always' | 'onlyWhenVisible'",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "DockviewPanelRenderer",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "literal",
+                            "value": "always"
+                        },
+                        {
+                            "type": "literal",
+                            "value": "onlyWhenVisible"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -26364,6 +27243,24 @@
                 "signature": [
                     {
                         "name": "clear",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
                         "typeParameters": [],
                         "parameters": [],
                         "returnType": {
@@ -26672,7 +27569,9 @@
                 ]
             }
         ],
-        "extends": []
+        "extends": [
+            "IDisposable"
+        ]
     },
     "IBaseView": {
         "kind": "interface",
@@ -26700,12 +27599,27 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "LayoutPriority",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Normal",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.High",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Low",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -27304,6 +28218,18 @@
                     "type": "reference",
                     "value": "HTMLElement",
                     "source": "typescript"
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "gap",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
                 },
                 "flags": {
                     "isReadonly": true
@@ -27946,7 +28872,7 @@
             },
             {
                 "name": "addGroup",
-                "code": "(options?: AddGroupOptions): DockviewGroupPanel",
+                "code": "(options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition): DockviewGroupPanel",
                 "kind": "method",
                 "signature": [
                     {
@@ -27955,11 +28881,56 @@
                         "parameters": [
                             {
                                 "name": "options",
-                                "code": "options?: AddGroupOptions",
+                                "code": "options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition",
                                 "type": {
-                                    "type": "reference",
-                                    "value": "AddGroupOptions",
-                                    "source": "dockview-core"
+                                    "type": "or",
+                                    "values": [
+                                        {
+                                            "type": "intersection",
+                                            "values": [
+                                                {
+                                                    "type": "reference",
+                                                    "value": "GroupOptions",
+                                                    "source": "dockview-core"
+                                                },
+                                                {
+                                                    "type": "reference",
+                                                    "value": "AddGroupOptionsWithPanel",
+                                                    "source": "dockview-core"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "type": "intersection",
+                                            "values": [
+                                                {
+                                                    "type": "reference",
+                                                    "value": "GroupOptions",
+                                                    "source": "dockview-core"
+                                                },
+                                                {
+                                                    "type": "reference",
+                                                    "value": "AddGroupOptionsWithGroup",
+                                                    "source": "dockview-core"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "type": "intersection",
+                                            "values": [
+                                                {
+                                                    "type": "reference",
+                                                    "value": "GroupOptions",
+                                                    "source": "dockview-core"
+                                                },
+                                                {
+                                                    "type": "reference",
+                                                    "value": "AbsolutePosition",
+                                                    "source": "dockview-core"
+                                                }
+                                            ]
+                                        }
+                                    ]
                                 },
                                 "kind": "parameter"
                             }
@@ -27969,7 +28940,7 @@
                             "value": "DockviewGroupPanel",
                             "source": "dockview-core"
                         },
-                        "code": "(options?: AddGroupOptions): DockviewGroupPanel",
+                        "code": "(options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition): DockviewGroupPanel",
                         "kind": "callSignature"
                     }
                 ]
@@ -28290,6 +29261,24 @@
                             "source": "dockview-core"
                         },
                         "code": "(): IWatermarkRenderer",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -29011,14 +30000,24 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority | undefined",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low | undefined",
                 "kind": "property",
                 "type": {
                     "type": "or",
                     "values": [
                         {
                             "type": "reference",
-                            "value": "LayoutPriority",
+                            "value": "LayoutPriority.Normal",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.High",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Low",
                             "source": "dockview-core"
                         },
                         {
@@ -30708,12 +31707,27 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "LayoutPriority",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Normal",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.High",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Low",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -31079,12 +32093,27 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "LayoutPriority",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Normal",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.High",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Low",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -31456,12 +32485,27 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "LayoutPriority",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Normal",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.High",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Low",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -31991,6 +33035,24 @@
                 ]
             },
             {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
                 "name": "exitMaximizedGroup",
                 "code": "(): void",
                 "kind": "method",
@@ -32358,7 +33420,7 @@
             },
             {
                 "name": "removePanel",
-                "code": "(panel: IGridviewPanel<GridviewPanelApi>, sizing?: Sizing): void",
+                "code": "(panel: IGridviewPanel<GridviewPanelApi>, sizing?: InvisibleSizing | SplitSizing | DistributeSizing): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -32384,11 +33446,26 @@
                             },
                             {
                                 "name": "sizing",
-                                "code": "sizing?: Sizing",
+                                "code": "sizing?: InvisibleSizing | SplitSizing | DistributeSizing",
                                 "type": {
-                                    "type": "reference",
-                                    "value": "Sizing",
-                                    "source": "dockview-core"
+                                    "type": "or",
+                                    "values": [
+                                        {
+                                            "type": "reference",
+                                            "value": "InvisibleSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "SplitSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "DistributeSizing",
+                                            "source": "dockview-core"
+                                        }
+                                    ]
                                 },
                                 "kind": "parameter"
                             }
@@ -32397,7 +33474,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(panel: IGridviewPanel<GridviewPanelApi>, sizing?: Sizing): void",
+                        "code": "(panel: IGridviewPanel<GridviewPanelApi>, sizing?: InvisibleSizing | SplitSizing | DistributeSizing): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -32504,7 +33581,7 @@
             },
             {
                 "name": "updateOptions",
-                "code": "(options: Partial<GridviewComponentUpdateOptions>): void",
+                "code": "(options: Partial<GridviewComponentOptions>): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -32513,7 +33590,7 @@
                         "parameters": [
                             {
                                 "name": "options",
-                                "code": "options: Partial<GridviewComponentUpdateOptions>",
+                                "code": "options: Partial<GridviewComponentOptions>",
                                 "type": {
                                     "type": "reference",
                                     "value": "Partial",
@@ -32521,7 +33598,7 @@
                                     "typeArguments": [
                                         {
                                             "type": "reference",
-                                            "value": "GridviewComponentUpdateOptions",
+                                            "value": "GridviewComponentOptions",
                                             "source": "dockview-core"
                                         }
                                     ]
@@ -32533,7 +33610,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(options: Partial<GridviewComponentUpdateOptions>): void",
+                        "code": "(options: Partial<GridviewComponentOptions>): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -32657,14 +33734,24 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority | undefined",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low | undefined",
                 "kind": "property",
                 "type": {
                     "type": "or",
                     "values": [
                         {
                             "type": "reference",
-                            "value": "LayoutPriority",
+                            "value": "LayoutPriority.Normal",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.High",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Low",
                             "source": "dockview-core"
                         },
                         {
@@ -33557,12 +34644,27 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "LayoutPriority",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Normal",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.High",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Low",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -35058,7 +36160,7 @@
             },
             {
                 "name": "removePanel",
-                "code": "(panel: ISplitviewPanel, sizing?: Sizing): void",
+                "code": "(panel: ISplitviewPanel, sizing?: InvisibleSizing | SplitSizing | DistributeSizing): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -35077,11 +36179,26 @@
                             },
                             {
                                 "name": "sizing",
-                                "code": "sizing?: Sizing",
+                                "code": "sizing?: InvisibleSizing | SplitSizing | DistributeSizing",
                                 "type": {
-                                    "type": "reference",
-                                    "value": "Sizing",
-                                    "source": "dockview-core"
+                                    "type": "or",
+                                    "values": [
+                                        {
+                                            "type": "reference",
+                                            "value": "InvisibleSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "SplitSizing",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "reference",
+                                            "value": "DistributeSizing",
+                                            "source": "dockview-core"
+                                        }
+                                    ]
                                 },
                                 "kind": "parameter"
                             }
@@ -35090,7 +36207,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(panel: ISplitviewPanel, sizing?: Sizing): void",
+                        "code": "(panel: ISplitviewPanel, sizing?: InvisibleSizing | SplitSizing | DistributeSizing): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -35154,7 +36271,7 @@
             },
             {
                 "name": "updateOptions",
-                "code": "(options: Partial<SplitviewComponentUpdateOptions>): void",
+                "code": "(options: Partial<SplitViewOptions>): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -35163,7 +36280,7 @@
                         "parameters": [
                             {
                                 "name": "options",
-                                "code": "options: Partial<SplitviewComponentUpdateOptions>",
+                                "code": "options: Partial<SplitViewOptions>",
                                 "type": {
                                     "type": "reference",
                                     "value": "Partial",
@@ -35171,7 +36288,7 @@
                                     "typeArguments": [
                                         {
                                             "type": "reference",
-                                            "value": "SplitviewComponentUpdateOptions",
+                                            "value": "SplitViewOptions",
                                             "source": "dockview-core"
                                         }
                                     ]
@@ -35183,7 +36300,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(options: Partial<SplitviewComponentUpdateOptions>): void",
+                        "code": "(options: Partial<SplitViewOptions>): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -35295,14 +36412,24 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority | undefined",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low | undefined",
                 "kind": "property",
                 "type": {
                     "type": "or",
                     "values": [
                         {
                             "type": "reference",
-                            "value": "LayoutPriority",
+                            "value": "LayoutPriority.Normal",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.High",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Low",
                             "source": "dockview-core"
                         },
                         {
@@ -35709,12 +36836,27 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "LayoutPriority",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Normal",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.High",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Low",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -37205,12 +38347,27 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "LayoutPriority",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Normal",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.High",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Low",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -37237,6 +38394,18 @@
         "kind": "interface",
         "name": "PaneviewComponentOptions",
         "children": [
+            {
+                "name": "className",
+                "code": "string",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "string"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
             {
                 "name": "components",
                 "code": "",
@@ -37378,17 +38547,6 @@
                 "flags": {
                     "isOptional": true
                 }
-            },
-            {
-                "name": "parentElement",
-                "code": "HTMLElement",
-                "kind": "property",
-                "type": {
-                    "type": "reference",
-                    "value": "HTMLElement",
-                    "source": "typescript"
-                },
-                "flags": {}
             },
             {
                 "name": "showDndOverlay",
@@ -38669,12 +39827,27 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "LayoutPriority",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Normal",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.High",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Low",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -38826,12 +39999,27 @@
             },
             {
                 "name": "priority",
-                "code": "LayoutPriority",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "LayoutPriority",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Normal",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.High",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "LayoutPriority.Low",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -39041,6 +40229,18 @@
         "name": "SplitviewComponentOptions",
         "children": [
             {
+                "name": "className",
+                "code": "string",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "string"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
                 "name": "components",
                 "code": "",
                 "kind": "property",
@@ -39143,17 +40343,6 @@
                 "flags": {
                     "isReadonly": true
                 }
-            },
-            {
-                "name": "parentElement",
-                "code": "HTMLElement",
-                "kind": "property",
-                "type": {
-                    "type": "reference",
-                    "value": "HTMLElement",
-                    "source": "typescript"
-                },
-                "flags": {}
             },
             {
                 "name": "proportionalLayout",
@@ -39923,7 +41112,7 @@
                                     "summary": [
                                         {
                                             "kind": "text",
-                                            "text": "If true then add the panel without setting it as the active panel.\n\nDefaults to "
+                                            "text": "If true then add the panel without setting it as the active panel.\r\n\r\nDefaults to "
                                         },
                                         {
                                             "kind": "code",
@@ -39966,7 +41155,7 @@
                                     "summary": [
                                         {
                                             "kind": "text",
-                                            "text": "The rendering mode of the panel.\n\nThis dictates what happens to the HTML of the panel when it is hidden."
+                                            "text": "The rendering mode of the panel.\r\n\r\nThis dictates what happens to the HTML of the panel when it is hidden."
                                         }
                                     ]
                                 }
@@ -40006,7 +41195,7 @@
                                     "summary": [
                                         {
                                             "kind": "text",
-                                            "text": "The title for the panel which can be accessed within both the tab and component.\n\nIf using the default tab renderer this title will be displayed in the tab."
+                                            "text": "The title for the panel which can be accessed within both the tab and component.\r\n\r\nIf using the default tab renderer this title will be displayed in the tab."
                                         }
                                     ]
                                 }
@@ -40386,41 +41575,6 @@
         },
         "kind": "typeAlias"
     },
-    "GridviewComponentUpdateOptions": {
-        "name": "GridviewComponentUpdateOptions",
-        "code": "Pick<GridviewComponentOptions, 'frameworkComponents' | 'components' | 'orientation'>",
-        "typeParameters": [],
-        "type": {
-            "type": "reference",
-            "value": "Pick",
-            "source": "typescript",
-            "typeArguments": [
-                {
-                    "type": "reference",
-                    "value": "GridviewComponentOptions",
-                    "source": "dockview-core"
-                },
-                {
-                    "type": "or",
-                    "values": [
-                        {
-                            "type": "literal",
-                            "value": "frameworkComponents"
-                        },
-                        {
-                            "type": "literal",
-                            "value": "components"
-                        },
-                        {
-                            "type": "literal",
-                            "value": "orientation"
-                        }
-                    ]
-                }
-            ]
-        },
-        "kind": "typeAlias"
-    },
     "IDockviewGroupPanelPublic": {
         "name": "IDockviewGroupPanelPublic",
         "code": "IDockviewGroupPanel",
@@ -40639,41 +41793,6 @@
         },
         "kind": "typeAlias"
     },
-    "SplitviewComponentUpdateOptions": {
-        "name": "SplitviewComponentUpdateOptions",
-        "code": "Pick<SplitviewComponentOptions, 'frameworkComponents' | 'components' | 'orientation'>",
-        "typeParameters": [],
-        "type": {
-            "type": "reference",
-            "value": "Pick",
-            "source": "typescript",
-            "typeArguments": [
-                {
-                    "type": "reference",
-                    "value": "SplitviewComponentOptions",
-                    "source": "dockview-core"
-                },
-                {
-                    "type": "or",
-                    "values": [
-                        {
-                            "type": "literal",
-                            "value": "frameworkComponents"
-                        },
-                        {
-                            "type": "literal",
-                            "value": "components"
-                        },
-                        {
-                            "type": "literal",
-                            "value": "orientation"
-                        }
-                    ]
-                }
-            ]
-        },
-        "kind": "typeAlias"
-    },
     "PROPERTY_KEYS": {
         "name": "PROPERTY_KEYS",
         "code": "",
@@ -40788,6 +41907,158 @@
                 "refersToTypeParameter": true
             },
             "code": "<T>(id: string, componentName?: string, components: , frameworkComponents: , createFrameworkComponent?: FrameworkFactory<T>, fallback?: (): T): T",
+            "kind": "callSignature"
+        },
+        "kind": "function"
+    },
+    "createDockview": {
+        "name": "createDockview",
+        "code": "(element: HTMLElement, options: DockviewComponentOptions): DockviewApi",
+        "signature": {
+            "name": "createDockview",
+            "typeParameters": [],
+            "parameters": [
+                {
+                    "name": "element",
+                    "code": "element: HTMLElement",
+                    "type": {
+                        "type": "reference",
+                        "value": "HTMLElement",
+                        "source": "typescript"
+                    },
+                    "kind": "parameter"
+                },
+                {
+                    "name": "options",
+                    "code": "options: DockviewComponentOptions",
+                    "type": {
+                        "type": "reference",
+                        "value": "DockviewComponentOptions",
+                        "source": "dockview-core"
+                    },
+                    "kind": "parameter"
+                }
+            ],
+            "returnType": {
+                "type": "reference",
+                "value": "DockviewApi",
+                "source": "dockview-core"
+            },
+            "code": "(element: HTMLElement, options: DockviewComponentOptions): DockviewApi",
+            "kind": "callSignature"
+        },
+        "kind": "function"
+    },
+    "createGridview": {
+        "name": "createGridview",
+        "code": "(element: HTMLElement, options: GridviewComponentOptions): GridviewApi",
+        "signature": {
+            "name": "createGridview",
+            "typeParameters": [],
+            "parameters": [
+                {
+                    "name": "element",
+                    "code": "element: HTMLElement",
+                    "type": {
+                        "type": "reference",
+                        "value": "HTMLElement",
+                        "source": "typescript"
+                    },
+                    "kind": "parameter"
+                },
+                {
+                    "name": "options",
+                    "code": "options: GridviewComponentOptions",
+                    "type": {
+                        "type": "reference",
+                        "value": "GridviewComponentOptions",
+                        "source": "dockview-core"
+                    },
+                    "kind": "parameter"
+                }
+            ],
+            "returnType": {
+                "type": "reference",
+                "value": "GridviewApi",
+                "source": "dockview-core"
+            },
+            "code": "(element: HTMLElement, options: GridviewComponentOptions): GridviewApi",
+            "kind": "callSignature"
+        },
+        "kind": "function"
+    },
+    "createPaneview": {
+        "name": "createPaneview",
+        "code": "(element: HTMLElement, options: PaneviewComponentOptions): PaneviewApi",
+        "signature": {
+            "name": "createPaneview",
+            "typeParameters": [],
+            "parameters": [
+                {
+                    "name": "element",
+                    "code": "element: HTMLElement",
+                    "type": {
+                        "type": "reference",
+                        "value": "HTMLElement",
+                        "source": "typescript"
+                    },
+                    "kind": "parameter"
+                },
+                {
+                    "name": "options",
+                    "code": "options: PaneviewComponentOptions",
+                    "type": {
+                        "type": "reference",
+                        "value": "PaneviewComponentOptions",
+                        "source": "dockview-core"
+                    },
+                    "kind": "parameter"
+                }
+            ],
+            "returnType": {
+                "type": "reference",
+                "value": "PaneviewApi",
+                "source": "dockview-core"
+            },
+            "code": "(element: HTMLElement, options: PaneviewComponentOptions): PaneviewApi",
+            "kind": "callSignature"
+        },
+        "kind": "function"
+    },
+    "createSplitview": {
+        "name": "createSplitview",
+        "code": "(element: HTMLElement, options: SplitviewComponentOptions): SplitviewApi",
+        "signature": {
+            "name": "createSplitview",
+            "typeParameters": [],
+            "parameters": [
+                {
+                    "name": "element",
+                    "code": "element: HTMLElement",
+                    "type": {
+                        "type": "reference",
+                        "value": "HTMLElement",
+                        "source": "typescript"
+                    },
+                    "kind": "parameter"
+                },
+                {
+                    "name": "options",
+                    "code": "options: SplitviewComponentOptions",
+                    "type": {
+                        "type": "reference",
+                        "value": "SplitviewComponentOptions",
+                        "source": "dockview-core"
+                    },
+                    "kind": "parameter"
+                }
+            ],
+            "returnType": {
+                "type": "reference",
+                "value": "SplitviewApi",
+                "source": "dockview-core"
+            },
+            "code": "(element: HTMLElement, options: SplitviewComponentOptions): SplitviewApi",
             "kind": "callSignature"
         },
         "kind": "function"
@@ -41263,7 +42534,7 @@
             "returnType": {
                 "type": "reference",
                 "value": "Orientation",
-                "source": "dockview-core"
+                "refersToTypeParameter": true
             },
             "code": "(orientation: Orientation): Orientation",
             "kind": "callSignature"
@@ -41662,6 +42933,28 @@
                         "signatures": [
                             {
                                 "name": "__type",
+                                "comment": {
+                                    "summary": [],
+                                    "blockTags": [
+                                        {
+                                            "tag": "@deprecated",
+                                            "content": [
+                                                {
+                                                    "kind": "text",
+                                                    "text": "use "
+                                                },
+                                                {
+                                                    "kind": "code",
+                                                    "text": "`api.onUnhandledDragOverEvent`"
+                                                },
+                                                {
+                                                    "kind": "text",
+                                                    "text": " instead. This will be removed in the next release."
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
                                 "typeParameters": [],
                                 "parameters": [
                                     {
@@ -41925,12 +43218,22 @@
             },
             {
                 "name": "orientation",
-                "code": "Orientation",
+                "code": "Orientation.VERTICAL | Orientation.HORIZONTAL",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "Orientation",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "Orientation.VERTICAL",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "Orientation.HORIZONTAL",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -42384,12 +43687,22 @@
             },
             {
                 "name": "orientation",
-                "code": "Orientation",
+                "code": "Orientation.VERTICAL | Orientation.HORIZONTAL",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "Orientation",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "Orientation.VERTICAL",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "Orientation.HORIZONTAL",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true

@@ -12,7 +12,7 @@ import {
     GroupOptions,
 } from './dockviewGroupPanelModel';
 import { IDockviewPanel } from './dockviewPanel';
-import { DockviewPanelRenderer } from '../overlayRenderContainer';
+import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
 import { IGroupHeaderProps } from './framework';
 import { AnchoredBox } from '../types';
 import { FloatingGroupOptions } from './dockviewComponent';
@@ -54,6 +54,7 @@ export interface DockviewOptions {
     rootOverlayModel?: DroptargetOverlayModel;
     locked?: boolean;
     disableDnd?: boolean;
+    className?: string;
     /**
      * Pixel gap between groups
      */
@@ -109,13 +110,13 @@ export const PROPERTY_KEYS: (keyof DockviewOptions)[] = (() => {
         locked: undefined,
         disableDnd: undefined,
         gap: undefined,
+        className: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];
 })();
 
 export interface DockviewFrameworkOptions {
-    parentElement: HTMLElement;
     defaultTabComponent?: string;
     createRightHeaderActionComponent?: (
         group: DockviewGroupPanel

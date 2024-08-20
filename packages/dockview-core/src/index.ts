@@ -64,7 +64,7 @@ export * from './splitview/splitviewPanel';
 export * from './paneview/paneviewPanel';
 export * from './dockview/types';
 
-export { DockviewPanelRenderer } from './overlayRenderContainer';
+export { DockviewPanelRenderer } from './overlay/overlayRenderContainer';
 
 export {
     Position,
@@ -73,6 +73,7 @@ export {
     MeasuredValue,
     DroptargetOverlayModel,
 } from './dnd/droptarget';
+
 export {
     FocusEvent,
     PanelDimensionChangeEvent,
@@ -107,3 +108,9 @@ export {
     GridviewApi,
     DockviewApi,
 } from './api/component.api';
+export {
+    createDockview,
+    createGridview,
+    createPaneview,
+    createSplitview,
+} from './api/entryPoints';

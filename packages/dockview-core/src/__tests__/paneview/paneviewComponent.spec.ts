@@ -71,8 +71,7 @@ describe('componentPaneview', () => {
     test('vertical panels', () => {
         const disposables = new CompositeDisposable();
 
-        const paneview = new PaneviewComponent({
-            parentElement: container,
+        const paneview = new PaneviewComponent(container, {
             components: {
                 testPanel: TestPanel,
             },
@@ -144,8 +143,7 @@ describe('componentPaneview', () => {
     });
 
     test('serialization', () => {
-        const paneview = new PaneviewComponent({
-            parentElement: container,
+        const paneview = new PaneviewComponent(container, {
             components: {
                 testPanel: TestPanel,
             },
@@ -253,8 +251,7 @@ describe('componentPaneview', () => {
     });
 
     test('toJSON shouldnt fire any layout events', () => {
-        const paneview = new PaneviewComponent({
-            parentElement: container,
+        const paneview = new PaneviewComponent(container, {
             components: {
                 testPanel: TestPanel,
             },
@@ -285,8 +282,7 @@ describe('componentPaneview', () => {
     test('dispose of paneviewComponent', () => {
         expect(container.childNodes.length).toBe(0);
 
-        const paneview = new PaneviewComponent({
-            parentElement: container,
+        const paneview = new PaneviewComponent(container, {
             components: {
                 testPanel: TestPanel,
             },
@@ -313,8 +309,7 @@ describe('componentPaneview', () => {
     });
 
     test('panel is disposed of when component is disposed', () => {
-        const paneview = new PaneviewComponent({
-            parentElement: container,
+        const paneview = new PaneviewComponent(container, {
             components: {
                 testPanel: TestPanel,
             },
@@ -346,8 +341,7 @@ describe('componentPaneview', () => {
     });
 
     test('panel is disposed of when removed', () => {
-        const paneview = new PaneviewComponent({
-            parentElement: container,
+        const paneview = new PaneviewComponent(container, {
             components: {
                 testPanel: TestPanel,
             },
@@ -379,8 +373,7 @@ describe('componentPaneview', () => {
     });
 
     test('panel is disposed of when fromJSON is called', () => {
-        const paneview = new PaneviewComponent({
-            parentElement: container,
+        const paneview = new PaneviewComponent(container, {
             components: {
                 testPanel: TestPanel,
             },
@@ -412,8 +405,7 @@ describe('componentPaneview', () => {
     });
 
     test('that fromJSON layouts are resized to the current dimensions', async () => {
-        const paneview = new PaneviewComponent({
-            parentElement: container,
+        const paneview = new PaneviewComponent(container, {
             components: {
                 testPanel: TestPanel,
             },
@@ -493,8 +485,7 @@ describe('componentPaneview', () => {
     });
 
     test('that disableAutoResizing is false by default', () => {
-        const paneview = new PaneviewComponent({
-            parentElement: container,
+        const paneview = new PaneviewComponent(container, {
             components: {
                 testPanel: TestPanel,
             },
@@ -504,8 +495,7 @@ describe('componentPaneview', () => {
     });
 
     test('that disableAutoResizing can be enabled', () => {
-        const paneview = new PaneviewComponent({
-            parentElement: container,
+        const paneview = new PaneviewComponent(container, {
             components: {
                 testPanel: TestPanel,
             },
@@ -516,8 +506,7 @@ describe('componentPaneview', () => {
     });
 
     test('that setVisible toggles visiblity', () => {
-        const paneview = new PaneviewComponent({
-            parentElement: container,
+        const paneview = new PaneviewComponent(container, {
             components: {
                 default: TestPanel,
             },
@@ -547,5 +536,21 @@ describe('componentPaneview', () => {
         panel1.api.setVisible(true);
         expect(panel1.api.isVisible).toBeTruthy();
         expect(panel2.api.isVisible).toBeTruthy();
+    });
+
+    test('update className', () => {
+        const paneview = new PaneviewComponent(container, {
+            components: {
+                default: TestPanel,
+            },
+            disableAutoResizing: true,
+            className: 'test-a test-b',
+        });
+
+        expect(paneview.element.className).toBe('container test-a test-b');
+
+        paneview.updateOptions({ className: 'test-b test-c' });
+
+        expect(paneview.element.className).toBe('container test-b test-c');
     });
 });
