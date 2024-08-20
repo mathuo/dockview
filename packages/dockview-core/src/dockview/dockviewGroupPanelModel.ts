@@ -52,6 +52,8 @@ interface CoreGroupOptions {
     hideHeader?: boolean;
     skipSetActive?: boolean;
     constraints?: Partial<Contraints>;
+    initialWidth?: number;
+    initialHeight?: number;
 }
 
 export interface GroupOptions extends CoreGroupOptions {

@@ -1640,7 +1640,12 @@ export class DockviewComponent
             );
 
             const group = this.createGroup(options);
-            this.doAddGroup(group, relativeLocation);
+            const size =
+                this.getLocationOrientation(relativeLocation) ===
+                Orientation.VERTICAL
+                    ? options.initialHeight
+                    : options.initialWidth;
+            this.doAddGroup(group, relativeLocation, size);
             if (!options.skipSetActive) {
                 this.doSetGroupAndPanelActive(group);
             }
@@ -1652,6 +1657,13 @@ export class DockviewComponent
             this.doSetGroupAndPanelActive(group);
             return group;
         }
+    }
+
+    private getLocationOrientation(location: number[]) {
+        return location.length % 2 == 0 &&
+            this.gridview.orientation === Orientation.HORIZONTAL
+            ? Orientation.HORIZONTAL
+            : Orientation.VERTICAL;
     }
 
     removeGroup(
