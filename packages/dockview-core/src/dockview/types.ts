@@ -63,4 +63,8 @@ export interface GroupviewPanelState {
     title?: string;
     renderer?: DockviewPanelRenderer;
     params?: { [key: string]: any };
+    minimumWidth?: number;
+    minimumHeight?: number;
+    maximumWidth?: number;
+    maximumHeight?: number;
 }

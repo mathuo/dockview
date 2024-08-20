@@ -2242,7 +2242,13 @@ export class DockviewComponent
             this._api,
             group,
             view,
-            { renderer: options.renderer }
+            {
+                renderer: options.renderer,
+                minimumWidth: options.minimumWidth,
+                minimumHeight: options.minimumHeight,
+                maximumWidth: options.maximumWidth,
+                maximumHeight: options.maximumHeight,
+            }
         );
 
         panel.init({

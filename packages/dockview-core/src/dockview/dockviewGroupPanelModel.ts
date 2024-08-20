@@ -38,6 +38,7 @@ import {
 } from './options';
 import { OverlayRenderContainer } from '../overlay/overlayRenderContainer';
 import { TitleEvent } from '../api/dockviewPanelApi';
+import { Contraints } from '../gridview/gridviewPanel';
 
 interface GroupMoveEvent {
     groupId: string;
@@ -50,6 +51,7 @@ interface CoreGroupOptions {
     locked?: DockviewGroupPanelLocked;
     hideHeader?: boolean;
     skipSetActive?: boolean;
+    constraints?: Partial<Contraints>;
 }
 
 export interface GroupOptions extends CoreGroupOptions {

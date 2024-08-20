@@ -34,6 +34,38 @@ export class DockviewGroupPanel
 {
     private readonly _model: DockviewGroupPanelModel;
 
+    get minimumWidth(): number {
+        const sizes = this.panels
+            .filter((panel) => typeof panel.minimumWidth === 'number')
+            .map((panel) => panel.minimumWidth) as number[];
+
+        return sizes.length > 0 ? Math.max(...sizes) : 100;
+    }
+
+    get minimumHeight(): number {
+        const sizes = this.panels
+            .filter((panel) => typeof panel.minimumHeight === 'number')
+            .map((panel) => panel.minimumHeight) as number[];
+
+        return sizes.length > 0 ? Math.max(...sizes) : 100;
+    }
+
+    get maximumWidth(): number {
+        const sizes = this.panels
+            .filter((panel) => typeof panel.maximumWidth === 'number')
+            .map((panel) => panel.maximumWidth) as number[];
+
+        return sizes.length > 0 ? Math.min(...sizes) : Number.MAX_SAFE_INTEGER;
+    }
+
+    get maximumHeight(): number {
+        const sizes = this.panels
+            .filter((panel) => typeof panel.maximumHeight === 'number')
+            .map((panel) => panel.maximumHeight) as number[];
+
+        return sizes.length > 0 ? Math.min(...sizes) : Number.MAX_SAFE_INTEGER;
+    }
+
     get panels(): IDockviewPanel[] {
         return this._model.panels;
     }
@@ -71,8 +103,14 @@ export class DockviewGroupPanel
             id,
             'groupview_default',
             {
-                minimumHeight: MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT,
-                minimumWidth: MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH,
+                minimumHeight:
+                    options.constraints?.minimumHeight ??
+                    MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT,
+                minimumWidth:
+                    options.constraints?.maximumHeight ??
+                    MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH,
+                maximumHeight: options.constraints?.maximumHeight,
+                maximumWidth: options.constraints?.maximumWidth,
             },
             new DockviewGroupPanelApiImpl(id, accessor)
         );
