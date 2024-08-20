@@ -340,7 +340,7 @@ describe('splitview', () => {
             splitview.getViewSize(1),
             splitview.getViewSize(2),
             splitview.getViewSize(3),
-        ]).toEqual([50, 90, 60, -1]);
+        ]).toEqual([50, 90, 60, 60]);
 
         splitview.dispose();
     });
