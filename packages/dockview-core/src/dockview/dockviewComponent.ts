@@ -2068,7 +2068,24 @@ export class DockviewComponent
                 target
             );
 
-            this.gridview.addView(from, Sizing.Distribute, dropLocation);
+            let size: number;
+
+            switch (this.gridview.orientation) {
+                case Orientation.VERTICAL:
+                    size =
+                        referenceLocation.length % 2 == 0
+                            ? from.api.width
+                            : from.api.height;
+                    break;
+                case Orientation.HORIZONTAL:
+                    size =
+                        referenceLocation.length % 2 == 0
+                            ? from.api.height
+                            : from.api.width;
+                    break;
+            }
+
+            this.gridview.addView(from, size, dropLocation);
         }
 
         from.panels.forEach((panel) => {
