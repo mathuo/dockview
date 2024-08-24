@@ -35,35 +35,31 @@ export class DockviewGroupPanel
     private readonly _model: DockviewGroupPanelModel;
 
     get minimumWidth(): number {
-        const sizes = this.panels
-            .filter((panel) => typeof panel.minimumWidth === 'number')
-            .map((panel) => panel.minimumWidth) as number[];
-
-        return sizes.length > 0 ? Math.max(...sizes) : 100;
+        const activePanelMinimumWidth = this.activePanel?.minimumWidth;
+        return typeof activePanelMinimumWidth === 'number'
+            ? activePanelMinimumWidth
+            : MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH;
     }
 
     get minimumHeight(): number {
-        const sizes = this.panels
-            .filter((panel) => typeof panel.minimumHeight === 'number')
-            .map((panel) => panel.minimumHeight) as number[];
-
-        return sizes.length > 0 ? Math.max(...sizes) : 100;
+        const activePanelMinimumHeight = this.activePanel?.minimumHeight;
+        return typeof activePanelMinimumHeight === 'number'
+            ? activePanelMinimumHeight
+            : MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT;
     }
 
     get maximumWidth(): number {
-        const sizes = this.panels
-            .filter((panel) => typeof panel.maximumWidth === 'number')
-            .map((panel) => panel.maximumWidth) as number[];
-
-        return sizes.length > 0 ? Math.min(...sizes) : Number.MAX_SAFE_INTEGER;
+        const activePanelMaximumWidth = this.activePanel?.maximumWidth;
+        return typeof activePanelMaximumWidth === 'number'
+            ? activePanelMaximumWidth
+            : Number.MAX_SAFE_INTEGER;
     }
 
     get maximumHeight(): number {
-        const sizes = this.panels
-            .filter((panel) => typeof panel.maximumHeight === 'number')
-            .map((panel) => panel.maximumHeight) as number[];
-
-        return sizes.length > 0 ? Math.min(...sizes) : Number.MAX_SAFE_INTEGER;
+        const activePanelMaximumHeight = this.activePanel?.maximumHeight;
+        return typeof activePanelMaximumHeight === 'number'
+            ? activePanelMaximumHeight
+            : Number.MAX_SAFE_INTEGER;
     }
 
     get panels(): IDockviewPanel[] {

@@ -238,6 +238,8 @@ export type AddPanelOptions<P extends object = Parameters> = {
      * Defaults to `false` which forces newly added panels to become active.
      */
     inactive?: boolean;
+    initialWidth?: number;
+    initialHeight?: number;
 } & Partial<AddPanelOptionsUnion> &
     Partial<Contraints>;
 

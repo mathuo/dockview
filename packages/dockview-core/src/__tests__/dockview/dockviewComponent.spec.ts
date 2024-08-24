@@ -8,7 +8,7 @@ import { PanelUpdateEvent } from '../../panel/types';
 import { Orientation } from '../../splitview/splitview';
 import { CompositeDisposable } from '../../lifecycle';
 import { Emitter } from '../../events';
-import {  IDockviewPanel } from '../../dockview/dockviewPanel';
+import { IDockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import { fireEvent, queryByTestId } from '@testing-library/dom';
 import { getPanelData } from '../../dnd/dataTransfer';
@@ -626,6 +626,7 @@ describe('dockviewComponent', () => {
                 panel1: {
                     id: 'panel1',
                     contentComponent: 'default',
+                    tabComponent: 'tab-default',
                     title: 'panel1',
                 },
                 panel2: {
@@ -637,21 +638,25 @@ describe('dockviewComponent', () => {
                     id: 'panel3',
                     contentComponent: 'default',
                     title: 'panel3',
+                    renderer: 'onlyWhenVisible',
                 },
                 panel4: {
                     id: 'panel4',
                     contentComponent: 'default',
                     title: 'panel4',
+                    renderer: 'always',
                 },
                 panel5: {
                     id: 'panel5',
                     contentComponent: 'default',
                     title: 'panel5',
+                    minimumHeight: 100,
+                    maximumHeight: 1000,
+                    minimumWidth: 200,
+                    maximumWidth: 2000,
                 },
             },
         });
-
-        // dockview.layout(1000, 1000, true);
 
         expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
             activeGroup: 'group-1',
@@ -712,6 +717,7 @@ describe('dockviewComponent', () => {
                 panel1: {
                     id: 'panel1',
                     contentComponent: 'default',
+                    tabComponent: 'tab-default',
                     title: 'panel1',
                 },
                 panel2: {
@@ -723,16 +729,22 @@ describe('dockviewComponent', () => {
                     id: 'panel3',
                     contentComponent: 'default',
                     title: 'panel3',
+                    renderer: 'onlyWhenVisible',
                 },
                 panel4: {
                     id: 'panel4',
                     contentComponent: 'default',
                     title: 'panel4',
+                    renderer: 'always',
                 },
                 panel5: {
                     id: 'panel5',
                     contentComponent: 'default',
                     title: 'panel5',
+                    minimumHeight: 100,
+                    maximumHeight: 1000,
+                    minimumWidth: 200,
+                    maximumWidth: 2000,
                 },
             },
         });
