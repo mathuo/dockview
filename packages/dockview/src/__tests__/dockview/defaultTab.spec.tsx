@@ -176,7 +176,7 @@ describe('defaultTab', () => {
         expect(element.querySelector('.dv-default-tab-action')).toBeTruthy();
     });
 
-    test('that mouseDown on close button prevents panel becoming active', async () => {
+    test('that pointerDown on close button prevents panel becoming active', async () => {
         const api = fromPartial<DockviewPanelApi>({
             setActive: jest.fn(),
             onDidTitleChange: jest.fn().mockImplementation(() => Disposable.NONE),
@@ -197,7 +197,7 @@ describe('defaultTab', () => {
             '.dv-default-tab-action'
         ) as HTMLElement;
 
-        fireEvent.mouseDown(btn);
+        fireEvent.pointerDown(btn);
         expect(api.setActive).toHaveBeenCalledTimes(0);
 
         fireEvent.click(element);

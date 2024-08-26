@@ -49,7 +49,7 @@ export const DockviewDefaultTab: React.FunctionComponent<
         [api, closeActionOverride]
     );
 
-    const onMouseDown = React.useCallback((e: React.MouseEvent) => {
+    const onPointerDown = React.useCallback((e: React.MouseEvent) => {
         e.preventDefault();
     }, []);
 
@@ -79,7 +79,7 @@ export const DockviewDefaultTab: React.FunctionComponent<
             {!hideClose && (
                 <div
                     className="dv-default-tab-action"
-                    onMouseDown={onMouseDown}
+                    onPointerDown={onPointerDown}
                     onClick={onClose}
                 >
                     <CloseButton />

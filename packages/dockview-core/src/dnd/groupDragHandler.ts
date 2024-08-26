@@ -21,7 +21,7 @@ export class GroupDragHandler extends DragHandler {
         this.addDisposables(
             addDisposableListener(
                 element,
-                'mousedown',
+                'pointerdown',
                 (e) => {
                     if (e.shiftKey) {
                         /**

@@ -30,7 +30,7 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         this._element.appendChild(this.action);
 
         this.addDisposables(
-            addDisposableListener(this.action, 'mousedown', (ev) => {
+            addDisposableListener(this.action, 'pointerdown', (ev) => {
                 ev.preventDefault();
             })
         );
@@ -46,7 +46,7 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
                 this._title = event.title;
                 this.render();
             }),
-            addDisposableListener(this.action, 'mousedown', (ev) => {
+            addDisposableListener(this.action, 'pointerdown', (ev) => {
                 ev.preventDefault();
             }),
             addDisposableListener(this.action, 'click', (ev) => {
