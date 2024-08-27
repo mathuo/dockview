@@ -39,6 +39,7 @@ export interface DockviewOptions {
      * Call `.layout(width, height)` to manually resize the container.
      */
     disableAutoResizing?: boolean;
+    anchor?: HTMLElement;
     hideBorders?: boolean;
     singleTabMode?: 'fullwidth' | 'default';
     disableFloatingGroups?: boolean;
@@ -94,11 +95,12 @@ export class DockviewUnhandledDragOverEvent implements DockviewDndOverlayEvent {
 
 export const PROPERTY_KEYS: (keyof DockviewOptions)[] = (() => {
     /**
-     * by readong the keys from an empty value object TypeScript will error
+     * by reading the keys from an empty value object TypeScript will error
      * when we add or remove new properties to `DockviewOptions`
      */
     const properties: Record<keyof DockviewOptions, undefined> = {
         disableAutoResizing: undefined,
+        anchor: undefined,
         hideBorders: undefined,
         singleTabMode: undefined,
         disableFloatingGroups: undefined,

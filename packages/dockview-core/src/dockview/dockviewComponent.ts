@@ -168,6 +168,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly panels: IDockviewPanel[];
     readonly orientation: Orientation;
     readonly gap: number;
+    readonly anchor: HTMLElement;
     readonly onDidDrop: Event<DockviewDidDropEvent>;
     readonly onWillDrop: Event<DockviewWillDropEvent>;
     readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent>;
@@ -339,6 +340,10 @@ export class DockviewComponent
         return this._floatingGroups;
     }
 
+    get anchor(): HTMLElement {
+        return this.options.anchor ?? this.gridview.element;
+    }
+
     constructor(parentElement: HTMLElement, options: DockviewComponentOptions) {
         super(parentElement, {
             proportionalLayout: true,
@@ -352,8 +357,10 @@ export class DockviewComponent
             className: options.className,
         });
 
+        this._options = options;
+
         this.overlayRenderContainer = new OverlayRenderContainer(
-            this.gridview.element,
+            this.anchor,
             this
         );
 
@@ -422,8 +429,6 @@ export class DockviewComponent
                 }
             })
         );
-
-        this._options = options;
 
         this._rootDropTarget = new Droptarget(this.element, {
             canDisplayOverlay: (event, position) => {
@@ -873,6 +878,7 @@ export class DockviewComponent
 
         const overlay = new Overlay({
             container: this.gridview.element,
+            anchor: this.anchor,
             content: group.element,
             ...anchoredBox,
             minimumInViewportWidth:

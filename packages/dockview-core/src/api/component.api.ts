@@ -931,4 +931,8 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     dispose(): void {
         this.component.dispose();
     }
+
+    anchor(): HTMLElement {
+        return this.component.anchor;
+    }
 }
