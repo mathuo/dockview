@@ -18,6 +18,8 @@ export interface IDockviewPanel extends IDisposable, IPanel {
     readonly api: DockviewPanelApi;
     readonly title: string | undefined;
     readonly params: Parameters | undefined;
+    readonly componentElId: string;
+    readonly tabComponentElId: string;
     updateParentGroup(
         group: DockviewGroupPanel,
         options?: { skipSetActive?: boolean }
@@ -34,6 +36,8 @@ export class DockviewPanel
     implements IDockviewPanel
 {
     readonly api: DockviewPanelApiImpl;
+    readonly componentElId: string;
+    readonly tabComponentElId: string;
 
     private _group: DockviewGroupPanel;
     private _params?: Parameters;
@@ -64,11 +68,22 @@ export class DockviewPanel
         private readonly containerApi: DockviewApi,
         group: DockviewGroupPanel,
         readonly view: IDockviewPanelModel,
-        options: { renderer?: DockviewPanelRenderer }
+        options: {
+            renderer?: DockviewPanelRenderer;
+            componentElId?: string;
+            tabComponentElId?: string;
+        }
     ) {
         super();
         this._renderer = options.renderer;
         this._group = group;
+
+        const randomId = Math.random().toString(36).slice(2);
+
+        this.tabComponentElId =
+            options.tabComponentElId ?? `tab-${id}-${randomId}`;
+        this.componentElId =
+            options.componentElId ?? `tab-panel-${id}-${randomId}`;
 
         this.api = new DockviewPanelApiImpl(
             this,

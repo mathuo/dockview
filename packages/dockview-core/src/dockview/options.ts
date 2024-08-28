@@ -230,6 +230,18 @@ export type AddPanelOptions<P extends object = Parameters> = {
      * Defaults to `false` which forces newly added panels to become active.
      */
     inactive?: boolean;
+    /**
+     * The unique DOM id for the rendered panel element
+     * 
+     * Used for accessibility attributes
+     */
+    componentElId?: string;
+    /**
+     * The unique DOM id for the rendered tab element
+     * 
+     * Used for accessibility attributes
+     */
+    tabComponentElId?: string;
 } & Partial<AddPanelOptionsUnion>;
 
 type AddGroupOptionsWithPanel = {
