@@ -8,7 +8,7 @@ import { PanelUpdateEvent } from '../../panel/types';
 import { Orientation } from '../../splitview/splitview';
 import { CompositeDisposable } from '../../lifecycle';
 import { Emitter } from '../../events';
-import {  IDockviewPanel } from '../../dockview/dockviewPanel';
+import { IDockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import { fireEvent, queryByTestId } from '@testing-library/dom';
 import { getPanelData } from '../../dnd/dataTransfer';
@@ -5636,5 +5636,92 @@ describe('dockviewComponent', () => {
             dockview.updateOptions({ gap: 15 });
             expect(dockview.gap).toBe(15);
         });
+    });
+
+    test('that arrow keys should activate appropriate tabs', () => {
+        dockview.layout(500, 1000);
+
+        dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            position: { referencePanel: 'panel1', direction: 'within' },
+        });
+
+        dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+        });
+
+        dockview.addPanel({
+            id: 'panel4',
+            component: 'default',
+            position: { referencePanel: 'panel3', direction: 'below' },
+        });
+
+        const panel1 = dockview.getGroupPanel('panel1')!;
+        const panel2 = dockview.getGroupPanel('panel2')!;
+        const panel3 = dockview.getGroupPanel('panel3')!;
+        const panel4 = dockview.getGroupPanel('panel4')!;
+
+        panel1.api.setActive();
+
+        expect(panel1.api.isActive).toBeTruthy();
+        expect(panel2.api.isActive).toBeFalsy();
+        expect(panel3.api.isActive).toBeFalsy();
+        expect(panel4.api.isActive).toBeFalsy();
+
+        const tabsContainer = (panel: IDockviewPanel) =>
+            panel.api.group.element.querySelector('.tabs-container')!;
+
+        const event = new KeyboardEvent('keydown', { key: 'ArrowRight' });
+        
+        fireEvent(tabsContainer(panel1), event);
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeTruthy();
+        expect(panel3.api.isActive).toBeFalsy();
+        expect(panel4.api.isActive).toBeFalsy();
+
+        fireEvent(tabsContainer(panel1), event);
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeFalsy();
+        expect(panel3.api.isActive).toBeTruthy();
+        expect(panel4.api.isActive).toBeFalsy();
+
+        const event2 = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
+
+        fireEvent(tabsContainer(panel1), event2);
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeTruthy();
+        expect(panel3.api.isActive).toBeFalsy();
+        expect(panel4.api.isActive).toBeFalsy();
+
+        fireEvent(tabsContainer(panel1), event2);
+        expect(panel1.api.isActive).toBeTruthy();
+        expect(panel2.api.isActive).toBeFalsy();
+        expect(panel3.api.isActive).toBeFalsy();
+        expect(panel4.api.isActive).toBeFalsy();
+
+        panel4.api.setActive();
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeFalsy();
+        expect(panel3.api.isActive).toBeFalsy();
+        expect(panel4.api.isActive).toBeTruthy();
+
+        fireEvent(tabsContainer(panel4), event2);
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeFalsy();
+        expect(panel3.api.isActive).toBeFalsy();
+        expect(panel4.api.isActive).toBeTruthy();
+
+        fireEvent(tabsContainer(panel4), event);
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeFalsy();
+        expect(panel3.api.isActive).toBeFalsy();
+        expect(panel4.api.isActive).toBeTruthy();
     });
 });

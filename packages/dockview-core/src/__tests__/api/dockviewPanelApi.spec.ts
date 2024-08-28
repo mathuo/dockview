@@ -49,6 +49,7 @@ describe('groupPanelApi', () => {
         const accessor = fromPartial<DockviewComponent>({
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             options: {},
         });
 
@@ -81,6 +82,7 @@ describe('groupPanelApi', () => {
         const accessor = fromPartial<DockviewComponent>({
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             options: {},
         });
 
