@@ -2,8 +2,96 @@ import { DockviewApi } from 'dockview';
 import * as React from 'react';
 import { defaultConfig, nextId } from './defaultLayout';
 
+import { createRoot, Root } from 'react-dom/client';
+import { PanelBuilder } from './panelBuilder';
+
+let mount = document.querySelector('.popover-anchor') as HTMLElement | null;
+
+if (!mount) {
+    mount = document.createElement('div');
+    mount.className = 'popover-anchor';
+    document.body.insertBefore(mount, document.body.firstChild);
+}
+
+const PopoverComponent = (props: {
+    close: () => void;
+    component: React.FC<{ close: () => void }>;
+}) => {
+    const ref = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        const handler = (ev: MouseEvent) => {
+            let target = ev.target as HTMLElement;
+
+            while (target.parentElement) {
+                if (target === ref.current) {
+                    return;
+                }
+                target = target.parentElement;
+            }
+
+            props.close();
+        };
+
+        window.addEventListener('mousedown', handler);
+
+        return () => {
+            window.removeEventListener('mousedown', handler);
+        };
+    }, []);
+
+    return (
+        <div
+            style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                zIndex: 9999,
+                height: '100%',
+                width: '100%',
+            }}
+        >
+            <div
+                ref={ref}
+                style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%,-50%)',
+                    backgroundColor: 'black',
+                    color: 'white',
+                    padding: 10,
+                }}
+            >
+                <props.component close={props.close} />
+            </div>
+        </div>
+    );
+};
+
+function usePopover() {
+    return {
+        open: (Component: React.FC<{ close: () => void }>) => {
+            const el = document.createElement('div');
+            mount!.appendChild(el);
+            const root = createRoot(el);
+
+            root.render(
+                <PopoverComponent
+                    component={Component}
+                    close={() => {
+                        root.unmount();
+                        el.remove();
+                    }}
+                />
+            );
+        },
+    };
+}
+
 export const GridActions = (props: {
     api?: DockviewApi;
+    containerRef: HTMLElement;
     hasCustomWatermark: boolean;
     toggleCustomWatermark: () => void;
 }) => {
@@ -39,13 +127,21 @@ export const GridActions = (props: {
         }
     };
 
-    const onAddPanel = (options?: { inactive: boolean }) => {
-        props.api?.addPanel({
-            id: `id_${Date.now().toString()}`,
-            component: 'default',
-            title: `Tab ${nextId()}`,
-            inactive: options?.inactive,
-        });
+    const popover = usePopover();
+
+    const onAddPanel = (options?: { advanced: boolean }) => {
+        if (options?.advanced) {
+            popover.open(({ close }) => {
+                return <PanelBuilder api={props.api!} done={close} />;
+            });
+        } else {
+            props.api?.addPanel({
+                id: `id_${Date.now().toString()}`,
+                component: 'default',
+                title: `Tab ${nextId()}`,
+                renderer: 'always',
+            });
+        }
     };
 
     const onAddGroup = () => {
@@ -60,15 +156,17 @@ export const GridActions = (props: {
 
     return (
         <div className="action-container">
-            <button className="text-button" onClick={() => onAddPanel()}>
-                Add Panel
-            </button>
-            <button
-                className="text-button"
-                onClick={() => onAddPanel({ inactive: true })}
-            >
-                Add Inactive Panel
-            </button>
+            <div className="button-group">
+                <button className="text-button" onClick={() => onAddPanel()}>
+                    Add Panel
+                </button>
+                <button
+                    className="demo-icon-button"
+                    onClick={() => onAddPanel({ advanced: true })}
+                >
+                    <span className="material-symbols-outlined">tune</span>
+                </button>
+            </div>
             <button className="text-button" onClick={onAddGroup}>
                 Add Group
             </button>

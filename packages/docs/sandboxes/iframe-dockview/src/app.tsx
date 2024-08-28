@@ -1,13 +1,33 @@
-import { DockviewReact, DockviewReadyEvent } from 'dockview';
+import {
+    DockviewReact,
+    DockviewReadyEvent,
+    IDockviewPanelProps,
+} from 'dockview';
 import * as React from 'react';
 
 const components = {
-    iframeComponent: () => {
+    iframeComponent: (props: IDockviewPanelProps) => {
+        const [enabled, setEnabled] = React.useState<boolean>(
+            props.api.isActive
+        );
+
+        React.useEffect(() => {
+            const disposable = props.api.onDidActiveChange((event) => {
+                setEnabled(event.isActive);
+                console.log(event);
+            });
+
+            return () => {
+                disposable.dispose();
+            };
+        }, [props.api]);
+
         return (
             <iframe
                 style={{
                     width: '100%',
                     height: '100%',
+                    pointerEvents: enabled ? 'inherit' : 'none',
                 }}
                 src="https://dockview.dev"
             />

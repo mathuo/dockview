@@ -9,24 +9,8 @@ import { DocRef } from '@site/src/components/ui/reference/docRef';
 import LiveExample from '@site/src/components/ui/exampleFrame';
 
 <DocRef declaration="DockviewApi"
-  methods={['onDidDrop']}
+  methods={['onDidDrop', 'onUnhandledDragOverEvent']}
 />
-
-
-<FrameworkSpecific framework='React'>
-  <DocRef declaration="IDockviewReactProps" methods={['showDndOverlay']} />
-</FrameworkSpecific>
-
-<FrameworkSpecific framework='Vue'>
-  <DocRef declaration="IDockviewVueProps" methods={['showDndOverlay']} />
-</FrameworkSpecific>
-
-<FrameworkSpecific framework='JavaScript'>
-  <DocRef declaration="DockviewComponentOptions"
-  methods={['showDndOverlay']}
-  />
-</FrameworkSpecific>
-
 
 ## Intercepting Drag Events
 
