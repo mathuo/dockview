@@ -8,7 +8,7 @@ import { PanelUpdateEvent } from '../../panel/types';
 import { Orientation } from '../../splitview/splitview';
 import { CompositeDisposable } from '../../lifecycle';
 import { Emitter } from '../../events';
-import {  IDockviewPanel } from '../../dockview/dockviewPanel';
+import { IDockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import { fireEvent, queryByTestId } from '@testing-library/dom';
 import { getPanelData } from '../../dnd/dataTransfer';
@@ -260,6 +260,112 @@ describe('dockviewComponent', () => {
         }).toThrowError('panel with id panel1 already exists');
 
         dockview.dispose();
+    });
+
+    describe('move group', () => {
+        test('horizontal', () => {
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(600, 1000);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            const panel3 = dockview.addPanel({
+                id: 'panel3',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            expect(panel1.api.width).toBe(200);
+            expect(panel2.api.width).toBe(200);
+            expect(panel3.api.width).toBe(200);
+
+            panel3.api.setSize({ width: 300 });
+
+            expect(panel1.api.width).toBe(200);
+            expect(panel2.api.width).toBe(100);
+            expect(panel3.api.width).toBe(300);
+
+            dockview.moveGroup({
+                from: { group: panel3.api.group },
+                to: { group: panel1.api.group, position: 'right' },
+            });
+
+            expect(panel1.api.width).toBe(200);
+            expect(panel2.api.width).toBe(100);
+            expect(panel3.api.width).toBe(300);
+        });
+
+        test('vertical', () => {
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 600);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'below' },
+            });
+            const panel3 = dockview.addPanel({
+                id: 'panel3',
+                component: 'default',
+                position: { direction: 'below' },
+            });
+
+            expect(panel1.api.height).toBe(200);
+            expect(panel2.api.height).toBe(200);
+            expect(panel3.api.height).toBe(200);
+
+            panel3.api.setSize({ height: 300 });
+
+            expect(panel1.api.height).toBe(200);
+            expect(panel2.api.height).toBe(100);
+            expect(panel3.api.height).toBe(300);
+
+            dockview.moveGroup({
+                from: { group: panel3.api.group },
+                to: { group: panel1.api.group, position: 'bottom' },
+            });
+
+            expect(panel1.api.height).toBe(200);
+            expect(panel2.api.height).toBe(100);
+            expect(panel3.api.height).toBe(300);
+        });
     });
 
     test('set active panel', () => {
