@@ -11,6 +11,7 @@ import { IDockviewPanelModel } from './dockviewPanelModel';
 import { DockviewComponent } from './dockviewComponent';
 import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
 import { WillFocusEvent } from '../api/panelApi';
+import { Contraints } from '../gridview/gridviewPanel';
 
 export interface IDockviewPanel extends IDisposable, IPanel {
     readonly view: IDockviewPanelModel;
@@ -20,6 +21,10 @@ export interface IDockviewPanel extends IDisposable, IPanel {
     readonly params: Parameters | undefined;
     readonly componentElId: string;
     readonly tabComponentElId: string;
+    readonly minimumWidth?: number;
+    readonly minimumHeight?: number;
+    readonly maximumWidth?: number;
+    readonly maximumHeight?: number;
     updateParentGroup(
         group: DockviewGroupPanel,
         options?: { skipSetActive?: boolean }
@@ -44,6 +49,11 @@ export class DockviewPanel
     private _title: string | undefined;
     private _renderer: DockviewPanelRenderer | undefined;
 
+    private _minimumWidth: number | undefined;
+    private _minimumHeight: number | undefined;
+    private _maximumWidth: number | undefined;
+    private _maximumHeight: number | undefined;
+
     get params(): Parameters | undefined {
         return this._params;
     }
@@ -60,6 +70,22 @@ export class DockviewPanel
         return this._renderer ?? this.accessor.renderer;
     }
 
+    get minimumWidth(): number | undefined {
+        return this._minimumWidth;
+    }
+
+    get minimumHeight(): number | undefined {
+        return this._minimumHeight;
+    }
+
+    get maximumWidth(): number | undefined {
+        return this._maximumWidth;
+    }
+
+    get maximumHeight(): number | undefined {
+        return this._maximumHeight;
+    }
+
     constructor(
         public readonly id: string,
         component: string,
@@ -72,11 +98,15 @@ export class DockviewPanel
             renderer?: DockviewPanelRenderer;
             componentElId?: string;
             tabComponentElId?: string;
-        }
+        } & Partial<Contraints>
     ) {
         super();
         this._renderer = options.renderer;
         this._group = group;
+        this._minimumWidth = options.minimumWidth;
+        this._minimumHeight = options.minimumHeight;
+        this._maximumWidth = options.maximumWidth;
+        this._maximumHeight = options.maximumHeight;
 
         const randomId = Math.random().toString(36).slice(2);
 
@@ -144,6 +174,10 @@ export class DockviewPanel
                     : undefined,
             title: this.title,
             renderer: this._renderer,
+            minimumHeight: this._minimumHeight,
+            maximumHeight: this._maximumHeight,
+            minimumWidth: this._minimumWidth,
+            maximumWidth: this._maximumWidth,
         };
     }
 

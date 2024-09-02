@@ -129,7 +129,7 @@ export class Tab extends CompositeDisposable {
                 this._onDragStart.fire(event);
             }),
             dragHandler,
-            addDisposableListener(this._element, 'mousedown', (event) => {
+            addDisposableListener(this._element, 'pointerdown', (event) => {
                 if (event.defaultPrevented) {
                     return;
                 }

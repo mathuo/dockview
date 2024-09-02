@@ -467,6 +467,7 @@ describe('tabsContainer', () => {
             onDidActivePanelChange: jest.fn(),
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
+            doSetGroupActive: jest.fn(),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -494,10 +495,11 @@ describe('tabsContainer', () => {
             return { top: 10, left: 20, width: 0, height: 0 } as any;
         });
 
-        const event = new KeyboardEvent('mousedown', { shiftKey: true });
+        const event = new KeyboardEvent('pointerdown', { shiftKey: true });
         const eventPreventDefaultSpy = jest.spyOn(event, 'preventDefault');
         fireEvent(container, event);
 
+        expect(accessor.doSetGroupActive).toHaveBeenCalledWith(groupPanel);
         expect(accessor.addFloatingGroup).toHaveBeenCalledWith(groupPanel, {
             x: 100,
             y: 60,
@@ -506,7 +508,7 @@ describe('tabsContainer', () => {
         expect(accessor.addFloatingGroup).toHaveBeenCalledTimes(1);
         expect(eventPreventDefaultSpy).toHaveBeenCalledTimes(1);
 
-        const event2 = new KeyboardEvent('mousedown', { shiftKey: false });
+        const event2 = new KeyboardEvent('pointerdown', { shiftKey: false });
         const eventPreventDefaultSpy2 = jest.spyOn(event2, 'preventDefault');
         fireEvent(container, event2);
 
@@ -522,6 +524,7 @@ describe('tabsContainer', () => {
             onDidActivePanelChange: jest.fn(),
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
+            doSetGroupActive: jest.fn(),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -549,14 +552,15 @@ describe('tabsContainer', () => {
             return { top: 10, left: 20, width: 0, height: 0 } as any;
         });
 
-        const event = new KeyboardEvent('mousedown', { shiftKey: true });
+        const event = new KeyboardEvent('pointerdown', { shiftKey: true });
         const eventPreventDefaultSpy = jest.spyOn(event, 'preventDefault');
         fireEvent(container, event);
 
+        expect(accessor.doSetGroupActive).toHaveBeenCalledWith(groupPanel);
         expect(accessor.addFloatingGroup).toHaveBeenCalledTimes(0);
         expect(eventPreventDefaultSpy).toHaveBeenCalledTimes(0);
 
-        const event2 = new KeyboardEvent('mousedown', { shiftKey: false });
+        const event2 = new KeyboardEvent('pointerdown', { shiftKey: false });
         const eventPreventDefaultSpy2 = jest.spyOn(event2, 'preventDefault');
         fireEvent(container, event2);
 
@@ -605,7 +609,7 @@ describe('tabsContainer', () => {
         const el = cut.element.querySelector('.tab')!;
         expect(el).toBeTruthy();
 
-        const event = new KeyboardEvent('mousedown', { shiftKey: true });
+        const event = new KeyboardEvent('pointerdown', { shiftKey: true });
         const preventDefaultSpy = jest.spyOn(event, 'preventDefault');
         fireEvent(el, event);
 

@@ -54,7 +54,7 @@ describe('defaultTab', () => {
 
         let el = cut.element.querySelector('.dv-default-tab-action');
 
-        fireEvent.mouseDown(el!);
+        fireEvent.pointerDown(el!);
         expect(api.close).toHaveBeenCalledTimes(0);
 
         fireEvent.click(el!);

@@ -16,6 +16,7 @@ import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
 import { IGroupHeaderProps } from './framework';
 import { AnchoredBox } from '../types';
 import { FloatingGroupOptions } from './dockviewComponent';
+import { Contraints } from '../gridview/gridviewPanel';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -116,6 +117,17 @@ export const PROPERTY_KEYS: (keyof DockviewOptions)[] = (() => {
     return Object.keys(properties) as (keyof DockviewOptions)[];
 })();
 
+export interface CreateComponentOptions {
+    /**
+     * The unqiue identifer of the component
+     */
+    id: string;
+    /**
+     * The component name, this should determine what is rendered.
+     */
+    name: string;
+}
+
 export interface DockviewFrameworkOptions {
     defaultTabComponent?: string;
     createRightHeaderActionComponent?: (
@@ -127,14 +139,10 @@ export interface DockviewFrameworkOptions {
     createPrefixHeaderActionComponent?: (
         group: DockviewGroupPanel
     ) => IHeaderActionsRenderer;
-    createTabComponent?: (options: {
-        id: string;
-        name: string;
-    }) => ITabRenderer | undefined;
-    createComponent: (options: {
-        id: string;
-        name: string;
-    }) => IContentRenderer;
+    createTabComponent?: (
+        options: CreateComponentOptions
+    ) => ITabRenderer | undefined;
+    createComponent: (options: CreateComponentOptions) => IContentRenderer;
     createWatermarkComponent?: () => IWatermarkRenderer;
 }
 
@@ -242,7 +250,10 @@ export type AddPanelOptions<P extends object = Parameters> = {
      * Used for accessibility attributes
      */
     tabComponentElId?: string;
-} & Partial<AddPanelOptionsUnion>;
+    initialWidth?: number;
+    initialHeight?: number;
+} & Partial<AddPanelOptionsUnion> &
+    Partial<Contraints>;
 
 type AddGroupOptionsWithPanel = {
     referencePanel: string | IDockviewPanel;

@@ -261,7 +261,7 @@ export class TabsContainer
             }),
             addDisposableListener(
                 this.voidContainer.element,
-                'mousedown',
+                'pointerdown',
                 (event) => {
                     const isFloatingGroupsEnabled =
                         !this.accessor.options.disableFloatingGroups;
@@ -286,7 +286,7 @@ export class TabsContainer
                     }
                 }
             ),
-            addDisposableListener(this.tabContainer, 'mousedown', (event) => {
+            addDisposableListener(this.tabContainer, 'pointerdown', (event) => {
                 if (event.defaultPrevented) {
                     return;
                 }
