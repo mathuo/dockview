@@ -91,7 +91,6 @@ function usePopover() {
 
 export const GridActions = (props: {
     api?: DockviewApi;
-    containerRef: HTMLElement;
     hasCustomWatermark: boolean;
     toggleCustomWatermark: () => void;
 }) => {
