@@ -329,7 +329,7 @@ export class Overlay extends CompositeDisposable {
 
                     this.setBounds(bounds);
                 }),
-                addDisposableWindowListener(window, 'mouseup', () => {
+                addDisposableWindowListener(window, 'pointerup', () => {
                     toggleClass(
                         this._element,
                         'dv-resize-container-dragging',
@@ -595,7 +595,7 @@ export class Overlay extends CompositeDisposable {
                             iframes.release();
                         },
                     },
-                    addDisposableWindowListener(window, 'mouseup', () => {
+                    addDisposableWindowListener(window, 'pointerup', () => {
                         move.dispose();
                         this._onDidChangeEnd.fire();
                     })
