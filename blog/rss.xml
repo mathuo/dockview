@@ -4,10 +4,31 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Tue, 13 Aug 2024 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Thu, 05 Sep 2024 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 1.17.0]]></title>
+            <link>https://dockview.dev/blog/dockview-1.17.0-release</link>
+            <guid>https://dockview.dev/blog/dockview-1.17.0-release</guid>
+            <pubDate>Thu, 05 Sep 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.17.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<ul>
+<li>Touch Support <a href="https://github.com/mathuo/dockview/pull/698" target="_blank" rel="noopener noreferrer">#698</a></li>
+<li>Initial and bounding panel sizing <a href="https://github.com/mathuo/dockview/pull/690" target="_blank" rel="noopener noreferrer">#690</a></li>
+<li>Improve group resize logic <a href="https://github.com/mathuo/dockview/pull/693" target="_blank" rel="noopener noreferrer">#693</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.17.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Theme Typo <a href="https://github.com/mathuo/dockview/pull/694" target="_blank" rel="noopener noreferrer">#694</a></li>
+<li>Docs <a href="https://github.com/mathuo/dockview/pull/703" target="_blank" rel="noopener noreferrer">#703</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.17.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 1.16.1]]></title>
             <link>https://dockview.dev/blog/dockview-1.16.1-release</link>
@@ -497,47 +518,6 @@ when popout is closed.</li>
 </li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.9.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 1.8.4]]></title>
-            <link>https://dockview.dev/blog/dockview-1.8.4-release</link>
-            <guid>https://dockview.dev/blog/dockview-1.8.4-release</guid>
-            <pubDate>Fri, 06 Oct 2023 00:00:00 GMT</pubDate>
-            <description><![CDATA[Please reference to docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference to docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.8.4-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<ul>
-<li>Optional header actions before tabs list <a href="https://github.com/mathuo/dockview/issues/338" target="_blank" rel="noopener noreferrer">#338</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.8.4-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>
-<p>Bug: Recover from corrupted layouts gracefully <a href="https://github.com/mathuo/dockview/issues/341" target="_blank" rel="noopener noreferrer">#341</a></p>
-</li>
-<li>
-<p>Bug: Fix floating group resizing within nested tabs <a href="https://github.com/mathuo/dockview/issues/344" target="_blank" rel="noopener noreferrer">#344</a></p>
-</li>
-<li>
-<p>Bug: Progmatic resizing priority <a href="https://github.com/mathuo/dockview/issues/350" target="_blank" rel="noopener noreferrer">#350</a></p>
-</li>
-<li>
-<p>Bug: Incorrect disposal of deeply nested gridview <a href="https://github.com/mathuo/dockview/issues/356" target="_blank" rel="noopener noreferrer">#356</a></p>
-</li>
-<li>
-<p>Splitview separator stlye restored on deserialize step <a href="https://github.com/mathuo/dockview/issues/358" target="_blank" rel="noopener noreferrer">#358</a></p>
-</li>
-<li>
-<p>Docs: Additional Docs <a href="https://github.com/mathuo/dockview/issues/347" target="_blank" rel="noopener noreferrer">#347</a></p>
-</li>
-<li>
-<p>Docs: Additional Docs <a href="https://github.com/mathuo/dockview/issues/336" target="_blank" rel="noopener noreferrer">#336</a></p>
-</li>
-<li>
-<p>Docs: Additional Docs <a href="https://github.com/mathuo/dockview/issues/352" target="_blank" rel="noopener noreferrer">#352</a></p>
-</li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.8.4-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
     </channel>
