@@ -13,7 +13,7 @@ import { GridActions } from './gridActions';
 import { PanelActions } from './panelActions';
 import { GroupActions } from './groupActions';
 import { LeftControls, PrefixHeaderControls, RightControls } from './controls';
-import { Table, usePanelApiMetadata } from './debugPanel';
+import { usePanelApiMetadata } from './debugPanel';
 
 const components = {
     default: (props: IDockviewPanelProps) => {
@@ -26,6 +26,7 @@ const components = {
                     overflow: 'auto',
                     color: 'white',
                     position: 'relative',
+                    padding: 5,
                     // border: '5px dashed purple',
                 }}
             >
@@ -43,12 +44,50 @@ const components = {
                 >
                     {props.api.title}
                 </span>
+
+                <div>
+                    <span>{'Panel Rendering Mode: '}</span>
+                    <span>{metadata.renderer.value}</span>
+                    <button
+                        onClick={() => {
+                            props.api.setRenderer(
+                                props.api.renderer === 'always'
+                                    ? 'onlyWhenVisible'
+                                    : 'always'
+                            );
+                        }}
+                    >
+                        Toggle
+                    </button>
+                </div>
             </div>
         );
     },
-    iframe: () => {
+    nested: (props: IDockviewPanelProps) => {
+        return (
+            <DockviewReact
+                components={components}
+                onReady={(event: DockviewReadyEvent) => {
+                    event.api.addPanel({ id: 'panel_1', component: 'default' });
+                    event.api.addPanel({ id: 'panel_2', component: 'default' });
+                    event.api.addPanel({
+                        id: 'panel_3',
+                        component: 'default',
+                        floating: true,
+                    });
+                }}
+                className={'dockview-theme-abyss'}
+            />
+        );
+    },
+    iframe: (props: IDockviewPanelProps) => {
         return (
             <iframe
+                onMouseDown={() => {
+                    if (!props.api.isActive) {
+                        props.api.setActive();
+                    }
+                }}
                 style={{
                     width: '100%',
                     height: '100%',
@@ -210,6 +249,7 @@ const DockviewDemo = (props: { theme?: string }) => {
                 padding: '8px',
                 backgroundColor: 'rgba(0,0,50,0.25)',
                 borderRadius: '8px',
+                position: 'relative',
                 ...css,
             }}
         >

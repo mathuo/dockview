@@ -10,7 +10,7 @@ export interface FrameworkDescriptor {
 }
 
 const frameworks: FrameworkDescriptor[] = [
-    // { value: 'JavaScript', label: 'JavaScript', icon: 'img/js-icon.svg' },
+    { value: 'JavaScript', label: 'JavaScript', icon: 'img/js-icon.svg' },
     { value: 'React', label: 'React', icon: 'img/react-icon.svg' },
     { value: 'Vue', label: 'Vue', icon: 'img/vue-icon.svg' },
     // { value: 'Angular', label: 'Angular' },

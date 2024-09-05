@@ -50,8 +50,7 @@ const Watermark = (props: IWatermarkPanelProps) => {
                 }}
             >
                 <span>
-                    This is a custom watermark. You can put whatever React
-                    component you want here
+                    This is a custom watermark. You can change this content.
                 </span>
                 <span>
                     <button onClick={addPanel}>Add New Panel</button>
