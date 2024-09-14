@@ -7,6 +7,7 @@ import {
 } from 'dockview-vue';
 
 const Panel = defineComponent({
+    inject: ['vu3ProvideInjectEvidenceTestMessage'],
     name: 'Panel',
     props: {
         params: {
@@ -14,14 +15,27 @@ const Panel = defineComponent({
             required: true,
         },
     },
-    setup(props) {
+    data() {
         return {
-            title: props.params.api.title,
+            title: '',
+            message: this.vu3ProvideInjectEvidenceTestMessage ?? 'not found',
+        };
+    },
+    mounted() {
+        const disposable = this.params.api.onDidTitleChange(() => {
+            this.title = this.params.api.title;
+        });
+        this.title = this.params.api.title;
+
+        return () => {
+            disposable.dispose();
         };
     },
     template: `
     <div style="height:100%; color:red;">
       Hello World
+      <div>{{title}}</div>
+      <div>{{message}}</div>
     </div>`,
 });
 
@@ -39,6 +53,11 @@ const App = defineComponent({
                 title: 'Panel 1',
             });
         },
+    },
+    provide() {
+        return {
+            vu3ProvideInjectEvidenceTestMessage: 'Hello from the provider',
+        };
     },
     template: `
       <dockview-vue
