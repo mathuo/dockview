@@ -176,3 +176,35 @@ api.addPanel({
   }
 });
 ```
+
+### Minimum and Maximum
+
+You can define both minimum and maxmium widths and heights, these are persisted with layouts.
+
+:::info
+Since panels exist within groups there are occasions where these boundaries will be ignored to prevent overflow and clipping issues within the dock.
+:::
+
+```ts
+api.addPanel({
+    id: 'panel_1',
+    component: 'default',
+    minimumWidth: 100,
+    maximumWidth: 100,
+    minimumHeight: 200,
+    maximumHeight: 2000
+});
+```
+
+### Initial Size
+
+You can define an `initialWidth` and `initialHeight`. The dock will may a best attempt to obey these inputs but it may not always be possible due to the constraints of the grid.
+
+```ts
+api.addPanel({
+    id: 'panel_1',
+    component: 'default',
+    initialWidth: 100,
+    initialHeight: 100
+});
+```

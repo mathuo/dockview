@@ -50,9 +50,14 @@ const components = {
             </div>
         );
     },
-    iframe: () => {
+    iframe: (props: IDockviewPanelProps) => {
         return (
             <iframe
+                onMouseDown={() => {
+                    if (!props.api.isActive) {
+                        props.api.setActive();
+                    }
+                }}
                 style={{
                     width: '100%',
                     height: '100%',

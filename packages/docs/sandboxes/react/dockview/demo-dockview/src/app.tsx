@@ -15,8 +15,24 @@ import { GroupActions } from './groupActions';
 import { LeftControls, PrefixHeaderControls, RightControls } from './controls';
 import { Table, usePanelApiMetadata } from './debugPanel';
 
+const DebugContext = React.createContext<boolean>(false);
+
+const Option = (props: {
+    title: string;
+    onClick: () => void;
+    value: string;
+}) => {
+    return (
+        <div>
+            <span>{`${props.title}: `}</span>
+            <button onClick={props.onClick}>{props.value}</button>
+        </div>
+    );
+};
+
 const components = {
     default: (props: IDockviewPanelProps) => {
+        const isDebug = React.useContext(DebugContext);
         const metadata = usePanelApiMetadata(props.api);
 
         return (
@@ -24,12 +40,11 @@ const components = {
                 style={{
                     height: '100%',
                     overflow: 'auto',
-                    color: 'white',
                     position: 'relative',
-                    // border: '5px dashed purple',
+                    padding: 5,
+                    border: isDebug ? '2px dashed orange' : '',
                 }}
             >
-                {/* <Table data={metadata} /> */}
                 <span
                     style={{
                         position: 'absolute',
@@ -43,12 +58,52 @@ const components = {
                 >
                     {props.api.title}
                 </span>
+
+                {isDebug && (
+                    <div style={{ fontSize: '0.8em' }}>
+                        <Option
+                            title="Panel Rendering Mode"
+                            value={metadata.renderer.value}
+                            onClick={() =>
+                                props.api.setRenderer(
+                                    props.api.renderer === 'always'
+                                        ? 'onlyWhenVisible'
+                                        : 'always'
+                                )
+                            }
+                        />
+
+                        <Table data={metadata} />
+                    </div>
+                )}
             </div>
         );
     },
-    iframe: () => {
+    nested: (props: IDockviewPanelProps) => {
+        return (
+            <DockviewReact
+                components={components}
+                onReady={(event: DockviewReadyEvent) => {
+                    event.api.addPanel({ id: 'panel_1', component: 'default' });
+                    event.api.addPanel({ id: 'panel_2', component: 'default' });
+                    event.api.addPanel({
+                        id: 'panel_3',
+                        component: 'default',
+                        floating: true,
+                    });
+                }}
+                className={'dockview-theme-abyss'}
+            />
+        );
+    },
+    iframe: (props: IDockviewPanelProps) => {
         return (
             <iframe
+                onMouseDown={() => {
+                    if (!props.api.isActive) {
+                        props.api.setActive();
+                    }
+                }}
                 style={{
                     width: '100%',
                     height: '100%',
@@ -199,6 +254,7 @@ const DockviewDemo = (props: { theme?: string }) => {
     }, [gapCheck]);
 
     const [showLogs, setShowLogs] = React.useState<boolean>(false);
+    const [debug, setDebug] = React.useState<boolean>(false);
 
     return (
         <div
@@ -210,6 +266,7 @@ const DockviewDemo = (props: { theme?: string }) => {
                 padding: '8px',
                 backgroundColor: 'rgba(0,0,50,0.25)',
                 borderRadius: '8px',
+                position: 'relative',
                 ...css,
             }}
         >
@@ -254,6 +311,15 @@ const DockviewDemo = (props: { theme?: string }) => {
             >
                 <button
                     onClick={() => {
+                        setDebug(!debug);
+                    }}
+                >
+                    <span className="material-symbols-outlined">
+                        engineering
+                    </span>
+                </button>
+                <button
+                    onClick={() => {
                         setShowLogs(!showLogs);
                     }}
                 >
@@ -278,18 +344,20 @@ const DockviewDemo = (props: { theme?: string }) => {
                         display: 'flex',
                     }}
                 >
-                    <DockviewReact
-                        components={components}
-                        defaultTabComponent={headerComponents.default}
-                        rightHeaderActionsComponent={RightControls}
-                        leftHeaderActionsComponent={LeftControls}
-                        prefixHeaderActionsComponent={PrefixHeaderControls}
-                        watermarkComponent={
-                            watermark ? WatermarkComponent : undefined
-                        }
-                        onReady={onReady}
-                        className={props.theme || 'dockview-theme-abyss'}
-                    />
+                    <DebugContext.Provider value={debug}>
+                        <DockviewReact
+                            components={components}
+                            defaultTabComponent={headerComponents.default}
+                            rightHeaderActionsComponent={RightControls}
+                            leftHeaderActionsComponent={LeftControls}
+                            prefixHeaderActionsComponent={PrefixHeaderControls}
+                            watermarkComponent={
+                                watermark ? WatermarkComponent : undefined
+                            }
+                            onReady={onReady}
+                            className={props.theme || 'dockview-theme-abyss'}
+                        />
+                    </DebugContext.Provider>
                 </div>
 
                 {showLogs && (
