@@ -19,6 +19,8 @@ export interface IDockviewPanel extends IDisposable, IPanel {
     readonly api: DockviewPanelApi;
     readonly title: string | undefined;
     readonly params: Parameters | undefined;
+    readonly componentElId: string;
+    readonly tabComponentElId: string;
     readonly minimumWidth?: number;
     readonly minimumHeight?: number;
     readonly maximumWidth?: number;
@@ -39,6 +41,8 @@ export class DockviewPanel
     implements IDockviewPanel
 {
     readonly api: DockviewPanelApiImpl;
+    readonly componentElId: string;
+    readonly tabComponentElId: string;
 
     private _group: DockviewGroupPanel;
     private _params?: Parameters;
@@ -90,7 +94,11 @@ export class DockviewPanel
         private readonly containerApi: DockviewApi,
         group: DockviewGroupPanel,
         readonly view: IDockviewPanelModel,
-        options: { renderer?: DockviewPanelRenderer } & Partial<Contraints>
+        options: {
+            renderer?: DockviewPanelRenderer;
+            componentElId?: string;
+            tabComponentElId?: string;
+        } & Partial<Contraints>
     ) {
         super();
         this._renderer = options.renderer;
@@ -99,6 +107,13 @@ export class DockviewPanel
         this._minimumHeight = options.minimumHeight;
         this._maximumWidth = options.maximumWidth;
         this._maximumHeight = options.maximumHeight;
+
+        const randomId = Math.random().toString(36).slice(2);
+
+        this.tabComponentElId =
+            options.tabComponentElId ?? `tab-${id}-${randomId}`;
+        this.componentElId =
+            options.componentElId ?? `tab-panel-${id}-${randomId}`;
 
         this.api = new DockviewPanelApiImpl(
             this,
