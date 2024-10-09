@@ -1,14 +1,12 @@
 .dv-render-overlay {
+    --dv-overlay-z-index: var(--dv-overlay-z-index, 999);
+
     position: absolute;
     z-index: 1;
     height: 100%;
 
     &.dv-render-overlay-float {
-        z-index: 998;
-
-        &.dv-render-overlay-active {
-          // z-index: 1000;
-        }
+        z-index: calc(var(--dv-overlay-z-index) - 1);
     }
 }
 

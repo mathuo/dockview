@@ -136,7 +136,7 @@ export class OverlayRenderContainer extends CompositeDisposable {
                         const level = Number(
                             element.getAttribute('aria-level')
                         );
-                        focusContainer.style.zIndex = `calc(var(--dv-floating-z-index) + ${
+                        focusContainer.style.zIndex = `calc(var(--dv-overlay-z-index, 999) + ${
                             level * 2 + 1
                         })`;
                     };
