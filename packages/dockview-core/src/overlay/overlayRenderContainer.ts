@@ -9,7 +9,6 @@ import {
 } from '../lifecycle';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 import { DockviewComponent } from '../dockview/dockviewComponent';
-import { DEFAULT_OVERLAY_Z_INDEX } from './overlay';
 
 export type DockviewPanelRenderer = 'onlyWhenVisible' | 'always';
 
@@ -137,9 +136,9 @@ export class OverlayRenderContainer extends CompositeDisposable {
                         const level = Number(
                             element.getAttribute('aria-level')
                         );
-                        focusContainer.style.zIndex = `${
-                            DEFAULT_OVERLAY_Z_INDEX + level * 2 + 1
-                        }`;
+                        focusContainer.style.zIndex = `calc(var(--dv-floating-z-index) + ${
+                            level * 2 + 1
+                        })`;
                     };
 
                     const observer = new MutationObserver(() => {
