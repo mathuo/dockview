@@ -1,6 +1,6 @@
 import { addStyles } from './dom';
 import { Emitter, addDisposableWindowListener } from './events';
-import { CompositeDisposable, IDisposable } from './lifecycle';
+import { CompositeDisposable, Disposable, IDisposable } from './lifecycle';
 import { Box } from './types';
 
 export type PopoutWindowOptions = {
@@ -99,6 +99,9 @@ export class PopoutWindow extends CompositeDisposable {
         this._window = { value: externalWindow, disposable };
 
         disposable.addDisposables(
+            Disposable.from(() => {
+                externalWindow.close();
+            }),
             addDisposableWindowListener(window, 'beforeunload', () => {
                 /**
                  * before the main window closes we should close this popup too
