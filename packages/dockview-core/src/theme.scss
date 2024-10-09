@@ -8,6 +8,7 @@
     --dv-tabs-container-scrollbar-color: #888;
     --dv-icon-hover-background-color: rgba(90, 93, 94, 0.31);
     --dv-floating-box-shadow: 8px 8px 8px 0px rgba(83, 89, 93, 0.5);
+    --dv-overlay-z-index: 999;
 }
 
 @mixin dockview-theme-dark-mixin {
@@ -268,52 +269,51 @@
     }
 
     .vertical > .sash-container > .sash {
-
-      &:not(.disabled) {
-        &::after {
-            content: '';
-            height: 4px;
-            width: 40px;
-            border-radius: 2px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: var(--dv-separator-handle-background-color);
-            position: absolute;
-        }
-
-        &:hover {
+        &:not(.disabled) {
             &::after {
-                background-color: var(
-                    --dv-separator-handle-hover-background-color
-                );
+                content: '';
+                height: 4px;
+                width: 40px;
+                border-radius: 2px;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: var(--dv-separator-handle-background-color);
+                position: absolute;
+            }
+
+            &:hover {
+                &::after {
+                    background-color: var(
+                        --dv-separator-handle-hover-background-color
+                    );
+                }
             }
         }
-      }
     }
 
     .horizontal > .sash-container > .sash {
-      &:not(.disabled) {
-        &::after {
-            content: '';
-            height: 40px;
-            width: 4px;
-            border-radius: 2px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: var(--dv-separator-handle-background-color);
-            position: absolute;
-        }
-
-        &:hover {
+        &:not(.disabled) {
             &::after {
-                background-color: var(
-                    --dv-separator-handle-hover-background-color
-                );
+                content: '';
+                height: 40px;
+                width: 4px;
+                border-radius: 2px;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: var(--dv-separator-handle-background-color);
+                position: absolute;
+            }
+
+            &:hover {
+                &::after {
+                    background-color: var(
+                        --dv-separator-handle-hover-background-color
+                    );
+                }
             }
         }
-      }
     }
 }
 

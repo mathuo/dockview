@@ -13,8 +13,6 @@ import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { clamp } from '../math';
 import { AnchoredBox } from '../types';
 
-export const DEFAULT_OVERLAY_Z_INDEX = 999;
-
 class AriaLevelTracker {
     private _orderedList: HTMLElement[] = [];
 
@@ -37,9 +35,9 @@ class AriaLevelTracker {
     private update(): void {
         for (let i = 0; i < this._orderedList.length; i++) {
             this._orderedList[i].setAttribute('aria-level', `${i}`);
-            this._orderedList[i].style.zIndex = `${
-                DEFAULT_OVERLAY_Z_INDEX + i * 2
-            }`;
+            this._orderedList[
+                i
+            ].style.zIndex = `calc(var(--dv-overlay-z-index, 999) + ${i * 2})`;
         }
     }
 }
