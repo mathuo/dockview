@@ -635,6 +635,7 @@ export class DockviewComponent
                     options?.overridePopoutGroup ??
                     this.createGroup({ id: groupId });
                 group.model.renderContainer = overlayRenderContainer;
+                group.layout(_window.window!.innerWidth, _window.window!.innerHeight);
 
                 if (!options?.overridePopoutGroup) {
                     this._onDidAddGroup.fire(group);
@@ -715,7 +716,7 @@ export class DockviewComponent
                         _window.window!,
                         'resize',
                         () => {
-                            group.layout(window.innerWidth, window.innerHeight);
+                            group.layout(_window.window!.innerWidth, _window.window!.innerHeight);
                         }
                     ),
                     overlayRenderContainer,
