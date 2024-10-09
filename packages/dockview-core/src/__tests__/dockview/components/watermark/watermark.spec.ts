@@ -12,7 +12,7 @@ describe('watermark', () => {
 
         cut.init({ containerApi: api, group });
 
-        const closeEl = cut.element.querySelector('.close-action')!;
+        const closeEl = cut.element.querySelector('.dv-close-action')!;
 
         expect(closeEl).toBeTruthy();
 

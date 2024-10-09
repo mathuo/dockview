@@ -890,7 +890,7 @@ export class DockviewComponent
                       DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
         });
 
-        const el = group.element.querySelector('.void-container');
+        const el = group.element.querySelector('.dv-void-container');
 
         if (!el) {
             throw new Error('failed to find drag handle');

@@ -20,7 +20,7 @@ describe('tab', () => {
             new groupMock()
         );
 
-        expect(cut.element.className).toBe('tab inactive-tab');
+        expect(cut.element.className).toBe('dv-tab dv-inactive-tab');
     });
 
     test('that active tab has active-tab class', () => {
@@ -34,10 +34,10 @@ describe('tab', () => {
         );
 
         cut.setActive(true);
-        expect(cut.element.className).toBe('tab active-tab');
+        expect(cut.element.className).toBe('dv-tab dv-active-tab');
 
         cut.setActive(false);
-        expect(cut.element.className).toBe('tab inactive-tab');
+        expect(cut.element.className).toBe('dv-tab dv-inactive-tab');
     });
 
     test('that an external event does not render a drop target and calls through to the group model', () => {
@@ -85,7 +85,7 @@ describe('tab', () => {
         expect(groupView.canDisplayOverlay).toBeCalled();
 
         expect(
-            cut.element.getElementsByClassName('drop-target-dropzone').length
+            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(0);
     });
 
@@ -139,7 +139,7 @@ describe('tab', () => {
         expect(groupView.canDisplayOverlay).toBeCalledTimes(0);
 
         expect(
-            cut.element.getElementsByClassName('drop-target-dropzone').length
+            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(0);
     });
 
@@ -193,7 +193,7 @@ describe('tab', () => {
         expect(groupView.canDisplayOverlay).toBeCalledTimes(0);
 
         expect(
-            cut.element.getElementsByClassName('drop-target-dropzone').length
+            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(1);
     });
 
@@ -253,7 +253,7 @@ describe('tab', () => {
         expect(groupView.canDisplayOverlay).toBeCalledTimes(1);
 
         expect(
-            cut.element.getElementsByClassName('drop-target-dropzone').length
+            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(0);
     });
 
@@ -313,7 +313,7 @@ describe('tab', () => {
         expect(groupView.canDisplayOverlay).toBeCalledTimes(1);
 
         expect(
-            cut.element.getElementsByClassName('drop-target-dropzone').length
+            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(0);
     });
 });

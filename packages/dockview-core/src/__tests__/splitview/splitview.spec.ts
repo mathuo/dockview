@@ -96,7 +96,7 @@ describe('splitview', () => {
         expect(splitview.orientation).toBe(Orientation.HORIZONTAL);
 
         const viewQuery = container.querySelectorAll(
-            '.split-view-container horizontal'
+            '.dv-split-view-container dv-horizontal'
         );
         expect(viewQuery).toBeTruthy();
 
@@ -111,7 +111,7 @@ describe('splitview', () => {
         expect(splitview.orientation).toBe(Orientation.VERTICAL);
 
         const viewQuery = container.querySelectorAll(
-            '.split-view-container vertical'
+            '.dv-split-view-container dv-vertical'
         );
         expect(viewQuery).toBeTruthy();
 
@@ -128,48 +128,48 @@ describe('splitview', () => {
         splitview.addView(new Testview(50, 50));
 
         let viewQuery = container.querySelectorAll(
-            '.split-view-container > .view-container > .view'
+            '.dv-split-view-container > .dv-view-container > .dv-view'
         );
         expect(viewQuery.length).toBe(3);
 
         let sashQuery = container.querySelectorAll(
-            '.split-view-container > .sash-container > .sash'
+            '.dv-split-view-container > .dv-sash-container > .dv-sash'
         );
         expect(sashQuery.length).toBe(2);
 
         splitview.removeView(2);
 
         viewQuery = container.querySelectorAll(
-            '.split-view-container > .view-container > .view'
+            '.dv-split-view-container > .dv-view-container > .dv-view'
         );
         expect(viewQuery.length).toBe(2);
 
         sashQuery = container.querySelectorAll(
-            '.split-view-container > .sash-container > .sash'
+            '.dv-split-view-container > .dv-sash-container > .dv-sash'
         );
         expect(sashQuery.length).toBe(1);
 
         splitview.removeView(0);
 
         viewQuery = container.querySelectorAll(
-            '.split-view-container > .view-container > .view'
+            '.dv-split-view-container > .dv-view-container > .dv-view'
         );
         expect(viewQuery.length).toBe(1);
 
         sashQuery = container.querySelectorAll(
-            '.split-view-container > .sash-container > .sash'
+            '.dv-split-view-container > .dv-sash-container > .dv-sash'
         );
         expect(sashQuery.length).toBe(0);
 
         splitview.removeView(0);
 
         viewQuery = container.querySelectorAll(
-            '.split-view-container > .view-container > .view'
+            '.dv-split-view-container > .dv-view-container > .dv-view'
         );
         expect(viewQuery.length).toBe(0);
 
         sashQuery = container.querySelectorAll(
-            '.split-view-container > .sash-container > .sash'
+            '.dv-split-view-container > .dv-sash-container > .dv-sash'
         );
         expect(sashQuery.length).toBe(0);
 
@@ -188,14 +188,14 @@ describe('splitview', () => {
         splitview.addView(view2);
 
         let viewQuery = container.querySelectorAll(
-            '.split-view-container > .view-container > .view.visible'
+            '.dv-split-view-container > .dv-view-container > .dv-view.visible'
         );
         expect(viewQuery.length).toBe(2);
 
         splitview.setViewVisible(1, false);
 
         viewQuery = container.querySelectorAll(
-            '.split-view-container > .view-container > .view.visible'
+            '.dv-split-view-container > .dv-view-container > .dv-view.visible'
         );
         expect(viewQuery.length).toBe(1);
 
@@ -619,7 +619,7 @@ describe('splitview', () => {
         );
 
         const sashElement = container
-            .getElementsByClassName('sash')
+            .getElementsByClassName('dv-sash')
             .item(0) as HTMLElement;
 
         // validate the expected state before drag
@@ -803,7 +803,7 @@ describe('splitview', () => {
         let viewQuery = Array.from(
             container
                 .querySelectorAll(
-                    '.split-view-container > .view-container > .view'
+                    '.dv-split-view-container > .dv-view-container > .dv-view'
                 )
                 .entries()
         )
@@ -818,7 +818,7 @@ describe('splitview', () => {
         let sashQuery = Array.from(
             container
                 .querySelectorAll(
-                    '.split-view-container > .sash-container > .sash'
+                    '.dv-split-view-container > .dv-sash-container > .dv-sash'
                 )
                 .entries()
         )
@@ -860,7 +860,7 @@ describe('splitview', () => {
         viewQuery = Array.from(
             container
                 .querySelectorAll(
-                    '.split-view-container > .view-container > .view'
+                    '.dv-split-view-container > .dv-view-container > .dv-view'
                 )
                 .entries()
         )
@@ -875,7 +875,7 @@ describe('splitview', () => {
         sashQuery = Array.from(
             container
                 .querySelectorAll(
-                    '.split-view-container > .sash-container > .sash'
+                    '.dv-split-view-container > .dv-sash-container > .dv-sash'
                 )
                 .entries()
         )

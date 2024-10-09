@@ -16,16 +16,16 @@
     }
 }
 
-.groupview {
-    &.active-group {
-        > .tabs-and-actions-container > .tabs-container > .tab {
-            &.active-tab {
+.dv-groupview {
+    &.dv-active-group {
+        > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab {
+            &.dv-active-tab {
                 background-color: var(
                     --dv-activegroup-visiblepanel-tab-background-color
                 );
                 color: var(--dv-activegroup-visiblepanel-tab-color);
             }
-            &.inactive-tab {
+            &.dv-inactive-tab {
                 background-color: var(
                     --dv-activegroup-hiddenpanel-tab-background-color
                 );
@@ -33,15 +33,15 @@
             }
         }
     }
-    &.inactive-group {
-        > .tabs-and-actions-container > .tabs-container > .tab {
-            &.active-tab {
+    &.dv-inactive-group {
+        > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab {
+            &.dv-active-tab {
                 background-color: var(
                     --dv-inactivegroup-visiblepanel-tab-background-color
                 );
                 color: var(--dv-inactivegroup-visiblepanel-tab-color);
             }
-            &.inactive-tab {
+            &.dv-inactive-tab {
                 background-color: var(
                     --dv-inactivegroup-hiddenpanel-tab-background-color
                 );
@@ -55,7 +55,7 @@
  * when a tab is dragged we lose the above stylings because they are conditional on parent elements
  * therefore we also set some stylings for the dragging event
  **/
-.tab {
+.dv-tab {
     &.dv-tab-dragging {
         background-color: var(
             --dv-activegroup-visiblepanel-tab-background-color

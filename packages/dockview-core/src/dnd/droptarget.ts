@@ -196,13 +196,13 @@ export class Droptarget extends CompositeDisposable {
 
                 if (!this.targetElement) {
                     this.targetElement = document.createElement('div');
-                    this.targetElement.className = 'drop-target-dropzone';
+                    this.targetElement.className = 'dv-drop-target-dropzone';
                     this.overlayElement = document.createElement('div');
-                    this.overlayElement.className = 'drop-target-selection';
+                    this.overlayElement.className = 'dv-drop-target-selection';
                     this._state = 'center';
                     this.targetElement.appendChild(this.overlayElement);
 
-                    this.element.classList.add('drop-target');
+                    this.element.classList.add('dv-drop-target');
                     this.element.append(this.targetElement);
                 }
 
@@ -399,7 +399,7 @@ export class Droptarget extends CompositeDisposable {
             this.element.removeChild(this.targetElement);
             this.targetElement = undefined;
             this.overlayElement = undefined;
-            this.element.classList.remove('drop-target');
+            this.element.classList.remove('dv-drop-target');
         }
     }
 }

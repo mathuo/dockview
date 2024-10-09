@@ -2594,7 +2594,7 @@ describe('gridview', () => {
             components: { default: TestGridview },
         });
 
-        let el = gridview.element.querySelector('.view-container');
+        let el = gridview.element.querySelector('.dv-view-container');
         expect(el).toBeTruthy();
         expect(el!.childNodes.length).toBe(0);
 
@@ -2661,7 +2661,7 @@ describe('gridview', () => {
 
         expect(gridview.groups.length).toBe(0);
 
-        el = gridview.element.querySelector('.view-container');
+        el = gridview.element.querySelector('.dv-view-container');
         expect(el).toBeTruthy();
         expect(el!.childNodes.length).toBe(0);
     });

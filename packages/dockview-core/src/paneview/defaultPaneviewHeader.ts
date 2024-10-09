@@ -26,11 +26,11 @@ export class DefaultHeader
         super();
 
         this._element = document.createElement('div');
-        this.element.className = 'default-header';
+        this.element.className = 'dv-default-header';
 
         this._content = document.createElement('span');
         this._expander = document.createElement('div');
-        this._expander.className = 'dockview-pane-header-icon';
+        this._expander.className = 'dv-pane-header-icon';
 
         this.element.appendChild(this._expander);
         this.element.appendChild(this._content);
