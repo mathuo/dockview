@@ -783,7 +783,7 @@ export class DockviewComponent
             group = item;
 
             const popoutReferenceGroupId = this._popoutGroups.find(
-                (_) => _.popoutGroup === group
+                (_) => _.popoutGroup.id === group.id
             )?.referenceGroup;
             const popoutReferenceGroup = popoutReferenceGroupId
                 ? this.getPanel(popoutReferenceGroupId)
@@ -1733,7 +1733,7 @@ export class DockviewComponent
 
         if (group.api.location.type === 'floating') {
             const floatingGroup = this._floatingGroups.find(
-                (_) => _.group === group
+                (_) => _.group.id === group.id
             );
 
             if (floatingGroup) {
@@ -1746,7 +1746,7 @@ export class DockviewComponent
                 remove(this._floatingGroups, floatingGroup);
                 floatingGroup.dispose();
 
-                if (!options?.skipActive && this._activeGroup === group) {
+                if (!options?.skipActive && this._activeGroup?.id === group.id) {
                     const groups = Array.from(this._groups.values());
 
                     this.doSetGroupAndPanelActive(
@@ -1762,7 +1762,7 @@ export class DockviewComponent
 
         if (group.api.location.type === 'popout') {
             const selectedGroup = this._popoutGroups.find(
-                (_) => _.popoutGroup === group
+                (_) => _.popoutGroup.id === group.id
             );
 
             if (selectedGroup) {
@@ -1791,7 +1791,7 @@ export class DockviewComponent
                     this.doSetGroupAndPanelActive(removedGroup);
                 }
 
-                if (!options?.skipActive && this._activeGroup === group) {
+                if (!options?.skipActive && this._activeGroup?.id === group.id) {
                     const groups = Array.from(this._groups.values());
 
                     this.doSetGroupAndPanelActive(
@@ -1877,11 +1877,6 @@ export class DockviewComponent
                 throw new Error(`No panel with id ${sourceItemId}`);
             }
 
-            if (sourceGroup.model.size === 0) {
-                // remove the group and do not set a new group as active
-                this.doRemoveGroup(sourceGroup, { skipActive: true });
-            }
-
             this.movingLock(() =>
                 destinationGroup.model.openPanel(removedPanel, {
                     index: destinationIndex,
@@ -1889,6 +1884,11 @@ export class DockviewComponent
                 })
             );
             this.doSetGroupAndPanelActive(destinationGroup);
+
+            if (sourceGroup.model.size === 0) {
+                // remove the group and do not set a new group as active
+                this.doRemoveGroup(sourceGroup, { skipActive: true });
+            }
 
             this._onDidMovePanel.fire({
                 panel: removedPanel,
