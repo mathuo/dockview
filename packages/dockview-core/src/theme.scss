@@ -80,22 +80,22 @@
     --dv-inactivegroup-visiblepanel-tab-color: white;
     --dv-inactivegroup-hiddenpanel-tab-color: white;
 
-    .groupview {
-        &.active-group {
-            > .tabs-and-actions-container {
+    .dv-groupview {
+        &.dv-active-group {
+            > .dv-tabs-and-actions-container {
                 box-sizing: content-box;
                 border-bottom: 2px solid
                     var(--dv-activegroup-visiblepanel-tab-background-color);
 
-                .tab {
-                    &.active-tab {
+                .dv-tab {
+                    &.dv-active-tab {
                         border-top: 2px solid
                             var(
                                 --dv-activegroup-visiblepanel-tab-background-color
                             );
                     }
 
-                    &.inactive-tab {
+                    &.dv-inactive-tab {
                         border-top: 2px solid
                             var(
                                 --dv-activegroup-hiddenpanel-tab-background-color
@@ -104,21 +104,21 @@
                 }
             }
         }
-        &.inactive-group {
-            > .tabs-and-actions-container {
+        &.dv-inactive-group {
+            > .dv-tabs-and-actions-container {
                 box-sizing: content-box;
                 border-bottom: 2px solid
                     var(--dv-inactivegroup-visiblepanel-tab-background-color);
 
-                .tab {
-                    &.active-tab {
+                .dv-tab {
+                    &.dv-active-tab {
                         border-top: 2px solid
                             var(
                                 --dv-inactivegroup-visiblepanel-tab-background-color
                             );
                     }
 
-                    &.inactive-tab {
+                    &.dv-inactive-tab {
                         border-top: 2px solid
                             var(
                                 --dv-inactivegroup-hiddenpanel-tab-background-color
@@ -177,11 +177,11 @@
 
     --dv-paneview-active-outline-color: #6272a4;
 
-    .groupview {
-        &.active-group {
-            > .tabs-and-actions-container {
-                > .tabs-container {
-                    > .tab.active-tab {
+    .dv-groupview {
+        &.dv-active-group {
+            > .dv-tabs-and-actions-container {
+                > .dv-tabs-container {
+                    > .dv-tab.dv-active-tab {
                         position: relative;
 
                         &::after {
@@ -198,10 +198,10 @@
                 }
             }
         }
-        &.inactive-group {
-            > .tabs-and-actions-container {
-                > .tabs-container {
-                    > .tab.active-tab {
+        &.dv-inactive-group {
+            > .dv-tabs-and-actions-container {
+                > .dv-tabs-container {
+                    > .dv-tab.dv-active-tab {
                         position: relative;
 
                         &::after {
@@ -230,20 +230,20 @@
 }
 
 @mixin dockview-design-replit-mixin {
-    .dv-resize-container:has(> .groupview) {
+    .dv-resize-container:has(> .dv-groupview) {
         border-radius: 8px;
     }
 
-    .groupview {
+    .dv-groupview {
         overflow: hidden;
         border-radius: 10px;
 
-        .tabs-and-actions-container {
-            .tab {
+        .dv-tabs-and-actions-container {
+            .dv-tab {
                 margin: 4px;
                 border-radius: 8px;
 
-                .dockview-svg {
+                .dv-svg {
                     height: 8px;
                     width: 8px;
                 }
@@ -255,15 +255,15 @@
             border-bottom: 1px solid rgba(128, 128, 128, 0.35);
         }
 
-        .content-container {
+        .dv-content-container {
             background-color: #fcfcfc;
         }
 
-        &.active-group {
+        &.dv-active-group {
             border: 1px solid rgba(128, 128, 128, 0.35);
         }
 
-        &.inactive-group {
+        &.dv-inactive-group {
             border: 1px solid transparent;
         }
     }
@@ -292,8 +292,21 @@
         }
     }
 
-    .horizontal > .sash-container > .sash {
-        &:not(.disabled) {
+    .dv-horizontal > .dv-sash-container > .dv-sash {
+      &:not(.disabled) {
+        &::after {
+            content: '';
+            height: 40px;
+            width: 4px;
+            border-radius: 2px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--dv-separator-handle-background-color);
+            position: absolute;
+        }
+
+        &:hover {
             &::after {
                 content: '';
                 height: 40px;

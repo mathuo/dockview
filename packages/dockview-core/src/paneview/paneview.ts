@@ -61,7 +61,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         this._orientation = options.orientation ?? Orientation.VERTICAL;
 
         this.element = document.createElement('div');
-        this.element.className = 'pane-container';
+        this.element.className = 'dv-pane-container';
 
         container.appendChild(this.element);
 
@@ -190,11 +190,11 @@ export class Paneview extends CompositeDisposable implements IDisposable {
             this.animationTimer = undefined;
         }
 
-        addClasses(this.element, 'animated');
+        addClasses(this.element, 'dv-animated');
 
         this.animationTimer = setTimeout(() => {
             this.animationTimer = undefined;
-            removeClasses(this.element, 'animated');
+            removeClasses(this.element, 'dv-animated');
         }, 200);
     }
 

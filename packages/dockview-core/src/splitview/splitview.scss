@@ -1,17 +1,17 @@
 .dv-debug {
-    .split-view-container {
-        .sash-container {
-            .sash {
-                &.enabled {
+    .dv-split-view-container {
+        .dv-sash-container {
+            .dv-sash {
+                &.dv-enabled {
                     background-color: black;
                 }
-                &.disabled {
+                &.dv-disabled {
                     background-color: orange;
                 }
-                &.maximum {
+                &.dv-maximum {
                     background-color: green;
                 }
-                &.minimum {
+                &.dv-minimum {
                     background-color: red;
                 }
             }
@@ -19,47 +19,47 @@
     }
 }
 
-.split-view-container {
+.dv-split-view-container {
     position: relative;
     overflow: hidden;
     height: 100%;
     width: 100%;
 
     &.dv-splitview-disabled {
-        & > .sash-container > .sash {
+        & > .dv-sash-container > .dv-sash {
             pointer-events: none;
         }
     }
 
-    &.animation {
-        .view,
-        .sash {
+    &.dv-animation {
+        .dv-view,
+        .dv-sash {
             transition-duration: 0.15s;
             transition-timing-function: ease-out;
         }
     }
 
-    &.horizontal {
+    &.dv-horizontal {
         height: 100%;
 
-        & > .sash-container > .sash {
+        & > .dv-sash-container > .dv-sash {
             height: 100%;
             width: 4px;
-            &.enabled {
+            &.dv-enabled {
                 cursor: ew-resize;
             }
-            &.disabled {
+            &.dv-disabled {
                 cursor: default;
             }
-            &.maximum {
+            &.dv-maximum {
                 cursor: w-resize;
             }
-            &.minimum {
+            &.dv-minimum {
                 cursor: e-resize;
             }
         }
 
-        & > .view-container > .view {
+        & > .dv-view-container > .dv-view {
             &:not(:first-child) {
                 &::before {
                     height: 100%;
@@ -69,28 +69,28 @@
         }
     }
 
-    &.vertical {
+    &.dv-vertical {
         width: 100%;
 
-        & > .sash-container > .sash {
+        & > .dv-sash-container > .dv-sash {
             width: 100%;
             height: 4px;
 
-            &.enabled {
+            &.dv-enabled {
                 cursor: ns-resize;
             }
-            &.disabled {
+            &.dv-disabled {
                 cursor: default;
             }
-            &.maximum {
+            &.dv-maximum {
                 cursor: n-resize;
             }
-            &.minimum {
+            &.dv-minimum {
                 cursor: s-resize;
             }
         }
 
-        & > .view-container > .view {
+        & > .dv-view-container > .dv-view {
             width: 100%;
 
             &:not(:first-child) {
@@ -102,12 +102,12 @@
         }
     }
 
-    .sash-container {
+    .dv-sash-container {
         height: 100%;
         width: 100%;
         position: absolute;
 
-        .sash {
+        .dv-sash {
             position: absolute;
             z-index: 99;
             outline: none;
@@ -130,13 +130,13 @@
         }
     }
 
-    .view-container {
+    .dv-view-container {
         position: relative;
         height: 100%;
         width: 100%;
         background-color: var(--dv-background-color);
 
-        .view {
+        .dv-view {
             height: 100%;
             box-sizing: border-box;
             overflow: auto;
@@ -144,8 +144,8 @@
         }
     }
 
-    &.separator-border {
-        .view:not(:first-child)::before {
+    &.dv-separator-border {
+        .dv-view:not(:first-child)::before {
             content: ' ';
             position: absolute;
             top: 0;

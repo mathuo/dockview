@@ -1,7 +1,7 @@
-.drop-target {
+.dv-drop-target {
     position: relative;
 
-    > .drop-target-dropzone {
+    > .dv-drop-target-dropzone {
         position: absolute;
         left: 0px;
         top: 0px;
@@ -10,7 +10,7 @@
         z-index: 1000;
         pointer-events: none;
 
-        > .drop-target-selection {
+        > .dv-drop-target-selection {
             position: relative;
             box-sizing: border-box;
             height: 100%;

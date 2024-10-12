@@ -160,11 +160,11 @@ export class Splitview {
         this.size = this.orthogonalSize;
         this.orthogonalSize = tmp;
 
-        removeClasses(this.element, 'horizontal', 'vertical');
+        removeClasses(this.element, 'dv-horizontal', 'dv-vertical');
         this.element.classList.add(
             this.orientation == Orientation.HORIZONTAL
-                ? 'horizontal'
-                : 'vertical'
+                ? 'dv-horizontal'
+                : 'dv-vertical'
         );
     }
 
@@ -277,10 +277,10 @@ export class Splitview {
 
     style(styles?: ISplitviewStyles): void {
         if (styles?.separatorBorder === 'transparent') {
-            removeClasses(this.element, 'separator-border');
+            removeClasses(this.element, 'dv-separator-border');
             this.element.style.removeProperty('--dv-separator-border');
         } else {
-            addClasses(this.element, 'separator-border');
+            addClasses(this.element, 'dv-separator-border');
             if (styles?.separatorBorder) {
                 this.element.style.setProperty(
                     '--dv-separator-border',
@@ -390,7 +390,7 @@ export class Splitview {
         skipLayout?: boolean
     ): void {
         const container = document.createElement('div');
-        container.className = 'view';
+        container.className = 'dv-view';
 
         container.appendChild(view.element);
 
@@ -431,7 +431,7 @@ export class Splitview {
         if (this.viewItems.length > 1) {
             //add sash
             const sash = document.createElement('div');
-            sash.className = 'sash';
+            sash.className = 'dv-sash';
 
             const onPointerStart = (event: PointerEvent) => {
                 for (const item of this.viewItems) {
@@ -835,13 +835,17 @@ export class Splitview {
 
             const size = view.visible ? view.size - marginReducedSize : 0;
 
-            const visiblePanelsBeforeThisView = Math.max(0, runningVisiblePanelCount[i] - 1);
+            const visiblePanelsBeforeThisView = Math.max(
+                0,
+                runningVisiblePanelCount[i] - 1
+            );
 
             const offset =
                 i === 0 || visiblePanelsBeforeThisView === 0
                     ? 0
                     : viewLeftOffsets[i - 1] +
-                      (visiblePanelsBeforeThisView / sashCount) * marginReducedSize;
+                      (visiblePanelsBeforeThisView / sashCount) *
+                          marginReducedSize;
 
             if (i < this.viewItems.length - 1) {
                 // calculate sash position
@@ -985,10 +989,10 @@ export class Splitview {
     }
 
     private updateSash(sash: ISashItem, state: SashState): void {
-        toggleClass(sash.container, 'disabled', state === SashState.DISABLED);
-        toggleClass(sash.container, 'enabled', state === SashState.ENABLED);
-        toggleClass(sash.container, 'maximum', state === SashState.MAXIMUM);
-        toggleClass(sash.container, 'minimum', state === SashState.MINIMUM);
+        toggleClass(sash.container, 'dv-disabled', state === SashState.DISABLED);
+        toggleClass(sash.container, 'dv-enabled', state === SashState.ENABLED);
+        toggleClass(sash.container, 'dv-maximum', state === SashState.MAXIMUM);
+        toggleClass(sash.container, 'dv-minimum', state === SashState.MINIMUM);
     }
 
     private resize = (
@@ -1122,13 +1126,13 @@ export class Splitview {
 
     private createViewContainer(): HTMLElement {
         const element = document.createElement('div');
-        element.className = 'view-container';
+        element.className = 'dv-view-container';
         return element;
     }
 
     private createSashContainer(): HTMLElement {
         const element = document.createElement('div');
-        element.className = 'sash-container';
+        element.className = 'dv-sash-container';
         return element;
     }
 
@@ -1136,9 +1140,9 @@ export class Splitview {
         const element = document.createElement('div');
         const orientationClassname =
             this._orientation === Orientation.HORIZONTAL
-                ? 'horizontal'
-                : 'vertical';
-        element.className = `split-view-container ${orientationClassname}`;
+                ? 'dv-horizontal'
+                : 'dv-vertical';
+        element.className = `dv-split-view-container ${orientationClassname}`;
         return element;
     }
 

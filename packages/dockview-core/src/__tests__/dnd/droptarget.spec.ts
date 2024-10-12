@@ -53,7 +53,7 @@ describe('droptarget', () => {
         fireEvent.dragOver(element);
 
         const target = element.querySelector(
-            '.drop-target-dropzone'
+            '.dv-drop-target-dropzone'
         ) as HTMLElement;
         fireEvent.drop(target);
         expect(position).toBe('center');
@@ -61,7 +61,7 @@ describe('droptarget', () => {
         const event = new Event('dragover');
         (event as any)['__dockview_droptarget_event_is_used__'] = true;
         fireEvent(element, event);
-        expect(element.querySelector('.drop-target-dropzone')).toBeNull();
+        expect(element.querySelector('.dv-drop-target-dropzone')).toBeNull();
     });
 
     test('directionToPosition', () => {
@@ -102,7 +102,7 @@ describe('droptarget', () => {
         fireEvent.dragOver(element);
 
         const target = element.querySelector(
-            '.drop-target-dropzone'
+            '.dv-drop-target-dropzone'
         ) as HTMLElement;
         fireEvent.drop(target);
         expect(position).toBe('center');
@@ -124,7 +124,7 @@ describe('droptarget', () => {
         fireEvent.dragOver(element);
 
         const target = element.querySelector(
-            '.drop-target-dropzone'
+            '.dv-drop-target-dropzone'
         ) as HTMLElement;
 
         jest.spyOn(target, 'clientHeight', 'get').mockImplementation(() => 100);
@@ -155,12 +155,12 @@ describe('droptarget', () => {
         fireEvent.dragOver(element);
 
         let viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection'
+            '.dv-drop-target > .dv-drop-target-dropzone > .dv-drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
 
         const target = element.querySelector(
-            '.drop-target-dropzone'
+            '.dv-drop-target-dropzone'
         ) as HTMLElement;
 
         jest.spyOn(target, 'clientHeight', 'get').mockImplementation(() => 100);
@@ -187,13 +187,13 @@ describe('droptarget', () => {
         }
 
         viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection'
+            '.dv-drop-target > .dv-drop-target-dropzone > .dv-drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
         expect(droptarget.state).toBe('left');
         check(
             element
-                .getElementsByClassName('drop-target-selection')
+                .getElementsByClassName('dv-drop-target-selection')
                 .item(0) as HTMLDivElement,
             {
                 top: '0px',
@@ -209,13 +209,13 @@ describe('droptarget', () => {
         );
 
         viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection'
+            '.dv-drop-target > .dv-drop-target-dropzone > .dv-drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
         expect(droptarget.state).toBe('top');
         check(
             element
-                .getElementsByClassName('drop-target-selection')
+                .getElementsByClassName('dv-drop-target-selection')
                 .item(0) as HTMLDivElement,
             {
                 top: '0px',
@@ -231,13 +231,13 @@ describe('droptarget', () => {
         );
 
         viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection'
+            '.dv-drop-target > .dv-drop-target-dropzone > .dv-drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
         expect(droptarget.state).toBe('bottom');
         check(
             element
-                .getElementsByClassName('drop-target-selection')
+                .getElementsByClassName('dv-drop-target-selection')
                 .item(0) as HTMLDivElement,
             {
                 top: '50%',
@@ -253,13 +253,13 @@ describe('droptarget', () => {
         );
 
         viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection'
+            '.dv-drop-target > .dv-drop-target-dropzone > .dv-drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
         expect(droptarget.state).toBe('right');
         check(
             element
-                .getElementsByClassName('drop-target-selection')
+                .getElementsByClassName('dv-drop-target-selection')
                 .item(0) as HTMLDivElement,
             {
                 top: '0px',
@@ -276,14 +276,14 @@ describe('droptarget', () => {
         expect(
             (
                 element
-                    .getElementsByClassName('drop-target-selection')
+                    .getElementsByClassName('dv-drop-target-selection')
                     .item(0) as HTMLDivElement
             ).style.transform
         ).toBe('');
 
         fireEvent.dragLeave(target);
         expect(droptarget.state).toBe('center');
-        viewQuery = element.querySelectorAll('.drop-target');
+        viewQuery = element.querySelectorAll('.dv-drop-target');
         expect(viewQuery.length).toBe(0);
     });
 

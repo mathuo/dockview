@@ -10,7 +10,7 @@ const createSvgElementFromPath = (params: {
     svg.setAttributeNS(null, 'viewBox', params.viewbox);
     svg.setAttributeNS(null, 'aria-hidden', 'false');
     svg.setAttributeNS(null, 'focusable', 'false');
-    svg.classList.add('dockview-svg');
+    svg.classList.add('dv-svg');
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttributeNS(null, 'd', params.path);
     svg.appendChild(path);
