@@ -280,3 +280,50 @@ export function disableIframePointEvents() {
         },
     };
 }
+
+export function getDockviewTheme(element: HTMLElement): string | undefined {
+    function toClassList(element: HTMLElement) {
+        const list: string[] = [];
+
+        for (let i = 0; i < element.classList.length; i++) {
+            list.push(element.classList.item(i)!);
+        }
+
+        return list;
+    }
+
+    let theme: string | undefined = undefined;
+    let parent: HTMLElement | null = element;
+
+    while (parent !== null) {
+        theme = toClassList(parent).find((cls) =>
+            cls.startsWith('dockview-theme-')
+        );
+        if (typeof theme === 'string') {
+            break;
+        }
+        parent = parent.parentElement;
+    }
+
+    return theme;
+}
+
+export class Classnames {
+    private _classNames: string[] = [];
+
+    constructor(private readonly element: HTMLElement) {}
+
+    setClassNames(classNames: string) {
+        for (const className of this._classNames) {
+            toggleClass(this.element, className, false);
+        }
+
+        this._classNames = classNames
+            .split(' ')
+            .filter((v) => v.trim().length > 0);
+
+        for (const className of this._classNames) {
+            toggleClass(this.element, className, true);
+        }
+    }
+}

@@ -258,6 +258,8 @@ describe('overlayRenderContainer', () => {
         await exhaustMicrotaskQueue();
 
         expect(spy).toHaveBeenCalledWith('aria-level');
-        expect(panelContentEl.parentElement!.style.zIndex).toBe('1004');
+        expect(panelContentEl.parentElement!.style.zIndex).toBe(
+            'calc(var(--dv-overlay-z-index, 999) + 5)'
+        );
     });
 });

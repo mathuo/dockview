@@ -32,7 +32,6 @@ export interface IWatermarkRenderer
     extends Optional<Omit<IPanel, 'id' | 'init'>, RendererMethodOptionalList> {
     readonly element: HTMLElement;
     init: (params: WatermarkRendererInitParameters) => void;
-    updateParentGroup(group: DockviewGroupPanel, visible: boolean): void;
 }
 
 export interface ITabRenderer
@@ -64,4 +63,8 @@ export interface GroupviewPanelState {
     title?: string;
     renderer?: DockviewPanelRenderer;
     params?: { [key: string]: any };
+    minimumWidth?: number;
+    minimumHeight?: number;
+    maximumWidth?: number;
+    maximumHeight?: number;
 }

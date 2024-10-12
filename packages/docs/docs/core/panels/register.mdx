@@ -20,7 +20,7 @@ You can register panels through the dock  [option](/docs/api/dockview/options) `
 
 
 <FrameworkSpecific framework='JavaScript'>
-  <DocRef declaration="DockviewComponentOptions" methods={['components']} />
+  <DocRef declaration="DockviewComponentOptions" methods={['createComponent']} />
 </FrameworkSpecific>
 
 
@@ -40,6 +40,37 @@ const components = {
 }
 
 return <DockviewReact components={components}/>
+```
+</FrameworkSpecific>
+
+
+<FrameworkSpecific framework='JavaScript'>
+```tsx
+class Panel implements IContentRenderer {
+    private readonly _element: HTMLElement;
+
+    get element(): HTMLElement {
+        return this._element;
+    }
+
+    constructor() {
+        this._element = document.createElement('div');
+    }
+
+    init(parameters: GroupPanelPartInitParameters): void {
+        //
+    }
+}
+
+
+const api = createDockview(parentElement, {
+    createComponent: (options) => {
+        switch (options.name) {
+            case 'component_1':
+                return new Panel();
+        }
+    },
+});
 ```
 </FrameworkSpecific>
 

@@ -13,8 +13,6 @@ import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { clamp } from '../math';
 import { AnchoredBox } from '../types';
 
-export const DEFAULT_OVERLAY_Z_INDEX = 999;
-
 class AriaLevelTracker {
     private _orderedList: HTMLElement[] = [];
 
@@ -37,7 +35,9 @@ class AriaLevelTracker {
     private update(): void {
         for (let i = 0; i < this._orderedList.length; i++) {
             this._orderedList[i].setAttribute('aria-level', `${i}`);
-            this._orderedList[i].style.zIndex = `${DEFAULT_OVERLAY_Z_INDEX + i * 2}`;
+            this._orderedList[
+                i
+            ].style.zIndex = `calc(var(--dv-overlay-z-index, 999) + ${i * 2})`;
         }
     }
 }
@@ -241,7 +241,7 @@ export class Overlay extends CompositeDisposable {
                         iframes.release();
                     },
                 },
-                addDisposableWindowListener(window, 'mousemove', (e) => {
+                addDisposableWindowListener(window, 'pointermove', (e) => {
                     const containerRect =
                         this.options.container.getBoundingClientRect();
                     const x = e.clientX - containerRect.left;
@@ -327,7 +327,7 @@ export class Overlay extends CompositeDisposable {
 
                     this.setBounds(bounds);
                 }),
-                addDisposableWindowListener(window, 'mouseup', () => {
+                addDisposableWindowListener(window, 'pointerup', () => {
                     toggleClass(
                         this._element,
                         'dv-resize-container-dragging',
@@ -342,7 +342,7 @@ export class Overlay extends CompositeDisposable {
 
         this.addDisposables(
             move,
-            addDisposableListener(dragTarget, 'mousedown', (event) => {
+            addDisposableListener(dragTarget, 'pointerdown', (event) => {
                 if (event.defaultPrevented) {
                     event.preventDefault();
                     return;
@@ -358,7 +358,7 @@ export class Overlay extends CompositeDisposable {
             }),
             addDisposableListener(
                 this.options.content,
-                'mousedown',
+                'pointerdown',
                 (event) => {
                     if (event.defaultPrevented) {
                         return;
@@ -377,7 +377,7 @@ export class Overlay extends CompositeDisposable {
             ),
             addDisposableListener(
                 this.options.content,
-                'mousedown',
+                'pointerdown',
                 () => {
                     arialLevelTracker.push(this._element);
                 },
@@ -409,7 +409,7 @@ export class Overlay extends CompositeDisposable {
 
         this.addDisposables(
             move,
-            addDisposableListener(resizeHandleElement, 'mousedown', (e) => {
+            addDisposableListener(resizeHandleElement, 'pointerdown', (e) => {
                 e.preventDefault();
 
                 let startPosition: {
@@ -422,7 +422,7 @@ export class Overlay extends CompositeDisposable {
                 const iframes = disableIframePointEvents();
 
                 move.value = new CompositeDisposable(
-                    addDisposableWindowListener(window, 'mousemove', (e) => {
+                    addDisposableWindowListener(window, 'pointermove', (e) => {
                         const containerRect =
                             this.options.container.getBoundingClientRect();
                         const overlayRect =
@@ -593,7 +593,7 @@ export class Overlay extends CompositeDisposable {
                             iframes.release();
                         },
                     },
-                    addDisposableWindowListener(window, 'mouseup', () => {
+                    addDisposableWindowListener(window, 'pointerup', () => {
                         move.dispose();
                         this._onDidChangeEnd.fire();
                     })

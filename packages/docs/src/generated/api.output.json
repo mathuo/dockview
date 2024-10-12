@@ -9015,6 +9015,98 @@
                 }
             },
             {
+                "name": "maximumHeight",
+                "code": "number | undefined",
+                "kind": "accessor",
+                "value": {
+                    "name": "maximumHeight",
+                    "code": "number | undefined",
+                    "kind": "getSignature",
+                    "returnType": {
+                        "type": "or",
+                        "values": [
+                            {
+                                "type": "intrinsic",
+                                "value": "number"
+                            },
+                            {
+                                "type": "intrinsic",
+                                "value": "undefined"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "maximumWidth",
+                "code": "number | undefined",
+                "kind": "accessor",
+                "value": {
+                    "name": "maximumWidth",
+                    "code": "number | undefined",
+                    "kind": "getSignature",
+                    "returnType": {
+                        "type": "or",
+                        "values": [
+                            {
+                                "type": "intrinsic",
+                                "value": "number"
+                            },
+                            {
+                                "type": "intrinsic",
+                                "value": "undefined"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "minimumHeight",
+                "code": "number | undefined",
+                "kind": "accessor",
+                "value": {
+                    "name": "minimumHeight",
+                    "code": "number | undefined",
+                    "kind": "getSignature",
+                    "returnType": {
+                        "type": "or",
+                        "values": [
+                            {
+                                "type": "intrinsic",
+                                "value": "number"
+                            },
+                            {
+                                "type": "intrinsic",
+                                "value": "undefined"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "minimumWidth",
+                "code": "number | undefined",
+                "kind": "accessor",
+                "value": {
+                    "name": "minimumWidth",
+                    "code": "number | undefined",
+                    "kind": "getSignature",
+                    "returnType": {
+                        "type": "or",
+                        "values": [
+                            {
+                                "type": "intrinsic",
+                                "value": "number"
+                            },
+                            {
+                                "type": "intrinsic",
+                                "value": "undefined"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
                 "name": "params",
                 "code": "Parameters | undefined",
                 "kind": "accessor",
@@ -22781,19 +22873,6 @@
                 }
             },
             {
-                "name": "parentElement",
-                "code": "HTMLElement",
-                "kind": "property",
-                "type": {
-                    "type": "reference",
-                    "value": "HTMLElement",
-                    "source": "typescript"
-                },
-                "flags": {
-                    "isReadonly": true
-                }
-            },
-            {
                 "name": "proportionalLayout",
                 "code": "boolean",
                 "kind": "property",
@@ -23032,6 +23111,104 @@
         ],
         "extends": []
     },
+    "Contraints": {
+        "kind": "interface",
+        "name": "Contraints",
+        "children": [
+            {
+                "name": "maximumHeight",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "maximumWidth",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "minimumHeight",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "minimumWidth",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            }
+        ],
+        "extends": []
+    },
+    "CreateComponentOptions": {
+        "kind": "interface",
+        "name": "CreateComponentOptions",
+        "children": [
+            {
+                "name": "id",
+                "code": "string",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "string"
+                },
+                "flags": {},
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The unqiue identifer of the component"
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "name",
+                "code": "string",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "string"
+                },
+                "flags": {},
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The component name, this should determine what is rendered."
+                        }
+                    ]
+                }
+            }
+        ],
+        "extends": []
+    },
     "DockviewDndOverlayEvent": {
         "kind": "interface",
         "name": "DockviewDndOverlayEvent",
@@ -23156,13 +23333,13 @@
         "children": [
             {
                 "name": "createComponent",
-                "code": "(options: { id: string, name: string }): IContentRenderer",
+                "code": "(options: CreateComponentOptions): IContentRenderer",
                 "kind": "property",
                 "type": {
                     "type": "reflection",
                     "value": {
                         "name": "__type",
-                        "code": "(options: { id: string, name: string }): IContentRenderer",
+                        "code": "(options: CreateComponentOptions): IContentRenderer",
                         "kind": "typeLiteral",
                         "signatures": [
                             {
@@ -23171,36 +23348,11 @@
                                 "parameters": [
                                     {
                                         "name": "options",
-                                        "code": "options: { id: string, name: string }",
+                                        "code": "options: CreateComponentOptions",
                                         "type": {
-                                            "type": "reflection",
-                                            "value": {
-                                                "name": "__type",
-                                                "code": "{ id: string, name: string }",
-                                                "kind": "typeLiteral",
-                                                "properties": [
-                                                    {
-                                                        "name": "id",
-                                                        "code": "string",
-                                                        "kind": "property",
-                                                        "type": {
-                                                            "type": "intrinsic",
-                                                            "value": "string"
-                                                        },
-                                                        "flags": {}
-                                                    },
-                                                    {
-                                                        "name": "name",
-                                                        "code": "string",
-                                                        "kind": "property",
-                                                        "type": {
-                                                            "type": "intrinsic",
-                                                            "value": "string"
-                                                        },
-                                                        "flags": {}
-                                                    }
-                                                ]
-                                            }
+                                            "type": "reference",
+                                            "value": "CreateComponentOptions",
+                                            "source": "dockview-core"
                                         },
                                         "kind": "parameter"
                                     }
@@ -23210,7 +23362,7 @@
                                     "value": "IContentRenderer",
                                     "source": "dockview-core"
                                 },
-                                "code": "(options: { id: string, name: string }): IContentRenderer",
+                                "code": "(options: CreateComponentOptions): IContentRenderer",
                                 "kind": "callSignature"
                             }
                         ]
@@ -23343,13 +23495,13 @@
             },
             {
                 "name": "createTabComponent",
-                "code": "(options: { id: string, name: string }): ITabRenderer | undefined",
+                "code": "(options: CreateComponentOptions): ITabRenderer | undefined",
                 "kind": "property",
                 "type": {
                     "type": "reflection",
                     "value": {
                         "name": "__type",
-                        "code": "(options: { id: string, name: string }): ITabRenderer | undefined",
+                        "code": "(options: CreateComponentOptions): ITabRenderer | undefined",
                         "kind": "typeLiteral",
                         "signatures": [
                             {
@@ -23358,36 +23510,11 @@
                                 "parameters": [
                                     {
                                         "name": "options",
-                                        "code": "options: { id: string, name: string }",
+                                        "code": "options: CreateComponentOptions",
                                         "type": {
-                                            "type": "reflection",
-                                            "value": {
-                                                "name": "__type",
-                                                "code": "{ id: string, name: string }",
-                                                "kind": "typeLiteral",
-                                                "properties": [
-                                                    {
-                                                        "name": "id",
-                                                        "code": "string",
-                                                        "kind": "property",
-                                                        "type": {
-                                                            "type": "intrinsic",
-                                                            "value": "string"
-                                                        },
-                                                        "flags": {}
-                                                    },
-                                                    {
-                                                        "name": "name",
-                                                        "code": "string",
-                                                        "kind": "property",
-                                                        "type": {
-                                                            "type": "intrinsic",
-                                                            "value": "string"
-                                                        },
-                                                        "flags": {}
-                                                    }
-                                                ]
-                                            }
+                                            "type": "reference",
+                                            "value": "CreateComponentOptions",
+                                            "source": "dockview-core"
                                         },
                                         "kind": "parameter"
                                     }
@@ -23406,7 +23533,7 @@
                                         }
                                     ]
                                 },
-                                "code": "(options: { id: string, name: string }): ITabRenderer | undefined",
+                                "code": "(options: CreateComponentOptions): ITabRenderer | undefined",
                                 "kind": "callSignature"
                             }
                         ]
@@ -26717,6 +26844,26 @@
                 }
             },
             {
+                "name": "constraints",
+                "code": "Partial<Contraints>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Partial",
+                    "source": "typescript",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "Contraints",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
                 "name": "hideHeader",
                 "code": "boolean",
                 "kind": "property",
@@ -26739,6 +26886,30 @@
                 "flags": {
                     "isOptional": true,
                     "isReadonly": true
+                }
+            },
+            {
+                "name": "initialHeight",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "initialWidth",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
                 }
             },
             {
@@ -26866,6 +27037,26 @@
                 }
             },
             {
+                "name": "constraints",
+                "code": "Partial<Contraints>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Partial",
+                    "source": "typescript",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "Contraints",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
                 "name": "hideHeader",
                 "code": "boolean",
                 "kind": "property",
@@ -26886,6 +27077,30 @@
                     "value": "string"
                 },
                 "flags": {}
+            },
+            {
+                "name": "initialHeight",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "initialWidth",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
+                }
             },
             {
                 "name": "locked",
@@ -26963,6 +27178,54 @@
                     "value": "string"
                 },
                 "flags": {}
+            },
+            {
+                "name": "maximumHeight",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "maximumWidth",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "minimumHeight",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "minimumWidth",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
+                }
             },
             {
                 "name": "params",
@@ -31157,6 +31420,58 @@
                     "value": "string"
                 },
                 "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "maximumHeight",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true,
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "maximumWidth",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true,
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "minimumHeight",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true,
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "minimumWidth",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true,
                     "isReadonly": true
                 }
             },
@@ -37257,44 +37572,6 @@
                         "kind": "callSignature"
                     }
                 ]
-            },
-            {
-                "name": "updateParentGroup",
-                "code": "(group: DockviewGroupPanel, visible: boolean): void",
-                "kind": "method",
-                "signature": [
-                    {
-                        "name": "updateParentGroup",
-                        "typeParameters": [],
-                        "parameters": [
-                            {
-                                "name": "group",
-                                "code": "group: DockviewGroupPanel",
-                                "type": {
-                                    "type": "reference",
-                                    "value": "DockviewGroupPanel",
-                                    "source": "dockview-core"
-                                },
-                                "kind": "parameter"
-                            },
-                            {
-                                "name": "visible",
-                                "code": "visible: boolean",
-                                "type": {
-                                    "type": "intrinsic",
-                                    "value": "boolean"
-                                },
-                                "kind": "parameter"
-                            }
-                        ],
-                        "returnType": {
-                            "type": "intrinsic",
-                            "value": "void"
-                        },
-                        "code": "(group: DockviewGroupPanel, visible: boolean): void",
-                        "kind": "callSignature"
-                    }
-                ]
             }
         ],
         "extends": [
@@ -41037,11 +41314,23 @@
     },
     "AddPanelOptions": {
         "name": "AddPanelOptions",
-        "code": "Partial<AddPanelOptionsUnion> & { component: string, id: string, inactive?: boolean, params?: P, renderer?: DockviewPanelRenderer, tabComponent?: string, title?: string }",
+        "code": "Partial<Contraints> & Partial<AddPanelOptionsUnion> & { component: string, id: string, inactive?: boolean, initialHeight?: number, initialWidth?: number, params?: P, renderer?: DockviewPanelRenderer, tabComponent?: string, title?: string }",
         "typeParameters": [],
         "type": {
             "type": "intersection",
             "values": [
+                {
+                    "type": "reference",
+                    "value": "Partial",
+                    "source": "typescript",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "Contraints",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
                 {
                     "type": "reference",
                     "value": "Partial",
@@ -41058,7 +41347,7 @@
                     "type": "reflection",
                     "value": {
                         "name": "__type",
-                        "code": "{ component: string, id: string, inactive?: boolean, params?: P, renderer?: DockviewPanelRenderer, tabComponent?: string, title?: string }",
+                        "code": "{ component: string, id: string, inactive?: boolean, initialHeight?: number, initialWidth?: number, params?: P, renderer?: DockviewPanelRenderer, tabComponent?: string, title?: string }",
                         "kind": "typeLiteral",
                         "properties": [
                             {
@@ -41123,6 +41412,30 @@
                                             "text": " which forces newly added panels to become active."
                                         }
                                     ]
+                                }
+                            },
+                            {
+                                "name": "initialHeight",
+                                "code": "number",
+                                "kind": "property",
+                                "type": {
+                                    "type": "intrinsic",
+                                    "value": "number"
+                                },
+                                "flags": {
+                                    "isOptional": true
+                                }
+                            },
+                            {
+                                "name": "initialWidth",
+                                "code": "number",
+                                "kind": "property",
+                                "type": {
+                                    "type": "intrinsic",
+                                    "value": "number"
+                                },
+                                "flags": {
+                                    "isOptional": true
                                 }
                             },
                             {

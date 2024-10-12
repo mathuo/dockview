@@ -3,6 +3,7 @@ import {
     SerializedGridObject,
     getGridLocation,
     ISerializedLeafNode,
+    orthogonal,
 } from '../gridview/gridview';
 import {
     directionToPosition,
@@ -51,7 +52,12 @@ import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
 import { Parameters } from '../panel/types';
 import { Overlay } from '../overlay/overlay';
-import { addTestId, toggleClass, watchElementResize } from '../dom';
+import {
+    addTestId,
+    getDockviewTheme,
+    toggleClass,
+    watchElementResize,
+} from '../dom';
 import { DockviewFloatingGroupPanel } from './dockviewFloatingGroupPanel';
 import {
     GroupDragEvent,
@@ -90,33 +96,6 @@ function moveGroupWithoutDestroying(options: {
             skipSetGroupActive: true,
         });
     });
-}
-
-function getDockviewTheme(element: HTMLElement): string | undefined {
-    function toClassList(element: HTMLElement) {
-        const list: string[] = [];
-
-        for (let i = 0; i < element.classList.length; i++) {
-            list.push(element.classList.item(i)!);
-        }
-
-        return list;
-    }
-
-    let theme: string | undefined = undefined;
-    let parent: HTMLElement | null = element;
-
-    while (parent !== null) {
-        theme = toClassList(parent).find((cls) =>
-            cls.startsWith('dockview-theme-')
-        );
-        if (typeof theme === 'string') {
-            break;
-        }
-        parent = parent.parentElement;
-    }
-
-    return theme;
 }
 
 export interface PanelReference {
@@ -362,22 +341,17 @@ export class DockviewComponent
     }
 
     constructor(parentElement: HTMLElement, options: DockviewComponentOptions) {
-        super({
+        super(parentElement, {
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
             styles: options.hideBorders
                 ? { separatorBorder: 'transparent' }
                 : undefined,
-            parentElement: parentElement,
             disableAutoResizing: options.disableAutoResizing,
             locked: options.locked,
             margin: options.gap,
             className: options.className,
         });
-
-        // const gready = document.createElement('div');
-        // gready.className = 'dv-overlay-render-container';
-        // this.gridview.element.appendChild(gready);
 
         this.overlayRenderContainer = new OverlayRenderContainer(
             this.gridview.element,
@@ -1022,19 +996,9 @@ export class DockviewComponent
     override updateOptions(options: Partial<DockviewComponentOptions>): void {
         super.updateOptions(options);
 
-        const changed_floatingGroupBounds =
-            'floatingGroupBounds' in options &&
-            options.floatingGroupBounds !== this.options.floatingGroupBounds;
-
-        const changed_rootOverlayOptions =
-            'rootOverlayModel' in options &&
-            options.rootOverlayModel !== this.options.rootOverlayModel;
-
-        this._options = { ...this.options, ...options };
-
-        if (changed_floatingGroupBounds) {
+        if ('floatingGroupBounds' in options) {
             for (const group of this._floatingGroups) {
-                switch (this.options.floatingGroupBounds) {
+                switch (options.floatingGroupBounds) {
                     case 'boundedWithinViewport':
                         group.overlay.minimumInViewportHeight = undefined;
                         group.overlay.minimumInViewportWidth = undefined;
@@ -1047,30 +1011,26 @@ export class DockviewComponent
                         break;
                     default:
                         group.overlay.minimumInViewportHeight =
-                            this.options.floatingGroupBounds?.minimumHeightWithinViewport;
+                            options.floatingGroupBounds?.minimumHeightWithinViewport;
                         group.overlay.minimumInViewportWidth =
-                            this.options.floatingGroupBounds?.minimumWidthWithinViewport;
+                            options.floatingGroupBounds?.minimumWidthWithinViewport;
                 }
 
                 group.overlay.setBounds();
             }
         }
 
-        if (changed_rootOverlayOptions) {
-            this._rootDropTarget.setOverlayModel(options.rootOverlayModel!);
+        if ('rootOverlayModel' in options) {
+            this._rootDropTarget.setOverlayModel(
+                options.rootOverlayModel ?? DEFAULT_ROOT_OVERLAY_MODEL
+            );
         }
 
-        if (
-            //  if explicitly set as `undefined`
-            'gap' in options &&
-            options.gap === undefined
-        ) {
-            this.gridview.margin = 0;
+        if ('gap' in options) {
+            this.gridview.margin = options.gap ?? 0;
         }
 
-        if (typeof options.gap === 'number') {
-            this.gridview.margin = options.gap;
-        }
+        this._options = { ...this.options, ...options };
 
         this.layout(this.gridview.width, this.gridview.height, true);
     }
@@ -1412,6 +1372,11 @@ export class DockviewComponent
             );
         }
 
+        const initial = {
+            width: options.initialWidth,
+            height: options.initialHeight,
+        };
+
         if (options.position) {
             if (isPanelOptionsWithPanel(options.position)) {
                 const referencePanel =
@@ -1452,6 +1417,11 @@ export class DockviewComponent
                 if (!options.inactive) {
                     this.doSetGroupAndPanelActive(group);
                 }
+
+                group.api.setSize({
+                    height: initial?.height,
+                    width: initial?.width,
+                });
 
                 return panel;
             }
@@ -1499,6 +1469,11 @@ export class DockviewComponent
                     skipSetGroupActive: options.inactive,
                 });
 
+                referenceGroup.api.setSize({
+                    width: initial?.width,
+                    height: initial?.height,
+                });
+
                 if (!options.inactive) {
                     this.doSetGroupAndPanelActive(referenceGroup);
                 }
@@ -1509,7 +1484,13 @@ export class DockviewComponent
                     location,
                     target
                 );
-                const group = this.createGroupAtLocation(relativeLocation);
+                const group = this.createGroupAtLocation(
+                    relativeLocation,
+                    this.orientationAtLocation(relativeLocation) ===
+                        Orientation.VERTICAL
+                        ? initial?.height
+                        : initial?.width
+                );
                 panel = this.createPanel(options, group);
                 group.model.openPanel(panel, {
                     skipSetActive: options.inactive,
@@ -1543,7 +1524,12 @@ export class DockviewComponent
                 skipSetGroupActive: options.inactive,
             });
         } else {
-            const group = this.createGroupAtLocation();
+            const group = this.createGroupAtLocation(
+                [0],
+                this.gridview.orientation === Orientation.VERTICAL
+                    ? initial?.height
+                    : initial?.width
+            );
             panel = this.createPanel(options, group);
             group.model.openPanel(panel, {
                 skipSetActive: options.inactive,
@@ -1681,7 +1667,12 @@ export class DockviewComponent
             );
 
             const group = this.createGroup(options);
-            this.doAddGroup(group, relativeLocation);
+            const size =
+                this.getLocationOrientation(relativeLocation) ===
+                Orientation.VERTICAL
+                    ? options.initialHeight
+                    : options.initialWidth;
+            this.doAddGroup(group, relativeLocation, size);
             if (!options.skipSetActive) {
                 this.doSetGroupAndPanelActive(group);
             }
@@ -1693,6 +1684,13 @@ export class DockviewComponent
             this.doSetGroupAndPanelActive(group);
             return group;
         }
+    }
+
+    private getLocationOrientation(location: number[]) {
+        return location.length % 2 == 0 &&
+            this.gridview.orientation === Orientation.HORIZONTAL
+            ? Orientation.HORIZONTAL
+            : Orientation.VERTICAL;
     }
 
     removeGroup(
@@ -2109,7 +2107,24 @@ export class DockviewComponent
                 target
             );
 
-            this.gridview.addView(from, Sizing.Distribute, dropLocation);
+            let size: number;
+
+            switch (this.gridview.orientation) {
+                case Orientation.VERTICAL:
+                    size =
+                        referenceLocation.length % 2 == 0
+                            ? from.api.width
+                            : from.api.height;
+                    break;
+                case Orientation.HORIZONTAL:
+                    size =
+                        referenceLocation.length % 2 == 0
+                            ? from.api.height
+                            : from.api.width;
+                    break;
+            }
+
+            this.gridview.addView(from, size, dropLocation);
         }
 
         from.panels.forEach((panel) => {
@@ -2283,7 +2298,13 @@ export class DockviewComponent
             this._api,
             group,
             view,
-            { renderer: options.renderer }
+            {
+                renderer: options.renderer,
+                minimumWidth: options.minimumWidth,
+                minimumHeight: options.minimumHeight,
+                maximumWidth: options.maximumWidth,
+                maximumHeight: options.maximumHeight,
+            }
         );
 
         panel.init({
@@ -2295,10 +2316,11 @@ export class DockviewComponent
     }
 
     private createGroupAtLocation(
-        location: number[] = [0]
+        location: number[],
+        size?: number
     ): DockviewGroupPanel {
         const group = this.createGroup();
-        this.doAddGroup(group, location);
+        this.doAddGroup(group, location, size);
         return group;
     }
 
@@ -2306,5 +2328,12 @@ export class DockviewComponent
         return Array.from(this._groups.values()).find((group) =>
             group.value.model.containsPanel(panel)
         )?.value;
+    }
+
+    private orientationAtLocation(location: number[]) {
+        const rootOrientation = this.gridview.orientation;
+        return location.length % 2 == 1
+            ? rootOrientation
+            : orthogonal(rootOrientation);
     }
 }

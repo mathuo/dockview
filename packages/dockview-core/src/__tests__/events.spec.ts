@@ -153,14 +153,14 @@ describe('events', () => {
 
         const disposable = addDisposableWindowListener(
             element as any,
-            'mousedown',
+            'pointerdown',
             handler,
             true
         );
 
         expect(element.addEventListener).toBeCalledTimes(1);
         expect(element.addEventListener).toHaveBeenCalledWith(
-            'mousedown',
+            'pointerdown',
             handler,
             true
         );
@@ -171,7 +171,7 @@ describe('events', () => {
         expect(element.addEventListener).toBeCalledTimes(1);
         expect(element.removeEventListener).toBeCalledTimes(1);
         expect(element.removeEventListener).toBeCalledWith(
-            'mousedown',
+            'pointerdown',
             handler,
             true
         );
@@ -187,13 +187,13 @@ describe('events', () => {
 
         const disposable = addDisposableWindowListener(
             element as any,
-            'mousedown',
+            'pointerdown',
             handler
         );
 
         expect(element.addEventListener).toBeCalledTimes(1);
         expect(element.addEventListener).toHaveBeenCalledWith(
-            'mousedown',
+            'pointerdown',
             handler,
             undefined
         );
@@ -204,7 +204,7 @@ describe('events', () => {
         expect(element.addEventListener).toBeCalledTimes(1);
         expect(element.removeEventListener).toBeCalledTimes(1);
         expect(element.removeEventListener).toBeCalledWith(
-            'mousedown',
+            'pointerdown',
             handler,
             undefined
         );
@@ -220,14 +220,14 @@ describe('events', () => {
 
         const disposable = addDisposableListener(
             element as any,
-            'mousedown',
+            'pointerdown',
             handler,
             true
         );
 
         expect(element.addEventListener).toBeCalledTimes(1);
         expect(element.addEventListener).toHaveBeenCalledWith(
-            'mousedown',
+            'pointerdown',
             handler,
             true
         );
@@ -238,7 +238,7 @@ describe('events', () => {
         expect(element.addEventListener).toBeCalledTimes(1);
         expect(element.removeEventListener).toBeCalledTimes(1);
         expect(element.removeEventListener).toBeCalledWith(
-            'mousedown',
+            'pointerdown',
             handler,
             true
         );
@@ -254,13 +254,13 @@ describe('events', () => {
 
         const disposable = addDisposableListener(
             element as any,
-            'mousedown',
+            'pointerdown',
             handler
         );
 
         expect(element.addEventListener).toBeCalledTimes(1);
         expect(element.addEventListener).toHaveBeenCalledWith(
-            'mousedown',
+            'pointerdown',
             handler,
             undefined
         );
@@ -271,7 +271,7 @@ describe('events', () => {
         expect(element.addEventListener).toBeCalledTimes(1);
         expect(element.removeEventListener).toBeCalledTimes(1);
         expect(element.removeEventListener).toBeCalledWith(
-            'mousedown',
+            'pointerdown',
             handler,
             undefined
         );

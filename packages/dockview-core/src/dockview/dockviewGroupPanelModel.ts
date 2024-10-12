@@ -38,6 +38,7 @@ import {
 } from './options';
 import { OverlayRenderContainer } from '../overlay/overlayRenderContainer';
 import { TitleEvent } from '../api/dockviewPanelApi';
+import { Contraints } from '../gridview/gridviewPanel';
 
 interface GroupMoveEvent {
     groupId: string;
@@ -50,6 +51,9 @@ interface CoreGroupOptions {
     locked?: DockviewGroupPanelLocked;
     hideHeader?: boolean;
     skipSetActive?: boolean;
+    constraints?: Partial<Contraints>;
+    initialWidth?: number;
+    initialHeight?: number;
 }
 
 export interface GroupOptions extends CoreGroupOptions {
@@ -972,8 +976,6 @@ export class DockviewGroupPanelModel
 
             this.tabsContainer.hide();
             this.contentContainer.element.appendChild(this.watermark.element);
-
-            this.watermark.updateParentGroup(this.groupPanel, true);
         }
         if (!this.isEmpty && this.watermark) {
             this.watermark.element.remove();

@@ -34,6 +34,34 @@ export class DockviewGroupPanel
 {
     private readonly _model: DockviewGroupPanelModel;
 
+    get minimumWidth(): number {
+        const activePanelMinimumWidth = this.activePanel?.minimumWidth;
+        return typeof activePanelMinimumWidth === 'number'
+            ? activePanelMinimumWidth
+            : MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH;
+    }
+
+    get minimumHeight(): number {
+        const activePanelMinimumHeight = this.activePanel?.minimumHeight;
+        return typeof activePanelMinimumHeight === 'number'
+            ? activePanelMinimumHeight
+            : MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT;
+    }
+
+    get maximumWidth(): number {
+        const activePanelMaximumWidth = this.activePanel?.maximumWidth;
+        return typeof activePanelMaximumWidth === 'number'
+            ? activePanelMaximumWidth
+            : Number.MAX_SAFE_INTEGER;
+    }
+
+    get maximumHeight(): number {
+        const activePanelMaximumHeight = this.activePanel?.maximumHeight;
+        return typeof activePanelMaximumHeight === 'number'
+            ? activePanelMaximumHeight
+            : Number.MAX_SAFE_INTEGER;
+    }
+
     get panels(): IDockviewPanel[] {
         return this._model.panels;
     }
@@ -71,8 +99,14 @@ export class DockviewGroupPanel
             id,
             'groupview_default',
             {
-                minimumHeight: MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT,
-                minimumWidth: MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH,
+                minimumHeight:
+                    options.constraints?.minimumHeight ??
+                    MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT,
+                minimumWidth:
+                    options.constraints?.maximumHeight ??
+                    MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH,
+                maximumHeight: options.constraints?.maximumHeight,
+                maximumWidth: options.constraints?.maximumWidth,
             },
             new DockviewGroupPanelApiImpl(id, accessor)
         );

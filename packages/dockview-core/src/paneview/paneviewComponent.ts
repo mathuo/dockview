@@ -24,7 +24,7 @@ import { sequentialNumberGenerator } from '../math';
 import { PaneTransfer } from '../dnd/dataTransfer';
 import { Resizable } from '../resizable';
 import { Parameters } from '../panel/types';
-import { toggleClass } from '../dom';
+import { Classnames, toggleClass } from '../dom';
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -152,7 +152,7 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
     private readonly _onDidRemoveView = new Emitter<PaneviewPanel>();
     readonly onDidRemoveView = this._onDidRemoveView.event;
 
-    private classNames: string[] = [];
+    private readonly _classNames: Classnames;
 
     get id(): string {
         return this._id;
@@ -213,11 +213,8 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
             this._onDidRemoveView
         );
 
-        this.classNames = options.className?.split(' ') ?? [];
-
-        for (const className of this.classNames) {
-            toggleClass(this.element, className, true);
-        }
+        this._classNames = new Classnames(this.element);
+        this._classNames.setClassNames(options.className ?? '');
 
         this._options = options;
 
@@ -247,13 +244,11 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
 
     updateOptions(options: Partial<PaneviewComponentOptions>): void {
         if ('className' in options) {
-            for (const className of this.classNames) {
-                toggleClass(this.element, className, false);
-            }
-            this.classNames = options.className?.split(' ') ?? [];
-            for (const className of this.classNames) {
-                toggleClass(this.element, className, true);
-            }
+            this._classNames.setClassNames(options.className ?? '');
+        }
+
+        if ('disableResizing' in options) {
+            this.disableResizing = options.disableAutoResizing ?? false;
         }
 
         this._options = { ...this.options, ...options };

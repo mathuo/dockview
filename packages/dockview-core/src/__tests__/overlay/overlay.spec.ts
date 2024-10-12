@@ -369,8 +369,11 @@ describe('overlay', () => {
 
         const overlay1 = createOverlay();
 
+        const zIndexValue = (delta: number) =>
+            `calc(var(--dv-overlay-z-index, 999) + ${delta})`;
+
         expect(overlay1.element.getAttribute('aria-level')).toBe('0');
-        expect(overlay1.element.style.zIndex).toBe('999');
+        expect(overlay1.element.style.zIndex).toBe(zIndexValue(0));
 
         const overlay2 = createOverlay();
         const overlay3 = createOverlay();
@@ -378,38 +381,38 @@ describe('overlay', () => {
         expect(overlay1.element.getAttribute('aria-level')).toBe('0');
         expect(overlay2.element.getAttribute('aria-level')).toBe('1');
         expect(overlay3.element.getAttribute('aria-level')).toBe('2');
-        expect(overlay1.element.style.zIndex).toBe('999');
-        expect(overlay2.element.style.zIndex).toBe('1001');
-        expect(overlay3.element.style.zIndex).toBe('1003');
+        expect(overlay1.element.style.zIndex).toBe(zIndexValue(0));
+        expect(overlay2.element.style.zIndex).toBe(zIndexValue(2));
+        expect(overlay3.element.style.zIndex).toBe(zIndexValue(4));
 
         overlay2.bringToFront();
 
         expect(overlay1.element.getAttribute('aria-level')).toBe('0');
         expect(overlay2.element.getAttribute('aria-level')).toBe('2');
         expect(overlay3.element.getAttribute('aria-level')).toBe('1');
-        expect(overlay1.element.style.zIndex).toBe('999');
-        expect(overlay2.element.style.zIndex).toBe('1003');
-        expect(overlay3.element.style.zIndex).toBe('1001');
+        expect(overlay1.element.style.zIndex).toBe(zIndexValue(0));
+        expect(overlay2.element.style.zIndex).toBe(zIndexValue(4));
+        expect(overlay3.element.style.zIndex).toBe(zIndexValue(2));
 
         overlay1.bringToFront();
 
         expect(overlay1.element.getAttribute('aria-level')).toBe('2');
         expect(overlay2.element.getAttribute('aria-level')).toBe('1');
         expect(overlay3.element.getAttribute('aria-level')).toBe('0');
-        expect(overlay1.element.style.zIndex).toBe('1003');
-        expect(overlay2.element.style.zIndex).toBe('1001');
-        expect(overlay3.element.style.zIndex).toBe('999');
+        expect(overlay1.element.style.zIndex).toBe(zIndexValue(4));
+        expect(overlay2.element.style.zIndex).toBe(zIndexValue(2));
+        expect(overlay3.element.style.zIndex).toBe(zIndexValue(0));
 
         overlay2.dispose();
 
         expect(overlay1.element.getAttribute('aria-level')).toBe('1');
         expect(overlay3.element.getAttribute('aria-level')).toBe('0');
-        expect(overlay1.element.style.zIndex).toBe('1001');
-        expect(overlay3.element.style.zIndex).toBe('999');
+        expect(overlay1.element.style.zIndex).toBe(zIndexValue(2));
+        expect(overlay3.element.style.zIndex).toBe(zIndexValue(0));
 
         overlay1.dispose();
 
         expect(overlay3.element.getAttribute('aria-level')).toBe('0');
-        expect(overlay3.element.style.zIndex).toBe('999');
+        expect(overlay3.element.style.zIndex).toBe(zIndexValue(0));
     });
 });
