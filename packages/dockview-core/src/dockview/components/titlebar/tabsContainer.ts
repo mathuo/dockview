@@ -195,6 +195,7 @@ export class TabsContainer
 
         this.tabContainer = document.createElement('div');
         this.tabContainer.className = 'tabs-container';
+        this.tabContainer.role = 'tablist';
 
         this.voidContainer = new VoidContainer(this.accessor, this.group);
 
@@ -221,6 +222,13 @@ export class TabsContainer
                         'dv-single-tab',
                         this.size === 1
                     );
+                }
+            }),
+            this.accessor.onDidActivePanelChange((e) => {
+                if (e?.api.group === this.group) {
+                    this.selectedIndex = this.indexOf(e.id);
+                } else {
+                    this.selectedIndex = -1;
                 }
             }),
             this._onWillShowOverlay,
@@ -288,6 +296,40 @@ export class TabsContainer
                 if (isLeftClick) {
                     this.accessor.doSetGroupActive(this.group);
                 }
+            }),
+            addDisposableListener(this.tabContainer, 'keydown', (event) => {
+                if (event.defaultPrevented) {
+                    return;
+                }
+
+                let tab: IValueDisposable<Tab> | undefined = undefined;
+
+                switch (event.key) {
+                    case 'ArrowLeft': {
+                        if (this.selectedIndex > 0) {
+                            tab = this.tabs[this.selectedIndex - 1];
+                        }
+                        break;
+                    }
+                    case 'ArrowRight': {
+                        if (this.selectedIndex + 1 < this.size) {
+                            tab = this.tabs[this.selectedIndex + 1];
+                        }
+                        break;
+                    }
+                    case 'Home':
+                        tab = this.tabs[0];
+                        break;
+                    case 'End':
+                        tab = this.tabs[this.size - 1];
+                        break;
+                }
+
+                if (tab == null) {
+                    return;
+                }
+
+                this.group.model.openPanel(tab.value.panel);
             })
         );
     }
@@ -336,6 +378,7 @@ export class TabsContainer
         this.tabs.forEach((tab) => {
             const isActivePanel = panel.id === tab.value.panel.id;
             tab.value.setActive(isActivePanel);
+            tab.value.panel.runEvents();
         });
     }
 
