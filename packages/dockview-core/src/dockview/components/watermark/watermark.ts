@@ -24,25 +24,25 @@ export class Watermark
     constructor() {
         super();
         this._element = document.createElement('div');
-        this._element.className = 'watermark';
+        this._element.className = 'dv-watermark';
 
         const title = document.createElement('div');
-        title.className = 'watermark-title';
+        title.className = 'dv-watermark-title';
 
         const emptySpace = document.createElement('span');
         emptySpace.style.flexGrow = '1';
 
         const content = document.createElement('div');
-        content.className = 'watermark-content';
+        content.className = 'dv-watermark-content';
 
         this._element.appendChild(title);
         this._element.appendChild(content);
 
         const actionsContainer = document.createElement('div');
-        actionsContainer.className = 'actions-container';
+        actionsContainer.className = 'dv-actions-container';
 
         const closeAnchor = document.createElement('div');
-        closeAnchor.className = 'close-action';
+        closeAnchor.className = 'dv-close-action';
         closeAnchor.appendChild(createCloseButton());
 
         actionsContainer.appendChild(closeAnchor);
@@ -69,6 +69,6 @@ export class Watermark
 
     private render(): void {
         const isOneGroup = !!(this._api && this._api.size <= 1);
-        toggleClass(this.element, 'has-actions', isOneGroup);
+        toggleClass(this.element, 'dv-has-actions', isOneGroup);
     }
 }

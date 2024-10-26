@@ -342,7 +342,7 @@ export class DockviewGroupPanelModel
 
         toggleClass(
             this.container,
-            'locked-groupview',
+            'dv-locked-groupview',
             value === 'no-drop-target' || value
         );
     }
@@ -436,7 +436,7 @@ export class DockviewGroupPanelModel
     ) {
         super();
 
-        toggleClass(this.container, 'groupview', true);
+        toggleClass(this.container, 'dv-groupview', true);
 
         this._api = new DockviewApi(this.accessor);
 
@@ -806,8 +806,8 @@ export class DockviewGroupPanelModel
 
         this._isGroupActive = isGroupActive;
 
-        toggleClass(this.container, 'active-group', isGroupActive);
-        toggleClass(this.container, 'inactive-group', !isGroupActive);
+        toggleClass(this.container, 'dv-active-group', isGroupActive);
+        toggleClass(this.container, 'dv-inactive-group', !isGroupActive);
 
         this.tabsContainer.setActive(this.isActive);
 
@@ -956,7 +956,7 @@ export class DockviewGroupPanelModel
     }
 
     private updateContainer(): void {
-        toggleClass(this.container, 'empty', this.isEmpty);
+        toggleClass(this.container, 'dv-empty', this.isEmpty);
 
         this.panels.forEach((panel) => panel.runEvents());
 

@@ -72,11 +72,11 @@ export class Tab extends CompositeDisposable {
         super();
 
         this._element = document.createElement('div');
-        this._element.className = 'tab';
+        this._element.className = 'dv-tab';
         this._element.tabIndex = 0;
         this._element.draggable = true;
 
-        toggleClass(this.element, 'inactive-tab', true);
+        toggleClass(this.element, 'dv-inactive-tab', true);
 
         const dragHandler = new TabDragHandler(
             this._element,
@@ -139,8 +139,8 @@ export class Tab extends CompositeDisposable {
     }
 
     public setActive(isActive: boolean): void {
-        toggleClass(this.element, 'active-tab', isActive);
-        toggleClass(this.element, 'inactive-tab', !isActive);
+        toggleClass(this.element, 'dv-active-tab', isActive);
+        toggleClass(this.element, 'dv-inactive-tab', !isActive);
     }
 
     public setContent(part: ITabRenderer): void {
