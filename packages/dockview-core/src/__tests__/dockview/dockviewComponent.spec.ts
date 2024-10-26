@@ -19,6 +19,8 @@ import {
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewApi } from '../../api/component.api';
 import { DockviewDndOverlayEvent } from '../../dockview/options';
+import { SizeEvent } from '../../api/gridviewPanelApi';
+import { setupMockWindow } from '../__mocks__/mockWindow';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
@@ -115,7 +117,7 @@ describe('dockviewComponent', () => {
             },
         });
 
-        window.open = jest.fn(); // not implemented by jest
+        window.open = jest.fn();
     });
 
     test('update className', () => {
@@ -4817,6 +4819,8 @@ describe('dockviewComponent', () => {
         test('add a popout group', async () => {
             const container = document.createElement('div');
 
+            window.open = () => setupMockWindow();
+
             const dockview = new DockviewComponent(container, {
                 createComponent(options) {
                     switch (options.name) {
@@ -4848,12 +4852,36 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(1);
             expect(dockview.panels.length).toBe(2);
 
-            await dockview.addPopoutGroup(panel2.group);
+            const events: SizeEvent[] = [];
+
+            panel2.api.onDidDimensionsChange((event) => {
+                events.push(event);
+            });
+
+            const originalGroup = panel2.group;
+
+            expect(await dockview.addPopoutGroup(panel2.group)).toBeTruthy();
+
+            expect(events).toEqual([{ height: 2000, width: 1000 }]);
+
+            expect(originalGroup.api.location.type).toBe('grid');
+            expect(originalGroup.api.isVisible).toBeFalsy();
 
             expect(panel1.group.api.location.type).toBe('popout');
             expect(panel2.group.api.location.type).toBe('popout');
             expect(dockview.groups.length).toBe(2);
             expect(dockview.panels.length).toBe(2);
+
+            if (panel2.api.location.type !== 'popout') {
+                fail('unexpected');
+            }
+            const alternativeWindow = panel2.api.location.getWindow();
+            alternativeWindow.dispatchEvent(new Event('resize'));
+
+            expect(events).toEqual([
+                { height: 2000, width: 1000 },
+                { height: 2001, width: 1001 },
+            ]);
         });
 
         test('remove all panels from popout group', async () => {
@@ -4892,7 +4920,7 @@ describe('dockviewComponent', () => {
                 position: { referencePanel: panel2 },
             });
 
-            await dockview.addPopoutGroup(panel2.group);
+            expect(await dockview.addPopoutGroup(panel2.group)).toBeTruthy();
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('popout');
@@ -4934,7 +4962,7 @@ describe('dockviewComponent', () => {
                 component: 'default',
             });
 
-            await dockview.addPopoutGroup(panel1);
+            expect(await dockview.addPopoutGroup(panel1)).toBeTruthy();
 
             expect(dockview.panels.length).toBe(1);
             expect(dockview.groups.length).toBe(2);
@@ -4989,7 +5017,7 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(2);
             expect(dockview.panels.length).toBe(3);
 
-            await dockview.addPopoutGroup(panel2.group);
+            expect(await dockview.addPopoutGroup(panel2.group)).toBeTruthy();
 
             expect(panel1.group.api.location.type).toBe('popout');
             expect(panel2.group.api.location.type).toBe('popout');
