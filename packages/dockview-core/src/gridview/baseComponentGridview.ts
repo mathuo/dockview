@@ -7,7 +7,7 @@ import { ISplitviewStyles, Orientation, Sizing } from '../splitview/splitview';
 import { IPanel } from '../panel/types';
 import { MovementOptions2 } from '../dockview/options';
 import { Resizable } from '../resizable';
-import { Classnames, toggleClass } from '../dom';
+import { Classnames } from '../dom';
 
 const nextLayoutId = sequentialNumberGenerator();
 

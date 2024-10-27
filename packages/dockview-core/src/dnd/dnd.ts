@@ -13,8 +13,8 @@ export class DragAndDropObserver extends CompositeDisposable {
     private target: EventTarget | null = null;
 
     constructor(
-        private element: HTMLElement,
-        private callbacks: IDragAndDropObserverCallbacks
+        private readonly element: HTMLElement,
+        private readonly callbacks: IDragAndDropObserverCallbacks
     ) {
         super();
 

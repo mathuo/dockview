@@ -8,7 +8,7 @@ import {
 } from 'dockview-core';
 
 export class ReactPanelHeaderPart implements ITabRenderer {
-    private _element: HTMLElement;
+    private readonly _element: HTMLElement;
     private part?: ReactPart<IGroupPanelBaseProps>;
 
     get element(): HTMLElement {

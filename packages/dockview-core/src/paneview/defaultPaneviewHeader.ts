@@ -16,7 +16,9 @@ export class DefaultHeader
     private readonly _element: HTMLElement;
     private readonly _content: HTMLElement;
     private readonly _expander: HTMLElement;
-    private apiRef: { api: PaneviewPanelApiImpl | null } = { api: null };
+    private readonly apiRef: { api: PaneviewPanelApiImpl | null } = {
+        api: null,
+    };
 
     get element(): HTMLElement {
         return this._element;

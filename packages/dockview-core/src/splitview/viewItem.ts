@@ -51,7 +51,7 @@ export class ViewItem {
         public container: HTMLElement,
         public view: IView,
         size: number | { cachedVisibleSize: number },
-        private disposable: IDisposable
+        private readonly disposable: IDisposable
     ) {
         if (typeof size === 'number') {
             this._size = size;

@@ -12,8 +12,8 @@ import {
 } from 'dockview-core';
 
 export class ReactHeaderActionsRendererPart implements IHeaderActionsRenderer {
-    private mutableDisposable = new DockviewMutableDisposable();
-    private _element: HTMLElement;
+    private readonly mutableDisposable = new DockviewMutableDisposable();
+    private readonly _element: HTMLElement;
     private _part?: ReactPart<IDockviewHeaderActionsProps>;
 
     get element(): HTMLElement {

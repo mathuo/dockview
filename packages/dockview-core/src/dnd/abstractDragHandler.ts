@@ -1,4 +1,4 @@
-import { disableIframePointEvents, getElementsByTagName } from '../dom';
+import { disableIframePointEvents } from '../dom';
 import { addDisposableListener, Emitter } from '../events';
 import {
     CompositeDisposable,

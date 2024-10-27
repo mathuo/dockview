@@ -272,7 +272,7 @@ export class DockviewGroupPanelModel
     private _width = 0;
     private _height = 0;
 
-    private _panels: IDockviewPanel[] = [];
+    private readonly _panels: IDockviewPanel[] = [];
     private readonly _panelDisposables = new Map<string, IDisposable>();
 
     private readonly _onMove = new Emitter<GroupMoveEvent>();
@@ -429,7 +429,7 @@ export class DockviewGroupPanelModel
 
     constructor(
         private readonly container: HTMLElement,
-        private accessor: DockviewComponent,
+        private readonly accessor: DockviewComponent,
         public id: string,
         private readonly options: GroupOptions,
         private readonly groupPanel: DockviewGroupPanel

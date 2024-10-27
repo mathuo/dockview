@@ -67,9 +67,8 @@ export abstract class PaneviewPanel
     extends BasePanelView<PaneviewPanelApiImpl>
     implements IPaneview, IPaneviewPanel
 {
-    private _onDidChangeExpansionState: Emitter<boolean> = new Emitter<boolean>(
-        { replay: true }
-    );
+    private readonly _onDidChangeExpansionState: Emitter<boolean> =
+        new Emitter<boolean>({ replay: true });
     onDidChangeExpansionState = this._onDidChangeExpansionState.event;
     private readonly _onDidChange = new Emitter<{
         size?: number;
@@ -78,7 +77,7 @@ export abstract class PaneviewPanel
     readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
         this._onDidChange.event;
 
-    private headerSize = 22;
+    private readonly headerSize = 22;
     private _orthogonalSize = 0;
     private _size = 0;
     private _minimumBodySize = 100;

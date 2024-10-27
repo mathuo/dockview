@@ -45,7 +45,7 @@ class AriaLevelTracker {
 const arialLevelTracker = new AriaLevelTracker();
 
 export class Overlay extends CompositeDisposable {
-    private _element: HTMLElement = document.createElement('div');
+    private readonly _element: HTMLElement = document.createElement('div');
 
     private readonly _onDidChange = new Emitter<void>();
     readonly onDidChange: Event<void> = this._onDidChange.event;
@@ -53,8 +53,8 @@ export class Overlay extends CompositeDisposable {
     private readonly _onDidChangeEnd = new Emitter<void>();
     readonly onDidChangeEnd: Event<void> = this._onDidChangeEnd.event;
 
-    private static MINIMUM_HEIGHT = 20;
-    private static MINIMUM_WIDTH = 20;
+    private static readonly MINIMUM_HEIGHT = 20;
+    private static readonly MINIMUM_WIDTH = 20;
 
     private verticalAlignment: 'top' | 'bottom' | undefined;
     private horiziontalAlignment: 'left' | 'right' | undefined;

@@ -4,9 +4,9 @@ import { addDisposableListener } from '../../../events';
 import { createCloseButton } from '../../../svg';
 
 export class DefaultTab extends CompositeDisposable implements ITabRenderer {
-    private _element: HTMLElement;
-    private _content: HTMLElement;
-    private action: HTMLElement;
+    private readonly _element: HTMLElement;
+    private readonly _content: HTMLElement;
+    private readonly action: HTMLElement;
     private _title: string | undefined;
 
     get element(): HTMLElement {

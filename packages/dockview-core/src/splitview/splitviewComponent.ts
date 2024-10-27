@@ -17,7 +17,7 @@ import { Emitter, Event } from '../events';
 import { SplitviewPanel, ISplitviewPanel } from './splitviewPanel';
 import { createComponent } from '../panel/componentFactory';
 import { Resizable } from '../resizable';
-import { Classnames, toggleClass } from '../dom';
+import { Classnames } from '../dom';
 
 export interface SerializedSplitviewPanelData {
     id: string;
@@ -82,10 +82,10 @@ export class SplitviewComponent
     extends Resizable
     implements ISplitviewComponent
 {
-    private _splitviewChangeDisposable = new MutableDisposable();
+    private readonly _splitviewChangeDisposable = new MutableDisposable();
     private _splitview!: Splitview;
     private _activePanel: SplitviewPanel | undefined;
-    private _panels = new Map<string, IDisposable>();
+    private readonly _panels = new Map<string, IDisposable>();
     private _options: SplitviewComponentOptions;
 
     private readonly _onDidLayoutfromJSON = new Emitter<void>();
