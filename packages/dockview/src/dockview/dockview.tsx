@@ -13,7 +13,6 @@ import {
     PROPERTY_KEYS,
     DockviewComponentOptions,
     DockviewFrameworkOptions,
-    DockviewDndOverlayEvent,
     DockviewReadyEvent,
     createDockview,
 } from 'dockview-core';
@@ -56,10 +55,6 @@ export interface IDockviewReactProps extends DockviewOptions {
     onReady: (event: DockviewReadyEvent) => void;
     onDidDrop?: (event: DockviewDidDropEvent) => void;
     onWillDrop?: (event: DockviewWillDropEvent) => void;
-    /**
-     * @deprecated use `api.onUnhandledDragOverEvent` instead. This will be removed in the next release.
-     */
-    showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
 }
 
 function extractCoreOptions(props: IDockviewReactProps): DockviewOptions {
@@ -202,26 +197,6 @@ export const DockviewReact = React.forwardRef(
                 disposable.dispose();
             };
         }, [props.onDidDrop]);
-
-        React.useEffect(() => {
-            if (!dockviewRef.current) {
-                return () => {
-                    // noop
-                };
-            }
-
-            const disposable = dockviewRef.current.onUnhandledDragOverEvent(
-                (event) => {
-                    if (props.showDndOverlay?.(event)) {
-                        event.accept();
-                    }
-                }
-            );
-
-            return () => {
-                disposable.dispose();
-            };
-        }, [props.showDndOverlay]);
 
         React.useEffect(() => {
             if (!dockviewRef.current) {
