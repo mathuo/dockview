@@ -10,7 +10,7 @@ import {
 } from 'dockview-core';
 
 export class ReactPanelContentPart implements IContentRenderer {
-    private _element: HTMLElement;
+    private readonly _element: HTMLElement;
     private part?: ReactPart<IDockviewPanelProps>;
 
     private readonly _onDidFocus = new DockviewEmitter<void>();

@@ -7,7 +7,6 @@ import {
     removeClasses,
     addClasses,
     toggleClass,
-    getElementsByTagName,
     disableIframePointEvents,
 } from '../dom';
 import { Event, Emitter } from '../events';
@@ -98,17 +97,17 @@ export interface ISplitViewDescriptor {
 }
 
 export class Splitview {
-    private element: HTMLElement;
-    private viewContainer: HTMLElement;
-    private sashContainer: HTMLElement;
-    private viewItems: ViewItem[] = [];
+    private readonly element: HTMLElement;
+    private readonly viewContainer: HTMLElement;
+    private readonly sashContainer: HTMLElement;
+    private readonly viewItems: ViewItem[] = [];
     private sashes: ISashItem[] = [];
     private _orientation: Orientation;
     private _size = 0;
     private _orthogonalSize = 0;
     private _contentSize = 0;
     private _proportions: (number | undefined)[] | undefined = undefined;
-    private proportionalLayout: boolean;
+    private readonly proportionalLayout: boolean;
     private _startSnappingEnabled = true;
     private _endSnappingEnabled = true;
     private _disabled = false;
@@ -989,7 +988,11 @@ export class Splitview {
     }
 
     private updateSash(sash: ISashItem, state: SashState): void {
-        toggleClass(sash.container, 'dv-disabled', state === SashState.DISABLED);
+        toggleClass(
+            sash.container,
+            'dv-disabled',
+            state === SashState.DISABLED
+        );
         toggleClass(sash.container, 'dv-enabled', state === SashState.ENABLED);
         toggleClass(sash.container, 'dv-maximum', state === SashState.MAXIMUM);
         toggleClass(sash.container, 'dv-minimum', state === SashState.MINIMUM);

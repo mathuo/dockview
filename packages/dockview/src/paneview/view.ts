@@ -8,7 +8,7 @@ import { ReactPart, ReactPortalStore } from '../react';
 import { IPaneviewPanelProps } from './paneview';
 
 export class PanePanelSection implements IPaneBodyPart {
-    private _element: HTMLElement;
+    private readonly _element: HTMLElement;
     private part?: ReactPart<IPaneviewPanelProps>;
 
     get element() {

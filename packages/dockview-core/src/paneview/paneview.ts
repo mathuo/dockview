@@ -15,10 +15,10 @@ interface PaneItem {
 }
 
 export class Paneview extends CompositeDisposable implements IDisposable {
-    private element: HTMLElement;
-    private splitview: Splitview;
+    private readonly element: HTMLElement;
+    private readonly splitview: Splitview;
     private paneItems: PaneItem[] = [];
-    private _orientation: Orientation;
+    private readonly _orientation: Orientation;
     private animationTimer: any;
     private skipAnimation = false;
 

@@ -39,7 +39,7 @@ import {
     toTarget,
 } from '../gridview/baseComponentGridview';
 import { DockviewApi } from '../api/component.api';
-import { Orientation, Sizing } from '../splitview/splitview';
+import { Orientation } from '../splitview/splitview';
 import {
     GroupOptions,
     GroupPanelViewState,
@@ -1977,7 +1977,7 @@ export class DockviewComponent
 
                     const newGroup = this.createGroupAtLocation(targetLocation);
                     this.movingLock(() =>
-                        newGroup.model.openPanel(removedPanel!, {
+                        newGroup.model.openPanel(removedPanel, {
                             skipSetActive: true,
                         })
                     );

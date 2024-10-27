@@ -19,7 +19,7 @@ import { CompositeDisposable, IDisposable, Disposable } from '../lifecycle';
 
 export class BranchNode extends CompositeDisposable implements IView {
     readonly element: HTMLElement;
-    private splitview: Splitview;
+    private readonly splitview: Splitview;
     private _orthogonalSize: number;
     private _size: number;
     private _childrenDisposable: IDisposable = Disposable.NONE;

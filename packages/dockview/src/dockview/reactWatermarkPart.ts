@@ -2,7 +2,6 @@ import React from 'react';
 import { ReactPart, ReactPortalStore } from '../react';
 import {
     PanelUpdateEvent,
-    DockviewGroupPanel,
     GroupPanelPartInitParameters,
     IWatermarkRenderer,
     WatermarkRendererInitParameters,
@@ -10,9 +9,9 @@ import {
 } from 'dockview-core';
 
 export class ReactWatermarkPart implements IWatermarkRenderer {
-    private _element: HTMLElement;
+    private readonly _element: HTMLElement;
     private part?: ReactPart<IWatermarkPanelProps>;
-    private parameters: GroupPanelPartInitParameters | undefined;
+    private readonly parameters: GroupPanelPartInitParameters | undefined;
 
     get element(): HTMLElement {
         return this._element;

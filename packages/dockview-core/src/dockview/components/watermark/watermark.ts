@@ -13,7 +13,7 @@ export class Watermark
     extends CompositeDisposable
     implements IWatermarkRenderer
 {
-    private _element: HTMLElement;
+    private readonly _element: HTMLElement;
     private _group: IDockviewGroupPanel | undefined;
     private _api: DockviewApi | undefined;
 

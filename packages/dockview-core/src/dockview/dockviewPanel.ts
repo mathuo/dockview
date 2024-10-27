@@ -45,10 +45,10 @@ export class DockviewPanel
     private _title: string | undefined;
     private _renderer: DockviewPanelRenderer | undefined;
 
-    private _minimumWidth: number | undefined;
-    private _minimumHeight: number | undefined;
-    private _maximumWidth: number | undefined;
-    private _maximumHeight: number | undefined;
+    private readonly _minimumWidth: number | undefined;
+    private readonly _minimumHeight: number | undefined;
+    private readonly _maximumWidth: number | undefined;
+    private readonly _maximumHeight: number | undefined;
 
     get params(): Parameters | undefined {
         return this._params;

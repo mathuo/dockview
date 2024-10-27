@@ -32,7 +32,7 @@ export abstract class BasePanelView<T extends PanelApiImpl>
 {
     private _height = 0;
     private _width = 0;
-    private _element: HTMLElement;
+    private readonly _element: HTMLElement;
     protected part?: IFrameworkPart;
     protected _params?: PanelInitParameters;
 

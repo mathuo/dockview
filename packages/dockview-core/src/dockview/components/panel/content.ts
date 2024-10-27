@@ -3,12 +3,7 @@ import {
     IDisposable,
     MutableDisposable,
 } from '../../../lifecycle';
-import {
-    addDisposableListener,
-    addDisposableWindowListener,
-    Emitter,
-    Event,
-} from '../../../events';
+import { Emitter, Event } from '../../../events';
 import { trackFocus } from '../../../dom';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
@@ -33,9 +28,9 @@ export class ContentContainer
     extends CompositeDisposable
     implements IContentContainer
 {
-    private _element: HTMLElement;
+    private readonly _element: HTMLElement;
     private panel: IDockviewPanel | undefined;
-    private disposable = new MutableDisposable();
+    private readonly disposable = new MutableDisposable();
 
     private readonly _onDidFocus = new Emitter<void>();
     readonly onDidFocus: Event<void> = this._onDidFocus.event;

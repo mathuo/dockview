@@ -17,7 +17,7 @@ export class LeafNode implements IView {
         this._onDidChange.event;
     private _size: number;
     private _orthogonalSize: number;
-    private _disposable: IDisposable;
+    private readonly _disposable: IDisposable;
 
     private get minimumWidth(): number {
         return this.view.minimumWidth;
