@@ -15,6 +15,8 @@ import {
     onBeforeUnmount,
     markRaw,
     getCurrentInstance,
+    reactive,
+    mergeProps,
 } from 'vue';
 import {
     VueHeaderActionsRenderer,
@@ -22,7 +24,8 @@ import {
     VueWatermarkRenderer,
     findComponent,
 } from '../utils';
-import type { IDockviewVueProps, VueEvents } from './types';
+import type { IDockviewVueProps, VNodeType, VueEvents } from './types';
+import Tele from './teleport.vue'
 
 function extractCoreOptions(props: IDockviewVueProps): DockviewOptions {
     const coreOptions = (PROPERTY_KEYS as (keyof DockviewOptions)[]).reduce(
@@ -173,8 +176,29 @@ onBeforeUnmount(() => {
         instance.value.dispose();
     }
 });
+
+const vnodes = reactive<VNodeType[]>([]);
+
+defineExpose({
+  add(item: VNodeType) {
+    vnodes.push(item)
+  },
+  remove(key: symbol) {
+    const index = vnodes.findIndex(item => item.key === key);
+    if(index > -1) {
+      vnodes.splice(index, 1);
+    }
+  },
+  update(key: symbol, props: Record<string, any>) {
+    const item = vnodes.find(item => item.key === key);
+    if(item) {
+      item.props = mergeProps(item.props, props);
+    }
+  }
+})
 </script>
 
 <template>
-    <div ref="el" />
+    <div ref="el" :="$attrs" />
+    <Tele :items="vnodes"/>
 </template>

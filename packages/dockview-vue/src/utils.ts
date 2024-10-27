@@ -21,6 +21,7 @@ import {
     cloneVNode,
     type DefineComponent,
     type ComponentInternalInstance,
+    markRaw,
 } from 'vue';
 
 export type ComponentInterface = ComponentOptionsBase<
@@ -69,22 +70,32 @@ export function mountVueComponent<T extends Record<string, any>>(
     props: T,
     element: HTMLElement
 ) {
-    let vNode = createVNode(component, Object.freeze(props));
+    // let vNode = createVNode(component, Object.freeze(props));
 
-    vNode.appContext = parent.appContext;
+    // vNode.appContext = parent.appContext;
 
-    render(vNode, element);
+    // render(vNode, element);
 
-    let runningProps = props;
+    // let runningProps = props;
+
+    const key = Symbol();
+    parent.exposed!.add({
+      key,
+      component: markRaw(component),
+      target: markRaw(element),
+      props,
+    });
 
     return {
         update: (newProps: any) => {
-            runningProps = { ...props, ...newProps };
-            vNode = cloneVNode(vNode, runningProps);
-            render(vNode, element);
+            // runningProps = { ...props, ...newProps };
+            // vNode = cloneVNode(vNode, runningProps);
+            // render(vNode, element);
+            parent.exposed!.update(key, newProps);
         },
         dispose: () => {
-            render(null, element);
+            // render(null, element);
+            parent.exposed!.remove(key);
         },
     };
 }
