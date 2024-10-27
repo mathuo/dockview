@@ -11,11 +11,12 @@ export class DockviewPanelModelMock implements IDockviewPanelModel {
     constructor(
         readonly contentComponent: string,
         readonly content: IContentRenderer,
-        readonly tabComponent?: string,
-        readonly tab?: ITabRenderer
+        readonly tabComponent: string,
+        readonly tab: ITabRenderer
     ) {
         //
     }
+
 
     init(params: GroupPanelPartInitParameters): void {
         //

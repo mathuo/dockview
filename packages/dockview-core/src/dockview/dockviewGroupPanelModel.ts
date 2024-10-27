@@ -264,6 +264,7 @@ export class DockviewGroupPanelModel
     private _location: DockviewGroupLocation = { type: 'grid' };
 
     private mostRecentlyUsed: IDockviewPanel[] = [];
+    private _overwriteRenderContainer: OverlayRenderContainer | null = null;
 
     private readonly _onDidChange = new Emitter<IViewSize | undefined>();
     readonly onDidChange: Event<IViewSize | undefined> =
@@ -512,8 +513,6 @@ export class DockviewGroupPanelModel
     focusContent(): void {
         this.contentContainer.element.focus();
     }
-
-    private _overwriteRenderContainer: OverlayRenderContainer | null = null;
 
     set renderContainer(value: OverlayRenderContainer | null) {
         this.panels.forEach((panel) => {

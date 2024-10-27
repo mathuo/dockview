@@ -74,6 +74,38 @@ export abstract class GridviewPanel<
     }
 
     get minimumWidth(): number {
+        /**
+         * defer to protected function to allow subclasses to override easily.
+         * see https://github.com/microsoft/TypeScript/issues/338
+         */
+        return this.__minimumWidth();
+    }
+
+    get minimumHeight(): number {
+        /**
+         * defer to protected function to allow subclasses to override easily.
+         * see https://github.com/microsoft/TypeScript/issues/338
+         */
+        return this.__minimumHeight();
+    }
+
+    get maximumHeight(): number {
+        /**
+         * defer to protected function to allow subclasses to override easily.
+         * see https://github.com/microsoft/TypeScript/issues/338
+         */
+        return this.__maximumHeight();
+    }
+
+    get maximumWidth(): number {
+        /**
+         * defer to protected function to allow subclasses to override easily.
+         * see https://github.com/microsoft/TypeScript/issues/338
+         */
+        return this.__maximumWidth();
+    }
+
+    protected __minimumWidth(): number {
         const width =
             typeof this._minimumWidth === 'function'
                 ? this._minimumWidth()
@@ -87,7 +119,21 @@ export abstract class GridviewPanel<
         return width;
     }
 
-    get minimumHeight(): number {
+    protected __maximumWidth(): number {
+        const width =
+            typeof this._maximumWidth === 'function'
+                ? this._maximumWidth()
+                : this._maximumWidth;
+
+        if (width !== this._evaluatedMaximumWidth) {
+            this._evaluatedMaximumWidth = width;
+            this.updateConstraints();
+        }
+
+        return width;
+    }
+
+    protected __minimumHeight(): number {
         const height =
             typeof this._minimumHeight === 'function'
                 ? this._minimumHeight()
@@ -101,7 +147,7 @@ export abstract class GridviewPanel<
         return height;
     }
 
-    get maximumHeight(): number {
+    protected __maximumHeight(): number {
         const height =
             typeof this._maximumHeight === 'function'
                 ? this._maximumHeight()
@@ -113,20 +159,6 @@ export abstract class GridviewPanel<
         }
 
         return height;
-    }
-
-    get maximumWidth(): number {
-        const width =
-            typeof this._maximumWidth === 'function'
-                ? this._maximumWidth()
-                : this._maximumWidth;
-
-        if (width !== this._evaluatedMaximumWidth) {
-            this._evaluatedMaximumWidth = width;
-            this.updateConstraints();
-        }
-
-        return width;
     }
 
     get isActive(): boolean {

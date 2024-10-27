@@ -154,6 +154,10 @@ export class ContentContainer
                     referenceContainer: this,
                 });
                 break;
+            default:
+                throw new Error(
+                    `dockview: invalid renderer type '${panel.api.renderer}'`
+                );
         }
 
         if (doRender) {
