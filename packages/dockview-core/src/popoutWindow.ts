@@ -1,6 +1,6 @@
 import { addStyles } from './dom';
 import { Emitter, addDisposableWindowListener } from './events';
-import { CompositeDisposable, IDisposable } from './lifecycle';
+import { CompositeDisposable, Disposable, IDisposable } from './lifecycle';
 import { Box } from './types';
 
 export type PopoutWindowOptions = {
@@ -99,6 +99,9 @@ export class PopoutWindow extends CompositeDisposable {
         this._window = { value: externalWindow, disposable };
 
         disposable.addDisposables(
+            Disposable.from(() => {
+                externalWindow.close();
+            }),
             addDisposableWindowListener(window, 'beforeunload', () => {
                 /**
                  * before the main window closes we should close this popup too
@@ -121,7 +124,7 @@ export class PopoutWindow extends CompositeDisposable {
             window: externalWindow,
         });
 
-        return new Promise<HTMLElement | null>((resolve) => {
+        return new Promise<HTMLElement | null>((resolve, reject) => {
             externalWindow.addEventListener('unload', (e) => {
                 // if page fails to load before unloading
                 // this.close();
@@ -132,29 +135,34 @@ export class PopoutWindow extends CompositeDisposable {
                  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event
                  */
 
-                const externalDocument = externalWindow.document;
-                externalDocument.title = document.title;
+                try {
+                    const externalDocument = externalWindow.document;
+                    externalDocument.title = document.title;
 
-                externalDocument.body.appendChild(container);
+                    externalDocument.body.appendChild(container);
 
-                addStyles(externalDocument, window.document.styleSheets);
+                    addStyles(externalDocument, window.document.styleSheets);
 
-                /**
-                 * beforeunload must be registered after load for reasons I could not determine
-                 * otherwise the beforeunload event will not fire when the window is closed
-                 */
-                addDisposableWindowListener(
-                    externalWindow,
-                    'beforeunload',
-                    () => {
-                        /**
-                         * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
-                         */
-                        this.close();
-                    }
-                );
+                    /**
+                     * beforeunload must be registered after load for reasons I could not determine
+                     * otherwise the beforeunload event will not fire when the window is closed
+                     */
+                    addDisposableWindowListener(
+                        externalWindow,
+                        'beforeunload',
+                        () => {
+                            /**
+                             * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
+                             */
+                            this.close();
+                        }
+                    );
 
-                resolve(container);
+                    resolve(container);
+                } catch (err) {
+                    // only except this is the DOM isn't setup. e.g. in a in correctly configured test
+                    reject(err);
+                }
             });
         });
     }

@@ -1,4 +1,4 @@
-import { disableIframePointEvents, getElementsByTagName } from '../dom';
+import { disableIframePointEvents } from '../dom';
 import { addDisposableListener, Emitter } from '../events';
 import {
     CompositeDisposable,
@@ -69,10 +69,7 @@ export abstract class DragHandler extends CompositeDisposable {
                          * dnd logic. You can see the code at
                          * https://github.com/react-dnd/react-dnd/blob/main/packages/backend-html5/src/HTML5BackendImpl.ts#L542
                          */
-                        event.dataTransfer.setData(
-                            'text/plain',
-                            '__dockview_internal_drag_event__'
-                        );
+                        event.dataTransfer.setData('text/plain', '');
                     }
                 }
             }),

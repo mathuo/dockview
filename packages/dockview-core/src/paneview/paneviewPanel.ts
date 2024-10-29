@@ -67,9 +67,8 @@ export abstract class PaneviewPanel
     extends BasePanelView<PaneviewPanelApiImpl>
     implements IPaneview, IPaneviewPanel
 {
-    private _onDidChangeExpansionState: Emitter<boolean> = new Emitter<boolean>(
-        { replay: true }
-    );
+    private readonly _onDidChangeExpansionState: Emitter<boolean> =
+        new Emitter<boolean>({ replay: true });
     onDidChangeExpansionState = this._onDidChangeExpansionState.event;
     private readonly _onDidChange = new Emitter<{
         size?: number;
@@ -78,7 +77,7 @@ export abstract class PaneviewPanel
     readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
         this._onDidChange.event;
 
-    private headerSize = 22;
+    private readonly headerSize = 22;
     private _orthogonalSize = 0;
     private _size = 0;
     private _minimumBodySize = 100;
@@ -175,7 +174,7 @@ export abstract class PaneviewPanel
 
         this._orientation = orientation;
 
-        this.element.classList.add('pane');
+        this.element.classList.add('dv-pane');
 
         this.addDisposables(
             this.api.onWillVisibilityChange((event) => {
@@ -310,7 +309,7 @@ export abstract class PaneviewPanel
         this.header = document.createElement('div');
         this.header.tabIndex = 0;
 
-        this.header.className = 'pane-header';
+        this.header.className = 'dv-pane-header';
         this.header.style.height = `${this.headerSize}px`;
         this.header.style.lineHeight = `${this.headerSize}px`;
         this.header.style.minHeight = `${this.headerSize}px`;
@@ -320,7 +319,7 @@ export abstract class PaneviewPanel
 
         this.body = document.createElement('div');
 
-        this.body.className = 'pane-body';
+        this.body.className = 'dv-pane-body';
 
         this.element.appendChild(this.body);
     }

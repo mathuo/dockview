@@ -39,7 +39,7 @@ import {
     toTarget,
 } from '../gridview/baseComponentGridview';
 import { DockviewApi } from '../api/component.api';
-import { Orientation, Sizing } from '../splitview/splitview';
+import { Orientation } from '../splitview/splitview';
 import {
     GroupOptions,
     GroupPanelViewState,
@@ -218,7 +218,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
             onDidOpen?: (event: { id: string; window: Window }) => void;
             onWillClose?: (event: { id: string; window: Window }) => void;
         }
-    ): Promise<void>;
+    ): Promise<boolean>;
 }
 
 export class DockviewComponent
@@ -548,7 +548,7 @@ export class DockviewComponent
             onWillClose?: (event: { id: string; window: Window }) => void;
             overridePopoutGroup?: DockviewGroupPanel;
         }
-    ): Promise<void> {
+    ): Promise<boolean> {
         if (
             itemToPopout instanceof DockviewPanel &&
             itemToPopout.group.size === 1
@@ -579,10 +579,6 @@ export class DockviewComponent
         const groupId =
             options?.overridePopoutGroup?.id ?? this.getNextGroupId();
 
-        if (itemToPopout.api.location.type === 'grid') {
-            itemToPopout.api.setVisible(false);
-        }
-
         const _window = new PopoutWindow(
             `${this.id}-${groupId}`, // unique id
             theme ?? '',
@@ -608,12 +604,12 @@ export class DockviewComponent
             .open()
             .then((popoutContainer) => {
                 if (_window.isDisposed) {
-                    return;
+                    return false;
                 }
 
                 if (popoutContainer === null) {
                     popoutWindowDisposable.dispose();
-                    return;
+                    return false;
                 }
 
                 const gready = document.createElement('div');
@@ -635,6 +631,10 @@ export class DockviewComponent
                     options?.overridePopoutGroup ??
                     this.createGroup({ id: groupId });
                 group.model.renderContainer = overlayRenderContainer;
+                group.layout(
+                    _window.window!.innerWidth,
+                    _window.window!.innerHeight
+                );
 
                 if (!options?.overridePopoutGroup) {
                     this._onDidAddGroup.fire(group);
@@ -676,6 +676,10 @@ export class DockviewComponent
                     getWindow: () => _window.window!,
                 };
 
+                if (itemToPopout.api.location.type === 'grid') {
+                    itemToPopout.api.setVisible(false);
+                }
+
                 this.doSetGroupAndPanelActive(group);
 
                 popoutWindowDisposable.addDisposables(
@@ -715,7 +719,10 @@ export class DockviewComponent
                         _window.window!,
                         'resize',
                         () => {
-                            group.layout(window.innerWidth, window.innerHeight);
+                            group.layout(
+                                _window.window!.innerWidth,
+                                _window.window!.innerHeight
+                            );
                         }
                     ),
                     overlayRenderContainer,
@@ -752,9 +759,12 @@ export class DockviewComponent
 
                 this._popoutGroups.push(value);
                 this.updateWatermark();
+
+                return true;
             })
             .catch((err) => {
                 console.error('dockview: failed to create popout window', err);
+                return false;
             });
     }
 
@@ -890,7 +900,7 @@ export class DockviewComponent
                       DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
         });
 
-        const el = group.element.querySelector('.void-container');
+        const el = group.element.querySelector('.dv-void-container');
 
         if (!el) {
             throw new Error('failed to find drag handle');
@@ -1967,7 +1977,7 @@ export class DockviewComponent
 
                     const newGroup = this.createGroupAtLocation(targetLocation);
                     this.movingLock(() =>
-                        newGroup.model.openPanel(removedPanel!, {
+                        newGroup.model.openPanel(removedPanel, {
                             skipSetActive: true,
                         })
                     );

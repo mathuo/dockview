@@ -73,7 +73,8 @@ export class Tab extends CompositeDisposable {
 
         this._element = document.createElement('div');
         this._element.id = this.panel.tabComponentElId;
-        this._element.className = 'tab';
+        this._element.className = 'dv-tab';
+        this._element.tabIndex = 0;
         this._element.draggable = true;
 
         this._element.role = 'tab';
@@ -81,7 +82,7 @@ export class Tab extends CompositeDisposable {
         this._element.ariaSelected = 'false';
         this._element.setAttribute('aria-controls', this.panel.componentElId);
 
-        toggleClass(this.element, 'inactive-tab', true);
+        toggleClass(this.element, 'dv-inactive-tab', true);
 
         const dragHandler = new TabDragHandler(
             this._element,
@@ -147,8 +148,8 @@ export class Tab extends CompositeDisposable {
         this.element.tabIndex = isActive ? 0 : -1;
         this.element.ariaSelected = isActive.toString();
 
-        toggleClass(this.element, 'active-tab', isActive);
-        toggleClass(this.element, 'inactive-tab', !isActive);
+        toggleClass(this.element, 'dv-active-tab', isActive);
+        toggleClass(this.element, 'dv-inactive-tab', !isActive);
     }
 
     public setContent(part: ITabRenderer): void {

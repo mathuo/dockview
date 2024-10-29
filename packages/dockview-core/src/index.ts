@@ -1,4 +1,9 @@
-export * from './dnd/dataTransfer';
+export {
+    getPaneData,
+    getPanelData,
+    PaneTransfer,
+    PanelTransfer,
+} from './dnd/dataTransfer';
 
 /**
  * Events, Emitters and Disposables are very common concepts that many codebases will contain, however we need
@@ -7,14 +12,13 @@ export * from './dnd/dataTransfer';
  */
 export { Emitter as DockviewEmitter, Event as DockviewEvent } from './events';
 export {
-    IDisposable as IDockviewDisposable,
+    IDisposable as DockviewIDisposable,
     MutableDisposable as DockviewMutableDisposable,
     CompositeDisposable as DockviewCompositeDisposable,
     Disposable as DockviewDisposable,
 } from './lifecycle';
 
 export * from './panel/types';
-export * from './panel/componentFactory';
 
 export * from './splitview/splitview';
 export {
@@ -27,7 +31,10 @@ export * from './gridview/gridview';
 export { GridviewComponentOptions } from './gridview/options';
 export * from './gridview/baseComponentGridview';
 
-export * from './paneview/draggablePaneviewPanel';
+export {
+    DraggablePaneviewPanel,
+    PaneviewDropEvent,
+} from './paneview/draggablePaneviewPanel';
 
 export * from './dockview/components/panel/content';
 export * from './dockview/components/tab/tab';
@@ -50,8 +57,11 @@ export {
 
 export * from './dockview/options';
 export * from './dockview/dockviewPanel';
-export * from './dockview/components/tab/defaultTab';
-export * from './dockview/deserializer';
+export { DefaultTab } from './dockview/components/tab/defaultTab';
+export {
+    DefaultDockviewDeserialzier,
+    IPanelDeserializer,
+} from './dockview/deserializer';
 
 export * from './dockview/dockviewComponent';
 export * from './gridview/gridviewComponent';
@@ -60,7 +70,7 @@ export * from './paneview/paneviewComponent';
 export { PaneviewComponentOptions } from './paneview/options';
 
 export * from './gridview/gridviewPanel';
-export * from './splitview/splitviewPanel';
+export { SplitviewPanel, ISplitviewPanel } from './splitview/splitviewPanel';
 export * from './paneview/paneviewPanel';
 export * from './dockview/types';
 

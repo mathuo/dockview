@@ -3,12 +3,12 @@ import ReactDOM from 'react-dom';
 import {
     DockviewDisposable,
     IFrameworkPart,
-    IDockviewDisposable,
+    DockviewIDisposable,
     Parameters,
 } from 'dockview-core';
 
 export interface ReactPortalStore {
-    addPortal: (portal: React.ReactPortal) => IDockviewDisposable;
+    addPortal: (portal: React.ReactPortal) => DockviewIDisposable;
 }
 
 interface IPanelWrapperProps {
@@ -75,7 +75,7 @@ export class ReactPart<P extends object, C extends object = {}>
     private componentInstance?: IPanelWrapperRef;
     private ref?: {
         portal: React.ReactPortal;
-        disposable: IDockviewDisposable;
+        disposable: DockviewIDisposable;
     };
     private disposed = false;
 
@@ -163,7 +163,7 @@ export class ReactPart<P extends object, C extends object = {}>
 
 type PortalLifecycleHook = () => [
     React.ReactPortal[],
-    (portal: React.ReactPortal) => IDockviewDisposable
+    (portal: React.ReactPortal) => DockviewIDisposable
 ];
 
 /**

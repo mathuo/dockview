@@ -1,4 +1,4 @@
-.groupview {
+.dv-groupview {
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -9,13 +9,13 @@
         outline: none;
     }
 
-    &.empty {
-        > .tabs-and-actions-container {
+    &.dv-empty {
+        > .dv-tabs-and-actions-container {
             display: none;
         }
     }
 
-    > .content-container {
+    > .dv-content-container {
         flex-grow: 1;
         min-height: 0;
         outline: none;

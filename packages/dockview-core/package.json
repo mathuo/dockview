@@ -1,6 +1,6 @@
 {
   "name": "dockview-core",
-  "version": "1.17.1",
+  "version": "1.17.2",
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
   "keywords": [
     "splitview",

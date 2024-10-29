@@ -13,8 +13,6 @@ import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { clamp } from '../math';
 import { AnchoredBox } from '../types';
 
-export const DEFAULT_OVERLAY_Z_INDEX = 999;
-
 class AriaLevelTracker {
     private _orderedList: HTMLElement[] = [];
 
@@ -37,9 +35,9 @@ class AriaLevelTracker {
     private update(): void {
         for (let i = 0; i < this._orderedList.length; i++) {
             this._orderedList[i].setAttribute('aria-level', `${i}`);
-            this._orderedList[i].style.zIndex = `${
-                DEFAULT_OVERLAY_Z_INDEX + i * 2
-            }`;
+            this._orderedList[
+                i
+            ].style.zIndex = `calc(var(--dv-overlay-z-index, 999) + ${i * 2})`;
         }
     }
 }
@@ -47,7 +45,7 @@ class AriaLevelTracker {
 const arialLevelTracker = new AriaLevelTracker();
 
 export class Overlay extends CompositeDisposable {
-    private _element: HTMLElement = document.createElement('div');
+    private readonly _element: HTMLElement = document.createElement('div');
 
     private readonly _onDidChange = new Emitter<void>();
     readonly onDidChange: Event<void> = this._onDidChange.event;
@@ -55,8 +53,8 @@ export class Overlay extends CompositeDisposable {
     private readonly _onDidChangeEnd = new Emitter<void>();
     readonly onDidChangeEnd: Event<void> = this._onDidChangeEnd.event;
 
-    private static MINIMUM_HEIGHT = 20;
-    private static MINIMUM_WIDTH = 20;
+    private static readonly MINIMUM_HEIGHT = 20;
+    private static readonly MINIMUM_WIDTH = 20;
 
     private verticalAlignment: 'top' | 'bottom' | undefined;
     private horiziontalAlignment: 'left' | 'right' | undefined;

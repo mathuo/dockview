@@ -24,7 +24,7 @@ import { sequentialNumberGenerator } from '../math';
 import { PaneTransfer } from '../dnd/dataTransfer';
 import { Resizable } from '../resizable';
 import { Parameters } from '../panel/types';
-import { Classnames, toggleClass } from '../dom';
+import { Classnames } from '../dom';
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -133,8 +133,8 @@ export interface IPaneviewComponent extends IDisposable {
 export class PaneviewComponent extends Resizable implements IPaneviewComponent {
     private readonly _id = nextLayoutId.next();
     private _options: PaneviewComponentOptions;
-    private _disposable = new MutableDisposable();
-    private _viewDisposables = new Map<string, IDisposable>();
+    private readonly _disposable = new MutableDisposable();
+    private readonly _viewDisposables = new Map<string, IDisposable>();
     private _paneview!: Paneview;
 
     private readonly _onDidLayoutfromJSON = new Emitter<void>();

@@ -14,7 +14,6 @@ import {
 import { IDockviewPanel } from './dockviewPanel';
 import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
 import { IGroupHeaderProps } from './framework';
-import { AnchoredBox } from '../types';
 import { FloatingGroupOptions } from './dockviewComponent';
 import { Contraints } from '../gridview/gridviewPanel';
 

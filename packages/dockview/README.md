@@ -16,6 +16,8 @@
 
 ##
 
+![](https://github.com/mathuo/dockview/blob/HEAD/packages/docs/static/img/splashscreen.gif?raw=true)
+
 Please see the website: https://dockview.dev
 
 ## Features
