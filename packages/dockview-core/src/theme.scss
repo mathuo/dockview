@@ -308,25 +308,9 @@
 
             &:hover {
                 &::after {
-                    content: '';
-                    height: 40px;
-                    width: 4px;
-                    border-radius: 2px;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
                     background-color: var(
-                        --dv-separator-handle-background-color
+                        --dv-separator-handle-hover-background-color
                     );
-                    position: absolute;
-                }
-
-                &:hover {
-                    &::after {
-                        background-color: var(
-                            --dv-separator-handle-hover-background-color
-                        );
-                    }
                 }
             }
         }
