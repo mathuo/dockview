@@ -9,6 +9,15 @@ import { Emitter, Event } from '../events';
 import { MutableDisposable } from '../lifecycle';
 import { GridviewPanelApi, GridviewPanelApiImpl } from './gridviewPanelApi';
 
+export interface DockviewGroupMoveParams {
+    group?: DockviewGroupPanel;
+    position?: Position;
+    /**
+     * The index to place the panel within a group, only applicable if the placement is within an existing group
+     */
+    index?: number;
+}
+
 export interface DockviewGroupPanelApi extends GridviewPanelApi {
     readonly onDidLocationChange: Event<DockviewGroupPanelFloatingChangeEvent>;
     readonly onDidActivePanelChange: Event<DockviewGroupChangeEvent>;
@@ -17,7 +26,7 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
      * If you require the Window object
      */
     getWindow(): Window;
-    moveTo(options: { group?: DockviewGroupPanel; position?: Position }): void;
+    moveTo(options: DockviewGroupMoveParams): void;
     maximize(): void;
     isMaximized(): boolean;
     exitMaximized(): void;
@@ -28,7 +37,8 @@ export interface DockviewGroupPanelFloatingChangeEvent {
     readonly location: DockviewGroupLocation;
 }
 
-const NOT_INITIALIZED_MESSAGE = 'dockview: DockviewGroupPanelApiImpl not initialized';
+const NOT_INITIALIZED_MESSAGE =
+    'dockview: DockviewGroupPanelApiImpl not initialized';
 
 export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     private readonly _mutableDisposable = new MutableDisposable();
@@ -74,7 +84,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             : window;
     }
 
-    moveTo(options: { group?: DockviewGroupPanel; position?: Position }): void {
+    moveTo(options: DockviewGroupMoveParams): void {
         if (!this._group) {
             throw new Error(NOT_INITIALIZED_MESSAGE);
         }
@@ -93,6 +103,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
                 position: options.group
                     ? options.position ?? 'center'
                     : 'center',
+                index: options.index,
             },
         });
     }

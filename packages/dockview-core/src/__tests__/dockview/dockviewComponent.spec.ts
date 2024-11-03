@@ -8,7 +8,7 @@ import { PanelUpdateEvent } from '../../panel/types';
 import { Orientation } from '../../splitview/splitview';
 import { CompositeDisposable } from '../../lifecycle';
 import { Emitter } from '../../events';
-import { IDockviewPanel } from '../../dockview/dockviewPanel';
+import { DockviewPanel, IDockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import { fireEvent, queryByTestId } from '@testing-library/dom';
 import { getPanelData } from '../../dnd/dataTransfer';
@@ -116,8 +116,6 @@ describe('dockviewComponent', () => {
                 }
             },
         });
-
-        window.open = jest.fn();
     });
 
     test('update className', () => {
@@ -4886,6 +4884,150 @@ describe('dockviewComponent', () => {
             ]);
         });
 
+        test('popout / floating layouts', async () => {
+            jest.useRealTimers();
+            const container = document.createElement('div');
+
+            window.open = () => setupMockWindow();
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            let panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            let panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+            });
+
+            let panel3 = dockview.addPanel({
+                id: 'panel_3',
+                component: 'default',
+            });
+
+            let panel4 = dockview.addPanel({
+                id: 'panel_4',
+                component: 'default',
+            });
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(panel2.api.location.type).toBe('grid');
+            expect(panel3.api.location.type).toBe('grid');
+            expect(panel4.api.location.type).toBe('grid');
+
+            dockview.addFloatingGroup(panel2);
+            dockview.addFloatingGroup(panel3);
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(panel2.api.location.type).toBe('floating');
+            expect(panel3.api.location.type).toBe('floating');
+            expect(panel4.api.location.type).toBe('grid');
+
+            await dockview.addPopoutGroup(panel2);
+            await dockview.addPopoutGroup(panel4);
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(panel2.api.location.type).toBe('popout');
+            expect(panel3.api.location.type).toBe('floating');
+            expect(panel4.api.location.type).toBe('popout');
+
+            const state = dockview.toJSON();
+            dockview.fromJSON(state);
+
+            /**
+             * exhaust task queue since popout group completion is async but not awaited in `fromJSON(...)`
+             */
+            await new Promise((resolve) => setTimeout(resolve, 0));
+
+            expect(dockview.panels.length).toBe(4);
+
+            panel1 = dockview.api.getPanel('panel_1') as DockviewPanel;
+            panel2 = dockview.api.getPanel('panel_2') as DockviewPanel;
+            panel3 = dockview.api.getPanel('panel_3') as DockviewPanel;
+            panel4 = dockview.api.getPanel('panel_4') as DockviewPanel;
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(panel2.api.location.type).toBe('popout');
+            expect(panel3.api.location.type).toBe('floating');
+            expect(panel4.api.location.type).toBe('popout');
+
+            dockview.clear();
+            expect(dockview.groups.length).toBe(0);
+            expect(dockview.panels.length).toBe(0);
+        });
+
+        test('close popout window object', async () => {
+            const container = document.createElement('div');
+
+            const mockWindow = setupMockWindow();
+            window.open = () => mockWindow;
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            let panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            let panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: { referencePanel: panel1, direction: 'within' },
+            });
+
+            let panel3 = dockview.addPanel({
+                id: 'panel_3',
+                component: 'default',
+            });
+
+            dockview.addFloatingGroup(panel2);
+            await dockview.addPopoutGroup(panel2);
+
+            expect(panel1.group.api.location.type).toBe('grid');
+            expect(panel2.group.api.location.type).toBe('popout');
+            expect(panel3.group.api.location.type).toBe('grid');
+
+            mockWindow.close();
+
+            expect(panel1.group.api.location.type).toBe('grid');
+            expect(panel2.group.api.location.type).toBe('grid');
+            expect(panel3.group.api.location.type).toBe('grid');
+
+            dockview.clear();
+            expect(dockview.groups.length).toBe(0);
+            expect(dockview.panels.length).toBe(0);
+        });
+
         test('remove all panels from popout group', async () => {
             const container = document.createElement('div');
 
@@ -5378,6 +5520,101 @@ describe('dockviewComponent', () => {
     });
 
     describe('addPanel', () => {
+        test('that can add panel to index with referencePanel', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            const api = new DockviewApi(dockview);
+
+            dockview.layout(1000, 1000);
+
+            const panel1 = api.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = api.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: {
+                    referencePanel: panel1,
+                },
+            });
+
+            const panel3 = api.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                position: {
+                    referencePanel: panel1,
+                    index: 1,
+                },
+            });
+
+            expect(panel1.api.group.panels).toEqual([panel1, panel3, panel2]);
+        });
+
+        test('that can add panel to index with referenceGroup', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            const api = new DockviewApi(dockview);
+
+            dockview.layout(1000, 1000);
+
+            const panel1 = api.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = api.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: {
+                    referencePanel: panel1,
+                    index: 1,
+                },
+            });
+
+            const panel3 = api.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                position: {
+                    referenceGroup: panel1.api.group,
+                    index: 1,
+                },
+            });
+
+            expect(panel1.api.group.panels).toEqual([panel1, panel3, panel2]);
+
+            panel1.api.moveTo({ index: 1 });
+
+            expect(panel1.api.group.panels).toEqual([panel3, panel1, panel2]);
+        });
+
         test('that can add panel', () => {
             const container = document.createElement('div');
 

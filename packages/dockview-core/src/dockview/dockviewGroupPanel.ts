@@ -34,32 +34,36 @@ export class DockviewGroupPanel
 {
     private readonly _model: DockviewGroupPanelModel;
 
-    get minimumWidth(): number {
+    override get minimumWidth(): number {
         const activePanelMinimumWidth = this.activePanel?.minimumWidth;
-        return typeof activePanelMinimumWidth === 'number'
-            ? activePanelMinimumWidth
-            : MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH;
+        if (typeof activePanelMinimumWidth === 'number') {
+            return activePanelMinimumWidth;
+        }
+        return super.__minimumWidth();
     }
 
-    get minimumHeight(): number {
+    override get minimumHeight(): number {
         const activePanelMinimumHeight = this.activePanel?.minimumHeight;
-        return typeof activePanelMinimumHeight === 'number'
-            ? activePanelMinimumHeight
-            : MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT;
+        if (typeof activePanelMinimumHeight === 'number') {
+            return activePanelMinimumHeight;
+        }
+        return super.__minimumHeight();
     }
 
-    get maximumWidth(): number {
+    override get maximumWidth(): number {
         const activePanelMaximumWidth = this.activePanel?.maximumWidth;
-        return typeof activePanelMaximumWidth === 'number'
-            ? activePanelMaximumWidth
-            : Number.MAX_SAFE_INTEGER;
+        if (typeof activePanelMaximumWidth === 'number') {
+            return activePanelMaximumWidth;
+        }
+        return super.__maximumWidth();
     }
 
-    get maximumHeight(): number {
+    override get maximumHeight(): number {
         const activePanelMaximumHeight = this.activePanel?.maximumHeight;
-        return typeof activePanelMaximumHeight === 'number'
-            ? activePanelMaximumHeight
-            : Number.MAX_SAFE_INTEGER;
+        if (typeof activePanelMaximumHeight === 'number') {
+            return activePanelMaximumHeight;
+        }
+        return super.__maximumHeight();
     }
 
     get panels(): IDockviewPanel[] {

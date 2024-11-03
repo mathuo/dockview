@@ -1,5 +1,4 @@
 @mixin dockview-theme-core-mixin {
-    --dv-background-color: black;
     --dv-paneview-active-outline-color: dodgerblue;
     --dv-tabs-and-actions-container-font-size: 13px;
     --dv-tabs-and-actions-container-height: 35px;
@@ -308,25 +307,9 @@
 
             &:hover {
                 &::after {
-                    content: '';
-                    height: 40px;
-                    width: 4px;
-                    border-radius: 2px;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
                     background-color: var(
-                        --dv-separator-handle-background-color
+                        --dv-separator-handle-hover-background-color
                     );
-                    position: absolute;
-                }
-
-                &:hover {
-                    &::after {
-                        background-color: var(
-                            --dv-separator-handle-hover-background-color
-                        );
-                    }
                 }
             }
         }
@@ -354,8 +337,6 @@
     //
     --dv-separator-border: transparent;
     --dv-paneview-header-border-color: rgb(51, 51, 51);
-
-    --dv-background-color: #ebeced;
 
     /////
     --dv-separator-handle-background-color: #cfd1d3;

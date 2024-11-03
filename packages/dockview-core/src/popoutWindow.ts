@@ -59,7 +59,6 @@ export class PopoutWindow extends CompositeDisposable {
             });
 
             this._window.disposable.dispose();
-            this._window.value.close();
             this._window = null;
 
             this._onDidClose.fire();

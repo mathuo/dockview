@@ -2,7 +2,7 @@ import { DockviewPanelApi } from '../api/dockviewPanelApi';
 import { PanelInitParameters, IPanel } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
 import { Optional } from '../types';
-import { DockviewGroupPanel, IDockviewGroupPanel } from './dockviewGroupPanel';
+import { IDockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
 
 export interface HeaderPartInitParameters {
