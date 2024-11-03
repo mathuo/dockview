@@ -326,7 +326,7 @@ export class DockviewGroupPanelModel
     private readonly _api: DockviewApi;
 
     get element(): HTMLElement {
-        throw new Error('not supported');
+        throw new Error('dockview: not supported');
     }
 
     get activePanel(): IDockviewPanel | undefined {
