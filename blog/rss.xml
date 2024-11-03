@@ -4,10 +4,58 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Thu, 05 Sep 2024 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Sun, 03 Nov 2024 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 2.0.0]]></title>
+            <link>https://dockview.dev/blog/dockview-2.0.0-release</link>
+            <guid>https://dockview.dev/blog/dockview-2.0.0-release</guid>
+            <pubDate>Sun, 03 Nov 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[This major version bump is due to breaking changes related to classnames.]]></description>
+            <content:encoded><![CDATA[<p>This major version bump is due to breaking changes related to classnames.</p>
+<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-2.0.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<ul>
+<li>Add panel within group at specific index <a href="https://github.com/mathuo/dockview/pull/751" target="_blank" rel="noopener noreferrer">#751</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-2.0.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Set drag event dataTransfer object to empty string <a href="https://github.com/mathuo/dockview/pull/738" target="_blank" rel="noopener noreferrer">#738</a></li>
+<li>General code cleanup / housekeeping <a href="https://github.com/mathuo/dockview/pull/740" target="_blank" rel="noopener noreferrer">#740</a> <a href="https://github.com/mathuo/dockview/pull/746" target="_blank" rel="noopener noreferrer">#746</a></li>
+<li>Bug: Popout window initial sizing <a href="https://github.com/mathuo/dockview/pull/737" target="_blank" rel="noopener noreferrer">#737</a> <a href="https://github.com/mathuo/dockview/pull/727" target="_blank" rel="noopener noreferrer">#727</a></li>
+<li>Bug: Close popout window on unload (refresh) <a href="https://github.com/mathuo/dockview/pull/731" target="_blank" rel="noopener noreferrer">#731</a></li>
+<li>Bug: Preserve Vue3 inject/provide context <a href="https://github.com/mathuo/dockview/pull/673" target="_blank" rel="noopener noreferrer">#673</a></li>
+<li>Bug: Fix Contraints <a href="https://github.com/mathuo/dockview/pull/744" target="_blank" rel="noopener noreferrer">#744</a></li>
+<li>Bug: Fix popout window issues <a href="https://github.com/mathuo/dockview/pull/748" target="_blank" rel="noopener noreferrer">#748</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-2.0.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
+<ul>
+<li>Prefix all classnames with <code>-dv-*</code> <a href="https://github.com/mathuo/dockview/pull/688" target="_blank" rel="noopener noreferrer">#688</a></li>
+<li>Remove depreciated methods <a href="https://github.com/mathuo/dockview/pull/742" target="_blank" rel="noopener noreferrer">#742</a></li>
+</ul>]]></content:encoded>
+            <category>release</category>
+        </item>
+        <item>
+            <title><![CDATA[Dockview 1.17.2]]></title>
+            <link>https://dockview.dev/blog/dockview-1.17.2-release</link>
+            <guid>https://dockview.dev/blog/dockview-1.17.2-release</guid>
+            <pubDate>Sat, 12 Oct 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.17.2-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<ul>
+<li>Customization of z-index <a href="https://github.com/mathuo/dockview/pull/730" target="_blank" rel="noopener noreferrer">#730</a> <a href="https://github.com/mathuo/dockview/pull/724" target="_blank" rel="noopener noreferrer">#724</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.17.2-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Adjust README.md file <a href="https://github.com/mathuo/dockview/pull/715" target="_blank" rel="noopener noreferrer">#715</a></li>
+<li>Docs typo <a href="https://github.com/mathuo/dockview/pull/714" target="_blank" rel="noopener noreferrer">#714</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.17.2-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 1.17.0]]></title>
             <link>https://dockview.dev/blog/dockview-1.17.0-release</link>
@@ -458,47 +506,6 @@ when popout is closed.</li>
 </ul>
 </li>
 </ul>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 1.9.2]]></title>
-            <link>https://dockview.dev/blog/dockview-1.9.2-release</link>
-            <guid>https://dockview.dev/blog/dockview-1.9.2-release</guid>
-            <pubDate>Tue, 23 Jan 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Please reference to docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference to docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.9.2-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<ul>
-<li>Expose addGroup options <a href="https://github.com/mathuo/dockview/issues/465" target="_blank" rel="noopener noreferrer">#465</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.9.2-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Bug: Panel rendering broken when closing adjacent tabs <a href="https://github.com/mathuo/dockview/issues/472" target="_blank" rel="noopener noreferrer">#472</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.9.2-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 1.9.1]]></title>
-            <link>https://dockview.dev/blog/dockview-1.9.1-release</link>
-            <guid>https://dockview.dev/blog/dockview-1.9.1-release</guid>
-            <pubDate>Sat, 20 Jan 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Please reference to docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference to docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.9.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<ul>
-<li>
-<p>Drop target overlay classnames <a href="https://github.com/mathuo/dockview/issues/452" target="_blank" rel="noopener noreferrer">#452</a></p>
-</li>
-<li>
-<p>Expose root drop target configuration options <a href="https://github.com/mathuo/dockview/issues/431" target="_blank" rel="noopener noreferrer">#431</a></p>
-</li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.9.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Bug: Floating groups position reset when display<!-- -->:none<!-- --> applied to component <a href="https://github.com/mathuo/dockview/issues/458" target="_blank" rel="noopener noreferrer">#458</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.9.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
     </channel>
