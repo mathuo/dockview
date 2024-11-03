@@ -1,4 +1,4 @@
-import { fromPartial } from "@total-typescript/shoehorn";
+import { fromPartial } from '@total-typescript/shoehorn';
 
 export function setupMockWindow() {
     const listeners: Record<string, (() => void)[]> = {};
@@ -16,6 +16,14 @@ export function setupMockWindow() {
                 listener();
             }
         },
+        removeEventListener: (type: string, listener: () => void) => {
+            if (listeners[type]) {
+                const index = listeners[type].indexOf(listener);
+                if (index > -1) {
+                    listeners[type].splice(index, 1);
+                }
+            }
+        },
         dispatchEvent: (event: Event) => {
             const items = listeners[event.type];
             if (!items) {
@@ -24,7 +32,9 @@ export function setupMockWindow() {
             items.forEach((item) => item());
         },
         document: document,
-        close: jest.fn(),
+        close: () => {
+            listeners['beforeunload']?.forEach((f) => f());
+        },
         get innerWidth() {
             return width++;
         },

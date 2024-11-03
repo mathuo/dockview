@@ -103,7 +103,8 @@ export const GridActions = (props: {
         if (state) {
             try {
                 props.api?.fromJSON(JSON.parse(state));
-            } catch {
+            } catch (err) {
+                console.error('failed to load state', err);
                 localStorage.removeItem('dv-demo-state');
             }
         }
@@ -121,8 +122,12 @@ export const GridActions = (props: {
 
     const onReset = () => {
         if (props.api) {
-            props.api.clear();
-            defaultConfig(props.api);
+            try {
+                props.api.clear();
+                defaultConfig(props.api);
+            } catch (err) {
+                localStorage.removeItem('dv-demo-state');
+            }
         }
     };
 
