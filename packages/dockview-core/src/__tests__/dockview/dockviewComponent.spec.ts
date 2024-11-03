@@ -5520,6 +5520,101 @@ describe('dockviewComponent', () => {
     });
 
     describe('addPanel', () => {
+        test('that can add panel to index with referencePanel', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            const api = new DockviewApi(dockview);
+
+            dockview.layout(1000, 1000);
+
+            const panel1 = api.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = api.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: {
+                    referencePanel: panel1,
+                },
+            });
+
+            const panel3 = api.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                position: {
+                    referencePanel: panel1,
+                    index: 1,
+                },
+            });
+
+            expect(panel1.api.group.panels).toEqual([panel1, panel3, panel2]);
+        });
+
+        test('that can add panel to index with referenceGroup', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            const api = new DockviewApi(dockview);
+
+            dockview.layout(1000, 1000);
+
+            const panel1 = api.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = api.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: {
+                    referencePanel: panel1,
+                    index: 1,
+                },
+            });
+
+            const panel3 = api.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                position: {
+                    referenceGroup: panel1.api.group,
+                    index: 1,
+                },
+            });
+
+            expect(panel1.api.group.panels).toEqual([panel1, panel3, panel2]);
+
+            panel1.api.moveTo({ index: 1 });
+
+            expect(panel1.api.group.panels).toEqual([panel3, panel1, panel2]);
+        });
+
         test('that can add panel', () => {
             const container = document.createElement('div');
 

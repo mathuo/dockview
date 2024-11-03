@@ -1419,12 +1419,15 @@ export class DockviewComponent
             height: options.initialHeight,
         };
 
+        let index: number | undefined;
+
         if (options.position) {
             if (isPanelOptionsWithPanel(options.position)) {
                 const referencePanel =
                     typeof options.position.referencePanel === 'string'
                         ? this.getGroupPanel(options.position.referencePanel)
                         : options.position.referencePanel;
+                index = options.position.index;
 
                 if (!referencePanel) {
                     throw new Error(
@@ -1439,6 +1442,7 @@ export class DockviewComponent
                         ? this._groups.get(options.position.referenceGroup)
                               ?.value
                         : options.position.referenceGroup;
+                index = options.position.index;
 
                 if (!referenceGroup) {
                     throw new Error(
@@ -1454,6 +1458,7 @@ export class DockviewComponent
                 group.model.openPanel(panel, {
                     skipSetActive: options.inactive,
                     skipSetGroupActive: options.inactive,
+                    index,
                 });
 
                 if (!options.inactive) {
@@ -1500,6 +1505,7 @@ export class DockviewComponent
                 group.model.openPanel(panel, {
                     skipSetActive: options.inactive,
                     skipSetGroupActive: options.inactive,
+                    index,
                 });
             } else if (
                 referenceGroup.api.location.type === 'floating' ||
@@ -1509,6 +1515,7 @@ export class DockviewComponent
                 referenceGroup.model.openPanel(panel, {
                     skipSetActive: options.inactive,
                     skipSetGroupActive: options.inactive,
+                    index,
                 });
 
                 referenceGroup.api.setSize({
@@ -1537,6 +1544,7 @@ export class DockviewComponent
                 group.model.openPanel(panel, {
                     skipSetActive: options.inactive,
                     skipSetGroupActive: options.inactive,
+                    index,
                 });
 
                 if (!options.inactive) {
@@ -1564,6 +1572,7 @@ export class DockviewComponent
             group.model.openPanel(panel, {
                 skipSetActive: options.inactive,
                 skipSetGroupActive: options.inactive,
+                index,
             });
         } else {
             const group = this.createGroupAtLocation(
@@ -1576,6 +1585,7 @@ export class DockviewComponent
             group.model.openPanel(panel, {
                 skipSetActive: options.inactive,
                 skipSetGroupActive: options.inactive,
+                index,
             });
 
             if (!options.inactive) {

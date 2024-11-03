@@ -159,11 +159,19 @@ export interface PanelOptions<P extends object = Parameters> {
 type RelativePanel = {
     direction?: Direction;
     referencePanel: string | IDockviewPanel;
+    /**
+     * The index to place the panel within a group, only applicable if the placement is within an existing group
+     */
+    index?: number;
 };
 
 type RelativeGroup = {
     direction?: Direction;
     referenceGroup: string | DockviewGroupPanel;
+    /**
+     * The index to place the panel within a group, only applicable if the placement is within an existing group
+     */
+    index?: number;
 };
 
 type AbsolutePosition = {
