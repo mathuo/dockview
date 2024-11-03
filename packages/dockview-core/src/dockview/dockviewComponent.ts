@@ -592,12 +592,9 @@ export class DockviewComponent
             }
         );
 
-        let windowExplicitlyClosed = false;
-
         const popoutWindowDisposable = new CompositeDisposable(
             _window,
             _window.onDidClose(() => {
-                windowExplicitlyClosed = true;
                 popoutWindowDisposable.dispose();
             })
         );
