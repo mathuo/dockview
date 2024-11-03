@@ -115,6 +115,15 @@ api.addPanel({
       direction: 'above'
     }
 });
+
+api.addPanel({
+    id: 'panel_4',
+    component: 'default',
+    position: {
+      referencePanel: panel2,
+      index: 2  // optionally specify which index to add the panel at
+    }
+});
 ```
 
 #### Relative to another Group
@@ -129,12 +138,23 @@ const panel2: IDockviewPanel = api.addPanel({
     }
 });
 
-const panel = api.addPanel({
+
+
+api.addPanel({
     id: 'panel_2',
     component: 'default',
     position: {
       referenceGroup: panel2.group,
       direction: 'left'
+    }
+});
+
+api.addPanel({
+    id: 'panel_3',
+    component: 'default',
+    position: {
+      referenceGroup: panel2.group,
+          index: 2  // optionally specify which index to add the panel at
     }
 });
 ```
