@@ -347,9 +347,6 @@ export class TabsContainer
             return;
         }
         const tab = new Tab(panel, this.accessor, this.group);
-        if (!panel.view?.tab) {
-            throw new Error('invalid header component');
-        }
         tab.setContent(panel.view.tab);
 
         const disposable = new CompositeDisposable(
