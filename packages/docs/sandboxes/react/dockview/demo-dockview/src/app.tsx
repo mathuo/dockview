@@ -202,6 +202,10 @@ const DockviewDemo = (props: { theme?: string }) => {
             addLogLine(`Group Added ${event.id}`);
         });
 
+        event.api.onDidRepositionFloatingGroup((event) => {
+            addLogLine(`Floating Group repositioned ${event.id}`);
+        });
+
         event.api.onDidMovePanel((event) => {
             addLogLine(`Panel Moved ${event.panel.id}`);
         });
