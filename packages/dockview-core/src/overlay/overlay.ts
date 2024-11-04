@@ -59,6 +59,8 @@ export class Overlay extends CompositeDisposable {
     private verticalAlignment: 'top' | 'bottom' | undefined;
     private horiziontalAlignment: 'left' | 'right' | undefined;
 
+    private _isVisible: boolean;
+
     set minimumInViewportWidth(value: number | undefined) {
         this.options.minimumInViewportWidth = value;
     }
@@ -69,6 +71,10 @@ export class Overlay extends CompositeDisposable {
 
     get element(): HTMLElement {
         return this._element;
+    }
+
+    get isVisible(): boolean {
+        return this._isVisible;
     }
 
     constructor(
@@ -84,6 +90,7 @@ export class Overlay extends CompositeDisposable {
         this.addDisposables(this._onDidChange, this._onDidChangeEnd);
 
         this._element.className = 'dv-resize-container';
+        this._isVisible = true;
 
         this.setupResize('top');
         this.setupResize('bottom');
@@ -108,6 +115,16 @@ export class Overlay extends CompositeDisposable {
         });
 
         arialLevelTracker.push(this._element);
+    }
+
+    setVisible(isVisible: boolean): void {
+        if (isVisible === this.isVisible) {
+            return;
+        }
+
+        this._isVisible = isVisible;
+
+        toggleClass(this.element, 'dv-hidden', !this.isVisible);
     }
 
     bringToFront(): void {

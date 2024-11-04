@@ -34,6 +34,10 @@
     border: 1px solid var(--dv-tab-divider-color);
     box-shadow: var(--dv-floating-box-shadow);
 
+    &.dv-hidden {
+        display: none;
+    }
+
     &.dv-resize-container-dragging {
         opacity: 0.5;
     }
