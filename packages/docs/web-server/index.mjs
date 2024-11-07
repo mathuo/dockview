@@ -35,5 +35,10 @@ function write(res, file) {
 
 http.createServer((req, res) => {
     const route = req.url.split('/').slice(1);
+    if (route.includes('..')) {
+        res.writeHead(403);
+        res.end('');
+        return;
+    }
     write(res, route);
 }).listen(PORT, HOST);
