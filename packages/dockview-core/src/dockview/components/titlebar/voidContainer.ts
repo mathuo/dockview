@@ -36,7 +36,6 @@ export class VoidContainer extends CompositeDisposable {
         this._element = document.createElement('div');
 
         this._element.className = 'dv-void-container';
-        this._element.tabIndex = 0;
         this._element.draggable = true;
 
         this.addDisposables(
