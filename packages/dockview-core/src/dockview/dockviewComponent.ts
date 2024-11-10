@@ -163,6 +163,11 @@ export interface FloatingGroupOptionsInternal extends FloatingGroupOptions {
     skipActiveGroup?: boolean;
 }
 
+export interface DockviewMaximizedGroupChanged {
+    group: DockviewGroupPanel;
+    isMaximized: boolean;
+}
+
 export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly activePanel: IDockviewPanel | undefined;
     readonly totalPanels: number;
@@ -183,6 +188,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidActiveGroupChange: Event<DockviewGroupPanel | undefined>;
     readonly onUnhandledDragOverEvent: Event<DockviewDndOverlayEvent>;
     readonly onDidMovePanel: Event<MovePanelEvent>;
+    readonly onDidMaximizedGroupChange: Event<DockviewMaximizedGroupChanged>;
     readonly options: DockviewComponentOptions;
     updateOptions(options: DockviewOptions): void;
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void;
@@ -274,6 +280,10 @@ export class DockviewComponent
 
     private readonly _onDidMovePanel = new Emitter<MovePanelEvent>();
     readonly onDidMovePanel = this._onDidMovePanel.event;
+
+    private readonly _onDidMaximizedGroupChange =
+        new Emitter<DockviewMaximizedGroupChanged>();
+    readonly onDidMaximizedGroupChange = this._onDidMaximizedGroupChange.event;
 
     private readonly _floatingGroups: DockviewFloatingGroupPanel[] = [];
     private readonly _popoutGroups: {
@@ -394,6 +404,12 @@ export class DockviewComponent
                 if (!this._moving) {
                     this._onDidActiveGroupChange.fire(event);
                 }
+            }),
+            this.onDidMaximizedChange((event) => {
+                this._onDidMaximizedGroupChange.fire({
+                    group: event.panel,
+                    isMaximized: event.isMaximized,
+                });
             }),
             Event.any(
                 this.onDidAdd,
