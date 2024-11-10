@@ -5354,169 +5354,378 @@ describe('dockviewComponent', () => {
         });
     });
 
-    test('that setVisible toggles visiblity', () => {
-        const container = document.createElement('div');
+    describe('panel visibility', () => {
+        test('that setVisible toggles visiblity', () => {
+            const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
-            createComponent(options) {
-                switch (options.name) {
-                    case 'default':
-                        return new PanelContentPartTest(
-                            options.id,
-                            options.name
-                        );
-                    default:
-                        throw new Error(`unsupported`);
-                }
-            },
-        });
-        const api = new DockviewApi(dockview);
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            const api = new DockviewApi(dockview);
 
-        dockview.layout(1000, 1000);
+            dockview.layout(1000, 1000);
 
-        const panel1 = api.addPanel({
-            id: 'panel1',
-            component: 'default',
-        });
-        const panel2 = api.addPanel({
-            id: 'panel2',
-            component: 'default',
-            position: { referencePanel: panel1, direction: 'within' },
-        });
+            const panel1 = api.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = api.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { referencePanel: panel1, direction: 'within' },
+            });
 
-        const panel3 = api.addPanel({
-            id: 'panel3',
-            component: 'default',
-            position: { referencePanel: panel1, direction: 'right' },
-        });
+            const panel3 = api.addPanel({
+                id: 'panel3',
+                component: 'default',
+                position: { referencePanel: panel1, direction: 'right' },
+            });
 
-        const panel4 = api.addPanel({
-            id: 'panel4',
-            component: 'default',
-            position: { referencePanel: panel3, direction: 'within' },
-        });
+            const panel4 = api.addPanel({
+                id: 'panel4',
+                component: 'default',
+                position: { referencePanel: panel3, direction: 'within' },
+            });
 
-        expect(api.groups.length).toBe(2);
-        expect(panel1.group).toBe(panel2.group);
-        expect(panel3.group).toBe(panel4.group);
+            expect(api.groups.length).toBe(2);
+            expect(panel1.group).toBe(panel2.group);
+            expect(panel3.group).toBe(panel4.group);
 
-        expect(panel1.group.api.isVisible).toBeTruthy();
-        expect(panel2.group.api.isVisible).toBeTruthy();
-        expect(panel3.group.api.isVisible).toBeTruthy();
-        expect(panel4.group.api.isVisible).toBeTruthy();
+            expect(panel1.group.api.isVisible).toBeTruthy();
+            expect(panel2.group.api.isVisible).toBeTruthy();
+            expect(panel3.group.api.isVisible).toBeTruthy();
+            expect(panel4.group.api.isVisible).toBeTruthy();
 
-        expect(panel1.api.isVisible).toBeFalsy();
-        expect(panel2.api.isVisible).toBeTruthy();
-        expect(panel3.api.isVisible).toBeFalsy();
-        expect(panel4.api.isVisible).toBeTruthy();
+            expect(panel1.api.isVisible).toBeFalsy();
+            expect(panel2.api.isVisible).toBeTruthy();
+            expect(panel3.api.isVisible).toBeFalsy();
+            expect(panel4.api.isVisible).toBeTruthy();
 
-        // case #1
-        panel1.group.api.setVisible(false);
+            // case #1
+            panel1.group.api.setVisible(false);
 
-        expect(panel1.group.api.isVisible).toBeFalsy();
-        expect(panel2.group.api.isVisible).toBeFalsy();
-        expect(panel3.group.api.isVisible).toBeTruthy();
-        expect(panel4.group.api.isVisible).toBeTruthy();
+            expect(panel1.group.api.isVisible).toBeFalsy();
+            expect(panel2.group.api.isVisible).toBeFalsy();
+            expect(panel3.group.api.isVisible).toBeTruthy();
+            expect(panel4.group.api.isVisible).toBeTruthy();
 
-        expect(panel1.api.isVisible).toBeFalsy();
-        expect(panel2.api.isVisible).toBeFalsy();
-        expect(panel3.api.isVisible).toBeFalsy();
-        expect(panel4.api.isVisible).toBeTruthy();
+            expect(panel1.api.isVisible).toBeFalsy();
+            expect(panel2.api.isVisible).toBeFalsy();
+            expect(panel3.api.isVisible).toBeFalsy();
+            expect(panel4.api.isVisible).toBeTruthy();
 
-        // case #2
+            // case #2
 
-        panel3.group.api.setVisible(false);
+            panel3.group.api.setVisible(false);
 
-        expect(panel1.group.api.isVisible).toBeFalsy();
-        expect(panel2.group.api.isVisible).toBeFalsy();
-        expect(panel3.group.api.isVisible).toBeFalsy();
-        expect(panel4.group.api.isVisible).toBeFalsy();
+            expect(panel1.group.api.isVisible).toBeFalsy();
+            expect(panel2.group.api.isVisible).toBeFalsy();
+            expect(panel3.group.api.isVisible).toBeFalsy();
+            expect(panel4.group.api.isVisible).toBeFalsy();
 
-        expect(panel1.api.isVisible).toBeFalsy();
-        expect(panel2.api.isVisible).toBeFalsy();
-        expect(panel3.api.isVisible).toBeFalsy();
-        expect(panel4.api.isVisible).toBeFalsy();
+            expect(panel1.api.isVisible).toBeFalsy();
+            expect(panel2.api.isVisible).toBeFalsy();
+            expect(panel3.api.isVisible).toBeFalsy();
+            expect(panel4.api.isVisible).toBeFalsy();
 
-        // case #2
+            // case #2
 
-        panel3.group.api.setVisible(true);
+            panel3.group.api.setVisible(true);
 
-        expect(panel1.group.api.isVisible).toBeFalsy();
-        expect(panel2.group.api.isVisible).toBeFalsy();
-        expect(panel3.group.api.isVisible).toBeTruthy();
-        expect(panel4.group.api.isVisible).toBeTruthy();
+            expect(panel1.group.api.isVisible).toBeFalsy();
+            expect(panel2.group.api.isVisible).toBeFalsy();
+            expect(panel3.group.api.isVisible).toBeTruthy();
+            expect(panel4.group.api.isVisible).toBeTruthy();
 
-        expect(panel1.api.isVisible).toBeFalsy();
-        expect(panel2.api.isVisible).toBeFalsy();
-        expect(panel3.api.isVisible).toBeFalsy();
-        expect(panel4.api.isVisible).toBeTruthy();
+            expect(panel1.api.isVisible).toBeFalsy();
+            expect(panel2.api.isVisible).toBeFalsy();
+            expect(panel3.api.isVisible).toBeFalsy();
+            expect(panel4.api.isVisible).toBeTruthy();
 
-        // case #2
+            // case #2
 
-        panel1.group.api.setVisible(true);
+            panel1.group.api.setVisible(true);
 
-        expect(panel1.group.api.isVisible).toBeTruthy();
-        expect(panel2.group.api.isVisible).toBeTruthy();
-        expect(panel3.group.api.isVisible).toBeTruthy();
-        expect(panel4.group.api.isVisible).toBeTruthy();
+            expect(panel1.group.api.isVisible).toBeTruthy();
+            expect(panel2.group.api.isVisible).toBeTruthy();
+            expect(panel3.group.api.isVisible).toBeTruthy();
+            expect(panel4.group.api.isVisible).toBeTruthy();
 
-        expect(panel1.api.isVisible).toBeFalsy();
-        expect(panel2.api.isVisible).toBeTruthy();
-        expect(panel3.api.isVisible).toBeFalsy();
-        expect(panel4.api.isVisible).toBeTruthy();
-    });
-
-    test('setVisible #1', () => {
-        const container = document.createElement('div');
-
-        const dockview = new DockviewComponent(container, {
-            createComponent(options) {
-                switch (options.name) {
-                    case 'default':
-                        return new PanelContentPartTest(
-                            options.id,
-                            options.name
-                        );
-                    default:
-                        throw new Error(`unsupported`);
-                }
-            },
-        });
-        const api = new DockviewApi(dockview);
-
-        dockview.layout(1000, 1000);
-
-        const panel1 = api.addPanel({
-            id: 'panel1',
-            component: 'default',
-        });
-        const panel2 = api.addPanel({
-            id: 'panel2',
-            component: 'default',
-            position: { referencePanel: panel1, direction: 'below' },
+            expect(panel1.api.isVisible).toBeFalsy();
+            expect(panel2.api.isVisible).toBeTruthy();
+            expect(panel3.api.isVisible).toBeFalsy();
+            expect(panel4.api.isVisible).toBeTruthy();
         });
 
-        const panel3 = api.addPanel({
-            id: 'panel3',
-            component: 'default',
-            position: { referencePanel: panel1, direction: 'below' },
+        test('setVisible #1', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            const api = new DockviewApi(dockview);
+
+            dockview.layout(1000, 1000);
+
+            const panel1 = api.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = api.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { referencePanel: panel1, direction: 'below' },
+            });
+
+            const panel3 = api.addPanel({
+                id: 'panel3',
+                component: 'default',
+                position: { referencePanel: panel1, direction: 'below' },
+            });
+
+            expect(api.groups.length).toBe(3);
+
+            panel1.group.api.setVisible(false);
+            panel2.group.api.setVisible(false);
+            panel3.group.api.setVisible(false);
+
+            expect(panel1.group.api.isVisible).toBeFalsy();
+            expect(panel2.group.api.isVisible).toBeFalsy();
+            expect(panel3.group.api.isVisible).toBeFalsy();
+
+            panel1.group.api.setVisible(true);
+
+            expect(panel1.group.api.isVisible).toBeTruthy();
+            expect(panel2.group.api.isVisible).toBeFalsy();
+            expect(panel3.group.api.isVisible).toBeFalsy();
         });
 
-        expect(api.groups.length).toBe(3);
+        test('that watermark appears when all views are not visible', () => {
+            jest.useFakeTimers();
+            const container = document.createElement('div');
 
-        panel1.group.api.setVisible(false);
-        panel2.group.api.setVisible(false);
-        panel3.group.api.setVisible(false);
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            const api = new DockviewApi(dockview);
 
-        expect(panel1.group.api.isVisible).toBeFalsy();
-        expect(panel2.group.api.isVisible).toBeFalsy();
-        expect(panel3.group.api.isVisible).toBeFalsy();
+            dockview.layout(1000, 1000);
 
-        panel1.group.api.setVisible(true);
+            const panel1 = api.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+            const panel2 = api.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: {
+                    direction: 'right',
+                },
+            });
 
-        expect(panel1.group.api.isVisible).toBeTruthy();
-        expect(panel2.group.api.isVisible).toBeFalsy();
-        expect(panel3.group.api.isVisible).toBeFalsy();
+            let query = queryByTestId(container, 'watermark-component');
+            expect(query).toBeFalsy();
+
+            panel1.group.api.setVisible(false);
+            jest.runAllTicks(); // visibility events check fires on microtask-queue
+            query = queryByTestId(container, 'watermark-component');
+            expect(query).toBeFalsy();
+
+            panel2.group.api.setVisible(false);
+            jest.runAllTicks(); // visibility events check fires on microtask-queue
+            query = queryByTestId(container, 'watermark-component');
+            expect(query).toBeTruthy();
+
+            panel1.group.api.setVisible(true);
+            jest.runAllTicks(); // visibility events check fires on microtask-queue
+            query = queryByTestId(container, 'watermark-component');
+            expect(query).toBeFalsy();
+        });
+
+        test('setVisible on floating group', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            const api = new DockviewApi(dockview);
+
+            dockview.layout(1000, 1000);
+
+            const panel1 = api.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = api.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { referencePanel: panel1, direction: 'below' },
+            });
+
+            const panel3 = api.addPanel({
+                id: 'panel3',
+                component: 'default',
+                position: { referencePanel: panel1, direction: 'below' },
+            });
+
+            api.addFloatingGroup(panel2);
+            expect(panel2.api.location.type).toBe('floating');
+
+            panel2.api.group.setVisible(false);
+            expect(panel2.api.isVisible).toBeFalsy();
+            expect(panel2.api.group.api.isVisible).toBeFalsy();
+
+            panel2.api.group.setVisible(true);
+            expect(panel2.api.isVisible).toBeTruthy();
+            expect(panel2.api.group.api.isVisible).toBeTruthy();
+
+            panel2.api.group.setVisible(false);
+            expect(panel2.api.isVisible).toBeFalsy();
+            expect(panel2.api.group.api.isVisible).toBeFalsy();
+
+            panel2.api.group.api.moveTo({
+                group: panel1.group,
+                position: 'left',
+            });
+            expect(api.groups.length).toBe(3);
+            expect(panel2.api.isVisible).toBeFalsy();
+            expect(panel2.api.group.api.isVisible).toBeFalsy();
+
+            panel2.api.group.setVisible(true);
+            expect(panel2.api.isVisible).toBeTruthy();
+            expect(panel2.api.group.api.isVisible).toBeTruthy();
+        });
+
+        test('setVisible on popout group should have no effect', async () => {
+            window.open = () => setupMockWindow();
+
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            const api = new DockviewApi(dockview);
+
+            dockview.layout(1000, 1000);
+
+            const panel1 = api.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = api.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { referencePanel: panel1, direction: 'below' },
+            });
+
+            const panel3 = api.addPanel({
+                id: 'panel3',
+                component: 'default',
+                position: { referencePanel: panel1, direction: 'below' },
+            });
+
+            await api.addPopoutGroup(panel2);
+            expect(panel2.api.location.type).toBe('popout');
+
+            expect(panel2.api.group.api.isVisible).toBeTruthy();
+            panel2.api.group.api.setVisible(false);
+            expect(panel2.api.group.api.isVisible).toBeTruthy();
+        });
+
+        test('opening a popout group from a group that is non visible should automatically make it visible', async () => {
+            window.open = () => setupMockWindow();
+
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            const api = new DockviewApi(dockview);
+
+            dockview.layout(1000, 1000);
+
+            const panel1 = api.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = api.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { referencePanel: panel1, direction: 'below' },
+            });
+
+            const panel3 = api.addPanel({
+                id: 'panel3',
+                component: 'default',
+                position: { referencePanel: panel1, direction: 'below' },
+            });
+
+            panel2.api.group.api.setVisible(false);
+
+            await api.addPopoutGroup(panel2);
+            expect(panel2.api.location.type).toBe('popout');
+            expect(panel2.api.group.api.isVisible).toBeTruthy();
+        });
     });
 
     describe('addPanel', () => {
@@ -5937,58 +6146,6 @@ describe('dockviewComponent', () => {
 
         expect(api.panels.length).toBe(3);
         expect(api.groups.length).toBe(3);
-    });
-
-    test('that watermark appears when all views are not visible', () => {
-        jest.useFakeTimers();
-        const container = document.createElement('div');
-
-        const dockview = new DockviewComponent(container, {
-            createComponent(options) {
-                switch (options.name) {
-                    case 'default':
-                        return new PanelContentPartTest(
-                            options.id,
-                            options.name
-                        );
-                    default:
-                        throw new Error(`unsupported`);
-                }
-            },
-        });
-        const api = new DockviewApi(dockview);
-
-        dockview.layout(1000, 1000);
-
-        const panel1 = api.addPanel({
-            id: 'panel_1',
-            component: 'default',
-        });
-        const panel2 = api.addPanel({
-            id: 'panel_2',
-            component: 'default',
-            position: {
-                direction: 'right',
-            },
-        });
-
-        let query = queryByTestId(container, 'watermark-component');
-        expect(query).toBeFalsy();
-
-        panel1.group.api.setVisible(false);
-        jest.runAllTicks(); // visibility events check fires on microtask-queue
-        query = queryByTestId(container, 'watermark-component');
-        expect(query).toBeFalsy();
-
-        panel2.group.api.setVisible(false);
-        jest.runAllTicks(); // visibility events check fires on microtask-queue
-        query = queryByTestId(container, 'watermark-component');
-        expect(query).toBeTruthy();
-
-        panel1.group.api.setVisible(true);
-        jest.runAllTicks(); // visibility events check fires on microtask-queue
-        query = queryByTestId(container, 'watermark-component');
-        expect(query).toBeFalsy();
     });
 
     describe('updateOptions', () => {

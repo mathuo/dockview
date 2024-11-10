@@ -538,6 +538,32 @@ export class DockviewComponent
         this.updateWatermark();
     }
 
+    override setVisible(panel: DockviewGroupPanel, visible: boolean): void {
+        switch (panel.api.location.type) {
+            case 'grid':
+                super.setVisible(panel, visible);
+                break;
+            case 'floating': {
+                const item = this.floatingGroups.find(
+                    (floatingGroup) => floatingGroup.group === panel
+                );
+
+                if (item) {
+                    item.overlay.setVisible(visible);
+                    panel.api._onDidVisibilityChange.fire({
+                        isVisible: visible,
+                    });
+                }
+                break;
+            }
+            case 'popout':
+                console.warn(
+                    'dockview: You cannot hide a group that is in a popout window'
+                );
+                break;
+        }
+    }
+
     addPopoutGroup(
         itemToPopout: DockviewPanel | DockviewGroupPanel,
         options?: {
