@@ -543,7 +543,7 @@ export class DockviewComponent
             case 'grid':
                 super.setVisible(panel, visible);
                 break;
-            case 'floating':
+            case 'floating': {
                 const item = this.floatingGroups.find(
                     (floatingGroup) => floatingGroup.group === panel
                 );
@@ -555,6 +555,7 @@ export class DockviewComponent
                     });
                 }
                 break;
+            }
             case 'popout':
                 console.warn(
                     'dockview: You cannot hide a group that is in a popout window'
