@@ -13,7 +13,7 @@ export interface IDockviewPanelModel extends IDisposable {
     readonly contentComponent: string;
     readonly tabComponent?: string;
     readonly content: IContentRenderer;
-    readonly tab?: ITabRenderer;
+    readonly tab: ITabRenderer;
     update(event: PanelUpdateEvent): void;
     layout(width: number, height: number): void;
     init(params: GroupPanelPartInitParameters): void;

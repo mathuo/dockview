@@ -101,7 +101,7 @@ export class Splitview {
     private readonly viewContainer: HTMLElement;
     private readonly sashContainer: HTMLElement;
     private readonly viewItems: ViewItem[] = [];
-    private sashes: ISashItem[] = [];
+    private readonly sashes: ISashItem[] = [];
     private _orientation: Orientation;
     private _size = 0;
     private _orthogonalSize = 0;

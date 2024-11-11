@@ -1,6 +1,6 @@
 {
   "name": "dockview-react",
-  "version": "1.17.2",
+  "version": "2.0.0",
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
   "keywords": [
     "splitview",
@@ -54,6 +54,6 @@
     "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-react --coverage"
   },
   "dependencies": {
-    "dockview": "^1.17.2"
+    "dockview": "^2.0.0"
   }
 }

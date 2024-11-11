@@ -100,6 +100,7 @@ export {
     TitleEvent,
     RendererChangedEvent,
     DockviewPanelApi,
+    DockviewPanelMoveParams,
 } from './api/dockviewPanelApi';
 export {
     PanelSizeEvent,
@@ -110,6 +111,7 @@ export { ExpansionEvent, PaneviewPanelApi } from './api/paneviewPanelApi';
 export {
     DockviewGroupPanelApi,
     DockviewGroupPanelFloatingChangeEvent,
+    DockviewGroupMoveParams,
 } from './api/dockviewGroupPanelApi';
 export {
     CommonApi,

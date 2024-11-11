@@ -4,9 +4,11 @@ import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
 import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { DockviewPanel } from '../dockview/dockviewPanel';
 import { DockviewComponent } from '../dockview/dockviewComponent';
-import { Position } from '../dnd/droptarget';
 import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
-import { DockviewGroupPanelFloatingChangeEvent } from './dockviewGroupPanelApi';
+import {
+    DockviewGroupMoveParams,
+    DockviewGroupPanelFloatingChangeEvent,
+} from './dockviewGroupPanelApi';
 import { DockviewGroupLocation } from '../dockview/dockviewGroupPanelModel';
 
 export interface TitleEvent {
@@ -24,6 +26,8 @@ export interface ActiveGroupEvent {
 export interface GroupChangedEvent {
     // empty
 }
+
+export type DockviewPanelMoveParams = DockviewGroupMoveParams;
 
 export interface DockviewPanelApi
     extends Omit<
@@ -50,11 +54,7 @@ export interface DockviewPanelApi
     close(): void;
     setTitle(title: string): void;
     setRenderer(renderer: DockviewPanelRenderer): void;
-    moveTo(options: {
-        group: DockviewGroupPanel;
-        position?: Position;
-        index?: number;
-    }): void;
+    moveTo(options: DockviewPanelMoveParams): void;
     maximize(): void;
     isMaximized(): boolean;
     exitMaximized(): void;
@@ -160,16 +160,14 @@ export class DockviewPanelApiImpl
         return this.group.api.getWindow();
     }
 
-    moveTo(options: {
-        group: DockviewGroupPanel;
-        position?: Position;
-        index?: number;
-    }): void {
+    moveTo(options: DockviewPanelMoveParams): void {
         this.accessor.moveGroupOrPanel({
             from: { groupId: this._group.id, panelId: this.panel.id },
             to: {
-                group: options.group,
-                position: options.position ?? 'center',
+                group: options.group ?? this._group,
+                position: options.group
+                    ? options.position ?? 'center'
+                    : 'center',
                 index: options.index,
             },
         });
