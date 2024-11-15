@@ -196,7 +196,7 @@ export interface IDockviewGroupPanelModel extends IPanel {
 export type DockviewGroupLocation =
     | { type: 'grid' }
     | { type: 'floating' }
-    | { type: 'popout'; getWindow: () => Window };
+    | { type: 'popout'; getWindow: () => Window; popoutUrl?: string };
 
 export class WillShowOverlayLocationEvent implements IDockviewEvent {
     get kind(): DockviewGroupDropLocation {
