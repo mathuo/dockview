@@ -183,6 +183,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidActiveGroupChange: Event<DockviewGroupPanel | undefined>;
     readonly onUnhandledDragOverEvent: Event<DockviewDndOverlayEvent>;
     readonly onDidMovePanel: Event<MovePanelEvent>;
+    readonly onDidRepositionFloatingGroup: Event<DockviewGroupPanel>;
     readonly options: DockviewComponentOptions;
     updateOptions(options: DockviewOptions): void;
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void;
@@ -298,6 +299,11 @@ export class DockviewComponent
     readonly onDidActiveGroupChange: Event<DockviewGroupPanel | undefined> =
         this._onDidActiveGroupChange.event;
 
+    private readonly _onDidRepositionFloatingGroup =
+        new Emitter<DockviewGroupPanel>();
+    readonly onDidRepositionFloatingGroup: Event<DockviewGroupPanel> =
+        this._onDidRepositionFloatingGroup.event;
+
     get orientation(): Orientation {
         return this.gridview.orientation;
     }
@@ -407,7 +413,8 @@ export class DockviewComponent
                 this.onDidAddGroup,
                 this.onDidRemove,
                 this.onDidMovePanel,
-                this.onDidActivePanelChange
+                this.onDidActivePanelChange,
+                this.onDidRepositionFloatingGroup
             )(() => {
                 this._bufferOnDidLayoutChange.fire();
             }),
@@ -990,7 +997,7 @@ export class DockviewComponent
                 group.layout(group.width, group.height);
             }),
             overlay.onDidChangeEnd(() => {
-                this._bufferOnDidLayoutChange.fire();
+                this._onDidRepositionFloatingGroup.fire(group);
             }),
             group.onDidChange((event) => {
                 overlay.setBounds({

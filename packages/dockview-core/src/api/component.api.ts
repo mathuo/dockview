@@ -678,8 +678,18 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.onDidRemovePanel;
     }
 
+    /**
+     * Invoked when a panel is moved
+     */
     get onDidMovePanel(): Event<MovePanelEvent> {
         return this.component.onDidMovePanel;
+    }
+
+    /**
+     * Invoked when a floating group is repositioned.
+     */
+    get onDidRepositionFloatingGroup(): Event<DockviewGroupPanel> {
+        return this.component.onDidRepositionFloatingGroup;
     }
 
     /**
