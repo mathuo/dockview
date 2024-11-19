@@ -73,6 +73,7 @@ import {
     OverlayRenderContainer,
 } from '../overlay/overlayRenderContainer';
 import { PopoutWindow } from '../popoutWindow';
+import { PopupService } from './components/popupService';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     activationSize: { type: 'pixels', value: 10 },
@@ -233,6 +234,8 @@ export class DockviewComponent
 
     readonly overlayRenderContainer: OverlayRenderContainer;
 
+    readonly popupService: PopupService;
+
     private readonly _onWillDragPanel = new Emitter<TabDragEvent>();
     readonly onWillDragPanel: Event<TabDragEvent> = this._onWillDragPanel.event;
 
@@ -357,6 +360,8 @@ export class DockviewComponent
             this.gridview.element,
             this
         );
+
+        this.popupService = new PopupService(this.element);
 
         toggleClass(this.gridview.element, 'dv-dockview', true);
         toggleClass(this.element, 'dv-debug', !!options.debug);
