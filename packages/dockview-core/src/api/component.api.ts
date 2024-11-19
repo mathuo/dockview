@@ -1,4 +1,5 @@
 import {
+    DockviewMaximizedGroupChanged,
     FloatingGroupOptions,
     IDockviewComponent,
     MovePanelEvent,
@@ -898,7 +899,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         this.component.exitMaximizedGroup();
     }
 
-    get onDidMaximizedGroupChange(): Event<void> {
+    get onDidMaximizedGroupChange(): Event<DockviewMaximizedGroupChanged> {
         return this.component.onDidMaximizedGroupChange;
     }
 

@@ -1,5 +1,10 @@
 import { Emitter, Event, AsapEvent } from '../events';
-import { getGridLocation, Gridview, IGridView } from './gridview';
+import {
+    getGridLocation,
+    Gridview,
+    IGridView,
+    MaximizedViewChanged,
+} from './gridview';
 import { Position } from '../dnd/droptarget';
 import { Disposable, IDisposable, IValueDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
@@ -8,6 +13,7 @@ import { IPanel } from '../panel/types';
 import { MovementOptions2 } from '../dockview/options';
 import { Resizable } from '../resizable';
 import { Classnames } from '../dom';
+import { IGridviewComponent } from './gridviewComponent';
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -27,6 +33,11 @@ export function toTarget(direction: Direction): Position {
         default:
             return 'center';
     }
+}
+
+export interface MaximizedChanged<T extends IGridPanelView> {
+    panel: T;
+    isMaximized: boolean;
 }
 
 export interface BaseGridOptions {
@@ -56,6 +67,8 @@ export interface IBaseGrid<T extends IGridPanelView> extends IDisposable {
     readonly activeGroup: T | undefined;
     readonly size: number;
     readonly groups: T[];
+    readonly onDidMaximizedChange: Event<MaximizedChanged<T>>;
+    readonly onDidLayoutChange: Event<void>;
     getPanel(id: string): T | undefined;
     toJSON(): object;
     fromJSON(data: any): void;
@@ -67,8 +80,6 @@ export interface IBaseGrid<T extends IGridPanelView> extends IDisposable {
     isMaximizedGroup(panel: T): boolean;
     exitMaximizedGroup(): void;
     hasMaximizedGroup(): boolean;
-    readonly onDidMaximizedGroupChange: Event<void>;
-    readonly onDidLayoutChange: Event<void>;
 }
 
 export abstract class BaseGrid<T extends IGridPanelView>
@@ -86,6 +97,10 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     private readonly _onDidAdd = new Emitter<T>();
     readonly onDidAdd: Event<T> = this._onDidAdd.event;
+
+    private readonly _onDidMaximizedChange = new Emitter<MaximizedChanged<T>>();
+    readonly onDidMaximizedChange: Event<MaximizedChanged<T>> =
+        this._onDidMaximizedChange.event;
 
     private readonly _onDidActiveChange = new Emitter<T | undefined>();
     readonly onDidActiveChange: Event<T | undefined> =
@@ -171,6 +186,12 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.layout(0, 0, true); // set some elements height/widths
 
         this.addDisposables(
+            this.gridview.onDidMaximizedNodeChange((event) => {
+                this._onDidMaximizedChange.fire({
+                    panel: event.view as T,
+                    isMaximized: event.isMaximized,
+                });
+            }),
             this.gridview.onDidViewVisibilityChange(() =>
                 this._onDidViewVisibilityChangeMicroTaskQueue.fire()
             ),
@@ -248,10 +269,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     hasMaximizedGroup(): boolean {
         return this.gridview.hasMaximizedView();
-    }
-
-    get onDidMaximizedGroupChange(): Event<void> {
-        return this.gridview.onDidMaximizedNodeChange;
     }
 
     protected doAddGroup(

@@ -679,180 +679,231 @@ describe('dockviewComponent', () => {
         expect(viewQuery.length).toBe(1);
     });
 
-    test('serialization', () => {
-        dockview.layout(1000, 1000);
+    describe('serialization', () => {
+        test('basic', () => {
+            dockview.layout(1000, 1000);
 
-        dockview.fromJSON({
-            activeGroup: 'group-1',
-            grid: {
-                root: {
-                    type: 'branch',
-                    data: [
-                        {
-                            type: 'leaf',
-                            data: {
-                                views: ['panel1'],
-                                id: 'group-1',
-                                activeView: 'panel1',
+            dockview.fromJSON({
+                activeGroup: 'group-1',
+                grid: {
+                    root: {
+                        type: 'branch',
+                        data: [
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panel1'],
+                                    id: 'group-1',
+                                    activeView: 'panel1',
+                                },
+                                size: 500,
                             },
-                            size: 500,
-                        },
-                        {
-                            type: 'branch',
-                            data: [
-                                {
-                                    type: 'leaf',
-                                    data: {
-                                        views: ['panel2', 'panel3'],
-                                        id: 'group-2',
+                            {
+                                type: 'branch',
+                                data: [
+                                    {
+                                        type: 'leaf',
+                                        data: {
+                                            views: ['panel2', 'panel3'],
+                                            id: 'group-2',
+                                        },
+                                        size: 500,
                                     },
-                                    size: 500,
+                                    {
+                                        type: 'leaf',
+                                        data: {
+                                            views: ['panel4'],
+                                            id: 'group-3',
+                                        },
+                                        size: 500,
+                                    },
+                                ],
+                                size: 250,
+                            },
+                            {
+                                type: 'leaf',
+                                data: { views: ['panel5'], id: 'group-4' },
+                                size: 250,
+                            },
+                        ],
+                        size: 1000,
+                    },
+                    height: 1000,
+                    width: 1000,
+                    orientation: Orientation.VERTICAL,
+                },
+                panels: {
+                    panel1: {
+                        id: 'panel1',
+                        contentComponent: 'default',
+                        tabComponent: 'tab-default',
+                        title: 'panel1',
+                    },
+                    panel2: {
+                        id: 'panel2',
+                        contentComponent: 'default',
+                        title: 'panel2',
+                    },
+                    panel3: {
+                        id: 'panel3',
+                        contentComponent: 'default',
+                        title: 'panel3',
+                        renderer: 'onlyWhenVisible',
+                    },
+                    panel4: {
+                        id: 'panel4',
+                        contentComponent: 'default',
+                        title: 'panel4',
+                        renderer: 'always',
+                    },
+                    panel5: {
+                        id: 'panel5',
+                        contentComponent: 'default',
+                        title: 'panel5',
+                        minimumHeight: 100,
+                        maximumHeight: 1000,
+                        minimumWidth: 200,
+                        maximumWidth: 2000,
+                    },
+                },
+            });
+
+            expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
+                activeGroup: 'group-1',
+                grid: {
+                    root: {
+                        type: 'branch',
+                        data: [
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panel1'],
+                                    id: 'group-1',
+                                    activeView: 'panel1',
                                 },
-                                {
-                                    type: 'leaf',
-                                    data: { views: ['panel4'], id: 'group-3' },
-                                    size: 500,
+                                size: 500,
+                            },
+                            {
+                                type: 'branch',
+                                data: [
+                                    {
+                                        type: 'leaf',
+                                        data: {
+                                            views: ['panel2', 'panel3'],
+                                            id: 'group-2',
+                                            activeView: 'panel3',
+                                        },
+                                        size: 500,
+                                    },
+                                    {
+                                        type: 'leaf',
+                                        data: {
+                                            views: ['panel4'],
+                                            id: 'group-3',
+                                            activeView: 'panel4',
+                                        },
+                                        size: 500,
+                                    },
+                                ],
+                                size: 250,
+                            },
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panel5'],
+                                    id: 'group-4',
+                                    activeView: 'panel5',
                                 },
-                            ],
-                            size: 250,
-                        },
-                        {
-                            type: 'leaf',
-                            data: { views: ['panel5'], id: 'group-4' },
-                            size: 250,
-                        },
-                    ],
-                    size: 1000,
+                                size: 250,
+                            },
+                        ],
+                        size: 1000,
+                    },
+                    height: 1000,
+                    width: 1000,
+                    orientation: Orientation.VERTICAL,
                 },
-                height: 1000,
-                width: 1000,
-                orientation: Orientation.VERTICAL,
-            },
-            panels: {
-                panel1: {
-                    id: 'panel1',
-                    contentComponent: 'default',
-                    tabComponent: 'tab-default',
-                    title: 'panel1',
+                panels: {
+                    panel1: {
+                        id: 'panel1',
+                        contentComponent: 'default',
+                        tabComponent: 'tab-default',
+                        title: 'panel1',
+                    },
+                    panel2: {
+                        id: 'panel2',
+                        contentComponent: 'default',
+                        title: 'panel2',
+                    },
+                    panel3: {
+                        id: 'panel3',
+                        contentComponent: 'default',
+                        title: 'panel3',
+                        renderer: 'onlyWhenVisible',
+                    },
+                    panel4: {
+                        id: 'panel4',
+                        contentComponent: 'default',
+                        title: 'panel4',
+                        renderer: 'always',
+                    },
+                    panel5: {
+                        id: 'panel5',
+                        contentComponent: 'default',
+                        title: 'panel5',
+                        minimumHeight: 100,
+                        maximumHeight: 1000,
+                        minimumWidth: 200,
+                        maximumWidth: 2000,
+                    },
                 },
-                panel2: {
-                    id: 'panel2',
-                    contentComponent: 'default',
-                    title: 'panel2',
-                },
-                panel3: {
-                    id: 'panel3',
-                    contentComponent: 'default',
-                    title: 'panel3',
-                    renderer: 'onlyWhenVisible',
-                },
-                panel4: {
-                    id: 'panel4',
-                    contentComponent: 'default',
-                    title: 'panel4',
-                    renderer: 'always',
-                },
-                panel5: {
-                    id: 'panel5',
-                    contentComponent: 'default',
-                    title: 'panel5',
-                    minimumHeight: 100,
-                    maximumHeight: 1000,
-                    minimumWidth: 200,
-                    maximumWidth: 2000,
-                },
-            },
+            });
         });
 
-        expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
-            activeGroup: 'group-1',
-            grid: {
-                root: {
-                    type: 'branch',
-                    data: [
-                        {
-                            type: 'leaf',
-                            data: {
-                                views: ['panel1'],
-                                id: 'group-1',
-                                activeView: 'panel1',
-                            },
-                            size: 500,
-                        },
-                        {
-                            type: 'branch',
-                            data: [
-                                {
-                                    type: 'leaf',
-                                    data: {
-                                        views: ['panel2', 'panel3'],
-                                        id: 'group-2',
-                                        activeView: 'panel3',
-                                    },
-                                    size: 500,
-                                },
-                                {
-                                    type: 'leaf',
-                                    data: {
-                                        views: ['panel4'],
-                                        id: 'group-3',
-                                        activeView: 'panel4',
-                                    },
-                                    size: 500,
-                                },
-                            ],
-                            size: 250,
-                        },
-                        {
-                            type: 'leaf',
-                            data: {
-                                views: ['panel5'],
-                                id: 'group-4',
-                                activeView: 'panel5',
-                            },
-                            size: 250,
-                        },
-                    ],
-                    size: 1000,
-                },
-                height: 1000,
-                width: 1000,
-                orientation: Orientation.VERTICAL,
-            },
-            panels: {
-                panel1: {
-                    id: 'panel1',
-                    contentComponent: 'default',
-                    tabComponent: 'tab-default',
-                    title: 'panel1',
-                },
-                panel2: {
-                    id: 'panel2',
-                    contentComponent: 'default',
-                    title: 'panel2',
-                },
-                panel3: {
-                    id: 'panel3',
-                    contentComponent: 'default',
-                    title: 'panel3',
-                    renderer: 'onlyWhenVisible',
-                },
-                panel4: {
-                    id: 'panel4',
-                    contentComponent: 'default',
-                    title: 'panel4',
-                    renderer: 'always',
-                },
-                panel5: {
-                    id: 'panel5',
-                    contentComponent: 'default',
-                    title: 'panel5',
-                    minimumHeight: 100,
-                    maximumHeight: 1000,
-                    minimumWidth: 200,
-                    maximumWidth: 2000,
-                },
-            },
+        test('serialized layout with maximized node', () => {
+            const api = new DockviewApi(dockview);
+
+            api.layout(500, 1000);
+
+            api.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            api.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            api.addPanel({
+                id: 'panel3',
+                component: 'default',
+                position: { direction: 'below' },
+            });
+
+            const panel4 = api.addPanel({
+                id: 'panel4',
+                component: 'default',
+            });
+
+            panel4.api.maximize();
+            expect(panel4.api.isMaximized()).toBeTruthy();
+
+            const state = api.toJSON();
+            expect(api.hasMaximizedGroup()).toBeTruthy();
+            expect(panel4.api.isMaximized()).toBeTruthy();
+
+            api.clear();
+            expect(api.groups.length).toBe(0);
+            expect(api.panels.length).toBe(0);
+
+            api.fromJSON(state);
+            const newPanel4 = api.getPanel('panel4')!;
+            expect(api.hasMaximizedGroup()).toBeTruthy();
+            expect(newPanel4.api.isMaximized()).toBeTruthy();
+
+            expect(state).toEqual(api.toJSON());
         });
     });
 
