@@ -854,8 +854,11 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     /**
      * Create a component from a serialized object.
      */
-    fromJSON(data: SerializedDockview): void {
-        this.component.fromJSON(data);
+    fromJSON(
+        data: SerializedDockview,
+        options?: { keepExistingPanels: boolean }
+    ): void {
+        this.component.fromJSON(data, options);
     }
 
     /**
