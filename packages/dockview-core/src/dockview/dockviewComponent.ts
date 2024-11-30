@@ -147,6 +147,7 @@ type MoveGroupOrPanelOptions = {
         position: Position;
         index?: number;
     };
+    keepEmptyGroups?: boolean;
 };
 
 export interface FloatingGroupOptions {
@@ -219,6 +220,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
             onWillClose?: (event: { id: string; window: Window }) => void;
         }
     ): Promise<boolean>;
+    fromJSON(data: any, options?: { keepExistingPanels: boolean }): void;
 }
 
 export class DockviewComponent
@@ -381,17 +383,17 @@ export class DockviewComponent
                 this.updateWatermark();
             }),
             this.onDidAdd((event) => {
-                if (!this._moving) {
+                if (!this._isEventSuppressionEnabled) {
                     this._onDidAddGroup.fire(event);
                 }
             }),
             this.onDidRemove((event) => {
-                if (!this._moving) {
+                if (!this._isEventSuppressionEnabled) {
                     this._onDidRemoveGroup.fire(event);
                 }
             }),
             this.onDidActiveChange((event) => {
-                if (!this._moving) {
+                if (!this._isEventSuppressionEnabled) {
                     this._onDidActiveGroupChange.fire(event);
                 }
             }),
@@ -675,13 +677,13 @@ export class DockviewComponent
 
                 if (!options?.overridePopoutGroup && isGroupAddedToDom) {
                     if (itemToPopout instanceof DockviewPanel) {
-                        this.movingLock(() => {
+                        this.runWithSuppressedEvents(() => {
                             const panel =
                                 referenceGroup.model.removePanel(itemToPopout);
                             group.model.openPanel(panel);
                         });
                     } else {
-                        this.movingLock(() =>
+                        this.runWithSuppressedEvents(() =>
                             moveGroupWithoutDestroying({
                                 from: referenceGroup,
                                 to: group,
@@ -773,7 +775,7 @@ export class DockviewComponent
                             isGroupAddedToDom &&
                             this.getPanel(referenceGroup.id)
                         ) {
-                            this.movingLock(() =>
+                            this.runWithSuppressedEvents(() =>
                                 moveGroupWithoutDestroying({
                                     from: group,
                                     to: referenceGroup,
@@ -830,7 +832,7 @@ export class DockviewComponent
             group = this.createGroup();
             this._onDidAddGroup.fire(group);
 
-            this.movingLock(() =>
+            this.runWithSuppressedEvents(() =>
                 this.removePanel(item, {
                     removeEmptyGroup: true,
                     skipDispose: true,
@@ -838,7 +840,7 @@ export class DockviewComponent
                 })
             );
 
-            this.movingLock(() =>
+            this.runWithSuppressedEvents(() =>
                 group.model.openPanel(item, { skipSetGroupActive: true })
             );
         } else {
@@ -857,7 +859,7 @@ export class DockviewComponent
 
             if (!skip) {
                 if (popoutReferenceGroup) {
-                    this.movingLock(() =>
+                    this.runWithSuppressedEvents(() =>
                         moveGroupWithoutDestroying({
                             from: item,
                             to: popoutReferenceGroup,
@@ -1219,7 +1221,47 @@ export class DockviewComponent
         return result;
     }
 
-    fromJSON(data: SerializedDockview): void {
+    fromJSON(
+        data: SerializedDockview,
+        options?: { keepExistingPanels: boolean }
+    ): void {
+        const existingPanels = new Map<string, IDockviewPanel>();
+        const tempGroup = this.createGroup();
+        this._groups.delete(tempGroup.api.id);
+
+        if (options?.keepExistingPanels) {
+            /**
+             * What are we doing here?
+             *
+             * 1. Create a temporary group to hold any panels that currently exist and that also exist in the new layout
+             * 2. Remove that temporary group from the group mapping so that it doesn't get cleared when we clear the layout
+             */
+
+            const newPanels = Object.keys(data.panels);
+
+            for (const panel of this.panels) {
+                if (newPanels.includes(panel.api.id)) {
+                    existingPanels.set(panel.api.id, panel);
+                }
+            }
+
+            this.runWithSuppressedEvents(() => {
+                Array.from(existingPanels.values()).forEach((panel) => {
+                    this.moveGroupOrPanel({
+                        from: {
+                            groupId: panel.api.group.api.id,
+                            panelId: panel.api.id,
+                        },
+                        to: {
+                            group: tempGroup,
+                            position: 'center',
+                        },
+                        keepEmptyGroups: true,
+                    });
+                });
+            });
+        }
+
         this.clear();
 
         if (typeof data !== 'object' || data === null) {
@@ -1260,11 +1302,23 @@ export class DockviewComponent
                      * In running this section first we avoid firing lots of 'add' events in the event of a failure
                      * due to a corruption of input data.
                      */
-                    const panel = this._deserializer.fromJSON(
-                        panels[child],
-                        group
-                    );
-                    createdPanels.push(panel);
+
+                    const existingPanel = existingPanels.get(child);
+
+                    if (existingPanel) {
+                        this.runWithSuppressedEvents(() => {
+                            tempGroup.model.removePanel(existingPanel);
+                        });
+
+                        createdPanels.push(existingPanel);
+                        existingPanel.updateFromStateModel(panels[child]);
+                    } else {
+                        const panel = this._deserializer.fromJSON(
+                            panels[child],
+                            group
+                        );
+                        createdPanels.push(panel);
+                    }
                 }
 
                 this._onDidAddGroup.fire(group);
@@ -1276,10 +1330,21 @@ export class DockviewComponent
                         typeof activeView === 'string' &&
                         activeView === panel.id;
 
-                    group.model.openPanel(panel, {
-                        skipSetActive: !isActive,
-                        skipSetGroupActive: true,
-                    });
+                    const hasExisting = existingPanels.has(panel.api.id);
+
+                    if (hasExisting) {
+                        this.runWithSuppressedEvents(() => {
+                            group.model.openPanel(panel, {
+                                skipSetActive: !isActive,
+                                skipSetGroupActive: true,
+                            });
+                        });
+                    } else {
+                        group.model.openPanel(panel, {
+                            skipSetActive: !isActive,
+                            skipSetGroupActive: true,
+                        });
+                    }
                 }
 
                 if (!group.activePanel && group.panels.length > 0) {
@@ -1892,16 +1957,21 @@ export class DockviewComponent
         return re;
     }
 
-    private _moving = false;
+    private _isEventSuppressionEnabled = false;
 
-    movingLock<T>(func: () => T): T {
-        const isMoving = this._moving;
+    /**
+     * Code that runs within the provided function will not cause any events to fire. This is useful if you want
+     * to move things around as an intermediate step without raises any associated events
+     */
+    runWithSuppressedEvents<T>(func: () => T): T {
+        const isMoving = this._isEventSuppressionEnabled;
 
         try {
-            this._moving = true;
+            this._isEventSuppressionEnabled = true;
             return func();
         } finally {
-            this._moving = isMoving;
+            // return to the original state which isn't necessarily false since calls may be nested
+            this._isEventSuppressionEnabled = isMoving;
         }
     }
 
@@ -1940,24 +2010,24 @@ export class DockviewComponent
              * Dropping a panel within another group
              */
 
-            const removedPanel: IDockviewPanel | undefined = this.movingLock(
-                () =>
+            const removedPanel: IDockviewPanel | undefined =
+                this.runWithSuppressedEvents(() =>
                     sourceGroup.model.removePanel(sourceItemId, {
                         skipSetActive: false,
                         skipSetActiveGroup: true,
                     })
-            );
+                );
 
             if (!removedPanel) {
                 throw new Error(`No panel with id ${sourceItemId}`);
             }
 
-            if (sourceGroup.model.size === 0) {
+            if (!options.keepEmptyGroups && sourceGroup.model.size === 0) {
                 // remove the group and do not set a new group as active
                 this.doRemoveGroup(sourceGroup, { skipActive: true });
             }
 
-            this.movingLock(() =>
+            this.runWithSuppressedEvents(() =>
                 destinationGroup.model.openPanel(removedPanel, {
                     index: destinationIndex,
                     skipSetGroupActive: true,
@@ -2028,7 +2098,7 @@ export class DockviewComponent
                     )!;
 
                     const removedPanel: IDockviewPanel | undefined =
-                        this.movingLock(() =>
+                        this.runWithSuppressedEvents(() =>
                             popoutGroup.popoutGroup.model.removePanel(
                                 popoutGroup.popoutGroup.panels[0],
                                 {
@@ -2041,7 +2111,7 @@ export class DockviewComponent
                     this.doRemoveGroup(sourceGroup, { skipActive: true });
 
                     const newGroup = this.createGroupAtLocation(targetLocation);
-                    this.movingLock(() =>
+                    this.runWithSuppressedEvents(() =>
                         newGroup.model.openPanel(removedPanel, {
                             skipSetActive: true,
                         })
@@ -2056,7 +2126,7 @@ export class DockviewComponent
                 }
 
                 // source group will become empty so delete the group
-                const targetGroup = this.movingLock(() =>
+                const targetGroup = this.runWithSuppressedEvents(() =>
                     this.doRemoveGroup(sourceGroup, {
                         skipActive: true,
                         skipDispose: true,
@@ -2073,7 +2143,9 @@ export class DockviewComponent
                     updatedReferenceLocation,
                     destinationTarget
                 );
-                this.movingLock(() => this.doAddGroup(targetGroup, location));
+                this.runWithSuppressedEvents(() =>
+                    this.doAddGroup(targetGroup, location)
+                );
                 this.doSetGroupAndPanelActive(targetGroup);
 
                 this._onDidMovePanel.fire({
@@ -2086,7 +2158,7 @@ export class DockviewComponent
                  * create a new group, add the panels to that new group and add the new group in an appropiate position
                  */
                 const removedPanel: IDockviewPanel | undefined =
-                    this.movingLock(() =>
+                    this.runWithSuppressedEvents(() =>
                         sourceGroup.model.removePanel(sourceItemId, {
                             skipSetActive: false,
                             skipSetActiveGroup: true,
@@ -2104,7 +2176,7 @@ export class DockviewComponent
                 );
 
                 const group = this.createGroupAtLocation(dropLocation);
-                this.movingLock(() =>
+                this.runWithSuppressedEvents(() =>
                     group.model.openPanel(removedPanel, {
                         skipSetGroupActive: true,
                     })
@@ -2127,7 +2199,7 @@ export class DockviewComponent
         if (target === 'center') {
             const activePanel = from.activePanel;
 
-            const panels = this.movingLock(() =>
+            const panels = this.runWithSuppressedEvents(() =>
                 [...from.panels].map((p) =>
                     from.model.removePanel(p.id, {
                         skipSetActive: true,
@@ -2139,7 +2211,7 @@ export class DockviewComponent
                 this.doRemoveGroup(from, { skipActive: true });
             }
 
-            this.movingLock(() => {
+            this.runWithSuppressedEvents(() => {
                 for (const panel of panels) {
                     to.model.openPanel(panel, {
                         skipSetActive: panel !== activePanel,
@@ -2213,7 +2285,7 @@ export class DockviewComponent
         const activePanel = this.activePanel;
 
         if (
-            !this._moving &&
+            !this._isEventSuppressionEnabled &&
             activePanel !== this._onDidActivePanelChange.value
         ) {
             this._onDidActivePanelChange.fire(activePanel);
@@ -2234,7 +2306,7 @@ export class DockviewComponent
         }
 
         if (
-            !this._moving &&
+            !this._isEventSuppressionEnabled &&
             activePanel !== this._onDidActivePanelChange.value
         ) {
             this._onDidActivePanelChange.fire(activePanel);
@@ -2311,19 +2383,19 @@ export class DockviewComponent
                     this._onUnhandledDragOverEvent.fire(event);
                 }),
                 view.model.onDidAddPanel((event) => {
-                    if (this._moving) {
+                    if (this._isEventSuppressionEnabled) {
                         return;
                     }
                     this._onDidAddPanel.fire(event.panel);
                 }),
                 view.model.onDidRemovePanel((event) => {
-                    if (this._moving) {
+                    if (this._isEventSuppressionEnabled) {
                         return;
                     }
                     this._onDidRemovePanel.fire(event.panel);
                 }),
                 view.model.onDidActivePanelChange((event) => {
-                    if (this._moving) {
+                    if (this._isEventSuppressionEnabled) {
                         return;
                     }
                     if (event.panel !== this.activePanel) {
