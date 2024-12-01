@@ -1793,6 +1793,10 @@ export class DockviewComponent
               }
             | undefined
     ): DockviewGroupPanel {
+        if (this.groups.length <= 1) {
+            return false;
+        }
+
         const panels = [...group.panels]; // reassign since group panels will mutate
 
         if (!options?.skipDispose) {
