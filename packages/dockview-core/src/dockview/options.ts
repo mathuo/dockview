@@ -59,6 +59,12 @@ export interface DockviewOptions {
      * Pixel gap between groups
      */
     gap?: number;
+    /**
+     * Ensure the last group is not removed allowing for any group header components
+     * to remain in scope. When `false` or `undefined` the final group is removed and
+     * a `watermark` is rendered instead.
+     */
+    showEmptyGroupWhenHasNoPanels?: boolean;
 }
 
 export interface DockviewDndOverlayEvent {
@@ -111,6 +117,7 @@ export const PROPERTY_KEYS: (keyof DockviewOptions)[] = (() => {
         disableDnd: undefined,
         gap: undefined,
         className: undefined,
+        hasGroupWhenEmpty: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];
