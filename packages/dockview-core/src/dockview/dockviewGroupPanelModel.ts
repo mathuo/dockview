@@ -787,7 +787,15 @@ export class DockviewGroupPanelModel
     }
 
     private doClose(panel: IDockviewPanel): void {
-        this.accessor.removePanel(panel);
+        const isLast =
+            this.panels.length === 1 && this.accessor.groups.length === 1;
+
+        this.accessor.removePanel(
+            panel,
+            isLast && this.accessor.options.noPanelsOverlay === 'emptyGroup'
+                ? { removeEmptyGroup: false }
+                : undefined
+        );
     }
 
     public isPanelActive(panel: IDockviewPanel): boolean {
@@ -955,8 +963,6 @@ export class DockviewGroupPanelModel
     }
 
     private updateContainer(): void {
-        toggleClass(this.container, 'dv-empty', this.isEmpty);
-
         this.panels.forEach((panel) => panel.runEvents());
 
         if (this.isEmpty && !this.watermark) {
@@ -973,14 +979,12 @@ export class DockviewGroupPanelModel
                 }
             });
 
-            this.tabsContainer.hide();
             this.contentContainer.element.appendChild(this.watermark.element);
         }
         if (!this.isEmpty && this.watermark) {
             this.watermark.element.remove();
             this.watermark.dispose?.();
             this.watermark = undefined;
-            this.tabsContainer.show();
         }
     }
 

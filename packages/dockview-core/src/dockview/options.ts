@@ -59,6 +59,10 @@ export interface DockviewOptions {
      * Pixel gap between groups
      */
     gap?: number;
+    /**
+     * Define the behaviour of the dock when there are no panels to display. Defaults to `watermark`.
+     */
+    noPanelsOverlay?: 'emptyGroup' | 'watermark';
 }
 
 export interface DockviewDndOverlayEvent {
@@ -111,6 +115,7 @@ export const PROPERTY_KEYS: (keyof DockviewOptions)[] = (() => {
         disableDnd: undefined,
         gap: undefined,
         className: undefined,
+        noPanelsOverlay: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];

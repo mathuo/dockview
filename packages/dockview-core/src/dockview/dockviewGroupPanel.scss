@@ -9,12 +9,6 @@
         outline: none;
     }
 
-    &.dv-empty {
-        > .dv-tabs-and-actions-container {
-            display: none;
-        }
-    }
-
     > .dv-content-container {
         flex-grow: 1;
         min-height: 0;

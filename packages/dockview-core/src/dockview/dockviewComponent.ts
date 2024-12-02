@@ -1623,11 +1623,10 @@ export class DockviewComponent
         panel: IDockviewPanel,
         options: {
             removeEmptyGroup: boolean;
-            skipDispose: boolean;
+            skipDispose?: boolean;
             skipSetActiveGroup?: boolean;
         } = {
             removeEmptyGroup: true,
-            skipDispose: false,
         }
     ): void {
         const group = panel.group;
@@ -1793,10 +1792,6 @@ export class DockviewComponent
               }
             | undefined
     ): DockviewGroupPanel {
-        if (this.groups.length <= 1) {
-            return false;
-        }
-
         const panels = [...group.panels]; // reassign since group panels will mutate
 
         if (!options?.skipDispose) {

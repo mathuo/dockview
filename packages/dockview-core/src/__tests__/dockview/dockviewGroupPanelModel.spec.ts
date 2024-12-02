@@ -9,39 +9,20 @@ import {
 } from '../../dockview/types';
 import { PanelUpdateEvent, Parameters } from '../../panel/types';
 import {
-    DockviewGroupLocation,
     DockviewGroupPanelModel,
     GroupOptions,
 } from '../../dockview/dockviewGroupPanelModel';
 import { fireEvent } from '@testing-library/dom';
 import { LocalSelectionTransfer, PanelTransfer } from '../../dnd/dataTransfer';
 import { CompositeDisposable } from '../../lifecycle';
-import {
-    ActiveGroupEvent,
-    DockviewPanelApi,
-    GroupChangedEvent,
-    RendererChangedEvent,
-} from '../../api/dockviewPanelApi';
+import { DockviewPanelApi } from '../../api/dockviewPanelApi';
 import { IDockviewPanel } from '../../dockview/dockviewPanel';
 import { IDockviewPanelModel } from '../../dockview/dockviewPanelModel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import { WatermarkRendererInitParameters } from '../../dockview/types';
 import { createOffsetDragOverEvent } from '../__test_utils__/utils';
-import {
-    DockviewPanelRenderer,
-    OverlayRenderContainer,
-} from '../../overlay/overlayRenderContainer';
-import { DockviewGroupPanelFloatingChangeEvent } from '../../api/dockviewGroupPanelApi';
-import { SizeEvent } from '../../api/gridviewPanelApi';
-import {
-    PanelDimensionChangeEvent,
-    FocusEvent,
-    VisibilityEvent,
-    ActiveEvent,
-    WillFocusEvent,
-} from '../../api/panelApi';
-import { Position } from '../../dnd/droptarget';
-import { Emitter, Event } from '../../events';
+import { OverlayRenderContainer } from '../../overlay/overlayRenderContainer';
+import { Emitter } from '../../events';
 import { fromPartial } from '@total-typescript/shoehorn';
 
 enum GroupChangeKind2 {
@@ -513,14 +494,14 @@ describe('dockviewGroupPanelModel', () => {
 
         groupview.model.closeAllPanels();
 
-        expect(removePanelMock).toBeCalledWith(panel1);
-        expect(removePanelMock).toBeCalledWith(panel2);
-        expect(removePanelMock).toBeCalledWith(panel3);
+        expect(removePanelMock).toHaveBeenCalledWith(panel1, undefined);
+        expect(removePanelMock).toHaveBeenCalledWith(panel2, undefined);
+        expect(removePanelMock).toHaveBeenCalledWith(panel3, undefined);
     });
 
     test('closeAllPanels with no panels', () => {
         groupview.model.closeAllPanels();
-        expect(removeGroupMock).toBeCalledWith(groupview);
+        expect(removeGroupMock).toHaveBeenCalledWith(groupview);
     });
 
     test('that group is set on panel during onDidAddPanel event', () => {
