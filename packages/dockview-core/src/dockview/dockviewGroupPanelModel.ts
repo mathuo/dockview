@@ -787,7 +787,15 @@ export class DockviewGroupPanelModel
     }
 
     private doClose(panel: IDockviewPanel): void {
-        this.accessor.removePanel(panel);
+        const isLast =
+            this.panels.length === 1 && this.accessor.groups.length === 1;
+
+        this.accessor.removePanel(
+            panel,
+            isLast && this.accessor.options.showEmptyGroupWhenHasNoPanels
+                ? { removeEmptyGroup: false }
+                : undefined
+        );
     }
 
     public isPanelActive(panel: IDockviewPanel): boolean {
@@ -973,14 +981,14 @@ export class DockviewGroupPanelModel
                 }
             });
 
-            this.tabsContainer.hide();
+            // this.tabsContainer.hide();
             this.contentContainer.element.appendChild(this.watermark.element);
         }
         if (!this.isEmpty && this.watermark) {
             this.watermark.element.remove();
             this.watermark.dispose?.();
             this.watermark = undefined;
-            this.tabsContainer.show();
+            // this.tabsContainer.show();
         }
     }
 

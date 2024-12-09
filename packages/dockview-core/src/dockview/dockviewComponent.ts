@@ -1643,11 +1643,10 @@ export class DockviewComponent
         panel: IDockviewPanel,
         options: {
             removeEmptyGroup: boolean;
-            skipDispose: boolean;
+            skipDispose?: boolean;
             skipSetActiveGroup?: boolean;
         } = {
             removeEmptyGroup: true,
-            skipDispose: false,
         }
     ): void {
         const group = panel.group;
