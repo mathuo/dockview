@@ -18,7 +18,10 @@
 
 .dv-groupview {
     &.dv-active-group {
-        > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab {
+        > .dv-tabs-and-actions-container
+            > .dv-tabs-panel
+            > .dv-tabs-container
+            > .dv-tab {
             &.dv-active-tab {
                 background-color: var(
                     --dv-activegroup-visiblepanel-tab-background-color
@@ -34,7 +37,10 @@
         }
     }
     &.dv-inactive-group {
-        > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab {
+        > .dv-tabs-and-actions-container
+            > .dv-tabs-panel
+            > .dv-tabs-container
+            > .dv-tab {
             &.dv-active-tab {
                 background-color: var(
                     --dv-inactivegroup-visiblepanel-tab-background-color
