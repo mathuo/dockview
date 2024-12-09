@@ -673,19 +673,22 @@ export class DockviewComponent
                 const isGroupAddedToDom =
                     referenceGroup.element.parentElement !== null;
 
-                const group = !isGroupAddedToDom
-                    ? referenceGroup
-                    : options?.overridePopoutGroup ??
-                      this.createGroup({ id: groupId });
+                let group: DockviewGroupPanel;
+
+                if (!isGroupAddedToDom) {
+                    group = referenceGroup;
+                } else if (options?.overridePopoutGroup) {
+                    group = options.overridePopoutGroup;
+                } else {
+                    group = this.createGroup({ id: groupId });
+                    this._onDidAddGroup.fire(group);
+                }
+
                 group.model.renderContainer = overlayRenderContainer;
                 group.layout(
                     _window.window!.innerWidth,
                     _window.window!.innerHeight
                 );
-
-                if (!this._groups.has(group.api.id)) {
-                    this._onDidAddGroup.fire(group);
-                }
 
                 if (!options?.overridePopoutGroup && isGroupAddedToDom) {
                     if (itemToPopout instanceof DockviewPanel) {
