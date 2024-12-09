@@ -265,11 +265,21 @@ export interface IViewDeserializer {
     fromJSON: (data: ISerializedLeafNode) => IGridView;
 }
 
+export interface SerializedNodeDescriptor {
+    location: number[];
+}
+
 export interface SerializedGridview<T> {
     root: SerializedGridObject<T>;
     width: number;
     height: number;
     orientation: Orientation;
+    maximizedNode?: SerializedNodeDescriptor;
+}
+
+export interface MaximizedViewChanged {
+    view: IGridView;
+    isMaximized: boolean;
 }
 
 export class Gridview implements IDisposable {
@@ -293,7 +303,8 @@ export class Gridview implements IDisposable {
     private readonly _onDidViewVisibilityChange = new Emitter<void>();
     readonly onDidViewVisibilityChange = this._onDidViewVisibilityChange.event;
 
-    private readonly _onDidMaximizedNodeChange = new Emitter<void>();
+    private readonly _onDidMaximizedNodeChange =
+        new Emitter<MaximizedViewChanged>();
     readonly onDidMaximizedNodeChange = this._onDidMaximizedNodeChange.event;
 
     public get length(): number {
@@ -395,6 +406,8 @@ export class Gridview implements IDisposable {
             this.exitMaximizedView();
         }
 
+        serializeBranchNode(this.getView(), this.orientation);
+
         const hiddenOnMaximize: LeafNode[] = [];
 
         function hideAllViewsBut(parent: BranchNode, exclude: LeafNode): void {
@@ -416,7 +429,10 @@ export class Gridview implements IDisposable {
 
         hideAllViewsBut(this.root, node);
         this._maximizedNode = { leaf: node, hiddenOnMaximize };
-        this._onDidMaximizedNodeChange.fire();
+        this._onDidMaximizedNodeChange.fire({
+            view: node.view,
+            isMaximized: true,
+        });
     }
 
     exitMaximizedView(): void {
@@ -441,27 +457,60 @@ export class Gridview implements IDisposable {
 
         showViewsInReverseOrder(this.root);
 
+        const tmp = this._maximizedNode.leaf;
         this._maximizedNode = undefined;
-        this._onDidMaximizedNodeChange.fire();
+        this._onDidMaximizedNodeChange.fire({
+            view: tmp.view,
+            isMaximized: false,
+        });
     }
 
     public serialize(): SerializedGridview<any> {
+        const maximizedView = this.maximizedView();
+
+        let maxmizedViewLocation: number[] | undefined;
+
+        if (maximizedView) {
+            /**
+             * The minimum information we can get away with in order to serialize a maxmized view is it's location within the grid
+             * which is represented as a branch of indices
+             */
+            maxmizedViewLocation = getGridLocation(maximizedView.element);
+        }
+
         if (this.hasMaximizedView()) {
             /**
-             * do not persist maximized view state
-             * firstly exit any maximized views to ensure the correct dimensions are persisted
+             * the saved layout cannot be in its maxmized state otherwise all of the underlying
+             * view dimensions will be wrong
+             *
+             * To counteract this we temporaily remove the maximized view to compute the serialized output
+             * of the grid before adding back the maxmized view as to not alter the layout from the users
+             * perspective when `.toJSON()` is called
              */
             this.exitMaximizedView();
         }
 
         const root = serializeBranchNode(this.getView(), this.orientation);
 
-        return {
+        const resullt: SerializedGridview<any> = {
             root,
             width: this.width,
             height: this.height,
             orientation: this.orientation,
         };
+
+        if (maxmizedViewLocation) {
+            resullt.maximizedNode = {
+                location: maxmizedViewLocation,
+            };
+        }
+
+        if (maximizedView) {
+            // replace any maximzied view that was removed for serialization purposes
+            this.maximizeView(maximizedView);
+        }
+
+        return resullt;
     }
 
     public dispose(): void {
@@ -502,6 +551,24 @@ export class Gridview implements IDisposable {
             deserializer,
             height
         );
+
+        /**
+         * The deserialied layout must be positioned through this.layout(...)
+         * before any maximizedNode can be positioned
+         */
+        this.layout(json.width, json.height);
+
+        if (json.maximizedNode) {
+            const location = json.maximizedNode.location;
+
+            const [_, node] = this.getNode(location);
+
+            if (!(node instanceof LeafNode)) {
+                return;
+            }
+
+            this.maximizeView(node.view);
+        }
     }
 
     private _deserialize(

@@ -206,6 +206,12 @@ const DockviewDemo = (props: { theme?: string }) => {
             addLogLine(`Panel Moved ${event.panel.id}`);
         });
 
+        event.api.onDidMaximizedGroupChange((event) => {
+            addLogLine(
+                `Group Maximized Changed ${event.view.id} [${event.isMaximized}]`
+            );
+        });
+
         event.api.onDidRemoveGroup((event) => {
             setGroups((_) => {
                 const next = [..._];
@@ -318,6 +324,15 @@ const DockviewDemo = (props: { theme?: string }) => {
                         engineering
                     </span>
                 </button>
+                {showLogs && (
+                    <button
+                        onClick={() => {
+                            setLogLines([]);
+                        }}
+                    >
+                        <span className="material-symbols-outlined">undo</span>
+                    </button>
+                )}
                 <button
                     onClick={() => {
                         setShowLogs(!showLogs);
