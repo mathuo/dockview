@@ -103,6 +103,8 @@ export const GridActions = (props: {
         if (state) {
             try {
                 props.api?.fromJSON(JSON.parse(state));
+
+                setGap(props.api?.gap ?? 0);
             } catch (err) {
                 console.error('failed to load state', err);
                 localStorage.removeItem('dv-demo-state');
@@ -154,10 +156,6 @@ export const GridActions = (props: {
 
     const [gap, setGap] = React.useState(0);
 
-    React.useEffect(() => {
-        props.api?.setGap(gap);
-    }, [gap, props.api]);
-
     return (
         <div className="action-container">
             <div className="button-group">
@@ -208,7 +206,11 @@ export const GridActions = (props: {
                     max={99}
                     step={1}
                     value={gap}
-                    onChange={(event) => setGap(Number(event.target.value))}
+                    onChange={(event) => {
+                        const value = Number(event.target.value);
+                        setGap(value);
+                        props.api?.setGap(value);
+                    }}
                 />
             </div>
         </div>
