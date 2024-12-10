@@ -112,8 +112,11 @@ export function isAncestor(
     return false;
 }
 
-export function getElementsByTagName(tag: string): HTMLElement[] {
-    return Array.prototype.slice.call(document.getElementsByTagName(tag), 0);
+export function getElementsByTagName(
+    tag: string,
+    document: ParentNode
+): HTMLElement[] {
+    return Array.prototype.slice.call(document.querySelectorAll(tag), 0);
 }
 
 export interface IFocusTracker extends IDisposable {
@@ -288,10 +291,29 @@ export function addTestId(element: HTMLElement, id: string): void {
     element.setAttribute('data-testid', id);
 }
 
-export function disableIframePointEvents() {
+export function disableIframePointEvents(rootNode: ParentNode = document) {
+    const includeShadowDom = true;
+
+    const shadowRoots: ShadowRoot[] = [];
+
+    if (includeShadowDom) {
+        const items = rootNode.querySelectorAll('*');
+
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            if (item.shadowRoot) {
+                shadowRoots.push(item.shadowRoot);
+            }
+        }
+    }
+
     const iframes: HTMLElement[] = [
-        ...getElementsByTagName('iframe'),
-        ...getElementsByTagName('webview'),
+        ...getElementsByTagName('iframe', rootNode),
+        ...getElementsByTagName('webview', rootNode),
+        ...shadowRoots.flatMap((root) => [
+            ...getElementsByTagName('iframe', root),
+            ...getElementsByTagName('webview', root),
+        ]),
     ];
 
     const original = new WeakMap<HTMLElement, string>(); // don't hold onto HTMLElement references longer than required
