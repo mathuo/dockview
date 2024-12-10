@@ -98,6 +98,22 @@ function moveGroupWithoutDestroying(options: {
     });
 }
 
+export interface DockviewPopoutGroupOptions {
+    /**
+     * The position of the popout group
+     */
+    position?: Box;
+    /**
+     * The same-origin path at which the popout window will be created
+     *
+     * Defaults to `/popout.html` if not provided
+     */
+    popoutUrl?: string;
+    onDidOpen?: (event: { id: string; window: Window }) => void;
+    onWillClose?: (event: { id: string; window: Window }) => void;
+    overridePopoutGroup?: DockviewGroupPanel;
+}
+
 export interface PanelReference {
     update: (event: { params: { [key: string]: any } }) => void;
     remove: () => void;
@@ -110,6 +126,7 @@ export interface SerializedFloatingGroup {
 
 export interface SerializedPopoutGroup {
     data: GroupPanelViewState;
+    url?: string;
     gridReferenceGroup?: string;
     position: Box | null;
 }
@@ -566,13 +583,7 @@ export class DockviewComponent
 
     addPopoutGroup(
         itemToPopout: DockviewPanel | DockviewGroupPanel,
-        options?: {
-            position?: Box;
-            popoutUrl?: string;
-            onDidOpen?: (event: { id: string; window: Window }) => void;
-            onWillClose?: (event: { id: string; window: Window }) => void;
-            overridePopoutGroup?: DockviewGroupPanel;
-        }
+        options?: DockviewPopoutGroupOptions
     ): Promise<boolean> {
         if (
             itemToPopout instanceof DockviewPanel &&
@@ -608,7 +619,10 @@ export class DockviewComponent
             `${this.id}-${groupId}`, // unique id
             theme ?? '',
             {
-                url: options?.popoutUrl ?? '/popout.html',
+                url:
+                    options?.popoutUrl ??
+                    this.options?.popoutUrl ??
+                    '/popout.html',
                 left: window.screenX + box.left,
                 top: window.screenY + box.top,
                 width: box.width,
@@ -659,19 +673,22 @@ export class DockviewComponent
                 const isGroupAddedToDom =
                     referenceGroup.element.parentElement !== null;
 
-                const group = !isGroupAddedToDom
-                    ? referenceGroup
-                    : options?.overridePopoutGroup ??
-                      this.createGroup({ id: groupId });
+                let group: DockviewGroupPanel;
+
+                if (!isGroupAddedToDom) {
+                    group = referenceGroup;
+                } else if (options?.overridePopoutGroup) {
+                    group = options.overridePopoutGroup;
+                } else {
+                    group = this.createGroup({ id: groupId });
+                    this._onDidAddGroup.fire(group);
+                }
+
                 group.model.renderContainer = overlayRenderContainer;
                 group.layout(
                     _window.window!.innerWidth,
                     _window.window!.innerHeight
                 );
-
-                if (!this._groups.has(group.api.id)) {
-                    this._onDidAddGroup.fire(group);
-                }
 
                 if (!options?.overridePopoutGroup && isGroupAddedToDom) {
                     if (itemToPopout instanceof DockviewPanel) {
@@ -709,6 +726,7 @@ export class DockviewComponent
                 group.model.location = {
                     type: 'popout',
                     getWindow: () => _window.window!,
+                    popoutUrl: options?.popoutUrl,
                 };
 
                 if (
@@ -1198,6 +1216,10 @@ export class DockviewComponent
                     data: group.popoutGroup.toJSON() as GroupPanelViewState,
                     gridReferenceGroup: group.referenceGroup,
                     position: group.window.dimensions(),
+                    url:
+                        group.popoutGroup.api.location.type === 'popout'
+                            ? group.popoutGroup.api.location.popoutUrl
+                            : undefined,
                 };
             }
         );
@@ -1321,7 +1343,7 @@ export class DockviewComponent
             const serializedPopoutGroups = data.popoutGroups ?? [];
 
             for (const serializedPopoutGroup of serializedPopoutGroups) {
-                const { data, position, gridReferenceGroup } =
+                const { data, position, gridReferenceGroup, url } =
                     serializedPopoutGroup;
 
                 const group = createGroupFromSerializedState(data);
@@ -1335,6 +1357,7 @@ export class DockviewComponent
                         overridePopoutGroup: gridReferenceGroup
                             ? group
                             : undefined,
+                        popoutUrl: url,
                     }
                 );
             }

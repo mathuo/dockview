@@ -5191,6 +5191,126 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(2);
             expect(dockview.panels.length).toBe(3);
         });
+
+        test('persistance with custom url', async () => {
+            const container = document.createElement('div');
+
+            window.open = () => setupMockWindow();
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            const panel3 = dockview.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            expect(await dockview.addPopoutGroup(panel2.group)).toBeTruthy();
+            expect(
+                await dockview.addPopoutGroup(panel3.group, {
+                    popoutUrl: '/custom.html',
+                })
+            ).toBeTruthy();
+
+            const state = dockview.toJSON();
+
+            expect(state.popoutGroups).toEqual([
+                {
+                    data: {
+                        activeView: 'panel_2',
+                        id: '4',
+                        views: ['panel_2'],
+                    },
+                    gridReferenceGroup: '2',
+                    position: {
+                        height: 2001,
+                        left: undefined,
+                        top: undefined,
+                        width: 1001,
+                    },
+                    url: undefined,
+                },
+                {
+                    data: {
+                        activeView: 'panel_3',
+                        id: '5',
+                        views: ['panel_3'],
+                    },
+                    gridReferenceGroup: '3',
+                    position: {
+                        height: 2001,
+                        left: undefined,
+                        top: undefined,
+                        width: 1001,
+                    },
+                    url: '/custom.html',
+                },
+            ]);
+
+            dockview.clear();
+            expect(dockview.groups.length).toBe(0);
+
+            dockview.fromJSON(state);
+            await new Promise((resolve) => setTimeout(resolve, 0)); // popout views are completed as a promise so must complete microtask-queue
+
+            expect(dockview.toJSON().popoutGroups).toEqual([
+                {
+                    data: {
+                        activeView: 'panel_2',
+                        id: '4',
+                        views: ['panel_2'],
+                    },
+                    gridReferenceGroup: '2',
+                    position: {
+                        height: 2001,
+                        left: undefined,
+                        top: undefined,
+                        width: 1001,
+                    },
+                    url: undefined,
+                },
+                {
+                    data: {
+                        activeView: 'panel_3',
+                        id: '5',
+                        views: ['panel_3'],
+                    },
+                    gridReferenceGroup: '3',
+                    position: {
+                        height: 2001,
+                        left: undefined,
+                        top: undefined,
+                        width: 1001,
+                    },
+                    url: '/custom.html',
+                },
+            ]);
+        });
     });
 
     describe('maximized group', () => {
