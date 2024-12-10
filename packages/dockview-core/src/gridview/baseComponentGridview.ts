@@ -1,10 +1,5 @@
 import { Emitter, Event, AsapEvent } from '../events';
-import {
-    getGridLocation,
-    Gridview,
-    IGridView,
-    MaximizedViewChanged,
-} from './gridview';
+import { getGridLocation, Gridview, IGridView } from './gridview';
 import { Position } from '../dnd/droptarget';
 import { Disposable, IDisposable, IValueDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
@@ -13,7 +8,6 @@ import { IPanel } from '../panel/types';
 import { MovementOptions2 } from '../dockview/options';
 import { Resizable } from '../resizable';
 import { Classnames } from '../dom';
-import { IGridviewComponent } from './gridviewComponent';
 
 const nextLayoutId = sequentialNumberGenerator();
 
