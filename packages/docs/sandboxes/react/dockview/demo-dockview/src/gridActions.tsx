@@ -112,11 +112,10 @@ export const GridActions = (props: {
 
     const onSave = () => {
         if (props.api) {
-            console.log(props.api.toJSON());
-            localStorage.setItem(
-                'dv-demo-state',
-                JSON.stringify(props.api.toJSON())
-            );
+            const state = props.api.toJSON();
+            console.log(state);
+
+            localStorage.setItem('dv-demo-state', JSON.stringify(state));
         }
     };
 
