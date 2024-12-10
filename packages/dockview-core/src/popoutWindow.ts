@@ -160,7 +160,7 @@ export class PopoutWindow extends CompositeDisposable {
                     resolve(container);
                 } catch (err) {
                     // only except this is the DOM isn't setup. e.g. in a in correctly configured test
-                    reject(err);
+                    reject(err as Error);
                 }
             });
         });

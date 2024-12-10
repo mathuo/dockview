@@ -767,15 +767,16 @@ export class DockviewComponent
 
                 let returnedGroup: DockviewGroupPanel | undefined;
 
+                const isValidReferenceGroup =
+                    isGroupAddedToDom &&
+                    referenceGroup &&
+                    this.getPanel(referenceGroup.id);
+
                 const value = {
                     window: _window,
                     popoutGroup: group,
-                    referenceGroup: !isGroupAddedToDom
-                        ? undefined
-                        : referenceGroup
-                        ? this.getPanel(referenceGroup.id)
-                            ? referenceGroup.id
-                            : undefined
+                    referenceGroup: isValidReferenceGroup
+                        ? referenceGroup.id
                         : undefined,
                     disposable: {
                         dispose: () => {
