@@ -110,6 +110,22 @@ export const GridActions = (props: {
         }
     };
 
+    const onLoad2 = () => {
+        const state = localStorage.getItem('dv-demo-state');
+        if (state) {
+            try {
+                props.api?.fromJSON(JSON.parse(state), {
+                    keepExistingPanels: true,
+                });
+
+                setGap(props.api?.gap ?? 0);
+            } catch (err) {
+                console.error('failed to load state', err);
+                localStorage.removeItem('dv-demo-state');
+            }
+        }
+    };
+
     const onSave = () => {
         if (props.api) {
             const state = props.api.toJSON();
@@ -190,6 +206,9 @@ export const GridActions = (props: {
             </button>
             <button className="text-button" onClick={onLoad}>
                 Load
+            </button>
+            <button className="text-button" onClick={onLoad2}>
+                Load2
             </button>
             <button className="text-button" onClick={onSave}>
                 Save
