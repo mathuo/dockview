@@ -132,7 +132,10 @@ export const GridActions = (props: {
 
     const popover = usePopover();
 
-    const onAddPanel = (options?: { advanced: boolean }) => {
+    const onAddPanel = (options?: {
+        advanced: boolean;
+        component?: string;
+    }) => {
         if (options?.advanced) {
             popover.open(({ close }) => {
                 return <PanelBuilder api={props.api!} done={close} />;
@@ -140,7 +143,7 @@ export const GridActions = (props: {
         } else {
             props.api?.addPanel({
                 id: `id_${Date.now().toString()}`,
-                component: 'default',
+                component: options?.component ?? 'default',
                 title: `Tab ${nextId()}`,
                 renderer: 'always',
             });
@@ -162,6 +165,22 @@ export const GridActions = (props: {
             <div className="button-group">
                 <button className="text-button" onClick={() => onAddPanel()}>
                     Add Panel
+                </button>
+                <button
+                    className="demo-icon-button"
+                    onClick={() => onAddPanel({ advanced: true })}
+                >
+                    <span className="material-symbols-outlined">tune</span>
+                </button>
+            </div>
+            <div className="button-group">
+                <button
+                    className="text-button"
+                    onClick={() =>
+                        onAddPanel({ component: 'shadowDom', advanced: false })
+                    }
+                >
+                    Add Panel 2
                 </button>
                 <button
                     className="demo-icon-button"
