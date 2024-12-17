@@ -208,7 +208,7 @@ const DockviewDemo = (props: { theme?: string }) => {
 
         event.api.onDidMaximizedGroupChange((event) => {
             addLogLine(
-                `Group Maximized Changed ${event.view.id} [${event.isMaximized}]`
+                `Group Maximized Changed ${event.group.api.id} [${event.isMaximized}]`
             );
         });
 
