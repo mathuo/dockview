@@ -4867,6 +4867,51 @@ describe('dockviewComponent', () => {
             );
         });
 
+        test('move popout group of 1 panel inside grid', async () => {
+            const container = document.createElement('div');
+
+            window.open = () => setupMockWindow();
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+            });
+
+            const panel3 = dockview.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            await dockview.addPopoutGroup(panel2);
+
+            panel2.api.moveTo({ position: 'top', group: panel3.group });
+
+            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups.length).toBe(3);
+        });
+
         test('add a popout group', async () => {
             const container = document.createElement('div');
 
