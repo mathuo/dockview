@@ -316,6 +316,34 @@
                 }
             },
             {
+                "name": "onDidMaximizedChange",
+                "code": "Event<MaximizedChanged<BaseGrid.T>>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "MaximizedChanged",
+                            "source": "dockview-core",
+                            "typeArguments": [
+                                {
+                                    "type": "reference",
+                                    "value": "T",
+                                    "source": "dockview-core",
+                                    "refersToTypeParameter": true
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "onDidRemove",
                 "code": "Event<BaseGrid.T>",
                 "kind": "property",
@@ -537,27 +565,6 @@
                     "returnType": {
                         "type": "intrinsic",
                         "value": "number"
-                    }
-                }
-            },
-            {
-                "name": "onDidMaximizedGroupChange",
-                "code": "Event<void>",
-                "kind": "accessor",
-                "value": {
-                    "name": "onDidMaximizedGroupChange",
-                    "code": "Event<void>",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "reference",
-                        "value": "Event",
-                        "source": "dockview-core",
-                        "typeArguments": [
-                            {
-                                "type": "intrinsic",
-                                "value": "void"
-                            }
-                        ]
                     }
                 }
             },
@@ -2352,11 +2359,11 @@
             },
             {
                 "name": "onDidMaximizedGroupChange",
-                "code": "Event<void>",
+                "code": "Event<DockviewMaximizedGroupChanged>",
                 "kind": "accessor",
                 "value": {
                     "name": "onDidMaximizedGroupChange",
-                    "code": "Event<void>",
+                    "code": "Event<DockviewMaximizedGroupChanged>",
                     "kind": "getSignature",
                     "returnType": {
                         "type": "reference",
@@ -2364,8 +2371,9 @@
                         "source": "dockview-core",
                         "typeArguments": [
                             {
-                                "type": "intrinsic",
-                                "value": "void"
+                                "type": "reference",
+                                "value": "DockviewMaximizedGroupChanged",
+                                "source": "dockview-core"
                             }
                         ]
                     }
@@ -4357,6 +4365,53 @@
                 }
             },
             {
+                "name": "onDidMaximizedChange",
+                "code": "Event<MaximizedChanged<DockviewGroupPanel>>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "MaximizedChanged",
+                            "source": "dockview-core",
+                            "typeArguments": [
+                                {
+                                    "type": "reference",
+                                    "value": "DockviewGroupPanel",
+                                    "source": "dockview-core"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "onDidMaximizedGroupChange",
+                "code": "Event<DockviewMaximizedGroupChanged>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "DockviewMaximizedGroupChanged",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "onDidMovePanel",
                 "code": "Event<MovePanelEvent>",
                 "kind": "property",
@@ -4825,27 +4880,6 @@
                 }
             },
             {
-                "name": "onDidMaximizedGroupChange",
-                "code": "Event<void>",
-                "kind": "accessor",
-                "value": {
-                    "name": "onDidMaximizedGroupChange",
-                    "code": "Event<void>",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "reference",
-                        "value": "Event",
-                        "source": "dockview-core",
-                        "typeArguments": [
-                            {
-                                "type": "intrinsic",
-                                "value": "void"
-                            }
-                        ]
-                    }
-                }
-            },
-            {
                 "name": "options",
                 "code": "DockviewComponentOptions",
                 "kind": "accessor",
@@ -5155,7 +5189,7 @@
             },
             {
                 "name": "addPopoutGroup",
-                "code": "(itemToPopout: DockviewPanel | DockviewGroupPanel, options?: { onDidOpen?: (event: { id: string, window: Window }): void, onWillClose?: (event: { id: string, window: Window }): void, overridePopoutGroup?: DockviewGroupPanel, popoutUrl?: string, position?: Box }): Promise<boolean>",
+                "code": "(itemToPopout: DockviewPanel | DockviewGroupPanel, options?: DockviewPopoutGroupOptions): Promise<boolean>",
                 "kind": "method",
                 "signature": [
                     {
@@ -5184,186 +5218,11 @@
                             },
                             {
                                 "name": "options",
-                                "code": "options?: { onDidOpen?: (event: { id: string, window: Window }): void, onWillClose?: (event: { id: string, window: Window }): void, overridePopoutGroup?: DockviewGroupPanel, popoutUrl?: string, position?: Box }",
+                                "code": "options?: DockviewPopoutGroupOptions",
                                 "type": {
-                                    "type": "reflection",
-                                    "value": {
-                                        "name": "__type",
-                                        "code": "{ onDidOpen?: (event: { id: string, window: Window }): void, onWillClose?: (event: { id: string, window: Window }): void, overridePopoutGroup?: DockviewGroupPanel, popoutUrl?: string, position?: Box }",
-                                        "kind": "typeLiteral",
-                                        "properties": [
-                                            {
-                                                "name": "onDidOpen",
-                                                "code": "(event: { id: string, window: Window }): void",
-                                                "kind": "property",
-                                                "type": {
-                                                    "type": "reflection",
-                                                    "value": {
-                                                        "name": "__type",
-                                                        "code": "(event: { id: string, window: Window }): void",
-                                                        "kind": "typeLiteral",
-                                                        "signatures": [
-                                                            {
-                                                                "name": "__type",
-                                                                "typeParameters": [],
-                                                                "parameters": [
-                                                                    {
-                                                                        "name": "event",
-                                                                        "code": "event: { id: string, window: Window }",
-                                                                        "type": {
-                                                                            "type": "reflection",
-                                                                            "value": {
-                                                                                "name": "__type",
-                                                                                "code": "{ id: string, window: Window }",
-                                                                                "kind": "typeLiteral",
-                                                                                "properties": [
-                                                                                    {
-                                                                                        "name": "id",
-                                                                                        "code": "string",
-                                                                                        "kind": "property",
-                                                                                        "type": {
-                                                                                            "type": "intrinsic",
-                                                                                            "value": "string"
-                                                                                        },
-                                                                                        "flags": {}
-                                                                                    },
-                                                                                    {
-                                                                                        "name": "window",
-                                                                                        "code": "Window",
-                                                                                        "kind": "property",
-                                                                                        "type": {
-                                                                                            "type": "reference",
-                                                                                            "value": "Window",
-                                                                                            "source": "typescript"
-                                                                                        },
-                                                                                        "flags": {}
-                                                                                    }
-                                                                                ]
-                                                                            }
-                                                                        },
-                                                                        "kind": "parameter"
-                                                                    }
-                                                                ],
-                                                                "returnType": {
-                                                                    "type": "intrinsic",
-                                                                    "value": "void"
-                                                                },
-                                                                "code": "(event: { id: string, window: Window }): void",
-                                                                "kind": "callSignature"
-                                                            }
-                                                        ]
-                                                    }
-                                                },
-                                                "flags": {
-                                                    "isOptional": true
-                                                }
-                                            },
-                                            {
-                                                "name": "onWillClose",
-                                                "code": "(event: { id: string, window: Window }): void",
-                                                "kind": "property",
-                                                "type": {
-                                                    "type": "reflection",
-                                                    "value": {
-                                                        "name": "__type",
-                                                        "code": "(event: { id: string, window: Window }): void",
-                                                        "kind": "typeLiteral",
-                                                        "signatures": [
-                                                            {
-                                                                "name": "__type",
-                                                                "typeParameters": [],
-                                                                "parameters": [
-                                                                    {
-                                                                        "name": "event",
-                                                                        "code": "event: { id: string, window: Window }",
-                                                                        "type": {
-                                                                            "type": "reflection",
-                                                                            "value": {
-                                                                                "name": "__type",
-                                                                                "code": "{ id: string, window: Window }",
-                                                                                "kind": "typeLiteral",
-                                                                                "properties": [
-                                                                                    {
-                                                                                        "name": "id",
-                                                                                        "code": "string",
-                                                                                        "kind": "property",
-                                                                                        "type": {
-                                                                                            "type": "intrinsic",
-                                                                                            "value": "string"
-                                                                                        },
-                                                                                        "flags": {}
-                                                                                    },
-                                                                                    {
-                                                                                        "name": "window",
-                                                                                        "code": "Window",
-                                                                                        "kind": "property",
-                                                                                        "type": {
-                                                                                            "type": "reference",
-                                                                                            "value": "Window",
-                                                                                            "source": "typescript"
-                                                                                        },
-                                                                                        "flags": {}
-                                                                                    }
-                                                                                ]
-                                                                            }
-                                                                        },
-                                                                        "kind": "parameter"
-                                                                    }
-                                                                ],
-                                                                "returnType": {
-                                                                    "type": "intrinsic",
-                                                                    "value": "void"
-                                                                },
-                                                                "code": "(event: { id: string, window: Window }): void",
-                                                                "kind": "callSignature"
-                                                            }
-                                                        ]
-                                                    }
-                                                },
-                                                "flags": {
-                                                    "isOptional": true
-                                                }
-                                            },
-                                            {
-                                                "name": "overridePopoutGroup",
-                                                "code": "DockviewGroupPanel",
-                                                "kind": "property",
-                                                "type": {
-                                                    "type": "reference",
-                                                    "value": "DockviewGroupPanel",
-                                                    "source": "dockview-core"
-                                                },
-                                                "flags": {
-                                                    "isOptional": true
-                                                }
-                                            },
-                                            {
-                                                "name": "popoutUrl",
-                                                "code": "string",
-                                                "kind": "property",
-                                                "type": {
-                                                    "type": "intrinsic",
-                                                    "value": "string"
-                                                },
-                                                "flags": {
-                                                    "isOptional": true
-                                                }
-                                            },
-                                            {
-                                                "name": "position",
-                                                "code": "Box",
-                                                "kind": "property",
-                                                "type": {
-                                                    "type": "reference",
-                                                    "value": "Box",
-                                                    "source": "dockview-core"
-                                                },
-                                                "flags": {
-                                                    "isOptional": true
-                                                }
-                                            }
-                                        ]
-                                    }
+                                    "type": "reference",
+                                    "value": "DockviewPopoutGroupOptions",
+                                    "source": "dockview-core"
                                 },
                                 "kind": "parameter"
                             }
@@ -5379,7 +5238,7 @@
                                 }
                             ]
                         },
-                        "code": "(itemToPopout: DockviewPanel | DockviewGroupPanel, options?: { onDidOpen?: (event: { id: string, window: Window }): void, onWillClose?: (event: { id: string, window: Window }): void, overridePopoutGroup?: DockviewGroupPanel, popoutUrl?: string, position?: Box }): Promise<boolean>",
+                        "code": "(itemToPopout: DockviewPanel | DockviewGroupPanel, options?: DockviewPopoutGroupOptions): Promise<boolean>",
                         "kind": "callSignature"
                     }
                 ]
@@ -6261,7 +6120,7 @@
             },
             {
                 "name": "removePanel",
-                "code": "(panel: IDockviewPanel, options: { removeEmptyGroup: boolean, skipDispose: boolean, skipSetActiveGroup?: boolean }): void",
+                "code": "(panel: IDockviewPanel, options: { removeEmptyGroup: boolean, skipDispose?: boolean, skipSetActiveGroup?: boolean }): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -6280,12 +6139,12 @@
                             },
                             {
                                 "name": "options",
-                                "code": "options: { removeEmptyGroup: boolean, skipDispose: boolean, skipSetActiveGroup?: boolean }",
+                                "code": "options: { removeEmptyGroup: boolean, skipDispose?: boolean, skipSetActiveGroup?: boolean }",
                                 "type": {
                                     "type": "reflection",
                                     "value": {
                                         "name": "__type",
-                                        "code": "{ removeEmptyGroup: boolean, skipDispose: boolean, skipSetActiveGroup?: boolean }",
+                                        "code": "{ removeEmptyGroup: boolean, skipDispose?: boolean, skipSetActiveGroup?: boolean }",
                                         "kind": "typeLiteral",
                                         "properties": [
                                             {
@@ -6306,7 +6165,9 @@
                                                     "type": "intrinsic",
                                                     "value": "boolean"
                                                 },
-                                                "flags": {}
+                                                "flags": {
+                                                    "isOptional": true
+                                                }
                                             },
                                             {
                                                 "name": "skipSetActiveGroup",
@@ -6330,7 +6191,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(panel: IDockviewPanel, options: { removeEmptyGroup: boolean, skipDispose: boolean, skipSetActiveGroup?: boolean }): void",
+                        "code": "(panel: IDockviewPanel, options: { removeEmptyGroup: boolean, skipDispose?: boolean, skipSetActiveGroup?: boolean }): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -10682,7 +10543,7 @@
             },
             {
                 "name": "onDidMaximizedNodeChange",
-                "code": "Event<void>",
+                "code": "Event<MaximizedViewChanged>",
                 "kind": "property",
                 "type": {
                     "type": "reference",
@@ -10690,8 +10551,9 @@
                     "source": "dockview-core",
                     "typeArguments": [
                         {
-                            "type": "intrinsic",
-                            "value": "void"
+                            "type": "reference",
+                            "value": "MaximizedViewChanged",
+                            "source": "dockview-core"
                         }
                     ]
                 },
@@ -13012,6 +12874,40 @@
                 }
             },
             {
+                "name": "onDidMaximizedChange",
+                "code": "Event<MaximizedChanged<GridviewPanel<GridviewPanelApiImpl>>>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "MaximizedChanged",
+                            "source": "dockview-core",
+                            "typeArguments": [
+                                {
+                                    "type": "reference",
+                                    "value": "GridviewPanel",
+                                    "source": "dockview-core",
+                                    "typeArguments": [
+                                        {
+                                            "type": "reference",
+                                            "value": "GridviewPanelApiImpl",
+                                            "source": "dockview-core"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "onDidRemove",
                 "code": "Event<GridviewPanel<GridviewPanelApiImpl>>",
                 "kind": "property",
@@ -13290,27 +13186,6 @@
                     "returnType": {
                         "type": "intrinsic",
                         "value": "number"
-                    }
-                }
-            },
-            {
-                "name": "onDidMaximizedGroupChange",
-                "code": "Event<void>",
-                "kind": "accessor",
-                "value": {
-                    "name": "onDidMaximizedGroupChange",
-                    "code": "Event<void>",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "reference",
-                        "value": "Event",
-                        "source": "dockview-core",
-                        "typeArguments": [
-                            {
-                                "type": "intrinsic",
-                                "value": "void"
-                            }
-                        ]
                     }
                 }
             },
@@ -24313,6 +24188,34 @@
         ],
         "extends": []
     },
+    "DockviewMaximizedGroupChanged": {
+        "kind": "interface",
+        "name": "DockviewMaximizedGroupChanged",
+        "children": [
+            {
+                "name": "group",
+                "code": "DockviewGroupPanel",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "DockviewGroupPanel",
+                    "source": "dockview-core"
+                },
+                "flags": {}
+            },
+            {
+                "name": "isMaximized",
+                "code": "boolean",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "boolean"
+                },
+                "flags": {}
+            }
+        ],
+        "extends": []
+    },
     "DockviewOptions": {
         "kind": "interface",
         "name": "DockviewOptions",
@@ -24515,6 +24418,43 @@
                 },
                 "flags": {
                     "isOptional": true
+                }
+            },
+            {
+                "name": "noPanelsOverlay",
+                "code": "'watermark' | 'emptyGroup'",
+                "kind": "property",
+                "type": {
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "literal",
+                            "value": "watermark"
+                        },
+                        {
+                            "type": "literal",
+                            "value": "emptyGroup"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isOptional": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Define the behaviour of the dock when there are no panels to display. Defaults to "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`watermark`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": "."
+                        }
+                    ]
                 }
             },
             {
@@ -25329,6 +25269,207 @@
                         "kind": "callSignature"
                     }
                 ]
+            }
+        ],
+        "extends": []
+    },
+    "DockviewPopoutGroupOptions": {
+        "kind": "interface",
+        "name": "DockviewPopoutGroupOptions",
+        "children": [
+            {
+                "name": "onDidOpen",
+                "code": "(event: { id: string, window: Window }): void",
+                "kind": "property",
+                "type": {
+                    "type": "reflection",
+                    "value": {
+                        "name": "__type",
+                        "code": "(event: { id: string, window: Window }): void",
+                        "kind": "typeLiteral",
+                        "signatures": [
+                            {
+                                "name": "__type",
+                                "typeParameters": [],
+                                "parameters": [
+                                    {
+                                        "name": "event",
+                                        "code": "event: { id: string, window: Window }",
+                                        "type": {
+                                            "type": "reflection",
+                                            "value": {
+                                                "name": "__type",
+                                                "code": "{ id: string, window: Window }",
+                                                "kind": "typeLiteral",
+                                                "properties": [
+                                                    {
+                                                        "name": "id",
+                                                        "code": "string",
+                                                        "kind": "property",
+                                                        "type": {
+                                                            "type": "intrinsic",
+                                                            "value": "string"
+                                                        },
+                                                        "flags": {}
+                                                    },
+                                                    {
+                                                        "name": "window",
+                                                        "code": "Window",
+                                                        "kind": "property",
+                                                        "type": {
+                                                            "type": "reference",
+                                                            "value": "Window",
+                                                            "source": "typescript"
+                                                        },
+                                                        "flags": {}
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "kind": "parameter"
+                                    }
+                                ],
+                                "returnType": {
+                                    "type": "intrinsic",
+                                    "value": "void"
+                                },
+                                "code": "(event: { id: string, window: Window }): void",
+                                "kind": "callSignature"
+                            }
+                        ]
+                    }
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "onWillClose",
+                "code": "(event: { id: string, window: Window }): void",
+                "kind": "property",
+                "type": {
+                    "type": "reflection",
+                    "value": {
+                        "name": "__type",
+                        "code": "(event: { id: string, window: Window }): void",
+                        "kind": "typeLiteral",
+                        "signatures": [
+                            {
+                                "name": "__type",
+                                "typeParameters": [],
+                                "parameters": [
+                                    {
+                                        "name": "event",
+                                        "code": "event: { id: string, window: Window }",
+                                        "type": {
+                                            "type": "reflection",
+                                            "value": {
+                                                "name": "__type",
+                                                "code": "{ id: string, window: Window }",
+                                                "kind": "typeLiteral",
+                                                "properties": [
+                                                    {
+                                                        "name": "id",
+                                                        "code": "string",
+                                                        "kind": "property",
+                                                        "type": {
+                                                            "type": "intrinsic",
+                                                            "value": "string"
+                                                        },
+                                                        "flags": {}
+                                                    },
+                                                    {
+                                                        "name": "window",
+                                                        "code": "Window",
+                                                        "kind": "property",
+                                                        "type": {
+                                                            "type": "reference",
+                                                            "value": "Window",
+                                                            "source": "typescript"
+                                                        },
+                                                        "flags": {}
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "kind": "parameter"
+                                    }
+                                ],
+                                "returnType": {
+                                    "type": "intrinsic",
+                                    "value": "void"
+                                },
+                                "code": "(event: { id: string, window: Window }): void",
+                                "kind": "callSignature"
+                            }
+                        ]
+                    }
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "overridePopoutGroup",
+                "code": "DockviewGroupPanel",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "DockviewGroupPanel",
+                    "source": "dockview-core"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "popoutUrl",
+                "code": "string",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "string"
+                },
+                "flags": {
+                    "isOptional": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The same-origin path at which the popout window will be created\n\nDefaults to "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`/popout.html`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " if not provided"
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "position",
+                "code": "Box",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Box",
+                    "source": "dockview-core"
+                },
+                "flags": {
+                    "isOptional": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The position of the popout group"
+                        }
+                    ]
+                }
             }
         ],
         "extends": []
@@ -27325,8 +27466,8 @@
                 }
             },
             {
-                "name": "onDidMaximizedGroupChange",
-                "code": "Event<void>",
+                "name": "onDidMaximizedChange",
+                "code": "Event<MaximizedChanged<IBaseGrid.T>>",
                 "kind": "property",
                 "type": {
                     "type": "reference",
@@ -27334,8 +27475,17 @@
                     "source": "dockview-core",
                     "typeArguments": [
                         {
-                            "type": "intrinsic",
-                            "value": "void"
+                            "type": "reference",
+                            "value": "MaximizedChanged",
+                            "source": "dockview-core",
+                            "typeArguments": [
+                                {
+                                    "type": "reference",
+                                    "value": "T",
+                                    "source": "dockview-core",
+                                    "refersToTypeParameter": true
+                                }
+                            ]
                         }
                     ]
                 },
@@ -28658,8 +28808,8 @@
                 }
             },
             {
-                "name": "onDidMaximizedGroupChange",
-                "code": "Event<void>",
+                "name": "onDidMaximizedChange",
+                "code": "Event<MaximizedChanged<DockviewGroupPanel>>",
                 "kind": "property",
                 "type": {
                     "type": "reference",
@@ -28667,8 +28817,36 @@
                     "source": "dockview-core",
                     "typeArguments": [
                         {
-                            "type": "intrinsic",
-                            "value": "void"
+                            "type": "reference",
+                            "value": "MaximizedChanged",
+                            "source": "dockview-core",
+                            "typeArguments": [
+                                {
+                                    "type": "reference",
+                                    "value": "DockviewGroupPanel",
+                                    "source": "dockview-core"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "onDidMaximizedGroupChange",
+                "code": "Event<DockviewMaximizedGroupChanged>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "DockviewMaximizedGroupChanged",
+                            "source": "dockview-core"
                         }
                     ]
                 },
@@ -33038,8 +33216,8 @@
                 }
             },
             {
-                "name": "onDidMaximizedGroupChange",
-                "code": "Event<void>",
+                "name": "onDidMaximizedChange",
+                "code": "Event<MaximizedChanged<GridviewPanel<GridviewPanelApiImpl>>>",
                 "kind": "property",
                 "type": {
                     "type": "reference",
@@ -33047,8 +33225,23 @@
                     "source": "dockview-core",
                     "typeArguments": [
                         {
-                            "type": "intrinsic",
-                            "value": "void"
+                            "type": "reference",
+                            "value": "MaximizedChanged",
+                            "source": "dockview-core",
+                            "typeArguments": [
+                                {
+                                    "type": "reference",
+                                    "value": "GridviewPanel",
+                                    "source": "dockview-core",
+                                    "typeArguments": [
+                                        {
+                                            "type": "reference",
+                                            "value": "GridviewPanelApiImpl",
+                                            "source": "dockview-core"
+                                        }
+                                    ]
+                                }
+                            ]
                         }
                     ]
                 },
@@ -37421,6 +37614,63 @@
             "Optional"
         ]
     },
+    "MaximizedChanged": {
+        "kind": "interface",
+        "name": "MaximizedChanged",
+        "children": [
+            {
+                "name": "isMaximized",
+                "code": "boolean",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "boolean"
+                },
+                "flags": {}
+            },
+            {
+                "name": "panel",
+                "code": "MaximizedChanged.T",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "T",
+                    "source": "dockview-core",
+                    "refersToTypeParameter": true
+                },
+                "flags": {}
+            }
+        ],
+        "extends": []
+    },
+    "MaximizedViewChanged": {
+        "kind": "interface",
+        "name": "MaximizedViewChanged",
+        "children": [
+            {
+                "name": "isMaximized",
+                "code": "boolean",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "boolean"
+                },
+                "flags": {}
+            },
+            {
+                "name": "view",
+                "code": "IGridView",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "IGridView",
+                    "source": "dockview-core"
+                },
+                "flags": {}
+            }
+        ],
+        "extends": []
+    },
     "MovePanelEvent": {
         "kind": "interface",
         "name": "MovePanelEvent",
@@ -39721,6 +39971,19 @@
                 "flags": {}
             },
             {
+                "name": "maximizedNode",
+                "code": "SerializedNodeDescriptor",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "SerializedNodeDescriptor",
+                    "source": "dockview-core"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
                 "name": "orientation",
                 "code": "Orientation",
                 "kind": "property",
@@ -39794,6 +40057,26 @@
                             "source": "dockview-core"
                         }
                     ]
+                },
+                "flags": {}
+            }
+        ],
+        "extends": []
+    },
+    "SerializedNodeDescriptor": {
+        "kind": "interface",
+        "name": "SerializedNodeDescriptor",
+        "children": [
+            {
+                "name": "location",
+                "code": "number[]",
+                "kind": "property",
+                "type": {
+                    "type": "array",
+                    "value": {
+                        "type": "intrinsic",
+                        "value": "number"
+                    }
                 },
                 "flags": {}
             }
@@ -40044,6 +40327,18 @@
                     ]
                 },
                 "flags": {}
+            },
+            {
+                "name": "url",
+                "code": "string",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "string"
+                },
+                "flags": {
+                    "isOptional": true
+                }
             }
         ],
         "extends": []
@@ -41496,7 +41791,7 @@
     },
     "DockviewGroupLocation": {
         "name": "DockviewGroupLocation",
-        "code": "{ getWindow: (): Window, type: 'popout' } | { type: 'floating' } | { type: 'grid' }",
+        "code": "{ getWindow: (): Window, popoutUrl?: string, type: 'popout' } | { type: 'floating' } | { type: 'grid' }",
         "typeParameters": [],
         "type": {
             "type": "or",
@@ -41505,7 +41800,7 @@
                     "type": "reflection",
                     "value": {
                         "name": "__type",
-                        "code": "{ getWindow: (): Window, type: 'popout' }",
+                        "code": "{ getWindow: (): Window, popoutUrl?: string, type: 'popout' }",
                         "kind": "typeLiteral",
                         "properties": [
                             {
@@ -41535,6 +41830,18 @@
                                     }
                                 },
                                 "flags": {}
+                            },
+                            {
+                                "name": "popoutUrl",
+                                "code": "string",
+                                "kind": "property",
+                                "type": {
+                                    "type": "intrinsic",
+                                    "value": "string"
+                                },
+                                "flags": {
+                                    "isOptional": true
+                                }
                             },
                             {
                                 "name": "type",
@@ -43852,11 +44159,6 @@
         },
         "kind": "typeAlias"
     },
-    "ReactPartContext": {
-        "name": "ReactPartContext",
-        "code": "",
-        "kind": "variable"
-    },
     "DockviewDefaultTab": {
         "kind": "function",
         "name": "DockviewDefaultTab",
@@ -44410,7 +44712,7 @@
                 "summary": [
                     {
                         "kind": "text",
-                        "text": "A React Hook that returns an array of portals to be rendered by the user of this hook\r\nand a disposable function to add a portal. Calling dispose removes this portal from the\r\nportal array"
+                        "text": "A React Hook that returns an array of portals to be rendered by the user of this hook\nand a disposable function to add a portal. Calling dispose removes this portal from the\nportal array"
                     }
                 ]
             },
