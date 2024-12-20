@@ -1885,7 +1885,7 @@ export class DockviewComponent
                         const refGroup = selectedGroup.referenceGroup
                             ? this.getPanel(selectedGroup.referenceGroup)
                             : undefined;
-                        if (refGroup) {
+                        if (refGroup && refGroup.panels.length === 0) {
                             this.removeGroup(refGroup);
                         }
                     }
