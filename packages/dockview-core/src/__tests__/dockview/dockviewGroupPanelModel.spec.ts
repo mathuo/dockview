@@ -190,6 +190,10 @@ export class TestPanel implements IDockviewPanel {
         });
     }
 
+    updateFromStateModel(state: GroupviewPanelState): void {
+        //
+    }
+
     init(params: IGroupPanelInitParameters) {
         this._params = params;
     }

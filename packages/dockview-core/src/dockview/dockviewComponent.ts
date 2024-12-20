@@ -164,6 +164,7 @@ type MoveGroupOrPanelOptions = {
         position: Position;
         index?: number;
     };
+    keepEmptyGroups?: boolean;
 };
 
 export interface FloatingGroupOptions {
@@ -242,6 +243,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
             onWillClose?: (event: { id: string; window: Window }) => void;
         }
     ): Promise<boolean>;
+    fromJSON(data: any, options?: { reuseExistingPanels: boolean }): void;
 }
 
 export class DockviewComponent
@@ -408,17 +410,17 @@ export class DockviewComponent
                 this.updateWatermark();
             }),
             this.onDidAdd((event) => {
-                if (!this._moving) {
+                if (!this._isEventSuppressionEnabled) {
                     this._onDidAddGroup.fire(event);
                 }
             }),
             this.onDidRemove((event) => {
-                if (!this._moving) {
+                if (!this._isEventSuppressionEnabled) {
                     this._onDidRemoveGroup.fire(event);
                 }
             }),
             this.onDidActiveChange((event) => {
-                if (!this._moving) {
+                if (!this._isEventSuppressionEnabled) {
                     this._onDidActiveGroupChange.fire(event);
                 }
             }),
@@ -708,13 +710,13 @@ export class DockviewComponent
 
                 if (!options?.overridePopoutGroup && isGroupAddedToDom) {
                     if (itemToPopout instanceof DockviewPanel) {
-                        this.movingLock(() => {
+                        this.runWithSuppressedEvents(() => {
                             const panel =
                                 referenceGroup.model.removePanel(itemToPopout);
                             group.model.openPanel(panel);
                         });
                     } else {
-                        this.movingLock(() =>
+                        this.runWithSuppressedEvents(() =>
                             moveGroupWithoutDestroying({
                                 from: referenceGroup,
                                 to: group,
@@ -808,7 +810,7 @@ export class DockviewComponent
                             isGroupAddedToDom &&
                             this.getPanel(referenceGroup.id)
                         ) {
-                            this.movingLock(() =>
+                            this.runWithSuppressedEvents(() =>
                                 moveGroupWithoutDestroying({
                                     from: group,
                                     to: referenceGroup,
@@ -865,7 +867,7 @@ export class DockviewComponent
             group = this.createGroup();
             this._onDidAddGroup.fire(group);
 
-            this.movingLock(() =>
+            this.runWithSuppressedEvents(() =>
                 this.removePanel(item, {
                     removeEmptyGroup: true,
                     skipDispose: true,
@@ -873,7 +875,7 @@ export class DockviewComponent
                 })
             );
 
-            this.movingLock(() =>
+            this.runWithSuppressedEvents(() =>
                 group.model.openPanel(item, { skipSetGroupActive: true })
             );
         } else {
@@ -892,7 +894,7 @@ export class DockviewComponent
 
             if (!skip) {
                 if (popoutReferenceGroup) {
-                    this.movingLock(() =>
+                    this.runWithSuppressedEvents(() =>
                         moveGroupWithoutDestroying({
                             from: item,
                             to: popoutReferenceGroup,
@@ -990,7 +992,7 @@ export class DockviewComponent
         const el = group.element.querySelector('.dv-void-container');
 
         if (!el) {
-            throw new Error('failed to find drag handle');
+            throw new Error('dockview: failed to find drag handle');
         }
 
         overlay.setupDrag(<HTMLElement>el, {
@@ -1086,7 +1088,7 @@ export class DockviewComponent
             case 'right':
                 return this.createGroupAtLocation([this.gridview.length]); // insert into last position
             default:
-                throw new Error(`unsupported position ${position}`);
+                throw new Error(`dockview: unsupported position ${position}`);
         }
     }
 
@@ -1258,17 +1260,62 @@ export class DockviewComponent
         return result;
     }
 
-    fromJSON(data: SerializedDockview): void {
+    fromJSON(
+        data: SerializedDockview,
+        options?: { reuseExistingPanels: boolean }
+    ): void {
+        const existingPanels = new Map<string, IDockviewPanel>();
+
+        let tempGroup: DockviewGroupPanel | undefined;
+
+        if (options?.reuseExistingPanels) {
+            /**
+             * What are we doing here?
+             *
+             * 1. Create a temporary group to hold any panels that currently exist and that also exist in the new layout
+             * 2. Remove that temporary group from the group mapping so that it doesn't get cleared when we clear the layout
+             */
+
+            tempGroup = this.createGroup();
+            this._groups.delete(tempGroup.api.id);
+
+            const newPanels = Object.keys(data.panels);
+
+            for (const panel of this.panels) {
+                if (newPanels.includes(panel.api.id)) {
+                    existingPanels.set(panel.api.id, panel);
+                }
+            }
+
+            this.runWithSuppressedEvents(() => {
+                Array.from(existingPanels.values()).forEach((panel) => {
+                    this.moveGroupOrPanel({
+                        from: {
+                            groupId: panel.api.group.api.id,
+                            panelId: panel.api.id,
+                        },
+                        to: {
+                            group: tempGroup!,
+                            position: 'center',
+                        },
+                        keepEmptyGroups: true,
+                    });
+                });
+            });
+        }
+
         this.clear();
 
         if (typeof data !== 'object' || data === null) {
-            throw new Error('serialized layout must be a non-null object');
+            throw new Error(
+                'dockview: serialized layout must be a non-null object'
+            );
         }
 
         const { grid, panels, activeGroup } = data;
 
         if (grid.root.type !== 'branch' || !Array.isArray(grid.root.data)) {
-            throw new Error('root must be of type branch');
+            throw new Error('dockview: root must be of type branch');
         }
 
         try {
@@ -1282,7 +1329,9 @@ export class DockviewComponent
                 const { id, locked, hideHeader, views, activeView } = data;
 
                 if (typeof id !== 'string') {
-                    throw new Error('group id must be of type string');
+                    throw new Error(
+                        'dockview: group id must be of type string'
+                    );
                 }
 
                 const group = this.createGroup({
@@ -1299,11 +1348,23 @@ export class DockviewComponent
                      * In running this section first we avoid firing lots of 'add' events in the event of a failure
                      * due to a corruption of input data.
                      */
-                    const panel = this._deserializer.fromJSON(
-                        panels[child],
-                        group
-                    );
-                    createdPanels.push(panel);
+
+                    const existingPanel = existingPanels.get(child);
+
+                    if (tempGroup && existingPanel) {
+                        this.runWithSuppressedEvents(() => {
+                            tempGroup!.model.removePanel(existingPanel);
+                        });
+
+                        createdPanels.push(existingPanel);
+                        existingPanel.updateFromStateModel(panels[child]);
+                    } else {
+                        const panel = this._deserializer.fromJSON(
+                            panels[child],
+                            group
+                        );
+                        createdPanels.push(panel);
+                    }
                 }
 
                 this._onDidAddGroup.fire(group);
@@ -1315,10 +1376,21 @@ export class DockviewComponent
                         typeof activeView === 'string' &&
                         activeView === panel.id;
 
-                    group.model.openPanel(panel, {
-                        skipSetActive: !isActive,
-                        skipSetGroupActive: true,
-                    });
+                    const hasExisting = existingPanels.has(panel.api.id);
+
+                    if (hasExisting) {
+                        this.runWithSuppressedEvents(() => {
+                            group.model.openPanel(panel, {
+                                skipSetActive: !isActive,
+                                skipSetGroupActive: true,
+                            });
+                        });
+                    } else {
+                        group.model.openPanel(panel, {
+                            skipSetActive: !isActive,
+                            skipSetGroupActive: true,
+                        });
+                    }
                 }
 
                 if (!group.activePanel && group.panels.length > 0) {
@@ -1466,14 +1538,16 @@ export class DockviewComponent
         options: AddPanelOptions<T>
     ): DockviewPanel {
         if (this.panels.find((_) => _.id === options.id)) {
-            throw new Error(`panel with id ${options.id} already exists`);
+            throw new Error(
+                `dockview: panel with id ${options.id} already exists`
+            );
         }
 
         let referenceGroup: DockviewGroupPanel | undefined;
 
         if (options.position && options.floating) {
             throw new Error(
-                'you can only provide one of: position, floating as arguments to .addPanel(...)'
+                'dockview: you can only provide one of: position, floating as arguments to .addPanel(...)'
             );
         }
 
@@ -1494,7 +1568,7 @@ export class DockviewComponent
 
                 if (!referencePanel) {
                     throw new Error(
-                        `referencePanel '${options.position.referencePanel}' does not exist`
+                        `dockview: referencePanel '${options.position.referencePanel}' does not exist`
                     );
                 }
 
@@ -1509,7 +1583,7 @@ export class DockviewComponent
 
                 if (!referenceGroup) {
                     throw new Error(
-                        `referenceGroup '${options.position.referenceGroup}' does not exist`
+                        `dockview: referenceGroup '${options.position.referenceGroup}' does not exist`
                     );
                 }
             } else {
@@ -1673,7 +1747,7 @@ export class DockviewComponent
 
         if (!group) {
             throw new Error(
-                `cannot remove panel ${panel.id}. it's missing a group.`
+                `dockview: cannot remove panel ${panel.id}. it's missing a group.`
             );
         }
 
@@ -1739,7 +1813,7 @@ export class DockviewComponent
 
                 if (!referencePanel) {
                     throw new Error(
-                        `reference panel ${options.referencePanel} does not exist`
+                        `dockview: reference panel ${options.referencePanel} does not exist`
                     );
                 }
 
@@ -1747,7 +1821,7 @@ export class DockviewComponent
 
                 if (!referenceGroup) {
                     throw new Error(
-                        `reference group for reference panel ${options.referencePanel} does not exist`
+                        `dockview: reference group for reference panel ${options.referencePanel} does not exist`
                     );
                 }
             } else if (isGroupOptionsWithGroup(options)) {
@@ -1758,7 +1832,7 @@ export class DockviewComponent
 
                 if (!referenceGroup) {
                     throw new Error(
-                        `reference group ${options.referenceGroup} does not exist`
+                        `dockview: reference group ${options.referenceGroup} does not exist`
                     );
                 }
             } else {
@@ -1871,7 +1945,7 @@ export class DockviewComponent
                 return floatingGroup.group;
             }
 
-            throw new Error('failed to find floating group');
+            throw new Error('dockview: failed to find floating group');
         }
 
         if (group.api.location.type === 'popout') {
@@ -1917,7 +1991,7 @@ export class DockviewComponent
                 return selectedGroup.popoutGroup;
             }
 
-            throw new Error('failed to find popout group');
+            throw new Error('dockview: failed to find popout group');
         }
 
         const re = super.doRemoveGroup(group, options);
@@ -1931,16 +2005,21 @@ export class DockviewComponent
         return re;
     }
 
-    private _moving = false;
+    private _isEventSuppressionEnabled = false;
 
-    movingLock<T>(func: () => T): T {
-        const isMoving = this._moving;
+    /**
+     * Code that runs within the provided function will not cause any events to fire. This is useful if you want
+     * to move things around as an intermediate step without raises any associated events
+     */
+    runWithSuppressedEvents<T>(func: () => T): T {
+        const isMoving = this._isEventSuppressionEnabled;
 
         try {
-            this._moving = true;
+            this._isEventSuppressionEnabled = true;
             return func();
         } finally {
-            this._moving = isMoving;
+            // return to the original state which isn't necessarily false since calls may be nested
+            this._isEventSuppressionEnabled = isMoving;
         }
     }
 
@@ -1956,7 +2035,9 @@ export class DockviewComponent
             : undefined;
 
         if (!sourceGroup) {
-            throw new Error(`Failed to find group id ${sourceGroupId}`);
+            throw new Error(
+                `dockview: Failed to find group id ${sourceGroupId}`
+            );
         }
 
         if (sourceItemId === undefined) {
@@ -1979,24 +2060,24 @@ export class DockviewComponent
              * Dropping a panel within another group
              */
 
-            const removedPanel: IDockviewPanel | undefined = this.movingLock(
-                () =>
+            const removedPanel: IDockviewPanel | undefined =
+                this.runWithSuppressedEvents(() =>
                     sourceGroup.model.removePanel(sourceItemId, {
                         skipSetActive: false,
                         skipSetActiveGroup: true,
                     })
-            );
+                );
 
             if (!removedPanel) {
-                throw new Error(`No panel with id ${sourceItemId}`);
+                throw new Error(`dockview: No panel with id ${sourceItemId}`);
             }
 
-            if (sourceGroup.model.size === 0) {
+            if (!options.keepEmptyGroups && sourceGroup.model.size === 0) {
                 // remove the group and do not set a new group as active
                 this.doRemoveGroup(sourceGroup, { skipActive: true });
             }
 
-            this.movingLock(() =>
+            this.runWithSuppressedEvents(() =>
                 destinationGroup.model.openPanel(removedPanel, {
                     index: destinationIndex,
                     skipSetGroupActive: true,
@@ -2067,7 +2148,7 @@ export class DockviewComponent
                     )!;
 
                     const removedPanel: IDockviewPanel | undefined =
-                        this.movingLock(() =>
+                        this.runWithSuppressedEvents(() =>
                             popoutGroup.popoutGroup.model.removePanel(
                                 popoutGroup.popoutGroup.panels[0],
                                 {
@@ -2080,7 +2161,7 @@ export class DockviewComponent
                     this.doRemoveGroup(sourceGroup, { skipActive: true });
 
                     const newGroup = this.createGroupAtLocation(targetLocation);
-                    this.movingLock(() =>
+                    this.runWithSuppressedEvents(() =>
                         newGroup.model.openPanel(removedPanel, {
                             skipSetActive: true,
                         })
@@ -2095,7 +2176,7 @@ export class DockviewComponent
                 }
 
                 // source group will become empty so delete the group
-                const targetGroup = this.movingLock(() =>
+                const targetGroup = this.runWithSuppressedEvents(() =>
                     this.doRemoveGroup(sourceGroup, {
                         skipActive: true,
                         skipDispose: true,
@@ -2112,7 +2193,9 @@ export class DockviewComponent
                     updatedReferenceLocation,
                     destinationTarget
                 );
-                this.movingLock(() => this.doAddGroup(targetGroup, location));
+                this.runWithSuppressedEvents(() =>
+                    this.doAddGroup(targetGroup, location)
+                );
                 this.doSetGroupAndPanelActive(targetGroup);
 
                 this._onDidMovePanel.fire({
@@ -2125,7 +2208,7 @@ export class DockviewComponent
                  * create a new group, add the panels to that new group and add the new group in an appropiate position
                  */
                 const removedPanel: IDockviewPanel | undefined =
-                    this.movingLock(() =>
+                    this.runWithSuppressedEvents(() =>
                         sourceGroup.model.removePanel(sourceItemId, {
                             skipSetActive: false,
                             skipSetActiveGroup: true,
@@ -2133,7 +2216,9 @@ export class DockviewComponent
                     );
 
                 if (!removedPanel) {
-                    throw new Error(`No panel with id ${sourceItemId}`);
+                    throw new Error(
+                        `dockview: No panel with id ${sourceItemId}`
+                    );
                 }
 
                 const dropLocation = getRelativeLocation(
@@ -2143,7 +2228,7 @@ export class DockviewComponent
                 );
 
                 const group = this.createGroupAtLocation(dropLocation);
-                this.movingLock(() =>
+                this.runWithSuppressedEvents(() =>
                     group.model.openPanel(removedPanel, {
                         skipSetGroupActive: true,
                     })
@@ -2166,7 +2251,7 @@ export class DockviewComponent
         if (target === 'center') {
             const activePanel = from.activePanel;
 
-            const panels = this.movingLock(() =>
+            const panels = this.runWithSuppressedEvents(() =>
                 [...from.panels].map((p) =>
                     from.model.removePanel(p.id, {
                         skipSetActive: true,
@@ -2178,7 +2263,7 @@ export class DockviewComponent
                 this.doRemoveGroup(from, { skipActive: true });
             }
 
-            this.movingLock(() => {
+            this.runWithSuppressedEvents(() => {
                 for (const panel of panels) {
                     to.model.openPanel(panel, {
                         skipSetActive: panel !== activePanel,
@@ -2198,7 +2283,9 @@ export class DockviewComponent
                         (x) => x.group === from
                     );
                     if (!selectedFloatingGroup) {
-                        throw new Error('failed to find floating group');
+                        throw new Error(
+                            'dockview: failed to find floating group'
+                        );
                     }
                     selectedFloatingGroup.dispose();
                     break;
@@ -2208,7 +2295,9 @@ export class DockviewComponent
                         (x) => x.popoutGroup === from
                     );
                     if (!selectedPopoutGroup) {
-                        throw new Error('failed to find popout group');
+                        throw new Error(
+                            'dockview: failed to find popout group'
+                        );
                     }
                     selectedPopoutGroup.disposable.dispose();
                 }
@@ -2252,7 +2341,7 @@ export class DockviewComponent
         const activePanel = this.activePanel;
 
         if (
-            !this._moving &&
+            !this._isEventSuppressionEnabled &&
             activePanel !== this._onDidActivePanelChange.value
         ) {
             this._onDidActivePanelChange.fire(activePanel);
@@ -2273,7 +2362,7 @@ export class DockviewComponent
         }
 
         if (
-            !this._moving &&
+            !this._isEventSuppressionEnabled &&
             activePanel !== this._onDidActivePanelChange.value
         ) {
             this._onDidActivePanelChange.fire(activePanel);
@@ -2350,19 +2439,19 @@ export class DockviewComponent
                     this._onUnhandledDragOverEvent.fire(event);
                 }),
                 view.model.onDidAddPanel((event) => {
-                    if (this._moving) {
+                    if (this._isEventSuppressionEnabled) {
                         return;
                     }
                     this._onDidAddPanel.fire(event.panel);
                 }),
                 view.model.onDidRemovePanel((event) => {
-                    if (this._moving) {
+                    if (this._isEventSuppressionEnabled) {
                         return;
                     }
                     this._onDidRemovePanel.fire(event.panel);
                 }),
                 view.model.onDidActivePanelChange((event) => {
-                    if (this._moving) {
+                    if (this._isEventSuppressionEnabled) {
                         return;
                     }
                     if (event.panel !== this.activePanel) {
