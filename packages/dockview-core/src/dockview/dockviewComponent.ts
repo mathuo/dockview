@@ -741,6 +741,7 @@ export class DockviewComponent
                                             itemToPopout.api.id
                                     )
                                     ?.overlay.toJSON();
+
                                 this.removeGroup(referenceGroup);
 
                                 break;
@@ -859,7 +860,9 @@ export class DockviewComponent
                                     this.overlayRenderContainer;
                                 removedGroup.model.location = { type: 'grid' };
                                 returnedGroup = removedGroup;
+
                                 this.movingLock(() => {
+                                    // suppress group add events since the group already exists
                                     this.doAddGroup(removedGroup, [0]);
                                 });
                             }
