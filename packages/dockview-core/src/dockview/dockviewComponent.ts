@@ -706,6 +706,8 @@ export class DockviewComponent
                     _window.window!.innerHeight
                 );
 
+                let floatingBox: AnchoredBox | undefined;
+
                 if (!options?.overridePopoutGroup && isGroupAddedToDom) {
                     if (itemToPopout instanceof DockviewPanel) {
                         this.movingLock(() => {
@@ -727,7 +729,15 @@ export class DockviewComponent
                                 break;
                             case 'floating':
                             case 'popout':
+                                floatingBox = this._floatingGroups
+                                    .find(
+                                        (value) =>
+                                            value.group.api.id ===
+                                            itemToPopout.api.id
+                                    )
+                                    ?.overlay.toJSON();
                                 this.removeGroup(referenceGroup);
+
                                 break;
                         }
                     }
@@ -825,20 +835,29 @@ export class DockviewComponent
                                 });
                             }
                         } else if (this.getPanel(group.id)) {
-                            this.doRemoveGroup(group, {
-                                skipDispose: true,
-                                skipActive: true,
-                                skipPopoutReturn: true,
-                            });
-
                             const removedGroup = group;
 
-                            removedGroup.model.renderContainer =
-                                this.overlayRenderContainer;
-                            removedGroup.model.location = { type: 'grid' };
-                            returnedGroup = removedGroup;
+                            if (floatingBox) {
+                                this.addFloatingGroup(removedGroup, {
+                                    height: floatingBox.height,
+                                    width: floatingBox.width,
+                                    position: floatingBox,
+                                });
+                            } else {
+                                this.doRemoveGroup(removedGroup, {
+                                    skipDispose: true,
+                                    skipActive: true,
+                                    skipPopoutReturn: true,
+                                });
 
-                            this.doAddGroup(removedGroup, [0]);
+                                removedGroup.model.renderContainer =
+                                    this.overlayRenderContainer;
+                                removedGroup.model.location = { type: 'grid' };
+                                returnedGroup = removedGroup;
+                                this.movingLock(() => {
+                                    this.doAddGroup(removedGroup, [0]);
+                                });
+                            }
                             this.doSetGroupAndPanelActive(removedGroup);
                         }
                     })
@@ -1475,6 +1494,22 @@ export class DockviewComponent
             throw new Error(
                 'you can only provide one of: position, floating as arguments to .addPanel(...)'
             );
+        }
+
+        if (options.popout) {
+            const group = this.createGroup();
+            this._onDidAddGroup.fire(group);
+
+            this.addPopoutGroup(group);
+
+            const panel = this.createPanel(options, group);
+
+            group.model.openPanel(panel, {
+                skipSetActive: options.inactive,
+                skipSetGroupActive: options.inactive,
+            });
+
+            return panel;
         }
 
         const initial = {

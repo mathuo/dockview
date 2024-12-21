@@ -21,6 +21,7 @@ import { DockviewApi } from '../../api/component.api';
 import { DockviewDndOverlayEvent } from '../../dockview/options';
 import { SizeEvent } from '../../api/gridviewPanelApi';
 import { setupMockWindow } from '../__mocks__/mockWindow';
+import { exhaustMicrotaskQueue } from '../__test_utils__/utils';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
@@ -4867,6 +4868,155 @@ describe('dockviewComponent', () => {
             );
         });
 
+        test('basic', async () => {
+            jest.useRealTimers();
+
+            const container = document.createElement('div');
+
+            window.open = () => setupMockWindow();
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 1000);
+
+            dockview.fromJSON({
+                activeGroup: 'group-1',
+                grid: {
+                    root: {
+                        type: 'branch',
+                        data: [
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panel1'],
+                                    id: 'group-1',
+                                    activeView: 'panel1',
+                                },
+                                size: 1000,
+                            },
+                        ],
+                        size: 1000,
+                    },
+                    height: 1000,
+                    width: 1000,
+                    orientation: Orientation.VERTICAL,
+                },
+                popoutGroups: [
+                    {
+                        data: {
+                            views: ['panel2'],
+                            id: 'group-2',
+                            activeView: 'panel2',
+                        },
+                        position: null,
+                    },
+                ],
+                panels: {
+                    panel1: {
+                        id: 'panel1',
+                        contentComponent: 'default',
+                        title: 'panel1',
+                    },
+                    panel2: {
+                        id: 'panel2',
+                        contentComponent: 'default',
+                        title: 'panel2',
+                    },
+                },
+            });
+
+            await new Promise((resolve) => setTimeout(resolve, 0));
+
+            const panel2 = dockview.api.getPanel('panel2');
+
+            const windowObject =
+                panel2?.api.location.type === 'popout'
+                    ? panel2?.api.location.getWindow()
+                    : undefined;
+
+            expect(windowObject).toBeTruthy();
+
+            windowObject!.close();
+        });
+
+        test('grid -> floating -> popout -> popout closed', async () => {
+            const container = document.createElement('div');
+
+            window.open = () => setupMockWindow();
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+            });
+
+            const panel3 = dockview.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(panel2.api.location.type).toBe('grid');
+            expect(panel3.api.location.type).toBe('grid');
+
+            dockview.addFloatingGroup(panel2);
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(panel2.api.location.type).toBe('floating');
+            expect(panel3.api.location.type).toBe('grid');
+
+            await dockview.addPopoutGroup(panel2);
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(panel2.api.location.type).toBe('popout');
+            expect(panel3.api.location.type).toBe('grid');
+
+            const windowObject =
+                panel2.api.location.type === 'popout'
+                    ? panel2.api.location.getWindow()
+                    : undefined;
+            expect(windowObject).toBeTruthy();
+
+            windowObject!.close();
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(panel2.api.location.type).toBe('floating');
+            expect(panel3.api.location.type).toBe('grid');
+        });
+
         test('move popout group of 1 panel inside grid', async () => {
             const container = document.createElement('div');
 
@@ -5116,7 +5266,7 @@ describe('dockviewComponent', () => {
             mockWindow.close();
 
             expect(panel1.group.api.location.type).toBe('grid');
-            expect(panel2.group.api.location.type).toBe('grid');
+            expect(panel2.group.api.location.type).toBe('floating');
             expect(panel3.group.api.location.type).toBe('grid');
 
             dockview.clear();

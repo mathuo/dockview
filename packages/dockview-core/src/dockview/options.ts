@@ -252,6 +252,7 @@ export type AddPanelOptions<P extends object = Parameters> = {
     inactive?: boolean;
     initialWidth?: number;
     initialHeight?: number;
+    popout?: boolean;
 } & Partial<AddPanelOptionsUnion> &
     Partial<Contraints>;
 
