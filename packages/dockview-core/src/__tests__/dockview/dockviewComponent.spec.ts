@@ -21,7 +21,6 @@ import { DockviewApi } from '../../api/component.api';
 import { DockviewDndOverlayEvent } from '../../dockview/options';
 import { SizeEvent } from '../../api/gridviewPanelApi';
 import { setupMockWindow } from '../__mocks__/mockWindow';
-import { exhaustMicrotaskQueue } from '../__test_utils__/utils';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
@@ -141,109 +140,114 @@ describe('dockviewComponent', () => {
         expect(dockview.element.className).toBe('test-b test-c');
     });
 
-    // describe('memory leakage', () => {
-    //     beforeEach(() => {
-    //         window.open = () => fromPartial<Window>({
-    //             addEventListener: jest.fn(),
-    //             close: jest.fn(),
-    //         });
-    //     });
+    describe('memory leakage', () => {
+        beforeEach(() => {
+            window.open = () => setupMockWindow();
+        });
 
-    //     test('event leakage', () => {
-    //         Emitter.setLeakageMonitorEnabled(true);
+        test('event leakage', async () => {
+            Emitter.setLeakageMonitorEnabled(true);
 
-    //         dockview = new DockviewComponent({
-    //             parentElement: container,
-    //             components: {
-    //                 default: PanelContentPartTest,
-    //             },
-    //         });
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                className: 'test-a test-b',
+            });
 
-    //         dockview.layout(500, 1000);
+            dockview.layout(500, 1000);
 
-    //         const panel1 = dockview.addPanel({
-    //             id: 'panel1',
-    //             component: 'default',
-    //         });
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
 
-    //         const panel2 = dockview.addPanel({
-    //             id: 'panel2',
-    //             component: 'default',
-    //         });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
 
-    //         dockview.removePanel(panel2);
+            dockview.removePanel(panel2);
 
-    //         const panel3 = dockview.addPanel({
-    //             id: 'panel3',
-    //             component: 'default',
-    //             position: {
-    //                 direction: 'right',
-    //                 referencePanel: 'panel1',
-    //             },
-    //         });
+            const panel3 = dockview.addPanel({
+                id: 'panel3',
+                component: 'default',
+                position: {
+                    direction: 'right',
+                    referencePanel: 'panel1',
+                },
+            });
 
-    //         const panel4 = dockview.addPanel({
-    //             id: 'panel4',
-    //             component: 'default',
-    //             position: {
-    //                 direction: 'above',
-    //             },
-    //         });
+            const panel4 = dockview.addPanel({
+                id: 'panel4',
+                component: 'default',
+                position: {
+                    direction: 'above',
+                },
+            });
 
-    //         dockview.moveGroupOrPanel(
-    //             panel4.group,
-    //             panel3.group.id,
-    //             panel3.id,
-    //             'center'
-    //         );
+            panel4.api.group.api.moveTo({
+                group: panel3.api.group,
+                position: 'center',
+            });
 
-    //         dockview.addPanel({
-    //             id: 'panel5',
-    //             component: 'default',
-    //             floating: true,
-    //         });
+            dockview.addPanel({
+                id: 'panel5',
+                component: 'default',
+                floating: true,
+            });
 
-    //         const panel6 = dockview.addPanel({
-    //             id: 'panel6',
-    //             component: 'default',
-    //             position: {
-    //                 referencePanel: 'panel5',
-    //                 direction: 'within',
-    //             },
-    //         });
+            const panel6 = dockview.addPanel({
+                id: 'panel6',
+                component: 'default',
+                position: {
+                    referencePanel: 'panel5',
+                    direction: 'within',
+                },
+            });
 
-    //         dockview.addFloatingGroup(panel4.api.group);
+            dockview.addFloatingGroup(panel4.api.group);
 
-    //         dockview.addPopoutGroup(panel6);
+            await dockview.addPopoutGroup(panel2);
 
-    //         dockview.moveGroupOrPanel(
-    //             panel1.group,
-    //             panel6.group.id,
-    //             panel6.id,
-    //             'center'
-    //         );
+            panel1.api.group.api.moveTo({
+                group: panel6.api.group,
+                position: 'center',
+            });
 
-    //         dockview.moveGroupOrPanel(
-    //             panel4.group,
-    //             panel6.group.id,
-    //             panel6.id,
-    //             'center'
-    //         );
+            panel4.api.group.api.moveTo({
+                group: panel6.api.group,
+                position: 'center',
+            });
 
-    //         dockview.dispose();
+            dockview.dispose();
 
-    //         if (Emitter.MEMORY_LEAK_WATCHER.size > 0) {
-    //             for (const entry of Array.from(
-    //                 Emitter.MEMORY_LEAK_WATCHER.events
-    //             )) {
-    //                 console.log('disposal', entry[1]);
-    //             }
-    //             throw new Error('not all listeners disposed');
-    //         }
+            if (Emitter.MEMORY_LEAK_WATCHER.size > 0) {
+                console.warn(
+                    `${Emitter.MEMORY_LEAK_WATCHER.size} undisposed resources`
+                );
 
-    //         Emitter.setLeakageMonitorEnabled(false);
-    //     });
-    // });
+                for (const entry of Array.from(
+                    Emitter.MEMORY_LEAK_WATCHER.events
+                )) {
+                    console.log('disposal', entry[1]);
+                }
+                throw new Error(
+                    `${Emitter.MEMORY_LEAK_WATCHER.size} undisposed resources`
+                );
+            }
+
+            Emitter.setLeakageMonitorEnabled(false);
+        });
+    });
 
     test('duplicate panel', () => {
         dockview.layout(500, 1000);

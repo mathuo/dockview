@@ -409,6 +409,7 @@ export class DockviewComponent
             this._onDidRemoveGroup,
             this._onDidActiveGroupChange,
             this._onUnhandledDragOverEvent,
+            this._onDidMaximizedGroupChange,
             this.onDidViewVisibilityChangeMicroTaskQueue(() => {
                 this.updateWatermark();
             }),
@@ -574,6 +575,11 @@ export class DockviewComponent
         this._api = new DockviewApi(this);
 
         this.updateWatermark();
+    }
+
+    override dispose(): void {
+        this.clear(); // explicitly clear the layout before cleaning up
+        super.dispose();
     }
 
     override setVisible(panel: DockviewGroupPanel, visible: boolean): void {
