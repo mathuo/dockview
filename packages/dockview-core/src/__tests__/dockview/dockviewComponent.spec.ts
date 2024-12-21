@@ -3708,16 +3708,16 @@ describe('dockviewComponent', () => {
                 floatingGroups: [
                     {
                         data: {
-                            views: ['panelB'],
-                            activeView: 'panelB',
+                            views: ['panelC'],
+                            activeView: 'panelC',
                             id: '3',
                         },
                         position: { left: 0, top: 0, height: 100, width: 100 },
                     },
                     {
                         data: {
-                            views: ['panelC'],
-                            activeView: 'panelC',
+                            views: ['panelD'],
+                            activeView: 'panelD',
                             id: '4',
                         },
                         position: { left: 0, top: 0, height: 100, width: 100 },

@@ -73,6 +73,7 @@ import {
     OverlayRenderContainer,
 } from '../overlay/overlayRenderContainer';
 import { PopoutWindow } from '../popoutWindow';
+import { StrictEventsSequencing } from './strictEventsSequencing';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     activationSize: { type: 'pixels', value: 10 },
@@ -387,6 +388,10 @@ export class DockviewComponent
 
         toggleClass(this.gridview.element, 'dv-dockview', true);
         toggleClass(this.element, 'dv-debug', !!options.debug);
+
+        if (options.debug) {
+            this.addDisposables(new StrictEventsSequencing(this));
+        }
 
         this.addDisposables(
             this.overlayRenderContainer,
@@ -1309,6 +1314,7 @@ export class DockviewComponent
                     locked: !!locked,
                     hideHeader: !!hideHeader,
                 });
+                this._onDidAddGroup.fire(group);
 
                 const createdPanels: IDockviewPanel[] = [];
 
@@ -1324,8 +1330,6 @@ export class DockviewComponent
                     );
                     createdPanels.push(panel);
                 }
-
-                this._onDidAddGroup.fire(group);
 
                 for (let i = 0; i < views.length; i++) {
                     const panel = createdPanels[i];
@@ -1413,6 +1417,7 @@ export class DockviewComponent
                 'dockview: failed to deserialize layout. Reverting changes',
                 err
             );
+
             /**
              * Takes all the successfully created groups and remove all of their panels.
              */
