@@ -1501,22 +1501,6 @@ export class DockviewComponent
             );
         }
 
-        if (options.popout) {
-            const group = this.createGroup();
-            this._onDidAddGroup.fire(group);
-
-            this.addPopoutGroup(group);
-
-            const panel = this.createPanel(options, group);
-
-            group.model.openPanel(panel, {
-                skipSetActive: options.inactive,
-                skipSetGroupActive: options.inactive,
-            });
-
-            return panel;
-        }
-
         const initial = {
             width: options.initialWidth,
             height: options.initialHeight,
