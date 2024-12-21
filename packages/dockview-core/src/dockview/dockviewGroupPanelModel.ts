@@ -506,7 +506,9 @@ export class DockviewGroupPanelModel
             this._onDidAddPanel,
             this._onDidRemovePanel,
             this._onDidActivePanelChange,
-            this._onUnhandledDragOverEvent
+            this._onUnhandledDragOverEvent,
+            this._onDidPanelTitleChange,
+            this._onDidPanelParametersChange
         );
     }
 

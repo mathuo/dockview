@@ -205,6 +205,8 @@ export abstract class BaseGrid<T extends IGridPanelView>
             )(() => {
                 this._bufferOnDidLayoutChange.fire();
             }),
+            this._onDidMaximizedChange,
+            this._onDidViewVisibilityChangeMicroTaskQueue,
             this._bufferOnDidLayoutChange
         );
     }
