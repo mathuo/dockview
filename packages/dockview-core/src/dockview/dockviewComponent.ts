@@ -2114,9 +2114,7 @@ export class DockviewComponent
 
                     const newGroup = this.createGroupAtLocation(targetLocation);
                     this.movingLock(() =>
-                        newGroup.model.openPanel(removedPanel, {
-                            skipSetActive: true,
-                        })
+                        newGroup.model.openPanel(removedPanel)
                     );
                     this.doSetGroupAndPanelActive(newGroup);
 
