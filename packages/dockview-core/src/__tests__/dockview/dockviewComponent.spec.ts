@@ -5052,8 +5052,13 @@ describe('dockviewComponent', () => {
                 component: 'default',
             });
 
-            await dockview.addPopoutGroup(panel2);
+            const panel3 = dockview.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                renderer: 'always',
+            });
 
+            await dockview.addPopoutGroup(panel2);
             panel2.api.moveTo({ group: panel1.api.group, position: 'right' });
 
             // confirm panel is rendered on DOM
@@ -5062,6 +5067,22 @@ describe('dockviewComponent', () => {
                     '.dv-content-container > .testpanel-panel_2'
                 ).length
             ).toBe(1);
+
+            await dockview.addPopoutGroup(panel3);
+            panel3.api.moveTo({ group: panel1.api.group, position: 'right' });
+
+            // confirm panel is rendered to always overlay container
+            expect(
+                dockview.element.querySelectorAll(
+                    '.dv-render-overlay > .testpanel-panel_3'
+                ).length
+            ).toBe(1);
+            expect(
+                panel2.group.element.querySelectorAll(
+                    '.dv-content-container > .testpanel-panel_3'
+                ).length
+            ).toBe(0);
+            expect(dockview.element);
         });
 
         test('move popout group of 1 panel inside grid', async () => {

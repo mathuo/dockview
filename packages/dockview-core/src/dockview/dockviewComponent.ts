@@ -577,11 +577,6 @@ export class DockviewComponent
         this.updateWatermark();
     }
 
-    override dispose(): void {
-        this.clear(); // explicitly clear the layout before cleaning up
-        super.dispose();
-    }
-
     override setVisible(panel: DockviewGroupPanel, visible: boolean): void {
         switch (panel.api.location.type) {
             case 'grid':
@@ -847,32 +842,31 @@ export class DockviewComponent
                                 });
                             }
                         } else if (this.getPanel(group.id)) {
-                            const removedGroup = group;
+                            group.model.renderContainer =
+                                this.overlayRenderContainer;
+                            returnedGroup = group;
 
                             if (floatingBox) {
-                                this.addFloatingGroup(removedGroup, {
+                                this.addFloatingGroup(group, {
                                     height: floatingBox.height,
                                     width: floatingBox.width,
                                     position: floatingBox,
                                 });
                             } else {
-                                this.doRemoveGroup(removedGroup, {
+                                this.doRemoveGroup(group, {
                                     skipDispose: true,
                                     skipActive: true,
                                     skipPopoutReturn: true,
                                 });
 
-                                removedGroup.model.renderContainer =
-                                    this.overlayRenderContainer;
-                                removedGroup.model.location = { type: 'grid' };
-                                returnedGroup = removedGroup;
+                                group.model.location = { type: 'grid' };
 
                                 this.movingLock(() => {
                                     // suppress group add events since the group already exists
-                                    this.doAddGroup(removedGroup, [0]);
+                                    this.doAddGroup(group, [0]);
                                 });
                             }
-                            this.doSetGroupAndPanelActive(removedGroup);
+                            this.doSetGroupAndPanelActive(group);
                         }
                     })
                 );
