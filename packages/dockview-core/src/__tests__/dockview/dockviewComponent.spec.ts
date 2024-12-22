@@ -4872,7 +4872,7 @@ describe('dockviewComponent', () => {
             );
         });
 
-        test('basic', async () => {
+        test('deserailize popout with no reference group', async () => {
             jest.useRealTimers();
 
             const container = document.createElement('div');
@@ -5019,6 +5019,49 @@ describe('dockviewComponent', () => {
             expect(panel1.api.location.type).toBe('grid');
             expect(panel2.api.location.type).toBe('floating');
             expect(panel3.api.location.type).toBe('grid');
+        });
+
+        test('that panel is rendered when moving from popout to new group', async () => {
+            const container = document.createElement('div');
+
+            window.open = () => setupMockWindow();
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+            });
+
+            await dockview.addPopoutGroup(panel2);
+
+            panel2.api.moveTo({ group: panel1.api.group, position: 'right' });
+
+            // confirm panel is rendered on DOM
+            expect(
+                panel2.group.element.querySelectorAll(
+                    '.dv-content-container > .testpanel-panel_2'
+                ).length
+            ).toBe(1);
         });
 
         test('move popout group of 1 panel inside grid', async () => {
