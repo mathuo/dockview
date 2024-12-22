@@ -4,10 +4,25 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Sat, 21 Dec 2024 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Sun, 22 Dec 2024 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 2.1.3]]></title>
+            <link>https://dockview.dev/blog/dockview-2.1.3-release</link>
+            <guid>https://dockview.dev/blog/dockview-2.1.3-release</guid>
+            <pubDate>Sun, 22 Dec 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-2.1.3-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-2.1.3-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Fix rendering issue when popout group is moved into new grid group <a href="https://github.com/mathuo/dockview/issues/799" target="_blank" rel="noopener noreferrer">#799</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-2.1.3-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 2.1.2]]></title>
             <link>https://dockview.dev/blog/dockview-2.1.2-release</link>
@@ -405,43 +420,6 @@ These are still in active development and will be offically support soon.</p>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.12.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
 <ul>
 <li>Fix Typo: <code>onlyWhenVisibile</code> to <code>onlyWhenVisible</code> <a href="https://github.com/mathuo/dockview/pull/559" target="_blank" rel="noopener noreferrer">#559</a></li>
-</ul>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 1.11.0]]></title>
-            <link>https://dockview.dev/blog/dockview-1.11.0-release</link>
-            <guid>https://dockview.dev/blog/dockview-1.11.0-release</guid>
-            <pubDate>Sun, 17 Mar 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.11.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>
-<p>Adjust <code>React</code> imports <a href="https://github.com/mathuo/dockview/pull/556" target="_blank" rel="noopener noreferrer">#556</a></p>
-<ul>
-<li>Rename <code>import * as React from 'react'</code> to <code>import React from 'react'</code></li>
-<li>Rename <code>import * as ReactDOM from 'react-dom'</code> to <code>import ReactDOM from 'react-dom'</code></li>
-<li>This is preperation work for supporting multiple framworks (Vue, Angular etc...)</li>
-</ul>
-</li>
-<li>
-<p>Only export CSS from <code>dockview-core</code> <a href="https://github.com/mathuo/dockview/pull/553" target="_blank" rel="noopener noreferrer">#553</a></p>
-<ul>
-<li>All required CSS is now found in <code>dockview-core</code> only. <code>dockview</code> (React) specific CSS has been removed and made compatible with CSS in <code>dockview-core</code>. This is preperation work for supporting multiple framworks (Vue, Angular etc...)</li>
-<li>For compatibility reasons <code>dockview-core</code> CSS continues to be re-exported through <code>dockview</code>.</li>
-<li>Class name changes as follows:<!-- -->
-<ul>
-<li><code>tab-action</code> to <code>dv-default-tab-action</code></li>
-<li><code>default-tab</code> to <code>dv-default-tab</code></li>
-<li><code>tab-content</code> to <code>dv-default-tab-content</code></li>
-<li><code>dockview-react-tab</code> to <code>dv-default-tab</code></li>
-<li><code>dockview-react-tab-title</code> to <code>dv-default-tab-content</code></li>
-<li><code>dv-react-tab-close-btn</code> to <code>dv-default-tab-action</code></li>
-</ul>
-</li>
-</ul>
-</li>
 </ul>]]></content:encoded>
             <category>release</category>
         </item>
