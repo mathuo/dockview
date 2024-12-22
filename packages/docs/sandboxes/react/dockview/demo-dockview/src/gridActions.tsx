@@ -132,7 +132,7 @@ export const GridActions = (props: {
 
     const popover = usePopover();
 
-    const onAddPanel = (options?: { advanced: boolean }) => {
+    const onAddPanel = (options?: { advanced?: boolean; nested?: boolean }) => {
         if (options?.advanced) {
             popover.open(({ close }) => {
                 return <PanelBuilder api={props.api!} done={close} />;
@@ -140,7 +140,7 @@ export const GridActions = (props: {
         } else {
             props.api?.addPanel({
                 id: `id_${Date.now().toString()}`,
-                component: 'default',
+                component: options?.nested ? 'nested' : 'default',
                 title: `Tab ${nextId()}`,
                 renderer: 'always',
             });
@@ -170,6 +170,12 @@ export const GridActions = (props: {
                     <span className="material-symbols-outlined">tune</span>
                 </button>
             </div>
+            <button
+                className="text-button"
+                onClick={() => onAddPanel({ nested: true })}
+            >
+                Add Nested Panel
+            </button>
             <button className="text-button" onClick={onAddGroup}>
                 Add Group
             </button>
@@ -198,8 +204,8 @@ export const GridActions = (props: {
                 Reset
             </button>
             <span style={{ flexGrow: 1 }} />
-            <div style={{ display: 'flex' }}>
-                <span style={{ paddingRight: '4px' }}>Group Gap</span>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ paddingRight: '4px' }}>Grid Gap</span>
                 <input
                     style={{ width: 40 }}
                     type="number"
@@ -209,6 +215,7 @@ export const GridActions = (props: {
                     value={gap}
                     onChange={(event) => setGap(Number(event.target.value))}
                 />
+                <button onClick={() => setGap(0)}>Reset</button>
             </div>
         </div>
     );
