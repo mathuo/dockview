@@ -577,11 +577,6 @@ export class DockviewComponent
         this.updateWatermark();
     }
 
-    override dispose(): void {
-        this.clear(); // explicitly clear the layout before cleaning up
-        super.dispose();
-    }
-
     override setVisible(panel: DockviewGroupPanel, visible: boolean): void {
         switch (panel.api.location.type) {
             case 'grid':
