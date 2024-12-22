@@ -37,7 +37,7 @@ describe('headerActionsRenderer', () => {
         );
 
         expect(cut.element.childNodes.length).toBe(0);
-        expect(cut.element.className).toBe('dockview-react-part');
+        expect(cut.element.className).toBe('dv-react-part');
         expect(cut.part).toBeUndefined();
 
         cut.init({
