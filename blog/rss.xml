@@ -4,10 +4,26 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Sun, 22 Dec 2024 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Mon, 23 Dec 2024 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 2.1.4]]></title>
+            <link>https://dockview.dev/blog/dockview-2.1.4-release</link>
+            <guid>https://dockview.dev/blog/dockview-2.1.4-release</guid>
+            <pubDate>Mon, 23 Dec 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-2.1.4-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-2.1.4-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Maintenance: Cleanup resource dispose <a href="https://github.com/mathuo/dockview/issues/801" target="_blank" rel="noopener noreferrer">#801</a></li>
+<li>Bug: Fix for using popout groups with <code>always</code> rendering <a href="https://github.com/mathuo/dockview/issues/803" target="_blank" rel="noopener noreferrer">#803</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-2.1.4-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 2.1.3]]></title>
             <link>https://dockview.dev/blog/dockview-2.1.3-release</link>
@@ -398,28 +414,6 @@ These are still in active development and will be offically support soon.</p>
 <li>[dockview-core] Remove <code>frameworkTabComponents</code> and <code>tabComponents</code>, replaced by <code>createTabComponent</code> <a href="https://github.com/mathuo/dockview/pull/576" target="_blank" rel="noopener noreferrer">#576</a></li>
 <li>[dockview-core] Remove <code>frameworkComponents</code> and <code>components</code>, replaced by <code>createComponent</code> <a href="https://github.com/mathuo/dockview/pull/576" target="_blank" rel="noopener noreferrer">#576</a></li>
 <li>[dockview-core] Remove <code>watermarkFrameworkComponent</code> and <code>watermarkComponent</code>, replaced by <code>createWatermarkComponent</code> <a href="https://github.com/mathuo/dockview/pull/576" target="_blank" rel="noopener noreferrer">#576</a></li>
-</ul>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 1.12.0]]></title>
-            <link>https://dockview.dev/blog/dockview-1.12.0-release</link>
-            <guid>https://dockview.dev/blog/dockview-1.12.0-release</guid>
-            <pubDate>Mon, 15 Apr 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.12.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<ul>
-<li>
-<p>Enhance <code>onWillShowOverlay</code> event to contain additional commonly used methods and properties <a href="https://github.com/mathuo/dockview/issues/564" target="_blank" rel="noopener noreferrer">#564</a></p>
-</li>
-<li>
-<p>Expose <code>api.component</code> and <code>api.tabComponent</code> on panel api <a href="https://github.com/mathuo/dockview/issues/569" target="_blank" rel="noopener noreferrer">#569</a></p>
-</li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.12.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
-<ul>
-<li>Fix Typo: <code>onlyWhenVisibile</code> to <code>onlyWhenVisible</code> <a href="https://github.com/mathuo/dockview/pull/559" target="_blank" rel="noopener noreferrer">#559</a></li>
 </ul>]]></content:encoded>
             <category>release</category>
         </item>
