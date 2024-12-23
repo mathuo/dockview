@@ -1,13 +1,13 @@
 import React from 'react';
 import {
     PanelUpdateEvent,
-    IPaneBodyPart,
+    IPanePart,
     PanePanelComponentInitParameter,
 } from 'dockview-core';
 import { ReactPart, ReactPortalStore } from '../react';
 import { IPaneviewPanelProps } from './paneview';
 
-export class PanePanelSection implements IPaneBodyPart {
+export class PanePanelSection implements IPanePart {
     private readonly _element: HTMLElement;
     private part?: ReactPart<IPaneviewPanelProps>;
 

@@ -1,5 +1,4 @@
 import { PaneviewApi } from '../api/component.api';
-import { createComponent } from '../panel/componentFactory';
 import { Emitter, Event } from '../events';
 import {
     CompositeDisposable,
@@ -9,12 +8,7 @@ import {
 import { LayoutPriority, Orientation, Sizing } from '../splitview/splitview';
 import { PaneviewComponentOptions } from './options';
 import { Paneview } from './paneview';
-import {
-    IPaneBodyPart,
-    IPaneHeaderPart,
-    PaneviewPanel,
-    IPaneviewPanel,
-} from './paneviewPanel';
+import { IPanePart, PaneviewPanel, IPaneviewPanel } from './paneviewPanel';
 import {
     DraggablePaneviewPanel,
     PaneviewDropEvent,
@@ -61,8 +55,8 @@ export class PaneFramework extends DraggablePaneviewPanel {
             id: string;
             component: string;
             headerComponent: string | undefined;
-            body: IPaneBodyPart;
-            header: IPaneHeaderPart;
+            body: IPanePart;
+            header: IPanePart;
             orientation: Orientation;
             isExpanded: boolean;
             disableDnd: boolean;
@@ -218,13 +212,6 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
 
         this._options = options;
 
-        if (!options.components) {
-            options.components = {};
-        }
-        if (!options.frameworkComponents) {
-            options.frameworkComponents = {};
-        }
-
         this.paneview = new Paneview(this.element, {
             // only allow paneview in the vertical orientation for now
             orientation: Orientation.VERTICAL,
@@ -257,36 +244,21 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
     addPanel<T extends object = Parameters>(
         options: AddPaneviewComponentOptions<T>
     ): IPaneviewPanel {
-        const body = createComponent(
-            options.id,
-            options.component,
-            this.options.components ?? {},
-            this.options.frameworkComponents ?? {},
-            this.options.frameworkWrapper
-                ? {
-                      createComponent:
-                          this.options.frameworkWrapper.body.createComponent,
-                  }
-                : undefined
-        );
+        const body = this.options.createComponent({
+            id: options.id,
+            name: options.component,
+        });
 
-        let header: IPaneHeaderPart;
+        let header: IPanePart | undefined;
 
-        if (options.headerComponent) {
-            header = createComponent(
-                options.id,
-                options.headerComponent,
-                this.options.headerComponents ?? {},
-                this.options.headerframeworkComponents,
-                this.options.frameworkWrapper
-                    ? {
-                          createComponent:
-                              this.options.frameworkWrapper.header
-                                  .createComponent,
-                      }
-                    : undefined
-            );
-        } else {
+        if (options.headerComponent && this.options.createHeaderComponent) {
+            header = this.options.createHeaderComponent({
+                id: options.id,
+                name: options.headerComponent,
+            });
+        }
+
+        if (!header) {
             header = new DefaultHeader();
         }
 
@@ -395,37 +367,24 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
                 views: views.map((view) => {
                     const data = view.data;
 
-                    const body = createComponent(
-                        data.id,
-                        data.component,
-                        this.options.components ?? {},
-                        this.options.frameworkComponents ?? {},
-                        this.options.frameworkWrapper
-                            ? {
-                                  createComponent:
-                                      this.options.frameworkWrapper.body
-                                          .createComponent,
-                              }
-                            : undefined
-                    );
+                    const body = this.options.createComponent({
+                        id: data.id,
+                        name: data.component,
+                    });
 
-                    let header: IPaneHeaderPart;
+                    let header: IPanePart | undefined;
 
-                    if (data.headerComponent) {
-                        header = createComponent(
-                            data.id,
-                            data.headerComponent,
-                            this.options.headerComponents ?? {},
-                            this.options.headerframeworkComponents ?? {},
-                            this.options.frameworkWrapper
-                                ? {
-                                      createComponent:
-                                          this.options.frameworkWrapper.header
-                                              .createComponent,
-                                  }
-                                : undefined
-                        );
-                    } else {
+                    if (
+                        data.headerComponent &&
+                        this.options.createHeaderComponent
+                    ) {
+                        header = this.options.createHeaderComponent({
+                            id: data.id,
+                            name: data.headerComponent,
+                        });
+                    }
+
+                    if (!header) {
                         header = new DefaultHeader();
                     }
 

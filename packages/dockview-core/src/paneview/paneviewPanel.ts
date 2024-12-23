@@ -36,13 +36,7 @@ export interface PanePanelComponentInitParameter
     api: PaneviewPanelApiImpl;
 }
 
-export interface IPaneBodyPart extends IDisposable {
-    readonly element: HTMLElement;
-    update(params: PanelUpdateEvent): void;
-    init(parameters: PanePanelComponentInitParameter): void;
-}
-
-export interface IPaneHeaderPart extends IDisposable {
+export interface IPanePart extends IDisposable {
     readonly element: HTMLElement;
     update(params: PanelUpdateEvent): void;
     init(parameters: PanePanelComponentInitParameter): void;
@@ -85,8 +79,8 @@ export abstract class PaneviewPanel
     private _isExpanded = false;
     protected header?: HTMLElement;
     protected body?: HTMLElement;
-    private bodyPart?: IPaneHeaderPart;
-    private headerPart?: IPaneBodyPart;
+    private bodyPart?: IPanePart;
+    private headerPart?: IPanePart;
     private expandedSize = 0;
     private animationTimer: any;
     private _orientation: Orientation;
@@ -338,6 +332,6 @@ export abstract class PaneviewPanel
         };
     }
 
-    protected abstract getBodyComponent(): IPaneBodyPart;
-    protected abstract getHeaderComponent(): IPaneHeaderPart;
+    protected abstract getBodyComponent(): IPanePart;
+    protected abstract getHeaderComponent(): IPanePart;
 }
