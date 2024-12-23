@@ -1,14 +1,10 @@
 import { CompositeDisposable } from '../../lifecycle';
 import { Paneview } from '../../paneview/paneview';
-import {
-    IPaneBodyPart,
-    IPaneHeaderPart,
-    PaneviewPanel,
-} from '../../paneview/paneviewPanel';
+import { IPanePart, PaneviewPanel } from '../../paneview/paneviewPanel';
 import { Orientation } from '../../splitview/splitview';
 
 class TestPanel extends PaneviewPanel {
-    protected getBodyComponent(): IPaneBodyPart {
+    protected getBodyComponent(): IPanePart {
         return {
             element: document.createElement('div'),
             update: () => {
@@ -23,7 +19,7 @@ class TestPanel extends PaneviewPanel {
         };
     }
 
-    protected getHeaderComponent(): IPaneHeaderPart {
+    protected getHeaderComponent(): IPanePart {
         return {
             element: document.createElement('div'),
             update: () => {

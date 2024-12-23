@@ -23,7 +23,6 @@ import {
 } from './gridviewPanel';
 import { BaseComponentOptions, Parameters } from '../panel/types';
 import { Orientation, Sizing } from '../splitview/splitview';
-import { createComponent } from '../panel/componentFactory';
 import { Emitter, Event } from '../events';
 import { Position } from '../dnd/droptarget';
 
@@ -116,9 +115,11 @@ export class GridviewComponent
 
     constructor(parentElement: HTMLElement, options: GridviewComponentOptions) {
         super(parentElement, {
-            proportionalLayout: options.proportionalLayout,
+            proportionalLayout: options.proportionalLayout ?? true,
             orientation: options.orientation,
-            styles: options.styles,
+            styles: options.hideBorders
+                ? { separatorBorder: 'transparent' }
+                : undefined,
             disableAutoResizing: options.disableAutoResizing,
             className: options.className,
         });
@@ -139,13 +140,6 @@ export class GridviewComponent
                 this._onDidActiveGroupChange.fire(event);
             })
         );
-
-        if (!this.options.components) {
-            this.options.components = {};
-        }
-        if (!this.options.frameworkComponents) {
-            this.options.frameworkComponents = {};
-        }
     }
 
     override updateOptions(options: Partial<GridviewComponentOptions>): void {
@@ -216,19 +210,11 @@ export class GridviewComponent
             this.gridview.deserialize(grid, {
                 fromJSON: (node) => {
                     const { data } = node;
-                    const view = createComponent(
-                        data.id,
-                        data.component,
-                        this.options.components ?? {},
-                        this.options.frameworkComponents ?? {},
-                        this.options.frameworkComponentFactory
-                            ? {
-                                  createComponent:
-                                      this.options.frameworkComponentFactory
-                                          .createComponent,
-                              }
-                            : undefined
-                    );
+
+                    const view = this.options.createComponent({
+                        id: data.id,
+                        name: data.component,
+                    });
 
                     queue.push(() =>
                         view.init({
@@ -363,19 +349,10 @@ export class GridviewComponent
             }
         }
 
-        const view = createComponent(
-            options.id,
-            options.component,
-            this.options.components ?? {},
-            this.options.frameworkComponents ?? {},
-            this.options.frameworkComponentFactory
-                ? {
-                      createComponent:
-                          this.options.frameworkComponentFactory
-                              .createComponent,
-                  }
-                : undefined
-        );
+        const view = this.options.createComponent({
+            id: options.id,
+            name: options.component,
+        });
 
         view.init({
             params: options.params ?? {},

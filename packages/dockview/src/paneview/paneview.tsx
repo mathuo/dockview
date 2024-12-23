@@ -5,6 +5,10 @@ import {
     PaneviewApi,
     PaneviewDropEvent,
     createPaneview,
+    PaneviewOptions,
+    PROPERTY_KEYS_PANEVIEW,
+    PaneviewComponentOptions,
+    PaneviewFrameworkOptions,
 } from 'dockview-core';
 import { usePortalsLifecycle } from '../react';
 import { PanePanelSection } from './view';
@@ -21,18 +25,26 @@ export interface IPaneviewPanelProps<T extends { [index: string]: any } = any>
     title: string;
 }
 
-export interface IPaneviewReactProps {
+export interface IPaneviewReactProps extends PaneviewOptions {
     onReady: (event: PaneviewReadyEvent) => void;
     components: Record<string, React.FunctionComponent<IPaneviewPanelProps>>;
     headerComponents?: Record<
         string,
         React.FunctionComponent<IPaneviewPanelProps>
     >;
-    className?: string;
-    disableAutoResizing?: boolean;
-    disableDnd?: boolean;
     showDndOverlay?: (event: PaneviewDndOverlayEvent) => boolean;
     onDidDrop?(event: PaneviewDropEvent): void;
+}
+
+function extractCoreOptions(props: IPaneviewReactProps): PaneviewOptions {
+    const coreOptions = PROPERTY_KEYS_PANEVIEW.reduce((obj, key) => {
+        if (key in props) {
+            obj[key] = props[key] as any;
+        }
+        return obj;
+    }, {} as Partial<PaneviewComponentOptions>);
+
+    return coreOptions as PaneviewOptions;
 }
 
 export const PaneviewReact = React.forwardRef(
@@ -43,35 +55,64 @@ export const PaneviewReact = React.forwardRef(
 
         React.useImperativeHandle(ref, () => domRef.current!, []);
 
-        React.useEffect(() => {
-            const createComponent = (
-                id: string,
-                _componentId: string,
-                component: any
-            ) =>
-                new PanePanelSection(id, component, {
-                    addPortal,
+        const prevProps = React.useRef<Partial<IPaneviewReactProps>>({});
+
+        React.useEffect(
+            () => {
+                const changes: Partial<PaneviewOptions> = {};
+
+                PROPERTY_KEYS_PANEVIEW.forEach((propKey) => {
+                    const key = propKey;
+                    const propValue = props[key];
+
+                    if (key in props && propValue !== prevProps.current[key]) {
+                        changes[key] = propValue as any;
+                    }
                 });
 
-            const api = createPaneview(domRef.current!, {
-                disableAutoResizing: props.disableAutoResizing,
-                frameworkComponents: props.components,
-                components: {},
-                headerComponents: {},
-                disableDnd: props.disableDnd,
-                headerframeworkComponents: props.headerComponents,
-                frameworkWrapper: {
-                    header: {
-                        createComponent,
-                    },
-                    body: {
-                        createComponent,
-                    },
+                if (paneviewRef.current) {
+                    paneviewRef.current.updateOptions(changes);
+                } else {
+                    // not yet fully initialized
+                }
+
+                prevProps.current = props;
+            },
+            PROPERTY_KEYS_PANEVIEW.map((key) => props[key])
+        );
+
+        React.useEffect(() => {
+            if (!domRef.current) {
+                return () => {
+                    // noop
+                };
+            }
+
+            const headerComponents = props.headerComponents ?? {};
+
+            const frameworkOptions: PaneviewFrameworkOptions = {
+                createComponent: (options) => {
+                    return new PanePanelSection(
+                        options.id,
+                        props.components[options.name],
+                        { addPortal }
+                    );
                 },
-                showDndOverlay: props.showDndOverlay,
+                createHeaderComponent: (options) => {
+                    return new PanePanelSection(
+                        options.id,
+                        headerComponents[options.name],
+                        { addPortal }
+                    );
+                },
+            };
+
+            const api = createPaneview(domRef.current, {
+                ...extractCoreOptions(props),
+                ...frameworkOptions,
             });
 
-            const { clientWidth, clientHeight } = domRef.current!;
+            const { clientWidth, clientHeight } = domRef.current;
             api.layout(clientWidth, clientHeight);
 
             if (props.onReady) {
@@ -90,7 +131,13 @@ export const PaneviewReact = React.forwardRef(
                 return;
             }
             paneviewRef.current.updateOptions({
-                frameworkComponents: props.components,
+                createComponent: (options) => {
+                    return new PanePanelSection(
+                        options.id,
+                        props.components[options.name],
+                        { addPortal }
+                    );
+                },
             });
         }, [props.components]);
 
@@ -98,26 +145,30 @@ export const PaneviewReact = React.forwardRef(
             if (!paneviewRef.current) {
                 return;
             }
+
+            const headerComponents = props.headerComponents ?? {};
+
             paneviewRef.current.updateOptions({
-                headerframeworkComponents: props.headerComponents,
+                createHeaderComponent: (options) => {
+                    return new PanePanelSection(
+                        options.id,
+                        headerComponents[options.name],
+                        { addPortal }
+                    );
+                },
             });
         }, [props.headerComponents]);
 
         React.useEffect(() => {
             if (!paneviewRef.current) {
                 return () => {
-                    //
+                    // noop
                 };
             }
 
-            const api = paneviewRef.current;
-
-            const disposable = api.onDidDrop((event) => {
+            const disposable = paneviewRef.current.onDidDrop((event) => {
                 if (props.onDidDrop) {
-                    props.onDidDrop({
-                        ...event,
-                        api,
-                    });
+                    props.onDidDrop(event);
                 }
             });
 
