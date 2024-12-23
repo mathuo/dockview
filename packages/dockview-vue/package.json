@@ -53,5 +53,8 @@
   },
   "dependencies": {
     "dockview-core": "^2.1.4"
+  },
+  "peerDependencies": {
+    "vue": "^3.4.0"
   }
 }
