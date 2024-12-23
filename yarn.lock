@@ -5282,11 +5282,6 @@ address@^1.0.1, address@^1.1.2:
   resolved "https://registry.yarnpkg.com/address/-/address-1.2.2.tgz#2b5248dac5485a6390532c6a517fda2e3faac89e"
   integrity sha512-4B/qKCfeE/ODUaAUpSwfzazo5x29WD4r3vXiWsB7I2mSDAihwEqKO+g8GELZUQSSAo5e1XTYh3ZVfLyxBc12nA==
 
-ag-grid-community@31.1.1:
-  version "31.1.1"
-  resolved "https://registry.yarnpkg.com/ag-grid-community/-/ag-grid-community-31.1.1.tgz#212fc3e358d4be1865bc4618f6d0d865faaed385"
-  integrity sha512-tiQZ7VQ07yJScTMIQpaYoUMPgiyXMwYDcwTxe4riRrcYGTg0e258XEihoPUZFejR60P1fYWMxdJaR2JUnyhGrg==
-
 ag-grid-community@^31.0.2, ag-grid-community@~31.0.2:
   version "31.0.2"
   resolved "https://registry.yarnpkg.com/ag-grid-community/-/ag-grid-community-31.0.2.tgz#8421c4e23e29205628281c1258808e83dccdada2"
@@ -5299,13 +5294,6 @@ ag-grid-react@^31.0.2:
   dependencies:
     ag-grid-community "~31.0.2"
     prop-types "^15.8.1"
-
-ag-grid-vue3@^31.1.1:
-  version "31.1.1"
-  resolved "https://registry.yarnpkg.com/ag-grid-vue3/-/ag-grid-vue3-31.1.1.tgz#0382632cf521138c532b48c9b985c3951d69e788"
-  integrity sha512-GjR4/6JUWQ0VsdmcxSN5ks1vH+wB7lLjX1CbskPqNfD69/fb9l7Eg2oGAgqNJo8b87W87jzhg9RguOx5bDpsZQ==
-  dependencies:
-    ag-grid-community "31.1.1"
 
 agent-base@6, agent-base@^6.0.2:
   version "6.0.2"
