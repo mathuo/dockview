@@ -10,6 +10,7 @@ import { fireEvent } from '@testing-library/dom';
 import { TestPanel } from '../../dockviewGroupPanelModel.spec';
 import { IDockviewPanel } from '../../../../dockview/dockviewPanel';
 import { fromPartial } from '@total-typescript/shoehorn';
+import { DockviewPanelApi } from '../../../../api/dockviewPanelApi';
 
 describe('tabsContainer', () => {
     test('that an external event does not render a drop target and calls through to the group mode', () => {
@@ -814,5 +815,36 @@ describe('tabsContainer', () => {
         result = cut.element.querySelector('.dv-right-actions-container');
         expect(result).toBeTruthy();
         expect(result!.childNodes.length).toBe(0);
+    });
+
+    test('class dv-single-tab is present when only one tab exists`', () => {
+        const cut = new TabsContainer(
+            fromPartial<DockviewComponent>({
+                options: {},
+            }),
+            fromPartial<DockviewGroupPanel>({})
+        );
+
+        expect(cut.element.classList.contains('dv-single-tab')).toBeFalsy();
+
+        const panel1 = new TestPanel(
+            'panel_1',
+            fromPartial<DockviewPanelApi>({})
+        );
+        cut.openPanel(panel1);
+        expect(cut.element.classList.contains('dv-single-tab')).toBeTruthy();
+
+        const panel2 = new TestPanel(
+            'panel_2',
+            fromPartial<DockviewPanelApi>({})
+        );
+        cut.openPanel(panel2);
+        expect(cut.element.classList.contains('dv-single-tab')).toBeFalsy();
+
+        cut.closePanel(panel1);
+        expect(cut.element.classList.contains('dv-single-tab')).toBeTruthy();
+
+        cut.closePanel(panel2);
+        expect(cut.element.classList.contains('dv-single-tab')).toBeFalsy();
     });
 });
