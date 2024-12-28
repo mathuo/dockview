@@ -41,6 +41,23 @@ export class DockviewEvent implements IDockviewEvent {
     }
 }
 
+export interface IAcceptableEvent {
+    readonly isAccepted: boolean;
+    accept(): void;
+}
+
+export class AcceptableEvent implements IAcceptableEvent {
+    private _isAccepted = false;
+
+    get isAccepted(): boolean {
+        return this._isAccepted;
+    }
+
+    accept(): void {
+        this._isAccepted = true;
+    }
+}
+
 class LeakageMonitor {
     readonly events = new Map<Event<any>, Stacktrace>();
 

@@ -41,7 +41,7 @@ export * from './gridview/baseComponentGridview';
 
 export {
     DraggablePaneviewPanel,
-    PaneviewDropEvent,
+    PaneviewDidDropEvent as PaneviewDropEvent,
 } from './paneview/draggablePaneviewPanel';
 
 export * from './dockview/components/panel/content';
@@ -80,6 +80,8 @@ export {
     PaneviewOptions,
     PaneviewFrameworkOptions,
     PROPERTY_KEYS_PANEVIEW,
+    PaneviewUnhandledDragOverEvent,
+    PaneviewDndOverlayEvent,
 } from './paneview/options';
 
 export * from './gridview/gridviewPanel';

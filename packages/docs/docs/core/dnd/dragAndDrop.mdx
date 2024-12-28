@@ -43,7 +43,7 @@ For interaction with the Drag events directly the component exposes some method 
 ```tsx
 /**
  * called when an ondrop event which does not originate from the dockview libray and
- * passes the showDndOverlay condition occurs
+ * passes the onUnhandledDragOverEvent condition
  **/
 const onDidDrop = (event: DockviewDropEvent) => {
     const { group } = event;
@@ -58,14 +58,17 @@ const onDidDrop = (event: DockviewDropEvent) => {
     });
 };
 
-/**
- * called for drag over events which do not originate from the dockview library
- * allowing the developer to decide where the overlay should be shown for a
- * particular drag event
- **/
-const showDndOverlay = (event: DockviewDndOverlayEvent) => {
-    return true;
-};
+const onReady = (event: DockviewReadyEvent) => {
+
+  /**
+   * called for drag over events which do not originate from the dockview library
+   * allowing the developer to decide where the overlay should be shown for a
+   * particular drag event
+   **/
+  api.onUnhandledDragOverEvent(event => {
+    event.accept();
+  });
+}
 
 return (
     <DockviewReact
@@ -73,7 +76,6 @@ return (
         onReady={onReady}
         className="dockview-theme-abyss"
         onDidDrop={onDidDrop}
-        showDndOverlay={showDndOverlay}
     />
 );
 ```

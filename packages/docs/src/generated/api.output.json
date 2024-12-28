@@ -2509,7 +2509,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked before a group is dragged.\r\n\r\nCalling "
+                                "text": "Invoked before a group is dragged.\n\nCalling "
                             },
                             {
                                 "kind": "code",
@@ -2540,7 +2540,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked before a group is dragged.\r\n\r\nCalling "
+                            "text": "Invoked before a group is dragged.\n\nCalling "
                         },
                         {
                             "kind": "code",
@@ -2563,7 +2563,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked before a panel is dragged.\r\n\r\nCalling "
+                                "text": "Invoked before a panel is dragged.\n\nCalling "
                             },
                             {
                                 "kind": "code",
@@ -2594,7 +2594,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked before a panel is dragged.\r\n\r\nCalling "
+                            "text": "Invoked before a panel is dragged.\n\nCalling "
                         },
                         {
                             "kind": "code",
@@ -2617,7 +2617,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\r\nprevent the event from occuring using the standard "
+                                "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\nprevent the event from occuring using the standard "
                             },
                             {
                                 "kind": "code",
@@ -2625,7 +2625,7 @@
                             },
                             {
                                 "kind": "text",
-                                "text": " syntax.\r\n\r\nPreventing certain events may causes unexpected behaviours, use carefully."
+                                "text": " syntax.\n\nPreventing certain events may causes unexpected behaviours, use carefully."
                             }
                         ]
                     },
@@ -2648,7 +2648,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\r\nprevent the event from occuring using the standard "
+                            "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\nprevent the event from occuring using the standard "
                         },
                         {
                             "kind": "code",
@@ -2656,7 +2656,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": " syntax.\r\n\r\nPreventing certain events may causes unexpected behaviours, use carefully."
+                            "text": " syntax.\n\nPreventing certain events may causes unexpected behaviours, use carefully."
                         }
                     ]
                 }
@@ -2671,7 +2671,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked before an overlay is shown indicating a drop target.\r\n\r\nCalling "
+                                "text": "Invoked before an overlay is shown indicating a drop target.\n\nCalling "
                             },
                             {
                                 "kind": "code",
@@ -2679,7 +2679,7 @@
                             },
                             {
                                 "kind": "text",
-                                "text": " will prevent the overlay being shown and prevent\r\nthe any subsequent drop event."
+                                "text": " will prevent the overlay being shown and prevent\nthe any subsequent drop event."
                             }
                         ]
                     },
@@ -2702,7 +2702,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked before an overlay is shown indicating a drop target.\r\n\r\nCalling "
+                            "text": "Invoked before an overlay is shown indicating a drop target.\n\nCalling "
                         },
                         {
                             "kind": "code",
@@ -2710,7 +2710,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": " will prevent the overlay being shown and prevent\r\nthe any subsequent drop event."
+                            "text": " will prevent the overlay being shown and prevent\nthe any subsequent drop event."
                         }
                     ]
                 }
@@ -9548,7 +9548,9 @@
                 ]
             }
         ],
-        "extends": []
+        "extends": [
+            "AcceptableEvent"
+        ]
     },
     "DockviewWillDropEvent": {
         "kind": "class",
@@ -9901,6 +9903,26 @@
                         {
                             "type": "reference",
                             "value": "PaneviewDropEvent",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "onUnhandledDragOverEvent",
+                "code": "Event<PaneviewDndOverlayEvent>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "PaneviewDndOverlayEvent",
                             "source": "dockview-core"
                         }
                     ]
@@ -15116,6 +15138,26 @@
                 }
             },
             {
+                "name": "onUnhandledDragOverEvent",
+                "code": "Event<PaneviewDndOverlayEvent>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "PaneviewDndOverlayEvent",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "part",
                 "code": "IFrameworkPart",
                 "kind": "property",
@@ -16585,6 +16627,28 @@
                 }
             },
             {
+                "name": "onUnhandledDragOverEvent",
+                "code": "Event<PaneviewDndOverlayEvent>",
+                "kind": "accessor",
+                "value": {
+                    "name": "onUnhandledDragOverEvent",
+                    "code": "Event<PaneviewDndOverlayEvent>",
+                    "kind": "getSignature",
+                    "returnType": {
+                        "type": "reference",
+                        "value": "Event",
+                        "source": "dockview-core",
+                        "typeArguments": [
+                            {
+                                "type": "reference",
+                                "value": "PaneviewDndOverlayEvent",
+                                "source": "dockview-core"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
                 "name": "panels",
                 "code": "IPaneviewPanel[]",
                 "kind": "accessor",
@@ -17284,6 +17348,26 @@
                         {
                             "type": "reference",
                             "value": "PaneviewPanel",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "onUnhandledDragOverEvent",
+                "code": "Event<PaneviewDndOverlayEvent>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "PaneviewDndOverlayEvent",
                             "source": "dockview-core"
                         }
                     ]
@@ -19487,7 +19571,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked whenever any aspect of the layout changes.\r\nIf listening to this event it may be worth debouncing ouputs."
+                                "text": "Invoked whenever any aspect of the layout changes.\nIf listening to this event it may be worth debouncing ouputs."
                             }
                         ]
                     },
@@ -19509,7 +19593,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked whenever any aspect of the layout changes.\r\nIf listening to this event it may be worth debouncing ouputs."
+                            "text": "Invoked whenever any aspect of the layout changes.\nIf listening to this event it may be worth debouncing ouputs."
                         }
                     ]
                 }
@@ -20105,7 +20189,7 @@
                                 },
                                 {
                                     "kind": "text",
-                                    "text": " method\r\nfor the subsequent resize."
+                                    "text": " method\nfor the subsequent resize."
                                 }
                             ]
                         },
@@ -20167,7 +20251,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": " method\r\nfor the subsequent resize."
+                            "text": " method\nfor the subsequent resize."
                         }
                     ]
                 }
@@ -23092,7 +23176,9 @@
                     "type": "intrinsic",
                     "value": "boolean"
                 },
-                "flags": {}
+                "flags": {
+                    "isReadonly": true
+                }
             },
             {
                 "name": "nativeEvent",
@@ -23146,7 +23232,9 @@
                 ]
             }
         ],
-        "extends": []
+        "extends": [
+            "IAcceptableEvent"
+        ]
     },
     "DockviewFrameworkOptions": {
         "kind": "interface",
@@ -24288,7 +24376,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": ".\r\nCall "
+                            "text": ".\nCall "
                         },
                         {
                             "kind": "code",
@@ -35162,6 +35250,26 @@
                 }
             },
             {
+                "name": "onUnhandledDragOverEvent",
+                "code": "Event<PaneviewDndOverlayEvent>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "PaneviewDndOverlayEvent",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "options",
                 "code": "PaneviewComponentOptions",
                 "kind": "property",
@@ -38650,72 +38758,6 @@
             "PanelInitParameters"
         ]
     },
-    "PaneviewDndOverlayEvent": {
-        "kind": "interface",
-        "name": "PaneviewDndOverlayEvent",
-        "children": [
-            {
-                "name": "getData",
-                "code": "(): PaneTransfer | undefined",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(): PaneTransfer | undefined",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [],
-                                "returnType": {
-                                    "type": "or",
-                                    "values": [
-                                        {
-                                            "type": "reference",
-                                            "value": "PaneTransfer",
-                                            "source": "dockview-core"
-                                        },
-                                        {
-                                            "type": "intrinsic",
-                                            "value": "undefined"
-                                        }
-                                    ]
-                                },
-                                "code": "(): PaneTransfer | undefined",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {}
-            },
-            {
-                "name": "nativeEvent",
-                "code": "DragEvent",
-                "kind": "property",
-                "type": {
-                    "type": "reference",
-                    "value": "DragEvent",
-                    "source": "typescript"
-                },
-                "flags": {}
-            },
-            {
-                "name": "panel",
-                "code": "IPaneviewPanel",
-                "kind": "property",
-                "type": {
-                    "type": "reference",
-                    "value": "IPaneviewPanel",
-                    "source": "dockview-core"
-                },
-                "flags": {}
-            }
-        ],
-        "extends": []
-    },
     "PaneviewDropEvent": {
         "kind": "interface",
         "name": "PaneviewDropEvent",
@@ -38941,46 +38983,6 @@
                 "type": {
                     "type": "intrinsic",
                     "value": "boolean"
-                },
-                "flags": {
-                    "isOptional": true
-                }
-            },
-            {
-                "name": "showDndOverlay",
-                "code": "(event: PaneviewDndOverlayEvent): boolean",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(event: PaneviewDndOverlayEvent): boolean",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [
-                                    {
-                                        "name": "event",
-                                        "code": "event: PaneviewDndOverlayEvent",
-                                        "type": {
-                                            "type": "reference",
-                                            "value": "PaneviewDndOverlayEvent",
-                                            "source": "dockview-core"
-                                        },
-                                        "kind": "parameter"
-                                    }
-                                ],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "boolean"
-                                },
-                                "code": "(event: PaneviewDndOverlayEvent): boolean",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
                 },
                 "flags": {
                     "isOptional": true
@@ -41389,7 +41391,7 @@
                                     "summary": [
                                         {
                                             "kind": "text",
-                                            "text": "If true then add the panel without setting it as the active panel.\r\n\r\nDefaults to "
+                                            "text": "If true then add the panel without setting it as the active panel.\n\nDefaults to "
                                         },
                                         {
                                             "kind": "code",
@@ -41456,7 +41458,7 @@
                                     "summary": [
                                         {
                                             "kind": "text",
-                                            "text": "The rendering mode of the panel.\r\n\r\nThis dictates what happens to the HTML of the panel when it is hidden."
+                                            "text": "The rendering mode of the panel.\n\nThis dictates what happens to the HTML of the panel when it is hidden."
                                         }
                                     ]
                                 }
@@ -41496,7 +41498,7 @@
                                     "summary": [
                                         {
                                             "kind": "text",
-                                            "text": "The title for the panel which can be accessed within both the tab and component.\r\n\r\nIf using the default tab renderer this title will be displayed in the tab."
+                                            "text": "The title for the panel which can be accessed within both the tab and component.\n\nIf using the default tab renderer this title will be displayed in the tab."
                                         }
                                     ]
                                 }
@@ -43523,46 +43525,6 @@
                     }
                 },
                 "flags": {}
-            },
-            {
-                "name": "showDndOverlay",
-                "code": "(event: PaneviewDndOverlayEvent): boolean",
-                "kind": "property",
-                "type": {
-                    "type": "reflection",
-                    "value": {
-                        "name": "__type",
-                        "code": "(event: PaneviewDndOverlayEvent): boolean",
-                        "kind": "typeLiteral",
-                        "signatures": [
-                            {
-                                "name": "__type",
-                                "typeParameters": [],
-                                "parameters": [
-                                    {
-                                        "name": "event",
-                                        "code": "event: PaneviewDndOverlayEvent",
-                                        "type": {
-                                            "type": "reference",
-                                            "value": "PaneviewDndOverlayEvent",
-                                            "source": "dockview-core"
-                                        },
-                                        "kind": "parameter"
-                                    }
-                                ],
-                                "returnType": {
-                                    "type": "intrinsic",
-                                    "value": "boolean"
-                                },
-                                "code": "(event: PaneviewDndOverlayEvent): boolean",
-                                "kind": "callSignature"
-                            }
-                        ]
-                    }
-                },
-                "flags": {
-                    "isOptional": true
-                }
             },
             {
                 "name": "onDidDrop",
