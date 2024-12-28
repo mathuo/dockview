@@ -107,8 +107,8 @@ const config = {
                     sidebarPath: require.resolve('./sidebars.js'),
                     // Please change this to your repo.
                     // Remove this to remove the "edit this page" links.
-                    editUrl:
-                        'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+                    // editUrl:
+                    //     'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
                     // versions: {
                     //     current: {
                     //         label: `Development 🚧`,
@@ -116,11 +116,11 @@ const config = {
                     // },
                 },
                 blog: {
-                    showReadingTime: true,
+                    // showReadingTime: true,
                     // Please change this to your repo.
                     // Remove this to remove the "edit this page" links.
-                    editUrl:
-                        'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+                    // editUrl:
+                    //     'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
                 },
                 theme: {
                     customCss: require.resolve('./src/css/custom.scss'),
@@ -210,8 +210,8 @@ const config = {
                         title: 'Learn',
                         items: [
                             {
-                                label: 'Docs',
-                                to: '/docs',
+                                label: 'Demo',
+                                to: '/demo',
                             },
                         ],
                     },
