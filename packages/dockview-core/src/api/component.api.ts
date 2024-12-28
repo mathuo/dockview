@@ -40,7 +40,7 @@ import {
 } from '../dockview/dockviewGroupPanel';
 import { Emitter, Event } from '../events';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
-import { PaneviewDropEvent } from '../paneview/draggablePaneviewPanel';
+import { PaneviewDidDropEvent } from '../paneview/draggablePaneviewPanel';
 import {
     GroupDragEvent,
     TabDragEvent,
@@ -51,7 +51,10 @@ import {
     DockviewWillDropEvent,
     WillShowOverlayLocationEvent,
 } from '../dockview/dockviewGroupPanelModel';
-import { PaneviewComponentOptions } from '../paneview/options';
+import {
+    PaneviewComponentOptions,
+    PaneviewDndOverlayEvent,
+} from '../paneview/options';
 import { SplitviewComponentOptions } from '../splitview/options';
 import { GridviewComponentOptions } from '../gridview/options';
 
@@ -294,19 +297,12 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
     /**
      * Invoked when a Drag'n'Drop event occurs that the component was unable to handle. Exposed for custom Drag'n'Drop functionality.
      */
-    get onDidDrop(): Event<PaneviewDropEvent> {
-        const emitter = new Emitter<PaneviewDropEvent>();
+    get onDidDrop(): Event<PaneviewDidDropEvent> {
+        return this.component.onDidDrop;
+    }
 
-        const disposable = this.component.onDidDrop((e) => {
-            emitter.fire({ ...e, api: this });
-        });
-
-        emitter.dispose = () => {
-            disposable.dispose();
-            emitter.dispose();
-        };
-
-        return emitter.event;
+    get onUnhandledDragOverEvent(): Event<PaneviewDndOverlayEvent> {
+        return this.component.onUnhandledDragOverEvent;
     }
 
     constructor(private readonly component: IPaneviewComponent) {}

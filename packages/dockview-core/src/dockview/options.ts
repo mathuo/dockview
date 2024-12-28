@@ -16,6 +16,7 @@ import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
 import { IGroupHeaderProps } from './framework';
 import { FloatingGroupOptions } from './dockviewComponent';
 import { Contraints } from '../gridview/gridviewPanel';
+import { AcceptableEvent, IAcceptableEvent } from '../events';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -65,34 +66,26 @@ export interface DockviewOptions {
     noPanelsOverlay?: 'emptyGroup' | 'watermark';
 }
 
-export interface DockviewDndOverlayEvent {
+export interface DockviewDndOverlayEvent extends IAcceptableEvent {
     nativeEvent: DragEvent;
     target: DockviewGroupDropLocation;
     position: Position;
     group?: DockviewGroupPanel;
     getData: () => PanelTransfer | undefined;
-    //
-    isAccepted: boolean;
-    accept(): void;
 }
 
-export class DockviewUnhandledDragOverEvent implements DockviewDndOverlayEvent {
-    private _isAccepted = false;
-
-    get isAccepted(): boolean {
-        return this._isAccepted;
-    }
-
+export class DockviewUnhandledDragOverEvent
+    extends AcceptableEvent
+    implements DockviewDndOverlayEvent
+{
     constructor(
         readonly nativeEvent: DragEvent,
         readonly target: DockviewGroupDropLocation,
         readonly position: Position,
         readonly getData: () => PanelTransfer | undefined,
         readonly group?: DockviewGroupPanel
-    ) {}
-
-    accept(): void {
-        this._isAccepted = true;
+    ) {
+        super();
     }
 }
 

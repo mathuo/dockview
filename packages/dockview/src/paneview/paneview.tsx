@@ -1,7 +1,6 @@
 import React from 'react';
 import {
     PaneviewPanelApi,
-    PaneviewDndOverlayEvent,
     PaneviewApi,
     PaneviewDropEvent,
     createPaneview,
@@ -32,7 +31,6 @@ export interface IPaneviewReactProps extends PaneviewOptions {
         string,
         React.FunctionComponent<IPaneviewPanelProps>
     >;
-    showDndOverlay?: (event: PaneviewDndOverlayEvent) => boolean;
     onDidDrop?(event: PaneviewDropEvent): void;
 }
 
@@ -176,15 +174,6 @@ export const PaneviewReact = React.forwardRef(
                 disposable.dispose();
             };
         }, [props.onDidDrop]);
-
-        React.useEffect(() => {
-            if (!paneviewRef.current) {
-                return;
-            }
-            paneviewRef.current.updateOptions({
-                showDndOverlay: props.showDndOverlay,
-            });
-        }, [props.showDndOverlay]);
 
         return (
             <div

@@ -6,12 +6,12 @@ import {
     MutableDisposable,
 } from '../lifecycle';
 import { LayoutPriority, Orientation, Sizing } from '../splitview/splitview';
-import { PaneviewComponentOptions } from './options';
+import { PaneviewComponentOptions, PaneviewDndOverlayEvent } from './options';
 import { Paneview } from './paneview';
 import { IPanePart, PaneviewPanel, IPaneviewPanel } from './paneviewPanel';
 import {
     DraggablePaneviewPanel,
-    PaneviewDropEvent,
+    PaneviewDidDropEvent,
 } from './draggablePaneviewPanel';
 import { DefaultHeader } from './defaultPaneviewHeader';
 import { sequentialNumberGenerator } from '../math';
@@ -21,12 +21,6 @@ import { Parameters } from '../panel/types';
 import { Classnames } from '../dom';
 
 const nextLayoutId = sequentialNumberGenerator();
-
-export interface PaneviewDndOverlayEvent {
-    nativeEvent: DragEvent;
-    panel: IPaneviewPanel;
-    getData: () => PaneTransfer | undefined;
-}
 
 export interface SerializedPaneviewPanel {
     snap?: boolean;
@@ -106,9 +100,10 @@ export interface IPaneviewComponent extends IDisposable {
     readonly options: PaneviewComponentOptions;
     readonly onDidAddView: Event<PaneviewPanel>;
     readonly onDidRemoveView: Event<PaneviewPanel>;
-    readonly onDidDrop: Event<PaneviewDropEvent>;
+    readonly onDidDrop: Event<PaneviewDidDropEvent>;
     readonly onDidLayoutChange: Event<void>;
     readonly onDidLayoutFromJSON: Event<void>;
+    readonly onUnhandledDragOverEvent: Event<PaneviewDndOverlayEvent>;
     addPanel<T extends object = Parameters>(
         options: AddPaneviewComponentOptions<T>
     ): IPaneviewPanel;
@@ -137,14 +132,19 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
     private readonly _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
 
-    private readonly _onDidDrop = new Emitter<PaneviewDropEvent>();
-    readonly onDidDrop: Event<PaneviewDropEvent> = this._onDidDrop.event;
+    private readonly _onDidDrop = new Emitter<PaneviewDidDropEvent>();
+    readonly onDidDrop: Event<PaneviewDidDropEvent> = this._onDidDrop.event;
 
     private readonly _onDidAddView = new Emitter<PaneviewPanel>();
     readonly onDidAddView = this._onDidAddView.event;
 
     private readonly _onDidRemoveView = new Emitter<PaneviewPanel>();
     readonly onDidRemoveView = this._onDidRemoveView.event;
+
+    private readonly _onUnhandledDragOverEvent =
+        new Emitter<PaneviewDndOverlayEvent>();
+    readonly onUnhandledDragOverEvent: Event<PaneviewDndOverlayEvent> =
+        this._onUnhandledDragOverEvent.event;
 
     private readonly _classNames: Classnames;
 
@@ -204,7 +204,8 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
             this._onDidLayoutfromJSON,
             this._onDidDrop,
             this._onDidAddView,
-            this._onDidRemoveView
+            this._onDidRemoveView,
+            this._onUnhandledDragOverEvent
         );
 
         this._classNames = new Classnames(this.element);
@@ -442,9 +443,14 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
     }
 
     private doAddPanel(panel: PaneFramework): void {
-        const disposable = panel.onDidDrop((event) => {
-            this._onDidDrop.fire(event);
-        });
+        const disposable = new CompositeDisposable(
+            panel.onDidDrop((event) => {
+                this._onDidDrop.fire(event);
+            }),
+            panel.onUnhandledDragOverEvent((event) => {
+                this._onUnhandledDragOverEvent.fire(event);
+            })
+        );
 
         this._viewDisposables.set(panel.id, disposable);
     }
