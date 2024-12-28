@@ -113,6 +113,10 @@ const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
             }
         });
 
+        const disposable = api.onUnhandledDragOverEvent((event) => {
+            event.accept();
+        });
+
         return () => {
             panelDragDisposable.dispose();
             groupDragDisposable.dispose();
@@ -132,10 +136,6 @@ const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
                 referenceGroup: event.group || undefined,
             },
         });
-    };
-
-    const showDndOverlay = (event: DockviewDndOverlayEvent) => {
-        return true;
     };
 
     const onDrop = (event: React.DragEvent) => {
@@ -179,7 +179,6 @@ const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
                 onReady={onReady}
                 className={`${props.theme || 'dockview-theme-abyss'}`}
                 onDidDrop={onDidDrop}
-                showDndOverlay={showDndOverlay}
                 rootOverlayModel={{
                     size: { value: 100, type: 'pixels' },
                     activationSize: { value: 5, type: 'percentage' },
