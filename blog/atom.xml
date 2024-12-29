@@ -2,11 +2,40 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dockview.dev/blog</id>
     <title>Dockview Blog</title>
-    <updated>2024-12-23T00:00:00.000Z</updated>
+    <updated>2024-12-29T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dockview.dev/blog"/>
     <subtitle>Dockview Blog</subtitle>
     <icon>https://dockview.dev/img/dockview_logo.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Dockview 3.0.0]]></title>
+        <id>https://dockview.dev/blog/dockview-3.0.0-release</id>
+        <link href="https://dockview.dev/blog/dockview-3.0.0-release"/>
+        <updated>2024-12-29T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[This is a major release version due to some breaking changes in the dockview-core package. If you use the react or vue versions of dockview you should not see any breaking changes when upgrading. There are no new features in this release.]]></summary>
+        <content type="html"><![CDATA[<p>This is a major release version due to some breaking changes in the <code>dockview-core</code> package. If you use the react or vue versions of dockview you should not see any breaking changes when upgrading. There are no new features in this release.</p>
+<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-3.0.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-3.0.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li><code>dockview-vue</code> vue3 peerDependency <a href="https://github.com/mathuo/dockview/issues/808" target="_blank" rel="noopener noreferrer">#808</a></li>
+<li>Bug: correct enablement of <code>dv-single-tab</code> class <a href="https://github.com/mathuo/dockview/issues/811" target="_blank" rel="noopener noreferrer">#811</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-3.0.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
+<ul>
+<li>Standardize <code>dockview-core</code> components for generic framework extensions following the pattern in <code>DockviewComponent</code> <a href="https://github.com/mathuo/dockview/issues/810" target="_blank" rel="noopener noreferrer">#810</a>
+<ul>
+<li><code>SplitviewComponent</code>: Replace <code>components</code> and <code>frameworkComponents</code> with <code>createComponent</code></li>
+<li><code>PaneviewComponent</code>: Replace <code>components</code> and <code>frameworkComponents</code> with <code>createComponent</code> and replace <code>headerComponents</code> and <code>headerFrameworkComponents</code> with <code>createHeaderComponent</code></li>
+<li><code>GridviewComponent</code>: Replace <code>components</code> and <code>frameworkComponents</code> with <code>createComponent</code></li>
+</ul>
+</li>
+<li>rename class <code>dockview-react-part</code> to <code>dv-react-part</code> <a href="https://github.com/mathuo/dockview/issues/806" target="_blank" rel="noopener noreferrer">#806</a></li>
+<li>rename type <code>PaneviewDropEvent</code> to <code>PaneviewDidDropEvent</code> <a href="https://github.com/mathuo/dockview/issues/812" target="_blank" rel="noopener noreferrer">#812</a></li>
+<li>remove <code>showDndOverlay</code> from <code>PaneviewComponent</code> in favour of <code>api.onUnhandledDragOverEvent</code> <a href="https://github.com/mathuo/dockview/issues/812" target="_blank" rel="noopener noreferrer">#812</a></li>
+</ul>]]></content>
+        <category label="release" term="release"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Dockview 2.1.4]]></title>
         <id>https://dockview.dev/blog/dockview-2.1.4-release</id>
@@ -354,65 +383,6 @@
 <li><code>onDidLayoutChange</code> is an aggregation of events that constitute a layout change. Previously these events were aggregated and the events were then fired once through a <code>setTimeout(..., 0)</code> approach. This has been altered to fire on a <code>queueMicrotask</code> event and will only subscribe to events that happen after the event is subscribed to, previously you may have recieved events yet to fire on the <code>setTimeout</code> function but within the same event-loop cycle which was a bug.</li>
 </ul>
 </li>
-</ul>]]></content>
-        <category label="release" term="release"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Dockview 1.13.0]]></title>
-        <id>https://dockview.dev/blog/dockview-1.13.0-release</id>
-        <link href="https://dockview.dev/blog/dockview-1.13.0-release"/>
-        <updated>2024-04-27T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
-        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<p>The majority of the changes in this release are internal changes to support the upcoming support of multiple frameworks, starting with Vue.js.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.13.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<ul>
-<li>
-<p>Add <code>onDidActivePanelChange</code> event to group api <a href="https://github.com/mathuo/dockview/pull/541" target="_blank" rel="noopener noreferrer">#541</a></p>
-</li>
-<li>
-<p>Add <code>inactive</code> property to <code>addPanel</code> method to add panels without making them active <a href="https://github.com/mathuo/dockview/issues/572" target="_blank" rel="noopener noreferrer">#572</a></p>
-</li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.13.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>
-<p>Bug: width and height set incorrectly on floating groups when resized <a href="https://github.com/mathuo/dockview/issues/580" target="_blank" rel="noopener noreferrer">#580</a></p>
-</li>
-<li>
-<p>Create framework packages in preperation for multiple framework support <a href="https://github.com/mathuo/dockview/pull/541" target="_blank" rel="noopener noreferrer">#541</a>
-These are still in active development and will be offically support soon.</p>
-<ul>
-<li>Create <code>dockview-react</code> package</li>
-<li>Create <code>dockview-angular</code> package</li>
-<li>Create <code>dockview-vue</code> package</li>
-</ul>
-</li>
-<li>
-<p>Move various type definitions from <code>dockview</code> to <code>dockview-core</code> in preperation for multiple framework support <a href="https://github.com/mathuo/dockview/pull/541" target="_blank" rel="noopener noreferrer">#541</a></p>
-<ul>
-<li>Move <code>IGroupPanelBaseProps</code> from <code>dockview</code> to <code>dockview-core</code></li>
-<li>Move <code>IDockviewPanelHeaderProps</code> from <code>dockview</code> to <code>dockview-core</code></li>
-<li>Move <code>IDockviewPanelProps</code> from <code>dockview</code> to <code>dockview-core</code></li>
-<li>Move <code>IDockviewHeaderActionsProps </code> from <code>dockview</code> to <code>dockview-core</code></li>
-<li>Move <code>IGroupHeaderProps</code> from <code>dockview</code> to <code>dockview-core</code></li>
-<li>Move <code>IWatermarkPanelProps</code> from <code>dockview</code> to <code>dockview-core</code></li>
-<li>Move <code>DockviewReadyEvent</code> from <code>dockview</code> to <code>dockview-core</code></li>
-</ul>
-</li>
-<li>
-<p>[dockview] Depreciate <code>canDisplayOverlay</code> in favour of the <code>onUnhandledDragOverEvent</code> api event <a href="https://github.com/mathuo/dockview/pull/541" target="_blank" rel="noopener noreferrer">#541</a></p>
-</li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.13.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
-<ul>
-<li>[dockview-core] Replace DockviewComponent <code>canDisplayOverlay</code> option with <code>onUnhandledDragOverEvent</code> event <a href="https://github.com/mathuo/dockview/pull/541" target="_blank" rel="noopener noreferrer">#541</a></li>
-<li>[dockview-core] Rename <code>createRightHeaderActionsElement</code> to <code>createRightHeaderActionElement</code> <a href="https://github.com/mathuo/dockview/pull/576" target="_blank" rel="noopener noreferrer">#576</a></li>
-<li>[dockview-core] Rename <code>createLeftHeaderActionsElement</code> to <code>createLeftHeaderActionElement</code> <a href="https://github.com/mathuo/dockview/pull/576" target="_blank" rel="noopener noreferrer">#576</a></li>
-<li>[dockview-core] Rename <code>createPrefixHeaderActionsElement</code> to <code>createPrefixHeaderActionElement</code> <a href="https://github.com/mathuo/dockview/pull/576" target="_blank" rel="noopener noreferrer">#576</a></li>
-<li>[dockview-core] Remove <code>frameworkTabComponents</code> and <code>tabComponents</code>, replaced by <code>createTabComponent</code> <a href="https://github.com/mathuo/dockview/pull/576" target="_blank" rel="noopener noreferrer">#576</a></li>
-<li>[dockview-core] Remove <code>frameworkComponents</code> and <code>components</code>, replaced by <code>createComponent</code> <a href="https://github.com/mathuo/dockview/pull/576" target="_blank" rel="noopener noreferrer">#576</a></li>
-<li>[dockview-core] Remove <code>watermarkFrameworkComponent</code> and <code>watermarkComponent</code>, replaced by <code>createWatermarkComponent</code> <a href="https://github.com/mathuo/dockview/pull/576" target="_blank" rel="noopener noreferrer">#576</a></li>
 </ul>]]></content>
         <category label="release" term="release"/>
     </entry>
