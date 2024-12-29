@@ -38,7 +38,7 @@ import {
     DockviewGroupPanel,
     IDockviewGroupPanel,
 } from '../dockview/dockviewGroupPanel';
-import { Emitter, Event } from '../events';
+import { Event } from '../events';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 import { PaneviewDidDropEvent } from '../paneview/draggablePaneviewPanel';
 import {

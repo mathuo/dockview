@@ -15,7 +15,6 @@ import {
 } from './draggablePaneviewPanel';
 import { DefaultHeader } from './defaultPaneviewHeader';
 import { sequentialNumberGenerator } from '../math';
-import { PaneTransfer } from '../dnd/dataTransfer';
 import { Resizable } from '../resizable';
 import { Parameters } from '../panel/types';
 import { Classnames } from '../dom';

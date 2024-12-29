@@ -5082,7 +5082,6 @@ describe('dockviewComponent', () => {
                     '.dv-content-container > .testpanel-panel_3'
                 ).length
             ).toBe(0);
-            expect(dockview.element);
         });
 
         test('move popout group of 1 panel inside grid', async () => {
