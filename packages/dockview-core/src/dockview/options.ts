@@ -16,6 +16,7 @@ import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
 import { IGroupHeaderProps } from './framework';
 import { FloatingGroupOptions } from './dockviewComponent';
 import { Contraints } from '../gridview/gridviewPanel';
+import { AcceptableEvent, IAcceptableEvent } from '../events';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -59,40 +60,36 @@ export interface DockviewOptions {
      * Pixel gap between groups
      */
     gap?: number;
+    /**
+     * Define the behaviour of the dock when there are no panels to display. Defaults to `watermark`.
+     */
+    noPanelsOverlay?: 'emptyGroup' | 'watermark';
 }
 
-export interface DockviewDndOverlayEvent {
+export interface DockviewDndOverlayEvent extends IAcceptableEvent {
     nativeEvent: DragEvent;
     target: DockviewGroupDropLocation;
     position: Position;
     group?: DockviewGroupPanel;
     getData: () => PanelTransfer | undefined;
-    //
-    isAccepted: boolean;
-    accept(): void;
 }
 
-export class DockviewUnhandledDragOverEvent implements DockviewDndOverlayEvent {
-    private _isAccepted = false;
-
-    get isAccepted(): boolean {
-        return this._isAccepted;
-    }
-
+export class DockviewUnhandledDragOverEvent
+    extends AcceptableEvent
+    implements DockviewDndOverlayEvent
+{
     constructor(
         readonly nativeEvent: DragEvent,
         readonly target: DockviewGroupDropLocation,
         readonly position: Position,
         readonly getData: () => PanelTransfer | undefined,
         readonly group?: DockviewGroupPanel
-    ) {}
-
-    accept(): void {
-        this._isAccepted = true;
+    ) {
+        super();
     }
 }
 
-export const PROPERTY_KEYS: (keyof DockviewOptions)[] = (() => {
+export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
     /**
      * by readong the keys from an empty value object TypeScript will error
      * when we add or remove new properties to `DockviewOptions`
@@ -111,6 +108,7 @@ export const PROPERTY_KEYS: (keyof DockviewOptions)[] = (() => {
         disableDnd: undefined,
         gap: undefined,
         className: undefined,
+        noPanelsOverlay: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];

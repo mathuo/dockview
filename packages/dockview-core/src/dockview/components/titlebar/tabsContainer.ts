@@ -206,24 +206,10 @@ export class TabsContainer
         this._element.appendChild(this.rightActionsContainer);
 
         this.addDisposables(
-            this.accessor.onDidAddPanel((e) => {
-                if (e.api.group === this.group) {
-                    toggleClass(
-                        this._element,
-                        'dv-single-tab',
-                        this.size === 1
-                    );
-                }
-            }),
-            this.accessor.onDidRemovePanel((e) => {
-                if (e.api.group === this.group) {
-                    toggleClass(
-                        this._element,
-                        'dv-single-tab',
-                        this.size === 1
-                    );
-                }
-            }),
+            this._onWillShowOverlay,
+            this._onDrop,
+            this._onTabDragStart,
+            this._onGroupDragStart,
             this.accessor.onDidActivePanelChange((e) => {
                 if (e?.api.group === this.group) {
                     this.selectedIndex = this.indexOf(e.id);
@@ -231,10 +217,6 @@ export class TabsContainer
                     this.selectedIndex = -1;
                 }
             }),
-            this._onWillShowOverlay,
-            this._onDrop,
-            this._onTabDragStart,
-            this._onGroupDragStart,
             this.voidContainer,
             this.voidContainer.onDragStart((event) => {
                 this._onGroupDragStart.fire({
@@ -338,30 +320,6 @@ export class TabsContainer
         // noop
     }
 
-    private addTab(
-        tab: IValueDisposable<Tab>,
-        index: number = this.tabs.length
-    ): void {
-        if (index < 0 || index > this.tabs.length) {
-            throw new Error('invalid location');
-        }
-
-        this.tabContainer.insertBefore(
-            tab.value.element,
-            this.tabContainer.children[index]
-        );
-
-        this.tabs = [
-            ...this.tabs.slice(0, index),
-            tab,
-            ...this.tabs.slice(index),
-        ];
-
-        if (this.selectedIndex < 0) {
-            this.selectedIndex = index;
-        }
-    }
-
     public delete(id: string): void {
         const index = this.tabs.findIndex((tab) => tab.value.panel.id === id);
 
@@ -372,6 +330,8 @@ export class TabsContainer
         disposable.dispose();
         value.dispose();
         value.element.remove();
+
+        this.updateClassnames();
     }
 
     public setActivePanel(panel: IDockviewPanel): void {
@@ -472,5 +432,35 @@ export class TabsContainer
         }
 
         this.tabs = [];
+    }
+
+    private addTab(
+        tab: IValueDisposable<Tab>,
+        index: number = this.tabs.length
+    ): void {
+        if (index < 0 || index > this.tabs.length) {
+            throw new Error('invalid location');
+        }
+
+        this.tabContainer.insertBefore(
+            tab.value.element,
+            this.tabContainer.children[index]
+        );
+
+        this.tabs = [
+            ...this.tabs.slice(0, index),
+            tab,
+            ...this.tabs.slice(index),
+        ];
+
+        if (this.selectedIndex < 0) {
+            this.selectedIndex = index;
+        }
+
+        this.updateClassnames();
+    }
+
+    private updateClassnames(): void {
+        toggleClass(this._element, 'dv-single-tab', this.size === 1);
     }
 }

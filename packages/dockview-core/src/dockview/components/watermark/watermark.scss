@@ -1,42 +1,4 @@
 .dv-watermark {
     display: flex;
-    width: 100%;
-
-    &.dv-has-actions {
-        .dv-watermark-title {
-            .dv-actions-container {
-                display: none;
-            }
-        }
-    }
-
-    .dv-watermark-title {
-        height: 35px;
-        width: 100%;
-        display: flex;
-    }
-    .dv-watermark-content {
-        flex-grow: 1;
-    }
-
-    .dv-actions-container {
-        display: flex;
-        align-items: center;
-        padding: 0px 8px;
-
-        .dv-close-action {
-            padding: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-sizing: border-box;
-            cursor: pointer;
-            color: var(--dv-activegroup-hiddenpanel-tab-color);
-
-            &:hover {
-                border-radius: 2px;
-                background-color: var(--dv-icon-hover-background-color);
-            }
-        }
-    }
+    height: 100%;
 }

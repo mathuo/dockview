@@ -70,23 +70,11 @@ const NestedDockview = (props: { theme?: string }) => {
         });
     };
 
-    const showDndOverlay = (event: DockviewDndOverlayEvent) => {
-        // console.log(event.getData());
-
-        return false;
-    };
-
-    const onDidDrop = (event: DockviewDidDropEvent) => {
-        // event.getData();
-    };
-
     return (
         <DockviewReact
             onReady={onReady}
             components={components}
             className={`${props.theme || 'dockview-theme-abyss'}`}
-            showDndOverlay={showDndOverlay}
-            onDidDrop={onDidDrop}
         />
     );
 };

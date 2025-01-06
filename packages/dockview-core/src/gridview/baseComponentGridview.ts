@@ -29,6 +29,11 @@ export function toTarget(direction: Direction): Position {
     }
 }
 
+export interface MaximizedChanged<T extends IGridPanelView> {
+    panel: T;
+    isMaximized: boolean;
+}
+
 export interface BaseGridOptions {
     readonly proportionalLayout: boolean;
     readonly orientation: Orientation;
@@ -56,6 +61,8 @@ export interface IBaseGrid<T extends IGridPanelView> extends IDisposable {
     readonly activeGroup: T | undefined;
     readonly size: number;
     readonly groups: T[];
+    readonly onDidMaximizedChange: Event<MaximizedChanged<T>>;
+    readonly onDidLayoutChange: Event<void>;
     getPanel(id: string): T | undefined;
     toJSON(): object;
     fromJSON(data: any): void;
@@ -67,8 +74,6 @@ export interface IBaseGrid<T extends IGridPanelView> extends IDisposable {
     isMaximizedGroup(panel: T): boolean;
     exitMaximizedGroup(): void;
     hasMaximizedGroup(): boolean;
-    readonly onDidMaximizedGroupChange: Event<void>;
-    readonly onDidLayoutChange: Event<void>;
 }
 
 export abstract class BaseGrid<T extends IGridPanelView>
@@ -86,6 +91,10 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     private readonly _onDidAdd = new Emitter<T>();
     readonly onDidAdd: Event<T> = this._onDidAdd.event;
+
+    private readonly _onDidMaximizedChange = new Emitter<MaximizedChanged<T>>();
+    readonly onDidMaximizedChange: Event<MaximizedChanged<T>> =
+        this._onDidMaximizedChange.event;
 
     private readonly _onDidActiveChange = new Emitter<T | undefined>();
     readonly onDidActiveChange: Event<T | undefined> =
@@ -171,6 +180,12 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.layout(0, 0, true); // set some elements height/widths
 
         this.addDisposables(
+            this.gridview.onDidMaximizedNodeChange((event) => {
+                this._onDidMaximizedChange.fire({
+                    panel: event.view as T,
+                    isMaximized: event.isMaximized,
+                });
+            }),
             this.gridview.onDidViewVisibilityChange(() =>
                 this._onDidViewVisibilityChangeMicroTaskQueue.fire()
             ),
@@ -190,6 +205,8 @@ export abstract class BaseGrid<T extends IGridPanelView>
             )(() => {
                 this._bufferOnDidLayoutChange.fire();
             }),
+            this._onDidMaximizedChange,
+            this._onDidViewVisibilityChangeMicroTaskQueue,
             this._bufferOnDidLayoutChange
         );
     }
@@ -248,10 +265,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     hasMaximizedGroup(): boolean {
         return this.gridview.hasMaximizedView();
-    }
-
-    get onDidMaximizedGroupChange(): Event<void> {
-        return this.gridview.onDidMaximizedNodeChange;
     }
 
     protected doAddGroup(

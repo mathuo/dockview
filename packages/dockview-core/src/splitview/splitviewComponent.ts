@@ -15,7 +15,6 @@ import { SplitviewComponentOptions } from './options';
 import { BaseComponentOptions, Parameters } from '../panel/types';
 import { Emitter, Event } from '../events';
 import { SplitviewPanel, ISplitviewPanel } from './splitviewPanel';
-import { createComponent } from '../panel/componentFactory';
 import { Resizable } from '../resizable';
 import { Classnames } from '../dom';
 
@@ -167,13 +166,6 @@ export class SplitviewComponent
 
         this._options = options;
 
-        if (!options.components) {
-            options.components = {};
-        }
-        if (!options.frameworkComponents) {
-            options.frameworkComponents = {};
-        }
-
         this.splitview = new Splitview(this.element, options);
 
         this.addDisposables(
@@ -267,18 +259,10 @@ export class SplitviewComponent
             throw new Error(`panel ${options.id} already exists`);
         }
 
-        const view = createComponent(
-            options.id,
-            options.component,
-            this.options.components ?? {},
-            this.options.frameworkComponents ?? {},
-            this.options.frameworkWrapper
-                ? {
-                      createComponent:
-                          this.options.frameworkWrapper.createComponent,
-                  }
-                : undefined
-        );
+        const view = this.options.createComponent({
+            id: options.id,
+            name: options.component,
+        });
 
         view.orientation = this.splitview.orientation;
 
@@ -367,19 +351,10 @@ export class SplitviewComponent
                         throw new Error(`panel ${data.id} already exists`);
                     }
 
-                    const panel = createComponent(
-                        data.id,
-                        data.component,
-                        this.options.components ?? {},
-                        this.options.frameworkComponents ?? {},
-                        this.options.frameworkWrapper
-                            ? {
-                                  createComponent:
-                                      this.options.frameworkWrapper
-                                          .createComponent,
-                              }
-                            : undefined
-                    );
+                    const panel = this.options.createComponent({
+                        id: data.id,
+                        name: data.component,
+                    });
 
                     queue.push(() => {
                         panel.init({

@@ -89,7 +89,10 @@ const components = {
                     event.api.addPanel({
                         id: 'panel_3',
                         component: 'default',
-                        floating: true,
+                    });
+
+                    event.api.onDidRemovePanel((e) => {
+                        console.log('remove', e);
                     });
                 }}
                 className={'dockview-theme-abyss'}
@@ -206,6 +209,12 @@ const DockviewDemo = (props: { theme?: string }) => {
             addLogLine(`Panel Moved ${event.panel.id}`);
         });
 
+        event.api.onDidMaximizedGroupChange((event) => {
+            addLogLine(
+                `Group Maximized Changed ${event.group.api.id} [${event.isMaximized}]`
+            );
+        });
+
         event.api.onDidRemoveGroup((event) => {
             setGroups((_) => {
                 const next = [..._];
@@ -258,6 +267,7 @@ const DockviewDemo = (props: { theme?: string }) => {
 
     return (
         <div
+            className="dockview-demo"
             style={{
                 height: '100%',
                 display: 'flex',
@@ -318,6 +328,15 @@ const DockviewDemo = (props: { theme?: string }) => {
                         engineering
                     </span>
                 </button>
+                {showLogs && (
+                    <button
+                        onClick={() => {
+                            setLogLines([]);
+                        }}
+                    >
+                        <span className="material-symbols-outlined">undo</span>
+                    </button>
+                )}
                 <button
                     onClick={() => {
                         setShowLogs(!showLogs);
@@ -366,61 +385,77 @@ const DockviewDemo = (props: { theme?: string }) => {
                             width: '400px',
                             backgroundColor: 'black',
                             color: 'white',
-                            overflow: 'auto',
+                            overflow: 'hidden',
                             fontFamily: 'monospace',
                             marginLeft: '10px',
                             flexShrink: 0,
+                            display: 'flex',
+                            flexDirection: 'column',
                         }}
                     >
-                        {logLines.map((line, i) => {
-                            return (
-                                <div
-                                    style={{
-                                        height: '30px',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                        fontSize: '13px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-
-                                        backgroundColor: line.backgroundColor,
-                                    }}
-                                    key={i}
-                                >
-                                    <span
+                        <div style={{ flexGrow: 1, overflow: 'auto' }}>
+                            {logLines.map((line, i) => {
+                                return (
+                                    <div
                                         style={{
+                                            height: '30px',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap',
+                                            fontSize: '13px',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            minWidth: '20px',
-                                            maxWidth: '20px',
-                                            color: 'gray',
-                                            borderRight: '1px solid gray',
-                                            marginRight: '4px',
-                                            paddingLeft: '4px',
-                                            height: '100%',
+
+                                            backgroundColor:
+                                                line.backgroundColor,
                                         }}
+                                        key={i}
                                     >
-                                        {logLines.length - i}
-                                    </span>
-                                    <span>
-                                        {line.timestamp && (
-                                            <span
-                                                style={{
-                                                    fontSize: '0.7em',
-                                                    padding: '0px 2px',
-                                                }}
-                                            >
-                                                {line.timestamp
-                                                    .toISOString()
-                                                    .substring(11, 23)}
-                                            </span>
-                                        )}
-                                        <span>{line.text}</span>
-                                    </span>
-                                </div>
-                            );
-                        })}
+                                        <span
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                minWidth: '20px',
+                                                maxWidth: '20px',
+                                                color: 'gray',
+                                                borderRight: '1px solid gray',
+                                                marginRight: '4px',
+                                                paddingLeft: '4px',
+                                                height: '100%',
+                                            }}
+                                        >
+                                            {logLines.length - i}
+                                        </span>
+                                        <span>
+                                            {line.timestamp && (
+                                                <span
+                                                    style={{
+                                                        fontSize: '0.7em',
+                                                        padding: '0px 2px',
+                                                    }}
+                                                >
+                                                    {line.timestamp
+                                                        .toISOString()
+                                                        .substring(11, 23)}
+                                                </span>
+                                            )}
+                                            <span>{line.text}</span>
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        <div
+                            style={{
+                                padding: '4px',
+                                display: 'flex',
+                                justifyContent: 'flex-end',
+                            }}
+                        >
+                            <button onClick={() => setLogLines([])}>
+                                Clear
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>

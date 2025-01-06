@@ -32,11 +32,11 @@ export interface ISplitviewStyles {
 }
 
 export interface SplitViewOptions {
-    readonly orientation: Orientation;
-    readonly descriptor?: ISplitViewDescriptor;
-    readonly proportionalLayout?: boolean;
-    readonly styles?: ISplitviewStyles;
-    readonly margin?: number;
+    orientation: Orientation;
+    descriptor?: ISplitViewDescriptor;
+    proportionalLayout?: boolean;
+    styles?: ISplitviewStyles;
+    margin?: number;
 }
 
 export enum LayoutPriority {

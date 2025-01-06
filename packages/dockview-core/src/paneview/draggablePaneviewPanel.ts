@@ -6,9 +6,13 @@ import {
     PaneTransfer,
 } from '../dnd/dataTransfer';
 import { Droptarget, DroptargetEvent } from '../dnd/droptarget';
-import { Emitter } from '../events';
+import { Emitter, Event } from '../events';
 import { IDisposable } from '../lifecycle';
 import { Orientation } from '../splitview/splitview';
+import {
+    PaneviewDndOverlayEvent,
+    PaneviewUnhandledDragOverEvent,
+} from './options';
 import { IPaneviewComponent } from './paneviewComponent';
 import {
     IPaneviewPanel,
@@ -16,7 +20,7 @@ import {
     PaneviewPanel,
 } from './paneviewPanel';
 
-export interface PaneviewDropEvent extends DroptargetEvent {
+export interface PaneviewDidDropEvent extends DroptargetEvent {
     panel: IPaneviewPanel;
     getData: () => PaneTransfer | undefined;
     api: PaneviewApi;
@@ -26,8 +30,13 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
     private handler: DragHandler | undefined;
     private target: Droptarget | undefined;
 
-    private readonly _onDidDrop = new Emitter<PaneviewDropEvent>();
+    private readonly _onDidDrop = new Emitter<PaneviewDidDropEvent>();
     readonly onDidDrop = this._onDidDrop.event;
+
+    private readonly _onUnhandledDragOverEvent =
+        new Emitter<PaneviewDndOverlayEvent>();
+    readonly onUnhandledDragOverEvent: Event<PaneviewDndOverlayEvent> =
+        this._onUnhandledDragOverEvent.event;
 
     constructor(
         private readonly accessor: IPaneviewComponent,
@@ -39,6 +48,8 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
         disableDnd: boolean
     ) {
         super(id, component, headerComponent, orientation, isExpanded, true);
+
+        this.addDisposables(this._onDidDrop, this._onUnhandledDragOverEvent);
 
         if (!disableDnd) {
             this.initDragFeatures();
@@ -76,7 +87,7 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
             overlayModel: {
                 activationSize: { type: 'percentage', value: 50 },
             },
-            canDisplayOverlay: (event) => {
+            canDisplayOverlay: (event, position) => {
                 const data = getPaneData();
 
                 if (data) {
@@ -88,15 +99,16 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
                     }
                 }
 
-                if (this.accessor.options.showDndOverlay) {
-                    return this.accessor.options.showDndOverlay({
-                        nativeEvent: event,
-                        getData: getPaneData,
-                        panel: this,
-                    });
-                }
+                const firedEvent = new PaneviewUnhandledDragOverEvent(
+                    event,
+                    position,
+                    getPaneData,
+                    this
+                );
 
-                return false;
+                this._onUnhandledDragOverEvent.fire(firedEvent);
+
+                return firedEvent.isAccepted;
             },
         });
 

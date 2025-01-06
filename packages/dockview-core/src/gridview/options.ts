@@ -1,21 +1,34 @@
 import { GridviewPanel } from './gridviewPanel';
-import { ISplitviewStyles, Orientation } from '../splitview/splitview';
-import {
-    ComponentConstructor,
-    FrameworkFactory,
-} from '../panel/componentFactory';
+import { Orientation } from '../splitview/splitview';
+import { CreateComponentOptions } from '../dockview/options';
 
-export interface GridviewComponentOptions {
+export interface GridviewOptions {
     disableAutoResizing?: boolean;
-    proportionalLayout: boolean;
+    proportionalLayout?: boolean;
     orientation: Orientation;
-    components?: {
-        [componentName: string]: ComponentConstructor<GridviewPanel>;
-    };
-    frameworkComponents?: {
-        [componentName: string]: any;
-    };
-    frameworkComponentFactory?: FrameworkFactory<GridviewPanel>;
-    styles?: ISplitviewStyles;
     className?: string;
+    hideBorders?: boolean;
 }
+
+export interface GridviewFrameworkOptions {
+    createComponent: (options: CreateComponentOptions) => GridviewPanel;
+}
+
+export type GridviewComponentOptions = GridviewOptions &
+    GridviewFrameworkOptions;
+
+export const PROPERTY_KEYS_GRIDVIEW: (keyof GridviewOptions)[] = (() => {
+    /**
+     * by readong the keys from an empty value object TypeScript will error
+     * when we add or remove new properties to `DockviewOptions`
+     */
+    const properties: Record<keyof GridviewOptions, undefined> = {
+        disableAutoResizing: undefined,
+        proportionalLayout: undefined,
+        orientation: undefined,
+        hideBorders: undefined,
+        className: undefined,
+    };
+
+    return Object.keys(properties) as (keyof GridviewOptions)[];
+})();
