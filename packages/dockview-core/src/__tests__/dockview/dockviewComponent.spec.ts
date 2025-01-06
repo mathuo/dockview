@@ -6485,6 +6485,262 @@ describe('dockviewComponent', () => {
         });
     });
 
+    describe('moveGroup', () => {
+        test('#1', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            const api = new DockviewApi(dockview);
+
+            dockview.layout(1000, 1000);
+
+            let panel1!: IDockviewPanel;
+            let panel2!: IDockviewPanel;
+            let panel3!: IDockviewPanel;
+
+            const reset = () => {
+                dockview.clear();
+
+                panel1 = api.addPanel({
+                    id: 'panel_1',
+                    component: 'default',
+                });
+
+                panel2 = api.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    position: { direction: 'right' },
+                });
+
+                panel3 = api.addPanel({
+                    id: 'panel_3',
+                    component: 'default',
+                    position: { direction: 'right' },
+                });
+
+                panel2.api.setActive();
+            };
+
+            // default case
+
+            reset();
+            expect([
+                panel1.group.api.isActive,
+                panel2.group.api.isActive,
+            ]).toEqual([false, true]);
+            expect([panel1.api.isActive, panel2.api.isActive]).toEqual([
+                false,
+                true,
+            ]);
+
+            // move inactive group
+
+            reset();
+            panel1.group.api.moveTo({ group: panel2.group, position: 'right' });
+            expect([
+                panel1.group.api.isActive,
+                panel2.group.api.isActive,
+            ]).toEqual([true, false]);
+            expect([panel1.api.isActive, panel2.api.isActive]).toEqual([
+                true,
+                false,
+            ]);
+
+            // move active group
+
+            reset();
+            panel2.group.api.moveTo({ group: panel1.group, position: 'left' });
+            expect([
+                panel1.group.api.isActive,
+                panel2.group.api.isActive,
+            ]).toEqual([false, true]);
+            expect([panel1.api.isActive, panel2.api.isActive]).toEqual([
+                false,
+                true,
+            ]);
+
+            // move inactive group (with inactive flag)
+
+            reset();
+            panel1.group.api.moveTo({
+                group: panel2.group,
+                position: 'right',
+                inactive: true,
+            });
+            expect([
+                panel1.group.api.isActive,
+                panel2.group.api.isActive,
+            ]).toEqual([false, true]);
+            expect([panel1.api.isActive, panel2.api.isActive]).toEqual([
+                false,
+                true,
+            ]);
+
+            // move active group (with inactive flag)
+
+            reset();
+            panel2.group.api.moveTo({
+                group: panel1.group,
+                position: 'left',
+                inactive: true,
+            });
+            expect([
+                panel1.group.api.isActive,
+                panel2.group.api.isActive,
+            ]).toEqual([false, true]);
+            expect([panel1.api.isActive, panel2.api.isActive]).toEqual([
+                false,
+                true,
+            ]);
+
+            // merge inactive group with active group
+
+            reset();
+            panel1.group.api.moveTo({ group: panel2.group });
+            expect([
+                panel1.group.api.isActive,
+                panel2.group.api.isActive,
+            ]).toEqual([true, true]);
+            expect([panel1.api.isActive, panel2.api.isActive]).toEqual([
+                true,
+                false,
+            ]);
+
+            // merge active group with inactive group
+
+            reset();
+            panel2.group.api.moveTo({ group: panel1.group });
+            expect([
+                panel1.group.api.isActive,
+                panel2.group.api.isActive,
+            ]).toEqual([true, true]);
+            expect([panel1.api.isActive, panel2.api.isActive]).toEqual([
+                false,
+                true,
+            ]);
+
+            // merge inactive group with active group (with inactive flag)
+
+            reset();
+            panel1.group.api.moveTo({ group: panel2.group, inactive: true });
+            expect([
+                panel1.group.api.isActive,
+                panel2.group.api.isActive,
+            ]).toEqual([true, true]);
+            expect([panel1.api.isActive, panel2.api.isActive]).toEqual([
+                false,
+                true,
+            ]);
+
+            // merge active group with inactive group (with inactive flag)
+
+            reset();
+            panel2.group.api.moveTo({ group: panel1.group, inactive: true });
+            expect([
+                panel1.group.api.isActive,
+                panel2.group.api.isActive,
+            ]).toEqual([true, true]);
+            expect([panel1.api.isActive, panel2.api.isActive]).toEqual([
+                false,
+                true,
+            ]);
+
+            // merge inactive group with inactive group
+
+            reset();
+            panel1.group.api.moveTo({ group: panel3.group });
+            expect([
+                panel1.group.api.isActive,
+                panel2.group.api.isActive,
+                panel3.group.api.isActive,
+            ]).toEqual([true, false, true]);
+            expect([
+                panel1.api.isActive,
+                panel2.api.isActive,
+                panel3.api.isActive,
+            ]).toEqual([true, false, false]);
+
+            // merge inactive group with inactive group (with inactive flag)
+
+            reset();
+            panel1.group.api.moveTo({ group: panel3.group, inactive: true });
+            expect([
+                panel1.group.api.isActive,
+                panel2.group.api.isActive,
+                panel3.group.api.isActive,
+            ]).toEqual([false, true, false]);
+            expect([
+                panel1.api.isActive,
+                panel2.api.isActive,
+                panel3.api.isActive,
+            ]).toEqual([false, true, false]);
+        });
+    });
+
+    describe('movePanel', () => {
+        test('#1', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            const api = new DockviewApi(dockview);
+
+            dockview.layout(1000, 1000);
+
+            let panel1!: IDockviewPanel;
+            let panel2!: IDockviewPanel;
+
+            const reset = () => {
+                dockview.clear();
+
+                panel1 = api.addPanel({
+                    id: 'panel_1',
+                    component: 'default',
+                });
+
+                panel2 = api.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    position: { direction: 'right' },
+                });
+            };
+
+            // default case
+            //
+            // last panel of group to within another group
+            //
+            // panel from group of at least 2 panels to within another group
+            //
+            // last panel of group to a new group within same branch
+            //
+            // last panel of group to a new group not within same branch
+            //
+        });
+    });
+
     test('that `onDidLayoutChange` only subscribes to events after initial subscription time', () => {
         jest.useFakeTimers();
 

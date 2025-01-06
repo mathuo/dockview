@@ -16,6 +16,7 @@ export interface DockviewGroupMoveParams {
      * The index to place the panel within a group, only applicable if the placement is within an existing group
      */
     index?: number;
+    inactive?: boolean;
 }
 
 export interface DockviewGroupPanelApi extends GridviewPanelApi {
@@ -105,6 +106,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
                     : 'center',
                 index: options.index,
             },
+            inactive: options.inactive,
         });
     }
 
