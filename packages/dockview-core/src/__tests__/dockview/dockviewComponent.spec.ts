@@ -5021,6 +5021,78 @@ describe('dockviewComponent', () => {
             expect(panel3.api.location.type).toBe('grid');
         });
 
+        test('grid -> floating -> popout -> floating', async () => {
+            const container = document.createElement('div');
+
+            window.open = () => setupMockWindow();
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+            });
+
+            const panel3 = dockview.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(panel2.api.location.type).toBe('grid');
+            expect(panel3.api.location.type).toBe('grid');
+
+            dockview.addFloatingGroup(panel2.group);
+
+            expect(panel1.api.location.type).toBe('floating');
+            expect(panel2.api.location.type).toBe('floating');
+            expect(panel3.api.location.type).toBe('grid');
+
+            await dockview.addPopoutGroup(panel2.group);
+
+            expect(panel1.api.location.type).toBe('popout');
+            expect(panel2.api.location.type).toBe('popout');
+            expect(panel3.api.location.type).toBe('grid');
+
+            dockview.addFloatingGroup(panel2.group);
+
+            expect(panel1.api.location.type).toBe('floating');
+            expect(panel2.api.location.type).toBe('floating');
+            expect(panel3.api.location.type).toBe('grid');
+
+            await dockview.addPopoutGroup(panel2.group);
+
+            expect(panel1.api.location.type).toBe('popout');
+            expect(panel2.api.location.type).toBe('popout');
+            expect(panel3.api.location.type).toBe('grid');
+
+            panel2.group.api.moveTo({ group: panel3.group });
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(panel2.api.location.type).toBe('grid');
+            expect(panel3.api.location.type).toBe('grid');
+        });
+
         test('that panel is rendered when moving from popout to new group', async () => {
             const container = document.createElement('div');
 

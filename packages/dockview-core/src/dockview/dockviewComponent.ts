@@ -846,6 +846,20 @@ export class DockviewComponent
                                 this.overlayRenderContainer;
                             returnedGroup = group;
 
+                            const alreadyRemoved = !this._popoutGroups.find(
+                                (p) => p.popoutGroup === group
+                            );
+
+                            if (alreadyRemoved) {
+                                /**
+                                 * If this popout group was explicitly removed then we shouldn't run the additional
+                                 * steps. To tell if the running of this disposable is the result of this popout group
+                                 * being explicitly removed we can check if this popout group is still referenced in
+                                 * the `this._popoutGroups` list.
+                                 */
+                                return;
+                            }
+
                             if (floatingBox) {
                                 this.addFloatingGroup(group, {
                                     height: floatingBox.height,
