@@ -156,14 +156,12 @@ export abstract class BaseGrid<T extends IGridPanelView>
     }
 
     constructor(parentElement: HTMLElement, options: BaseGridOptions) {
-        super(document.createElement('div'), options.disableAutoResizing);
+        super(parentElement, options.disableAutoResizing);
         this.element.style.height = '100%';
         this.element.style.width = '100%';
 
         this._classNames = new Classnames(this.element);
         this._classNames.setClassNames(options.className ?? '');
-
-        parentElement.appendChild(this.element);
 
         this.gridview = new Gridview(
             !!options.proportionalLayout,
