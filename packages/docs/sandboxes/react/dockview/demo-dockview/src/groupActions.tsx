@@ -88,7 +88,6 @@ const GroupAction = (props: {
                     }
                     onClick={() => {
                         if (group) {
-
                             props.api.addFloatingGroup(group, {
                                 width: 400,
                                 height: 300,
@@ -99,7 +98,6 @@ const GroupAction = (props: {
                                     right: 50,
                                 },
                             });
-
                         }
                     }}
                 >
