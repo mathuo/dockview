@@ -368,8 +368,8 @@ export class DockviewComponent
         return this._floatingGroups;
     }
 
-    constructor(parentElement: HTMLElement, options: DockviewComponentOptions) {
-        super(parentElement, {
+    constructor(container: HTMLElement, options: DockviewComponentOptions) {
+        super(container, {
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
             styles: options.hideBorders

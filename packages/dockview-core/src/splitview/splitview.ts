@@ -32,7 +32,7 @@ export interface ISplitviewStyles {
 }
 
 export interface SplitViewOptions {
-    orientation: Orientation;
+    orientation?: Orientation;
     descriptor?: ISplitViewDescriptor;
     proportionalLayout?: boolean;
     styles?: ISplitviewStyles;
@@ -225,7 +225,7 @@ export class Splitview {
         private readonly container: HTMLElement,
         options: SplitViewOptions
     ) {
-        this._orientation = options.orientation;
+        this._orientation = options.orientation ?? Orientation.VERTICAL;
         this.element = this.createContainer();
 
         this.margin = options.margin ?? 0;
