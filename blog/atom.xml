@@ -2,11 +2,26 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dockview.dev/blog</id>
     <title>Dockview Blog</title>
-    <updated>2024-12-29T00:00:00.000Z</updated>
+    <updated>2025-01-09T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dockview.dev/blog"/>
     <subtitle>Dockview Blog</subtitle>
     <icon>https://dockview.dev/img/dockview_logo.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Dockview 3.0.1]]></title>
+        <id>https://dockview.dev/blog/dockview-3.0.-release</id>
+        <link href="https://dockview.dev/blog/dockview-3.0.-release"/>
+        <updated>2025-01-09T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
+        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-3.0.-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-3.0.-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-3.0.-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
+<ul>
+<li>Fix duplicate HTML element <a href="https://github.com/mathuo/dockview/issues/818" target="_blank" rel="noopener noreferrer">#810</a></li>
+</ul>]]></content>
+        <category label="release" term="release"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Dockview 3.0.0]]></title>
         <id>https://dockview.dev/blog/dockview-3.0.0-release</id>
@@ -362,27 +377,6 @@
 <ul>
 <li>Internal Changes <a href="https://github.com/mathuo/dockview/issues/601" target="_blank" rel="noopener noreferrer">#601</a></li>
 <li>Internal Changes <a href="https://github.com/mathuo/dockview/issues/603" target="_blank" rel="noopener noreferrer">#603</a></li>
-</ul>]]></content>
-        <category label="release" term="release"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Dockview 1.13.1]]></title>
-        <id>https://dockview.dev/blog/dockview-1.13.1-release</id>
-        <link href="https://dockview.dev/blog/dockview-1.13.1-release"/>
-        <updated>2024-05-05T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
-        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.13.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>
-<p>Bug: fix duplicate group added when adding group with absolute position <a href="https://github.com/mathuo/dockview/issues/596" target="_blank" rel="noopener noreferrer">#596</a></p>
-</li>
-<li>
-<p>Bug: Adjust onDidLayoutChange behaviour <a href="https://github.com/mathuo/dockview/issues/597" target="_blank" rel="noopener noreferrer">#597</a></p>
-<ul>
-<li><code>onDidLayoutChange</code> is an aggregation of events that constitute a layout change. Previously these events were aggregated and the events were then fired once through a <code>setTimeout(..., 0)</code> approach. This has been altered to fire on a <code>queueMicrotask</code> event and will only subscribe to events that happen after the event is subscribed to, previously you may have recieved events yet to fire on the <code>setTimeout</code> function but within the same event-loop cycle which was a bug.</li>
-</ul>
-</li>
 </ul>]]></content>
         <category label="release" term="release"/>
     </entry>

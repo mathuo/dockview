@@ -4,10 +4,25 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Sun, 29 Dec 2024 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Thu, 09 Jan 2025 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 3.0.1]]></title>
+            <link>https://dockview.dev/blog/dockview-3.0.-release</link>
+            <guid>https://dockview.dev/blog/dockview-3.0.-release</guid>
+            <pubDate>Thu, 09 Jan 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-3.0.-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-3.0.-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-3.0.-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
+<ul>
+<li>Fix duplicate HTML element <a href="https://github.com/mathuo/dockview/issues/818" target="_blank" rel="noopener noreferrer">#810</a></li>
+</ul>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 3.0.0]]></title>
             <link>https://dockview.dev/blog/dockview-3.0.0-release</link>
@@ -363,27 +378,6 @@
 <ul>
 <li>Internal Changes <a href="https://github.com/mathuo/dockview/issues/601" target="_blank" rel="noopener noreferrer">#601</a></li>
 <li>Internal Changes <a href="https://github.com/mathuo/dockview/issues/603" target="_blank" rel="noopener noreferrer">#603</a></li>
-</ul>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 1.13.1]]></title>
-            <link>https://dockview.dev/blog/dockview-1.13.1-release</link>
-            <guid>https://dockview.dev/blog/dockview-1.13.1-release</guid>
-            <pubDate>Sun, 05 May 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.13.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>
-<p>Bug: fix duplicate group added when adding group with absolute position <a href="https://github.com/mathuo/dockview/issues/596" target="_blank" rel="noopener noreferrer">#596</a></p>
-</li>
-<li>
-<p>Bug: Adjust onDidLayoutChange behaviour <a href="https://github.com/mathuo/dockview/issues/597" target="_blank" rel="noopener noreferrer">#597</a></p>
-<ul>
-<li><code>onDidLayoutChange</code> is an aggregation of events that constitute a layout change. Previously these events were aggregated and the events were then fired once through a <code>setTimeout(..., 0)</code> approach. This has been altered to fire on a <code>queueMicrotask</code> event and will only subscribe to events that happen after the event is subscribed to, previously you may have recieved events yet to fire on the <code>setTimeout</code> function but within the same event-loop cycle which was a bug.</li>
-</ul>
-</li>
 </ul>]]></content:encoded>
             <category>release</category>
         </item>
