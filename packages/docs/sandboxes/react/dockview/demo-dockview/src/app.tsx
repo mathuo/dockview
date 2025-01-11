@@ -178,6 +178,11 @@ const DockviewDemo = (props: { theme?: string }) => {
 
     const onReady = (event: DockviewReadyEvent) => {
         setApi(event.api);
+        setPanels([]);
+        setGroups([]);
+        setActivePanel(undefined);
+        setActiveGroup(undefined);
+        addLogLine(`Dockview Is Ready`);
 
         event.api.onDidAddPanel((event) => {
             setPanels((_) => [..._, event.id]);
