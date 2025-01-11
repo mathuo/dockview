@@ -4,20 +4,36 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Thu, 09 Jan 2025 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Sat, 11 Jan 2025 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
         <item>
+            <title><![CDATA[Dockview 3.0.2]]></title>
+            <link>https://dockview.dev/blog/dockview-3.0.2-release</link>
+            <guid>https://dockview.dev/blog/dockview-3.0.2-release</guid>
+            <pubDate>Sat, 11 Jan 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-3.0.2-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-3.0.2-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-3.0.2-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
+<ul>
+<li>Fix issue when transitioning panel from floating to popout to floating <a href="https://github.com/mathuo/dockview/issues/824" target="_blank" rel="noopener noreferrer">#810</a></li>
+<li>Fix duplicate HTML containers <a href="https://github.com/mathuo/dockview/pull/825" target="_blank" rel="noopener noreferrer">#825</a></li>
+</ul>]]></content:encoded>
+            <category>release</category>
+        </item>
+        <item>
             <title><![CDATA[Dockview 3.0.1]]></title>
-            <link>https://dockview.dev/blog/dockview-3.0.-release</link>
-            <guid>https://dockview.dev/blog/dockview-3.0.-release</guid>
+            <link>https://dockview.dev/blog/dockview-3.0.1-release</link>
+            <guid>https://dockview.dev/blog/dockview-3.0.1-release</guid>
             <pubDate>Thu, 09 Jan 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
             <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-3.0.-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-3.0.-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-3.0.-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-3.0.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-3.0.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-3.0.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
 <ul>
 <li>Fix duplicate HTML element <a href="https://github.com/mathuo/dockview/issues/818" target="_blank" rel="noopener noreferrer">#810</a></li>
 </ul>]]></content:encoded>
@@ -360,24 +376,6 @@
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.14.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
 <ul>
 <li>Bug: fix CSS related to group gap sizing <a href="https://github.com/mathuo/dockview/issues/613" target="_blank" rel="noopener noreferrer">#596</a></li>
-</ul>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 1.14.0]]></title>
-            <link>https://dockview.dev/blog/dockview-1.14.0-release</link>
-            <guid>https://dockview.dev/blog/dockview-1.14.0-release</guid>
-            <pubDate>Thu, 23 May 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.14.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<ul>
-<li>Progess towards Vue.js integration <a href="https://github.com/mathuo/dockview/issues/562" target="_blank" rel="noopener noreferrer">#562</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.14.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Internal Changes <a href="https://github.com/mathuo/dockview/issues/601" target="_blank" rel="noopener noreferrer">#601</a></li>
-<li>Internal Changes <a href="https://github.com/mathuo/dockview/issues/603" target="_blank" rel="noopener noreferrer">#603</a></li>
 </ul>]]></content:encoded>
             <category>release</category>
         </item>
