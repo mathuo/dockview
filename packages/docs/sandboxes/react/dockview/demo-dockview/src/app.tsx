@@ -376,7 +376,6 @@ const DockviewDemo = (props: { theme?: string }) => {
                     style={{
                         flexGrow: 1,
                         overflow: 'hidden',
-                        height: '100%',
                         display: 'flex',
                     }}
                 >
