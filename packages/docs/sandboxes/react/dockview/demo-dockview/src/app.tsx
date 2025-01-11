@@ -176,80 +176,92 @@ const DockviewDemo = (props: { theme?: string }) => {
         setPending([]);
     }, [pending]);
 
-    const onReady = (event: DockviewReadyEvent) => {
-        setApi(event.api);
-        setPanels([]);
-        setGroups([]);
-        setActivePanel(undefined);
-        setActiveGroup(undefined);
-        addLogLine(`Dockview Is Ready`);
-
-        event.api.onDidAddPanel((event) => {
-            setPanels((_) => [..._, event.id]);
-            addLogLine(`Panel Added ${event.id}`);
-        });
-        event.api.onDidActivePanelChange((event) => {
-            setActivePanel(event?.id);
-            addLogLine(`Panel Activated ${event?.id}`);
-        });
-        event.api.onDidRemovePanel((event) => {
-            setPanels((_) => {
-                const next = [..._];
-                next.splice(
-                    next.findIndex((x) => x === event.id),
-                    1
-                );
-
-                return next;
-            });
-            addLogLine(`Panel Removed ${event.id}`);
-        });
-
-        event.api.onDidAddGroup((event) => {
-            setGroups((_) => [..._, event.id]);
-            addLogLine(`Group Added ${event.id}`);
-        });
-
-        event.api.onDidMovePanel((event) => {
-            addLogLine(`Panel Moved ${event.panel.id}`);
-        });
-
-        event.api.onDidMaximizedGroupChange((event) => {
-            addLogLine(
-                `Group Maximized Changed ${event.group.api.id} [${event.isMaximized}]`
-            );
-        });
-
-        event.api.onDidRemoveGroup((event) => {
-            setGroups((_) => {
-                const next = [..._];
-                next.splice(
-                    next.findIndex((x) => x === event.id),
-                    1
-                );
-
-                return next;
-            });
-            addLogLine(`Group Removed ${event.id}`);
-        });
-
-        event.api.onDidActiveGroupChange((event) => {
-            setActiveGroup(event?.id);
-            addLogLine(`Group Activated ${event?.id}`);
-        });
-
-        const state = localStorage.getItem('dv-demo-state');
-        if (state) {
-            try {
-                event.api.fromJSON(JSON.parse(state));
-                return;
-            } catch {
-                localStorage.removeItem('dv-demo-state');
-            }
+    React.useEffect(() => {
+        if (!api) {
             return;
         }
 
-        defaultConfig(event.api);
+        const disposables = [
+            api.onDidAddPanel((event) => {
+                setPanels((_) => [..._, event.id]);
+                addLogLine(`Panel Added ${event.id}`);
+            }),
+            api.onDidActivePanelChange((event) => {
+                setActivePanel(event?.id);
+                addLogLine(`Panel Activated ${event?.id}`);
+            }),
+            api.onDidRemovePanel((event) => {
+                setPanels((_) => {
+                    const next = [..._];
+                    next.splice(
+                        next.findIndex((x) => x === event.id),
+                        1
+                    );
+
+                    return next;
+                });
+                addLogLine(`Panel Removed ${event.id}`);
+            }),
+
+            api.onDidAddGroup((event) => {
+                setGroups((_) => [..._, event.id]);
+                addLogLine(`Group Added ${event.id}`);
+            }),
+
+            api.onDidMovePanel((event) => {
+                addLogLine(`Panel Moved ${event.panel.id}`);
+            }),
+
+            api.onDidMaximizedGroupChange((event) => {
+                addLogLine(
+                    `Group Maximized Changed ${event.group.api.id} [${event.isMaximized}]`
+                );
+            }),
+
+            api.onDidRemoveGroup((event) => {
+                setGroups((_) => {
+                    const next = [..._];
+                    next.splice(
+                        next.findIndex((x) => x === event.id),
+                        1
+                    );
+
+                    return next;
+                });
+                addLogLine(`Group Removed ${event.id}`);
+            }),
+
+            api.onDidActiveGroupChange((event) => {
+                setActiveGroup(event?.id);
+                addLogLine(`Group Activated ${event?.id}`);
+            }),
+        ];
+
+        const loadLayout = () => {
+            const state = localStorage.getItem('dv-demo-state');
+
+            if (state) {
+                try {
+                    api.fromJSON(JSON.parse(state));
+                    return;
+                } catch {
+                    localStorage.removeItem('dv-demo-state');
+                }
+                return;
+            }
+
+            defaultConfig(api);
+        };
+
+        loadLayout();
+
+        return () => {
+            disposables.forEach((disposable) => disposable.dispose());
+        };
+    }, [api]);
+
+    const onReady = (event: DockviewReadyEvent) => {
+        setApi(event.api);
     };
 
     const [watermark, setWatermark] = React.useState<boolean>(false);
