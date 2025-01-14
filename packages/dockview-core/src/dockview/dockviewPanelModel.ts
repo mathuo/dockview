@@ -14,6 +14,7 @@ export interface IDockviewPanelModel extends IDisposable {
     readonly tabComponent?: string;
     readonly content: IContentRenderer;
     readonly tab: ITabRenderer;
+    readonly newTab: ITabRenderer;
     update(event: PanelUpdateEvent): void;
     layout(width: number, height: number): void;
     init(params: GroupPanelPartInitParameters): void;
@@ -40,6 +41,11 @@ export class DockviewPanelModel implements IDockviewPanelModel {
     ) {
         this._content = this.createContentComponent(this.id, contentComponent);
         this._tab = this.createTabComponent(this.id, tabComponent);
+    }
+
+    get newTab() {
+        const cmp = this.createTabComponent(this.id, this.tabComponent);
+        return cmp;
     }
 
     init(params: GroupPanelPartInitParameters): void {

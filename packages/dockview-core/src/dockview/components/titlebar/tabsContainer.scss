@@ -7,65 +7,22 @@
     font-size: var(--dv-tabs-and-actions-container-font-size);
 
     &.dv-single-tab.dv-full-width-single-tab {
-      .dv-tabs-container {
-          flex-grow: 1;
-
-          .dv-tab {
+        .dv-tabs-container {
             flex-grow: 1;
-          }
-      }
 
-      .dv-void-container {
-        flex-grow: 0;
-      }
+            .dv-tab {
+                flex-grow: 1;
+            }
+        }
+
+        .dv-void-container {
+            flex-grow: 0;
+        }
     }
 
     .dv-void-container {
         display: flex;
         flex-grow: 1;
         cursor: grab;
-    }
-
-    .dv-tabs-container {
-        display: flex;
-        overflow-x: overlay;
-        overflow-y: hidden;
-
-        scrollbar-width: thin; // firefox
-
-        &::-webkit-scrollbar {
-            height: 3px;
-        }
-
-        /* Track */
-        &::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        /* Handle */
-        &::-webkit-scrollbar-thumb {
-            background: var(--dv-tabs-container-scrollbar-color);
-        }
-
-        .dv-tab {
-            -webkit-user-drag: element;
-            outline: none;
-            min-width: 75px;
-            cursor: pointer;
-            position: relative;
-            box-sizing: border-box;
-
-            &:not(:first-child)::before {
-                content: ' ';
-                position: absolute;
-                top: 0;
-                left: 0;
-                z-index: 5;
-                pointer-events: none;
-                background-color: var(--dv-tab-divider-color);
-                width: 1px;
-                height: 100%;
-            }
-        }
     }
 }
