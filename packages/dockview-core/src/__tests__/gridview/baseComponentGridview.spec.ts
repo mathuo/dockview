@@ -105,6 +105,21 @@ class ClassUnderTest extends BaseGrid<TestPanel> {
 }
 
 describe('baseComponentGridview', () => {
+    test('that the container is not removed when grid is disposed', () => {
+        const root = document.createElement('div');
+        const container = document.createElement('div');
+        root.appendChild(container);
+
+        const cut = new ClassUnderTest(container, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: true,
+        });
+
+        cut.dispose();
+
+        expect(container.parentElement).toBe(root);
+    });
+
     test('that .layout(...) force flag works', () => {
         const cut = new ClassUnderTest(document.createElement('div'), {
             orientation: Orientation.HORIZONTAL,

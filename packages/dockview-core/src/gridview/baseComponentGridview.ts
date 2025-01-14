@@ -155,7 +155,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.gridview.locked = value;
     }
 
-    constructor(parentElement: HTMLElement, options: BaseGridOptions) {
+    constructor(container: HTMLElement, options: BaseGridOptions) {
         super(document.createElement('div'), options.disableAutoResizing);
         this.element.style.height = '100%';
         this.element.style.width = '100%';
@@ -163,7 +163,8 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this._classNames = new Classnames(this.element);
         this._classNames.setClassNames(options.className ?? '');
 
-        parentElement.appendChild(this.element);
+        // the container is owned by the third-party, do not modify/delete it
+        container.appendChild(this.element);
 
         this.gridview = new Gridview(
             !!options.proportionalLayout,
