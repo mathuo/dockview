@@ -39,4 +39,35 @@
             height: 100%;
         }
     }
+
+    &.dv-tabs-overflow-container {
+        flex-direction: column;
+        height: unset;
+
+        .dv-tab {
+            height: var(--dv-tabs-and-actions-container-height);
+        }
+
+        .dv-active-tab {
+            background-color: var(
+                --dv-activegroup-visiblepanel-tab-background-color
+            );
+            color: var(--dv-activegroup-visiblepanel-tab-color);
+        }
+        .dv-inactive-tab {
+            background-color: var(
+                --dv-activegroup-hiddenpanel-tab-background-color
+            );
+            color: var(--dv-activegroup-hiddenpanel-tab-color);
+        }
+    }
+}
+
+.dv-tabs-panel {
+    .dv-tabs-overflow-handle {
+        height: 100%;
+        width: 15px;
+        flex-shrink: 0;
+        background-color: red;
+    }
 }

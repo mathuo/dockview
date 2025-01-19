@@ -220,6 +220,7 @@ export class Tabs extends CompositeDisposable {
 
     private toggleDropdown(show: boolean): void {
         this._hasOverflow = show;
+
         if (this._dropdownAnchor) {
             this._dropdownAnchor.remove();
             this._dropdownAnchor = null;
@@ -230,28 +231,29 @@ export class Tabs extends CompositeDisposable {
         }
 
         this._dropdownAnchor = document.createElement('div');
-        this._dropdownAnchor.style.width = '10px';
-        this._dropdownAnchor.style.height = '100%';
-        this._dropdownAnchor.style.flexShrink = '0';
-        this._dropdownAnchor.style.backgroundColor = 'red';
+        this._dropdownAnchor.className = 'dv-tabs-overflow-handle';
 
         this.element.appendChild(this._dropdownAnchor);
 
         addDisposableListener(this._dropdownAnchor, 'click', (event) => {
             const el = document.createElement('div');
-            el.style.width = '200px';
-            el.style.maxHeight = '600px';
             el.style.overflow = 'auto';
-            el.style.backgroundColor = 'lightgreen';
+            el.className =
+                'dv-tabs-and-actions-container dv-tabs-container dv-tabs-overflow-container';
 
             this.tabs.map((tab) => {
-                const tab2 = new Tab(
-                    tab.value.panel,
-                    this.accessor,
-                    this.group
-                );
-                tab2.setContent(tab.value.panel.view.newTab);
-                el.appendChild(tab2.element);
+                const child = tab.value.element.cloneNode(true);
+
+                const wrapper = document.createElement('div');
+
+                wrapper.addEventListener('mousedown', () => {
+                    this.accessor.popupService.close();
+                    tab.value.element.scrollIntoView();
+                    tab.value.panel.api.setActive();
+                });
+                wrapper.appendChild(child);
+
+                el.appendChild(wrapper);
             });
 
             this.accessor.popupService.openPopover(el, {
