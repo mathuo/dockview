@@ -267,7 +267,7 @@
         }
     }
 
-    .vertical > .sash-container > .sash {
+    .dv-vertical > .dv-sash-container > .dv-sash {
         &:not(.disabled) {
             &::after {
                 content: '';
