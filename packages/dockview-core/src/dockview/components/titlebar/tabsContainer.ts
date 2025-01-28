@@ -283,6 +283,9 @@ export class TabsContainer
 
         const tabToRemove = this.tabs.splice(index, 1)[0];
 
+        if (!tabToRemove)
+            return;
+
         const { value, disposable } = tabToRemove;
 
         disposable.dispose();
