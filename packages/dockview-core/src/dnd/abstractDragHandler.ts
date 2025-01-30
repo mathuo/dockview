@@ -75,7 +75,9 @@ export abstract class DragHandler extends CompositeDisposable {
             }),
             addDisposableListener(this.el, 'dragend', () => {
                 this.pointerEventsDisposable.dispose();
-                this.dataDisposable.dispose();
+                setTimeout(() => {
+                    this.dataDisposable.dispose();
+                }, 0);
             })
         );
     }

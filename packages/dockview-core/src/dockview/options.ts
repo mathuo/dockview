@@ -34,6 +34,13 @@ export interface ViewFactoryData {
     tab?: string;
 }
 
+export interface DndModel {
+    disableEdges?: boolean;
+    edges?: DroptargetOverlayModel;
+    groupDropPosition?: 'content' | 'group';
+    animated?: boolean;
+}
+
 export interface DockviewOptions {
     /**
      * Disable the auto-resizing which is controlled through a `ResizeObserver`.
@@ -52,9 +59,12 @@ export interface DockviewOptions {
     popoutUrl?: string;
     defaultRenderer?: DockviewPanelRenderer;
     debug?: boolean;
+    // #start dnd
     rootOverlayModel?: DroptargetOverlayModel;
-    locked?: boolean;
     disableDnd?: boolean;
+    // #end dnd
+    locked?: boolean;
+
     className?: string;
     /**
      * Pixel gap between groups

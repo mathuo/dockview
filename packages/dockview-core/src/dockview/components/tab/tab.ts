@@ -16,6 +16,7 @@ import {
 } from '../../../dnd/droptarget';
 import { DragHandler } from '../../../dnd/abstractDragHandler';
 import { IDockviewPanel } from '../../dockviewPanel';
+import { addGhostImage } from '../../../dnd/ghost';
 
 class TabDragHandler extends DragHandler {
     private readonly panelTransfer =
@@ -85,8 +86,11 @@ export class Tab extends CompositeDisposable {
             this.panel
         );
 
+        const target = group.model.dropTargetContainer;
+
         this.dropTarget = new Droptarget(this._element, {
-            acceptedTargetZones: ['center'],
+            acceptedTargetZones: ['left', 'right'],
+            overlayModel: { activationSize: { value: 50, type: 'percentage' } },
             canDisplayOverlay: (event, position) => {
                 if (this.group.locked) {
                     return false;
@@ -95,15 +99,16 @@ export class Tab extends CompositeDisposable {
                 const data = getPanelData();
 
                 if (data && this.accessor.id === data.viewId) {
-                    if (
-                        data.panelId === null &&
-                        data.groupId === this.group.id
-                    ) {
-                        // don't allow group move to drop on self
-                        return false;
-                    }
+                    return true;
+                    // if (
+                    //     data.panelId === null &&
+                    //     data.groupId === this.group.id
+                    // ) {
+                    //     // don't allow group move to drop on self
+                    //     return false;
+                    // }
 
-                    return this.panel.id !== data.panelId;
+                    // return this.panel.id !== data.panelId;
                 }
 
                 return this.group.model.canDisplayOverlay(
@@ -112,6 +117,7 @@ export class Tab extends CompositeDisposable {
                     'tab'
                 );
             },
+            getOverrideTraget: target ? () => target.model : undefined,
         });
 
         this.onWillShowOverlay = this.dropTarget.onWillShowOverlay;
@@ -121,6 +127,23 @@ export class Tab extends CompositeDisposable {
             this._onDropped,
             this._onDragStart,
             dragHandler.onDragStart((event) => {
+                if (event.dataTransfer) {
+                    const style = getComputedStyle(this.element);
+                    const newNode = this.element.cloneNode(true) as HTMLElement;
+                    Array.from(style).forEach((key) =>
+                        newNode.style.setProperty(
+                            key,
+                            style.getPropertyValue(key),
+                            style.getPropertyPriority(key)
+                        )
+                    );
+                    newNode.style.position = 'absolute';
+
+                    addGhostImage(event.dataTransfer, newNode, {
+                        y: -10,
+                        x: 30,
+                    });
+                }
                 this._onDragStart.fire(event);
             }),
             dragHandler,

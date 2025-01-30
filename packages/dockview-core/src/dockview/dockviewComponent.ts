@@ -9,6 +9,7 @@ import {
     directionToPosition,
     Droptarget,
     DroptargetOverlayModel,
+    DropTargetTargetModel,
     Position,
 } from '../dnd/droptarget';
 import { tail, sequenceEquals, remove } from '../array';
@@ -74,6 +75,7 @@ import {
 } from '../overlay/overlayRenderContainer';
 import { PopoutWindow } from '../popoutWindow';
 import { StrictEventsSequencing } from './strictEventsSequencing';
+import { DropTargetAnchorContainer } from '../dnd/dropTragetAnchorContainer';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     activationSize: { type: 'pixels', value: 10 },
@@ -368,6 +370,12 @@ export class DockviewComponent
         return this._floatingGroups;
     }
 
+    private _targetModel: DropTargetAnchorContainer | null;
+
+    get targetModel(): DropTargetAnchorContainer | null {
+        return this._targetModel;
+    }
+
     constructor(container: HTMLElement, options: DockviewComponentOptions) {
         super(container, {
             proportionalLayout: true,
@@ -380,6 +388,9 @@ export class DockviewComponent
             margin: options.gap,
             className: options.className,
         });
+
+        this._targetModel = new DropTargetAnchorContainer(this.element);
+        // this._targetModel = null;
 
         this.overlayRenderContainer = new OverlayRenderContainer(
             this.gridview.element,
@@ -465,7 +476,10 @@ export class DockviewComponent
 
         this._options = options;
 
+        const target = this.targetModel;
+
         this._rootDropTarget = new Droptarget(this.element, {
+            className: 'dv-drop-target-edge',
             canDisplayOverlay: (event, position) => {
                 const data = getPanelData();
 
@@ -506,6 +520,7 @@ export class DockviewComponent
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
             overlayModel:
                 this.options.rootOverlayModel ?? DEFAULT_ROOT_OVERLAY_MODEL,
+            getOverrideTraget: target ? () => target.model : undefined,
         });
 
         this.addDisposables(
@@ -756,6 +771,14 @@ export class DockviewComponent
 
                 popoutContainer.appendChild(group.element);
 
+                const anchor = document.createElement('div');
+                const dropTragetContainer = new DropTargetAnchorContainer(
+                    anchor
+                );
+                popoutContainer.appendChild(anchor);
+
+                group.model.dropTargetContainer = dropTragetContainer;
+
                 group.model.location = {
                     type: 'popout',
                     getWindow: () => _window.window!,
@@ -844,6 +867,7 @@ export class DockviewComponent
                         } else if (this.getPanel(group.id)) {
                             group.model.renderContainer =
                                 this.overlayRenderContainer;
+                            group.model.dropTargetContainer = this.targetModel;
                             returnedGroup = group;
 
                             const alreadyRemoved = !this._popoutGroups.find(
@@ -2404,9 +2428,11 @@ export class DockviewComponent
                     if (this._moving) {
                         return;
                     }
+
                     if (event.panel !== this.activePanel) {
                         return;
                     }
+
                     if (this._onDidActivePanelChange.value !== event.panel) {
                         this._onDidActivePanelChange.fire(event.panel);
                     }

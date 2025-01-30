@@ -10,6 +10,7 @@ import { DockviewComponent } from '../../dockviewComponent';
 import { addDisposableListener, Emitter, Event } from '../../../events';
 import { CompositeDisposable } from '../../../lifecycle';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
+import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
 
 export class VoidContainer extends CompositeDisposable {
     private readonly _element: HTMLElement;
@@ -29,7 +30,8 @@ export class VoidContainer extends CompositeDisposable {
 
     constructor(
         private readonly accessor: DockviewComponent,
-        private readonly group: DockviewGroupPanel
+        private readonly group: DockviewGroupPanel,
+        model: DockviewGroupPanelModel
     ) {
         super();
 
@@ -48,6 +50,8 @@ export class VoidContainer extends CompositeDisposable {
 
         const handler = new GroupDragHandler(this._element, accessor, group);
 
+        const target = model.dropTargetContainer;
+
         this.dropTraget = new Droptarget(this._element, {
             acceptedTargetZones: ['center'],
             canDisplayOverlay: (event, position) => {
@@ -58,12 +62,14 @@ export class VoidContainer extends CompositeDisposable {
                         data.panelId === null &&
                         data.groupId === this.group.id
                     ) {
-                        // don't allow group move to drop on self
-                        return false;
+                        // // don't allow group move to drop on self
+                        // return false;
                     }
 
+                    return true;
+
                     // don't show the overlay if the tab being dragged is the last panel of this group
-                    return last(this.group.panels)?.id !== data.panelId;
+                    // return last(this.group.panels)?.id !== data.panelId;
                 }
 
                 return group.model.canDisplayOverlay(
@@ -72,6 +78,7 @@ export class VoidContainer extends CompositeDisposable {
                     'header_space'
                 );
             },
+            getOverrideTraget: target ? () => target.model : undefined,
         });
 
         this.onWillShowOverlay = this.dropTraget.onWillShowOverlay;
