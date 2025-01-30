@@ -5,6 +5,7 @@ import {
     IDockviewPanelHeaderProps,
     IDockviewPanelProps,
     DockviewApi,
+    DockviewTheme,
 } from 'dockview';
 import * as React from 'react';
 import './app.scss';
@@ -80,6 +81,7 @@ const components = {
         );
     },
     nested: (props: IDockviewPanelProps) => {
+        const theme = React.useContext(ThemeContext);
         return (
             <DockviewReact
                 components={components}
@@ -95,7 +97,7 @@ const components = {
                         console.log('remove', e);
                     });
                 }}
-                className={'dockview-theme-abyss'}
+                theme={theme}
             />
         );
     },
@@ -141,7 +143,9 @@ const WatermarkComponent = () => {
     return <div>custom watermark</div>;
 };
 
-const DockviewDemo = (props: { theme?: string }) => {
+const ThemeContext = React.createContext<DockviewTheme | undefined>(undefined);
+
+const DockviewDemo = (props: { theme?: DockviewTheme }) => {
     const [logLines, setLogLines] = React.useState<
         { text: string; timestamp?: Date; backgroundColor?: string }[]
     >([]);
@@ -380,18 +384,22 @@ const DockviewDemo = (props: { theme?: string }) => {
                     }}
                 >
                     <DebugContext.Provider value={debug}>
-                        <DockviewReact
-                            components={components}
-                            defaultTabComponent={headerComponents.default}
-                            rightHeaderActionsComponent={RightControls}
-                            leftHeaderActionsComponent={LeftControls}
-                            prefixHeaderActionsComponent={PrefixHeaderControls}
-                            watermarkComponent={
-                                watermark ? WatermarkComponent : undefined
-                            }
-                            onReady={onReady}
-                            className={props.theme || 'dockview-theme-abyss'}
-                        />
+                        <ThemeContext.Provider value={props.theme}>
+                            <DockviewReact
+                                components={components}
+                                defaultTabComponent={headerComponents.default}
+                                rightHeaderActionsComponent={RightControls}
+                                leftHeaderActionsComponent={LeftControls}
+                                prefixHeaderActionsComponent={
+                                    PrefixHeaderControls
+                                }
+                                watermarkComponent={
+                                    watermark ? WatermarkComponent : undefined
+                                }
+                                onReady={onReady}
+                                theme={props.theme}
+                            />
+                        </ThemeContext.Provider>
                     </DebugContext.Provider>
                 </div>
 

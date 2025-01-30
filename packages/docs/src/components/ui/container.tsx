@@ -57,7 +57,7 @@ export const Container = (props: {
 const ReactIcon = (props: { height: number; width: number }) => {
     return (
         <img
-            // className="dockview-svg"
+            // className="dv-svg"
             style={{ marginRight: '0px 4px' }}
             height={props.height}
             width={props.width}
@@ -69,7 +69,7 @@ const ReactIcon = (props: { height: number; width: number }) => {
 const JavascriptIcon = (props: { height: number; width: number }) => {
     return (
         <img
-            // className="dockview-svg "
+            // className="dv-svg "
             style={{ marginRight: '0px 4px' }}
             height={props.height}
             width={props.width}
@@ -85,6 +85,7 @@ const themes = [
     'dockview-theme-vs',
     'dockview-theme-dracula',
     'dockview-theme-replit',
+    'dockview-theme-kraken',
 ];
 
 function useLocalStorageItem(key: string, defaultValue: string): string {
@@ -122,7 +123,6 @@ export const ThemePicker = () => {
     return (
         <div
             style={{
-              
                 height: '20px',
                 display: 'flex',
                 alignItems: 'center',

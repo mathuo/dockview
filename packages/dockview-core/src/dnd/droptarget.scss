@@ -1,5 +1,6 @@
 .dv-drop-target {
     position: relative;
+    --dv-transition-duration: 70ms;
 
     > .dv-drop-target-dropzone {
         position: absolute;
@@ -15,10 +16,13 @@
             box-sizing: border-box;
             height: 100%;
             width: 100%;
+            border: var(--dv-drag-over-border);
             background-color: var(--dv-drag-over-background-color);
-            transition: top 70ms ease-out, left 70ms ease-out,
-                width 70ms ease-out, height 70ms ease-out,
-                opacity 0.15s ease-out;
+            transition: top var(--dv-transition-duration) ease-out,
+                left var(--dv-transition-duration) ease-out,
+                width var(--dv-transition-duration) ease-out,
+                height var(--dv-transition-duration) ease-out,
+                opacity var(--dv-transition-duration) ease-out;
             will-change: transform;
             pointer-events: none;
 
