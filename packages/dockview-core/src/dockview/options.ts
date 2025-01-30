@@ -52,9 +52,18 @@ export interface DockviewOptions {
     popoutUrl?: string;
     defaultRenderer?: DockviewPanelRenderer;
     debug?: boolean;
+    // #start dnd
+    dndEdges?: false | DroptargetOverlayModel;
+    dndOverlayMode?: 'transitional' | 'static';
+    dndContentOverlayIncludesHeader?: boolean;
+    /**
+     * @deprecated use `dndEdges` instead. Will be removed in a future version.
+     * */
     rootOverlayModel?: DroptargetOverlayModel;
-    locked?: boolean;
     disableDnd?: boolean;
+    // #end dnd
+    locked?: boolean;
+
     className?: string;
     /**
      * Pixel gap between groups
@@ -109,6 +118,9 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         gap: undefined,
         className: undefined,
         noPanelsOverlay: undefined,
+        dndEdges: undefined,
+        dndOverlayMode: undefined,
+        dndContentOverlayIncludesHeader: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];

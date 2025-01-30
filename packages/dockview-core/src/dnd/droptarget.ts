@@ -93,10 +93,26 @@ const DEFAULT_SIZE: MeasuredValue = {
 const SMALL_WIDTH_BOUNDARY = 100;
 const SMALL_HEIGHT_BOUNDARY = 100;
 
+export interface DropTargetTargetModel {
+    getElements(
+        event?: DragEvent,
+        outline?: HTMLElement
+    ): {
+        root: HTMLElement;
+        overlay: HTMLElement;
+        changed: boolean;
+    };
+    exists(): boolean;
+    clear(): void;
+}
+
 export interface DroptargetOptions {
     canDisplayOverlay: CanDisplayOverlay;
     acceptedTargetZones: Position[];
     overlayModel?: DroptargetOverlayModel;
+    getOverrideTarget?: () => DropTargetTargetModel;
+    className?: string;
+    getOverlayOutline?: () => HTMLElement | null;
 }
 
 export class Droptarget extends CompositeDisposable {
@@ -116,6 +132,18 @@ export class Droptarget extends CompositeDisposable {
 
     private static USED_EVENT_ID = '__dockview_droptarget_event_is_used__';
 
+    private static ACTUAL_TARGET: Droptarget | undefined;
+
+    private _disabled: boolean;
+
+    get disabled(): boolean {
+        return this._disabled;
+    }
+
+    set disabled(value: boolean) {
+        this._disabled = value;
+    }
+
     get state(): Position | undefined {
         return this._state;
     }
@@ -126,21 +154,33 @@ export class Droptarget extends CompositeDisposable {
     ) {
         super();
 
+        this._disabled = false;
+
         // use a set to take advantage of #<set>.has
         this._acceptedTargetZonesSet = new Set(
             this.options.acceptedTargetZones
         );
 
         this.dnd = new DragAndDropObserver(this.element, {
-            onDragEnter: () => undefined,
+            onDragEnter: () => {
+                this.options.getOverrideTarget?.()?.getElements();
+            },
             onDragOver: (e) => {
+                Droptarget.ACTUAL_TARGET = this;
+
                 if (this._acceptedTargetZonesSet.size === 0) {
+                    if (this.options.getOverrideTarget) {
+                        return;
+                    }
                     this.removeDropTarget();
                     return;
                 }
 
-                const width = this.element.clientWidth;
-                const height = this.element.clientHeight;
+                const target =
+                    this.options.getOverlayOutline?.() ?? this.element;
+
+                const width = target.clientWidth;
+                const height = target.clientHeight;
 
                 if (width === 0 || height === 0) {
                     return; // avoid div!0
@@ -172,6 +212,9 @@ export class Droptarget extends CompositeDisposable {
                 }
 
                 if (!this.options.canDisplayOverlay(e, quadrant)) {
+                    if (this.options.getOverrideTarget) {
+                        return;
+                    }
                     this.removeDropTarget();
                     return;
                 }
@@ -194,7 +237,9 @@ export class Droptarget extends CompositeDisposable {
 
                 this.markAsUsed(e);
 
-                if (!this.targetElement) {
+                if (this.options.getOverrideTarget) {
+                    //
+                } else if (!this.targetElement) {
                     this.targetElement = document.createElement('div');
                     this.targetElement.className = 'dv-drop-target-dropzone';
                     this.overlayElement = document.createElement('div');
@@ -202,8 +247,16 @@ export class Droptarget extends CompositeDisposable {
                     this._state = 'center';
                     this.targetElement.appendChild(this.overlayElement);
 
-                    this.element.classList.add('dv-drop-target');
-                    this.element.append(this.targetElement);
+                    target.classList.add('dv-drop-target');
+                    target.append(this.targetElement);
+
+                    this.overlayElement.style.opacity = '0';
+
+                    requestAnimationFrame(() => {
+                        if (this.overlayElement) {
+                            this.overlayElement.style.opacity = '';
+                        }
+                    });
                 }
 
                 this.toggleClasses(quadrant, width, height);
@@ -211,10 +264,31 @@ export class Droptarget extends CompositeDisposable {
                 this._state = quadrant;
             },
             onDragLeave: () => {
+                if (this.options.getOverrideTarget) {
+                    return;
+                }
+
                 this.removeDropTarget();
             },
-            onDragEnd: () => {
+            onDragEnd: (e) => {
+                if (
+                    this.options.getOverrideTarget &&
+                    Droptarget.ACTUAL_TARGET === this
+                ) {
+                    if (this._state) {
+                        // only stop the propagation of the event if we are dealing with it
+                        // which is only when the target has state
+                        e.stopPropagation();
+                        this._onDrop.fire({
+                            position: this._state,
+                            nativeEvent: e,
+                        });
+                    }
+                }
+
                 this.removeDropTarget();
+
+                this.options.getOverrideTarget?.().clear();
             },
             onDrop: (e) => {
                 e.preventDefault();
@@ -222,6 +296,8 @@ export class Droptarget extends CompositeDisposable {
                 const state = this._state;
 
                 this.removeDropTarget();
+
+                this.options.getOverrideTarget?.().clear();
 
                 if (state) {
                     // only stop the propagation of the event if we are dealing with it
@@ -268,7 +344,7 @@ export class Droptarget extends CompositeDisposable {
         width: number,
         height: number
     ): void {
-        if (!this.overlayElement) {
+        if (!this.options.getOverrideTarget && !this.overlayElement) {
             return;
         }
 
@@ -298,6 +374,105 @@ export class Droptarget extends CompositeDisposable {
             if (topClass || bottomClass) {
                 size = clamp(0, sizeOptions.value, height) / height;
             }
+        }
+
+        if (this.options.getOverrideTarget) {
+            const outlineEl =
+                this.options.getOverlayOutline?.() ?? this.element;
+            const elBox = outlineEl.getBoundingClientRect();
+
+            const ta = this.options
+                .getOverrideTarget?.()
+                .getElements(undefined, outlineEl);
+            const el = ta.root;
+            const overlay = ta.overlay;
+
+            const bigbox = el.getBoundingClientRect();
+
+            const rootTop = elBox.top - bigbox.top;
+            const rootLeft = elBox.left - bigbox.left;
+
+            const box = {
+                top: rootTop,
+                left: rootLeft,
+                width: width,
+                height: height,
+            };
+
+            if (rightClass) {
+                box.left = rootLeft + width * (1 - size);
+                box.width = width * size;
+            } else if (leftClass) {
+                box.width = width * size;
+            } else if (topClass) {
+                box.height = height * size;
+            } else if (bottomClass) {
+                box.top = rootTop + height * (1 - size);
+                box.height = height * size;
+            }
+
+            if (isSmallX && isLeft) {
+                box.width = 4;
+            }
+            if (isSmallX && isRight) {
+                box.left = rootLeft + width - 4;
+                box.width = 4;
+            }
+
+            const topPx = `${Math.round(box.top)}px`;
+            const leftPx = `${Math.round(box.left)}px`;
+            const widthPx = `${Math.round(box.width)}px`;
+            const heightPx = `${Math.round(box.height)}px`;
+
+            if (
+                overlay.style.top === topPx &&
+                overlay.style.left === leftPx &&
+                overlay.style.width === widthPx &&
+                overlay.style.height === heightPx
+            ) {
+                return;
+            }
+
+            overlay.style.top = topPx;
+            overlay.style.left = leftPx;
+            overlay.style.width = widthPx;
+            overlay.style.height = heightPx;
+            overlay.style.visibility = 'visible';
+
+            overlay.className = `dv-drop-target-anchor${
+                this.options.className ? ` ${this.options.className}` : ''
+            }`;
+
+            toggleClass(overlay, 'dv-drop-target-left', isLeft);
+            toggleClass(overlay, 'dv-drop-target-right', isRight);
+            toggleClass(overlay, 'dv-drop-target-top', isTop);
+            toggleClass(overlay, 'dv-drop-target-bottom', isBottom);
+            toggleClass(
+                overlay,
+                'dv-drop-target-center',
+                quadrant === 'center'
+            );
+
+            if (ta.changed) {
+                toggleClass(
+                    overlay,
+                    'dv-drop-target-anchor-container-changed',
+                    true
+                );
+                setTimeout(() => {
+                    toggleClass(
+                        overlay,
+                        'dv-drop-target-anchor-container-changed',
+                        false
+                    );
+                }, 10);
+            }
+
+            return;
+        }
+
+        if (!this.overlayElement) {
+            return;
         }
 
         const box = { top: '0px', left: '0px', width: '100%', height: '100%' };
@@ -396,10 +571,12 @@ export class Droptarget extends CompositeDisposable {
     private removeDropTarget(): void {
         if (this.targetElement) {
             this._state = undefined;
-            this.element.removeChild(this.targetElement);
+            this.targetElement.parentElement?.classList.remove(
+                'dv-drop-target'
+            );
+            this.targetElement.remove();
             this.targetElement = undefined;
             this.overlayElement = undefined;
-            this.element.classList.remove('dv-drop-target');
         }
     }
 }

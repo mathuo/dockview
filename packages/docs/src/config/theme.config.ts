@@ -30,4 +30,9 @@ export const themeConfig = [
         key: '**[dockview-theme-replit](/demo?theme=dockview-theme-replit)**',
         text: 'Based on  [Replit](https://replit.com)',
     },
+    {
+        id: 'dockview-theme-kraken',
+        key: '**[dockview-theme-replit](/demo?theme=dockview-theme-kraken)**',
+        text: '',
+    },
 ];

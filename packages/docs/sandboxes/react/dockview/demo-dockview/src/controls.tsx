@@ -81,7 +81,7 @@ export const RightControls = (props: IDockviewHeaderActionsProps) => {
                 alignItems: 'center',
                 padding: '0px 8px',
                 height: '100%',
-                color: 'var(--dv-activegroup-visiblepanel-tab-color)',
+                color: 'var(--dv-activegroup-hiddenpanel-tab-color)',
             }}
         >
             {props.isGroupActive && <Icon icon="star" />}
