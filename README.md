@@ -35,4 +35,4 @@ Please see the website: https://dockview.dev
 -   Transparent builds and Code Analysis
 -   Security at mind - verifed publishing and builds through GitHub Actions
 
-Want to verify our builds? Go [here](https://www.npmjs.com/package/dockview#Provenance).
+Want to verify our builds? Go [here](https://www.npmjs.com/package/dockview#user-content-provenance).
