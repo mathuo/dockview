@@ -151,11 +151,20 @@ export const GridActions = (props: {
         props.api?.addGroup();
     };
 
-    const [gap, setGap] = React.useState(0);
+    // const [gap, setGap] = React.useState<number | undefined>(undefined);
 
-    React.useEffect(() => {
-        props.api?.setGap(gap);
-    }, [gap, props.api]);
+    const [overlayMode, setOverlayMode] = React.useState<boolean>(false);
+
+    // React.useEffect(() => {
+    //     if (!props.api) {
+    //         return;
+    //     }
+    //     if (typeof gap === 'number') {
+    //         props.api.setGap(gap);
+    //     } else {
+    //         setGap(props.api.gap);
+    //     }
+    // }, [gap, props.api]);
 
     return (
         <div className="action-container">
@@ -191,6 +200,23 @@ export const GridActions = (props: {
                     Use Custom Watermark
                 </button>
             </span>
+            {/* <span className="button-action">
+                <button
+                    className={
+                        overlayMode ? 'demo-button selected' : 'demo-button'
+                    }
+                    onClick={() => {
+                        props.api?.updateOptions({
+                            dndOverlayMode: !overlayMode
+                                ? 'static'
+                                : 'transitional',
+                        });
+                        setOverlayMode(!overlayMode);
+                    }}
+                >
+                    Use static overlay
+                </button>
+            </span> */}
             <button className="text-button" onClick={onClear}>
                 Clear
             </button>
@@ -204,7 +230,7 @@ export const GridActions = (props: {
                 Reset
             </button>
             <span style={{ flexGrow: 1 }} />
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            {/* <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span style={{ paddingRight: '4px' }}>Grid Gap</span>
                 <input
                     style={{ width: 40 }}
@@ -212,11 +238,11 @@ export const GridActions = (props: {
                     min={0}
                     max={99}
                     step={1}
-                    value={gap}
+                    value={gap ?? 0}
                     onChange={(event) => setGap(Number(event.target.value))}
                 />
                 <button onClick={() => setGap(0)}>Reset</button>
-            </div>
+            </div> */}
         </div>
     );
 };

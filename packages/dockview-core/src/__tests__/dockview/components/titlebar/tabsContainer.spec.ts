@@ -73,15 +73,14 @@ describe('tabsContainer', () => {
             options: {},
         });
 
-        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
-            () => {
-                return {
-                    canDisplayOverlay: jest.fn(),
-                };
-            }
-        );
+        const dropTargetContainer = document.createElement('div');
 
-        const groupView = new groupviewMock() as DockviewGroupPanelModel;
+        const groupView = fromPartial<DockviewGroupPanelModel>({
+            canDisplayOverlay: jest.fn(),
+            // dropTargetContainer: new DropTargetAnchorContainer(
+            //     dropTargetContainer
+            // ),
+        });
 
         const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
             return {
@@ -129,6 +128,10 @@ describe('tabsContainer', () => {
         expect(
             cut.element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(1);
+        // expect(
+        //     dropTargetContainer.getElementsByClassName('dv-drop-target-anchor')
+        //         .length
+        // ).toBe(1);
     });
 
     test('that dropping over the empty space should render a drop target', () => {

@@ -17,7 +17,7 @@ const createSvgElementFromPath = (params: {
             width={params.width}
             viewBox={params.viewbox}
             focusable={false}
-            className={'dockview-svg'}
+            className={'dv-svg'}
         >
             <path d={params.path} />
         </svg>
@@ -54,7 +54,7 @@ export const CodeSandboxButton = (props: {
                 <a
                     href={url}
                     target={'_blank'}
-                    rel='noopener'
+                    rel="noopener"
                     className="codesandbox-button-content"
                 >
                     <span

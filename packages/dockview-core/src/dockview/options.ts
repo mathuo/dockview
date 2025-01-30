@@ -17,6 +17,7 @@ import { IGroupHeaderProps } from './framework';
 import { FloatingGroupOptions } from './dockviewComponent';
 import { Contraints } from '../gridview/gridviewPanel';
 import { AcceptableEvent, IAcceptableEvent } from '../events';
+import { DockviewTheme } from './theme';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -51,19 +52,26 @@ export interface DockviewOptions {
           };
     popoutUrl?: string;
     defaultRenderer?: DockviewPanelRenderer;
-    debug?: boolean;
-    rootOverlayModel?: DroptargetOverlayModel;
-    locked?: boolean;
-    disableDnd?: boolean;
-    className?: string;
     /**
-     * Pixel gap between groups
+     * @deprecated dockview: dockviewComponent.gap has been deprecated. Use `theme` instead. This will be removed in a future version.
      */
     gap?: number;
+    debug?: boolean;
+    // #start dnd
+    dndEdges?: false | DroptargetOverlayModel;
+    /**
+     * @deprecated use `dndEdges` instead. To be removed in a future version.
+     * */
+    rootOverlayModel?: DroptargetOverlayModel;
+    disableDnd?: boolean;
+    // #end dnd
+    locked?: boolean;
+    className?: string;
     /**
      * Define the behaviour of the dock when there are no panels to display. Defaults to `watermark`.
      */
     noPanelsOverlay?: 'emptyGroup' | 'watermark';
+    theme?: DockviewTheme;
 }
 
 export interface DockviewDndOverlayEvent extends IAcceptableEvent {
@@ -106,9 +114,11 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         rootOverlayModel: undefined,
         locked: undefined,
         disableDnd: undefined,
-        gap: undefined,
         className: undefined,
         noPanelsOverlay: undefined,
+        dndEdges: undefined,
+        theme: undefined,
+        gap: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];

@@ -219,6 +219,8 @@ export class Splitview {
 
     set margin(value: number) {
         this._margin = value;
+
+        toggleClass(this.element, 'dv-splitview-has-margin', value !== 0);
     }
 
     constructor(
