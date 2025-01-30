@@ -389,6 +389,7 @@ const DockviewDemo = (props: { theme?: string }) => {
                             watermarkComponent={
                                 watermark ? WatermarkComponent : undefined
                             }
+                            gap={10}
                             onReady={onReady}
                             className={props.theme || 'dockview-theme-abyss'}
                         />

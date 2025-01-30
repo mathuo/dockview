@@ -10,7 +10,10 @@ import { VoidContainer } from './voidContainer';
 import { toggleClass } from '../../../dom';
 import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
-import { WillShowOverlayLocationEvent } from '../../dockviewGroupPanelModel';
+import {
+    DockviewGroupPanelModel,
+    WillShowOverlayLocationEvent,
+} from '../../dockviewGroupPanelModel';
 import { getPanelData } from '../../../dnd/dataTransfer';
 
 export interface TabDropIndexEvent {
@@ -171,7 +174,8 @@ export class TabsContainer
 
     constructor(
         private readonly accessor: DockviewComponent,
-        private readonly group: DockviewGroupPanel
+        private readonly group: DockviewGroupPanel,
+        model: DockviewGroupPanelModel
     ) {
         super();
 
@@ -196,7 +200,11 @@ export class TabsContainer
         this.tabContainer = document.createElement('div');
         this.tabContainer.className = 'dv-tabs-container';
 
-        this.voidContainer = new VoidContainer(this.accessor, this.group);
+        this.voidContainer = new VoidContainer(
+            this.accessor,
+            this.group,
+            model
+        );
 
         this._element.appendChild(this.preActionsContainer);
         this._element.appendChild(this.tabContainer);

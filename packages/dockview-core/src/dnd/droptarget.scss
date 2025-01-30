@@ -1,5 +1,6 @@
 .dv-drop-target {
     position: relative;
+    --dv-transition-duration: 70ms;
 
     > .dv-drop-target-dropzone {
         position: absolute;
@@ -16,9 +17,11 @@
             height: 100%;
             width: 100%;
             background-color: var(--dv-drag-over-background-color);
-            transition: top 70ms ease-out, left 70ms ease-out,
-                width 70ms ease-out, height 70ms ease-out,
-                opacity 0.15s ease-out;
+            transition: top var(--dv-transition-duration) ease-out,
+                left var(--dv-transition-duration) ease-out,
+                width var(--dv-transition-duration) ease-out,
+                height var(--dv-transition-duration) ease-out,
+                opacity var(--dv-transition-duration) ease-out;
             will-change: transform;
             pointer-events: none;
 
@@ -46,5 +49,42 @@
                 }
             }
         }
+    }
+}
+
+.dv-drop-target-global {
+    position: absolute;
+    z-index: 9999;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    --dv-transition-duration: 300ms;
+
+    .dv-drop-target-anchor {
+        position: relative;
+        border: 2px solid rgb(91, 30, 207);
+        transition: top var(--dv-transition-duration),
+            left var(--dv-transition-duration),
+            width var(--dv-transition-duration),
+            height var(--dv-transition-duration);
+
+        // &::before {
+        //     content: '';
+        //     position: absolute;
+        //     top: 0px;
+        //     left: 0px;
+        //     height: 100%;
+        //     width: 100%;
+        //     border: 2px solid rgb(91, 30, 207);
+        //     transition: top 0.3s, left 0.3s, width 0.3s, height 0.3s;
+        //     // background-color: var(--dv-drag-over-background-color);
+        //     // transition: top 70ms ease-out, left 70ms ease-out,
+        //     //     width 70ms ease-out, height 70ms ease-out,
+        //     //     opacity 0.15s ease-out;
+        //     will-change: transform;
+        // }
     }
 }
