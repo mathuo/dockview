@@ -29,12 +29,6 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         this._element.appendChild(this._content);
         this._element.appendChild(this.action);
 
-        this.addDisposables(
-            addDisposableListener(this.action, 'pointerdown', (ev) => {
-                ev.preventDefault();
-            })
-        );
-
         this.render();
     }
 

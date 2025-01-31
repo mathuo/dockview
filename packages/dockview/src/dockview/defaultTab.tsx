@@ -53,26 +53,10 @@ export const DockviewDefaultTab: React.FunctionComponent<
         e.preventDefault();
     }, []);
 
-    const onClick = React.useCallback(
-        (event: React.MouseEvent<HTMLDivElement>) => {
-            if (event.defaultPrevented) {
-                return;
-            }
-
-            api.setActive();
-
-            if (rest.onClick) {
-                rest.onClick(event);
-            }
-        },
-        [api, rest.onClick]
-    );
-
     return (
         <div
             data-testid="dockview-dv-default-tab"
             {...rest}
-            onClick={onClick}
             className="dv-default-tab"
         >
             <span className="dv-default-tab-content">{title}</span>
