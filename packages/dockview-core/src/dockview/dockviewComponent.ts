@@ -821,6 +821,10 @@ export class DockviewComponent
                     ),
                     overlayRenderContainer,
                     Disposable.from(() => {
+                        if (this.isDisposed) {
+                            return; // cleanup may run after instance is disposed
+                        }
+
                         if (
                             isGroupAddedToDom &&
                             this.getPanel(referenceGroup.id)

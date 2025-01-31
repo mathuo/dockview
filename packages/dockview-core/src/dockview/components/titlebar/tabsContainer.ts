@@ -283,6 +283,10 @@ export class TabsContainer
 
         const tabToRemove = this.tabs.splice(index, 1)[0];
 
+        if (!tabToRemove) {
+            throw new Error(`dockview: Tab not found`);
+        }
+
         const { value, disposable } = tabToRemove;
 
         disposable.dispose();
