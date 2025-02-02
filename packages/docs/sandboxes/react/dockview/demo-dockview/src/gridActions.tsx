@@ -151,10 +151,17 @@ export const GridActions = (props: {
         props.api?.addGroup();
     };
 
-    const [gap, setGap] = React.useState(0);
+    const [gap, setGap] = React.useState<number | undefined>(undefined);
 
     React.useEffect(() => {
-        props.api?.setGap(gap);
+        if (!props.api) {
+            return;
+        }
+        if (typeof gap === 'number') {
+            props.api.setGap(gap);
+        } else {
+            setGap(props.api.gap);
+        }
     }, [gap, props.api]);
 
     return (
@@ -212,7 +219,7 @@ export const GridActions = (props: {
                     min={0}
                     max={99}
                     step={1}
-                    value={gap}
+                    value={gap ?? 0}
                     onChange={(event) => setGap(Number(event.target.value))}
                 />
                 <button onClick={() => setGap(0)}>Reset</button>

@@ -58,15 +58,13 @@
         position: relative;
         height: 100%;
         display: flex;
-        min-width: 80px;
         align-items: center;
-        padding: 0px 8px;
         white-space: nowrap;
         text-overflow: ellipsis;
 
         .dv-default-tab-content {
-            padding: 0px 8px;
             flex-grow: 1;
+            margin-right: 4px;
         }
 
         .dv-default-tab-action {

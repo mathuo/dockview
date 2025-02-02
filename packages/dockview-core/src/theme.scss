@@ -10,8 +10,20 @@
     --dv-overlay-z-index: 999;
 }
 
+@mixin dockview-drop-target-no-travel {
+    .dv-drop-target-container {
+        .dv-drop-target-anchor {
+            &.dv-drop-target-anchor-container-changed {
+                opacity: 0;
+                transition: none;
+            }
+        }
+    }
+}
+
 @mixin dockview-theme-dark-mixin {
     @include dockview-theme-core-mixin();
+    @include dockview-drop-target-no-travel();
 
     //
     --dv-group-view-background-color: #1e1e1e;
@@ -35,6 +47,8 @@
 
 @mixin dockview-theme-light-mixin {
     @include dockview-theme-core-mixin();
+    @include dockview-drop-target-no-travel();
+
     //
     --dv-group-view-background-color: white;
     //
@@ -131,6 +145,8 @@
 
 @mixin dockview-theme-abyss-mixin {
     @include dockview-theme-core-mixin();
+    @include dockview-drop-target-no-travel();
+
     //
     --dv-group-view-background-color: #000c18;
     //
@@ -155,6 +171,8 @@
 
 @mixin dockview-theme-dracula-mixin {
     @include dockview-theme-core-mixin();
+    @include dockview-drop-target-no-travel();
+
     //
     --dv-group-view-background-color: #282a36;
     //
@@ -229,6 +247,8 @@
 }
 
 @mixin dockview-design-replit-mixin {
+    @include dockview-drop-target-no-travel();
+
     .dv-resize-container:has(> .dv-groupview) {
         border-radius: 8px;
     }
@@ -341,4 +361,131 @@
     /////
     --dv-separator-handle-background-color: #cfd1d3;
     --dv-separator-handle-hover-background-color: #babbbb;
+}
+
+@mixin dockview-design-kraken-mixin {
+    .dv-resize-container:has(> .dv-groupview) {
+        border-radius: 8px;
+    }
+
+    .dv-drop-target-anchor {
+        &.dv-drop-target-content {
+            border-radius: 20px;
+        }
+    }
+
+    .dv-groupview {
+        overflow: hidden;
+        border-radius: 20px;
+
+        .dv-tabs-and-actions-container {
+            .dv-tab {
+                border-radius: 8px;
+                font-size: 12px;
+
+                margin: 0.5rem 0;
+                height: 1.75rem;
+
+                &:first {
+                    margin-left: 0.5rem;
+                }
+
+                &:not(:nth-last-child(1)) {
+                    margin-right: 0.25rem;
+                }
+                .dv-svg {
+                    height: 8px;
+                    width: 8px;
+                }
+            }
+        }
+
+        .dv-content-container {
+            background-color: #16121f;
+        }
+    }
+
+    .vertical > .sash-container > .sash {
+        &:not(.disabled) {
+            &::after {
+                content: '';
+                height: 4px;
+                width: 100%;
+                border-radius: 2px;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: transparent;
+                position: absolute;
+            }
+
+            &:hover {
+                &::after {
+                    background-color: var(
+                        --dv-separator-handle-hover-background-color
+                    );
+                }
+            }
+        }
+    }
+
+    .dv-horizontal > .dv-sash-container > .dv-sash {
+        &:not(.disabled) {
+            &::after {
+                content: '';
+                height: 100%;
+                width: 4px;
+                border-radius: 2px;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: var(--dv-separator-handle-background-color);
+                position: absolute;
+            }
+
+            &:hover {
+                &::after {
+                    background-color: var(
+                        --dv-separator-handle-hover-background-color
+                    );
+                }
+            }
+        }
+    }
+}
+
+.dockview-theme-kraken {
+    @include dockview-theme-core-mixin();
+    @include dockview-design-kraken-mixin();
+
+    //
+    --dv-drag-over-border: 2px solid rgb(91, 30, 207);
+    --dv-drag-over-background-color: '';
+    //
+    --dv-tabs-and-actions-container-height: 44px;
+    //
+    --dv-group-view-background-color: rgb(11, 6, 17);
+    //
+    --dv-tabs-and-actions-container-background-color: #16121f;
+    //
+    --dv-activegroup-visiblepanel-tab-background-color: #2a2837;
+    --dv-activegroup-hiddenpanel-tab-background-color: #201d2b;
+    --dv-inactivegroup-visiblepanel-tab-background-color: #2a2837;
+    --dv-inactivegroup-hiddenpanel-tab-background-color: #201d2b;
+    --dv-tab-divider-color: transparent;
+    //
+    --dv-activegroup-visiblepanel-tab-color: white;
+    --dv-activegroup-hiddenpanel-tab-color: rgb(148, 151, 169);
+    --dv-inactivegroup-visiblepanel-tab-color: white;
+    --dv-inactivegroup-hiddenpanel-tab-color: rgb(148, 151, 169);
+    //
+    --dv-separator-border: transparent;
+    --dv-paneview-header-border-color: rgb(51, 51, 51);
+
+    /////
+    --dv-separator-handle-background-color: transparent;
+    --dv-separator-handle-hover-background-color: rgb(91, 30, 207);
+
+    padding: 10px;
+    background-color: rgb(11, 6, 17);
 }
