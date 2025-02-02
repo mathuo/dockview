@@ -139,6 +139,7 @@ export interface SerializedDockview {
         width: number;
         orientation: Orientation;
     };
+    gridGap?: number;
     panels: Record<string, GroupviewPanelState>;
     activeGroup?: string;
     floatingGroups?: SerializedFloatingGroup[];
@@ -1300,6 +1301,12 @@ export class DockviewComponent
             result.popoutGroups = popoutGroups;
         }
 
+        const gap = this.gap;
+
+        if (gap !== 0) {
+            result.gridGap = gap;
+        }
+
         return result;
     }
 
@@ -1315,6 +1322,8 @@ export class DockviewComponent
         if (grid.root.type !== 'branch' || !Array.isArray(grid.root.data)) {
             throw new Error('root must be of type branch');
         }
+
+        this.gridview.margin = data.gridGap ?? 0;
 
         try {
             // take note of the existing dimensions
