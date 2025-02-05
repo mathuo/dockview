@@ -124,6 +124,12 @@ export class DockviewGroupPanel
             options,
             this
         );
+
+        this.addDisposables(
+            this.model.onDidActivePanelChange((event) => {
+                this.api._onDidActivePanelChange.fire(event);
+            })
+        );
     }
 
     override focus(): void {

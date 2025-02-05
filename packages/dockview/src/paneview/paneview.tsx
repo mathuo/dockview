@@ -176,11 +176,7 @@ export const PaneviewReact = React.forwardRef(
         }, [props.onDidDrop]);
 
         return (
-            <div
-                className={props.className}
-                style={{ height: '100%', width: '100%' }}
-                ref={domRef}
-            >
+            <div style={{ height: '100%', width: '100%' }} ref={domRef}>
                 {portals}
             </div>
         );

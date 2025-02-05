@@ -325,6 +325,10 @@ export class TabsContainer
 
         const tabToRemove = this.tabs.splice(index, 1)[0];
 
+        if (!tabToRemove) {
+            throw new Error(`dockview: Tab not found`);
+        }
+
         const { value, disposable } = tabToRemove;
 
         disposable.dispose();
@@ -357,6 +361,10 @@ export class TabsContainer
                 this._onTabDragStart.fire({ nativeEvent: event, panel });
             }),
             tab.onChanged((event) => {
+                if (event.defaultPrevented) {
+                    return;
+                }
+
                 const isFloatingGroupsEnabled =
                     !this.accessor.options.disableFloatingGroups;
 
@@ -385,14 +393,15 @@ export class TabsContainer
                     return;
                 }
 
-                const isLeftClick = event.button === 0;
-
-                if (!isLeftClick || event.defaultPrevented) {
-                    return;
-                }
-
-                if (this.group.activePanel !== panel) {
-                    this.group.model.openPanel(panel);
+                switch (event.button) {
+                    case 0: // left click or touch
+                        if (this.group.activePanel !== panel) {
+                            this.group.model.openPanel(panel);
+                        }
+                        break;
+                    case 1: // middle click
+                        panel.api.close();
+                        break;
                 }
             }),
             tab.onDrop((event) => {

@@ -368,8 +368,8 @@ export class DockviewComponent
         return this._floatingGroups;
     }
 
-    constructor(parentElement: HTMLElement, options: DockviewComponentOptions) {
-        super(parentElement, {
+    constructor(container: HTMLElement, options: DockviewComponentOptions) {
+        super(container, {
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
             styles: options.hideBorders
@@ -821,6 +821,10 @@ export class DockviewComponent
                     ),
                     overlayRenderContainer,
                     Disposable.from(() => {
+                        if (this.isDisposed) {
+                            return; // cleanup may run after instance is disposed
+                        }
+
                         if (
                             isGroupAddedToDom &&
                             this.getPanel(referenceGroup.id)
@@ -845,6 +849,20 @@ export class DockviewComponent
                             group.model.renderContainer =
                                 this.overlayRenderContainer;
                             returnedGroup = group;
+
+                            const alreadyRemoved = !this._popoutGroups.find(
+                                (p) => p.popoutGroup === group
+                            );
+
+                            if (alreadyRemoved) {
+                                /**
+                                 * If this popout group was explicitly removed then we shouldn't run the additional
+                                 * steps. To tell if the running of this disposable is the result of this popout group
+                                 * being explicitly removed we can check if this popout group is still referenced in
+                                 * the `this._popoutGroups` list.
+                                 */
+                                return;
+                            }
 
                             if (floatingBox) {
                                 this.addFloatingGroup(group, {

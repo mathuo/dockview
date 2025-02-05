@@ -26,6 +26,28 @@ describe('componentSplitview', () => {
         container.className = 'container';
     });
 
+    test('that the container is not removed when grid is disposed', () => {
+        const root = document.createElement('div');
+        const container = document.createElement('div');
+        root.appendChild(container);
+
+        const splitview = new SplitviewComponent(container, {
+            orientation: Orientation.VERTICAL,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
+            },
+        });
+
+        splitview.dispose();
+
+        expect(container.parentElement).toBe(root);
+    });
+
     test('event leakage', () => {
         Emitter.setLeakageMonitorEnabled(true);
 
@@ -451,39 +473,6 @@ describe('componentSplitview', () => {
         disposable.dispose();
     });
 
-    test('dispose of splitviewComponent', () => {
-        expect(container.childNodes.length).toBe(0);
-
-        const splitview = new SplitviewComponent(container, {
-            orientation: Orientation.HORIZONTAL,
-            createComponent: (options) => {
-                switch (options.name) {
-                    case 'default':
-                        return new TestPanel(options.id, options.name);
-                    default:
-                        throw new Error('unsupported');
-                }
-            },
-        });
-
-        splitview.layout(1000, 1000);
-
-        splitview.addPanel({
-            id: 'panel1',
-            component: 'default',
-        });
-        splitview.addPanel({
-            id: 'panel2',
-            component: 'default',
-        });
-
-        expect(container.childNodes.length).toBeGreaterThan(0);
-
-        splitview.dispose();
-
-        expect(container.childNodes.length).toBe(0);
-    });
-
     test('panel is disposed of when component is disposed', () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
@@ -736,10 +725,10 @@ describe('componentSplitview', () => {
             className: 'test-a test-b',
         });
 
-        expect(splitview.element.className).toBe('container test-a test-b');
+        expect(splitview.element.className).toBe('test-a test-b');
 
         splitview.updateOptions({ className: 'test-b test-c' });
 
-        expect(splitview.element.className).toBe('container test-b test-c');
+        expect(splitview.element.className).toBe('test-b test-c');
     });
 });

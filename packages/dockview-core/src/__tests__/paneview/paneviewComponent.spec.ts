@@ -67,6 +67,27 @@ describe('componentPaneview', () => {
         container.className = 'container';
     });
 
+    test('that the container is not removed when grid is disposed', () => {
+        const root = document.createElement('div');
+        const container = document.createElement('div');
+        root.appendChild(container);
+
+        const paneview = new PaneviewComponent(container, {
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
+            },
+        });
+
+        paneview.dispose();
+
+        expect(container.parentElement).toBe(root);
+    });
+
     test('vertical panels', () => {
         const disposables = new CompositeDisposable();
 
@@ -291,40 +312,6 @@ describe('componentPaneview', () => {
         expect(result).toBeTruthy();
 
         disposable.dispose();
-    });
-
-    test('dispose of paneviewComponent', () => {
-        expect(container.childNodes.length).toBe(0);
-
-        const paneview = new PaneviewComponent(container, {
-            createComponent: (options) => {
-                switch (options.name) {
-                    case 'default':
-                        return new TestPanel(options.id, options.name);
-                    default:
-                        throw new Error('unsupported');
-                }
-            },
-        });
-
-        paneview.layout(1000, 1000);
-
-        paneview.addPanel({
-            id: 'panel1',
-            component: 'default',
-            title: 'Panel 1',
-        });
-        paneview.addPanel({
-            id: 'panel2',
-            component: 'default',
-            title: 'Panel 2',
-        });
-
-        expect(container.childNodes.length).toBeGreaterThan(0);
-
-        paneview.dispose();
-
-        expect(container.childNodes.length).toBe(0);
     });
 
     test('panel is disposed of when component is disposed', () => {
@@ -606,10 +593,10 @@ describe('componentPaneview', () => {
             className: 'test-a test-b',
         });
 
-        expect(paneview.element.className).toBe('container test-a test-b');
+        expect(paneview.element.className).toBe('test-a test-b');
 
         paneview.updateOptions({ className: 'test-b test-c' });
 
-        expect(paneview.element.className).toBe('container test-b test-c');
+        expect(paneview.element.className).toBe('test-b test-c');
     });
 });

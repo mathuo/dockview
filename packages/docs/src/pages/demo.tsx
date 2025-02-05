@@ -27,7 +27,7 @@ const ThemeToggle: React.FC = () => {
                     value={theme}
                 >
                     {themeConfig.map((theme) => {
-                        return <option>{theme.id}</option>;
+                        return <option key={theme.id}>{theme.id}</option>;
                     })}
                 </select>
             </div>

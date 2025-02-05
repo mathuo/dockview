@@ -7,12 +7,12 @@
 
 ---
 
-[![npm version](https://badge.fury.io/js/dockview.svg)](https://www.npmjs.com/package/dockview)
-[![npm](https://img.shields.io/npm/dm/dockview)](https://www.npmjs.com/package/dockview)
+[![npm version](https://badge.fury.io/js/dockview-core.svg)](https://www.npmjs.com/package/dockview-core)
+[![npm](https://img.shields.io/npm/dm/dockview-core)](https://www.npmjs.com/package/dockview-core)
 [![CI Build](https://github.com/mathuo/dockview/workflows/CI/badge.svg)](https://github.com/mathuo/dockview/actions?query=workflow%3ACI)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mathuo_dockview&metric=coverage)](https://sonarcloud.io/summary/overall?id=mathuo_dockview)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mathuo_dockview&metric=alert_status)](https://sonarcloud.io/summary/overall?id=mathuo_dockview)
-[![Bundle Phobia](https://badgen.net/bundlephobia/minzip/dockview)](https://bundlephobia.com/result?p=dockview)
+[![Bundle Phobia](https://badgen.net/bundlephobia/minzip/dockview-core)](https://bundlephobia.com/result?p=dockview-core)
 
 ##
 
