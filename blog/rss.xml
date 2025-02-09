@@ -4,10 +4,25 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Sun, 02 Feb 2025 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Sun, 09 Feb 2025 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 3.1.1]]></title>
+            <link>https://dockview.dev/blog/dockview-3.1.1-release</link>
+            <guid>https://dockview.dev/blog/dockview-3.1.1-release</guid>
+            <pubDate>Sun, 09 Feb 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-3.1.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-3.1.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Fix Middle mouse button to close tab <a href="https://github.com/mathuo/dockview/issues/853" target="_blank" rel="noopener noreferrer">#835</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-3.1.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 3.1.0]]></title>
             <link>https://dockview.dev/blog/dockview-3.1.0-release</link>
@@ -368,21 +383,6 @@
 <ul>
 <li>Bug: setVisible fixes and enhancements <a href="https://github.com/mathuo/dockview/pull/633" target="_blank" rel="noopener noreferrer">#633</a></li>
 <li>Documentation changes <a href="https://github.com/mathuo/dockview/pull/627" target="_blank" rel="noopener noreferrer">#627</a></li>
-</ul>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 1.14.2]]></title>
-            <link>https://dockview.dev/blog/dockview-1.14.2-release</link>
-            <guid>https://dockview.dev/blog/dockview-1.14.2-release</guid>
-            <pubDate>Sat, 08 Jun 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.14.2-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Bug: setTitle fixes <a href="https://github.com/mathuo/dockview/pull/623" target="_blank" rel="noopener noreferrer">#623</a></li>
-<li>Bug: Vue3 component rendering issues <a href="https://github.com/mathuo/dockview/pull/625" target="_blank" rel="noopener noreferrer">#625</a></li>
-<li>Improves docs <a href="https://github.com/mathuo/dockview/pull/617" target="_blank" rel="noopener noreferrer">#617</a> <a href="https://github.com/mathuo/dockview/pull/620" target="_blank" rel="noopener noreferrer">#620</a></li>
 </ul>]]></content:encoded>
             <category>release</category>
         </item>
