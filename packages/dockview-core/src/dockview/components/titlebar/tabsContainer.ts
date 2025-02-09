@@ -317,7 +317,7 @@ export class TabsContainer
             tab.onDragStart((event) => {
                 this._onTabDragStart.fire({ nativeEvent: event, panel });
             }),
-            tab.onChanged((event) => {
+            tab.onPointerDown((event) => {
                 if (event.defaultPrevented) {
                     return;
                 }
@@ -355,9 +355,6 @@ export class TabsContainer
                         if (this.group.activePanel !== panel) {
                             this.group.model.openPanel(panel);
                         }
-                        break;
-                    case 1: // middle click
-                        panel.api.close();
                         break;
                 }
             }),
