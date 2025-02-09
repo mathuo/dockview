@@ -1,0 +1,23 @@
+.dockview-groupcontrol-demo {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    color: white;
+    background-color: black;
+    padding: 0px 8px;
+
+    margin: 1px;
+    border: 1px dotted orange;
+
+
+}
+
+.dockview-groupcontrol-demo  .dockview-groupcontrol-demo-group-active {
+  padding: 0px 8px;
+}
+
+.dockview-groupcontrol-demo .dockview-groupcontrol-demo-active-panel {
+  color: yellow;
+  padding: 0px 8px;
+}
+
