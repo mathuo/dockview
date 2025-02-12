@@ -2,11 +2,26 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dockview.dev/blog</id>
     <title>Dockview Blog</title>
-    <updated>2025-02-09T00:00:00.000Z</updated>
+    <updated>2025-02-12T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dockview.dev/blog"/>
     <subtitle>Dockview Blog</subtitle>
     <icon>https://dockview.dev/img/dockview_logo.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Dockview 3.2.0]]></title>
+        <id>https://dockview.dev/blog/dockview-3.2.0-release</id>
+        <link href="https://dockview.dev/blog/dockview-3.2.0-release"/>
+        <updated>2025-02-12T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
+        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-3.2.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<ul>
+<li>Add CSS properties <code>--dv-active-sash-transition-duration</code> and <code>--dv-active-sash-transition-delay</code> <a href="https://github.com/mathuo/dockview/issues/859" target="_blank" rel="noopener noreferrer">#835</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-3.2.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-3.2.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content>
+        <category label="release" term="release"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Dockview 3.1.1]]></title>
         <id>https://dockview.dev/blog/dockview-3.1.1-release</id>
@@ -362,26 +377,6 @@
 <li>Bug: Fix typing when adding panels with <code>floating</code> options <a href="https://github.com/mathuo/dockview/issues/647" target="_blank" rel="noopener noreferrer">#647</a></li>
 <li>Bug: Fix <code>gap</code> property <a href="https://github.com/mathuo/dockview/pull/649" target="_blank" rel="noopener noreferrer">#649</a></li>
 <li>Bug: Group option not passed through correctly for popout groups <a href="https://github.com/mathuo/dockview/issues/650" target="_blank" rel="noopener noreferrer">#650</a></li>
-</ul>]]></content>
-        <category label="release" term="release"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Dockview 1.15.0]]></title>
-        <id>https://dockview.dev/blog/dockview-1.15.0-release</id>
-        <link href="https://dockview.dev/blog/dockview-1.15.0-release"/>
-        <updated>2024-07-12T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
-        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.15.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<ul>
-<li>add <code>onDidMovePanel</code> event and incorperate into <code>onDidLayoutChange</code> events <a href="https://github.com/mathuo/dockview/pull/616" target="_blank" rel="noopener noreferrer">#616</a></li>
-<li>panel gap size controlled through new <code>gap</code> property <a href="https://github.com/mathuo/dockview/pull/618" target="_blank" rel="noopener noreferrer">#618</a></li>
-<li>Support floating groups anchoring through <code>bottom</code> and <code>right</code> attributes <a href="https://github.com/mathuo/dockview/pull/628" target="_blank" rel="noopener noreferrer">#628</a> <a href="https://github.com/mathuo/dockview/pull/621" target="_blank" rel="noopener noreferrer">#621</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.15.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Bug: setVisible fixes and enhancements <a href="https://github.com/mathuo/dockview/pull/633" target="_blank" rel="noopener noreferrer">#633</a></li>
-<li>Documentation changes <a href="https://github.com/mathuo/dockview/pull/627" target="_blank" rel="noopener noreferrer">#627</a></li>
 </ul>]]></content>
         <category label="release" term="release"/>
     </entry>
