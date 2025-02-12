@@ -8,6 +8,9 @@
     --dv-icon-hover-background-color: rgba(90, 93, 94, 0.31);
     --dv-floating-box-shadow: 8px 8px 8px 0px rgba(83, 89, 93, 0.5);
     --dv-overlay-z-index: 999;
+
+    --dv-sash-transition-duration: 0.1s;
+    --dv-sash-transition-delay: 0.5s;
 }
 
 @mixin dockview-theme-dark-mixin {
