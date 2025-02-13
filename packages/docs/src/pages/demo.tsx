@@ -3,11 +3,29 @@ import Layout from '@theme/Layout';
 import { themeConfig } from '../config/theme.config';
 import ExampleFrame from '../components/ui/exampleFrame';
 import BrowserOnly from '@docusaurus/BrowserOnly';
+import { DockviewTheme, themeAbyss } from 'dockview';
+
+const updateTheme = (theme: DockviewTheme) => {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    urlParams.set('theme', theme.name);
+
+    const newUrl = window.location.pathname + '?' + urlParams.toString();
+
+    window.history.pushState({ path: newUrl }, '', newUrl);
+};
 
 const ThemeToggle: React.FC = () => {
-    const [theme, setTheme] = React.useState<string>(
-        new URLSearchParams(location.search).get('theme') ?? themeConfig[3].id
-    );
+    const [theme, setTheme] = React.useState<DockviewTheme>(themeAbyss);
+
+    React.useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const themeName = urlParams.get('theme');
+        const newTheme =
+            themeConfig.find((c) => c.id.name === themeName)?.id ?? themeAbyss;
+        setTheme(newTheme);
+        updateTheme(newTheme);
+    }, []);
 
     return (
         <>
@@ -20,14 +38,18 @@ const ThemeToggle: React.FC = () => {
             >
                 <select
                     onChange={(event) => {
-                        const url = new URL(window.location.href);
-                        url.searchParams.set('theme', event.target.value);
-                        window.location.href = url.toString();
+                        const theme = themeConfig.find(
+                            (theme) => theme.id.name === event.target.value
+                        ).id;
+                        setTheme(theme);
+                        updateTheme(theme);
                     }}
-                    value={theme}
+                    value={theme.name}
                 >
                     {themeConfig.map((theme) => {
-                        return <option key={theme.id}>{theme.id}</option>;
+                        return (
+                            <option key={theme.id.name}>{theme.id.name}</option>
+                        );
                     })}
                 </select>
             </div>
