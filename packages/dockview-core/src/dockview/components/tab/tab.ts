@@ -49,8 +49,8 @@ export class Tab extends CompositeDisposable {
     private readonly dropTarget: Droptarget;
     private content: ITabRenderer | undefined = undefined;
 
-    private readonly _onChanged = new Emitter<MouseEvent>();
-    readonly onChanged: Event<MouseEvent> = this._onChanged.event;
+    private readonly _onPointDown = new Emitter<MouseEvent>();
+    readonly onPointerDown: Event<MouseEvent> = this._onPointDown.event;
 
     private readonly _onDropped = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDropped.event;
@@ -123,7 +123,7 @@ export class Tab extends CompositeDisposable {
         this.onWillShowOverlay = this.dropTarget.onWillShowOverlay;
 
         this.addDisposables(
-            this._onChanged,
+            this._onPointDown,
             this._onDropped,
             this._onDragStart,
             dragHandler.onDragStart((event) => {
@@ -131,11 +131,7 @@ export class Tab extends CompositeDisposable {
             }),
             dragHandler,
             addDisposableListener(this._element, 'pointerdown', (event) => {
-                if (event.defaultPrevented) {
-                    return;
-                }
-
-                this._onChanged.fire(event);
+                this._onPointDown.fire(event);
             }),
             this.dropTarget.onDrop((event) => {
                 this._onDropped.fire(event);
