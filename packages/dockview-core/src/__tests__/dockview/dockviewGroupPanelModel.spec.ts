@@ -169,6 +169,8 @@ export class TestPanel implements IDockviewPanel {
     private _group: DockviewGroupPanel | undefined;
     private _params: IGroupPanelInitParameters | undefined;
     readonly view: IDockviewPanelModel;
+    readonly componentElId: string;
+    readonly tabComponentElId: string;
 
     get title() {
         return '';
@@ -184,6 +186,8 @@ export class TestPanel implements IDockviewPanel {
 
     constructor(public readonly id: string, public api: DockviewPanelApi) {
         this.view = new TestModel(id);
+        this.tabComponentElId = `tab-${id}`;
+        this.componentElId = `tab-panel-${id}`;
         this.init({
             title: `${id}`,
             params: {},
@@ -261,6 +265,7 @@ describe('dockviewGroupPanelModel', () => {
             removeGroup: removeGroupMock,
             onDidAddPanel: () => ({ dispose: jest.fn() }),
             onDidRemovePanel: () => ({ dispose: jest.fn() }),
+            onDidActivePanelChange: () => ({ dispose: jest.fn() }),
             overlayRenderContainer: new OverlayRenderContainer(
                 document.createElement('div'),
                 fromPartial<DockviewComponent>({})
@@ -646,6 +651,7 @@ describe('dockviewGroupPanelModel', () => {
             getPanel: jest.fn(),
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -708,6 +714,7 @@ describe('dockviewGroupPanelModel', () => {
             getPanel: jest.fn(),
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -800,6 +807,7 @@ describe('dockviewGroupPanelModel', () => {
             doSetGroupActive: jest.fn(),
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             overlayRenderContainer: new OverlayRenderContainer(
                 document.createElement('div'),
                 fromPartial<DockviewComponent>({})
@@ -872,6 +880,7 @@ describe('dockviewGroupPanelModel', () => {
             doSetGroupActive: jest.fn(),
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             overlayRenderContainer: new OverlayRenderContainer(
                 document.createElement('div'),
                 fromPartial<DockviewComponent>({})
@@ -945,6 +954,7 @@ describe('dockviewGroupPanelModel', () => {
             doSetGroupActive: jest.fn(),
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             overlayRenderContainer: new OverlayRenderContainer(
                 document.createElement('div'),
                 fromPartial<DockviewComponent>({})
@@ -1025,6 +1035,7 @@ describe('dockviewGroupPanelModel', () => {
             return {
                 id: 'testgroupid',
                 model: groupView,
+                dispose: jest.fn()
             };
         });
 

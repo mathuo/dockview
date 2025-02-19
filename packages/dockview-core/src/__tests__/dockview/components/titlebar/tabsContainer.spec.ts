@@ -17,6 +17,7 @@ describe('tabsContainer', () => {
         const accessor = fromPartial<DockviewComponent>({
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             options: {},
         });
 
@@ -70,6 +71,7 @@ describe('tabsContainer', () => {
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             options: {},
         });
 
@@ -136,6 +138,7 @@ describe('tabsContainer', () => {
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             options: {},
         });
 
@@ -199,6 +202,7 @@ describe('tabsContainer', () => {
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             options: {},
         });
 
@@ -262,6 +266,7 @@ describe('tabsContainer', () => {
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             options: {},
         });
 
@@ -330,6 +335,7 @@ describe('tabsContainer', () => {
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             options: {},
         });
 
@@ -394,6 +400,7 @@ describe('tabsContainer', () => {
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             options: {},
         });
 
@@ -458,6 +465,7 @@ describe('tabsContainer', () => {
             options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             doSetGroupActive: jest.fn(),
@@ -514,6 +522,7 @@ describe('tabsContainer', () => {
             options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             doSetGroupActive: jest.fn(),
@@ -565,6 +574,7 @@ describe('tabsContainer', () => {
             options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             getGroupPanel: jest.fn(),
@@ -621,6 +631,7 @@ describe('tabsContainer', () => {
             options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             getGroupPanel: jest.fn(),
@@ -688,6 +699,7 @@ describe('tabsContainer', () => {
             options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             getGroupPanel: jest.fn(),
@@ -755,6 +767,7 @@ describe('tabsContainer', () => {
             options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidActivePanelChange: jest.fn(),
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             getGroupPanel: jest.fn(),
