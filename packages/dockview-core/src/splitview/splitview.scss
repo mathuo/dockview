@@ -118,15 +118,16 @@
             touch-action: none;
             background-color: var(--dv-sash-color, transparent);
 
-            &:not(.disabled):active {
-                transition: background-color 0.1s ease-in-out;
-                background-color: var(--dv-active-sash-color, transparent);
-            }
-
+            &:not(.disabled):active,
             &:not(.disabled):hover {
                 background-color: var(--dv-active-sash-color, transparent);
-                transition: background-color 0.1s ease-in-out;
-                transition-delay: 0.5s;
+                transition-property: background-color;
+                transition-timing-function: ease-in-out;
+                transition-duration: var(
+                    --dv-active-sash-transition-duration,
+                    0.1s
+                );
+                transition-delay: var(--dv-active-sash-transition-delay, 0.5s);
             }
         }
     }

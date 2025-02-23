@@ -184,17 +184,8 @@ const config = {
                         label: 'API',
                     },
                     { to: '/blog', label: 'Blog', position: 'left' },
+                    { href: '/templates', target:"_blank", label: 'Examples', position: 'left' },
                     { to: '/demo', label: 'Demo', position: 'left' },
-                    // {
-                    //     to: 'https://dockview.dev/typedocs',
-                    //     label: 'TSDoc',
-                    //     position: 'left',
-                    // },
-
-                    // {
-                    //     type: 'docsVersionDropdown',
-                    //     position: 'right',
-                    // },
                     {
                         href: 'https://github.com/mathuo/dockview',
                         position: 'right',

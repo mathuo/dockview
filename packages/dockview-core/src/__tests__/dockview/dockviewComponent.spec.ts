@@ -1102,7 +1102,9 @@ describe('dockviewComponent', () => {
         disposable.dispose();
     });
 
-    test('events flow', () => {
+    test('events flow', async () => {
+        window.open = () => setupMockWindow();
+
         dockview.layout(1000, 1000);
 
         let events: {
@@ -1295,7 +1297,42 @@ describe('dockviewComponent', () => {
         expect(dockview.size).toBe(0);
         expect(dockview.totalPanels).toBe(0);
 
+        events = [];
+
+        const panel8 = dockview.addPanel({
+            id: 'panel8',
+            component: 'default',
+        });
+        const panel9 = dockview.addPanel({
+            id: 'panel9',
+            component: 'default',
+            floating: true,
+        });
+        const panel10 = dockview.addPanel({
+            id: 'panel10',
+            component: 'default',
+        });
+
+        expect(await dockview.addPopoutGroup(panel10)).toBeTruthy();
+
+        expect(events).toEqual([
+            { type: 'ADD_GROUP', group: panel8.group },
+            { type: 'ADD_PANEL', panel: panel8 },
+            { type: 'ACTIVE_GROUP', group: panel8.group },
+            { type: 'ACTIVE_PANEL', panel: panel8 },
+            { type: 'ADD_GROUP', group: panel9.group },
+            { type: 'ADD_PANEL', panel: panel9 },
+            { type: 'ACTIVE_GROUP', group: panel9.group },
+            { type: 'ACTIVE_PANEL', panel: panel9 },
+            { type: 'ADD_PANEL', panel: panel10 },
+            { type: 'ACTIVE_PANEL', panel: panel10 },
+            { type: 'ADD_GROUP', group: panel10.group },
+        ]);
+
+        events = [];
         disposable.dispose();
+
+        expect(events.length).toBe(0);
     });
 
     test('that removing a panel from a group reflects in the dockviewcomponent when searching for a panel', () => {
@@ -5695,6 +5732,42 @@ describe('dockviewComponent', () => {
                     url: '/custom.html',
                 },
             ]);
+        });
+
+        test('dispose of dockview instance when popup is open', async () => {
+            const container = document.createElement('div');
+
+            window.open = () => setupMockWindow();
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+            });
+
+            expect(await dockview.addPopoutGroup(panel2.group)).toBeTruthy();
+
+            dockview.dispose();
         });
     });
 

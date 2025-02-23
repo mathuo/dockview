@@ -19,6 +19,8 @@
     --dv-tab-margin: 0;
     --dv-sash-color: transparent;
     --dv-active-sash-color: transparent;
+    --dv-active-sash-transition-duration: 0.1s;
+    --dv-active-sash-transition-delay: 0.5s;
 }
 
 @mixin dockview-theme-dark-mixin {
