@@ -1,7 +1,6 @@
 import fs from 'fs-extra';
 import * as path from 'path';
 import { argv } from 'process';
-import { execSync } from 'child_process';
 
 import { fileURLToPath } from 'url';
 
@@ -86,7 +85,8 @@ function createIndexHTML(options) {
                 .map(([key, value]) => `"${key}": "${value}"`)
                 .join(',\n')}`
         )
-        .replace('{{app}}', options.app);
+        .replace('{{app}}', options.app)
+        .replace('{{githubLink}}', options.githubUrl)
 }
 
 const input_dir = path.join(__dirname, '../templates');
@@ -96,6 +96,8 @@ const COMPONENTS = ['dockview'];
 const FRAMEWORKS = ['react', 'vue', 'typescript'];
 
 const list = [];
+
+const githubUrl = "https://github.com/mathuo/dockview/tree/master/packages/docs/templates"
 
 for (const component of COMPONENTS) {
     const componentDir = path.join(input_dir, component);
@@ -115,6 +117,9 @@ for (const component of COMPONENTS) {
                 path.join(componentDir, folder, framework, 'src'),
                 path.join(output, component, folder, framework, 'src')
             );
+
+            const templateGithubUrl = `${githubUrl}/${component}/${folder}/${framework}/src`
+
             const template = createIndexHTML({
                 title: `Dockview | ${folder} ${framework}`,
                 app:
@@ -127,6 +132,7 @@ for (const component of COMPONENTS) {
                         USE_LOCAL_CDN ? 'local' : 'remote'
                     ],
                 },
+                githubUrl: templateGithubUrl
             });
             fs.writeFileSync(
                 path.join(output, component, folder, framework, 'index.html'),

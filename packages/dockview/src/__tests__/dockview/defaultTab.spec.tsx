@@ -10,7 +10,9 @@ import { Disposable } from 'dockview-core/dist/cjs/lifecycle';
 describe('defaultTab', () => {
     test('has close button by default', async () => {
         const api = fromPartial<DockviewPanelApi>({
-            onDidTitleChange: jest.fn().mockImplementation(() => Disposable.NONE),
+            onDidTitleChange: jest
+                .fn()
+                .mockImplementation(() => Disposable.NONE),
         });
         const containerApi = fromPartial<DockviewApi>({});
         const params = {};
@@ -30,7 +32,9 @@ describe('defaultTab', () => {
     test('that title is displayed', async () => {
         const api = fromPartial<DockviewPanelApi>({
             title: 'test_title',
-            onDidTitleChange: jest.fn().mockImplementation(() => Disposable.NONE),
+            onDidTitleChange: jest
+                .fn()
+                .mockImplementation(() => Disposable.NONE),
         });
         const containerApi = fromPartial<DockviewApi>({});
         const params = {};
@@ -84,7 +88,9 @@ describe('defaultTab', () => {
 
     test('has no close button when hideClose=true', async () => {
         const api = fromPartial<DockviewPanelApi>({
-            onDidTitleChange: jest.fn().mockImplementation(() => Disposable.NONE),
+            onDidTitleChange: jest
+                .fn()
+                .mockImplementation(() => Disposable.NONE),
         });
         const containerApi = fromPartial<DockviewApi>({});
         const params = {};
@@ -105,7 +111,9 @@ describe('defaultTab', () => {
     test('that settings closeActionOverride skips api.close()', async () => {
         const api = fromPartial<DockviewPanelApi>({
             close: jest.fn(),
-            onDidTitleChange: jest.fn().mockImplementation(() => Disposable.NONE),
+            onDidTitleChange: jest
+                .fn()
+                .mockImplementation(() => Disposable.NONE),
         });
         const containerApi = fromPartial<DockviewApi>({});
         const params = {};
@@ -134,7 +142,9 @@ describe('defaultTab', () => {
     test('that clicking close calls api.close()', async () => {
         const api = fromPartial<DockviewPanelApi>({
             close: jest.fn(),
-            onDidTitleChange: jest.fn().mockImplementation(() => Disposable.NONE),
+            onDidTitleChange: jest
+                .fn()
+                .mockImplementation(() => Disposable.NONE),
         });
         const containerApi = fromPartial<DockviewApi>({});
         const params = {};
@@ -158,7 +168,9 @@ describe('defaultTab', () => {
 
     test('has close button when hideClose=false', async () => {
         const api = fromPartial<DockviewPanelApi>({
-            onDidTitleChange: jest.fn().mockImplementation(() => Disposable.NONE),
+            onDidTitleChange: jest
+                .fn()
+                .mockImplementation(() => Disposable.NONE),
         });
         const containerApi = fromPartial<DockviewApi>({});
         const params = {};
@@ -174,33 +186,5 @@ describe('defaultTab', () => {
 
         const element = await screen.getByTestId('dockview-dv-default-tab');
         expect(element.querySelector('.dv-default-tab-action')).toBeTruthy();
-    });
-
-    test('that pointerDown on close button prevents panel becoming active', async () => {
-        const api = fromPartial<DockviewPanelApi>({
-            setActive: jest.fn(),
-            onDidTitleChange: jest.fn().mockImplementation(() => Disposable.NONE),
-        });
-        const containerApi = fromPartial<DockviewApi>({});
-        const params = {};
-
-        render(
-            <DockviewDefaultTab
-                api={api}
-                containerApi={containerApi}
-                params={params}
-            />
-        );
-
-        const element = await screen.getByTestId('dockview-dv-default-tab');
-        const btn = element.querySelector(
-            '.dv-default-tab-action'
-        ) as HTMLElement;
-
-        fireEvent.pointerDown(btn);
-        expect(api.setActive).toHaveBeenCalledTimes(0);
-
-        fireEvent.click(element);
-        expect(api.setActive).toHaveBeenCalledTimes(1);
     });
 });

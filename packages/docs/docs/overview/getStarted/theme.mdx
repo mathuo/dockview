@@ -7,7 +7,9 @@ title: Theme
 
 import { CSSVariablesTable, ThemeTable } from '@site/src/components/cssVariables';
 
-Theming is controlled through CSS and is highly customizable.
+
+Dockview components accept a `theme` property which is highly customizable, the theme is largly controlled through CSS however some properties can only be adjusted
+by direct editing variables of the `theme` object.
 
 Firstly, you should import `dockview.css`:
 
@@ -38,7 +40,7 @@ To use a `dockview` theme the CSS must encapsulate the component. The current li
 <ThemeTable/>
 
 :::info
-The source code for all themes can be found [here](https://github.com/mathuo/dockview/blob/master/packages/dockview-core/src/theme.scss).
+The source code for all themes can be found [here](https://github.com/mathuo/dockview/blob/master/packages/dockview-core/src/theme.scss) and the associated CSS [here](https://github.com/mathuo/dockview/blob/master/packages/dockview-core/src/theme.scss).
 :::
 
 ## Customizing Theme

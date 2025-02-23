@@ -6,7 +6,10 @@ import { VoidContainer } from './voidContainer';
 import { toggleClass } from '../../../dom';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
-import { WillShowOverlayLocationEvent } from '../../dockviewGroupPanelModel';
+import {
+    DockviewGroupPanelModel,
+    WillShowOverlayLocationEvent,
+} from '../../dockviewGroupPanelModel';
 import { getPanelData } from '../../../dnd/dataTransfer';
 import { Tabs } from './tabs';
 

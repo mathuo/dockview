@@ -11,10 +11,10 @@
 
 /* You can override the default Infima variables here. */
 :root {
-    --ifm-font-family-base: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system,
-        BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans,
-        sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol,
-        Noto Color Emoji;
+    --ifm-font-family-base: 'IBM Plex Sans', ui-sans-serif, system-ui,
+        -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue,
+        Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji,
+        Segoe UI Symbol, Noto Color Emoji;
 
     --ifm-font-weight-bold: 600;
 
@@ -36,6 +36,9 @@
 
     --ifm-color-primary: black;
 
+    --ifm-dropdown-background-color: white;
+    --ifm-dropdown-border: 1px solid var(--ifm-color-primary-darkest);
+
     --ifm-navbar-link-color: white;
     --ifm-navbar-link-hover-color: white;
 
@@ -54,14 +57,17 @@
     }
 
     /* --ifm-color-primary: #0c111d; */
-    --ifm-color-primary: #25c2a0;
-    --ifm-color-primary-dark: #21af90;
-    --ifm-color-primary-darker: #1fa588;
-    --ifm-color-primary-darkest: #1a8870;
-    --ifm-color-primary-light: #29d5b0;
-    --ifm-color-primary-lighter: #32d8b4;
-    --ifm-color-primary-lightest: #4fddbf;
+    --ifm-color-primary: #98a2b3;
+    --ifm-color-primary-dark: #828a99;
+    --ifm-color-primary-darker: #6a707c;
+    --ifm-color-primary-darkest: #474b53;
+    --ifm-color-primary-light: #acb7ca;
+    --ifm-color-primary-lighter: #bcc9df;
+    --ifm-color-primary-lightest: #d2e1fa;
     --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+
+    --ifm-dropdown-background-color: #373d4b;
+    --ifm-dropdown-border: 1px solid var(--ifm-color-primary-darkest);
 
     --dv-docs-markdown-text-color: #cdced8;
 }

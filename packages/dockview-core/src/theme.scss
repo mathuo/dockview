@@ -1,17 +1,31 @@
+@import 'theme/_sash-handle-mixin';
+@import 'theme/_drop-target-static-mixin';
+@import 'theme/_space-mixin';
+
 @mixin dockview-theme-core-mixin {
     --dv-paneview-active-outline-color: dodgerblue;
     --dv-tabs-and-actions-container-font-size: 13px;
     --dv-tabs-and-actions-container-height: 35px;
     --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);
-    --dv-drag-over-border-color: white;
+    --dv-drag-over-border-color: transparent;
     --dv-tabs-container-scrollbar-color: #888;
     --dv-icon-hover-background-color: rgba(90, 93, 94, 0.31);
     --dv-floating-box-shadow: 8px 8px 8px 0px rgba(83, 89, 93, 0.5);
     --dv-overlay-z-index: 999;
+    //
+
+    --dv-tab-font-size: inherit;
+    --dv-border-radius: 0px;
+    --dv-tab-margin: 0;
+    --dv-sash-color: transparent;
+    --dv-active-sash-color: transparent;
+    --dv-active-sash-transition-duration: 0.1s;
+    --dv-active-sash-transition-delay: 0.5s;
 }
 
 @mixin dockview-theme-dark-mixin {
     @include dockview-theme-core-mixin();
+    @include dockview-drop-target-no-travel();
 
     //
     --dv-group-view-background-color: #1e1e1e;
@@ -35,6 +49,8 @@
 
 @mixin dockview-theme-light-mixin {
     @include dockview-theme-core-mixin();
+    @include dockview-drop-target-no-travel();
+
     //
     --dv-group-view-background-color: white;
     //
@@ -131,30 +147,49 @@
 
 @mixin dockview-theme-abyss-mixin {
     @include dockview-theme-core-mixin();
+    @include dockview-drop-target-no-travel();
+
+    --dv-color-abyss-dark: #000c18;
+    --dv-color-abyss: #10192c;
+    --dv-color-abyss-light: #1c1c2a;
+    --dv-color-abyss-lighter: #2b2b4a;
+    --dv-color-abyss-accent: rgb(91, 30, 207);
+
+    --dv-color-abyss-primary-text: white;
+    --dv-color-abyss-secondary-text: rgb(148, 151, 169);
+
     //
-    --dv-group-view-background-color: #000c18;
+    --dv-group-view-background-color: var(--dv-color-abyss-dark);
     //
-    --dv-tabs-and-actions-container-background-color: #1c1c2a;
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-abyss-light
+    );
     //
-    --dv-activegroup-visiblepanel-tab-background-color: #000c18;
-    --dv-activegroup-hiddenpanel-tab-background-color: #10192c;
-    --dv-inactivegroup-visiblepanel-tab-background-color: #000c18;
-    --dv-inactivegroup-hiddenpanel-tab-background-color: #10192c;
-    --dv-tab-divider-color: #2b2b4a;
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-abyss-dark
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(--dv-color-abyss);
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-abyss-dark
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(--dv-color-abyss);
+    --dv-tab-divider-color: var(--dv-color-abyss-lighter);
     //
     --dv-activegroup-visiblepanel-tab-color: white;
     --dv-activegroup-hiddenpanel-tab-color: rgba(255, 255, 255, 0.5);
     --dv-inactivegroup-visiblepanel-tab-color: rgba(255, 255, 255, 0.5);
     --dv-inactivegroup-hiddenpanel-tab-color: rgba(255, 255, 255, 0.25);
     //
-    --dv-separator-border: #2b2b4a;
-    --dv-paneview-header-border-color: #2b2b4a;
+    --dv-separator-border: var(--dv-color-abyss-lighter);
+    --dv-paneview-header-border-color: var(--dv-color-abyss-lighter);
 
     --dv-paneview-active-outline-color: #596f99;
 }
 
 @mixin dockview-theme-dracula-mixin {
     @include dockview-theme-core-mixin();
+    @include dockview-drop-target-no-travel();
+
     //
     --dv-group-view-background-color: #282a36;
     //
@@ -229,8 +264,15 @@
 }
 
 @mixin dockview-design-replit-mixin {
+    @include dockview-drop-target-no-travel();
+
     .dv-resize-container:has(> .dv-groupview) {
         border-radius: 8px;
+    }
+
+    .dv-resize-container {
+        border-radius: 10px !important;
+        border: none;
     }
 
     .dv-groupview {
@@ -266,59 +308,16 @@
             border: 1px solid transparent;
         }
     }
-
-    .vertical > .sash-container > .sash {
-        &:not(.disabled) {
-            &::after {
-                content: '';
-                height: 4px;
-                width: 40px;
-                border-radius: 2px;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background-color: var(--dv-separator-handle-background-color);
-                position: absolute;
-            }
-
-            &:hover {
-                &::after {
-                    background-color: var(
-                        --dv-separator-handle-hover-background-color
-                    );
-                }
-            }
-        }
-    }
-
-    .dv-horizontal > .dv-sash-container > .dv-sash {
-        &:not(.disabled) {
-            &::after {
-                content: '';
-                height: 40px;
-                width: 4px;
-                border-radius: 2px;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background-color: var(--dv-separator-handle-background-color);
-                position: absolute;
-            }
-
-            &:hover {
-                &::after {
-                    background-color: var(
-                        --dv-separator-handle-hover-background-color
-                    );
-                }
-            }
-        }
-    }
 }
 
 .dockview-theme-replit {
     @include dockview-theme-core-mixin();
     @include dockview-design-replit-mixin();
+    @include dockview-design-handle-mixin();
+
+    padding: 10px;
+    background-color: #ebeced;
+
     //
     --dv-group-view-background-color: #ebeced;
     //
@@ -339,6 +338,115 @@
     --dv-paneview-header-border-color: rgb(51, 51, 51);
 
     /////
-    --dv-separator-handle-background-color: #cfd1d3;
-    --dv-separator-handle-hover-background-color: #babbbb;
+    --dv-sash-color: #cfd1d3;
+    --dv-active-sash-color: #babbbb;
+}
+
+.dockview-theme-abyss-spaced {
+    @include dockview-theme-core-mixin();
+    @include dockview-design-space-mixin();
+
+    //  stylesheet
+    --dv-color-abyss-dark: rgb(11, 6, 17);
+    --dv-color-abyss: #16121f;
+    --dv-color-abyss-light: #201d2b;
+    --dv-color-abyss-lighter: #2a2837;
+    --dv-color-abyss-accent: rgb(91, 30, 207);
+    --dv-color-abyss-primary-text: white;
+    --dv-color-abyss-secondary-text: rgb(148, 151, 169);
+
+    //
+    --dv-drag-over-border: 2px solid var(--dv-color-abyss-accent);
+    --dv-drag-over-background-color: '';
+    //
+
+    //
+    --dv-group-view-background-color: var(--dv-color-abyss-dark);
+    //
+    --dv-tabs-and-actions-container-background-color: var(--dv-color-abyss);
+    //
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-abyss-lighter
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-abyss-light
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-abyss-lighter
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-abyss-light
+    );
+    --dv-tab-divider-color: transparent;
+    //
+    --dv-activegroup-visiblepanel-tab-color: var(--dv-color-abyss-primary-text);
+    --dv-activegroup-hiddenpanel-tab-color: var(
+        --dv-color-abyss-secondary-text
+    );
+    --dv-inactivegroup-visiblepanel-tab-color: var(
+        --dv-color-abyss-primary-text
+    );
+    --dv-inactivegroup-hiddenpanel-tab-color: var(
+        --dv-color-abyss-secondary-text
+    );
+    //
+    --dv-separator-border: transparent;
+    --dv-paneview-header-border-color: rgb(51, 51, 51);
+
+    /////
+    --dv-active-sash-color: var(--dv-color-abyss-accent);
+    //
+    --dv-floating-box-shadow: 8px 8px 8px 0px rgba(0, 0, 0, 0.5);
+
+    padding: 10px;
+    background-color: var(--dv-color-abyss-dark);
+
+    .dv-resize-container {
+        .dv-groupview {
+            border: 2px solid var(--dv-color-abyss-dark);
+        }
+    }
+}
+
+.dockview-theme-light-spaced {
+    @include dockview-theme-core-mixin();
+    @include dockview-design-space-mixin();
+
+    //
+    --dv-drag-over-border: 2px solid rgb(91, 30, 207);
+    --dv-drag-over-background-color: '';
+    //
+
+    //
+    --dv-group-view-background-color: #f6f5f9;
+    //
+    --dv-tabs-and-actions-container-background-color: white;
+    //
+    --dv-activegroup-visiblepanel-tab-background-color: #ededf0;
+    --dv-activegroup-hiddenpanel-tab-background-color: #f9f9fa;
+    --dv-inactivegroup-visiblepanel-tab-background-color: #ededf0;
+    --dv-inactivegroup-hiddenpanel-tab-background-color: #f9f9fa;
+    --dv-tab-divider-color: transparent;
+    //
+    --dv-activegroup-visiblepanel-tab-color: rgb(104, 107, 130);
+    --dv-activegroup-hiddenpanel-tab-color: rgb(148, 151, 169);
+    --dv-inactivegroup-visiblepanel-tab-color: rgb(104, 107, 130);
+    --dv-inactivegroup-hiddenpanel-tab-color: rgb(148, 151, 169);
+    //
+    --dv-separator-border: transparent;
+    --dv-paneview-header-border-color: rgb(51, 51, 51);
+
+    /////
+    --dv-active-sash-color: rgb(91, 30, 207);
+    //
+    --dv-floating-box-shadow: 8px 8px 8px 0px rgba(0, 0, 0, 0.1);
+
+    padding: 10px;
+    background-color: #f6f5f9;
+
+    .dv-resize-container {
+        .dv-groupview {
+            border: 2px solid rgb(255, 255, 255, 0.1);
+        }
+    }
 }

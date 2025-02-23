@@ -1,0 +1,10 @@
+@mixin dockview-drop-target-no-travel {
+    .dv-drop-target-container {
+        .dv-drop-target-anchor {
+            &.dv-drop-target-anchor-container-changed {
+                opacity: 0;
+                transition: none;
+            }
+        }
+    }
+}

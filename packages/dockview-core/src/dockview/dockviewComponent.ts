@@ -54,6 +54,7 @@ import { Parameters } from '../panel/types';
 import { Overlay } from '../overlay/overlay';
 import {
     addTestId,
+    Classnames,
     getDockviewTheme,
     toggleClass,
     watchElementResize,
@@ -75,6 +76,8 @@ import {
 import { PopoutWindow } from '../popoutWindow';
 import { StrictEventsSequencing } from './strictEventsSequencing';
 import { PopupService } from './components/popupService';
+import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
+import { themeAbyss } from './theme';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     activationSize: { type: 'pixels', value: 10 },
@@ -192,6 +195,9 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly totalPanels: number;
     readonly panels: IDockviewPanel[];
     readonly orientation: Orientation;
+    /**
+     * @deprecated use `theme` instead. This will be removed in a future version
+     */
     readonly gap: number;
     readonly onDidDrop: Event<DockviewDidDropEvent>;
     readonly onWillDrop: Event<DockviewWillDropEvent>;
@@ -254,10 +260,12 @@ export class DockviewComponent
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
     private readonly _api: DockviewApi;
     private _options: Exclude<DockviewComponentOptions, 'orientation'>;
-    private watermark: IWatermarkRenderer | null = null;
+    private _watermark: IWatermarkRenderer | null = null;
+    private readonly _themeClassnames: Classnames;
 
     readonly overlayRenderContainer: OverlayRenderContainer;
     readonly popupService: PopupService;
+    readonly rootDropTargetContainer: DropTargetAnchorContainer;
 
     private readonly _onWillDragPanel = new Emitter<TabDragEvent>();
     readonly onWillDragPanel: Event<TabDragEvent> = this._onWillDragPanel.event;
@@ -363,6 +371,9 @@ export class DockviewComponent
     }
 
     get gap(): number {
+        console.warn(
+            'dockview: dockviewComponent.gap has been deprecated. Use `theme` instead. This will be removed in a future version.'
+        );
         return this.gridview.margin;
     }
 
@@ -379,12 +390,20 @@ export class DockviewComponent
                 : undefined,
             disableAutoResizing: options.disableAutoResizing,
             locked: options.locked,
-            margin: options.gap,
+            margin: options.theme?.gap ?? 0,
             className: options.className,
         });
 
         this.popupService = new PopupService(this.element);
 
+        this.updateDropTargetModel(options);
+
+        this._themeClassnames = new Classnames(this.element);
+
+        this.rootDropTargetContainer = new DropTargetAnchorContainer(
+            this.element,
+            { disabled: true }
+        );
         this.overlayRenderContainer = new OverlayRenderContainer(
             this.gridview.element,
             this
@@ -398,6 +417,7 @@ export class DockviewComponent
         }
 
         this.addDisposables(
+            this.rootDropTargetContainer,
             this.overlayRenderContainer,
             this._onWillDragPanel,
             this._onWillDragGroup,
@@ -468,8 +488,10 @@ export class DockviewComponent
         );
 
         this._options = options;
+        this.updateTheme();
 
         this._rootDropTarget = new Droptarget(this.element, {
+            className: 'dv-drop-target-edge',
             canDisplayOverlay: (event, position) => {
                 const data = getPanelData();
 
@@ -510,6 +532,7 @@ export class DockviewComponent
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
             overlayModel:
                 this.options.rootOverlayModel ?? DEFAULT_ROOT_OVERLAY_MODEL,
+            getOverrideTarget: () => this.rootDropTargetContainer?.model,
         });
 
         this.addDisposables(
@@ -760,6 +783,15 @@ export class DockviewComponent
 
                 popoutContainer.appendChild(group.element);
 
+                const anchor = document.createElement('div');
+                const dropTargetContainer = new DropTargetAnchorContainer(
+                    anchor,
+                    { disabled: this.rootDropTargetContainer.disabled }
+                );
+                popoutContainer.appendChild(anchor);
+
+                group.model.dropTargetContainer = dropTargetContainer;
+
                 group.model.location = {
                     type: 'popout',
                     getWindow: () => _window.window!,
@@ -825,6 +857,10 @@ export class DockviewComponent
                     ),
                     overlayRenderContainer,
                     Disposable.from(() => {
+                        if (this.isDisposed) {
+                            return; // cleanup may run after instance is disposed
+                        }
+
                         if (
                             isGroupAddedToDom &&
                             this.getPanel(referenceGroup.id)
@@ -848,6 +884,8 @@ export class DockviewComponent
                         } else if (this.getPanel(group.id)) {
                             group.model.renderContainer =
                                 this.overlayRenderContainer;
+                            group.model.dropTargetContainer =
+                                this.rootDropTargetContainer;
                             returnedGroup = group;
 
                             const alreadyRemoved = !this._popoutGroups.find(
@@ -1138,6 +1176,13 @@ export class DockviewComponent
     override updateOptions(options: Partial<DockviewComponentOptions>): void {
         super.updateOptions(options);
 
+        if ('gap' in options) {
+            console.warn(
+                'dockview: dockviewComponent.setGap has been deprecated. Use `theme` instead. This will be removed in a future version.'
+            );
+            this.gridview.margin = options.gap ?? 0;
+        }
+
         if ('floatingGroupBounds' in options) {
             for (const group of this._floatingGroups) {
                 switch (options.floatingGroupBounds) {
@@ -1162,17 +1207,13 @@ export class DockviewComponent
             }
         }
 
-        if ('rootOverlayModel' in options) {
-            this._rootDropTarget.setOverlayModel(
-                options.rootOverlayModel ?? DEFAULT_ROOT_OVERLAY_MODEL
-            );
-        }
-
-        if ('gap' in options) {
-            this.gridview.margin = options.gap ?? 0;
-        }
+        this.updateDropTargetModel(options);
 
         this._options = { ...this.options, ...options };
+
+        if ('theme' in options) {
+            this.updateTheme();
+        }
 
         this.layout(this.gridview.width, this.gridview.height, true);
     }
@@ -1749,24 +1790,24 @@ export class DockviewComponent
                 (x) => x.api.location.type === 'grid' && x.api.isVisible
             ).length === 0
         ) {
-            if (!this.watermark) {
-                this.watermark = this.createWatermarkComponent();
+            if (!this._watermark) {
+                this._watermark = this.createWatermarkComponent();
 
-                this.watermark.init({
+                this._watermark.init({
                     containerApi: new DockviewApi(this),
                 });
 
                 const watermarkContainer = document.createElement('div');
                 watermarkContainer.className = 'dv-watermark-container';
                 addTestId(watermarkContainer, 'watermark-component');
-                watermarkContainer.appendChild(this.watermark.element);
+                watermarkContainer.appendChild(this._watermark.element);
 
                 this.gridview.element.appendChild(watermarkContainer);
             }
-        } else if (this.watermark) {
-            this.watermark.element.parentElement!.remove();
-            this.watermark.dispose?.();
-            this.watermark = null;
+        } else if (this._watermark) {
+            this._watermark.element.parentElement!.remove();
+            this._watermark.dispose?.();
+            this._watermark = null;
         }
     }
 
@@ -2408,9 +2449,11 @@ export class DockviewComponent
                     if (this._moving) {
                         return;
                     }
+
                     if (event.panel !== this.activePanel) {
                         return;
                     }
+
                     if (this._onDidActivePanelChange.value !== event.panel) {
                         this._onDidActivePanelChange.fire(event.panel);
                     }
@@ -2492,5 +2535,45 @@ export class DockviewComponent
         return location.length % 2 == 1
             ? rootOrientation
             : orthogonal(rootOrientation);
+    }
+
+    private updateDropTargetModel(options: Partial<DockviewComponentOptions>) {
+        if ('dndEdges' in options) {
+            this._rootDropTarget.disabled =
+                typeof options.dndEdges === 'boolean' &&
+                options.dndEdges === false;
+
+            if (
+                typeof options.dndEdges === 'object' &&
+                options.dndEdges !== null
+            ) {
+                this._rootDropTarget.setOverlayModel(options.dndEdges);
+            } else {
+                this._rootDropTarget.setOverlayModel(
+                    DEFAULT_ROOT_OVERLAY_MODEL
+                );
+            }
+        }
+
+        if ('rootOverlayModel' in options) {
+            this.updateDropTargetModel({ dndEdges: options.dndEdges });
+        }
+    }
+
+    private updateTheme(): void {
+        const theme = this._options.theme ?? themeAbyss;
+        this._themeClassnames.setClassNames(theme.className);
+
+        this.gridview.margin = theme.gap ?? 0;
+
+        switch (theme.dndOverlayMounting) {
+            case 'absolute':
+                this.rootDropTargetContainer.disabled = false;
+                break;
+            case 'relative':
+            default:
+                this.rootDropTargetContainer.disabled = true;
+                break;
+        }
     }
 }

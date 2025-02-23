@@ -1,13 +1,16 @@
 
 .DropdownMenuContent {
   /* min-width: 220px; */
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--ifm-dropdown-background-color);
+  color: var(--ifm-color-primary);
+  border: var(--ifm-dropdown-border);
   border-radius: 6px;
   padding: 5px;
   box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2);
   animation-duration: 400ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
+  z-index: 99;
 }
 .DropdownMenuContent[data-side='top'],
 .DropdownMenuSubContent[data-side='top'] {
@@ -39,25 +42,33 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100px;
-  height: 25px;
+  width: 120px;
+  /* height: 25px; */
   padding: 4px 8px;
-  font-size: 13px;
+  font-size: 1rem;
+  font-weight: normal;
   cursor: pointer;
+
+  color: var(--ifm-menu-color);
+
+  &:hover {
+    background-color: var(--ifm-hover-overlay);
+  }
 }
 
 .framework-menu-item-select {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 120px;
+  width: 130px;
   height: 35px;
   padding: 4px 8px;
   border-radius: 6px;
-  font-size: 13px;
-  background-color: rgba(255, 255, 255, 0.1);
+  font-size: 1rem;
+  font-weight: normal;
   cursor: pointer;
-  border: 1px solid rgba(0,0,0, 0.1);
+
+  border: 1px solid rgba(60, 60, 66,0.5);
 }
 
 @keyframes slideUpAndFade {

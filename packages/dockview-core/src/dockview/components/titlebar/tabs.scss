@@ -22,10 +22,20 @@
     .dv-tab {
         -webkit-user-drag: element;
         outline: none;
-        min-width: 75px;
+        padding: 0.25rem 0.5rem;
         cursor: pointer;
         position: relative;
         box-sizing: border-box;
+        font-size: var(-dv-tab-font-size);
+        margin: var(--dv-tab-margin);
+
+        &:first-child {
+            margin-right: 0;
+        }
+
+        &:not(:nth-last-child(1)) {
+            margin-left: 0;
+        }
 
         &:not(:first-child)::before {
             content: ' ';

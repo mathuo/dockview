@@ -32,9 +32,14 @@ export const DockviewDefaultTab: React.FunctionComponent<
     params: _params,
     hideClose,
     closeActionOverride,
+    onPointerDown,
+    onPointerUp,
+    onPointerLeave,
     ...rest
 }) => {
     const title = useTitle(api);
+
+    const isMiddleMouseButton = React.useRef<boolean>(false);
 
     const onClose = React.useCallback(
         (event: React.MouseEvent<HTMLSpanElement>) => {
@@ -49,37 +54,52 @@ export const DockviewDefaultTab: React.FunctionComponent<
         [api, closeActionOverride]
     );
 
-    const onPointerDown = React.useCallback((e: React.MouseEvent) => {
-        e.preventDefault();
+    const onBtnPointerDown = React.useCallback((event: React.MouseEvent) => {
+        event.preventDefault();
     }, []);
 
-    const onClick = React.useCallback(
-        (event: React.MouseEvent<HTMLDivElement>) => {
-            if (event.defaultPrevented) {
-                return;
-            }
-
-            api.setActive();
-
-            if (rest.onClick) {
-                rest.onClick(event);
-            }
+    const _onPointerDown = React.useCallback(
+        (event: React.PointerEvent<HTMLDivElement>) => {
+            isMiddleMouseButton.current = event.button === 1;
+            onPointerDown?.(event);
         },
-        [api, rest.onClick]
+        [onPointerDown]
+    );
+
+    const _onPointerUp = React.useCallback(
+        (event: React.PointerEvent<HTMLDivElement>) => {
+            if (isMiddleMouseButton && event.button === 1 && !hideClose) {
+                isMiddleMouseButton.current = false;
+                onClose(event);
+            }
+
+            onPointerUp?.(event);
+        },
+        [onPointerUp, onClose, hideClose]
+    );
+
+    const _onPointerLeave = React.useCallback(
+        (event: React.PointerEvent<HTMLDivElement>) => {
+            isMiddleMouseButton.current = false;
+            onPointerLeave?.(event);
+        },
+        [onPointerLeave]
     );
 
     return (
         <div
             data-testid="dockview-dv-default-tab"
             {...rest}
-            onClick={onClick}
+            onPointerDown={_onPointerDown}
+            onPointerUp={_onPointerUp}
+            onPointerLeave={_onPointerLeave}
             className="dv-default-tab"
         >
             <span className="dv-default-tab-content">{title}</span>
             {!hideClose && (
                 <div
                     className="dv-default-tab-action"
-                    onPointerDown={onPointerDown}
+                    onPointerDown={onBtnPointerDown}
                     onClick={onClose}
                 >
                     <CloseButton />
