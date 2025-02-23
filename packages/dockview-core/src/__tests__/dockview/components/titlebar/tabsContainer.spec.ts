@@ -42,16 +42,16 @@ describe('tabsContainer', () => {
 
         const emptySpace = cut.element
             .getElementsByClassName('dv-void-container')
-            .item(0);
+            .item(0) as HTMLElement;
 
         if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -73,15 +73,14 @@ describe('tabsContainer', () => {
             options: {},
         });
 
-        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
-            () => {
-                return {
-                    canDisplayOverlay: jest.fn(),
-                };
-            }
-        );
+        const dropTargetContainer = document.createElement('div');
 
-        const groupView = new groupviewMock() as DockviewGroupPanelModel;
+        const groupView = fromPartial<DockviewGroupPanelModel>({
+            canDisplayOverlay: jest.fn(),
+            // dropTargetContainer: new DropTargetAnchorContainer(
+            //     dropTargetContainer
+            // ),
+        });
 
         const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
             return {
@@ -97,16 +96,16 @@ describe('tabsContainer', () => {
 
         const emptySpace = cut.element
             .getElementsByClassName('dv-void-container')
-            .item(0);
+            .item(0) as HTMLElement;
 
         if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -129,6 +128,10 @@ describe('tabsContainer', () => {
         expect(
             cut.element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(1);
+        // expect(
+        //     dropTargetContainer.getElementsByClassName('dv-drop-target-anchor')
+        //         .length
+        // ).toBe(1);
     });
 
     test('that dropping over the empty space should render a drop target', () => {
@@ -166,16 +169,16 @@ describe('tabsContainer', () => {
 
         const emptySpace = cut.element
             .getElementsByClassName('dv-void-container')
-            .item(0);
+            .item(0) as HTMLElement;
 
         if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -229,16 +232,16 @@ describe('tabsContainer', () => {
 
         const emptySpace = cut.element
             .getElementsByClassName('dv-void-container')
-            .item(0);
+            .item(0) as HTMLElement;
 
         if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -291,16 +294,16 @@ describe('tabsContainer', () => {
 
         const emptySpace = cut.element
             .getElementsByClassName('dv-void-container')
-            .item(0);
+            .item(0) as HTMLElement;
 
         if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetWidth', 'get').mockImplementation(
             () => 100
         );
 

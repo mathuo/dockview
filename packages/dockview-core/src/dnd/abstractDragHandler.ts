@@ -67,7 +67,7 @@ export abstract class DragHandler extends CompositeDisposable {
                          * For example: in react-dnd if dataTransfer.types is not set then the dragStart event will be cancelled
                          * through .preventDefault(). Since this is applied globally to all drag events this would break dockviews
                          * dnd logic. You can see the code at
-                         * https://github.com/react-dnd/react-dnd/blob/main/packages/backend-html5/src/HTML5BackendImpl.ts#L542
+                     P    * https://github.com/react-dnd/react-dnd/blob/main/packages/backend-html5/src/HTML5BackendImpl.ts#L542
                          */
                         event.dataTransfer.setData('text/plain', '');
                     }
@@ -75,7 +75,9 @@ export abstract class DragHandler extends CompositeDisposable {
             }),
             addDisposableListener(this.el, 'dragend', () => {
                 this.pointerEventsDisposable.dispose();
-                this.dataDisposable.dispose();
+                setTimeout(() => {
+                    this.dataDisposable.dispose(); // allow the data to be read by other handlers before disposing
+                }, 0);
             })
         );
     }

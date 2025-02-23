@@ -629,8 +629,18 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.totalPanels;
     }
 
+    /**
+     * @deprecated dockview: dockviewComponent.gap has been deprecated. Use `theme` instead. This will be removed in a future version.
+     */
     get gap(): number {
         return this.component.gap;
+    }
+
+    /**
+     * @deprecated dockview: dockviewComponent.setGap has been deprecated. Use `theme` instead. This will be removed in a future version.
+     */
+    setGap(gap: number | undefined): void {
+        this.component.updateOptions({ gap: gap });
     }
 
     /**
@@ -912,10 +922,6 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         }
     ): Promise<boolean> {
         return this.component.addPopoutGroup(item, options);
-    }
-
-    setGap(gap: number | undefined): void {
-        this.component.updateOptions({ gap });
     }
 
     updateOptions(options: Partial<DockviewComponentOptions>) {

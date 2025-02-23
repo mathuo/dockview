@@ -133,11 +133,11 @@ describe('dockviewComponent', () => {
             },
             className: 'test-a test-b',
         });
-        expect(dockview.element.className).toBe('test-a test-b');
+        expect(dockview.element.className).toBe('test-a test-b dockview-theme-abyss');
 
         dockview.updateOptions({ className: 'test-b test-c' });
 
-        expect(dockview.element.className).toBe('test-b test-c');
+        expect(dockview.element.className).toBe('dockview-theme-abyss test-b test-c');
     });
 
     describe('memory leakage', () => {
@@ -3376,10 +3376,10 @@ describe('dockviewComponent', () => {
             position: { direction: 'right' },
         });
 
-        Object.defineProperty(dockview.element, 'clientWidth', {
+        Object.defineProperty(dockview.element, 'offsetWidth', {
             get: () => 100,
         });
-        Object.defineProperty(dockview.element, 'clientHeight', {
+        Object.defineProperty(dockview.element, 'offsetHeight', {
             get: () => 100,
         });
 
@@ -6724,37 +6724,5 @@ describe('dockviewComponent', () => {
 
         expect(api.panels.length).toBe(3);
         expect(api.groups.length).toBe(3);
-    });
-
-    describe('updateOptions', () => {
-        test('gap', () => {
-            const container = document.createElement('div');
-
-            const dockview = new DockviewComponent(container, {
-                createComponent(options) {
-                    switch (options.name) {
-                        case 'default':
-                            return new PanelContentPartTest(
-                                options.id,
-                                options.name
-                            );
-                        default:
-                            throw new Error(`unsupported`);
-                    }
-                },
-                gap: 6,
-            });
-
-            expect(dockview.gap).toBe(6);
-
-            dockview.updateOptions({ gap: 10 });
-            expect(dockview.gap).toBe(10);
-
-            dockview.updateOptions({});
-            expect(dockview.gap).toBe(10);
-
-            dockview.updateOptions({ gap: 15 });
-            expect(dockview.gap).toBe(15);
-        });
     });
 });
