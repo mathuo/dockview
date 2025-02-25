@@ -1,11 +1,12 @@
 import { IDockviewPanelModel } from '../../dockview/dockviewPanelModel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import {
-    GroupPanelPartInitParameters,
+    TabPartInitParameters,
     IContentRenderer,
     ITabRenderer,
 } from '../../dockview/types';
 import { PanelUpdateEvent } from '../../panel/types';
+import { TabLocation } from '../../dockview/framework';
 
 export class DockviewPanelModelMock implements IDockviewPanelModel {
     constructor(
@@ -17,8 +18,11 @@ export class DockviewPanelModelMock implements IDockviewPanelModel {
         //
     }
 
+    copyTabComponent(tabLocation: TabLocation): ITabRenderer {
+        return this.tab;
+    }
 
-    init(params: GroupPanelPartInitParameters): void {
+    init(params: TabPartInitParameters): void {
         //
     }
 

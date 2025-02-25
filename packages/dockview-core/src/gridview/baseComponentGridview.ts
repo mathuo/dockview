@@ -11,6 +11,9 @@ import { Classnames } from '../dom';
 
 const nextLayoutId = sequentialNumberGenerator();
 
+/**
+ * A direction in which a panel can be moved or placed relative to another panel.
+ */
 export type Direction = 'left' | 'right' | 'above' | 'below' | 'within';
 
 export function toTarget(direction: Direction): Position {

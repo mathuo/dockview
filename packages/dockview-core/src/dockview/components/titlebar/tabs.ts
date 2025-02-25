@@ -1,11 +1,17 @@
 import { getPanelData } from '../../../dnd/dataTransfer';
-import { OverflowObserver } from '../../../dom';
+import {
+    isChildEntirelyVisibleWithinParent,
+    OverflowObserver,
+    toggleClass,
+} from '../../../dom';
 import { addDisposableListener, Emitter, Event } from '../../../events';
 import {
     CompositeDisposable,
     Disposable,
     IValueDisposable,
+    MutableDisposable,
 } from '../../../lifecycle';
+import { createChevronRightButton } from '../../../svg';
 import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { WillShowOverlayLocationEvent } from '../../dockviewGroupPanelModel';
@@ -13,14 +19,38 @@ import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
 import { Tab } from '../tab/tab';
 import { TabDragEvent, TabDropIndexEvent } from './tabsContainer';
 
+type DropdownElement = {
+    element: HTMLElement;
+    update: (params: { tabs: number }) => void;
+    dispose?: () => void;
+};
+
+function createDropdownElementHandle(): DropdownElement {
+    const el = document.createElement('div');
+    el.className = 'dv-tabs-overflow-dropdown-default';
+
+    const text = document.createElement('span');
+    text.textContent = ``;
+    const icon = createChevronRightButton();
+    el.appendChild(icon);
+    el.appendChild(text);
+
+    return {
+        element: el,
+        update: (params: { tabs: number }) => {
+            text.textContent = `${params.tabs}`;
+        },
+    };
+}
+
 export class Tabs extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private readonly _tabsList: HTMLElement;
 
     private tabs: IValueDisposable<Tab>[] = [];
     private selectedIndex = -1;
-    private _hasOverflow = false;
-    private _dropdownAnchor: HTMLElement | null = null;
+
+    private readonly _dropdownDisposable = new MutableDisposable();
 
     private readonly _onTabDragStart = new Emitter<TabDragEvent>();
     readonly onTabDragStart: Event<TabDragEvent> = this._onTabDragStart.event;
@@ -32,6 +62,9 @@ export class Tabs extends CompositeDisposable {
         new Emitter<WillShowOverlayLocationEvent>();
     readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent> =
         this._onWillShowOverlay.event;
+
+    private dropdownPart: DropdownElement | null = null;
+    private _overflowTabs: string[] = [];
 
     get element(): HTMLElement {
         return this._element;
@@ -52,7 +85,7 @@ export class Tabs extends CompositeDisposable {
         super();
 
         this._element = document.createElement('div');
-        this._element.className = 'dv-tabs-panel';
+        this._element.className = 'dv-tabs-panel dv-horizontal';
         this._element.style.display = 'flex';
         this._element.style.overflow = 'auto';
         this._tabsList = document.createElement('div');
@@ -62,12 +95,17 @@ export class Tabs extends CompositeDisposable {
         const observer = new OverflowObserver(this._tabsList);
 
         this.addDisposables(
+            this._dropdownDisposable,
+            this._onWillShowOverlay,
+            this._onDrop,
+            this._onTabDragStart,
             observer,
             observer.onDidChange((event) => {
                 const hasOverflow = event.hasScrollX || event.hasScrollY;
-                if (this._hasOverflow !== hasOverflow) {
-                    this.toggleDropdown(hasOverflow);
-                }
+                this.toggleDropdown({ reset: !hasOverflow });
+            }),
+            addDisposableListener(this._tabsList, 'scroll', () => {
+                this.toggleDropdown({ reset: false });
             }),
             addDisposableListener(this.element, 'pointerdown', (event) => {
                 if (event.defaultPrevented) {
@@ -103,10 +141,27 @@ export class Tabs extends CompositeDisposable {
     }
 
     setActivePanel(panel: IDockviewPanel): void {
-        this.tabs.forEach((tab) => {
+        let runningWidth = 0;
+
+        for (const tab of this.tabs) {
             const isActivePanel = panel.id === tab.value.panel.id;
             tab.value.setActive(isActivePanel);
-        });
+
+            if (isActivePanel) {
+                const element = tab.value.element;
+                const parentElement = element.parentElement!;
+
+                if (
+                    runningWidth < parentElement.scrollLeft ||
+                    runningWidth + element.clientWidth >
+                        parentElement.scrollLeft + parentElement.clientWidth
+                ) {
+                    parentElement.scrollLeft = runningWidth;
+                }
+            }
+
+            runningWidth += tab.value.element.clientWidth;
+        }
     }
 
     openPanel(panel: IDockviewPanel, index: number = this.tabs.length): void {
@@ -120,7 +175,11 @@ export class Tabs extends CompositeDisposable {
             tab.onDragStart((event) => {
                 this._onTabDragStart.fire({ nativeEvent: event, panel });
             }),
-            tab.onChanged((event) => {
+            tab.onPointerDown((event) => {
+                if (event.defaultPrevented) {
+                    return;
+                }
+
                 const isFloatingGroupsEnabled =
                     !this.accessor.options.disableFloatingGroups;
 
@@ -149,14 +208,12 @@ export class Tabs extends CompositeDisposable {
                     return;
                 }
 
-                const isLeftClick = event.button === 0;
-
-                if (!isLeftClick || event.defaultPrevented) {
-                    return;
-                }
-
-                if (this.group.activePanel !== panel) {
-                    this.group.model.openPanel(panel);
+                switch (event.button) {
+                    case 0: // left click or touch
+                        if (this.group.activePanel !== panel) {
+                            this.group.model.openPanel(panel);
+                        }
+                        break;
                 }
             }),
             tab.onDrop((event) => {
@@ -218,48 +275,105 @@ export class Tabs extends CompositeDisposable {
         }
     }
 
-    private toggleDropdown(show: boolean): void {
-        this._hasOverflow = show;
+    private toggleDropdown(options: { reset: boolean }): void {
+        const tabs = options.reset
+            ? []
+            : this.tabs
+                  .filter(
+                      (tab) =>
+                          !isChildEntirelyVisibleWithinParent(
+                              tab.value.element,
+                              this._tabsList
+                          )
+                  )
+                  .map((x) => x.value.panel.id);
 
-        if (this._dropdownAnchor) {
-            this._dropdownAnchor.remove();
-            this._dropdownAnchor = null;
-        }
+        this._overflowTabs = tabs;
 
-        if (!show) {
+        if (this._overflowTabs.length > 0 && this.dropdownPart) {
+            this.dropdownPart.update({ tabs: tabs.length });
             return;
         }
 
-        this._dropdownAnchor = document.createElement('div');
-        this._dropdownAnchor.className = 'dv-tabs-overflow-handle';
+        if (this._overflowTabs.length === 0) {
+            this._dropdownDisposable.dispose();
+            return;
+        }
 
-        this.element.appendChild(this._dropdownAnchor);
+        const root = document.createElement('div');
+        root.className = 'dv-tabs-overflow-dropdown-root';
 
-        addDisposableListener(this._dropdownAnchor, 'click', (event) => {
-            const el = document.createElement('div');
-            el.style.overflow = 'auto';
-            el.className =
-                'dv-tabs-and-actions-container dv-tabs-container dv-tabs-overflow-container';
+        const part = createDropdownElementHandle();
+        part.update({ tabs: tabs.length });
 
-            this.tabs.map((tab) => {
-                const child = tab.value.element.cloneNode(true);
+        this.dropdownPart = part;
 
-                const wrapper = document.createElement('div');
+        root.appendChild(part.element);
+        this.element.appendChild(root);
 
-                wrapper.addEventListener('mousedown', () => {
-                    this.accessor.popupService.close();
-                    tab.value.element.scrollIntoView();
-                    tab.value.panel.api.setActive();
+        this._dropdownDisposable.value = new CompositeDisposable(
+            Disposable.from(() => {
+                root.remove();
+                this.dropdownPart?.dispose?.();
+                this.dropdownPart = null;
+            }),
+            addDisposableListener(
+                root,
+                'pointerdown',
+                (event) => {
+                    event.preventDefault();
+                },
+                { capture: true }
+            ),
+            addDisposableListener(root, 'click', (event) => {
+                const el = document.createElement('div');
+                el.style.overflow = 'auto';
+                el.className = 'dv-tabs-overflow-container';
+
+                this.tabs
+                    .filter((tab) =>
+                        this._overflowTabs.includes(tab.value.panel.id)
+                    )
+                    .map((tab) => {
+                        const panelObject = this.group.panels.find(
+                            (panel) => panel === tab.value.panel
+                        )!;
+
+                        const tabComponent =
+                            panelObject.view.createTabRenderer(
+                                'headerOverflow'
+                            );
+
+                        const child = tabComponent.element;
+
+                        const wrapper = document.createElement('div');
+                        toggleClass(wrapper, 'dv-tab', true);
+                        toggleClass(
+                            wrapper,
+                            'dv-active-tab',
+                            panelObject.api.isActive
+                        );
+                        toggleClass(
+                            wrapper,
+                            'dv-inactive-tab',
+                            !panelObject.api.isActive
+                        );
+
+                        wrapper.addEventListener('mousedown', () => {
+                            this.accessor.popupService.close();
+                            tab.value.element.scrollIntoView();
+                            tab.value.panel.api.setActive();
+                        });
+                        wrapper.appendChild(child);
+
+                        el.appendChild(wrapper);
+                    });
+
+                this.accessor.popupService.openPopover(el, {
+                    x: event.clientX,
+                    y: event.clientY,
                 });
-                wrapper.appendChild(child);
-
-                el.appendChild(wrapper);
-            });
-
-            this.accessor.popupService.openPopover(el, {
-                x: event.clientX,
-                y: event.clientY,
-            });
-        });
+            })
+        );
     }
 }

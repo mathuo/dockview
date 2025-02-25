@@ -11,9 +11,11 @@ export interface IGroupPanelBaseProps<T extends { [index: string]: any } = any>
     containerApi: DockviewApi;
 }
 
+export type TabLocation = 'header' | 'headerOverflow';
+
 export type IDockviewPanelHeaderProps<
     T extends { [index: string]: any } = any
-> = IGroupPanelBaseProps<T>;
+> = IGroupPanelBaseProps<T> & { tabLocation: TabLocation };
 
 export type IDockviewPanelProps<T extends { [index: string]: any } = any> =
     IGroupPanelBaseProps<T>;

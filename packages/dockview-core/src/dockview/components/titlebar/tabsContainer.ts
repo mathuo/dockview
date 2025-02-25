@@ -140,6 +140,7 @@ export class TabsContainer
         this._element.appendChild(this.rightActionsContainer);
 
         this.addDisposables(
+            this.tabs,
             this._onWillShowOverlay,
             this._onDrop,
             this._onGroupDragStart,
@@ -171,6 +172,10 @@ export class TabsContainer
                 this.voidContainer.element,
                 'pointerdown',
                 (event) => {
+                    if (event.defaultPrevented) {
+                        return;
+                    }
+
                     const isFloatingGroupsEnabled =
                         !this.accessor.options.disableFloatingGroups;
 

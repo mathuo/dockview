@@ -1,23 +1,93 @@
-.dv-tabs-container {
-    display: flex;
-    overflow-x: overlay;
-    overflow-y: hidden;
+.dv-tabs-panel {
+    overflow: hidden;
 
-    scrollbar-width: thin; // firefox
+    &.dv-horizontal {
+        .dv-tabs-container {
+            .dv-tab {
+                &:last-child {
+                    margin-right: 0;
+                }
 
-    &::-webkit-scrollbar {
-        height: 3px;
+                &:not(:nth-last-child(1)) {
+                    margin-left: 0;
+                }
+
+                &:not(:first-child)::before {
+                    content: ' ';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    z-index: 5;
+                    pointer-events: none;
+                    background-color: var(--dv-tab-divider-color);
+                    width: 1px;
+                    height: 100%;
+                }
+            }
+        }
     }
 
-    /* Track */
-    &::-webkit-scrollbar-track {
-        background: transparent;
+    .dv-tabs-container {
+        display: flex;
+        overflow: hidden;
+        scrollbar-width: thin; // firefox
+
+        &::-webkit-scrollbar {
+            height: 3px;
+        }
+
+        /* Track */
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        /* Handle */
+        &::-webkit-scrollbar-thumb {
+            background: var(--dv-tabs-container-scrollbar-color);
+        }
+
+        .dv-tab {
+            -webkit-user-drag: element;
+            outline: none;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            position: relative;
+            box-sizing: border-box;
+            font-size: var(--dv-tab-font-size);
+            margin: var(--dv-tab-margin);
+        }
     }
 
-    /* Handle */
-    &::-webkit-scrollbar-thumb {
-        background: var(--dv-tabs-container-scrollbar-color);
+    .dv-tabs-overflow-dropdown-default {
+        background-color: var(
+            --dv-activegroup-hiddenpanel-tab-background-color
+        );
+        height: 100%;
+        color: var(--dv-activegroup-hiddenpanel-tab-color);
+        border-left: 1px solid var(--dv-tab-divider-color);
+
+        margin: var(--dv-tab-margin);
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        padding: 0.25rem 0.5rem;
+        cursor: pointer;
+
+        > span {
+            padding-left: 0.25rem;
+        }
+
+        > svg {
+            transform: rotate(90deg);
+        }
     }
+}
+
+.dv-tabs-overflow-container {
+    flex-direction: column;
+    height: unset;
+    border: 1px solid var(--dv-tab-divider-color);
+    background-color: var(--dv-group-view-background-color);
 
     .dv-tab {
         -webkit-user-drag: element;
@@ -26,58 +96,24 @@
         cursor: pointer;
         position: relative;
         box-sizing: border-box;
-        font-size: var(-dv-tab-font-size);
+        font-size: var(--dv-tab-font-size);
         margin: var(--dv-tab-margin);
 
-        &:first-child {
-            margin-right: 0;
-        }
-
-        &:not(:nth-last-child(1)) {
-            margin-left: 0;
-        }
-
-        &:not(:first-child)::before {
-            content: ' ';
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 5;
-            pointer-events: none;
-            background-color: var(--dv-tab-divider-color);
-            width: 1px;
-            height: 100%;
+        &:not(:last-child) {
+            border-bottom: 1px solid var(--dv-tab-divider-color);
         }
     }
 
-    &.dv-tabs-overflow-container {
-        flex-direction: column;
-        height: unset;
-
-        .dv-tab {
-            height: var(--dv-tabs-and-actions-container-height);
-        }
-
-        .dv-active-tab {
-            background-color: var(
-                --dv-activegroup-visiblepanel-tab-background-color
-            );
-            color: var(--dv-activegroup-visiblepanel-tab-color);
-        }
-        .dv-inactive-tab {
-            background-color: var(
-                --dv-activegroup-hiddenpanel-tab-background-color
-            );
-            color: var(--dv-activegroup-hiddenpanel-tab-color);
-        }
+    .dv-active-tab {
+        background-color: var(
+            --dv-activegroup-visiblepanel-tab-background-color
+        );
+        color: var(--dv-activegroup-visiblepanel-tab-color);
     }
-}
-
-.dv-tabs-panel {
-    .dv-tabs-overflow-handle {
-        height: 100%;
-        width: 15px;
-        flex-shrink: 0;
-        background-color: red;
+    .dv-inactive-tab {
+        background-color: var(
+            --dv-activegroup-hiddenpanel-tab-background-color
+        );
+        color: var(--dv-activegroup-hiddenpanel-tab-color);
     }
 }

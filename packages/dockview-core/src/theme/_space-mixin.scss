@@ -4,8 +4,7 @@
     --dv-tab-margin: 0.5rem 0.25rem;
     --dv-tabs-and-actions-container-height: 44px;
 
-
-    --dv-border-radius 
+    --dv-border-radius: 20px;
 
     .dv-resize-container:has(> .dv-groupview) {
         border-radius: 8px;
@@ -27,20 +26,26 @@
         border: none;
     }
 
+    .dv-tabs-overflow-container,
+    .dv-tabs-overflow-dropdown-default {
+        border-radius: 8px;
+        height: unset !important;
+    }
+
+    .dv-tab {
+        border-radius: 8px;
+
+        .dv-svg {
+            height: 8px;
+            width: 8px;
+        }
+    }
+
     .dv-groupview {
         border-radius: var(--dv-border-radius);
 
         .dv-tabs-and-actions-container {
             padding: 0px calc(var(--dv-border-radius) / 2);
-
-            .dv-tab {
-                border-radius: 8px;
-
-                .dv-svg {
-                    height: 8px;
-                    width: 8px;
-                }
-            }
         }
 
         .dv-content-container {

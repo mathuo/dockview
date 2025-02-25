@@ -4,26 +4,28 @@ import {
     IContentRenderer,
     ITabRenderer,
 } from './types';
-import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDisposable } from '../lifecycle';
 import { IDockviewComponent } from './dockviewComponent';
 import { PanelUpdateEvent } from '../panel/types';
+import { TabLocation } from './framework';
 
 export interface IDockviewPanelModel extends IDisposable {
     readonly contentComponent: string;
     readonly tabComponent?: string;
     readonly content: IContentRenderer;
     readonly tab: ITabRenderer;
-    readonly newTab: ITabRenderer;
     update(event: PanelUpdateEvent): void;
     layout(width: number, height: number): void;
     init(params: GroupPanelPartInitParameters): void;
-    updateParentGroup(group: DockviewGroupPanel, isPanelVisible: boolean): void;
+    createTabRenderer(tabLocation: TabLocation): ITabRenderer;
 }
 
 export class DockviewPanelModel implements IDockviewPanelModel {
     private readonly _content: IContentRenderer;
     private readonly _tab: ITabRenderer;
+
+    private _params: GroupPanelPartInitParameters | undefined;
+    private _updateEvent: PanelUpdateEvent | undefined;
 
     get content(): IContentRenderer {
         return this._content;
@@ -43,21 +45,23 @@ export class DockviewPanelModel implements IDockviewPanelModel {
         this._tab = this.createTabComponent(this.id, tabComponent);
     }
 
-    get newTab() {
+    createTabRenderer(tabLocation: TabLocation): ITabRenderer {
         const cmp = this.createTabComponent(this.id, this.tabComponent);
+        if (this._params) {
+            cmp.init({ ...this._params, tabLocation });
+        }
+        if (this._updateEvent) {
+            cmp.update?.(this._updateEvent);
+        }
+
         return cmp;
     }
 
     init(params: GroupPanelPartInitParameters): void {
-        this.content.init(params);
-        this.tab.init(params);
-    }
+        this._params = params;
 
-    updateParentGroup(
-        _group: DockviewGroupPanel,
-        _isPanelVisible: boolean
-    ): void {
-        // noop
+        this.content.init(params);
+        this.tab.init({ ...params, tabLocation: 'header' });
     }
 
     layout(width: number, height: number): void {
@@ -65,6 +69,8 @@ export class DockviewPanelModel implements IDockviewPanelModel {
     }
 
     update(event: PanelUpdateEvent): void {
+        this._updateEvent = event;
+
         this.content.update?.(event);
         this.tab.update?.(event);
     }

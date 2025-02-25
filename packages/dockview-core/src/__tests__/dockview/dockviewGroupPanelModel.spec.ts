@@ -24,6 +24,7 @@ import { createOffsetDragOverEvent } from '../__test_utils__/utils';
 import { OverlayRenderContainer } from '../../overlay/overlayRenderContainer';
 import { Emitter } from '../../events';
 import { fromPartial } from '@total-typescript/shoehorn';
+import { TabLocation } from '../../dockview/framework';
 
 enum GroupChangeKind2 {
     ADD_PANEL,
@@ -36,10 +37,14 @@ class TestModel implements IDockviewPanelModel {
     readonly contentComponent: string;
     readonly tab: ITabRenderer;
 
-    constructor(id: string) {
+    constructor(readonly id: string) {
         this.content = new TestHeaderPart(id);
         this.contentComponent = id;
         this.tab = new TestContentPart(id);
+    }
+
+    copyTabComponent(tabLocation: TabLocation): ITabRenderer {
+        return new TestHeaderPart(this.id);
     }
 
     update(event: PanelUpdateEvent): void {
