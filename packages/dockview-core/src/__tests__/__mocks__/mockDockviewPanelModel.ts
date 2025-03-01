@@ -18,7 +18,7 @@ export class DockviewPanelModelMock implements IDockviewPanelModel {
         //
     }
 
-    copyTabComponent(tabLocation: TabLocation): ITabRenderer {
+    createTabRenderer(tabLocation: TabLocation): ITabRenderer {
         return this.tab;
     }
 

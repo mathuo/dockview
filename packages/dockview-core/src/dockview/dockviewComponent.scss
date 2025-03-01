@@ -19,7 +19,7 @@
 .dv-groupview {
     &.dv-active-group {
         > .dv-tabs-and-actions-container
-            > .dv-tabs-panel
+            > .dv-scrollable
             > .dv-tabs-container
             > .dv-tab {
             &.dv-active-tab {
@@ -38,7 +38,7 @@
     }
     &.dv-inactive-group {
         > .dv-tabs-and-actions-container
-            > .dv-tabs-panel
+            > .dv-scrollable
             > .dv-tabs-container
             > .dv-tab {
             &.dv-active-tab {

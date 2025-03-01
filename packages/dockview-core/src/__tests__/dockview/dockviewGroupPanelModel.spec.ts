@@ -43,7 +43,7 @@ class TestModel implements IDockviewPanelModel {
         this.tab = new TestContentPart(id);
     }
 
-    copyTabComponent(tabLocation: TabLocation): ITabRenderer {
+    createTabRenderer(tabLocation: TabLocation): ITabRenderer {
         return new TestHeaderPart(this.id);
     }
 

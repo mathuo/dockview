@@ -1,6 +1,5 @@
-.dv-tabs-panel {
+.dv-tabs-container {
     overflow: hidden;
-
     &.dv-horizontal {
         .dv-tabs-container {
             .dv-tab {
@@ -27,61 +26,37 @@
         }
     }
 
-    .dv-tabs-container {
-        display: flex;
-        overflow: hidden;
-        scrollbar-width: thin; // firefox
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+    scrollbar-width: thin; // firefox
 
-        &::-webkit-scrollbar {
-            height: 3px;
-        }
-
-        /* Track */
-        &::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        /* Handle */
-        &::-webkit-scrollbar-thumb {
-            background: var(--dv-tabs-container-scrollbar-color);
-        }
-
-        .dv-tab {
-            -webkit-user-drag: element;
-            outline: none;
-            padding: 0.25rem 0.5rem;
-            cursor: pointer;
-            position: relative;
-            box-sizing: border-box;
-            font-size: var(--dv-tab-font-size);
-            margin: var(--dv-tab-margin);
-        }
+    &::-webkit-scrollbar {
+        height: 3px;
     }
 
-    .dv-tabs-overflow-dropdown-default {
-        background-color: var(
-            --dv-activegroup-hiddenpanel-tab-background-color
-        );
-        height: 100%;
-        color: var(--dv-activegroup-hiddenpanel-tab-color);
-        border-left: 1px solid var(--dv-tab-divider-color);
+    /* Track */
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
 
-        margin: var(--dv-tab-margin);
-        display: flex;
-        align-items: center;
-        flex-shrink: 0;
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+        background: var(--dv-tabs-container-scrollbar-color);
+    }
+
+    .dv-tab {
+        -webkit-user-drag: element;
+        outline: none;
         padding: 0.25rem 0.5rem;
         cursor: pointer;
-
-        > span {
-            padding-left: 0.25rem;
-        }
-
-        > svg {
-            transform: rotate(90deg);
-        }
+        position: relative;
+        box-sizing: border-box;
+        font-size: var(--dv-tab-font-size);
+        margin: var(--dv-tab-margin);
     }
 }
+
 
 .dv-tabs-overflow-container {
     flex-direction: column;

@@ -133,11 +133,15 @@ describe('dockviewComponent', () => {
             },
             className: 'test-a test-b',
         });
-        expect(dockview.element.className).toBe('test-a test-b dockview-theme-abyss');
+        expect(dockview.element.className).toBe(
+            'test-a test-b dockview-theme-abyss'
+        );
 
         dockview.updateOptions({ className: 'test-b test-c' });
 
-        expect(dockview.element.className).toBe('dockview-theme-abyss test-b test-c');
+        expect(dockview.element.className).toBe(
+            'dockview-theme-abyss test-b test-c'
+        );
     });
 
     describe('memory leakage', () => {
@@ -2453,17 +2457,17 @@ describe('dockviewComponent', () => {
         const group = dockview.getGroupPanel('panel2')!.api.group;
 
         const viewQuery = group.element.querySelectorAll(
-            '.dv-groupview > .dv-tabs-and-actions-container > .dv-tabs-panel > .dv-tabs-container > .dv-tab'
+            '.dv-groupview > .dv-tabs-and-actions-container > .dv-scrollable > .dv-tabs-container > .dv-tab'
         );
         expect(viewQuery.length).toBe(2);
 
         const viewQuery2 = group.element.querySelectorAll(
-            '.dv-groupview > .dv-tabs-and-actions-container > .dv-tabs-panel > .dv-tabs-container > .dv-tab > .dv-default-tab'
+            '.dv-groupview > .dv-tabs-and-actions-container > .dv-scrollable > .dv-tabs-container > .dv-tab > .dv-default-tab'
         );
         expect(viewQuery2.length).toBe(1);
 
         const viewQuery3 = group.element.querySelectorAll(
-            '.dv-groupview > .dv-tabs-and-actions-container > .dv-tabs-panel > .dv-tabs-container > .dv-tab > .panel-tab-part-panel2'
+            '.dv-groupview > .dv-tabs-and-actions-container > .dv-scrollable > .dv-tabs-container > .dv-tab > .panel-tab-part-panel2'
         );
         expect(viewQuery3.length).toBe(1);
     });
