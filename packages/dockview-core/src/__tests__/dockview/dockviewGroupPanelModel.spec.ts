@@ -270,6 +270,7 @@ describe('dockviewGroupPanelModel', () => {
                 document.createElement('div'),
                 fromPartial<DockviewComponent>({})
             ),
+            onDidOptionsChange: () => ({ dispose: jest.fn() }),
         });
 
         groupview = new DockviewGroupPanel(dockview, 'groupview-1', options);
@@ -651,6 +652,7 @@ describe('dockviewGroupPanelModel', () => {
             getPanel: jest.fn(),
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -713,6 +715,7 @@ describe('dockviewGroupPanelModel', () => {
             getPanel: jest.fn(),
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -809,6 +812,7 @@ describe('dockviewGroupPanelModel', () => {
                 document.createElement('div'),
                 fromPartial<DockviewComponent>({})
             ),
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupView = fromPartial<DockviewGroupPanelModel>({
@@ -875,6 +879,7 @@ describe('dockviewGroupPanelModel', () => {
                 document.createElement('div'),
                 fromPartial<DockviewComponent>({})
             ),
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -948,6 +953,7 @@ describe('dockviewGroupPanelModel', () => {
                 document.createElement('div'),
                 fromPartial<DockviewComponent>({})
             ),
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(

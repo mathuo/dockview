@@ -140,11 +140,7 @@ export class TabsContainer
         this.preActionsContainer.className = 'dv-pre-actions-container';
 
         this.tabs = new Tabs(group, accessor, {
-            showTabsOverflowControl: false,
-        });
-
-        this.tabs.onOverflowTabsChange((event) => {
-            this.toggleDropdown(event);
+            showTabsOverflowControl: !accessor.options.disableTabsOverflowList,
         });
 
         this.voidContainer = new VoidContainer(this.accessor, this.group);
@@ -156,6 +152,13 @@ export class TabsContainer
         this._element.appendChild(this.rightActionsContainer);
 
         this.addDisposables(
+            accessor.onDidOptionsChange(() => {
+                this.tabs.showTabsOverflowControl =
+                    !accessor.options.disableTabsOverflowList;
+            }),
+            this.tabs.onOverflowTabsChange((event) => {
+                this.toggleDropdown(event);
+            }),
             this.tabs,
             this._onWillShowOverlay,
             this._onDrop,
@@ -348,42 +351,40 @@ export class TabsContainer
                 el.style.overflow = 'auto';
                 el.className = 'dv-tabs-overflow-container';
 
-                this.tabs.tabs
-                    .filter((tab) => this._overflowTabs.includes(tab.panel.id))
-                    .map((tab) => {
-                        const panelObject = this.group.panels.find(
-                            (panel) => panel === tab.panel
-                        )!;
+                for (const tab of this.tabs.tabs.filter((tab) =>
+                    this._overflowTabs.includes(tab.panel.id)
+                )) {
+                    const panelObject = this.group.panels.find(
+                        (panel) => panel === tab.panel
+                    )!;
 
-                        const tabComponent =
-                            panelObject.view.createTabRenderer(
-                                'headerOverflow'
-                            );
+                    const tabComponent =
+                        panelObject.view.createTabRenderer('headerOverflow');
 
-                        const child = tabComponent.element;
+                    const child = tabComponent.element;
 
-                        const wrapper = document.createElement('div');
-                        toggleClass(wrapper, 'dv-tab', true);
-                        toggleClass(
-                            wrapper,
-                            'dv-active-tab',
-                            panelObject.api.isActive
-                        );
-                        toggleClass(
-                            wrapper,
-                            'dv-inactive-tab',
-                            !panelObject.api.isActive
-                        );
+                    const wrapper = document.createElement('div');
+                    toggleClass(wrapper, 'dv-tab', true);
+                    toggleClass(
+                        wrapper,
+                        'dv-active-tab',
+                        panelObject.api.isActive
+                    );
+                    toggleClass(
+                        wrapper,
+                        'dv-inactive-tab',
+                        !panelObject.api.isActive
+                    );
 
-                        wrapper.addEventListener('mousedown', () => {
-                            this.accessor.popupService.close();
-                            tab.element.scrollIntoView();
-                            tab.panel.api.setActive();
-                        });
-                        wrapper.appendChild(child);
-
-                        el.appendChild(wrapper);
+                    wrapper.addEventListener('mousedown', () => {
+                        this.accessor.popupService.close();
+                        tab.element.scrollIntoView();
+                        tab.panel.api.setActive();
                     });
+                    wrapper.appendChild(child);
+
+                    el.appendChild(wrapper);
+                }
 
                 this.accessor.popupService.openPopover(el, {
                     x: event.clientX,

@@ -330,6 +330,9 @@ export class DockviewComponent
     readonly onDidAddGroup: Event<DockviewGroupPanel> =
         this._onDidAddGroup.event;
 
+    private readonly _onDidOptionsChange = new Emitter<void>();
+    readonly onDidOptionsChange: Event<void> = this._onDidOptionsChange.event;
+
     private readonly _onDidActiveGroupChange = new Emitter<
         DockviewGroupPanel | undefined
     >();
@@ -434,6 +437,7 @@ export class DockviewComponent
             this._onDidActiveGroupChange,
             this._onUnhandledDragOverEvent,
             this._onDidMaximizedGroupChange,
+            this._onDidOptionsChange,
             this.onDidViewVisibilityChangeMicroTaskQueue(() => {
                 this.updateWatermark();
             }),

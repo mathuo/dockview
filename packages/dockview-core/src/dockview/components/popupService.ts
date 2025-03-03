@@ -8,7 +8,7 @@ import {
 export class PopupService extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private _active: HTMLElement | null = null;
-    private _activeDisposable = new MutableDisposable();
+    private readonly _activeDisposable = new MutableDisposable();
 
     constructor(private readonly root: HTMLElement) {
         super();

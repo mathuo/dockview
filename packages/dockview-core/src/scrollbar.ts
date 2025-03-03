@@ -4,11 +4,11 @@ import { CompositeDisposable } from './lifecycle';
 import { clamp } from './math';
 
 export class Scrollbar extends CompositeDisposable {
-    private _element: HTMLElement;
-    private _horizontalScrollbar: HTMLElement;
+    private readonly _element: HTMLElement;
+    private readonly _horizontalScrollbar: HTMLElement;
     private _scrollLeft: number = 0;
     private _animationTimer: any;
-    static MouseWheelSpeed = 1;
+    public static MouseWheelSpeed = 1;
 
     get element(): HTMLElement {
         return this._element;
