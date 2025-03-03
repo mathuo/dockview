@@ -75,8 +75,9 @@ import {
 } from '../overlay/overlayRenderContainer';
 import { PopoutWindow } from '../popoutWindow';
 import { StrictEventsSequencing } from './strictEventsSequencing';
+import { PopupService } from './components/popupService';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
-import { DockviewTheme, themeAbyss } from './theme';
+import { themeAbyss } from './theme';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     activationSize: { type: 'pixels', value: 10 },
@@ -263,6 +264,7 @@ export class DockviewComponent
     private readonly _themeClassnames: Classnames;
 
     readonly overlayRenderContainer: OverlayRenderContainer;
+    readonly popupService: PopupService;
     readonly rootDropTargetContainer: DropTargetAnchorContainer;
 
     private readonly _onWillDragPanel = new Emitter<TabDragEvent>();
@@ -328,6 +330,9 @@ export class DockviewComponent
     readonly onDidAddGroup: Event<DockviewGroupPanel> =
         this._onDidAddGroup.event;
 
+    private readonly _onDidOptionsChange = new Emitter<void>();
+    readonly onDidOptionsChange: Event<void> = this._onDidOptionsChange.event;
+
     private readonly _onDidActiveGroupChange = new Emitter<
         DockviewGroupPanel | undefined
     >();
@@ -392,6 +397,8 @@ export class DockviewComponent
             className: options.className,
         });
 
+        this.popupService = new PopupService(this.element);
+
         this.updateDropTargetModel(options);
 
         this._themeClassnames = new Classnames(this.element);
@@ -430,6 +437,7 @@ export class DockviewComponent
             this._onDidActiveGroupChange,
             this._onUnhandledDragOverEvent,
             this._onDidMaximizedGroupChange,
+            this._onDidOptionsChange,
             this.onDidViewVisibilityChangeMicroTaskQueue(() => {
                 this.updateWatermark();
             }),

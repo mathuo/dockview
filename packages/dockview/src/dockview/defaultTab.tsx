@@ -35,6 +35,7 @@ export const DockviewDefaultTab: React.FunctionComponent<
     onPointerDown,
     onPointerUp,
     onPointerLeave,
+    tabLocation,
     ...rest
 }) => {
     const title = useTitle(api);
@@ -96,7 +97,7 @@ export const DockviewDefaultTab: React.FunctionComponent<
             className="dv-default-tab"
         >
             <span className="dv-default-tab-content">{title}</span>
-            {!hideClose && (
+            {!hideClose && tabLocation !== 'headerOverflow' && (
                 <div
                     className="dv-default-tab-action"
                     onPointerDown={onBtnPointerDown}

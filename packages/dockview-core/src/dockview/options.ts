@@ -72,6 +72,7 @@ export interface DockviewOptions {
      */
     noPanelsOverlay?: 'emptyGroup' | 'watermark';
     theme?: DockviewTheme;
+    disableTabsOverflowList?: boolean;
 }
 
 export interface DockviewDndOverlayEvent extends IAcceptableEvent {
@@ -119,6 +120,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         dndEdges: undefined,
         theme: undefined,
         gap: undefined,
+        disableTabsOverflowList: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];

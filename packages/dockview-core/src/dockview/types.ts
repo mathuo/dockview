@@ -4,6 +4,7 @@ import { DockviewApi } from '../api/component.api';
 import { Optional } from '../types';
 import { IDockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
+import { TabLocation } from './framework';
 
 export interface HeaderPartInitParameters {
     title: string;
@@ -34,10 +35,14 @@ export interface IWatermarkRenderer
     init: (params: WatermarkRendererInitParameters) => void;
 }
 
+export interface TabPartInitParameters extends GroupPanelPartInitParameters {
+    tabLocation: TabLocation;
+}
+
 export interface ITabRenderer
     extends Optional<Omit<IPanel, 'id'>, RendererMethodOptionalList> {
     readonly element: HTMLElement;
-    init(parameters: GroupPanelPartInitParameters): void;
+    init(parameters: TabPartInitParameters): void;
 }
 
 export interface IContentRenderer

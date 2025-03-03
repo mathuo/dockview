@@ -16,6 +16,7 @@ describe('dockviewGroupPanel', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
+            onDidOptionsChange: jest.fn(),
         });
         const options = fromPartial<GroupOptions>({});
         const cut = new DockviewGroupPanel(accessor, 'test_id', options);
@@ -39,6 +40,7 @@ describe('dockviewGroupPanel', () => {
                 detatch: jest.fn(),
             },
             doSetGroupActive: jest.fn(),
+            onDidOptionsChange: jest.fn(),
         });
         const options = fromPartial<GroupOptions>({});
 
@@ -81,6 +83,7 @@ describe('dockviewGroupPanel', () => {
                 detatch: jest.fn(),
             }),
             options: {},
+            onDidOptionsChange: jest.fn(),
         });
         const options = fromPartial<GroupOptions>({});
         const cut = new DockviewGroupPanel(accessor, 'test_id', options);

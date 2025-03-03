@@ -3,13 +3,13 @@ import { ReactPart, ReactPortalStore } from '../react';
 import {
     PanelUpdateEvent,
     ITabRenderer,
-    GroupPanelPartInitParameters,
-    IGroupPanelBaseProps,
+    TabPartInitParameters,
+    IDockviewPanelHeaderProps,
 } from 'dockview-core';
 
 export class ReactPanelHeaderPart implements ITabRenderer {
     private readonly _element: HTMLElement;
-    private part?: ReactPart<IGroupPanelBaseProps>;
+    private part?: ReactPart<IDockviewPanelHeaderProps>;
 
     get element(): HTMLElement {
         return this._element;
@@ -17,7 +17,7 @@ export class ReactPanelHeaderPart implements ITabRenderer {
 
     constructor(
         public readonly id: string,
-        private readonly component: React.FunctionComponent<IGroupPanelBaseProps>,
+        private readonly component: React.FunctionComponent<IDockviewPanelHeaderProps>,
         private readonly reactPortalStore: ReactPortalStore
     ) {
         this._element = document.createElement('div');
@@ -30,7 +30,7 @@ export class ReactPanelHeaderPart implements ITabRenderer {
         //noop
     }
 
-    public init(parameters: GroupPanelPartInitParameters): void {
+    public init(parameters: TabPartInitParameters): void {
         this.part = new ReactPart(
             this.element,
             this.reactPortalStore,
@@ -39,6 +39,7 @@ export class ReactPanelHeaderPart implements ITabRenderer {
                 params: parameters.params,
                 api: parameters.api,
                 containerApi: parameters.containerApi,
+                tabLocation: parameters.tabLocation,
             }
         );
     }
