@@ -180,7 +180,7 @@ const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
                 onReady={onReady}
                 className={`${props.theme || 'dockview-theme-abyss'}`}
                 onDidDrop={onDidDrop}
-                rootOverlayModel={{
+                dndEdges={{
                     size: { value: 100, type: 'pixels' },
                     activationSize: { value: 5, type: 'percentage' },
                 }}

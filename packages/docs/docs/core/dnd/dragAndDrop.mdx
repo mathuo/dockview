@@ -24,12 +24,12 @@ The dock makes heavy use of drag and drop functionalities.
 
 # Drag And Drop
 
-You can override the conditions of the far edge overlays through the `rootOverlayModel` prop.
+You can override the conditions of the far edge overlays through the `dndEdges` prop.
 
 ```tsx
 <DockviewReact
   {...props}
-   rootOverlayModel={{
+   dndEdges={{
     size: { value: 100, type: 'pixels' },
     activationSize: { value: 5, type: 'percentage' },
   }}
