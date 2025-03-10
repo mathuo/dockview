@@ -46,6 +46,7 @@ describe('componentSplitview', () => {
         splitview.dispose();
 
         expect(container.parentElement).toBe(root);
+        expect(container.children.length).toBe(0);
     });
 
     test('event leakage', () => {
