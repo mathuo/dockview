@@ -52,10 +52,6 @@ export interface DockviewOptions {
           };
     popoutUrl?: string;
     defaultRenderer?: DockviewPanelRenderer;
-    /**
-     * @deprecated dockview: dockviewComponent.gap has been deprecated. Use `theme` instead. This will be removed in a future version.
-     */
-    gap?: number;
     debug?: boolean;
     // #start dnd
     dndEdges?: false | DroptargetOverlayModel;
@@ -119,7 +115,6 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         noPanelsOverlay: undefined,
         dndEdges: undefined,
         theme: undefined,
-        gap: undefined,
         disableTabsOverflowList: undefined,
     };
 

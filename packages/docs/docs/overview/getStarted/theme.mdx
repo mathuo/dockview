@@ -34,8 +34,20 @@ Firstly, you should import `dockview.css`:
 
 ## Provided themes
 
-`dockview` comes with a number of themes which are all CSS classes and can be found [here](https://github.com/mathuo/dockview/blob/master/packages/dockview-core/src/theme.scss).
-To use a `dockview` theme the CSS must encapsulate the component. The current list of themes is:
+`dockview` comes with a number of built-in themes. Each theme is represented as an object that can be imported.
+
+For dock components you should pass the theme object to the `theme` property, for other components such as split, pane and grid views you should
+use set the themes associated CSS class to the `className` property.
+
+```tsx
+import { themeAbyss } from "dockview";
+
+// For dock components
+theme={themeAbyss}
+
+// For other components
+const {className} = themeAbyss;
+```
 
 <ThemeTable/>
 

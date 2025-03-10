@@ -12,43 +12,43 @@ import {
 export const themeConfig = [
     {
         id: themeDark,
-        key: '**[dockview-theme-dark](/demo?theme=dockview-theme-dark)**',
+        key: '**[Dark](/demo?theme=dark)**',
         text: '',
     },
     {
         id: themeLight,
-        key: '**[dockview-theme-light](/demo?theme=dockview-theme-light)**',
+        key: '**[Light](/demo?theme=light)**',
         text: '',
     },
     {
         id: themeVisualStudio,
-        key: '**[dockview-theme-vs](/demo?theme=dockview-theme-vs)**',
+        key: '**[Visual Studio](/demo?theme=visualStudio)**',
 
         text: 'Based on [Visual Studio](https://visualstudio.microsoft.com)',
     },
     {
         id: themeAbyss,
-        key: '**[dockview-theme-abyss](/demo?theme=dockview-theme-abyss)**',
+        key: '**[Abyss](/demo?theme=abyss)**',
         text: 'Based on [Visual Studio Code](https://code.visualstudio.com/docs/getstarted/themes) abyss theme',
     },
     {
         id: themeDracula,
-        key: '**[dockview-theme-dracula](/demo?theme=dockview-theme-dracula)**',
+        key: '**[Dracula](/demo?theme=dracula)**',
         text: 'Based on [Visual Studio Code](https://code.visualstudio.com/docs/getstarted/themes) dracula theme',
     },
     {
         id: themeReplit,
-        key: '**[dockview-theme-replit](/demo?theme=dockview-theme-replit)**',
+        key: '**[Replit](/demo?theme=replit)**',
         text: 'Based on  [Replit](https://replit.com)',
     },
     {
         id: themeLightSpaced,
-        key: '**[dockview-theme-replit](/demo?theme=dockview-theme-kraken)**',
+        key: '**[Light Spaced](/demo?theme=lightSpaced)**',
         text: '',
     },
     {
         id: themeAbyssSpaced,
-        key: '**[dockview-theme-replit](/demo?theme=dockview-theme-kraken)**',
+        key: '**[Abyss Spaced](/demo?theme=abyssSpaced)**',
         text: '',
     },
 ];

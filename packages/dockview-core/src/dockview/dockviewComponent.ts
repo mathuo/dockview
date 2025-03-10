@@ -195,10 +195,6 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly totalPanels: number;
     readonly panels: IDockviewPanel[];
     readonly orientation: Orientation;
-    /**
-     * @deprecated use `theme` instead. This will be removed in a future version
-     */
-    readonly gap: number;
     readonly onDidDrop: Event<DockviewDidDropEvent>;
     readonly onWillDrop: Event<DockviewWillDropEvent>;
     readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent>;
@@ -371,13 +367,6 @@ export class DockviewComponent
 
     get api(): DockviewApi {
         return this._api;
-    }
-
-    get gap(): number {
-        console.warn(
-            'dockview: dockviewComponent.gap has been deprecated. Use `theme` instead. This will be removed in a future version.'
-        );
-        return this.gridview.margin;
     }
 
     get floatingGroups(): DockviewFloatingGroupPanel[] {
@@ -1179,13 +1168,6 @@ export class DockviewComponent
 
     override updateOptions(options: Partial<DockviewComponentOptions>): void {
         super.updateOptions(options);
-
-        if ('gap' in options) {
-            console.warn(
-                'dockview: dockviewComponent.setGap has been deprecated. Use `theme` instead. This will be removed in a future version.'
-            );
-            this.gridview.margin = options.gap ?? 0;
-        }
 
         if ('floatingGroupBounds' in options) {
             for (const group of this._floatingGroups) {

@@ -629,19 +629,6 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.totalPanels;
     }
 
-    /**
-     * @deprecated dockview: dockviewComponent.gap has been deprecated. Use `theme` instead. This will be removed in a future version.
-     */
-    get gap(): number {
-        return this.component.gap;
-    }
-
-    /**
-     * @deprecated dockview: dockviewComponent.setGap has been deprecated. Use `theme` instead. This will be removed in a future version.
-     */
-    setGap(gap: number | undefined): void {
-        this.component.updateOptions({ gap: gap });
-    }
 
     /**
      * Invoked when the active group changes. May be undefined if no group is active.

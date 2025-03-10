@@ -69,6 +69,8 @@
     //
     --dv-separator-border: rgba(128, 128, 128, 0.35);
     --dv-paneview-header-border-color: rgb(51, 51, 51);
+
+    --dv-scrollbar-background-color: rgba(0, 0, 0, 0.25);
 }
 
 .dockview-theme-dark {
@@ -214,19 +216,21 @@
     .dv-groupview {
         &.dv-active-group {
             > .dv-tabs-and-actions-container {
-                > .dv-tabs-container {
-                    > .dv-tab.dv-active-tab {
-                        position: relative;
+                > .dv-scrollable {
+                    > .dv-tabs-container {
+                        > .dv-tab.dv-active-tab {
+                            position: relative;
 
-                        &::after {
-                            position: absolute;
-                            left: 0px;
-                            top: 0px;
-                            content: '';
-                            width: 100%;
-                            height: 1px;
-                            background-color: #94527e;
-                            z-index: 999;
+                            &::after {
+                                position: absolute;
+                                left: 0px;
+                                top: 0px;
+                                content: '';
+                                width: 100%;
+                                height: 1px;
+                                background-color: #94527e;
+                                z-index: 999;
+                            }
                         }
                     }
                 }
@@ -234,19 +238,21 @@
         }
         &.dv-inactive-group {
             > .dv-tabs-and-actions-container {
-                > .dv-tabs-container {
-                    > .dv-tab.dv-active-tab {
-                        position: relative;
+                > .dv-scrollable {
+                    > .dv-tabs-container {
+                        > .dv-tab.dv-active-tab {
+                            position: relative;
 
-                        &::after {
-                            position: absolute;
-                            left: 0px;
-                            bottom: 0px;
-                            content: '';
-                            width: 100%;
-                            height: 1px;
-                            background-color: #5e3d5a;
-                            z-index: 999;
+                            &::after {
+                                position: absolute;
+                                left: 0px;
+                                bottom: 0px;
+                                content: '';
+                                width: 100%;
+                                height: 1px;
+                                background-color: #5e3d5a;
+                                z-index: 999;
+                            }
                         }
                     }
                 }
@@ -443,6 +449,8 @@
 
     padding: 10px;
     background-color: #f6f5f9;
+
+    --dv-scrollbar-background-color: rgba(0, 0, 0, 0.25);
 
     .dv-resize-container {
         .dv-groupview {
