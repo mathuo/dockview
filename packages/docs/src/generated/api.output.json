@@ -1832,20 +1832,6 @@
                 }
             },
             {
-                "name": "gap",
-                "code": "number",
-                "kind": "accessor",
-                "value": {
-                    "name": "gap",
-                    "code": "number",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "intrinsic",
-                        "value": "number"
-                    }
-                }
-            },
-            {
                 "name": "groups",
                 "code": "DockviewGroupPanel[]",
                 "kind": "accessor",
@@ -2509,7 +2495,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked before a group is dragged.\n\nCalling "
+                                "text": "Invoked before a group is dragged.\r\n\r\nCalling "
                             },
                             {
                                 "kind": "code",
@@ -2540,7 +2526,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked before a group is dragged.\n\nCalling "
+                            "text": "Invoked before a group is dragged.\r\n\r\nCalling "
                         },
                         {
                             "kind": "code",
@@ -2563,7 +2549,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked before a panel is dragged.\n\nCalling "
+                                "text": "Invoked before a panel is dragged.\r\n\r\nCalling "
                             },
                             {
                                 "kind": "code",
@@ -2594,7 +2580,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked before a panel is dragged.\n\nCalling "
+                            "text": "Invoked before a panel is dragged.\r\n\r\nCalling "
                         },
                         {
                             "kind": "code",
@@ -2617,7 +2603,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\nprevent the event from occuring using the standard "
+                                "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\r\nprevent the event from occuring using the standard "
                             },
                             {
                                 "kind": "code",
@@ -2625,7 +2611,7 @@
                             },
                             {
                                 "kind": "text",
-                                "text": " syntax.\n\nPreventing certain events may causes unexpected behaviours, use carefully."
+                                "text": " syntax.\r\n\r\nPreventing certain events may causes unexpected behaviours, use carefully."
                             }
                         ]
                     },
@@ -2648,7 +2634,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\nprevent the event from occuring using the standard "
+                            "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\r\nprevent the event from occuring using the standard "
                         },
                         {
                             "kind": "code",
@@ -2656,7 +2642,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": " syntax.\n\nPreventing certain events may causes unexpected behaviours, use carefully."
+                            "text": " syntax.\r\n\r\nPreventing certain events may causes unexpected behaviours, use carefully."
                         }
                     ]
                 }
@@ -2671,7 +2657,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked before an overlay is shown indicating a drop target.\n\nCalling "
+                                "text": "Invoked before an overlay is shown indicating a drop target.\r\n\r\nCalling "
                             },
                             {
                                 "kind": "code",
@@ -2679,7 +2665,7 @@
                             },
                             {
                                 "kind": "text",
-                                "text": " will prevent the overlay being shown and prevent\nthe any subsequent drop event."
+                                "text": " will prevent the overlay being shown and prevent\r\nthe any subsequent drop event."
                             }
                         ]
                     },
@@ -2702,7 +2688,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked before an overlay is shown indicating a drop target.\n\nCalling "
+                            "text": "Invoked before an overlay is shown indicating a drop target.\r\n\r\nCalling "
                         },
                         {
                             "kind": "code",
@@ -2710,7 +2696,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": " will prevent the overlay being shown and prevent\nthe any subsequent drop event."
+                            "text": " will prevent the overlay being shown and prevent\r\nthe any subsequent drop event."
                         }
                     ]
                 }
@@ -2906,7 +2892,7 @@
             },
             {
                 "name": "addGroup",
-                "code": "(options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition): DockviewGroupPanel",
+                "code": "(options?: GroupOptions & AbsolutePosition | GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup): DockviewGroupPanel",
                 "kind": "method",
                 "signature": [
                     {
@@ -2923,10 +2909,25 @@
                         "parameters": [
                             {
                                 "name": "options",
-                                "code": "options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition",
+                                "code": "options?: GroupOptions & AbsolutePosition | GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup",
                                 "type": {
                                     "type": "or",
                                     "values": [
+                                        {
+                                            "type": "intersection",
+                                            "values": [
+                                                {
+                                                    "type": "reference",
+                                                    "value": "GroupOptions",
+                                                    "source": "dockview-core"
+                                                },
+                                                {
+                                                    "type": "reference",
+                                                    "value": "AbsolutePosition",
+                                                    "source": "dockview-core"
+                                                }
+                                            ]
+                                        },
                                         {
                                             "type": "intersection",
                                             "values": [
@@ -2956,21 +2957,6 @@
                                                     "source": "dockview-core"
                                                 }
                                             ]
-                                        },
-                                        {
-                                            "type": "intersection",
-                                            "values": [
-                                                {
-                                                    "type": "reference",
-                                                    "value": "GroupOptions",
-                                                    "source": "dockview-core"
-                                                },
-                                                {
-                                                    "type": "reference",
-                                                    "value": "AbsolutePosition",
-                                                    "source": "dockview-core"
-                                                }
-                                            ]
                                         }
                                     ]
                                 },
@@ -2982,7 +2968,7 @@
                             "value": "DockviewGroupPanel",
                             "source": "dockview-core"
                         },
-                        "code": "(options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition): DockviewGroupPanel",
+                        "code": "(options?: GroupOptions & AbsolutePosition | GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup): DockviewGroupPanel",
                         "kind": "callSignature"
                     }
                 ],
@@ -3937,43 +3923,6 @@
                 }
             },
             {
-                "name": "setGap",
-                "code": "(gap: number | undefined): void",
-                "kind": "method",
-                "signature": [
-                    {
-                        "name": "setGap",
-                        "typeParameters": [],
-                        "parameters": [
-                            {
-                                "name": "gap",
-                                "code": "gap: number | undefined",
-                                "type": {
-                                    "type": "or",
-                                    "values": [
-                                        {
-                                            "type": "intrinsic",
-                                            "value": "number"
-                                        },
-                                        {
-                                            "type": "intrinsic",
-                                            "value": "undefined"
-                                        }
-                                    ]
-                                },
-                                "kind": "parameter"
-                            }
-                        ],
-                        "returnType": {
-                            "type": "intrinsic",
-                            "value": "void"
-                        },
-                        "code": "(gap: number | undefined): void",
-                        "kind": "callSignature"
-                    }
-                ]
-            },
-            {
                 "name": "toJSON",
                 "code": "(): SerializedDockview",
                 "kind": "method",
@@ -4432,6 +4381,25 @@
                 }
             },
             {
+                "name": "onDidOptionsChange",
+                "code": "Event<void>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "intrinsic",
+                            "value": "void"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "onDidRemove",
                 "code": "Event<DockviewGroupPanel>",
                 "kind": "property",
@@ -4624,6 +4592,32 @@
                 }
             },
             {
+                "name": "popupService",
+                "code": "PopupService",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "PopupService",
+                    "source": "dockview-core"
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "rootDropTargetContainer",
+                "code": "DropTargetAnchorContainer",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "DropTargetAnchorContainer",
+                    "source": "dockview-core"
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "activeGroup",
                 "code": "BaseGrid.T | undefined",
                 "kind": "accessor",
@@ -4731,20 +4725,6 @@
                             "value": "DockviewFloatingGroupPanel",
                             "source": "dockview-core"
                         }
-                    }
-                }
-            },
-            {
-                "name": "gap",
-                "code": "number",
-                "kind": "accessor",
-                "value": {
-                    "name": "gap",
-                    "code": "number",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "intrinsic",
-                        "value": "number"
                     }
                 }
             },
@@ -5067,7 +5047,7 @@
             },
             {
                 "name": "addGroup",
-                "code": "(options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition): DockviewGroupPanel",
+                "code": "(options?: GroupOptions & AbsolutePosition | GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup): DockviewGroupPanel",
                 "kind": "method",
                 "signature": [
                     {
@@ -5076,10 +5056,25 @@
                         "parameters": [
                             {
                                 "name": "options",
-                                "code": "options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition",
+                                "code": "options?: GroupOptions & AbsolutePosition | GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup",
                                 "type": {
                                     "type": "or",
                                     "values": [
+                                        {
+                                            "type": "intersection",
+                                            "values": [
+                                                {
+                                                    "type": "reference",
+                                                    "value": "GroupOptions",
+                                                    "source": "dockview-core"
+                                                },
+                                                {
+                                                    "type": "reference",
+                                                    "value": "AbsolutePosition",
+                                                    "source": "dockview-core"
+                                                }
+                                            ]
+                                        },
                                         {
                                             "type": "intersection",
                                             "values": [
@@ -5109,21 +5104,6 @@
                                                     "source": "dockview-core"
                                                 }
                                             ]
-                                        },
-                                        {
-                                            "type": "intersection",
-                                            "values": [
-                                                {
-                                                    "type": "reference",
-                                                    "value": "GroupOptions",
-                                                    "source": "dockview-core"
-                                                },
-                                                {
-                                                    "type": "reference",
-                                                    "value": "AbsolutePosition",
-                                                    "source": "dockview-core"
-                                                }
-                                            ]
                                         }
                                     ]
                                 },
@@ -5135,7 +5115,7 @@
                             "value": "DockviewGroupPanel",
                             "source": "dockview-core"
                         },
-                        "code": "(options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition): DockviewGroupPanel",
+                        "code": "(options?: GroupOptions & AbsolutePosition | GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup): DockviewGroupPanel",
                         "kind": "callSignature"
                     }
                 ]
@@ -7859,6 +7839,30 @@
                 }
             },
             {
+                "name": "dropTargetContainer",
+                "code": "DropTargetAnchorContainer | 'null'",
+                "kind": "accessor",
+                "value": {
+                    "name": "dropTargetContainer",
+                    "code": "DropTargetAnchorContainer | 'null'",
+                    "kind": "getSignature",
+                    "returnType": {
+                        "type": "or",
+                        "values": [
+                            {
+                                "type": "reference",
+                                "value": "DropTargetAnchorContainer",
+                                "source": "dockview-core"
+                            },
+                            {
+                                "type": "literal",
+                                "value": null
+                            }
+                        ]
+                    }
+                }
+            },
+            {
                 "name": "element",
                 "code": "HTMLElement",
                 "kind": "accessor",
@@ -9893,7 +9897,7 @@
             },
             {
                 "name": "onDidDrop",
-                "code": "Event<PaneviewDropEvent>",
+                "code": "Event<PaneviewDidDropEvent>",
                 "kind": "property",
                 "type": {
                     "type": "reference",
@@ -9902,7 +9906,7 @@
                     "typeArguments": [
                         {
                             "type": "reference",
-                            "value": "PaneviewDropEvent",
+                            "value": "PaneviewDidDropEvent",
                             "source": "dockview-core"
                         }
                     ]
@@ -15119,7 +15123,7 @@
             },
             {
                 "name": "onDidDrop",
-                "code": "Event<PaneviewDropEvent>",
+                "code": "Event<PaneviewDidDropEvent>",
                 "kind": "property",
                 "type": {
                     "type": "reference",
@@ -15128,7 +15132,7 @@
                     "typeArguments": [
                         {
                             "type": "reference",
-                            "value": "PaneviewDropEvent",
+                            "value": "PaneviewDidDropEvent",
                             "source": "dockview-core"
                         }
                     ]
@@ -16462,7 +16466,7 @@
             },
             {
                 "name": "onDidDrop",
-                "code": "Event<PaneviewDropEvent>",
+                "code": "Event<PaneviewDidDropEvent>",
                 "kind": "accessor",
                 "value": {
                     "name": "onDidDrop",
@@ -16474,7 +16478,7 @@
                             }
                         ]
                     },
-                    "code": "Event<PaneviewDropEvent>",
+                    "code": "Event<PaneviewDidDropEvent>",
                     "kind": "getSignature",
                     "returnType": {
                         "type": "reference",
@@ -16483,7 +16487,7 @@
                         "typeArguments": [
                             {
                                 "type": "reference",
-                                "value": "PaneviewDropEvent",
+                                "value": "PaneviewDidDropEvent",
                                 "source": "dockview-core"
                             }
                         ]
@@ -17280,7 +17284,7 @@
             },
             {
                 "name": "onDidDrop",
-                "code": "Event<PaneviewDropEvent>",
+                "code": "Event<PaneviewDidDropEvent>",
                 "kind": "property",
                 "type": {
                     "type": "reference",
@@ -17289,7 +17293,7 @@
                     "typeArguments": [
                         {
                             "type": "reference",
-                            "value": "PaneviewDropEvent",
+                            "value": "PaneviewDidDropEvent",
                             "source": "dockview-core"
                         }
                     ]
@@ -18656,6 +18660,130 @@
             "BasePanelView"
         ]
     },
+    "PaneviewUnhandledDragOverEvent": {
+        "kind": "class",
+        "name": "PaneviewUnhandledDragOverEvent",
+        "children": [
+            {
+                "name": "constructor",
+                "kind": "constructor",
+                "code": ""
+            },
+            {
+                "name": "getData",
+                "code": "(): PaneTransfer | undefined",
+                "kind": "property",
+                "type": {
+                    "type": "reflection",
+                    "value": {
+                        "name": "__type",
+                        "code": "(): PaneTransfer | undefined",
+                        "kind": "typeLiteral",
+                        "signatures": [
+                            {
+                                "name": "__type",
+                                "typeParameters": [],
+                                "parameters": [],
+                                "returnType": {
+                                    "type": "or",
+                                    "values": [
+                                        {
+                                            "type": "reference",
+                                            "value": "PaneTransfer",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "intrinsic",
+                                            "value": "undefined"
+                                        }
+                                    ]
+                                },
+                                "code": "(): PaneTransfer | undefined",
+                                "kind": "callSignature"
+                            }
+                        ]
+                    }
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "nativeEvent",
+                "code": "DragEvent",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "DragEvent",
+                    "source": "typescript"
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "panel",
+                "code": "IPaneviewPanel",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "IPaneviewPanel",
+                    "source": "dockview-core"
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "position",
+                "code": "Position",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Position",
+                    "source": "dockview-core"
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "isAccepted",
+                "code": "boolean",
+                "kind": "accessor",
+                "value": {
+                    "name": "isAccepted",
+                    "code": "boolean",
+                    "kind": "getSignature",
+                    "returnType": {
+                        "type": "intrinsic",
+                        "value": "boolean"
+                    }
+                }
+            },
+            {
+                "name": "accept",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "accept",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            }
+        ],
+        "extends": [
+            "AcceptableEvent"
+        ]
+    },
     "Splitview": {
         "kind": "class",
         "name": "Splitview",
@@ -19571,7 +19699,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked whenever any aspect of the layout changes.\nIf listening to this event it may be worth debouncing ouputs."
+                                "text": "Invoked whenever any aspect of the layout changes.\r\nIf listening to this event it may be worth debouncing ouputs."
                             }
                         ]
                     },
@@ -19593,7 +19721,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked whenever any aspect of the layout changes.\nIf listening to this event it may be worth debouncing ouputs."
+                            "text": "Invoked whenever any aspect of the layout changes.\r\nIf listening to this event it may be worth debouncing ouputs."
                         }
                     ]
                 }
@@ -20189,7 +20317,7 @@
                                 },
                                 {
                                     "kind": "text",
-                                    "text": " method\nfor the subsequent resize."
+                                    "text": " method\r\nfor the subsequent resize."
                                 }
                             ]
                         },
@@ -20251,7 +20379,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": " method\nfor the subsequent resize."
+                            "text": " method\r\nfor the subsequent resize."
                         }
                     ]
                 }
@@ -21731,26 +21859,6 @@
                 "code": ""
             },
             {
-                "name": "onChanged",
-                "code": "Event<MouseEvent>",
-                "kind": "property",
-                "type": {
-                    "type": "reference",
-                    "value": "Event",
-                    "source": "dockview-core",
-                    "typeArguments": [
-                        {
-                            "type": "reference",
-                            "value": "MouseEvent",
-                            "source": "typescript"
-                        }
-                    ]
-                },
-                "flags": {
-                    "isReadonly": true
-                }
-            },
-            {
                 "name": "onDragStart",
                 "code": "Event<DragEvent>",
                 "kind": "property",
@@ -21783,6 +21891,26 @@
                             "type": "reference",
                             "value": "DroptargetEvent",
                             "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "onPointerDown",
+                "code": "Event<MouseEvent>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "MouseEvent",
+                            "source": "typescript"
                         }
                     ]
                 },
@@ -24376,7 +24504,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": ".\nCall "
+                            "text": ".\r\nCall "
                         },
                         {
                             "kind": "code",
@@ -24408,6 +24536,40 @@
                 "type": {
                     "type": "intrinsic",
                     "value": "boolean"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "disableTabsOverflowList",
+                "code": "boolean",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "boolean"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "dndEdges",
+                "code": "DroptargetOverlayModel | 'false'",
+                "kind": "property",
+                "type": {
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "DroptargetOverlayModel",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "literal",
+                            "value": false
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -24462,26 +24624,6 @@
                 },
                 "flags": {
                     "isOptional": true
-                }
-            },
-            {
-                "name": "gap",
-                "code": "number",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "number"
-                },
-                "flags": {
-                    "isOptional": true
-                },
-                "comment": {
-                    "summary": [
-                        {
-                            "kind": "text",
-                            "text": "Pixel gap between groups"
-                        }
-                    ]
                 }
             },
             {
@@ -24568,6 +24710,28 @@
                 },
                 "flags": {
                     "isOptional": true
+                },
+                "comment": {
+                    "summary": [],
+                    "blockTags": [
+                        {
+                            "tag": "@deprecated",
+                            "content": [
+                                {
+                                    "kind": "text",
+                                    "text": "use "
+                                },
+                                {
+                                    "kind": "code",
+                                    "text": "`dndEdges`"
+                                },
+                                {
+                                    "kind": "text",
+                                    "text": " instead. To be removed in a future version."
+                                }
+                            ]
+                        }
+                    ]
                 }
             },
             {
@@ -24586,6 +24750,19 @@
                             "value": "fullwidth"
                         }
                     ]
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "theme",
+                "code": "DockviewTheme",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "DockviewTheme",
+                    "source": "dockview-core"
                 },
                 "flags": {
                     "isOptional": true
@@ -25574,6 +25751,78 @@
                     "type": "reference",
                     "value": "DockviewApi",
                     "source": "dockview-core"
+                },
+                "flags": {}
+            }
+        ],
+        "extends": []
+    },
+    "DockviewTheme": {
+        "kind": "interface",
+        "name": "DockviewTheme",
+        "children": [
+            {
+                "name": "className",
+                "code": "string",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "string"
+                },
+                "flags": {}
+            },
+            {
+                "name": "dndOverlayMounting",
+                "code": "'relative' | 'absolute'",
+                "kind": "property",
+                "type": {
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "literal",
+                            "value": "relative"
+                        },
+                        {
+                            "type": "literal",
+                            "value": "absolute"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "gap",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "includeHeaderWhenHoverOverContent",
+                "code": "boolean",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "boolean"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "name",
+                "code": "string",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "string"
                 },
                 "flags": {}
             }
@@ -28588,18 +28837,6 @@
                 }
             },
             {
-                "name": "gap",
-                "code": "number",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "number"
-                },
-                "flags": {
-                    "isReadonly": true
-                }
-            },
-            {
                 "name": "getGroupPanel",
                 "code": "(id: string): IDockviewPanel | undefined",
                 "kind": "property",
@@ -29264,7 +29501,7 @@
             },
             {
                 "name": "addGroup",
-                "code": "(options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition): DockviewGroupPanel",
+                "code": "(options?: GroupOptions & AbsolutePosition | GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup): DockviewGroupPanel",
                 "kind": "method",
                 "signature": [
                     {
@@ -29273,10 +29510,25 @@
                         "parameters": [
                             {
                                 "name": "options",
-                                "code": "options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition",
+                                "code": "options?: GroupOptions & AbsolutePosition | GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup",
                                 "type": {
                                     "type": "or",
                                     "values": [
+                                        {
+                                            "type": "intersection",
+                                            "values": [
+                                                {
+                                                    "type": "reference",
+                                                    "value": "GroupOptions",
+                                                    "source": "dockview-core"
+                                                },
+                                                {
+                                                    "type": "reference",
+                                                    "value": "AbsolutePosition",
+                                                    "source": "dockview-core"
+                                                }
+                                            ]
+                                        },
                                         {
                                             "type": "intersection",
                                             "values": [
@@ -29306,21 +29558,6 @@
                                                     "source": "dockview-core"
                                                 }
                                             ]
-                                        },
-                                        {
-                                            "type": "intersection",
-                                            "values": [
-                                                {
-                                                    "type": "reference",
-                                                    "value": "GroupOptions",
-                                                    "source": "dockview-core"
-                                                },
-                                                {
-                                                    "type": "reference",
-                                                    "value": "AbsolutePosition",
-                                                    "source": "dockview-core"
-                                                }
-                                            ]
                                         }
                                     ]
                                 },
@@ -29332,7 +29569,7 @@
                             "value": "DockviewGroupPanel",
                             "source": "dockview-core"
                         },
-                        "code": "(options?: GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup | GroupOptions & AbsolutePosition): DockviewGroupPanel",
+                        "code": "(options?: GroupOptions & AbsolutePosition | GroupOptions & AddGroupOptionsWithPanel | GroupOptions & AddGroupOptionsWithGroup): DockviewGroupPanel",
                         "kind": "callSignature"
                     }
                 ]
@@ -35173,7 +35410,7 @@
             },
             {
                 "name": "onDidDrop",
-                "code": "Event<PaneviewDropEvent>",
+                "code": "Event<PaneviewDidDropEvent>",
                 "kind": "property",
                 "type": {
                     "type": "reference",
@@ -35182,7 +35419,7 @@
                     "typeArguments": [
                         {
                             "type": "reference",
-                            "value": "PaneviewDropEvent",
+                            "value": "PaneviewDidDropEvent",
                             "source": "dockview-core"
                         }
                     ]
@@ -36964,7 +37201,7 @@
             },
             {
                 "name": "init",
-                "code": "(parameters: GroupPanelPartInitParameters): void",
+                "code": "(parameters: TabPartInitParameters): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -36973,10 +37210,10 @@
                         "parameters": [
                             {
                                 "name": "parameters",
-                                "code": "parameters: GroupPanelPartInitParameters",
+                                "code": "parameters: TabPartInitParameters",
                                 "type": {
                                     "type": "reference",
-                                    "value": "GroupPanelPartInitParameters",
+                                    "value": "TabPartInitParameters",
                                     "source": "dockview-core"
                                 },
                                 "kind": "parameter"
@@ -36986,7 +37223,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(parameters: GroupPanelPartInitParameters): void",
+                        "code": "(parameters: TabPartInitParameters): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -38758,6 +38995,115 @@
             "PanelInitParameters"
         ]
     },
+    "PaneviewDndOverlayEvent": {
+        "kind": "interface",
+        "name": "PaneviewDndOverlayEvent",
+        "children": [
+            {
+                "name": "getData",
+                "code": "(): PaneTransfer | undefined",
+                "kind": "property",
+                "type": {
+                    "type": "reflection",
+                    "value": {
+                        "name": "__type",
+                        "code": "(): PaneTransfer | undefined",
+                        "kind": "typeLiteral",
+                        "signatures": [
+                            {
+                                "name": "__type",
+                                "typeParameters": [],
+                                "parameters": [],
+                                "returnType": {
+                                    "type": "or",
+                                    "values": [
+                                        {
+                                            "type": "reference",
+                                            "value": "PaneTransfer",
+                                            "source": "dockview-core"
+                                        },
+                                        {
+                                            "type": "intrinsic",
+                                            "value": "undefined"
+                                        }
+                                    ]
+                                },
+                                "code": "(): PaneTransfer | undefined",
+                                "kind": "callSignature"
+                            }
+                        ]
+                    }
+                },
+                "flags": {}
+            },
+            {
+                "name": "isAccepted",
+                "code": "boolean",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "boolean"
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "nativeEvent",
+                "code": "DragEvent",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "DragEvent",
+                    "source": "typescript"
+                },
+                "flags": {}
+            },
+            {
+                "name": "panel",
+                "code": "IPaneviewPanel",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "IPaneviewPanel",
+                    "source": "dockview-core"
+                },
+                "flags": {}
+            },
+            {
+                "name": "position",
+                "code": "Position",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Position",
+                    "source": "dockview-core"
+                },
+                "flags": {}
+            },
+            {
+                "name": "accept",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "accept",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            }
+        ],
+        "extends": [
+            "IAcceptableEvent"
+        ]
+    },
     "PaneviewDropEvent": {
         "kind": "interface",
         "name": "PaneviewDropEvent",
@@ -40466,14 +40812,26 @@
             },
             {
                 "name": "orientation",
-                "code": "Orientation",
+                "code": "Orientation.VERTICAL | Orientation.HORIZONTAL",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "Orientation",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "Orientation.VERTICAL",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "Orientation.HORIZONTAL",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
-                "flags": {}
+                "flags": {
+                    "isOptional": true
+                }
             },
             {
                 "name": "proportionalLayout",
@@ -40604,14 +40962,26 @@
             },
             {
                 "name": "orientation",
-                "code": "Orientation",
+                "code": "Orientation.VERTICAL | Orientation.HORIZONTAL",
                 "kind": "property",
                 "type": {
-                    "type": "reference",
-                    "value": "Orientation",
-                    "source": "dockview-core"
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "reference",
+                            "value": "Orientation.VERTICAL",
+                            "source": "dockview-core"
+                        },
+                        {
+                            "type": "reference",
+                            "value": "Orientation.HORIZONTAL",
+                            "source": "dockview-core"
+                        }
+                    ]
                 },
-                "flags": {}
+                "flags": {
+                    "isOptional": true
+                }
             },
             {
                 "name": "proportionalLayout",
@@ -41168,6 +41538,69 @@
         ],
         "extends": []
     },
+    "TabPartInitParameters": {
+        "kind": "interface",
+        "name": "TabPartInitParameters",
+        "children": [
+            {
+                "name": "api",
+                "code": "DockviewPanelApi",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "DockviewPanelApi",
+                    "source": "dockview-core"
+                },
+                "flags": {}
+            },
+            {
+                "name": "containerApi",
+                "code": "DockviewApi",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "DockviewApi",
+                    "source": "dockview-core"
+                },
+                "flags": {}
+            },
+            {
+                "name": "params",
+                "code": "Parameters",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Parameters",
+                    "source": "dockview-core"
+                },
+                "flags": {}
+            },
+            {
+                "name": "tabLocation",
+                "code": "TabLocation",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "TabLocation",
+                    "source": "dockview-core"
+                },
+                "flags": {}
+            },
+            {
+                "name": "title",
+                "code": "string",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "string"
+                },
+                "flags": {}
+            }
+        ],
+        "extends": [
+            "GroupPanelPartInitParameters"
+        ]
+    },
     "TitleEvent": {
         "kind": "interface",
         "name": "TitleEvent",
@@ -41391,7 +41824,7 @@
                                     "summary": [
                                         {
                                             "kind": "text",
-                                            "text": "If true then add the panel without setting it as the active panel.\n\nDefaults to "
+                                            "text": "If true then add the panel without setting it as the active panel.\r\n\r\nDefaults to "
                                         },
                                         {
                                             "kind": "code",
@@ -41458,7 +41891,7 @@
                                     "summary": [
                                         {
                                             "kind": "text",
-                                            "text": "The rendering mode of the panel.\n\nThis dictates what happens to the HTML of the panel when it is hidden."
+                                            "text": "The rendering mode of the panel.\r\n\r\nThis dictates what happens to the HTML of the panel when it is hidden."
                                         }
                                     ]
                                 }
@@ -41498,7 +41931,7 @@
                                     "summary": [
                                         {
                                             "kind": "text",
-                                            "text": "The title for the panel which can be accessed within both the tab and component.\n\nIf using the default tab renderer this title will be displayed in the tab."
+                                            "text": "The title for the panel which can be accessed within both the tab and component.\r\n\r\nIf using the default tab renderer this title will be displayed in the tab."
                                         }
                                     ]
                                 }
@@ -41538,6 +41971,14 @@
     },
     "Direction": {
         "name": "Direction",
+        "comment": {
+            "summary": [
+                {
+                    "kind": "text",
+                    "text": "A direction in which a panel can be moved or placed relative to another panel."
+                }
+            ]
+        },
         "code": "'within' | 'below' | 'above' | 'right' | 'left'",
         "typeParameters": [],
         "type": {
@@ -41914,18 +42355,44 @@
     },
     "IDockviewPanelHeaderProps": {
         "name": "IDockviewPanelHeaderProps",
-        "code": "IGroupPanelBaseProps<T>",
+        "code": "{ tabLocation: TabLocation } & IGroupPanelBaseProps<T>",
         "typeParameters": [],
         "type": {
-            "type": "reference",
-            "value": "IGroupPanelBaseProps",
-            "source": "dockview-core",
-            "typeArguments": [
+            "type": "intersection",
+            "values": [
+                {
+                    "type": "reflection",
+                    "value": {
+                        "name": "__type",
+                        "code": "{ tabLocation: TabLocation }",
+                        "kind": "typeLiteral",
+                        "properties": [
+                            {
+                                "name": "tabLocation",
+                                "code": "TabLocation",
+                                "kind": "property",
+                                "type": {
+                                    "type": "reference",
+                                    "value": "TabLocation",
+                                    "source": "dockview-core"
+                                },
+                                "flags": {}
+                            }
+                        ]
+                    }
+                },
                 {
                     "type": "reference",
-                    "value": "T",
+                    "value": "IGroupPanelBaseProps",
                     "source": "dockview-core",
-                    "refersToTypeParameter": true
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "T",
+                            "source": "dockview-core",
+                            "refersToTypeParameter": true
+                        }
+                    ]
                 }
             ]
         },
@@ -42178,6 +42645,46 @@
     },
     "PROPERTY_KEYS_SPLITVIEW": {
         "name": "PROPERTY_KEYS_SPLITVIEW",
+        "code": "",
+        "kind": "variable"
+    },
+    "themeAbyss": {
+        "name": "themeAbyss",
+        "code": "",
+        "kind": "variable"
+    },
+    "themeAbyssSpaced": {
+        "name": "themeAbyssSpaced",
+        "code": "",
+        "kind": "variable"
+    },
+    "themeDark": {
+        "name": "themeDark",
+        "code": "",
+        "kind": "variable"
+    },
+    "themeDracula": {
+        "name": "themeDracula",
+        "code": "",
+        "kind": "variable"
+    },
+    "themeLight": {
+        "name": "themeLight",
+        "code": "",
+        "kind": "variable"
+    },
+    "themeLightSpaced": {
+        "name": "themeLightSpaced",
+        "code": "",
+        "kind": "variable"
+    },
+    "themeReplit": {
+        "name": "themeReplit",
+        "code": "",
+        "kind": "variable"
+    },
+    "themeVisualStudio": {
+        "name": "themeVisualStudio",
         "code": "",
         "kind": "variable"
     },
@@ -43528,7 +44035,7 @@
             },
             {
                 "name": "onDidDrop",
-                "code": "(event: PaneviewDropEvent): void",
+                "code": "(event: PaneviewDidDropEvent): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -43537,10 +44044,10 @@
                         "parameters": [
                             {
                                 "name": "event",
-                                "code": "event: PaneviewDropEvent",
+                                "code": "event: PaneviewDidDropEvent",
                                 "type": {
                                     "type": "reference",
-                                    "value": "PaneviewDropEvent",
+                                    "value": "PaneviewDidDropEvent",
                                     "source": "dockview-core"
                                 },
                                 "kind": "parameter"
@@ -43550,7 +44057,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(event: PaneviewDropEvent): void",
+                        "code": "(event: PaneviewDidDropEvent): void",
                         "kind": "callSignature"
                     }
                 ]
