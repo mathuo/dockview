@@ -425,6 +425,8 @@ export class SplitviewComponent
             view.dispose();
         }
 
+        this.element.remove();
+
         super.dispose();
     }
 }

@@ -476,6 +476,8 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
         }
         this._viewDisposables.clear();
 
+        this.element.remove();
+
         this.paneview.dispose();
     }
 }
