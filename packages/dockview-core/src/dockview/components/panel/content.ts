@@ -59,7 +59,7 @@ export class ContentContainer
 
         this.dropTarget = new Droptarget(this.element, {
             getOverlayOutline: () => {
-                return accessor.options.theme?.includeHeaderWhenHoverOverContent
+                return accessor.options.theme?.dndPanelOverlay === 'group'
                     ? this.element.parentElement
                     : null;
             },

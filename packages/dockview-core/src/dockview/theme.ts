@@ -1,9 +1,25 @@
 export interface DockviewTheme {
+    /**
+     *  The name of the theme
+     */
     name: string;
+    /**
+     * The class name to apply to the theme containing the CSS variables settings.
+     */
     className: string;
+    /**
+     * The gap between the groups
+     */
     gap?: number;
+    /**
+     * The mouting position of the overlay shown when dragging a panel. `absolute`
+     * will mount the overlay to root of the dockview component whereas `relative` will mount the overlay to the group container.
+     */
     dndOverlayMounting?: 'absolute' | 'relative';
-    includeHeaderWhenHoverOverContent?: boolean;
+    /**
+     * When dragging a panel, the overlay can either encompass the panel contents or the entire group including the tab header space.
+     */
+    dndPanelOverlay?: 'content' | 'group';
 }
 
 export const themeDark: DockviewTheme = {
@@ -42,7 +58,7 @@ export const themeAbyssSpaced: DockviewTheme = {
     className: 'dockview-theme-abyss-spaced',
     gap: 10,
     dndOverlayMounting: 'absolute',
-    includeHeaderWhenHoverOverContent: true,
+    dndPanelOverlay: 'group',
 };
 
 export const themeLightSpaced: DockviewTheme = {
@@ -50,5 +66,5 @@ export const themeLightSpaced: DockviewTheme = {
     className: 'dockview-theme-light-spaced',
     gap: 10,
     dndOverlayMounting: 'absolute',
-    includeHeaderWhenHoverOverContent: true,
+    dndPanelOverlay: 'group',
 };
