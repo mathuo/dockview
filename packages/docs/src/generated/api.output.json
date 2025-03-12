@@ -25769,7 +25769,15 @@
                     "type": "intrinsic",
                     "value": "string"
                 },
-                "flags": {}
+                "flags": {},
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The class name to apply to the theme containing the CSS variables settings."
+                        }
+                    ]
+                }
             },
             {
                 "name": "dndOverlayMounting",
@@ -25790,6 +25798,59 @@
                 },
                 "flags": {
                     "isOptional": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The mouting position of the overlay shown when dragging a panel. "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`absolute`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": "\nwill mount the overlay to root of the dockview component whereas "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`relative`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " will mount the overlay to the group container."
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "dndPanelOverlay",
+                "code": "'content' | 'group'",
+                "kind": "property",
+                "type": {
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "literal",
+                            "value": "content"
+                        },
+                        {
+                            "type": "literal",
+                            "value": "group"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isOptional": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "When dragging a panel, the overlay can either encompass the panel contents or the entire group including the tab header space."
+                        }
+                    ]
                 }
             },
             {
@@ -25802,18 +25863,14 @@
                 },
                 "flags": {
                     "isOptional": true
-                }
-            },
-            {
-                "name": "includeHeaderWhenHoverOverContent",
-                "code": "boolean",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "boolean"
                 },
-                "flags": {
-                    "isOptional": true
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The gap between the groups"
+                        }
+                    ]
                 }
             },
             {
@@ -25824,7 +25881,15 @@
                     "type": "intrinsic",
                     "value": "string"
                 },
-                "flags": {}
+                "flags": {},
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "The name of the theme"
+                        }
+                    ]
+                }
             }
         ],
         "extends": []
