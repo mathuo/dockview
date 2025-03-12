@@ -192,6 +192,8 @@ function filter(docs: TypeSystem.Type, methods: string[]) {
                 .map((v) => filter(v, methods))
                 .flat();
         }
+
+        return [docs];
     }
 
     if (docs.kind === 'class' || docs.kind === 'interface') {

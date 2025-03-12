@@ -1,17 +1,23 @@
 import {
     IDisposable,
     CompositeDisposable,
-    IValueDisposable,
+    Disposable,
+    MutableDisposable,
 } from '../../../lifecycle';
 import { addDisposableListener, Emitter, Event } from '../../../events';
 import { Tab } from '../tab/tab';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { VoidContainer } from './voidContainer';
 import { toggleClass } from '../../../dom';
-import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
+import { IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
 import { WillShowOverlayLocationEvent } from '../../dockviewGroupPanelModel';
 import { getPanelData } from '../../../dnd/dataTransfer';
+import { Tabs } from './tabs';
+import {
+    createDropdownElementHandle,
+    DropdownElement,
+} from './tabOverflowControl';
 
 export interface TabDropIndexEvent {
     readonly event: DragEvent;
@@ -56,25 +62,28 @@ export class TabsContainer
     implements ITabsContainer
 {
     private readonly _element: HTMLElement;
-    private readonly tabContainer: HTMLElement;
+    private readonly tabs: Tabs;
     private readonly rightActionsContainer: HTMLElement;
     private readonly leftActionsContainer: HTMLElement;
     private readonly preActionsContainer: HTMLElement;
     private readonly voidContainer: VoidContainer;
 
-    private tabs: IValueDisposable<Tab>[] = [];
-    private selectedIndex = -1;
     private rightActions: HTMLElement | undefined;
     private leftActions: HTMLElement | undefined;
     private preActions: HTMLElement | undefined;
 
     private _hidden = false;
 
+    private dropdownPart: DropdownElement | null = null;
+    private _overflowTabs: string[] = [];
+    private readonly _dropdownDisposable = new MutableDisposable();
+
     private readonly _onDrop = new Emitter<TabDropIndexEvent>();
     readonly onDrop: Event<TabDropIndexEvent> = this._onDrop.event;
 
-    private readonly _onTabDragStart = new Emitter<TabDragEvent>();
-    readonly onTabDragStart: Event<TabDragEvent> = this._onTabDragStart.event;
+    get onTabDragStart(): Event<TabDragEvent> {
+        return this.tabs.onTabDragStart;
+    }
 
     private readonly _onGroupDragStart = new Emitter<GroupDragEvent>();
     readonly onGroupDragStart: Event<GroupDragEvent> =
@@ -86,11 +95,11 @@ export class TabsContainer
         this._onWillShowOverlay.event;
 
     get panels(): string[] {
-        return this.tabs.map((_) => _.value.panel.id);
+        return this.tabs.panels;
     }
 
     get size(): number {
-        return this.tabs.length;
+        return this.tabs.size;
     }
 
     get hidden(): boolean {
@@ -100,6 +109,116 @@ export class TabsContainer
     set hidden(value: boolean) {
         this._hidden = value;
         this.element.style.display = value ? 'none' : '';
+    }
+
+    get element(): HTMLElement {
+        return this._element;
+    }
+
+    constructor(
+        private readonly accessor: DockviewComponent,
+        private readonly group: DockviewGroupPanel
+    ) {
+        super();
+
+        this._element = document.createElement('div');
+        this._element.className = 'dv-tabs-and-actions-container';
+
+        toggleClass(
+            this._element,
+            'dv-full-width-single-tab',
+            this.accessor.options.singleTabMode === 'fullwidth'
+        );
+
+        this.rightActionsContainer = document.createElement('div');
+        this.rightActionsContainer.className = 'dv-right-actions-container';
+
+        this.leftActionsContainer = document.createElement('div');
+        this.leftActionsContainer.className = 'dv-left-actions-container';
+
+        this.preActionsContainer = document.createElement('div');
+        this.preActionsContainer.className = 'dv-pre-actions-container';
+
+        this.tabs = new Tabs(group, accessor, {
+            showTabsOverflowControl: !accessor.options.disableTabsOverflowList,
+        });
+
+        this.voidContainer = new VoidContainer(this.accessor, this.group);
+
+        this._element.appendChild(this.preActionsContainer);
+        this._element.appendChild(this.tabs.element);
+        this._element.appendChild(this.leftActionsContainer);
+        this._element.appendChild(this.voidContainer.element);
+        this._element.appendChild(this.rightActionsContainer);
+
+        this.addDisposables(
+            accessor.onDidOptionsChange(() => {
+                this.tabs.showTabsOverflowControl =
+                    !accessor.options.disableTabsOverflowList;
+            }),
+            this.tabs.onOverflowTabsChange((event) => {
+                this.toggleDropdown(event);
+            }),
+            this.tabs,
+            this._onWillShowOverlay,
+            this._onDrop,
+            this._onGroupDragStart,
+            this.voidContainer,
+            this.voidContainer.onDragStart((event) => {
+                this._onGroupDragStart.fire({
+                    nativeEvent: event,
+                    group: this.group,
+                });
+            }),
+            this.voidContainer.onDrop((event) => {
+                this._onDrop.fire({
+                    event: event.nativeEvent,
+                    index: this.tabs.size,
+                });
+            }),
+            this.voidContainer.onWillShowOverlay((event) => {
+                this._onWillShowOverlay.fire(
+                    new WillShowOverlayLocationEvent(event, {
+                        kind: 'header_space',
+                        panel: this.group.activePanel,
+                        api: this.accessor.api,
+                        group: this.group,
+                        getData: getPanelData,
+                    })
+                );
+            }),
+            addDisposableListener(
+                this.voidContainer.element,
+                'pointerdown',
+                (event) => {
+                    if (event.defaultPrevented) {
+                        return;
+                    }
+
+                    const isFloatingGroupsEnabled =
+                        !this.accessor.options.disableFloatingGroups;
+
+                    if (
+                        isFloatingGroupsEnabled &&
+                        event.shiftKey &&
+                        this.group.api.location.type !== 'floating'
+                    ) {
+                        event.preventDefault();
+
+                        const { top, left } =
+                            this.element.getBoundingClientRect();
+                        const { top: rootTop, left: rootLeft } =
+                            this.accessor.element.getBoundingClientRect();
+
+                        this.accessor.addFloatingGroup(this.group, {
+                            x: left - rootLeft + 20,
+                            y: top - rootTop + 20,
+                            inDragMode: true,
+                        });
+                    }
+                }
+            )
+        );
     }
 
     show(): void {
@@ -154,280 +273,124 @@ export class TabsContainer
         }
     }
 
-    get element(): HTMLElement {
-        return this._element;
+    isActive(tab: Tab): boolean {
+        return this.tabs.isActive(tab);
     }
 
-    public isActive(tab: Tab): boolean {
-        return (
-            this.selectedIndex > -1 &&
-            this.tabs[this.selectedIndex].value === tab
-        );
+    indexOf(id: string): number {
+        return this.tabs.indexOf(id);
     }
 
-    public indexOf(id: string): number {
-        return this.tabs.findIndex((tab) => tab.value.panel.id === id);
-    }
-
-    constructor(
-        private readonly accessor: DockviewComponent,
-        private readonly group: DockviewGroupPanel
-    ) {
-        super();
-
-        this._element = document.createElement('div');
-        this._element.className = 'dv-tabs-and-actions-container';
-
-        toggleClass(
-            this._element,
-            'dv-full-width-single-tab',
-            this.accessor.options.singleTabMode === 'fullwidth'
-        );
-
-        this.rightActionsContainer = document.createElement('div');
-        this.rightActionsContainer.className = 'dv-right-actions-container';
-
-        this.leftActionsContainer = document.createElement('div');
-        this.leftActionsContainer.className = 'dv-left-actions-container';
-
-        this.preActionsContainer = document.createElement('div');
-        this.preActionsContainer.className = 'dv-pre-actions-container';
-
-        this.tabContainer = document.createElement('div');
-        this.tabContainer.className = 'dv-tabs-container';
-
-        this.voidContainer = new VoidContainer(this.accessor, this.group);
-
-        this._element.appendChild(this.preActionsContainer);
-        this._element.appendChild(this.tabContainer);
-        this._element.appendChild(this.leftActionsContainer);
-        this._element.appendChild(this.voidContainer.element);
-        this._element.appendChild(this.rightActionsContainer);
-
-        this.addDisposables(
-            this.accessor.onDidAddPanel((e) => {
-                if (e.api.group === this.group) {
-                    toggleClass(
-                        this._element,
-                        'dv-single-tab',
-                        this.size === 1
-                    );
-                }
-            }),
-            this.accessor.onDidRemovePanel((e) => {
-                if (e.api.group === this.group) {
-                    toggleClass(
-                        this._element,
-                        'dv-single-tab',
-                        this.size === 1
-                    );
-                }
-            }),
-            this._onWillShowOverlay,
-            this._onDrop,
-            this._onTabDragStart,
-            this._onGroupDragStart,
-            this.voidContainer,
-            this.voidContainer.onDragStart((event) => {
-                this._onGroupDragStart.fire({
-                    nativeEvent: event,
-                    group: this.group,
-                });
-            }),
-            this.voidContainer.onDrop((event) => {
-                this._onDrop.fire({
-                    event: event.nativeEvent,
-                    index: this.tabs.length,
-                });
-            }),
-            this.voidContainer.onWillShowOverlay((event) => {
-                this._onWillShowOverlay.fire(
-                    new WillShowOverlayLocationEvent(event, {
-                        kind: 'header_space',
-                        panel: this.group.activePanel,
-                        api: this.accessor.api,
-                        group: this.group,
-                        getData: getPanelData,
-                    })
-                );
-            }),
-            addDisposableListener(
-                this.voidContainer.element,
-                'pointerdown',
-                (event) => {
-                    const isFloatingGroupsEnabled =
-                        !this.accessor.options.disableFloatingGroups;
-
-                    if (
-                        isFloatingGroupsEnabled &&
-                        event.shiftKey &&
-                        this.group.api.location.type !== 'floating'
-                    ) {
-                        event.preventDefault();
-
-                        const { top, left } =
-                            this.element.getBoundingClientRect();
-                        const { top: rootTop, left: rootLeft } =
-                            this.accessor.element.getBoundingClientRect();
-
-                        this.accessor.addFloatingGroup(this.group, {
-                            x: left - rootLeft + 20,
-                            y: top - rootTop + 20,
-                            inDragMode: true,
-                        });
-                    }
-                }
-            ),
-            addDisposableListener(this.tabContainer, 'pointerdown', (event) => {
-                if (event.defaultPrevented) {
-                    return;
-                }
-
-                const isLeftClick = event.button === 0;
-
-                if (isLeftClick) {
-                    this.accessor.doSetGroupActive(this.group);
-                }
-            })
-        );
-    }
-
-    public setActive(_isGroupActive: boolean) {
+    setActive(_isGroupActive: boolean) {
         // noop
     }
 
-    private addTab(
-        tab: IValueDisposable<Tab>,
-        index: number = this.tabs.length
-    ): void {
-        if (index < 0 || index > this.tabs.length) {
-            throw new Error('invalid location');
-        }
-
-        this.tabContainer.insertBefore(
-            tab.value.element,
-            this.tabContainer.children[index]
-        );
-
-        this.tabs = [
-            ...this.tabs.slice(0, index),
-            tab,
-            ...this.tabs.slice(index),
-        ];
-
-        if (this.selectedIndex < 0) {
-            this.selectedIndex = index;
-        }
+    delete(id: string): void {
+        this.tabs.delete(id);
+        this.updateClassnames();
     }
 
-    public delete(id: string): void {
-        const index = this.tabs.findIndex((tab) => tab.value.panel.id === id);
-
-        const tabToRemove = this.tabs.splice(index, 1)[0];
-
-        const { value, disposable } = tabToRemove;
-
-        disposable.dispose();
-        value.dispose();
-        value.element.remove();
+    setActivePanel(panel: IDockviewPanel): void {
+        this.tabs.setActivePanel(panel);
     }
 
-    public setActivePanel(panel: IDockviewPanel): void {
-        this.tabs.forEach((tab) => {
-            const isActivePanel = panel.id === tab.value.panel.id;
-            tab.value.setActive(isActivePanel);
-        });
+    openPanel(panel: IDockviewPanel, index: number = this.tabs.size): void {
+        this.tabs.openPanel(panel, index);
+        this.updateClassnames();
     }
 
-    public openPanel(
-        panel: IDockviewPanel,
-        index: number = this.tabs.length
-    ): void {
-        if (this.tabs.find((tab) => tab.value.panel.id === panel.id)) {
-            return;
-        }
-        const tab = new Tab(panel, this.accessor, this.group);
-        tab.setContent(panel.view.tab);
-
-        const disposable = new CompositeDisposable(
-            tab.onDragStart((event) => {
-                this._onTabDragStart.fire({ nativeEvent: event, panel });
-            }),
-            tab.onChanged((event) => {
-                const isFloatingGroupsEnabled =
-                    !this.accessor.options.disableFloatingGroups;
-
-                const isFloatingWithOnePanel =
-                    this.group.api.location.type === 'floating' &&
-                    this.size === 1;
-
-                if (
-                    isFloatingGroupsEnabled &&
-                    !isFloatingWithOnePanel &&
-                    event.shiftKey
-                ) {
-                    event.preventDefault();
-
-                    const panel = this.accessor.getGroupPanel(tab.panel.id);
-
-                    const { top, left } = tab.element.getBoundingClientRect();
-                    const { top: rootTop, left: rootLeft } =
-                        this.accessor.element.getBoundingClientRect();
-
-                    this.accessor.addFloatingGroup(panel as DockviewPanel, {
-                        x: left - rootLeft,
-                        y: top - rootTop,
-                        inDragMode: true,
-                    });
-                    return;
-                }
-
-                const isLeftClick = event.button === 0;
-
-                if (!isLeftClick || event.defaultPrevented) {
-                    return;
-                }
-
-                if (this.group.activePanel !== panel) {
-                    this.group.model.openPanel(panel);
-                }
-            }),
-            tab.onDrop((event) => {
-                this._onDrop.fire({
-                    event: event.nativeEvent,
-                    index: this.tabs.findIndex((x) => x.value === tab),
-                });
-            }),
-            tab.onWillShowOverlay((event) => {
-                this._onWillShowOverlay.fire(
-                    new WillShowOverlayLocationEvent(event, {
-                        kind: 'tab',
-                        panel: this.group.activePanel,
-                        api: this.accessor.api,
-                        group: this.group,
-                        getData: getPanelData,
-                    })
-                );
-            })
-        );
-
-        const value: IValueDisposable<Tab> = { value: tab, disposable };
-
-        this.addTab(value, index);
-    }
-
-    public closePanel(panel: IDockviewPanel): void {
+    closePanel(panel: IDockviewPanel): void {
         this.delete(panel.id);
     }
 
-    public dispose(): void {
-        super.dispose();
+    private updateClassnames(): void {
+        toggleClass(this._element, 'dv-single-tab', this.size === 1);
+    }
 
-        for (const { value, disposable } of this.tabs) {
-            disposable.dispose();
-            value.dispose();
+    private toggleDropdown(options: { tabs: string[]; reset: boolean }): void {
+        const tabs = options.reset ? [] : options.tabs;
+        this._overflowTabs = tabs;
+
+        if (this._overflowTabs.length > 0 && this.dropdownPart) {
+            this.dropdownPart.update({ tabs: tabs.length });
+            return;
         }
 
-        this.tabs = [];
+        if (this._overflowTabs.length === 0) {
+            this._dropdownDisposable.dispose();
+            return;
+        }
+
+        const root = document.createElement('div');
+        root.className = 'dv-tabs-overflow-dropdown-root';
+
+        const part = createDropdownElementHandle();
+        part.update({ tabs: tabs.length });
+
+        this.dropdownPart = part;
+
+        root.appendChild(part.element);
+        this.rightActionsContainer.prepend(root);
+
+        this._dropdownDisposable.value = new CompositeDisposable(
+            Disposable.from(() => {
+                root.remove();
+                this.dropdownPart?.dispose?.();
+                this.dropdownPart = null;
+            }),
+            addDisposableListener(
+                root,
+                'pointerdown',
+                (event) => {
+                    event.preventDefault();
+                },
+                { capture: true }
+            ),
+            addDisposableListener(root, 'click', (event) => {
+                const el = document.createElement('div');
+                el.style.overflow = 'auto';
+                el.className = 'dv-tabs-overflow-container';
+
+                for (const tab of this.tabs.tabs.filter((tab) =>
+                    this._overflowTabs.includes(tab.panel.id)
+                )) {
+                    const panelObject = this.group.panels.find(
+                        (panel) => panel === tab.panel
+                    )!;
+
+                    const tabComponent =
+                        panelObject.view.createTabRenderer('headerOverflow');
+
+                    const child = tabComponent.element;
+
+                    const wrapper = document.createElement('div');
+                    toggleClass(wrapper, 'dv-tab', true);
+                    toggleClass(
+                        wrapper,
+                        'dv-active-tab',
+                        panelObject.api.isActive
+                    );
+                    toggleClass(
+                        wrapper,
+                        'dv-inactive-tab',
+                        !panelObject.api.isActive
+                    );
+
+                    wrapper.addEventListener('mousedown', () => {
+                        this.accessor.popupService.close();
+                        tab.element.scrollIntoView();
+                        tab.panel.api.setActive();
+                    });
+                    wrapper.appendChild(child);
+
+                    el.appendChild(wrapper);
+                }
+
+                this.accessor.popupService.openPopover(el, {
+                    x: event.clientX,
+                    y: event.clientY,
+                });
+            })
+        );
     }
 }

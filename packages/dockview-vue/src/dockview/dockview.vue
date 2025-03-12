@@ -2,7 +2,7 @@
 import {
     DockviewApi,
     type DockviewOptions,
-    PROPERTY_KEYS,
+    PROPERTY_KEYS_DOCKVIEW,
     type DockviewFrameworkOptions,
 createDockview,
 } from 'dockview-core';
@@ -25,7 +25,7 @@ import {
 import type { IDockviewVueProps, VueEvents } from './types';
 
 function extractCoreOptions(props: IDockviewVueProps): DockviewOptions {
-    const coreOptions = (PROPERTY_KEYS as (keyof DockviewOptions)[]).reduce(
+    const coreOptions = (PROPERTY_KEYS_DOCKVIEW as (keyof DockviewOptions)[]).reduce(
         (obj, key) => {
             (obj as any)[key] = props[key];
             return obj;
@@ -43,7 +43,7 @@ const props = defineProps<IDockviewVueProps>();
 const el = ref<HTMLElement | null>(null);
 const instance = ref<DockviewApi | null>(null);
 
-PROPERTY_KEYS.forEach((coreOptionKey) => {
+PROPERTY_KEYS_DOCKVIEW.forEach((coreOptionKey) => {
     watch(
         () => props[coreOptionKey],
         (newValue, oldValue) => {

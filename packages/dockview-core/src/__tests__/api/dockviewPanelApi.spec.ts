@@ -10,6 +10,7 @@ describe('groupPanelApi', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
+            onDidOptionsChange: jest.fn(),
         });
 
         const panelMock = jest.fn<DockviewPanel, []>(() => {
@@ -50,6 +51,7 @@ describe('groupPanelApi', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupViewPanel = new DockviewGroupPanel(
@@ -82,6 +84,7 @@ describe('groupPanelApi', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupViewPanel = new DockviewGroupPanel(

@@ -8,6 +8,7 @@ import { DockviewGroupPanel } from '../../../dockview/dockviewGroupPanel';
 import { DockviewGroupPanelModel } from '../../../dockview/dockviewGroupPanelModel';
 import { Tab } from '../../../dockview/components/tab/tab';
 import { IDockviewPanel } from '../../../dockview/dockviewPanel';
+import { fromPartial } from '@total-typescript/shoehorn';
 
 describe('tab', () => {
     test('that empty tab has inactive-tab class', () => {
@@ -46,15 +47,10 @@ describe('tab', () => {
                 id: 'testcomponentid',
             };
         });
-        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
-            () => {
-                return {
-                    canDisplayOverlay: jest.fn(),
-                };
-            }
-        );
 
-        const groupView = new groupviewMock() as DockviewGroupPanelModel;
+        const groupView = fromPartial<DockviewGroupPanelModel>({
+            canDisplayOverlay: jest.fn(),
+        });
 
         const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
             return {
@@ -72,38 +68,33 @@ describe('tab', () => {
             groupPanel
         );
 
-        jest.spyOn(cut.element, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(cut.element, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(cut.element, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(cut.element, 'offsetWidth', 'get').mockImplementation(
             () => 100
         );
 
         fireEvent.dragEnter(cut.element);
         fireEvent.dragOver(cut.element);
 
-        expect(groupView.canDisplayOverlay).toBeCalled();
+        expect(groupView.canDisplayOverlay).toHaveBeenCalled();
 
         expect(
             cut.element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(0);
     });
 
-    test('that if you drag over yourself no drop target is shown', () => {
+    test('that if you drag over yourself a drop target is shown', () => {
         const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
             return {
                 id: 'testcomponentid',
             };
         });
-        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
-            () => {
-                return {
-                    canDisplayOverlay: jest.fn(),
-                };
-            }
-        );
 
-        const groupView = new groupviewMock() as DockviewGroupPanelModel;
+        const groupView = fromPartial<DockviewGroupPanelModel>({
+            canDisplayOverlay: jest.fn(),
+        });
 
         const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
             return {
@@ -121,10 +112,10 @@ describe('tab', () => {
             groupPanel
         );
 
-        jest.spyOn(cut.element, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(cut.element, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(cut.element, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(cut.element, 'offsetWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -136,11 +127,11 @@ describe('tab', () => {
         fireEvent.dragEnter(cut.element);
         fireEvent.dragOver(cut.element);
 
-        expect(groupView.canDisplayOverlay).toBeCalledTimes(0);
+        expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(0);
 
         expect(
             cut.element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+        ).toBe(1);
     });
 
     test('that if you drag over another tab a drop target is shown', () => {
@@ -175,10 +166,10 @@ describe('tab', () => {
             groupPanel
         );
 
-        jest.spyOn(cut.element, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(cut.element, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(cut.element, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(cut.element, 'offsetWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -229,10 +220,10 @@ describe('tab', () => {
             groupPanel
         );
 
-        jest.spyOn(cut.element, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(cut.element, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(cut.element, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(cut.element, 'offsetWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -289,10 +280,10 @@ describe('tab', () => {
             groupPanel
         );
 
-        jest.spyOn(cut.element, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(cut.element, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(cut.element, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(cut.element, 'offsetWidth', 'get').mockImplementation(
             () => 100
         );
 

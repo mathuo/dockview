@@ -1,0 +1,19 @@
+.dv-tabs-overflow-dropdown-default {
+    height: 100%;
+    color: var(--dv-activegroup-hiddenpanel-tab-color);
+
+    margin: var(--dv-tab-margin);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+
+    > span {
+        padding-left: 0.25rem;
+    }
+
+    > svg {
+        transform: rotate(90deg);
+    }
+}

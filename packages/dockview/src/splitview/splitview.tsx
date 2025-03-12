@@ -2,8 +2,11 @@ import React from 'react';
 import {
     SplitviewApi,
     SplitviewPanelApi,
-    Orientation,
     createSplitview,
+    SplitviewOptions,
+    PROPERTY_KEYS_SPLITVIEW,
+    SplitviewFrameworkOptions,
+    SplitviewComponentOptions,
 } from 'dockview-core';
 import { usePortalsLifecycle } from '../react';
 import { PanelParameters } from '../types';
@@ -19,14 +22,20 @@ export interface ISplitviewPanelProps<T extends { [index: string]: any } = any>
     containerApi: SplitviewApi;
 }
 
-export interface ISplitviewReactProps {
-    orientation?: Orientation;
+export interface ISplitviewReactProps extends SplitviewOptions {
     onReady: (event: SplitviewReadyEvent) => void;
     components: Record<string, React.FunctionComponent<ISplitviewPanelProps>>;
-    proportionalLayout?: boolean;
-    hideBorders?: boolean;
-    className?: string;
-    disableAutoResizing?: boolean;
+}
+
+function extractCoreOptions(props: ISplitviewReactProps): SplitviewOptions {
+    const coreOptions = PROPERTY_KEYS_SPLITVIEW.reduce((obj, key) => {
+        if (key in props) {
+            obj[key] = props[key] as any;
+        }
+        return obj;
+    }, {} as Partial<SplitviewComponentOptions>);
+
+    return coreOptions as SplitviewOptions;
 }
 
 export const SplitviewReact = React.forwardRef(
@@ -37,32 +46,56 @@ export const SplitviewReact = React.forwardRef(
 
         React.useImperativeHandle(ref, () => domRef.current!, []);
 
+        const prevProps = React.useRef<Partial<ISplitviewReactProps>>({});
+
+        React.useEffect(
+            () => {
+                const changes: Partial<SplitviewOptions> = {};
+
+                PROPERTY_KEYS_SPLITVIEW.forEach((propKey) => {
+                    const key = propKey;
+                    const propValue = props[key];
+
+                    if (key in props && propValue !== prevProps.current[key]) {
+                        changes[key] = propValue as any;
+                    }
+                });
+
+                if (splitviewRef.current) {
+                    splitviewRef.current.updateOptions(changes);
+                } else {
+                    // not yet fully initialized
+                }
+
+                prevProps.current = props;
+            },
+            PROPERTY_KEYS_SPLITVIEW.map((key) => props[key])
+        );
+
         React.useEffect(() => {
-            const api = createSplitview(domRef.current!, {
-                disableAutoResizing: props.disableAutoResizing,
-                orientation: props.orientation ?? Orientation.HORIZONTAL,
-                frameworkComponents: props.components,
-                frameworkWrapper: {
-                    createComponent: (
-                        id: string,
-                        componentId,
-                        component: any
-                    ) => {
-                        return new ReactPanelView(id, componentId, component, {
-                            addPortal,
-                        });
-                    },
+            if (!domRef.current) {
+                return () => {
+                    // noop
+                };
+            }
+
+            const frameworkOptions: SplitviewFrameworkOptions = {
+                createComponent: (options) => {
+                    return new ReactPanelView(
+                        options.id,
+                        options.name,
+                        props.components[options.name],
+                        { addPortal }
+                    );
                 },
-                proportionalLayout:
-                    typeof props.proportionalLayout === 'boolean'
-                        ? props.proportionalLayout
-                        : true,
-                styles: props.hideBorders
-                    ? { separatorBorder: 'transparent' }
-                    : undefined,
+            };
+
+            const api = createSplitview(domRef.current, {
+                ...extractCoreOptions(props),
+                ...frameworkOptions,
             });
 
-            const { clientWidth, clientHeight } = domRef.current!;
+            const { clientWidth, clientHeight } = domRef.current;
             api.layout(clientWidth, clientHeight);
 
             if (props.onReady) {
@@ -81,16 +114,19 @@ export const SplitviewReact = React.forwardRef(
                 return;
             }
             splitviewRef.current.updateOptions({
-                frameworkComponents: props.components,
+                createComponent: (options) => {
+                    return new ReactPanelView(
+                        options.id,
+                        options.name,
+                        props.components[options.name],
+                        { addPortal }
+                    );
+                },
             });
         }, [props.components]);
 
         return (
-            <div
-                className={props.className}
-                style={{ height: '100%', width: '100%' }}
-                ref={domRef}
-            >
+            <div style={{ height: '100%', width: '100%' }} ref={domRef}>
                 {portals}
             </div>
         );

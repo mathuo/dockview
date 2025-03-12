@@ -133,116 +133,125 @@ describe('dockviewComponent', () => {
             },
             className: 'test-a test-b',
         });
-        expect(dockview.element.className).toBe('test-a test-b');
+        expect(dockview.element.className).toBe(
+            'test-a test-b dockview-theme-abyss'
+        );
 
         dockview.updateOptions({ className: 'test-b test-c' });
 
-        expect(dockview.element.className).toBe('test-b test-c');
+        expect(dockview.element.className).toBe(
+            'dockview-theme-abyss test-b test-c'
+        );
     });
 
-    // describe('memory leakage', () => {
-    //     beforeEach(() => {
-    //         window.open = () => fromPartial<Window>({
-    //             addEventListener: jest.fn(),
-    //             close: jest.fn(),
-    //         });
-    //     });
+    describe('memory leakage', () => {
+        beforeEach(() => {
+            window.open = () => setupMockWindow();
+        });
 
-    //     test('event leakage', () => {
-    //         Emitter.setLeakageMonitorEnabled(true);
+        test('event leakage', async () => {
+            Emitter.setLeakageMonitorEnabled(true);
 
-    //         dockview = new DockviewComponent({
-    //             parentElement: container,
-    //             components: {
-    //                 default: PanelContentPartTest,
-    //             },
-    //         });
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                className: 'test-a test-b',
+            });
 
-    //         dockview.layout(500, 1000);
+            dockview.layout(500, 1000);
 
-    //         const panel1 = dockview.addPanel({
-    //             id: 'panel1',
-    //             component: 'default',
-    //         });
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
 
-    //         const panel2 = dockview.addPanel({
-    //             id: 'panel2',
-    //             component: 'default',
-    //         });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
 
-    //         dockview.removePanel(panel2);
+            dockview.removePanel(panel2);
 
-    //         const panel3 = dockview.addPanel({
-    //             id: 'panel3',
-    //             component: 'default',
-    //             position: {
-    //                 direction: 'right',
-    //                 referencePanel: 'panel1',
-    //             },
-    //         });
+            const panel3 = dockview.addPanel({
+                id: 'panel3',
+                component: 'default',
+                position: {
+                    direction: 'right',
+                    referencePanel: 'panel1',
+                },
+            });
 
-    //         const panel4 = dockview.addPanel({
-    //             id: 'panel4',
-    //             component: 'default',
-    //             position: {
-    //                 direction: 'above',
-    //             },
-    //         });
+            const panel4 = dockview.addPanel({
+                id: 'panel4',
+                component: 'default',
+                position: {
+                    direction: 'above',
+                },
+            });
 
-    //         dockview.moveGroupOrPanel(
-    //             panel4.group,
-    //             panel3.group.id,
-    //             panel3.id,
-    //             'center'
-    //         );
+            panel4.api.group.api.moveTo({
+                group: panel3.api.group,
+                position: 'center',
+            });
 
-    //         dockview.addPanel({
-    //             id: 'panel5',
-    //             component: 'default',
-    //             floating: true,
-    //         });
+            dockview.addPanel({
+                id: 'panel5',
+                component: 'default',
+                floating: true,
+            });
 
-    //         const panel6 = dockview.addPanel({
-    //             id: 'panel6',
-    //             component: 'default',
-    //             position: {
-    //                 referencePanel: 'panel5',
-    //                 direction: 'within',
-    //             },
-    //         });
+            const panel6 = dockview.addPanel({
+                id: 'panel6',
+                component: 'default',
+                position: {
+                    referencePanel: 'panel5',
+                    direction: 'within',
+                },
+            });
 
-    //         dockview.addFloatingGroup(panel4.api.group);
+            dockview.addFloatingGroup(panel4.api.group);
 
-    //         dockview.addPopoutGroup(panel6);
+            await dockview.addPopoutGroup(panel2);
 
-    //         dockview.moveGroupOrPanel(
-    //             panel1.group,
-    //             panel6.group.id,
-    //             panel6.id,
-    //             'center'
-    //         );
+            panel1.api.group.api.moveTo({
+                group: panel6.api.group,
+                position: 'center',
+            });
 
-    //         dockview.moveGroupOrPanel(
-    //             panel4.group,
-    //             panel6.group.id,
-    //             panel6.id,
-    //             'center'
-    //         );
+            panel4.api.group.api.moveTo({
+                group: panel6.api.group,
+                position: 'center',
+            });
 
-    //         dockview.dispose();
+            dockview.dispose();
 
-    //         if (Emitter.MEMORY_LEAK_WATCHER.size > 0) {
-    //             for (const entry of Array.from(
-    //                 Emitter.MEMORY_LEAK_WATCHER.events
-    //             )) {
-    //                 console.log('disposal', entry[1]);
-    //             }
-    //             throw new Error('not all listeners disposed');
-    //         }
+            if (Emitter.MEMORY_LEAK_WATCHER.size > 0) {
+                console.warn(
+                    `${Emitter.MEMORY_LEAK_WATCHER.size} undisposed resources`
+                );
 
-    //         Emitter.setLeakageMonitorEnabled(false);
-    //     });
-    // });
+                for (const entry of Array.from(
+                    Emitter.MEMORY_LEAK_WATCHER.events
+                )) {
+                    console.log('disposal', entry[1]);
+                }
+                throw new Error(
+                    `${Emitter.MEMORY_LEAK_WATCHER.size} undisposed resources`
+                );
+            }
+
+            Emitter.setLeakageMonitorEnabled(false);
+        });
+    });
 
     test('duplicate panel', () => {
         dockview.layout(500, 1000);
@@ -1097,7 +1106,9 @@ describe('dockviewComponent', () => {
         disposable.dispose();
     });
 
-    test('events flow', () => {
+    test('events flow', async () => {
+        window.open = () => setupMockWindow();
+
         dockview.layout(1000, 1000);
 
         let events: {
@@ -1290,7 +1301,42 @@ describe('dockviewComponent', () => {
         expect(dockview.size).toBe(0);
         expect(dockview.totalPanels).toBe(0);
 
+        events = [];
+
+        const panel8 = dockview.addPanel({
+            id: 'panel8',
+            component: 'default',
+        });
+        const panel9 = dockview.addPanel({
+            id: 'panel9',
+            component: 'default',
+            floating: true,
+        });
+        const panel10 = dockview.addPanel({
+            id: 'panel10',
+            component: 'default',
+        });
+
+        expect(await dockview.addPopoutGroup(panel10)).toBeTruthy();
+
+        expect(events).toEqual([
+            { type: 'ADD_GROUP', group: panel8.group },
+            { type: 'ADD_PANEL', panel: panel8 },
+            { type: 'ACTIVE_GROUP', group: panel8.group },
+            { type: 'ACTIVE_PANEL', panel: panel8 },
+            { type: 'ADD_GROUP', group: panel9.group },
+            { type: 'ADD_PANEL', panel: panel9 },
+            { type: 'ACTIVE_GROUP', group: panel9.group },
+            { type: 'ACTIVE_PANEL', panel: panel9 },
+            { type: 'ADD_PANEL', panel: panel10 },
+            { type: 'ACTIVE_PANEL', panel: panel10 },
+            { type: 'ADD_GROUP', group: panel10.group },
+        ]);
+
+        events = [];
         disposable.dispose();
+
+        expect(events.length).toBe(0);
     });
 
     test('that removing a panel from a group reflects in the dockviewcomponent when searching for a panel', () => {
@@ -2411,17 +2457,17 @@ describe('dockviewComponent', () => {
         const group = dockview.getGroupPanel('panel2')!.api.group;
 
         const viewQuery = group.element.querySelectorAll(
-            '.dv-groupview > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab'
+            '.dv-groupview > .dv-tabs-and-actions-container > .dv-scrollable > .dv-tabs-container > .dv-tab'
         );
         expect(viewQuery.length).toBe(2);
 
         const viewQuery2 = group.element.querySelectorAll(
-            '.dv-groupview > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab > .dv-default-tab'
+            '.dv-groupview > .dv-tabs-and-actions-container > .dv-scrollable > .dv-tabs-container > .dv-tab > .dv-default-tab'
         );
         expect(viewQuery2.length).toBe(1);
 
         const viewQuery3 = group.element.querySelectorAll(
-            '.dv-groupview > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab > .panel-tab-part-panel2'
+            '.dv-groupview > .dv-tabs-and-actions-container > .dv-scrollable > .dv-tabs-container > .dv-tab > .panel-tab-part-panel2'
         );
         expect(viewQuery3.length).toBe(1);
     });
@@ -3334,10 +3380,10 @@ describe('dockviewComponent', () => {
             position: { direction: 'right' },
         });
 
-        Object.defineProperty(dockview.element, 'clientWidth', {
+        Object.defineProperty(dockview.element, 'offsetWidth', {
             get: () => 100,
         });
-        Object.defineProperty(dockview.element, 'clientHeight', {
+        Object.defineProperty(dockview.element, 'offsetHeight', {
             get: () => 100,
         });
 
@@ -3707,16 +3753,16 @@ describe('dockviewComponent', () => {
                 floatingGroups: [
                     {
                         data: {
-                            views: ['panelB'],
-                            activeView: 'panelB',
+                            views: ['panelC'],
+                            activeView: 'panelC',
                             id: '3',
                         },
                         position: { left: 0, top: 0, height: 100, width: 100 },
                     },
                     {
                         data: {
-                            views: ['panelC'],
-                            activeView: 'panelC',
+                            views: ['panelD'],
+                            activeView: 'panelD',
                             id: '4',
                         },
                         position: { left: 0, top: 0, height: 100, width: 100 },
@@ -4867,6 +4913,335 @@ describe('dockviewComponent', () => {
             );
         });
 
+        test('deserailize popout with no reference group', async () => {
+            jest.useRealTimers();
+
+            const container = document.createElement('div');
+
+            window.open = () => setupMockWindow();
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 1000);
+
+            dockview.fromJSON({
+                activeGroup: 'group-1',
+                grid: {
+                    root: {
+                        type: 'branch',
+                        data: [
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panel1'],
+                                    id: 'group-1',
+                                    activeView: 'panel1',
+                                },
+                                size: 1000,
+                            },
+                        ],
+                        size: 1000,
+                    },
+                    height: 1000,
+                    width: 1000,
+                    orientation: Orientation.VERTICAL,
+                },
+                popoutGroups: [
+                    {
+                        data: {
+                            views: ['panel2'],
+                            id: 'group-2',
+                            activeView: 'panel2',
+                        },
+                        position: null,
+                    },
+                ],
+                panels: {
+                    panel1: {
+                        id: 'panel1',
+                        contentComponent: 'default',
+                        title: 'panel1',
+                    },
+                    panel2: {
+                        id: 'panel2',
+                        contentComponent: 'default',
+                        title: 'panel2',
+                    },
+                },
+            });
+
+            await new Promise((resolve) => setTimeout(resolve, 0));
+
+            const panel2 = dockview.api.getPanel('panel2');
+
+            const windowObject =
+                panel2?.api.location.type === 'popout'
+                    ? panel2?.api.location.getWindow()
+                    : undefined;
+
+            expect(windowObject).toBeTruthy();
+
+            windowObject!.close();
+        });
+
+        test('grid -> floating -> popout -> popout closed', async () => {
+            const container = document.createElement('div');
+
+            window.open = () => setupMockWindow();
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+            });
+
+            const panel3 = dockview.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(panel2.api.location.type).toBe('grid');
+            expect(panel3.api.location.type).toBe('grid');
+
+            dockview.addFloatingGroup(panel2);
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(panel2.api.location.type).toBe('floating');
+            expect(panel3.api.location.type).toBe('grid');
+
+            await dockview.addPopoutGroup(panel2);
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(panel2.api.location.type).toBe('popout');
+            expect(panel3.api.location.type).toBe('grid');
+
+            const windowObject =
+                panel2.api.location.type === 'popout'
+                    ? panel2.api.location.getWindow()
+                    : undefined;
+            expect(windowObject).toBeTruthy();
+
+            windowObject!.close();
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(panel2.api.location.type).toBe('floating');
+            expect(panel3.api.location.type).toBe('grid');
+        });
+
+        test('grid -> floating -> popout -> floating', async () => {
+            const container = document.createElement('div');
+
+            window.open = () => setupMockWindow();
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+            });
+
+            const panel3 = dockview.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(panel2.api.location.type).toBe('grid');
+            expect(panel3.api.location.type).toBe('grid');
+
+            dockview.addFloatingGroup(panel2.group);
+
+            expect(panel1.api.location.type).toBe('floating');
+            expect(panel2.api.location.type).toBe('floating');
+            expect(panel3.api.location.type).toBe('grid');
+
+            await dockview.addPopoutGroup(panel2.group);
+
+            expect(panel1.api.location.type).toBe('popout');
+            expect(panel2.api.location.type).toBe('popout');
+            expect(panel3.api.location.type).toBe('grid');
+
+            dockview.addFloatingGroup(panel2.group);
+
+            expect(panel1.api.location.type).toBe('floating');
+            expect(panel2.api.location.type).toBe('floating');
+            expect(panel3.api.location.type).toBe('grid');
+
+            await dockview.addPopoutGroup(panel2.group);
+
+            expect(panel1.api.location.type).toBe('popout');
+            expect(panel2.api.location.type).toBe('popout');
+            expect(panel3.api.location.type).toBe('grid');
+
+            panel2.group.api.moveTo({ group: panel3.group });
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(panel2.api.location.type).toBe('grid');
+            expect(panel3.api.location.type).toBe('grid');
+        });
+
+        test('that panel is rendered when moving from popout to new group', async () => {
+            const container = document.createElement('div');
+
+            window.open = () => setupMockWindow();
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+            });
+
+            const panel3 = dockview.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                renderer: 'always',
+            });
+
+            await dockview.addPopoutGroup(panel2);
+            panel2.api.moveTo({ group: panel1.api.group, position: 'right' });
+
+            // confirm panel is rendered on DOM
+            expect(
+                panel2.group.element.querySelectorAll(
+                    '.dv-content-container > .testpanel-panel_2'
+                ).length
+            ).toBe(1);
+
+            await dockview.addPopoutGroup(panel3);
+            panel3.api.moveTo({ group: panel1.api.group, position: 'right' });
+
+            // confirm panel is rendered to always overlay container
+            expect(
+                dockview.element.querySelectorAll(
+                    '.dv-render-overlay > .testpanel-panel_3'
+                ).length
+            ).toBe(1);
+            expect(
+                panel2.group.element.querySelectorAll(
+                    '.dv-content-container > .testpanel-panel_3'
+                ).length
+            ).toBe(0);
+        });
+
+        test('move popout group of 1 panel inside grid', async () => {
+            const container = document.createElement('div');
+
+            window.open = () => setupMockWindow();
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+            });
+
+            const panel3 = dockview.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            await dockview.addPopoutGroup(panel2);
+
+            panel2.api.moveTo({ position: 'top', group: panel3.group });
+
+            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups.length).toBe(3);
+        });
+
         test('add a popout group', async () => {
             const container = document.createElement('div');
 
@@ -5071,7 +5446,7 @@ describe('dockviewComponent', () => {
             mockWindow.close();
 
             expect(panel1.group.api.location.type).toBe('grid');
-            expect(panel2.group.api.location.type).toBe('grid');
+            expect(panel2.group.api.location.type).toBe('floating');
             expect(panel3.group.api.location.type).toBe('grid');
 
             dockview.clear();
@@ -5361,6 +5736,42 @@ describe('dockviewComponent', () => {
                     url: '/custom.html',
                 },
             ]);
+        });
+
+        test('dispose of dockview instance when popup is open', async () => {
+            const container = document.createElement('div');
+
+            window.open = () => setupMockWindow();
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+            });
+
+            expect(await dockview.addPopoutGroup(panel2.group)).toBeTruthy();
+
+            dockview.dispose();
         });
     });
 
@@ -6317,37 +6728,5 @@ describe('dockviewComponent', () => {
 
         expect(api.panels.length).toBe(3);
         expect(api.groups.length).toBe(3);
-    });
-
-    describe('updateOptions', () => {
-        test('gap', () => {
-            const container = document.createElement('div');
-
-            const dockview = new DockviewComponent(container, {
-                createComponent(options) {
-                    switch (options.name) {
-                        case 'default':
-                            return new PanelContentPartTest(
-                                options.id,
-                                options.name
-                            );
-                        default:
-                            throw new Error(`unsupported`);
-                    }
-                },
-                gap: 6,
-            });
-
-            expect(dockview.gap).toBe(6);
-
-            dockview.updateOptions({ gap: 10 });
-            expect(dockview.gap).toBe(10);
-
-            dockview.updateOptions({});
-            expect(dockview.gap).toBe(10);
-
-            dockview.updateOptions({ gap: 15 });
-            expect(dockview.gap).toBe(15);
-        });
     });
 });

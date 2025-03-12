@@ -4,8 +4,7 @@ import { PanelUpdateEvent } from '../../panel/types';
 import { PaneviewComponent } from '../../paneview/paneviewComponent';
 import {
     PaneviewPanel,
-    IPaneBodyPart,
-    IPaneHeaderPart,
+    IPanePart,
     PanePanelComponentInitParameter,
 } from '../../paneview/paneviewPanel';
 import { Orientation } from '../../splitview/splitview';
@@ -16,7 +15,7 @@ class TestPanel extends PaneviewPanel {
     }
 
     getHeaderComponent() {
-        return new (class Header implements IPaneHeaderPart {
+        return new (class Header implements IPanePart {
             private _element: HTMLElement = document.createElement('div');
 
             get element() {
@@ -38,7 +37,7 @@ class TestPanel extends PaneviewPanel {
     }
 
     getBodyComponent() {
-        return new (class Header implements IPaneBodyPart {
+        return new (class Header implements IPanePart {
             private _element: HTMLElement = document.createElement('div');
 
             get element() {
@@ -68,12 +67,39 @@ describe('componentPaneview', () => {
         container.className = 'container';
     });
 
+    test('that the container is not removed when grid is disposed', () => {
+        const root = document.createElement('div');
+        const container = document.createElement('div');
+        root.appendChild(container);
+
+        const paneview = new PaneviewComponent(container, {
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
+            },
+        });
+
+        paneview.dispose();
+
+        expect(container.parentElement).toBe(root);
+        expect(container.children.length).toBe(0);
+    });
+
     test('vertical panels', () => {
         const disposables = new CompositeDisposable();
 
         const paneview = new PaneviewComponent(container, {
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
 
@@ -81,12 +107,12 @@ describe('componentPaneview', () => {
 
         paneview.addPanel({
             id: 'panel1',
-            component: 'testPanel',
+            component: 'default',
             title: 'Panel 1',
         });
         paneview.addPanel({
             id: 'panel2',
-            component: 'testPanel',
+            component: 'default',
             title: 'Panel2',
         });
 
@@ -144,8 +170,13 @@ describe('componentPaneview', () => {
 
     test('serialization', () => {
         const paneview = new PaneviewComponent(container, {
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
 
@@ -156,7 +187,7 @@ describe('componentPaneview', () => {
                     size: 1,
                     data: {
                         id: 'panel1',
-                        component: 'testPanel',
+                        component: 'default',
                         title: 'Panel 1',
                     },
                     expanded: true,
@@ -165,7 +196,7 @@ describe('componentPaneview', () => {
                     size: 2,
                     data: {
                         id: 'panel2',
-                        component: 'testPanel',
+                        component: 'default',
                         title: 'Panel 2',
                     },
                     expanded: false,
@@ -174,7 +205,7 @@ describe('componentPaneview', () => {
                     size: 3,
                     data: {
                         id: 'panel3',
-                        component: 'testPanel',
+                        component: 'default',
                         title: 'Panel 3',
                     },
                 },
@@ -220,7 +251,7 @@ describe('componentPaneview', () => {
                     size: 756,
                     data: {
                         id: 'panel1',
-                        component: 'testPanel',
+                        component: 'default',
                         title: 'Panel 1',
                     },
                     expanded: true,
@@ -230,7 +261,7 @@ describe('componentPaneview', () => {
                     size: 22,
                     data: {
                         id: 'panel2',
-                        component: 'testPanel',
+                        component: 'default',
                         title: 'Panel 2',
                     },
                     expanded: false,
@@ -240,7 +271,7 @@ describe('componentPaneview', () => {
                     size: 22,
                     data: {
                         id: 'panel3',
-                        component: 'testPanel',
+                        component: 'default',
                         title: 'Panel 3',
                     },
                     expanded: false,
@@ -252,20 +283,25 @@ describe('componentPaneview', () => {
 
     test('toJSON shouldnt fire any layout events', () => {
         const paneview = new PaneviewComponent(container, {
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
         paneview.layout(1000, 1000);
 
         paneview.addPanel({
             id: 'panel1',
-            component: 'testPanel',
+            component: 'default',
             title: 'Panel 1',
         });
         paneview.addPanel({
             id: 'panel2',
-            component: 'testPanel',
+            component: 'default',
             title: 'Panel 2',
         });
 
@@ -279,39 +315,15 @@ describe('componentPaneview', () => {
         disposable.dispose();
     });
 
-    test('dispose of paneviewComponent', () => {
-        expect(container.childNodes.length).toBe(0);
-
-        const paneview = new PaneviewComponent(container, {
-            components: {
-                testPanel: TestPanel,
-            },
-        });
-
-        paneview.layout(1000, 1000);
-
-        paneview.addPanel({
-            id: 'panel1',
-            component: 'testPanel',
-            title: 'Panel 1',
-        });
-        paneview.addPanel({
-            id: 'panel2',
-            component: 'testPanel',
-            title: 'Panel 2',
-        });
-
-        expect(container.childNodes.length).toBeGreaterThan(0);
-
-        paneview.dispose();
-
-        expect(container.childNodes.length).toBe(0);
-    });
-
     test('panel is disposed of when component is disposed', () => {
         const paneview = new PaneviewComponent(container, {
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
 
@@ -319,12 +331,12 @@ describe('componentPaneview', () => {
 
         paneview.addPanel({
             id: 'panel1',
-            component: 'testPanel',
+            component: 'default',
             title: 'Panel 1',
         });
         paneview.addPanel({
             id: 'panel2',
-            component: 'testPanel',
+            component: 'default',
             title: 'Panel 2',
         });
 
@@ -342,8 +354,13 @@ describe('componentPaneview', () => {
 
     test('panel is disposed of when removed', () => {
         const paneview = new PaneviewComponent(container, {
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
 
@@ -351,12 +368,12 @@ describe('componentPaneview', () => {
 
         paneview.addPanel({
             id: 'panel1',
-            component: 'testPanel',
+            component: 'default',
             title: 'Panel 1',
         });
         paneview.addPanel({
             id: 'panel2',
-            component: 'testPanel',
+            component: 'default',
             title: 'Panel 2',
         });
 
@@ -374,8 +391,13 @@ describe('componentPaneview', () => {
 
     test('panel is disposed of when fromJSON is called', () => {
         const paneview = new PaneviewComponent(container, {
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
 
@@ -383,12 +405,12 @@ describe('componentPaneview', () => {
 
         paneview.addPanel({
             id: 'panel1',
-            component: 'testPanel',
+            component: 'default',
             title: 'Panel 1',
         });
         paneview.addPanel({
             id: 'panel2',
-            component: 'testPanel',
+            component: 'default',
             title: 'Panel 2',
         });
 
@@ -406,8 +428,13 @@ describe('componentPaneview', () => {
 
     test('that fromJSON layouts are resized to the current dimensions', async () => {
         const paneview = new PaneviewComponent(container, {
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
 
@@ -420,7 +447,7 @@ describe('componentPaneview', () => {
                     size: 1,
                     data: {
                         id: 'panel1',
-                        component: 'testPanel',
+                        component: 'default',
                         title: 'Panel 1',
                     },
                     expanded: true,
@@ -429,7 +456,7 @@ describe('componentPaneview', () => {
                     size: 2,
                     data: {
                         id: 'panel2',
-                        component: 'testPanel',
+                        component: 'default',
                         title: 'Panel 2',
                     },
                     expanded: true,
@@ -438,7 +465,7 @@ describe('componentPaneview', () => {
                     size: 3,
                     data: {
                         id: 'panel3',
-                        component: 'testPanel',
+                        component: 'default',
                         title: 'Panel 3',
                     },
                     expanded: true,
@@ -454,7 +481,7 @@ describe('componentPaneview', () => {
                     size: 122,
                     data: {
                         id: 'panel1',
-                        component: 'testPanel',
+                        component: 'default',
                         title: 'Panel 1',
                     },
                     expanded: true,
@@ -464,7 +491,7 @@ describe('componentPaneview', () => {
                     size: 122,
                     data: {
                         id: 'panel2',
-                        component: 'testPanel',
+                        component: 'default',
                         title: 'Panel 2',
                     },
                     expanded: true,
@@ -474,7 +501,7 @@ describe('componentPaneview', () => {
                     size: 356,
                     data: {
                         id: 'panel3',
-                        component: 'testPanel',
+                        component: 'default',
                         title: 'Panel 3',
                     },
                     expanded: true,
@@ -486,8 +513,13 @@ describe('componentPaneview', () => {
 
     test('that disableAutoResizing is false by default', () => {
         const paneview = new PaneviewComponent(container, {
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
 
@@ -496,8 +528,13 @@ describe('componentPaneview', () => {
 
     test('that disableAutoResizing can be enabled', () => {
         const paneview = new PaneviewComponent(container, {
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
             disableAutoResizing: true,
         });
@@ -507,8 +544,13 @@ describe('componentPaneview', () => {
 
     test('that setVisible toggles visiblity', () => {
         const paneview = new PaneviewComponent(container, {
-            components: {
-                default: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
             disableAutoResizing: true,
         });
@@ -540,17 +582,22 @@ describe('componentPaneview', () => {
 
     test('update className', () => {
         const paneview = new PaneviewComponent(container, {
-            components: {
-                default: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
             disableAutoResizing: true,
             className: 'test-a test-b',
         });
 
-        expect(paneview.element.className).toBe('container test-a test-b');
+        expect(paneview.element.className).toBe('test-a test-b');
 
         paneview.updateOptions({ className: 'test-b test-c' });
 
-        expect(paneview.element.className).toBe('container test-b test-c');
+        expect(paneview.element.className).toBe('test-b test-c');
     });
 });

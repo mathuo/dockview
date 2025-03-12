@@ -55,7 +55,15 @@ export class ContentContainer
 
         this.addDisposables(this._onDidFocus, this._onDidBlur);
 
+        const target = group.dropTargetContainer;
+
         this.dropTarget = new Droptarget(this.element, {
+            getOverlayOutline: () => {
+                return accessor.options.theme?.dndPanelOverlay === 'group'
+                    ? this.element.parentElement
+                    : null;
+            },
+            className: 'dv-drop-target-content',
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
             canDisplayOverlay: (event, position) => {
                 if (
@@ -76,26 +84,12 @@ export class ContentContainer
                 }
 
                 if (data && data.viewId === this.accessor.id) {
-                    if (data.groupId === this.group.id) {
-                        if (position === 'center') {
-                            // don't allow to drop on self for center position
-                            return false;
-                        }
-                        if (data.panelId === null) {
-                            // don't allow group move to drop anywhere on self
-                            return false;
-                        }
-                    }
-
-                    const groupHasOnePanelAndIsActiveDragElement =
-                        this.group.panels.length === 1 &&
-                        data.groupId === this.group.id;
-
-                    return !groupHasOnePanelAndIsActiveDragElement;
+                    return true;
                 }
 
                 return this.group.canDisplayOverlay(event, position, 'content');
             },
+            getOverrideTarget: target ? () => target.model : undefined,
         });
 
         this.addDisposables(this.dropTarget);

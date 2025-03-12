@@ -2,7 +2,7 @@ import { DockviewApi } from 'dockview';
 import * as React from 'react';
 import { defaultConfig, nextId } from './defaultLayout';
 
-import { createRoot, Root } from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import { PanelBuilder } from './panelBuilder';
 
 let mount = document.querySelector('.popover-anchor') as HTMLElement | null;
@@ -132,10 +132,7 @@ export const GridActions = (props: {
 
     const popover = usePopover();
 
-    const onAddPanel = (options?: {
-        advanced: boolean;
-        component?: string;
-    }) => {
+    const onAddPanel = (options?: { advanced?: boolean; nested?: boolean }) => {
         if (options?.advanced) {
             popover.open(({ close }) => {
                 return <PanelBuilder api={props.api!} done={close} />;
@@ -143,7 +140,7 @@ export const GridActions = (props: {
         } else {
             props.api?.addPanel({
                 id: `id_${Date.now().toString()}`,
-                component: options?.component ?? 'default',
+                component: options?.nested ? 'nested' : 'default',
                 title: `Tab ${nextId()}`,
                 renderer: 'always',
             });
@@ -153,12 +150,6 @@ export const GridActions = (props: {
     const onAddGroup = () => {
         props.api?.addGroup();
     };
-
-    const [gap, setGap] = React.useState(0);
-
-    React.useEffect(() => {
-        props.api?.setGap(gap);
-    }, [gap, props.api]);
 
     return (
         <div className="action-container">
@@ -173,22 +164,12 @@ export const GridActions = (props: {
                     <span className="material-symbols-outlined">tune</span>
                 </button>
             </div>
-            <div className="button-group">
-                <button
-                    className="text-button"
-                    onClick={() =>
-                        onAddPanel({ component: 'shadowDom', advanced: false })
-                    }
-                >
-                    Add Panel 2
-                </button>
-                <button
-                    className="demo-icon-button"
-                    onClick={() => onAddPanel({ advanced: true })}
-                >
-                    <span className="material-symbols-outlined">tune</span>
-                </button>
-            </div>
+            <button
+                className="text-button"
+                onClick={() => onAddPanel({ nested: true })}
+            >
+                Add Nested Panel
+            </button>
             <button className="text-button" onClick={onAddGroup}>
                 Add Group
             </button>
@@ -217,18 +198,6 @@ export const GridActions = (props: {
                 Reset
             </button>
             <span style={{ flexGrow: 1 }} />
-            <div style={{ display: 'flex' }}>
-                <span style={{ paddingRight: '4px' }}>Group Gap</span>
-                <input
-                    style={{ width: 40 }}
-                    type="number"
-                    min={0}
-                    max={99}
-                    step={1}
-                    value={gap}
-                    onChange={(event) => setGap(Number(event.target.value))}
-                />
-            </div>
         </div>
     );
 };

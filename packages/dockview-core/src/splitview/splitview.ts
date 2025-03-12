@@ -32,11 +32,11 @@ export interface ISplitviewStyles {
 }
 
 export interface SplitViewOptions {
-    readonly orientation: Orientation;
-    readonly descriptor?: ISplitViewDescriptor;
-    readonly proportionalLayout?: boolean;
-    readonly styles?: ISplitviewStyles;
-    readonly margin?: number;
+    orientation?: Orientation;
+    descriptor?: ISplitViewDescriptor;
+    proportionalLayout?: boolean;
+    styles?: ISplitviewStyles;
+    margin?: number;
 }
 
 export enum LayoutPriority {
@@ -219,13 +219,15 @@ export class Splitview {
 
     set margin(value: number) {
         this._margin = value;
+
+        toggleClass(this.element, 'dv-splitview-has-margin', value !== 0);
     }
 
     constructor(
         private readonly container: HTMLElement,
         options: SplitViewOptions
     ) {
-        this._orientation = options.orientation;
+        this._orientation = options.orientation ?? Orientation.VERTICAL;
         this.element = this.createContainer();
 
         this.margin = options.margin ?? 0;

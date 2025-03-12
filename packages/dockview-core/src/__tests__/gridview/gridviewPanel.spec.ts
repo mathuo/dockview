@@ -8,6 +8,7 @@ describe('gridviewPanel', () => {
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
                 options: {},
+                onDidOptionsChange: jest.fn(),
             } as any;
         });
 

@@ -2,7 +2,6 @@ import type {
     DockviewApi,
     DockviewGroupPanel,
     DockviewPanelApi,
-    GroupPanelPartInitParameters,
     IContentRenderer,
     IDockviewPanelHeaderProps,
     IGroupHeaderProps,
@@ -12,6 +11,7 @@ import type {
     IWatermarkRenderer,
     PanelUpdateEvent,
     Parameters,
+    TabPartInitParameters,
     WatermarkRendererInitParameters,
 } from 'dockview-core';
 import {
@@ -121,7 +121,7 @@ export class VueRenderer
     private _api: DockviewPanelApi | undefined;
     private _containerApi: DockviewApi | undefined;
 
-    init(parameters: GroupPanelPartInitParameters): void {
+    init(parameters: TabPartInitParameters): void {
         this._api = parameters.api;
         this._containerApi = parameters.containerApi;
 
@@ -129,6 +129,7 @@ export class VueRenderer
             params: parameters.params,
             api: parameters.api,
             containerApi: parameters.containerApi,
+            tabLocation: parameters.tabLocation,
         };
 
         this._renderDisposable?.dispose();

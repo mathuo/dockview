@@ -10,7 +10,7 @@ import {
     IDockviewPanelHeaderProps,
     IDockviewPanelProps,
     DockviewOptions,
-    PROPERTY_KEYS,
+    PROPERTY_KEYS_DOCKVIEW,
     DockviewComponentOptions,
     DockviewFrameworkOptions,
     DockviewReadyEvent,
@@ -40,7 +40,6 @@ function createGroupControlElement(
 const DEFAULT_REACT_TAB = 'props.defaultTabComponent';
 
 export interface IDockviewReactProps extends DockviewOptions {
-    className?: string;
     tabComponents?: Record<
         string,
         React.FunctionComponent<IDockviewPanelHeaderProps>
@@ -58,7 +57,7 @@ export interface IDockviewReactProps extends DockviewOptions {
 }
 
 function extractCoreOptions(props: IDockviewReactProps): DockviewOptions {
-    const coreOptions = PROPERTY_KEYS.reduce((obj, key) => {
+    const coreOptions = PROPERTY_KEYS_DOCKVIEW.reduce((obj, key) => {
         if (key in props) {
             obj[key] = props[key] as any;
         }
@@ -82,7 +81,7 @@ export const DockviewReact = React.forwardRef(
             () => {
                 const changes: Partial<DockviewOptions> = {};
 
-                PROPERTY_KEYS.forEach((propKey) => {
+                PROPERTY_KEYS_DOCKVIEW.forEach((propKey) => {
                     const key = propKey;
                     const propValue = props[key];
 
@@ -99,7 +98,7 @@ export const DockviewReact = React.forwardRef(
 
                 prevProps.current = props;
             },
-            PROPERTY_KEYS.map((key) => props[key])
+            PROPERTY_KEYS_DOCKVIEW.map((key) => props[key])
         );
 
         React.useEffect(() => {
@@ -319,11 +318,7 @@ export const DockviewReact = React.forwardRef(
         }, [props.prefixHeaderActionsComponent]);
 
         return (
-            <div
-                className={props.className}
-                style={{ height: '100%', width: '100%' }}
-                ref={domRef}
-            >
+            <div style={{ height: '100%', width: '100%' }} ref={domRef}>
                 {portals}
             </div>
         );

@@ -5,6 +5,7 @@ import {
     IDockviewPanelHeaderProps,
     IDockviewPanelProps,
     DockviewApi,
+    DockviewTheme,
 } from 'dockview';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
@@ -95,6 +96,7 @@ const components = {
         );
     },
     nested: (props: IDockviewPanelProps) => {
+        const theme = React.useContext(ThemeContext);
         return (
             <DockviewReact
                 components={components}
@@ -104,10 +106,13 @@ const components = {
                     event.api.addPanel({
                         id: 'panel_3',
                         component: 'default',
-                        floating: true,
+                    });
+
+                    event.api.onDidRemovePanel((e) => {
+                        console.log('remove', e);
                     });
                 }}
-                className={'dockview-theme-abyss'}
+                theme={theme}
             />
         );
     },
@@ -181,7 +186,9 @@ const WatermarkComponent = () => {
     return <div>custom watermark</div>;
 };
 
-const DockviewDemo = (props: { theme?: string }) => {
+const ThemeContext = React.createContext<DockviewTheme | undefined>(undefined);
+
+const DockviewDemo = (props: { theme?: DockviewTheme }) => {
     const [logLines, setLogLines] = React.useState<
         { text: string; timestamp?: Date; backgroundColor?: string }[]
     >([]);
@@ -216,75 +223,92 @@ const DockviewDemo = (props: { theme?: string }) => {
         setPending([]);
     }, [pending]);
 
-    const onReady = (event: DockviewReadyEvent) => {
-        setApi(event.api);
-
-        event.api.onDidAddPanel((event) => {
-            setPanels((_) => [..._, event.id]);
-            addLogLine(`Panel Added ${event.id}`);
-        });
-        event.api.onDidActivePanelChange((event) => {
-            setActivePanel(event?.id);
-            addLogLine(`Panel Activated ${event?.id}`);
-        });
-        event.api.onDidRemovePanel((event) => {
-            setPanels((_) => {
-                const next = [..._];
-                next.splice(
-                    next.findIndex((x) => x === event.id),
-                    1
-                );
-
-                return next;
-            });
-            addLogLine(`Panel Removed ${event.id}`);
-        });
-
-        event.api.onDidAddGroup((event) => {
-            setGroups((_) => [..._, event.id]);
-            addLogLine(`Group Added ${event.id}`);
-        });
-
-        event.api.onDidMovePanel((event) => {
-            addLogLine(`Panel Moved ${event.panel.id}`);
-        });
-
-        event.api.onDidMaximizedGroupChange((event) => {
-            addLogLine(
-                `Group Maximized Changed ${event.group.id} [${event.isMaximized}]`
-            );
-        });
-
-        event.api.onDidRemoveGroup((event) => {
-            setGroups((_) => {
-                const next = [..._];
-                next.splice(
-                    next.findIndex((x) => x === event.id),
-                    1
-                );
-
-                return next;
-            });
-            addLogLine(`Group Removed ${event.id}`);
-        });
-
-        event.api.onDidActiveGroupChange((event) => {
-            setActiveGroup(event?.id);
-            addLogLine(`Group Activated ${event?.id}`);
-        });
-
-        const state = localStorage.getItem('dv-demo-state');
-        if (state) {
-            try {
-                event.api.fromJSON(JSON.parse(state));
-                return;
-            } catch {
-                localStorage.removeItem('dv-demo-state');
-            }
+    React.useEffect(() => {
+        if (!api) {
             return;
         }
 
-        defaultConfig(event.api);
+        const disposables = [
+            api.onDidAddPanel((event) => {
+                setPanels((_) => [..._, event.id]);
+                addLogLine(`Panel Added ${event.id}`);
+            }),
+            api.onDidActivePanelChange((event) => {
+                setActivePanel(event?.id);
+                addLogLine(`Panel Activated ${event?.id}`);
+            }),
+            api.onDidRemovePanel((event) => {
+                setPanels((_) => {
+                    const next = [..._];
+                    next.splice(
+                        next.findIndex((x) => x === event.id),
+                        1
+                    );
+
+                    return next;
+                });
+                addLogLine(`Panel Removed ${event.id}`);
+            }),
+
+            api.onDidAddGroup((event) => {
+                setGroups((_) => [..._, event.id]);
+                addLogLine(`Group Added ${event.id}`);
+            }),
+
+            api.onDidMovePanel((event) => {
+                addLogLine(`Panel Moved ${event.panel.id}`);
+            }),
+
+            api.onDidMaximizedGroupChange((event) => {
+                addLogLine(
+                    `Group Maximized Changed ${event.group.api.id} [${event.isMaximized}]`
+                );
+            }),
+
+            api.onDidRemoveGroup((event) => {
+                setGroups((_) => {
+                    const next = [..._];
+                    next.splice(
+                        next.findIndex((x) => x === event.id),
+                        1
+                    );
+
+                    return next;
+                });
+                addLogLine(`Group Removed ${event.id}`);
+            }),
+
+            api.onDidActiveGroupChange((event) => {
+                setActiveGroup(event?.id);
+                addLogLine(`Group Activated ${event?.id}`);
+            }),
+        ];
+
+        const loadLayout = () => {
+            const state = localStorage.getItem('dv-demo-state');
+
+            if (state) {
+                try {
+                    api.fromJSON(JSON.parse(state));
+                    return;
+                } catch {
+                    localStorage.removeItem('dv-demo-state');
+                }
+                return;
+            }
+
+            defaultConfig(api);
+        };
+
+        loadLayout();
+
+        return () => {
+            disposables.forEach((disposable) => disposable.dispose());
+        };
+    }, [api]);
+
+    const onReady = (event: DockviewReadyEvent) => {
+        setApi(event.api);
     };
 
     const [watermark, setWatermark] = React.useState<boolean>(false);
@@ -307,6 +331,7 @@ const DockviewDemo = (props: { theme?: string }) => {
 
     return (
         <div
+            className="dockview-demo"
             style={{
                 height: '100%',
                 display: 'flex',
@@ -398,23 +423,26 @@ const DockviewDemo = (props: { theme?: string }) => {
                     style={{
                         flexGrow: 1,
                         overflow: 'hidden',
-                        height: '100%',
                         display: 'flex',
                     }}
                 >
                     <DebugContext.Provider value={debug}>
-                        <DockviewReact
-                            components={components}
-                            defaultTabComponent={headerComponents.default}
-                            rightHeaderActionsComponent={RightControls}
-                            leftHeaderActionsComponent={LeftControls}
-                            prefixHeaderActionsComponent={PrefixHeaderControls}
-                            watermarkComponent={
-                                watermark ? WatermarkComponent : undefined
-                            }
-                            onReady={onReady}
-                            className={props.theme || 'dockview-theme-abyss'}
-                        />
+                        <ThemeContext.Provider value={props.theme}>
+                            <DockviewReact
+                                components={components}
+                                defaultTabComponent={headerComponents.default}
+                                rightHeaderActionsComponent={RightControls}
+                                leftHeaderActionsComponent={LeftControls}
+                                prefixHeaderActionsComponent={
+                                    PrefixHeaderControls
+                                }
+                                watermarkComponent={
+                                    watermark ? WatermarkComponent : undefined
+                                }
+                                onReady={onReady}
+                                theme={props.theme}
+                            />
+                        </ThemeContext.Provider>
                     </DebugContext.Provider>
                 </div>
 
@@ -424,61 +452,77 @@ const DockviewDemo = (props: { theme?: string }) => {
                             width: '400px',
                             backgroundColor: 'black',
                             color: 'white',
-                            overflow: 'auto',
+                            overflow: 'hidden',
                             fontFamily: 'monospace',
                             marginLeft: '10px',
                             flexShrink: 0,
+                            display: 'flex',
+                            flexDirection: 'column',
                         }}
                     >
-                        {logLines.map((line, i) => {
-                            return (
-                                <div
-                                    style={{
-                                        height: '30px',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                        fontSize: '13px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-
-                                        backgroundColor: line.backgroundColor,
-                                    }}
-                                    key={i}
-                                >
-                                    <span
+                        <div style={{ flexGrow: 1, overflow: 'auto' }}>
+                            {logLines.map((line, i) => {
+                                return (
+                                    <div
                                         style={{
+                                            height: '30px',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap',
+                                            fontSize: '13px',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            minWidth: '20px',
-                                            maxWidth: '20px',
-                                            color: 'gray',
-                                            borderRight: '1px solid gray',
-                                            marginRight: '4px',
-                                            paddingLeft: '4px',
-                                            height: '100%',
+
+                                            backgroundColor:
+                                                line.backgroundColor,
                                         }}
+                                        key={i}
                                     >
-                                        {logLines.length - i}
-                                    </span>
-                                    <span>
-                                        {line.timestamp && (
-                                            <span
-                                                style={{
-                                                    fontSize: '0.7em',
-                                                    padding: '0px 2px',
-                                                }}
-                                            >
-                                                {line.timestamp
-                                                    .toISOString()
-                                                    .substring(11, 23)}
-                                            </span>
-                                        )}
-                                        <span>{line.text}</span>
-                                    </span>
-                                </div>
-                            );
-                        })}
+                                        <span
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                minWidth: '20px',
+                                                maxWidth: '20px',
+                                                color: 'gray',
+                                                borderRight: '1px solid gray',
+                                                marginRight: '4px',
+                                                paddingLeft: '4px',
+                                                height: '100%',
+                                            }}
+                                        >
+                                            {logLines.length - i}
+                                        </span>
+                                        <span>
+                                            {line.timestamp && (
+                                                <span
+                                                    style={{
+                                                        fontSize: '0.7em',
+                                                        padding: '0px 2px',
+                                                    }}
+                                                >
+                                                    {line.timestamp
+                                                        .toISOString()
+                                                        .substring(11, 23)}
+                                                </span>
+                                            )}
+                                            <span>{line.text}</span>
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        <div
+                            style={{
+                                padding: '4px',
+                                display: 'flex',
+                                justifyContent: 'flex-end',
+                            }}
+                        >
+                            <button onClick={() => setLogLines([])}>
+                                Clear
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>

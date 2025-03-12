@@ -221,7 +221,7 @@ If you provide the `PaneviewReact` component with the prop `onDidDrop` you will 
 
 You can safely create multiple paneview instances within one page. They will not interact with each other by default.
 
-If you wish to interact with the drop event from one paneview instance in another paneview instance you can implement the `showDndOverlay` and `onDidDrop` props on `PaneviewReact`.
+If you wish to interact with the drop event from one paneview instance in another paneview instance you can implement the `api.onUnhandledDragOverEvent` and `onDidDrop` props on `PaneviewReact`.
 
 As an example see how dragging a header from one control to another will only trigger an interactable event for the developer if the checkbox is enabled.
 

@@ -10,6 +10,7 @@ import { fireEvent } from '@testing-library/dom';
 import { TestPanel } from '../../dockviewGroupPanelModel.spec';
 import { IDockviewPanel } from '../../../../dockview/dockviewPanel';
 import { fromPartial } from '@total-typescript/shoehorn';
+import { DockviewPanelApi } from '../../../../api/dockviewPanelApi';
 
 describe('tabsContainer', () => {
     test('that an external event does not render a drop target and calls through to the group mode', () => {
@@ -17,6 +18,7 @@ describe('tabsContainer', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -41,16 +43,16 @@ describe('tabsContainer', () => {
 
         const emptySpace = cut.element
             .getElementsByClassName('dv-void-container')
-            .item(0);
+            .item(0) as HTMLElement;
 
         if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -70,17 +72,17 @@ describe('tabsContainer', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
+            onDidOptionsChange: jest.fn(),
         });
 
-        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
-            () => {
-                return {
-                    canDisplayOverlay: jest.fn(),
-                };
-            }
-        );
+        const dropTargetContainer = document.createElement('div');
 
-        const groupView = new groupviewMock() as DockviewGroupPanelModel;
+        const groupView = fromPartial<DockviewGroupPanelModel>({
+            canDisplayOverlay: jest.fn(),
+            // dropTargetContainer: new DropTargetAnchorContainer(
+            //     dropTargetContainer
+            // ),
+        });
 
         const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
             return {
@@ -96,16 +98,16 @@ describe('tabsContainer', () => {
 
         const emptySpace = cut.element
             .getElementsByClassName('dv-void-container')
-            .item(0);
+            .item(0) as HTMLElement;
 
         if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -128,6 +130,10 @@ describe('tabsContainer', () => {
         expect(
             cut.element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(1);
+        // expect(
+        //     dropTargetContainer.getElementsByClassName('dv-drop-target-anchor')
+        //         .length
+        // ).toBe(1);
     });
 
     test('that dropping over the empty space should render a drop target', () => {
@@ -136,6 +142,7 @@ describe('tabsContainer', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -165,16 +172,16 @@ describe('tabsContainer', () => {
 
         const emptySpace = cut.element
             .getElementsByClassName('dv-void-container')
-            .item(0);
+            .item(0) as HTMLElement;
 
         if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -199,6 +206,7 @@ describe('tabsContainer', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -228,16 +236,16 @@ describe('tabsContainer', () => {
 
         const emptySpace = cut.element
             .getElementsByClassName('dv-void-container')
-            .item(0);
+            .item(0) as HTMLElement;
 
         if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -262,6 +270,7 @@ describe('tabsContainer', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -290,16 +299,16 @@ describe('tabsContainer', () => {
 
         const emptySpace = cut.element
             .getElementsByClassName('dv-void-container')
-            .item(0);
+            .item(0) as HTMLElement;
 
         if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'offsetWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -330,6 +339,7 @@ describe('tabsContainer', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -394,6 +404,7 @@ describe('tabsContainer', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -460,6 +471,7 @@ describe('tabsContainer', () => {
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             doSetGroupActive: jest.fn(),
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -516,6 +528,7 @@ describe('tabsContainer', () => {
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             doSetGroupActive: jest.fn(),
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -567,6 +580,7 @@ describe('tabsContainer', () => {
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             getGroupPanel: jest.fn(),
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -623,6 +637,7 @@ describe('tabsContainer', () => {
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             getGroupPanel: jest.fn(),
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -690,6 +705,7 @@ describe('tabsContainer', () => {
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             getGroupPanel: jest.fn(),
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -757,6 +773,7 @@ describe('tabsContainer', () => {
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             getGroupPanel: jest.fn(),
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -814,5 +831,37 @@ describe('tabsContainer', () => {
         result = cut.element.querySelector('.dv-right-actions-container');
         expect(result).toBeTruthy();
         expect(result!.childNodes.length).toBe(0);
+    });
+
+    test('class dv-single-tab is present when only one tab exists`', () => {
+        const cut = new TabsContainer(
+            fromPartial<DockviewComponent>({
+                options: {},
+                onDidOptionsChange: jest.fn(),
+            }),
+            fromPartial<DockviewGroupPanel>({})
+        );
+
+        expect(cut.element.classList.contains('dv-single-tab')).toBeFalsy();
+
+        const panel1 = new TestPanel(
+            'panel_1',
+            fromPartial<DockviewPanelApi>({})
+        );
+        cut.openPanel(panel1);
+        expect(cut.element.classList.contains('dv-single-tab')).toBeTruthy();
+
+        const panel2 = new TestPanel(
+            'panel_2',
+            fromPartial<DockviewPanelApi>({})
+        );
+        cut.openPanel(panel2);
+        expect(cut.element.classList.contains('dv-single-tab')).toBeFalsy();
+
+        cut.closePanel(panel1);
+        expect(cut.element.classList.contains('dv-single-tab')).toBeTruthy();
+
+        cut.closePanel(panel2);
+        expect(cut.element.classList.contains('dv-single-tab')).toBeFalsy();
     });
 });

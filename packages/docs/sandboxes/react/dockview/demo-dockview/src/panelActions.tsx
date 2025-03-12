@@ -74,14 +74,7 @@ const PanelAction = (props: {
                     onClick={() => {
                         const panel = props.api.getPanel(props.panelId);
                         if (panel) {
-                            props.api.addFloatingGroup(panel, {
-                                width: 400,
-                                height: 300,
-                                position: {
-                                    bottom: 50,
-                                    right: 50,
-                                },
-                            });
+                            props.api.addFloatingGroup(panel);
                         }
                     }}
                 >

@@ -77,8 +77,5 @@
   },
   "engines": {
     "node": ">=18.0"
-  },
-  "dependencies": {
-    "ag-grid-vue3": "^31.1.1"
   }
 }

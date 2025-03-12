@@ -6,8 +6,10 @@ title: Theme
 
 
 import { CSSVariablesTable, ThemeTable } from '@site/src/components/cssVariables';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-Theming is controlled through CSS and is highly customizable.
+Dockview components accept a `theme` property which is highly customizable, the theme is largly controlled through CSS however some properties can only be adjusted
+by direct editing variables of the `theme` object.
 
 Firstly, you should import `dockview.css`:
 
@@ -32,14 +34,33 @@ Firstly, you should import `dockview.css`:
 
 ## Provided themes
 
-`dockview` comes with a number of themes which are all CSS classes and can be found [here](https://github.com/mathuo/dockview/blob/master/packages/dockview-core/src/theme.scss).
-To use a `dockview` theme the CSS must encapsulate the component. The current list of themes is:
+`dockview` comes with a number of built-in themes. Each theme is represented as an object that can be imported.
+
+For dock components you should pass the theme object to the `theme` property, for other components such as split, pane and grid views you should
+use set the themes associated CSS class to the `className` property.
+
+```tsx
+import { themeAbyss } from "dockview";
+
+// For dock components
+theme={themeAbyss}
+
+// For other components
+const {className} = themeAbyss;
+```
 
 <ThemeTable/>
 
 :::info
-The source code for all themes can be found [here](https://github.com/mathuo/dockview/blob/master/packages/dockview-core/src/theme.scss).
+The source code for all themes can be found [here](https://github.com/mathuo/dockview/blob/master/packages/dockview-core/src/theme.scss) and the associated CSS [here](https://github.com/mathuo/dockview/blob/master/packages/dockview-core/src/theme.scss).
 :::
+
+## Build your own theme
+
+You can define your own `DockviewTheme` object and pass it to the `theme` property.
+
+<DocRef declaration="DockviewTheme" />
+
 
 ## Customizing Theme
 

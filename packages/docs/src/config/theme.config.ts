@@ -1,33 +1,54 @@
+import {
+    themeAbyss,
+    themeDark,
+    themeDracula,
+    themeAbyssSpaced,
+    themeLightSpaced,
+    themeLight,
+    themeReplit,
+    themeVisualStudio,
+} from 'dockview';
+
 export const themeConfig = [
     {
-        id: 'dockview-theme-dark',
-        key: '**[dockview-theme-dark](/demo?theme=dockview-theme-dark)**',
+        id: themeDark,
+        key: '**[Dark](/demo?theme=dark)**',
         text: '',
     },
     {
-        id: 'dockview-theme-light',
-        key: '**[dockview-theme-light](/demo?theme=dockview-theme-light)**',
+        id: themeLight,
+        key: '**[Light](/demo?theme=light)**',
         text: '',
     },
     {
-        id: 'dockview-theme-vs',
-        key: '**[dockview-theme-vs](/demo?theme=dockview-theme-vs)**',
+        id: themeVisualStudio,
+        key: '**[Visual Studio](/demo?theme=visualStudio)**',
 
         text: 'Based on [Visual Studio](https://visualstudio.microsoft.com)',
     },
     {
-        id: 'dockview-theme-abyss',
-        key: '**[dockview-theme-abyss](/demo?theme=dockview-theme-abyss)**',
+        id: themeAbyss,
+        key: '**[Abyss](/demo?theme=abyss)**',
         text: 'Based on [Visual Studio Code](https://code.visualstudio.com/docs/getstarted/themes) abyss theme',
     },
     {
-        id: 'dockview-theme-dracula',
-        key: '**[dockview-theme-dracula](/demo?theme=dockview-theme-dracula)**',
+        id: themeDracula,
+        key: '**[Dracula](/demo?theme=dracula)**',
         text: 'Based on [Visual Studio Code](https://code.visualstudio.com/docs/getstarted/themes) dracula theme',
     },
     {
-        id: 'dockview-theme-replit',
-        key: '**[dockview-theme-replit](/demo?theme=dockview-theme-replit)**',
+        id: themeReplit,
+        key: '**[Replit](/demo?theme=replit)**',
         text: 'Based on  [Replit](https://replit.com)',
+    },
+    {
+        id: themeLightSpaced,
+        key: '**[Light Spaced](/demo?theme=lightSpaced)**',
+        text: '',
+    },
+    {
+        id: themeAbyssSpaced,
+        key: '**[Abyss Spaced](/demo?theme=abyssSpaced)**',
+        text: '',
     },
 ];

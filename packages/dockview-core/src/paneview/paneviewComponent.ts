@@ -1,5 +1,4 @@
 import { PaneviewApi } from '../api/component.api';
-import { createComponent } from '../panel/componentFactory';
 import { Emitter, Event } from '../events';
 import {
     CompositeDisposable,
@@ -7,32 +6,20 @@ import {
     MutableDisposable,
 } from '../lifecycle';
 import { LayoutPriority, Orientation, Sizing } from '../splitview/splitview';
-import { PaneviewComponentOptions } from './options';
+import { PaneviewComponentOptions, PaneviewDndOverlayEvent } from './options';
 import { Paneview } from './paneview';
-import {
-    IPaneBodyPart,
-    IPaneHeaderPart,
-    PaneviewPanel,
-    IPaneviewPanel,
-} from './paneviewPanel';
+import { IPanePart, PaneviewPanel, IPaneviewPanel } from './paneviewPanel';
 import {
     DraggablePaneviewPanel,
-    PaneviewDropEvent,
+    PaneviewDidDropEvent,
 } from './draggablePaneviewPanel';
 import { DefaultHeader } from './defaultPaneviewHeader';
 import { sequentialNumberGenerator } from '../math';
-import { PaneTransfer } from '../dnd/dataTransfer';
 import { Resizable } from '../resizable';
 import { Parameters } from '../panel/types';
 import { Classnames } from '../dom';
 
 const nextLayoutId = sequentialNumberGenerator();
-
-export interface PaneviewDndOverlayEvent {
-    nativeEvent: DragEvent;
-    panel: IPaneviewPanel;
-    getData: () => PaneTransfer | undefined;
-}
 
 export interface SerializedPaneviewPanel {
     snap?: boolean;
@@ -61,8 +48,8 @@ export class PaneFramework extends DraggablePaneviewPanel {
             id: string;
             component: string;
             headerComponent: string | undefined;
-            body: IPaneBodyPart;
-            header: IPaneHeaderPart;
+            body: IPanePart;
+            header: IPanePart;
             orientation: Orientation;
             isExpanded: boolean;
             disableDnd: boolean;
@@ -112,9 +99,10 @@ export interface IPaneviewComponent extends IDisposable {
     readonly options: PaneviewComponentOptions;
     readonly onDidAddView: Event<PaneviewPanel>;
     readonly onDidRemoveView: Event<PaneviewPanel>;
-    readonly onDidDrop: Event<PaneviewDropEvent>;
+    readonly onDidDrop: Event<PaneviewDidDropEvent>;
     readonly onDidLayoutChange: Event<void>;
     readonly onDidLayoutFromJSON: Event<void>;
+    readonly onUnhandledDragOverEvent: Event<PaneviewDndOverlayEvent>;
     addPanel<T extends object = Parameters>(
         options: AddPaneviewComponentOptions<T>
     ): IPaneviewPanel;
@@ -143,14 +131,19 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
     private readonly _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
 
-    private readonly _onDidDrop = new Emitter<PaneviewDropEvent>();
-    readonly onDidDrop: Event<PaneviewDropEvent> = this._onDidDrop.event;
+    private readonly _onDidDrop = new Emitter<PaneviewDidDropEvent>();
+    readonly onDidDrop: Event<PaneviewDidDropEvent> = this._onDidDrop.event;
 
     private readonly _onDidAddView = new Emitter<PaneviewPanel>();
     readonly onDidAddView = this._onDidAddView.event;
 
     private readonly _onDidRemoveView = new Emitter<PaneviewPanel>();
     readonly onDidRemoveView = this._onDidRemoveView.event;
+
+    private readonly _onUnhandledDragOverEvent =
+        new Emitter<PaneviewDndOverlayEvent>();
+    readonly onUnhandledDragOverEvent: Event<PaneviewDndOverlayEvent> =
+        this._onUnhandledDragOverEvent.event;
 
     private readonly _classNames: Classnames;
 
@@ -202,28 +195,27 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
         return this._options;
     }
 
-    constructor(parentElement: HTMLElement, options: PaneviewComponentOptions) {
-        super(parentElement, options.disableAutoResizing);
+    constructor(container: HTMLElement, options: PaneviewComponentOptions) {
+        super(document.createElement('div'), options.disableAutoResizing);
+        this.element.style.height = '100%';
+        this.element.style.width = '100%';
 
         this.addDisposables(
             this._onDidLayoutChange,
             this._onDidLayoutfromJSON,
             this._onDidDrop,
             this._onDidAddView,
-            this._onDidRemoveView
+            this._onDidRemoveView,
+            this._onUnhandledDragOverEvent
         );
 
         this._classNames = new Classnames(this.element);
         this._classNames.setClassNames(options.className ?? '');
 
-        this._options = options;
+        // the container is owned by the third-party, do not modify/delete it
+        container.appendChild(this.element);
 
-        if (!options.components) {
-            options.components = {};
-        }
-        if (!options.frameworkComponents) {
-            options.frameworkComponents = {};
-        }
+        this._options = options;
 
         this.paneview = new Paneview(this.element, {
             // only allow paneview in the vertical orientation for now
@@ -257,36 +249,21 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
     addPanel<T extends object = Parameters>(
         options: AddPaneviewComponentOptions<T>
     ): IPaneviewPanel {
-        const body = createComponent(
-            options.id,
-            options.component,
-            this.options.components ?? {},
-            this.options.frameworkComponents ?? {},
-            this.options.frameworkWrapper
-                ? {
-                      createComponent:
-                          this.options.frameworkWrapper.body.createComponent,
-                  }
-                : undefined
-        );
+        const body = this.options.createComponent({
+            id: options.id,
+            name: options.component,
+        });
 
-        let header: IPaneHeaderPart;
+        let header: IPanePart | undefined;
 
-        if (options.headerComponent) {
-            header = createComponent(
-                options.id,
-                options.headerComponent,
-                this.options.headerComponents ?? {},
-                this.options.headerframeworkComponents,
-                this.options.frameworkWrapper
-                    ? {
-                          createComponent:
-                              this.options.frameworkWrapper.header
-                                  .createComponent,
-                      }
-                    : undefined
-            );
-        } else {
+        if (options.headerComponent && this.options.createHeaderComponent) {
+            header = this.options.createHeaderComponent({
+                id: options.id,
+                name: options.headerComponent,
+            });
+        }
+
+        if (!header) {
             header = new DefaultHeader();
         }
 
@@ -395,37 +372,24 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
                 views: views.map((view) => {
                     const data = view.data;
 
-                    const body = createComponent(
-                        data.id,
-                        data.component,
-                        this.options.components ?? {},
-                        this.options.frameworkComponents ?? {},
-                        this.options.frameworkWrapper
-                            ? {
-                                  createComponent:
-                                      this.options.frameworkWrapper.body
-                                          .createComponent,
-                              }
-                            : undefined
-                    );
+                    const body = this.options.createComponent({
+                        id: data.id,
+                        name: data.component,
+                    });
 
-                    let header: IPaneHeaderPart;
+                    let header: IPanePart | undefined;
 
-                    if (data.headerComponent) {
-                        header = createComponent(
-                            data.id,
-                            data.headerComponent,
-                            this.options.headerComponents ?? {},
-                            this.options.headerframeworkComponents ?? {},
-                            this.options.frameworkWrapper
-                                ? {
-                                      createComponent:
-                                          this.options.frameworkWrapper.header
-                                              .createComponent,
-                                  }
-                                : undefined
-                        );
-                    } else {
+                    if (
+                        data.headerComponent &&
+                        this.options.createHeaderComponent
+                    ) {
+                        header = this.options.createHeaderComponent({
+                            id: data.id,
+                            name: data.headerComponent,
+                        });
+                    }
+
+                    if (!header) {
                         header = new DefaultHeader();
                     }
 
@@ -483,9 +447,14 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
     }
 
     private doAddPanel(panel: PaneFramework): void {
-        const disposable = panel.onDidDrop((event) => {
-            this._onDidDrop.fire(event);
-        });
+        const disposable = new CompositeDisposable(
+            panel.onDidDrop((event) => {
+                this._onDidDrop.fire(event);
+            }),
+            panel.onUnhandledDragOverEvent((event) => {
+                this._onUnhandledDragOverEvent.fire(event);
+            })
+        );
 
         this._viewDisposables.set(panel.id, disposable);
     }
@@ -506,6 +475,8 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
             value.dispose();
         }
         this._viewDisposables.clear();
+
+        this.element.remove();
 
         this.paneview.dispose();
     }

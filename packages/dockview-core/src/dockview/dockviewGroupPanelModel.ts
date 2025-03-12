@@ -39,6 +39,7 @@ import {
 import { OverlayRenderContainer } from '../overlay/overlayRenderContainer';
 import { TitleEvent } from '../api/dockviewPanelApi';
 import { Contraints } from '../gridview/gridviewPanel';
+import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 
 interface GroupMoveEvent {
     groupId: string;
@@ -265,6 +266,8 @@ export class DockviewGroupPanelModel
 
     private mostRecentlyUsed: IDockviewPanel[] = [];
     private _overwriteRenderContainer: OverlayRenderContainer | null = null;
+    private _overwriteDropTargetContainer: DropTargetAnchorContainer | null =
+        null;
 
     private readonly _onDidChange = new Emitter<IViewSize | undefined>();
     readonly onDidChange: Event<IViewSize | undefined> =
@@ -506,7 +509,9 @@ export class DockviewGroupPanelModel
             this._onDidAddPanel,
             this._onDidRemovePanel,
             this._onDidActivePanelChange,
-            this._onUnhandledDragOverEvent
+            this._onUnhandledDragOverEvent,
+            this._onDidPanelTitleChange,
+            this._onDidPanelParametersChange
         );
     }
 
@@ -530,6 +535,17 @@ export class DockviewGroupPanelModel
         return (
             this._overwriteRenderContainer ??
             this.accessor.overlayRenderContainer
+        );
+    }
+
+    set dropTargetContainer(value: DropTargetAnchorContainer | null) {
+        this._overwriteDropTargetContainer = value;
+    }
+
+    get dropTargetContainer(): DropTargetAnchorContainer | null {
+        return (
+            this._overwriteDropTargetContainer ??
+            this.accessor.rootDropTargetContainer
         );
     }
 
@@ -1047,6 +1063,29 @@ export class DockviewGroupPanelModel
         const data = getPanelData();
 
         if (data && data.viewId === this.accessor.id) {
+            if (type === 'content') {
+                if (data.groupId === this.id) {
+                    // don't allow to drop on self for center position
+
+                    if (position === 'center') {
+                        return;
+                    }
+
+                    if (data.panelId === null) {
+                        // don't allow group move to drop anywhere on self
+                        return;
+                    }
+                }
+            }
+
+            if (type === 'header') {
+                if (data.groupId === this.id) {
+                    if (data.panelId === null) {
+                        return;
+                    }
+                }
+            }
+
             if (data.panelId === null) {
                 // this is a group move dnd event
                 const { groupId } = data;

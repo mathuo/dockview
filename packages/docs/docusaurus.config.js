@@ -107,8 +107,8 @@ const config = {
                     sidebarPath: require.resolve('./sidebars.js'),
                     // Please change this to your repo.
                     // Remove this to remove the "edit this page" links.
-                    editUrl:
-                        'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+                    // editUrl:
+                    //     'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
                     // versions: {
                     //     current: {
                     //         label: `Development 🚧`,
@@ -116,11 +116,11 @@ const config = {
                     // },
                 },
                 blog: {
-                    showReadingTime: true,
+                    // showReadingTime: true,
                     // Please change this to your repo.
                     // Remove this to remove the "edit this page" links.
-                    editUrl:
-                        'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+                    // editUrl:
+                    //     'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
                 },
                 theme: {
                     customCss: require.resolve('./src/css/custom.scss'),
@@ -184,17 +184,8 @@ const config = {
                         label: 'API',
                     },
                     { to: '/blog', label: 'Blog', position: 'left' },
+                    { href: '/templates', target:"_blank", label: 'Examples', position: 'left' },
                     { to: '/demo', label: 'Demo', position: 'left' },
-                    // {
-                    //     to: 'https://dockview.dev/typedocs',
-                    //     label: 'TSDoc',
-                    //     position: 'left',
-                    // },
-
-                    // {
-                    //     type: 'docsVersionDropdown',
-                    //     position: 'right',
-                    // },
                     {
                         href: 'https://github.com/mathuo/dockview',
                         position: 'right',
@@ -210,8 +201,8 @@ const config = {
                         title: 'Learn',
                         items: [
                             {
-                                label: 'Docs',
-                                to: '/docs',
+                                label: 'Demo',
+                                to: '/demo',
                             },
                         ],
                     },

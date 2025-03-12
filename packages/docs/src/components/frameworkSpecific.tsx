@@ -1,6 +1,8 @@
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import { DockviewEmitter } from 'dockview';
 import * as React from 'react';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import './frameworkSpecific.css';
 
 export interface FrameworkDescriptor {
@@ -51,8 +53,7 @@ export function useActiveFramework(): [
     return [option, setter];
 }
 
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import useBaseUrl from '@docusaurus/useBaseUrl';
+
 
 const FrameworkSelector1 = () => {
     const [activeFramework, setActiveFramework] = useActiveFramework();

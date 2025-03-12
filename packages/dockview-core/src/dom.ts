@@ -379,3 +379,25 @@ export class Classnames {
         }
     }
 }
+
+export function isChildEntirelyVisibleWithinParent(
+    child: HTMLElement,
+    parent: HTMLElement
+): boolean {
+    //
+    const childPosition = getDomNodePagePosition(child);
+    const parentPosition = getDomNodePagePosition(parent);
+
+    if (childPosition.left < parentPosition.left) {
+        return false;
+    }
+
+    if (
+        childPosition.left + childPosition.width >
+        parentPosition.left + parentPosition.width
+    ) {
+        return false;
+    }
+
+    return true;
+}

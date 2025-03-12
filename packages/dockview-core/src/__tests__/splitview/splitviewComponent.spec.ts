@@ -26,24 +26,52 @@ describe('componentSplitview', () => {
         container.className = 'container';
     });
 
+    test('that the container is not removed when grid is disposed', () => {
+        const root = document.createElement('div');
+        const container = document.createElement('div');
+        root.appendChild(container);
+
+        const splitview = new SplitviewComponent(container, {
+            orientation: Orientation.VERTICAL,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
+            },
+        });
+
+        splitview.dispose();
+
+        expect(container.parentElement).toBe(root);
+        expect(container.children.length).toBe(0);
+    });
+
     test('event leakage', () => {
         Emitter.setLeakageMonitorEnabled(true);
 
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
         splitview.layout(600, 400);
 
         const panel1 = splitview.addPanel({
             id: 'panel1',
-            component: 'testPanel',
+            component: 'default',
         });
         const panel2 = splitview.addPanel({
             id: 'panel2',
-            component: 'testPanel',
+            component: 'default',
         });
 
         splitview.movePanel(0, 1);
@@ -67,15 +95,20 @@ describe('componentSplitview', () => {
     test('remove panel', () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
         splitview.layout(600, 400);
 
-        splitview.addPanel({ id: 'panel1', component: 'testPanel' });
-        splitview.addPanel({ id: 'panel2', component: 'testPanel' });
-        splitview.addPanel({ id: 'panel3', component: 'testPanel' });
+        splitview.addPanel({ id: 'panel1', component: 'default' });
+        splitview.addPanel({ id: 'panel2', component: 'default' });
+        splitview.addPanel({ id: 'panel3', component: 'default' });
 
         const panel1 = splitview.getPanel('panel1')!;
         const panel2 = splitview.getPanel('panel2')!;
@@ -102,8 +135,13 @@ describe('componentSplitview', () => {
     test('horizontal dimensions', () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
         splitview.layout(600, 400);
@@ -115,8 +153,13 @@ describe('componentSplitview', () => {
     test('vertical dimensions', () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
         splitview.layout(600, 400);
@@ -128,15 +171,20 @@ describe('componentSplitview', () => {
     test('api resize', () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
 
         splitview.layout(400, 600);
-        splitview.addPanel({ id: 'panel1', component: 'testPanel' });
-        splitview.addPanel({ id: 'panel2', component: 'testPanel' });
-        splitview.addPanel({ id: 'panel3', component: 'testPanel' });
+        splitview.addPanel({ id: 'panel1', component: 'default' });
+        splitview.addPanel({ id: 'panel2', component: 'default' });
+        splitview.addPanel({ id: 'panel3', component: 'default' });
 
         const panel1 = splitview.getPanel('panel1')!;
         const panel2 = splitview.getPanel('panel2')!;
@@ -180,13 +228,18 @@ describe('componentSplitview', () => {
     test('api', () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
 
         splitview.layout(600, 400);
-        splitview.addPanel({ id: 'panel1', component: 'testPanel' });
+        splitview.addPanel({ id: 'panel1', component: 'default' });
 
         const panel1 = splitview.getPanel('panel1');
 
@@ -197,7 +250,7 @@ describe('componentSplitview', () => {
         // expect(panel1?.api.isFocused).toBeFalsy();
         expect(panel1!.api.isVisible).toBeTruthy();
 
-        splitview.addPanel({ id: 'panel2', component: 'testPanel' });
+        splitview.addPanel({ id: 'panel2', component: 'default' });
 
         const panel2 = splitview.getPanel('panel2');
 
@@ -221,15 +274,20 @@ describe('componentSplitview', () => {
 
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
 
         splitview.layout(300, 200);
 
-        splitview.addPanel({ id: 'panel1', component: 'testPanel' });
-        splitview.addPanel({ id: 'panel2', component: 'testPanel' });
+        splitview.addPanel({ id: 'panel1', component: 'default' });
+        splitview.addPanel({ id: 'panel2', component: 'default' });
 
         const panel1 = splitview.getPanel('panel1') as SplitviewPanel;
         const panel2 = splitview.getPanel('panel2') as SplitviewPanel;
@@ -272,15 +330,20 @@ describe('componentSplitview', () => {
 
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
 
         splitview.layout(300, 200);
 
-        splitview.addPanel({ id: 'panel1', component: 'testPanel' });
-        splitview.addPanel({ id: 'panel2', component: 'testPanel' });
+        splitview.addPanel({ id: 'panel1', component: 'default' });
+        splitview.addPanel({ id: 'panel2', component: 'default' });
 
         const panel1 = splitview.getPanel('panel1') as SplitviewPanel;
         const panel2 = splitview.getPanel('panel2') as SplitviewPanel;
@@ -321,8 +384,13 @@ describe('componentSplitview', () => {
     test('serialization', () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
         splitview.layout(400, 6);
@@ -331,15 +399,15 @@ describe('componentSplitview', () => {
             views: [
                 {
                     size: 1,
-                    data: { id: 'panel1', component: 'testPanel' },
+                    data: { id: 'panel1', component: 'default' },
                     snap: false,
                 },
                 {
                     size: 2,
-                    data: { id: 'panel2', component: 'testPanel' },
+                    data: { id: 'panel2', component: 'default' },
                     snap: true,
                 },
-                { size: 3, data: { id: 'panel3', component: 'testPanel' } },
+                { size: 3, data: { id: 'panel3', component: 'default' } },
             ],
             size: 6,
             orientation: Orientation.VERTICAL,
@@ -352,17 +420,17 @@ describe('componentSplitview', () => {
             views: [
                 {
                     size: 1,
-                    data: { id: 'panel1', component: 'testPanel' },
+                    data: { id: 'panel1', component: 'default' },
                     snap: false,
                 },
                 {
                     size: 2,
-                    data: { id: 'panel2', component: 'testPanel' },
+                    data: { id: 'panel2', component: 'default' },
                     snap: true,
                 },
                 {
                     size: 3,
-                    data: { id: 'panel3', component: 'testPanel' },
+                    data: { id: 'panel3', component: 'default' },
                     snap: false,
                 },
             ],
@@ -375,8 +443,13 @@ describe('componentSplitview', () => {
     test('toJSON shouldnt fire any layout events', () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
 
@@ -384,11 +457,11 @@ describe('componentSplitview', () => {
 
         splitview.addPanel({
             id: 'panel1',
-            component: 'testPanel',
+            component: 'default',
         });
         splitview.addPanel({
             id: 'panel2',
-            component: 'testPanel',
+            component: 'default',
         });
 
         const disposable = splitview.onDidLayoutChange(() => {
@@ -401,39 +474,16 @@ describe('componentSplitview', () => {
         disposable.dispose();
     });
 
-    test('dispose of splitviewComponent', () => {
-        expect(container.childNodes.length).toBe(0);
-
-        const splitview = new SplitviewComponent(container, {
-            orientation: Orientation.HORIZONTAL,
-            components: {
-                testPanel: TestPanel,
-            },
-        });
-
-        splitview.layout(1000, 1000);
-
-        splitview.addPanel({
-            id: 'panel1',
-            component: 'testPanel',
-        });
-        splitview.addPanel({
-            id: 'panel2',
-            component: 'testPanel',
-        });
-
-        expect(container.childNodes.length).toBeGreaterThan(0);
-
-        splitview.dispose();
-
-        expect(container.childNodes.length).toBe(0);
-    });
-
     test('panel is disposed of when component is disposed', () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
-            components: {
-                default: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
 
@@ -463,8 +513,13 @@ describe('componentSplitview', () => {
     test('panel is disposed of when removed', () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
-            components: {
-                default: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
 
@@ -494,8 +549,13 @@ describe('componentSplitview', () => {
     test('panel is disposed of when fromJSON is called', () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
-            components: {
-                default: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
 
@@ -529,8 +589,13 @@ describe('componentSplitview', () => {
     test('that fromJSON layouts are resized to the current dimensions', async () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
         splitview.layout(400, 600);
@@ -539,15 +604,15 @@ describe('componentSplitview', () => {
             views: [
                 {
                     size: 1,
-                    data: { id: 'panel1', component: 'testPanel' },
+                    data: { id: 'panel1', component: 'default' },
                     snap: false,
                 },
                 {
                     size: 2,
-                    data: { id: 'panel2', component: 'testPanel' },
+                    data: { id: 'panel2', component: 'default' },
                     snap: true,
                 },
-                { size: 3, data: { id: 'panel3', component: 'testPanel' } },
+                { size: 3, data: { id: 'panel3', component: 'default' } },
             ],
             size: 6,
             orientation: Orientation.VERTICAL,
@@ -558,17 +623,17 @@ describe('componentSplitview', () => {
             views: [
                 {
                     size: 100,
-                    data: { id: 'panel1', component: 'testPanel' },
+                    data: { id: 'panel1', component: 'default' },
                     snap: false,
                 },
                 {
                     size: 200,
-                    data: { id: 'panel2', component: 'testPanel' },
+                    data: { id: 'panel2', component: 'default' },
                     snap: true,
                 },
                 {
                     size: 300,
-                    data: { id: 'panel3', component: 'testPanel' },
+                    data: { id: 'panel3', component: 'default' },
                     snap: false,
                 },
             ],
@@ -581,8 +646,13 @@ describe('componentSplitview', () => {
     test('that disableAutoResizing is false by default', () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
 
@@ -592,8 +662,13 @@ describe('componentSplitview', () => {
     test('that disableAutoResizing can be enabled', () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
-            components: {
-                testPanel: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
             disableAutoResizing: true,
         });
@@ -604,8 +679,13 @@ describe('componentSplitview', () => {
     test('that setVisible toggles visiblity', () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
-            components: {
-                default: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
         });
 
@@ -635,16 +715,21 @@ describe('componentSplitview', () => {
     test('update className', () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
-            components: {
-                default: TestPanel,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestPanel(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
             },
             className: 'test-a test-b',
         });
 
-        expect(splitview.element.className).toBe('container test-a test-b');
+        expect(splitview.element.className).toBe('test-a test-b');
 
         splitview.updateOptions({ className: 'test-b test-c' });
 
-        expect(splitview.element.className).toBe('container test-b test-c');
+        expect(splitview.element.className).toBe('test-b test-c');
     });
 });

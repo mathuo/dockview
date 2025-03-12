@@ -1,0 +1,83 @@
+.dv-tabs-container {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+    scrollbar-width: thin; // firefox
+
+    &.dv-horizontal {
+        .dv-tabs-container {
+            .dv-tab {
+                &:last-child {
+                    margin-right: 0;
+                }
+
+                &:not(:nth-last-child(1)) {
+                    margin-left: 0;
+                }
+
+                &:not(:first-child)::before {
+                    content: ' ';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    z-index: 5;
+                    pointer-events: none;
+                    background-color: var(--dv-tab-divider-color);
+                    width: 1px;
+                    height: 100%;
+                }
+            }
+        }
+    }
+
+    &::-webkit-scrollbar {
+        height: 3px;
+    }
+
+    /* Track */
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+        background: var(--dv-tabs-container-scrollbar-color);
+    }
+}
+
+.dv-tab {
+    -webkit-user-drag: element;
+    outline: none;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    position: relative;
+    box-sizing: border-box;
+    font-size: var(--dv-tab-font-size);
+    margin: var(--dv-tab-margin);
+}
+
+.dv-tabs-overflow-container {
+    flex-direction: column;
+    height: unset;
+    border: 1px solid var(--dv-tab-divider-color);
+    background-color: var(--dv-group-view-background-color);
+
+    .dv-tab {
+        &:not(:last-child) {
+            border-bottom: 1px solid var(--dv-tab-divider-color);
+        }
+    }
+
+    .dv-active-tab {
+        background-color: var(
+            --dv-activegroup-visiblepanel-tab-background-color
+        );
+        color: var(--dv-activegroup-visiblepanel-tab-color);
+    }
+    .dv-inactive-tab {
+        background-color: var(
+            --dv-activegroup-hiddenpanel-tab-background-color
+        );
+        color: var(--dv-activegroup-hiddenpanel-tab-color);
+    }
+}

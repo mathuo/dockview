@@ -24,16 +24,24 @@ export * from './splitview/splitview';
 export {
     SplitviewComponentOptions,
     PanelViewInitParameters,
+    SplitviewOptions,
+    SplitviewFrameworkOptions,
+    PROPERTY_KEYS_SPLITVIEW,
 } from './splitview/options';
 
 export * from './paneview/paneview';
 export * from './gridview/gridview';
-export { GridviewComponentOptions } from './gridview/options';
+export {
+    GridviewComponentOptions,
+    GridviewOptions,
+    GridviewFrameworkOptions,
+    PROPERTY_KEYS_GRIDVIEW,
+} from './gridview/options';
 export * from './gridview/baseComponentGridview';
 
 export {
     DraggablePaneviewPanel,
-    PaneviewDropEvent,
+    PaneviewDidDropEvent as PaneviewDropEvent,
 } from './paneview/draggablePaneviewPanel';
 
 export * from './dockview/components/panel/content';
@@ -56,6 +64,7 @@ export {
 } from './dockview/framework';
 
 export * from './dockview/options';
+export * from './dockview/theme';
 export * from './dockview/dockviewPanel';
 export { DefaultTab } from './dockview/components/tab/defaultTab';
 export {
@@ -67,7 +76,14 @@ export * from './dockview/dockviewComponent';
 export * from './gridview/gridviewComponent';
 export * from './splitview/splitviewComponent';
 export * from './paneview/paneviewComponent';
-export { PaneviewComponentOptions } from './paneview/options';
+export {
+    PaneviewComponentOptions,
+    PaneviewOptions,
+    PaneviewFrameworkOptions,
+    PROPERTY_KEYS_PANEVIEW,
+    PaneviewUnhandledDragOverEvent,
+    PaneviewDndOverlayEvent,
+} from './paneview/options';
 
 export * from './gridview/gridviewPanel';
 export { SplitviewPanel, ISplitviewPanel } from './splitview/splitviewPanel';
