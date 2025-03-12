@@ -56,22 +56,28 @@ describe('paneview', () => {
             paneview.onDidRemoveView((view) => removed.push(view))
         );
 
-        const view1 = new TestPanel(
-            'id',
-            'component',
-            'headerComponent',
-            Orientation.VERTICAL,
-            true,
-            true
-        );
-        const view2 = new TestPanel(
-            'id2',
-            'component',
-            'headerComponent',
-            Orientation.VERTICAL,
-            true,
-            true
-        );
+        const view1 = new TestPanel({
+            id: 'id',
+            component: 'component',
+            headerComponent: 'headerComponent',
+            orientation: Orientation.VERTICAL,
+            isExpanded: true,
+            isHeaderVisible: true,
+            headerSize: 22,
+            minimumBodySize: 0,
+            maximumBodySize: Number.MAX_SAFE_INTEGER,
+        });
+        const view2 = new TestPanel({
+            id: 'id2',
+            component: 'component',
+            headerComponent: 'headerComponent',
+            orientation: Orientation.VERTICAL,
+            isExpanded: true,
+            isHeaderVisible: true,
+            headerSize: 22,
+            minimumBodySize: 0,
+            maximumBodySize: Number.MAX_SAFE_INTEGER,
+        });
 
         expect(added.length).toBe(0);
         expect(removed.length).toBe(0);
@@ -106,22 +112,28 @@ describe('paneview', () => {
             orientation: Orientation.HORIZONTAL,
         });
 
-        const view1 = new TestPanel(
-            'id',
-            'component',
-            'headerComponent',
-            Orientation.VERTICAL,
-            true,
-            true
-        );
-        const view2 = new TestPanel(
-            'id2',
-            'component',
-            'headerComponent',
-            Orientation.VERTICAL,
-            true,
-            true
-        );
+        const view1 = new TestPanel({
+            id: 'id',
+            component: 'component',
+            headerComponent: 'headerComponent',
+            orientation: Orientation.VERTICAL,
+            isExpanded: true,
+            isHeaderVisible: true,
+            headerSize: 22,
+            minimumBodySize: 0,
+            maximumBodySize: Number.MAX_SAFE_INTEGER,
+        });
+        const view2 = new TestPanel({
+            id: 'id2',
+            component: 'component',
+            headerComponent: 'headerComponent',
+            orientation: Orientation.VERTICAL,
+            isExpanded: true,
+            isHeaderVisible: true,
+            headerSize: 22,
+            minimumBodySize: 0,
+            maximumBodySize: Number.MAX_SAFE_INTEGER,
+        });
 
         paneview.addPane(view1);
         paneview.addPane(view2);

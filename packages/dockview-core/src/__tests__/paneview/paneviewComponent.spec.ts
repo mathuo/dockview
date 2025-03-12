@@ -11,7 +11,17 @@ import { Orientation } from '../../splitview/splitview';
 
 class TestPanel extends PaneviewPanel {
     constructor(id: string, component: string) {
-        super(id, component, 'header', Orientation.VERTICAL, false, true);
+        super({
+            id,
+            component,
+            headerComponent: 'header',
+            orientation: Orientation.VERTICAL,
+            isExpanded: false,
+            isHeaderVisible: true,
+            headerSize: 22,
+            minimumBodySize: 0,
+            maximumBodySize: Number.MAX_SAFE_INTEGER,
+        });
     }
 
     getHeaderComponent() {
@@ -59,7 +69,7 @@ class TestPanel extends PaneviewPanel {
     }
 }
 
-describe('componentPaneview', () => {
+describe('paneviewComponent', () => {
     let container: HTMLElement;
 
     beforeEach(() => {
@@ -255,7 +265,7 @@ describe('componentPaneview', () => {
                         title: 'Panel 1',
                     },
                     expanded: true,
-                    minimumSize: 100,
+                    headerSize: 22,
                 },
                 {
                     size: 22,
@@ -265,7 +275,7 @@ describe('componentPaneview', () => {
                         title: 'Panel 2',
                     },
                     expanded: false,
-                    minimumSize: 100,
+                    headerSize: 22,
                 },
                 {
                     size: 22,
@@ -275,7 +285,7 @@ describe('componentPaneview', () => {
                         title: 'Panel 3',
                     },
                     expanded: false,
-                    minimumSize: 100,
+                    headerSize: 22,
                 },
             ],
         });
@@ -450,6 +460,7 @@ describe('componentPaneview', () => {
                         component: 'default',
                         title: 'Panel 1',
                     },
+                    minimumSize: 100,
                     expanded: true,
                 },
                 {
@@ -486,26 +497,27 @@ describe('componentPaneview', () => {
                     },
                     expanded: true,
                     minimumSize: 100,
+                    headerSize: 22,
                 },
                 {
-                    size: 122,
+                    size: 22,
                     data: {
                         id: 'panel2',
                         component: 'default',
                         title: 'Panel 2',
                     },
                     expanded: true,
-                    minimumSize: 100,
+                    headerSize: 22,
                 },
                 {
-                    size: 356,
+                    size: 456,
                     data: {
                         id: 'panel3',
                         component: 'default',
                         title: 'Panel 3',
                     },
                     expanded: true,
-                    minimumSize: 100,
+                    headerSize: 22,
                 },
             ],
         });
