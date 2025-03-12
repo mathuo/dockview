@@ -2,11 +2,36 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dockview.dev/blog</id>
     <title>Dockview Blog</title>
-    <updated>2025-02-12T00:00:00.000Z</updated>
+    <updated>2025-03-12T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dockview.dev/blog"/>
     <subtitle>Dockview Blog</subtitle>
     <icon>https://dockview.dev/img/dockview_logo.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Dockview 4.0.0]]></title>
+        <id>https://dockview.dev/blog/dockview-4.0.0-release</id>
+        <link href="https://dockview.dev/blog/dockview-4.0.0-release"/>
+        <updated>2025-03-12T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
+        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.0.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<ul>
+<li>To control the theme of dockview you should no longer pass a <code>dv-theme-*</code> class, instead directly use the <code>theme</code> property. See <a href="https://dockview.dev/demo" target="_blank" rel="noopener noreferrer">Themes</a> for more details. <a href="https://github.com/mathuo/dockview/pull/850" target="_blank" rel="noopener noreferrer">#850</a></li>
+<li>Introduces a new dnd overlay model with improved animations and customization options allowing themes to take more fine grained control over the dnd overlay styles. <a href="https://github.com/mathuo/dockview/pull/850" target="_blank" rel="noopener noreferrer">#850</a></li>
+<li>Custom scrollbar on tab headers for better UX <a href="https://github.com/mathuo/dockview/pull/822" target="_blank" rel="noopener noreferrer">#822</a></li>
+<li>When tabs are hidden within scrollbar hidden tabs can be selected from a dropdown that appears in header <a href="https://github.com/mathuo/dockview/pull/822" target="_blank" rel="noopener noreferrer">#822</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.0.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Remove elements from DOM after disposable for Splitview and Paneview components <a href="https://github.com/mathuo/dockview/pull/870" target="_blank" rel="noopener noreferrer">#870</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.0.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
+<ul>
+<li><code>setGap(gap: number | undefined): void</code> and <code>gap(): number</code> have been removed. The gap property is now controlled directly within the chosen Theme. See <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">Themes</a>  for more details.</li>
+<li><code>DockviewDefaultTab</code> requires a <code>tabLocation</code> field, to mimic existing behaviour use <code>tabLocation="header"</code>.</li>
+</ul>]]></content>
+        <category label="release" term="release"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Dockview 3.2.0]]></title>
         <id>https://dockview.dev/blog/dockview-3.2.0-release</id>
@@ -362,21 +387,6 @@
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.15.2-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
 <ul>
 <li>Bug: Calling layout with <code>force=false</code> was preventing layout calls <a href="https://github.com/mathuo/dockview/issues/654" target="_blank" rel="noopener noreferrer">#654</a></li>
-</ul>]]></content>
-        <category label="release" term="release"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Dockview 1.15.1]]></title>
-        <id>https://dockview.dev/blog/dockview-1.15.1-release</id>
-        <link href="https://dockview.dev/blog/dockview-1.15.1-release"/>
-        <updated>2024-07-16T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
-        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.15.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Bug: Fix typing when adding panels with <code>floating</code> options <a href="https://github.com/mathuo/dockview/issues/647" target="_blank" rel="noopener noreferrer">#647</a></li>
-<li>Bug: Fix <code>gap</code> property <a href="https://github.com/mathuo/dockview/pull/649" target="_blank" rel="noopener noreferrer">#649</a></li>
-<li>Bug: Group option not passed through correctly for popout groups <a href="https://github.com/mathuo/dockview/issues/650" target="_blank" rel="noopener noreferrer">#650</a></li>
 </ul>]]></content>
         <category label="release" term="release"/>
     </entry>
