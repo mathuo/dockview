@@ -14,7 +14,7 @@ import {
 import { tail, sequenceEquals, remove } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
 import { CompositeDisposable, Disposable } from '../lifecycle';
-import { Event, Emitter, addDisposableWindowListener } from '../events';
+import { Event, Emitter, addDisposableListener } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import { IWatermarkRenderer, GroupviewPanelState } from './types';
 import { sequentialNumberGenerator } from '../math';
@@ -56,6 +56,8 @@ import {
     addTestId,
     Classnames,
     getDockviewTheme,
+    onDidWindowResizeEnd,
+    onDidWindowMoveEnd,
     toggleClass,
     watchElementResize,
 } from '../dom';
@@ -190,6 +192,18 @@ export interface DockviewMaximizedGroupChanged {
     isMaximized: boolean;
 }
 
+export interface PopoutGroupChangeSizeEvent {
+    width: number;
+    height: number;
+    group: DockviewGroupPanel;
+}
+
+export interface PopoutGroupChangePositionEvent {
+    screenX: number;
+    screenY: number;
+    group: DockviewGroupPanel;
+}
+
 export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly activePanel: IDockviewPanel | undefined;
     readonly totalPanels: number;
@@ -210,6 +224,8 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onUnhandledDragOverEvent: Event<DockviewDndOverlayEvent>;
     readonly onDidMovePanel: Event<MovePanelEvent>;
     readonly onDidMaximizedGroupChange: Event<DockviewMaximizedGroupChanged>;
+    readonly onDidPopoutGroupSizeChange: Event<PopoutGroupChangeSizeEvent>;
+    readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent>;
     readonly options: DockviewComponentOptions;
     updateOptions(options: DockviewOptions): void;
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void;
@@ -292,6 +308,16 @@ export class DockviewComponent
 
     private readonly _onDidAddPanel = new Emitter<IDockviewPanel>();
     readonly onDidAddPanel: Event<IDockviewPanel> = this._onDidAddPanel.event;
+
+    private readonly _onDidPopoutGroupSizeChange =
+        new Emitter<PopoutGroupChangeSizeEvent>();
+    readonly onDidPopoutGroupSizeChange: Event<PopoutGroupChangeSizeEvent> =
+        this._onDidPopoutGroupSizeChange.event;
+
+    private readonly _onDidPopoutGroupPositionChange =
+        new Emitter<PopoutGroupChangePositionEvent>();
+    readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent> =
+        this._onDidPopoutGroupPositionChange.event;
 
     private readonly _onDidLayoutFromJSON = new Emitter<void>();
     readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutFromJSON.event;
@@ -427,6 +453,8 @@ export class DockviewComponent
             this._onUnhandledDragOverEvent,
             this._onDidMaximizedGroupChange,
             this._onDidOptionsChange,
+            this._onDidPopoutGroupSizeChange,
+            this._onDidPopoutGroupPositionChange,
             this.onDidViewVisibilityChangeMicroTaskQueue(() => {
                 this.updateWatermark();
             }),
@@ -463,7 +491,9 @@ export class DockviewComponent
                 this.onDidAddGroup,
                 this.onDidRemove,
                 this.onDidMovePanel,
-                this.onDidActivePanelChange
+                this.onDidActivePanelChange,
+                this.onDidPopoutGroupPositionChange,
+                this.onDidPopoutGroupSizeChange
             )(() => {
                 this._bufferOnDidLayoutChange.fire();
             }),
@@ -832,22 +862,37 @@ export class DockviewComponent
                     },
                 };
 
+                const _onDidWindowPositionChange = onDidWindowMoveEnd(
+                    _window.window!
+                );
+
                 popoutWindowDisposable.addDisposables(
+                    _onDidWindowPositionChange,
+                    onDidWindowResizeEnd(_window.window!, () => {
+                        this._onDidPopoutGroupSizeChange.fire({
+                            width: _window.window!.innerWidth,
+                            height: _window.window!.innerHeight,
+                            group,
+                        });
+                    }),
+                    _onDidWindowPositionChange.event(() => {
+                        this._onDidPopoutGroupPositionChange.fire({
+                            screenX: _window.window!.screenX,
+                            screenY: _window.window!.screenX,
+                            group,
+                        });
+                    }),
                     /**
                      * ResizeObserver seems slow here, I do not know why but we don't need it
                      * since we can reply on the window resize event as we will occupy the full
                      * window dimensions
                      */
-                    addDisposableWindowListener(
-                        _window.window!,
-                        'resize',
-                        () => {
-                            group.layout(
-                                _window.window!.innerWidth,
-                                _window.window!.innerHeight
-                            );
-                        }
-                    ),
+                    addDisposableListener(_window.window!, 'resize', () => {
+                        group.layout(
+                            _window.window!.innerWidth,
+                            _window.window!.innerHeight
+                        );
+                    }),
                     overlayRenderContainer,
                     Disposable.from(() => {
                         if (this.isDisposed) {

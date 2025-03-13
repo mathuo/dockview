@@ -1,5 +1,5 @@
 import { addStyles } from './dom';
-import { Emitter, addDisposableWindowListener } from './events';
+import { Emitter, addDisposableListener } from './events';
 import { CompositeDisposable, Disposable, IDisposable } from './lifecycle';
 import { Box } from './types';
 
@@ -101,7 +101,7 @@ export class PopoutWindow extends CompositeDisposable {
             Disposable.from(() => {
                 externalWindow.close();
             }),
-            addDisposableWindowListener(window, 'beforeunload', () => {
+            addDisposableListener(window, 'beforeunload', () => {
                 /**
                  * before the main window closes we should close this popup too
                  * to be good citizens
@@ -146,7 +146,7 @@ export class PopoutWindow extends CompositeDisposable {
                      * beforeunload must be registered after load for reasons I could not determine
                      * otherwise the beforeunload event will not fire when the window is closed
                      */
-                    addDisposableWindowListener(
+                    addDisposableListener(
                         externalWindow,
                         'beforeunload',
                         () => {
