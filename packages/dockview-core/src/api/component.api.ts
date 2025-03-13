@@ -3,6 +3,8 @@ import {
     FloatingGroupOptions,
     IDockviewComponent,
     MovePanelEvent,
+    PopoutGroupChangePositionEvent,
+    PopoutGroupChangeSizeEvent,
     SerializedDockview,
 } from '../dockview/dockviewComponent';
 import {
@@ -629,7 +631,6 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.totalPanels;
     }
 
-
     /**
      * Invoked when the active group changes. May be undefined if no group is active.
      */
@@ -738,6 +739,14 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     get onUnhandledDragOverEvent(): Event<DockviewDndOverlayEvent> {
         return this.component.onUnhandledDragOverEvent;
+    }
+
+    get onDidPopoutGroupSizeChange(): Event<PopoutGroupChangeSizeEvent> {
+        return this.component.onDidPopoutGroupSizeChange;
+    }
+
+    get onDidPopoutGroupPositionChange(): Event<PopoutGroupChangePositionEvent> {
+        return this.component.onDidPopoutGroupPositionChange;
     }
 
     /**
