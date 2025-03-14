@@ -7,7 +7,6 @@ import {
     Emitter,
     Event,
     addDisposableListener,
-    addDisposableWindowListener,
 } from '../events';
 import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { clamp } from '../math';
@@ -258,7 +257,7 @@ export class Overlay extends CompositeDisposable {
                         iframes.release();
                     },
                 },
-                addDisposableWindowListener(window, 'pointermove', (e) => {
+                addDisposableListener(window, 'pointermove', (e) => {
                     const containerRect =
                         this.options.container.getBoundingClientRect();
                     const x = e.clientX - containerRect.left;
@@ -344,7 +343,7 @@ export class Overlay extends CompositeDisposable {
 
                     this.setBounds(bounds);
                 }),
-                addDisposableWindowListener(window, 'pointerup', () => {
+                addDisposableListener(window, 'pointerup', () => {
                     toggleClass(
                         this._element,
                         'dv-resize-container-dragging',
@@ -439,7 +438,7 @@ export class Overlay extends CompositeDisposable {
                 const iframes = disableIframePointEvents();
 
                 move.value = new CompositeDisposable(
-                    addDisposableWindowListener(window, 'pointermove', (e) => {
+                  addDisposableListener(window, 'pointermove', (e) => {
                         const containerRect =
                             this.options.container.getBoundingClientRect();
                         const overlayRect =
@@ -610,7 +609,7 @@ export class Overlay extends CompositeDisposable {
                             iframes.release();
                         },
                     },
-                    addDisposableWindowListener(window, 'pointerup', () => {
+                    addDisposableListener(window, 'pointerup', () => {
                         move.dispose();
                         this._onDidChangeEnd.fire();
                     })

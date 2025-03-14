@@ -3,7 +3,6 @@ import {
     Emitter,
     Event,
     addDisposableListener,
-    addDisposableWindowListener,
 } from '../events';
 
 describe('events', () => {
@@ -143,7 +142,7 @@ describe('events', () => {
         expect(value).toBe(3);
     });
 
-    it('addDisposableWindowListener with capture options', () => {
+    it('addDisposableListener with capture options', () => {
         const element = {
             addEventListener: jest.fn(),
             removeEventListener: jest.fn(),
@@ -151,7 +150,7 @@ describe('events', () => {
 
         const handler = jest.fn();
 
-        const disposable = addDisposableWindowListener(
+        const disposable = addDisposableListener(
             element as any,
             'pointerdown',
             handler,
@@ -177,7 +176,7 @@ describe('events', () => {
         );
     });
 
-    it('addDisposableWindowListener without capture options', () => {
+    it('addDisposableListener without capture options', () => {
         const element = {
             addEventListener: jest.fn(),
             removeEventListener: jest.fn(),
@@ -185,7 +184,7 @@ describe('events', () => {
 
         const handler = jest.fn();
 
-        const disposable = addDisposableWindowListener(
+        const disposable = addDisposableListener(
             element as any,
             'pointerdown',
             handler
