@@ -1131,7 +1131,7 @@ export class DockviewComponent
         this.updateWatermark();
     }
 
-    private orthogonalize(position: Position): DockviewGroupPanel {
+    private orthogonalize(position: Position, options?: GroupOptions): DockviewGroupPanel {
         switch (position) {
             case 'top':
             case 'bottom':
@@ -1157,10 +1157,10 @@ export class DockviewComponent
             case 'top':
             case 'left':
             case 'center':
-                return this.createGroupAtLocation([0]); // insert into first position
+                return this.createGroupAtLocation([0], undefined, options); // insert into first position
             case 'bottom':
             case 'right':
-                return this.createGroupAtLocation([this.gridview.length]); // insert into last position
+                return this.createGroupAtLocation([this.gridview.length], undefined, options); // insert into last position
             default:
                 throw new Error(`unsupported position ${position}`);
         }
@@ -1835,7 +1835,8 @@ export class DockviewComponent
                 }
             } else {
                 const group = this.orthogonalize(
-                    directionToPosition(<Direction>options.direction)
+                    directionToPosition(<Direction>options.direction),
+                    options
                 );
                 if (!options.skipSetActive) {
                     this.doSetGroupAndPanelActive(group);
@@ -2503,9 +2504,10 @@ export class DockviewComponent
 
     private createGroupAtLocation(
         location: number[],
-        size?: number
+        size?: number,
+        options?: GroupOptions
     ): DockviewGroupPanel {
-        const group = this.createGroup();
+        const group = this.createGroup(options);
         this.doAddGroup(group, location, size);
         return group;
     }
