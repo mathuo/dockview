@@ -180,6 +180,8 @@ describe('componentPaneview', () => {
             },
         });
 
+        expect(container.querySelectorAll('.dv-pane-container').length).toBe(1);
+
         paneview.fromJSON({
             size: 6,
             views: [
@@ -211,6 +213,8 @@ describe('componentPaneview', () => {
                 },
             ],
         });
+
+        expect(container.querySelectorAll('.dv-pane-container').length).toBe(1);
 
         paneview.layout(400, 800);
 

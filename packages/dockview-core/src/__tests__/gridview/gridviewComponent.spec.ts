@@ -198,6 +198,8 @@ describe('gridview', () => {
             },
         });
 
+        expect(container.querySelectorAll('.dv-grid-view').length).toBe(1);
+
         gridview.layout(800, 400);
         gridview.fromJSON({
             grid: {
@@ -242,6 +244,9 @@ describe('gridview', () => {
             },
             activePanel: 'panel_1',
         });
+
+        expect(container.querySelectorAll('.dv-grid-view').length).toBe(1);
+
         gridview.layout(800, 400, true);
 
         const panel1 = gridview.getPanel('panel_1')!;
