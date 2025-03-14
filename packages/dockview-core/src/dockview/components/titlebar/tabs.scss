@@ -5,27 +5,17 @@
     scrollbar-width: thin; // firefox
 
     &.dv-horizontal {
-        .dv-tabs-container {
-            .dv-tab {
-                &:last-child {
-                    margin-right: 0;
-                }
-
-                &:not(:nth-last-child(1)) {
-                    margin-left: 0;
-                }
-
-                &:not(:first-child)::before {
-                    content: ' ';
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    z-index: 5;
-                    pointer-events: none;
-                    background-color: var(--dv-tab-divider-color);
-                    width: 1px;
-                    height: 100%;
-                }
+        .dv-tab {
+            &:not(:first-child)::before {
+                content: ' ';
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: 5;
+                pointer-events: none;
+                background-color: var(--dv-tab-divider-color);
+                width: 1px;
+                height: 100%;
             }
         }
     }
