@@ -6729,4 +6729,51 @@ describe('dockviewComponent', () => {
         expect(api.panels.length).toBe(3);
         expect(api.groups.length).toBe(3);
     });
+
+    test('add group with custom group is', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+        const api = new DockviewApi(dockview);
+
+        dockview.layout(1000, 1000);
+
+        const panel1 = api.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const group1 = api.addGroup({
+            id: 'group_1',
+            direction: 'left',
+        });
+
+        const group2 = api.addGroup({
+            id: 'group_2',
+            direction: 'left',
+            referencePanel: panel1,
+        });
+
+        const group3 = api.addGroup({
+            id: 'group_3',
+            direction: 'left',
+            referenceGroup: panel1.api.group,
+        });
+
+        expect(group1.api.id).toBe('group_1');
+        expect(group2.api.id).toBe('group_2');
+        expect(group3.api.id).toBe('group_3');
+    });
 });
