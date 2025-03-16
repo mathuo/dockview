@@ -291,30 +291,36 @@ export function addTestId(element: HTMLElement, id: string): void {
     element.setAttribute('data-testid', id);
 }
 
-export function disableIframePointEvents(rootNode: ParentNode = document) {
-    const includeShadowDom = true;
+/**
+ * Should be more efficient than element.querySelectorAll("*") since there
+ * is no need to store every element in-memory using this approach
+ */
+function allTagsNamesInclusiveOfShadowDoms(tagNames: string[]) {
+    const iframes: HTMLElement[] = [];
 
-    const shadowRoots: ShadowRoot[] = [];
+    function findIframesInNode(node: Element) {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+            if (tagNames.includes(node.tagName)) {
+                iframes.push(node as HTMLElement);
+            }
 
-    if (includeShadowDom) {
-        const items = rootNode.querySelectorAll('*');
+            if (node.shadowRoot) {
+                findIframesInNode(<any>node.shadowRoot);
+            }
 
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-            if (item.shadowRoot) {
-                shadowRoots.push(item.shadowRoot);
+            for (const child of node.children) {
+                findIframesInNode(child);
             }
         }
     }
 
-    const iframes: HTMLElement[] = [
-        ...getElementsByTagName('iframe', rootNode),
-        ...getElementsByTagName('webview', rootNode),
-        ...shadowRoots.flatMap((root) => [
-            ...getElementsByTagName('iframe', root),
-            ...getElementsByTagName('webview', root),
-        ]),
-    ];
+    findIframesInNode(document.documentElement);
+
+    return iframes;
+}
+
+export function disableIframePointEvents(rootNode: ParentNode = document) {
+    const iframes = allTagsNamesInclusiveOfShadowDoms(['IFRAME', 'WEBVIEW']);
 
     const original = new WeakMap<HTMLElement, string>(); // don't hold onto HTMLElement references longer than required
 
