@@ -4,10 +4,26 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Wed, 12 Mar 2025 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Fri, 14 Mar 2025 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 4.0.1]]></title>
+            <link>https://dockview.dev/blog/dockview-4.0.1-release</link>
+            <guid>https://dockview.dev/blog/dockview-4.0.1-release</guid>
+            <pubDate>Fri, 14 Mar 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.0.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.0.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Fix full-width tab CSS <a href="https://github.com/mathuo/dockview/pull/880" target="_blank" rel="noopener noreferrer">#880</a></li>
+<li>Bug: Fix tab divider CSS <a href="https://github.com/mathuo/dockview/pull/879" target="_blank" rel="noopener noreferrer">#879</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.0.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 4.0.0]]></title>
             <link>https://dockview.dev/blog/dockview-4.0.0-release</link>
@@ -375,19 +391,6 @@
 <ul>
 <li>Bug: CSS typo <a href="https://github.com/mathuo/dockview/issues/671" target="_blank" rel="noopener noreferrer">#671</a></li>
 <li>Bug: Floating groups fromJSON(...) incorrect sizes <a href="https://github.com/mathuo/dockview/issues/668" target="_blank" rel="noopener noreferrer">#668</a></li>
-</ul>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 1.15.2]]></title>
-            <link>https://dockview.dev/blog/dockview-1.15.2-release</link>
-            <guid>https://dockview.dev/blog/dockview-1.15.2-release</guid>
-            <pubDate>Wed, 17 Jul 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.15.2-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Bug: Calling layout with <code>force=false</code> was preventing layout calls <a href="https://github.com/mathuo/dockview/issues/654" target="_blank" rel="noopener noreferrer">#654</a></li>
 </ul>]]></content:encoded>
             <category>release</category>
         </item>
