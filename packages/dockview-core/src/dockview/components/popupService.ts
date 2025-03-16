@@ -1,4 +1,4 @@
-import { addDisposableWindowListener } from '../../events';
+import { addDisposableListener } from '../../events';
 import {
     CompositeDisposable,
     Disposable,
@@ -50,7 +50,7 @@ export class PopupService extends CompositeDisposable {
         this._active = wrapper;
 
         this._activeDisposable.value = new CompositeDisposable(
-            addDisposableWindowListener(window, 'pointerdown', (event) => {
+          addDisposableListener(window, 'pointerdown', (event) => {
                 const target = event.target;
 
                 if (!(target instanceof HTMLElement)) {
