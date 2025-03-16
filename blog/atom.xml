@@ -2,11 +2,32 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dockview.dev/blog</id>
     <title>Dockview Blog</title>
-    <updated>2025-03-14T00:00:00.000Z</updated>
+    <updated>2025-03-16T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dockview.dev/blog"/>
     <subtitle>Dockview Blog</subtitle>
     <icon>https://dockview.dev/img/dockview_logo.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Dockview 4.1.0]]></title>
+        <id>https://dockview.dev/blog/dockview-4.1.0-release</id>
+        <link href="https://dockview.dev/blog/dockview-4.1.0-release"/>
+        <updated>2025-03-16T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
+        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.1.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<ul>
+<li>Custom header size for Paneview components <a href="https://github.com/mathuo/dockview/pull/875" target="_blank" rel="noopener noreferrer">#875</a></li>
+<li>Add events <code>onDidPopoutGroupSizeChange</code> and <code>onDidPopoutGroupPositionChange</code> <a href="https://github.com/mathuo/dockview/pull/876" target="_blank" rel="noopener noreferrer">#876</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.1.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Prevent ghost DOM elements after <code>fromJSON</code> calls on Splitview components <a href="https://github.com/mathuo/dockview/pull/881" target="_blank" rel="noopener noreferrer">#881</a></li>
+<li>Bug: Disable point-events for iframes within shadow DOMs during tab dnd events <a href="https://github.com/mathuo/dockview/pull/791" target="_blank" rel="noopener noreferrer">#791</a></li>
+<li>Bug: Custom group id when no reference panel nor group is provided <a href="https://github.com/mathuo/dockview/pull/882" target="_blank" rel="noopener noreferrer">#882</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.1.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content>
+        <category label="release" term="release"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Dockview 4.0.1]]></title>
         <id>https://dockview.dev/blog/dockview-4.0.1-release</id>
@@ -376,20 +397,6 @@
 <li><code>DockviewComponent</code>, <code>GridviewComponent</code>, <code>SplitviewComponent</code>, <code>PaneviewComponent</code> constructor signature changes from <code>(options)</code> to <code>(parentElement, options)</code> removing <code>parentElement</code> from <code>options</code>.</li>
 </ul>
 </li>
-</ul>]]></content>
-        <category label="release" term="release"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Dockview 1.15.3]]></title>
-        <id>https://dockview.dev/blog/dockview-1.15.3-release</id>
-        <link href="https://dockview.dev/blog/dockview-1.15.3-release"/>
-        <updated>2024-08-01T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
-        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.15.3-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Bug: CSS typo <a href="https://github.com/mathuo/dockview/issues/671" target="_blank" rel="noopener noreferrer">#671</a></li>
-<li>Bug: Floating groups fromJSON(...) incorrect sizes <a href="https://github.com/mathuo/dockview/issues/668" target="_blank" rel="noopener noreferrer">#668</a></li>
 </ul>]]></content>
         <category label="release" term="release"/>
     </entry>
