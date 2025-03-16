@@ -8,6 +8,7 @@ import {
     DockviewTheme,
 } from 'dockview';
 import * as React from 'react';
+import * as ReactDOM from 'react-dom/client';
 import './app.scss';
 import { defaultConfig } from './defaultLayout';
 import { GridActions } from './gridActions';
@@ -28,6 +29,20 @@ const Option = (props: {
             <span>{`${props.title}: `}</span>
             <button onClick={props.onClick}>{props.value}</button>
         </div>
+    );
+};
+
+const ShadowIframe = (props: IDockviewPanelProps) => {
+    return (
+        <iframe
+            onMouseDown={() => {
+                if (!props.api.isActive) {
+                    props.api.setActive();
+                }
+            }}
+            style={{ border: 'none', width: '100%', height: '100%' }}
+            src="https://dockview.dev"
+        />
     );
 };
 
@@ -110,12 +125,40 @@ const components = {
                     }
                 }}
                 style={{
+                    border: 'none',
                     width: '100%',
                     height: '100%',
                 }}
                 src="https://dockview.dev"
             />
         );
+    },
+    shadowDom: (props: IDockviewPanelProps) => {
+        const ref = React.useRef<HTMLDivElement>(null);
+
+        React.useEffect(() => {
+            if (!ref.current) {
+                return;
+            }
+
+            const shadow = ref.current.attachShadow({
+                mode: 'open',
+            });
+
+            const shadowRoot = document.createElement('div');
+            shadowRoot.style.height = '100%';
+            shadow.appendChild(shadowRoot);
+
+            const root = ReactDOM.createRoot(shadowRoot);
+
+            root.render(<ShadowIframe {...props} />);
+
+            return () => {
+                root.unmount();
+            };
+        }, []);
+
+        return <div style={{ height: '100%' }} ref={ref}></div>;
     },
 };
 

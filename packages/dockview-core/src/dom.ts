@@ -112,8 +112,11 @@ export function isAncestor(
     return false;
 }
 
-export function getElementsByTagName(tag: string): HTMLElement[] {
-    return Array.prototype.slice.call(document.getElementsByTagName(tag), 0);
+export function getElementsByTagName(
+    tag: string,
+    document: ParentNode
+): HTMLElement[] {
+    return Array.prototype.slice.call(document.querySelectorAll(tag), 0);
 }
 
 export interface IFocusTracker extends IDisposable {
@@ -288,11 +291,36 @@ export function addTestId(element: HTMLElement, id: string): void {
     element.setAttribute('data-testid', id);
 }
 
-export function disableIframePointEvents() {
-    const iframes: HTMLElement[] = [
-        ...getElementsByTagName('iframe'),
-        ...getElementsByTagName('webview'),
-    ];
+/**
+ * Should be more efficient than element.querySelectorAll("*") since there
+ * is no need to store every element in-memory using this approach
+ */
+function allTagsNamesInclusiveOfShadowDoms(tagNames: string[]) {
+    const iframes: HTMLElement[] = [];
+
+    function findIframesInNode(node: Element) {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+            if (tagNames.includes(node.tagName)) {
+                iframes.push(node as HTMLElement);
+            }
+
+            if (node.shadowRoot) {
+                findIframesInNode(<any>node.shadowRoot);
+            }
+
+            for (const child of node.children) {
+                findIframesInNode(child);
+            }
+        }
+    }
+
+    findIframesInNode(document.documentElement);
+
+    return iframes;
+}
+
+export function disableIframePointEvents(rootNode: ParentNode = document) {
+    const iframes = allTagsNamesInclusiveOfShadowDoms(['IFRAME', 'WEBVIEW']);
 
     const original = new WeakMap<HTMLElement, string>(); // don't hold onto HTMLElement references longer than required
 
