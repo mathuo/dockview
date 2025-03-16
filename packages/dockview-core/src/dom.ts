@@ -2,7 +2,6 @@ import {
     Event as DockviewEvent,
     Emitter,
     addDisposableListener,
-    addDisposableWindowListener,
 } from './events';
 import { IDisposable, CompositeDisposable } from './lifecycle';
 
@@ -125,7 +124,7 @@ export interface IFocusTracker extends IDisposable {
     refreshState?(): void;
 }
 
-export function trackFocus(element: HTMLElement | Window): IFocusTracker {
+export function trackFocus(element: HTMLElement): IFocusTracker {
     return new FocusTracker(element);
 }
 
@@ -141,7 +140,7 @@ class FocusTracker extends CompositeDisposable implements IFocusTracker {
 
     private readonly _refreshStateHandler: () => void;
 
-    constructor(element: HTMLElement | Window) {
+    constructor(element: HTMLElement) {
         super();
 
         this.addDisposables(this._onDidFocus, this._onDidBlur);
@@ -184,21 +183,12 @@ class FocusTracker extends CompositeDisposable implements IFocusTracker {
             }
         };
 
-        if (element instanceof HTMLElement) {
-            this.addDisposables(
-                addDisposableListener(element, 'focus', onFocus, true)
-            );
-            this.addDisposables(
-                addDisposableListener(element, 'blur', onBlur, true)
-            );
-        } else {
-            this.addDisposables(
-                addDisposableWindowListener(element, 'focus', onFocus, true)
-            );
-            this.addDisposables(
-                addDisposableWindowListener(element, 'blur', onBlur, true)
-            );
-        }
+        this.addDisposables(
+            addDisposableListener(element, 'focus', onFocus, true)
+        );
+        this.addDisposables(
+            addDisposableListener(element, 'blur', onBlur, true)
+        );
     }
 
     refreshState(): void {
@@ -386,6 +376,8 @@ export class Classnames {
     }
 }
 
+const DEBOUCE_DELAY = 100;
+
 export function isChildEntirelyVisibleWithinParent(
     child: HTMLElement,
     parent: HTMLElement
@@ -406,4 +398,56 @@ export function isChildEntirelyVisibleWithinParent(
     }
 
     return true;
+}
+
+export function onDidWindowMoveEnd(window: Window): Emitter<void> {
+    const emitter = new Emitter<void>();
+
+    let previousScreenX = window.screenX;
+    let previousScreenY = window.screenY;
+
+    let timeout: any;
+
+    const checkMovement = () => {
+        if (window.closed) {
+            return;
+        }
+
+        const currentScreenX = window.screenX;
+        const currentScreenY = window.screenY;
+
+        if (
+            currentScreenX !== previousScreenX ||
+            currentScreenY !== previousScreenY
+        ) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                emitter.fire();
+            }, DEBOUCE_DELAY);
+
+            previousScreenX = currentScreenX;
+            previousScreenY = currentScreenY;
+        }
+
+        requestAnimationFrame(checkMovement);
+    };
+
+    checkMovement();
+
+    return emitter;
+}
+
+export function onDidWindowResizeEnd(element: Window, cb: () => void) {
+    let resizeTimeout: any;
+
+    const disposable = new CompositeDisposable(
+        addDisposableListener(element, 'resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                cb();
+            }, DEBOUCE_DELAY);
+        })
+    );
+
+    return disposable;
 }
