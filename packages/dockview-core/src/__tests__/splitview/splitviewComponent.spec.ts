@@ -395,6 +395,10 @@ describe('componentSplitview', () => {
         });
         splitview.layout(400, 6);
 
+        expect(
+            container.querySelectorAll('.dv-split-view-container').length
+        ).toBe(1);
+
         splitview.fromJSON({
             views: [
                 {
@@ -413,6 +417,10 @@ describe('componentSplitview', () => {
             orientation: Orientation.VERTICAL,
             activeView: 'panel1',
         });
+
+        expect(
+            container.querySelectorAll('.dv-split-view-container').length
+        ).toBe(1);
 
         expect(splitview.length).toBe(3);
 
