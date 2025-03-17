@@ -69,6 +69,13 @@ export interface DockviewOptions {
     noPanelsOverlay?: 'emptyGroup' | 'watermark';
     theme?: DockviewTheme;
     disableTabsOverflowList?: boolean;
+    /**
+     * Select `native` to use built-in scrollbar behaviours and `custom` to use an internal implementation
+     * that allows for improved scrollbar overlay UX.
+     *
+     * This is only applied to the tab header section. Defaults to `custom`.
+     */
+    scrollbars?: 'native' | 'custom';
 }
 
 export interface DockviewDndOverlayEvent extends IAcceptableEvent {
@@ -116,6 +123,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         dndEdges: undefined,
         theme: undefined,
         disableTabsOverflowList: undefined,
+        scrollbars: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];

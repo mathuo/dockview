@@ -101,13 +101,17 @@ export class Tabs extends CompositeDisposable {
 
         this.showTabsOverflowControl = options.showTabsOverflowControl;
 
-        const scrollbar = new Scrollbar(this._tabsList);
-        this._element = scrollbar.element;
+        if (accessor.options.scrollbars === 'native') {
+            this._element = this._tabsList;
+        } else {
+            const scrollbar = new Scrollbar(this._tabsList);
+            this._element = scrollbar.element;
+            this.addDisposables(scrollbar);
+        }
 
         this.addDisposables(
             this._onOverflowTabsChange,
             this._observerDisposable,
-            scrollbar,
             this._onWillShowOverlay,
             this._onDrop,
             this._onTabDragStart,
