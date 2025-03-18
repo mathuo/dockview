@@ -152,6 +152,8 @@ export class TabsContainer
         this._element.appendChild(this.rightActionsContainer);
 
         this.addDisposables(
+            this.tabs.onDrop((e) => this._onDrop.fire(e)),
+            this.tabs.onWillShowOverlay((e) => this._onWillShowOverlay.fire(e)),
             accessor.onDidOptionsChange(() => {
                 this.tabs.showTabsOverflowControl =
                     !accessor.options.disableTabsOverflowList;
