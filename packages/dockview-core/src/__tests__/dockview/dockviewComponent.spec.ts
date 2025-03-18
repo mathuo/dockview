@@ -6776,4 +6776,31 @@ describe('dockviewComponent', () => {
         expect(group2.api.id).toBe('group_2');
         expect(group3.api.id).toBe('group_3');
     });
+
+    describe('dndEdges', () => {
+        test('that can init dndEdges property', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                dndEdges: {
+                    size: { value: 100, type: 'pixels' },
+                    activationSize: { value: 5, type: 'percentage' },
+                },
+            });
+            const api = new DockviewApi(dockview);
+
+            dockview.layout(1000, 1000);
+        });
+    });
 });
