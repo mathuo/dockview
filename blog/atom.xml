@@ -2,11 +2,27 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dockview.dev/blog</id>
     <title>Dockview Blog</title>
-    <updated>2025-03-17T00:00:00.000Z</updated>
+    <updated>2025-03-18T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dockview.dev/blog"/>
     <subtitle>Dockview Blog</subtitle>
     <icon>https://dockview.dev/img/dockview_logo.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Dockview 4.2.1]]></title>
+        <id>https://dockview.dev/blog/dockview-4.2.1-release</id>
+        <link href="https://dockview.dev/blog/dockview-4.2.1-release"/>
+        <updated>2025-03-18T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
+        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.2.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.2.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Fix styles and dnd issues <a href="https://github.com/mathuo/dockview/pull/887" target="_blank" rel="noopener noreferrer">#887</a></li>
+<li>Bug: Fix options init issues <a href="https://github.com/mathuo/dockview/pull/888" target="_blank" rel="noopener noreferrer">#888</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.2.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content>
+        <category label="release" term="release"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Dockview 4.2.0]]></title>
         <id>https://dockview.dev/blog/dockview-4.2.0-release</id>
@@ -371,19 +387,6 @@
 <li>Docs <a href="https://github.com/mathuo/dockview/pull/703" target="_blank" rel="noopener noreferrer">#703</a></li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.17.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content>
-        <category label="release" term="release"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Dockview 1.16.1]]></title>
-        <id>https://dockview.dev/blog/dockview-1.16.1-release</id>
-        <link href="https://dockview.dev/blog/dockview-1.16.1-release"/>
-        <updated>2024-08-13T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
-        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.16.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Bug: Multiple classNames in single string not accepted <a href="https://github.com/mathuo/dockview/issues/684" target="_blank" rel="noopener noreferrer">#684</a></li>
-</ul>]]></content>
         <category label="release" term="release"/>
     </entry>
 </feed>
