@@ -63,7 +63,7 @@ import {
     watchElementResize,
 } from '../dom';
 import { DockviewFloatingGroupPanel } from './dockviewFloatingGroupPanel';
-import { GroupDragEvent } from './components/titlebar/tabsContainer';
+import { GroupDragEvent } from '../tabs/tabsContainer';
 import { AnchoredBox, AnchorPosition, Box } from '../types';
 import {
     DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,

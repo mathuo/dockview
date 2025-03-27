@@ -1,15 +1,15 @@
-import { getPanelData } from '../../../dnd/dataTransfer';
+import { getPanelData } from '../dnd/dataTransfer';
 import {
     Droptarget,
     DroptargetEvent,
     WillShowOverlayEvent,
-} from '../../../dnd/droptarget';
-import { GroupDragHandler } from '../../../dnd/groupDragHandler';
-import { DockviewComponent } from '../../dockviewComponent';
-import { addDisposableListener, Emitter, Event } from '../../../events';
-import { CompositeDisposable } from '../../../lifecycle';
-import { DockviewGroupPanel } from '../../dockviewGroupPanel';
-import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
+} from '../dnd/droptarget';
+import { GroupDragHandler } from '../dnd/groupDragHandler';
+import { DockviewComponent } from '../dockview/dockviewComponent';
+import { addDisposableListener, Emitter, Event } from '../events';
+import { CompositeDisposable } from '../lifecycle';
+import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
+import { DockviewGroupPanelModel } from '../dockview/dockviewGroupPanelModel';
 
 export class VoidContainer extends CompositeDisposable {
     private readonly _element: HTMLElement;

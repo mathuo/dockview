@@ -26,7 +26,7 @@ import {
     GroupDragEvent,
     ITabsContainer,
     TabsContainer,
-} from './components/titlebar/tabsContainer';
+} from '../tabs/tabsContainer';
 import { IWatermarkRenderer } from './types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';

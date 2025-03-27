@@ -3,22 +3,22 @@ import {
     CompositeDisposable,
     Disposable,
     MutableDisposable,
-} from '../../../lifecycle';
-import { addDisposableListener, Emitter, Event } from '../../../events';
-import { Tab } from '../tab/tab';
-import { DockviewGroupPanel } from '../../dockviewGroupPanel';
+} from '../lifecycle';
+import { addDisposableListener, Emitter, Event } from '../events';
+import { Tab } from '../dockview/components/tab/tab';
+import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
 import { VoidContainer } from './voidContainer';
-import { toggleClass } from '../../../dom';
-import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
-import { DockviewComponent } from '../../dockviewComponent';
-import { WillShowOverlayLocationEvent } from '../../dockviewGroupPanelModel';
-import { getPanelData } from '../../../dnd/dataTransfer';
+import { toggleClass } from '../dom';
+import { DockviewPanel, IDockviewPanel } from '../dockview/dockviewPanel';
+import { DockviewComponent } from '../dockview/dockviewComponent';
+import { WillShowOverlayLocationEvent } from '../dockview/dockviewGroupPanelModel';
+import { getPanelData } from '../dnd/dataTransfer';
 import { Tabs } from './tabs';
 import {
     createDropdownElementHandle,
     DropdownElement,
 } from './tabOverflowControl';
-import { DroptargetOptions } from '../../../dnd/droptarget';
+import { DroptargetOptions } from '../dnd/droptarget';
 
 export interface TabDropIndexEvent {
     readonly event: DragEvent;

@@ -1,22 +1,16 @@
-import {
-    DroptargetOptions,
-    WillShowOverlayEvent,
-} from '../../../dnd/droptarget';
-import {
-    isChildEntirelyVisibleWithinParent,
-    OverflowObserver,
-} from '../../../dom';
-import { addDisposableListener, Emitter, Event } from '../../../events';
+import { DroptargetOptions, WillShowOverlayEvent } from '../dnd/droptarget';
+import { isChildEntirelyVisibleWithinParent, OverflowObserver } from '../dom';
+import { addDisposableListener, Emitter, Event } from '../events';
 import {
     CompositeDisposable,
     Disposable,
     IValueDisposable,
     MutableDisposable,
-} from '../../../lifecycle';
-import { Scrollbar } from '../../../scrollbar';
-import { WillShowOverlayLocationEvent } from '../../dockviewGroupPanelModel';
-import { ITabRenderer } from '../../types';
-import { Tab, TabDragHandler } from '../tab/tab';
+} from '../lifecycle';
+import { Scrollbar } from '../scrollbar';
+import { WillShowOverlayLocationEvent } from '../dockview/dockviewGroupPanelModel';
+import { ITabRenderer } from '../dockview/types';
+import { Tab, TabDragHandler } from '../dockview/components/tab/tab';
 import { TabDragEvent, TabDropIndexEvent } from './tabsContainer';
 
 export class Tabs extends CompositeDisposable {

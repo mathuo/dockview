@@ -43,7 +43,7 @@ import {
 import { Event } from '../events';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 import { PaneviewDidDropEvent } from '../paneview/draggablePaneviewPanel';
-import { GroupDragEvent } from '../dockview/components/titlebar/tabsContainer';
+import { GroupDragEvent } from '../tabs/tabsContainer';
 import { Box } from '../types';
 import {
     DockviewDidDropEvent,
