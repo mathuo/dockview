@@ -25,7 +25,6 @@ import {
 import {
     GroupDragEvent,
     ITabsContainer,
-    TabDragEvent,
     TabsContainer,
 } from './components/titlebar/tabsContainer';
 import { IWatermarkRenderer } from './types';
@@ -55,6 +54,11 @@ interface CoreGroupOptions {
     constraints?: Partial<Contraints>;
     initialWidth?: number;
     initialHeight?: number;
+}
+
+export interface DockviewTabDragEvent {
+    readonly nativeEvent: DragEvent;
+    readonly panel: IDockviewPanel;
 }
 
 export interface GroupOptions extends CoreGroupOptions {
@@ -293,8 +297,9 @@ export class DockviewGroupPanelModel
     readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent> =
         this._onWillShowOverlay.event;
 
-    private readonly _onTabDragStart = new Emitter<TabDragEvent>();
-    readonly onTabDragStart: Event<TabDragEvent> = this._onTabDragStart.event;
+    private readonly _onTabDragStart = new Emitter<DockviewTabDragEvent>();
+    readonly onTabDragStart: Event<DockviewTabDragEvent> =
+        this._onTabDragStart.event;
 
     private readonly _onGroupDragStart = new Emitter<GroupDragEvent>();
     readonly onGroupDragStart: Event<GroupDragEvent> =
@@ -461,7 +466,18 @@ export class DockviewGroupPanelModel
             this._onGroupDragStart,
             this._onWillShowOverlay,
             this.tabsContainer.onTabDragStart((event) => {
-                this._onTabDragStart.fire(event);
+                const panel = this.groupPanel.panels.find(
+                    (panel) => panel.id === event.id
+                );
+
+                if (!panel) {
+                    return;
+                }
+
+                this._onTabDragStart.fire({
+                    nativeEvent: event.nativeEvent,
+                    panel,
+                });
             }),
             this.tabsContainer.onGroupDragStart((event) => {
                 this._onGroupDragStart.fire(event);

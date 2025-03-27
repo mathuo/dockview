@@ -9,7 +9,7 @@ import { Tab } from '../tab/tab';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { VoidContainer } from './voidContainer';
 import { toggleClass } from '../../../dom';
-import { IDockviewPanel } from '../../dockviewPanel';
+import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
 import { WillShowOverlayLocationEvent } from '../../dockviewGroupPanelModel';
 import { getPanelData } from '../../../dnd/dataTransfer';
@@ -18,6 +18,7 @@ import {
     createDropdownElementHandle,
     DropdownElement,
 } from './tabOverflowControl';
+import { DroptargetOptions } from '../../../dnd/droptarget';
 
 export interface TabDropIndexEvent {
     readonly event: DragEvent;
@@ -26,7 +27,7 @@ export interface TabDropIndexEvent {
 
 export interface TabDragEvent {
     readonly nativeEvent: DragEvent;
-    readonly panel: IDockviewPanel;
+    readonly id: string;
 }
 
 export interface GroupDragEvent {
@@ -139,8 +140,35 @@ export class TabsContainer
         this.preActionsContainer = document.createElement('div');
         this.preActionsContainer.className = 'dv-pre-actions-container';
 
-        this.tabs = new Tabs(group, accessor, {
+        const dropTargetOptions: DroptargetOptions = {
+            acceptedTargetZones: ['left', 'right'],
+            overlayModel: {
+                activationSize: { value: 50, type: 'percentage' },
+            },
+            canDisplayOverlay: (event, position) => {
+                if (this.group.locked) {
+                    return false;
+                }
+
+                const data = getPanelData();
+
+                if (data && this.accessor.id === data.viewId) {
+                    return true;
+                }
+
+                return this.group.model.canDisplayOverlay(
+                    event,
+                    position,
+                    'tab'
+                );
+            },
+            getOverrideTarget: () =>
+                this.group.model.dropTargetContainer?.model,
+        };
+
+        this.tabs = new Tabs(this.accessor.id, group.id, dropTargetOptions, {
             showTabsOverflowControl: !accessor.options.disableTabsOverflowList,
+            scrollbars: accessor.options.scrollbars,
         });
 
         this.voidContainer = new VoidContainer(this.accessor, this.group);
@@ -152,6 +180,66 @@ export class TabsContainer
         this._element.appendChild(this.rightActionsContainer);
 
         this.addDisposables(
+            this.tabs.onTabWillShowOverlay(({ event }) => {
+                this._onWillShowOverlay.fire(
+                    new WillShowOverlayLocationEvent(event, {
+                        kind: 'tab',
+                        panel: this.group.activePanel,
+                        api: this.accessor.api,
+                        group: this.group,
+                        getData: getPanelData,
+                    })
+                );
+            }),
+            this.tabs.onTabPointDown(({ tab, event }) => {
+                if (event.defaultPrevented) {
+                    return;
+                }
+
+                const isFloatingGroupsEnabled =
+                    !this.accessor.options.disableFloatingGroups;
+
+                const isFloatingWithOnePanel =
+                    this.group.api.location.type === 'floating' &&
+                    this.size === 1;
+
+                if (
+                    isFloatingGroupsEnabled &&
+                    !isFloatingWithOnePanel &&
+                    event.shiftKey
+                ) {
+                    event.preventDefault();
+
+                    const panel = this.accessor.getGroupPanel(tab.id);
+
+                    const { top, left } = tab.element.getBoundingClientRect();
+                    const { top: rootTop, left: rootLeft } =
+                        this.accessor.element.getBoundingClientRect();
+
+                    this.accessor.addFloatingGroup(panel as DockviewPanel, {
+                        x: left - rootLeft,
+                        y: top - rootTop,
+                        inDragMode: true,
+                    });
+                    return;
+                }
+
+                switch (event.button) {
+                    case 0: // left click or touch
+                        if (this.group.activePanel?.id !== tab.id) {
+                            const panel = this.group.panels.find(
+                                (panel) => panel.id === tab.id
+                            );
+                            if (panel) {
+                                this.group.model.openPanel(panel);
+                            }
+                        }
+                        break;
+                }
+            }),
+            this.tabs.onSelected(() => {
+                this.accessor.doSetGroupActive(this.group);
+            }),
             this.tabs.onDrop((e) => this._onDrop.fire(e)),
             this.tabs.onWillShowOverlay((e) => this._onWillShowOverlay.fire(e)),
             accessor.onDidOptionsChange(() => {
@@ -293,11 +381,11 @@ export class TabsContainer
     }
 
     setActivePanel(panel: IDockviewPanel): void {
-        this.tabs.setActivePanel(panel);
+        this.tabs.setActivePanel(panel.id);
     }
 
     openPanel(panel: IDockviewPanel, index: number = this.tabs.size): void {
-        this.tabs.openPanel(panel, index);
+        this.tabs.openPanel(panel.id, panel.view.tab, index);
         this.updateClassnames();
     }
 
@@ -354,10 +442,10 @@ export class TabsContainer
                 el.className = 'dv-tabs-overflow-container';
 
                 for (const tab of this.tabs.tabs.filter((tab) =>
-                    this._overflowTabs.includes(tab.panel.id)
+                    this._overflowTabs.includes(tab.id)
                 )) {
                     const panelObject = this.group.panels.find(
-                        (panel) => panel === tab.panel
+                        (panel) => panel.id === tab.id
                     )!;
 
                     const tabComponent =
@@ -381,7 +469,14 @@ export class TabsContainer
                     wrapper.addEventListener('mousedown', () => {
                         this.accessor.popupService.close();
                         tab.element.scrollIntoView();
-                        tab.panel.api.setActive();
+
+                        const panel = this.group.panels.find(
+                            (panel) => panel.id === tab.id
+                        );
+
+                        if (panel) {
+                            panel.api.setActive();
+                        }
                     });
                     wrapper.appendChild(child);
 

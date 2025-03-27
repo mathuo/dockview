@@ -43,13 +43,11 @@ import {
 import { Event } from '../events';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 import { PaneviewDidDropEvent } from '../paneview/draggablePaneviewPanel';
-import {
-    GroupDragEvent,
-    TabDragEvent,
-} from '../dockview/components/titlebar/tabsContainer';
+import { GroupDragEvent } from '../dockview/components/titlebar/tabsContainer';
 import { Box } from '../types';
 import {
     DockviewDidDropEvent,
+    DockviewTabDragEvent,
     DockviewWillDropEvent,
     WillShowOverlayLocationEvent,
 } from '../dockview/dockviewGroupPanelModel';
@@ -733,7 +731,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      *
      * Calling `event.nativeEvent.preventDefault()` will prevent the panel drag starting.
      */
-    get onWillDragPanel(): Event<TabDragEvent> {
+    get onWillDragPanel(): Event<DockviewTabDragEvent> {
         return this.component.onWillDragPanel;
     }
 
