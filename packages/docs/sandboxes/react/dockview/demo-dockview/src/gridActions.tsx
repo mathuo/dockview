@@ -2,7 +2,7 @@ import { DockviewApi } from 'dockview';
 import * as React from 'react';
 import { defaultConfig, nextId } from './defaultLayout';
 
-import { createRoot, Root } from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import { PanelBuilder } from './panelBuilder';
 
 let mount = document.querySelector('.popover-anchor') as HTMLElement | null;
@@ -151,12 +151,6 @@ export const GridActions = (props: {
         props.api?.addGroup();
     };
 
-    const [gap, setGap] = React.useState(0);
-
-    React.useEffect(() => {
-        props.api?.setGap(gap);
-    }, [gap, props.api]);
-
     return (
         <div className="action-container">
             <div className="button-group">
@@ -204,19 +198,6 @@ export const GridActions = (props: {
                 Reset
             </button>
             <span style={{ flexGrow: 1 }} />
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ paddingRight: '4px' }}>Grid Gap</span>
-                <input
-                    style={{ width: 40 }}
-                    type="number"
-                    min={0}
-                    max={99}
-                    step={1}
-                    value={gap}
-                    onChange={(event) => setGap(Number(event.target.value))}
-                />
-                <button onClick={() => setGap(0)}>Reset</button>
-            </div>
         </div>
     );
 };

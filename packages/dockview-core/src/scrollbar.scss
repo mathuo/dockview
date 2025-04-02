@@ -1,0 +1,28 @@
+.dv-scrollable {
+    position: relative;
+    overflow: hidden;
+
+    .dv-scrollbar-horizontal {
+        position: absolute;
+        bottom: 0px;
+        left: 0px;
+        height: 4px;
+        border-radius: 2px;
+        background-color: transparent;
+        transition-property: background-color;
+        transition-timing-function: ease-in-out;
+        transition-duration: 1s;
+        transition-delay: 0s;
+    }
+
+    &:hover,
+    &.dv-scrollable-resizing,
+    &.dv-scrollable-scrolling {
+        .dv-scrollbar-horizontal {
+            background-color: var(
+                --dv-scrollbar-background-color,
+                rgba(255, 255, 255, 0.25)
+            );
+        }
+    }
+}

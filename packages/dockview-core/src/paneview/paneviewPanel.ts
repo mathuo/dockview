@@ -71,21 +71,22 @@ export abstract class PaneviewPanel
     readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
         this._onDidChange.event;
 
-    private readonly headerSize = 22;
     private _orthogonalSize = 0;
     private _size = 0;
-    private _minimumBodySize = 100;
-    private _maximumBodySize: number = Number.POSITIVE_INFINITY;
+    private _minimumBodySize: number;
+    private _maximumBodySize: number;
     private _isExpanded = false;
     protected header?: HTMLElement;
     protected body?: HTMLElement;
     private bodyPart?: IPanePart;
     private headerPart?: IPanePart;
-    private expandedSize = 0;
     private animationTimer: any;
     private _orientation: Orientation;
 
     private _headerVisible: boolean;
+
+    readonly headerSize: number;
+    readonly headerComponent: string | undefined;
 
     set orientation(value: Orientation) {
         this._orientation = value;
@@ -149,24 +150,37 @@ export abstract class PaneviewPanel
         this.header!.style.display = value ? '' : 'none';
     }
 
-    constructor(
-        id: string,
-        component: string,
-        private readonly headerComponent: string | undefined,
-        orientation: Orientation,
-        isExpanded: boolean,
-        isHeaderVisible: boolean
-    ) {
-        super(id, component, new PaneviewPanelApiImpl(id, component));
+    constructor(options: {
+        id: string;
+        component: string;
+        headerComponent: string | undefined;
+        orientation: Orientation;
+        isExpanded: boolean;
+        isHeaderVisible: boolean;
+        headerSize: number;
+        minimumBodySize: number;
+        maximumBodySize: number;
+    }) {
+        super(
+            options.id,
+            options.component,
+            new PaneviewPanelApiImpl(options.id, options.component)
+        );
         this.api.pane = this; // TODO cannot use 'this' before 'super'
         this.api.initialize(this);
 
-        this._isExpanded = isExpanded;
-        this._headerVisible = isHeaderVisible;
+        this.headerSize = options.headerSize;
+        this.headerComponent = options.headerComponent;
+
+        this._minimumBodySize = options.minimumBodySize;
+        this._maximumBodySize = options.maximumBodySize;
+
+        this._isExpanded = options.isExpanded;
+        this._headerVisible = options.isHeaderVisible;
 
         this._onDidChangeExpansionState.fire(this.isExpanded()); // initialize value
 
-        this._orientation = orientation;
+        this._orientation = options.orientation;
 
         this.element.classList.add('dv-pane');
 
@@ -260,9 +274,6 @@ export abstract class PaneviewPanel
             this.orientation === Orientation.HORIZONTAL
                 ? [size, orthogonalSize]
                 : [orthogonalSize, size];
-        if (this.isExpanded()) {
-            this.expandedSize = width;
-        }
         super.layout(width, height);
     }
 

@@ -5,8 +5,10 @@ import {
     IDockviewPanelHeaderProps,
     IDockviewPanelProps,
     DockviewApi,
+    DockviewTheme,
 } from 'dockview';
 import * as React from 'react';
+import * as ReactDOM from 'react-dom/client';
 import './app.scss';
 import { defaultConfig } from './defaultLayout';
 import { GridActions } from './gridActions';
@@ -27,6 +29,20 @@ const Option = (props: {
             <span>{`${props.title}: `}</span>
             <button onClick={props.onClick}>{props.value}</button>
         </div>
+    );
+};
+
+const ShadowIframe = (props: IDockviewPanelProps) => {
+    return (
+        <iframe
+            onMouseDown={() => {
+                if (!props.api.isActive) {
+                    props.api.setActive();
+                }
+            }}
+            style={{ border: 'none', width: '100%', height: '100%' }}
+            src="https://dockview.dev"
+        />
     );
 };
 
@@ -80,6 +96,7 @@ const components = {
         );
     },
     nested: (props: IDockviewPanelProps) => {
+        const theme = React.useContext(ThemeContext);
         return (
             <DockviewReact
                 components={components}
@@ -95,7 +112,7 @@ const components = {
                         console.log('remove', e);
                     });
                 }}
-                className={'dockview-theme-abyss'}
+                theme={theme}
             />
         );
     },
@@ -108,12 +125,40 @@ const components = {
                     }
                 }}
                 style={{
+                    border: 'none',
                     width: '100%',
                     height: '100%',
                 }}
                 src="https://dockview.dev"
             />
         );
+    },
+    shadowDom: (props: IDockviewPanelProps) => {
+        const ref = React.useRef<HTMLDivElement>(null);
+
+        React.useEffect(() => {
+            if (!ref.current) {
+                return;
+            }
+
+            const shadow = ref.current.attachShadow({
+                mode: 'open',
+            });
+
+            const shadowRoot = document.createElement('div');
+            shadowRoot.style.height = '100%';
+            shadow.appendChild(shadowRoot);
+
+            const root = ReactDOM.createRoot(shadowRoot);
+
+            root.render(<ShadowIframe {...props} />);
+
+            return () => {
+                root.unmount();
+            };
+        }, []);
+
+        return <div style={{ height: '100%' }} ref={ref}></div>;
     },
 };
 
@@ -141,7 +186,9 @@ const WatermarkComponent = () => {
     return <div>custom watermark</div>;
 };
 
-const DockviewDemo = (props: { theme?: string }) => {
+const ThemeContext = React.createContext<DockviewTheme | undefined>(undefined);
+
+const DockviewDemo = (props: { theme?: DockviewTheme }) => {
     const [logLines, setLogLines] = React.useState<
         { text: string; timestamp?: Date; backgroundColor?: string }[]
     >([]);
@@ -380,18 +427,22 @@ const DockviewDemo = (props: { theme?: string }) => {
                     }}
                 >
                     <DebugContext.Provider value={debug}>
-                        <DockviewReact
-                            components={components}
-                            defaultTabComponent={headerComponents.default}
-                            rightHeaderActionsComponent={RightControls}
-                            leftHeaderActionsComponent={LeftControls}
-                            prefixHeaderActionsComponent={PrefixHeaderControls}
-                            watermarkComponent={
-                                watermark ? WatermarkComponent : undefined
-                            }
-                            onReady={onReady}
-                            className={props.theme || 'dockview-theme-abyss'}
-                        />
+                        <ThemeContext.Provider value={props.theme}>
+                            <DockviewReact
+                                components={components}
+                                defaultTabComponent={headerComponents.default}
+                                rightHeaderActionsComponent={RightControls}
+                                leftHeaderActionsComponent={LeftControls}
+                                prefixHeaderActionsComponent={
+                                    PrefixHeaderControls
+                                }
+                                watermarkComponent={
+                                    watermark ? WatermarkComponent : undefined
+                                }
+                                onReady={onReady}
+                                theme={props.theme}
+                            />
+                        </ThemeContext.Provider>
                     </DebugContext.Provider>
                 </div>
 

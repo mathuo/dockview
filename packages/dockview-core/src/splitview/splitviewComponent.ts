@@ -122,6 +122,10 @@ export class SplitviewComponent
     }
 
     set splitview(value: Splitview) {
+        if (this._splitview) {
+            this._splitview.dispose();
+        }
+
         this._splitview = value;
 
         this._splitviewChangeDisposable.value = new CompositeDisposable(
@@ -424,6 +428,8 @@ export class SplitviewComponent
         for (const view of views) {
             view.dispose();
         }
+
+        this.element.remove();
 
         super.dispose();
     }

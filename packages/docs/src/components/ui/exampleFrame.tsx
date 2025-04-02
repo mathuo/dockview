@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { CodeSandboxButton } from './codeSandboxButton';
 import BrowserOnly from '@docusaurus/BrowserOnly';
+import { DockviewTheme } from 'dockview';
 
 const ExampleFrame = (props: {
     framework: string;
-    theme?: string;
+    theme?: DockviewTheme;
     id: string;
     height?: string;
 }) => {

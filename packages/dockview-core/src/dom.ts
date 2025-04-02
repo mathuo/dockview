@@ -2,7 +2,6 @@ import {
     Event as DockviewEvent,
     Emitter,
     addDisposableListener,
-    addDisposableWindowListener,
 } from './events';
 import { IDisposable, CompositeDisposable } from './lifecycle';
 
@@ -112,8 +111,11 @@ export function isAncestor(
     return false;
 }
 
-export function getElementsByTagName(tag: string): HTMLElement[] {
-    return Array.prototype.slice.call(document.getElementsByTagName(tag), 0);
+export function getElementsByTagName(
+    tag: string,
+    document: ParentNode
+): HTMLElement[] {
+    return Array.prototype.slice.call(document.querySelectorAll(tag), 0);
 }
 
 export interface IFocusTracker extends IDisposable {
@@ -122,7 +124,7 @@ export interface IFocusTracker extends IDisposable {
     refreshState?(): void;
 }
 
-export function trackFocus(element: HTMLElement | Window): IFocusTracker {
+export function trackFocus(element: HTMLElement): IFocusTracker {
     return new FocusTracker(element);
 }
 
@@ -138,7 +140,7 @@ class FocusTracker extends CompositeDisposable implements IFocusTracker {
 
     private readonly _refreshStateHandler: () => void;
 
-    constructor(element: HTMLElement | Window) {
+    constructor(element: HTMLElement) {
         super();
 
         this.addDisposables(this._onDidFocus, this._onDidBlur);
@@ -181,21 +183,12 @@ class FocusTracker extends CompositeDisposable implements IFocusTracker {
             }
         };
 
-        if (element instanceof HTMLElement) {
-            this.addDisposables(
-                addDisposableListener(element, 'focus', onFocus, true)
-            );
-            this.addDisposables(
-                addDisposableListener(element, 'blur', onBlur, true)
-            );
-        } else {
-            this.addDisposables(
-                addDisposableWindowListener(element, 'focus', onFocus, true)
-            );
-            this.addDisposables(
-                addDisposableWindowListener(element, 'blur', onBlur, true)
-            );
-        }
+        this.addDisposables(
+            addDisposableListener(element, 'focus', onFocus, true)
+        );
+        this.addDisposables(
+            addDisposableListener(element, 'blur', onBlur, true)
+        );
     }
 
     refreshState(): void {
@@ -288,11 +281,36 @@ export function addTestId(element: HTMLElement, id: string): void {
     element.setAttribute('data-testid', id);
 }
 
-export function disableIframePointEvents() {
-    const iframes: HTMLElement[] = [
-        ...getElementsByTagName('iframe'),
-        ...getElementsByTagName('webview'),
-    ];
+/**
+ * Should be more efficient than element.querySelectorAll("*") since there
+ * is no need to store every element in-memory using this approach
+ */
+function allTagsNamesInclusiveOfShadowDoms(tagNames: string[]) {
+    const iframes: HTMLElement[] = [];
+
+    function findIframesInNode(node: Element) {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+            if (tagNames.includes(node.tagName)) {
+                iframes.push(node as HTMLElement);
+            }
+
+            if (node.shadowRoot) {
+                findIframesInNode(<any>node.shadowRoot);
+            }
+
+            for (const child of node.children) {
+                findIframesInNode(child);
+            }
+        }
+    }
+
+    findIframesInNode(document.documentElement);
+
+    return iframes;
+}
+
+export function disableIframePointEvents(rootNode: ParentNode = document) {
+    const iframes = allTagsNamesInclusiveOfShadowDoms(['IFRAME', 'WEBVIEW']);
 
     const original = new WeakMap<HTMLElement, string>(); // don't hold onto HTMLElement references longer than required
 
@@ -356,4 +374,80 @@ export class Classnames {
             toggleClass(this.element, className, true);
         }
     }
+}
+
+const DEBOUCE_DELAY = 100;
+
+export function isChildEntirelyVisibleWithinParent(
+    child: HTMLElement,
+    parent: HTMLElement
+): boolean {
+    //
+    const childPosition = getDomNodePagePosition(child);
+    const parentPosition = getDomNodePagePosition(parent);
+
+    if (childPosition.left < parentPosition.left) {
+        return false;
+    }
+
+    if (
+        childPosition.left + childPosition.width >
+        parentPosition.left + parentPosition.width
+    ) {
+        return false;
+    }
+
+    return true;
+}
+
+export function onDidWindowMoveEnd(window: Window): Emitter<void> {
+    const emitter = new Emitter<void>();
+
+    let previousScreenX = window.screenX;
+    let previousScreenY = window.screenY;
+
+    let timeout: any;
+
+    const checkMovement = () => {
+        if (window.closed) {
+            return;
+        }
+
+        const currentScreenX = window.screenX;
+        const currentScreenY = window.screenY;
+
+        if (
+            currentScreenX !== previousScreenX ||
+            currentScreenY !== previousScreenY
+        ) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                emitter.fire();
+            }, DEBOUCE_DELAY);
+
+            previousScreenX = currentScreenX;
+            previousScreenY = currentScreenY;
+        }
+
+        requestAnimationFrame(checkMovement);
+    };
+
+    checkMovement();
+
+    return emitter;
+}
+
+export function onDidWindowResizeEnd(element: Window, cb: () => void) {
+    let resizeTimeout: any;
+
+    const disposable = new CompositeDisposable(
+        addDisposableListener(element, 'resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                cb();
+            }, DEBOUCE_DELAY);
+        })
+    );
+
+    return disposable;
 }

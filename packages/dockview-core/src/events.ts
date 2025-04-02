@@ -193,32 +193,38 @@ export class Emitter<T> implements IDisposable {
     }
 }
 
-export function addDisposableWindowListener<K extends keyof WindowEventMap>(
+export function addDisposableListener<K extends keyof WindowEventMap>(
     element: Window,
     type: K,
     listener: (this: Window, ev: WindowEventMap[K]) => any,
     options?: boolean | AddEventListenerOptions
-): IDisposable {
-    element.addEventListener(type, listener, options);
-
-    return {
-        dispose: () => {
-            element.removeEventListener(type, listener, options);
-        },
-    };
-}
-
+): IDisposable;
 export function addDisposableListener<K extends keyof HTMLElementEventMap>(
     element: HTMLElement,
     type: K,
     listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
     options?: boolean | AddEventListenerOptions
+): IDisposable;
+export function addDisposableListener<
+    K extends keyof HTMLElementEventMap | keyof WindowEventMap
+>(
+    element: HTMLElement | Window,
+    type: K,
+    listener: (
+        this: K extends keyof HTMLElementEventMap ? HTMLElement : Window,
+        ev: K extends keyof HTMLElementEventMap
+            ? HTMLElementEventMap[K]
+            : K extends keyof WindowEventMap
+            ? WindowEventMap[K]
+            : never
+    ) => any,
+    options?: boolean | AddEventListenerOptions
 ): IDisposable {
-    element.addEventListener(type, listener, options);
+    element.addEventListener(type, <any>listener, options);
 
     return {
         dispose: () => {
-            element.removeEventListener(type, listener, options);
+            element.removeEventListener(type, <any>listener, options);
         },
     };
 }

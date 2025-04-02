@@ -1,0 +1,53 @@
+@mixin dockview-design-handle-mixin {
+    .dv-vertical > .dv-sash-container > .dv-sash {
+        background-color: transparent;
+
+        &:not(.disabled) {
+            &::after {
+                content: '';
+                height: 4px;
+                width: 40px;
+                border-radius: 2px;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: var(--dv-sash-color);
+                position: absolute;
+            }
+
+            &:hover,
+            &:active {
+                background-color: transparent;
+                &::after {
+                    background-color: var(--dv-active-sash-color);
+                }
+            }
+        }
+    }
+
+    .dv-horizontal > .dv-sash-container > .dv-sash {
+        background-color: transparent;
+
+        &:not(.disabled) {
+            &::after {
+                content: '';
+                height: 40px;
+                width: 4px;
+                border-radius: 2px;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: var(--dv-sash-color);
+                position: absolute;
+            }
+
+            &:hover,
+            &:active {
+                background-color: transparent;
+                &::after {
+                    background-color: var(--dv-active-sash-color);
+                }
+            }
+        }
+    }
+}

@@ -16,10 +16,10 @@ describe('droptarget', () => {
     beforeEach(() => {
         element = document.createElement('div');
 
-        jest.spyOn(element, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(element, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(element, 'clientWidth', 'get').mockImplementation(() => 200);
+        jest.spyOn(element, 'offsetWidth', 'get').mockImplementation(() => 200);
     });
 
     test('that dragover events are marked', () => {

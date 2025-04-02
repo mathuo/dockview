@@ -72,9 +72,11 @@ export class GroupDragHandler extends DragHandler {
             ghostElement.style.lineHeight = '20px';
             ghostElement.style.borderRadius = '12px';
             ghostElement.style.position = 'absolute';
+            ghostElement.style.pointerEvents = 'none';
+            ghostElement.style.top = '-9999px';
             ghostElement.textContent = `Multiple Panels (${this.group.size})`;
 
-            addGhostImage(dataTransfer, ghostElement);
+            addGhostImage(dataTransfer, ghostElement, { y: -10, x: 30 });
         }
 
         return {

@@ -1,0 +1,23 @@
+.dv-drop-target-container {
+    position: absolute;
+    z-index: 9999;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    --dv-transition-duration: 300ms;
+
+    .dv-drop-target-anchor {
+        position: relative;
+        border: var(--dv-drag-over-border);
+        transition: opacity var(--dv-transition-duration) ease-in,
+            top var(--dv-transition-duration) ease-out,
+            left var(--dv-transition-duration) ease-out,
+            width var(--dv-transition-duration) ease-out,
+            height var(--dv-transition-duration) ease-out;
+        background-color: var(--dv-drag-over-background-color);
+        opacity: 1;
+    }
+}

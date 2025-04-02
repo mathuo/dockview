@@ -64,6 +64,7 @@ export {
 } from './dockview/framework';
 
 export * from './dockview/options';
+export * from './dockview/theme';
 export * from './dockview/dockviewPanel';
 export { DefaultTab } from './dockview/components/tab/defaultTab';
 export {

@@ -19,6 +19,7 @@ describe('defaultTab', () => {
 
         render(
             <DockviewDefaultTab
+                tabLocation="header"
                 api={api}
                 containerApi={containerApi}
                 params={params}
@@ -41,6 +42,7 @@ describe('defaultTab', () => {
 
         render(
             <DockviewDefaultTab
+                tabLocation="header"
                 api={api}
                 containerApi={containerApi}
                 params={params}
@@ -65,6 +67,7 @@ describe('defaultTab', () => {
 
         render(
             <DockviewDefaultTab
+                tabLocation="header"
                 api={api}
                 containerApi={containerApi}
                 params={params}
@@ -97,6 +100,7 @@ describe('defaultTab', () => {
 
         render(
             <DockviewDefaultTab
+                tabLocation="header"
                 api={api}
                 containerApi={containerApi}
                 params={params}
@@ -122,6 +126,7 @@ describe('defaultTab', () => {
 
         render(
             <DockviewDefaultTab
+                tabLocation="header"
                 api={api}
                 containerApi={containerApi}
                 params={params}
@@ -151,6 +156,7 @@ describe('defaultTab', () => {
 
         render(
             <DockviewDefaultTab
+                tabLocation="header"
                 api={api}
                 containerApi={containerApi}
                 params={params}
@@ -177,6 +183,7 @@ describe('defaultTab', () => {
 
         render(
             <DockviewDefaultTab
+                tabLocation="header"
                 api={api}
                 containerApi={containerApi}
                 params={params}

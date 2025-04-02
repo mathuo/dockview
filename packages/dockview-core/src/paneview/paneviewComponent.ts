@@ -21,11 +21,16 @@ import { Classnames } from '../dom';
 
 const nextLayoutId = sequentialNumberGenerator();
 
+const HEADER_SIZE = 22;
+const MINIMUM_BODY_SIZE = 0;
+const MAXIMUM_BODY_SIZE = Number.MAX_SAFE_INTEGER;
+
 export interface SerializedPaneviewPanel {
     snap?: boolean;
     priority?: LayoutPriority;
     minimumSize?: number;
     maximumSize?: number;
+    headerSize?: number;
     data: {
         id: string;
         component: string;
@@ -54,17 +59,23 @@ export class PaneFramework extends DraggablePaneviewPanel {
             isExpanded: boolean;
             disableDnd: boolean;
             accessor: IPaneviewComponent;
+            headerSize: number;
+            minimumBodySize: number;
+            maximumBodySize: number;
         }
     ) {
-        super(
-            options.accessor,
-            options.id,
-            options.component,
-            options.headerComponent,
-            options.orientation,
-            options.isExpanded,
-            options.disableDnd
-        );
+        super({
+            accessor: options.accessor,
+            id: options.id,
+            component: options.component,
+            headerComponent: options.headerComponent,
+            orientation: options.orientation,
+            isExpanded: options.isExpanded,
+            disableDnd: options.disableDnd,
+            headerSize: options.headerSize,
+            minimumBodySize: options.minimumBodySize,
+            maximumBodySize: options.maximumBodySize,
+        });
     }
 
     getBodyComponent() {
@@ -83,6 +94,7 @@ export interface AddPaneviewComponentOptions<T extends object = Parameters> {
     params?: T;
     minimumBodySize?: number;
     maximumBodySize?: number;
+    headerSize?: number;
     isExpanded?: boolean;
     title: string;
     index?: number;
@@ -277,6 +289,9 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
             isExpanded: !!options.isExpanded,
             disableDnd: !!this.options.disableDnd,
             accessor: this,
+            headerSize: options.headerSize ?? HEADER_SIZE,
+            minimumBodySize: MINIMUM_BODY_SIZE,
+            maximumBodySize: MAXIMUM_BODY_SIZE,
         });
 
         this.doAddPanel(view);
@@ -344,6 +359,7 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
                     data: view.toJSON(),
                     minimumSize: minimum(view.minimumBodySize),
                     maximumSize: maximum(view.maximumBodySize),
+                    headerSize: view.headerSize,
                     expanded: view.isExpanded(),
                 };
             });
@@ -403,6 +419,9 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
                         isExpanded: !!view.expanded,
                         disableDnd: !!this.options.disableDnd,
                         accessor: this,
+                        headerSize: view.headerSize ?? HEADER_SIZE,
+                        minimumBodySize: view.minimumSize ?? MINIMUM_BODY_SIZE,
+                        maximumBodySize: view.maximumSize ?? MAXIMUM_BODY_SIZE,
                     });
 
                     this.doAddPanel(panel);
@@ -475,6 +494,8 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
             value.dispose();
         }
         this._viewDisposables.clear();
+
+        this.element.remove();
 
         this.paneview.dispose();
     }

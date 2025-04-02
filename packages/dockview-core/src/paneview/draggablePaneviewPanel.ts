@@ -38,20 +38,37 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
     readonly onUnhandledDragOverEvent: Event<PaneviewDndOverlayEvent> =
         this._onUnhandledDragOverEvent.event;
 
-    constructor(
-        private readonly accessor: IPaneviewComponent,
-        id: string,
-        component: string,
-        headerComponent: string | undefined,
-        orientation: Orientation,
-        isExpanded: boolean,
-        disableDnd: boolean
-    ) {
-        super(id, component, headerComponent, orientation, isExpanded, true);
+    readonly accessor: IPaneviewComponent;
+
+    constructor(options: {
+        accessor: IPaneviewComponent;
+        id: string;
+        component: string;
+        headerComponent: string | undefined;
+        orientation: Orientation;
+        isExpanded: boolean;
+        disableDnd: boolean;
+        headerSize: number;
+        minimumBodySize: number;
+        maximumBodySize: number;
+    }) {
+        super({
+            id: options.id,
+            component: options.component,
+            headerComponent: options.headerComponent,
+            orientation: options.orientation,
+            isExpanded: options.isExpanded,
+            isHeaderVisible: true,
+            headerSize: options.headerSize,
+            minimumBodySize: options.minimumBodySize,
+            maximumBodySize: options.maximumBodySize,
+        });
+
+        this.accessor = options.accessor;
 
         this.addDisposables(this._onDidDrop, this._onUnhandledDragOverEvent);
 
-        if (!disableDnd) {
+        if (!options.disableDnd) {
             this.initDragFeatures();
         }
     }

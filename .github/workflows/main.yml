@@ -27,7 +27,7 @@ jobs:
             - run: npm run build
             - run: npm run test:cov
             - name: SonarCloud Scan
-              uses: sonarsource/sonarqube-scan-action@v4.1.0
+              uses: sonarsource/sonarqube-scan-action@v5
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
                   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

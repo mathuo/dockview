@@ -9,6 +9,7 @@ describe('gridviewPanel', () => {
                 onDidRemovePanel: jest.fn(),
                 onDidActivePanelChange: jest.fn(),
                 options: {},
+                onDidOptionsChange: jest.fn(),
             } as any;
         });
 

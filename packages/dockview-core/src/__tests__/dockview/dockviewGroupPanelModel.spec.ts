@@ -24,6 +24,7 @@ import { createOffsetDragOverEvent } from '../__test_utils__/utils';
 import { OverlayRenderContainer } from '../../overlay/overlayRenderContainer';
 import { Emitter } from '../../events';
 import { fromPartial } from '@total-typescript/shoehorn';
+import { TabLocation } from '../../dockview/framework';
 
 enum GroupChangeKind2 {
     ADD_PANEL,
@@ -36,10 +37,14 @@ class TestModel implements IDockviewPanelModel {
     readonly contentComponent: string;
     readonly tab: ITabRenderer;
 
-    constructor(id: string) {
+    constructor(readonly id: string) {
         this.content = new TestHeaderPart(id);
         this.contentComponent = id;
         this.tab = new TestContentPart(id);
+    }
+
+    createTabRenderer(tabLocation: TabLocation): ITabRenderer {
+        return new TestHeaderPart(this.id);
     }
 
     update(event: PanelUpdateEvent): void {
@@ -270,6 +275,7 @@ describe('dockviewGroupPanelModel', () => {
                 document.createElement('div'),
                 fromPartial<DockviewComponent>({})
             ),
+            onDidOptionsChange: () => ({ dispose: jest.fn() }),
         });
 
         groupview = new DockviewGroupPanel(dockview, 'groupview-1', options);
@@ -651,6 +657,7 @@ describe('dockviewGroupPanelModel', () => {
             getPanel: jest.fn(),
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidOptionsChange: jest.fn(),
             onDidActivePanelChange: jest.fn(),
         });
 
@@ -690,12 +697,12 @@ describe('dockviewGroupPanelModel', () => {
 
         const element = container
             .getElementsByClassName('dv-content-container')
-            .item(0)!;
+            .item(0)! as HTMLElement;
 
-        jest.spyOn(element, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(element, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(element, 'clientWidth', 'get').mockImplementation(() => 100);
+        jest.spyOn(element, 'offsetWidth', 'get').mockImplementation(() => 100);
 
         fireEvent.dragEnter(element);
         fireEvent.dragOver(element);
@@ -714,6 +721,7 @@ describe('dockviewGroupPanelModel', () => {
             getPanel: jest.fn(),
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
+            onDidOptionsChange: jest.fn(),
             onDidActivePanelChange: jest.fn(),
         });
 
@@ -751,12 +759,12 @@ describe('dockviewGroupPanelModel', () => {
 
         const element = container
             .getElementsByClassName('dv-content-container')
-            .item(0)!;
+            .item(0)! as HTMLElement;
 
-        jest.spyOn(element, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(element, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(element, 'clientWidth', 'get').mockImplementation(() => 100);
+        jest.spyOn(element, 'offsetWidth', 'get').mockImplementation(() => 100);
 
         function run(value: number) {
             fireEvent.dragEnter(element);
@@ -799,7 +807,7 @@ describe('dockviewGroupPanelModel', () => {
         fireEvent.dragEnd(element);
     });
 
-    test('that should not show drop target if dropping on self', () => {
+    test('that should show drop target if dropping on self', () => {
         const accessor = fromPartial<DockviewComponent>({
             id: 'testcomponentid',
             options: {},
@@ -812,17 +820,12 @@ describe('dockviewGroupPanelModel', () => {
                 document.createElement('div'),
                 fromPartial<DockviewComponent>({})
             ),
+            onDidOptionsChange: jest.fn(),
         });
 
-        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
-            () => {
-                return {
-                    canDisplayOverlay: jest.fn(),
-                };
-            }
-        );
-
-        const groupView = new groupviewMock() as DockviewGroupPanelModel;
+        const groupView = fromPartial<DockviewGroupPanelModel>({
+            canDisplayOverlay: jest.fn(),
+        });
 
         const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
             return {
@@ -850,12 +853,12 @@ describe('dockviewGroupPanelModel', () => {
 
         const element = container
             .getElementsByClassName('dv-content-container')
-            .item(0)!;
+            .item(0)! as HTMLElement;
 
-        jest.spyOn(element, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(element, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(element, 'clientWidth', 'get').mockImplementation(() => 100);
+        jest.spyOn(element, 'offsetWidth', 'get').mockImplementation(() => 100);
 
         LocalSelectionTransfer.getInstance().setData(
             [new PanelTransfer('testcomponentid', 'groupviewid', 'panel1')],
@@ -869,10 +872,10 @@ describe('dockviewGroupPanelModel', () => {
 
         expect(
             element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+        ).toBe(1);
     });
 
-    test('that should not allow drop when dropping on self for same component id', () => {
+    test('that should allow drop when dropping on self for same component id', () => {
         const accessor = fromPartial<DockviewComponent>({
             id: 'testcomponentid',
             options: {},
@@ -885,6 +888,7 @@ describe('dockviewGroupPanelModel', () => {
                 document.createElement('div'),
                 fromPartial<DockviewComponent>({})
             ),
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -924,12 +928,12 @@ describe('dockviewGroupPanelModel', () => {
 
         const element = container
             .getElementsByClassName('dv-content-container')
-            .item(0)!;
+            .item(0) as HTMLElement;
 
-        jest.spyOn(element, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(element, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(element, 'clientWidth', 'get').mockImplementation(() => 100);
+        jest.spyOn(element, 'offsetWidth', 'get').mockImplementation(() => 100);
 
         LocalSelectionTransfer.getInstance().setData(
             [new PanelTransfer('testcomponentid', 'groupviewid', 'panel1')],
@@ -943,7 +947,7 @@ describe('dockviewGroupPanelModel', () => {
 
         expect(
             element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+        ).toBe(1);
     });
 
     test('that should not allow drop when not dropping for different component id', () => {
@@ -959,6 +963,7 @@ describe('dockviewGroupPanelModel', () => {
                 document.createElement('div'),
                 fromPartial<DockviewComponent>({})
             ),
+            onDidOptionsChange: jest.fn(),
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -998,12 +1003,12 @@ describe('dockviewGroupPanelModel', () => {
 
         const element = container
             .getElementsByClassName('dv-content-container')
-            .item(0)!;
+            .item(0) as HTMLElement;
 
-        jest.spyOn(element, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(element, 'offsetHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(element, 'clientWidth', 'get').mockImplementation(() => 100);
+        jest.spyOn(element, 'offsetWidth', 'get').mockImplementation(() => 100);
 
         LocalSelectionTransfer.getInstance().setData(
             [new PanelTransfer('anothercomponentid', 'groupviewid', 'panel1')],

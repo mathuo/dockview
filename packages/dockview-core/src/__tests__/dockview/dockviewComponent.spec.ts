@@ -133,11 +133,15 @@ describe('dockviewComponent', () => {
             },
             className: 'test-a test-b',
         });
-        expect(dockview.element.className).toBe('test-a test-b');
+        expect(dockview.element.className).toBe(
+            'test-a test-b dockview-theme-abyss'
+        );
 
         dockview.updateOptions({ className: 'test-b test-c' });
 
-        expect(dockview.element.className).toBe('test-b test-c');
+        expect(dockview.element.className).toBe(
+            'dockview-theme-abyss test-b test-c'
+        );
     });
 
     describe('memory leakage', () => {
@@ -2453,17 +2457,17 @@ describe('dockviewComponent', () => {
         const group = dockview.getGroupPanel('panel2')!.api.group;
 
         const viewQuery = group.element.querySelectorAll(
-            '.dv-groupview > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab'
+            '.dv-groupview > .dv-tabs-and-actions-container > .dv-scrollable > .dv-tabs-container > .dv-tab'
         );
         expect(viewQuery.length).toBe(2);
 
         const viewQuery2 = group.element.querySelectorAll(
-            '.dv-groupview > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab > .dv-default-tab'
+            '.dv-groupview > .dv-tabs-and-actions-container > .dv-scrollable > .dv-tabs-container > .dv-tab > .dv-default-tab'
         );
         expect(viewQuery2.length).toBe(1);
 
         const viewQuery3 = group.element.querySelectorAll(
-            '.dv-groupview > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab > .panel-tab-part-panel2'
+            '.dv-groupview > .dv-tabs-and-actions-container > .dv-scrollable > .dv-tabs-container > .dv-tab > .panel-tab-part-panel2'
         );
         expect(viewQuery3.length).toBe(1);
     });
@@ -3376,10 +3380,10 @@ describe('dockviewComponent', () => {
             position: { direction: 'right' },
         });
 
-        Object.defineProperty(dockview.element, 'clientWidth', {
+        Object.defineProperty(dockview.element, 'offsetWidth', {
             get: () => 100,
         });
-        Object.defineProperty(dockview.element, 'clientHeight', {
+        Object.defineProperty(dockview.element, 'offsetHeight', {
             get: () => 100,
         });
 
@@ -6726,8 +6730,55 @@ describe('dockviewComponent', () => {
         expect(api.groups.length).toBe(3);
     });
 
-    describe('updateOptions', () => {
-        test('gap', () => {
+    test('add group with custom group is', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+        const api = new DockviewApi(dockview);
+
+        dockview.layout(1000, 1000);
+
+        const panel1 = api.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const group1 = api.addGroup({
+            id: 'group_1',
+            direction: 'left',
+        });
+
+        const group2 = api.addGroup({
+            id: 'group_2',
+            direction: 'left',
+            referencePanel: panel1,
+        });
+
+        const group3 = api.addGroup({
+            id: 'group_3',
+            direction: 'left',
+            referenceGroup: panel1.api.group,
+        });
+
+        expect(group1.api.id).toBe('group_1');
+        expect(group2.api.id).toBe('group_2');
+        expect(group3.api.id).toBe('group_3');
+    });
+
+    describe('dndEdges', () => {
+        test('that can init dndEdges property', () => {
             const container = document.createElement('div');
 
             const dockview = new DockviewComponent(container, {
@@ -6742,19 +6793,14 @@ describe('dockviewComponent', () => {
                             throw new Error(`unsupported`);
                     }
                 },
-                gap: 6,
+                dndEdges: {
+                    size: { value: 100, type: 'pixels' },
+                    activationSize: { value: 5, type: 'percentage' },
+                },
             });
+            const api = new DockviewApi(dockview);
 
-            expect(dockview.gap).toBe(6);
-
-            dockview.updateOptions({ gap: 10 });
-            expect(dockview.gap).toBe(10);
-
-            dockview.updateOptions({});
-            expect(dockview.gap).toBe(10);
-
-            dockview.updateOptions({ gap: 15 });
-            expect(dockview.gap).toBe(15);
+            dockview.layout(1000, 1000);
         });
     });
 

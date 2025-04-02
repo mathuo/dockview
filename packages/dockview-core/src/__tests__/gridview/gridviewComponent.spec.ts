@@ -58,7 +58,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -84,7 +84,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -121,7 +121,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -188,7 +188,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -197,6 +197,8 @@ describe('gridview', () => {
                 }
             },
         });
+
+        expect(container.querySelectorAll('.dv-grid-view').length).toBe(1);
 
         gridview.layout(800, 400);
         gridview.fromJSON({
@@ -242,6 +244,9 @@ describe('gridview', () => {
             },
             activePanel: 'panel_1',
         });
+
+        expect(container.querySelectorAll('.dv-grid-view').length).toBe(1);
+
         gridview.layout(800, 400, true);
 
         const panel1 = gridview.getPanel('panel_1')!;
@@ -322,7 +327,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -365,7 +370,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -495,7 +500,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -524,14 +529,14 @@ describe('gridview', () => {
 
         gridview.dispose();
 
-        expect(container.childNodes.length).toBe(0);
+        expect(container.children.length).toBe(0);
     });
 
     test('#1/VERTICAL', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -596,7 +601,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -661,7 +666,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -744,7 +749,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -845,7 +850,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -946,7 +951,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -1047,7 +1052,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -1178,7 +1183,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -1309,7 +1314,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -1442,7 +1447,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -1573,7 +1578,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: false,
             orientation: Orientation.HORIZONTAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -1704,7 +1709,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -1838,7 +1843,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -1875,7 +1880,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -1911,7 +1916,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -1956,7 +1961,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -2085,7 +2090,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -2218,7 +2223,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -2500,7 +2505,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
             orientation: Orientation.VERTICAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -2864,7 +2869,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -2881,7 +2886,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);
@@ -2899,7 +2904,7 @@ describe('gridview', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
-                createComponent: (options) => {
+            createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
                         return new TestGridview(options.id, options.name);

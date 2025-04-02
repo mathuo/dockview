@@ -17,6 +17,7 @@ import { IGroupHeaderProps } from './framework';
 import { FloatingGroupOptions } from './dockviewComponent';
 import { Contraints } from '../gridview/gridviewPanel';
 import { AcceptableEvent, IAcceptableEvent } from '../events';
+import { DockviewTheme } from './theme';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -52,18 +53,29 @@ export interface DockviewOptions {
     popoutUrl?: string;
     defaultRenderer?: DockviewPanelRenderer;
     debug?: boolean;
-    rootOverlayModel?: DroptargetOverlayModel;
-    locked?: boolean;
-    disableDnd?: boolean;
-    className?: string;
+    // #start dnd
+    dndEdges?: false | DroptargetOverlayModel;
     /**
-     * Pixel gap between groups
-     */
-    gap?: number;
+     * @deprecated use `dndEdges` instead. To be removed in a future version.
+     * */
+    rootOverlayModel?: DroptargetOverlayModel;
+    disableDnd?: boolean;
+    // #end dnd
+    locked?: boolean;
+    className?: string;
     /**
      * Define the behaviour of the dock when there are no panels to display. Defaults to `watermark`.
      */
     noPanelsOverlay?: 'emptyGroup' | 'watermark';
+    theme?: DockviewTheme;
+    disableTabsOverflowList?: boolean;
+    /**
+     * Select `native` to use built-in scrollbar behaviours and `custom` to use an internal implementation
+     * that allows for improved scrollbar overlay UX.
+     *
+     * This is only applied to the tab header section. Defaults to `custom`.
+     */
+    scrollbars?: 'native' | 'custom';
 }
 
 export interface DockviewDndOverlayEvent extends IAcceptableEvent {
@@ -106,9 +118,12 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         rootOverlayModel: undefined,
         locked: undefined,
         disableDnd: undefined,
-        gap: undefined,
         className: undefined,
         noPanelsOverlay: undefined,
+        dndEdges: undefined,
+        theme: undefined,
+        disableTabsOverflowList: undefined,
+        scrollbars: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];

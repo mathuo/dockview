@@ -18,34 +18,38 @@
 
 .dv-groupview {
     &.dv-active-group {
-        > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab {
-            &.dv-active-tab {
-                background-color: var(
-                    --dv-activegroup-visiblepanel-tab-background-color
-                );
-                color: var(--dv-activegroup-visiblepanel-tab-color);
-            }
-            &.dv-inactive-tab {
-                background-color: var(
-                    --dv-activegroup-hiddenpanel-tab-background-color
-                );
-                color: var(--dv-activegroup-hiddenpanel-tab-color);
+        > .dv-tabs-and-actions-container {
+            .dv-tabs-container > .dv-tab {
+                &.dv-active-tab {
+                    background-color: var(
+                        --dv-activegroup-visiblepanel-tab-background-color
+                    );
+                    color: var(--dv-activegroup-visiblepanel-tab-color);
+                }
+                &.dv-inactive-tab {
+                    background-color: var(
+                        --dv-activegroup-hiddenpanel-tab-background-color
+                    );
+                    color: var(--dv-activegroup-hiddenpanel-tab-color);
+                }
             }
         }
     }
     &.dv-inactive-group {
-        > .dv-tabs-and-actions-container > .dv-tabs-container > .dv-tab {
-            &.dv-active-tab {
-                background-color: var(
-                    --dv-inactivegroup-visiblepanel-tab-background-color
-                );
-                color: var(--dv-inactivegroup-visiblepanel-tab-color);
-            }
-            &.dv-inactive-tab {
-                background-color: var(
-                    --dv-inactivegroup-hiddenpanel-tab-background-color
-                );
-                color: var(--dv-inactivegroup-hiddenpanel-tab-color);
+        > .dv-tabs-and-actions-container {
+            .dv-tabs-container > .dv-tab {
+                &.dv-active-tab {
+                    background-color: var(
+                        --dv-inactivegroup-visiblepanel-tab-background-color
+                    );
+                    color: var(--dv-inactivegroup-visiblepanel-tab-color);
+                }
+                &.dv-inactive-tab {
+                    background-color: var(
+                        --dv-inactivegroup-hiddenpanel-tab-background-color
+                    );
+                    color: var(--dv-inactivegroup-hiddenpanel-tab-color);
+                }
             }
         }
     }
