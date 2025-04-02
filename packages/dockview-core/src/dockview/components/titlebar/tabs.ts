@@ -109,7 +109,7 @@ export class Tabs extends CompositeDisposable {
             this.addDisposables(scrollbar);
         }
 
-        this.element.role = "tablist"
+        this.element.role = 'tablist';
 
         this.addDisposables(
             this._onOverflowTabsChange,
@@ -167,6 +167,7 @@ export class Tabs extends CompositeDisposable {
                     return;
                 }
 
+                tab.value.element.focus();
                 this.group.model.openPanel(tab.value.panel);
             }),
             Disposable.from(() => {
@@ -197,7 +198,7 @@ export class Tabs extends CompositeDisposable {
         for (const tab of this._tabs) {
             const isActivePanel = panel.id === tab.value.panel.id;
             tab.value.setActive(isActivePanel);
-            tab.value.panel.runEvents()
+            tab.value.panel.runEvents();
 
             if (isActivePanel) {
                 const element = tab.value.element;

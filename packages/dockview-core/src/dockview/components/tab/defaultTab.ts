@@ -24,16 +24,28 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
 
         this.action = document.createElement('div');
         this.action.className = 'dv-default-tab-action';
+        this.action.tabIndex = 0;
+        this.action.ariaHidden = 'true';
         this.action.appendChild(createCloseButton());
 
         this._element.appendChild(this._content);
         this._element.appendChild(this.action);
+
+        this.addDisposables(
+            addDisposableListener(this.action, 'focus', (event) => {
+                this.action.ariaHidden = 'false';
+            }),
+            addDisposableListener(this.action, 'blur', (event) => {
+                this.action.ariaHidden = 'true';
+            })
+        );
 
         this.render();
     }
 
     init(params: GroupPanelPartInitParameters): void {
         this._title = params.title;
+        this.action.ariaLabel = `Close ${this._title}`;
 
         this.addDisposables(
             params.api.onDidTitleChange((event) => {

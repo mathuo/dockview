@@ -41,7 +41,17 @@ export class DockviewPanel
     implements IDockviewPanel
 {
     readonly api: DockviewPanelApiImpl;
+    /**
+     * The unique DOM id for the rendered panel element
+     *
+     * Used for accessibility attributes
+     */
     readonly componentElId: string;
+    /**
+     * The unique DOM id for the rendered tab element
+     *
+     * Used for accessibility attributes
+     */
     readonly tabComponentElId: string;
 
     private _group: DockviewGroupPanel;
@@ -94,11 +104,7 @@ export class DockviewPanel
         private readonly containerApi: DockviewApi,
         group: DockviewGroupPanel,
         readonly view: IDockviewPanelModel,
-        options: {
-            renderer?: DockviewPanelRenderer;
-            componentElId?: string;
-            tabComponentElId?: string;
-        } & Partial<Contraints>
+        options: { renderer?: DockviewPanelRenderer } & Partial<Contraints>
     ) {
         super();
         this._renderer = options.renderer;
@@ -110,10 +116,8 @@ export class DockviewPanel
 
         const randomId = Math.random().toString(36).slice(2);
 
-        this.tabComponentElId =
-            options.tabComponentElId ?? `tab-${id}-${randomId}`;
-        this.componentElId =
-            options.componentElId ?? `tab-panel-${id}-${randomId}`;
+        this.tabComponentElId = `tab-${id}-${randomId}`;
+        this.componentElId = `tab-panel-${id}-${randomId}`;
 
         this.api = new DockviewPanelApiImpl(
             this,

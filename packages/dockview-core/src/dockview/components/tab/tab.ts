@@ -75,11 +75,9 @@ export class Tab extends CompositeDisposable {
         this._element = document.createElement('div');
         this._element.id = this.panel.tabComponentElId;
         this._element.className = 'dv-tab';
-        this._element.tabIndex = 0;
-        this._element.draggable = true;
-
         this._element.role = 'tab';
         this._element.tabIndex = -1;
+        this._element.draggable = true;
         this._element.ariaSelected = 'false';
         this._element.setAttribute('aria-controls', this.panel.componentElId);
 
