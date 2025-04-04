@@ -112,7 +112,7 @@ export class Tabs extends CompositeDisposable {
 
         this.element.role = 'tablist';
         this.element.ariaLabel =
-            'Use Left Arrow to select the previous tab, Right Arrow for the next tab, Home for the first tab, and End for the last tab. Press Enter to select the focused tab.';
+            'Use the Left Arrow to select the previous tab, Right Arrow for the next tab, Home for the first tab, and End for the last tab. Press Enter to select the focused tab.';
 
         this.addDisposables(
             this._onOverflowTabsChange,
