@@ -20,6 +20,9 @@
     &.dv-active-group {
         > .dv-tabs-and-actions-container {
             .dv-tabs-container > .dv-tab {
+                &:focus {
+                    outline: 1px solid var(--dv-paneview-active-outline-color);
+                }
                 &.dv-active-tab {
                     background-color: var(
                         --dv-activegroup-visiblepanel-tab-background-color
@@ -38,6 +41,9 @@
     &.dv-inactive-group {
         > .dv-tabs-and-actions-container {
             .dv-tabs-container > .dv-tab {
+                &:focus {
+                    outline: 1px solid var(--dv-paneview-active-outline-color);
+                }
                 &.dv-active-tab {
                     background-color: var(
                         --dv-inactivegroup-visiblepanel-tab-background-color
