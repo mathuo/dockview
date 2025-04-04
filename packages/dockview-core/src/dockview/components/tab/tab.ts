@@ -73,9 +73,13 @@ export class Tab extends CompositeDisposable {
         super();
 
         this._element = document.createElement('div');
+        this._element.id = this.panel.tabComponentElId;
         this._element.className = 'dv-tab';
-        this._element.tabIndex = 0;
+        this._element.role = 'tab';
+        this._element.tabIndex = -1;
         this._element.draggable = true;
+        this._element.ariaSelected = 'false';
+        this._element.setAttribute('aria-controls', this.panel.componentElId);
 
         toggleClass(this.element, 'dv-inactive-tab', true);
 
@@ -139,6 +143,18 @@ export class Tab extends CompositeDisposable {
             addDisposableListener(this._element, 'pointerdown', (event) => {
                 this._onPointDown.fire(event);
             }),
+            addDisposableListener(this.element, 'keydown', (event) => {
+                if (event.defaultPrevented) {
+                    return;
+                }
+
+                switch (event.key) {
+                    case 'Enter':
+                    case 'Space':
+                        this.group.model.openPanel(this.panel);
+                        break;
+                }
+            }),
             this.dropTarget.onDrop((event) => {
                 this._onDropped.fire(event);
             }),
@@ -147,6 +163,9 @@ export class Tab extends CompositeDisposable {
     }
 
     public setActive(isActive: boolean): void {
+        this.element.tabIndex = isActive ? 0 : -1;
+        this.element.ariaSelected = isActive.toString();
+
         toggleClass(this.element, 'dv-active-tab', isActive);
         toggleClass(this.element, 'dv-inactive-tab', !isActive);
     }

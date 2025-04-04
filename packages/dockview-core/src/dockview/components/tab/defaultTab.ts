@@ -6,7 +6,7 @@ import { createCloseButton } from '../../../svg';
 export class DefaultTab extends CompositeDisposable implements ITabRenderer {
     private readonly _element: HTMLElement;
     private readonly _content: HTMLElement;
-    private readonly action: HTMLElement;
+    private readonly action: HTMLButtonElement;
     private _title: string | undefined;
 
     get element(): HTMLElement {
@@ -22,22 +22,38 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         this._content = document.createElement('div');
         this._content.className = 'dv-default-tab-content';
 
-        this.action = document.createElement('div');
+        this.action = document.createElement('button');
+        this.action.type = 'button';
         this.action.className = 'dv-default-tab-action';
+        // originally hide this, so only when it is focused is it read out.
+        // so the SR when focused on the tab, doesn't read "<Tab Content> Close Button"
+        this.action.ariaHidden = 'true';
+
         this.action.appendChild(createCloseButton());
 
         this._element.appendChild(this._content);
         this._element.appendChild(this.action);
+
+        this.addDisposables(
+            addDisposableListener(this.action, 'focus', (event) => {
+                this.action.ariaHidden = 'false';
+            }),
+            addDisposableListener(this.action, 'blur', (event) => {
+                this.action.ariaHidden = 'true';
+            })
+        );
 
         this.render();
     }
 
     init(params: GroupPanelPartInitParameters): void {
         this._title = params.title;
-
+        this.action.ariaLabel = `Close "${this._title}" tab`;
+        
         this.addDisposables(
             params.api.onDidTitleChange((event) => {
                 this._title = event.title;
+                this.action.ariaLabel = `Close "${event.title}" tab`;
                 this.render();
             }),
             addDisposableListener(this.action, 'pointerdown', (ev) => {
@@ -50,6 +66,18 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
 
                 ev.preventDefault();
                 params.api.close();
+            }),
+            addDisposableListener(this.action, 'keydown', (ev) => {
+                if (ev.defaultPrevented) {
+                    return;
+                }
+
+                switch (ev.key) {
+                    case 'Enter':
+                    case 'Space':
+                        params.api.close();
+                        break;
+                }
             })
         );
 

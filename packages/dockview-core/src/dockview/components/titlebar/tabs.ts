@@ -98,6 +98,7 @@ export class Tabs extends CompositeDisposable {
 
         this._tabsList = document.createElement('div');
         this._tabsList.className = 'dv-tabs-container dv-horizontal';
+        this._tabsList.ariaOrientation = 'horizontal';
 
         this.showTabsOverflowControl = options.showTabsOverflowControl;
 
@@ -109,12 +110,23 @@ export class Tabs extends CompositeDisposable {
             this.addDisposables(scrollbar);
         }
 
+        this.element.role = 'tablist';
+        this.element.ariaLabel =
+            'Use the Left Arrow to select the previous tab, Right Arrow for the next tab, Home for the first tab, and End for the last tab. Press Enter to select the focused tab.';
+
         this.addDisposables(
             this._onOverflowTabsChange,
             this._observerDisposable,
             this._onWillShowOverlay,
             this._onDrop,
             this._onTabDragStart,
+            this.accessor.onDidActivePanelChange((e) => {
+                if (e?.api.group === this.group) {
+                    this.selectedIndex = this.indexOf(e.id);
+                } else {
+                    this.selectedIndex = -1;
+                }
+            }),
             addDisposableListener(this.element, 'pointerdown', (event) => {
                 if (event.defaultPrevented) {
                     return;
@@ -125,6 +137,41 @@ export class Tabs extends CompositeDisposable {
                 if (isLeftClick) {
                     this.accessor.doSetGroupActive(this.group);
                 }
+            }),
+            addDisposableListener(this.element, 'keydown', (event) => {
+                if (event.defaultPrevented) {
+                    return;
+                }
+
+                let tab: IValueDisposable<Tab> | undefined = undefined;
+
+                switch (event.key) {
+                    case 'ArrowLeft': {
+                        if (this.selectedIndex > 0) {
+                            tab = this._tabs[this.selectedIndex - 1];
+                        }
+                        break;
+                    }
+                    case 'ArrowRight': {
+                        if (this.selectedIndex + 1 < this.size) {
+                            tab = this._tabs[this.selectedIndex + 1];
+                        }
+                        break;
+                    }
+                    case 'Home':
+                        tab = this._tabs[0];
+                        break;
+                    case 'End':
+                        tab = this._tabs[this.size - 1];
+                        break;
+                }
+
+                if (tab == null) {
+                    return;
+                }
+
+                tab.value.element.focus();
+                this.group.model.openPanel(tab.value.panel);
             }),
             Disposable.from(() => {
                 for (const { value, disposable } of this._tabs) {
@@ -154,6 +201,7 @@ export class Tabs extends CompositeDisposable {
         for (const tab of this._tabs) {
             const isActivePanel = panel.id === tab.value.panel.id;
             tab.value.setActive(isActivePanel);
+            tab.value.panel.runEvents();
 
             if (isActivePanel) {
                 const element = tab.value.element;
