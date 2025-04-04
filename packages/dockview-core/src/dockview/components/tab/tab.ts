@@ -143,6 +143,18 @@ export class Tab extends CompositeDisposable {
             addDisposableListener(this._element, 'pointerdown', (event) => {
                 this._onPointDown.fire(event);
             }),
+            addDisposableListener(this.element, 'keydown', (event) => {
+                if (event.defaultPrevented) {
+                    return;
+                }
+
+                switch (event.key) {
+                    case 'Enter':
+                    case 'Space':
+                        this.group.model.openPanel(this.panel);
+                        break;
+                }
+            }),
             this.dropTarget.onDrop((event) => {
                 this._onDropped.fire(event);
             }),
