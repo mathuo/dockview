@@ -4,10 +4,25 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Wed, 26 Mar 2025 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 08 Apr 2025 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 4.2.2]]></title>
+            <link>https://dockview.dev/blog/dockview-4.2.2-release</link>
+            <guid>https://dockview.dev/blog/dockview-4.2.2-release</guid>
+            <pubDate>Tue, 08 Apr 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.2.2-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.2.2-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: React disposable issues <a href="https://github.com/mathuo/dockview/pull/892" target="_blank" rel="noopener noreferrer">#892</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.2.2-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 4.2.2]]></title>
             <link>https://dockview.dev/blog/dockview-4.2.2-release</link>
@@ -361,27 +376,6 @@
 <li>Docs typo <a href="https://github.com/mathuo/dockview/pull/714" target="_blank" rel="noopener noreferrer">#714</a></li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.17.2-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 1.17.0]]></title>
-            <link>https://dockview.dev/blog/dockview-1.17.0-release</link>
-            <guid>https://dockview.dev/blog/dockview-1.17.0-release</guid>
-            <pubDate>Thu, 05 Sep 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.17.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<ul>
-<li>Touch Support <a href="https://github.com/mathuo/dockview/pull/698" target="_blank" rel="noopener noreferrer">#698</a></li>
-<li>Initial and bounding panel sizing <a href="https://github.com/mathuo/dockview/pull/690" target="_blank" rel="noopener noreferrer">#690</a></li>
-<li>Improve group resize logic <a href="https://github.com/mathuo/dockview/pull/693" target="_blank" rel="noopener noreferrer">#693</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.17.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Bug: Theme Typo <a href="https://github.com/mathuo/dockview/pull/694" target="_blank" rel="noopener noreferrer">#694</a></li>
-<li>Docs <a href="https://github.com/mathuo/dockview/pull/703" target="_blank" rel="noopener noreferrer">#703</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.17.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
     </channel>
