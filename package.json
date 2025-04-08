@@ -58,7 +58,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "jest-sonar-reporter": "^2.0.0",
     "jsdom": "^23.0.1",
-    "lerna": "^8.0.1",
+    "lerna": "^8.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rimraf": "^5.0.5",
