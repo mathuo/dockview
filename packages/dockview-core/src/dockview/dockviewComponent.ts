@@ -46,6 +46,7 @@ import {
     DockviewDidDropEvent,
     DockviewWillDropEvent,
     WillShowOverlayLocationEvent,
+    DockviewTabDragEvent,
 } from './dockviewGroupPanelModel';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
@@ -62,10 +63,7 @@ import {
     watchElementResize,
 } from '../dom';
 import { DockviewFloatingGroupPanel } from './dockviewFloatingGroupPanel';
-import {
-    GroupDragEvent,
-    TabDragEvent,
-} from './components/titlebar/tabsContainer';
+import { GroupDragEvent } from '../tabs/tabsContainer';
 import { AnchoredBox, AnchorPosition, Box } from '../types';
 import {
     DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
@@ -216,7 +214,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidAddPanel: Event<IDockviewPanel>;
     readonly onDidLayoutFromJSON: Event<void>;
     readonly onDidActivePanelChange: Event<IDockviewPanel | undefined>;
-    readonly onWillDragPanel: Event<TabDragEvent>;
+    readonly onWillDragPanel: Event<DockviewTabDragEvent>;
     readonly onWillDragGroup: Event<GroupDragEvent>;
     readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
     readonly onDidAddGroup: Event<DockviewGroupPanel>;
@@ -279,8 +277,9 @@ export class DockviewComponent
     readonly popupService: PopupService;
     readonly rootDropTargetContainer: DropTargetAnchorContainer;
 
-    private readonly _onWillDragPanel = new Emitter<TabDragEvent>();
-    readonly onWillDragPanel: Event<TabDragEvent> = this._onWillDragPanel.event;
+    private readonly _onWillDragPanel = new Emitter<DockviewTabDragEvent>();
+    readonly onWillDragPanel: Event<DockviewTabDragEvent> =
+        this._onWillDragPanel.event;
 
     private readonly _onWillDragGroup = new Emitter<GroupDragEvent>();
     readonly onWillDragGroup: Event<GroupDragEvent> =

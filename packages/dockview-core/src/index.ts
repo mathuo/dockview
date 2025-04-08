@@ -47,10 +47,7 @@ export {
 export * from './dockview/components/panel/content';
 export * from './dockview/components/tab/tab';
 export * from './dockview/dockviewGroupPanelModel';
-export {
-    TabDragEvent,
-    GroupDragEvent,
-} from './dockview/components/titlebar/tabsContainer';
+export { TabDragEvent, GroupDragEvent } from './tabs/tabsContainer';
 export * from './dockview/types';
 export * from './dockview/dockviewGroupPanel';
 export {

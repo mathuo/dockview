@@ -1,39 +1,36 @@
 import { addDisposableListener, Emitter, Event } from '../../../events';
 import { CompositeDisposable, IDisposable } from '../../../lifecycle';
 import {
-    getPanelData,
     LocalSelectionTransfer,
     PanelTransfer,
 } from '../../../dnd/dataTransfer';
 import { toggleClass } from '../../../dom';
-import { DockviewComponent } from '../../dockviewComponent';
 import { ITabRenderer } from '../../types';
-import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import {
     DroptargetEvent,
     Droptarget,
     WillShowOverlayEvent,
+    DroptargetOptions,
 } from '../../../dnd/droptarget';
 import { DragHandler } from '../../../dnd/abstractDragHandler';
-import { IDockviewPanel } from '../../dockviewPanel';
 import { addGhostImage } from '../../../dnd/ghost';
 
-class TabDragHandler extends DragHandler {
+export class TabDragHandler extends DragHandler {
     private readonly panelTransfer =
         LocalSelectionTransfer.getInstance<PanelTransfer>();
 
     constructor(
         element: HTMLElement,
-        private readonly accessor: DockviewComponent,
-        private readonly group: DockviewGroupPanel,
-        private readonly panel: IDockviewPanel
+        private readonly id: string,
+        private readonly groupId: string,
+        private readonly panelId: string
     ) {
         super(element);
     }
 
-    getData(event: DragEvent): IDisposable {
+    getData(_event: DragEvent): IDisposable {
         this.panelTransfer.setData(
-            [new PanelTransfer(this.accessor.id, this.group.id, this.panel.id)],
+            [new PanelTransfer(this.id, this.groupId, this.panelId)],
             PanelTransfer.prototype
         );
 
@@ -66,9 +63,9 @@ export class Tab extends CompositeDisposable {
     }
 
     constructor(
-        public readonly panel: IDockviewPanel,
-        private readonly accessor: DockviewComponent,
-        private readonly group: DockviewGroupPanel
+        public readonly id: string,
+        dragHandler: DragHandler,
+        dropTargetOptions: DroptargetOptions
     ) {
         super();
 
@@ -79,35 +76,7 @@ export class Tab extends CompositeDisposable {
 
         toggleClass(this.element, 'dv-inactive-tab', true);
 
-        const dragHandler = new TabDragHandler(
-            this._element,
-            this.accessor,
-            this.group,
-            this.panel
-        );
-
-        this.dropTarget = new Droptarget(this._element, {
-            acceptedTargetZones: ['left', 'right'],
-            overlayModel: { activationSize: { value: 50, type: 'percentage' } },
-            canDisplayOverlay: (event, position) => {
-                if (this.group.locked) {
-                    return false;
-                }
-
-                const data = getPanelData();
-
-                if (data && this.accessor.id === data.viewId) {
-                    return true;
-                }
-
-                return this.group.model.canDisplayOverlay(
-                    event,
-                    position,
-                    'tab'
-                );
-            },
-            getOverrideTarget: () => group.model.dropTargetContainer?.model,
-        });
+        this.dropTarget = new Droptarget(this._element, dropTargetOptions);
 
         this.onWillShowOverlay = this.dropTarget.onWillShowOverlay;
 
@@ -115,6 +84,7 @@ export class Tab extends CompositeDisposable {
             this._onPointDown,
             this._onDropped,
             this._onDragStart,
+            dragHandler,
             dragHandler.onDragStart((event) => {
                 if (event.dataTransfer) {
                     const style = getComputedStyle(this.element);

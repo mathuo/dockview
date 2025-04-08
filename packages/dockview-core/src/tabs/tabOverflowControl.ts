@@ -1,4 +1,4 @@
-import { createChevronRightButton } from '../../../svg';
+import { createChevronRightButton } from '../svg';
 
 export type DropdownElement = {
     element: HTMLElement;
