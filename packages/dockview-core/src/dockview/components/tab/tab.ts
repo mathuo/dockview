@@ -52,6 +52,9 @@ export class Tab extends CompositeDisposable {
 
     private readonly _onPointDown = new Emitter<MouseEvent>();
     readonly onPointerDown: Event<MouseEvent> = this._onPointDown.event;
+    
+    private readonly _onKeyDown = new Emitter<KeyboardEvent>();
+    readonly onKeyDown: Event<KeyboardEvent> = this._onKeyDown.event;
 
     private readonly _onDropped = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDropped.event;
@@ -143,17 +146,8 @@ export class Tab extends CompositeDisposable {
             addDisposableListener(this._element, 'pointerdown', (event) => {
                 this._onPointDown.fire(event);
             }),
-            addDisposableListener(this.element, 'keydown', (event) => {
-                if (event.defaultPrevented) {
-                    return;
-                }
-
-                switch (event.key) {
-                    case 'Enter':
-                    case 'Space':
-                        this.group.model.openPanel(this.panel);
-                        break;
-                }
+            addDisposableListener(this._element, 'keydown', (event) => {
+                this._onKeyDown.fire(event);
             }),
             this.dropTarget.onDrop((event) => {
                 this._onDropped.fire(event);

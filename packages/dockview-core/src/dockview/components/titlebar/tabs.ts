@@ -138,41 +138,6 @@ export class Tabs extends CompositeDisposable {
                     this.accessor.doSetGroupActive(this.group);
                 }
             }),
-            addDisposableListener(this.element, 'keydown', (event) => {
-                if (event.defaultPrevented) {
-                    return;
-                }
-
-                let tab: IValueDisposable<Tab> | undefined = undefined;
-
-                switch (event.key) {
-                    case 'ArrowLeft': {
-                        if (this.selectedIndex > 0) {
-                            tab = this._tabs[this.selectedIndex - 1];
-                        }
-                        break;
-                    }
-                    case 'ArrowRight': {
-                        if (this.selectedIndex + 1 < this.size) {
-                            tab = this._tabs[this.selectedIndex + 1];
-                        }
-                        break;
-                    }
-                    case 'Home':
-                        tab = this._tabs[0];
-                        break;
-                    case 'End':
-                        tab = this._tabs[this.size - 1];
-                        break;
-                }
-
-                if (tab == null) {
-                    return;
-                }
-
-                tab.value.element.focus();
-                this.group.model.openPanel(tab.value.panel);
-            }),
             Disposable.from(() => {
                 for (const { value, disposable } of this._tabs) {
                     disposable.dispose();
@@ -270,6 +235,40 @@ export class Tabs extends CompositeDisposable {
                             this.group.model.openPanel(panel);
                         }
                         break;
+                }
+            }),
+            tab.onKeyDown((event) => {
+                if (event.defaultPrevented) {
+                    return;
+                }
+
+                const index = this.indexOf(tab.panel.id);
+                let nextTab: Tab | undefined = undefined;
+
+                switch (event.key) {
+                    case 'ArrowLeft':
+                        nextTab = this.tabs[Math.max(0, index - 1)];
+                        break;
+                    case 'ArrowRight':
+                        nextTab = this.tabs[Math.min(this.size - 1, index + 1)];
+                        break;
+                    case 'Home':
+                        nextTab = this.tabs[0];
+                        break;
+                    case 'End':
+                        nextTab = this.tabs[this.size - 1];
+                        break;
+                    case 'Enter':
+                    case 'Space':
+                        nextTab = tab;
+                }
+
+                if (
+                    nextTab != null &&
+                    this.group.activePanel !== nextTab.panel
+                ) {
+                    nextTab.element.focus();
+                    this.group.model.openPanel(nextTab.panel);
                 }
             }),
             tab.onDrop((event) => {
