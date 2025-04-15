@@ -550,7 +550,10 @@ describe('dockviewGroupPanelModel', () => {
             dockviewComponent,
             'id',
             {},
-            null as any
+            fromPartial<DockviewGroupPanel>({
+                id: 'group1',
+                setActive: jest.fn(),
+            })
         );
 
         expect(cut.toJSON()).toEqual({
@@ -580,7 +583,10 @@ describe('dockviewGroupPanelModel', () => {
             dockviewComponent,
             'id',
             {},
-            null as any
+            fromPartial<DockviewGroupPanel>({
+              id: 'group1',
+              setActive: jest.fn(),
+          })
         );
 
         cut.locked = true;
@@ -616,7 +622,10 @@ describe('dockviewGroupPanelModel', () => {
             dockviewComponent,
             'id',
             {},
-            null as any
+            fromPartial<DockviewGroupPanel>({
+              id: 'group1',
+              setActive: jest.fn(),
+          })
         );
         const contentContainer = groupviewContainer
             .getElementsByClassName('dv-content-container')

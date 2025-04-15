@@ -3,36 +3,28 @@ import {
     LocalSelectionTransfer,
     PanelTransfer,
 } from '../../../dnd/dataTransfer';
-import { DockviewComponent } from '../../../dockview/dockviewComponent';
-import { DockviewGroupPanel } from '../../../dockview/dockviewGroupPanel';
-import { DockviewGroupPanelModel } from '../../../dockview/dockviewGroupPanelModel';
-import { Tab } from '../../../dockview/components/tab/tab';
-import { IDockviewPanel } from '../../../dockview/dockviewPanel';
 import { fromPartial } from '@total-typescript/shoehorn';
+import { Tab } from '../../../tabs/tab';
+import { DroptargetOptions } from '../../../dnd/droptarget';
 
 describe('tab', () => {
     test('that empty tab has inactive-tab class', () => {
-        const accessorMock = jest.fn();
-        const groupMock = jest.fn();
+        const options = fromPartial<DroptargetOptions>({
+            canDisplayOverlay: jest.fn(),
+            acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
+        });
 
-        const cut = new Tab(
-            { id: 'panelId' } as IDockviewPanel,
-            new accessorMock(),
-            new groupMock()
-        );
-
+        const cut = new Tab('panel1', 'accessor1', 'group1', options);
         expect(cut.element.className).toBe('dv-tab dv-inactive-tab');
     });
 
     test('that active tab has active-tab class', () => {
-        const accessorMock = jest.fn();
-        const groupMock = jest.fn();
+        const options = fromPartial<DroptargetOptions>({
+            canDisplayOverlay: jest.fn(),
+            acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
+        });
 
-        const cut = new Tab(
-            { id: 'panelId' } as IDockviewPanel,
-            new accessorMock(),
-            new groupMock()
-        );
+        const cut = new Tab('panel1', 'accessor1', 'group1', options);
 
         cut.setActive(true);
         expect(cut.element.className).toBe('dv-tab dv-active-tab');
@@ -42,31 +34,12 @@ describe('tab', () => {
     });
 
     test('that an external event does not render a drop target and calls through to the group model', () => {
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-            };
-        });
-
-        const groupView = fromPartial<DockviewGroupPanelModel>({
+        const options = fromPartial<DroptargetOptions>({
             canDisplayOverlay: jest.fn(),
+            acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
         });
 
-        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
-            return {
-                id: 'testgroupid',
-                model: groupView,
-            };
-        });
-
-        const accessor = new accessorMock() as DockviewComponent;
-        const groupPanel = new groupPanelMock() as DockviewGroupPanel;
-
-        const cut = new Tab(
-            { id: 'panelId' } as IDockviewPanel,
-            accessor,
-            groupPanel
-        );
+        const cut = new Tab('panel1', 'accessor1', 'group1', options);
 
         jest.spyOn(cut.element, 'offsetHeight', 'get').mockImplementation(
             () => 100
@@ -78,7 +51,7 @@ describe('tab', () => {
         fireEvent.dragEnter(cut.element);
         fireEvent.dragOver(cut.element);
 
-        expect(groupView.canDisplayOverlay).toHaveBeenCalled();
+        expect(options.canDisplayOverlay).toHaveBeenCalled();
 
         expect(
             cut.element.getElementsByClassName('dv-drop-target-dropzone').length
@@ -86,31 +59,12 @@ describe('tab', () => {
     });
 
     test('that if you drag over yourself a drop target is shown', () => {
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-            };
+        const options = fromPartial<DroptargetOptions>({
+            canDisplayOverlay: jest.fn().mockImplementation(() => true),
+            acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
         });
 
-        const groupView = fromPartial<DockviewGroupPanelModel>({
-            canDisplayOverlay: jest.fn(),
-        });
-
-        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
-            return {
-                id: 'testgroupid',
-                model: groupView,
-            };
-        });
-
-        const accessor = new accessorMock() as DockviewComponent;
-        const groupPanel = new groupPanelMock() as DockviewGroupPanel;
-
-        const cut = new Tab(
-            { id: 'panel1' } as IDockviewPanel,
-            accessor,
-            groupPanel
-        );
+        const cut = new Tab('panel1', 'accessor1', 'group1', options);
 
         jest.spyOn(cut.element, 'offsetHeight', 'get').mockImplementation(
             () => 100
@@ -120,14 +74,14 @@ describe('tab', () => {
         );
 
         LocalSelectionTransfer.getInstance().setData(
-            [new PanelTransfer('testcomponentid', 'anothergroupid', 'panel1')],
+            [new PanelTransfer('accessor1', 'anothergroupid', 'panel1')],
             PanelTransfer.prototype
         );
 
         fireEvent.dragEnter(cut.element);
         fireEvent.dragOver(cut.element);
 
-        expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(0);
+        expect(options.canDisplayOverlay).toHaveBeenCalledTimes(1);
 
         expect(
             cut.element.getElementsByClassName('dv-drop-target-dropzone').length
@@ -135,36 +89,12 @@ describe('tab', () => {
     });
 
     test('that if you drag over another tab a drop target is shown', () => {
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-            };
-        });
-        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
-            () => {
-                return {
-                    canDisplayOverlay: jest.fn(),
-                };
-            }
-        );
-
-        const groupView = new groupviewMock() as DockviewGroupPanelModel;
-
-        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
-            return {
-                id: 'testgroupid',
-                model: groupView,
-            };
+        const options = fromPartial<DroptargetOptions>({
+            canDisplayOverlay: jest.fn().mockImplementation(() => true),
+            acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
         });
 
-        const accessor = new accessorMock() as DockviewComponent;
-        const groupPanel = new groupPanelMock() as DockviewGroupPanel;
-
-        const cut = new Tab(
-            { id: 'panel1' } as IDockviewPanel,
-            accessor,
-            groupPanel
-        );
+        const cut = new Tab('panel1', 'accessor1', 'group1', options);
 
         jest.spyOn(cut.element, 'offsetHeight', 'get').mockImplementation(
             () => 100
@@ -174,14 +104,14 @@ describe('tab', () => {
         );
 
         LocalSelectionTransfer.getInstance().setData(
-            [new PanelTransfer('testcomponentid', 'anothergroupid', 'panel2')],
+            [new PanelTransfer('accessor1', 'anothergroupid', 'panel2')],
             PanelTransfer.prototype
         );
 
         fireEvent.dragEnter(cut.element);
         fireEvent.dragOver(cut.element);
 
-        expect(groupView.canDisplayOverlay).toBeCalledTimes(0);
+        expect(options.canDisplayOverlay).toBeCalledTimes(1);
 
         expect(
             cut.element.getElementsByClassName('dv-drop-target-dropzone').length
@@ -189,36 +119,12 @@ describe('tab', () => {
     });
 
     test('that dropping on a tab with the same id but from a different component should not render a drop over and call through to the group model', () => {
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-            };
-        });
-        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
-            () => {
-                return {
-                    canDisplayOverlay: jest.fn(),
-                };
-            }
-        );
-
-        const groupView = new groupviewMock() as DockviewGroupPanelModel;
-
-        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
-            return {
-                id: 'testgroupid',
-                model: groupView,
-            };
+        const options = fromPartial<DroptargetOptions>({
+            canDisplayOverlay: jest.fn(),
+            acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
         });
 
-        const accessor = new accessorMock() as DockviewComponent;
-        const groupPanel = new groupPanelMock() as DockviewGroupPanel;
-
-        const cut = new Tab(
-            { id: 'panel1' } as IDockviewPanel,
-            accessor,
-            groupPanel
-        );
+        const cut = new Tab('panel1', 'accessor1', 'group1', options);
 
         jest.spyOn(cut.element, 'offsetHeight', 'get').mockImplementation(
             () => 100
@@ -241,7 +147,7 @@ describe('tab', () => {
         fireEvent.dragEnter(cut.element);
         fireEvent.dragOver(cut.element);
 
-        expect(groupView.canDisplayOverlay).toBeCalledTimes(1);
+        expect(options.canDisplayOverlay).toBeCalledTimes(1);
 
         expect(
             cut.element.getElementsByClassName('dv-drop-target-dropzone').length
@@ -249,36 +155,12 @@ describe('tab', () => {
     });
 
     test('that dropping on a tab from a different component should not render a drop over and call through to the group model', () => {
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-            };
-        });
-        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
-            () => {
-                return {
-                    canDisplayOverlay: jest.fn(),
-                };
-            }
-        );
-
-        const groupView = new groupviewMock() as DockviewGroupPanelModel;
-
-        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
-            return {
-                id: 'testgroupid',
-                model: groupView,
-            };
+        const options = fromPartial<DroptargetOptions>({
+            canDisplayOverlay: jest.fn(),
+            acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
         });
 
-        const accessor = new accessorMock() as DockviewComponent;
-        const groupPanel = new groupPanelMock() as DockviewGroupPanel;
-
-        const cut = new Tab(
-            { id: 'panel1' } as IDockviewPanel,
-            accessor,
-            groupPanel
-        );
+        const cut = new Tab('panel1', 'accessor1', 'group1', options);
 
         jest.spyOn(cut.element, 'offsetHeight', 'get').mockImplementation(
             () => 100
@@ -301,7 +183,7 @@ describe('tab', () => {
         fireEvent.dragEnter(cut.element);
         fireEvent.dragOver(cut.element);
 
-        expect(groupView.canDisplayOverlay).toBeCalledTimes(1);
+        expect(options.canDisplayOverlay).toBeCalledTimes(1);
 
         expect(
             cut.element.getElementsByClassName('dv-drop-target-dropzone').length

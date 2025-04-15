@@ -1,15 +1,14 @@
-import { getPanelData } from '../../../dnd/dataTransfer';
 import {
     Droptarget,
     DroptargetEvent,
+    DroptargetOptions,
     WillShowOverlayEvent,
-} from '../../../dnd/droptarget';
-import { GroupDragHandler } from '../../../dnd/groupDragHandler';
-import { DockviewComponent } from '../../dockviewComponent';
-import { addDisposableListener, Emitter, Event } from '../../../events';
-import { CompositeDisposable } from '../../../lifecycle';
-import { DockviewGroupPanel } from '../../dockviewGroupPanel';
-import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
+} from '../dnd/droptarget';
+import { GroupDragHandler } from '../dnd/groupDragHandler';
+import { DockviewComponent } from '../dockview/dockviewComponent';
+import { addDisposableListener, Emitter, Event } from '../events';
+import { CompositeDisposable } from '../lifecycle';
+import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
 
 export class VoidContainer extends CompositeDisposable {
     private readonly _element: HTMLElement;
@@ -21,6 +20,9 @@ export class VoidContainer extends CompositeDisposable {
     private readonly _onDragStart = new Emitter<DragEvent>();
     readonly onDragStart = this._onDragStart.event;
 
+    private readonly _onPointerDown = new Emitter<PointerEvent>();
+    readonly onPointerDown = this._onPointerDown.event;
+
     readonly onWillShowOverlay: Event<WillShowOverlayEvent>;
 
     get element(): HTMLElement {
@@ -28,8 +30,9 @@ export class VoidContainer extends CompositeDisposable {
     }
 
     constructor(
-        private readonly accessor: DockviewComponent,
-        private readonly group: DockviewGroupPanel
+        id: string,
+        group: DockviewGroupPanel,
+        dropTargetOptions: DroptargetOptions
     ) {
         super();
 
@@ -41,30 +44,26 @@ export class VoidContainer extends CompositeDisposable {
         this.addDisposables(
             this._onDrop,
             this._onDragStart,
-            addDisposableListener(this._element, 'pointerdown', () => {
-                this.accessor.doSetGroupActive(this.group);
+            this._onPointerDown,
+            addDisposableListener(this._element, 'pointerdown', (event) => {
+                this._onPointerDown.fire(event);
             })
         );
 
-        const handler = new GroupDragHandler(this._element, accessor, group);
-
-        this.dropTraget = new Droptarget(this._element, {
-            acceptedTargetZones: ['center'],
-            canDisplayOverlay: (event, position) => {
-                const data = getPanelData();
-
-                if (data && this.accessor.id === data.viewId) {
+        const handler = new GroupDragHandler(this._element, id, {
+            id: group.id,
+            isCancelled: (event) => {
+                if (group.api.location.type === 'floating' && !event.shiftKey) {
                     return true;
                 }
-
-                return group.model.canDisplayOverlay(
-                    event,
-                    position,
-                    'header_space'
-                );
+                return false;
             },
-            getOverrideTarget: () => group.model.dropTargetContainer?.model,
+            text: () => {
+                return `Multiple Panels (${group.size})`;
+            },
         });
+
+        this.dropTraget = new Droptarget(this._element, dropTargetOptions);
 
         this.onWillShowOverlay = this.dropTraget.onWillShowOverlay;
 

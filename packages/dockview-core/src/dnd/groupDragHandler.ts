@@ -1,4 +1,3 @@
-import { DockviewComponent } from '../dockview/dockviewComponent';
 import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
 import { quasiPreventDefault } from '../dom';
 import { addDisposableListener } from '../events';
@@ -7,14 +6,20 @@ import { DragHandler } from './abstractDragHandler';
 import { LocalSelectionTransfer, PanelTransfer } from './dataTransfer';
 import { addGhostImage } from './ghost';
 
+export interface GroupDragHandlerOptions {
+    id: string;
+    isCancelled(_event: DragEvent): boolean;
+    text(): string;
+}
+
 export class GroupDragHandler extends DragHandler {
     private readonly panelTransfer =
         LocalSelectionTransfer.getInstance<PanelTransfer>();
 
     constructor(
         element: HTMLElement,
-        private readonly accessor: DockviewComponent,
-        private readonly group: DockviewGroupPanel
+        private readonly id: string,
+        private readonly options: GroupDragHandlerOptions
     ) {
         super(element);
 
@@ -37,18 +42,15 @@ export class GroupDragHandler extends DragHandler {
         );
     }
 
-    override isCancelled(_event: DragEvent): boolean {
-        if (this.group.api.location.type === 'floating' && !_event.shiftKey) {
-            return true;
-        }
-        return false;
+    override isCancelled(event: DragEvent): boolean {
+        return this.options.isCancelled(event);
     }
 
     getData(dragEvent: DragEvent): IDisposable {
         const dataTransfer = dragEvent.dataTransfer;
 
         this.panelTransfer.setData(
-            [new PanelTransfer(this.accessor.id, this.group.id, null)],
+            [new PanelTransfer(this.id, this.options.id, null)],
             PanelTransfer.prototype
         );
 
@@ -74,7 +76,7 @@ export class GroupDragHandler extends DragHandler {
             ghostElement.style.position = 'absolute';
             ghostElement.style.pointerEvents = 'none';
             ghostElement.style.top = '-9999px';
-            ghostElement.textContent = `Multiple Panels (${this.group.size})`;
+            ghostElement.textContent = this.options.text();
 
             addGhostImage(dataTransfer, ghostElement, { y: -10, x: 30 });
         }

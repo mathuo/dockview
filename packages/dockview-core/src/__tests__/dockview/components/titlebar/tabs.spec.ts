@@ -1,16 +1,14 @@
-import { Tabs } from '../../../../dockview/components/titlebar/tabs';
 import { fromPartial } from '@total-typescript/shoehorn';
-import { DockviewGroupPanel } from '../../../../dockview/dockviewGroupPanel';
-import { DockviewComponent } from '../../../../dockview/dockviewComponent';
+import { Tabs } from '../../../../tabs/tabs';
+import { DroptargetOptions } from '../../../../dnd/droptarget';
 
 describe('tabs', () => {
     describe('disableCustomScrollbars', () => {
         test('enabled by default', () => {
             const cut = new Tabs(
-                fromPartial<DockviewGroupPanel>({}),
-                fromPartial<DockviewComponent>({
-                    options: {},
-                }),
+                'panel1',
+                'group1',
+                fromPartial<DroptargetOptions>({}),
                 {
                     showTabsOverflowControl: true,
                 }
@@ -25,14 +23,12 @@ describe('tabs', () => {
 
         test('enabled when disabled flag is false', () => {
             const cut = new Tabs(
-                fromPartial<DockviewGroupPanel>({}),
-                fromPartial<DockviewComponent>({
-                    options: {
-                        scrollbars: 'custom',
-                    },
-                }),
+                'panel1',
+                'group1',
+                fromPartial<DroptargetOptions>({}),
                 {
                     showTabsOverflowControl: true,
+                    scrollbars: 'custom',
                 }
             );
 
@@ -45,14 +41,12 @@ describe('tabs', () => {
 
         test('disabled when disabled flag is true', () => {
             const cut = new Tabs(
-                fromPartial<DockviewGroupPanel>({}),
-                fromPartial<DockviewComponent>({
-                    options: {
-                        scrollbars: 'native',
-                    },
-                }),
+                'panel1',
+                'group1',
+                fromPartial<DroptargetOptions>({}),
                 {
                     showTabsOverflowControl: true,
+                    scrollbars: 'native',
                 }
             );
 

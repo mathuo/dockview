@@ -1,22 +1,25 @@
-import { getPanelData } from '../../../dnd/dataTransfer';
-import {
-    isChildEntirelyVisibleWithinParent,
-    OverflowObserver,
-} from '../../../dom';
-import { addDisposableListener, Emitter, Event } from '../../../events';
+import { DroptargetOptions, WillShowOverlayEvent } from '../dnd/droptarget';
+import { isChildEntirelyVisibleWithinParent, OverflowObserver } from '../dom';
+import { addDisposableListener, Emitter, Event } from '../events';
 import {
     CompositeDisposable,
     Disposable,
     IValueDisposable,
     MutableDisposable,
-} from '../../../lifecycle';
-import { Scrollbar } from '../../../scrollbar';
-import { DockviewComponent } from '../../dockviewComponent';
-import { DockviewGroupPanel } from '../../dockviewGroupPanel';
-import { WillShowOverlayLocationEvent } from '../../dockviewGroupPanelModel';
-import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
-import { Tab } from '../tab/tab';
-import { TabDragEvent, TabDropIndexEvent } from './tabsContainer';
+} from '../lifecycle';
+import { Scrollbar } from '../scrollbar';
+import { ITabRenderer } from '../dockview/types';
+import { Tab, TabDragHandler } from './tab';
+
+export interface TabDragEvent {
+    readonly nativeEvent: DragEvent;
+    readonly id: string;
+}
+
+export interface TabDropIndexEvent {
+    readonly event: DragEvent;
+    readonly index: number;
+}
 
 export class Tabs extends CompositeDisposable {
     private readonly _element: HTMLElement;
@@ -33,10 +36,24 @@ export class Tabs extends CompositeDisposable {
     private readonly _onDrop = new Emitter<TabDropIndexEvent>();
     readonly onDrop: Event<TabDropIndexEvent> = this._onDrop.event;
 
-    private readonly _onWillShowOverlay =
-        new Emitter<WillShowOverlayLocationEvent>();
-    readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent> =
-        this._onWillShowOverlay.event;
+    private readonly _onSelected = new Emitter<void>();
+    readonly onSelected: Event<void> = this._onSelected.event;
+
+    private readonly _onTabPointDown = new Emitter<{
+        tab: Tab;
+        event: MouseEvent;
+    }>();
+    readonly onTabPointDown: Event<{ tab: Tab; event: MouseEvent }> =
+        this._onTabPointDown.event;
+
+    private readonly _onTabWillShowOverlay = new Emitter<{
+        tab: Tab;
+        event: WillShowOverlayEvent;
+    }>();
+    readonly onTabWillShowOverlay: Event<{
+        tab: Tab;
+        event: WillShowOverlayEvent;
+    }> = this._onTabWillShowOverlay.event;
 
     private readonly _onOverflowTabsChange = new Emitter<{
         tabs: string[];
@@ -76,7 +93,7 @@ export class Tabs extends CompositeDisposable {
     }
 
     get panels(): string[] {
-        return this._tabs.map((_) => _.value.panel.id);
+        return this._tabs.map((_) => _.value.id);
     }
 
     get size(): number {
@@ -88,9 +105,11 @@ export class Tabs extends CompositeDisposable {
     }
 
     constructor(
-        private readonly group: DockviewGroupPanel,
-        private readonly accessor: DockviewComponent,
+        private readonly id: string,
+        private readonly groupId: string,
+        private readonly dropTargetOptions: DroptargetOptions,
         options: {
+            scrollbars?: 'native' | 'custom';
             showTabsOverflowControl: boolean;
         }
     ) {
@@ -101,7 +120,7 @@ export class Tabs extends CompositeDisposable {
 
         this.showTabsOverflowControl = options.showTabsOverflowControl;
 
-        if (accessor.options.scrollbars === 'native') {
+        if (options.scrollbars === 'native') {
             this._element = this._tabsList;
         } else {
             const scrollbar = new Scrollbar(this._tabsList);
@@ -112,9 +131,11 @@ export class Tabs extends CompositeDisposable {
         this.addDisposables(
             this._onOverflowTabsChange,
             this._observerDisposable,
-            this._onWillShowOverlay,
             this._onDrop,
             this._onTabDragStart,
+            this._onSelected,
+            this._onTabPointDown,
+            this._onTabWillShowOverlay,
             addDisposableListener(this.element, 'pointerdown', (event) => {
                 if (event.defaultPrevented) {
                     return;
@@ -123,7 +144,7 @@ export class Tabs extends CompositeDisposable {
                 const isLeftClick = event.button === 0;
 
                 if (isLeftClick) {
-                    this.accessor.doSetGroupActive(this.group);
+                    this._onSelected.fire();
                 }
             }),
             Disposable.from(() => {
@@ -138,7 +159,7 @@ export class Tabs extends CompositeDisposable {
     }
 
     indexOf(id: string): number {
-        return this._tabs.findIndex((tab) => tab.value.panel.id === id);
+        return this._tabs.findIndex((tab) => tab.value.id === id);
     }
 
     isActive(tab: Tab): boolean {
@@ -148,11 +169,11 @@ export class Tabs extends CompositeDisposable {
         );
     }
 
-    setActivePanel(panel: IDockviewPanel): void {
+    setActivePanel(id: string): void {
         let runningWidth = 0;
 
         for (const tab of this._tabs) {
-            const isActivePanel = panel.id === tab.value.panel.id;
+            const isActivePanel = id === tab.value.id;
             tab.value.setActive(isActivePanel);
 
             if (isActivePanel) {
@@ -172,57 +193,24 @@ export class Tabs extends CompositeDisposable {
         }
     }
 
-    openPanel(panel: IDockviewPanel, index: number = this._tabs.length): void {
-        if (this._tabs.find((tab) => tab.value.panel.id === panel.id)) {
+    openPanel(
+        id: string,
+        groupId: string,
+        view: ITabRenderer,
+        index: number = this._tabs.length
+    ): void {
+        if (this._tabs.find((tab) => tab.value.id === id)) {
             return;
         }
-        const tab = new Tab(panel, this.accessor, this.group);
-        tab.setContent(panel.view.tab);
+        const tab = new Tab(id, this.id, groupId, this.dropTargetOptions);
+        tab.setContent(view);
 
         const disposable = new CompositeDisposable(
             tab.onDragStart((event) => {
-                this._onTabDragStart.fire({ nativeEvent: event, panel });
+                this._onTabDragStart.fire({ nativeEvent: event, id });
             }),
             tab.onPointerDown((event) => {
-                if (event.defaultPrevented) {
-                    return;
-                }
-
-                const isFloatingGroupsEnabled =
-                    !this.accessor.options.disableFloatingGroups;
-
-                const isFloatingWithOnePanel =
-                    this.group.api.location.type === 'floating' &&
-                    this.size === 1;
-
-                if (
-                    isFloatingGroupsEnabled &&
-                    !isFloatingWithOnePanel &&
-                    event.shiftKey
-                ) {
-                    event.preventDefault();
-
-                    const panel = this.accessor.getGroupPanel(tab.panel.id);
-
-                    const { top, left } = tab.element.getBoundingClientRect();
-                    const { top: rootTop, left: rootLeft } =
-                        this.accessor.element.getBoundingClientRect();
-
-                    this.accessor.addFloatingGroup(panel as DockviewPanel, {
-                        x: left - rootLeft,
-                        y: top - rootTop,
-                        inDragMode: true,
-                    });
-                    return;
-                }
-
-                switch (event.button) {
-                    case 0: // left click or touch
-                        if (this.group.activePanel !== panel) {
-                            this.group.model.openPanel(panel);
-                        }
-                        break;
-                }
+                this._onTabPointDown.fire({ tab, event });
             }),
             tab.onDrop((event) => {
                 this._onDrop.fire({
@@ -231,15 +219,7 @@ export class Tabs extends CompositeDisposable {
                 });
             }),
             tab.onWillShowOverlay((event) => {
-                this._onWillShowOverlay.fire(
-                    new WillShowOverlayLocationEvent(event, {
-                        kind: 'tab',
-                        panel: this.group.activePanel,
-                        api: this.accessor.api,
-                        group: this.group,
-                        getData: getPanelData,
-                    })
-                );
+                this._onTabWillShowOverlay.fire({ tab, event });
             })
         );
 
@@ -264,7 +244,7 @@ export class Tabs extends CompositeDisposable {
         index: number = this._tabs.length
     ): void {
         if (index < 0 || index > this._tabs.length) {
-            throw new Error('invalid location');
+            throw new Error('dockview: cannot add tab. index out of bounds.');
         }
 
         this._tabsList.insertBefore(
@@ -294,7 +274,7 @@ export class Tabs extends CompositeDisposable {
                               this._tabsList
                           )
                   )
-                  .map((x) => x.value.panel.id);
+                  .map((x) => x.value.id);
 
         this._onOverflowTabsChange.fire({ tabs, reset: options.reset });
     }
