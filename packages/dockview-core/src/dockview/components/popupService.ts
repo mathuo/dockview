@@ -5,6 +5,48 @@ import {
     MutableDisposable,
 } from '../../lifecycle';
 
+function shiftAbsoluteElementIntoView(element: HTMLElement, root: HTMLElement) {
+    const rect = element.getBoundingClientRect();
+    const rootRect = element.getBoundingClientRect();
+
+    const viewportWidth = root.clientWidth;
+    const viewportHeight = root.clientHeight;
+
+    // const viewportWidth =
+    //     window.innerWidth || document.documentElement.clientWidth;
+    // const viewportHeight =
+    //     window.innerHeight || document.documentElement.clientHeight;
+
+    const buffer = 10; // 10px buffer
+
+    let translateX = 0;
+    let translateY = 0;
+
+    const left = rect.left - rootRect.left;
+    const top = rect.top - rootRect.top;
+    const bottom = rect.bottom - rootRect.bottom;
+    const right = rect.right - rootRect.right;
+
+    // Check horizontal overflow
+    if (left < buffer) {
+        translateX = buffer - left;
+    } else if (right > viewportWidth - buffer) {
+        translateX = viewportWidth - right - buffer;
+    }
+
+    // Check vertical overflow
+    if (top < buffer) {
+        translateY = buffer - top;
+    } else if (bottom > viewportHeight - buffer) {
+        translateY = viewportHeight - bottom - buffer;
+    }
+
+    // Apply the translation if needed
+    if (translateX !== 0 || translateY !== 0) {
+        element.style.transform = `translate(${translateX}px, ${translateY}px)`;
+    }
+}
+
 export class PopupService extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private _active: HTMLElement | null = null;
@@ -70,6 +112,10 @@ export class PopupService extends CompositeDisposable {
                 this.close();
             })
         );
+
+        requestAnimationFrame(() => {
+            shiftAbsoluteElementIntoView(wrapper, this.root);
+        });
     }
 
     close(): void {
