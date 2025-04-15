@@ -2,7 +2,6 @@ import {
     LocalSelectionTransfer,
     PanelTransfer,
 } from '../../../../dnd/dataTransfer';
-import { TabsContainer } from '../../../../dockview/components/titlebar/tabsContainer';
 import { DockviewComponent } from '../../../../dockview/dockviewComponent';
 import { DockviewGroupPanel } from '../../../../dockview/dockviewGroupPanel';
 import { DockviewGroupPanelModel } from '../../../../dockview/dockviewGroupPanelModel';
@@ -11,6 +10,7 @@ import { TestPanel } from '../../dockviewGroupPanelModel.spec';
 import { IDockviewPanel } from '../../../../dockview/dockviewPanel';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewPanelApi } from '../../../../api/dockviewPanelApi';
+import { TabsContainer } from '../../../../tabs/tabsContainer';
 
 describe('tabsContainer', () => {
     test('that an external event does not render a drop target and calls through to the group mode', () => {

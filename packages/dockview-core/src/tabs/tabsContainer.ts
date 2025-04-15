@@ -5,7 +5,7 @@ import {
     MutableDisposable,
 } from '../lifecycle';
 import { addDisposableListener, Emitter, Event } from '../events';
-import { Tab } from '../dockview/components/tab/tab';
+import { Tab } from './tab';
 import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
 import { VoidContainer } from './voidContainer';
 import { toggleClass } from '../dom';
@@ -13,22 +13,12 @@ import { DockviewPanel, IDockviewPanel } from '../dockview/dockviewPanel';
 import { DockviewComponent } from '../dockview/dockviewComponent';
 import { WillShowOverlayLocationEvent } from '../dockview/dockviewGroupPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
-import { Tabs } from './tabs';
+import { TabDragEvent, TabDropIndexEvent, Tabs } from './tabs';
 import {
     createDropdownElementHandle,
     DropdownElement,
 } from './tabOverflowControl';
 import { DroptargetOptions } from '../dnd/droptarget';
-
-export interface TabDropIndexEvent {
-    readonly event: DragEvent;
-    readonly index: number;
-}
-
-export interface TabDragEvent {
-    readonly nativeEvent: DragEvent;
-    readonly id: string;
-}
 
 export interface GroupDragEvent {
     readonly nativeEvent: DragEvent;
@@ -171,7 +161,23 @@ export class TabsContainer
             scrollbars: accessor.options.scrollbars,
         });
 
-        this.voidContainer = new VoidContainer(this.accessor, this.group);
+        this.voidContainer = new VoidContainer(this.accessor.id, this.group, {
+            acceptedTargetZones: ['center'],
+            canDisplayOverlay: (event, position) => {
+                const data = getPanelData();
+
+                if (data && this.accessor.id === data.viewId) {
+                    return true;
+                }
+
+                return group.model.canDisplayOverlay(
+                    event,
+                    position,
+                    'header_space'
+                );
+            },
+            getOverrideTarget: () => group.model.dropTargetContainer?.model,
+        });
 
         this._element.appendChild(this.preActionsContainer);
         this._element.appendChild(this.tabs.element);
@@ -180,6 +186,9 @@ export class TabsContainer
         this._element.appendChild(this.rightActionsContainer);
 
         this.addDisposables(
+            this.voidContainer.onPointerDown(() => {
+                this.accessor.doSetGroupActive(this.group);
+            }),
             this.tabs.onTabWillShowOverlay(({ event }) => {
                 this._onWillShowOverlay.fire(
                     new WillShowOverlayLocationEvent(event, {
@@ -241,7 +250,6 @@ export class TabsContainer
                 this.accessor.doSetGroupActive(this.group);
             }),
             this.tabs.onDrop((e) => this._onDrop.fire(e)),
-            this.tabs.onWillShowOverlay((e) => this._onWillShowOverlay.fire(e)),
             accessor.onDidOptionsChange(() => {
                 this.tabs.showTabsOverflowControl =
                     !accessor.options.disableTabsOverflowList;
@@ -385,7 +393,7 @@ export class TabsContainer
     }
 
     openPanel(panel: IDockviewPanel, index: number = this.tabs.size): void {
-        this.tabs.openPanel(panel.id, panel.view.tab, index);
+        this.tabs.openPanel(panel.id, panel.group.id, panel.view.tab, index);
         this.updateClassnames();
     }
 

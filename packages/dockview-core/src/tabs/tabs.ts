@@ -8,10 +8,18 @@ import {
     MutableDisposable,
 } from '../lifecycle';
 import { Scrollbar } from '../scrollbar';
-import { WillShowOverlayLocationEvent } from '../dockview/dockviewGroupPanelModel';
 import { ITabRenderer } from '../dockview/types';
-import { Tab, TabDragHandler } from '../dockview/components/tab/tab';
-import { TabDragEvent, TabDropIndexEvent } from './tabsContainer';
+import { Tab, TabDragHandler } from './tab';
+
+export interface TabDragEvent {
+    readonly nativeEvent: DragEvent;
+    readonly id: string;
+}
+
+export interface TabDropIndexEvent {
+    readonly event: DragEvent;
+    readonly index: number;
+}
 
 export class Tabs extends CompositeDisposable {
     private readonly _element: HTMLElement;
@@ -46,11 +54,6 @@ export class Tabs extends CompositeDisposable {
         tab: Tab;
         event: WillShowOverlayEvent;
     }> = this._onTabWillShowOverlay.event;
-
-    private readonly _onWillShowOverlay =
-        new Emitter<WillShowOverlayLocationEvent>();
-    readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent> =
-        this._onWillShowOverlay.event;
 
     private readonly _onOverflowTabsChange = new Emitter<{
         tabs: string[];
@@ -128,7 +131,6 @@ export class Tabs extends CompositeDisposable {
         this.addDisposables(
             this._onOverflowTabsChange,
             this._observerDisposable,
-            this._onWillShowOverlay,
             this._onDrop,
             this._onTabDragStart,
             this._onSelected,
@@ -193,17 +195,14 @@ export class Tabs extends CompositeDisposable {
 
     openPanel(
         id: string,
+        groupId: string,
         view: ITabRenderer,
         index: number = this._tabs.length
     ): void {
         if (this._tabs.find((tab) => tab.value.id === id)) {
             return;
         }
-        const tab = new Tab(
-            id,
-            new TabDragHandler(this._element, this.id, this.groupId, id),
-            this.dropTargetOptions
-        );
+        const tab = new Tab(id, this.id, groupId, this.dropTargetOptions);
         tab.setContent(view);
 
         const disposable = new CompositeDisposable(
@@ -245,7 +244,7 @@ export class Tabs extends CompositeDisposable {
         index: number = this._tabs.length
     ): void {
         if (index < 0 || index > this._tabs.length) {
-            throw new Error('invalid location');
+            throw new Error('dockview: cannot add tab. index out of bounds.');
         }
 
         this._tabsList.insertBefore(

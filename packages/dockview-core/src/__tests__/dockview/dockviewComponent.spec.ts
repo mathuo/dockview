@@ -12,15 +12,13 @@ import { DockviewPanel, IDockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import { fireEvent, queryByTestId } from '@testing-library/dom';
 import { getPanelData } from '../../dnd/dataTransfer';
-import {
-    GroupDragEvent,
-    TabDragEvent,
-} from '../../dockview/components/titlebar/tabsContainer';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewApi } from '../../api/component.api';
 import { DockviewDndOverlayEvent } from '../../dockview/options';
 import { SizeEvent } from '../../api/gridviewPanelApi';
 import { setupMockWindow } from '../__mocks__/mockWindow';
+import { GroupDragEvent } from '../../tabs/tabsContainer';
+import { DockviewTabDragEvent } from '../../dockview/dockviewGroupPanelModel';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
@@ -3521,7 +3519,7 @@ describe('dockviewComponent', () => {
             component: 'default',
         });
 
-        const tabDragEvents: TabDragEvent[] = [];
+        const tabDragEvents: DockviewTabDragEvent[] = [];
         const groupDragEvents: GroupDragEvent[] = [];
 
         dockview.onWillDragPanel((event) => {
@@ -3564,7 +3562,7 @@ describe('dockviewComponent', () => {
             component: 'default',
         });
 
-        const tabDragEvents: TabDragEvent[] = [];
+        const tabDragEvents: DockviewTabDragEvent[] = [];
         const groupDragEvents: GroupDragEvent[] = [];
 
         dockview.onWillDragPanel((event) => {

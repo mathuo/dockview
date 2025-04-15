@@ -1,19 +1,16 @@
-import { addDisposableListener, Emitter, Event } from '../../../events';
-import { CompositeDisposable, IDisposable } from '../../../lifecycle';
-import {
-    LocalSelectionTransfer,
-    PanelTransfer,
-} from '../../../dnd/dataTransfer';
-import { toggleClass } from '../../../dom';
-import { ITabRenderer } from '../../types';
+import { addDisposableListener, Emitter, Event } from '../events';
+import { CompositeDisposable, IDisposable } from '../lifecycle';
+import { LocalSelectionTransfer, PanelTransfer } from '../dnd/dataTransfer';
+import { toggleClass } from '../dom';
+import { ITabRenderer } from '../dockview/types';
 import {
     DroptargetEvent,
     Droptarget,
     WillShowOverlayEvent,
     DroptargetOptions,
-} from '../../../dnd/droptarget';
-import { DragHandler } from '../../../dnd/abstractDragHandler';
-import { addGhostImage } from '../../../dnd/ghost';
+} from '../dnd/droptarget';
+import { DragHandler } from '../dnd/abstractDragHandler';
+import { addGhostImage } from '../dnd/ghost';
 
 export class TabDragHandler extends DragHandler {
     private readonly panelTransfer =
@@ -64,7 +61,8 @@ export class Tab extends CompositeDisposable {
 
     constructor(
         public readonly id: string,
-        dragHandler: DragHandler,
+        accessorId: string,
+        groupId: string,
         dropTargetOptions: DroptargetOptions
     ) {
         super();
@@ -79,6 +77,13 @@ export class Tab extends CompositeDisposable {
         this.dropTarget = new Droptarget(this._element, dropTargetOptions);
 
         this.onWillShowOverlay = this.dropTarget.onWillShowOverlay;
+
+        const dragHandler = new TabDragHandler(
+            this._element,
+            accessorId,
+            groupId,
+            id
+        );
 
         this.addDisposables(
             this._onPointDown,
