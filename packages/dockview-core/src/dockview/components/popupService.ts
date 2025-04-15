@@ -71,13 +71,13 @@ export class PopupService extends CompositeDisposable {
 
     openPopover(
         element: HTMLElement,
-        position: { x: number; y: number }
+        position: { x: number; y: number; zIndex?: string }
     ): void {
         this.close();
 
         const wrapper = document.createElement('div');
         wrapper.style.position = 'absolute';
-        wrapper.style.zIndex = '99';
+        wrapper.style.zIndex = position.zIndex ?? 'var(--dv-overlay-z-index)';
         wrapper.appendChild(element);
 
         const anchorBox = this._element.getBoundingClientRect();
@@ -92,7 +92,7 @@ export class PopupService extends CompositeDisposable {
         this._active = wrapper;
 
         this._activeDisposable.value = new CompositeDisposable(
-          addDisposableListener(window, 'pointerdown', (event) => {
+            addDisposableListener(window, 'pointerdown', (event) => {
                 const target = event.target;
 
                 if (!(target instanceof HTMLElement)) {

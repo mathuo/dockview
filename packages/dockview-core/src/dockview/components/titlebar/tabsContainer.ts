@@ -378,7 +378,7 @@ export class TabsContainer
                         !panelObject.api.isActive
                     );
 
-                    wrapper.addEventListener('mousedown', () => {
+                    wrapper.addEventListener('pointerdown', () => {
                         this.accessor.popupService.close();
                         tab.element.scrollIntoView();
                         tab.panel.api.setActive();
@@ -388,9 +388,21 @@ export class TabsContainer
                     el.appendChild(wrapper);
                 }
 
+                let tmp: HTMLElement | null = root;
+
+                while (
+                    tmp &&
+                    (tmp.style.zIndex === 'auto' || tmp.style.zIndex === '')
+                ) {
+                    tmp = tmp.parentElement;
+                }
+
                 this.accessor.popupService.openPopover(el, {
                     x: event.clientX,
                     y: event.clientY,
+                    zIndex: tmp?.style.zIndex
+                        ? `calc(${tmp.style.zIndex} + 1)`
+                        : undefined,
                 });
             })
         );
