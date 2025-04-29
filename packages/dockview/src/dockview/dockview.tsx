@@ -175,6 +175,7 @@ export const DockviewReact = React.forwardRef(
             dockviewRef.current = api;
 
             return () => {
+                dockviewRef.current = undefined;
                 api.dispose();
             };
         }, []);

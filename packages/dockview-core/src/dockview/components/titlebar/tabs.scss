@@ -1,7 +1,7 @@
 .dv-tabs-container {
     display: flex;
     height: 100%;
-    overflow: hidden;
+    overflow: auto;
     scrollbar-width: thin; // firefox
 
     &.dv-horizontal {
@@ -32,6 +32,12 @@
     /* Handle */
     &::-webkit-scrollbar-thumb {
         background: var(--dv-tabs-container-scrollbar-color);
+    }
+}
+
+.dv-scrollable {
+    > .dv-tabs-container {
+        overflow: hidden;
     }
 }
 

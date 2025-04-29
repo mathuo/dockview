@@ -2388,6 +2388,50 @@
                 }
             },
             {
+                "name": "onDidPopoutGroupPositionChange",
+                "code": "Event<PopoutGroupChangePositionEvent>",
+                "kind": "accessor",
+                "value": {
+                    "name": "onDidPopoutGroupPositionChange",
+                    "code": "Event<PopoutGroupChangePositionEvent>",
+                    "kind": "getSignature",
+                    "returnType": {
+                        "type": "reference",
+                        "value": "Event",
+                        "source": "dockview-core",
+                        "typeArguments": [
+                            {
+                                "type": "reference",
+                                "value": "PopoutGroupChangePositionEvent",
+                                "source": "dockview-core"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "onDidPopoutGroupSizeChange",
+                "code": "Event<PopoutGroupChangeSizeEvent>",
+                "kind": "accessor",
+                "value": {
+                    "name": "onDidPopoutGroupSizeChange",
+                    "code": "Event<PopoutGroupChangeSizeEvent>",
+                    "kind": "getSignature",
+                    "returnType": {
+                        "type": "reference",
+                        "value": "Event",
+                        "source": "dockview-core",
+                        "typeArguments": [
+                            {
+                                "type": "reference",
+                                "value": "PopoutGroupChangeSizeEvent",
+                                "source": "dockview-core"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
                 "name": "onDidRemoveGroup",
                 "code": "Event<DockviewGroupPanel>",
                 "kind": "accessor",
@@ -4392,6 +4436,46 @@
                         {
                             "type": "intrinsic",
                             "value": "void"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "onDidPopoutGroupPositionChange",
+                "code": "Event<PopoutGroupChangePositionEvent>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "PopoutGroupChangePositionEvent",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "onDidPopoutGroupSizeChange",
+                "code": "Event<PopoutGroupChangeSizeEvent>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "PopoutGroupChangeSizeEvent",
+                            "source": "dockview-core"
                         }
                     ]
                 },
@@ -9762,6 +9846,19 @@
                 }
             },
             {
+                "name": "accessor",
+                "code": "IPaneviewComponent",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "IPaneviewComponent",
+                    "source": "dockview-core"
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "api",
                 "code": "PaneviewPanelApiImpl",
                 "kind": "property",
@@ -9814,6 +9911,39 @@
                 "flags": {
                     "isProtected": true,
                     "isOptional": true
+                }
+            },
+            {
+                "name": "headerComponent",
+                "code": "string | undefined",
+                "kind": "property",
+                "type": {
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "intrinsic",
+                            "value": "string"
+                        },
+                        {
+                            "type": "intrinsic",
+                            "value": "undefined"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "headerSize",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isReadonly": true
                 }
             },
             {
@@ -14988,6 +15118,19 @@
                 }
             },
             {
+                "name": "accessor",
+                "code": "IPaneviewComponent",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "IPaneviewComponent",
+                    "source": "dockview-core"
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "api",
                 "code": "PaneviewPanelApiImpl",
                 "kind": "property",
@@ -15040,6 +15183,39 @@
                 "flags": {
                     "isProtected": true,
                     "isOptional": true
+                }
+            },
+            {
+                "name": "headerComponent",
+                "code": "string | undefined",
+                "kind": "property",
+                "type": {
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "intrinsic",
+                            "value": "string"
+                        },
+                        {
+                            "type": "intrinsic",
+                            "value": "undefined"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "headerSize",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isReadonly": true
                 }
             },
             {
@@ -18018,6 +18194,39 @@
                 "flags": {
                     "isProtected": true,
                     "isOptional": true
+                }
+            },
+            {
+                "name": "headerComponent",
+                "code": "string | undefined",
+                "kind": "property",
+                "type": {
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "intrinsic",
+                            "value": "string"
+                        },
+                        {
+                            "type": "intrinsic",
+                            "value": "undefined"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "headerSize",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isReadonly": true
                 }
             },
             {
@@ -22516,6 +22725,18 @@
                 }
             },
             {
+                "name": "headerSize",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
                 "name": "id",
                 "code": "string",
                 "kind": "property",
@@ -25811,7 +26032,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": "\nwill mount the overlay to root of the dockview component whereas "
+                            "text": "\r\nwill mount the overlay to root of the dockview component whereas "
                         },
                         {
                             "kind": "code",
@@ -29251,6 +29472,46 @@
                         {
                             "type": "reference",
                             "value": "MovePanelEvent",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "onDidPopoutGroupPositionChange",
+                "code": "Event<PopoutGroupChangePositionEvent>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "PopoutGroupChangePositionEvent",
+                            "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "onDidPopoutGroupSizeChange",
+                "code": "Event<PopoutGroupChangeSizeEvent>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "PopoutGroupChangeSizeEvent",
                             "source": "dockview-core"
                         }
                     ]
@@ -39967,6 +40228,82 @@
         "code": "",
         "kind": "interface"
     },
+    "PopoutGroupChangePositionEvent": {
+        "kind": "interface",
+        "name": "PopoutGroupChangePositionEvent",
+        "children": [
+            {
+                "name": "group",
+                "code": "DockviewGroupPanel",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "DockviewGroupPanel",
+                    "source": "dockview-core"
+                },
+                "flags": {}
+            },
+            {
+                "name": "screenX",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {}
+            },
+            {
+                "name": "screenY",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {}
+            }
+        ],
+        "extends": []
+    },
+    "PopoutGroupChangeSizeEvent": {
+        "kind": "interface",
+        "name": "PopoutGroupChangeSizeEvent",
+        "children": [
+            {
+                "name": "group",
+                "code": "DockviewGroupPanel",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "DockviewGroupPanel",
+                    "source": "dockview-core"
+                },
+                "flags": {}
+            },
+            {
+                "name": "height",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {}
+            },
+            {
+                "name": "width",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
+                },
+                "flags": {}
+            }
+        ],
+        "extends": []
+    },
     "RendererChangedEvent": {
         "kind": "interface",
         "name": "RendererChangedEvent",
@@ -40480,6 +40817,18 @@
                 "type": {
                     "type": "intrinsic",
                     "value": "boolean"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
+                "name": "headerSize",
+                "code": "number",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "number"
                 },
                 "flags": {
                     "isOptional": true

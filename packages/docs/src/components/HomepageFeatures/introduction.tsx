@@ -24,9 +24,6 @@ export const Introduction = () => {
             </div>
             <div style={{ padding: '20px' }}>
                 <BrowserHeader />
-            </div>
-            <div style={{ padding: '20px' }}>
-                <BrowserHeader />
                 <MultiFrameworkContainer
                     height={500}
                     react={DockviewDemo2}

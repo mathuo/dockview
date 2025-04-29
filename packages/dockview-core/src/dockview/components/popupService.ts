@@ -1,3 +1,4 @@
+import { shiftAbsoluteElementIntoView } from '../../dom';
 import { addDisposableListener } from '../../events';
 import {
     CompositeDisposable,
@@ -29,13 +30,13 @@ export class PopupService extends CompositeDisposable {
 
     openPopover(
         element: HTMLElement,
-        position: { x: number; y: number }
+        position: { x: number; y: number; zIndex?: string }
     ): void {
         this.close();
 
         const wrapper = document.createElement('div');
         wrapper.style.position = 'absolute';
-        wrapper.style.zIndex = 'calc(var(--dv-overlay-z-index, 999) * 2)';
+        wrapper.style.zIndex = position.zIndex ?? 'var(--dv-overlay-z-index)';
         wrapper.appendChild(element);
 
         const anchorBox = this._element.getBoundingClientRect();
@@ -70,6 +71,10 @@ export class PopupService extends CompositeDisposable {
                 this.close();
             })
         );
+
+        requestAnimationFrame(() => {
+            shiftAbsoluteElementIntoView(wrapper, this.root);
+        });
     }
 
     close(): void {

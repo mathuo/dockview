@@ -105,6 +105,7 @@ export const GridviewReact = React.forwardRef(
             gridviewRef.current = api;
 
             return () => {
+                gridviewRef.current = undefined;
                 api.dispose();
             };
         }, []);

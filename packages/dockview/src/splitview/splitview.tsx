@@ -105,6 +105,7 @@ export const SplitviewReact = React.forwardRef(
             splitviewRef.current = api;
 
             return () => {
+                splitviewRef.current = undefined;
                 api.dispose();
             };
         }, []);

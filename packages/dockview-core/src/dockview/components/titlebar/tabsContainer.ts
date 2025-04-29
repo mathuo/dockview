@@ -8,7 +8,7 @@ import { addDisposableListener, Emitter, Event } from '../../../events';
 import { Tab } from '../tab/tab';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { VoidContainer } from './voidContainer';
-import { toggleClass } from '../../../dom';
+import { findRelativeZIndexParent, toggleClass } from '../../../dom';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
 import { WillShowOverlayLocationEvent } from '../../dockviewGroupPanelModel';
@@ -152,6 +152,8 @@ export class TabsContainer
         this._element.appendChild(this.rightActionsContainer);
 
         this.addDisposables(
+            this.tabs.onDrop((e) => this._onDrop.fire(e)),
+            this.tabs.onWillShowOverlay((e) => this._onWillShowOverlay.fire(e)),
             accessor.onDidOptionsChange(() => {
                 this.tabs.showTabsOverflowControl =
                     !accessor.options.disableTabsOverflowList;
@@ -376,7 +378,7 @@ export class TabsContainer
                         !panelObject.api.isActive
                     );
 
-                    wrapper.addEventListener('mousedown', () => {
+                    wrapper.addEventListener('pointerdown', () => {
                         this.accessor.popupService.close();
                         tab.element.scrollIntoView();
                         tab.panel.api.setActive();
@@ -386,9 +388,14 @@ export class TabsContainer
                     el.appendChild(wrapper);
                 }
 
+                const relativeParent = findRelativeZIndexParent(root);
+
                 this.accessor.popupService.openPopover(el, {
                     x: event.clientX,
                     y: event.clientY,
+                    zIndex: relativeParent?.style.zIndex
+                        ? `calc(${relativeParent.style.zIndex} * 2)`
+                        : undefined,
                 });
             })
         );

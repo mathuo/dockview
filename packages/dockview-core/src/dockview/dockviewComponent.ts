@@ -412,11 +412,11 @@ export class DockviewComponent
             className: options.className,
         });
 
+        this._options = options;
+
         this.popupService = new PopupService(this.element);
-
-        this.updateDropTargetModel(options);
-
         this._themeClassnames = new Classnames(this.element);
+        this._api = new DockviewApi(this);
 
         this.rootDropTargetContainer = new DropTargetAnchorContainer(
             this.element,
@@ -427,8 +427,58 @@ export class DockviewComponent
             this
         );
 
+        this._rootDropTarget = new Droptarget(this.element, {
+            className: 'dv-drop-target-edge',
+            canDisplayOverlay: (event, position) => {
+                const data = getPanelData();
+
+                if (data) {
+                    if (data.viewId !== this.id) {
+                        return false;
+                    }
+
+                    if (position === 'center') {
+                        // center drop target is only allowed if there are no panels in the grid
+                        // floating panels are allowed
+                        return this.gridview.length === 0;
+                    }
+
+                    return true;
+                }
+
+                if (position === 'center' && this.gridview.length !== 0) {
+                    /**
+                     * for external events only show the four-corner drag overlays, disable
+                     * the center position so that external drag events can fall through to the group
+                     * and panel drop target handlers
+                     */
+                    return false;
+                }
+
+                const firedEvent = new DockviewUnhandledDragOverEvent(
+                    event,
+                    'edge',
+                    position,
+                    getPanelData
+                );
+
+                this._onUnhandledDragOverEvent.fire(firedEvent);
+
+                return firedEvent.isAccepted;
+            },
+            acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
+            overlayModel:
+                options.rootOverlayModel ?? DEFAULT_ROOT_OVERLAY_MODEL,
+            getOverrideTarget: () => this.rootDropTargetContainer?.model,
+        });
+
+        this.updateDropTargetModel(options);
+
         toggleClass(this.gridview.element, 'dv-dockview', true);
         toggleClass(this.element, 'dv-debug', !!options.debug);
+
+        this.updateTheme();
+        this.updateWatermark();
 
         if (options.debug) {
             this.addDisposables(new StrictEventsSequencing(this));
@@ -507,58 +557,7 @@ export class DockviewComponent
                 for (const group of [...this._popoutGroups]) {
                     group.disposable.dispose();
                 }
-            })
-        );
-
-        this._options = options;
-        this.updateTheme();
-
-        this._rootDropTarget = new Droptarget(this.element, {
-            className: 'dv-drop-target-edge',
-            canDisplayOverlay: (event, position) => {
-                const data = getPanelData();
-
-                if (data) {
-                    if (data.viewId !== this.id) {
-                        return false;
-                    }
-
-                    if (position === 'center') {
-                        // center drop target is only allowed if there are no panels in the grid
-                        // floating panels are allowed
-                        return this.gridview.length === 0;
-                    }
-
-                    return true;
-                }
-
-                if (position === 'center' && this.gridview.length !== 0) {
-                    /**
-                     * for external events only show the four-corner drag overlays, disable
-                     * the center position so that external drag events can fall through to the group
-                     * and panel drop target handlers
-                     */
-                    return false;
-                }
-
-                const firedEvent = new DockviewUnhandledDragOverEvent(
-                    event,
-                    'edge',
-                    position,
-                    getPanelData
-                );
-
-                this._onUnhandledDragOverEvent.fire(firedEvent);
-
-                return firedEvent.isAccepted;
-            },
-            acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
-            overlayModel:
-                this.options.rootOverlayModel ?? DEFAULT_ROOT_OVERLAY_MODEL,
-            getOverrideTarget: () => this.rootDropTargetContainer?.model,
-        });
-
-        this.addDisposables(
+            }),
             this._rootDropTarget,
             this._rootDropTarget.onWillShowOverlay((event) => {
                 if (this.gridview.length > 0 && event.position === 'center') {
@@ -621,10 +620,6 @@ export class DockviewComponent
             }),
             this._rootDropTarget
         );
-
-        this._api = new DockviewApi(this);
-
-        this.updateWatermark();
     }
 
     override setVisible(panel: DockviewGroupPanel, visible: boolean): void {
@@ -1176,7 +1171,10 @@ export class DockviewComponent
         this.updateWatermark();
     }
 
-    private orthogonalize(position: Position, options?: GroupOptions): DockviewGroupPanel {
+    private orthogonalize(
+        position: Position,
+        options?: GroupOptions
+    ): DockviewGroupPanel {
         switch (position) {
             case 'top':
             case 'bottom':
@@ -1205,7 +1203,11 @@ export class DockviewComponent
                 return this.createGroupAtLocation([0], undefined, options); // insert into first position
             case 'bottom':
             case 'right':
-                return this.createGroupAtLocation([this.gridview.length], undefined, options); // insert into last position
+                return this.createGroupAtLocation(
+                    [this.gridview.length],
+                    undefined,
+                    options
+                ); // insert into last position
             default:
                 throw new Error(`unsupported position ${position}`);
         }
@@ -2330,31 +2332,33 @@ export class DockviewComponent
                 }
             }
 
-            const referenceLocation = getGridLocation(to.element);
-            const dropLocation = getRelativeLocation(
-                this.gridview.orientation,
-                referenceLocation,
-                target
-            );
+            if (from.api.location.type !== 'popout') {
+                const referenceLocation = getGridLocation(to.element);
+                const dropLocation = getRelativeLocation(
+                    this.gridview.orientation,
+                    referenceLocation,
+                    target
+                );
 
-            let size: number;
+                let size: number;
 
-            switch (this.gridview.orientation) {
-                case Orientation.VERTICAL:
-                    size =
-                        referenceLocation.length % 2 == 0
-                            ? from.api.width
-                            : from.api.height;
-                    break;
-                case Orientation.HORIZONTAL:
-                    size =
-                        referenceLocation.length % 2 == 0
-                            ? from.api.height
-                            : from.api.width;
-                    break;
+                switch (this.gridview.orientation) {
+                    case Orientation.VERTICAL:
+                        size =
+                            referenceLocation.length % 2 == 0
+                                ? from.api.width
+                                : from.api.height;
+                        break;
+                    case Orientation.HORIZONTAL:
+                        size =
+                            referenceLocation.length % 2 == 0
+                                ? from.api.height
+                                : from.api.width;
+                        break;
+                }
+
+                this.gridview.addView(from, size, dropLocation);
             }
-
-            this.gridview.addView(from, size, dropLocation);
         }
 
         from.panels.forEach((panel) => {

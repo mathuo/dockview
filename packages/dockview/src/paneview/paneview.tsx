@@ -120,6 +120,7 @@ export const PaneviewReact = React.forwardRef(
             paneviewRef.current = api;
 
             return () => {
+                paneviewRef.current = undefined;
                 api.dispose();
             };
         }, []);
