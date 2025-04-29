@@ -459,10 +459,7 @@ export function shiftAbsoluteElementIntoView(
 ) {
     const buffer = options.buffer;
     const rect = element.getBoundingClientRect();
-    const rootRect = element.getBoundingClientRect();
-
-    const viewportWidth = root.clientWidth;
-    const viewportHeight = root.clientHeight;
+    const rootRect = root.getBoundingClientRect();
 
     let translateX = 0;
     let translateY = 0;
@@ -475,15 +472,15 @@ export function shiftAbsoluteElementIntoView(
     // Check horizontal overflow
     if (left < buffer) {
         translateX = buffer - left;
-    } else if (right > viewportWidth - buffer) {
-        translateX = viewportWidth - right - buffer;
+    } else if (right > buffer) {
+        translateX = -buffer - right;
     }
 
     // Check vertical overflow
     if (top < buffer) {
         translateY = buffer - top;
-    } else if (bottom > viewportHeight - buffer) {
-        translateY = viewportHeight - bottom - buffer;
+    } else if (bottom > buffer) {
+        translateY = -bottom - buffer;
     }
 
     // Apply the translation if needed
