@@ -4,10 +4,26 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Tue, 29 Apr 2025 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Thu, 01 May 2025 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 4.2.5]]></title>
+            <link>https://dockview.dev/blog/dockview-4.2.5-release</link>
+            <guid>https://dockview.dev/blog/dockview-4.2.5-release</guid>
+            <pubDate>Thu, 01 May 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.2.5-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.2.5-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Tab overflow dropdown positions on boundaries of viewport <a href="https://github.com/mathuo/dockview/pull/921" target="_blank" rel="noopener noreferrer">#921</a></li>
+<li>Bug: Dnd Ghost image rendering interactivity issues <a href="https://github.com/mathuo/dockview/pull/920" target="_blank" rel="noopener noreferrer">#920</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.2.5-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 4.2.4]]></title>
             <link>https://dockview.dev/blog/dockview-4.2.4-release</link>
@@ -345,35 +361,6 @@
 <li>Build tooling <a href="https://github.com/mathuo/dockview/pull/789" target="_blank" rel="noopener noreferrer">#789</a> <a href="https://github.com/mathuo/dockview/pull/759" target="_blank" rel="noopener noreferrer">#759</a></li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-2.1.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 2.0.0]]></title>
-            <link>https://dockview.dev/blog/dockview-2.0.0-release</link>
-            <guid>https://dockview.dev/blog/dockview-2.0.0-release</guid>
-            <pubDate>Sun, 03 Nov 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[This major version bump is due to breaking changes related to classnames.]]></description>
-            <content:encoded><![CDATA[<p>This major version bump is due to breaking changes related to classnames.</p>
-<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-2.0.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<ul>
-<li>Add panel within group at specific index <a href="https://github.com/mathuo/dockview/pull/751" target="_blank" rel="noopener noreferrer">#751</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-2.0.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Set drag event dataTransfer object to empty string <a href="https://github.com/mathuo/dockview/pull/738" target="_blank" rel="noopener noreferrer">#738</a></li>
-<li>General code cleanup / housekeeping <a href="https://github.com/mathuo/dockview/pull/740" target="_blank" rel="noopener noreferrer">#740</a> <a href="https://github.com/mathuo/dockview/pull/746" target="_blank" rel="noopener noreferrer">#746</a></li>
-<li>Bug: Popout window initial sizing <a href="https://github.com/mathuo/dockview/pull/737" target="_blank" rel="noopener noreferrer">#737</a> <a href="https://github.com/mathuo/dockview/pull/727" target="_blank" rel="noopener noreferrer">#727</a></li>
-<li>Bug: Close popout window on unload (refresh) <a href="https://github.com/mathuo/dockview/pull/731" target="_blank" rel="noopener noreferrer">#731</a></li>
-<li>Bug: Preserve Vue3 inject/provide context <a href="https://github.com/mathuo/dockview/pull/673" target="_blank" rel="noopener noreferrer">#673</a></li>
-<li>Bug: Fix Contraints <a href="https://github.com/mathuo/dockview/pull/744" target="_blank" rel="noopener noreferrer">#744</a></li>
-<li>Bug: Fix popout window issues <a href="https://github.com/mathuo/dockview/pull/748" target="_blank" rel="noopener noreferrer">#748</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-2.0.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
-<ul>
-<li>Prefix all classnames with <code>-dv-*</code> <a href="https://github.com/mathuo/dockview/pull/688" target="_blank" rel="noopener noreferrer">#688</a></li>
-<li>Remove depreciated methods <a href="https://github.com/mathuo/dockview/pull/742" target="_blank" rel="noopener noreferrer">#742</a></li>
-</ul>]]></content:encoded>
             <category>release</category>
         </item>
     </channel>
