@@ -738,7 +738,9 @@ export class DockviewComponent
                     group = options.overridePopoutGroup;
                 } else {
                     group = this.createGroup({ id: groupId });
-                    this._onDidAddGroup.fire(group);
+                    if (popoutContainer) {
+                      this._onDidAddGroup.fire(group);
+                    }
                 }
 
                 if (popoutContainer === null) {
