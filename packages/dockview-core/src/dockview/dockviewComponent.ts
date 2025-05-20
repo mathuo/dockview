@@ -226,6 +226,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidMaximizedGroupChange: Event<DockviewMaximizedGroupChanged>;
     readonly onDidPopoutGroupSizeChange: Event<PopoutGroupChangeSizeEvent>;
     readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent>;
+    readonly onDidBlockPopout: Event<void>;
     readonly options: DockviewComponentOptions;
     updateOptions(options: DockviewOptions): void;
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void;
@@ -318,6 +319,9 @@ export class DockviewComponent
         new Emitter<PopoutGroupChangePositionEvent>();
     readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent> =
         this._onDidPopoutGroupPositionChange.event;
+
+    private readonly _onDidBlockPopout = new Emitter<void>();
+    readonly onDidBlockPopout: Event<void> = this._onDidBlockPopout.event;
 
     private readonly _onDidLayoutFromJSON = new Emitter<void>();
     readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutFromJSON.event;
@@ -505,6 +509,7 @@ export class DockviewComponent
             this._onDidOptionsChange,
             this._onDidPopoutGroupSizeChange,
             this._onDidPopoutGroupPositionChange,
+            this._onDidBlockPopout,
             this.onDidViewVisibilityChangeMicroTaskQueue(() => {
                 this.updateWatermark();
             }),
@@ -715,6 +720,7 @@ export class DockviewComponent
 
                 if (popoutContainer === null) {
                     popoutWindowDisposable.dispose();
+                    this._onDidBlockPopout.fire();
                     return false;
                 }
 
@@ -734,7 +740,7 @@ export class DockviewComponent
                 const referenceLocation = itemToPopout.api.location.type;
 
                 /**
-                 * The group that is being added doesn't already exist within the DOM, the most likely occurance
+                 * The group that is being added doesn't already exist within the DOM, the most likely occurrence
                  * of this case is when being called from the `fromJSON(...)` method
                  */
                 const isGroupAddedToDom =
