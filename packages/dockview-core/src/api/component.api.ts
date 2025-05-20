@@ -840,7 +840,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     /**
      * Get a group object given a `string` id. May return undefined.
      */
-    getGroup(id: string): DockviewGroupPanel | undefined {
+    getGroup(id: string): IDockviewGroupPanel | undefined {
         return this.component.getPanel(id);
     }
 
