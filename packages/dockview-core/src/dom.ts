@@ -451,3 +451,50 @@ export function onDidWindowResizeEnd(element: Window, cb: () => void) {
 
     return disposable;
 }
+
+export function shiftAbsoluteElementIntoView(
+    element: HTMLElement,
+    root: HTMLElement,
+    options: { buffer: number } = { buffer: 10 }
+) {
+    const buffer = options.buffer;
+    const rect = element.getBoundingClientRect();
+    const rootRect = root.getBoundingClientRect();
+
+    let translateX = 0;
+    let translateY = 0;
+
+    const left = rect.left - rootRect.left;
+    const top = rect.top - rootRect.top;
+    const bottom = rect.bottom - rootRect.bottom;
+    const right = rect.right - rootRect.right;
+
+    // Check horizontal overflow
+    if (left < buffer) {
+        translateX = buffer - left;
+    } else if (right > buffer) {
+        translateX = -buffer - right;
+    }
+
+    // Check vertical overflow
+    if (top < buffer) {
+        translateY = buffer - top;
+    } else if (bottom > buffer) {
+        translateY = -bottom - buffer;
+    }
+
+    // Apply the translation if needed
+    if (translateX !== 0 || translateY !== 0) {
+        element.style.transform = `translate(${translateX}px, ${translateY}px)`;
+    }
+}
+
+export function findRelativeZIndexParent(el: HTMLElement): HTMLElement | null {
+    let tmp: HTMLElement | null = el;
+
+    while (tmp && (tmp.style.zIndex === 'auto' || tmp.style.zIndex === '')) {
+        tmp = tmp.parentElement;
+    }
+
+    return tmp;
+}

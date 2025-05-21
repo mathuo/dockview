@@ -272,6 +272,59 @@ describe('dockviewComponent', () => {
     });
 
     describe('move group', () => {
+        test('that moving a popup group into the grid manages view disposals correctly', async () => {
+            window.open = () => setupMockWindow();
+
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(600, 1000);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            const panel3 = dockview.addPanel({
+                id: 'panel3',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            await dockview.addPopoutGroup(panel1.api.group);
+
+            expect(panel1.api.location.type).toBe('popout');
+            expect(dockview.groups.length).toBe(4);
+            expect(dockview.panels.length).toBe(3);
+
+            panel1.api.group.api.moveTo({
+                group: panel2.api.group,
+                position: 'left',
+            });
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(dockview.groups.length).toBe(3);
+            expect(dockview.panels.length).toBe(3);
+
+            const query = dockview.element.querySelectorAll('.dv-view');
+            expect(query.length).toBe(3);
+        });
+
         test('horizontal', () => {
             dockview = new DockviewComponent(container, {
                 createComponent(options) {
