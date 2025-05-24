@@ -251,6 +251,9 @@ export class Tabs extends CompositeDisposable {
     delete(id: string): void {
         const index = this.indexOf(id);
         const tabToRemove = this._tabs.splice(index, 1)[0];
+        if (!tabToRemove) {
+            return;
+        }
 
         const { value, disposable } = tabToRemove;
 

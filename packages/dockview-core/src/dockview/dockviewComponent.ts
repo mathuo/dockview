@@ -718,26 +718,10 @@ export class DockviewComponent
                     return false;
                 }
 
-                if (popoutContainer === null) {
-                    popoutWindowDisposable.dispose();
-                    this._onDidBlockPopout.fire();
-                    return false;
-                }
-
-                const gready = document.createElement('div');
-                gready.className = 'dv-overlay-render-container';
-
-                const overlayRenderContainer = new OverlayRenderContainer(
-                    gready,
-                    this
-                );
-
                 const referenceGroup =
                     itemToPopout instanceof DockviewPanel
                         ? itemToPopout.group
                         : itemToPopout;
-
-                const referenceLocation = itemToPopout.api.location.type;
 
                 /**
                  * The group that is being added doesn't already exist within the DOM, the most likely occurrence
@@ -754,8 +738,40 @@ export class DockviewComponent
                     group = options.overridePopoutGroup;
                 } else {
                     group = this.createGroup({ id: groupId });
-                    this._onDidAddGroup.fire(group);
+                    if (popoutContainer) {
+                      this._onDidAddGroup.fire(group);
+                    }
                 }
+
+                if (popoutContainer === null) {
+                    popoutWindowDisposable.dispose();
+                    this._onDidBlockPopout.fire();
+
+                    // if the popout window was blocked, we need to move the group back to the reference group
+                    // and set it to visible
+                    this.movingLock(() =>
+                        moveGroupWithoutDestroying({
+                            from: group,
+                            to: referenceGroup,
+                        })
+                    );
+
+                    if (!referenceGroup.api.isVisible) {
+                        referenceGroup.api.setVisible(true);
+                    }
+
+                    return false;
+                }
+
+                const gready = document.createElement('div');
+                gready.className = 'dv-overlay-render-container';
+
+                const overlayRenderContainer = new OverlayRenderContainer(
+                    gready,
+                    this
+                );
+
+                const referenceLocation = itemToPopout.api.location.type;
 
                 group.model.renderContainer = overlayRenderContainer;
                 group.layout(
