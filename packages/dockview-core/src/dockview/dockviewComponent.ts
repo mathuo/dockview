@@ -226,6 +226,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidMaximizedGroupChange: Event<DockviewMaximizedGroupChanged>;
     readonly onDidPopoutGroupSizeChange: Event<PopoutGroupChangeSizeEvent>;
     readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent>;
+    readonly onDidBlockPopout: Event<void>;
     readonly options: DockviewComponentOptions;
     updateOptions(options: DockviewOptions): void;
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void;
@@ -318,6 +319,9 @@ export class DockviewComponent
         new Emitter<PopoutGroupChangePositionEvent>();
     readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent> =
         this._onDidPopoutGroupPositionChange.event;
+
+    private readonly _onDidBlockPopout = new Emitter<void>();
+    readonly onDidBlockPopout: Event<void> = this._onDidBlockPopout.event;
 
     private readonly _onDidLayoutFromJSON = new Emitter<void>();
     readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutFromJSON.event;
@@ -505,6 +509,7 @@ export class DockviewComponent
             this._onDidOptionsChange,
             this._onDidPopoutGroupSizeChange,
             this._onDidPopoutGroupPositionChange,
+            this._onDidBlockPopout,
             this.onDidViewVisibilityChangeMicroTaskQueue(() => {
                 this.updateWatermark();
             }),
@@ -713,28 +718,13 @@ export class DockviewComponent
                     return false;
                 }
 
-                if (popoutContainer === null) {
-                    popoutWindowDisposable.dispose();
-                    return false;
-                }
-
-                const gready = document.createElement('div');
-                gready.className = 'dv-overlay-render-container';
-
-                const overlayRenderContainer = new OverlayRenderContainer(
-                    gready,
-                    this
-                );
-
                 const referenceGroup =
                     itemToPopout instanceof DockviewPanel
                         ? itemToPopout.group
                         : itemToPopout;
 
-                const referenceLocation = itemToPopout.api.location.type;
-
                 /**
-                 * The group that is being added doesn't already exist within the DOM, the most likely occurance
+                 * The group that is being added doesn't already exist within the DOM, the most likely occurrence
                  * of this case is when being called from the `fromJSON(...)` method
                  */
                 const isGroupAddedToDom =
@@ -748,8 +738,40 @@ export class DockviewComponent
                     group = options.overridePopoutGroup;
                 } else {
                     group = this.createGroup({ id: groupId });
-                    this._onDidAddGroup.fire(group);
+                    if (popoutContainer) {
+                      this._onDidAddGroup.fire(group);
+                    }
                 }
+
+                if (popoutContainer === null) {
+                    popoutWindowDisposable.dispose();
+                    this._onDidBlockPopout.fire();
+
+                    // if the popout window was blocked, we need to move the group back to the reference group
+                    // and set it to visible
+                    this.movingLock(() =>
+                        moveGroupWithoutDestroying({
+                            from: group,
+                            to: referenceGroup,
+                        })
+                    );
+
+                    if (!referenceGroup.api.isVisible) {
+                        referenceGroup.api.setVisible(true);
+                    }
+
+                    return false;
+                }
+
+                const gready = document.createElement('div');
+                gready.className = 'dv-overlay-render-container';
+
+                const overlayRenderContainer = new OverlayRenderContainer(
+                    gready,
+                    this
+                );
+
+                const referenceLocation = itemToPopout.api.location.type;
 
                 group.model.renderContainer = overlayRenderContainer;
                 group.layout(
