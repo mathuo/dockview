@@ -143,6 +143,9 @@ export const App = (props: { theme?: string }) => {
 
     const load = (api: DockviewApi) => {
         api.clear();
+        api.onDidBlockPopout(() => {
+            console.log('Popout blocked');
+        });
         if (layout) {
             try {
                 api.fromJSON(layout);
