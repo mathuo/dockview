@@ -168,10 +168,10 @@ export class Droptarget extends CompositeDisposable {
             onDragOver: (e) => {
                 Droptarget.ACTUAL_TARGET = this;
 
-                const overrideTraget = this.options.getOverrideTarget?.();
+                const overrideTarget = this.options.getOverrideTarget?.();
 
                 if (this._acceptedTargetZonesSet.size === 0) {
-                    if (overrideTraget) {
+                    if (overrideTarget) {
                         return;
                     }
                     this.removeDropTarget();
@@ -214,7 +214,7 @@ export class Droptarget extends CompositeDisposable {
                 }
 
                 if (!this.options.canDisplayOverlay(e, quadrant)) {
-                    if (overrideTraget) {
+                    if (overrideTarget) {
                         return;
                     }
                     this.removeDropTarget();
@@ -239,7 +239,7 @@ export class Droptarget extends CompositeDisposable {
 
                 this.markAsUsed(e);
 
-                if (overrideTraget) {
+                if (overrideTarget) {
                     //
                 } else if (!this.targetElement) {
                     this.targetElement = document.createElement('div');

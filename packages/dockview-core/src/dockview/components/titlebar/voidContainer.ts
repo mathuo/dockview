@@ -13,7 +13,7 @@ import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
 
 export class VoidContainer extends CompositeDisposable {
     private readonly _element: HTMLElement;
-    private readonly dropTraget: Droptarget;
+    private readonly dropTarget: Droptarget;
 
     private readonly _onDrop = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDrop.event;
@@ -48,7 +48,7 @@ export class VoidContainer extends CompositeDisposable {
 
         const handler = new GroupDragHandler(this._element, accessor, group);
 
-        this.dropTraget = new Droptarget(this._element, {
+        this.dropTarget = new Droptarget(this._element, {
             acceptedTargetZones: ['center'],
             canDisplayOverlay: (event, position) => {
                 const data = getPanelData();
@@ -66,17 +66,17 @@ export class VoidContainer extends CompositeDisposable {
             getOverrideTarget: () => group.model.dropTargetContainer?.model,
         });
 
-        this.onWillShowOverlay = this.dropTraget.onWillShowOverlay;
+        this.onWillShowOverlay = this.dropTarget.onWillShowOverlay;
 
         this.addDisposables(
             handler,
             handler.onDragStart((event) => {
                 this._onDragStart.fire(event);
             }),
-            this.dropTraget.onDrop((event) => {
+            this.dropTarget.onDrop((event) => {
                 this._onDrop.fire(event);
             }),
-            this.dropTraget
+            this.dropTarget
         );
     }
 }
