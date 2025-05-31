@@ -25,6 +25,7 @@ export class Tabs extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private readonly _tabsList: HTMLElement;
     private readonly _observerDisposable = new MutableDisposable();
+    private readonly _scrollbar: Scrollbar | null = null;
 
     private _tabs: IValueDisposable<Tab>[] = [];
     private selectedIndex = -1;
@@ -96,7 +97,14 @@ export class Tabs extends CompositeDisposable {
     }
 
     set direction(value: IHeaderDirection) {
+        if(this._direction === value) {
+            return;
+        }
+
         this._direction = value;
+        if(this._scrollbar) {
+            this._scrollbar.orientation = value;
+        }
         removeClasses(this._tabsList, 'dv-horizontal', 'dv-vertical');
         if(value === 'vertical') {
             addClasses(this._tabsList, 'dv-tabs-container-vertical', 'dv-vertical');
@@ -123,9 +131,10 @@ export class Tabs extends CompositeDisposable {
         if (accessor.options.scrollbars === 'native') {
             this._element = this._tabsList;
         } else {
-            const scrollbar = new Scrollbar(this._tabsList);
-            this._element = scrollbar.element;
-            this.addDisposables(scrollbar);
+            this._scrollbar = new Scrollbar(this._tabsList);
+            this._scrollbar.orientation = this.direction
+            this._element = this._scrollbar.element;
+            this.addDisposables(this._scrollbar);
         }
 
         this.addDisposables(
