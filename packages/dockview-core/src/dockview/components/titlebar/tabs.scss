@@ -4,7 +4,8 @@
     overflow: auto;
     scrollbar-width: thin; // firefox
 
-    &.dv-horizontal {
+    &.dv-horizontal,
+    &.dv-vertical {
         .dv-tab {
             &:not(:first-child)::before {
                 content: ' ';
@@ -14,10 +15,18 @@
                 z-index: 5;
                 pointer-events: none;
                 background-color: var(--dv-tab-divider-color);
-                width: 1px;
-                height: 100%;
             }
         }
+    }
+
+    &.dv-horizontal .dv-tab:not(:first-child)::before {
+        width: 1px;
+        height: 100%;
+    }
+
+    &.dv-vertical .dv-tab:not(:first-child)::before {
+        width: 100%;
+        height: 1px;
     }
 
     &::-webkit-scrollbar {
@@ -32,6 +41,15 @@
     /* Handle */
     &::-webkit-scrollbar-thumb {
         background: var(--dv-tabs-container-scrollbar-color);
+    }
+
+    &.dv-tabs-container-vertical {
+        flex-direction: column;
+
+        .dv-tab {
+          writing-mode: vertical-rl;
+          transform: rotate(180deg);
+        }
     }
 }
 

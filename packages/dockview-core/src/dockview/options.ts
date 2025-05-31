@@ -35,6 +35,9 @@ export interface ViewFactoryData {
     tab?: string;
 }
 
+export type IHeaderPosition = 'top' | 'bottom' | 'left' | 'right';
+export type IHeaderDirection = 'horizontal' | 'vertical';
+
 export interface DockviewOptions {
     /**
      * Disable the auto-resizing which is controlled through a `ResizeObserver`.

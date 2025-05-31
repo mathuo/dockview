@@ -2,7 +2,7 @@ import { DockviewApi } from '../api/component.api';
 import { getPanelData, PanelTransfer } from '../dnd/dataTransfer';
 import { Position, WillShowOverlayEvent } from '../dnd/droptarget';
 import { DockviewComponent } from './dockviewComponent';
-import { isAncestor, toggleClass } from '../dom';
+import { addClasses, isAncestor, removeClasses, toggleClass } from '../dom';
 import {
     addDisposableListener,
     DockviewEvent,
@@ -35,6 +35,8 @@ import {
     DockviewDndOverlayEvent,
     DockviewUnhandledDragOverEvent,
     IHeaderActionsRenderer,
+    IHeaderDirection,
+    IHeaderPosition,
 } from './options';
 import { OverlayRenderContainer } from '../overlay/overlayRenderContainer';
 import { TitleEvent } from '../api/dockviewPanelApi';
@@ -51,6 +53,7 @@ interface GroupMoveEvent {
 interface CoreGroupOptions {
     locked?: DockviewGroupPanelLocked;
     hideHeader?: boolean;
+    headerPosition?: 'top' | 'bottom' | 'left' | 'right';
     skipSetActive?: boolean;
     constraints?: Partial<Contraints>;
     initialWidth?: number;
@@ -136,6 +139,7 @@ export class DockviewWillDropEvent extends DockviewDidDropEvent {
 
 export interface IHeader {
     hidden: boolean;
+    direction: IHeaderDirection;
 }
 
 export type DockviewGroupPanelLocked = boolean | 'no-drop-target';
@@ -160,6 +164,7 @@ export interface IDockviewGroupPanelModel extends IPanel {
     readonly onDidActivePanelChange: Event<DockviewGroupChangeEvent>;
     readonly onMove: Event<GroupMoveEvent>;
     locked: DockviewGroupPanelLocked;
+    headerPosition: IHeaderPosition;
     setActive(isActive: boolean): void;
     initialize(): void;
     // state
@@ -261,7 +266,10 @@ export class DockviewGroupPanelModel
     private _rightHeaderActions: IHeaderActionsRenderer | undefined;
     private _leftHeaderActions: IHeaderActionsRenderer | undefined;
     private _prefixHeaderActions: IHeaderActionsRenderer | undefined;
-
+    private _rightHeaderActionsDisposable: IDisposable | undefined;
+    private _leftHeaderActionsDisposable: IDisposable | undefined;
+    private _prefixHeaderActionsDisposable: IDisposable | undefined;
+    private _headerPosition: IHeaderPosition | undefined;
     private _location: DockviewGroupLocation = { type: 'grid' };
 
     private mostRecentlyUsed: IDockviewPanel[] = [];
@@ -387,6 +395,37 @@ export class DockviewGroupPanelModel
         );
     }
 
+    get headerPosition(): IHeaderPosition {
+        return this._headerPosition ?? 'top';
+    }
+
+    set headerPosition(value: IHeaderPosition) {
+        this._headerPosition = value;
+        removeClasses(
+          this.container,
+          'dv-groupview-header-top',
+          'dv-groupview-header-bottom',
+          'dv-groupview-header-left',
+          'dv-groupview-header-right'
+        );
+        addClasses(this.container, `dv-groupview-header-${value}`);
+
+        const direction = value === 'top' || value === 'bottom' ? 'horizontal' : 'vertical';
+        this.tabsContainer.direction = direction;
+        this.header.direction = direction;
+
+
+        // resize the active panel to fit the new header direction
+        // if not, the panel will overflow the tabs container
+        if (this._activePanel?.layout) {
+            this._activePanel.layout(this._width, this._height);
+        }
+
+        if(this._leftHeaderActions || this._rightHeaderActions || this._prefixHeaderActions) {
+            this.updateHeaderActions();
+        }
+    }
+
     get location(): DockviewGroupLocation {
         return this._location;
     }
@@ -455,6 +494,7 @@ export class DockviewGroupPanelModel
 
         this.header.hidden = !!options.hideHeader;
         this.locked = options.locked ?? false;
+        this.headerPosition = options.headerPosition ?? 'top';
 
         this.addDisposables(
             this._onTabDragStart,
@@ -565,11 +605,21 @@ export class DockviewGroupPanelModel
         this.setActive(this.isActive, true);
         this.updateContainer();
 
+        this.updateHeaderActions();
+    }
+
+    updateHeaderActions(): void {
         if (this.accessor.options.createRightHeaderActionComponent) {
+            if(this._rightHeaderActionsDisposable) {
+                this._rightHeaderActionsDisposable.dispose()
+                this.removeDisposable(this._rightHeaderActionsDisposable);
+            }
+
             this._rightHeaderActions =
                 this.accessor.options.createRightHeaderActionComponent(
                     this.groupPanel
                 );
+            this._rightHeaderActionsDisposable = this._rightHeaderActions;
             this.addDisposables(this._rightHeaderActions);
             this._rightHeaderActions.init({
                 containerApi: this._api,
@@ -582,10 +632,16 @@ export class DockviewGroupPanelModel
         }
 
         if (this.accessor.options.createLeftHeaderActionComponent) {
+            if(this._leftHeaderActionsDisposable) {
+                this._leftHeaderActionsDisposable.dispose()
+                this.removeDisposable(this._leftHeaderActionsDisposable);
+            }
+
             this._leftHeaderActions =
                 this.accessor.options.createLeftHeaderActionComponent(
                     this.groupPanel
                 );
+            this._leftHeaderActionsDisposable = this._leftHeaderActions;
             this.addDisposables(this._leftHeaderActions);
             this._leftHeaderActions.init({
                 containerApi: this._api,
@@ -598,10 +654,16 @@ export class DockviewGroupPanelModel
         }
 
         if (this.accessor.options.createPrefixHeaderActionComponent) {
+            if(this._prefixHeaderActionsDisposable) {
+                this._prefixHeaderActionsDisposable.dispose()
+                this.removeDisposable(this._prefixHeaderActionsDisposable);
+            }
+
             this._prefixHeaderActions =
                 this.accessor.options.createPrefixHeaderActionComponent(
                     this.groupPanel
                 );
+            this._prefixHeaderActionsDisposable = this._prefixHeaderActions;
             this.addDisposables(this._prefixHeaderActions);
             this._prefixHeaderActions.init({
                 containerApi: this._api,
@@ -612,6 +674,7 @@ export class DockviewGroupPanelModel
                 this._prefixHeaderActions.element
             );
         }
+
     }
 
     rerender(panel: IDockviewPanel): void {
