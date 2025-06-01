@@ -25,7 +25,11 @@ const components = {
         );
     },
     isolatedApp: (
-        props: IDockviewPanelProps<{ title: string; x?: number }>
+        props: IDockviewPanelProps<{
+            title: string;
+            x?: number;
+            vertical?: boolean;
+        }>
     ) => {
         const onReady = (event: DockviewReadyEvent) => {
             const panel1 = event.api.addPanel({
@@ -49,6 +53,9 @@ const components = {
                     title: 'Tab 3',
                 },
             });
+            if(props.params.vertical){
+              panel1.group.headerPosition = 'left'
+            }
         };
         return (
             <DockviewReact
@@ -113,6 +120,7 @@ const DockviewNative2 = (props: { theme?: string }) => {
             tabComponent: 'default',
             params: {
                 title: 'Window 3',
+                vertical: true,
             },
             position: {
                 direction: 'below',

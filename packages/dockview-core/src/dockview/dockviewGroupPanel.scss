@@ -3,6 +3,7 @@
     height: 100%;
     background-color: var(--dv-group-view-background-color);
     overflow: hidden;
+    flex-direction: column;
 
     &:focus {
         outline: none;
@@ -12,10 +13,6 @@
         flex-grow: 1;
         min-height: 0;
         outline: none;
-    }
-
-    &.dv-groupview-header-top {
-        flex-direction: column;
     }
 
     &.dv-groupview-header-bottom {
