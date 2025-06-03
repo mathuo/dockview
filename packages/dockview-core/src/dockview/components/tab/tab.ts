@@ -52,7 +52,7 @@ export class Tab extends CompositeDisposable {
 
     private readonly _onPointDown = new Emitter<MouseEvent>();
     readonly onPointerDown: Event<MouseEvent> = this._onPointDown.event;
-    
+
     private readonly _onKeyDown = new Emitter<KeyboardEvent>();
     readonly onKeyDown: Event<KeyboardEvent> = this._onKeyDown.event;
 
@@ -76,13 +76,17 @@ export class Tab extends CompositeDisposable {
         super();
 
         this._element = document.createElement('div');
-        this._element.id = this.panel.tabComponentElId;
         this._element.className = 'dv-tab';
         this._element.role = 'tab';
         this._element.tabIndex = -1;
         this._element.draggable = true;
         this._element.ariaSelected = 'false';
-        this._element.setAttribute('aria-controls', this.panel.componentElId);
+
+        Object.entries(this.panel.tabComponentAttributes).forEach(
+            ([key, value]) => {
+                this._element.setAttribute(key, value);
+            }
+        );
 
         toggleClass(this.element, 'dv-inactive-tab', true);
 

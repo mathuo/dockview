@@ -24,6 +24,7 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
 
         this.action = document.createElement('button');
         this.action.type = 'button';
+
         this.action.className = 'dv-default-tab-action';
         // originally hide this, so only when it is focused is it read out.
         // so the SR when focused on the tab, doesn't read "<Tab Content> Close Button"
@@ -49,7 +50,7 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
     init(params: GroupPanelPartInitParameters): void {
         this._title = params.title;
         this.action.ariaLabel = `Close "${this._title}" tab`;
-        
+
         this.addDisposables(
             params.api.onDidTitleChange((event) => {
                 this._title = event.title;

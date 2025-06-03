@@ -99,6 +99,9 @@ export class Tabs extends CompositeDisposable {
         this._tabsList = document.createElement('div');
         this._tabsList.className = 'dv-tabs-container dv-horizontal';
         this._tabsList.ariaOrientation = 'horizontal';
+        this.element.role = 'tablist';
+        this.element.ariaLabel =
+            'Use the Left Arrow to select the previous tab, Right Arrow for the next tab, Home for the first tab, and End for the last tab. Press Enter to select the focused tab.';
 
         this.showTabsOverflowControl = options.showTabsOverflowControl;
 
@@ -109,10 +112,6 @@ export class Tabs extends CompositeDisposable {
             this._element = scrollbar.element;
             this.addDisposables(scrollbar);
         }
-
-        this.element.role = 'tablist';
-        this.element.ariaLabel =
-            'Use the Left Arrow to select the previous tab, Right Arrow for the next tab, Home for the first tab, and End for the last tab. Press Enter to select the focused tab.';
 
         this.addDisposables(
             this._onOverflowTabsChange,
