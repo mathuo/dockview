@@ -4,10 +4,29 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Thu, 01 May 2025 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 03 Jun 2025 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 4.3.0]]></title>
+            <link>https://dockview.dev/blog/dockview-4.3.0-release</link>
+            <guid>https://dockview.dev/blog/dockview-4.3.0-release</guid>
+            <pubDate>Tue, 03 Jun 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.3.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<ul>
+<li>Hide group private methods from public API <a href="https://github.com/mathuo/dockview/pull/925" target="_blank" rel="noopener noreferrer">#925</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.3.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Fix the restoring of popout groups from layout <a href="https://github.com/mathuo/dockview/pull/933" target="_blank" rel="noopener noreferrer">#933</a></li>
+<li>Internals: Variable name typo <a href="https://github.com/mathuo/dockview/pull/940" target="_blank" rel="noopener noreferrer">#940</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.3.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 4.2.5]]></title>
             <link>https://dockview.dev/blog/dockview-4.2.5-release</link>
@@ -336,31 +355,6 @@
 <li>Bug: Fix issue with moving tab from popout group into main grid <a href="https://github.com/mathuo/dockview/issues/795" target="_blank" rel="noopener noreferrer">#795</a></li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-2.1.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 2.1.0]]></title>
-            <link>https://dockview.dev/blog/dockview-2.1.0-release</link>
-            <guid>https://dockview.dev/blog/dockview-2.1.0-release</guid>
-            <pubDate>Tue, 17 Dec 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-2.1.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<ul>
-<li>Persist custom popout urls in layouts <a href="https://github.com/mathuo/dockview/pull/769" target="_blank" rel="noopener noreferrer">#769</a></li>
-<li>Ensure group always exists <a href="https://github.com/mathuo/dockview/pull/783" target="_blank" rel="noopener noreferrer">#783</a></li>
-<li>Serialization of maximized views <a href="https://github.com/mathuo/dockview/pull/762" target="_blank" rel="noopener noreferrer">#762</a></li>
-<li>Set <code>react</code> as an explicit peerDependency of the <code>dockview</code> package</li>
-<li>Make tabs container non-focusable <a href="https://github.com/mathuo/dockview/pull/761" target="_blank" rel="noopener noreferrer">#761</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-2.1.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Bug: fix <code>setVisible</code> for floating groups <a href="https://github.com/mathuo/dockview/pull/755" target="_blank" rel="noopener noreferrer">#755</a></li>
-<li>Bug: fix <code>onDidAddGroup</code> event firing when adding floating groups and panels <a href="https://github.com/mathuo/dockview/pull/785" target="_blank" rel="noopener noreferrer">#785</a></li>
-<li>Documentation <a href="https://github.com/mathuo/dockview/pull/743" target="_blank" rel="noopener noreferrer">#743</a> <a href="https://github.com/mathuo/dockview/pull/770" target="_blank" rel="noopener noreferrer">#770</a></li>
-<li>Build tooling <a href="https://github.com/mathuo/dockview/pull/789" target="_blank" rel="noopener noreferrer">#789</a> <a href="https://github.com/mathuo/dockview/pull/759" target="_blank" rel="noopener noreferrer">#759</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-2.1.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
     </channel>
