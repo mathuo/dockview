@@ -73,12 +73,14 @@ export class OverlayRenderContainer extends CompositeDisposable {
         if (!this.map[panel.api.id]) {
             const element = createFocusableElement();
             element.className = 'dv-render-overlay';
+            element.role = 'tabpanel';
+            element.tabIndex = 0;
+            element.setAttribute('aria-labelledby', panel.tabComponentElId);
 
             this.map[panel.api.id] = {
                 panel,
                 disposable: Disposable.NONE,
                 destroy: Disposable.NONE,
-
                 element,
             };
         }

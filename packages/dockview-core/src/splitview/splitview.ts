@@ -165,6 +165,10 @@ export class Splitview {
                 ? 'dv-horizontal'
                 : 'dv-vertical'
         );
+        this.element.ariaOrientation =
+            this.orientation == Orientation.HORIZONTAL
+                ? 'horizontal'
+                : 'vertical';
     }
 
     get minimumSize(): number {
@@ -1148,6 +1152,10 @@ export class Splitview {
                 ? 'dv-horizontal'
                 : 'dv-vertical';
         element.className = `dv-split-view-container ${orientationClassname}`;
+        element.ariaOrientation =
+            this._orientation == Orientation.HORIZONTAL
+                ? 'horizontal'
+                : 'vertical';
         return element;
     }
 
