@@ -160,7 +160,9 @@ export class Emitter<T> implements IDisposable {
     }
 
     public fire(e: T): void {
-        this._last = e;
+        if(this.options?.replay){
+            this._last = e;
+        }
         for (const listener of this._listeners) {
             listener.callback(e);
         }
