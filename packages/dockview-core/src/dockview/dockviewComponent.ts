@@ -325,7 +325,7 @@ export class DockviewComponent
 
     private readonly _onDidActivePanelChange = new Emitter<
         IDockviewPanel | undefined
-    >();
+    >({ replay: true });
     readonly onDidActivePanelChange: Event<IDockviewPanel | undefined> =
         this._onDidActivePanelChange.event;
 
