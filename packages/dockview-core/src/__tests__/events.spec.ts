@@ -1,9 +1,4 @@
-import {
-    AsapEvent,
-    Emitter,
-    Event,
-    addDisposableListener,
-} from '../events';
+import { AsapEvent, Emitter, Event, addDisposableListener } from '../events';
 
 describe('events', () => {
     describe('emitter', () => {
@@ -67,7 +62,7 @@ describe('events', () => {
             expect(value).toBeUndefined();
         });
 
-        it('should relay last value in replay mode', () => {
+        it('should replay last value in replay mode', () => {
             const emitter = new Emitter<number>({ replay: true });
             let value: number | undefined = undefined;
 
@@ -77,6 +72,20 @@ describe('events', () => {
                 value = x;
             });
             expect(value).toBe(1);
+
+            stream.dispose();
+        });
+
+        it('should not replay last value in replay mode', () => {
+            const emitter = new Emitter<number>();
+            let value: number | undefined = undefined;
+
+            emitter.fire(1);
+
+            const stream = emitter.event((x) => {
+                value = x;
+            });
+            expect(value).toBeUndefined();
 
             stream.dispose();
         });
