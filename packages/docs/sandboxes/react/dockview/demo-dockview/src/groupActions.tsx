@@ -104,6 +104,23 @@ const GroupAction = (props: {
                     <span className="material-symbols-outlined">ad_group</span>
                 </button>
                 <button
+                  className="demo-icon-button"
+                  onClick={() => {
+                      const panel = props.api?.getGroup(props.groupId);
+                            const dir = ['top', 'left', 'bottom', 'right']
+                            if (panel) {
+                              const index = ((dir.indexOf(panel.headerPosition) + 1) % dir.length)
+
+                              panel.headerPosition = dir[index] as IHeaderPosition
+                              console.log(props.groupId, panel.headerPosition)
+                            }
+                        }}
+                    >
+                      <span className="material-symbols-outlined">
+                        loop
+                      </span>
+                </button>
+                <button
                     className={
                         location?.type === 'popout'
                             ? 'demo-icon-button selected'
