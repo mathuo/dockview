@@ -19,7 +19,7 @@ export default function Home(): JSX.Element {
                             <div className="splashscreen-title">
                                 <h1>Fully Featured Docking Layout Manager</h1>
                                 <h2>
-                                    Zero dependency layout managment and docking
+                                    Zero dependency layout management and docking
                                     controls
                                 </h2>
                             </div>
