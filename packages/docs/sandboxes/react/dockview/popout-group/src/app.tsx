@@ -143,7 +143,7 @@ export const App = (props: { theme?: string }) => {
 
     const load = (api: DockviewApi) => {
         api.clear();
-        api.onDidBlockPopout(() => {
+        api.onDidOpenPopoutWindowFail(() => {
             console.log('Popout blocked');
         });
         if (layout) {

@@ -5823,9 +5823,9 @@ describe('dockviewComponent', () => {
                 });
             });
 
-            test('onDidBlockPopout event is emitted', async () => {
+            test('onDidOpenPoputWindowFail event is emitted', async () => {
                 const onDidBlockPopoutHandler = jest.fn();
-                dockview.onDidBlockPopout(onDidBlockPopoutHandler);
+                dockview.onDidOpenPopoutWindowFail(onDidBlockPopoutHandler);
 
                 await dockview.addPopoutGroup(panel.group);
 
