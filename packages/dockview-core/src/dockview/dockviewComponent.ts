@@ -226,7 +226,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidMaximizedGroupChange: Event<DockviewMaximizedGroupChanged>;
     readonly onDidPopoutGroupSizeChange: Event<PopoutGroupChangeSizeEvent>;
     readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent>;
-    readonly onDidBlockPopout: Event<void>;
+    readonly onDidOpenPopoutWindowFail: Event<void>;
     readonly options: DockviewComponentOptions;
     updateOptions(options: DockviewOptions): void;
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void;
@@ -320,8 +320,9 @@ export class DockviewComponent
     readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent> =
         this._onDidPopoutGroupPositionChange.event;
 
-    private readonly _onDidBlockPopout = new Emitter<void>();
-    readonly onDidBlockPopout: Event<void> = this._onDidBlockPopout.event;
+    private readonly _onDidOpenPopoutWindowFail = new Emitter<void>();
+    readonly onDidOpenPopoutWindowFail: Event<void> =
+        this._onDidOpenPopoutWindowFail.event;
 
     private readonly _onDidLayoutFromJSON = new Emitter<void>();
     readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutFromJSON.event;
@@ -509,7 +510,7 @@ export class DockviewComponent
             this._onDidOptionsChange,
             this._onDidPopoutGroupSizeChange,
             this._onDidPopoutGroupPositionChange,
-            this._onDidBlockPopout,
+            this._onDidOpenPopoutWindowFail,
             this.onDidViewVisibilityChangeMicroTaskQueue(() => {
                 this.updateWatermark();
             }),
@@ -739,13 +740,17 @@ export class DockviewComponent
                 } else {
                     group = this.createGroup({ id: groupId });
                     if (popoutContainer) {
-                      this._onDidAddGroup.fire(group);
+                        this._onDidAddGroup.fire(group);
                     }
                 }
 
                 if (popoutContainer === null) {
+                    console.error(
+                        'dockview: failed to create popout. perhaps you need to allow pop-ups for this website'
+                    );
+
                     popoutWindowDisposable.dispose();
-                    this._onDidBlockPopout.fire();
+                    this._onDidOpenPopoutWindowFail.fire();
 
                     // if the popout window was blocked, we need to move the group back to the reference group
                     // and set it to visible
@@ -988,7 +993,7 @@ export class DockviewComponent
                 return true;
             })
             .catch((err) => {
-                console.error('dockview: failed to create popout window', err);
+                console.error('dockview: failed to create popout.', err);
                 return false;
             });
     }
