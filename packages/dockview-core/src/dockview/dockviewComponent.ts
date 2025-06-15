@@ -116,6 +116,7 @@ export interface DockviewPopoutGroupOptions {
      * Defaults to `/popout.html` if not provided
      */
     popoutUrl?: string;
+    referenceGroup?: DockviewGroupPanel;
     onDidOpen?: (event: { id: string; window: Window }) => void;
     onWillClose?: (event: { id: string; window: Window }) => void;
     overridePopoutGroup?: DockviewGroupPanel;
@@ -329,7 +330,7 @@ export class DockviewComponent
 
     private readonly _onDidActivePanelChange = new Emitter<
         IDockviewPanel | undefined
-    >();
+    >({ replay: true });
     readonly onDidActivePanelChange: Event<IDockviewPanel | undefined> =
         this._onDidActivePanelChange.event;
 
@@ -1510,18 +1511,14 @@ export class DockviewComponent
 
                 const group = createGroupFromSerializedState(data);
 
-                this.addPopoutGroup(
-                    (gridReferenceGroup
+                this.addPopoutGroup(group, {
+                    position: position ?? undefined,
+                    overridePopoutGroup: gridReferenceGroup ? group : undefined,
+                    referenceGroup: gridReferenceGroup
                         ? this.getPanel(gridReferenceGroup)
-                        : undefined) ?? group,
-                    {
-                        position: position ?? undefined,
-                        overridePopoutGroup: gridReferenceGroup
-                            ? group
-                            : undefined,
-                        popoutUrl: url,
-                    }
-                );
+                        : undefined,
+                    popoutUrl: url,
+                });
             }
 
             for (const floatingGroup of this._floatingGroups) {

@@ -5597,6 +5597,67 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(0);
         });
 
+        test('popout single panel -> save layout -> load layout', async () => {
+            const container = document.createElement('div');
+
+            window.open = () => setupMockWindow();
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+            });
+
+            const panel3 = dockview.addPanel({
+                id: 'panel_3',
+                component: 'default',
+            });
+
+            const panel4 = dockview.addPanel({
+                id: 'panel_4',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            expect(dockview.panels.length).toBe(4);
+            expect(dockview.groups.length).toBe(2);
+
+            expect(await dockview.addPopoutGroup(panel1)).toBeTruthy();
+
+            expect(dockview.panels.length).toBe(4);
+            expect(dockview.groups.length).toBe(3);
+
+            expect(panel1.api.location.type).toBe('popout');
+
+            dockview.fromJSON(dockview.toJSON());
+
+            await new Promise((resolve) => setTimeout(resolve, 0)); // popout views are completed as a promise so must complete microtask-queue
+
+            expect(dockview.panels.length).toBe(4);
+            expect(dockview.groups.length).toBe(3);
+            expect(dockview.groups.every((g) => g.api.isVisible)).toBeTruthy();
+        });
+
         test('move from fixed to popout group and back', async () => {
             const container = document.createElement('div');
 
