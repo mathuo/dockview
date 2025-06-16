@@ -720,10 +720,13 @@ export class DockviewComponent
                     return false;
                 }
 
-                const referenceGroup =
-                    itemToPopout instanceof DockviewPanel
-                        ? itemToPopout.group
-                        : itemToPopout;
+                const referenceGroup = options?.referenceGroup
+                    ? options.referenceGroup
+                    : itemToPopout instanceof DockviewPanel
+                    ? itemToPopout.group
+                    : itemToPopout;
+
+                const referenceLocation = itemToPopout.api.location.type;
 
                 /**
                  * The group that is being added doesn't already exist within the DOM, the most likely occurrence
@@ -740,6 +743,7 @@ export class DockviewComponent
                     group = options.overridePopoutGroup;
                 } else {
                     group = this.createGroup({ id: groupId });
+
                     if (popoutContainer) {
                         this._onDidAddGroup.fire(group);
                     }
@@ -776,8 +780,6 @@ export class DockviewComponent
                     gready,
                     this
                 );
-
-                const referenceLocation = itemToPopout.api.location.type;
 
                 group.model.renderContainer = overlayRenderContainer;
                 group.layout(
