@@ -260,6 +260,8 @@ export type AddPanelOptions<P extends object = Parameters> = {
     inactive?: boolean;
     initialWidth?: number;
     initialHeight?: number;
+    componentAttributes?: Record<string, string>;
+    tabComponentAttributes?: Record<string, string>;
 } & Partial<AddPanelOptionsUnion> &
     Partial<Contraints>;
 

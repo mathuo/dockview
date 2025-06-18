@@ -19,6 +19,8 @@ export interface IDockviewPanel extends IDisposable, IPanel {
     readonly api: DockviewPanelApi;
     readonly title: string | undefined;
     readonly params: Parameters | undefined;
+    readonly componentAttributes: Record<string, string>;
+    readonly tabComponentAttributes: Record<string, string>;
     readonly minimumWidth?: number;
     readonly minimumHeight?: number;
     readonly maximumWidth?: number;
@@ -39,6 +41,9 @@ export class DockviewPanel
     implements IDockviewPanel
 {
     readonly api: DockviewPanelApiImpl;
+
+    readonly componentAttributes: Record<string, string>;
+    readonly tabComponentAttributes: Record<string, string>;
 
     private _group: DockviewGroupPanel;
     private _params?: Parameters;
@@ -90,7 +95,10 @@ export class DockviewPanel
         private readonly containerApi: DockviewApi,
         group: DockviewGroupPanel,
         readonly view: IDockviewPanelModel,
-        options: { renderer?: DockviewPanelRenderer } & Partial<Contraints>
+        options: { renderer?: DockviewPanelRenderer } & Partial<Contraints> & {
+                componentAttributes?: Record<string, string>;
+                tabComponentAttributes?: Record<string, string>;
+            }
     ) {
         super();
         this._renderer = options.renderer;
@@ -99,6 +107,9 @@ export class DockviewPanel
         this._minimumHeight = options.minimumHeight;
         this._maximumWidth = options.maximumWidth;
         this._maximumHeight = options.maximumHeight;
+
+        this.componentAttributes = options.componentAttributes ?? {};
+        this.tabComponentAttributes = options.tabComponentAttributes ?? {};
 
         this.api = new DockviewPanelApiImpl(
             this,

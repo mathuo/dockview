@@ -53,6 +53,9 @@ export class Tab extends CompositeDisposable {
     private readonly _onPointDown = new Emitter<MouseEvent>();
     readonly onPointerDown: Event<MouseEvent> = this._onPointDown.event;
 
+    private readonly _onKeyDown = new Emitter<KeyboardEvent>();
+    readonly onKeyDown: Event<KeyboardEvent> = this._onKeyDown.event;
+
     private readonly _onDropped = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDropped.event;
 
@@ -74,8 +77,16 @@ export class Tab extends CompositeDisposable {
 
         this._element = document.createElement('div');
         this._element.className = 'dv-tab';
-        this._element.tabIndex = 0;
+        this._element.role = 'tab';
+        this._element.tabIndex = -1;
         this._element.draggable = true;
+        this._element.ariaSelected = 'false';
+
+        Object.entries(this.panel.tabComponentAttributes).forEach(
+            ([key, value]) => {
+                this._element.setAttribute(key, value);
+            }
+        );
 
         toggleClass(this.element, 'dv-inactive-tab', true);
 
@@ -139,6 +150,9 @@ export class Tab extends CompositeDisposable {
             addDisposableListener(this._element, 'pointerdown', (event) => {
                 this._onPointDown.fire(event);
             }),
+            addDisposableListener(this._element, 'keydown', (event) => {
+                this._onKeyDown.fire(event);
+            }),
             this.dropTarget.onDrop((event) => {
                 this._onDropped.fire(event);
             }),
@@ -147,6 +161,9 @@ export class Tab extends CompositeDisposable {
     }
 
     public setActive(isActive: boolean): void {
+        this.element.tabIndex = isActive ? 0 : -1;
+        this.element.ariaSelected = isActive.toString();
+
         toggleClass(this.element, 'dv-active-tab', isActive);
         toggleClass(this.element, 'dv-inactive-tab', !isActive);
     }
