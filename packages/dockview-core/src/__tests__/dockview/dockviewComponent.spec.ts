@@ -5852,6 +5852,54 @@ describe('dockviewComponent', () => {
             ]);
         });
 
+        describe('when browsers block popups', () => {
+            let container: HTMLDivElement;
+            let dockview: DockviewComponent;
+            let panel: DockviewPanel;
+
+            beforeEach(() => {
+                jest.spyOn(window, 'open').mockReturnValue(null);
+
+                container = document.createElement('div');
+
+                dockview = new DockviewComponent(container, {
+                    createComponent(options) {
+                        switch (options.name) {
+                            case 'default':
+                                return new PanelContentPartTest(
+                                    options.id,
+                                    options.name
+                                );
+                            default:
+                                throw new Error(`unsupported`);
+                        }
+                    },
+                });
+
+                dockview.layout(1000, 500);
+
+                panel = dockview.addPanel({
+                    id: 'panel_1',
+                    component: 'default',
+                });
+            });
+
+            test('onDidOpenPoputWindowFail event is emitted', async () => {
+                const onDidBlockPopoutHandler = jest.fn();
+                dockview.onDidOpenPopoutWindowFail(onDidBlockPopoutHandler);
+
+                await dockview.addPopoutGroup(panel.group);
+
+                expect(onDidBlockPopoutHandler).toHaveBeenCalledTimes(1);
+            });
+
+            test('popout group is restored to its original position', async () => {
+                await dockview.addPopoutGroup(panel.group);
+
+                expect(panel.group.api.location.type).toBe('grid');
+            });
+        });
+
         test('dispose of dockview instance when popup is open', async () => {
             const container = document.createElement('div');
 

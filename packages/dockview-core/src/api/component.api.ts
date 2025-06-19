@@ -749,6 +749,10 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.onDidPopoutGroupPositionChange;
     }
 
+    get onDidOpenPopoutWindowFail(): Event<void> {
+        return this.component.onDidOpenPopoutWindowFail;
+    }
+
     /**
      * All panel objects.
      */
