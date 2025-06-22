@@ -33,5 +33,15 @@
 
     .dv-right-actions-container {
         display: flex;
+
+        &.dv-right-actions-container-vertical {
+            flex-direction: column;
+        }
+    }
+
+    &.dv-groupview-header-vertical {
+        flex-direction: column;
+        height: auto;
+        width: var(--dv-tabs-and-actions-container-height);
     }
 }
