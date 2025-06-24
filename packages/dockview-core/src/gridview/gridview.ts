@@ -642,7 +642,7 @@ export class Gridview implements IDisposable {
         }
 
         this._root = root;
-        this.element.appendChild(this._root.element);
+        this.element.prepend(this._root.element);
         this.disposable.value = this._root.onDidChange((e) => {
             this._onDidChange.fire(e);
         });
@@ -698,7 +698,7 @@ export class Gridview implements IDisposable {
             this._root.addChild(oldRoot, Sizing.Distribute, 0);
         }
 
-        this.element.appendChild(this._root.element);
+        this.element.prepend(this._root.element);
 
         this.disposable.value = this._root.onDidChange((e) => {
             this._onDidChange.fire(e);

@@ -2552,6 +2552,12 @@ export class DockviewComponent
             tabComponent
         );
 
+        Object.entries(options.componentAttributes ?? {}).forEach(
+            ([key, value]) => {
+                view.content.element.setAttribute(key, value);
+            }
+        );
+
         const panel = new DockviewPanel(
             options.id,
             contentComponent,
@@ -2566,6 +2572,8 @@ export class DockviewComponent
                 minimumHeight: options.minimumHeight,
                 maximumWidth: options.maximumWidth,
                 maximumHeight: options.maximumHeight,
+                componentAttributes: options.componentAttributes,
+                tabComponentAttributes: options.tabComponentAttributes,
             }
         );
 

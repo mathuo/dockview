@@ -98,6 +98,10 @@ export class Tabs extends CompositeDisposable {
 
         this._tabsList = document.createElement('div');
         this._tabsList.className = 'dv-tabs-container dv-horizontal';
+        this._tabsList.ariaOrientation = 'horizontal';
+        this.element.role = 'tablist';
+        this.element.ariaLabel =
+            'Use the Left Arrow to select the previous tab, Right Arrow for the next tab, Home for the first tab, and End for the last tab. Press Enter to select the focused tab.';
 
         this.showTabsOverflowControl = options.showTabsOverflowControl;
 
@@ -115,6 +119,13 @@ export class Tabs extends CompositeDisposable {
             this._onWillShowOverlay,
             this._onDrop,
             this._onTabDragStart,
+            this.accessor.onDidActivePanelChange((e) => {
+                if (e?.api.group === this.group) {
+                    this.selectedIndex = this.indexOf(e.id);
+                } else {
+                    this.selectedIndex = -1;
+                }
+            }),
             addDisposableListener(this.element, 'pointerdown', (event) => {
                 if (event.defaultPrevented) {
                     return;
@@ -154,6 +165,7 @@ export class Tabs extends CompositeDisposable {
         for (const tab of this._tabs) {
             const isActivePanel = panel.id === tab.value.panel.id;
             tab.value.setActive(isActivePanel);
+            tab.value.panel.runEvents();
 
             if (isActivePanel) {
                 const element = tab.value.element;
@@ -222,6 +234,40 @@ export class Tabs extends CompositeDisposable {
                             this.group.model.openPanel(panel);
                         }
                         break;
+                }
+            }),
+            tab.onKeyDown((event) => {
+                if (event.defaultPrevented) {
+                    return;
+                }
+
+                const index = this.indexOf(tab.panel.id);
+                let nextTab: Tab | undefined = undefined;
+
+                switch (event.key) {
+                    case 'ArrowLeft':
+                        nextTab = this.tabs[Math.max(0, index - 1)];
+                        break;
+                    case 'ArrowRight':
+                        nextTab = this.tabs[Math.min(this.size - 1, index + 1)];
+                        break;
+                    case 'Home':
+                        nextTab = this.tabs[0];
+                        break;
+                    case 'End':
+                        nextTab = this.tabs[this.size - 1];
+                        break;
+                    case 'Enter':
+                    case 'Space':
+                        nextTab = tab;
+                }
+
+                if (
+                    nextTab != null &&
+                    this.group.activePanel !== nextTab.panel
+                ) {
+                    nextTab.element.focus();
+                    this.group.model.openPanel(nextTab.panel);
                 }
             }),
             tab.onDrop((event) => {

@@ -102,7 +102,7 @@ export class Splitview {
     private readonly sashContainer: HTMLElement;
     private readonly viewItems: ViewItem[] = [];
     private readonly sashes: ISashItem[] = [];
-    private _orientation: Orientation;
+    private _orientation = Orientation.VERTICAL;
     private _size = 0;
     private _orthogonalSize = 0;
     private _contentSize = 0;
@@ -159,12 +159,20 @@ export class Splitview {
         this.size = this.orthogonalSize;
         this.orthogonalSize = tmp;
 
-        removeClasses(this.element, 'dv-horizontal', 'dv-vertical');
-        this.element.classList.add(
-            this.orientation == Orientation.HORIZONTAL
-                ? 'dv-horizontal'
-                : 'dv-vertical'
+        toggleClass(
+            this.element,
+            'dv-horizontal',
+            this._orientation == Orientation.HORIZONTAL
         );
+        toggleClass(
+            this.element,
+            'dv-vertical',
+            this._orientation == Orientation.VERTICAL
+        );
+        this.element.ariaOrientation =
+            this.orientation == Orientation.HORIZONTAL
+                ? 'horizontal'
+                : 'vertical';
     }
 
     get minimumSize(): number {
@@ -227,8 +235,8 @@ export class Splitview {
         private readonly container: HTMLElement,
         options: SplitViewOptions
     ) {
-        this._orientation = options.orientation ?? Orientation.VERTICAL;
         this.element = this.createContainer();
+        this.orientation = options.orientation ?? Orientation.VERTICAL;
 
         this.margin = options.margin ?? 0;
 
@@ -1143,11 +1151,7 @@ export class Splitview {
 
     private createContainer(): HTMLElement {
         const element = document.createElement('div');
-        const orientationClassname =
-            this._orientation === Orientation.HORIZONTAL
-                ? 'dv-horizontal'
-                : 'dv-vertical';
-        element.className = `dv-split-view-container ${orientationClassname}`;
+        element.className = `dv-split-view-container`;
         return element;
     }
 
