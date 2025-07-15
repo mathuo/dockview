@@ -199,6 +199,14 @@ export type DockviewGroupLocation =
     | { type: 'floating' }
     | { type: 'popout'; getWindow: () => Window; popoutUrl?: string };
 
+export interface WillShowOverlayLocationEventOptions {
+    readonly kind: DockviewGroupDropLocation;
+    readonly panel: IDockviewPanel | undefined;
+    readonly api: DockviewApi;
+    readonly group: DockviewGroupPanel | undefined;
+    getData: () => PanelTransfer | undefined;
+}
+
 export class WillShowOverlayLocationEvent implements IDockviewEvent {
     get kind(): DockviewGroupDropLocation {
         return this.options.kind;
@@ -238,13 +246,7 @@ export class WillShowOverlayLocationEvent implements IDockviewEvent {
 
     constructor(
         private readonly event: WillShowOverlayEvent,
-        private readonly options: {
-            kind: DockviewGroupDropLocation;
-            panel: IDockviewPanel | undefined;
-            api: DockviewApi;
-            group: DockviewGroupPanel | undefined;
-            getData: () => PanelTransfer | undefined;
-        }
+        readonly options: WillShowOverlayLocationEventOptions
     ) {}
 }
 
