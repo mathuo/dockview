@@ -19,7 +19,7 @@ function useTitle(api: DockviewPanelApi): string | undefined {
 }
 
 export type IDockviewDefaultTabProps = IDockviewPanelHeaderProps &
-    React.DOMAttributes<HTMLDivElement> & {
+    React.HtmlHTMLAttributes<HTMLDivElement> & {
         hideClose?: boolean;
         closeActionOverride?: () => void;
     };
