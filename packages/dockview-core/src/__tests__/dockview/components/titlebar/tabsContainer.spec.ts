@@ -864,4 +864,34 @@ describe('tabsContainer', () => {
         cut.closePanel(panel2);
         expect(cut.element.classList.contains('dv-single-tab')).toBeFalsy();
     });
+
+    describe('updateDragAndDropState', () => {
+        test('that updateDragAndDropState calls updateDragAndDropState on tabs and voidContainer', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                options: {},
+                onDidOptionsChange: jest.fn(),
+            });
+
+            const groupPanel = fromPartial<DockviewGroupPanel>({
+                id: 'testgroupid',
+                model: fromPartial<DockviewGroupPanelModel>({}),
+            });
+
+            const cut = new TabsContainer(accessor, groupPanel);
+
+            // Mock the tabs and voidContainer to verify methods are called
+            const mockTabs = { updateDragAndDropState: jest.fn() };
+            const mockVoidContainer = { updateDragAndDropState: jest.fn() };
+
+            (cut as any).tabs = mockTabs;
+            (cut as any).voidContainer = mockVoidContainer;
+
+            cut.updateDragAndDropState();
+
+            expect(mockTabs.updateDragAndDropState).toHaveBeenCalledTimes(1);
+            expect(mockVoidContainer.updateDragAndDropState).toHaveBeenCalledTimes(1);
+        });
+    });
 });

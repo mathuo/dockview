@@ -12,12 +12,14 @@ import { fromPartial } from '@total-typescript/shoehorn';
 
 describe('tab', () => {
     test('that empty tab has inactive-tab class', () => {
-        const accessorMock = jest.fn();
+        const accessor = fromPartial<DockviewComponent>({
+            options: {}
+        });
         const groupMock = jest.fn();
 
         const cut = new Tab(
             { id: 'panelId' } as IDockviewPanel,
-            new accessorMock(),
+            accessor,
             new groupMock()
         );
 
@@ -25,12 +27,14 @@ describe('tab', () => {
     });
 
     test('that active tab has active-tab class', () => {
-        const accessorMock = jest.fn();
+        const accessor = fromPartial<DockviewComponent>({
+            options: {}
+        });
         const groupMock = jest.fn();
 
         const cut = new Tab(
             { id: 'panelId' } as IDockviewPanel,
-            new accessorMock(),
+            accessor,
             new groupMock()
         );
 
@@ -42,25 +46,19 @@ describe('tab', () => {
     });
 
     test('that an external event does not render a drop target and calls through to the group model', () => {
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-            };
+        const accessor = fromPartial<DockviewComponent>({
+            id: 'testcomponentid',
+            options: {}
         });
 
         const groupView = fromPartial<DockviewGroupPanelModel>({
             canDisplayOverlay: jest.fn(),
         });
 
-        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
-            return {
-                id: 'testgroupid',
-                model: groupView,
-            };
+        const groupPanel = fromPartial<DockviewGroupPanel>({
+            id: 'testgroupid',
+            model: groupView,
         });
-
-        const accessor = new accessorMock() as DockviewComponent;
-        const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
         const cut = new Tab(
             { id: 'panelId' } as IDockviewPanel,
@@ -86,25 +84,19 @@ describe('tab', () => {
     });
 
     test('that if you drag over yourself a drop target is shown', () => {
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-            };
+        const accessor = fromPartial<DockviewComponent>({
+            id: 'testcomponentid',
+            options: {}
         });
 
         const groupView = fromPartial<DockviewGroupPanelModel>({
             canDisplayOverlay: jest.fn(),
         });
 
-        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
-            return {
-                id: 'testgroupid',
-                model: groupView,
-            };
+        const groupPanel = fromPartial<DockviewGroupPanel>({
+            id: 'testgroupid',
+            model: groupView,
         });
-
-        const accessor = new accessorMock() as DockviewComponent;
-        const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
         const cut = new Tab(
             { id: 'panel1' } as IDockviewPanel,
@@ -135,30 +127,19 @@ describe('tab', () => {
     });
 
     test('that if you drag over another tab a drop target is shown', () => {
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-            };
-        });
-        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
-            () => {
-                return {
-                    canDisplayOverlay: jest.fn(),
-                };
-            }
-        );
-
-        const groupView = new groupviewMock() as DockviewGroupPanelModel;
-
-        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
-            return {
-                id: 'testgroupid',
-                model: groupView,
-            };
+        const accessor = fromPartial<DockviewComponent>({
+            id: 'testcomponentid',
+            options: {}
         });
 
-        const accessor = new accessorMock() as DockviewComponent;
-        const groupPanel = new groupPanelMock() as DockviewGroupPanel;
+        const groupView = fromPartial<DockviewGroupPanelModel>({
+            canDisplayOverlay: jest.fn(),
+        });
+
+        const groupPanel = fromPartial<DockviewGroupPanel>({
+            id: 'testgroupid',
+            model: groupView,
+        });
 
         const cut = new Tab(
             { id: 'panel1' } as IDockviewPanel,
@@ -189,30 +170,19 @@ describe('tab', () => {
     });
 
     test('that dropping on a tab with the same id but from a different component should not render a drop over and call through to the group model', () => {
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-            };
-        });
-        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
-            () => {
-                return {
-                    canDisplayOverlay: jest.fn(),
-                };
-            }
-        );
-
-        const groupView = new groupviewMock() as DockviewGroupPanelModel;
-
-        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
-            return {
-                id: 'testgroupid',
-                model: groupView,
-            };
+        const accessor = fromPartial<DockviewComponent>({
+            id: 'testcomponentid',
+            options: {}
         });
 
-        const accessor = new accessorMock() as DockviewComponent;
-        const groupPanel = new groupPanelMock() as DockviewGroupPanel;
+        const groupView = fromPartial<DockviewGroupPanelModel>({
+            canDisplayOverlay: jest.fn(),
+        });
+
+        const groupPanel = fromPartial<DockviewGroupPanel>({
+            id: 'testgroupid',
+            model: groupView,
+        });
 
         const cut = new Tab(
             { id: 'panel1' } as IDockviewPanel,
@@ -249,30 +219,19 @@ describe('tab', () => {
     });
 
     test('that dropping on a tab from a different component should not render a drop over and call through to the group model', () => {
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-            };
-        });
-        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
-            () => {
-                return {
-                    canDisplayOverlay: jest.fn(),
-                };
-            }
-        );
-
-        const groupView = new groupviewMock() as DockviewGroupPanelModel;
-
-        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
-            return {
-                id: 'testgroupid',
-                model: groupView,
-            };
+        const accessor = fromPartial<DockviewComponent>({
+            id: 'testcomponentid',
+            options: {}
         });
 
-        const accessor = new accessorMock() as DockviewComponent;
-        const groupPanel = new groupPanelMock() as DockviewGroupPanel;
+        const groupView = fromPartial<DockviewGroupPanelModel>({
+            canDisplayOverlay: jest.fn(),
+        });
+
+        const groupPanel = fromPartial<DockviewGroupPanel>({
+            id: 'testgroupid',
+            model: groupView,
+        });
 
         const cut = new Tab(
             { id: 'panel1' } as IDockviewPanel,
@@ -306,5 +265,78 @@ describe('tab', () => {
         expect(
             cut.element.getElementsByClassName('dv-drop-target-dropzone').length
         ).toBe(0);
+    });
+
+    describe('disableDnd option', () => {
+        test('that tab is draggable by default (disableDnd not set)', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                options: {}
+            });
+            const groupMock = jest.fn();
+
+            const cut = new Tab(
+                { id: 'panelId' } as IDockviewPanel,
+                accessor,
+                new groupMock()
+            );
+
+            expect(cut.element.draggable).toBe(true);
+        });
+
+        test('that tab is draggable when disableDnd is false', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                options: { disableDnd: false }
+            });
+            const groupMock = jest.fn();
+
+            const cut = new Tab(
+                { id: 'panelId' } as IDockviewPanel,
+                accessor,
+                new groupMock()
+            );
+
+            expect(cut.element.draggable).toBe(true);
+        });
+
+        test('that tab is not draggable when disableDnd is true', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                options: { disableDnd: true }
+            });
+            const groupMock = jest.fn();
+
+            const cut = new Tab(
+                { id: 'panelId' } as IDockviewPanel,
+                accessor,
+                new groupMock()
+            );
+
+            expect(cut.element.draggable).toBe(false);
+        });
+
+        test('that updateDragAndDropState updates draggable attribute based on disableDnd option', () => {
+            const options = { disableDnd: false };
+            const accessor = fromPartial<DockviewComponent>({
+                options
+            });
+            const groupMock = jest.fn();
+
+            const cut = new Tab(
+                { id: 'panelId' } as IDockviewPanel,
+                accessor,
+                new groupMock()
+            );
+
+            expect(cut.element.draggable).toBe(true);
+
+            // Simulate option change
+            options.disableDnd = true;
+            cut.updateDragAndDropState();
+            expect(cut.element.draggable).toBe(false);
+
+            // Change back
+            options.disableDnd = false;
+            cut.updateDragAndDropState();
+            expect(cut.element.draggable).toBe(true);
+        });
     });
 });
