@@ -160,6 +160,7 @@ export interface MovePanelEvent {
 type MoveGroupOptions = {
     from: { group: DockviewGroupPanel };
     to: { group: DockviewGroupPanel; position: Position };
+    skipSetActive?: boolean;
 };
 
 type MoveGroupOrPanelOptions = {
@@ -172,6 +173,7 @@ type MoveGroupOrPanelOptions = {
         position: Position;
         index?: number;
     };
+    skipSetActive?: boolean;
 };
 
 export interface FloatingGroupOptions {
@@ -2116,6 +2118,7 @@ export class DockviewComponent
                     group: destinationGroup,
                     position: destinationTarget,
                 },
+                skipSetActive: options.skipSetActive,
             });
             return;
         }
@@ -2145,10 +2148,13 @@ export class DockviewComponent
             this.movingLock(() =>
                 destinationGroup.model.openPanel(removedPanel, {
                     index: destinationIndex,
-                    skipSetGroupActive: true,
+                    skipSetActive: options.skipSetActive ?? false,
+                    skipSetGroupActive: options.skipSetActive ?? false,
                 })
             );
-            this.doSetGroupAndPanelActive(destinationGroup);
+            if (!options.skipSetActive) {
+                this.doSetGroupAndPanelActive(destinationGroup);
+            }
 
             this._onDidMovePanel.fire({
                 panel: removedPanel,
@@ -2309,6 +2315,7 @@ export class DockviewComponent
 
         if (target === 'center') {
             const activePanel = from.activePanel;
+            const targetActivePanel = to.activePanel;
 
             const panels = this.movingLock(() =>
                 [...from.panels].map((p) =>
@@ -2325,13 +2332,18 @@ export class DockviewComponent
             this.movingLock(() => {
                 for (const panel of panels) {
                     to.model.openPanel(panel, {
-                        skipSetActive: panel !== activePanel,
-                        skipSetGroupActive: true,
+                        skipSetActive: options.skipSetActive ? true : panel !== activePanel,
+                        skipSetGroupActive: options.skipSetActive ?? true,
                     });
                 }
             });
 
-            this.doSetGroupAndPanelActive(to);
+            if (!options.skipSetActive) {
+                this.doSetGroupAndPanelActive(to);
+            } else if (targetActivePanel && to.panels.includes(targetActivePanel)) {
+                // Ensure the target group's original active panel remains active
+                to.model.openPanel(targetActivePanel);
+            }
         } else {
             switch (from.api.location.type) {
                 case 'grid':
@@ -2390,6 +2402,10 @@ export class DockviewComponent
         from.panels.forEach((panel) => {
             this._onDidMovePanel.fire({ panel, from });
         });
+
+        if (!options.skipSetActive) {
+            this.doSetGroupAndPanelActive(from);
+        }
     }
 
     override doSetGroupActive(group: DockviewGroupPanel | undefined): void {

@@ -493,6 +493,143 @@ describe('dockviewComponent', () => {
         expect(dockview.activeGroup!.model.activePanel).toBe(panel3);
     });
 
+    test('moveGroupOrPanel with skipSetActive should not activate group/panel', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(options.id, options.name);
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+        });
+
+        dockview.addPanel({
+            id: 'panel4',
+            component: 'default',
+        });
+
+        const panel1 = dockview.getGroupPanel('panel1');
+        const panel2 = dockview.getGroupPanel('panel2');
+        const panel3 = dockview.getGroupPanel('panel3');
+        const panel4 = dockview.getGroupPanel('panel4');
+
+        const group1 = panel1!.group;
+
+        // Move panel1 to create a new group
+        dockview.moveGroupOrPanel({
+            from: { groupId: group1.id, panelId: 'panel1' },
+            to: { group: group1, position: 'right' },
+        });
+        const group2 = panel1!.group;
+
+        // Verify panel1 is active after move (default behavior)
+        expect(dockview.activeGroup).toBe(group2);
+        expect(dockview.activePanel).toBe(panel1);
+
+        // Set a different group active and make panel2 the active panel
+        dockview.doSetGroupActive(group1);
+        group1.model.openPanel(panel2!);
+        expect(dockview.activeGroup).toBe(group1);
+        expect(dockview.activePanel?.id).toBe(panel2?.id);
+
+        // Move panel3 to group2 with skipSetActive
+        dockview.moveGroupOrPanel({
+            from: { groupId: group1.id, panelId: 'panel3' },
+            to: { group: group2, position: 'center' },
+            skipSetActive: true,
+        });
+
+        // group1 should still be active, not group2
+        expect(dockview.activeGroup).toBe(group1);
+        expect(dockview.activePanel?.id).toBe(panel2?.id); // panel2 should still be active in group1
+        expect(panel3!.group).toBe(group2); // panel3 should have moved to group2
+
+        dockview.dispose();
+    });
+
+    test('moveGroupOrPanel group move with skipSetActive should not activate group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(options.id, options.name);
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+        });
+
+        const panel1 = dockview.getGroupPanel('panel1')!;
+        const panel2 = dockview.getGroupPanel('panel2')!;
+        const panel3 = dockview.getGroupPanel('panel3')!;
+
+        // Create separate groups
+        panel2.api.moveTo({ position: 'right' });
+        panel3.api.moveTo({ group: panel2.group, position: 'center' });
+
+        // Set panel1's group as active and ensure panel1 is the active panel
+        dockview.doSetGroupActive(panel1.group);
+        panel1.group.model.openPanel(panel1);
+        expect(dockview.activeGroup).toBe(panel1.group);
+        expect(dockview.activePanel?.id).toBe(panel1.id);
+
+        // Move panel2's entire group to panel1's group with skipSetActive
+        dockview.moveGroupOrPanel({
+            from: { groupId: panel2.group.id },
+            to: { group: panel1.group, position: 'center' },
+            skipSetActive: true,
+        });
+
+        // panel1's group should still be active and there should be an active panel
+        expect(dockview.activeGroup).toBe(panel1.group);
+        expect(dockview.activePanel).toBeTruthy();
+        // All panels should now be in the same group
+        expect(panel2.group).toBe(panel1.group);
+        expect(panel3.group).toBe(panel1.group);
+
+        dockview.dispose();
+    });
+
     test('remove group', () => {
         dockview.layout(500, 1000);
 
@@ -6566,6 +6703,175 @@ describe('dockviewComponent', () => {
             panel1.api.moveTo({ index: 1 });
 
             expect(panel1.api.group.panels).toEqual([panel3, panel1, panel2]);
+        });
+
+        test('panel moveTo with skipSetActive should not activate group', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 1000);
+
+            dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+
+            const panel1 = dockview.getGroupPanel('panel1')!;
+            const panel2 = dockview.getGroupPanel('panel2')!;
+
+            // Move panel2 to a new group to the right
+            panel2.api.moveTo({ position: 'right' });
+            
+            // panel2's group should be active
+            expect(dockview.activeGroup).toBe(panel2.group);
+            expect(dockview.activePanel?.id).toBe(panel2.id);
+
+            // Now move panel1 to panel2's group without setting it active
+            panel1.api.moveTo({ 
+                group: panel2.group, 
+                position: 'center',
+                skipSetActive: true 
+            });
+
+            // panel2's group should still be active, but panel2 should still be the active panel
+            expect(dockview.activeGroup).toBe(panel2.group);
+            expect(dockview.activePanel?.id).toBe(panel2.id);
+            expect(panel1.group).toBe(panel2.group);
+        });
+
+        test('group moveTo with skipSetActive should not activate group', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 1000);
+
+            dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+
+            dockview.addPanel({
+                id: 'panel3',
+                component: 'default',
+            });
+
+            const panel1 = dockview.getGroupPanel('panel1')!;
+            const panel2 = dockview.getGroupPanel('panel2')!;
+            const panel3 = dockview.getGroupPanel('panel3')!;
+
+            // Move panel2 to a new group to create separate groups
+            panel2.api.moveTo({ position: 'right' });
+            
+            // Move panel3 to panel2's group
+            panel3.api.moveTo({ group: panel2.group, position: 'center' });
+
+            // panel2's group should be active
+            expect(dockview.activeGroup).toBe(panel2.group);
+
+            // Set panel1's group as active
+            dockview.doSetGroupActive(panel1.group);
+            expect(dockview.activeGroup).toBe(panel1.group);
+
+            // Now move panel2's group to panel1's group without setting it active
+            panel2.group.api.moveTo({ 
+                group: panel1.group, 
+                position: 'center',
+                skipSetActive: true 
+            });
+
+            // panel1's group should still be active and panel1 should still be the active panel
+            expect(dockview.activeGroup).toBe(panel1.group);
+            expect(dockview.activePanel?.id).toBe(panel1.id);
+            // panel2 and panel3 should now be in panel1's group
+            expect(panel2.group).toBe(panel1.group);
+            expect(panel3.group).toBe(panel1.group);
+        });
+
+        test('panel moveTo without skipSetActive should activate group (default behavior)', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 1000);
+
+            dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+
+            const panel1 = dockview.getGroupPanel('panel1')!;
+            const panel2 = dockview.getGroupPanel('panel2')!;
+
+            // Move panel2 to a new group to the right
+            panel2.api.moveTo({ position: 'right' });
+            
+            // Set panel1's group as active
+            dockview.doSetGroupActive(panel1.group);
+            expect(dockview.activeGroup).toBe(panel1.group);
+
+            // Move panel1 to panel2's group (should activate panel2's group)
+            panel1.api.moveTo({ 
+                group: panel2.group, 
+                position: 'center'
+            });
+
+            // panel2's group should now be active and panel1 should be the active panel
+            expect(dockview.activeGroup).toBe(panel2.group);
+            expect(dockview.activePanel?.id).toBe(panel1.id);
+            expect(panel1.group).toBe(panel2.group);
         });
 
         test('that can add panel', () => {

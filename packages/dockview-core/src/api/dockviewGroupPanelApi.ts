@@ -15,6 +15,10 @@ export interface DockviewGroupMoveParams {
      * The index to place the panel within a group, only applicable if the placement is within an existing group
      */
     index?: number;
+    /**
+     * Whether to skip setting the group as active after moving
+     */
+    skipSetActive?: boolean;
 }
 
 export interface DockviewGroupPanelApi extends GridviewPanelApi {
@@ -88,7 +92,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             options.group ??
             this.accessor.addGroup({
                 direction: positionToDirection(options.position ?? 'right'),
-                skipSetActive: true,
+                skipSetActive: options.skipSetActive ?? false,
             });
 
         this.accessor.moveGroupOrPanel({
@@ -100,6 +104,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
                     : 'center',
                 index: options.index,
             },
+            skipSetActive: options.skipSetActive,
         });
     }
 
