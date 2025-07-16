@@ -55,6 +55,7 @@ export interface ITabsContainer extends IDisposable {
     setPrefixActionsElement(element: HTMLElement | undefined): void;
     show(): void;
     hide(): void;
+    updateDragAndDropState(): void;
 }
 
 export class TabsContainer
@@ -399,5 +400,10 @@ export class TabsContainer
                 });
             })
         );
+    }
+
+    updateDragAndDropState(): void {
+        this.tabs.updateDragAndDropState();
+        this.voidContainer.updateDragAndDropState();
     }
 }

@@ -75,7 +75,7 @@ export class Tab extends CompositeDisposable {
         this._element = document.createElement('div');
         this._element.className = 'dv-tab';
         this._element.tabIndex = 0;
-        this._element.draggable = true;
+        this._element.draggable = !this.accessor.options.disableDnd;
 
         toggleClass(this.element, 'dv-inactive-tab', true);
 
@@ -157,6 +157,10 @@ export class Tab extends CompositeDisposable {
         }
         this.content = part;
         this._element.appendChild(this.content.element);
+    }
+
+    public updateDragAndDropState(): void {
+        this._element.draggable = !this.accessor.options.disableDnd;
     }
 
     public dispose(): void {

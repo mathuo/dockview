@@ -1136,6 +1136,10 @@ export class DockviewGroupPanelModel
         }
     }
 
+    updateDragAndDropState(): void {
+        this.tabsContainer.updateDragAndDropState();
+    }
+
     public dispose(): void {
         super.dispose();
 

@@ -36,7 +36,7 @@ export class VoidContainer extends CompositeDisposable {
         this._element = document.createElement('div');
 
         this._element.className = 'dv-void-container';
-        this._element.draggable = true;
+        this._element.draggable = !this.accessor.options.disableDnd;
 
         this.addDisposables(
             this._onDrop,
@@ -78,5 +78,9 @@ export class VoidContainer extends CompositeDisposable {
             }),
             this.dropTarget
         );
+    }
+
+    updateDragAndDropState(): void {
+        this._element.draggable = !this.accessor.options.disableDnd;
     }
 }
