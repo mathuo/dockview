@@ -2367,17 +2367,51 @@ export class DockviewComponent
                     if (!selectedPopoutGroup) {
                         throw new Error('failed to find popout group');
                     }
-                    selectedPopoutGroup.disposable.dispose();
+                    
+                    // For cross-window moves, we need to prevent the automatic restoration 
+                    // to the reference group that happens in the disposal cleanup
+                    const isMovingToNewTarget = to.api.location.type === 'grid';
+                    
+                    if (isMovingToNewTarget) {
+                        // For cross-window moves to new positions, we need to clean up properly
+                        // Remove from popout groups list to prevent automatic restoration
+                        const index = this._popoutGroups.indexOf(selectedPopoutGroup);
+                        if (index >= 0) {
+                            this._popoutGroups.splice(index, 1);
+                        }
+                        
+                        // Clean up the reference group (ghost) if it exists and is hidden
+                        if (selectedPopoutGroup.referenceGroup) {
+                            const referenceGroup = this.getPanel(selectedPopoutGroup.referenceGroup);
+                            if (referenceGroup && !referenceGroup.api.isVisible) {
+                                this.doRemoveGroup(referenceGroup, { skipActive: true });
+                            }
+                        }
+                        
+                        // Manually dispose the window without triggering restoration
+                        selectedPopoutGroup.window.dispose();
+                        
+                        // Update group's location and containers for main window
+                        from.model.renderContainer = this.overlayRenderContainer;
+                        from.model.dropTargetContainer = this.rootDropTargetContainer;
+                        from.model.location = { type: 'grid' };
+                    } else {
+                        // Normal disposal that will restore to reference group
+                        selectedPopoutGroup.disposable.dispose();
+                    }
                 }
             }
 
-            if (from.api.location.type !== 'popout') {
-                const referenceLocation = getGridLocation(to.element);
-                const dropLocation = getRelativeLocation(
-                    this.gridview.orientation,
-                    referenceLocation,
-                    target
-                );
+            // For moves to grid locations (including cross-window moves from popout)
+            const referenceLocation = getGridLocation(to.element);
+            const dropLocation = getRelativeLocation(
+                this.gridview.orientation,
+                referenceLocation,
+                target
+            );
+            
+            // Add to grid for moves from non-popout sources, or for cross-window moves from popout
+            if (from.api.location.type !== 'popout' || to.api.location.type === 'grid') {
 
                 let size: number;
 
