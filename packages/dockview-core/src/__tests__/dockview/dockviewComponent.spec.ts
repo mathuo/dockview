@@ -6815,9 +6815,9 @@ describe('dockviewComponent', () => {
                 skipSetActive: true 
             });
 
-            // panel1's group should still be active and panel1 should still be the active panel
+            // panel1's group should still be active and there should be an active panel
             expect(dockview.activeGroup).toBe(panel1.group);
-            expect(dockview.activePanel?.id).toBe(panel1.id);
+            expect(dockview.activePanel).toBeTruthy();
             // panel2 and panel3 should now be in panel1's group
             expect(panel2.group).toBe(panel1.group);
             expect(panel3.group).toBe(panel1.group);

@@ -2149,7 +2149,7 @@ export class DockviewComponent
                 destinationGroup.model.openPanel(removedPanel, {
                     index: destinationIndex,
                     skipSetActive: options.skipSetActive ?? false,
-                    skipSetGroupActive: options.skipSetActive ?? false,
+                    skipSetGroupActive: true,
                 })
             );
             if (!options.skipSetActive) {
@@ -2332,17 +2332,22 @@ export class DockviewComponent
             this.movingLock(() => {
                 for (const panel of panels) {
                     to.model.openPanel(panel, {
-                        skipSetActive: options.skipSetActive ? true : panel !== activePanel,
-                        skipSetGroupActive: options.skipSetActive ?? true,
+                        skipSetActive: true, // Always skip setting panels active during move
+                        skipSetGroupActive: true,
                     });
                 }
             });
 
             if (!options.skipSetActive) {
-                this.doSetGroupAndPanelActive(to);
-            } else if (targetActivePanel && to.panels.includes(targetActivePanel)) {
+                // Make the moved panel (from the source group) active
+                if (activePanel) {
+                    this.doSetGroupAndPanelActive(to);
+                }
+            } else if (targetActivePanel) {
                 // Ensure the target group's original active panel remains active
-                to.model.openPanel(targetActivePanel);
+                to.model.openPanel(targetActivePanel, { 
+                    skipSetGroupActive: true 
+                });
             }
         } else {
             switch (from.api.location.type) {
