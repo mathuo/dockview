@@ -8,6 +8,7 @@ describe('voidContainer', () => {
     test('that `pointerDown` triggers activation', () => {
         const accessor = fromPartial<DockviewComponent>({
             doSetGroupActive: jest.fn(),
+            options: {}
         });
         const group = fromPartial<DockviewGroupPanel>({});
         const cut = new VoidContainer(accessor, group);
@@ -16,5 +17,58 @@ describe('voidContainer', () => {
 
         fireEvent.pointerDown(cut.element);
         expect(accessor.doSetGroupActive).toHaveBeenCalledWith(group);
+    });
+
+    describe('disableDnd option', () => {
+        test('that void container is draggable by default (disableDnd not set)', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                options: {}
+            });
+            const group = fromPartial<DockviewGroupPanel>({});
+            const cut = new VoidContainer(accessor, group);
+
+            expect(cut.element.draggable).toBe(true);
+        });
+
+        test('that void container is draggable when disableDnd is false', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                options: { disableDnd: false }
+            });
+            const group = fromPartial<DockviewGroupPanel>({});
+            const cut = new VoidContainer(accessor, group);
+
+            expect(cut.element.draggable).toBe(true);
+        });
+
+        test('that void container is not draggable when disableDnd is true', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                options: { disableDnd: true }
+            });
+            const group = fromPartial<DockviewGroupPanel>({});
+            const cut = new VoidContainer(accessor, group);
+
+            expect(cut.element.draggable).toBe(false);
+        });
+
+        test('that updateDragAndDropState updates draggable attribute based on disableDnd option', () => {
+            const options = { disableDnd: false };
+            const accessor = fromPartial<DockviewComponent>({
+                options
+            });
+            const group = fromPartial<DockviewGroupPanel>({});
+            const cut = new VoidContainer(accessor, group);
+
+            expect(cut.element.draggable).toBe(true);
+
+            // Simulate option change
+            options.disableDnd = true;
+            cut.updateDragAndDropState();
+            expect(cut.element.draggable).toBe(false);
+
+            // Change back
+            options.disableDnd = false;
+            cut.updateDragAndDropState();
+            expect(cut.element.draggable).toBe(true);
+        });
     });
 });

@@ -1272,7 +1272,13 @@ export class DockviewComponent
 
         this.updateDropTargetModel(options);
 
+        const oldDisableDnd = this.options.disableDnd;
         this._options = { ...this.options, ...options };
+        const newDisableDnd = this.options.disableDnd;
+
+        if (oldDisableDnd !== newDisableDnd) {
+            this.updateDragAndDropState();
+        }
 
         if ('theme' in options) {
             this.updateTheme();
@@ -1293,6 +1299,13 @@ export class DockviewComponent
                 // ensure floting groups stay within visible boundaries
                 floating.overlay.setBounds();
             }
+        }
+    }
+
+    private updateDragAndDropState(): void {
+        // Update draggable state for all tabs and void containers
+        for (const group of this.groups) {
+            group.model.updateDragAndDropState();
         }
     }
 

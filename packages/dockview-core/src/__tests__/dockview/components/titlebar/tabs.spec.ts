@@ -63,4 +63,33 @@ describe('tabs', () => {
             ).toBe(0);
         });
     });
+
+    describe('updateDragAndDropState', () => {
+        test('that updateDragAndDropState calls updateDragAndDropState on all tabs', () => {
+            const cut = new Tabs(
+                fromPartial<DockviewGroupPanel>({}),
+                fromPartial<DockviewComponent>({
+                    options: {},
+                }),
+                {
+                    showTabsOverflowControl: true,
+                }
+            );
+
+            // Mock tab to verify the method is called
+            const mockTab1 = { updateDragAndDropState: jest.fn() };
+            const mockTab2 = { updateDragAndDropState: jest.fn() };
+
+            // Add mock tabs to the internal tabs array
+            (cut as any)._tabs = [
+                { value: mockTab1 },
+                { value: mockTab2 }
+            ];
+
+            cut.updateDragAndDropState();
+
+            expect(mockTab1.updateDragAndDropState).toHaveBeenCalledTimes(1);
+            expect(mockTab2.updateDragAndDropState).toHaveBeenCalledTimes(1);
+        });
+    });
 });

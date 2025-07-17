@@ -298,4 +298,10 @@ export class Tabs extends CompositeDisposable {
 
         this._onOverflowTabsChange.fire({ tabs, reset: options.reset });
     }
+
+    updateDragAndDropState(): void {
+        for (const tab of this._tabs) {
+            tab.value.updateDragAndDropState();
+        }
+    }
 }

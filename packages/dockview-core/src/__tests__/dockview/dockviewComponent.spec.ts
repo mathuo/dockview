@@ -144,6 +144,102 @@ describe('dockviewComponent', () => {
         );
     });
 
+    describe('disableDnd option integration', () => {
+        test('that updateOptions with disableDnd updates all tabs and void containers', () => {
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                disableDnd: false,
+            });
+
+            // Add some panels to create tabs
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+
+            // Get all tab elements and void containers
+            const tabElements = Array.from(dockview.element.querySelectorAll('.dv-tab')) as HTMLElement[];
+            const voidContainers = Array.from(dockview.element.querySelectorAll('.dv-void-container')) as HTMLElement[];
+
+            // Initially tabs should be draggable (disableDnd: false)
+            tabElements.forEach(tab => {
+                expect(tab.draggable).toBe(true);
+            });
+            voidContainers.forEach(container => {
+                expect(container.draggable).toBe(true);
+            });
+
+            // Update options to disable DnD
+            dockview.updateOptions({ disableDnd: true });
+
+            // Now tabs should not be draggable
+            tabElements.forEach(tab => {
+                expect(tab.draggable).toBe(false);
+            });
+            voidContainers.forEach(container => {
+                expect(container.draggable).toBe(false);
+            });
+
+            // Update options to enable DnD again
+            dockview.updateOptions({ disableDnd: false });
+
+            // Tabs should be draggable again
+            tabElements.forEach(tab => {
+                expect(tab.draggable).toBe(true);
+            });
+            voidContainers.forEach(container => {
+                expect(container.draggable).toBe(true);
+            });
+        });
+
+        test('that new tabs respect current disableDnd option when added after option change', () => {
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                disableDnd: false,
+            });
+
+            // Set disableDnd to true
+            dockview.updateOptions({ disableDnd: true });
+
+            // Add a panel after the option change
+            const panel = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            // New tab should not be draggable
+            const tabElement = dockview.element.querySelector('.dv-tab') as HTMLElement;
+            const voidContainer = dockview.element.querySelector('.dv-void-container') as HTMLElement;
+
+            expect(tabElement.draggable).toBe(false);
+            expect(voidContainer.draggable).toBe(false);
+        });
+    });
+
     describe('memory leakage', () => {
         beforeEach(() => {
             window.open = () => setupMockWindow();
