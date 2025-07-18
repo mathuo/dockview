@@ -2368,50 +2368,48 @@ export class DockviewComponent
                         throw new Error('failed to find popout group');
                     }
                     
-                    // For cross-window moves, we need to prevent the automatic restoration 
-                    // to the reference group that happens in the disposal cleanup
-                    const isMovingToNewTarget = to.api.location.type === 'grid';
+                    // Remove from popout groups list to prevent automatic restoration
+                    const index = this._popoutGroups.indexOf(selectedPopoutGroup);
+                    if (index >= 0) {
+                        this._popoutGroups.splice(index, 1);
+                    }
                     
-                    if (isMovingToNewTarget) {
-                        // For cross-window moves to new positions, we need to clean up properly
-                        // Remove from popout groups list to prevent automatic restoration
-                        const index = this._popoutGroups.indexOf(selectedPopoutGroup);
-                        if (index >= 0) {
-                            this._popoutGroups.splice(index, 1);
+                    // Clean up the reference group (ghost) if it exists and is hidden
+                    if (selectedPopoutGroup.referenceGroup) {
+                        const referenceGroup = this.getPanel(selectedPopoutGroup.referenceGroup);
+                        if (referenceGroup && !referenceGroup.api.isVisible) {
+                            this.doRemoveGroup(referenceGroup, { skipActive: true });
                         }
-                        
-                        // Clean up the reference group (ghost) if it exists and is hidden
-                        if (selectedPopoutGroup.referenceGroup) {
-                            const referenceGroup = this.getPanel(selectedPopoutGroup.referenceGroup);
-                            if (referenceGroup && !referenceGroup.api.isVisible) {
-                                this.doRemoveGroup(referenceGroup, { skipActive: true });
-                            }
-                        }
-                        
-                        // Manually dispose the window without triggering restoration
-                        selectedPopoutGroup.window.dispose();
-                        
-                        // Update group's location and containers for main window
+                    }
+                    
+                    // Manually dispose the window without triggering restoration
+                    selectedPopoutGroup.window.dispose();
+                    
+                    // Update group's location and containers for target
+                    if (to.api.location.type === 'grid') {
                         from.model.renderContainer = this.overlayRenderContainer;
                         from.model.dropTargetContainer = this.rootDropTargetContainer;
                         from.model.location = { type: 'grid' };
-                    } else {
-                        // Normal disposal that will restore to reference group
-                        selectedPopoutGroup.disposable.dispose();
+                    } else if (to.api.location.type === 'floating') {
+                        from.model.renderContainer = this.overlayRenderContainer;
+                        from.model.dropTargetContainer = this.rootDropTargetContainer;
+                        from.model.location = { type: 'floating' };
                     }
+                    
+                    break;
                 }
             }
 
-            // For moves to grid locations (including cross-window moves from popout)
-            const referenceLocation = getGridLocation(to.element);
-            const dropLocation = getRelativeLocation(
-                this.gridview.orientation,
-                referenceLocation,
-                target
-            );
-            
-            // Add to grid for moves from non-popout sources, or for cross-window moves from popout
-            if (from.api.location.type !== 'popout' || to.api.location.type === 'grid') {
+            // For moves to grid locations
+            if (to.api.location.type === 'grid') {
+                const referenceLocation = getGridLocation(to.element);
+                const dropLocation = getRelativeLocation(
+                    this.gridview.orientation,
+                    referenceLocation,
+                    target
+                );
+                
+                // Add to grid for all moves targeting grid location
 
                 let size: number;
 
@@ -2431,6 +2429,42 @@ export class DockviewComponent
                 }
 
                 this.gridview.addView(from, size, dropLocation);
+            } else if (to.api.location.type === 'floating') {
+                // For moves to floating locations, add as floating group
+                // Get the position/size from the target floating group
+                const targetFloatingGroup = this._floatingGroups.find(
+                    (x) => x.group === to
+                );
+                if (targetFloatingGroup) {
+                    const box = targetFloatingGroup.overlay.toJSON();
+                    
+                    // Calculate position based on available properties
+                    let left: number, top: number;
+                    if ('left' in box) {
+                        left = box.left + 50;
+                    } else if ('right' in box) {
+                        left = Math.max(0, box.right - box.width - 50);
+                    } else {
+                        left = 50; // Default fallback
+                    }
+                    
+                    if ('top' in box) {
+                        top = box.top + 50;
+                    } else if ('bottom' in box) {
+                        top = Math.max(0, box.bottom - box.height - 50);
+                    } else {
+                        top = 50; // Default fallback
+                    }
+                    
+                    this.addFloatingGroup(from, {
+                        height: box.height,
+                        width: box.width,
+                        position: {
+                            left,
+                            top,
+                        },
+                    });
+                }
             }
         }
 
