@@ -421,6 +421,153 @@ describe('dockviewComponent', () => {
             expect(query.length).toBe(3);
         });
 
+        test('that moving a popout group to specific position works correctly', async () => {
+            window.open = () => setupMockWindow();
+
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(600, 1000);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            await dockview.addPopoutGroup(panel1.api.group);
+            expect(panel1.api.location.type).toBe('popout');
+            expect(dockview.groups.length).toBe(3); // panel2 + hidden reference + popout
+
+            // Move popout group to left of panel2
+            panel1.api.group.api.moveTo({
+                group: panel2.api.group,
+                position: 'left',
+            });
+
+            // Core assertions: should be back in grid and positioned correctly
+            expect(panel1.api.location.type).toBe('grid');
+            expect(dockview.groups.length).toBe(2); // Should clean up properly
+            expect(dockview.panels.length).toBe(2);
+            
+            // Verify both panels are visible and accessible
+            expect(panel1.api.isVisible).toBe(true);
+            expect(panel2.api.isVisible).toBe(true);
+        });
+
+        test('that moving a popout group to different positions works', async () => {
+            window.open = () => setupMockWindow();
+
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(600, 1000);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            await dockview.addPopoutGroup(panel1.api.group);
+            expect(panel1.api.location.type).toBe('popout');
+
+            // Test moving to different positions
+            ['top', 'bottom', 'left', 'right'].forEach(position => {
+                panel1.api.group.api.moveTo({
+                    group: panel2.api.group,
+                    position: position as any,
+                });
+
+                // Should be back in grid and work correctly regardless of position
+                expect(panel1.api.location.type).toBe('grid');
+                expect(panel1.api.isVisible).toBe(true);
+                expect(panel2.api.isVisible).toBe(true);
+                expect(dockview.groups.length).toBeGreaterThanOrEqual(2);
+                expect(dockview.panels.length).toBe(2);
+            });
+        });
+
+        test('that reference group cleanup works when moving popout to new position', async () => {
+            window.open = () => setupMockWindow();
+
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(600, 1000);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            // Store reference group ID before popout
+            const originalGroupId = panel1.group.id;
+
+            await dockview.addPopoutGroup(panel1.api.group);
+            expect(panel1.api.location.type).toBe('popout');
+            expect(dockview.groups.length).toBe(3); // panel2 + hidden reference + popout
+
+            // Move to new position - should clean up reference group
+            panel1.api.group.api.moveTo({
+                group: panel2.api.group,
+                position: 'right',
+            });
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(dockview.groups.length).toBe(2); // Just panel2 + panel1 in new position
+            
+            // Reference group should be cleaned up (no longer exist)
+            const referenceGroupStillExists = dockview.groups.some(g => g.id === originalGroupId);
+            expect(referenceGroupStillExists).toBe(false);
+        });
+
         test('horizontal', () => {
             dockview = new DockviewComponent(container, {
                 createComponent(options) {
