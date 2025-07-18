@@ -170,6 +170,7 @@ export class DockviewPanelApiImpl
                     : 'center',
                 index: options.index,
             },
+            skipSetActive: options.skipSetActive,
         });
     }
 
