@@ -7,12 +7,13 @@ import {
     IHeader,
     DockviewGroupPanelLocked,
 } from './dockviewGroupPanelModel';
-import { GridviewPanel, IGridviewPanel } from '../gridview/gridviewPanel';
+import { GridviewPanel, IGridviewPanel, Contraints } from '../gridview/gridviewPanel';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 import {
     DockviewGroupPanelApi,
     DockviewGroupPanelApiImpl,
 } from '../api/dockviewGroupPanelApi';
+// GridConstraintChangeEvent2 is not exported, so we'll type it manually
 
 const MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH = 100;
 const MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT = 100;
@@ -33,8 +34,16 @@ export class DockviewGroupPanel
     implements IDockviewGroupPanel
 {
     private readonly _model: DockviewGroupPanelModel;
+    
+    // Track explicitly set constraints to override panel constraints
+    private _explicitConstraints: Partial<Contraints> = {};
 
     override get minimumWidth(): number {
+        // Check for explicitly set group constraint first
+        if (typeof this._explicitConstraints.minimumWidth === 'number') {
+            return this._explicitConstraints.minimumWidth;
+        }
+        
         const activePanelMinimumWidth = this.activePanel?.minimumWidth;
         if (typeof activePanelMinimumWidth === 'number') {
             return activePanelMinimumWidth;
@@ -43,6 +52,11 @@ export class DockviewGroupPanel
     }
 
     override get minimumHeight(): number {
+        // Check for explicitly set group constraint first
+        if (typeof this._explicitConstraints.minimumHeight === 'number') {
+            return this._explicitConstraints.minimumHeight;
+        }
+        
         const activePanelMinimumHeight = this.activePanel?.minimumHeight;
         if (typeof activePanelMinimumHeight === 'number') {
             return activePanelMinimumHeight;
@@ -51,6 +65,11 @@ export class DockviewGroupPanel
     }
 
     override get maximumWidth(): number {
+        // Check for explicitly set group constraint first
+        if (typeof this._explicitConstraints.maximumWidth === 'number') {
+            return this._explicitConstraints.maximumWidth;
+        }
+        
         const activePanelMaximumWidth = this.activePanel?.maximumWidth;
         if (typeof activePanelMaximumWidth === 'number') {
             return activePanelMaximumWidth;
@@ -59,6 +78,11 @@ export class DockviewGroupPanel
     }
 
     override get maximumHeight(): number {
+        // Check for explicitly set group constraint first
+        if (typeof this._explicitConstraints.maximumHeight === 'number') {
+            return this._explicitConstraints.maximumHeight;
+        }
+        
         const activePanelMaximumHeight = this.activePanel?.maximumHeight;
         if (typeof activePanelMaximumHeight === 'number') {
             return activePanelMaximumHeight;
@@ -107,7 +131,7 @@ export class DockviewGroupPanel
                     options.constraints?.minimumHeight ??
                     MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT,
                 minimumWidth:
-                    options.constraints?.maximumHeight ??
+                    options.constraints?.minimumWidth ??
                     MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH,
                 maximumHeight: options.constraints?.maximumHeight,
                 maximumWidth: options.constraints?.maximumWidth,
@@ -128,6 +152,30 @@ export class DockviewGroupPanel
         this.addDisposables(
             this.model.onDidActivePanelChange((event) => {
                 this.api._onDidActivePanelChange.fire(event);
+            }),
+            this.api.onDidConstraintsChangeInternal((event: any) => {
+                // Track explicitly set constraints to override panel constraints
+                // Extract numeric values from functions or values
+                if (event.minimumWidth !== undefined) {
+                    this._explicitConstraints.minimumWidth = typeof event.minimumWidth === 'function' 
+                        ? event.minimumWidth() 
+                        : event.minimumWidth;
+                }
+                if (event.minimumHeight !== undefined) {
+                    this._explicitConstraints.minimumHeight = typeof event.minimumHeight === 'function' 
+                        ? event.minimumHeight() 
+                        : event.minimumHeight;
+                }
+                if (event.maximumWidth !== undefined) {
+                    this._explicitConstraints.maximumWidth = typeof event.maximumWidth === 'function' 
+                        ? event.maximumWidth() 
+                        : event.maximumWidth;
+                }
+                if (event.maximumHeight !== undefined) {
+                    this._explicitConstraints.maximumHeight = typeof event.maximumHeight === 'function' 
+                        ? event.maximumHeight() 
+                        : event.maximumHeight;
+                }
             })
         );
     }
