@@ -2,11 +2,48 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dockview.dev/blog</id>
     <title>Dockview Blog</title>
-    <updated>2025-06-19T00:00:00.000Z</updated>
+    <updated>2025-07-19T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dockview.dev/blog"/>
     <subtitle>Dockview Blog</subtitle>
     <icon>https://dockview.dev/img/dockview_logo.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Dockview 4.5.0]]></title>
+        <id>https://dockview.dev/blog/dockview-4.5.0-release</id>
+        <link href="https://dockview.dev/blog/dockview-4.5.0-release"/>
+        <updated>2025-07-19T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
+        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.5.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<ul>
+<li>Add <code>skipSetActive</code> parameter to moveTo functions <a href="https://github.com/mathuo/dockview/pull/962" target="_blank" rel="noopener noreferrer">#962</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.5.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Prevent ghost group creation when dragging popout groups back to grid <a href="https://github.com/mathuo/dockview/pull/966" target="_blank" rel="noopener noreferrer">#966</a></li>
+<li>Bug: Correct positioning when dragging groups from popout to main window <a href="https://github.com/mathuo/dockview/pull/964" target="_blank" rel="noopener noreferrer">#964</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.5.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content>
+        <category label="release" term="release"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Dockview 4.4.1]]></title>
+        <id>https://dockview.dev/blog/dockview-4.4.1-release</id>
+        <link href="https://dockview.dev/blog/dockview-4.4.1-release"/>
+        <updated>2025-07-17T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
+        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.4.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<ul>
+<li>Export <code>WillShowOverlayLocationEventOptions</code> interface <a href="https://github.com/mathuo/dockview/pull/959" target="_blank" rel="noopener noreferrer">#959</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.4.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Respect disableDnd option for tab draggable attribute <a href="https://github.com/mathuo/dockview/pull/961" target="_blank" rel="noopener noreferrer">#961</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.4.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content>
+        <category label="release" term="release"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Dockview 4.4.0]]></title>
         <id>https://dockview.dev/blog/dockview-4.4.0-release</id>
@@ -326,37 +363,6 @@
 <li>rename type <code>PaneviewDropEvent</code> to <code>PaneviewDidDropEvent</code> <a href="https://github.com/mathuo/dockview/issues/812" target="_blank" rel="noopener noreferrer">#812</a></li>
 <li>remove <code>showDndOverlay</code> from <code>PaneviewComponent</code> in favour of <code>api.onUnhandledDragOverEvent</code> <a href="https://github.com/mathuo/dockview/issues/812" target="_blank" rel="noopener noreferrer">#812</a></li>
 </ul>]]></content>
-        <category label="release" term="release"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Dockview 2.1.4]]></title>
-        <id>https://dockview.dev/blog/dockview-2.1.4-release</id>
-        <link href="https://dockview.dev/blog/dockview-2.1.4-release"/>
-        <updated>2024-12-23T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
-        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-2.1.4-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-2.1.4-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Maintenance: Cleanup resource dispose <a href="https://github.com/mathuo/dockview/issues/801" target="_blank" rel="noopener noreferrer">#801</a></li>
-<li>Bug: Fix for using popout groups with <code>always</code> rendering <a href="https://github.com/mathuo/dockview/issues/803" target="_blank" rel="noopener noreferrer">#803</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-2.1.4-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content>
-        <category label="release" term="release"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Dockview 2.1.3]]></title>
-        <id>https://dockview.dev/blog/dockview-2.1.3-release</id>
-        <link href="https://dockview.dev/blog/dockview-2.1.3-release"/>
-        <updated>2024-12-22T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Please reference docs @ dockview.dev.]]></summary>
-        <content type="html"><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-2.1.3-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-2.1.3-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Bug: Fix rendering issue when popout group is moved into new grid group <a href="https://github.com/mathuo/dockview/issues/799" target="_blank" rel="noopener noreferrer">#799</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-2.1.3-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content>
         <category label="release" term="release"/>
     </entry>
 </feed>
