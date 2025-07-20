@@ -6,6 +6,7 @@ import {
     ITabRenderer,
     PanelUpdateEvent,
     Parameters,
+    themeAbyss,
 } from 'dockview-core';
 
 class Panel implements IContentRenderer {
@@ -36,7 +37,7 @@ class Panel implements IContentRenderer {
 }
 
 const api = createDockview(document.getElementById('app'), {
-    className: 'dockview-theme-abyss',
+    theme: themeAbyss,
     createComponent: (options) => {
         switch (options.name) {
             case 'default':

@@ -6,6 +6,7 @@ import {
     IContentRenderer,
     IGroupHeaderProps,
     IHeaderActionsRenderer,
+    themeAbyss,
 } from 'dockview-core';
 import './index.css';
 
@@ -133,7 +134,7 @@ class LeftHeaderActions implements IHeaderActionsRenderer {
 }
 
 const api = createDockview(document.getElementById('app'), {
-    className: 'dockview-theme-abyss',
+    theme: themeAbyss,
     createComponent: (options): IContentRenderer => {
         switch (options.name) {
             case 'default':

@@ -87,6 +87,7 @@ function createIndexHTML(options) {
         )
         .replace('{{app}}', options.app)
         .replace('{{githubLink}}', options.githubUrl)
+        .replace('{{codeSandboxLink}}', options.codeSandboxUrl)
 }
 
 const input_dir = path.join(__dirname, '../templates');
@@ -98,6 +99,7 @@ const FRAMEWORKS = ['react', 'vue', 'typescript'];
 const list = [];
 
 const githubUrl = "https://github.com/mathuo/dockview/tree/master/packages/docs/templates"
+const codeSandboxUrl = "https://codesandbox.io/p/sandbox/github/mathuo/dockview/tree/gh-pages/templates"
 
 for (const component of COMPONENTS) {
     const componentDir = path.join(input_dir, component);
@@ -119,6 +121,7 @@ for (const component of COMPONENTS) {
             );
 
             const templateGithubUrl = `${githubUrl}/${component}/${folder}/${framework}/src`
+            const templateCodeSandboxUrl = `${codeSandboxUrl}/${component}/${folder}/${framework}`
 
             const template = createIndexHTML({
                 title: `Dockview | ${folder} ${framework}`,
@@ -132,7 +135,8 @@ for (const component of COMPONENTS) {
                         USE_LOCAL_CDN ? 'local' : 'remote'
                     ],
                 },
-                githubUrl: templateGithubUrl
+                githubUrl: templateGithubUrl,
+                codeSandboxUrl: templateCodeSandboxUrl
             });
             fs.writeFileSync(
                 path.join(output, component, folder, framework, 'index.html'),
