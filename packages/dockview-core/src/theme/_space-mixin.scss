@@ -5,6 +5,7 @@
     --dv-tabs-and-actions-container-height: 44px;
 
     --dv-border-radius: 20px;
+    box-sizing: border-box;
 
     .dv-resize-container:has(> .dv-groupview) {
         border-radius: 8px;
