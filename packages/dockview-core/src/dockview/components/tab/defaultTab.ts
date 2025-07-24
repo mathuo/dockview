@@ -1,5 +1,5 @@
 import { CompositeDisposable } from '../../../lifecycle';
-import { ITabRenderer, GroupPanelPartInitParameters } from '../../types';
+import { ITabRenderer, TabPartInitParameters } from '../../types';
 import { addDisposableListener } from '../../../events';
 import { createCloseButton } from '../../../svg';
 
@@ -32,8 +32,12 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         this.render();
     }
 
-    init(params: GroupPanelPartInitParameters): void {
-        this._title = params.title;
+    init(params: TabPartInitParameters): void {
+        if (params.tabLocation === 'headerOverflow') {
+            this._title = params.api.title;
+        } else {
+            this._title = params.title;
+        }
 
         this.addDisposables(
             params.api.onDidTitleChange((event) => {
@@ -47,7 +51,6 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
                 if (ev.defaultPrevented) {
                     return;
                 }
-
                 ev.preventDefault();
                 params.api.close();
             })
