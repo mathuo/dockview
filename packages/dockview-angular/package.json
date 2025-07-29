@@ -41,12 +41,11 @@
     "README.md"
   ],
   "scripts": {
-    "build": "npm run build:package && npm run build:bundles",
-    "build:bundles": "rollup -c",
+    "prepare": "rollup -c",
     "build:cjs": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
     "build:css": "gulp sass",
     "build:esm": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
-    "build:package": "npm run build:cjs && npm run build:esm && npm run build:css",
+    "build": "npm run build:cjs && npm run build:esm && npm run build:css",
     "clean": "rimraf dist/ .build/ .rollup.cache/",
     "prepublishOnly": "npm run rebuild && npm run test",
     "rebuild": "npm run clean && npm run build",
