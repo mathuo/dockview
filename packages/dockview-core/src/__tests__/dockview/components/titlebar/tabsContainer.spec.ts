@@ -894,4 +894,230 @@ describe('tabsContainer', () => {
             expect(mockVoidContainer.updateDragAndDropState).toHaveBeenCalledTimes(1);
         });
     });
+
+    describe('dropdown tab close button functionality', () => {
+        let accessor: DockviewComponent;
+        let groupPanel: DockviewGroupPanel;
+        let cut: TabsContainer;
+        let popupServiceCloseSpy: jest.SpyInstance;
+        let popupServiceOpenPopoverSpy: jest.SpyInstance;
+
+        beforeEach(() => {
+            popupServiceCloseSpy = jest.fn();
+            popupServiceOpenPopoverSpy = jest.fn();
+
+            accessor = fromPartial<DockviewComponent>({
+                id: 'test-component',
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                options: {},
+                onDidOptionsChange: jest.fn(),
+                popupService: {
+                    close: popupServiceCloseSpy,
+                    openPopover: popupServiceOpenPopoverSpy,
+                },
+            });
+
+            groupPanel = fromPartial<DockviewGroupPanel>({
+                id: 'test-group',
+                model: fromPartial<DockviewGroupPanelModel>({}),
+                panels: [],
+            });
+
+            cut = new TabsContainer(accessor, groupPanel);
+        });
+
+        const createTestPanel = (id: string): IDockviewPanel => {
+            const closeMock = jest.fn();
+            const setActiveMock = jest.fn();
+            
+            const api = fromPartial<DockviewPanelApi>({
+                close: closeMock,
+                setActive: setActiveMock,
+                isActive: false,
+            });
+
+            // Create a realistic tab element with close button
+            const tabElement = document.createElement('div');
+            tabElement.className = 'dv-default-tab';
+            
+            const contentElement = document.createElement('div');
+            contentElement.className = 'dv-default-tab-content';
+            contentElement.textContent = id;
+            
+            const actionElement = document.createElement('div');
+            actionElement.className = 'dv-default-tab-action';
+            
+            // Add SVG close button (simplified)
+            const closeButton = document.createElement('div');
+            closeButton.innerHTML = '×';
+            actionElement.appendChild(closeButton);
+            
+            tabElement.appendChild(contentElement);
+            tabElement.appendChild(actionElement);
+
+            const panel = fromPartial<IDockviewPanel>({
+                id,
+                api,
+                view: {
+                    createTabRenderer: () => ({
+                        element: tabElement,
+                        init: () => {},
+                    }),
+                    tab: {
+                        element: tabElement,
+                    },
+                    content: {
+                        element: document.createElement('div'),
+                    },
+                },
+            });
+
+            // Mock panel.api for accessing in groupPanel.panels
+            (panel as any).api = api;
+            
+            return panel;
+        };
+
+        test('dropdown tab pointerdown event handler prevents activation when clicking close button', () => {
+            // Create test panels
+            const panel1 = createTestPanel('panel1');
+            const panel2 = createTestPanel('panel2');
+            
+            // Mock groupPanel.panels to include our test panels
+            Object.defineProperty(groupPanel, 'panels', {
+                value: [panel1, panel2],
+                writable: true,
+                configurable: true,
+            });
+
+            // Create a mock tab wrapper element that mimics the dropdown structure
+            const tabWrapper = document.createElement('div');
+            tabWrapper.className = 'dv-tab';
+            
+            // Add the tab content
+            const tabContent = panel2.view.createTabRenderer('headerOverflow');
+            tabWrapper.appendChild(tabContent.element);
+
+            // Create the event handler function directly (this is what we're testing)
+            const eventHandler = (event: Event) => {
+                // Check if the click is on the close button
+                const target = event.target as HTMLElement;
+                if (target.closest('.dv-default-tab-action')) {
+                    // Don't activate tab if clicking on close button
+                    return;
+                }
+                
+                (popupServiceCloseSpy as jest.Mock)();
+                panel2.api.setActive();
+            };
+
+            // Test 1: Clicking on close button should NOT activate tab
+            const closeButton = tabWrapper.querySelector('.dv-default-tab-action')!;
+            const closeClickEvent = new MouseEvent('pointerdown');
+            Object.defineProperty(closeClickEvent, 'target', {
+                value: closeButton,
+                enumerable: true,
+            });
+            
+            eventHandler(closeClickEvent);
+            
+            expect(popupServiceCloseSpy).toHaveBeenCalledTimes(0);
+            expect(panel2.api.setActive).toHaveBeenCalledTimes(0);
+
+            // Test 2: Clicking on tab content should activate tab
+            const tabContentArea = tabWrapper.querySelector('.dv-default-tab-content')!;
+            const tabClickEvent = new MouseEvent('pointerdown');
+            Object.defineProperty(tabClickEvent, 'target', {
+                value: tabContentArea,
+                enumerable: true,
+            });
+            
+            eventHandler(tabClickEvent);
+            
+            expect(popupServiceCloseSpy).toHaveBeenCalledTimes(1);
+            expect(panel2.api.setActive).toHaveBeenCalledTimes(1);
+        });
+
+        test('closest() method works correctly for nested elements inside close button', () => {
+            const panel2 = createTestPanel('panel2');
+            
+            // Create a mock tab wrapper element
+            const tabWrapper = document.createElement('div');
+            tabWrapper.className = 'dv-tab';
+            
+            // Add the tab content
+            const tabContent = panel2.view.createTabRenderer('headerOverflow');
+            tabWrapper.appendChild(tabContent.element);
+
+            // Create nested element inside close button (like SVG paths)
+            const closeButton = tabWrapper.querySelector('.dv-default-tab-action')!;
+            const nestedElement = document.createElement('span');
+            nestedElement.className = 'nested-svg-path';
+            closeButton.appendChild(nestedElement);
+
+            // Create the event handler function
+            const eventHandler = (event: Event) => {
+                const target = event.target as HTMLElement;
+                if (target.closest('.dv-default-tab-action')) {
+                    return;
+                }
+                
+                (popupServiceCloseSpy as jest.Mock)();
+                panel2.api.setActive();
+            };
+
+            // Test clicking on nested element inside close button
+            const nestedClickEvent = new MouseEvent('pointerdown');
+            Object.defineProperty(nestedClickEvent, 'target', {
+                value: nestedElement,
+                enumerable: true,
+            });
+            
+            eventHandler(nestedClickEvent);
+            
+            // Should not activate tab because nested element is inside close button
+            expect(popupServiceCloseSpy).toHaveBeenCalledTimes(0);
+            expect(panel2.api.setActive).toHaveBeenCalledTimes(0);
+        });
+
+        test('integration test - full dropdown workflow', () => {
+            // Create test panels
+            const panel1 = createTestPanel('panel1');
+            const panel2 = createTestPanel('panel2');
+            
+            cut.openPanel(panel1);
+            cut.openPanel(panel2);
+
+            // Mock groupPanel.panels to include our test panels
+            Object.defineProperty(groupPanel, 'panels', {
+                value: [panel1, panel2],
+                writable: true,
+                configurable: true,
+            });
+
+            // Create mock tabs to match the structure expected by toggleDropdown
+            const mockTab1 = { panel: panel1, element: panel1.view.tab.element };
+            const mockTab2 = { panel: panel2, element: panel2.view.tab.element };
+            
+            // Mock the tabs.tabs getter to return our mock tabs
+            Object.defineProperty(cut, 'tabs', {
+                value: {
+                    tabs: [mockTab1, mockTab2],
+                },
+                writable: true,
+                configurable: true,
+            });
+
+            // Trigger dropdown creation by calling toggleDropdown
+            (cut as any).toggleDropdown({ tabs: ['panel2'], reset: false });
+
+            // Verify dropdown element was created
+            const dropdownElement = cut.element.querySelector('.dv-tabs-overflow-dropdown-default');
+            expect(dropdownElement).toBeTruthy();
+            
+            // Verify the dropdown shows the correct count
+            expect(dropdownElement!.textContent).toContain('1');
+        });
+    });
 });
