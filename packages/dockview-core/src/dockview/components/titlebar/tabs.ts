@@ -13,7 +13,7 @@ import {
 import { Scrollbar } from '../../../scrollbar';
 import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
-import { WillShowOverlayLocationEvent } from '../../dockviewGroupPanelModel';
+import { WillShowOverlayLocationEvent } from '../../events';
 import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
 import { Tab } from '../tab/tab';
 import { TabDragEvent, TabDropIndexEvent } from './tabsContainer';

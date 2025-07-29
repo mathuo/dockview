@@ -51,8 +51,8 @@ import { Box } from '../types';
 import {
     DockviewDidDropEvent,
     DockviewWillDropEvent,
-    WillShowOverlayLocationEvent,
 } from '../dockview/dockviewGroupPanelModel';
+import { WillShowOverlayLocationEvent } from '../dockview/events';
 import {
     PaneviewComponentOptions,
     PaneviewDndOverlayEvent,
