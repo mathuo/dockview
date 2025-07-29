@@ -8950,6 +8950,24 @@
                         "kind": "callSignature"
                     }
                 ]
+            },
+            {
+                "name": "updateDragAndDropState",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "updateDragAndDropState",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             }
         ],
         "extends": [
@@ -22336,178 +22354,14 @@
                         "kind": "callSignature"
                     }
                 ]
-            }
-        ],
-        "extends": [
-            "CompositeDisposable"
-        ]
-    },
-    "WillShowOverlayLocationEvent": {
-        "kind": "class",
-        "name": "WillShowOverlayLocationEvent",
-        "children": [
-            {
-                "name": "constructor",
-                "kind": "constructor",
-                "code": ""
             },
             {
-                "name": "api",
-                "code": "DockviewApi",
-                "kind": "accessor",
-                "value": {
-                    "name": "api",
-                    "code": "DockviewApi",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "reference",
-                        "value": "DockviewApi",
-                        "source": "dockview-core"
-                    }
-                }
-            },
-            {
-                "name": "defaultPrevented",
-                "code": "boolean",
-                "kind": "accessor",
-                "value": {
-                    "name": "defaultPrevented",
-                    "code": "boolean",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "intrinsic",
-                        "value": "boolean"
-                    }
-                }
-            },
-            {
-                "name": "group",
-                "code": "DockviewGroupPanel | undefined",
-                "kind": "accessor",
-                "value": {
-                    "name": "group",
-                    "code": "DockviewGroupPanel | undefined",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "or",
-                        "values": [
-                            {
-                                "type": "reference",
-                                "value": "DockviewGroupPanel",
-                                "source": "dockview-core"
-                            },
-                            {
-                                "type": "intrinsic",
-                                "value": "undefined"
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                "name": "kind",
-                "code": "DockviewGroupDropLocation",
-                "kind": "accessor",
-                "value": {
-                    "name": "kind",
-                    "code": "DockviewGroupDropLocation",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "reference",
-                        "value": "DockviewGroupDropLocation",
-                        "source": "dockview-core"
-                    }
-                }
-            },
-            {
-                "name": "nativeEvent",
-                "code": "DragEvent",
-                "kind": "accessor",
-                "value": {
-                    "name": "nativeEvent",
-                    "code": "DragEvent",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "reference",
-                        "value": "DragEvent",
-                        "source": "typescript"
-                    }
-                }
-            },
-            {
-                "name": "panel",
-                "code": "IDockviewPanel | undefined",
-                "kind": "accessor",
-                "value": {
-                    "name": "panel",
-                    "code": "IDockviewPanel | undefined",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "or",
-                        "values": [
-                            {
-                                "type": "reference",
-                                "value": "IDockviewPanel",
-                                "source": "dockview-core"
-                            },
-                            {
-                                "type": "intrinsic",
-                                "value": "undefined"
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                "name": "position",
-                "code": "Position",
-                "kind": "accessor",
-                "value": {
-                    "name": "position",
-                    "code": "Position",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "reference",
-                        "value": "Position",
-                        "source": "dockview-core"
-                    }
-                }
-            },
-            {
-                "name": "getData",
-                "code": "(): PanelTransfer | undefined",
-                "kind": "method",
-                "signature": [
-                    {
-                        "name": "getData",
-                        "typeParameters": [],
-                        "parameters": [],
-                        "returnType": {
-                            "type": "or",
-                            "values": [
-                                {
-                                    "type": "reference",
-                                    "value": "PanelTransfer",
-                                    "source": "dockview-core"
-                                },
-                                {
-                                    "type": "intrinsic",
-                                    "value": "undefined"
-                                }
-                            ]
-                        },
-                        "code": "(): PanelTransfer | undefined",
-                        "kind": "callSignature"
-                    }
-                ]
-            },
-            {
-                "name": "preventDefault",
+                "name": "updateDragAndDropState",
                 "code": "(): void",
                 "kind": "method",
                 "signature": [
                     {
-                        "name": "preventDefault",
+                        "name": "updateDragAndDropState",
                         "typeParameters": [],
                         "parameters": [],
                         "returnType": {
@@ -22520,7 +22374,9 @@
                 ]
             }
         ],
-        "extends": []
+        "extends": [
+            "CompositeDisposable"
+        ]
     },
     "ActiveEvent": {
         "kind": "interface",
@@ -23974,6 +23830,26 @@
                 },
                 "flags": {
                     "isOptional": true
+                }
+            },
+            {
+                "name": "skipSetActive",
+                "code": "boolean",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "boolean"
+                },
+                "flags": {
+                    "isOptional": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether to skip setting the group as active after moving"
+                        }
+                    ]
                 }
             }
         ],
@@ -42594,33 +42470,6 @@
         },
         "kind": "typeAlias"
     },
-    "DockviewGroupDropLocation": {
-        "name": "DockviewGroupDropLocation",
-        "code": "'edge' | 'content' | 'header_space' | 'tab'",
-        "typeParameters": [],
-        "type": {
-            "type": "or",
-            "values": [
-                {
-                    "type": "literal",
-                    "value": "edge"
-                },
-                {
-                    "type": "literal",
-                    "value": "content"
-                },
-                {
-                    "type": "literal",
-                    "value": "header_space"
-                },
-                {
-                    "type": "literal",
-                    "value": "tab"
-                }
-            ]
-        },
-        "kind": "typeAlias"
-    },
     "DockviewGroupLocation": {
         "name": "DockviewGroupLocation",
         "code": "{ getWindow: (): Window, popoutUrl?: string, type: 'popout' } | { type: 'floating' } | { type: 'grid' }",
@@ -44834,7 +44683,7 @@
     },
     "IDockviewDefaultTabProps": {
         "name": "IDockviewDefaultTabProps",
-        "code": "{ closeActionOverride?: (): void, hideClose?: boolean } & React.DOMAttributes<HTMLDivElement> & IDockviewPanelHeaderProps",
+        "code": "{ closeActionOverride?: (): void, hideClose?: boolean } & React.HtmlHTMLAttributes<HTMLDivElement> & IDockviewPanelHeaderProps",
         "typeParameters": [],
         "type": {
             "type": "intersection",
@@ -44892,7 +44741,7 @@
                 },
                 {
                     "type": "reference",
-                    "value": "React.DOMAttributes",
+                    "value": "React.HtmlHTMLAttributes",
                     "source": "@types/react",
                     "typeArguments": [
                         {
