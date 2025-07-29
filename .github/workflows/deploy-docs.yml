@@ -34,7 +34,7 @@ jobs:
               working-directory: packages/docs
             - run: npm run docs
               working-directory: .
-            - run: npm run package-docs
+            - run: node scripts/package-docs.js
               working-directory: .
             - name: Deploy 🚀
               uses: JamesIves/github-pages-deploy-action@3.7.1

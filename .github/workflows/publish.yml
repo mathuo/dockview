@@ -63,7 +63,7 @@ jobs:
                       ${{ runner.os }}-node-
 
             - run: yarn
-            - run: npm run set-experimental-versions
+            - run: node scripts/set-experimental-versions
             - name: Publish dockview-core
               run: npm publish --provenance --tag experimental
               working-directory: packages/dockview-core
