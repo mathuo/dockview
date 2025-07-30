@@ -11,7 +11,7 @@ import { VoidContainer } from './voidContainer';
 import { findRelativeZIndexParent, toggleClass } from '../../../dom';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
-import { WillShowOverlayLocationEvent } from '../../dockviewGroupPanelModel';
+import { WillShowOverlayLocationEvent } from '../../events';
 import { getPanelData } from '../../../dnd/dataTransfer';
 import { Tabs } from './tabs';
 import {

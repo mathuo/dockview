@@ -17,13 +17,11 @@
   ],
   "scripts": {
     "build": "lerna run build --scope '{dockview-core,dockview,dockview-vue,dockview-react}'",
+    "build:bundle": "lerna run build:bundle --scope '{dockview-core,dockview,dockview-vue,dockview-react}'",
     "clean": "lerna run clean",
-    "docs": "typedoc",
-    "generate-docs": "node scripts/docs.mjs",
-    "lint": "eslint packages/**/src/** --ext .ts,.tsx,.js,.jsx",
-    "package": "node scripts/package.js",
-    "package-docs": "node scripts/package-docs.js",
-    "set-experimental-versions": "node scripts/set-experimental-versions",
+    "docs": "node scripts/docs.mjs",
+    "lint": "eslint 'packages/*/src/**/*.{ts,tsx,js,jsx}'",
+    "lint:fix": "eslint 'packages/*/src/**/*.{ts,tsx,js,jsx}' --fix",
     "test": "jest",
     "test:cov": "jest --coverage",
     "version": "lerna version"

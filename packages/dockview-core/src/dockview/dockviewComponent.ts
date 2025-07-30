@@ -45,8 +45,8 @@ import {
     GroupPanelViewState,
     DockviewDidDropEvent,
     DockviewWillDropEvent,
-    WillShowOverlayLocationEvent,
 } from './dockviewGroupPanelModel';
+import { WillShowOverlayLocationEvent } from './events';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
