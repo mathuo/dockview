@@ -19,7 +19,7 @@
     "build": "lerna run build --scope '{dockview-core,dockview,dockview-vue,dockview-react}'",
     "build:bundle": "lerna run build:bundle --scope '{dockview-core,dockview,dockview-vue,dockview-react}'",
     "clean": "lerna run clean",
-    "docs": "node scripts/docs.mjs",
+    "docs": "typedoc && node scripts/docs.mjs",
     "lint": "eslint 'packages/*/src/**/*.{ts,tsx,js,jsx}'",
     "lint:fix": "eslint 'packages/*/src/**/*.{ts,tsx,js,jsx}' --fix",
     "test": "jest",
