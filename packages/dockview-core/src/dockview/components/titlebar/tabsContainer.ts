@@ -379,16 +379,7 @@ export class TabsContainer
                         !panelObject.api.isActive
                     );
 
-                    wrapper.addEventListener('pointerdown', (event) => {
-                        // Check if the click is on a close button or its children
-                        const target = event.target as HTMLElement;
-                        const isCloseButton = target.closest('.dv-default-tab-action') !== null;
-                        
-                        if (isCloseButton) {
-                            // Let the close button handle its own event
-                            return;
-                        }
-                        
+                    wrapper.addEventListener('pointerdown', () => {
                         this.accessor.popupService.close();
                         tab.element.scrollIntoView();
                         tab.panel.api.setActive();
