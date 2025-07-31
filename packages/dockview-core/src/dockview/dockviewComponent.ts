@@ -351,6 +351,7 @@ export class DockviewComponent
         disposable: { dispose: () => DockviewGroupPanel | undefined };
     }[] = [];
     private readonly _rootDropTarget: Droptarget;
+    private _popoutRestorationPromise: Promise<void> = Promise.resolve();
 
     private readonly _onDidRemoveGroup = new Emitter<DockviewGroupPanel>();
     readonly onDidRemoveGroup: Event<DockviewGroupPanel> =
@@ -405,6 +406,14 @@ export class DockviewComponent
 
     get floatingGroups(): DockviewFloatingGroupPanel[] {
         return this._floatingGroups;
+    }
+
+    /**
+     * Promise that resolves when all popout groups from the last fromJSON call are restored.
+     * Useful for tests that need to wait for delayed popout creation.
+     */
+    get popoutRestorationPromise(): Promise<void> {
+        return this._popoutRestorationPromise;
     }
 
     constructor(container: HTMLElement, options: DockviewComponentOptions) {
@@ -1522,21 +1531,36 @@ export class DockviewComponent
 
             const serializedPopoutGroups = data.popoutGroups ?? [];
 
-            for (const serializedPopoutGroup of serializedPopoutGroups) {
+            // Create a promise that resolves when all popout groups are created
+            const popoutPromises: Promise<void>[] = [];
+            
+            // Queue popup group creation with delays to avoid browser blocking
+            serializedPopoutGroups.forEach((serializedPopoutGroup, index) => {
                 const { data, position, gridReferenceGroup, url } =
                     serializedPopoutGroup;
 
                 const group = createGroupFromSerializedState(data);
 
-                this.addPopoutGroup(group, {
-                    position: position ?? undefined,
-                    overridePopoutGroup: gridReferenceGroup ? group : undefined,
-                    referenceGroup: gridReferenceGroup
-                        ? this.getPanel(gridReferenceGroup)
-                        : undefined,
-                    popoutUrl: url,
+                // Add a small delay for each popup after the first to avoid browser popup blocking
+                const popoutPromise = new Promise<void>((resolve) => {
+                    setTimeout(() => {
+                        this.addPopoutGroup(group, {
+                            position: position ?? undefined,
+                            overridePopoutGroup: gridReferenceGroup ? group : undefined,
+                            referenceGroup: gridReferenceGroup
+                                ? this.getPanel(gridReferenceGroup)
+                                : undefined,
+                            popoutUrl: url,
+                        });
+                        resolve();
+                    }, index * 100); // 100ms delay between each popup
                 });
-            }
+                
+                popoutPromises.push(popoutPromise);
+            });
+            
+            // Store the promise for tests to wait on
+            this._popoutRestorationPromise = Promise.all(popoutPromises).then(() => void 0);
 
             for (const floatingGroup of this._floatingGroups) {
                 floatingGroup.overlay.setBounds();
