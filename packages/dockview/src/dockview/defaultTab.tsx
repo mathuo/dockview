@@ -97,7 +97,7 @@ export const DockviewDefaultTab: React.FunctionComponent<
             className="dv-default-tab"
         >
             <span className="dv-default-tab-content">{title}</span>
-            {!hideClose && tabLocation !== 'headerOverflow' && (
+            {!hideClose && (
                 <div
                     className="dv-default-tab-action"
                     onPointerDown={onBtnPointerDown}

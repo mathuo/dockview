@@ -379,8 +379,13 @@ export class TabsContainer
                         !panelObject.api.isActive
                     );
 
-                    wrapper.addEventListener('pointerdown', () => {
+                    wrapper.addEventListener('click', (event) => {
                         this.accessor.popupService.close();
+
+                        if (event.defaultPrevented) {
+                            return;
+                        }
+
                         tab.element.scrollIntoView();
                         tab.panel.api.setActive();
                     });
