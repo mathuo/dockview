@@ -894,4 +894,137 @@ describe('tabsContainer', () => {
             expect(mockVoidContainer.updateDragAndDropState).toHaveBeenCalledTimes(1);
         });
     });
+
+    describe('tab overflow dropdown', () => {
+        test('close button clicks in dropdown should not trigger tab activation', () => {
+            const mockPopupService = {
+                openPopover: jest.fn(),
+                close: jest.fn(),
+            };
+
+            const accessor = fromPartial<DockviewComponent>({
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                options: {},
+                onDidOptionsChange: jest.fn(),
+                popupService: mockPopupService,
+            });
+
+            const mockClose = jest.fn();
+            const mockSetActive = jest.fn();
+            const mockScrollIntoView = jest.fn();
+
+            const mockPanel = fromPartial<IDockviewPanel>({
+                id: 'test-panel',
+                api: {
+                    isActive: false,
+                    close: mockClose,
+                    setActive: mockSetActive,
+                },
+                view: {
+                    createTabRenderer: jest.fn().mockReturnValue({
+                        element: (() => {
+                            const tabElement = document.createElement('div');
+                            tabElement.className = 'dv-default-tab';
+                            
+                            const content = document.createElement('div');
+                            content.className = 'dv-default-tab-content';
+                            content.textContent = 'Test Tab';
+                            
+                            const action = document.createElement('div');
+                            action.className = 'dv-default-tab-action';
+                            const closeButton = document.createElement('div');
+                            action.appendChild(closeButton);
+                            
+                            tabElement.appendChild(content);
+                            tabElement.appendChild(action);
+                            
+                            return tabElement;
+                        })(),
+                    }),
+                },
+            });
+
+            const mockTab = {
+                panel: mockPanel,
+                element: {
+                    scrollIntoView: mockScrollIntoView,
+                },
+            };
+
+            const mockTabs = {
+                tabs: [mockTab],
+                onDrop: jest.fn(),
+                onTabDragStart: jest.fn(),
+                onWillShowOverlay: jest.fn(),
+                onOverflowTabsChange: jest.fn(),
+                size: 1,
+                panels: ['test-panel'],
+                isActive: jest.fn(),
+                indexOf: jest.fn(),
+                delete: jest.fn(),
+                setActivePanel: jest.fn(),
+                openPanel: jest.fn(),
+                showTabsOverflowControl: true,
+                updateDragAndDropState: jest.fn(),
+                element: document.createElement('div'),
+                dispose: jest.fn(),
+            };
+
+            const groupPanel = fromPartial<DockviewGroupPanel>({
+                id: 'testgroupid',
+                panels: [mockPanel],
+                model: fromPartial<DockviewGroupPanelModel>({}),
+            });
+
+            const cut = new TabsContainer(accessor, groupPanel);
+            (cut as any).tabs = mockTabs;
+
+            // Simulate overflow tabs
+            (cut as any).toggleDropdown({ tabs: ['test-panel'], reset: false });
+
+            // Find the dropdown trigger and click it
+            const dropdownTrigger = cut.element.querySelector('.dv-tabs-overflow-dropdown-root');
+            expect(dropdownTrigger).toBeTruthy();
+
+            // Simulate clicking the dropdown trigger
+            fireEvent.click(dropdownTrigger!);
+
+            // Verify popup was opened
+            expect(mockPopupService.openPopover).toHaveBeenCalled();
+
+            // Get the popover content
+            const popoverContent = mockPopupService.openPopover.mock.calls[0][0];
+            expect(popoverContent).toBeTruthy();
+
+            // Find the tab wrapper in the popover
+            const tabWrapper = popoverContent.querySelector('.dv-tab');
+            expect(tabWrapper).toBeTruthy();
+
+            // Find the close button in the popover
+            const closeButton = tabWrapper!.querySelector('.dv-default-tab-action');
+            expect(closeButton).toBeTruthy();
+
+            // Simulate clicking the close button
+            fireEvent.pointerDown(closeButton!, {
+                bubbles: true,
+            });
+
+            // Verify that tab activation methods were NOT called when clicking close button
+            expect(mockPopupService.close).not.toHaveBeenCalled();
+            expect(mockScrollIntoView).not.toHaveBeenCalled();
+            expect(mockSetActive).not.toHaveBeenCalled();
+
+            // Simulate clicking elsewhere in the tab (not the close button)
+            const tabContent = tabWrapper!.querySelector('.dv-default-tab-content');
+            fireEvent.pointerDown(tabContent!, {
+                bubbles: true,
+            });
+
+            // Verify that tab activation methods WERE called when clicking elsewhere
+            expect(mockPopupService.close).toHaveBeenCalled();
+            expect(mockScrollIntoView).toHaveBeenCalled();
+            expect(mockSetActive).toHaveBeenCalled();
+        });
+    });
 });
