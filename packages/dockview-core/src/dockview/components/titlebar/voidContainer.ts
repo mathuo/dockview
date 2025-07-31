@@ -10,6 +10,7 @@ import { addDisposableListener, Emitter, Event } from '../../../events';
 import { CompositeDisposable } from '../../../lifecycle';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
+import { toggleClass } from '../../../dom';
 
 export class VoidContainer extends CompositeDisposable {
     private readonly _element: HTMLElement;
@@ -37,6 +38,8 @@ export class VoidContainer extends CompositeDisposable {
 
         this._element.className = 'dv-void-container';
         this._element.draggable = !this.accessor.options.disableDnd;
+        
+        toggleClass(this._element, 'dv-draggable', !this.accessor.options.disableDnd);
 
         this.addDisposables(
             this._onDrop,
@@ -82,5 +85,6 @@ export class VoidContainer extends CompositeDisposable {
 
     updateDragAndDropState(): void {
         this._element.draggable = !this.accessor.options.disableDnd;
+        toggleClass(this._element, 'dv-draggable', !this.accessor.options.disableDnd);
     }
 }

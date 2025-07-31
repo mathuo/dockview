@@ -70,5 +70,46 @@ describe('voidContainer', () => {
             cut.updateDragAndDropState();
             expect(cut.element.draggable).toBe(true);
         });
+
+        test('that void container has dv-draggable class when draggable', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                options: { disableDnd: false }
+            });
+            const group = fromPartial<DockviewGroupPanel>({});
+            const cut = new VoidContainer(accessor, group);
+
+            expect(cut.element.classList.contains('dv-draggable')).toBe(true);
+        });
+
+        test('that void container does not have dv-draggable class when not draggable', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                options: { disableDnd: true }
+            });
+            const group = fromPartial<DockviewGroupPanel>({});
+            const cut = new VoidContainer(accessor, group);
+
+            expect(cut.element.classList.contains('dv-draggable')).toBe(false);
+        });
+
+        test('that updateDragAndDropState updates dv-draggable class based on disableDnd option', () => {
+            const options = { disableDnd: false };
+            const accessor = fromPartial<DockviewComponent>({
+                options
+            });
+            const group = fromPartial<DockviewGroupPanel>({});
+            const cut = new VoidContainer(accessor, group);
+
+            expect(cut.element.classList.contains('dv-draggable')).toBe(true);
+
+            // Simulate option change
+            options.disableDnd = true;
+            cut.updateDragAndDropState();
+            expect(cut.element.classList.contains('dv-draggable')).toBe(false);
+
+            // Change back
+            options.disableDnd = false;
+            cut.updateDragAndDropState();
+            expect(cut.element.classList.contains('dv-draggable')).toBe(true);
+        });
     });
 });
