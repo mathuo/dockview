@@ -60,4 +60,81 @@ describe('defaultTab', () => {
         fireEvent.click(el!);
         expect(api.close).toHaveBeenCalledTimes(1);
     });
+
+    test('that close button prevents default behavior', () => {
+        const cut = new DefaultTab();
+
+        const api = fromPartial<DockviewPanelApi>({
+            onDidTitleChange: jest.fn(),
+            close: jest.fn(),
+        });
+        const containerApi = fromPartial<DockviewApi>({});
+
+        cut.init({
+            api,
+            containerApi,
+            params: {},
+            title: 'title_abc',
+        });
+
+        let el = cut.element.querySelector('.dv-default-tab-action');
+
+        // Create a custom event to verify preventDefault is called
+        const clickEvent = new Event('click', { cancelable: true });
+        const preventDefaultSpy = jest.spyOn(clickEvent, 'preventDefault');
+
+        el!.dispatchEvent(clickEvent);
+
+        expect(preventDefaultSpy).toHaveBeenCalledTimes(1);
+        expect(api.close).toHaveBeenCalledTimes(1);
+    });
+
+    test('that close button respects already prevented events', () => {
+        const cut = new DefaultTab();
+
+        const api = fromPartial<DockviewPanelApi>({
+            onDidTitleChange: jest.fn(),
+            close: jest.fn(),
+        });
+        const containerApi = fromPartial<DockviewApi>({});
+
+        cut.init({
+            api,
+            containerApi,
+            params: {},
+            title: 'title_abc',
+        });
+
+        let el = cut.element.querySelector('.dv-default-tab-action');
+
+        // Create a custom event and prevent it before dispatching
+        const clickEvent = new Event('click', { cancelable: true });
+        clickEvent.preventDefault();
+
+        el!.dispatchEvent(clickEvent);
+
+        // Close should not be called if event was already prevented
+        expect(api.close).not.toHaveBeenCalled();
+    });
+
+    test('that close button is visible by default', () => {
+        const cut = new DefaultTab();
+
+        const api = fromPartial<DockviewPanelApi>({
+            onDidTitleChange: jest.fn(),
+            close: jest.fn(),
+        });
+        const containerApi = fromPartial<DockviewApi>({});
+
+        cut.init({
+            api,
+            containerApi,
+            params: {},
+            title: 'title_abc',
+        });
+
+        let el = cut.element.querySelector('.dv-default-tab-action') as HTMLElement;
+        expect(el).toBeTruthy();
+        expect(el.style.display).not.toBe('none');
+    });
 });
