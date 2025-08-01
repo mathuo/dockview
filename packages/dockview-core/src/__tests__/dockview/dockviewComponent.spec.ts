@@ -5810,9 +5810,9 @@ describe('dockviewComponent', () => {
             dockview.fromJSON(state);
 
             /**
-             * exhaust task queue since popout group completion is async but not awaited in `fromJSON(...)`
+             * Wait for delayed popout group creation to complete
              */
-            await new Promise((resolve) => setTimeout(resolve, 0));
+            await dockview.popoutRestorationPromise;
 
             expect(dockview.panels.length).toBe(4);
 
@@ -6113,6 +6113,7 @@ describe('dockviewComponent', () => {
         });
 
         test('persistance with custom url', async () => {
+            jest.useFakeTimers();
             const container = document.createElement('div');
 
             window.open = () => setupMockWindow();
@@ -6196,7 +6197,12 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(0);
 
             dockview.fromJSON(state);
-            await new Promise((resolve) => setTimeout(resolve, 0)); // popout views are completed as a promise so must complete microtask-queue
+            
+            // Advance timers to trigger delayed popout creation (0ms, 100ms delays)
+            jest.advanceTimersByTime(200);
+            
+            // Wait for the popout restoration to complete
+            await dockview.popoutRestorationPromise;
 
             expect(dockview.toJSON().popoutGroups).toEqual([
                 {
@@ -6230,6 +6236,8 @@ describe('dockviewComponent', () => {
                     url: '/custom.html',
                 },
             ]);
+            
+            jest.useRealTimers();
         });
 
         describe('when browsers block popups', () => {
