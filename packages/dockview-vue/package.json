@@ -41,6 +41,7 @@
     "README.md"
   ],
   "scripts": {
+    "build:bundle": "",
     "build:js": "vite build",
     "build:types": "vue-tsc --project tsconfig.build-types.json --declaration --emitDeclarationOnly --outDir dist/types",
     "build:css": "node scripts/copy-css.js",
