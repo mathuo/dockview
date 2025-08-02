@@ -53,7 +53,7 @@
     "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-vue --coverage"
   },
   "dependencies": {
-    "dockview-core": "^4.6.0"
+    "dockview-core": "^4.6.1"
   },
   "peerDependencies": {
     "vue": "^3.4.0"
