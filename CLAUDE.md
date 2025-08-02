@@ -114,3 +114,40 @@ Dockview is a zero-dependency layout manager supporting tabs, groups, grids and 
 -   Components use internal state with event-driven updates
 -   Serialization provides snapshot-based state persistence
 -   APIs provide reactive interfaces with event subscriptions
+
+## Release Management
+
+### Creating Release Notes
+
+Release notes are stored in `packages/docs/blog/` with the naming format `YYYY-MM-DD-dockview-X.Y.Z.md`.
+
+To create release notes for a new version:
+
+1. Check git commits since the last release: `git log --oneline --since="YYYY-MM-DD"`
+2. Create a new markdown file following the established format:
+   - Front matter with slug, title, and tags
+   - Sections for Features (🚀), Miscs (🛠), and Breaking changes (🔥)
+   - Reference GitHub PR numbers for significant changes
+   - Focus on user-facing changes, bug fixes, and new features
+
+Example format:
+```markdown
+---
+slug: dockview-X.Y.Z-release
+title: Dockview X.Y.Z
+tags: [release]
+---
+
+# Release Notes
+
+Please reference docs @ [dockview.dev](https://dockview.dev).
+
+## 🚀 Features
+- Feature description [#PR](link)
+
+## 🛠 Miscs
+- Bug: Fix description [#PR](link)
+- Chore: Maintenance description [#PR](link)
+
+## 🔥 Breaking changes
+```
