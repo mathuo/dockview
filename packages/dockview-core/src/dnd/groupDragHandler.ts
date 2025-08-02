@@ -6,6 +6,10 @@ import { IDisposable } from '../lifecycle';
 import { DragHandler } from './abstractDragHandler';
 import { LocalSelectionTransfer, PanelTransfer } from './dataTransfer';
 import { addGhostImage } from './ghost';
+import {
+    ITabsContainerAccessor,
+    ITabsContainerGroup,
+} from '../dockview/components/titlebar/tabsContainer';
 
 export class GroupDragHandler extends DragHandler {
     private readonly panelTransfer =
@@ -13,8 +17,8 @@ export class GroupDragHandler extends DragHandler {
 
     constructor(
         element: HTMLElement,
-        private readonly accessor: DockviewComponent,
-        private readonly group: DockviewGroupPanel
+        private readonly accessor: ITabsContainerAccessor,
+        private readonly group: ITabsContainerGroup
     ) {
         super(element);
 

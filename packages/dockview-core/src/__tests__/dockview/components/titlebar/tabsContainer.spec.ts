@@ -3,6 +3,7 @@ import {
     PanelTransfer,
 } from '../../../../dnd/dataTransfer';
 import { TabsContainer } from '../../../../dockview/components/titlebar/tabsContainer';
+import { createTabsContainerDirect } from '../../../../dockview/components/titlebar/dockviewTabsContainerAdapter';
 import { DockviewComponent } from '../../../../dockview/dockviewComponent';
 import { DockviewGroupPanel } from '../../../../dockview/dockviewGroupPanel';
 import { DockviewGroupPanelModel } from '../../../../dockview/dockviewGroupPanelModel';
@@ -39,7 +40,7 @@ describe('tabsContainer', () => {
 
         const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
-        const cut = new TabsContainer(accessor, groupPanel);
+        const cut = createTabsContainerDirect(accessor, groupPanel);
 
         const emptySpace = cut.element
             .getElementsByClassName('dv-void-container')
@@ -94,7 +95,7 @@ describe('tabsContainer', () => {
 
         const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
-        const cut = new TabsContainer(accessor, groupPanel);
+        const cut = createTabsContainerDirect(accessor, groupPanel);
 
         const emptySpace = cut.element
             .getElementsByClassName('dv-void-container')
@@ -165,7 +166,7 @@ describe('tabsContainer', () => {
 
         const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
-        const cut = new TabsContainer(accessor, groupPanel);
+        const cut = createTabsContainerDirect(accessor, groupPanel);
 
         cut.openPanel(new TestPanel('panel1', jest.fn() as any));
         cut.openPanel(new TestPanel('panel2', jest.fn() as any));
@@ -229,7 +230,7 @@ describe('tabsContainer', () => {
 
         const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
-        const cut = new TabsContainer(accessor, groupPanel);
+        const cut = createTabsContainerDirect(accessor, groupPanel);
 
         cut.openPanel(new TestPanel('panel1', jest.fn() as any));
         cut.openPanel(new TestPanel('panel2', jest.fn() as any));
@@ -292,7 +293,7 @@ describe('tabsContainer', () => {
 
         const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
-        const cut = new TabsContainer(accessor, groupPanel);
+        const cut = createTabsContainerDirect(accessor, groupPanel);
 
         cut.openPanel(new TestPanel('panel1', jest.fn() as any));
         cut.openPanel(new TestPanel('panel2', jest.fn() as any));
@@ -348,7 +349,7 @@ describe('tabsContainer', () => {
 
         const groupPanel = new groupPanelMock();
 
-        const cut = new TabsContainer(accessor, groupPanel);
+        const cut = createTabsContainerDirect(accessor, groupPanel);
 
         let query = cut.element.querySelectorAll(
             '.dv-tabs-and-actions-container > .dv-left-actions-container'
@@ -413,7 +414,7 @@ describe('tabsContainer', () => {
 
         const groupPanel = new groupPanelMock();
 
-        const cut = new TabsContainer(accessor, groupPanel);
+        const cut = createTabsContainerDirect(accessor, groupPanel);
 
         let query = cut.element.querySelectorAll(
             '.dv-tabs-and-actions-container > .dv-right-actions-container'
@@ -482,7 +483,7 @@ describe('tabsContainer', () => {
 
         const groupPanel = new groupPanelMock();
 
-        const cut = new TabsContainer(accessor, groupPanel);
+        const cut = createTabsContainerDirect(accessor, groupPanel);
 
         const container = cut.element.querySelector('.dv-void-container')!;
         expect(container).toBeTruthy();
@@ -539,7 +540,7 @@ describe('tabsContainer', () => {
 
         const groupPanel = new groupPanelMock();
 
-        const cut = new TabsContainer(accessor, groupPanel);
+        const cut = createTabsContainerDirect(accessor, groupPanel);
 
         const container = cut.element.querySelector('.dv-void-container')!;
         expect(container).toBeTruthy();
@@ -592,7 +593,7 @@ describe('tabsContainer', () => {
 
         const groupPanel = new groupPanelMock();
 
-        const cut = new TabsContainer(accessor, groupPanel);
+        const cut = createTabsContainerDirect(accessor, groupPanel);
 
         const createPanel = (id: string) =>
             fromPartial<IDockviewPanel>({
@@ -649,7 +650,7 @@ describe('tabsContainer', () => {
 
         const groupPanel = new groupPanelMock();
 
-        const cut = new TabsContainer(accessor, groupPanel);
+        const cut = createTabsContainerDirect(accessor, groupPanel);
 
         const panelMock = jest.fn<IDockviewPanel, [string]>((id: string) => {
             const partial: Partial<IDockviewPanel> = {
@@ -717,7 +718,7 @@ describe('tabsContainer', () => {
 
         const groupPanel = new groupPanelMock();
 
-        const cut = new TabsContainer(accessor, groupPanel);
+        const cut = createTabsContainerDirect(accessor, groupPanel);
 
         const panelMock = jest.fn<IDockviewPanel, [string]>((id: string) => {
             const partial: Partial<IDockviewPanel> = {
@@ -785,7 +786,7 @@ describe('tabsContainer', () => {
 
         const groupPanel = new groupPanelMock();
 
-        const cut = new TabsContainer(accessor, groupPanel);
+        const cut = createTabsContainerDirect(accessor, groupPanel);
 
         const panelMock = jest.fn<IDockviewPanel, [string]>((id: string) => {
             const partial: Partial<IDockviewPanel> = {
@@ -834,7 +835,7 @@ describe('tabsContainer', () => {
     });
 
     test('class dv-single-tab is present when only one tab exists`', () => {
-        const cut = new TabsContainer(
+        const cut = createTabsContainerDirect(
             fromPartial<DockviewComponent>({
                 options: {},
                 onDidOptionsChange: jest.fn(),
@@ -879,7 +880,7 @@ describe('tabsContainer', () => {
                 model: fromPartial<DockviewGroupPanelModel>({}),
             });
 
-            const cut = new TabsContainer(accessor, groupPanel);
+            const cut = createTabsContainerDirect(accessor, groupPanel);
 
             // Mock the tabs and voidContainer to verify methods are called
             const mockTabs = { updateDragAndDropState: jest.fn() };
@@ -983,7 +984,7 @@ describe('tabsContainer', () => {
                 model: fromPartial<DockviewGroupPanelModel>({}),
             });
 
-            const cut = new TabsContainer(accessor, groupPanel);
+            const cut = createTabsContainerDirect(accessor, groupPanel);
             (cut as any).tabs = mockTabs;
 
             // Simulate overflow tabs
@@ -1110,7 +1111,7 @@ describe('tabsContainer', () => {
                 model: fromPartial<DockviewGroupPanelModel>({}),
             });
 
-            const cut = new TabsContainer(accessor, groupPanel);
+            const cut = createTabsContainerDirect(accessor, groupPanel);
             (cut as any).tabs = mockTabs;
 
             // Simulate overflow tabs
@@ -1227,7 +1228,7 @@ describe('tabsContainer', () => {
                 model: fromPartial<DockviewGroupPanelModel>({}),
             });
 
-            const cut = new TabsContainer(accessor, groupPanel);
+            const cut = createTabsContainerDirect(accessor, groupPanel);
             (cut as any).tabs = mockTabs;
 
             // Simulate overflow tabs

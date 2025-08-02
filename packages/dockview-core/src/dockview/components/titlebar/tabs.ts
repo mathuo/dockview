@@ -16,7 +16,13 @@ import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { WillShowOverlayLocationEvent } from '../../events';
 import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
 import { Tab } from '../tab/tab';
-import { TabDragEvent, TabDropIndexEvent } from './tabsContainer';
+import {
+    TabDragEvent,
+    TabDropIndexEvent,
+    ITabsContainerAccessor,
+    ITabsContainerGroup,
+    ITabsContainerPanel,
+} from './tabsContainer';
 
 export class Tabs extends CompositeDisposable {
     private readonly _element: HTMLElement;
@@ -88,8 +94,8 @@ export class Tabs extends CompositeDisposable {
     }
 
     constructor(
-        private readonly group: DockviewGroupPanel,
-        private readonly accessor: DockviewComponent,
+        private readonly group: ITabsContainerGroup,
+        private readonly accessor: ITabsContainerAccessor,
         options: {
             showTabsOverflowControl: boolean;
         }
@@ -148,7 +154,7 @@ export class Tabs extends CompositeDisposable {
         );
     }
 
-    setActivePanel(panel: IDockviewPanel): void {
+    setActivePanel(panel: ITabsContainerPanel): void {
         let runningWidth = 0;
 
         for (const tab of this._tabs) {
@@ -172,7 +178,7 @@ export class Tabs extends CompositeDisposable {
         }
     }
 
-    openPanel(panel: IDockviewPanel, index: number = this._tabs.length): void {
+    openPanel(panel: ITabsContainerPanel, index: number = this._tabs.length): void {
         if (this._tabs.find((tab) => tab.value.panel.id === panel.id)) {
             return;
         }

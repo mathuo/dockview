@@ -17,6 +17,11 @@ import {
 import { DragHandler } from '../../../dnd/abstractDragHandler';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { addGhostImage } from '../../../dnd/ghost';
+import {
+    ITabsContainerAccessor,
+    ITabsContainerGroup,
+    ITabsContainerPanel,
+} from '../titlebar/tabsContainer';
 
 class TabDragHandler extends DragHandler {
     private readonly panelTransfer =
@@ -24,9 +29,9 @@ class TabDragHandler extends DragHandler {
 
     constructor(
         element: HTMLElement,
-        private readonly accessor: DockviewComponent,
-        private readonly group: DockviewGroupPanel,
-        private readonly panel: IDockviewPanel
+        private readonly accessor: ITabsContainerAccessor,
+        private readonly group: ITabsContainerGroup,
+        private readonly panel: ITabsContainerPanel
     ) {
         super(element);
     }
@@ -66,9 +71,9 @@ export class Tab extends CompositeDisposable {
     }
 
     constructor(
-        public readonly panel: IDockviewPanel,
-        private readonly accessor: DockviewComponent,
-        private readonly group: DockviewGroupPanel
+        public readonly panel: ITabsContainerPanel,
+        private readonly accessor: ITabsContainerAccessor,
+        private readonly group: ITabsContainerGroup
     ) {
         super();
 

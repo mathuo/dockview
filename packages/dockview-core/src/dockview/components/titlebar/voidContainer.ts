@@ -11,6 +11,10 @@ import { CompositeDisposable } from '../../../lifecycle';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
 import { toggleClass } from '../../../dom';
+import {
+    ITabsContainerAccessor,
+    ITabsContainerGroup,
+} from './tabsContainer';
 
 export class VoidContainer extends CompositeDisposable {
     private readonly _element: HTMLElement;
@@ -29,8 +33,8 @@ export class VoidContainer extends CompositeDisposable {
     }
 
     constructor(
-        private readonly accessor: DockviewComponent,
-        private readonly group: DockviewGroupPanel
+        private readonly accessor: ITabsContainerAccessor,
+        private readonly group: ITabsContainerGroup
     ) {
         super();
 

@@ -19,6 +19,56 @@ import {
     DropdownElement,
 } from './tabOverflowControl';
 
+// Generic interfaces for tab container
+export interface ITabsContainerOptions {
+    readonly singleTabMode?: 'fullwidth' | 'shrink' | 'default';
+    readonly disableTabsOverflowList?: boolean;
+    readonly disableFloatingGroups?: boolean;
+    readonly disableDnd?: boolean;
+    readonly scrollbars?: 'native' | 'custom';
+}
+
+export interface ITabsContainerAccessor {
+    readonly element: HTMLElement;
+    readonly options: ITabsContainerOptions;
+    readonly api: unknown;
+    readonly id: string;
+    readonly onDidOptionsChange: Event<void>;
+    readonly popupService: {
+        openPopover(element: HTMLElement, options: { x: number; y: number; zIndex?: string }): void;
+        close(): void;
+    };
+    addFloatingGroup(group: ITabsContainerGroup, options: { x: number; y: number; inDragMode: boolean }): void;
+    doSetGroupActive(group: ITabsContainerGroup): void;
+}
+
+export interface ITabsContainerGroup {
+    readonly id: string;
+    readonly size: number;
+    readonly panels: ITabsContainerPanel[];
+    readonly activePanel?: ITabsContainerPanel;
+    readonly locked: boolean | string;
+    readonly api: {
+        readonly location: { type: string };
+    };
+    readonly model: {
+        canDisplayOverlay(event: any, position: any, overlayType: string): boolean;
+        dropTargetContainer?: { model: any } | null;
+    };
+}
+
+export interface ITabsContainerPanel {
+    readonly id: string;
+    readonly api: {
+        readonly isActive: boolean;
+        setActive(): void;
+    };
+    readonly view: {
+        createTabRenderer(location: string): { element: HTMLElement };
+    };
+}
+
+
 export interface TabDropIndexEvent {
     readonly event: DragEvent;
     readonly index: number;
@@ -26,12 +76,12 @@ export interface TabDropIndexEvent {
 
 export interface TabDragEvent {
     readonly nativeEvent: DragEvent;
-    readonly panel: IDockviewPanel;
+    readonly panel: ITabsContainerPanel;
 }
 
 export interface GroupDragEvent {
     readonly nativeEvent: DragEvent;
-    readonly group: DockviewGroupPanel;
+    readonly group: ITabsContainerGroup;
 }
 
 export interface ITabsContainer extends IDisposable {
@@ -46,10 +96,10 @@ export interface ITabsContainer extends IDisposable {
     delete(id: string): void;
     indexOf(id: string): number;
     setActive(isGroupActive: boolean): void;
-    setActivePanel(panel: IDockviewPanel): void;
+    setActivePanel(panel: ITabsContainerPanel): void;
     isActive(tab: Tab): boolean;
-    closePanel(panel: IDockviewPanel): void;
-    openPanel(panel: IDockviewPanel, index?: number): void;
+    closePanel(panel: ITabsContainerPanel): void;
+    openPanel(panel: ITabsContainerPanel, index?: number): void;
     setRightActionsElement(element: HTMLElement | undefined): void;
     setLeftActionsElement(element: HTMLElement | undefined): void;
     setPrefixActionsElement(element: HTMLElement | undefined): void;
@@ -117,8 +167,8 @@ export class TabsContainer
     }
 
     constructor(
-        private readonly accessor: DockviewComponent,
-        private readonly group: DockviewGroupPanel
+        private readonly accessor: ITabsContainerAccessor,
+        private readonly group: ITabsContainerGroup
     ) {
         super();
 
@@ -183,9 +233,9 @@ export class TabsContainer
                 this._onWillShowOverlay.fire(
                     new WillShowOverlayLocationEvent(event, {
                         kind: 'header_space',
-                        panel: this.group.activePanel,
-                        api: this.accessor.api,
-                        group: this.group,
+                        panel: this.group.activePanel as IDockviewPanel,
+                        api: this.accessor.api as any,
+                        group: this.group as DockviewGroupPanel,
                         getData: getPanelData,
                     })
                 );
@@ -293,16 +343,16 @@ export class TabsContainer
         this.updateClassnames();
     }
 
-    setActivePanel(panel: IDockviewPanel): void {
+    setActivePanel(panel: ITabsContainerPanel): void {
         this.tabs.setActivePanel(panel);
     }
 
-    openPanel(panel: IDockviewPanel, index: number = this.tabs.size): void {
+    openPanel(panel: ITabsContainerPanel, index: number = this.tabs.size): void {
         this.tabs.openPanel(panel, index);
         this.updateClassnames();
     }
 
-    closePanel(panel: IDockviewPanel): void {
+    closePanel(panel: ITabsContainerPanel): void {
         this.delete(panel.id);
     }
 
@@ -358,7 +408,7 @@ export class TabsContainer
                     this._overflowTabs.includes(tab.panel.id)
                 )) {
                     const panelObject = this.group.panels.find(
-                        (panel) => panel === tab.panel
+                        (panel) => panel.id === tab.panel.id
                     )!;
 
                     const tabComponent =

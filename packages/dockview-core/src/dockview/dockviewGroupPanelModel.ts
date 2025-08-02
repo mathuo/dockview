@@ -29,6 +29,7 @@ import {
     TabDragEvent,
     TabsContainer,
 } from './components/titlebar/tabsContainer';
+import { createTabsContainerDirect } from './components/titlebar/dockviewTabsContainerAdapter';
 import { IWatermarkRenderer } from './types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
@@ -392,7 +393,7 @@ export class DockviewGroupPanelModel
 
         this._api = new DockviewApi(this.accessor);
 
-        this.tabsContainer = new TabsContainer(this.accessor, this.groupPanel);
+        this.tabsContainer = createTabsContainerDirect(this.accessor, this.groupPanel);
 
         this.contentContainer = new ContentContainer(this.accessor, this);
 
