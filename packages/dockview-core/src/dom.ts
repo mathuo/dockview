@@ -382,10 +382,10 @@ export function isChildEntirelyVisibleWithinParent(
     child: HTMLElement,
     parent: HTMLElement
 ): boolean {
-    //
     const childPosition = getDomNodePagePosition(child);
     const parentPosition = getDomNodePagePosition(parent);
 
+    // Check horizontal visibility
     if (childPosition.left < parentPosition.left) {
         return false;
     }
@@ -393,6 +393,18 @@ export function isChildEntirelyVisibleWithinParent(
     if (
         childPosition.left + childPosition.width >
         parentPosition.left + parentPosition.width
+    ) {
+        return false;
+    }
+
+    // Check vertical visibility
+    if (childPosition.top < parentPosition.top) {
+        return false;
+    }
+
+    if (
+        childPosition.top + childPosition.height >
+        parentPosition.top + parentPosition.height
     ) {
         return false;
     }
