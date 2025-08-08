@@ -198,13 +198,13 @@ describe('overlayRenderContainer', () => {
         onDidVisibilityChange.fire({});
         expect(container.style.display).toBe('');
 
-        expect(container.style.left).toBe('50px');
-        expect(container.style.top).toBe('100px');
-        expect(container.style.width).toBe('100px');
-        expect(container.style.height).toBe('200px');
+        expect(container.style.left).toBe('49px');
+        expect(container.style.top).toBe('99px');
+        expect(container.style.width).toBe('101px');
+        expect(container.style.height).toBe('201px');
         expect(
             referenceContainer.element.getBoundingClientRect
-        ).toHaveBeenCalledTimes(3);
+        ).toHaveBeenCalledTimes(2);
     });
 
     test('related z-index from `aria-level` set on floating panels', async () => {

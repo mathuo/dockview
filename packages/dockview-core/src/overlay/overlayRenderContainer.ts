@@ -27,6 +27,10 @@ class PositionCache {
         return rect;
     }
     
+    invalidate(): void {
+        this.currentFrameId++;
+    }
+    
     private scheduleFrameUpdate() {
         if (this.rafId) return;
         this.rafId = requestAnimationFrame(() => {
@@ -140,10 +144,26 @@ export class OverlayRenderContainer extends CompositeDisposable {
                 const box = this.positionCache.getPosition(referenceContainer.element);
                 const box2 = this.positionCache.getPosition(this.element);
                 
-                focusContainer.style.left = `${box.left - box2.left}px`;
-                focusContainer.style.top = `${box.top - box2.top}px`;
-                focusContainer.style.width = `${box.width}px`;
-                focusContainer.style.height = `${box.height}px`;
+                // Use traditional positioning for overlay containers
+                const left = box.left - box2.left;
+                const top = box.top - box2.top;
+                const width = box.width;
+                const height = box.height;
+                
+                focusContainer.style.left = `${left}px`;
+                focusContainer.style.top = `${top}px`;
+                focusContainer.style.width = `${width}px`;
+                focusContainer.style.height = `${height}px`;
+                
+                // Debug logging for always rendered panels
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('Always render positioning:', {
+                        panelId,
+                        left, top, width, height,
+                        referenceBox: box,
+                        containerBox: box2
+                    });
+                }
 
                 toggleClass(
                     focusContainer,
@@ -154,7 +174,16 @@ export class OverlayRenderContainer extends CompositeDisposable {
         };
 
         const visibilityChanged = () => {
+            if (process.env.NODE_ENV === 'development') {
+                console.log('Always render visibility changed:', {
+                    panelId: panel.api.id,
+                    isVisible: panel.api.isVisible,
+                    renderer: panel.api.renderer
+                });
+            }
+            
             if (panel.api.isVisible) {
+                this.positionCache.invalidate();
                 resize();
             }
 
