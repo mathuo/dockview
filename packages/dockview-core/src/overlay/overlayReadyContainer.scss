@@ -4,6 +4,8 @@
     position: absolute;
     z-index: 1;
     height: 100%;
+    contain: layout paint;
+    isolation: isolate;
 
     &.dv-render-overlay-float {
         z-index: calc(var(--dv-overlay-z-index) - 1);

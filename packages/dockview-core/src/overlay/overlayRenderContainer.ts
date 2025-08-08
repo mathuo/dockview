@@ -10,6 +10,32 @@ import {
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 import { DockviewComponent } from '../dockview/dockviewComponent';
 
+class PositionCache {
+    private cache = new Map<Element, { rect: { left: number; top: number; width: number; height: number }; frameId: number }>();
+    private currentFrameId = 0;
+    private rafId: number | null = null;
+    
+    getPosition(element: Element): { left: number; top: number; width: number; height: number } {
+        const cached = this.cache.get(element);
+        if (cached && cached.frameId === this.currentFrameId) {
+            return cached.rect;
+        }
+        
+        this.scheduleFrameUpdate();
+        const rect = getDomNodePagePosition(element);
+        this.cache.set(element, { rect, frameId: this.currentFrameId });
+        return rect;
+    }
+    
+    private scheduleFrameUpdate() {
+        if (this.rafId) return;
+        this.rafId = requestAnimationFrame(() => {
+            this.currentFrameId++;
+            this.rafId = null;
+        });
+    }
+}
+
 export type DockviewPanelRenderer = 'onlyWhenVisible' | 'always';
 
 export interface IRenderable {
@@ -35,6 +61,8 @@ export class OverlayRenderContainer extends CompositeDisposable {
     > = {};
 
     private _disposed = false;
+    private positionCache = new PositionCache();
+    private pendingUpdates = new Set<string>();
 
     constructor(
         readonly element: HTMLElement,
@@ -94,19 +122,35 @@ export class OverlayRenderContainer extends CompositeDisposable {
         }
 
         const resize = () => {
-            // TODO propagate position to avoid getDomNodePagePosition calls, possible performance bottleneck?
-            const box = getDomNodePagePosition(referenceContainer.element);
-            const box2 = getDomNodePagePosition(this.element);
-            focusContainer.style.left = `${box.left - box2.left}px`;
-            focusContainer.style.top = `${box.top - box2.top}px`;
-            focusContainer.style.width = `${box.width}px`;
-            focusContainer.style.height = `${box.height}px`;
+            const panelId = panel.api.id;
+            
+            if (this.pendingUpdates.has(panelId)) {
+                return; // Update already scheduled
+            }
+            
+            this.pendingUpdates.add(panelId);
+            
+            requestAnimationFrame(() => {
+                this.pendingUpdates.delete(panelId);
+                
+                if (this.isDisposed || !this.map[panelId]) {
+                    return;
+                }
+                
+                const box = this.positionCache.getPosition(referenceContainer.element);
+                const box2 = this.positionCache.getPosition(this.element);
+                
+                focusContainer.style.left = `${box.left - box2.left}px`;
+                focusContainer.style.top = `${box.top - box2.top}px`;
+                focusContainer.style.width = `${box.width}px`;
+                focusContainer.style.height = `${box.height}px`;
 
-            toggleClass(
-                focusContainer,
-                'dv-render-overlay-float',
-                panel.group.api.location.type === 'floating'
-            );
+                toggleClass(
+                    focusContainer,
+                    'dv-render-overlay-float',
+                    panel.group.api.location.type === 'floating'
+                );
+            });
         };
 
         const visibilityChanged = () => {
