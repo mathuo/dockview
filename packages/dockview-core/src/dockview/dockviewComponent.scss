@@ -1,6 +1,7 @@
 .dv-dockview {
     position: relative;
     background-color: var(--dv-group-view-background-color);
+    contain: layout;
 
     .dv-watermark-container {
         position: absolute;

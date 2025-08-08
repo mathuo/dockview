@@ -45,6 +45,12 @@ export function exhaustMicrotaskQueue(): Promise<void> {
     return new Promise<void>((resolve) => resolve());
 }
 
+export function exhaustAnimationFrame(): Promise<void> {
+    return new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+    });
+}
+
 export const mockGetBoundingClientRect = ({
     left,
     top,

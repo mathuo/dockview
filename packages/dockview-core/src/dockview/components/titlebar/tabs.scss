@@ -3,6 +3,10 @@
     height: 100%;
     overflow: auto;
     scrollbar-width: thin; // firefox
+    
+    /* GPU optimizations for smooth scrolling */
+    will-change: scroll-position;
+    transform: translate3d(0, 0, 0);
 
     &.dv-horizontal {
         .dv-tab {

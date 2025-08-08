@@ -12,12 +12,16 @@
     .dv-drop-target-anchor {
         position: relative;
         border: var(--dv-drag-over-border);
-        transition: opacity var(--dv-transition-duration) ease-in,
-            top var(--dv-transition-duration) ease-out,
-            left var(--dv-transition-duration) ease-out,
-            width var(--dv-transition-duration) ease-out,
-            height var(--dv-transition-duration) ease-out;
         background-color: var(--dv-drag-over-background-color);
         opacity: 1;
+        
+        /* GPU optimizations */
+        will-change: transform, opacity;
+        transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+        contain: layout paint;
+        
+        transition: opacity var(--dv-transition-duration) ease-in,
+            transform var(--dv-transition-duration) ease-out;
     }
 }

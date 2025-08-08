@@ -34,8 +34,12 @@
     &.dv-animation {
         .dv-view,
         .dv-sash {
-            transition-duration: 0.15s;
-            transition-timing-function: ease-out;
+            /* GPU optimizations for smooth animations */
+            will-change: transform;
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            
+            transition: transform 0.15s ease-out;
         }
     }
 

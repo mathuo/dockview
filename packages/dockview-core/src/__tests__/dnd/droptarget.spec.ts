@@ -180,10 +180,13 @@ describe('droptarget', () => {
                 height: string;
             }
         ) {
+            // Check positioning (back to top/left with GPU layer maintained)
             expect(element.style.top).toBe(box.top);
             expect(element.style.left).toBe(box.left);
             expect(element.style.width).toBe(box.width);
             expect(element.style.height).toBe(box.height);
+            // Ensure GPU layer is maintained
+            expect(element.style.transform).toBe('translate3d(0, 0, 0)');
         }
 
         viewQuery = element.querySelectorAll(
@@ -273,13 +276,14 @@ describe('droptarget', () => {
             createOffsetDragOverEvent({ clientX: 100, clientY: 50 })
         );
         expect(droptarget.state).toBe('center');
+        // With GPU optimizations, elements always have a base transform layer
         expect(
             (
                 element
                     .getElementsByClassName('dv-drop-target-selection')
                     .item(0) as HTMLDivElement
             ).style.transform
-        ).toBe('');
+        ).toBe('translate3d(0, 0, 0)');
 
         fireEvent.dragLeave(target);
         expect(droptarget.state).toBe('center');

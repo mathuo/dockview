@@ -33,6 +33,11 @@
 
     border: 1px solid var(--dv-tab-divider-color);
     box-shadow: var(--dv-floating-box-shadow);
+    
+    /* GPU optimizations for floating group movement */
+    will-change: transform, opacity;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
 
     &.dv-hidden {
         display: none;
@@ -40,6 +45,8 @@
 
     &.dv-resize-container-dragging {
         opacity: 0.5;
+        /* Enhanced GPU acceleration during drag */
+        will-change: transform, opacity;
     }
 
     .dv-resize-handle-top {
