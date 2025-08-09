@@ -2328,7 +2328,6 @@ export class DockviewComponent
 
         if (target === 'center') {
             const activePanel = from.activePanel;
-            const targetActivePanel = to.activePanel;
 
             const panels = this.movingLock(() =>
                 [...from.panels].map((p) =>
@@ -2345,23 +2344,14 @@ export class DockviewComponent
             this.movingLock(() => {
                 for (const panel of panels) {
                     to.model.openPanel(panel, {
-                        skipSetActive: true, // Always skip setting panels active during move
+                        skipSetActive: panel !== activePanel,
                         skipSetGroupActive: true,
                     });
                 }
             });
 
-            if (!options.skipSetActive) {
-                // Make the moved panel (from the source group) active
-                if (activePanel) {
-                    this.doSetGroupAndPanelActive(to);
-                }
-            } else if (targetActivePanel) {
-                // Ensure the target group's original active panel remains active
-                to.model.openPanel(targetActivePanel, { 
-                    skipSetGroupActive: true 
-                });
-            }
+            // Ensure group becomes active after move
+            this.doSetGroupAndPanelActive(to);
         } else {
             switch (from.api.location.type) {
                 case 'grid':
@@ -2384,13 +2374,13 @@ export class DockviewComponent
                     if (!selectedPopoutGroup) {
                         throw new Error('failed to find popout group');
                     }
-                    
+
                     // Remove from popout groups list to prevent automatic restoration
                     const index = this._popoutGroups.indexOf(selectedPopoutGroup);
                     if (index >= 0) {
                         this._popoutGroups.splice(index, 1);
                     }
-                    
+
                     // Clean up the reference group (ghost) if it exists and is hidden
                     if (selectedPopoutGroup.referenceGroup) {
                         const referenceGroup = this.getPanel(selectedPopoutGroup.referenceGroup);
@@ -2398,10 +2388,10 @@ export class DockviewComponent
                             this.doRemoveGroup(referenceGroup, { skipActive: true });
                         }
                     }
-                    
+
                     // Manually dispose the window without triggering restoration
                     selectedPopoutGroup.window.dispose();
-                    
+
                     // Update group's location and containers for target
                     if (to.api.location.type === 'grid') {
                         from.model.renderContainer = this.overlayRenderContainer;
@@ -2412,7 +2402,7 @@ export class DockviewComponent
                         from.model.dropTargetContainer = this.rootDropTargetContainer;
                         from.model.location = { type: 'floating' };
                     }
-                    
+
                     break;
                 }
             }
@@ -2425,7 +2415,7 @@ export class DockviewComponent
                     referenceLocation,
                     target
                 );
-                
+
                 // Add to grid for all moves targeting grid location
 
                 let size: number;
@@ -2454,7 +2444,7 @@ export class DockviewComponent
                 );
                 if (targetFloatingGroup) {
                     const box = targetFloatingGroup.overlay.toJSON();
-                    
+
                     // Calculate position based on available properties
                     let left: number, top: number;
                     if ('left' in box) {
@@ -2464,7 +2454,7 @@ export class DockviewComponent
                     } else {
                         left = 50; // Default fallback
                     }
-                    
+
                     if ('top' in box) {
                         top = box.top + 50;
                     } else if ('bottom' in box) {
@@ -2472,7 +2462,7 @@ export class DockviewComponent
                     } else {
                         top = 50; // Default fallback
                     }
-                    
+
                     this.addFloatingGroup(from, {
                         height: box.height,
                         width: box.width,
@@ -2489,8 +2479,11 @@ export class DockviewComponent
             this._onDidMovePanel.fire({ panel, from });
         });
 
+        // Ensure group becomes active after move
         if (!options.skipSetActive) {
-            this.doSetGroupAndPanelActive(from);
+            // Use 'to' group for non-center moves since 'from' may have been destroyed
+            const targetGroup = to ?? from;
+            this.doSetGroupAndPanelActive(targetGroup);
         }
     }
 
