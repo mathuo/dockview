@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdockview_docs=self.webpackChunkdockview_docs||[]).push([[9370],{9618:e=>{e.exports=JSON.parse('{"permalink":"/blog/tags/release/page/7","page":7,"postsPerPage":10,"totalPages":7,"totalCount":68,"previousPage":"/blog/tags/release/page/6","blogDescription":"Blog","blogTitle":"Blog"}')}}]);

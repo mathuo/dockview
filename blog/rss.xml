@@ -4,10 +4,29 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Sat, 19 Jul 2025 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Sat, 02 Aug 2025 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 4.6.2]]></title>
+            <link>https://dockview.dev/blog/dockview-4.6.2-release</link>
+            <guid>https://dockview.dev/blog/dockview-4.6.2-release</guid>
+            <pubDate>Sat, 02 Aug 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.6.2-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.6.2-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Fix close button functionality in tab overflow dropdown <a href="https://github.com/mathuo/dockview/pull/985" target="_blank" rel="noopener noreferrer">#985</a></li>
+<li>Bug: Fix cursor behavior on empty container spaces <a href="https://github.com/mathuo/dockview/pull/978" target="_blank" rel="noopener noreferrer">#978</a></li>
+<li>Bug: Fix theming consistency between JavaScript and React implementations <a href="https://github.com/mathuo/dockview/pull/970" target="_blank" rel="noopener noreferrer">#970</a></li>
+<li>Bug: Fix themes with gap overflow issues <a href="https://github.com/mathuo/dockview/pull/963" target="_blank" rel="noopener noreferrer">#963</a></li>
+<li>Chore: Project maintenance and build script improvements <a href="https://github.com/mathuo/dockview/pull/982" target="_blank" rel="noopener noreferrer">#982</a>, <a href="https://github.com/mathuo/dockview/pull/980" target="_blank" rel="noopener noreferrer">#980</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.6.2-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 4.5.0]]></title>
             <link>https://dockview.dev/blog/dockview-4.5.0-release</link>
@@ -334,35 +353,6 @@
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-3.0.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
 <ul>
 <li>Fix duplicate HTML element <a href="https://github.com/mathuo/dockview/issues/818" target="_blank" rel="noopener noreferrer">#810</a></li>
-</ul>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 3.0.0]]></title>
-            <link>https://dockview.dev/blog/dockview-3.0.0-release</link>
-            <guid>https://dockview.dev/blog/dockview-3.0.0-release</guid>
-            <pubDate>Sun, 29 Dec 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[This is a major release version due to some breaking changes in the dockview-core package. If you use the react or vue versions of dockview you should not see any breaking changes when upgrading. There are no new features in this release.]]></description>
-            <content:encoded><![CDATA[<p>This is a major release version due to some breaking changes in the <code>dockview-core</code> package. If you use the react or vue versions of dockview you should not see any breaking changes when upgrading. There are no new features in this release.</p>
-<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-3.0.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-3.0.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li><code>dockview-vue</code> vue3 peerDependency <a href="https://github.com/mathuo/dockview/issues/808" target="_blank" rel="noopener noreferrer">#808</a></li>
-<li>Bug: correct enablement of <code>dv-single-tab</code> class <a href="https://github.com/mathuo/dockview/issues/811" target="_blank" rel="noopener noreferrer">#811</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-3.0.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
-<ul>
-<li>Standardize <code>dockview-core</code> components for generic framework extensions following the pattern in <code>DockviewComponent</code> <a href="https://github.com/mathuo/dockview/issues/810" target="_blank" rel="noopener noreferrer">#810</a>
-<ul>
-<li><code>SplitviewComponent</code>: Replace <code>components</code> and <code>frameworkComponents</code> with <code>createComponent</code></li>
-<li><code>PaneviewComponent</code>: Replace <code>components</code> and <code>frameworkComponents</code> with <code>createComponent</code> and replace <code>headerComponents</code> and <code>headerFrameworkComponents</code> with <code>createHeaderComponent</code></li>
-<li><code>GridviewComponent</code>: Replace <code>components</code> and <code>frameworkComponents</code> with <code>createComponent</code></li>
-</ul>
-</li>
-<li>rename class <code>dockview-react-part</code> to <code>dv-react-part</code> <a href="https://github.com/mathuo/dockview/issues/806" target="_blank" rel="noopener noreferrer">#806</a></li>
-<li>rename type <code>PaneviewDropEvent</code> to <code>PaneviewDidDropEvent</code> <a href="https://github.com/mathuo/dockview/issues/812" target="_blank" rel="noopener noreferrer">#812</a></li>
-<li>remove <code>showDndOverlay</code> from <code>PaneviewComponent</code> in favour of <code>api.onUnhandledDragOverEvent</code> <a href="https://github.com/mathuo/dockview/issues/812" target="_blank" rel="noopener noreferrer">#812</a></li>
 </ul>]]></content:encoded>
             <category>release</category>
         </item>
