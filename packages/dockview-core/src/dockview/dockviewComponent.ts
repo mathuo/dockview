@@ -1207,6 +1207,8 @@ export class DockviewComponent
         position: Position,
         options?: GroupOptions
     ): DockviewGroupPanel {
+        this.gridview.normalize();
+
         switch (position) {
             case 'top':
             case 'bottom':
@@ -2376,16 +2378,21 @@ export class DockviewComponent
                     }
 
                     // Remove from popout groups list to prevent automatic restoration
-                    const index = this._popoutGroups.indexOf(selectedPopoutGroup);
+                    const index =
+                        this._popoutGroups.indexOf(selectedPopoutGroup);
                     if (index >= 0) {
                         this._popoutGroups.splice(index, 1);
                     }
 
                     // Clean up the reference group (ghost) if it exists and is hidden
                     if (selectedPopoutGroup.referenceGroup) {
-                        const referenceGroup = this.getPanel(selectedPopoutGroup.referenceGroup);
+                        const referenceGroup = this.getPanel(
+                            selectedPopoutGroup.referenceGroup
+                        );
                         if (referenceGroup && !referenceGroup.api.isVisible) {
-                            this.doRemoveGroup(referenceGroup, { skipActive: true });
+                            this.doRemoveGroup(referenceGroup, {
+                                skipActive: true,
+                            });
                         }
                     }
 
@@ -2394,12 +2401,16 @@ export class DockviewComponent
 
                     // Update group's location and containers for target
                     if (to.api.location.type === 'grid') {
-                        from.model.renderContainer = this.overlayRenderContainer;
-                        from.model.dropTargetContainer = this.rootDropTargetContainer;
+                        from.model.renderContainer =
+                            this.overlayRenderContainer;
+                        from.model.dropTargetContainer =
+                            this.rootDropTargetContainer;
                         from.model.location = { type: 'grid' };
                     } else if (to.api.location.type === 'floating') {
-                        from.model.renderContainer = this.overlayRenderContainer;
-                        from.model.dropTargetContainer = this.rootDropTargetContainer;
+                        from.model.renderContainer =
+                            this.overlayRenderContainer;
+                        from.model.dropTargetContainer =
+                            this.rootDropTargetContainer;
                         from.model.location = { type: 'floating' };
                     }
 

@@ -7441,6 +7441,51 @@ describe('dockviewComponent', () => {
         expect(api.groups.length).toBe(3);
     });
 
+    test('addGroup calls normalize method on gridview', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+        const api = new DockviewApi(dockview);
+
+        dockview.layout(1000, 1000);
+
+        // Add initial panel
+        api.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        // Access gridview through the (any) cast to bypass protected access
+        const gridview = (dockview as any).gridview;
+        
+        // Mock the normalize method to verify it's called
+        const normalizeSpy = jest.spyOn(gridview, 'normalize');
+
+        // Adding a group should trigger normalization
+        api.addGroup({ direction: 'left' });
+
+        // Verify normalize was called during addGroup
+        expect(normalizeSpy).toHaveBeenCalled();
+        
+        // Should have the new empty group plus the existing group with panels
+        expect(api.panels.length).toBe(1);
+        expect(api.groups.length).toBe(2);
+
+        normalizeSpy.mockRestore();
+    });
+
     test('add group with custom group is', () => {
         const container = document.createElement('div');
 

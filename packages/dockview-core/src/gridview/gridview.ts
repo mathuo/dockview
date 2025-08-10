@@ -30,6 +30,39 @@ function findLeaf(candiateNode: Node, last: boolean): LeafNode {
     throw new Error('invalid node');
 }
 
+function cloneNode<T extends Node>(
+    node: T,
+    size: number,
+    orthogonalSize: number
+): T {
+    if (node instanceof BranchNode) {
+        const result = new BranchNode(
+            node.orientation,
+            node.proportionalLayout,
+            node.styles,
+            size,
+            orthogonalSize,
+            node.disabled,
+            node.margin
+        );
+
+        for (let i = node.children.length - 1; i >= 0; i--) {
+            const child = node.children[i];
+
+            result.addChild(
+                cloneNode(child, child.size, child.orthogonalSize),
+                child.size,
+                0,
+                true
+            );
+        }
+
+        return result as T;
+    } else {
+        return new LeafNode(node.view, node.orientation, orthogonalSize) as T;
+    }
+}
+
 function flipNode<T extends Node>(
     node: T,
     size: number,
@@ -643,6 +676,43 @@ export class Gridview implements IDisposable {
 
         this._root = root;
         this.element.appendChild(this._root.element);
+        this.disposable.value = this._root.onDidChange((e) => {
+            this._onDidChange.fire(e);
+        });
+    }
+
+    normalize(): void {
+        if (!this._root) {
+            return;
+        }
+
+        if (this._root.children.length !== 1) {
+            return;
+        }
+
+        const oldRoot = this.root;
+
+        // can remove one level of redundant branching if there is only a single child
+        const childReference = oldRoot.children[0];
+
+        if (childReference instanceof LeafNode) {
+            return;
+        }
+
+        oldRoot.element.remove();
+
+        const child = oldRoot.removeChild(0); // Remove child to prevent double disposal
+        oldRoot.dispose(); // Dispose old root (won't dispose removed child)
+        child.dispose(); // Dispose the removed child
+
+        this._root = cloneNode(
+            childReference,
+            childReference.size,
+            childReference.orthogonalSize
+        );
+
+        this.element.appendChild(this._root.element);
+
         this.disposable.value = this._root.onDidChange((e) => {
             this._onDidChange.fire(e);
         });
