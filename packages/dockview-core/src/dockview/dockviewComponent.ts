@@ -70,6 +70,7 @@ import { AnchoredBox, AnchorPosition, Box } from '../types';
 import {
     DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
     DEFAULT_FLOATING_GROUP_POSITION,
+    DESERIALIZATION_POPOUT_DELAY_MS,
 } from '../constants';
 import {
     DockviewPanelRenderer,
@@ -351,6 +352,7 @@ export class DockviewComponent
         disposable: { dispose: () => DockviewGroupPanel | undefined };
     }[] = [];
     private readonly _rootDropTarget: Droptarget;
+    private _popoutRestorationPromise: Promise<void> = Promise.resolve();
 
     private readonly _onDidRemoveGroup = new Emitter<DockviewGroupPanel>();
     readonly onDidRemoveGroup: Event<DockviewGroupPanel> =
@@ -405,6 +407,14 @@ export class DockviewComponent
 
     get floatingGroups(): DockviewFloatingGroupPanel[] {
         return this._floatingGroups;
+    }
+
+    /**
+     * Promise that resolves when all popout groups from the last fromJSON call are restored.
+     * Useful for tests that need to wait for delayed popout creation.
+     */
+    get popoutRestorationPromise(): Promise<void> {
+        return this._popoutRestorationPromise;
     }
 
     constructor(container: HTMLElement, options: DockviewComponentOptions) {
@@ -1522,21 +1532,36 @@ export class DockviewComponent
 
             const serializedPopoutGroups = data.popoutGroups ?? [];
 
-            for (const serializedPopoutGroup of serializedPopoutGroups) {
+            // Create a promise that resolves when all popout groups are created
+            const popoutPromises: Promise<void>[] = [];
+
+            // Queue popup group creation with delays to avoid browser blocking
+            serializedPopoutGroups.forEach((serializedPopoutGroup, index) => {
                 const { data, position, gridReferenceGroup, url } =
                     serializedPopoutGroup;
 
                 const group = createGroupFromSerializedState(data);
 
-                this.addPopoutGroup(group, {
-                    position: position ?? undefined,
-                    overridePopoutGroup: gridReferenceGroup ? group : undefined,
-                    referenceGroup: gridReferenceGroup
-                        ? this.getPanel(gridReferenceGroup)
-                        : undefined,
-                    popoutUrl: url,
+                // Add a small delay for each popup after the first to avoid browser popup blocking
+                const popoutPromise = new Promise<void>((resolve) => {
+                    setTimeout(() => {
+                        this.addPopoutGroup(group, {
+                            position: position ?? undefined,
+                            overridePopoutGroup: gridReferenceGroup ? group : undefined,
+                            referenceGroup: gridReferenceGroup
+                                ? this.getPanel(gridReferenceGroup)
+                                : undefined,
+                            popoutUrl: url,
+                        });
+                        resolve();
+                    }, index * DESERIALIZATION_POPOUT_DELAY_MS); // 100ms delay between each popup
                 });
-            }
+
+                popoutPromises.push(popoutPromise);
+            });
+
+            // Store the promise for tests to wait on
+            this._popoutRestorationPromise = Promise.all(popoutPromises).then(() => void 0);
 
             for (const floatingGroup of this._floatingGroups) {
                 floatingGroup.overlay.setBounds();
@@ -2358,8 +2383,8 @@ export class DockviewComponent
                 }
             } else if (targetActivePanel) {
                 // Ensure the target group's original active panel remains active
-                to.model.openPanel(targetActivePanel, { 
-                    skipSetGroupActive: true 
+                to.model.openPanel(targetActivePanel, {
+                    skipSetGroupActive: true
                 });
             }
         } else {
@@ -2384,13 +2409,13 @@ export class DockviewComponent
                     if (!selectedPopoutGroup) {
                         throw new Error('failed to find popout group');
                     }
-                    
+
                     // Remove from popout groups list to prevent automatic restoration
                     const index = this._popoutGroups.indexOf(selectedPopoutGroup);
                     if (index >= 0) {
                         this._popoutGroups.splice(index, 1);
                     }
-                    
+
                     // Clean up the reference group (ghost) if it exists and is hidden
                     if (selectedPopoutGroup.referenceGroup) {
                         const referenceGroup = this.getPanel(selectedPopoutGroup.referenceGroup);
@@ -2398,10 +2423,10 @@ export class DockviewComponent
                             this.doRemoveGroup(referenceGroup, { skipActive: true });
                         }
                     }
-                    
+
                     // Manually dispose the window without triggering restoration
                     selectedPopoutGroup.window.dispose();
-                    
+
                     // Update group's location and containers for target
                     if (to.api.location.type === 'grid') {
                         from.model.renderContainer = this.overlayRenderContainer;
@@ -2412,7 +2437,7 @@ export class DockviewComponent
                         from.model.dropTargetContainer = this.rootDropTargetContainer;
                         from.model.location = { type: 'floating' };
                     }
-                    
+
                     break;
                 }
             }
@@ -2425,7 +2450,7 @@ export class DockviewComponent
                     referenceLocation,
                     target
                 );
-                
+
                 // Add to grid for all moves targeting grid location
 
                 let size: number;
@@ -2454,7 +2479,7 @@ export class DockviewComponent
                 );
                 if (targetFloatingGroup) {
                     const box = targetFloatingGroup.overlay.toJSON();
-                    
+
                     // Calculate position based on available properties
                     let left: number, top: number;
                     if ('left' in box) {
@@ -2464,7 +2489,7 @@ export class DockviewComponent
                     } else {
                         left = 50; // Default fallback
                     }
-                    
+
                     if ('top' in box) {
                         top = box.top + 50;
                     } else if ('bottom' in box) {
@@ -2472,7 +2497,7 @@ export class DockviewComponent
                     } else {
                         top = 50; // Default fallback
                     }
-                    
+
                     this.addFloatingGroup(from, {
                         height: box.height,
                         width: box.width,
