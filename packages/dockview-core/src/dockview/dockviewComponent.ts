@@ -2353,7 +2353,15 @@ export class DockviewComponent
             });
 
             // Ensure group becomes active after move
-            this.doSetGroupAndPanelActive(to);
+            if (options.skipSetActive !== true) {
+                // For center moves (merges), we need to ensure the target group is active
+                // unless explicitly told not to (skipSetActive: true)
+                this.doSetGroupAndPanelActive(to);
+            } else if (!this.activePanel) {
+                // Even with skipSetActive: true, ensure there's an active panel if none exists
+                // This maintains basic functionality while respecting skipSetActive
+                this.doSetGroupAndPanelActive(to);
+            }
         } else {
             switch (from.api.location.type) {
                 case 'grid':
@@ -2491,7 +2499,8 @@ export class DockviewComponent
         });
 
         // Ensure group becomes active after move
-        if (!options.skipSetActive) {
+        if (options.skipSetActive === false) {
+            // Only activate when explicitly requested (skipSetActive: false)
             // Use 'to' group for non-center moves since 'from' may have been destroyed
             const targetGroup = to ?? from;
             this.doSetGroupAndPanelActive(targetGroup);
