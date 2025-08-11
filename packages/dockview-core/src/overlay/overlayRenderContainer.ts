@@ -14,23 +14,23 @@ class PositionCache {
     private cache = new Map<Element, { rect: { left: number; top: number; width: number; height: number }; frameId: number }>();
     private currentFrameId = 0;
     private rafId: number | null = null;
-    
+
     getPosition(element: Element): { left: number; top: number; width: number; height: number } {
         const cached = this.cache.get(element);
         if (cached && cached.frameId === this.currentFrameId) {
             return cached.rect;
         }
-        
+
         this.scheduleFrameUpdate();
         const rect = getDomNodePagePosition(element);
         this.cache.set(element, { rect, frameId: this.currentFrameId });
         return rect;
     }
-    
+
     invalidate(): void {
         this.currentFrameId++;
     }
-    
+
     private scheduleFrameUpdate() {
         if (this.rafId) return;
         this.rafId = requestAnimationFrame(() => {
@@ -65,8 +65,8 @@ export class OverlayRenderContainer extends CompositeDisposable {
     > = {};
 
     private _disposed = false;
-    private positionCache = new PositionCache();
-    private pendingUpdates = new Set<string>();
+    private readonly positionCache = new PositionCache();
+    private readonly pendingUpdates = new Set<string>();
 
     constructor(
         readonly element: HTMLElement,
@@ -127,43 +127,33 @@ export class OverlayRenderContainer extends CompositeDisposable {
 
         const resize = () => {
             const panelId = panel.api.id;
-            
+
             if (this.pendingUpdates.has(panelId)) {
                 return; // Update already scheduled
             }
-            
+
             this.pendingUpdates.add(panelId);
-            
+
             requestAnimationFrame(() => {
                 this.pendingUpdates.delete(panelId);
-                
+
                 if (this.isDisposed || !this.map[panelId]) {
                     return;
                 }
-                
+
                 const box = this.positionCache.getPosition(referenceContainer.element);
                 const box2 = this.positionCache.getPosition(this.element);
-                
+
                 // Use traditional positioning for overlay containers
                 const left = box.left - box2.left;
                 const top = box.top - box2.top;
                 const width = box.width;
                 const height = box.height;
-                
+
                 focusContainer.style.left = `${left}px`;
                 focusContainer.style.top = `${top}px`;
                 focusContainer.style.width = `${width}px`;
                 focusContainer.style.height = `${height}px`;
-                
-                // Debug logging for always rendered panels
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('Always render positioning:', {
-                        panelId,
-                        left, top, width, height,
-                        referenceBox: box,
-                        containerBox: box2
-                    });
-                }
 
                 toggleClass(
                     focusContainer,
@@ -174,14 +164,6 @@ export class OverlayRenderContainer extends CompositeDisposable {
         };
 
         const visibilityChanged = () => {
-            if (process.env.NODE_ENV === 'development') {
-                console.log('Always render visibility changed:', {
-                    panelId: panel.api.id,
-                    isVisible: panel.api.isVisible,
-                    renderer: panel.api.renderer
-                });
-            }
-            
             if (panel.api.isVisible) {
                 this.positionCache.invalidate();
                 resize();
