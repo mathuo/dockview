@@ -6,7 +6,7 @@ import {
     OverlayRenderContainer,
 } from '../../overlay/overlayRenderContainer';
 import { fromPartial } from '@total-typescript/shoehorn';
-import { Writable, exhaustMicrotaskQueue } from '../__test_utils__/utils';
+import { Writable, exhaustMicrotaskQueue, exhaustAnimationFrame } from '../__test_utils__/utils';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 
@@ -160,6 +160,7 @@ describe('overlayRenderContainer', () => {
         const container = cut.attach({ panel, referenceContainer });
 
         await exhaustMicrotaskQueue();
+        await exhaustAnimationFrame();
 
         expect(panelContentEl.parentElement).toBe(container);
         expect(container.parentElement).toBe(parentContainer);
@@ -175,6 +176,7 @@ describe('overlayRenderContainer', () => {
         ).toHaveBeenCalledTimes(1);
 
         onDidDimensionsChange.fire({});
+        await exhaustAnimationFrame();
         expect(container.style.display).toBe('');
 
         expect(container.style.left).toBe('49px');
@@ -196,13 +198,13 @@ describe('overlayRenderContainer', () => {
         onDidVisibilityChange.fire({});
         expect(container.style.display).toBe('');
 
-        expect(container.style.left).toBe('50px');
-        expect(container.style.top).toBe('100px');
-        expect(container.style.width).toBe('100px');
-        expect(container.style.height).toBe('200px');
+        expect(container.style.left).toBe('49px');
+        expect(container.style.top).toBe('99px');
+        expect(container.style.width).toBe('101px');
+        expect(container.style.height).toBe('201px');
         expect(
             referenceContainer.element.getBoundingClientRect
-        ).toHaveBeenCalledTimes(3);
+        ).toHaveBeenCalledTimes(2);
     });
 
     test('related z-index from `aria-level` set on floating panels', async () => {
@@ -261,5 +263,88 @@ describe('overlayRenderContainer', () => {
         expect(panelContentEl.parentElement!.style.zIndex).toBe(
             'calc(var(--dv-overlay-z-index, 999) + 5)'
         );
+    });
+
+    test('that frequent resize calls are batched to prevent shaking (issue #988)', async () => {
+        const cut = new OverlayRenderContainer(
+            parentContainer,
+            fromPartial<DockviewComponent>({})
+        );
+
+        const panelContentEl = document.createElement('div');
+        const onDidVisibilityChange = new Emitter<any>();
+        const onDidDimensionsChange = new Emitter<any>();
+        const onDidLocationChange = new Emitter<any>();
+
+        const panel = fromPartial<IDockviewPanel>({
+            api: {
+                id: 'test_panel_id',
+                onDidVisibilityChange: onDidVisibilityChange.event,
+                onDidDimensionsChange: onDidDimensionsChange.event,
+                onDidLocationChange: onDidLocationChange.event,
+                isVisible: true,
+                location: { type: 'grid' },
+            },
+            view: {
+                content: {
+                    element: panelContentEl,
+                },
+            },
+            group: {
+                api: {
+                    location: {
+                        type: 'grid',
+                    },
+                },
+            },
+        });
+
+        jest.spyOn(referenceContainer.element, 'getBoundingClientRect')
+            .mockReturnValue(
+                fromPartial<DOMRect>({
+                    left: 100,
+                    top: 200,
+                    width: 150,
+                    height: 250,
+                })
+            );
+
+        jest.spyOn(parentContainer, 'getBoundingClientRect').mockReturnValue(
+            fromPartial<DOMRect>({
+                left: 50,
+                top: 100,
+                width: 200,
+                height: 300,
+            })
+        );
+
+        const container = cut.attach({ panel, referenceContainer });
+
+        // Wait for initial positioning
+        await exhaustMicrotaskQueue();
+        await exhaustAnimationFrame();
+
+        expect(container.style.left).toBe('50px');
+        expect(container.style.top).toBe('100px');
+
+        // Simulate rapid resize events that could cause shaking
+        onDidDimensionsChange.fire({});
+        onDidDimensionsChange.fire({});
+        onDidDimensionsChange.fire({});
+        onDidDimensionsChange.fire({});
+        onDidDimensionsChange.fire({});
+
+        // Even with multiple rapid events, only one RAF should be scheduled
+        await exhaustAnimationFrame();
+        
+        expect(container.style.left).toBe('50px');
+        expect(container.style.top).toBe('100px');
+        expect(container.style.width).toBe('150px');
+        expect(container.style.height).toBe('250px');
+
+        // Verify that DOM measurements are cached within the same frame
+        // Should be called initially and possibly one more time for visibility change
+        expect(referenceContainer.element.getBoundingClientRect).toHaveBeenCalledTimes(2);
+        expect(parentContainer.getBoundingClientRect).toHaveBeenCalledTimes(2);
     });
 });
