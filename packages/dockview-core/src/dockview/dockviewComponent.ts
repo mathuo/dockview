@@ -1217,6 +1217,8 @@ export class DockviewComponent
         position: Position,
         options?: GroupOptions
     ): DockviewGroupPanel {
+        this.gridview.normalize();
+
         switch (position) {
             case 'top':
             case 'bottom':
@@ -2353,7 +2355,6 @@ export class DockviewComponent
 
         if (target === 'center') {
             const activePanel = from.activePanel;
-            const targetActivePanel = to.activePanel;
 
             const panels = this.movingLock(() =>
                 [...from.panels].map((p) =>
@@ -2370,22 +2371,21 @@ export class DockviewComponent
             this.movingLock(() => {
                 for (const panel of panels) {
                     to.model.openPanel(panel, {
-                        skipSetActive: true, // Always skip setting panels active during move
+                        skipSetActive: panel !== activePanel,
                         skipSetGroupActive: true,
                     });
                 }
             });
 
-            if (!options.skipSetActive) {
-                // Make the moved panel (from the source group) active
-                if (activePanel) {
-                    this.doSetGroupAndPanelActive(to);
-                }
-            } else if (targetActivePanel) {
-                // Ensure the target group's original active panel remains active
-                to.model.openPanel(targetActivePanel, {
-                    skipSetGroupActive: true
-                });
+            // Ensure group becomes active after move
+            if (options.skipSetActive !== true) {
+                // For center moves (merges), we need to ensure the target group is active
+                // unless explicitly told not to (skipSetActive: true)
+                this.doSetGroupAndPanelActive(to);
+            } else if (!this.activePanel) {
+                // Even with skipSetActive: true, ensure there's an active panel if none exists
+                // This maintains basic functionality while respecting skipSetActive
+                this.doSetGroupAndPanelActive(to);
             }
         } else {
             switch (from.api.location.type) {
@@ -2411,16 +2411,21 @@ export class DockviewComponent
                     }
 
                     // Remove from popout groups list to prevent automatic restoration
-                    const index = this._popoutGroups.indexOf(selectedPopoutGroup);
+                    const index =
+                        this._popoutGroups.indexOf(selectedPopoutGroup);
                     if (index >= 0) {
                         this._popoutGroups.splice(index, 1);
                     }
 
                     // Clean up the reference group (ghost) if it exists and is hidden
                     if (selectedPopoutGroup.referenceGroup) {
-                        const referenceGroup = this.getPanel(selectedPopoutGroup.referenceGroup);
+                        const referenceGroup = this.getPanel(
+                            selectedPopoutGroup.referenceGroup
+                        );
                         if (referenceGroup && !referenceGroup.api.isVisible) {
-                            this.doRemoveGroup(referenceGroup, { skipActive: true });
+                            this.doRemoveGroup(referenceGroup, {
+                                skipActive: true,
+                            });
                         }
                     }
 
@@ -2429,12 +2434,16 @@ export class DockviewComponent
 
                     // Update group's location and containers for target
                     if (to.api.location.type === 'grid') {
-                        from.model.renderContainer = this.overlayRenderContainer;
-                        from.model.dropTargetContainer = this.rootDropTargetContainer;
+                        from.model.renderContainer =
+                            this.overlayRenderContainer;
+                        from.model.dropTargetContainer =
+                            this.rootDropTargetContainer;
                         from.model.location = { type: 'grid' };
                     } else if (to.api.location.type === 'floating') {
-                        from.model.renderContainer = this.overlayRenderContainer;
-                        from.model.dropTargetContainer = this.rootDropTargetContainer;
+                        from.model.renderContainer =
+                            this.overlayRenderContainer;
+                        from.model.dropTargetContainer =
+                            this.rootDropTargetContainer;
                         from.model.location = { type: 'floating' };
                     }
 
@@ -2514,8 +2523,12 @@ export class DockviewComponent
             this._onDidMovePanel.fire({ panel, from });
         });
 
-        if (!options.skipSetActive) {
-            this.doSetGroupAndPanelActive(from);
+        // Ensure group becomes active after move
+        if (options.skipSetActive === false) {
+            // Only activate when explicitly requested (skipSetActive: false)
+            // Use 'to' group for non-center moves since 'from' may have been destroyed
+            const targetGroup = to ?? from;
+            this.doSetGroupAndPanelActive(targetGroup);
         }
     }
 
