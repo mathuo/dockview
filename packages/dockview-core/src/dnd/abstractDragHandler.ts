@@ -35,7 +35,7 @@ export abstract class DragHandler extends CompositeDisposable {
         this.addDisposables(
             this._onDragStart,
             addDisposableListener(this.el, 'dragstart', (event) => {
-                if (event.defaultPrevented || this.isCancelled(event)) {
+                if (this.isCancelled(event)) {
                     event.preventDefault();
                     return;
                 }

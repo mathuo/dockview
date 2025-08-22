@@ -359,11 +359,6 @@ export class Overlay extends CompositeDisposable {
         this.addDisposables(
             move,
             addDisposableListener(dragTarget, 'mousedown', (event) => {
-                if (event.defaultPrevented) {
-                    event.preventDefault();
-                    return;
-                }
-
                 // if somebody has marked this event then treat as a defaultPrevented
                 // without actually calling event.preventDefault()
                 if (quasiDefaultPrevented(event)) {
@@ -376,10 +371,6 @@ export class Overlay extends CompositeDisposable {
                 this.options.content,
                 'mousedown',
                 (event) => {
-                    if (event.defaultPrevented) {
-                        return;
-                    }
-
                     // if somebody has marked this event then treat as a defaultPrevented
                     // without actually calling event.preventDefault()
                     if (quasiDefaultPrevented(event)) {

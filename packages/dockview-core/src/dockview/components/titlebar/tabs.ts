@@ -116,9 +116,12 @@ export class Tabs extends CompositeDisposable {
             this._onDrop,
             this._onTabDragStart,
             addDisposableListener(this.element, 'mousedown', (event) => {
-                if (event.defaultPrevented) {
-                    return;
-                }
+                console.log('Tab mousedown:', {
+                    button: event.button,
+                    defaultPrevented: event.defaultPrevented,
+                    target: event.target,
+                    shiftKey: event.shiftKey
+                });
 
                 const isLeftClick = event.button === 0;
 
@@ -162,7 +165,7 @@ export class Tabs extends CompositeDisposable {
                 if (
                     runningWidth < parentElement.scrollLeft ||
                     runningWidth + element.clientWidth >
-                        parentElement.scrollLeft + parentElement.clientWidth
+                    parentElement.scrollLeft + parentElement.clientWidth
                 ) {
                     parentElement.scrollLeft = runningWidth;
                 }
@@ -184,9 +187,12 @@ export class Tabs extends CompositeDisposable {
                 this._onTabDragStart.fire({ nativeEvent: event, panel });
             }),
             tab.onMouseDown((event) => {
-                if (event.defaultPrevented) {
-                    return;
-                }
+                console.log('Tab mousedown:', {
+                    button: event.button,
+                    defaultPrevented: event.defaultPrevented,
+                    target: event.target,
+                    shiftKey: event.shiftKey
+                });
 
                 const isFloatingGroupsEnabled =
                     !this.accessor.options.disableFloatingGroups;
@@ -287,14 +293,14 @@ export class Tabs extends CompositeDisposable {
         const tabs = options.reset
             ? []
             : this._tabs
-                  .filter(
-                      (tab) =>
-                          !isChildEntirelyVisibleWithinParent(
-                              tab.value.element,
-                              this._tabsList
-                          )
-                  )
-                  .map((x) => x.value.panel.id);
+                .filter(
+                    (tab) =>
+                        !isChildEntirelyVisibleWithinParent(
+                            tab.value.element,
+                            this._tabsList
+                        )
+                )
+                .map((x) => x.value.panel.id);
 
         this._onOverflowTabsChange.fire({ tabs, reset: options.reset });
     }

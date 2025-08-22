@@ -5,7 +5,7 @@ import { DockviewGroupPanel } from '../../../../dockview/dockviewGroupPanel';
 import { fireEvent } from '@testing-library/dom';
 
 describe('voidContainer', () => {
-    test('that `pointerDown` triggers activation', () => {
+    test('that `mouseDown` triggers activation', () => {
         const accessor = fromPartial<DockviewComponent>({
             doSetGroupActive: jest.fn(),
         });
@@ -14,7 +14,7 @@ describe('voidContainer', () => {
 
         expect(accessor.doSetGroupActive).not.toHaveBeenCalled();
 
-        fireEvent.pointerDown(cut.element);
+        fireEvent.mouseDown(cut.element);
         expect(accessor.doSetGroupActive).toHaveBeenCalledWith(group);
     });
 });

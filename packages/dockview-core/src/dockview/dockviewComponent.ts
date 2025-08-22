@@ -588,10 +588,6 @@ export class DockviewComponent
 
                 this._onWillDrop.fire(willDropEvent);
 
-                if (willDropEvent.defaultPrevented) {
-                    return;
-                }
-
                 const data = getPanelData();
 
                 if (data) {

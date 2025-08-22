@@ -193,9 +193,6 @@ export class TabsContainer
                 this.voidContainer.element,
                 'mousedown',
                 (event) => {
-                    if (event.defaultPrevented) {
-                        return;
-                    }
 
                     const isFloatingGroupsEnabled =
                         !this.accessor.options.disableFloatingGroups;

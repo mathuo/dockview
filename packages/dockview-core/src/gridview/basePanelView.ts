@@ -87,10 +87,6 @@ export abstract class BasePanelView<T extends PanelApiImpl>
         const event = new WillFocusEvent();
         this.api._onWillFocus.fire(event);
 
-        if (event.defaultPrevented) {
-            return;
-        }
-
         this._element.focus();
     }
 

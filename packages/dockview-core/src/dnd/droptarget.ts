@@ -232,11 +232,6 @@ export class Droptarget extends CompositeDisposable {
                  */
                 this._onWillShowOverlay.fire(willShowOverlayEvent);
 
-                if (willShowOverlayEvent.defaultPrevented) {
-                    this.removeDropTarget();
-                    return;
-                }
-
                 this.markAsUsed(e);
 
                 if (overrideTraget) {

@@ -44,10 +44,6 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
                 ev.preventDefault();
             }),
             addDisposableListener(this.action, 'click', (ev) => {
-                if (ev.defaultPrevented) {
-                    return;
-                }
-
                 ev.preventDefault();
                 params.api.close();
             })

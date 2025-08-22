@@ -36,8 +36,7 @@ export interface IDockviewPanel extends IDisposable, IPanel {
 
 export class DockviewPanel
     extends CompositeDisposable
-    implements IDockviewPanel
-{
+    implements IDockviewPanel {
     readonly api: DockviewPanelApiImpl;
 
     private _group: DockviewGroupPanel;
@@ -138,10 +137,9 @@ export class DockviewPanel
     focus(): void {
         const event = new WillFocusEvent();
         this.api._onWillFocus.fire(event);
-
-        if (event.defaultPrevented) {
-            return;
-        }
+        console.log('Tab mousedown:', {
+            defaultPrevented: event.defaultPrevented,
+        });
 
         if (!this.api.isActive) {
             this.api.setActive();
