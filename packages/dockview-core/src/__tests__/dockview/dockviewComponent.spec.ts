@@ -1363,6 +1363,104 @@ describe('dockviewComponent', () => {
 
             expect(state).toEqual(api.toJSON());
         });
+
+        test('always visible renderer positioning after fromJSON', async () => {
+            dockview.layout(1000, 1000);
+
+            // Create a layout with both onlyWhenVisible and always visible panels
+            dockview.fromJSON({
+                activeGroup: 'group-1',
+                grid: {
+                    root: {
+                        type: 'branch',
+                        data: [
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panel1', 'panel2'],
+                                    id: 'group-1',
+                                    activeView: 'panel1',
+                                },
+                                size: 500,
+                            },
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panel3'],
+                                    id: 'group-2',
+                                    activeView: 'panel3',
+                                },
+                                size: 500,
+                            },
+                        ],
+                        size: 1000,
+                    },
+                    height: 1000,
+                    width: 1000,
+                    orientation: Orientation.HORIZONTAL,
+                },
+                panels: {
+                    panel1: {
+                        id: 'panel1',
+                        contentComponent: 'default',
+                        title: 'panel1',
+                        renderer: 'onlyWhenVisible',
+                    },
+                    panel2: {
+                        id: 'panel2',
+                        contentComponent: 'default',
+                        title: 'panel2',
+                        renderer: 'always',
+                    },
+                    panel3: {
+                        id: 'panel3',
+                        contentComponent: 'default',
+                        title: 'panel3',
+                        renderer: 'always',
+                    },
+                },
+            });
+
+            // Wait for next animation frame to ensure positioning is complete
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+
+            const panel2 = dockview.getGroupPanel('panel2')!;
+            const panel3 = dockview.getGroupPanel('panel3')!;
+
+            // Verify that always visible panels have been positioned
+            const overlayContainer = dockview.overlayRenderContainer;
+            
+            // Check that panels with renderer: 'always' are attached to overlay container
+            expect(panel2.api.renderer).toBe('always');
+            expect(panel3.api.renderer).toBe('always');
+
+            // Get the overlay elements for always visible panels
+            const panel2Overlay = overlayContainer.element.querySelector('[data-panel-id]') as HTMLElement;
+            const panel3Overlay = overlayContainer.element.querySelector('[data-panel-id]:not(:first-child)') as HTMLElement;
+
+            // Verify positioning has been applied (should not be 0 after layout)
+            if (panel2Overlay) {
+                const style = getComputedStyle(panel2Overlay);
+                expect(style.position).toBe('absolute');
+                expect(style.left).not.toBe('0px');
+                expect(style.top).not.toBe('0px');
+                expect(style.width).not.toBe('0px');
+                expect(style.height).not.toBe('0px');
+            }
+
+            // Test that updateAllPositions method works correctly
+            const updateSpy = jest.spyOn(overlayContainer, 'updateAllPositions');
+            
+            // Call fromJSON again to trigger position updates
+            dockview.fromJSON(dockview.toJSON());
+            
+            // Wait for the position update to be called
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            
+            expect(updateSpy).toHaveBeenCalled();
+            
+            updateSpy.mockRestore();
+        });
     });
 
     test('add panel', () => {

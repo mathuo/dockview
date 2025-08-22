@@ -61,6 +61,7 @@ export class OverlayRenderContainer extends CompositeDisposable {
             disposable: IDisposable;
             destroy: IDisposable;
             element: HTMLElement;
+            resize?: () => void;
         }
     > = {};
 
@@ -83,6 +84,22 @@ export class OverlayRenderContainer extends CompositeDisposable {
                 this._disposed = true;
             })
         );
+    }
+
+    updateAllPositions(): void {
+        if (this._disposed) {
+            return;
+        }
+
+        // Invalidate position cache to force recalculation
+        this.positionCache.invalidate();
+
+        // Call resize function directly for all visible panels
+        for (const entry of Object.values(this.map)) {
+            if (entry.panel.api.isVisible && entry.resize) {
+                entry.resize();
+            }
+        }
     }
 
     detatch(panel: IDockviewPanel): boolean {
@@ -290,6 +307,8 @@ export class OverlayRenderContainer extends CompositeDisposable {
         this.map[panel.api.id].disposable.dispose();
         // and reset the disposable to the active reference-container
         this.map[panel.api.id].disposable = disposable;
+        // store the resize function for direct access
+        this.map[panel.api.id].resize = resize;
 
         return focusContainer;
     }

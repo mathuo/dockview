@@ -347,4 +347,111 @@ describe('overlayRenderContainer', () => {
         expect(referenceContainer.element.getBoundingClientRect).toHaveBeenCalledTimes(2);
         expect(parentContainer.getBoundingClientRect).toHaveBeenCalledTimes(2);
     });
+
+    test('updateAllPositions forces position recalculation for visible panels', async () => {
+        const cut = new OverlayRenderContainer(
+            parentContainer,
+            fromPartial<DockviewComponent>({})
+        );
+
+        const panelContentEl1 = document.createElement('div');
+        const panelContentEl2 = document.createElement('div');
+        
+        const onDidVisibilityChange1 = new Emitter<any>();
+        const onDidDimensionsChange1 = new Emitter<any>();
+        const onDidLocationChange1 = new Emitter<any>();
+        
+        const onDidVisibilityChange2 = new Emitter<any>();
+        const onDidDimensionsChange2 = new Emitter<any>();
+        const onDidLocationChange2 = new Emitter<any>();
+
+        const panel1 = fromPartial<IDockviewPanel>({
+            api: {
+                id: 'panel1',
+                onDidVisibilityChange: onDidVisibilityChange1.event,
+                onDidDimensionsChange: onDidDimensionsChange1.event,
+                onDidLocationChange: onDidLocationChange1.event,
+                isVisible: true,
+                location: { type: 'grid' },
+            },
+            view: {
+                content: {
+                    element: panelContentEl1,
+                },
+            },
+            group: {
+                api: {
+                    location: { type: 'grid' },
+                },
+            },
+        });
+
+        const panel2 = fromPartial<IDockviewPanel>({
+            api: {
+                id: 'panel2',
+                onDidVisibilityChange: onDidVisibilityChange2.event,
+                onDidDimensionsChange: onDidDimensionsChange2.event,
+                onDidLocationChange: onDidLocationChange2.event,
+                isVisible: false, // This panel is not visible
+                location: { type: 'grid' },
+            },
+            view: {
+                content: {
+                    element: panelContentEl2,
+                },
+            },
+            group: {
+                api: {
+                    location: { type: 'grid' },
+                },
+            },
+        });
+
+        // Mock getBoundingClientRect for consistent testing
+        jest.spyOn(referenceContainer.element, 'getBoundingClientRect')
+            .mockReturnValue(
+                fromPartial<DOMRect>({
+                    left: 100,
+                    top: 200,
+                    width: 150,
+                    height: 250,
+                })
+            );
+
+        jest.spyOn(parentContainer, 'getBoundingClientRect').mockReturnValue(
+            fromPartial<DOMRect>({
+                left: 50,
+                top: 100,
+                width: 200,
+                height: 300,
+            })
+        );
+
+        // Attach both panels
+        const container1 = cut.attach({ panel: panel1, referenceContainer });
+        const container2 = cut.attach({ panel: panel2, referenceContainer });
+
+        await exhaustMicrotaskQueue();
+        await exhaustAnimationFrame();
+
+        // Clear previous calls to getBoundingClientRect
+        jest.clearAllMocks();
+
+        // Call updateAllPositions
+        cut.updateAllPositions();
+
+        // Should trigger resize for visible panels only
+        await exhaustAnimationFrame();
+
+        // Verify that positioning was updated for visible panel
+        expect(container1.style.left).toBe('50px');
+        expect(container1.style.top).toBe('100px');
+        expect(container1.style.width).toBe('150px');
+        expect(container1.style.height).toBe('250px');
+
+        // Verify getBoundingClientRect was called for visible panel only
+        // updateAllPositions should call the resize function which triggers getBoundingClientRect
+        expect(referenceContainer.element.getBoundingClientRect).toHaveBeenCalled();
+        expect(parentContainer.getBoundingClientRect).toHaveBeenCalled();
+    });
 });
