@@ -34,7 +34,7 @@ export class Scrollbar extends CompositeDisposable {
             }),
             addDisposableListener(
                 this._horizontalScrollbar,
-                'pointerdown',
+                'mousedown',
                 (event) => {
                     event.preventDefault();
 

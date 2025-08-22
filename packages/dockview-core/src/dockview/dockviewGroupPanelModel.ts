@@ -989,7 +989,7 @@ export class DockviewGroupPanelModel
             });
             this.watermark = watermark;
 
-            addDisposableListener(this.watermark.element, 'pointerdown', () => {
+            addDisposableListener(this.watermark.element, 'mousedown', () => {
                 if (!this.isActive) {
                     this.accessor.doSetGroupActive(this.groupPanel);
                 }

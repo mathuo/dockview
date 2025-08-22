@@ -51,7 +51,7 @@ export class PopupService extends CompositeDisposable {
         this._active = wrapper;
 
         this._activeDisposable.value = new CompositeDisposable(
-            addDisposableListener(window, 'pointerdown', (event) => {
+            addDisposableListener(window, 'mousedown', (event) => {
                 const target = event.target;
 
                 if (!(target instanceof HTMLElement)) {

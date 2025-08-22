@@ -32,7 +32,7 @@ export const DockviewDefaultTab: React.FunctionComponent<
     params: _params,
     hideClose,
     closeActionOverride,
-    onPointerDown,
+    onMouseDown,
     onPointerUp,
     onPointerLeave,
     tabLocation,
@@ -59,12 +59,12 @@ export const DockviewDefaultTab: React.FunctionComponent<
         event.preventDefault();
     }, []);
 
-    const _onPointerDown = React.useCallback(
+    const _onMouseDown = React.useCallback(
         (event: React.PointerEvent<HTMLDivElement>) => {
             isMiddleMouseButton.current = event.button === 1;
-            onPointerDown?.(event);
+            onMouseDown?.(event);
         },
-        [onPointerDown]
+        [onMouseDown]
     );
 
     const _onPointerUp = React.useCallback(
@@ -91,7 +91,7 @@ export const DockviewDefaultTab: React.FunctionComponent<
         <div
             data-testid="dockview-dv-default-tab"
             {...rest}
-            onPointerDown={_onPointerDown}
+            onMouseDown={_onMouseDown}
             onPointerUp={_onPointerUp}
             onPointerLeave={_onPointerLeave}
             className="dv-default-tab"
@@ -100,7 +100,7 @@ export const DockviewDefaultTab: React.FunctionComponent<
             {!hideClose && tabLocation !== 'headerOverflow' && (
                 <div
                     className="dv-default-tab-action"
-                    onPointerDown={onBtnPointerDown}
+                    onMouseDown={onBtnPointerDown}
                     onClick={onClose}
                 >
                     <CloseButton />

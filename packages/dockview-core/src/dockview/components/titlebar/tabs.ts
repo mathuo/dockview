@@ -115,7 +115,7 @@ export class Tabs extends CompositeDisposable {
             this._onWillShowOverlay,
             this._onDrop,
             this._onTabDragStart,
-            addDisposableListener(this.element, 'pointerdown', (event) => {
+            addDisposableListener(this.element, 'mousedown', (event) => {
                 if (event.defaultPrevented) {
                     return;
                 }
@@ -183,7 +183,7 @@ export class Tabs extends CompositeDisposable {
             tab.onDragStart((event) => {
                 this._onTabDragStart.fire({ nativeEvent: event, panel });
             }),
-            tab.onPointerDown((event) => {
+            tab.onMouseDown((event) => {
                 if (event.defaultPrevented) {
                     return;
                 }

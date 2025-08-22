@@ -631,7 +631,7 @@ describe('splitview', () => {
         // start the drag event
         fireEvent(
             sashElement,
-            new MouseEvent('pointerdown', { clientX: 50, clientY: 100 })
+            new MouseEvent('mousedown', { clientX: 50, clientY: 100 })
         );
 
         expect(addEventListenerSpy).toBeCalledTimes(3);

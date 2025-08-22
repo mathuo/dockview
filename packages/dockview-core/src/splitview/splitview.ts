@@ -434,7 +434,7 @@ export class Splitview {
             const sash = document.createElement('div');
             sash.className = 'dv-sash';
 
-            const onPointerStart = (event: PointerEvent) => {
+            const onPointerStart = (event: MouseEvent) => {
                 for (const item of this.viewItems) {
                     item.enabled = false;
                 }
@@ -521,7 +521,7 @@ export class Splitview {
                     };
                 }
 
-                const onPointerMove = (event: PointerEvent) => {
+                const onPointerMove = (event: MouseEvent) => {
                     const current =
                         this._orientation === Orientation.HORIZONTAL
                             ? event.clientX
@@ -552,24 +552,24 @@ export class Splitview {
 
                     this.saveProportions();
 
-                    document.removeEventListener('pointermove', onPointerMove);
-                    document.removeEventListener('pointerup', end);
-                    document.removeEventListener('pointercancel', end);
+                    document.removeEventListener('mousemove', onPointerMove);
+                    document.removeEventListener('mouseup', end);
+                    document.removeEventListener('mouseleave', end);
 
                     this._onDidSashEnd.fire(undefined);
                 };
 
-                document.addEventListener('pointermove', onPointerMove);
-                document.addEventListener('pointerup', end);
-                document.addEventListener('pointercancel', end);
+                document.addEventListener('mousemove', onPointerMove);
+                document.addEventListener('mouseup', end);
+                document.addEventListener('mouseleave', end);
             };
 
-            sash.addEventListener('pointerdown', onPointerStart);
+            sash.addEventListener('mousedown', onPointerStart);
 
             const sashItem: ISashItem = {
                 container: sash,
                 disposable: () => {
-                    sash.removeEventListener('pointerdown', onPointerStart);
+                    sash.removeEventListener('mousedown', onPointerStart);
                     this.sashContainer.removeChild(sash);
                 },
             };

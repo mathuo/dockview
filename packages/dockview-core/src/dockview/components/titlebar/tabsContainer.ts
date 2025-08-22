@@ -191,7 +191,7 @@ export class TabsContainer
             }),
             addDisposableListener(
                 this.voidContainer.element,
-                'pointerdown',
+                'mousedown',
                 (event) => {
                     if (event.defaultPrevented) {
                         return;
@@ -342,7 +342,7 @@ export class TabsContainer
             }),
             addDisposableListener(
                 root,
-                'pointerdown',
+                'mousedown',
                 (event) => {
                     event.preventDefault();
                 },
@@ -378,7 +378,7 @@ export class TabsContainer
                         !panelObject.api.isActive
                     );
 
-                    wrapper.addEventListener('pointerdown', () => {
+                    wrapper.addEventListener('mousedown', () => {
                         this.accessor.popupService.close();
                         tab.element.scrollIntoView();
                         tab.panel.api.setActive();

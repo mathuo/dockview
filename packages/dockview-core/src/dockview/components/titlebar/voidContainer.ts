@@ -41,7 +41,7 @@ export class VoidContainer extends CompositeDisposable {
         this.addDisposables(
             this._onDrop,
             this._onDragStart,
-            addDisposableListener(this._element, 'pointerdown', () => {
+            addDisposableListener(this._element, 'mousedown', () => {
                 this.accessor.doSetGroupActive(this.group);
             })
         );

@@ -358,7 +358,7 @@ export class Overlay extends CompositeDisposable {
 
         this.addDisposables(
             move,
-            addDisposableListener(dragTarget, 'pointerdown', (event) => {
+            addDisposableListener(dragTarget, 'mousedown', (event) => {
                 if (event.defaultPrevented) {
                     event.preventDefault();
                     return;
@@ -374,7 +374,7 @@ export class Overlay extends CompositeDisposable {
             }),
             addDisposableListener(
                 this.options.content,
-                'pointerdown',
+                'mousedown',
                 (event) => {
                     if (event.defaultPrevented) {
                         return;
@@ -393,7 +393,7 @@ export class Overlay extends CompositeDisposable {
             ),
             addDisposableListener(
                 this.options.content,
-                'pointerdown',
+                'mousedown',
                 () => {
                     arialLevelTracker.push(this._element);
                 },
@@ -425,7 +425,7 @@ export class Overlay extends CompositeDisposable {
 
         this.addDisposables(
             move,
-            addDisposableListener(resizeHandleElement, 'pointerdown', (e) => {
+            addDisposableListener(resizeHandleElement, 'mousedown', (e) => {
                 e.preventDefault();
 
                 let startPosition: {
