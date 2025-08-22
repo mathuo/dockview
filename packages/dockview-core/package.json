@@ -1,6 +1,6 @@
 {
   "name": "@samelie/dockview-core",
-  "version": "4.2.4-mousedown.1",
+  "version": "4.2.4-mousedown.2",
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
   "keywords": [
     "splitview",
