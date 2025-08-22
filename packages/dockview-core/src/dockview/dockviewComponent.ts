@@ -1621,6 +1621,11 @@ export class DockviewComponent
 
         this.updateWatermark();
 
+        // Force position updates for always visible panels after DOM layout is complete
+        requestAnimationFrame(() => {
+            this.overlayRenderContainer.updateAllPositions();
+        });
+
         this._onDidLayoutFromJSON.fire();
     }
 
