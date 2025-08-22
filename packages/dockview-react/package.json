@@ -54,6 +54,6 @@
     "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-react --coverage"
   },
   "dependencies": {
-    "dockview": "^4.2.4"
+    "@samelie/dockview": "^4.2.4-mousedown.1"
   }
 }
