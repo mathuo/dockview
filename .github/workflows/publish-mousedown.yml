@@ -1,0 +1,45 @@
+name: Publish Mousedown Fork
+
+on:
+    push:
+        branches: [ feature/mousedown-events ]
+
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+        env:
+            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        permissions:
+            id-token: write
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '20.x'
+                  registry-url: 'https://registry.npmjs.org'
+
+            - uses: actions/cache@v4
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
+
+            - run: yarn install
+            - run: npm run build
+            
+            - name: Publish @samelie/dockview-core
+              run: npm publish --access public
+              working-directory: packages/dockview-core
+              
+            - name: Publish @samelie/dockview
+              run: npm publish --access public
+              working-directory: packages/dockview
+              
+            - name: Publish @samelie/dockview-vue
+              run: npm publish --access public
+              working-directory: packages/dockview-vue
+              
+            - name: Publish @samelie/dockview-react
+              run: npm publish --access public
+              working-directory: packages/dockview-react

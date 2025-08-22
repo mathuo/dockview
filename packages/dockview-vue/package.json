@@ -1,6 +1,6 @@
 {
-  "name": "dockview-vue",
-  "version": "4.2.4",
+  "name": "@samelie/dockview-vue",
+  "version": "4.2.4-mousedown.1",
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
   "keywords": [
     "splitview",
@@ -52,7 +52,7 @@
     "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-vue --coverage"
   },
   "dependencies": {
-    "dockview-core": "^4.2.4"
+    "@samelie/dockview-core": "^4.2.4-mousedown.1"
   },
   "peerDependencies": {
     "vue": "^3.4.0"

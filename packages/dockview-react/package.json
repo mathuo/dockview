@@ -1,6 +1,6 @@
 {
-  "name": "dockview-react",
-  "version": "4.2.4",
+  "name": "@samelie/dockview-react",
+  "version": "4.2.4-mousedown.1",
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
   "keywords": [
     "splitview",
