@@ -5,7 +5,7 @@ import {
     PROPERTY_KEYS_DOCKVIEW,
     type DockviewFrameworkOptions,
 createDockview,
-} from 'dockview-core';
+} from '@samelie/dockview-core';
 import {
     ref,
     onMounted,

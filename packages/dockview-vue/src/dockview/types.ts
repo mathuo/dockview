@@ -1,4 +1,4 @@
-import { type DockviewOptions, type DockviewReadyEvent } from 'dockview-core';
+import { type DockviewOptions, type DockviewReadyEvent } from '@samelie/dockview-core';
 
 export interface VueProps {
     watermarkComponent?: string;

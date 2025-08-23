@@ -1,6 +1,6 @@
 {
   "name": "@samelie/dockview",
-  "version": "4.2.4-mousedown.2",
+  "version": "4.2.4-mousedown.3",
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
   "keywords": [
     "splitview",
@@ -54,7 +54,7 @@
     "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage"
   },
   "dependencies": {
-    "@samelie/dockview-core": "^4.2.4-mousedown.2"
+    "@samelie/dockview-core": "^4.2.4-mousedown.3"
   },
   "peerDependencies": {
     "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"

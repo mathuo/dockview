@@ -13,7 +13,7 @@ import type {
     Parameters,
     TabPartInitParameters,
     WatermarkRendererInitParameters,
-} from 'dockview-core';
+} from '@samelie/dockview-core';
 import {
     createVNode,
     type ComponentOptionsBase,

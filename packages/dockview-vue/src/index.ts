@@ -1,4 +1,4 @@
-export * from 'dockview-core';
+export * from '@samelie/dockview-core';
 
 import DockviewVue from './dockview/dockview.vue';
 export { DockviewVue };
