@@ -55,5 +55,6 @@
   },
   "dependencies": {
     "dockview-core": "^4.2.4"
-  }
+  },
+  "gitHead": "5a2be44ecc845459af49105dd86bb77f4bc004cf"
 }
