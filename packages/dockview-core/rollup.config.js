@@ -5,7 +5,8 @@ const typescript = require('@rollup/plugin-typescript');
 const terser = require('@rollup/plugin-terser');
 const postcss = require('rollup-plugin-postcss');
 
-const { name, version, homepage, license } = require('./package.json');
+const { name: fullName, version, homepage, license } = require('./package.json');
+const name = fullName.split('/').pop(); // Extract 'dockview-core' from '@samelie/dockview-core'
 const main = join(__dirname, './scripts/rollupEntryTarget.ts');
 const mainNoStyles = join(__dirname, './src/index.ts');
 const outputDir = join(__dirname, 'dist');
@@ -50,7 +51,7 @@ function createBundle(format, options) {
         globals: {},
         banner: [
             `/**`,
-            ` * ${name}`,
+            ` * ${fullName}`,
             ` * @version ${version}`,
             ` * @link ${homepage}`,
             ` * @license ${license}`,
