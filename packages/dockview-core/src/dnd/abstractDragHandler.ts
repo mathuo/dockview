@@ -13,7 +13,7 @@ export abstract class DragHandler extends CompositeDisposable {
     private readonly _onDragStart = new Emitter<DragEvent>();
     readonly onDragStart = this._onDragStart.event;
 
-    constructor(protected readonly el: HTMLElement) {
+    constructor(protected readonly el: HTMLElement, private disabled?: boolean) {
         super();
 
         this.addDisposables(
@@ -23,6 +23,10 @@ export abstract class DragHandler extends CompositeDisposable {
         );
 
         this.configure();
+    }
+
+    public setDisabled(disabled: boolean): void {
+        this.disabled = disabled;
     }
 
     abstract getData(event: DragEvent): IDisposable;
@@ -35,7 +39,7 @@ export abstract class DragHandler extends CompositeDisposable {
         this.addDisposables(
             this._onDragStart,
             addDisposableListener(this.el, 'dragstart', (event) => {
-                if (event.defaultPrevented || this.isCancelled(event)) {
+                if (event.defaultPrevented || this.isCancelled(event) || this.disabled) {
                     event.preventDefault();
                     return;
                 }
