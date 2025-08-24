@@ -5437,6 +5437,73 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(1);
             expect(dockview.panels.length).toBe(2);
         });
+
+        test('component should remain visible when moving from floating back to new grid group (GitHub issue #996)', () => {
+            const container = document.createElement('div');
+            container.style.width = '800px';
+            container.style.height = '600px';
+            document.body.appendChild(container);
+            
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    const element = document.createElement('div');
+                    element.innerHTML = `<div class="test-content-${options.id}">Test Content: ${options.id}</div>`;
+                    element.style.background = 'lightblue';
+                    element.style.padding = '10px';
+                    return new PanelContentPartTest(options.id, options.name);
+                }
+            });
+            
+            dockview.layout(800, 600);
+            
+            try {
+                // 1. Create a panel
+                const panel = dockview.addPanel({
+                    id: 'test-panel',
+                    component: 'default'
+                });
+                
+                // Verify initial state
+                expect(panel.api.location.type).toBe('grid');
+                
+                // 2. Move to floating group
+                dockview.addFloatingGroup(panel, {
+                    position: {
+                        bottom: 50,
+                        right: 50,
+                    },
+                    width: 400,
+                    height: 300,
+                });
+                
+                // Verify floating state
+                expect(panel.api.location.type).toBe('floating');
+                
+                // 3. Move back to grid using addGroup + moveTo pattern (reproducing user's exact issue)
+                const addGroup = dockview.addGroup();
+                panel.api.moveTo({ group: addGroup });
+                
+                // THIS IS THE FIX: Component should still be visible
+                expect(panel.api.location.type).toBe('grid');
+                
+                // Test multiple scenarios
+                const panel2 = dockview.addPanel({
+                    id: 'panel-2',
+                    component: 'default',
+                    floating: true
+                });
+                
+                const group2 = dockview.addGroup();
+                panel2.api.moveTo({ group: group2 });
+                
+                expect(panel2.api.location.type).toBe('grid');
+            } finally {
+                dockview.dispose();
+                if (container.parentElement) {
+                    container.parentElement.removeChild(container);
+                }
+            }
+        });
     });
 
     describe('popout group', () => {

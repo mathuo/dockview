@@ -2190,10 +2190,13 @@ export class DockviewComponent
                 this.doRemoveGroup(sourceGroup, { skipActive: true });
             }
 
+            // Check if destination group is empty - if so, force render the component
+            const isDestinationGroupEmpty = destinationGroup.model.size === 0;
+            
             this.movingLock(() =>
                 destinationGroup.model.openPanel(removedPanel, {
                     index: destinationIndex,
-                    skipSetActive: options.skipSetActive ?? false,
+                    skipSetActive: (options.skipSetActive ?? false) && !isDestinationGroupEmpty,
                     skipSetGroupActive: true,
                 })
             );
