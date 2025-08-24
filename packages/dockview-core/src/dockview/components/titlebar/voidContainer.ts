@@ -15,6 +15,7 @@ import { toggleClass } from '../../../dom';
 export class VoidContainer extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private readonly dropTarget: Droptarget;
+    private readonly handler: GroupDragHandler;
 
     private readonly _onDrop = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDrop.event;
@@ -49,7 +50,7 @@ export class VoidContainer extends CompositeDisposable {
             })
         );
 
-        const handler = new GroupDragHandler(this._element, accessor, group);
+        this.handler = new GroupDragHandler(this._element, accessor, group, !!this.accessor.options.disableDnd);
 
         this.dropTarget = new Droptarget(this._element, {
             acceptedTargetZones: ['center'],
@@ -72,8 +73,8 @@ export class VoidContainer extends CompositeDisposable {
         this.onWillShowOverlay = this.dropTarget.onWillShowOverlay;
 
         this.addDisposables(
-            handler,
-            handler.onDragStart((event) => {
+            this.handler,
+            this.handler.onDragStart((event) => {
                 this._onDragStart.fire(event);
             }),
             this.dropTarget.onDrop((event) => {
@@ -86,5 +87,6 @@ export class VoidContainer extends CompositeDisposable {
     updateDragAndDropState(): void {
         this._element.draggable = !this.accessor.options.disableDnd;
         toggleClass(this._element, 'dv-draggable', !this.accessor.options.disableDnd);
+        this.handler.setDisabled(!!this.accessor.options.disableDnd);
     }
 }
