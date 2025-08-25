@@ -14,9 +14,10 @@ export class GroupDragHandler extends DragHandler {
     constructor(
         element: HTMLElement,
         private readonly accessor: DockviewComponent,
-        private readonly group: DockviewGroupPanel
+        private readonly group: DockviewGroupPanel,
+        disabled?: boolean
     ) {
-        super(element);
+        super(element, disabled);
 
         this.addDisposables(
             addDisposableListener(
