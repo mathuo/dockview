@@ -1,1 +1,1 @@
-export * from 'dockview-core';
+export * from './public-api';

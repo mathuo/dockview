@@ -1,14 +1,9 @@
 {
-    "extends": "../../tsconfig.base.json",
+    "extends": "./tsconfig.json",
     "compilerOptions": {
-        "module": "ES2020",
-        "moduleResolution": "node",
-        "target": "es6",
+        "module": "es2022",
         "outDir": "dist/esm",
         "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.esm",
-        "jsx": "react",
-        "rootDir": "src"
-    },
-    "include": ["src"],
-    "exclude": ["**/node_modules", "src/__tests__"]
+        "incremental": true
+    }
 }

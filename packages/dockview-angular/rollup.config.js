@@ -79,11 +79,13 @@ function createBundle(format, options) {
         output['name'] = name;
     }
 
-    external.push('react', 'react-dom');
+    // Angular externals
+    external.push('@angular/core', '@angular/common', 'rxjs');
 
     if (format === 'umd') {
-        output.globals['react'] = 'React';
-        output.globals['react-dom'] = 'ReactDOM';
+        output.globals['@angular/core'] = 'ng.core';
+        output.globals['@angular/common'] = 'ng.common';
+        output.globals['rxjs'] = 'rxjs';
     }
 
     return {
