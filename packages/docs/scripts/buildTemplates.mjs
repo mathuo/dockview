@@ -14,6 +14,7 @@ const { version } = JSON.parse(
 
 const REACT_VERSION = '18.2.0';
 const VUE_VERSION = '3.4.21';
+const ANGULAR_VERSION = '17.0.0';
 const DOCKVIEW_VERSION = version; //'latest';;
 const USE_LOCAL_CDN = argv.slice(2).includes('--local');
 
@@ -54,7 +55,20 @@ const DOCKVIEW_CDN = {
             'dockview-core/': `${local}/dockview-core/`,
         },
     },
-    angular: {},
+    angular: {
+        remote: {
+            'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/dist/dockview-core.esm.js`,
+            'dockview-core/': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/`,
+            'dockview-angular': `https://cdn.jsdelivr.net/npm/dockview-angular@${DOCKVIEW_VERSION}/dist/dockview-angular.esm.js`,
+            'dockview-angular/': `https://cdn.jsdelivr.net/npm/dockview-angular@${DOCKVIEW_VERSION}/`,
+        },
+        local: {
+            'dockview-core': `${local}/dockview-core/dist/dockview-core.esm.js`,
+            'dockview-core/': `${local}/dockview-core/`,
+            'dockview-angular': `${local}/dockview-angular/dist/dockview-angular.esm.js`,
+            'dockview-angular/': `${local}/dockview-angular/`,
+        },
+    },
 };
 
 const IMPORTS_PATHS = {
@@ -69,7 +83,14 @@ const IMPORTS_PATHS = {
         'vue-sfc-loader': `https://cdn.jsdelivr.net/npm/vue3-sfc-loader@0.9.5/dist/vue3-sfc-loader.js`,
     },
     typescript: {},
-    angular: {},
+    angular: {
+        '@angular/core': `https://esm.sh/@angular/core@${ANGULAR_VERSION}`,
+        '@angular/common': `https://esm.sh/@angular/common@${ANGULAR_VERSION}`,
+        '@angular/platform-browser-dynamic': `https://esm.sh/@angular/platform-browser-dynamic@${ANGULAR_VERSION}`,
+        '@angular/platform-browser': `https://esm.sh/@angular/platform-browser@${ANGULAR_VERSION}`,
+        'rxjs': `https://esm.sh/rxjs@7.8.1`,
+        'zone.js': `https://esm.sh/zone.js@0.14.3`,
+    },
 };
 
 const template = fs
@@ -94,7 +115,7 @@ const input_dir = path.join(__dirname, '../templates');
 const output = path.join(__dirname, '../static/templates');
 
 const COMPONENTS = ['dockview'];
-const FRAMEWORKS = ['react', 'vue', 'typescript'];
+const FRAMEWORKS = ['react', 'vue', 'typescript', 'angular'];
 
 const list = [];
 
@@ -128,6 +149,8 @@ for (const component of COMPONENTS) {
                 app:
                     framework === 'react'
                         ? './src/index.tsx'
+                        : framework === 'angular'
+                        ? './src/index.ts'
                         : './src/index.ts',
                 importPaths: {
                     ...IMPORTS_PATHS[framework],
