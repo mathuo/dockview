@@ -52,5 +52,6 @@
     "rebuild": "npm run clean && npm run build",
     "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core",
     "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core --coverage"
-  }
+  },
+  "gitHead": "63f81eeaa1cabd81fe38c800c7970734a511eed6"
 }
