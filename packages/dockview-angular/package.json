@@ -56,11 +56,13 @@
     "dockview-core": "^4.7.0"
   },
   "peerDependencies": {
-    "@angular/core": ">=14.0.0",
     "@angular/common": ">=14.0.0",
+    "@angular/core": ">=14.0.0",
     "rxjs": ">=7.0.0"
   },
   "devDependencies": {
-    "ng-packagr": "^17.0.0"
+    "jest-preset-angular": "^14.6.1",
+    "ng-packagr": "^17.0.0",
+    "zone.js": "^0.15.1"
   }
 }

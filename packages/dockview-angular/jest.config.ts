@@ -1,7 +1,7 @@
 import { JestConfigWithTsJest } from 'ts-jest';
 
 const config: JestConfigWithTsJest = {
-    preset: 'ts-jest',
+    preset: 'jest-preset-angular',
     roots: ['<rootDir>/packages/dockview-angular'],
     modulePaths: ['<rootDir>/packages/dockview-angular/src'],
     displayName: { name: 'dockview-angular', color: 'blue' },
@@ -12,11 +12,9 @@ const config: JestConfigWithTsJest = {
         '!<rootDir>/packages/dockview-angular/src/**/index.ts',
         '!<rootDir>/packages/dockview-angular/src/public-api.ts',
     ],
-    setupFiles: [
-        '<rootDir>/packages/dockview-angular/src/__tests__/__mocks__/resizeObserver.js',
-        '<rootDir>/packages/dockview-angular/src/__tests__/__mocks__/angular-testing.js',
+    setupFilesAfterEnv: [
+        '<rootDir>/packages/dockview-angular/src/__tests__/setup-jest.ts'
     ],
-    setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
     coveragePathIgnorePatterns: ['/node_modules/'],
     modulePathIgnorePatterns: [
         '<rootDir>/packages/dockview-angular/src/__tests__/__mocks__',
@@ -25,20 +23,19 @@ const config: JestConfigWithTsJest = {
     coverageDirectory: '<rootDir>/packages/dockview-angular/coverage/',
     testResultsProcessor: 'jest-sonar-reporter',
     testEnvironment: 'jsdom',
-    transform: {
-        '^.+\\.tsx?$': [
-            'ts-jest',
-            {
-                tsconfig: '<rootDir>/tsconfig.test.json',
-            },
-        ],
-    },
-    moduleNameMapper: {
-        '^@angular/(.*)$': '<rootDir>/../../node_modules/@angular/$1',
-    },
+    testMatch: [
+        '<rootDir>/packages/dockview-angular/src/**/*.spec.ts',
+        '<rootDir>/packages/dockview-angular/src/**/*.test.ts'
+    ],
     transformIgnorePatterns: [
         'node_modules/(?!(.*\\.mjs$|@angular|rxjs))'
     ],
+    globals: {
+        'ts-jest': {
+            tsconfig: '<rootDir>/tsconfig.spec.json',
+            stringifyContentPathRegex: '\\.(html|svg)$',
+        },
+    },
 };
 
 export default config;

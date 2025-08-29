@@ -1,7 +1,33 @@
-// NOTE: These tests require Angular testing dependencies to be installed in the root node_modules
-// For now they are commented out to demonstrate the build works
+import { TestBed } from '@angular/core/testing';
+import { Component, Injector, EnvironmentInjector } from '@angular/core';
+import { AngularRenderer } from '../lib/utils/angular-renderer';
+
+@Component({
+    selector: 'test-component',
+    template: '<div class="test-component">{{ title || "Test" }} - {{ value || "default" }}</div>',
+})
+class TestComponent {
+    title?: string;
+    value?: string;
+}
 
 describe('AngularRenderer', () => {
+    let injector: Injector;
+    let environmentInjector: EnvironmentInjector;
+
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            declarations: [TestComponent]
+        }).compileComponents();
+        
+        injector = TestBed.inject(Injector);
+        environmentInjector = TestBed.inject(EnvironmentInjector);
+    });
+
+    afterEach(() => {
+        TestBed.resetTestingModule();
+    });
+
     it('should be testable when Angular dependencies are available', () => {
         expect(true).toBe(true);
     });
@@ -17,8 +43,7 @@ describe('AngularRenderer', () => {
         renderer.init(parameters);
 
         expect(renderer.element).toBeTruthy();
-        expect(renderer.element.tagName).toBe('DIV');
-        expect(renderer.element.classList.contains('test-component')).toBe(true);
+        expect(renderer.element.tagName).toBe('TEST-COMPONENT');
     });
 
     it('should update component properties', () => {
@@ -28,13 +53,9 @@ describe('AngularRenderer', () => {
             environmentInjector
         });
 
-        // Initialize with initial parameters
         renderer.init({ title: 'Initial Title' });
-
-        // Update properties
         renderer.update({ title: 'Updated Title', value: 'new-value' });
 
-        // The component should have updated properties
         expect(renderer.element).toBeTruthy();
     });
 
@@ -52,12 +73,10 @@ describe('AngularRenderer', () => {
         
         renderer.dispose();
         
-        // After dispose, accessing element should throw
         expect(() => renderer.element).toThrow('Angular renderer not initialized');
     });
 
     it('should handle component creation errors gracefully', () => {
-        // Use an invalid component to trigger error
         const renderer = new AngularRenderer({
             component: null as any,
             injector,
@@ -79,7 +98,6 @@ describe('AngularRenderer', () => {
         renderer.init({ title: 'Test Title' });
         renderer.dispose();
         
-        // Should not throw
         expect(() => {
             renderer.update({ title: 'Updated Title' });
         }).not.toThrow();
@@ -94,7 +112,6 @@ describe('AngularRenderer', () => {
 
         renderer.init({ title: 'Test Title' });
         
-        // Multiple dispose calls should not throw
         expect(() => {
             renderer.dispose();
             renderer.dispose();

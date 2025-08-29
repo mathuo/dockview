@@ -4,11 +4,9 @@ import { By } from '@angular/platform-browser';
 
 import { DockviewAngularComponent } from '../lib/dockview/dockview-angular.component';
 import { DockviewApi } from 'dockview-core';
-import { setupTestBed, getTestComponents, TestPanelComponent } from './__test_utils__/test-helpers';
+import { setupTestBed, getTestComponents } from './__test_utils__/test-helpers';
 
-// NOTE: These tests require Angular testing dependencies to be installed in the root node_modules
-// For now they are commented out to demonstrate the build works
-describe.skip('DockviewAngularComponent', () => {
+describe('DockviewAngularComponent', () => {
     let component: DockviewAngularComponent;
     let fixture: ComponentFixture<DockviewAngularComponent>;
     let debugElement: DebugElement;
@@ -21,7 +19,6 @@ describe.skip('DockviewAngularComponent', () => {
         component = fixture.componentInstance;
         debugElement = fixture.debugElement;
         
-        // Set required inputs
         component.components = getTestComponents();
     });
 
@@ -84,7 +81,6 @@ describe.skip('DockviewAngularComponent', () => {
         const api = component.getDockviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
         
-        // Simulate input change
         component.className = 'test-class';
         component.ngOnChanges({
             className: {
@@ -105,12 +101,10 @@ describe.skip('DockviewAngularComponent', () => {
         
         component.ngOnInit();
         
-        // API should be initialized without throwing
         expect(component.getDockviewApi()).toBeDefined();
     });
 });
 
-// Integration test with template
 @Component({
     template: `
         <dv-dockview 
@@ -132,7 +126,7 @@ class TestHostComponent {
     }
 }
 
-describe.skip('DockviewAngularComponent Integration', () => {
+describe('DockviewAngularComponent Integration', () => {
     let hostComponent: TestHostComponent;
     let fixture: ComponentFixture<TestHostComponent>;
 
@@ -168,7 +162,5 @@ describe.skip('DockviewAngularComponent Integration', () => {
         fixture.detectChanges();
         
         expect(hostComponent.api).toBeDefined();
-        // Additional assertions could be added here to verify the properties
-        // were passed to the core dockview component
     });
 });
