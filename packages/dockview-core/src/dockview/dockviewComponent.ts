@@ -2193,9 +2193,18 @@ export class DockviewComponent
             // Check if destination group is empty - if so, force render the component
             const isDestinationGroupEmpty = destinationGroup.model.size === 0;
             
+            // Fix for GitHub issue #1004: When dragging from popout windows,
+            // the destination index might be incorrect due to stale position calculations.
+            // For popout sources, we should validate and potentially adjust the index.
+            let adjustedIndex = destinationIndex;
+            if (sourceGroup.api.location.type === 'popout' && typeof destinationIndex === 'number') {
+                // Ensure the index is within valid bounds for the destination group
+                adjustedIndex = Math.max(0, Math.min(destinationIndex, destinationGroup.model.size));
+            }
+            
             this.movingLock(() =>
                 destinationGroup.model.openPanel(removedPanel, {
-                    index: destinationIndex,
+                    index: adjustedIndex,
                     skipSetActive: (options.skipSetActive ?? false) && !isDestinationGroupEmpty,
                     skipSetGroupActive: true,
                 })

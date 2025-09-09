@@ -263,9 +263,10 @@ export class Tabs extends CompositeDisposable {
         tab: IValueDisposable<Tab>,
         index: number = this._tabs.length
     ): void {
-        if (index < 0 || index > this._tabs.length) {
-            throw new Error('invalid location');
-        }
+        // Clamp index to valid range to prevent IndexOutOfBounds errors
+        // This can happen when dragging panels from popouts where the original
+        // position calculations become stale after the source panel is removed
+        index = Math.max(0, Math.min(index, this._tabs.length));
 
         this._tabsList.insertBefore(
             tab.value.element,
