@@ -41,6 +41,9 @@ jobs:
             - name: Publish dockview-react
               run: npm publish --provenance
               working-directory: packages/dockview-react
+            - name: Publish dockview-angular
+              run: npm publish --provenance
+              working-directory: packages/dockview-angular
     publish-experimental:
         if: github.event_name == 'workflow_dispatch'
         runs-on: ubuntu-latest
@@ -76,3 +79,6 @@ jobs:
             - name: Publish dockview-react
               run: npm publish --provenance --tag experimental
               working-directory: packages/dockview-react
+            - name: Publish dockview-angular
+              run: npm publish --provenance
+              working-directory: packages/dockview-angular

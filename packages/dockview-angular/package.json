@@ -20,8 +20,8 @@
     "drag-and-drop",
     "drag",
     "drop",
-    "react",
-    "react-component"
+    "angular",
+    "angular-component"
   ],
   "homepage": "https://github.com/mathuo/dockview",
   "bugs": {
@@ -43,16 +43,26 @@
   "scripts": {
     "build:bundle": "rollup -c",
     "build:cjs": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
-    "build:css": "gulp sass",
     "build:esm": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
+    "build:css": "node scripts/copy-css.js",
     "build": "npm run build:cjs && npm run build:esm && npm run build:css",
     "clean": "rimraf dist/ .build/ .rollup.cache/",
     "prepublishOnly": "npm run rebuild && npm run build:bundle && npm run test",
     "rebuild": "npm run clean && npm run build",
-    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview",
-    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage"
+    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-angular",
+    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-angular --coverage"
   },
   "dependencies": {
     "dockview-core": "^4.7.1"
+  },
+  "peerDependencies": {
+    "@angular/common": ">=14.0.0",
+    "@angular/core": ">=14.0.0",
+    "rxjs": ">=7.0.0"
+  },
+  "devDependencies": {
+    "jest-preset-angular": "^14.6.1",
+    "ng-packagr": "^17.0.0",
+    "zone.js": "^0.15.1"
   }
 }

@@ -31,6 +31,8 @@ jobs:
             - run: npm run build
               working-directory: packages/dockview-react
             - run: npm run build
+              working-directory: packages/dockview-angular
+            - run: npm run build
               working-directory: packages/docs
             - run: npm run docs
               working-directory: .
