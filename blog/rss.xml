@@ -4,10 +4,25 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Fri, 29 Aug 2025 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Mon, 22 Sep 2025 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 4.8.0]]></title>
+            <link>https://dockview.dev/blog/dockview-4.8.0-release</link>
+            <guid>https://dockview.dev/blog/dockview-4.8.0-release</guid>
+            <pubDate>Mon, 22 Sep 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.8.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<ul>
+<li>Angular framework wrapper support <a href="https://github.com/mathuo/dockview/pull/1001" target="_blank" rel="noopener noreferrer">#1001</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.8.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.8.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 4.7.1]]></title>
             <link>https://dockview.dev/blog/dockview-4.7.1-release</link>
@@ -338,26 +353,6 @@
 <li>Bug: Fix Middle mouse button to close tab <a href="https://github.com/mathuo/dockview/issues/853" target="_blank" rel="noopener noreferrer">#835</a></li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-3.1.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 3.1.0]]></title>
-            <link>https://dockview.dev/blog/dockview-3.1.0-release</link>
-            <guid>https://dockview.dev/blog/dockview-3.1.0-release</guid>
-            <pubDate>Sun, 02 Feb 2025 00:00:00 GMT</pubDate>
-            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-3.1.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<ul>
-<li>Close tab with middle mouse button <a href="https://github.com/mathuo/dockview/pull/847" target="_blank" rel="noopener noreferrer">#847</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-3.1.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Bug: Fix crash on navigation with open popout group <a href="https://github.com/mathuo/dockview/pull/848" target="_blank" rel="noopener noreferrer">#835</a> <a href="https://github.com/mathuo/dockview/pull/845" target="_blank" rel="noopener noreferrer">#845</a></li>
-<li>Bug: Subscribe to <code>onDidAcitvePanelChange</code> immediately, rather than deferred to <code>queueMicrotask</code> <a href="https://github.com/mathuo/dockview/pull/843" target="_blank" rel="noopener noreferrer">#843</a></li>
-<li>Bug: Minor theme fixup <a href="https://github.com/mathuo/dockview/pull/831" target="_blank" rel="noopener noreferrer">#831</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-3.1.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
     </channel>
