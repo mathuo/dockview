@@ -12,7 +12,7 @@ export interface IPanelDeserializer {
     ): IDockviewPanel;
 }
 
-// @depreciated
+// @deprecated
 interface LegacyState extends GroupviewPanelState {
     view?: {
         tab?: { id: string };
