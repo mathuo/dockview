@@ -1,6 +1,6 @@
 {
   "name": "dockview-docs",
-  "version": "4.7.1",
+  "version": "4.8.0",
   "private": true,
   "scripts": {
     "build": "npm run build-templates && docusaurus build",
