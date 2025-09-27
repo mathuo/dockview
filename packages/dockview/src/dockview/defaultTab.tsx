@@ -10,6 +10,11 @@ function useTitle(api: DockviewPanelApi): string | undefined {
             setTitle(event.title);
         });
 
+        // Depending on the order in which React effects are run, the title may already be out of sync (cf. issue #1003).
+        if (title !== api.title) {
+            setTitle(api.title);
+        }
+
         return () => {
             disposable.dispose();
         };
