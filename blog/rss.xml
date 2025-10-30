@@ -4,10 +4,31 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Mon, 22 Sep 2025 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Thu, 30 Oct 2025 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 4.10.0]]></title>
+            <link>https://dockview.dev/blog/dockview-4.10.0-release</link>
+            <guid>https://dockview.dev/blog/dockview-4.10.0-release</guid>
+            <pubDate>Thu, 30 Oct 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.10.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<ul>
+<li>Template docs <a href="https://github.com/mathuo/dockview/pull/1027" target="_blank" rel="noopener noreferrer">#1027</a></li>
+<li>Angular docs</li>
+<li>Enhanced Vue component tests with comprehensive DOM and API testing <a href="https://github.com/mathuo/dockview/pull/1024" target="_blank" rel="noopener noreferrer">#1024</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.10.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Fix registerPanel timing to prevent undefined API errors <a href="https://github.com/mathuo/dockview/pull/1026" target="_blank" rel="noopener noreferrer">#1026</a></li>
+<li>Bug: Fix title possibly out of sync in DockviewDefaultTab <a href="https://github.com/mathuo/dockview/pull/1015" target="_blank" rel="noopener noreferrer">#1015</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.10.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 4.8.0]]></title>
             <link>https://dockview.dev/blog/dockview-4.8.0-release</link>
@@ -338,21 +359,6 @@
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-3.2.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-3.2.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 3.1.1]]></title>
-            <link>https://dockview.dev/blog/dockview-3.1.1-release</link>
-            <guid>https://dockview.dev/blog/dockview-3.1.1-release</guid>
-            <pubDate>Sun, 09 Feb 2025 00:00:00 GMT</pubDate>
-            <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-3.1.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-3.1.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Bug: Fix Middle mouse button to close tab <a href="https://github.com/mathuo/dockview/issues/853" target="_blank" rel="noopener noreferrer">#835</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-3.1.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
     </channel>
