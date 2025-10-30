@@ -57,5 +57,9 @@
   },
   "peerDependencies": {
     "vue": "^3.4.0"
+  },
+  "devDependencies": {
+    "@vue/test-utils": "^2.4.0-alpha.2",
+    "@vue/vue3-jest": "^29.2.6"
   }
 }
