@@ -41,7 +41,7 @@ export function findComponent(
     name: string
 ): VueComponent | null {
     let instance = parent as any;
-    let component = null;
+    let component: any = null;
 
     while (!component && instance) {
         component = instance.components?.[name];
@@ -56,7 +56,7 @@ export function findComponent(
         throw new Error(`Failed to find Vue Component '${name}'`);
     }
 
-    return component;
+    return component as VueComponent;
 }
 
 /**
@@ -225,6 +225,38 @@ export class VueHeaderActionsRenderer
             { params: props },
             this.element
         );
+    }
+
+    dispose(): void {
+        this._renderDisposable?.dispose();
+    }
+}
+
+export class VuePart<T extends Record<string, any> = any> {
+    private _renderDisposable:
+        | { update: (props: any) => void; dispose: () => void }
+        | undefined;
+
+    constructor(
+        private readonly element: HTMLElement,
+        private readonly vueComponent: VueComponent<T>,
+        private readonly parent: ComponentInternalInstance,
+        private props: T
+    ) {}
+
+    init(): void {
+        this._renderDisposable?.dispose();
+        this._renderDisposable = mountVueComponent(
+            this.vueComponent,
+            this.parent,
+            this.props,
+            this.element
+        );
+    }
+
+    update(props: T): void {
+        this.props = { ...this.props, ...props };
+        this._renderDisposable?.update(this.props);
     }
 
     dispose(): void {
