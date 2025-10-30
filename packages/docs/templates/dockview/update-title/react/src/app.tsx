@@ -42,7 +42,7 @@ export const App: React.FC = (props: { theme?: string }) => {
             id: 'panel_2',
             component: 'default',
             title: 'Panel 2',
-            position: { referencePanel: panel },
+            position: { referencePanel: panel.id },
         });
 
         const panel3 = event.api.addPanel({
@@ -50,14 +50,14 @@ export const App: React.FC = (props: { theme?: string }) => {
             component: 'default',
             title: 'Panel 3',
 
-            position: { referencePanel: panel, direction: 'right' },
+            position: { referencePanel: panel.id, direction: 'right' },
         });
 
         const panel4 = event.api.addPanel({
             id: 'panel_4',
             component: 'default',
             title: 'Panel 4',
-            position: { referencePanel: panel3 },
+            position: { referencePanel: panel3.id },
         });
     };
 

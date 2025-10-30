@@ -44,17 +44,17 @@ const panel1 = api.addPanel({
 const panel2 = api.addPanel({
     id: 'panel_2',
     component: 'default',
-    position: { referencePanel: panel1, direction: 'right' },
+    position: { referencePanel: panel1.id, direction: 'right' },
 });
 
 api.addPanel({
     id: 'panel_3',
     component: 'default',
-    position: { referencePanel: panel1, direction: 'below' },
+    position: { referencePanel: panel1.id, direction: 'below' },
 });
 
 api.addPanel({
     id: 'panel_4',
     component: 'default',
-    position: { referencePanel: panel2, direction: 'below' },
+    position: { referencePanel: panel2.id, direction: 'below' },
 });
