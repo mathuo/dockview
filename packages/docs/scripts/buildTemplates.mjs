@@ -90,7 +90,7 @@ const IMPORTS_PATHS = {
         '@angular/platform-browser-dynamic': `https://esm.sh/@angular/platform-browser-dynamic@${ANGULAR_VERSION}?target=es2018`,
         '@angular/platform-browser': `https://esm.sh/@angular/platform-browser@${ANGULAR_VERSION}?target=es2018`,
         '@angular/compiler': `https://esm.sh/@angular/compiler@${ANGULAR_VERSION}?target=es2018`,
-        'rxjs': `https://esm.sh/rxjs@7.8.1?target=es2018`,
+        rxjs: `https://esm.sh/rxjs@7.8.1?target=es2018`,
         'zone.js': `https://esm.sh/zone.js@0.14.3?target=es2018`,
     },
 };
@@ -103,20 +103,22 @@ async function compileAngularTypeScript(inputPath, outputPath) {
     try {
         // Import TypeScript compiler
         const ts = await import('typescript');
-        
+
         // Copy directory structure first
         fs.copySync(inputPath, outputPath);
-        
+
         // Find all .ts files and transpile them
-        const tsFiles = fs.readdirSync(outputPath).filter(file => file.endsWith('.ts'));
-        
+        const tsFiles = fs
+            .readdirSync(outputPath)
+            .filter((file) => file.endsWith('.ts'));
+
         for (const file of tsFiles) {
             const filePath = path.join(outputPath, file);
             const source = fs.readFileSync(filePath, 'utf8');
-            
+
             // Transpile with decorator support, keeping imports as-is
             const result = ts.default.transpile(source, {
-                target: ts.default.ScriptTarget.ES5,  // Use ES5 to ensure maximum compatibility
+                target: ts.default.ScriptTarget.ES5, // Use ES5 to ensure maximum compatibility
                 module: ts.default.ModuleKind.System,
                 experimentalDecorators: true,
                 emitDecoratorMetadata: true,
@@ -124,18 +126,21 @@ async function compileAngularTypeScript(inputPath, outputPath) {
                 allowSyntheticDefaultImports: true,
                 strict: false,
                 skipLibCheck: true,
-                noResolve: true,  // Don't try to resolve imports
-                useDefineForClassFields: false,  // Avoid class field initialization issues
-                downlevelIteration: true  // Ensure iterators work in older JS
+                noResolve: true, // Don't try to resolve imports
+                useDefineForClassFields: false, // Avoid class field initialization issues
+                downlevelIteration: true, // Ensure iterators work in older JS
             });
-            
+
             // Write the transpiled file
             fs.writeFileSync(filePath, result);
         }
-        
+
         return true;
     } catch (error) {
-        console.warn(`Failed to compile Angular TypeScript for ${inputPath}:`, error.message);
+        console.warn(
+            `Failed to compile Angular TypeScript for ${inputPath}:`,
+            error.message
+        );
         // Fall back to copying source files as-is
         fs.copySync(inputPath, outputPath);
         return false;
@@ -154,19 +159,21 @@ function createIndexHTML(options) {
         .replace('{{app}}', options.app)
         .replace('{{appElement}}', options.appElement || '')
         .replace('{{githubLink}}', options.githubUrl)
-        .replace('{{codeSandboxLink}}', options.codeSandboxUrl)
+        .replace('{{codeSandboxLink}}', options.codeSandboxUrl);
 }
 
 const input_dir = path.join(__dirname, '../templates');
 const output = path.join(__dirname, '../static/templates');
 
-const COMPONENTS = ['dockview'];
+const COMPONENTS = ['dockview', 'splitview', 'gridview', 'paneview'];
 const FRAMEWORKS = ['react', 'vue', 'typescript', 'angular'];
 
 const list = [];
 
-const githubUrl = "https://github.com/mathuo/dockview/tree/master/packages/docs/templates"
-const codeSandboxUrl = "https://codesandbox.io/p/sandbox/github/mathuo/dockview/tree/gh-pages/templates"
+const githubUrl =
+    'https://github.com/mathuo/dockview/tree/master/packages/docs/templates';
+const codeSandboxUrl =
+    'https://codesandbox.io/p/sandbox/github/mathuo/dockview/tree/gh-pages/templates';
 
 async function buildTemplates() {
     for (const component of COMPONENTS) {
@@ -183,9 +190,20 @@ async function buildTemplates() {
                 ) {
                     continue;
                 }
-                const srcPath = path.join(componentDir, folder, framework, 'src');
-                const destPath = path.join(output, component, folder, framework, 'src');
-                
+                const srcPath = path.join(
+                    componentDir,
+                    folder,
+                    framework,
+                    'src'
+                );
+                const destPath = path.join(
+                    output,
+                    component,
+                    folder,
+                    framework,
+                    'src'
+                );
+
                 if (framework === 'angular') {
                     // Compile Angular TypeScript files with decorator support
                     await compileAngularTypeScript(srcPath, destPath);
@@ -194,8 +212,8 @@ async function buildTemplates() {
                     fs.copySync(srcPath, destPath);
                 }
 
-                const templateGithubUrl = `${githubUrl}/${component}/${folder}/${framework}/src`
-                const templateCodeSandboxUrl = `${codeSandboxUrl}/${component}/${folder}/${framework}`
+                const templateGithubUrl = `${githubUrl}/${component}/${folder}/${framework}/src`;
+                const templateCodeSandboxUrl = `${codeSandboxUrl}/${component}/${folder}/${framework}`;
 
                 const template = createIndexHTML({
                     title: `Dockview | ${folder} ${framework}`,
@@ -205,7 +223,8 @@ async function buildTemplates() {
                             : framework === 'angular'
                             ? './src/index.ts'
                             : './src/index.ts',
-                    appElement: framework === 'angular' ? '<app-root></app-root>' : '',
+                    appElement:
+                        framework === 'angular' ? '<app-root></app-root>' : '',
                     importPaths: {
                         ...IMPORTS_PATHS[framework],
                         ...DOCKVIEW_CDN[framework][
@@ -213,15 +232,21 @@ async function buildTemplates() {
                         ],
                     },
                     githubUrl: templateGithubUrl,
-                    codeSandboxUrl: templateCodeSandboxUrl
+                    codeSandboxUrl: templateCodeSandboxUrl,
                 });
                 fs.writeFileSync(
-                    path.join(output, component, folder, framework, 'index.html'),
+                    path.join(
+                        output,
+                        component,
+                        folder,
+                        framework,
+                        'index.html'
+                    ),
                     template
                 );
 
                 list.push({
-                    name: `${framework}/${folder}`,
+                    name: `${component}/${framework}/${folder}`,
                     path: path.join(component, folder, framework, 'index.html'),
                 });
             }
