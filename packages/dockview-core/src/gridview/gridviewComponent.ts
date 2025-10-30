@@ -366,9 +366,8 @@ export class GridviewComponent
             isVisible: true,
         });
 
-        this.registerPanel(view);
-
         this.doAddGroup(view, relativeLocation, options.size);
+        this.registerPanel(view);
         this.doSetGroupActive(view);
 
         return view;
