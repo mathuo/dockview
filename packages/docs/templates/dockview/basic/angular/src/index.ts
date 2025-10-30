@@ -1,17 +1,22 @@
 import 'zone.js';
-import { bootstrapApplication } from '@angular/platform-browser';
-import { Component, Type } from '@angular/core';
-import { DockviewAngularComponent } from 'dockview-angular';
+import '@angular/compiler';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { Component, Type, NgModule, Input } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { DockviewAngularModule } from 'dockview-angular';
 import 'dockview-core/dist/styles/dockview.css';
 
 // Default panel component
 @Component({
     selector: 'default-panel',
-    template: `<div>{{ api.title }}</div>`,
-    standalone: true,
+    template: `<div>{{ title || 'Default Panel' }}</div>`
 })
 export class DefaultPanelComponent {
-    api: any;
+    @Input() api: any;
+    
+    get title() {
+        return this.api?.title || this.api?.id || 'Panel';
+    }
 
     constructor() {}
 }
@@ -27,9 +32,7 @@ export class DefaultPanelComponent {
                 (ready)="onReady($event)">
             </dv-dockview>
         </div>
-    `,
-    standalone: true,
-    imports: [DockviewAngularComponent]
+    `
 })
 export class AppComponent {
     components: Record<string, Type<any>>;
@@ -78,5 +81,14 @@ export class AppComponent {
     }
 }
 
-// Bootstrap the application
-bootstrapApplication(AppComponent).catch(err => console.error(err));
+// App module
+@NgModule({
+    declarations: [AppComponent, DefaultPanelComponent],
+    imports: [BrowserModule, DockviewAngularModule],
+    providers: [],
+    bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+// Bootstrap the application with JIT compilation
+platformBrowserDynamic().bootstrapModule(AppModule).catch(err => console.error(err));

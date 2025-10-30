@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import * as path from 'path';
 import { argv } from 'process';
+import { execSync } from 'child_process';
 
 import { fileURLToPath } from 'url';
 
@@ -84,18 +85,62 @@ const IMPORTS_PATHS = {
     },
     typescript: {},
     angular: {
-        '@angular/core': `https://esm.sh/@angular/core@${ANGULAR_VERSION}`,
-        '@angular/common': `https://esm.sh/@angular/common@${ANGULAR_VERSION}`,
-        '@angular/platform-browser-dynamic': `https://esm.sh/@angular/platform-browser-dynamic@${ANGULAR_VERSION}`,
-        '@angular/platform-browser': `https://esm.sh/@angular/platform-browser@${ANGULAR_VERSION}`,
-        'rxjs': `https://esm.sh/rxjs@7.8.1`,
-        'zone.js': `https://esm.sh/zone.js@0.14.3`,
+        '@angular/core': `https://esm.sh/@angular/core@${ANGULAR_VERSION}?target=es2018`,
+        '@angular/common': `https://esm.sh/@angular/common@${ANGULAR_VERSION}?target=es2018`,
+        '@angular/platform-browser-dynamic': `https://esm.sh/@angular/platform-browser-dynamic@${ANGULAR_VERSION}?target=es2018`,
+        '@angular/platform-browser': `https://esm.sh/@angular/platform-browser@${ANGULAR_VERSION}?target=es2018`,
+        '@angular/compiler': `https://esm.sh/@angular/compiler@${ANGULAR_VERSION}?target=es2018`,
+        'rxjs': `https://esm.sh/rxjs@7.8.1?target=es2018`,
+        'zone.js': `https://esm.sh/zone.js@0.14.3?target=es2018`,
     },
 };
 
 const template = fs
     .readFileSync(path.join(__dirname, './template.html'))
     .toString();
+
+async function compileAngularTypeScript(inputPath, outputPath) {
+    try {
+        // Import TypeScript compiler
+        const ts = await import('typescript');
+        
+        // Copy directory structure first
+        fs.copySync(inputPath, outputPath);
+        
+        // Find all .ts files and transpile them
+        const tsFiles = fs.readdirSync(outputPath).filter(file => file.endsWith('.ts'));
+        
+        for (const file of tsFiles) {
+            const filePath = path.join(outputPath, file);
+            const source = fs.readFileSync(filePath, 'utf8');
+            
+            // Transpile with decorator support, keeping imports as-is
+            const result = ts.default.transpile(source, {
+                target: ts.default.ScriptTarget.ES5,  // Use ES5 to ensure maximum compatibility
+                module: ts.default.ModuleKind.System,
+                experimentalDecorators: true,
+                emitDecoratorMetadata: true,
+                esModuleInterop: true,
+                allowSyntheticDefaultImports: true,
+                strict: false,
+                skipLibCheck: true,
+                noResolve: true,  // Don't try to resolve imports
+                useDefineForClassFields: false,  // Avoid class field initialization issues
+                downlevelIteration: true  // Ensure iterators work in older JS
+            });
+            
+            // Write the transpiled file
+            fs.writeFileSync(filePath, result);
+        }
+        
+        return true;
+    } catch (error) {
+        console.warn(`Failed to compile Angular TypeScript for ${inputPath}:`, error.message);
+        // Fall back to copying source files as-is
+        fs.copySync(inputPath, outputPath);
+        return false;
+    }
+}
 
 function createIndexHTML(options) {
     return template
@@ -107,6 +152,7 @@ function createIndexHTML(options) {
                 .join(',\n')}`
         )
         .replace('{{app}}', options.app)
+        .replace('{{appElement}}', options.appElement || '')
         .replace('{{githubLink}}', options.githubUrl)
         .replace('{{codeSandboxLink}}', options.codeSandboxUrl)
 }
@@ -122,65 +168,77 @@ const list = [];
 const githubUrl = "https://github.com/mathuo/dockview/tree/master/packages/docs/templates"
 const codeSandboxUrl = "https://codesandbox.io/p/sandbox/github/mathuo/dockview/tree/gh-pages/templates"
 
-for (const component of COMPONENTS) {
-    const componentDir = path.join(input_dir, component);
+async function buildTemplates() {
+    for (const component of COMPONENTS) {
+        const componentDir = path.join(input_dir, component);
 
-    const templates = fs.readdirSync(componentDir);
+        const templates = fs.readdirSync(componentDir);
 
-    for (const folder of templates) {
-        for (const framework of FRAMEWORKS) {
-            if (
-                !fs.existsSync(
-                    path.join(componentDir, folder, framework, 'src')
-                )
-            ) {
-                continue;
+        for (const folder of templates) {
+            for (const framework of FRAMEWORKS) {
+                if (
+                    !fs.existsSync(
+                        path.join(componentDir, folder, framework, 'src')
+                    )
+                ) {
+                    continue;
+                }
+                const srcPath = path.join(componentDir, folder, framework, 'src');
+                const destPath = path.join(output, component, folder, framework, 'src');
+                
+                if (framework === 'angular') {
+                    // Compile Angular TypeScript files with decorator support
+                    await compileAngularTypeScript(srcPath, destPath);
+                } else {
+                    // Copy other frameworks as-is
+                    fs.copySync(srcPath, destPath);
+                }
+
+                const templateGithubUrl = `${githubUrl}/${component}/${folder}/${framework}/src`
+                const templateCodeSandboxUrl = `${codeSandboxUrl}/${component}/${folder}/${framework}`
+
+                const template = createIndexHTML({
+                    title: `Dockview | ${folder} ${framework}`,
+                    app:
+                        framework === 'react'
+                            ? './src/index.tsx'
+                            : framework === 'angular'
+                            ? './src/index.ts'
+                            : './src/index.ts',
+                    appElement: framework === 'angular' ? '<app-root></app-root>' : '',
+                    importPaths: {
+                        ...IMPORTS_PATHS[framework],
+                        ...DOCKVIEW_CDN[framework][
+                            USE_LOCAL_CDN ? 'local' : 'remote'
+                        ],
+                    },
+                    githubUrl: templateGithubUrl,
+                    codeSandboxUrl: templateCodeSandboxUrl
+                });
+                fs.writeFileSync(
+                    path.join(output, component, folder, framework, 'index.html'),
+                    template
+                );
+
+                list.push({
+                    name: `${framework}/${folder}`,
+                    path: path.join(component, folder, framework, 'index.html'),
+                });
             }
-            fs.copySync(
-                path.join(componentDir, folder, framework, 'src'),
-                path.join(output, component, folder, framework, 'src')
-            );
-
-            const templateGithubUrl = `${githubUrl}/${component}/${folder}/${framework}/src`
-            const templateCodeSandboxUrl = `${codeSandboxUrl}/${component}/${folder}/${framework}`
-
-            const template = createIndexHTML({
-                title: `Dockview | ${folder} ${framework}`,
-                app:
-                    framework === 'react'
-                        ? './src/index.tsx'
-                        : framework === 'angular'
-                        ? './src/index.ts'
-                        : './src/index.ts',
-                importPaths: {
-                    ...IMPORTS_PATHS[framework],
-                    ...DOCKVIEW_CDN[framework][
-                        USE_LOCAL_CDN ? 'local' : 'remote'
-                    ],
-                },
-                githubUrl: templateGithubUrl,
-                codeSandboxUrl: templateCodeSandboxUrl
-            });
-            fs.writeFileSync(
-                path.join(output, component, folder, framework, 'index.html'),
-                template
-            );
-
-            list.push({
-                name: `${framework}/${folder}`,
-                path: path.join(component, folder, framework, 'index.html'),
-            });
         }
     }
+
+    const index = `<div>${list
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((item) => {
+            return `<div><a href=${`/templates/${item.path}`}>${
+                item.name
+            }</a></div>`;
+        })
+        .join('\n')}</div>`;
+
+    fs.writeFileSync(path.join(output, 'index.html'), index);
 }
 
-const index = `<div>${list
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .map((item) => {
-        return `<div><a href=${`/templates/${item.path}`}>${
-            item.name
-        }</a></div>`;
-    })
-    .join('\n')}</div>`;
-
-fs.writeFileSync(path.join(output, 'index.html'), index);
+// Run the build
+buildTemplates().catch(console.error);
