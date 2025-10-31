@@ -30,8 +30,9 @@ class AriaLevelTracker {
     private update(): void {
         for (let i = 0; i < this._orderedList.length; i++) {
             this._orderedList[i].setAttribute('aria-level', `${i}`);
-            this._orderedList[i].style.zIndex =
-                `calc(var(--dv-overlay-z-index, 999) + ${i * 2})`;
+            this._orderedList[
+                i
+            ].style.zIndex = `calc(var(--dv-overlay-z-index, 999) + ${i * 2})`;
         }
     }
 }
@@ -460,6 +461,7 @@ export class Overlay extends CompositeDisposable {
                         let width: number | undefined = undefined;
 
                         const moveTop = () => {
+                            // When dragging top handle, constrain top position to prevent oversizing
                             const maxTop =
                                 startPosition!.originalY +
                                     startPosition!.originalHeight >
@@ -490,6 +492,7 @@ export class Overlay extends CompositeDisposable {
                                 startPosition!.originalY -
                                 startPosition!.originalHeight;
 
+                            // When dragging bottom handle, constrain height to container height
                             const minHeight =
                                 top < 0 &&
                                 typeof this.options.minimumInViewportHeight ===
@@ -515,7 +518,7 @@ export class Overlay extends CompositeDisposable {
                                           0,
                                           containerRect.width -
                                               Overlay.MINIMUM_WIDTH
-                                      )
+                                      ) // Prevent extending beyong right edge
                                     : Math.max(
                                           0,
                                           startPosition!.originalX +
@@ -523,7 +526,7 @@ export class Overlay extends CompositeDisposable {
                                               Overlay.MINIMUM_WIDTH
                                       );
 
-                            left = clamp(x, 0, maxLeft);
+                            left = clamp(x, 0, maxLeft); // min is 0 (Not -Infinity) to prevent dragging beyond left edge
 
                             width =
                                 startPosition!.originalX +
@@ -538,6 +541,7 @@ export class Overlay extends CompositeDisposable {
                                 startPosition!.originalX -
                                 startPosition!.originalWidth;
 
+                            // When dragging right handle, constrain width to container width
                             const minWidth =
                                 left < 0 &&
                                 typeof this.options.minimumInViewportWidth ===
