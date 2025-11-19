@@ -33,6 +33,7 @@ export interface GridviewAngularOptions extends GridviewOptions {
 
 @Component({
     selector: 'dv-gridview',
+    standalone: true,
     template: '<div #gridviewContainer class="gridview-container"></div>',
     styles: [`
         :host {
@@ -40,7 +41,7 @@ export interface GridviewAngularOptions extends GridviewOptions {
             width: 100%;
             height: 100%;
         }
-        
+
         .gridview-container {
             width: 100%;
             height: 100%;
