@@ -31,7 +31,7 @@
     "@types/react-dom": "^18.2.18"
   },
   "devDependencies": {
-    "@angular/common": "^17.0.0",
+    "@angular/common": "^19.2.16",
     "@angular/compiler": "^17.0.0",
     "@angular/compiler-cli": "^17.0.0",
     "@angular/core": "^17.0.0",
