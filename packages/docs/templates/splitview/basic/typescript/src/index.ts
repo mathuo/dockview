@@ -1,37 +1,47 @@
 import 'dockview-core/dist/styles/dockview.css';
 import {
     createSplitview,
-    ISplitviewPanelProps,
-    IContentRenderer,
+    SplitviewPanel,
+    IFrameworkPart,
     themeAbyss,
 } from 'dockview-core';
 
-class Panel implements IContentRenderer {
-    private readonly _element: HTMLElement;
+class Panel extends SplitviewPanel {
+    private readonly _frameworkPart: IFrameworkPart;
 
-    get element(): HTMLElement {
-        return this._element;
+    constructor(id: string, component: string) {
+        super(id, component);
+
+        this.element.style.color = 'white';
+        this.element.style.padding = '10px';
+        this.element.style.background = '#1e1e1e';
+        this.element.style.border = '1px solid #333';
+
+        this._frameworkPart = {
+            update: (parameters) => {
+                this.element.textContent = `Panel ${parameters?.id || id}`;
+            },
+            dispose: () => {
+                // cleanup if needed
+            },
+        };
+
+        this.api.initialize(this);
     }
 
-    constructor() {
-        this._element = document.createElement('div');
-        this._element.style.color = 'white';
-        this._element.style.padding = '10px';
-        this._element.style.background = '#1e1e1e';
-    }
-
-    init(parameters: ISplitviewPanelProps): void {
-        this._element.textContent = `Panel ${parameters.id}`;
+    getComponent(): IFrameworkPart {
+        return this._frameworkPart;
     }
 }
 
 const api = createSplitview(document.getElementById('app'), {
-    theme: themeAbyss,
-    orientation: 'horizontal',
+    className: themeAbyss.className,
     createComponent: (options) => {
         switch (options.name) {
             case 'default':
-                return new Panel();
+                return new Panel(options.id, options.name);
+            default:
+                throw new Error(`Unsupported component: ${options.name}`);
         }
     },
 });
