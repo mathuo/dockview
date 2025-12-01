@@ -910,6 +910,9 @@ export class DockviewGroupPanelModel
 
             this.updateMru(panel);
 
+            // Refresh focus state to handle programmatic activation without DOM focus change
+            this.contentContainer.refreshFocusState();
+
             this._onDidActivePanelChange.fire({
                 panel,
             });
