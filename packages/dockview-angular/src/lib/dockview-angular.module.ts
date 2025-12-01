@@ -7,14 +7,12 @@ import { PaneviewAngularComponent } from './paneview/paneview-angular.component'
 import { SplitviewAngularComponent } from './splitview/splitview-angular.component';
 
 @NgModule({
-    declarations: [
+    imports: [
+        CommonModule,
         DockviewAngularComponent,
         GridviewAngularComponent,
         PaneviewAngularComponent,
         SplitviewAngularComponent
-    ],
-    imports: [
-        CommonModule
     ],
     exports: [
         DockviewAngularComponent,

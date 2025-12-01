@@ -41,6 +41,7 @@ export interface DockviewAngularOptions extends DockviewOptions {
 
 @Component({
     selector: 'dv-dockview',
+    standalone: true,
     template: '<div #dockviewContainer class="dockview-container"></div>',
     styles: [`
         :host {
@@ -48,7 +49,7 @@ export interface DockviewAngularOptions extends DockviewOptions {
             width: 100%;
             height: 100%;
         }
-        
+
         .dockview-container {
             width: 100%;
             height: 100%;

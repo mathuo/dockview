@@ -38,13 +38,19 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
     }
 
     init(parameters: Parameters): void {
-        this.render(parameters);
+        // If already initialized, just update the parameters
+        if (this.componentRef) {
+            this.update(parameters);
+        } else {
+            this.render(parameters);
+        }
     }
 
     update(params: Parameters): void {
         if (this.componentRef) {
             Object.keys(params).forEach(key => {
-                if (this.componentRef!.instance.hasOwnProperty(key)) {
+                // Use 'in' operator instead of hasOwnProperty to support getter/setter properties
+                if (key in this.componentRef!.instance) {
                     this.componentRef!.instance[key] = params[key];
                 }
             });
@@ -62,7 +68,8 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
 
             // Set initial parameters
             Object.keys(parameters).forEach(key => {
-                if (this.componentRef!.instance.hasOwnProperty(key)) {
+                // Use 'in' operator instead of hasOwnProperty to support getter/setter properties
+                if (key in this.componentRef!.instance) {
                     this.componentRef!.instance[key] = parameters[key];
                 }
             });

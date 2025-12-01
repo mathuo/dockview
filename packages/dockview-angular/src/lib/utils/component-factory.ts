@@ -145,7 +145,8 @@ export class AngularFrameworkComponentFactory {
             injector: this.injector,
             environmentInjector: this.environmentInjector
         });
-        
+
+        // Initialize with empty props - dockview-core will call init() again with actual IGroupHeaderProps
         renderer.init({});
         return renderer;
     }

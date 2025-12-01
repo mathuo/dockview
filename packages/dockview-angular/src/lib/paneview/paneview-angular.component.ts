@@ -36,6 +36,7 @@ export interface PaneviewAngularOptions extends PaneviewOptions {
 
 @Component({
     selector: 'dv-paneview',
+    standalone: true,
     template: '<div #paneviewContainer class="paneview-container"></div>',
     styles: [`
         :host {
@@ -43,7 +44,7 @@ export interface PaneviewAngularOptions extends PaneviewOptions {
             width: 100%;
             height: 100%;
         }
-        
+
         .paneview-container {
             width: 100%;
             height: 100%;

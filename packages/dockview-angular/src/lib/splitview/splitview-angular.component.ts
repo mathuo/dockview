@@ -33,6 +33,7 @@ export interface SplitviewAngularOptions extends SplitviewOptions {
 
 @Component({
     selector: 'dv-splitview',
+    standalone: true,
     template: '<div #splitviewContainer class="splitview-container"></div>',
     styles: [`
         :host {
@@ -40,7 +41,7 @@ export interface SplitviewAngularOptions extends SplitviewOptions {
             width: 100%;
             height: 100%;
         }
-        
+
         .splitview-container {
             width: 100%;
             height: 100%;
