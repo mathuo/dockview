@@ -51,6 +51,12 @@ const components = {
         const isDebug = React.useContext(DebugContext);
         const metadata = usePanelApiMetadata(props.api);
 
+        const [firstRender, setFirstRender] = React.useState<string>('');
+
+        React.useEffect(() => {
+            setFirstRender(new Date().toISOString());
+        }, []);
+
         return (
             <div
                 style={{
@@ -74,6 +80,8 @@ const components = {
                 >
                     {props.api.title}
                 </span>
+
+                <div>{firstRender}</div>
 
                 {isDebug && (
                     <div style={{ fontSize: '0.8em' }}>

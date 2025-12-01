@@ -906,6 +906,8 @@ export class DockviewGroupPanelModel
         if (panel) {
             this.tabsContainer.setActivePanel(panel);
 
+            this.contentContainer.openPanel(panel);
+
             panel.layout(this._width, this._height);
 
             this.updateMru(panel);
