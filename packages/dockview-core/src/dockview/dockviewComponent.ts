@@ -2208,6 +2208,14 @@ export class DockviewComponent
                 panel: removedPanel,
                 from: sourceGroup,
             });
+
+			 /**
+             * Update overlay positions after DOM layout completes to prevent 0×0 dimensions.
+             * With defaultRenderer="always" this results in panel content not showing after move operations.
+             */
+			 requestAnimationFrame(() => {
+                this.overlayRenderContainer.updateAllPositions();
+            });
         } else {
             /**
              * Dropping a panel to the extremities of a group which will place that panel
