@@ -27,6 +27,7 @@ export interface IDockviewPanel extends IDisposable, IPanel {
         group: DockviewGroupPanel,
         options?: { skipSetActive?: boolean }
     ): void;
+    updateFromStateModel(state: GroupviewPanelState): void;
     init(params: IGroupPanelInitParameters): void;
     toJSON(): GroupviewPanelState;
     setTitle(title: string): void;
@@ -45,10 +46,10 @@ export class DockviewPanel
     private _title: string | undefined;
     private _renderer: DockviewPanelRenderer | undefined;
 
-    private readonly _minimumWidth: number | undefined;
-    private readonly _minimumHeight: number | undefined;
-    private readonly _maximumWidth: number | undefined;
-    private readonly _maximumHeight: number | undefined;
+    private _minimumWidth: number | undefined;
+    private _minimumHeight: number | undefined;
+    private _maximumWidth: number | undefined;
+    private _maximumHeight: number | undefined;
 
     get params(): Parameters | undefined {
         return this._params;
@@ -207,6 +208,20 @@ export class DockviewPanel
         this.view.update({
             params: this._params,
         });
+    }
+
+    updateFromStateModel(state: GroupviewPanelState): void {
+        this._maximumHeight = state.maximumHeight;
+        this._minimumHeight = state.minimumHeight;
+        this._maximumWidth = state.maximumWidth;
+        this._minimumWidth = state.minimumWidth;
+
+        this.update({ params: state.params ?? {} });
+        this.setTitle(state.title ?? this.id);
+        this.setRenderer(state.renderer ?? this.accessor.renderer);
+
+        // state.contentComponent;
+        // state.tabComponent;
     }
 
     public updateParentGroup(
