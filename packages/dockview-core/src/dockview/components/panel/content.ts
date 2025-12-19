@@ -22,6 +22,7 @@ export interface IContentContainer extends IDisposable {
     show(): void;
     hide(): void;
     renderPanel(panel: IDockviewPanel, options: { asActive: boolean }): void;
+    refreshFocusState(): void;
 }
 
 export class ContentContainer
@@ -31,6 +32,7 @@ export class ContentContainer
     private readonly _element: HTMLElement;
     private panel: IDockviewPanel | undefined;
     private readonly disposable = new MutableDisposable();
+    private focusTracker: { refreshState?(): void } | undefined;
 
     private readonly _onDidFocus = new Emitter<void>();
     readonly onDidFocus: Event<void> = this._onDidFocus.event;
@@ -156,6 +158,7 @@ export class ContentContainer
 
         if (doRender) {
             const focusTracker = trackFocus(container);
+            this.focusTracker = focusTracker;
             const disposable = new CompositeDisposable();
 
             disposable.addDisposables(
@@ -194,5 +197,15 @@ export class ContentContainer
     public dispose(): void {
         this.disposable.dispose();
         super.dispose();
+    }
+
+    /**
+     * Refresh the focus tracker state to handle cases where focus state
+     * gets out of sync due to programmatic panel activation
+     */
+    public refreshFocusState(): void {
+        if (this.focusTracker?.refreshState) {
+            this.focusTracker.refreshState();
+        }
     }
 }
