@@ -60,9 +60,9 @@
               "imports": {
                 "react": "https://esm.sh/react@18.2.0",
 "react-dom": "https://esm.sh/react-dom@18.2.0",
-"react-dom/client": "https://esm.sh/react-dom@18.2.0",
-"dockview": "https://cdn.jsdelivr.net/npm/dockview@4.11.0/dist/dockview.esm.js",
-"dockview/": "https://cdn.jsdelivr.net/npm/dockview@4.11.0/"
+"react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+"dockview": "https://cdn.jsdelivr.net/npm/dockview@4.12.0/dist/dockview.esm.js",
+"dockview/": "https://cdn.jsdelivr.net/npm/dockview@4.12.0/"
               }
             }
         </script>
@@ -118,7 +118,7 @@
         <script id="loading-script">
             (function () {
                 const cleanupLoading = () => {
-                    if (document.querySelector('.dv-dockview')) {
+                    if (document.querySelector('.dv-pane-container')) {
                         document.querySelector('#loading-spinner').remove();
                         document.querySelector('#loading-script').remove();
                     } else {

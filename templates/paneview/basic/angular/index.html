@@ -65,10 +65,10 @@
 "@angular/compiler": "https://esm.sh/@angular/compiler@17.0.0?target=es2018",
 "rxjs": "https://esm.sh/rxjs@7.8.1?target=es2018",
 "zone.js": "https://esm.sh/zone.js@0.14.3?target=es2018",
-"dockview-core": "https://cdn.jsdelivr.net/npm/dockview-core@4.11.0/dist/dockview-core.esm.js",
-"dockview-core/": "https://cdn.jsdelivr.net/npm/dockview-core@4.11.0/",
-"dockview-angular": "https://cdn.jsdelivr.net/npm/dockview-angular@4.11.0/dist/dockview-angular.esm.js",
-"dockview-angular/": "https://cdn.jsdelivr.net/npm/dockview-angular@4.11.0/"
+"dockview-core": "https://cdn.jsdelivr.net/npm/dockview-core@4.12.0/dist/dockview-core.esm.js",
+"dockview-core/": "https://cdn.jsdelivr.net/npm/dockview-core@4.12.0/",
+"dockview-angular": "https://cdn.jsdelivr.net/npm/dockview-angular@4.12.0/dist/dockview-angular.esm.js",
+"dockview-angular/": "https://cdn.jsdelivr.net/npm/dockview-angular@4.12.0/"
               }
             }
         </script>
@@ -124,7 +124,7 @@
         <script id="loading-script">
             (function () {
                 const cleanupLoading = () => {
-                    if (document.querySelector('.dv-dockview')) {
+                    if (document.querySelector('.dv-pane-container')) {
                         document.querySelector('#loading-spinner').remove();
                         document.querySelector('#loading-script').remove();
                     } else {
