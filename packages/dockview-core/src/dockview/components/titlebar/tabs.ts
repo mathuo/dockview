@@ -13,7 +13,7 @@ import {
 import { Scrollbar } from '../../../scrollbar';
 import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
-import { WillShowOverlayLocationEvent } from '../../events';
+import { DockviewWillShowOverlayLocationEvent } from '../../events';
 import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
 import { Tab } from '../tab/tab';
 import { TabDragEvent, TabDropIndexEvent } from './tabsContainer';
@@ -34,8 +34,8 @@ export class Tabs extends CompositeDisposable {
     readonly onDrop: Event<TabDropIndexEvent> = this._onDrop.event;
 
     private readonly _onWillShowOverlay =
-        new Emitter<WillShowOverlayLocationEvent>();
-    readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent> =
+        new Emitter<DockviewWillShowOverlayLocationEvent>();
+    readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent> =
         this._onWillShowOverlay.event;
 
     private readonly _onOverflowTabsChange = new Emitter<{
@@ -232,7 +232,7 @@ export class Tabs extends CompositeDisposable {
             }),
             tab.onWillShowOverlay((event) => {
                 this._onWillShowOverlay.fire(
-                    new WillShowOverlayLocationEvent(event, {
+                    new DockviewWillShowOverlayLocationEvent(event, {
                         kind: 'tab',
                         panel: this.group.activePanel,
                         api: this.accessor.api,

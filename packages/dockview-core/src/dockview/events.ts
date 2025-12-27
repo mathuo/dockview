@@ -11,7 +11,7 @@ export type DockviewGroupDropLocation =
     | 'content'
     | 'edge';
 
-export interface WillShowOverlayLocationEventOptions {
+export interface DockviewWillShowOverlayLocationEventOptions {
     readonly kind: DockviewGroupDropLocation;
     readonly panel: IDockviewPanel | undefined;
     readonly api: DockviewApi;
@@ -19,7 +19,7 @@ export interface WillShowOverlayLocationEventOptions {
     getData: () => PanelTransfer | undefined;
 }
 
-export class WillShowOverlayLocationEvent implements IDockviewEvent {
+export class DockviewWillShowOverlayLocationEvent implements IDockviewEvent {
     get kind(): DockviewGroupDropLocation {
         return this.options.kind;
     }
@@ -58,6 +58,6 @@ export class WillShowOverlayLocationEvent implements IDockviewEvent {
 
     constructor(
         private readonly event: WillShowOverlayEvent,
-        readonly options: WillShowOverlayLocationEventOptions
+        readonly options: DockviewWillShowOverlayLocationEventOptions
     ) {}
 }
