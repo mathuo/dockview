@@ -8218,4 +8218,106 @@ describe('dockviewComponent', () => {
             expect(dockview.activePanel).toBeTruthy();
         });
     });
+
+    describe('issue reproduction', () => {
+        test('issue 1050: setSize followed immediately by setVisible(false) should preserve size', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(800, 600);
+
+            // Add two panels so we have layout that can be resized
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            // Initial state should be 400px each
+            expect(panel1.group.api.width).toBe(400);
+            expect(panel2.group.api.width).toBe(400);
+
+            // Set size to 350px width and immediately set invisible
+            panel1.group.api.setSize({ width: 350 });
+            expect(panel1.group.api.width).toBe(350); // Should work immediately
+            
+            panel1.group.api.setVisible(false);
+
+            // Group should be invisible
+            expect(panel1.group.api.isVisible).toBe(false);
+
+            // Make visible again
+            panel1.group.api.setVisible(true);
+
+            // The width should be preserved as 350px, not reverted to initial/minimal size
+            expect(panel1.group.api.width).toBe(350);
+        });
+
+
+        test('issue 1050 variant: test with delay to confirm fix works in async scenarios', async () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(800, 600);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            // Set size to 350px width
+            panel1.group.api.setSize({ width: 350 });
+            expect(panel1.group.api.width).toBe(350);
+
+            // Add small delay to simulate async conditions
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            // Then set invisible
+            panel1.group.api.setVisible(false);
+            expect(panel1.group.api.isVisible).toBe(false);
+
+            // Make visible again
+            panel1.group.api.setVisible(true);
+
+            // With delay, the width should still be preserved correctly
+            expect(panel1.group.api.width).toBe(350);
+        });
+    });
 });
