@@ -34,7 +34,12 @@ class Panel extends SplitviewPanel {
     }
 }
 
-const api = createSplitview(document.getElementById('app'), {
+const container = document.getElementById('app');
+if (!container) {
+    throw new Error('Container element #app not found');
+}
+
+const api = createSplitview(container, {
     className: themeAbyss.className,
     createComponent: (options) => {
         switch (options.name) {
@@ -45,6 +50,9 @@ const api = createSplitview(document.getElementById('app'), {
         }
     },
 });
+
+// Layout BEFORE adding panels (critical for splitview)
+api.layout(window.innerWidth, window.innerHeight);
 
 api.addPanel({
     id: 'panel_1',
