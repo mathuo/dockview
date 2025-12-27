@@ -17,6 +17,7 @@ class Panel extends GridviewPanel {
         this.element.style.padding = '10px';
         this.element.style.background = '#1e1e1e';
         this.element.style.border = '1px solid #333';
+        this.element.style.height = '100%';
 
         this._frameworkPart = {
             update: (parameters) => {
@@ -35,9 +36,14 @@ class Panel extends GridviewPanel {
     }
 }
 
-const api = createGridview(document.getElementById('app'), {
+const container = document.getElementById('app');
+if (!container) {
+    throw new Error('Container element #app not found');
+}
+
+const api = createGridview(container, {
     className: themeAbyss.className,
-    orientation: Orientation.VERTICAL,
+    orientation: Orientation.HORIZONTAL,
     createComponent: (options) => {
         switch (options.name) {
             case 'default':
@@ -47,6 +53,9 @@ const api = createGridview(document.getElementById('app'), {
         }
     },
 });
+
+// Layout BEFORE adding panels (critical for gridview)
+api.layout(window.innerWidth, window.innerHeight);
 
 const panel1 = api.addPanel({
     id: 'panel_1',

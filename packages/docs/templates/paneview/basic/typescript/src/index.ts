@@ -82,7 +82,12 @@ class Panel extends PaneviewPanel {
     }
 }
 
-const api = createPaneview(document.getElementById('app'), {
+const container = document.getElementById('app');
+if (!container) {
+    throw new Error('Container element #app not found');
+}
+
+const api = createPaneview(container, {
     className: themeAbyss.className,
     createComponent: (options) => {
         switch (options.name) {
@@ -93,6 +98,9 @@ const api = createPaneview(document.getElementById('app'), {
         }
     },
 });
+
+// Layout BEFORE adding panels (critical for paneview)
+api.layout(window.innerWidth, window.innerHeight);
 
 api.addPanel({
     id: 'panel_1',
