@@ -46,7 +46,7 @@ import {
     DockviewDidDropEvent,
     DockviewWillDropEvent,
 } from './dockviewGroupPanelModel';
-import { WillShowOverlayLocationEvent } from './events';
+import { DockviewWillShowOverlayLocationEvent } from './events';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
@@ -216,7 +216,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly orientation: Orientation;
     readonly onDidDrop: Event<DockviewDidDropEvent>;
     readonly onWillDrop: Event<DockviewWillDropEvent>;
-    readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent>;
+    readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent>;
     readonly onDidRemovePanel: Event<IDockviewPanel>;
     readonly onDidAddPanel: Event<IDockviewPanel>;
     readonly onDidLayoutFromJSON: Event<void>;
@@ -300,8 +300,8 @@ export class DockviewComponent
     readonly onWillDrop: Event<DockviewWillDropEvent> = this._onWillDrop.event;
 
     private readonly _onWillShowOverlay =
-        new Emitter<WillShowOverlayLocationEvent>();
-    readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent> =
+        new Emitter<DockviewWillShowOverlayLocationEvent>();
+    readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent> =
         this._onWillShowOverlay.event;
 
     private readonly _onUnhandledDragOverEvent =
@@ -587,7 +587,7 @@ export class DockviewComponent
                 }
 
                 this._onWillShowOverlay.fire(
-                    new WillShowOverlayLocationEvent(event, {
+                    new DockviewWillShowOverlayLocationEvent(event, {
                         kind: 'edge',
                         panel: undefined,
                         api: this._api,

@@ -11,7 +11,7 @@ import { VoidContainer } from './voidContainer';
 import { findRelativeZIndexParent, toggleClass } from '../../../dom';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
-import { WillShowOverlayLocationEvent } from '../../events';
+import { DockviewWillShowOverlayLocationEvent } from '../../events';
 import { getPanelData } from '../../../dnd/dataTransfer';
 import { Tabs } from './tabs';
 import {
@@ -41,7 +41,7 @@ export interface ITabsContainer extends IDisposable {
     readonly onDrop: Event<TabDropIndexEvent>;
     readonly onTabDragStart: Event<TabDragEvent>;
     readonly onGroupDragStart: Event<GroupDragEvent>;
-    readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent>;
+    readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent>;
     hidden: boolean;
     delete(id: string): void;
     indexOf(id: string): number;
@@ -91,8 +91,8 @@ export class TabsContainer
         this._onGroupDragStart.event;
 
     private readonly _onWillShowOverlay =
-        new Emitter<WillShowOverlayLocationEvent>();
-    readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent> =
+        new Emitter<DockviewWillShowOverlayLocationEvent>();
+    readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent> =
         this._onWillShowOverlay.event;
 
     get panels(): string[] {
@@ -181,7 +181,7 @@ export class TabsContainer
             }),
             this.voidContainer.onWillShowOverlay((event) => {
                 this._onWillShowOverlay.fire(
-                    new WillShowOverlayLocationEvent(event, {
+                    new DockviewWillShowOverlayLocationEvent(event, {
                         kind: 'header_space',
                         panel: this.group.activePanel,
                         api: this.accessor.api,
