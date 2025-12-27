@@ -25,27 +25,27 @@ const components = {
 
 export default () => {
     const onReady = (event: GridviewReadyEvent) => {
-        const panel1 = event.api.addPanel({
+        event.api.addPanel({
             id: 'panel_1',
             component: 'default',
         });
 
-        const panel2 = event.api.addPanel({
+        event.api.addPanel({
             id: 'panel_2',
             component: 'default',
-            position: { referencePanel: panel1, direction: 'right' },
+            position: { referencePanel: 'panel_1', direction: 'right' },
         });
 
         event.api.addPanel({
             id: 'panel_3',
             component: 'default',
-            position: { referencePanel: panel1, direction: 'below' },
+            position: { referencePanel: 'panel_1', direction: 'below' },
         });
 
         event.api.addPanel({
             id: 'panel_4',
             component: 'default',
-            position: { referencePanel: panel2, direction: 'below' },
+            position: { referencePanel: 'panel_2', direction: 'below' },
         });
     };
 

@@ -76,7 +76,7 @@ const IMPORTS_PATHS = {
     react: {
         react: `https://esm.sh/react@${REACT_VERSION}`,
         'react-dom': `https://esm.sh/react-dom@${REACT_VERSION}`,
-        'react-dom/client': `https://esm.sh/react-dom@${REACT_VERSION}`,
+        'react-dom/client': `https://esm.sh/react-dom@${REACT_VERSION}/client`,
     },
     vue: {
         vue: `https://cdn.jsdelivr.net/npm/vue@${VUE_VERSION}/dist/vue.esm-browser.js`,
@@ -158,6 +158,7 @@ function createIndexHTML(options) {
         )
         .replace('{{app}}', options.app)
         .replace('{{appElement}}', options.appElement || '')
+        .replace('{{componentSelector}}', options.componentSelector)
         .replace('{{githubLink}}', options.githubUrl)
         .replace('{{codeSandboxLink}}', options.codeSandboxUrl);
 }
@@ -167,6 +168,13 @@ const output = path.join(__dirname, '../static/templates');
 
 const COMPONENTS = ['dockview', 'splitview', 'gridview', 'paneview'];
 const FRAMEWORKS = ['react', 'vue', 'typescript', 'angular'];
+
+const COMPONENT_SELECTORS = {
+    'dockview': '.dv-dockview',
+    'splitview': '.dv-split-view-container', 
+    'gridview': '.dv-grid-view',
+    'paneview': '.dv-pane-container'
+};
 
 const list = [];
 
@@ -225,6 +233,7 @@ async function buildTemplates() {
                             : './src/index.ts',
                     appElement:
                         framework === 'angular' ? '<app-root></app-root>' : '',
+                    componentSelector: COMPONENT_SELECTORS[component],
                     importPaths: {
                         ...IMPORTS_PATHS[framework],
                         ...DOCKVIEW_CDN[framework][
