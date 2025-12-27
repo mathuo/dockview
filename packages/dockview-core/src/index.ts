@@ -47,6 +47,7 @@ export {
 export * from './dockview/components/panel/content';
 export * from './dockview/components/tab/tab';
 export * from './dockview/dockviewGroupPanelModel';
+export { WillShowOverlayLocationEvent } from './dockview/events';
 export {
     TabDragEvent,
     GroupDragEvent,
