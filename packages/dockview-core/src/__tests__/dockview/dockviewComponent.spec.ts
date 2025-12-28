@@ -8272,7 +8272,7 @@ describe('dockviewComponent', () => {
         });
 
 
-        test('issue 1050 variant: test with delay to confirm fix works in async scenarios', async () => {
+        test('issue 1050 variant: test that fix works with multiple size changes', () => {
             const container = document.createElement('div');
 
             const dockview = new DockviewComponent(container, {
@@ -8306,8 +8306,9 @@ describe('dockviewComponent', () => {
             panel1.group.api.setSize({ width: 350 });
             expect(panel1.group.api.width).toBe(350);
 
-            // Add small delay to simulate async conditions
-            await new Promise(resolve => setTimeout(resolve, 10));
+            // Set different size while visible
+            panel1.group.api.setSize({ width: 400 });
+            expect(panel1.group.api.width).toBe(400);
 
             // Then set invisible
             panel1.group.api.setVisible(false);
@@ -8316,8 +8317,8 @@ describe('dockviewComponent', () => {
             // Make visible again
             panel1.group.api.setVisible(true);
 
-            // With delay, the width should still be preserved correctly
-            expect(panel1.group.api.width).toBe(350);
+            // The most recent size (400px) should be preserved
+            expect(panel1.group.api.width).toBe(400);
         });
     });
 });
