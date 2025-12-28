@@ -22,8 +22,8 @@
     "docs": "typedoc && node scripts/docs.mjs",
     "lint": "eslint 'packages/*/src/**/*.{ts,tsx,js,jsx}'",
     "lint:fix": "eslint 'packages/*/src/**/*.{ts,tsx,js,jsx}' --fix",
-    "test": "jest",
-    "test:cov": "jest --coverage",
+    "test": "jest --passWithNoTests",
+    "test:cov": "jest --coverage --passWithNoTests",
     "version": "lerna version"
   },
   "resolutions": {
