@@ -517,6 +517,15 @@ export class DockviewComponent
             this._onDidDrop,
             this._onWillDrop,
             this._onDidMovePanel,
+            this._onDidMovePanel.event(() => {
+                /**
+                 * Update overlay positions after DOM layout completes to prevent 0×0 dimensions.
+                 * With defaultRenderer="always" this results in panel content not showing after move operations.
+                 */
+                requestAnimationFrame(() => {
+                    this.overlayRenderContainer.updateAllPositions();
+                });
+            }),
             this._onDidAddGroup,
             this._onDidRemoveGroup,
             this._onDidActiveGroupChange,
@@ -2289,14 +2298,6 @@ export class DockviewComponent
             this._onDidMovePanel.fire({
                 panel: removedPanel,
                 from: sourceGroup,
-            });
-
-			 /**
-             * Update overlay positions after DOM layout completes to prevent 0×0 dimensions.
-             * With defaultRenderer="always" this results in panel content not showing after move operations.
-             */
-			 requestAnimationFrame(() => {
-                this.overlayRenderContainer.updateAllPositions();
             });
         } else {
             /**
