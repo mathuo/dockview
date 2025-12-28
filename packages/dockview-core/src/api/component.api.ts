@@ -52,7 +52,7 @@ import {
     DockviewDidDropEvent,
     DockviewWillDropEvent,
 } from '../dockview/dockviewGroupPanelModel';
-import { WillShowOverlayLocationEvent } from '../dockview/events';
+import { DockviewWillShowOverlayLocationEvent } from '../dockview/events';
 import {
     PaneviewComponentOptions,
     PaneviewDndOverlayEvent,
@@ -714,7 +714,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      * Calling `event.preventDefault()` will prevent the overlay being shown and prevent
      * the any subsequent drop event.
      */
-    get onWillShowOverlay(): Event<WillShowOverlayLocationEvent> {
+    get onWillShowOverlay(): Event<DockviewWillShowOverlayLocationEvent> {
         return this.component.onWillShowOverlay;
     }
 
