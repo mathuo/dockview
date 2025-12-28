@@ -6,7 +6,7 @@ import {
     DockviewGroupLocation,
 } from '../dockview/dockviewGroupPanelModel';
 import { Emitter, Event } from '../events';
-import { GridviewPanelApi, GridviewPanelApiImpl } from './gridviewPanelApi';
+import { GridviewPanelApi, GridviewPanelApiImpl, SizeEvent } from './gridviewPanelApi';
 
 export interface DockviewGroupMoveParams {
     group?: DockviewGroupPanel;
@@ -45,6 +45,7 @@ const NOT_INITIALIZED_MESSAGE =
 
 export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     private _group: DockviewGroupPanel | undefined;
+    private _pendingSize: SizeEvent | undefined;
 
     readonly _onDidLocationChange =
         new Emitter<DockviewGroupPanelFloatingChangeEvent>();
@@ -66,8 +67,23 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
 
         this.addDisposables(
             this._onDidLocationChange,
-            this._onDidActivePanelChange
+            this._onDidActivePanelChange,
+            this._onDidVisibilityChange.event((event) => {
+                // When becoming visible, apply any pending size change
+                if (event.isVisible && this._pendingSize) {
+                    super.setSize(this._pendingSize);
+                    this._pendingSize = undefined;
+                }
+            })
         );
+    }
+
+    public override setSize(event: SizeEvent): void {
+        // Always store the requested size
+        this._pendingSize = { ...event };
+        
+        // Apply the size change immediately
+        super.setSize(event);
     }
 
     close(): void {
