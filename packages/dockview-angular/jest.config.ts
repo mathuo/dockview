@@ -21,7 +21,7 @@ const config: JestConfigWithTsJest = {
         '<rootDir>/packages/dockview-angular/src/__tests__/__test_utils__',
     ],
     coverageDirectory: '<rootDir>/packages/dockview-angular/coverage/',
-    testResultsProcessor: 'jest-sonar-reporter',
+    // testResultsProcessor inherited from root config
     testEnvironment: 'jsdom',
     testMatch: [
         '<rootDir>/packages/dockview-angular/src/**/*.spec.ts',
@@ -30,11 +30,14 @@ const config: JestConfigWithTsJest = {
     transformIgnorePatterns: [
         'node_modules/(?!(.*\\.mjs$|@angular|rxjs))'
     ],
-    globals: {
-        'ts-jest': {
-            tsconfig: '<rootDir>/tsconfig.spec.json',
-            stringifyContentPathRegex: '\\.(html|svg)$',
-        },
+    transform: {
+        '^.+\\.(ts|mjs|js|html)$': [
+            'jest-preset-angular',
+            {
+                tsconfig: '<rootDir>/tsconfig.spec.json',
+                stringifyContentPathRegex: '\\.(html|svg)$',
+            },
+        ],
     },
 };
 

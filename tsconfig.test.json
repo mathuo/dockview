@@ -3,7 +3,8 @@
     "compilerOptions": {
         "jsx": "react-jsx",
         "noImplicitAny": false,
-        "sourceMap": true
+        "sourceMap": true,
+        "isolatedModules": true
     },
     "include": ["**/*.spec.ts", "./jest-setup.ts"]
 }
