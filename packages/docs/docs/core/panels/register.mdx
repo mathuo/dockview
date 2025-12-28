@@ -18,6 +18,10 @@ You can register panels through the dock  [option](/docs/api/dockview/options) `
   <DocRef declaration="IDockviewVueProps" methods={['components']} />
 </FrameworkSpecific>
 
+<FrameworkSpecific framework='Angular'>
+  <DocRef declaration="IDockviewAngularProps" methods={['components']} />
+</FrameworkSpecific>
+
 
 <FrameworkSpecific framework='JavaScript'>
   <DocRef declaration="DockviewComponentOptions" methods={['createComponent']} />
@@ -102,6 +106,56 @@ const App = {
       >
       </dockview-vue>`,
 };
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Angular'>
+```tsx
+@Component({
+    selector: 'panel-component-1',
+    template: `<div>Panel Content 1</div>`
+})
+export class PanelComponent1 {
+    @Input() api: DockviewPanelApi;
+    @Input() group: any;
+    @Input() containerApi: DockviewApi;
+}
+
+@Component({
+    selector: 'panel-component-2', 
+    template: `<div>Panel Content 2</div>`
+})
+export class PanelComponent2 {
+    @Input() api: DockviewPanelApi;
+}
+
+@Component({
+    selector: 'app-root',
+    template: `
+        <dv-dockview 
+            [components]="components"
+            (ready)="onReady($event)">
+        </dv-dockview>
+    `
+})
+export class AppComponent {
+    components = {
+        'component_1': PanelComponent1,
+        'component_2': PanelComponent2,
+    };
+
+    onReady(event: DockviewReadyEvent) {
+        event.api.addPanel({
+            id: 'panel_1',
+            component: 'component_1'
+        });
+
+        event.api.addPanel({
+            id: 'panel_2',
+            component: 'component_2'
+        });
+    }
+}
 ```
 </FrameworkSpecific>
 

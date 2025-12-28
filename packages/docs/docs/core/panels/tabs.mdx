@@ -57,8 +57,94 @@ const App = {
 ```
 </FrameworkSpecific>
 
+<FrameworkSpecific framework='Angular'>
+```tsx
+@Component({
+    selector: 'tab-component-1',
+    template: `<div>Custom Tab 1</div>`
+})
+export class TabComponent1 {
+    @Input() api: DockviewPanelApi;
+    @Input() containerApi: DockviewApi;
+}
+
+@Component({
+    selector: 'tab-component-2',
+    template: `<div>Custom Tab 2</div>`
+})
+export class TabComponent2 {
+    @Input() api: DockviewPanelApi;
+    @Input() containerApi: DockviewApi;
+}
+
+@Component({
+    selector: 'app-root',
+    template: `
+        <dv-dockview 
+            [tabComponents]="tabComponents"
+            (ready)="onReady($event)">
+        </dv-dockview>
+    `
+})
+export class AppComponent {
+    tabComponents = {
+        'tab_1': TabComponent1,
+        'tab_2': TabComponent2,
+    };
+
+    onReady(event: DockviewReadyEvent) {
+        event.api.addPanel({
+            id: 'panel_1',
+            component: 'component_1',
+            tabComponent: 'tab_1'
+        });
+    }
+}
+```
+</FrameworkSpecific>
+
 <FrameworkSpecific framework='JavaScript'>
-not implemented
+```tsx
+class CustomTabRenderer implements IHeaderRenderer {
+    private readonly _element: HTMLElement;
+
+    get element(): HTMLElement {
+        return this._element;
+    }
+
+    constructor() {
+        this._element = document.createElement('div');
+    }
+
+    init(parameters: HeaderPartInitParameters): void {
+        const api: DockviewPanelApi = parameters.api;
+        const containerApi: DockviewApi = parameters.containerApi;
+        
+        this._element.textContent = api.title || 'Custom Tab';
+    }
+
+    dispose(): void {
+        // Cleanup logic
+    }
+}
+
+const api = createDockview(parentElement, {
+    createTabComponent: (options) => {
+        switch (options.name) {
+            case 'tab_1':
+                return new CustomTabRenderer();
+            default:
+                return undefined;
+        }
+    },
+});
+
+api.addPanel({
+    id: 'panel_1',
+    component: 'component_1',
+    tabComponent: 'tab_1'
+});
+```
 </FrameworkSpecific>
 
 
@@ -103,8 +189,72 @@ const App = {
 ```
 </FrameworkSpecific>
 
+<FrameworkSpecific framework='Angular'>
+```tsx
+@Component({
+    selector: 'custom-tab-renderer',
+    template: `<div>Default Tab</div>`
+})
+export class CustomTabRenderer {
+    @Input() api: DockviewPanelApi;
+    @Input() containerApi: DockviewApi;
+}
+
+@Component({
+    selector: 'app-root',
+    template: `
+        <dv-dockview 
+            [defaultTabRenderer]="defaultTabRenderer"
+            (ready)="onReady($event)">
+        </dv-dockview>
+    `
+})
+export class AppComponent {
+    defaultTabRenderer = CustomTabRenderer;
+
+    onReady(event: DockviewReadyEvent) {
+        event.api.addPanel({
+            id: 'panel_1',
+            component: 'component_1',
+        });
+    }
+}
+```
+</FrameworkSpecific>
+
 <FrameworkSpecific framework='JavaScript'>
-not implemented
+```tsx
+class DefaultTabRenderer implements IHeaderRenderer {
+    private readonly _element: HTMLElement;
+
+    get element(): HTMLElement {
+        return this._element;
+    }
+
+    constructor() {
+        this._element = document.createElement('div');
+        this._element.className = 'custom-default-tab';
+    }
+
+    init(parameters: HeaderPartInitParameters): void {
+        const api: DockviewPanelApi = parameters.api;
+        const containerApi: DockviewApi = parameters.containerApi;
+        
+        this._element.textContent = api.title || 'Default Tab';
+    }
+
+    dispose(): void {
+        // Cleanup logic
+    }
+}
+
+const api = createDockview(parentElement, {
+    createTabComponent: (options) => {
+        // Return the default tab renderer for all tabs
+        return new DefaultTabRenderer();
+    },
+});
+```
 </FrameworkSpecific>
 
 ## Accessing Custom Panel Parameters
@@ -163,6 +313,10 @@ When a group has only one single tab you may want that tab to take the full widt
 
 <FrameworkSpecific framework='Vue'>
   <DocRef declaration="IDockviewVueProps" methods={['singleTabMode']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Angular'>
+  <DocRef declaration="IDockviewAngularProps" methods={['singleTabMode']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
