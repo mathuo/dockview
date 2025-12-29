@@ -517,6 +517,14 @@ export class DockviewComponent
             this._onDidDrop,
             this._onWillDrop,
             this._onDidMovePanel,
+            this._onDidMovePanel.event(() => {
+                /**
+                 * Update overlay positions after DOM layout completes to prevent 0×0 dimensions.
+                 * With defaultRenderer="always" this results in panel content not showing after move operations.
+                 * Debounced to avoid multiple calls when moving groups with multiple panels.
+                 */
+                this.debouncedUpdateAllPositions();
+            }),
             this._onDidAddGroup,
             this._onDidRemoveGroup,
             this._onDidActiveGroupChange,
@@ -1698,9 +1706,7 @@ export class DockviewComponent
         this.updateWatermark();
 
         // Force position updates for always visible panels after DOM layout is complete
-        requestAnimationFrame(() => {
-            this.overlayRenderContainer.updateAllPositions();
-        });
+        this.debouncedUpdateAllPositions();
 
         this._onDidLayoutFromJSON.fire();
     }
@@ -2203,6 +2209,18 @@ export class DockviewComponent
     }
 
     private _moving = false;
+    private _updatePositionsFrameId: number | undefined;
+
+    private debouncedUpdateAllPositions(): void {
+        if (this._updatePositionsFrameId !== undefined) {
+            cancelAnimationFrame(this._updatePositionsFrameId);
+        }
+        this._updatePositionsFrameId = requestAnimationFrame(() => {
+            this._updatePositionsFrameId = undefined;
+
+            this.overlayRenderContainer.updateAllPositions();
+        });
+    }
 
     movingLock<T>(func: () => T): T {
         const isMoving = this._moving;
@@ -2289,14 +2307,6 @@ export class DockviewComponent
             this._onDidMovePanel.fire({
                 panel: removedPanel,
                 from: sourceGroup,
-            });
-
-			 /**
-             * Update overlay positions after DOM layout completes to prevent 0×0 dimensions.
-             * With defaultRenderer="always" this results in panel content not showing after move operations.
-             */
-			 requestAnimationFrame(() => {
-                this.overlayRenderContainer.updateAllPositions();
             });
         } else {
             /**
@@ -2628,6 +2638,8 @@ export class DockviewComponent
         from.panels.forEach((panel) => {
             this._onDidMovePanel.fire({ panel, from });
         });
+
+        this.debouncedUpdateAllPositions();
 
         // Ensure group becomes active after move
         if (options.skipSetActive === false) {
