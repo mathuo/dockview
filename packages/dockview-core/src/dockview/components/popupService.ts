@@ -69,6 +69,9 @@ export class PopupService extends CompositeDisposable {
                 }
 
                 this.close();
+            }),
+            addDisposableListener(window, 'resize', () => {
+                this.close();
             })
         );
 
