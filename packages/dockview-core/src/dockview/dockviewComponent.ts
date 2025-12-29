@@ -1706,9 +1706,7 @@ export class DockviewComponent
         this.updateWatermark();
 
         // Force position updates for always visible panels after DOM layout is complete
-        requestAnimationFrame(() => {
-            this.overlayRenderContainer.updateAllPositions();
-        });
+        this.debouncedUpdateAllPositions();
 
         this._onDidLayoutFromJSON.fire();
     }
@@ -2219,6 +2217,7 @@ export class DockviewComponent
         }
         this._updatePositionsFrameId = requestAnimationFrame(() => {
             this._updatePositionsFrameId = undefined;
+
             this.overlayRenderContainer.updateAllPositions();
         });
     }
@@ -2639,6 +2638,8 @@ export class DockviewComponent
         from.panels.forEach((panel) => {
             this._onDidMovePanel.fire({ panel, from });
         });
+
+        this.debouncedUpdateAllPositions();
 
         // Ensure group becomes active after move
         if (options.skipSetActive === false) {
