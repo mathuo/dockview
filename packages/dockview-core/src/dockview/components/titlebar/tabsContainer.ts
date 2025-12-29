@@ -18,6 +18,11 @@ import {
     createDropdownElementHandle,
     DropdownElement,
 } from './tabOverflowControl';
+import {
+    ITabOverflowRenderer,
+    OverflowTabData,
+    TabOverflowEvent,
+} from '../../options';
 
 export interface TabDropIndexEvent {
     readonly event: DragEvent;
@@ -76,6 +81,7 @@ export class TabsContainer
     private _hidden = false;
 
     private dropdownPart: DropdownElement | null = null;
+    private customOverflowRenderer: ITabOverflowRenderer | null = null;
     private _overflowTabs: string[] = [];
     private readonly _dropdownDisposable = new MutableDisposable();
 
@@ -146,11 +152,21 @@ export class TabsContainer
 
         this.voidContainer = new VoidContainer(this.accessor, this.group);
 
+        // Initialize custom overflow renderer if provided
+        if (accessor.options.createTabOverflowComponent) {
+            this.customOverflowRenderer = accessor.options.createTabOverflowComponent(group);
+        }
+
         this._element.appendChild(this.preActionsContainer);
         this._element.appendChild(this.tabs.element);
         this._element.appendChild(this.leftActionsContainer);
         this._element.appendChild(this.voidContainer.element);
         this._element.appendChild(this.rightActionsContainer);
+
+        // Add custom overflow renderer element if present
+        if (this.customOverflowRenderer) {
+            this.rightActionsContainer.appendChild(this.customOverflowRenderer.element);
+        }
 
         this.addDisposables(
             this.tabs.onDrop((e) => this._onDrop.fire(e)),
@@ -220,7 +236,8 @@ export class TabsContainer
                         });
                     }
                 }
-            )
+            ),
+            this.customOverflowRenderer ?? Disposable.NONE
         );
     }
 
@@ -314,6 +331,32 @@ export class TabsContainer
         const tabs = options.reset ? [] : options.tabs;
         this._overflowTabs = tabs;
 
+        // If we have a custom overflow renderer, use it instead
+        if (this.customOverflowRenderer) {
+            const overflowData: OverflowTabData[] = this._overflowTabs.map((tabId) => {
+                const tab = this.tabs.tabs.find((t) => t.panel.id === tabId);
+                if (!tab) {
+                    throw new Error(`Tab not found: ${tabId}`);
+                }
+                return {
+                    id: tab.panel.id,
+                    title: tab.panel.title ?? '',
+                    isActive: tab.panel.api.isActive,
+                    panel: tab.panel,
+                };
+            });
+
+            const event: TabOverflowEvent = {
+                tabs: overflowData,
+                isVisible: tabs.length > 0,
+                triggerElement: this.rightActionsContainer,
+            };
+
+            this.customOverflowRenderer.update(event);
+            return;
+        }
+
+        // Default behavior for built-in overflow dropdown
         if (this._overflowTabs.length > 0 && this.dropdownPart) {
             this.dropdownPart.update({ tabs: tabs.length });
             return;
