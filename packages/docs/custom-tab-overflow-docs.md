@@ -48,6 +48,184 @@ const CustomTabOverflow: React.FC<ITabOverflowProps> = ({ event }) => {
 />
 ```
 
+### Vue
+
+```vue
+<template>
+  <DockviewVue
+    :components="components"
+    :tab-overflow-component="'CustomTabOverflow'"
+    @ready="onReady"
+  />
+</template>
+
+<script setup>
+import { DockviewVue } from 'dockview-vue';
+
+// Custom overflow component
+const CustomTabOverflow = {
+  props: {
+    event: {
+      type: Object,
+      required: true
+    }
+  },
+  data() {
+    return {
+      isOpen: false
+    };
+  },
+  watch: {
+    'event.isVisible'(newValue) {
+      if (!newValue) {
+        this.isOpen = false;
+      }
+    }
+  },
+  template: `
+    <div v-if="event.isVisible" style="position: relative;">
+      <button @click="isOpen = !isOpen" style="padding: 4px 8px;">
+        +{{ event.tabs.length }} more
+      </button>
+      
+      <div
+        v-if="isOpen"
+        style="position: absolute; top: 100%; right: 0; background: white; 
+               border: 1px solid #ccc; border-radius: 4px; 
+               box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000; min-width: 200px;"
+      >
+        <div
+          v-for="tab in event.tabs"
+          :key="tab.id"
+          @click="activateTab(tab)"
+          style="padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eee;"
+          :style="{ backgroundColor: tab.isActive ? '#e6f3ff' : 'transparent' }"
+        >
+          {{ tab.title }}
+          <span v-if="tab.isActive" style="margin-left: 8px; font-weight: bold;">
+            (active)
+          </span>
+        </div>
+      </div>
+    </div>
+  `,
+  methods: {
+    activateTab(tab) {
+      tab.panel.api.setActive();
+      this.isOpen = false;
+    }
+  }
+};
+
+const components = {
+  CustomTabOverflow,
+  // ... your other components
+};
+
+const onReady = (event) => {
+  // Add multiple panels to trigger overflow
+  for (let i = 1; i <= 8; i++) {
+    event.api.addPanel({
+      id: `panel${i}`,
+      title: `Panel ${i}`,
+      component: 'simple',
+    });
+  }
+};
+</script>
+```
+
+### Angular
+
+```typescript
+// custom-tab-overflow.component.ts
+import { Component, Input } from '@angular/core';
+import { TabOverflowEvent } from 'dockview-core';
+
+@Component({
+  selector: 'app-custom-tab-overflow',
+  template: `
+    <div *ngIf="event.isVisible" style="position: relative;">
+      <button 
+        (click)="isOpen = !isOpen"
+        style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; 
+               background: white; cursor: pointer;"
+      >
+        +{{ event.tabs.length }} more
+      </button>
+      
+      <div
+        *ngIf="isOpen"
+        style="position: absolute; top: 100%; right: 0; background: white; 
+               border: 1px solid #ccc; border-radius: 4px; 
+               box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000; min-width: 200px;"
+      >
+        <div
+          *ngFor="let tab of event.tabs"
+          (click)="activateTab(tab)"
+          style="padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eee;"
+          [style.background-color]="tab.isActive ? '#e6f3ff' : 'transparent'"
+        >
+          {{ tab.title }}
+          <span *ngIf="tab.isActive" style="margin-left: 8px; font-weight: bold;">
+            (active)
+          </span>
+        </div>
+      </div>
+    </div>
+  `
+})
+export class CustomTabOverflowComponent {
+  @Input() event!: TabOverflowEvent;
+  isOpen = false;
+
+  activateTab(tab: any) {
+    tab.panel.api.setActive();
+    this.isOpen = false;
+  }
+}
+```
+
+```typescript
+// app.component.ts
+import { Component } from '@angular/core';
+import { DockviewAngularComponent } from 'dockview-angular';
+import { CustomTabOverflowComponent } from './custom-tab-overflow.component';
+
+@Component({
+  selector: 'app-root',
+  template: `
+    <dv-dockview
+      [components]="components"
+      [tab-overflow-component]="tabOverflowComponent"
+      (ready)="onReady($event)"
+      style="height: 100vh;"
+    >
+    </dv-dockview>
+  `,
+  standalone: true,
+  imports: [DockviewAngularComponent]
+})
+export class AppComponent {
+  components = {
+    // ... your panel components
+  };
+  
+  tabOverflowComponent = CustomTabOverflowComponent;
+
+  onReady(event: any) {
+    // Add multiple panels to trigger overflow
+    for (let i = 1; i <= 8; i++) {
+      event.api.addPanel({
+        id: `panel${i}`,
+        title: `Panel ${i}`,
+        component: 'simple',
+      });
+    }
+  }
+}
+```
+
 ### Core API (Framework Agnostic)
 
 ```typescript
