@@ -226,7 +226,161 @@ export class AppComponent {
 }
 ```
 
-### Core API (Framework Agnostic)
+### JavaScript (Vanilla JS)
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dockview-core/dist/styles/dockview.css">
+</head>
+<body>
+    <div id="app"></div>
+    
+    <script type="module">
+        import { createDockview } from 'https://cdn.jsdelivr.net/npm/dockview-core/dist/dockview-core.esm.js';
+
+        // Simple panel class
+        class Panel {
+            constructor() {
+                this._element = document.createElement('div');
+                this._element.style.padding = '16px';
+                this._element.style.height = '100%';
+            }
+
+            get element() {
+                return this._element;
+            }
+
+            init(parameters) {
+                const title = parameters.api.title || parameters.api.id;
+                this._element.innerHTML = `
+                    <h3>${title}</h3>
+                    <p>This is a sample panel. Try resizing to see custom overflow.</p>
+                `;
+            }
+
+            dispose() {
+                // cleanup
+            }
+        }
+
+        // Custom tab overflow renderer
+        class CustomTabOverflowRenderer {
+            constructor() {
+                this._element = document.createElement('div');
+                this._element.style.position = 'relative';
+                this.isOpen = false;
+            }
+
+            get element() {
+                return this._element;
+            }
+
+            update(event) {
+                if (!event.isVisible) {
+                    this._element.style.display = 'none';
+                    this.isOpen = false;
+                    return;
+                }
+
+                this._element.style.display = 'block';
+
+                // Create button
+                const button = document.createElement('button');
+                button.textContent = `+${event.tabs.length} more`;
+                button.style.cssText = `
+                    padding: 4px 8px; 
+                    border: 1px solid #ccc; 
+                    border-radius: 4px; 
+                    background: white; 
+                    cursor: pointer; 
+                    font-size: 12px;
+                `;
+
+                // Create dropdown
+                const dropdown = document.createElement('div');
+                dropdown.style.cssText = `
+                    position: absolute; 
+                    top: 100%; 
+                    right: 0; 
+                    background: white; 
+                    border: 1px solid #ccc; 
+                    border-radius: 4px; 
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
+                    z-index: 1000; 
+                    min-width: 200px;
+                    display: ${this.isOpen ? 'block' : 'none'};
+                `;
+
+                // Add tab items
+                event.tabs.forEach(tab => {
+                    const tabElement = document.createElement('div');
+                    tabElement.style.cssText = `
+                        padding: 8px 12px; 
+                        cursor: pointer; 
+                        border-bottom: 1px solid #eee;
+                        background-color: ${tab.isActive ? '#e6f3ff' : 'transparent'};
+                    `;
+                    
+                    tabElement.innerHTML = `
+                        ${tab.title}
+                        ${tab.isActive ? '<span style="margin-left: 8px; font-weight: bold;">(active)</span>' : ''}
+                    `;
+
+                    tabElement.addEventListener('click', () => {
+                        tab.panel.api.setActive();
+                        this.isOpen = false;
+                        this.update(event); // Re-render to close dropdown
+                    });
+
+                    dropdown.appendChild(tabElement);
+                });
+
+                // Toggle dropdown
+                button.addEventListener('click', () => {
+                    this.isOpen = !this.isOpen;
+                    dropdown.style.display = this.isOpen ? 'block' : 'none';
+                });
+
+                // Rebuild element
+                this._element.innerHTML = '';
+                this._element.appendChild(button);
+                this._element.appendChild(dropdown);
+            }
+
+            dispose() {
+                // cleanup
+            }
+        }
+
+        // Create dockview
+        const api = createDockview(document.getElementById('app'), {
+            createComponent: (options) => {
+                if (options.name === 'default') {
+                    return new Panel();
+                }
+                throw new Error(`Unknown component: ${options.name}`);
+            },
+            createTabOverflowComponent: () => {
+                return new CustomTabOverflowRenderer();
+            },
+        });
+
+        // Add panels to trigger overflow
+        for (let i = 1; i <= 8; i++) {
+            api.addPanel({
+                id: `panel_${i}`,
+                component: 'default',
+                title: `Panel ${i}`,
+            });
+        }
+    </script>
+</body>
+</html>
+```
+
+### TypeScript (Core API)
 
 ```typescript
 import { createDockview, ITabOverflowRenderer, TabOverflowEvent } from 'dockview-core';
