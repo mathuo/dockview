@@ -6,6 +6,7 @@ export interface VueProps {
     rightHeaderActionsComponent?: string;
     leftHeaderActionsComponent?: string;
     prefixHeaderActionsComponent?: string;
+    tabOverflowComponent?: string;
 }
 
 export type VueEvents = {

@@ -6,6 +6,7 @@ import {
     ITabRenderer,
     IWatermarkRenderer,
     IHeaderActionsRenderer,
+    ITabOverflowRenderer,
     TabPartInitParameters,
     WatermarkRendererInitParameters,
     GroupPanelPartInitParameters,
@@ -14,7 +15,7 @@ import {
     SplitviewPanel,
     IPanePart
 } from 'dockview-core';
-import { AngularRenderer, AngularRendererOptions } from './angular-renderer';
+import { AngularRenderer, AngularRendererOptions, AngularTabOverflowRenderer } from './angular-renderer';
 import { AngularGridviewPanel } from '../gridview/angular-gridview-panel';
 import { AngularSplitviewPanel } from '../splitview/angular-splitview-panel';
 import { AngularPanePart } from '../paneview/angular-pane-part';
@@ -27,7 +28,8 @@ export class AngularFrameworkComponentFactory {
         private tabComponents?: Record<string, Type<any>>,
         private watermarkComponent?: Type<any>,
         private headerActionsComponents?: Record<string, Type<any>>,
-        private defaultTabComponent?: Type<any>
+        private defaultTabComponent?: Type<any>,
+        private tabOverflowComponent?: Type<any>
     ) {}
 
     // For DockviewComponent
@@ -149,5 +151,17 @@ export class AngularFrameworkComponentFactory {
         // Initialize with empty props - dockview-core will call init() again with actual IGroupHeaderProps
         renderer.init({});
         return renderer;
+    }
+
+    createTabOverflowComponent(): ITabOverflowRenderer | undefined {
+        if (!this.tabOverflowComponent) {
+            return undefined;
+        }
+
+        return new AngularTabOverflowRenderer({
+            component: this.tabOverflowComponent,
+            injector: this.injector,
+            environmentInjector: this.environmentInjector
+        });
     }
 }

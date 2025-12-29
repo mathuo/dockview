@@ -19,6 +19,7 @@ import {
 import {
     VueHeaderActionsRenderer,
     VueRenderer,
+    VueTabOverflowRenderer,
     VueWatermarkRenderer,
     findComponent,
 } from '../utils';
@@ -134,6 +135,19 @@ onMounted(() => {
                       props.rightHeaderActionsComponent!
                   );
                   return new VueHeaderActionsRenderer(
+                      component!,
+                      inst,
+                      group
+                  );
+              }
+            : undefined,
+        createTabOverflowComponent: props.tabOverflowComponent
+            ? (group) => {
+                  const component = findComponent(
+                      inst,
+                      props.tabOverflowComponent!
+                  );
+                  return new VueTabOverflowRenderer(
                       component!,
                       inst,
                       group
