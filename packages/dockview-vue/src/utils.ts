@@ -6,11 +6,14 @@ import type {
     IDockviewPanelHeaderProps,
     IGroupHeaderProps,
     IHeaderActionsRenderer,
+    ITabOverflowRenderer,
+    ITabOverflowTriggerRenderer,
     ITabRenderer,
     IWatermarkPanelProps,
     IWatermarkRenderer,
     PanelUpdateEvent,
     Parameters,
+    TabOverflowEvent,
     TabPartInitParameters,
     WatermarkRendererInitParameters,
 } from 'dockview-core';
@@ -225,6 +228,82 @@ export class VueHeaderActionsRenderer
             { params: props },
             this.element
         );
+    }
+
+    dispose(): void {
+        this._renderDisposable?.dispose();
+    }
+}
+
+export class VueTabOverflowRenderer
+    extends AbstractVueRenderer
+    implements ITabOverflowRenderer
+{
+    private _renderDisposable:
+        | { update: (props: any) => void; dispose: () => void }
+        | undefined;
+
+    get element(): HTMLElement {
+        return this._element;
+    }
+
+    constructor(
+        component: VueComponent,
+        parent: ComponentInternalInstance,
+        group: DockviewGroupPanel
+    ) {
+        super(component, parent);
+    }
+
+    update(event: TabOverflowEvent): void {
+        if (!this._renderDisposable) {
+            this._renderDisposable = mountVueComponent(
+                this.component,
+                this.parent,
+                { event },
+                this.element
+            );
+        } else {
+            this._renderDisposable.update({ event });
+        }
+    }
+
+    dispose(): void {
+        this._renderDisposable?.dispose();
+    }
+}
+
+export class VueTabOverflowTriggerRenderer
+    extends AbstractVueRenderer
+    implements ITabOverflowTriggerRenderer
+{
+    private _renderDisposable:
+        | { update: (props: any) => void; dispose: () => void }
+        | undefined;
+
+    get element(): HTMLElement {
+        return this._element;
+    }
+
+    constructor(
+        component: VueComponent,
+        parent: ComponentInternalInstance,
+        group: DockviewGroupPanel
+    ) {
+        super(component, parent);
+    }
+
+    update(event: TabOverflowEvent): void {
+        if (!this._renderDisposable) {
+            this._renderDisposable = mountVueComponent(
+                this.component,
+                this.parent,
+                { event },
+                this.element
+            );
+        } else {
+            this._renderDisposable.update({ event });
+        }
     }
 
     dispose(): void {

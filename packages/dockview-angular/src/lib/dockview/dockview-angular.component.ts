@@ -28,16 +28,7 @@ import {
 } from 'dockview-core';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
-
-export interface DockviewAngularOptions extends DockviewOptions {
-    components: Record<string, Type<any>>;
-    tabComponents?: Record<string, Type<any>>;
-    watermarkComponent?: Type<any>;
-    defaultTabComponent?: Type<any>;
-    leftHeaderActionsComponent?: Type<any>;
-    rightHeaderActionsComponent?: Type<any>;
-    prefixHeaderActionsComponent?: Type<any>;
-}
+import { DockviewAngularOptions, IAngularTabOverflowConfig } from './types';
 
 @Component({
     selector: 'dv-dockview',
@@ -68,6 +59,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() leftHeaderActionsComponent?: Type<any>;
     @Input() rightHeaderActionsComponent?: Type<any>;
     @Input() prefixHeaderActionsComponent?: Type<any>;
+    @Input() tabOverflowComponent?: Type<any> | IAngularTabOverflowConfig;
 
     // Core dockview options as inputs
     @Input() className?: string;
@@ -182,7 +174,8 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
             this.tabComponents,
             this.watermarkComponent,
             headerActionsComponents,
-            this.defaultTabComponent
+            this.defaultTabComponent,
+            this.tabOverflowComponent
         );
 
         return {
@@ -210,6 +203,11 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
             createPrefixHeaderActionComponent: this.prefixHeaderActionsComponent
                 ? (group) => {
                     return componentFactory.createHeaderActionsComponent('prefix')!;
+                }
+                : undefined,
+            createTabOverflowComponent: this.tabOverflowComponent
+                ? (group) => {
+                    return componentFactory.createTabOverflowComponent()!;
                 }
                 : undefined
         };
