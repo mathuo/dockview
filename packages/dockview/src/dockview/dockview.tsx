@@ -21,8 +21,8 @@ import { ReactPanelHeaderPart } from './reactHeaderPart';
 import { ReactPortalStore, usePortalsLifecycle } from '../react';
 import { ReactWatermarkPart } from './reactWatermarkPart';
 import { ReactHeaderActionsRendererPart } from './headerActionsRenderer';
-import { ReactTabOverflowPart } from './reactTabOverflowPart';
-import { ITabOverflowProps } from '../types';
+import { ReactTabOverflowPart, ReactTabOverflowTriggerPart } from './reactTabOverflowPart';
+import { ITabOverflowProps, ITabOverflowTriggerProps, IReactTabOverflowConfig } from '../types';
 
 function createGroupControlElement(
     component: React.FunctionComponent<IDockviewHeaderActionsProps> | undefined,
@@ -52,7 +52,7 @@ export interface IDockviewReactProps extends DockviewOptions {
     rightHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
     leftHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
     prefixHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
-    tabOverflowComponent?: React.FunctionComponent<ITabOverflowProps>;
+    tabOverflowComponent?: React.FunctionComponent<ITabOverflowProps> | IReactTabOverflowConfig;
     //
     onReady: (event: DockviewReadyEvent) => void;
     onDidDrop?: (event: DockviewDidDropEvent) => void;
@@ -160,11 +160,37 @@ export const DockviewReact = React.forwardRef(
                     : undefined,
                 createTabOverflowComponent: props.tabOverflowComponent
                     ? (group: DockviewGroupPanel) => {
-                          return new ReactTabOverflowPart(
-                              props.tabOverflowComponent!,
-                              { addPortal },
-                              group
-                          );
+                          // Check if it's a config object or just a function component
+                          if (typeof props.tabOverflowComponent === 'function') {
+                              // Legacy: single component for content only
+                              return new ReactTabOverflowPart(
+                                  props.tabOverflowComponent,
+                                  { addPortal },
+                                  group
+                              );
+                          } else {
+                              // New: config object with content and/or trigger
+                              const config = props.tabOverflowComponent as IReactTabOverflowConfig;
+                              const result: any = {};
+                              
+                              if (config.content) {
+                                  result.content = new ReactTabOverflowPart(
+                                      config.content,
+                                      { addPortal },
+                                      group
+                                  );
+                              }
+                              
+                              if (config.trigger) {
+                                  result.trigger = new ReactTabOverflowTriggerPart(
+                                      config.trigger,
+                                      { addPortal },
+                                      group
+                                  );
+                              }
+                              
+                              return result;
+                          }
                       }
                     : undefined,
                 defaultTabComponent: props.defaultTabComponent
@@ -329,6 +355,49 @@ export const DockviewReact = React.forwardRef(
                 ),
             });
         }, [props.prefixHeaderActionsComponent]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+            dockviewRef.current.updateOptions({
+                createTabOverflowComponent: props.tabOverflowComponent
+                    ? (group: DockviewGroupPanel) => {
+                          // Check if it's a config object or just a function component
+                          if (typeof props.tabOverflowComponent === 'function') {
+                              // Legacy: single component for content only
+                              return new ReactTabOverflowPart(
+                                  props.tabOverflowComponent,
+                                  { addPortal },
+                                  group
+                              );
+                          } else {
+                              // New: config object with content and/or trigger
+                              const config = props.tabOverflowComponent as IReactTabOverflowConfig;
+                              const result: any = {};
+                              
+                              if (config.content) {
+                                  result.content = new ReactTabOverflowPart(
+                                      config.content,
+                                      { addPortal },
+                                      group
+                                  );
+                              }
+                              
+                              if (config.trigger) {
+                                  result.trigger = new ReactTabOverflowTriggerPart(
+                                      config.trigger,
+                                      { addPortal },
+                                      group
+                                  );
+                              }
+                              
+                              return result;
+                          }
+                      }
+                    : undefined,
+            });
+        }, [props.tabOverflowComponent]);
 
         return (
             <div style={{ height: '100%', width: '100%' }} ref={domRef}>

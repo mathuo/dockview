@@ -1,5 +1,5 @@
 import React from 'react';
-import { DockviewReact, DockviewReadyEvent, IDockviewPanelProps, ITabOverflowProps } from 'dockview';
+import { DockviewReact, DockviewReadyEvent, IDockviewPanelProps, ITabOverflowProps, ITabOverflowTriggerProps } from 'dockview';
 import 'dockview/dist/styles/dockview.css';
 
 // Simple panel component
@@ -27,74 +27,89 @@ const Panel: React.FC<IDockviewPanelProps> = (props) => {
     );
 };
 
-// Custom tab overflow component
-const CustomTabOverflow: React.FC<ITabOverflowProps> = ({ event }) => {
-    const [isOpen, setIsOpen] = React.useState(false);
-
-    React.useEffect(() => {
-        if (!event.isVisible) {
-            setIsOpen(false);
-        }
-    }, [event.isVisible]);
-
-    if (!event.isVisible) {
-        return null;
-    }
-
+// Custom trigger component (appears in the tab header)
+const CustomTrigger: React.FC<ITabOverflowTriggerProps> = ({ event }) => {
+    if (!event.isVisible) return null;
+    
     return (
-        <div style={{ position: 'relative' }}>
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                style={{
-                    padding: '4px 8px',
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    background: 'white',
-                    cursor: 'pointer',
-                    fontSize: '12px',
-                }}
-            >
-                +{event.tabs.length} more
-            </button>
+        <button style={{
+            background: 'linear-gradient(45deg, #ff6b6b, #feca57)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '50%',
+            width: '28px',
+            height: '28px',
+            fontSize: '12px',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+        }}>
+            {event.tabs.length}
+        </button>
+    );
+};
+
+// Custom content component (the overflow menu)
+const CustomContent: React.FC<ITabOverflowProps> = ({ event }) => {
+    return (
+        <div style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            borderRadius: '12px',
+            padding: '16px',
+            minWidth: '280px',
+            color: 'white',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
+        }}>
+            <div style={{ 
+                fontSize: '16px', 
+                fontWeight: 'bold', 
+                marginBottom: '12px',
+                textAlign: 'center'
+            }}>
+                📋 Hidden Tabs ({event.tabs.length})
+            </div>
             
-            {isOpen && (
-                <div
-                    style={{
-                        position: 'absolute',
-                        top: '100%',
-                        right: 0,
-                        background: 'white',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                        zIndex: 1000,
-                        minWidth: '200px',
-                    }}
-                >
-                    {event.tabs.map((tab) => (
-                        <div
-                            key={tab.id}
-                            onClick={() => {
-                                tab.panel.api.setActive();
-                                setIsOpen(false);
-                            }}
-                            style={{
-                                padding: '8px 12px',
-                                cursor: 'pointer',
-                                borderBottom: '1px solid #eee',
-                                backgroundColor: tab.isActive ? '#e6f3ff' : 'transparent',
-                            }}
-                        >
+            <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                {event.tabs.map((tab, index) => (
+                    <div
+                        key={tab.id}
+                        onClick={() => tab.panel.api.setActive()}
+                        style={{
+                            padding: '12px',
+                            margin: '6px 0',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            background: tab.isActive 
+                                ? 'rgba(255, 255, 255, 0.2)' 
+                                : 'rgba(255, 255, 255, 0.1)',
+                            border: tab.isActive 
+                                ? '2px solid rgba(255, 255, 255, 0.6)' 
+                                : '2px solid transparent',
+                            transition: 'all 0.2s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                        }}
+                    >
+                        <span style={{ fontWeight: tab.isActive ? 'bold' : 'normal' }}>
                             {tab.title}
-                            {tab.isActive && (
-                                <span style={{ marginLeft: '8px', fontWeight: 'bold' }}>
-                                    (active)
-                                </span>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            )}
+                        </span>
+                        {tab.isActive && (
+                            <span style={{ 
+                                fontSize: '12px', 
+                                background: 'rgba(255,255,255,0.3)',
+                                padding: '2px 6px',
+                                borderRadius: '4px'
+                            }}>
+                                ✓ Active
+                            </span>
+                        )}
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };
@@ -114,7 +129,10 @@ export const App: React.FC = () => {
     return (
         <DockviewReact
             components={{ panel: Panel }}
-            tabOverflowComponent={CustomTabOverflow}
+            tabOverflowComponent={{
+                trigger: CustomTrigger,
+                content: CustomContent
+            }}
             onReady={onReady}
             className="dockview-theme-abyss"
             style={{ height: '100vh' }}

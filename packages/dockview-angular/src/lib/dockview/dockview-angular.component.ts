@@ -28,7 +28,7 @@ import {
 } from 'dockview-core';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
-import { DockviewAngularOptions } from './types';
+import { DockviewAngularOptions, IAngularTabOverflowConfig } from './types';
 
 @Component({
     selector: 'dv-dockview',
@@ -59,7 +59,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() leftHeaderActionsComponent?: Type<any>;
     @Input() rightHeaderActionsComponent?: Type<any>;
     @Input() prefixHeaderActionsComponent?: Type<any>;
-    @Input() tabOverflowComponent?: Type<any>;
+    @Input() tabOverflowComponent?: Type<any> | IAngularTabOverflowConfig;
 
     // Core dockview options as inputs
     @Input() className?: string;

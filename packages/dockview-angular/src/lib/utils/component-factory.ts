@@ -7,6 +7,7 @@ import {
     IWatermarkRenderer,
     IHeaderActionsRenderer,
     ITabOverflowRenderer,
+    ITabOverflowTriggerRenderer,
     TabPartInitParameters,
     WatermarkRendererInitParameters,
     GroupPanelPartInitParameters,
@@ -15,10 +16,11 @@ import {
     SplitviewPanel,
     IPanePart
 } from 'dockview-core';
-import { AngularRenderer, AngularRendererOptions, AngularTabOverflowRenderer } from './angular-renderer';
+import { AngularRenderer, AngularRendererOptions, AngularTabOverflowRenderer, AngularTabOverflowTriggerRenderer } from './angular-renderer';
 import { AngularGridviewPanel } from '../gridview/angular-gridview-panel';
 import { AngularSplitviewPanel } from '../splitview/angular-splitview-panel';
 import { AngularPanePart } from '../paneview/angular-pane-part';
+import { IAngularTabOverflowConfig } from '../dockview/types';
 
 export class AngularFrameworkComponentFactory {
     constructor(
@@ -29,7 +31,7 @@ export class AngularFrameworkComponentFactory {
         private watermarkComponent?: Type<any>,
         private headerActionsComponents?: Record<string, Type<any>>,
         private defaultTabComponent?: Type<any>,
-        private tabOverflowComponent?: Type<any>
+        private tabOverflowComponent?: Type<any> | IAngularTabOverflowConfig
     ) {}
 
     // For DockviewComponent
@@ -153,15 +155,41 @@ export class AngularFrameworkComponentFactory {
         return renderer;
     }
 
-    createTabOverflowComponent(): ITabOverflowRenderer | undefined {
+    createTabOverflowComponent(): ITabOverflowRenderer | any | undefined {
         if (!this.tabOverflowComponent) {
             return undefined;
         }
 
-        return new AngularTabOverflowRenderer({
-            component: this.tabOverflowComponent,
-            injector: this.injector,
-            environmentInjector: this.environmentInjector
-        });
+        // Check if it's a config object or just a Type (component class)
+        if ('content' in this.tabOverflowComponent || 'trigger' in this.tabOverflowComponent) {
+            // New: config object with content and/or trigger
+            const config = this.tabOverflowComponent as IAngularTabOverflowConfig;
+            const result: any = {};
+            
+            if (config.content) {
+                result.content = new AngularTabOverflowRenderer({
+                    component: config.content,
+                    injector: this.injector,
+                    environmentInjector: this.environmentInjector
+                });
+            }
+            
+            if (config.trigger) {
+                result.trigger = new AngularTabOverflowTriggerRenderer({
+                    component: config.trigger,
+                    injector: this.injector,
+                    environmentInjector: this.environmentInjector
+                });
+            }
+            
+            return result;
+        } else {
+            // Legacy: single component for content only
+            return new AngularTabOverflowRenderer({
+                component: this.tabOverflowComponent as Type<any>,
+                injector: this.injector,
+                environmentInjector: this.environmentInjector
+            });
+        }
     }
 }

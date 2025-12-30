@@ -4,11 +4,16 @@ title: Custom Tab Overflow
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-This feature allows you to provide your own custom component for rendering tab overflow menus instead of using the built-in dropdown.
+This feature allows you to provide your own custom components for rendering tab overflow menus instead of using the built-in dropdown. You can customize both the trigger element (the button that appears in the tab header) and the overflow content (the menu that displays the hidden tabs).
 
 ## Overview
 
-When there are too many tabs to display in the available space, Dockview normally shows a built-in overflow dropdown. With this feature, you can replace that with your own custom component for better styling consistency and enhanced accessibility.
+When there are too many tabs to display in the available space, Dockview normally shows a built-in overflow dropdown. With this feature, you can replace that with your own custom components for better styling consistency and enhanced accessibility.
+
+You can customize:
+- **Content only** (legacy mode): Replace just the overflow menu content
+- **Both trigger and content**: Replace both the trigger button and the overflow menu  
+- **Trigger only**: Replace just the trigger button while keeping the built-in overflow menu
 
 ## Options
 
@@ -28,7 +33,7 @@ When there are too many tabs to display in the available space, Dockview normall
   <DocRef declaration="DockviewFrameworkOptions" methods={['createTabOverflowComponent']} />
 </FrameworkSpecific>
 
-## Usage
+## Basic Usage (Content Only)
 
 <FrameworkSpecific framework='React'>
 
@@ -357,6 +362,312 @@ class CustomTabOverflowRenderer {
 
 const api = createDockview(element, {
     createTabOverflowComponent: () => new CustomTabOverflowRenderer(),
+    // ... other options
+});
+```
+
+</FrameworkSpecific>
+
+## Enhanced Usage (Trigger and Content)
+
+<FrameworkSpecific framework='React'>
+
+You can customize both the trigger element and the overflow content using a configuration object:
+
+```tsx
+import React from 'react';
+import { DockviewReact, ITabOverflowProps, ITabOverflowTriggerProps } from 'dockview';
+
+// Custom trigger component (appears in tab header)
+const CustomTrigger: React.FC<ITabOverflowTriggerProps> = ({ event }) => {
+    if (!event.isVisible) return null;
+    
+    return (
+        <button style={{
+            background: '#ff6b6b',
+            color: 'white',
+            border: 'none',
+            borderRadius: '50%',
+            width: '24px',
+            height: '24px',
+            fontSize: '12px',
+            cursor: 'pointer'
+        }}>
+            {event.tabs.length}
+        </button>
+    );
+};
+
+// Custom content component (the overflow menu)
+const CustomContent: React.FC<ITabOverflowProps> = ({ event }) => {
+    return (
+        <div style={{
+            background: '#f8f9fa',
+            border: '2px solid #dee2e6',
+            borderRadius: '8px',
+            padding: '8px',
+            minWidth: '250px'
+        }}>
+            <h4 style={{ margin: '0 0 8px 0', fontSize: '14px' }}>Hidden Tabs</h4>
+            {event.tabs.map((tab) => (
+                <div
+                    key={tab.id}
+                    onClick={() => tab.panel.api.setActive()}
+                    style={{
+                        padding: '8px',
+                        margin: '4px 0',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        background: tab.isActive ? '#007bff' : '#ffffff',
+                        color: tab.isActive ? 'white' : 'black'
+                    }}
+                >
+                    {tab.title}
+                </div>
+            ))}
+        </div>
+    );
+};
+
+<DockviewReact
+    components={components}
+    tabOverflowComponent={{
+        trigger: CustomTrigger,
+        content: CustomContent
+    }}
+    onReady={onReady}
+/>
+```
+
+You can also customize just the trigger while keeping the built-in overflow menu:
+
+```tsx
+<DockviewReact
+    components={components}
+    tabOverflowComponent={{
+        trigger: CustomTrigger
+        // No content property means built-in overflow menu is used
+    }}
+    onReady={onReady}
+/>
+```
+
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Vue'>
+
+```vue
+<template>
+  <DockviewVue
+    :components="components"
+    :tab-overflow-component="{ trigger: 'CustomTrigger', content: 'CustomContent' }"
+    @ready="onReady"
+  />
+</template>
+
+<script setup>
+import { DockviewVue } from 'dockview-vue';
+
+const CustomTrigger = {
+  props: ['event'],
+  template: `
+    <button 
+      v-if="event.isVisible"
+      style="background: #ff6b6b; color: white; border: none; border-radius: 50%; 
+             width: 24px; height: 24px; font-size: 12px; cursor: pointer;"
+    >
+      {{ event.tabs.length }}
+    </button>
+  `
+};
+
+const CustomContent = {
+  props: ['event'],
+  template: `
+    <div style="background: #f8f9fa; border: 2px solid #dee2e6; border-radius: 8px; 
+                padding: 8px; min-width: 250px;">
+      <h4 style="margin: 0 0 8px 0; font-size: 14px;">Hidden Tabs</h4>
+      <div
+        v-for="tab in event.tabs"
+        :key="tab.id"
+        @click="tab.panel.api.setActive()"
+        style="padding: 8px; margin: 4px 0; border-radius: 4px; cursor: pointer;"
+        :style="{
+          background: tab.isActive ? '#007bff' : '#ffffff',
+          color: tab.isActive ? 'white' : 'black'
+        }"
+      >
+        {{ tab.title }}
+      </div>
+    </div>
+  `
+};
+
+const components = {
+  CustomTrigger,
+  CustomContent,
+  // ... your other components
+};
+</script>
+```
+
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Angular'>
+
+```typescript
+// custom-trigger.component.ts
+@Component({
+  selector: 'app-custom-trigger',
+  template: `
+    <button
+      *ngIf="event.isVisible"
+      style="background: #ff6b6b; color: white; border: none; border-radius: 50%; 
+             width: 24px; height: 24px; font-size: 12px; cursor: pointer;"
+    >
+      {{ event.tabs.length }}
+    </button>
+  `
+})
+export class CustomTriggerComponent {
+  @Input() event!: TabOverflowEvent;
+}
+
+// custom-content.component.ts
+@Component({
+  selector: 'app-custom-content',
+  template: `
+    <div style="background: #f8f9fa; border: 2px solid #dee2e6; border-radius: 8px; 
+                padding: 8px; min-width: 250px;">
+      <h4 style="margin: 0 0 8px 0; font-size: 14px;">Hidden Tabs</h4>
+      <div
+        *ngFor="let tab of event.tabs"
+        (click)="tab.panel.api.setActive()"
+        style="padding: 8px; margin: 4px 0; border-radius: 4px; cursor: pointer;"
+        [style.background]="tab.isActive ? '#007bff' : '#ffffff'"
+        [style.color]="tab.isActive ? 'white' : 'black'"
+      >
+        {{ tab.title }}
+      </div>
+    </div>
+  `
+})
+export class CustomContentComponent {
+  @Input() event!: TabOverflowEvent;
+}
+
+// app.component.ts
+@Component({
+  selector: 'app-root',
+  template: `
+    <dv-dockview
+      [components]="components"
+      [tab-overflow-component]="{
+        trigger: customTrigger,
+        content: customContent
+      }"
+      (ready)="onReady($event)"
+    >
+    </dv-dockview>
+  `
+})
+export class AppComponent {
+  components = { /* ... your panel components */ };
+  customTrigger = CustomTriggerComponent;
+  customContent = CustomContentComponent;
+}
+```
+
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+
+```javascript
+import { createDockview } from 'dockview-core';
+
+class CustomTriggerRenderer {
+    constructor() {
+        this._element = document.createElement('button');
+        this._element.style.cssText = `
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+            cursor: pointer;
+        `;
+    }
+
+    get element() {
+        return this._element;
+    }
+
+    update(event) {
+        if (!event.isVisible) {
+            this._element.style.display = 'none';
+            return;
+        }
+        this._element.style.display = 'block';
+        this._element.textContent = event.tabs.length;
+    }
+
+    dispose() {}
+}
+
+class CustomContentRenderer {
+    constructor() {
+        this._element = document.createElement('div');
+        this._element.style.cssText = `
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 8px;
+            min-width: 250px;
+        `;
+    }
+
+    get element() {
+        return this._element;
+    }
+
+    update(event) {
+        this._element.innerHTML = '';
+        
+        const title = document.createElement('h4');
+        title.textContent = 'Hidden Tabs';
+        title.style.cssText = 'margin: 0 0 8px 0; font-size: 14px;';
+        this._element.appendChild(title);
+
+        event.tabs.forEach(tab => {
+            const tabElement = document.createElement('div');
+            tabElement.textContent = tab.title;
+            tabElement.style.cssText = `
+                padding: 8px;
+                margin: 4px 0;
+                border-radius: 4px;
+                cursor: pointer;
+                background: ${tab.isActive ? '#007bff' : '#ffffff'};
+                color: ${tab.isActive ? 'white' : 'black'};
+            `;
+            
+            tabElement.addEventListener('click', () => {
+                tab.panel.api.setActive();
+            });
+
+            this._element.appendChild(tabElement);
+        });
+    }
+
+    dispose() {}
+}
+
+const api = createDockview(element, {
+    createTabOverflowComponent: () => ({
+        trigger: new CustomTriggerRenderer(),
+        content: new CustomContentRenderer()
+    }),
     // ... other options
 });
 ```

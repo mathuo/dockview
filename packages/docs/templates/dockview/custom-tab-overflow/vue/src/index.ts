@@ -37,59 +37,73 @@ const Panel = defineComponent({
     </div>`,
 });
 
-// Custom tab overflow component
-const CustomTabOverflow = defineComponent({
-    name: 'CustomTabOverflow',
+// Custom trigger component (appears in the tab header)
+const CustomTrigger = defineComponent({
+    name: 'CustomTrigger',
     props: {
         event: {
             type: Object,
             required: true,
         },
     },
-    data() {
-        return {
-            isOpen: false,
-        };
-    },
-    watch: {
-        'event.isVisible'(newValue: boolean) {
-            if (!newValue) {
-                this.isOpen = false;
-            }
+    template: `
+    <button 
+      v-if="event.isVisible"
+      style="background: linear-gradient(45deg, #ff6b6b, #feca57); 
+             color: white; border: none; border-radius: 50%; 
+             width: 28px; height: 28px; font-size: 12px; 
+             font-weight: bold; cursor: pointer; 
+             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+             display: flex; align-items: center; justify-content: center;"
+    >
+      {{ event.tabs.length }}
+    </button>`,
+});
+
+// Custom content component (the overflow menu)
+const CustomContent = defineComponent({
+    name: 'CustomContent',
+    props: {
+        event: {
+            type: Object,
+            required: true,
         },
     },
     methods: {
         activateTab(tab: any) {
             tab.panel.api.setActive();
-            this.isOpen = false;
         },
     },
     template: `
-    <div v-if="event.isVisible" style="position: relative;">
-      <button
-        @click="isOpen = !isOpen"
-        style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; 
-               background: white; cursor: pointer; font-size: 12px;"
-      >
-        +{{ event.tabs.length }} more
-      </button>
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 12px; padding: 16px; min-width: 280px; 
+                color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+      <div style="font-size: 16px; font-weight: bold; margin-bottom: 12px; text-align: center;">
+        📋 Hidden Tabs ({{ event.tabs.length }})
+      </div>
       
-      <div
-        v-if="isOpen"
-        style="position: absolute; top: 100%; right: 0; background: white; 
-               border: 1px solid #ccc; border-radius: 4px; 
-               box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000; min-width: 200px;"
-      >
+      <div style="max-height: 300px; overflow-y: auto;">
         <div
           v-for="tab in event.tabs"
           :key="tab.id"
           @click="activateTab(tab)"
-          style="padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eee;"
-          :style="{ backgroundColor: tab.isActive ? '#e6f3ff' : 'transparent' }"
+          style="padding: 12px; margin: 6px 0; border-radius: 8px; 
+                 cursor: pointer; transition: all 0.2s ease;
+                 display: flex; align-items: center; justify-content: space-between;"
+          :style="{
+            background: tab.isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+            border: tab.isActive ? '2px solid rgba(255, 255, 255, 0.6)' : '2px solid transparent'
+          }"
         >
-          {{ tab.title }}
-          <span v-if="tab.isActive" style="margin-left: 8px; font-weight: bold;">
-            (active)
+          <span :style="{ fontWeight: tab.isActive ? 'bold' : 'normal' }">
+            {{ tab.title }}
+          </span>
+          <span 
+            v-if="tab.isActive"
+            style="font-size: 12px; background: rgba(255,255,255,0.3);
+                   padding: 2px 6px; border-radius: 4px;"
+          >
+            ✓ Active
           </span>
         </div>
       </div>
@@ -101,7 +115,8 @@ const App = defineComponent({
     components: {
         'dockview-vue': DockviewVue,
         panel: Panel,
-        'custom-tab-overflow': CustomTabOverflow,
+        'custom-trigger': CustomTrigger,
+        'custom-content': CustomContent,
     },
     methods: {
         onReady(event: DockviewReadyEvent) {
@@ -119,7 +134,7 @@ const App = defineComponent({
       <dockview-vue
         style="width:100%; height:100%"
         class="dockview-theme-abyss"
-        :tab-overflow-component="'custom-tab-overflow'"
+        :tab-overflow-component="{ trigger: 'custom-trigger', content: 'custom-content' }"
         @ready="onReady"
       >
       </dockview-vue>`,

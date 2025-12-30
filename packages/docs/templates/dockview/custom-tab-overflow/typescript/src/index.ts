@@ -4,6 +4,7 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
     ITabOverflowRenderer,
+    ITabOverflowTriggerRenderer,
     TabOverflowEvent,
     themeAbyss,
 } from 'dockview-core';
@@ -35,10 +36,50 @@ class Panel implements IContentRenderer {
     }
 }
 
-// Custom tab overflow renderer
-class CustomTabOverflowRenderer implements ITabOverflowRenderer {
+// Custom trigger renderer (appears in the tab header)
+class CustomTriggerRenderer implements ITabOverflowTriggerRenderer {
     private readonly _element: HTMLElement;
-    private isOpen = false;
+
+    get element(): HTMLElement {
+        return this._element;
+    }
+
+    constructor() {
+        this._element = document.createElement('button');
+        this._element.style.cssText = `
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        `;
+    }
+
+    update(event: TabOverflowEvent): void {
+        if (!event.isVisible) {
+            this._element.style.display = 'none';
+            return;
+        }
+        this._element.style.display = 'flex';
+        this._element.textContent = event.tabs.length.toString();
+    }
+
+    dispose(): void {
+        // cleanup
+    }
+}
+
+// Custom content renderer (the overflow menu)
+class CustomContentRenderer implements ITabOverflowRenderer {
+    private readonly _element: HTMLElement;
 
     get element(): HTMLElement {
         return this._element;
@@ -46,92 +87,79 @@ class CustomTabOverflowRenderer implements ITabOverflowRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.position = 'relative';
+        this._element.style.cssText = `
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 16px;
+            min-width: 280px;
+            color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        `;
     }
 
     update(event: TabOverflowEvent): void {
-        if (!event.isVisible) {
-            this._element.style.display = 'none';
-            this.isOpen = false;
-            return;
-        }
+        this._element.innerHTML = '';
+        
+        // Title
+        const title = document.createElement('div');
+        title.textContent = `📋 Hidden Tabs (${event.tabs.length})`;
+        title.style.cssText = `
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-align: center;
+        `;
+        this._element.appendChild(title);
 
-        this._element.style.display = 'block';
-
-        // Create button
-        const button = document.createElement('button');
-        button.textContent = `+${event.tabs.length} more`;
-        button.style.cssText = `
-            padding: 4px 8px; 
-            border: 1px solid #ccc; 
-            border-radius: 4px; 
-            background: white; 
-            cursor: pointer; 
-            font-size: 12px;
+        // Scrollable container
+        const scrollContainer = document.createElement('div');
+        scrollContainer.style.cssText = `
+            max-height: 300px;
+            overflow-y: auto;
         `;
 
-        // Create dropdown
-        const dropdown = document.createElement('div');
-        dropdown.style.cssText = `
-            position: absolute; 
-            top: 100%; 
-            right: 0; 
-            background: white; 
-            border: 1px solid #ccc; 
-            border-radius: 4px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
-            z-index: 1000; 
-            min-width: 200px;
-            display: ${this.isOpen ? 'block' : 'none'};
-        `;
-
-        // Add tab items to dropdown
-        event.tabs.forEach(tab => {
+        // Add tab items
+        event.tabs.forEach((tab) => {
             const tabElement = document.createElement('div');
             tabElement.style.cssText = `
-                padding: 8px 12px; 
-                cursor: pointer; 
-                border-bottom: 1px solid #eee;
-                background-color: ${tab.isActive ? '#e6f3ff' : 'transparent'};
+                padding: 12px;
+                margin: 6px 0;
+                border-radius: 8px;
+                cursor: pointer;
+                background: ${tab.isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)'};
+                border: ${tab.isActive ? '2px solid rgba(255, 255, 255, 0.6)' : '2px solid transparent'};
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
             `;
             
-            tabElement.innerHTML = `
-                ${tab.title}
-                ${tab.isActive ? '<span style="margin-left: 8px; font-weight: bold;">(active)</span>' : ''}
-            `;
+            const titleSpan = document.createElement('span');
+            titleSpan.textContent = tab.title;
+            titleSpan.style.fontWeight = tab.isActive ? 'bold' : 'normal';
+            
+            tabElement.appendChild(titleSpan);
+            
+            if (tab.isActive) {
+                const activeSpan = document.createElement('span');
+                activeSpan.textContent = '✓ Active';
+                activeSpan.style.cssText = `
+                    font-size: 12px;
+                    background: rgba(255,255,255,0.3);
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                `;
+                tabElement.appendChild(activeSpan);
+            }
 
             tabElement.addEventListener('click', () => {
                 tab.panel.api.setActive();
-                this.isOpen = false;
-                this.update(event); // Re-render to close dropdown
             });
 
-            dropdown.appendChild(tabElement);
+            scrollContainer.appendChild(tabElement);
         });
-
-        // Toggle dropdown on button click
-        button.addEventListener('click', () => {
-            this.isOpen = !this.isOpen;
-            dropdown.style.display = this.isOpen ? 'block' : 'none';
-        });
-
-        // Clear and rebuild the element
-        this._element.innerHTML = '';
-        this._element.appendChild(button);
-        this._element.appendChild(dropdown);
-
-        // Close dropdown if clicking outside
-        const handleClickOutside = (e: MouseEvent) => {
-            if (!this._element.contains(e.target as Node)) {
-                this.isOpen = false;
-                dropdown.style.display = 'none';
-                document.removeEventListener('click', handleClickOutside);
-            }
-        };
-
-        if (this.isOpen) {
-            document.addEventListener('click', handleClickOutside);
-        }
+        
+        this._element.appendChild(scrollContainer);
     }
 
     dispose(): void {
@@ -151,7 +179,10 @@ const api = createDockview(document.getElementById('app')!, {
         }
     },
     createTabOverflowComponent: () => {
-        return new CustomTabOverflowRenderer();
+        return {
+            trigger: new CustomTriggerRenderer(),
+            content: new CustomContentRenderer()
+        };
     },
 });
 

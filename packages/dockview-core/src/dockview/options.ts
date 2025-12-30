@@ -46,6 +46,16 @@ export interface ITabOverflowRenderer extends IDisposable {
     update(event: TabOverflowEvent): void;
 }
 
+export interface ITabOverflowTriggerRenderer extends IDisposable {
+    readonly element: HTMLElement;
+    update(event: TabOverflowEvent): void;
+}
+
+export interface ITabOverflowConfig {
+    content?: ITabOverflowRenderer;
+    trigger?: ITabOverflowTriggerRenderer;
+}
+
 export interface ViewFactoryData {
     content: string;
     tab?: string;
@@ -174,7 +184,7 @@ export interface DockviewFrameworkOptions {
     createWatermarkComponent?: () => IWatermarkRenderer;
     createTabOverflowComponent?: (
         group: DockviewGroupPanel
-    ) => ITabOverflowRenderer;
+    ) => ITabOverflowRenderer | ITabOverflowConfig;
 }
 
 export type DockviewComponentOptions = DockviewOptions &

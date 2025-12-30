@@ -20,10 +20,11 @@ import {
     VueHeaderActionsRenderer,
     VueRenderer,
     VueTabOverflowRenderer,
+    VueTabOverflowTriggerRenderer,
     VueWatermarkRenderer,
     findComponent,
 } from '../utils';
-import type { IDockviewVueProps, VueEvents } from './types';
+import type { IDockviewVueProps, VueEvents, IVueTabOverflowConfig } from './types';
 
 function extractCoreOptions(props: IDockviewVueProps): DockviewOptions {
     const coreOptions = (PROPERTY_KEYS_DOCKVIEW as (keyof DockviewOptions)[]).reduce(
@@ -143,15 +144,49 @@ onMounted(() => {
             : undefined,
         createTabOverflowComponent: props.tabOverflowComponent
             ? (group) => {
-                  const component = findComponent(
-                      inst,
-                      props.tabOverflowComponent!
-                  );
-                  return new VueTabOverflowRenderer(
-                      component!,
-                      inst,
-                      group
-                  );
+                  // Check if it's a config object or just a string component name
+                  if (typeof props.tabOverflowComponent === 'string') {
+                      // Legacy: single component for content only
+                      const component = findComponent(
+                          inst,
+                          props.tabOverflowComponent
+                      );
+                      return new VueTabOverflowRenderer(
+                          component!,
+                          inst,
+                          group
+                      );
+                  } else {
+                      // New: config object with content and/or trigger
+                      const config = props.tabOverflowComponent as IVueTabOverflowConfig;
+                      const result: any = {};
+                      
+                      if (config.content) {
+                          const contentComponent = findComponent(
+                              inst,
+                              config.content
+                          );
+                          result.content = new VueTabOverflowRenderer(
+                              contentComponent!,
+                              inst,
+                              group
+                          );
+                      }
+                      
+                      if (config.trigger) {
+                          const triggerComponent = findComponent(
+                              inst,
+                              config.trigger
+                          );
+                          result.trigger = new VueTabOverflowTriggerRenderer(
+                              triggerComponent!,
+                              inst,
+                              group
+                          );
+                      }
+                      
+                      return result;
+                  }
               }
             : undefined,
     };

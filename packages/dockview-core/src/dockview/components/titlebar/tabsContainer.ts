@@ -20,6 +20,8 @@ import {
 } from './tabOverflowControl';
 import {
     ITabOverflowRenderer,
+    ITabOverflowTriggerRenderer,
+    ITabOverflowConfig,
     OverflowTabData,
     TabOverflowEvent,
 } from '../../options';
@@ -82,6 +84,7 @@ export class TabsContainer
 
     private dropdownPart: DropdownElement | null = null;
     private customOverflowRenderer: ITabOverflowRenderer | null = null;
+    private customTriggerRenderer: ITabOverflowTriggerRenderer | null = null;
     private _overflowTabs: string[] = [];
     private readonly _dropdownDisposable = new MutableDisposable();
 
@@ -146,15 +149,31 @@ export class TabsContainer
         this.preActionsContainer = document.createElement('div');
         this.preActionsContainer.className = 'dv-pre-actions-container';
 
+        // Determine if we should show built-in overflow control
+        const showBuiltInOverflow = !accessor.options.disableTabsOverflowList && 
+            (!accessor.options.createTabOverflowComponent || 
+             (accessor.options.createTabOverflowComponent && 
+              !this.wouldHaveCustomTrigger(accessor.options.createTabOverflowComponent(group))));
+
         this.tabs = new Tabs(group, accessor, {
-            showTabsOverflowControl: !accessor.options.disableTabsOverflowList,
+            showTabsOverflowControl: showBuiltInOverflow,
         });
 
         this.voidContainer = new VoidContainer(this.accessor, this.group);
 
-        // Initialize custom overflow renderer if provided
+        // Initialize custom overflow renderer(s) if provided
         if (accessor.options.createTabOverflowComponent) {
-            this.customOverflowRenderer = accessor.options.createTabOverflowComponent(group);
+            const overflowComponent = accessor.options.createTabOverflowComponent(group);
+            
+            // Check if it's a config object or just a renderer
+            if ('content' in overflowComponent || 'trigger' in overflowComponent) {
+                const config = overflowComponent as ITabOverflowConfig;
+                this.customOverflowRenderer = config.content || null;
+                this.customTriggerRenderer = config.trigger || null;
+            } else {
+                // Backward compatibility: treat as content renderer only
+                this.customOverflowRenderer = overflowComponent as ITabOverflowRenderer;
+            }
         }
 
         this._element.appendChild(this.preActionsContainer);
@@ -237,7 +256,8 @@ export class TabsContainer
                     }
                 }
             ),
-            this.customOverflowRenderer ?? Disposable.NONE
+            this.customOverflowRenderer ?? Disposable.NONE,
+            this.customTriggerRenderer ?? Disposable.NONE
         );
     }
 
@@ -331,8 +351,8 @@ export class TabsContainer
         const tabs = options.reset ? [] : options.tabs;
         this._overflowTabs = tabs;
 
-        // If we have a custom overflow renderer, use it instead
-        if (this.customOverflowRenderer) {
+        // If we have custom overflow renderer(s), use them instead
+        if (this.customOverflowRenderer || this.customTriggerRenderer) {
             const overflowData: OverflowTabData[] = this._overflowTabs.map((tabId) => {
                 const tab = this.tabs.tabs.find((t) => t.panel.id === tabId);
                 if (!tab) {
@@ -352,7 +372,28 @@ export class TabsContainer
                 triggerElement: this.rightActionsContainer,
             };
 
-            this.customOverflowRenderer.update(event);
+            // Update custom content renderer if provided
+            if (this.customOverflowRenderer) {
+                this.customOverflowRenderer.update(event);
+            }
+
+            // Update custom trigger renderer if provided
+            if (this.customTriggerRenderer) {
+                // Remove any existing built-in trigger element
+                if (this.dropdownPart) {
+                    this._dropdownDisposable.dispose();
+                    this.dropdownPart = null;
+                }
+
+                this.customTriggerRenderer.update(event);
+                
+                // Add custom trigger to the right actions container
+                if (tabs.length > 0 && !this.rightActionsContainer.contains(this.customTriggerRenderer.element)) {
+                    this.rightActionsContainer.prepend(this.customTriggerRenderer.element);
+                } else if (tabs.length === 0 && this.rightActionsContainer.contains(this.customTriggerRenderer.element)) {
+                    this.rightActionsContainer.removeChild(this.customTriggerRenderer.element);
+                }
+            }
             return;
         }
 
@@ -453,5 +494,14 @@ export class TabsContainer
     updateDragAndDropState(): void {
         this.tabs.updateDragAndDropState();
         this.voidContainer.updateDragAndDropState();
+    }
+
+    private wouldHaveCustomTrigger(overflowComponent: ITabOverflowRenderer | ITabOverflowConfig): boolean {
+        // Check if it's a config object with a trigger property
+        if ('content' in overflowComponent || 'trigger' in overflowComponent) {
+            const config = overflowComponent as ITabOverflowConfig;
+            return !!config.trigger;
+        }
+        return false;
     }
 }
