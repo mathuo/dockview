@@ -63,7 +63,7 @@
   },
   "devDependencies": {
     "jest-preset-angular": "^14.6.1",
-    "ng-packagr": "^21.0.1",
+    "ng-packagr": "^17.0.0",
     "zone.js": "^0.15.1"
   }
 }
