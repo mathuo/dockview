@@ -42,7 +42,7 @@
   ],
   "scripts": {
     "build:bundle": "rollup -c",
-    "build:cjs": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
+    "build:cjs": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.cjs.json --verbose --extendedDiagnostics",
     "build:esm": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
     "build:css": "node scripts/copy-css.js",
     "build": "npm run build:cjs && npm run build:esm && npm run build:css",

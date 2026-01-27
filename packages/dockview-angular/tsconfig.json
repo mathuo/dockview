@@ -2,9 +2,6 @@
     "compilerOptions": {
         "baseUrl": ".",
         "rootDir": "src",
-        "outDir": "dist/cjs",
-        "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.cjs",
-        "incremental": true,
         "forceConsistentCasingInFileNames": true,
         "target": "es2022",
         "module": "commonjs",
