@@ -42,10 +42,11 @@
   ],
   "scripts": {
     "build:bundle": "rollup -c",
+    "build:angular": "ng-packagr -c tsconfig.lib.json -p ng-package.json",
     "build:cjs": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.cjs.json --verbose --extendedDiagnostics",
     "build:esm": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
     "build:css": "node scripts/copy-css.js",
-    "build": "npm run build:cjs && npm run build:esm && npm run build:css",
+    "build": "npm run build:angular && npm run build:cjs && npm run build:esm && npm run build:css",
     "clean": "rimraf dist/ .build/ .rollup.cache/",
     "prepublishOnly": "npm run rebuild && npm run build:bundle && npm run test",
     "rebuild": "npm run clean && npm run build",
