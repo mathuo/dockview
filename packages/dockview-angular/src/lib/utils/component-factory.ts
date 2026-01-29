@@ -1,20 +1,15 @@
 import { Type, Injector, EnvironmentInjector } from '@angular/core';
 import {
-    IFrameworkPart,
-    Parameters,
     IContentRenderer,
     ITabRenderer,
     IWatermarkRenderer,
     IHeaderActionsRenderer,
-    TabPartInitParameters,
-    WatermarkRendererInitParameters,
-    GroupPanelPartInitParameters,
     CreateComponentOptions,
     GridviewPanel,
     SplitviewPanel,
     IPanePart
 } from 'dockview-core';
-import { AngularRenderer, AngularRendererOptions } from './angular-renderer';
+import { AngularRenderer } from './angular-renderer';
 import { AngularGridviewPanel } from '../gridview/angular-gridview-panel';
 import { AngularSplitviewPanel } from '../splitview/angular-splitview-panel';
 import { AngularPanePart } from '../paneview/angular-pane-part';

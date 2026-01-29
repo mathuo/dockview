@@ -2,9 +2,6 @@ import {
     ComponentRef,
     Injector,
     Type,
-    ViewContainerRef,
-    ApplicationRef,
-    ComponentFactoryResolver,
     EmbeddedViewRef,
     createComponent,
     EnvironmentInjector
@@ -12,7 +9,6 @@ import {
 import {
     IContentRenderer,
     IFrameworkPart,
-    DockviewIDisposable,
     Parameters
 } from 'dockview-core';
 
