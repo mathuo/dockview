@@ -4,7 +4,8 @@ import {
     Type,
     EmbeddedViewRef,
     createComponent,
-    EnvironmentInjector
+    EnvironmentInjector,
+    ApplicationRef
 } from '@angular/core';
 import {
     IContentRenderer,
@@ -46,17 +47,20 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
     }
 
     update(params: Parameters): void {
-        if (this.componentRef) {
-            Object.keys(params).forEach(key => {
-                // Use 'in' operator instead of hasOwnProperty to support getter/setter properties
-                if (key in this.componentRef!.instance) {
-                    this.componentRef!.instance[key] = params[key];
-                }
-            });
-
-            // trigger change detection
-            this.componentRef.changeDetectorRef.markForCheck();
+        if (!this.componentRef)
+        {
+            return;
         }
+
+        for (const key of Object.keys(params)) {
+            // Use 'in' operator instead of hasOwnProperty to support getter/setter properties
+            if (key in this.componentRef.instance) {
+                this.componentRef.instance[key] = params[key];
+            }
+        }
+
+        // trigger change detection
+        this.componentRef.changeDetectorRef.markForCheck();
     }
 
     private render(parameters: Parameters): void {
@@ -68,23 +72,17 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
             });
 
             // Set initial parameters
-            Object.keys(parameters).forEach(key => {
-                // Use 'in' operator instead of hasOwnProperty to support getter/setter properties
-                if (key in this.componentRef!.instance) {
-                    this.componentRef!.instance[key] = parameters[key];
-                }
-            });
+            this.update(parameters);
 
             // Get the DOM element
             const hostView = this.componentRef.hostView as EmbeddedViewRef<any>;
             this._element = hostView.rootNodes[0] as HTMLElement;
 
-            // attach
+            // attach to change detection
             this.appRef.attachView(hostView);
 
             // trigger change detection
             this.componentRef.changeDetectorRef.markForCheck();
-
         } catch (error) {
             console.error('Error creating Angular component:', error);
             throw error;
