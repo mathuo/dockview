@@ -511,16 +511,14 @@ export class Gridview implements IDisposable {
             maxmizedViewLocation = getGridLocation(maximizedView.element);
         }
 
-        const onDidMaximizedPauseToken = {};
-        
-        try {
-            /**
-             * We pause the onDidMaximizedNodeChange events because this method needs to
-             * call `this.exitMaximizedView()`. We don't want this to invoke any listeners
-             * since we undo it before leaving this method
-             */
-            this._onDidMaximizedNodeChange.pauseEvents(onDidMaximizedPauseToken);
+        /**
+         * We pause the onDidMaximizedNodeChange events because this method needs to
+         * call `this.exitMaximizedView()`. We don't want this to invoke any listeners
+         * since we undo it before leaving this method
+         */
+        const pauseToken = this._onDidMaximizedNodeChange.pauseEvents();
 
+        try {
             if (this.hasMaximizedView()) {
                 /**
                  * the saved layout cannot be in its maxmized state otherwise all of the underlying
@@ -532,30 +530,30 @@ export class Gridview implements IDisposable {
                  */
                 this.exitMaximizedView();
             }
-            
+
             const root = serializeBranchNode(this.getView(), this.orientation);
-            
+
             const result: SerializedGridview<any> = {
                 root,
                 width: this.width,
                 height: this.height,
                 orientation: this.orientation,
             };
-            
+
             if (maxmizedViewLocation) {
                 result.maximizedNode = {
                     location: maxmizedViewLocation,
                 };
             }
-            
+
             if (maximizedView) {
                 // replace any maximzied view that was removed for serialization purposes
                 this.maximizeView(maximizedView);
             }
-            
+
             return result;
         } finally {
-            this._onDidMaximizedNodeChange.unpauseEvents(onDidMaximizedPauseToken);
+            pauseToken.dispose();
         }
     }
 

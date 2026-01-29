@@ -1,4 +1,4 @@
-import { IDisposable } from './lifecycle';
+import { Disposable, IDisposable } from './lifecycle';
 
 export interface Event<T> {
     (listener: (e: T) => any): IDisposable;
@@ -165,7 +165,7 @@ export class Emitter<T> implements IDisposable {
         if (this._pauseTokens.size > 0) {
             return;
         }
-        if(this.options?.replay){
+        if (this.options?.replay) {
             this._last = e;
         }
         for (const listener of this._listeners) {
@@ -173,12 +173,10 @@ export class Emitter<T> implements IDisposable {
         }
     }
 
-    public pauseEvents(pauseToken: object) {
-        this._pauseTokens.add(pauseToken);
-    }
-
-    public unpauseEvents(pauseToken: object) {
-        this._pauseTokens.delete(pauseToken);
+    public pauseEvents(): IDisposable {
+        const lock = {};
+        this._pauseTokens.add(lock);
+        return Disposable.from(() => this._pauseTokens.delete(lock));
     }
 
     public dispose(): void {
@@ -221,7 +219,7 @@ export function addDisposableListener<K extends keyof HTMLElementEventMap>(
     options?: boolean | AddEventListenerOptions
 ): IDisposable;
 export function addDisposableListener<
-    K extends keyof HTMLElementEventMap | keyof WindowEventMap
+    K extends keyof HTMLElementEventMap | keyof WindowEventMap,
 >(
     element: HTMLElement | Window,
     type: K,
@@ -230,8 +228,8 @@ export function addDisposableListener<
         ev: K extends keyof HTMLElementEventMap
             ? HTMLElementEventMap[K]
             : K extends keyof WindowEventMap
-            ? WindowEventMap[K]
-            : never
+              ? WindowEventMap[K]
+              : never
     ) => any,
     options?: boolean | AddEventListenerOptions
 ): IDisposable {
