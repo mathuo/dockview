@@ -219,6 +219,7 @@ export function addStyles(document: Document, styleSheetList: StyleSheetList) {
             link.type = styleSheet.type;
             link.rel = 'stylesheet';
             document.head.appendChild(link);
+            continue;
         }
 
         let cssTexts: string[] = [];
