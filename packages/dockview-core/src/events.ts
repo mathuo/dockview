@@ -1,4 +1,4 @@
-import { IDisposable } from './lifecycle';
+import { Disposable, IDisposable } from './lifecycle';
 
 export interface Event<T> {
     (listener: (e: T) => any): IDisposable;
@@ -105,6 +105,8 @@ export class Emitter<T> implements IDisposable {
     private _listeners: Listener<any>[] = [];
     private _disposed = false;
 
+    private readonly _pauseTokens = new Set<object>();
+
     static ENABLE_TRACKING = false;
     static readonly MEMORY_LEAK_WATCHER = new LeakageMonitor();
 
@@ -160,12 +162,21 @@ export class Emitter<T> implements IDisposable {
     }
 
     public fire(e: T): void {
-        if(this.options?.replay){
+        if (this._pauseTokens.size > 0) {
+            return;
+        }
+        if (this.options?.replay) {
             this._last = e;
         }
         for (const listener of this._listeners) {
             listener.callback(e);
         }
+    }
+
+    public pauseEvents(): IDisposable {
+        const lock = {};
+        this._pauseTokens.add(lock);
+        return Disposable.from(() => this._pauseTokens.delete(lock));
     }
 
     public dispose(): void {
@@ -208,7 +219,7 @@ export function addDisposableListener<K extends keyof HTMLElementEventMap>(
     options?: boolean | AddEventListenerOptions
 ): IDisposable;
 export function addDisposableListener<
-    K extends keyof HTMLElementEventMap | keyof WindowEventMap
+    K extends keyof HTMLElementEventMap | keyof WindowEventMap,
 >(
     element: HTMLElement | Window,
     type: K,
@@ -217,8 +228,8 @@ export function addDisposableListener<
         ev: K extends keyof HTMLElementEventMap
             ? HTMLElementEventMap[K]
             : K extends keyof WindowEventMap
-            ? WindowEventMap[K]
-            : never
+              ? WindowEventMap[K]
+              : never
     ) => any,
     options?: boolean | AddEventListenerOptions
 ): IDisposable {

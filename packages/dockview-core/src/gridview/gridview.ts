@@ -511,39 +511,50 @@ export class Gridview implements IDisposable {
             maxmizedViewLocation = getGridLocation(maximizedView.element);
         }
 
-        if (this.hasMaximizedView()) {
-            /**
-             * the saved layout cannot be in its maxmized state otherwise all of the underlying
-             * view dimensions will be wrong
-             *
-             * To counteract this we temporaily remove the maximized view to compute the serialized output
-             * of the grid before adding back the maxmized view as to not alter the layout from the users
-             * perspective when `.toJSON()` is called
-             */
-            this.exitMaximizedView();
-        }
+        /**
+         * We pause the onDidMaximizedNodeChange events because this method needs to
+         * call `this.exitMaximizedView()`. We don't want this to invoke any listeners
+         * since we undo it before leaving this method
+         */
+        const pauseToken = this._onDidMaximizedNodeChange.pauseEvents();
 
-        const root = serializeBranchNode(this.getView(), this.orientation);
+        try {
+            if (this.hasMaximizedView()) {
+                /**
+                 * the saved layout cannot be in its maxmized state otherwise all of the underlying
+                 * view dimensions will be wrong
+                 *
+                 * To counteract this we temporaily remove the maximized view to compute the serialized output
+                 * of the grid before adding back the maxmized view as to not alter the layout from the users
+                 * perspective when `.toJSON()` is called
+                 */
+                this.exitMaximizedView();
+            }
 
-        const resullt: SerializedGridview<any> = {
-            root,
-            width: this.width,
-            height: this.height,
-            orientation: this.orientation,
-        };
+            const root = serializeBranchNode(this.getView(), this.orientation);
 
-        if (maxmizedViewLocation) {
-            resullt.maximizedNode = {
-                location: maxmizedViewLocation,
+            const result: SerializedGridview<any> = {
+                root,
+                width: this.width,
+                height: this.height,
+                orientation: this.orientation,
             };
-        }
 
-        if (maximizedView) {
-            // replace any maximzied view that was removed for serialization purposes
-            this.maximizeView(maximizedView);
-        }
+            if (maxmizedViewLocation) {
+                result.maximizedNode = {
+                    location: maxmizedViewLocation,
+                };
+            }
 
-        return resullt;
+            if (maximizedView) {
+                // replace any maximzied view that was removed for serialization purposes
+                this.maximizeView(maximizedView);
+            }
+
+            return result;
+        } finally {
+            pauseToken.dispose();
+        }
     }
 
     public dispose(): void {
