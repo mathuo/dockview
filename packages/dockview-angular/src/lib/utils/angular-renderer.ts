@@ -21,10 +21,13 @@ export interface AngularRendererOptions {
 export class AngularRenderer implements IContentRenderer, IFrameworkPart {
     private componentRef: ComponentRef<any> | null = null;
     private _element: HTMLElement | null = null;
+    private appRef: ApplicationRef;
 
     constructor(
         private options: AngularRendererOptions
-    ) {}
+    ) {
+        this.appRef = options.injector.get(ApplicationRef);
+    }
 
     get element(): HTMLElement {
         if (!this._element) {
@@ -50,7 +53,9 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
                     this.componentRef!.instance[key] = params[key];
                 }
             });
-            this.componentRef.changeDetectorRef.detectChanges();
+
+            // trigger change detection
+            this.componentRef.changeDetectorRef.markForCheck();
         }
     }
 
@@ -74,8 +79,11 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
             const hostView = this.componentRef.hostView as EmbeddedViewRef<any>;
             this._element = hostView.rootNodes[0] as HTMLElement;
 
-            // Trigger change detection
-            this.componentRef.changeDetectorRef.detectChanges();
+            // attach
+            this.appRef.attachView(hostView);
+
+            // trigger change detection
+            this.componentRef.changeDetectorRef.markForCheck();
 
         } catch (error) {
             console.error('Error creating Angular component:', error);
