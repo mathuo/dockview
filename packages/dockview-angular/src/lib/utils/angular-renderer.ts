@@ -37,6 +37,11 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
         return this._element;
     }
 
+    get component(): ComponentRef<any> | null
+    {
+        return this.componentRef;
+    }
+
     init(parameters: Parameters): void {
         // If already initialized, just update the parameters
         if (this.componentRef) {
