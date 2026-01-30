@@ -2,17 +2,14 @@ import {
     ComponentRef,
     Injector,
     Type,
-    ViewContainerRef,
-    ApplicationRef,
-    ComponentFactoryResolver,
     EmbeddedViewRef,
     createComponent,
-    EnvironmentInjector
+    EnvironmentInjector,
+    ApplicationRef
 } from '@angular/core';
 import {
     IContentRenderer,
     IFrameworkPart,
-    DockviewIDisposable,
     Parameters
 } from 'dockview-core';
 
@@ -25,16 +22,24 @@ export interface AngularRendererOptions {
 export class AngularRenderer implements IContentRenderer, IFrameworkPart {
     private componentRef: ComponentRef<any> | null = null;
     private _element: HTMLElement | null = null;
+    private appRef: ApplicationRef;
 
     constructor(
         private options: AngularRendererOptions
-    ) {}
+    ) {
+        this.appRef = options.injector.get(ApplicationRef);
+    }
 
     get element(): HTMLElement {
         if (!this._element) {
             throw new Error('Angular renderer not initialized');
         }
         return this._element;
+    }
+
+    get component(): ComponentRef<any> | null
+    {
+        return this.componentRef;
     }
 
     init(parameters: Parameters): void {
@@ -47,15 +52,20 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
     }
 
     update(params: Parameters): void {
-        if (this.componentRef) {
-            Object.keys(params).forEach(key => {
-                // Use 'in' operator instead of hasOwnProperty to support getter/setter properties
-                if (key in this.componentRef!.instance) {
-                    this.componentRef!.instance[key] = params[key];
-                }
-            });
-            this.componentRef.changeDetectorRef.detectChanges();
+        if (!this.componentRef)
+        {
+            return;
         }
+
+        for (const key of Object.keys(params)) {
+            // Use 'in' operator instead of hasOwnProperty to support getter/setter properties
+            if (key in this.componentRef.instance) {
+                this.componentRef.instance[key] = params[key];
+            }
+        }
+
+        // trigger change detection
+        this.componentRef.changeDetectorRef.markForCheck();
     }
 
     private render(parameters: Parameters): void {
@@ -67,20 +77,17 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
             });
 
             // Set initial parameters
-            Object.keys(parameters).forEach(key => {
-                // Use 'in' operator instead of hasOwnProperty to support getter/setter properties
-                if (key in this.componentRef!.instance) {
-                    this.componentRef!.instance[key] = parameters[key];
-                }
-            });
+            this.update(parameters);
 
             // Get the DOM element
             const hostView = this.componentRef.hostView as EmbeddedViewRef<any>;
             this._element = hostView.rootNodes[0] as HTMLElement;
 
-            // Trigger change detection
-            this.componentRef.changeDetectorRef.detectChanges();
+            // attach to change detection
+            this.appRef.attachView(hostView);
 
+            // trigger change detection
+            this.componentRef.changeDetectorRef.markForCheck();
         } catch (error) {
             console.error('Error creating Angular component:', error);
             throw error;

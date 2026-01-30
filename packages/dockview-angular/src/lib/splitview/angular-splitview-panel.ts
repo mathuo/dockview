@@ -1,9 +1,7 @@
 import { Type, Injector, EnvironmentInjector } from '@angular/core';
 import {
     SplitviewPanel,
-    SplitviewApi,
     IFrameworkPart,
-    SplitviewComponent,
 } from 'dockview-core';
 import { AngularRenderer } from '../utils/angular-renderer';
 

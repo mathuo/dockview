@@ -1,10 +1,7 @@
 import { Type, Injector, EnvironmentInjector } from '@angular/core';
 import {
     GridviewPanel,
-    GridviewApi,
-    GridviewInitParameters,
-    IFrameworkPart,
-    GridviewComponent,
+    IFrameworkPart
 } from 'dockview-core';
 import { AngularRenderer } from '../utils/angular-renderer';
 
