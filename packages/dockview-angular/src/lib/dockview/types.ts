@@ -8,7 +8,8 @@ import {
     IDockviewPanelProps,
     IDockviewPanelHeaderProps,
     IWatermarkPanelProps,
-    IDockviewHeaderActionsProps
+    IDockviewHeaderActionsProps,
+    TabOverflowEvent
 } from 'dockview-core';
 
 export interface IDockviewAngularPanelProps extends IDockviewPanelProps {
@@ -27,6 +28,19 @@ export interface IDockviewAngularHeaderActionsProps extends IDockviewHeaderActio
     // Angular-specific header actions properties can be added here
 }
 
+export interface IDockviewAngularTabOverflowProps {
+    event: TabOverflowEvent;
+}
+
+export interface IDockviewAngularTabOverflowTriggerProps {
+    event: TabOverflowEvent;
+}
+
+export interface IAngularTabOverflowConfig {
+    content?: Type<any>;
+    trigger?: Type<any>;
+}
+
 export interface DockviewAngularOptions extends DockviewOptions {
     components: Record<string, Type<any>>;
     tabComponents?: Record<string, Type<any>>;
@@ -35,6 +49,7 @@ export interface DockviewAngularOptions extends DockviewOptions {
     leftHeaderActionsComponent?: Type<any>;
     rightHeaderActionsComponent?: Type<any>;
     prefixHeaderActionsComponent?: Type<any>;
+    tabOverflowComponent?: Type<any> | IAngularTabOverflowConfig;
 }
 
 // Alias for backward compatibility

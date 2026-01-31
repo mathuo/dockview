@@ -28,6 +28,34 @@ export interface TabContextMenuEvent {
     panel: IDockviewPanel;
 }
 
+export interface OverflowTabData {
+    id: string;
+    title: string;
+    isActive: boolean;
+    panel: IDockviewPanel;
+}
+
+export interface TabOverflowEvent {
+    tabs: OverflowTabData[];
+    isVisible: boolean;
+    triggerElement: HTMLElement;
+}
+
+export interface ITabOverflowRenderer extends IDisposable {
+    readonly element: HTMLElement;
+    update(event: TabOverflowEvent): void;
+}
+
+export interface ITabOverflowTriggerRenderer extends IDisposable {
+    readonly element: HTMLElement;
+    update(event: TabOverflowEvent): void;
+}
+
+export interface ITabOverflowConfig {
+    content?: ITabOverflowRenderer;
+    trigger?: ITabOverflowTriggerRenderer;
+}
+
 export interface ViewFactoryData {
     content: string;
     tab?: string;
@@ -154,6 +182,9 @@ export interface DockviewFrameworkOptions {
     ) => ITabRenderer | undefined;
     createComponent: (options: CreateComponentOptions) => IContentRenderer;
     createWatermarkComponent?: () => IWatermarkRenderer;
+    createTabOverflowComponent?: (
+        group: DockviewGroupPanel
+    ) => ITabOverflowRenderer | ITabOverflowConfig;
 }
 
 export type DockviewComponentOptions = DockviewOptions &
