@@ -9,7 +9,6 @@ import { DockviewComponent } from '../../dockviewComponent';
 import { addDisposableListener, Emitter, Event } from '../../../events';
 import { CompositeDisposable } from '../../../lifecycle';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
-import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
 import { toggleClass } from '../../../dom';
 
 export class VoidContainer extends CompositeDisposable {

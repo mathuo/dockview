@@ -40,7 +40,7 @@ export const DockviewDefaultTab: React.FunctionComponent<
     onPointerDown,
     onPointerUp,
     onPointerLeave,
-    tabLocation,
+    tabLocation: _tabLocation,
     ...rest
 }) => {
     const title = useTitle(api);

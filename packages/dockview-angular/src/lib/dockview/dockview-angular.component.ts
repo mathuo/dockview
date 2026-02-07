@@ -198,17 +198,17 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
                 }
                 : undefined,
             createLeftHeaderActionComponent: this.leftHeaderActionsComponent
-                ? (group) => {
+                ? (_group) => {
                     return componentFactory.createHeaderActionsComponent('left')!;
                 }
                 : undefined,
             createRightHeaderActionComponent: this.rightHeaderActionsComponent
-                ? (group) => {
+                ? (_group) => {
                     return componentFactory.createHeaderActionsComponent('right')!;
                 }
                 : undefined,
             createPrefixHeaderActionComponent: this.prefixHeaderActionsComponent
-                ? (group) => {
+                ? (_group) => {
                     return componentFactory.createHeaderActionsComponent('prefix')!;
                 }
                 : undefined

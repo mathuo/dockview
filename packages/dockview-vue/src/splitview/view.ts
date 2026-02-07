@@ -1,6 +1,5 @@
 import {
     SplitviewApi,
-    PanelViewInitParameters,
     SplitviewPanel,
     IFrameworkPart,
 } from 'dockview-core';

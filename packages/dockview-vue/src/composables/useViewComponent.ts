@@ -13,7 +13,7 @@ export interface ViewComponentConfig<
     TApi,
     TOptions,
     TProps,
-    TEvents,
+    _TEvents,
     TView,
     TFrameworkOptions
 > {
@@ -33,11 +33,11 @@ export function useViewComponent<
     TApi extends { dispose(): void; updateOptions(options: Partial<TOptions>): void; layout(width: number, height: number): void },
     TOptions,
     TProps,
-    TEvents,
+    _TEvents,
     TView,
     TFrameworkOptions
 >(
-    config: ViewComponentConfig<TApi, TOptions, TProps, TEvents, TView, TFrameworkOptions>,
+    config: ViewComponentConfig<TApi, TOptions, TProps, _TEvents, TView, TFrameworkOptions>,
     props: TProps,
     emit: (event: 'ready', payload: { api: TApi }) => void
 ) {

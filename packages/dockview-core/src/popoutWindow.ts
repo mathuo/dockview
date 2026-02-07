@@ -124,7 +124,7 @@ export class PopoutWindow extends CompositeDisposable {
         });
 
         return new Promise<HTMLElement | null>((resolve, reject) => {
-            externalWindow.addEventListener('unload', (e) => {
+            externalWindow.addEventListener('unload', (_e) => {
                 // if page fails to load before unloading
                 // this.close();
             });

@@ -188,7 +188,7 @@ export class VueWatermarkRenderer
         );
     }
 
-    update(event: PanelUpdateEvent<Parameters>): void {
+    update(_event: PanelUpdateEvent<Parameters>): void {
         // noop
     }
 
@@ -212,7 +212,7 @@ export class VueHeaderActionsRenderer
     constructor(
         component: VueComponent,
         parent: ComponentInternalInstance,
-        group: DockviewGroupPanel
+        _group: DockviewGroupPanel
     ) {
         super(component, parent);
     }

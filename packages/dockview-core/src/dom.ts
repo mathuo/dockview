@@ -309,7 +309,7 @@ function allTagsNamesInclusiveOfShadowDoms(tagNames: string[]) {
     return iframes;
 }
 
-export function disableIframePointEvents(rootNode: ParentNode = document) {
+export function disableIframePointEvents(_rootNode: ParentNode = document) {
     const iframes = allTagsNamesInclusiveOfShadowDoms(['IFRAME', 'WEBVIEW']);
 
     const original = new WeakMap<HTMLElement, string>(); // don't hold onto HTMLElement references longer than required
