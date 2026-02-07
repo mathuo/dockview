@@ -276,8 +276,7 @@ describe('events', () => {
                 value = x;
             });
 
-            const pauseToken = {};
-            emitter.pauseEvents(pauseToken);
+            const pauseDisposable = emitter.pauseEvents();
 
             emitter.fire(0);
             expect(value).toBeUndefined();
@@ -285,6 +284,7 @@ describe('events', () => {
             emitter.fire(1);
             expect(value).toBeUndefined();
 
+            pauseDisposable.dispose();
             stream.dispose();
         });
 
@@ -296,13 +296,12 @@ describe('events', () => {
                 value = x;
             });
 
-            const pauseToken = {};
-            emitter.pauseEvents(pauseToken);
+            const pauseDisposable = emitter.pauseEvents();
 
             emitter.fire(0);
             expect(value).toBeUndefined();
 
-            emitter.unpauseEvents(pauseToken);
+            pauseDisposable.dispose();
 
             emitter.fire(1);
             expect(value).toBe(1);
@@ -314,8 +313,7 @@ describe('events', () => {
             const emitter = new Emitter<number>({ replay: true });
             let value: number | undefined = undefined;
 
-            const pauseToken = {};
-            emitter.pauseEvents(pauseToken);
+            const pauseDisposable = emitter.pauseEvents();
 
             emitter.fire(1);
 
@@ -324,6 +322,7 @@ describe('events', () => {
             });
             expect(value).toBeUndefined();
 
+            pauseDisposable.dispose();
             stream.dispose();
         });
 
@@ -335,19 +334,17 @@ describe('events', () => {
                 value = x;
             });
 
-            const pauseToken1 = {};
-            const pauseToken2 = {};
-            emitter.pauseEvents(pauseToken1);
-            emitter.pauseEvents(pauseToken2);
+            const pauseDisposable1 = emitter.pauseEvents();
+            const pauseDisposable2 = emitter.pauseEvents();
 
             emitter.fire(0);
             expect(value).toBeUndefined();
 
-            emitter.unpauseEvents(pauseToken1);
+            pauseDisposable1.dispose();
             emitter.fire(1);
             expect(value).toBeUndefined();
 
-            emitter.unpauseEvents(pauseToken2);
+            pauseDisposable2.dispose();
             emitter.fire(2);
             expect(value).toBe(2);
 
