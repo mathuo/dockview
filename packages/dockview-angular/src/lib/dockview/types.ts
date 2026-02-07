@@ -1,7 +1,6 @@
 import { Type } from '@angular/core';
 import {
     DockviewOptions,
-    DockviewApi,
     DockviewReadyEvent,
     DockviewDidDropEvent,
     DockviewWillDropEvent,
