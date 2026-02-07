@@ -1,6 +1,9 @@
 name: CI
 
-on: [push]
+on:
+    push:
+        branches: [master]
+    pull_request:
 
 jobs:
     build:
@@ -28,6 +31,7 @@ jobs:
             - run: npm run build:bundle
             - run: npm run test:cov
             - name: SonarCloud Scan
+              if: env.SONAR_TOKEN != ''
               uses: sonarsource/sonarqube-scan-action@v5
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
