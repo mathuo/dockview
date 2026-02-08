@@ -9,7 +9,7 @@ export interface GridviewAngularReadyEvent {
 }
 
 export interface GridviewAngularOptions extends GridviewOptions {
-    components: Record<string, Type<any>>;
+    components: Record<string, Type<unknown>>;
 }
 
 export interface GridviewAngularEvents {

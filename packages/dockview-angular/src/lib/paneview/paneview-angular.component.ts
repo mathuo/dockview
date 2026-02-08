@@ -30,8 +30,8 @@ import { PaneviewAngularReadyEvent } from './types';
 import { AngularPanePart } from './angular-pane-part';
 
 export interface PaneviewAngularOptions extends PaneviewOptions {
-    components: Record<string, Type<any>>;
-    headerComponents?: Record<string, Type<any>>;
+    components: Record<string, Type<unknown>>;
+    headerComponents?: Record<string, Type<unknown>>;
 }
 
 @Component({
@@ -56,8 +56,8 @@ export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @ViewChild('paneviewContainer', { static: true }) 
     private containerRef!: ElementRef<HTMLDivElement>;
 
-    @Input() components!: Record<string, Type<any>>;
-    @Input() headerComponents?: Record<string, Type<any>>;
+    @Input() components!: Record<string, Type<unknown>>;
+    @Input() headerComponents?: Record<string, Type<unknown>>;
 
     // Core paneview options as inputs
     @Input() className?: string;
@@ -93,7 +93,7 @@ export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
             // Check for changes in core paneview properties
             PROPERTY_KEYS_PANEVIEW.forEach(key => {
                 if (changes[key] && !changes[key].isFirstChange()) {
-                    (coreChanges as any)[key] = changes[key].currentValue;
+                    (coreChanges as Record<string, unknown>)[key] = changes[key].currentValue;
                     hasChanges = true;
                 }
             });
@@ -135,9 +135,9 @@ export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
         const coreOptions: Partial<PaneviewComponentOptions> = {};
 
         PROPERTY_KEYS_PANEVIEW.forEach(key => {
-            const value = (this as any)[key];
+            const value = (this as unknown as Record<string, unknown>)[key];
             if (value !== undefined) {
-                (coreOptions as any)[key] = value;
+                (coreOptions as Record<string, unknown>)[key] = value;
             }
         });
 

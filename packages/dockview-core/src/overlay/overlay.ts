@@ -212,7 +212,7 @@ export class Overlay extends CompositeDisposable {
         const container = this.options.container.getBoundingClientRect();
         const element = this._element.getBoundingClientRect();
 
-        const result: any = {};
+        const result: Partial<AnchoredBox> = {};
 
         if (this.verticalAlignment === 'top') {
             result.top = parseFloat(this._element.style.top);
@@ -321,7 +321,7 @@ export class Overlay extends CompositeDisposable {
                         )
                     );
 
-                    const bounds: any = {};
+                    const bounds: Partial<AnchoredBox> = {};
 
                     // Anchor to top or to bottom depending on which one is closer
                     if (top <= bottom) {
@@ -589,7 +589,7 @@ export class Overlay extends CompositeDisposable {
                                 break;
                         }
 
-                        const bounds: any = {};
+                        const bounds: Partial<AnchoredBox> = {};
 
                         // Anchor to top or to bottom depending on which one is closer
                         if (top! <= bottom!) {

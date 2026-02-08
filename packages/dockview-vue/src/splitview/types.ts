@@ -2,13 +2,14 @@ import type {
     SplitviewApi,
     SplitviewOptions,
     SplitviewPanelApi,
+    Parameters,
 } from 'dockview-core';
 
 export interface SplitviewReadyEvent {
     api: SplitviewApi;
 }
 
-export interface ISplitviewVuePanelProps<T extends Record<string, any> = any> {
+export interface ISplitviewVuePanelProps<T extends Parameters = Parameters> {
     params: T;
     api: SplitviewPanelApi;
     containerApi: SplitviewApi;

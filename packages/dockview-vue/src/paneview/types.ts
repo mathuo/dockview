@@ -2,13 +2,14 @@ import type {
     PaneviewApi,
     PaneviewOptions,
     PaneviewPanelApi,
+    Parameters,
 } from 'dockview-core';
 
 export interface PaneviewReadyEvent {
     api: PaneviewApi;
 }
 
-export interface IPaneviewVuePanelProps<T extends Record<string, any> = any> {
+export interface IPaneviewVuePanelProps<T extends Parameters = Parameters> {
     params: T;
     api: PaneviewPanelApi;
     containerApi: PaneviewApi;

@@ -235,7 +235,7 @@ export type GridNode<T extends IGridView> = GridLeafNode<T> | GridBranchNode<T>;
 export function isGridBranchNode<T extends IGridView>(
     node: GridNode<T>
 ): node is GridBranchNode<T> {
-    return !!(node as any).children;
+    return 'children' in node;
 }
 
 export interface SerializedGridObject<T> {
@@ -248,7 +248,7 @@ export interface SerializedGridObject<T> {
 const serializeBranchNode = <T extends IGridView>(
     node: GridNode<T>,
     orientation: Orientation
-): SerializedGridObject<any> => {
+): SerializedGridObject<object> => {
     const size =
         orientation === Orientation.VERTICAL ? node.box.width : node.box.height;
 
@@ -274,7 +274,7 @@ const serializeBranchNode = <T extends IGridView>(
     };
 };
 
-export interface ISerializedLeafNode<T = any> {
+export interface ISerializedLeafNode<T = object> {
     type: 'leaf';
     data: T;
     size: number;
@@ -498,7 +498,7 @@ export class Gridview implements IDisposable {
         });
     }
 
-    public serialize(): SerializedGridview<any> {
+    public serialize(): SerializedGridview<object> {
         const maximizedView = this.maximizedView();
 
         let maxmizedViewLocation: number[] | undefined;
@@ -525,7 +525,7 @@ export class Gridview implements IDisposable {
 
         const root = serializeBranchNode(this.getView(), this.orientation);
 
-        const resullt: SerializedGridview<any> = {
+        const resullt: SerializedGridview<object> = {
             root,
             width: this.width,
             height: this.height,

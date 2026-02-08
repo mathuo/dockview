@@ -49,7 +49,7 @@ export class VuePaneviewPanelView implements IPanePart {
     public update(params: PanelUpdateEvent) {
         // The update method for paneview doesn't need to pass all props,
         // just the updated params
-        (this.part as any)?.update({ params: params.params });
+        this.part?.update({ params: params.params } as IPaneviewVuePanelProps);
     }
 
     public dispose() {

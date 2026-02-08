@@ -5,18 +5,18 @@ import {
     createGridview,
     GridviewOptions,
     PROPERTY_KEYS_GRIDVIEW,
-    GridviewComponentOptions,
     GridviewFrameworkOptions,
 } from 'dockview-core';
 import { ReactGridPanelView } from './view';
 import { usePortalsLifecycle } from '../react';
 import { PanelParameters } from '../types';
+import { Parameters } from 'dockview-core';
 
 export interface GridviewReadyEvent {
     api: GridviewApi;
 }
 
-export interface IGridviewPanelProps<T extends { [index: string]: any } = any>
+export interface IGridviewPanelProps<T extends Parameters = Parameters>
     extends PanelParameters<T> {
     api: GridviewPanelApi;
     containerApi: GridviewApi;
@@ -28,12 +28,12 @@ export interface IGridviewReactProps extends GridviewOptions {
 }
 
 function extractCoreOptions(props: IGridviewReactProps): GridviewOptions {
-    const coreOptions = PROPERTY_KEYS_GRIDVIEW.reduce((obj, key) => {
+    const coreOptions = PROPERTY_KEYS_GRIDVIEW.reduce<Partial<GridviewOptions>>((obj, key) => {
         if (key in props) {
-            obj[key] = props[key] as any;
+            (obj as Record<string, unknown>)[key] = props[key];
         }
         return obj;
-    }, {} as Partial<GridviewComponentOptions>);
+    }, {});
 
     return coreOptions as GridviewOptions;
 }
@@ -57,7 +57,7 @@ export const GridviewReact = React.forwardRef(
                     const propValue = props[key];
 
                     if (key in props && propValue !== prevProps.current[key]) {
-                        changes[key] = propValue as any;
+                        (changes as Record<string, unknown>)[key] = propValue;
                     }
                 });
 

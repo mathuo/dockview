@@ -4,8 +4,9 @@ import { DockviewPanelApi } from '../api/dockviewPanelApi';
 import { PanelParameters } from '../framwork';
 import { DockviewGroupPanel, IDockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
+import { Parameters } from '../panel/types';
 
-export interface IGroupPanelBaseProps<T extends { [index: string]: any } = any>
+export interface IGroupPanelBaseProps<T extends Parameters = Parameters>
     extends PanelParameters<T> {
     api: DockviewPanelApi;
     containerApi: DockviewApi;
@@ -14,10 +15,10 @@ export interface IGroupPanelBaseProps<T extends { [index: string]: any } = any>
 export type TabLocation = 'header' | 'headerOverflow';
 
 export type IDockviewPanelHeaderProps<
-    T extends { [index: string]: any } = any
+    T extends Parameters = Parameters
 > = IGroupPanelBaseProps<T> & { tabLocation: TabLocation };
 
-export type IDockviewPanelProps<T extends { [index: string]: any } = any> =
+export type IDockviewPanelProps<T extends Parameters = Parameters> =
     IGroupPanelBaseProps<T>;
 
 export interface IDockviewHeaderActionsProps {

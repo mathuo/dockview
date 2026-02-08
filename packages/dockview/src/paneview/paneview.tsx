@@ -6,18 +6,18 @@ import {
     createPaneview,
     PaneviewOptions,
     PROPERTY_KEYS_PANEVIEW,
-    PaneviewComponentOptions,
     PaneviewFrameworkOptions,
 } from 'dockview-core';
 import { usePortalsLifecycle } from '../react';
 import { PanePanelSection } from './view';
 import { PanelParameters } from '../types';
+import { Parameters } from 'dockview-core';
 
 export interface PaneviewReadyEvent {
     api: PaneviewApi;
 }
 
-export interface IPaneviewPanelProps<T extends { [index: string]: any } = any>
+export interface IPaneviewPanelProps<T extends Parameters = Parameters>
     extends PanelParameters<T> {
     api: PaneviewPanelApi;
     containerApi: PaneviewApi;
@@ -35,12 +35,12 @@ export interface IPaneviewReactProps extends PaneviewOptions {
 }
 
 function extractCoreOptions(props: IPaneviewReactProps): PaneviewOptions {
-    const coreOptions = PROPERTY_KEYS_PANEVIEW.reduce((obj, key) => {
+    const coreOptions = PROPERTY_KEYS_PANEVIEW.reduce<Partial<PaneviewOptions>>((obj, key) => {
         if (key in props) {
-            obj[key] = props[key] as any;
+            (obj as Record<string, unknown>)[key] = props[key];
         }
         return obj;
-    }, {} as Partial<PaneviewComponentOptions>);
+    }, {});
 
     return coreOptions as PaneviewOptions;
 }
@@ -64,7 +64,7 @@ export const PaneviewReact = React.forwardRef(
                     const propValue = props[key];
 
                     if (key in props && propValue !== prevProps.current[key]) {
-                        changes[key] = propValue as any;
+                        (changes as Record<string, unknown>)[key] = propValue;
                     }
                 });
 

@@ -268,7 +268,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
             onWillClose?: (event: { id: string; window: Window }) => void;
         }
     ): Promise<boolean>;
-    fromJSON(data: any, options?: { reuseExistingPanels: boolean }): void;
+    fromJSON(data: SerializedDockview, options?: { reuseExistingPanels: boolean }): void;
 }
 
 export class DockviewComponent
@@ -1086,7 +1086,7 @@ export class DockviewComponent
 
         function getAnchoredBox(): AnchoredBox {
             if (options?.position) {
-                const result: any = {};
+                const result: Partial<AnchoredBox> = {};
 
                 if ('left' in options.position) {
                     result.left = Math.max(options.position.left, 0);

@@ -80,7 +80,7 @@ export abstract class PaneviewPanel
     protected body?: HTMLElement;
     private bodyPart?: IPanePart;
     private headerPart?: IPanePart;
-    private animationTimer: any;
+    private animationTimer: ReturnType<typeof setTimeout> | undefined;
     private _orientation: Orientation;
 
     private _headerVisible: boolean;

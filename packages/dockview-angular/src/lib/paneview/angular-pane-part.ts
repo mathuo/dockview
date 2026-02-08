@@ -10,7 +10,7 @@ export class AngularPanePart implements IPanePart {
     private renderer: AngularRenderer;
 
     constructor(
-        private readonly angularComponent: Type<any>,
+        private readonly angularComponent: Type<unknown>,
         private readonly injector: Injector,
         private readonly environmentInjector?: EnvironmentInjector
     ) {

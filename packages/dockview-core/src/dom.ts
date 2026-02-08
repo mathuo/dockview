@@ -295,7 +295,7 @@ function allTagsNamesInclusiveOfShadowDoms(tagNames: string[]) {
             }
 
             if (node.shadowRoot) {
-                findIframesInNode(<any>node.shadowRoot);
+                findIframesInNode(node.shadowRoot as unknown as Element);
             }
 
             for (const child of node.children) {
@@ -406,7 +406,7 @@ export function onDidWindowMoveEnd(window: Window): Emitter<void> {
     let previousScreenX = window.screenX;
     let previousScreenY = window.screenY;
 
-    let timeout: any;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
 
     const checkMovement = () => {
         if (window.closed) {
@@ -438,7 +438,7 @@ export function onDidWindowMoveEnd(window: Window): Emitter<void> {
 }
 
 export function onDidWindowResizeEnd(element: Window, cb: () => void) {
-    let resizeTimeout: any;
+    let resizeTimeout: ReturnType<typeof setTimeout> | undefined;
 
     const disposable = new CompositeDisposable(
         addDisposableListener(element, 'resize', () => {

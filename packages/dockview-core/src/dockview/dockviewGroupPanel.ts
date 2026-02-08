@@ -153,7 +153,7 @@ export class DockviewGroupPanel
             this.model.onDidActivePanelChange((event) => {
                 this.api._onDidActivePanelChange.fire(event);
             }),
-            this.api.onDidConstraintsChangeInternal((event: any) => {
+            this.api.onDidConstraintsChangeInternal((event) => {
                 // Track explicitly set constraints to override panel constraints
                 // Extract numeric values from functions or values
                 if (event.minimumWidth !== undefined) {

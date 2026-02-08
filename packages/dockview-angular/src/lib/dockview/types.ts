@@ -27,13 +27,13 @@ export interface IDockviewAngularHeaderActionsProps extends IDockviewHeaderActio
 }
 
 export interface DockviewAngularOptions extends DockviewOptions {
-    components: Record<string, Type<any>>;
-    tabComponents?: Record<string, Type<any>>;
-    watermarkComponent?: Type<any>;
-    defaultTabComponent?: Type<any>;
-    leftHeaderActionsComponent?: Type<any>;
-    rightHeaderActionsComponent?: Type<any>;
-    prefixHeaderActionsComponent?: Type<any>;
+    components: Record<string, Type<unknown>>;
+    tabComponents?: Record<string, Type<unknown>>;
+    watermarkComponent?: Type<unknown>;
+    defaultTabComponent?: Type<unknown>;
+    leftHeaderActionsComponent?: Type<unknown>;
+    rightHeaderActionsComponent?: Type<unknown>;
+    prefixHeaderActionsComponent?: Type<unknown>;
 }
 
 // Alias for backward compatibility

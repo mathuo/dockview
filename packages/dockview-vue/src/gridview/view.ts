@@ -1,6 +1,7 @@
 import {
     GridviewApi,
     GridviewPanel,
+    GridviewInitParameters,
     IFrameworkPart,
 } from 'dockview-core';
 import { type ComponentInternalInstance } from 'vue';
@@ -26,7 +27,7 @@ export class VueGridviewPanelView extends GridviewPanel {
                 params: this._params?.params ?? {},
                 api: this.api,
                 containerApi: new GridviewApi(
-                    (this._params as any).accessor
+                    (this._params as GridviewInitParameters).accessor
                 ),
             }
         );

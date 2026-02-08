@@ -10,8 +10,8 @@ export interface PaneviewAngularReadyEvent {
 }
 
 export interface PaneviewAngularOptions extends PaneviewOptions {
-    components: Record<string, Type<any>>;
-    headerComponents?: Record<string, Type<any>>;
+    components: Record<string, Type<unknown>>;
+    headerComponents?: Record<string, Type<unknown>>;
 }
 
 export interface PaneviewAngularEvents {

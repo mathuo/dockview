@@ -9,7 +9,7 @@ export interface SplitviewAngularReadyEvent {
 }
 
 export interface SplitviewAngularOptions extends SplitviewOptions {
-    components: Record<string, Type<any>>;
+    components: Record<string, Type<unknown>>;
 }
 
 export interface SplitviewAngularEvents {

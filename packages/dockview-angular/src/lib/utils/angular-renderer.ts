@@ -14,13 +14,13 @@ import {
 } from 'dockview-core';
 
 export interface AngularRendererOptions {
-    component: Type<any>;
+    component: Type<unknown>;
     injector: Injector;
     environmentInjector?: EnvironmentInjector;
 }
 
 export class AngularRenderer implements IContentRenderer, IFrameworkPart {
-    private componentRef: ComponentRef<any> | null = null;
+    private componentRef: ComponentRef<unknown> | null = null;
     private _element: HTMLElement | null = null;
     private appRef: ApplicationRef;
 
@@ -37,7 +37,7 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
         return this._element;
     }
 
-    get component(): ComponentRef<any> | null
+    get component(): ComponentRef<unknown> | null
     {
         return this.componentRef;
     }
@@ -57,10 +57,11 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
             return;
         }
 
+        const instance = this.componentRef.instance as Record<string, unknown>;
         for (const key of Object.keys(params)) {
             // Use 'in' operator instead of hasOwnProperty to support getter/setter properties
-            if (key in this.componentRef.instance) {
-                this.componentRef.instance[key] = params[key];
+            if (key in instance) {
+                instance[key] = params[key];
             }
         }
 
@@ -80,7 +81,7 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
             this.update(parameters);
 
             // Get the DOM element
-            const hostView = this.componentRef.hostView as EmbeddedViewRef<any>;
+            const hostView = this.componentRef.hostView as EmbeddedViewRef<unknown>;
             this._element = hostView.rootNodes[0] as HTMLElement;
 
             // attach to change detection

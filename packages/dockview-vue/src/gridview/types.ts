@@ -2,13 +2,14 @@ import type {
     GridviewApi,
     GridviewOptions,
     GridviewPanelApi,
+    Parameters,
 } from 'dockview-core';
 
 export interface GridviewReadyEvent {
     api: GridviewApi;
 }
 
-export interface IGridviewVuePanelProps<T extends Record<string, any> = any> {
+export interface IGridviewVuePanelProps<T extends Parameters = Parameters> {
     params: T;
     api: GridviewPanelApi;
     containerApi: GridviewApi;

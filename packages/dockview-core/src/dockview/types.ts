@@ -1,5 +1,5 @@
 import { DockviewPanelApi } from '../api/dockviewPanelApi';
-import { PanelInitParameters, IPanel } from '../panel/types';
+import { PanelInitParameters, IPanel, Parameters } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
 import { Optional } from '../types';
 import { IDockviewGroupPanel } from './dockviewGroupPanel';
@@ -67,7 +67,7 @@ export interface GroupviewPanelState {
     tabComponent?: string;
     title?: string;
     renderer?: DockviewPanelRenderer;
-    params?: { [key: string]: any };
+    params?: Parameters;
     minimumWidth?: number;
     minimumHeight?: number;
     maximumWidth?: number;

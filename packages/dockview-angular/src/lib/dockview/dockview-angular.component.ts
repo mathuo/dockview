@@ -30,13 +30,13 @@ import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
 
 export interface DockviewAngularOptions extends DockviewOptions {
-    components: Record<string, Type<any>>;
-    tabComponents?: Record<string, Type<any>>;
-    watermarkComponent?: Type<any>;
-    defaultTabComponent?: Type<any>;
-    leftHeaderActionsComponent?: Type<any>;
-    rightHeaderActionsComponent?: Type<any>;
-    prefixHeaderActionsComponent?: Type<any>;
+    components: Record<string, Type<unknown>>;
+    tabComponents?: Record<string, Type<unknown>>;
+    watermarkComponent?: Type<unknown>;
+    defaultTabComponent?: Type<unknown>;
+    leftHeaderActionsComponent?: Type<unknown>;
+    rightHeaderActionsComponent?: Type<unknown>;
+    prefixHeaderActionsComponent?: Type<unknown>;
 }
 
 @Component({
@@ -61,13 +61,13 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @ViewChild('dockviewContainer', { static: true }) 
     private containerRef!: ElementRef<HTMLDivElement>;
 
-    @Input() components!: Record<string, Type<any>>;
-    @Input() tabComponents?: Record<string, Type<any>>;
-    @Input() watermarkComponent?: Type<any>;
-    @Input() defaultTabComponent?: Type<any>;
-    @Input() leftHeaderActionsComponent?: Type<any>;
-    @Input() rightHeaderActionsComponent?: Type<any>;
-    @Input() prefixHeaderActionsComponent?: Type<any>;
+    @Input() components!: Record<string, Type<unknown>>;
+    @Input() tabComponents?: Record<string, Type<unknown>>;
+    @Input() watermarkComponent?: Type<unknown>;
+    @Input() defaultTabComponent?: Type<unknown>;
+    @Input() leftHeaderActionsComponent?: Type<unknown>;
+    @Input() rightHeaderActionsComponent?: Type<unknown>;
+    @Input() prefixHeaderActionsComponent?: Type<unknown>;
 
     // Core dockview options as inputs
     @Input() className?: string;
@@ -112,7 +112,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
             // Check for changes in core dockview properties
             PROPERTY_KEYS_DOCKVIEW.forEach(key => {
                 if (changes[key] && !changes[key].isFirstChange()) {
-                    (coreChanges as any)[key] = changes[key].currentValue;
+                    (coreChanges as Record<string, unknown>)[key] = changes[key].currentValue;
                     hasChanges = true;
                 }
             });
@@ -154,9 +154,9 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
         const coreOptions: Partial<DockviewComponentOptions> = {};
 
         PROPERTY_KEYS_DOCKVIEW.forEach(key => {
-            const value = (this as any)[key];
+            const value = (this as unknown as Record<string, unknown>)[key];
             if (value !== undefined) {
-                (coreOptions as any)[key] = value;
+                (coreOptions as Record<string, unknown>)[key] = value;
             }
         });
 
@@ -164,7 +164,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     private createFrameworkOptions(): DockviewFrameworkOptions {
-        const headerActionsComponents: Record<string, Type<any>> = {};
+        const headerActionsComponents: Record<string, Type<unknown>> = {};
         if (this.leftHeaderActionsComponent) {
             headerActionsComponents['left'] = this.leftHeaderActionsComponent;
         }

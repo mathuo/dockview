@@ -28,7 +28,7 @@ import { AngularLifecycleManager } from '../utils/lifecycle-utils';
 import { SplitviewAngularReadyEvent } from './types';
 
 export interface SplitviewAngularOptions extends SplitviewOptions {
-    components: Record<string, Type<any>>;
+    components: Record<string, Type<unknown>>;
 }
 
 @Component({
@@ -53,7 +53,7 @@ export class SplitviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @ViewChild('splitviewContainer', { static: true }) 
     private containerRef!: ElementRef<HTMLDivElement>;
 
-    @Input() components!: Record<string, Type<any>>;
+    @Input() components!: Record<string, Type<unknown>>;
 
     // Core splitview options as inputs
     @Input() className?: string;
@@ -89,7 +89,7 @@ export class SplitviewAngularComponent implements OnInit, OnDestroy, OnChanges {
             // Check for changes in core splitview properties
             PROPERTY_KEYS_SPLITVIEW.forEach(key => {
                 if (changes[key] && !changes[key].isFirstChange()) {
-                    (coreChanges as any)[key] = changes[key].currentValue;
+                    (coreChanges as Record<string, unknown>)[key] = changes[key].currentValue;
                     hasChanges = true;
                 }
             });
@@ -128,9 +128,9 @@ export class SplitviewAngularComponent implements OnInit, OnDestroy, OnChanges {
         const coreOptions: Partial<SplitviewComponentOptions> = {};
 
         PROPERTY_KEYS_SPLITVIEW.forEach(key => {
-            const value = (this as any)[key];
+            const value = (this as unknown as Record<string, unknown>)[key];
             if (value !== undefined) {
-                (coreOptions as any)[key] = value;
+                (coreOptions as Record<string, unknown>)[key] = value;
             }
         });
 

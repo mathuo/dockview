@@ -11,7 +11,6 @@ import {
     IDockviewPanelProps,
     DockviewOptions,
     PROPERTY_KEYS_DOCKVIEW,
-    DockviewComponentOptions,
     DockviewFrameworkOptions,
     DockviewReadyEvent,
     createDockview,
@@ -57,12 +56,12 @@ export interface IDockviewReactProps extends DockviewOptions {
 }
 
 function extractCoreOptions(props: IDockviewReactProps): DockviewOptions {
-    const coreOptions = PROPERTY_KEYS_DOCKVIEW.reduce((obj, key) => {
+    const coreOptions = PROPERTY_KEYS_DOCKVIEW.reduce<Partial<DockviewOptions>>((obj, key) => {
         if (key in props) {
-            obj[key] = props[key] as any;
+            (obj as Record<string, unknown>)[key] = props[key];
         }
         return obj;
-    }, {} as Partial<DockviewComponentOptions>);
+    }, {});
 
     return coreOptions as DockviewOptions;
 }
@@ -86,7 +85,7 @@ export const DockviewReact = React.forwardRef(
                     const propValue = props[key];
 
                     if (key in props && propValue !== prevProps.current[key]) {
-                        changes[key] = propValue as any;
+                        (changes as Record<string, unknown>)[key] = propValue;
                     }
                 });
 

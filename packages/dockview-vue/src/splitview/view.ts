@@ -2,6 +2,7 @@ import {
     SplitviewApi,
     SplitviewPanel,
     IFrameworkPart,
+    PanelViewInitParameters,
 } from 'dockview-core';
 import { type ComponentInternalInstance } from 'vue';
 import { VuePart, type VueComponent } from '../utils';
@@ -26,7 +27,7 @@ export class VueSplitviewPanelView extends SplitviewPanel {
                 params: this._params?.params ?? {},
                 api: this.api,
                 containerApi: new SplitviewApi(
-                    (this._params as any).accessor
+                    (this._params as PanelViewInitParameters).accessor
                 ),
             }
         );

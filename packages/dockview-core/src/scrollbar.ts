@@ -7,7 +7,7 @@ export class Scrollbar extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private readonly _horizontalScrollbar: HTMLElement;
     private _scrollLeft: number = 0;
-    private _animationTimer: any;
+    private _animationTimer: ReturnType<typeof setTimeout> | undefined;
     public static MouseWheelSpeed = 1;
 
     get element(): HTMLElement {

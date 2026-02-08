@@ -34,22 +34,22 @@ export type ComponentInterface = ComponentOptionsBase<
     any
 >;
 
-export type VueComponent<T = any> = DefineComponent<T>;
+export type VueComponent<T = Record<string, unknown>> = DefineComponent<T>;
 
 export function findComponent(
     parent: ComponentInternalInstance,
     name: string
 ): VueComponent | null {
-    let instance = parent as any;
-    let component: any = null;
+    let instance: ComponentInternalInstance | null = parent;
+    let component: VueComponent | null = null;
 
     while (!component && instance) {
-        component = instance.components?.[name];
+        component = (instance as unknown as Record<string, Record<string, VueComponent>>).components?.[name] ?? null;
         instance = instance.parent;
     }
 
     if (!component) {
-        component = parent.appContext.components?.[name];
+        component = (parent.appContext.components?.[name] as VueComponent) ?? null;
     }
 
     if (!component) {
@@ -63,7 +63,7 @@ export function findComponent(
  * @see https://vuejs.org/api/render-function.html#clonevnode
  * @see https://vuejs.org/api/render-function.html#mergeprops
  */
-export function mountVueComponent<T extends Record<string, any>>(
+export function mountVueComponent<T extends Record<string, unknown>>(
     component: VueComponent<T>,
     parent: ComponentInternalInstance,
     props: T,
@@ -74,7 +74,7 @@ export function mountVueComponent<T extends Record<string, any>>(
     vNode.appContext = parent.appContext;
     vNode.appContext.provides = {
         ...(vNode.appContext.provides ? vNode.appContext.provides : {}),
-        ...((parent as any).provides ? (parent as any).provides : {}),
+        ...(parent.provides ? parent.provides : {}),
     };
 
     render(vNode, element);
@@ -82,7 +82,7 @@ export function mountVueComponent<T extends Record<string, any>>(
     let runningProps = props;
 
     return {
-        update: (newProps: any) => {
+        update: (newProps: T) => {
             runningProps = { ...props, ...newProps };
             vNode = cloneVNode(vNode, runningProps);
             render(vNode, element);
@@ -116,7 +116,7 @@ export class VueRenderer
     implements ITabRenderer, IContentRenderer
 {
     private _renderDisposable:
-        | { update: (props: any) => void; dispose: () => void }
+        | { update: (props: Record<string, unknown>) => void; dispose: () => void }
         | undefined;
     private _api: DockviewPanelApi | undefined;
     private _containerApi: DockviewApi | undefined;
@@ -166,7 +166,7 @@ export class VueWatermarkRenderer
     implements IWatermarkRenderer
 {
     private _renderDisposable:
-        | { update: (props: any) => void; dispose: () => void }
+        | { update: (props: Record<string, unknown>) => void; dispose: () => void }
         | undefined;
 
     get element(): HTMLElement {
@@ -202,7 +202,7 @@ export class VueHeaderActionsRenderer
     implements IHeaderActionsRenderer
 {
     private _renderDisposable:
-        | { update: (props: any) => void; dispose: () => void }
+        | { update: (props: Record<string, unknown>) => void; dispose: () => void }
         | undefined;
 
     get element(): HTMLElement {
@@ -232,9 +232,9 @@ export class VueHeaderActionsRenderer
     }
 }
 
-export class VuePart<T extends Record<string, any> = any> {
+export class VuePart<T extends Record<string, unknown> = Record<string, unknown>> {
     private _renderDisposable:
-        | { update: (props: any) => void; dispose: () => void }
+        | { update: (props: Record<string, unknown>) => void; dispose: () => void }
         | undefined;
 
     constructor(

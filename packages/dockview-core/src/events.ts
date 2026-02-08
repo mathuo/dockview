@@ -1,7 +1,7 @@
 import { IDisposable } from './lifecycle';
 
 export interface Event<T> {
-    (listener: (e: T) => any): IDisposable;
+    (listener: (e: T) => void): IDisposable;
 }
 
 export interface EmitterOptions {
@@ -59,7 +59,7 @@ export class AcceptableEvent implements IAcceptableEvent {
 }
 
 class LeakageMonitor {
-    readonly events = new Map<Event<any>, Stacktrace>();
+    readonly events = new Map<Event<unknown>, Stacktrace>();
 
     get size(): number {
         return this.events.size;
@@ -102,7 +102,7 @@ export class Emitter<T> implements IDisposable {
     private _event?: Event<T>;
 
     private _last?: T;
-    private _listeners: Listener<any>[] = [];
+    private _listeners: Listener<T>[] = [];
     private _disposed = false;
 
     static ENABLE_TRACKING = false;
@@ -198,13 +198,13 @@ export class Emitter<T> implements IDisposable {
 export function addDisposableListener<K extends keyof WindowEventMap>(
     element: Window,
     type: K,
-    listener: (this: Window, ev: WindowEventMap[K]) => any,
+    listener: (this: Window, ev: WindowEventMap[K]) => void,
     options?: boolean | AddEventListenerOptions
 ): IDisposable;
 export function addDisposableListener<K extends keyof HTMLElementEventMap>(
     element: HTMLElement,
     type: K,
-    listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+    listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => void,
     options?: boolean | AddEventListenerOptions
 ): IDisposable;
 export function addDisposableListener<
@@ -219,14 +219,14 @@ export function addDisposableListener<
             : K extends keyof WindowEventMap
             ? WindowEventMap[K]
             : never
-    ) => any,
+    ) => void,
     options?: boolean | AddEventListenerOptions
 ): IDisposable {
-    element.addEventListener(type, <any>listener, options);
+    element.addEventListener(type, listener as EventListener, options);
 
     return {
         dispose: () => {
-            element.removeEventListener(type, <any>listener, options);
+            element.removeEventListener(type, listener as EventListener, options);
         },
     };
 }

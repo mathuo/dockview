@@ -12,12 +12,12 @@ export interface ReactPortalStore {
 }
 
 interface IPanelWrapperProps {
-    component: React.FunctionComponent<{ [key: string]: any }>;
-    componentProps: { [key: string]: any };
+    component: React.FunctionComponent<Parameters>;
+    componentProps: Parameters;
 }
 
 interface IPanelWrapperRef {
-    update: (props: { [key: string]: any }) => void;
+    update: (props: Parameters) => void;
 }
 
 /**
@@ -89,7 +89,7 @@ export class ReactPart<P extends object, C extends object = {}>
         this.createPortal();
     }
 
-    public update(props: { [index: string]: any }) {
+    public update(props: Parameters) {
         if (this.disposed) {
             throw new Error('invalid operation: resource is already disposed');
         }
@@ -193,7 +193,7 @@ export const usePortalsLifecycle: PortalLifecycleHook = () => {
     return [portals, addPortal];
 };
 
-export function isReactComponent(component: any): boolean {
+export function isReactComponent(component: unknown): boolean {
     /**
      * Yes, we could use "react-is" but that would introduce an unwanted peer dependency
      * so for now we will check in a rather crude fashion...

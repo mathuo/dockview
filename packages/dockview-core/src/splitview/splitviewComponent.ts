@@ -23,7 +23,7 @@ export interface SerializedSplitviewPanelData {
     component: string;
     minimumSize?: number;
     maximumSize?: number;
-    params?: { [index: string]: any };
+    params?: Parameters;
 }
 
 export interface SerializedSplitviewPanel {

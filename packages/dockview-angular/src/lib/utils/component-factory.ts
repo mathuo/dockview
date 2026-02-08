@@ -16,13 +16,13 @@ import { AngularPanePart } from '../paneview/angular-pane-part';
 
 export class AngularFrameworkComponentFactory {
     constructor(
-        private components: Record<string, Type<any>>,
+        private components: Record<string, Type<unknown>>,
         private injector: Injector,
         private environmentInjector?: EnvironmentInjector,
-        private tabComponents?: Record<string, Type<any>>,
-        private watermarkComponent?: Type<any>,
-        private headerActionsComponents?: Record<string, Type<any>>,
-        private defaultTabComponent?: Type<any>
+        private tabComponents?: Record<string, Type<unknown>>,
+        private watermarkComponent?: Type<unknown>,
+        private headerActionsComponents?: Record<string, Type<unknown>>,
+        private defaultTabComponent?: Type<unknown>
     ) {}
 
     // For DockviewComponent

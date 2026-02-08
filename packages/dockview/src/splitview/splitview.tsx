@@ -6,17 +6,17 @@ import {
     SplitviewOptions,
     PROPERTY_KEYS_SPLITVIEW,
     SplitviewFrameworkOptions,
-    SplitviewComponentOptions,
 } from 'dockview-core';
 import { usePortalsLifecycle } from '../react';
 import { PanelParameters } from '../types';
+import { Parameters } from 'dockview-core';
 import { ReactPanelView } from './view';
 
 export interface SplitviewReadyEvent {
     api: SplitviewApi;
 }
 
-export interface ISplitviewPanelProps<T extends { [index: string]: any } = any>
+export interface ISplitviewPanelProps<T extends Parameters = Parameters>
     extends PanelParameters<T> {
     api: SplitviewPanelApi;
     containerApi: SplitviewApi;
@@ -28,12 +28,12 @@ export interface ISplitviewReactProps extends SplitviewOptions {
 }
 
 function extractCoreOptions(props: ISplitviewReactProps): SplitviewOptions {
-    const coreOptions = PROPERTY_KEYS_SPLITVIEW.reduce((obj, key) => {
+    const coreOptions = PROPERTY_KEYS_SPLITVIEW.reduce<Partial<SplitviewOptions>>((obj, key) => {
         if (key in props) {
-            obj[key] = props[key] as any;
+            (obj as Record<string, unknown>)[key] = props[key];
         }
         return obj;
-    }, {} as Partial<SplitviewComponentOptions>);
+    }, {});
 
     return coreOptions as SplitviewOptions;
 }
@@ -57,7 +57,7 @@ export const SplitviewReact = React.forwardRef(
                     const propValue = props[key];
 
                     if (key in props && propValue !== prevProps.current[key]) {
-                        changes[key] = propValue as any;
+                        (changes as Record<string, unknown>)[key] = propValue;
                     }
                 });
 

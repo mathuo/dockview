@@ -60,7 +60,7 @@ import {
 import { SplitviewComponentOptions } from '../splitview/options';
 import { GridviewComponentOptions } from '../gridview/options';
 
-export interface CommonApi<T = any> {
+export interface CommonApi<T = object> {
     readonly height: number;
     readonly width: number;
     readonly onDidLayoutChange: Event<void>;

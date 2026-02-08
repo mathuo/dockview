@@ -96,7 +96,7 @@ export class DragAndDropObserver extends CompositeDisposable {
 
 export interface IDraggedCompositeData {
     eventData: DragEvent;
-    dragAndDropData: any;
+    dragAndDropData: unknown;
 }
 
 export interface ICompositeDragAndDropObserverCallbacks {
