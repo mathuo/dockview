@@ -1,0 +1,59 @@
+{
+    "$schema": "./node_modules/nx/schemas/nx-schema.json",
+    "namedInputs": {
+        "default": ["{projectRoot}/**/*", "sharedGlobals"],
+        "sharedGlobals": ["{workspaceRoot}/tsconfig.base.json"],
+        "production": [
+            "default",
+            "!{projectRoot}/src/__tests__/**/*",
+            "!{projectRoot}/jest.config.ts",
+            "!{projectRoot}/**/*.spec.ts",
+            "!{projectRoot}/**/*.test.ts"
+        ]
+    },
+    "targetDefaults": {
+        "build": {
+            "dependsOn": ["^build"],
+            "inputs": ["production", "^production"],
+            "outputs": ["{projectRoot}/dist"],
+            "cache": true
+        },
+        "build:bundle": {
+            "dependsOn": ["build"],
+            "inputs": ["production", "^production"],
+            "outputs": ["{projectRoot}/dist"],
+            "cache": true
+        },
+        "test": {
+            "dependsOn": ["^build"],
+            "inputs": ["default", "^production"],
+            "cache": true
+        },
+        "clean": {
+            "cache": false
+        }
+    },
+    "release": {
+        "projects": [
+            "dockview-core",
+            "dockview",
+            "dockview-vue",
+            "dockview-react",
+            "dockview-angular"
+        ],
+        "projectsRelationship": "fixed",
+        "version": {
+            "generatorOptions": {
+                "currentVersionSource": "git-tag",
+                "specifierSource": "prompt"
+            }
+        },
+        "git": {
+            "commit": true,
+            "commitMessage": "chore(release): publish {version}",
+            "tag": true
+        }
+    },
+    "defaultBase": "master",
+    "useInferencePlugins": false
+}

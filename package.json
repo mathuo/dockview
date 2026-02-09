@@ -16,15 +16,17 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "lerna run build --scope '{dockview-core,dockview,dockview-vue,dockview-react,dockview-angular}'",
-    "build:bundle": "lerna run build:bundle --scope '{dockview-core,dockview,dockview-vue,dockview-react,dockview-angular}'",
-    "clean": "lerna run clean",
+    "build": "nx run-many -t build --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular",
+    "build:bundle": "nx run-many -t build:bundle --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular",
+    "clean": "nx run-many -t clean",
     "docs": "typedoc && node scripts/docs.mjs",
     "lint": "eslint 'packages/*/src/**/*.{ts,tsx,js,jsx}'",
     "lint:fix": "eslint 'packages/*/src/**/*.{ts,tsx,js,jsx}' --fix",
-    "test": "jest --passWithNoTests",
+    "test": "nx run-many -t test",
     "test:cov": "jest --coverage --passWithNoTests",
-    "version": "lerna version"
+    "release": "nx release",
+    "release:version": "nx release version",
+    "release:publish": "nx release publish"
   },
   "resolutions": {
     "@types/react": "^18.2.46",
@@ -62,7 +64,8 @@
     "jest-environment-jsdom": "^29.7.0",
     "jest-sonar-reporter": "^2.0.0",
     "jsdom": "^23.0.1",
-    "lerna": "^8.2.1",
+    "nx": "^20.4.0",
+    "@nx/js": "^20.4.0",
     "ng-packagr": "^17.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
