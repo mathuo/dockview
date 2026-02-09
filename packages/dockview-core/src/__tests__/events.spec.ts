@@ -44,24 +44,6 @@ describe('events', () => {
             expect(value).toBeUndefined();
         });
 
-        it('should stop emitting after dispose', () => {
-            const emitter = new Emitter<number>();
-            let value: number | undefined = undefined;
-
-            const stream = emitter.event((x) => {
-                value = x;
-            });
-
-            emitter.fire(0);
-            expect(value).toBe(0);
-
-            stream.dispose();
-
-            value = undefined;
-            emitter.fire(1);
-            expect(value).toBeUndefined();
-        });
-
         it('should replay last value in replay mode', () => {
             const emitter = new Emitter<number>({ replay: true });
             let value: number | undefined = undefined;
@@ -76,7 +58,7 @@ describe('events', () => {
             stream.dispose();
         });
 
-        it('should not replay last value in replay mode', () => {
+        it('should not replay last value when not in replay mode', () => {
             const emitter = new Emitter<number>();
             let value: number | undefined = undefined;
 
@@ -283,5 +265,90 @@ describe('events', () => {
             handler,
             undefined
         );
+    });
+
+    describe('pausing and resuming events', () => {
+        it('should not fire events when paused', () => {
+            const emitter = new Emitter<number>();
+            let value: number | undefined = undefined;
+
+            const stream = emitter.event((x) => {
+                value = x;
+            });
+
+            const pauseDisposable = emitter.pauseEvents();
+
+            emitter.fire(0);
+            expect(value).toBeUndefined();
+
+            emitter.fire(1);
+            expect(value).toBeUndefined();
+
+            pauseDisposable.dispose();
+            stream.dispose();
+        });
+
+        it('should fire events fired after resuming', () => {
+            const emitter = new Emitter<number>();
+            let value: number | undefined = undefined;
+
+            const stream = emitter.event((x) => {
+                value = x;
+            });
+
+            const pauseDisposable = emitter.pauseEvents();
+
+            emitter.fire(0);
+            expect(value).toBeUndefined();
+
+            pauseDisposable.dispose();
+
+            emitter.fire(1);
+            expect(value).toBe(1);
+
+            stream.dispose();
+        });
+
+        it('should not replay values fired while paused when in replay mode', () => {
+            const emitter = new Emitter<number>({ replay: true });
+            let value: number | undefined = undefined;
+
+            const pauseDisposable = emitter.pauseEvents();
+
+            emitter.fire(1);
+
+            const stream = emitter.event((x) => {
+                value = x;
+            });
+            expect(value).toBeUndefined();
+
+            pauseDisposable.dispose();
+            stream.dispose();
+        });
+
+        it('should allow multiple pause tokens to each pause event emissions', () => {
+            const emitter = new Emitter<number>();
+            let value: number | undefined = undefined;
+
+            const stream = emitter.event((x) => {
+                value = x;
+            });
+
+            const pauseDisposable1 = emitter.pauseEvents();
+            const pauseDisposable2 = emitter.pauseEvents();
+
+            emitter.fire(0);
+            expect(value).toBeUndefined();
+
+            pauseDisposable1.dispose();
+            emitter.fire(1);
+            expect(value).toBeUndefined();
+
+            pauseDisposable2.dispose();
+            emitter.fire(2);
+            expect(value).toBe(2);
+
+            stream.dispose();
+        });
     });
 });
