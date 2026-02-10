@@ -54,12 +54,12 @@
             "generatorOptions": {
                 "currentVersionSource": "git-tag",
                 "specifierSource": "prompt"
+            },
+            "git": {
+                "commit": true,
+                "commitMessage": "chore(release): publish {version}",
+                "tag": true
             }
-        },
-        "git": {
-            "commit": true,
-            "commitMessage": "chore(release): publish {version}",
-            "tag": true
         }
     },
     "defaultBase": "master",
