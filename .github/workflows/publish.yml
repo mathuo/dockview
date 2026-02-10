@@ -62,5 +62,5 @@ jobs:
             - run: yarn
             - run: npx nx run-many -t build --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
             - run: npx nx run-many -t build:bundle --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
-            - run: npx nx release version 0.0.0-experimental-$(git rev-parse --short HEAD)-$(date +%Y%m%d) --skip-lockfile-update --git-commit=false --git-tag=false
+            - run: npx nx release version 0.0.0-experimental-$(git rev-parse --short HEAD)-$(date +%Y%m%d) --git-commit=false --git-tag=false
             - run: npx nx release publish --tag experimental ${{ inputs.dry-run && '--dry-run' || '' }}
