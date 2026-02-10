@@ -2,8 +2,7 @@
   "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
   "dest": "dist",
   "lib": {
-    "entryFile": "src/public-api.ts",
-    "tsConfig": "tsconfig.lib.json"
+    "entryFile": "src/public-api.ts"
   },
   "allowedNonPeerDependencies": [
     "dockview-core"
