@@ -12,7 +12,10 @@ export class DockviewFloatingGroupPanel
     extends CompositeDisposable
     implements IDockviewFloatingGroupPanel
 {
-    constructor(readonly group: DockviewGroupPanel, readonly overlay: Overlay) {
+    constructor(
+        readonly group: DockviewGroupPanel,
+        readonly overlay: Overlay
+    ) {
         super();
         this.addDisposables(overlay);
     }

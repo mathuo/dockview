@@ -26,17 +26,12 @@ export class VuePaneviewPanelView implements IPanePart {
     }
 
     public init(parameters: PanePanelComponentInitParameter): void {
-        this.part = new VuePart(
-            this.element,
-            this.vueComponent,
-            this.parent,
-            {
-                params: parameters.params,
-                api: parameters.api,
-                title: parameters.title,
-                containerApi: parameters.containerApi,
-            }
-        );
+        this.part = new VuePart(this.element, this.vueComponent, this.parent, {
+            params: parameters.params,
+            api: parameters.api,
+            title: parameters.title,
+            containerApi: parameters.containerApi,
+        });
         this.part.init();
     }
 

@@ -73,7 +73,10 @@ export class DropTargetAnchorContainer extends CompositeDisposable {
         };
     }
 
-    constructor(readonly element: HTMLElement, options: { disabled: boolean }) {
+    constructor(
+        readonly element: HTMLElement,
+        options: { disabled: boolean }
+    ) {
         super();
 
         this._disabled = options.disabled;

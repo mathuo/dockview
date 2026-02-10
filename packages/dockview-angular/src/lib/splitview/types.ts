@@ -1,8 +1,5 @@
 import { Type } from '@angular/core';
-import {
-    SplitviewOptions,
-    SplitviewApi
-} from 'dockview-core';
+import { SplitviewOptions, SplitviewApi } from 'dockview-core';
 
 export interface SplitviewAngularReadyEvent {
     api: SplitviewApi;
@@ -17,7 +14,4 @@ export interface SplitviewAngularEvents {
 }
 
 // Re-export commonly used types from dockview-core
-export {
-    SplitviewApi,
-    SplitviewOptions
-} from 'dockview-core';
+export { SplitviewApi, SplitviewOptions } from 'dockview-core';

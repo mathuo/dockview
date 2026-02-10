@@ -891,7 +891,9 @@ describe('tabsContainer', () => {
             cut.updateDragAndDropState();
 
             expect(mockTabs.updateDragAndDropState).toHaveBeenCalledTimes(1);
-            expect(mockVoidContainer.updateDragAndDropState).toHaveBeenCalledTimes(1);
+            expect(
+                mockVoidContainer.updateDragAndDropState
+            ).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -926,25 +928,25 @@ describe('tabsContainer', () => {
                         element: (() => {
                             const tabElement = document.createElement('div');
                             tabElement.className = 'dv-default-tab';
-                            
+
                             const content = document.createElement('div');
                             content.className = 'dv-default-tab-content';
                             content.textContent = 'Test Tab';
-                            
+
                             const action = document.createElement('div');
                             action.className = 'dv-default-tab-action';
                             const closeButton = document.createElement('div');
                             action.appendChild(closeButton);
-                            
+
                             // Simulate close button functionality
                             action.addEventListener('click', (e) => {
                                 e.preventDefault();
                                 mockClose();
                             });
-                            
+
                             tabElement.appendChild(content);
                             tabElement.appendChild(action);
-                            
+
                             return tabElement;
                         })(),
                     }),
@@ -990,7 +992,9 @@ describe('tabsContainer', () => {
             (cut as any).toggleDropdown({ tabs: ['test-panel'], reset: false });
 
             // Find the dropdown trigger and click it
-            const dropdownTrigger = cut.element.querySelector('.dv-tabs-overflow-dropdown-root');
+            const dropdownTrigger = cut.element.querySelector(
+                '.dv-tabs-overflow-dropdown-root'
+            );
             expect(dropdownTrigger).toBeTruthy();
 
             // Simulate clicking the dropdown trigger
@@ -1000,7 +1004,8 @@ describe('tabsContainer', () => {
             expect(mockPopupService.openPopover).toHaveBeenCalled();
 
             // Get the popover content
-            const popoverContent = mockPopupService.openPopover.mock.calls[0][0];
+            const popoverContent =
+                mockPopupService.openPopover.mock.calls[0][0];
             expect(popoverContent).toBeTruthy();
 
             // Find the tab wrapper in the popover
@@ -1008,7 +1013,9 @@ describe('tabsContainer', () => {
             expect(tabWrapper).toBeTruthy();
 
             // Verify the close button is visible in dropdown
-            const closeButton = tabWrapper!.querySelector('.dv-default-tab-action') as HTMLElement;
+            const closeButton = tabWrapper!.querySelector(
+                '.dv-default-tab-action'
+            ) as HTMLElement;
             expect(closeButton).toBeTruthy();
             expect(closeButton.style.display).not.toBe('none');
 
@@ -1053,25 +1060,25 @@ describe('tabsContainer', () => {
                         element: (() => {
                             const tabElement = document.createElement('div');
                             tabElement.className = 'dv-default-tab';
-                            
+
                             const content = document.createElement('div');
                             content.className = 'dv-default-tab-content';
                             content.textContent = 'Test Tab';
-                            
+
                             const action = document.createElement('div');
                             action.className = 'dv-default-tab-action';
                             const closeButton = document.createElement('div');
                             action.appendChild(closeButton);
-                            
+
                             // Simulate close button functionality
                             action.addEventListener('click', (e) => {
                                 e.preventDefault();
                                 mockClose();
                             });
-                            
+
                             tabElement.appendChild(content);
                             tabElement.appendChild(action);
-                            
+
                             return tabElement;
                         })(),
                     }),
@@ -1117,18 +1124,23 @@ describe('tabsContainer', () => {
             (cut as any).toggleDropdown({ tabs: ['test-panel'], reset: false });
 
             // Find the dropdown trigger and click it
-            const dropdownTrigger = cut.element.querySelector('.dv-tabs-overflow-dropdown-root');
+            const dropdownTrigger = cut.element.querySelector(
+                '.dv-tabs-overflow-dropdown-root'
+            );
             expect(dropdownTrigger).toBeTruthy();
 
             // Simulate clicking the dropdown trigger
             fireEvent.click(dropdownTrigger!);
 
             // Get the popover content
-            const popoverContent = mockPopupService.openPopover.mock.calls[0][0];
+            const popoverContent =
+                mockPopupService.openPopover.mock.calls[0][0];
             const tabWrapper = popoverContent.querySelector('.dv-tab');
-            
+
             // Simulate clicking the tab content (not the close button)
-            const tabContent = tabWrapper!.querySelector('.dv-default-tab-content');
+            const tabContent = tabWrapper!.querySelector(
+                '.dv-default-tab-content'
+            );
             fireEvent.click(tabContent!);
 
             // Verify that tab activation methods were called
@@ -1170,25 +1182,25 @@ describe('tabsContainer', () => {
                         element: (() => {
                             const tabElement = document.createElement('div');
                             tabElement.className = 'dv-default-tab';
-                            
+
                             const content = document.createElement('div');
                             content.className = 'dv-default-tab-content';
                             content.textContent = 'Test Tab';
-                            
+
                             const action = document.createElement('div');
                             action.className = 'dv-default-tab-action';
                             const closeButton = document.createElement('div');
                             action.appendChild(closeButton);
-                            
+
                             // Simulate close button functionality that prevents default
                             action.addEventListener('click', (e) => {
                                 e.preventDefault();
                                 mockClose();
                             });
-                            
+
                             tabElement.appendChild(content);
                             tabElement.appendChild(action);
-                            
+
                             return tabElement;
                         })(),
                     }),
@@ -1234,13 +1246,18 @@ describe('tabsContainer', () => {
             (cut as any).toggleDropdown({ tabs: ['test-panel'], reset: false });
 
             // Find the dropdown trigger and click it
-            const dropdownTrigger = cut.element.querySelector('.dv-tabs-overflow-dropdown-root');
+            const dropdownTrigger = cut.element.querySelector(
+                '.dv-tabs-overflow-dropdown-root'
+            );
             fireEvent.click(dropdownTrigger!);
 
             // Get the popover content
-            const popoverContent = mockPopupService.openPopover.mock.calls[0][0];
+            const popoverContent =
+                mockPopupService.openPopover.mock.calls[0][0];
             const tabWrapper = popoverContent.querySelector('.dv-tab');
-            const closeButton = tabWrapper!.querySelector('.dv-default-tab-action');
+            const closeButton = tabWrapper!.querySelector(
+                '.dv-default-tab-action'
+            );
 
             // Simulate clicking the close button (which calls preventDefault)
             fireEvent.click(closeButton!);

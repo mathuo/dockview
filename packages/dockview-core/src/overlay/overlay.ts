@@ -30,9 +30,8 @@ class AriaLevelTracker {
     private update(): void {
         for (let i = 0; i < this._orderedList.length; i++) {
             this._orderedList[i].setAttribute('aria-level', `${i}`);
-            this._orderedList[
-                i
-            ].style.zIndex = `calc(var(--dv-overlay-z-index, 999) + ${i * 2})`;
+            this._orderedList[i].style.zIndex =
+                `calc(var(--dv-overlay-z-index, 999) + ${i * 2})`;
         }
     }
 }

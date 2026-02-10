@@ -5,13 +5,9 @@ import {
     EmbeddedViewRef,
     createComponent,
     EnvironmentInjector,
-    ApplicationRef
+    ApplicationRef,
 } from '@angular/core';
-import {
-    IContentRenderer,
-    IFrameworkPart,
-    Parameters
-} from 'dockview-core';
+import { IContentRenderer, IFrameworkPart, Parameters } from 'dockview-core';
 
 export interface AngularRendererOptions {
     component: Type<any>;
@@ -24,9 +20,7 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
     private _element: HTMLElement | null = null;
     private appRef: ApplicationRef;
 
-    constructor(
-        private options: AngularRendererOptions
-    ) {
+    constructor(private options: AngularRendererOptions) {
         this.appRef = options.injector.get(ApplicationRef);
     }
 
@@ -37,8 +31,7 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
         return this._element;
     }
 
-    get component(): ComponentRef<any> | null
-    {
+    get component(): ComponentRef<any> | null {
         return this.componentRef;
     }
 
@@ -52,8 +45,7 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
     }
 
     update(params: Parameters): void {
-        if (!this.componentRef)
-        {
+        if (!this.componentRef) {
             return;
         }
 
@@ -72,8 +64,10 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
         try {
             // Create the component using modern Angular API
             this.componentRef = createComponent(this.options.component, {
-                environmentInjector: this.options.environmentInjector || this.options.injector as EnvironmentInjector,
-                elementInjector: this.options.injector
+                environmentInjector:
+                    this.options.environmentInjector ||
+                    (this.options.injector as EnvironmentInjector),
+                elementInjector: this.options.injector,
             });
 
             // Set initial parameters

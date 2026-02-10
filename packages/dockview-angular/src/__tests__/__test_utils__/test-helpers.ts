@@ -36,7 +36,9 @@ export function setupTestBed() {
     });
 }
 
-export function createComponentFixture<T>(component: Type<T>): ComponentFixture<T> {
+export function createComponentFixture<T>(
+    component: Type<T>
+): ComponentFixture<T> {
     return TestBed.createComponent(component);
 }
 

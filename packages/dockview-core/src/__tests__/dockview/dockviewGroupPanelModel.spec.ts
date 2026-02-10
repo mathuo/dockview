@@ -187,7 +187,10 @@ export class TestPanel implements IDockviewPanel {
         return {};
     }
 
-    constructor(public readonly id: string, public api: DockviewPanelApi) {
+    constructor(
+        public readonly id: string,
+        public api: DockviewPanelApi
+    ) {
         this.view = new TestModel(id);
         this.init({
             title: `${id}`,

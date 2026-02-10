@@ -15,11 +15,14 @@ export interface ViewComponentConfig<
     TProps,
     TEvents,
     TView,
-    TFrameworkOptions
+    TFrameworkOptions,
 > {
     componentName: string;
     propertyKeys: readonly (keyof TOptions)[];
-    createApi: (element: HTMLElement, options: TOptions & TFrameworkOptions) => TApi;
+    createApi: (
+        element: HTMLElement,
+        options: TOptions & TFrameworkOptions
+    ) => TApi;
     createView: (
         id: string,
         name: string | undefined,
@@ -30,14 +33,25 @@ export interface ViewComponentConfig<
 }
 
 export function useViewComponent<
-    TApi extends { dispose(): void; updateOptions(options: Partial<TOptions>): void; layout(width: number, height: number): void },
+    TApi extends {
+        dispose(): void;
+        updateOptions(options: Partial<TOptions>): void;
+        layout(width: number, height: number): void;
+    },
     TOptions,
     TProps,
     TEvents,
     TView,
-    TFrameworkOptions
+    TFrameworkOptions,
 >(
-    config: ViewComponentConfig<TApi, TOptions, TProps, TEvents, TView, TFrameworkOptions>,
+    config: ViewComponentConfig<
+        TApi,
+        TOptions,
+        TProps,
+        TEvents,
+        TView,
+        TFrameworkOptions
+    >,
     props: TProps,
     emit: (event: 'ready', payload: { api: TApi }) => void
 ) {
@@ -49,7 +63,9 @@ export function useViewComponent<
             () => (props as any)[coreOptionKey],
             (newValue) => {
                 if (instance.value) {
-                    instance.value.updateOptions({ [coreOptionKey]: newValue } as Partial<TOptions>);
+                    instance.value.updateOptions({
+                        [coreOptionKey]: newValue,
+                    } as Partial<TOptions>);
                 }
             }
         );
@@ -61,11 +77,16 @@ export function useViewComponent<
             if (instance.value) {
                 const inst = getCurrentInstance();
                 if (!inst) {
-                    throw new Error(`${config.componentName}: getCurrentInstance() returned null`);
+                    throw new Error(
+                        `${config.componentName}: getCurrentInstance() returned null`
+                    );
                 }
 
                 instance.value.updateOptions({
-                    createComponent: (options: { id: string; name?: string }) => {
+                    createComponent: (options: {
+                        id: string;
+                        name?: string;
+                    }) => {
                         const component = findComponent(inst, options.name!);
                         return config.createView(
                             options.id,
@@ -87,7 +108,9 @@ export function useViewComponent<
         const inst = getCurrentInstance();
 
         if (!inst) {
-            throw new Error(`${config.componentName}: getCurrentInstance() returned null`);
+            throw new Error(
+                `${config.componentName}: getCurrentInstance() returned null`
+            );
         }
 
         const frameworkOptions = {

@@ -81,10 +81,10 @@ describe('AngularFrameworkComponentFactory', () => {
                 TestHeaderActionsComponent,
             ],
         }).compileComponents();
-        
+
         injector = TestBed.inject(Injector);
         environmentInjector = TestBed.inject(EnvironmentInjector);
-        
+
         factory = new AngularFrameworkComponentFactory(
             components,
             injector,
@@ -104,11 +104,11 @@ describe('AngularFrameworkComponentFactory', () => {
         it('should create dockview component successfully', () => {
             const options: CreateComponentOptions = {
                 id: 'test-id',
-                name: 'dockview-test'
+                name: 'dockview-test',
             };
 
             const renderer = factory.createDockviewComponent(options);
-            
+
             expect(renderer).toBeDefined();
             expect(renderer.element).toBeTruthy();
             expect(renderer.element.tagName).toBe('TEST-DOCKVIEW-COMPONENT');
@@ -117,12 +117,14 @@ describe('AngularFrameworkComponentFactory', () => {
         it('should throw error for unknown component', () => {
             const options: CreateComponentOptions = {
                 id: 'test-id',
-                name: 'unknown-component'
+                name: 'unknown-component',
             };
 
             expect(() => {
                 factory.createDockviewComponent(options);
-            }).toThrow("Component 'unknown-component' not found in component registry");
+            }).toThrow(
+                "Component 'unknown-component' not found in component registry"
+            );
         });
     });
 
@@ -130,11 +132,11 @@ describe('AngularFrameworkComponentFactory', () => {
         it('should create gridview component successfully', () => {
             const options: CreateComponentOptions = {
                 id: 'test-id',
-                name: 'gridview-test'
+                name: 'gridview-test',
             };
 
             const panel = factory.createGridviewComponent(options);
-            
+
             expect(panel).toBeDefined();
             expect(panel.id).toBe('test-id');
         });
@@ -142,12 +144,14 @@ describe('AngularFrameworkComponentFactory', () => {
         it('should throw error for unknown component', () => {
             const options: CreateComponentOptions = {
                 id: 'test-id',
-                name: 'unknown-component'
+                name: 'unknown-component',
             };
 
             expect(() => {
                 factory.createGridviewComponent(options);
-            }).toThrow("Component 'unknown-component' not found in component registry");
+            }).toThrow(
+                "Component 'unknown-component' not found in component registry"
+            );
         });
     });
 
@@ -155,11 +159,11 @@ describe('AngularFrameworkComponentFactory', () => {
         it('should create splitview component successfully', () => {
             const options: CreateComponentOptions = {
                 id: 'test-id',
-                name: 'splitview-test'
+                name: 'splitview-test',
             };
 
             const panel = factory.createSplitviewComponent(options);
-            
+
             expect(panel).toBeDefined();
             expect(panel.id).toBe('test-id');
         });
@@ -167,12 +171,14 @@ describe('AngularFrameworkComponentFactory', () => {
         it('should throw error for unknown component', () => {
             const options: CreateComponentOptions = {
                 id: 'test-id',
-                name: 'unknown-component'
+                name: 'unknown-component',
             };
 
             expect(() => {
                 factory.createSplitviewComponent(options);
-            }).toThrow("Component 'unknown-component' not found in component registry");
+            }).toThrow(
+                "Component 'unknown-component' not found in component registry"
+            );
         });
     });
 
@@ -180,23 +186,25 @@ describe('AngularFrameworkComponentFactory', () => {
         it('should create paneview component successfully', () => {
             const options: CreateComponentOptions = {
                 id: 'test-id',
-                name: 'paneview-test'
+                name: 'paneview-test',
             };
 
             const part = factory.createPaneviewComponent(options);
-            
+
             expect(part).toBeDefined();
         });
 
         it('should throw error for unknown component', () => {
             const options: CreateComponentOptions = {
                 id: 'test-id',
-                name: 'unknown-component'
+                name: 'unknown-component',
             };
 
             expect(() => {
                 factory.createPaneviewComponent(options);
-            }).toThrow("Component 'unknown-component' not found in component registry");
+            }).toThrow(
+                "Component 'unknown-component' not found in component registry"
+            );
         });
     });
 
@@ -204,11 +212,11 @@ describe('AngularFrameworkComponentFactory', () => {
         it('should create tab component successfully', () => {
             const options: CreateComponentOptions = {
                 id: 'test-id',
-                name: 'tab-test'
+                name: 'tab-test',
             };
 
             const renderer = factory.createTabComponent(options);
-            
+
             expect(renderer).toBeDefined();
             expect(renderer!.element).toBeTruthy();
             expect(renderer!.element.tagName).toBe('TEST-TAB-COMPONENT');
@@ -217,11 +225,11 @@ describe('AngularFrameworkComponentFactory', () => {
         it('should use default tab component when specific component not found', () => {
             const options: CreateComponentOptions = {
                 id: 'test-id',
-                name: 'unknown-tab'
+                name: 'unknown-tab',
             };
 
             const renderer = factory.createTabComponent(options);
-            
+
             expect(renderer).toBeDefined();
             expect(renderer!.element).toBeTruthy();
             expect(renderer!.element.tagName).toBe('TEST-TAB-COMPONENT');
@@ -237,11 +245,11 @@ describe('AngularFrameworkComponentFactory', () => {
 
             const options: CreateComponentOptions = {
                 id: 'test-id',
-                name: 'unknown-tab'
+                name: 'unknown-tab',
             };
 
             const renderer = factoryWithoutDefault.createTabComponent(options);
-            
+
             expect(renderer).toBeUndefined();
         });
     });
@@ -249,18 +257,19 @@ describe('AngularFrameworkComponentFactory', () => {
     describe('createWatermarkComponent', () => {
         it('should create watermark component successfully', () => {
             const renderer = factory.createWatermarkComponent();
-            
+
             expect(renderer).toBeDefined();
             expect(renderer.element).toBeTruthy();
             expect(renderer.element.tagName).toBe('TEST-WATERMARK-COMPONENT');
         });
 
         it('should throw error when no watermark component provided', () => {
-            const factoryWithoutWatermark = new AngularFrameworkComponentFactory(
-                components,
-                injector,
-                environmentInjector
-            );
+            const factoryWithoutWatermark =
+                new AngularFrameworkComponentFactory(
+                    components,
+                    injector,
+                    environmentInjector
+                );
 
             expect(() => {
                 factoryWithoutWatermark.createWatermarkComponent();
@@ -270,28 +279,36 @@ describe('AngularFrameworkComponentFactory', () => {
 
     describe('createHeaderActionsComponent', () => {
         it('should create header actions component successfully', () => {
-            const renderer = factory.createHeaderActionsComponent('header-test');
-            
+            const renderer =
+                factory.createHeaderActionsComponent('header-test');
+
             expect(renderer).toBeDefined();
             expect(renderer!.element).toBeTruthy();
-            expect(renderer!.element.tagName).toBe('TEST-HEADER-ACTIONS-COMPONENT');
+            expect(renderer!.element.tagName).toBe(
+                'TEST-HEADER-ACTIONS-COMPONENT'
+            );
         });
 
         it('should return undefined for unknown component', () => {
-            const renderer = factory.createHeaderActionsComponent('unknown-header');
-            
+            const renderer =
+                factory.createHeaderActionsComponent('unknown-header');
+
             expect(renderer).toBeUndefined();
         });
 
         it('should return undefined when no header actions components provided', () => {
-            const factoryWithoutHeaderActions = new AngularFrameworkComponentFactory(
-                components,
-                injector,
-                environmentInjector
-            );
+            const factoryWithoutHeaderActions =
+                new AngularFrameworkComponentFactory(
+                    components,
+                    injector,
+                    environmentInjector
+                );
 
-            const renderer = factoryWithoutHeaderActions.createHeaderActionsComponent('test');
-            
+            const renderer =
+                factoryWithoutHeaderActions.createHeaderActionsComponent(
+                    'test'
+                );
+
             expect(renderer).toBeUndefined();
         });
     });
@@ -300,11 +317,11 @@ describe('AngularFrameworkComponentFactory', () => {
         it('should delegate to createDockviewComponent', () => {
             const options: CreateComponentOptions = {
                 id: 'test-id',
-                name: 'dockview-test'
+                name: 'dockview-test',
             };
 
             const renderer = factory.createComponent(options);
-            
+
             expect(renderer).toBeDefined();
             expect(renderer.element).toBeTruthy();
             expect(renderer.element.tagName).toBe('TEST-DOCKVIEW-COMPONENT');
@@ -315,11 +332,11 @@ describe('AngularFrameworkComponentFactory', () => {
         it('should pass options to dockview component', () => {
             const options: CreateComponentOptions = {
                 id: 'test-id',
-                name: 'dockview-test'
+                name: 'dockview-test',
             };
 
             const renderer = factory.createDockviewComponent(options);
-            
+
             expect(renderer).toBeDefined();
             expect(renderer.element).toBeTruthy();
         });
@@ -327,11 +344,11 @@ describe('AngularFrameworkComponentFactory', () => {
         it('should pass options to tab component', () => {
             const options: CreateComponentOptions = {
                 id: 'test-id',
-                name: 'tab-test'
+                name: 'tab-test',
             };
 
             const renderer = factory.createTabComponent(options);
-            
+
             expect(renderer).toBeDefined();
             expect(renderer!.element).toBeTruthy();
         });
@@ -341,11 +358,11 @@ describe('AngularFrameworkComponentFactory', () => {
         it('should dispose components correctly', () => {
             const options: CreateComponentOptions = {
                 id: 'test-id',
-                name: 'dockview-test'
+                name: 'dockview-test',
             };
 
             const renderer = factory.createDockviewComponent(options);
-            
+
             expect(renderer).toBeDefined();
             expect(renderer).toHaveProperty('dispose');
             expect(() => {
@@ -356,11 +373,11 @@ describe('AngularFrameworkComponentFactory', () => {
         it('should handle multiple disposals', () => {
             const options: CreateComponentOptions = {
                 id: 'test-id',
-                name: 'dockview-test'
+                name: 'dockview-test',
             };
 
             const renderer = factory.createDockviewComponent(options);
-            
+
             expect(renderer).toBeDefined();
             expect(() => {
                 (renderer as any).dispose();

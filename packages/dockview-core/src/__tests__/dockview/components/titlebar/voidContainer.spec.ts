@@ -8,7 +8,7 @@ describe('voidContainer', () => {
     test('that `pointerDown` triggers activation', () => {
         const accessor = fromPartial<DockviewComponent>({
             doSetGroupActive: jest.fn(),
-            options: {}
+            options: {},
         });
         const group = fromPartial<DockviewGroupPanel>({});
         const cut = new VoidContainer(accessor, group);
@@ -22,7 +22,7 @@ describe('voidContainer', () => {
     describe('disableDnd option', () => {
         test('that void container is draggable by default (disableDnd not set)', () => {
             const accessor = fromPartial<DockviewComponent>({
-                options: {}
+                options: {},
             });
             const group = fromPartial<DockviewGroupPanel>({});
             const cut = new VoidContainer(accessor, group);
@@ -32,7 +32,7 @@ describe('voidContainer', () => {
 
         test('that void container is draggable when disableDnd is false', () => {
             const accessor = fromPartial<DockviewComponent>({
-                options: { disableDnd: false }
+                options: { disableDnd: false },
             });
             const group = fromPartial<DockviewGroupPanel>({});
             const cut = new VoidContainer(accessor, group);
@@ -42,7 +42,7 @@ describe('voidContainer', () => {
 
         test('that void container is not draggable when disableDnd is true', () => {
             const accessor = fromPartial<DockviewComponent>({
-                options: { disableDnd: true }
+                options: { disableDnd: true },
             });
             const group = fromPartial<DockviewGroupPanel>({});
             const cut = new VoidContainer(accessor, group);
@@ -53,7 +53,7 @@ describe('voidContainer', () => {
         test('that updateDragAndDropState updates draggable attribute based on disableDnd option', () => {
             const options = { disableDnd: false };
             const accessor = fromPartial<DockviewComponent>({
-                options
+                options,
             });
             const group = fromPartial<DockviewGroupPanel>({});
             const cut = new VoidContainer(accessor, group);
@@ -73,7 +73,7 @@ describe('voidContainer', () => {
 
         test('that void container has dv-draggable class when draggable', () => {
             const accessor = fromPartial<DockviewComponent>({
-                options: { disableDnd: false }
+                options: { disableDnd: false },
             });
             const group = fromPartial<DockviewGroupPanel>({});
             const cut = new VoidContainer(accessor, group);
@@ -83,7 +83,7 @@ describe('voidContainer', () => {
 
         test('that void container does not have dv-draggable class when not draggable', () => {
             const accessor = fromPartial<DockviewComponent>({
-                options: { disableDnd: true }
+                options: { disableDnd: true },
             });
             const group = fromPartial<DockviewGroupPanel>({});
             const cut = new VoidContainer(accessor, group);
@@ -94,7 +94,7 @@ describe('voidContainer', () => {
         test('that updateDragAndDropState updates dv-draggable class based on disableDnd option', () => {
             const options = { disableDnd: false };
             const accessor = fromPartial<DockviewComponent>({
-                options
+                options,
             });
             const group = fromPartial<DockviewGroupPanel>({});
             const cut = new VoidContainer(accessor, group);
@@ -114,12 +114,12 @@ describe('voidContainer', () => {
 
         test('that dragstart is prevented when disableDnd is true', () => {
             const accessor = fromPartial<DockviewComponent>({
-                options: { disableDnd: true }
+                options: { disableDnd: true },
             });
             const group = fromPartial<DockviewGroupPanel>({
                 api: {
-                    location: { type: 'grid' }
-                }
+                    location: { type: 'grid' },
+                },
             });
             const cut = new VoidContainer(accessor, group);
 
@@ -133,12 +133,12 @@ describe('voidContainer', () => {
 
         test('that dragstart is not prevented when disableDnd is false', () => {
             const accessor = fromPartial<DockviewComponent>({
-                options: { disableDnd: false }
+                options: { disableDnd: false },
             });
             const group = fromPartial<DockviewGroupPanel>({
                 api: {
-                    location: { type: 'grid' }
-                }
+                    location: { type: 'grid' },
+                },
             });
             const cut = new VoidContainer(accessor, group);
 
@@ -153,12 +153,12 @@ describe('voidContainer', () => {
         test('that updateDragAndDropState updates drag handler disabled state', () => {
             const options = { disableDnd: false };
             const accessor = fromPartial<DockviewComponent>({
-                options
+                options,
             });
             const group = fromPartial<DockviewGroupPanel>({
                 api: {
-                    location: { type: 'grid' }
-                }
+                    location: { type: 'grid' },
+                },
             });
             const cut = new VoidContainer(accessor, group);
 
@@ -189,12 +189,12 @@ describe('voidContainer', () => {
 
         test('that onDragStart is not fired when disableDnd is true', () => {
             const accessor = fromPartial<DockviewComponent>({
-                options: { disableDnd: true }
+                options: { disableDnd: true },
             });
             const group = fromPartial<DockviewGroupPanel>({
                 api: {
-                    location: { type: 'grid' }
-                }
+                    location: { type: 'grid' },
+                },
             });
             const cut = new VoidContainer(accessor, group);
 

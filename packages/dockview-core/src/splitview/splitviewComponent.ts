@@ -40,8 +40,9 @@ export interface SerializedSplitview {
     views: SerializedSplitviewPanel[];
 }
 
-export interface AddSplitviewComponentOptions<T extends Parameters = Parameters>
-    extends BaseComponentOptions<T> {
+export interface AddSplitviewComponentOptions<
+    T extends Parameters = Parameters,
+> extends BaseComponentOptions<T> {
     index?: number;
     minimumSize?: number;
     maximumSize?: number;

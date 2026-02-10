@@ -6,7 +6,11 @@ import {
     DockviewGroupLocation,
 } from '../dockview/dockviewGroupPanelModel';
 import { Emitter, Event } from '../events';
-import { GridviewPanelApi, GridviewPanelApiImpl, SizeEvent } from './gridviewPanelApi';
+import {
+    GridviewPanelApi,
+    GridviewPanelApiImpl,
+    SizeEvent,
+} from './gridviewPanelApi';
 
 export interface DockviewGroupMoveParams {
     group?: DockviewGroupPanel;
@@ -62,7 +66,10 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
         return this._group.model.location;
     }
 
-    constructor(id: string, private readonly accessor: DockviewComponent) {
+    constructor(
+        id: string,
+        private readonly accessor: DockviewComponent
+    ) {
         super(id, '__dockviewgroup__');
 
         this.addDisposables(
@@ -81,7 +88,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     public override setSize(event: SizeEvent): void {
         // Always store the requested size
         this._pendingSize = { ...event };
-        
+
         // Apply the size change immediately
         super.setSize(event);
     }
@@ -116,7 +123,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             to: {
                 group,
                 position: options.group
-                    ? options.position ?? 'center'
+                    ? (options.position ?? 'center')
                     : 'center',
                 index: options.index,
             },

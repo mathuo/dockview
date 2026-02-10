@@ -10,7 +10,11 @@ import {
     Event,
     IDockviewEvent,
 } from '../events';
-import { DockviewGroupDropLocation, DockviewWillShowOverlayLocationEvent, DockviewWillShowOverlayLocationEventOptions } from './events';
+import {
+    DockviewGroupDropLocation,
+    DockviewWillShowOverlayLocationEvent,
+    DockviewWillShowOverlayLocationEventOptions,
+} from './events';
 import { IViewSize } from '../gridview/gridview';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import {
@@ -141,7 +145,6 @@ export interface IHeader {
 
 export type DockviewGroupPanelLocked = boolean | 'no-drop-target';
 
-
 export interface IDockviewGroupPanelModel extends IPanel {
     readonly isActive: boolean;
     readonly size: number;
@@ -194,7 +197,6 @@ export type DockviewGroupLocation =
     | { type: 'grid' }
     | { type: 'floating' }
     | { type: 'popout'; getWindow: () => Window; popoutUrl?: string };
-
 
 export class DockviewGroupPanelModel
     extends CompositeDisposable

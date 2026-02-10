@@ -81,10 +81,7 @@ describe('tabs', () => {
             const mockTab2 = { updateDragAndDropState: jest.fn() };
 
             // Add mock tabs to the internal tabs array
-            (cut as any)._tabs = [
-                { value: mockTab1 },
-                { value: mockTab2 }
-            ];
+            (cut as any)._tabs = [{ value: mockTab1 }, { value: mockTab2 }];
 
             cut.updateDragAndDropState();
 

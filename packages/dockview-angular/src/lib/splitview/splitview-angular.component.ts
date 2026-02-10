@@ -13,7 +13,7 @@ import {
     OnChanges,
     SimpleChanges,
     EnvironmentInjector,
-    inject
+    inject,
 } from '@angular/core';
 import {
     SplitviewApi,
@@ -21,7 +21,7 @@ import {
     createSplitview,
     PROPERTY_KEYS_SPLITVIEW,
     SplitviewFrameworkOptions,
-    SplitviewComponentOptions
+    SplitviewComponentOptions,
 } from 'dockview-core';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
@@ -35,22 +35,24 @@ export interface SplitviewAngularOptions extends SplitviewOptions {
     selector: 'dv-splitview',
     standalone: true,
     template: '<div #splitviewContainer class="splitview-container"></div>',
-    styles: [`
-        :host {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
+    styles: [
+        `
+            :host {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
 
-        .splitview-container {
-            width: 100%;
-            height: 100%;
-        }
-    `],
-    changeDetection: ChangeDetectionStrategy.OnPush
+            .splitview-container {
+                width: 100%;
+                height: 100%;
+            }
+        `,
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SplitviewAngularComponent implements OnInit, OnDestroy, OnChanges {
-    @ViewChild('splitviewContainer', { static: true }) 
+    @ViewChild('splitviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
     @Input() components!: Record<string, Type<any>>;
@@ -87,7 +89,7 @@ export class SplitviewAngularComponent implements OnInit, OnDestroy, OnChanges {
             let hasChanges = false;
 
             // Check for changes in core splitview properties
-            PROPERTY_KEYS_SPLITVIEW.forEach(key => {
+            PROPERTY_KEYS_SPLITVIEW.forEach((key) => {
                 if (changes[key] && !changes[key].isFirstChange()) {
                     (coreChanges as any)[key] = changes[key].currentValue;
                     hasChanges = true;
@@ -106,19 +108,18 @@ export class SplitviewAngularComponent implements OnInit, OnDestroy, OnChanges {
 
     private initializeSplitview(): void {
         if (!this.components) {
-            throw new Error('SplitviewAngularComponent: components input is required');
+            throw new Error(
+                'SplitviewAngularComponent: components input is required'
+            );
         }
 
         const coreOptions = this.extractCoreOptions();
         const frameworkOptions = this.createFrameworkOptions();
 
-        this.splitviewApi = createSplitview(
-            this.containerRef.nativeElement,
-            {
-                ...coreOptions,
-                ...frameworkOptions
-            }
-        );
+        this.splitviewApi = createSplitview(this.containerRef.nativeElement, {
+            ...coreOptions,
+            ...frameworkOptions,
+        });
 
         // Emit ready event
         this.ready.emit({ api: this.splitviewApi });
@@ -127,7 +128,7 @@ export class SplitviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     private extractCoreOptions(): SplitviewOptions {
         const coreOptions: Partial<SplitviewComponentOptions> = {};
 
-        PROPERTY_KEYS_SPLITVIEW.forEach(key => {
+        PROPERTY_KEYS_SPLITVIEW.forEach((key) => {
             const value = (this as any)[key];
             if (value !== undefined) {
                 (coreOptions as any)[key] = value;
@@ -147,7 +148,7 @@ export class SplitviewAngularComponent implements OnInit, OnDestroy, OnChanges {
         return {
             createComponent: (options) => {
                 return componentFactory.createSplitviewComponent(options);
-            }
+            },
         };
     }
 }

@@ -14,11 +14,11 @@ describe('DockviewAngularComponent', () => {
     beforeEach(async () => {
         setupTestBed();
         await TestBed.compileComponents();
-        
+
         fixture = TestBed.createComponent(DockviewAngularComponent);
         component = fixture.componentInstance;
         debugElement = fixture.debugElement;
-        
+
         component.components = getTestComponents();
     });
 
@@ -35,7 +35,7 @@ describe('DockviewAngularComponent', () => {
 
     it('should throw error if components input is not provided', () => {
         component.components = undefined as any;
-        
+
         expect(() => {
             component.ngOnInit();
         }).toThrow('DockviewAngularComponent: components input is required');
@@ -43,7 +43,7 @@ describe('DockviewAngularComponent', () => {
 
     it('should initialize dockview api on ngOnInit', () => {
         component.ngOnInit();
-        
+
         expect(component.getDockviewApi()).toBeDefined();
         expect(component.getDockviewApi()).toBeInstanceOf(Object);
     });
@@ -60,8 +60,10 @@ describe('DockviewAngularComponent', () => {
 
     it('should render container element', () => {
         fixture.detectChanges();
-        
-        const containerElement = debugElement.query(By.css('.dockview-container'));
+
+        const containerElement = debugElement.query(
+            By.css('.dockview-container')
+        );
         expect(containerElement).toBeTruthy();
         expect(containerElement.nativeElement.tagName).toBe('DIV');
     });
@@ -70,9 +72,9 @@ describe('DockviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getDockviewApi();
         const disposeSpy = jest.spyOn(api!, 'dispose');
-        
+
         component.ngOnDestroy();
-        
+
         expect(disposeSpy).toHaveBeenCalled();
     });
 
@@ -80,40 +82,41 @@ describe('DockviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getDockviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
-        
+
         component.className = 'test-class';
         component.ngOnChanges({
             className: {
                 currentValue: 'test-class',
                 previousValue: undefined,
                 firstChange: false,
-                isFirstChange: () => false
-            }
+                isFirstChange: () => false,
+            },
         });
-        
+
         expect(updateOptionsSpy).toHaveBeenCalledWith({
-            className: 'test-class'
+            className: 'test-class',
         });
     });
 
     it('should set up component registry correctly', () => {
         expect(component.components).toEqual(getTestComponents());
-        
+
         component.ngOnInit();
-        
+
         expect(component.getDockviewApi()).toBeDefined();
     });
 });
 
 @Component({
     template: `
-        <dv-dockview 
+        <dv-dockview
             [components]="components"
             [className]="className"
             [debug]="debug"
-            (ready)="onReady($event)">
+            (ready)="onReady($event)"
+        >
         </dv-dockview>
-    `
+    `,
 })
 class TestHostComponent {
     components = getTestComponents();
@@ -132,13 +135,13 @@ describe('DockviewAngularComponent Integration', () => {
 
     beforeEach(async () => {
         setupTestBed();
-        
+
         TestBed.configureTestingModule({
-            declarations: [TestHostComponent]
+            declarations: [TestHostComponent],
         });
-        
+
         await TestBed.compileComponents();
-        
+
         fixture = TestBed.createComponent(TestHostComponent);
         hostComponent = fixture.componentInstance;
     });
@@ -150,7 +153,7 @@ describe('DockviewAngularComponent Integration', () => {
 
     it('should create and initialize through template', () => {
         fixture.detectChanges();
-        
+
         expect(hostComponent).toBeTruthy();
         expect(hostComponent.api).toBeDefined();
     });
@@ -158,9 +161,9 @@ describe('DockviewAngularComponent Integration', () => {
     it('should pass properties correctly', () => {
         hostComponent.className = 'custom-class';
         hostComponent.debug = true;
-        
+
         fixture.detectChanges();
-        
+
         expect(hostComponent.api).toBeDefined();
     });
 });

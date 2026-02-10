@@ -679,7 +679,10 @@ describe('splitview', () => {
 
     test('should restore iframe pointer events on contextmenu during sash drag', () => {
         const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
-        const removeEventListenerSpy = jest.spyOn(document, 'removeEventListener');
+        const removeEventListenerSpy = jest.spyOn(
+            document,
+            'removeEventListener'
+        );
 
         const splitview = new Splitview(container, {
             orientation: Orientation.HORIZONTAL,
