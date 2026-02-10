@@ -1,7 +1,6 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
-        "outDir": "./dist/out-tsc",
         "target": "es2022",
         "module": "es2022",
         "moduleResolution": "node",
@@ -21,6 +20,7 @@
     "angularCompilerOptions": {
         "skipTemplateCodegen": true,
         "strictMetadataEmit": true,
-        "enableResourceInlining": true
+        "enableResourceInlining": true,
+        "compilationMode": "partial"
     }
 }
