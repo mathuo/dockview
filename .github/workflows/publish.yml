@@ -4,6 +4,12 @@ env:
     NPM_CONFIG_PROVENANCE: true
 on:
     workflow_dispatch:
+        inputs:
+            dry-run:
+                description: 'Dry run (skip actual publish)'
+                required: false
+                type: boolean
+                default: false
     release:
         types: [published]
 jobs:
@@ -29,6 +35,8 @@ jobs:
                       ${{ runner.os }}-node-
 
             - run: yarn
+            - run: npx nx run-many -t build --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
+            - run: npx nx run-many -t build:bundle --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
             - run: npx nx release publish
     publish-experimental:
         if: github.event_name == 'workflow_dispatch'
@@ -52,5 +60,7 @@ jobs:
                       ${{ runner.os }}-node-
 
             - run: yarn
+            - run: npx nx run-many -t build --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
+            - run: npx nx run-many -t build:bundle --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
             - run: npx nx release version 0.0.0-experimental-$(git rev-parse --short HEAD)-$(date +%Y%m%d) --skip-lockfile-update --git-commit=false --git-tag=false
-            - run: npx nx release publish --tag experimental
+            - run: npx nx release publish --tag experimental ${{ inputs.dry-run && '--dry-run' || '' }}
