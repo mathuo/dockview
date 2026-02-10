@@ -49,8 +49,12 @@
     "clean": "rimraf dist/ .build/ .rollup.cache/",
     "prepublishOnly": "npm run rebuild && npm run build:bundle && npm run test",
     "rebuild": "npm run clean && npm run build",
-    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-vue",
-    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-vue --coverage"
+    "test": "jest --selectProjects dockview-vue",
+    "test:cov": "jest --selectProjects dockview-vue --coverage",
+    "lint": "eslint 'src/**/*.{ts,tsx,js,jsx,vue}'",
+    "lint:fix": "eslint 'src/**/*.{ts,tsx,js,jsx,vue}' --fix",
+    "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx,vue}'",
+    "format:check": "prettier --check 'src/**/*.{ts,tsx,js,jsx,vue}'"
   },
   "dependencies": {
     "dockview-core": "^4.13.1"
