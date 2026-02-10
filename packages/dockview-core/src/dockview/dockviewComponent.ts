@@ -745,8 +745,8 @@ export class DockviewComponent
                 const referenceGroup = options?.referenceGroup
                     ? options.referenceGroup
                     : itemToPopout instanceof DockviewPanel
-                    ? itemToPopout.group
-                    : itemToPopout;
+                      ? itemToPopout.group
+                      : itemToPopout;
 
                 const referenceLocation = itemToPopout.api.location.type;
 
@@ -1144,15 +1144,15 @@ export class DockviewComponent
             minimumInViewportWidth:
                 this.options.floatingGroupBounds === 'boundedWithinViewport'
                     ? undefined
-                    : this.options.floatingGroupBounds
+                    : (this.options.floatingGroupBounds
                           ?.minimumWidthWithinViewport ??
-                      DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
+                      DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE),
             minimumInViewportHeight:
                 this.options.floatingGroupBounds === 'boundedWithinViewport'
                     ? undefined
-                    : this.options.floatingGroupBounds
+                    : (this.options.floatingGroupBounds
                           ?.minimumHeightWithinViewport ??
-                      DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
+                      DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE),
         });
 
         const el = group.element.querySelector('.dv-void-container');
@@ -1399,10 +1399,13 @@ export class DockviewComponent
     toJSON(): SerializedDockview {
         const data = this.gridview.serialize();
 
-        const panels = this.panels.reduce((collection, panel) => {
-            collection[panel.id] = panel.toJSON();
-            return collection;
-        }, {} as { [key: string]: GroupviewPanelState });
+        const panels = this.panels.reduce(
+            (collection, panel) => {
+                collection[panel.id] = panel.toJSON();
+                return collection;
+            },
+            {} as { [key: string]: GroupviewPanelState }
+        );
 
         const floats: SerializedFloatingGroup[] = this._floatingGroups.map(
             (group) => {

@@ -2,7 +2,7 @@ import { Type, Injector, EnvironmentInjector } from '@angular/core';
 import {
     IPanePart,
     PanelUpdateEvent,
-    PanePanelComponentInitParameter
+    PanePanelComponentInitParameter,
 } from 'dockview-core';
 import { AngularRenderer } from '../utils/angular-renderer';
 
@@ -17,7 +17,7 @@ export class AngularPanePart implements IPanePart {
         this.renderer = new AngularRenderer({
             component: this.angularComponent,
             injector: this.injector,
-            environmentInjector: this.environmentInjector
+            environmentInjector: this.environmentInjector,
         });
     }
 

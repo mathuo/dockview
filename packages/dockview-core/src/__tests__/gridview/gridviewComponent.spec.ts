@@ -2954,7 +2954,7 @@ describe('gridview', () => {
         });
 
         gridview.layout(800, 400);
-        
+
         // Add first panel
         const panel1 = gridview.addPanel({
             id: 'panel_1',
@@ -2964,7 +2964,7 @@ describe('gridview', () => {
         // Verify the panel API is immediately accessible and functional
         expect(panel1.api).toBeDefined();
         expect(panel1.api.onDidFocusChange).toBeDefined();
-        
+
         // Subscribe to focus events to verify event subscription works
         let focusEventCount = 0;
         const disposable = panel1.api.onDidFocusChange((event) => {
@@ -2988,7 +2988,7 @@ describe('gridview', () => {
         // Verify that the API is functional by checking properties
         expect(panel1.api.isVisible).toBeTruthy();
         expect(panel2.api.isVisible).toBeTruthy();
-        
+
         // Verify we can subscribe to events on the second panel too
         const disposable2 = panel2.api.onDidFocusChange((event) => {
             focusEventCount++;

@@ -133,7 +133,9 @@ describe('defaultTab', () => {
             title: 'title_abc',
         });
 
-        let el = cut.element.querySelector('.dv-default-tab-action') as HTMLElement;
+        let el = cut.element.querySelector(
+            '.dv-default-tab-action'
+        ) as HTMLElement;
         expect(el).toBeTruthy();
         expect(el.style.display).not.toBe('none');
     });

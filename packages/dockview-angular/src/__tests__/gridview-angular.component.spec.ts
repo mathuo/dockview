@@ -14,11 +14,11 @@ describe('GridviewAngularComponent', () => {
     beforeEach(async () => {
         setupTestBed();
         await TestBed.compileComponents();
-        
+
         fixture = TestBed.createComponent(GridviewAngularComponent);
         component = fixture.componentInstance;
         debugElement = fixture.debugElement;
-        
+
         component.components = getTestComponents();
     });
 
@@ -35,7 +35,7 @@ describe('GridviewAngularComponent', () => {
 
     it('should throw error if components input is not provided', () => {
         component.components = undefined as any;
-        
+
         expect(() => {
             component.ngOnInit();
         }).toThrow('GridviewAngularComponent: components input is required');
@@ -43,7 +43,7 @@ describe('GridviewAngularComponent', () => {
 
     it('should initialize gridview api on ngOnInit', () => {
         component.ngOnInit();
-        
+
         expect(component.getGridviewApi()).toBeDefined();
         expect(component.getGridviewApi()).toBeInstanceOf(Object);
     });
@@ -60,8 +60,10 @@ describe('GridviewAngularComponent', () => {
 
     it('should render container element', () => {
         fixture.detectChanges();
-        
-        const containerElement = debugElement.query(By.css('.gridview-container'));
+
+        const containerElement = debugElement.query(
+            By.css('.gridview-container')
+        );
         expect(containerElement).toBeTruthy();
         expect(containerElement.nativeElement.tagName).toBe('DIV');
     });
@@ -70,9 +72,9 @@ describe('GridviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getGridviewApi();
         const disposeSpy = jest.spyOn(api!, 'dispose');
-        
+
         component.ngOnDestroy();
-        
+
         expect(disposeSpy).toHaveBeenCalled();
     });
 
@@ -80,19 +82,19 @@ describe('GridviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getGridviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
-        
+
         component.className = 'test-class';
         component.ngOnChanges({
             className: {
                 currentValue: 'test-class',
                 previousValue: undefined,
                 firstChange: false,
-                isFirstChange: () => false
-            }
+                isFirstChange: () => false,
+            },
         });
-        
+
         expect(updateOptionsSpy).toHaveBeenCalledWith({
-            className: 'test-class'
+            className: 'test-class',
         });
     });
 
@@ -100,19 +102,19 @@ describe('GridviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getGridviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
-        
+
         component.orientation = 'vertical';
         component.ngOnChanges({
             orientation: {
                 currentValue: 'vertical',
                 previousValue: 'horizontal',
                 firstChange: false,
-                isFirstChange: () => false
-            }
+                isFirstChange: () => false,
+            },
         });
-        
+
         expect(updateOptionsSpy).toHaveBeenCalledWith({
-            orientation: 'vertical'
+            orientation: 'vertical',
         });
     });
 
@@ -120,19 +122,19 @@ describe('GridviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getGridviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
-        
+
         component.proportionalLayout = true;
         component.ngOnChanges({
             proportionalLayout: {
                 currentValue: true,
                 previousValue: false,
                 firstChange: false,
-                isFirstChange: () => false
-            }
+                isFirstChange: () => false,
+            },
         });
-        
+
         expect(updateOptionsSpy).toHaveBeenCalledWith({
-            proportionalLayout: true
+            proportionalLayout: true,
         });
     });
 
@@ -140,19 +142,19 @@ describe('GridviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getGridviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
-        
+
         component.hideBorders = true;
         component.ngOnChanges({
             hideBorders: {
                 currentValue: true,
                 previousValue: false,
                 firstChange: false,
-                isFirstChange: () => false
-            }
+                isFirstChange: () => false,
+            },
         });
-        
+
         expect(updateOptionsSpy).toHaveBeenCalledWith({
-            hideBorders: true
+            hideBorders: true,
         });
     });
 
@@ -160,24 +162,24 @@ describe('GridviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getGridviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
-        
+
         component.ngOnChanges({
             className: {
                 currentValue: 'test-class',
                 previousValue: undefined,
                 firstChange: true,
-                isFirstChange: () => true
-            }
+                isFirstChange: () => true,
+            },
         });
-        
+
         expect(updateOptionsSpy).not.toHaveBeenCalled();
     });
 
     it('should set up component registry correctly', () => {
         expect(component.components).toEqual(getTestComponents());
-        
+
         component.ngOnInit();
-        
+
         expect(component.getGridviewApi()).toBeDefined();
     });
 
@@ -185,7 +187,7 @@ describe('GridviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getGridviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
-        
+
         component.className = 'test-class';
         component.hideBorders = true;
         component.ngOnChanges({
@@ -193,34 +195,35 @@ describe('GridviewAngularComponent', () => {
                 currentValue: 'test-class',
                 previousValue: undefined,
                 firstChange: false,
-                isFirstChange: () => false
+                isFirstChange: () => false,
             },
             hideBorders: {
                 currentValue: true,
                 previousValue: false,
                 firstChange: false,
-                isFirstChange: () => false
-            }
+                isFirstChange: () => false,
+            },
         });
-        
+
         expect(updateOptionsSpy).toHaveBeenCalledWith({
             className: 'test-class',
-            hideBorders: true
+            hideBorders: true,
         });
     });
 });
 
 @Component({
     template: `
-        <dv-gridview 
+        <dv-gridview
             [components]="components"
             [className]="className"
             [orientation]="orientation"
             [proportionalLayout]="proportionalLayout"
             [debug]="debug"
-            (ready)="onReady($event)">
+            (ready)="onReady($event)"
+        >
         </dv-gridview>
-    `
+    `,
 })
 class TestHostComponent {
     components = getTestComponents();
@@ -241,13 +244,13 @@ describe('GridviewAngularComponent Integration', () => {
 
     beforeEach(async () => {
         setupTestBed();
-        
+
         TestBed.configureTestingModule({
-            declarations: [TestHostComponent]
+            declarations: [TestHostComponent],
         });
-        
+
         await TestBed.compileComponents();
-        
+
         fixture = TestBed.createComponent(TestHostComponent);
         hostComponent = fixture.componentInstance;
     });
@@ -259,7 +262,7 @@ describe('GridviewAngularComponent Integration', () => {
 
     it('should create and initialize through template', () => {
         fixture.detectChanges();
-        
+
         expect(hostComponent).toBeTruthy();
         expect(hostComponent.api).toBeDefined();
     });
@@ -269,9 +272,9 @@ describe('GridviewAngularComponent Integration', () => {
         hostComponent.debug = true;
         hostComponent.orientation = 'vertical';
         hostComponent.proportionalLayout = true;
-        
+
         fixture.detectChanges();
-        
+
         expect(hostComponent.api).toBeDefined();
     });
 });

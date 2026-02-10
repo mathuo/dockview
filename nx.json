@@ -31,6 +31,14 @@
         },
         "clean": {
             "cache": false
+        },
+        "lint": {
+            "inputs": ["default"],
+            "cache": true
+        },
+        "format:check": {
+            "inputs": ["default"],
+            "cache": true
         }
     },
     "release": {

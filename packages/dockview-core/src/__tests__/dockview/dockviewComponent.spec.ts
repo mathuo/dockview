@@ -30,7 +30,10 @@ class PanelContentPartTest implements IContentRenderer {
 
     isDisposed: boolean = false;
 
-    constructor(public readonly id: string, public readonly component: string) {
+    constructor(
+        public readonly id: string,
+        public readonly component: string
+    ) {
         this.element.classList.add(`testpanel-${id}`);
     }
 
@@ -69,7 +72,10 @@ class PanelTabPartTest implements ITabRenderer {
 
     isDisposed: boolean = false;
 
-    constructor(public readonly id: string, component: string) {
+    constructor(
+        public readonly id: string,
+        component: string
+    ) {
         this.element.className = `panel-tab-part-${id}`;
     }
 
@@ -8258,7 +8264,7 @@ describe('dockviewComponent', () => {
             // Set size to 350px width and immediately set invisible
             panel1.group.api.setSize({ width: 350 });
             expect(panel1.group.api.width).toBe(350); // Should work immediately
-            
+
             panel1.group.api.setVisible(false);
 
             // Group should be invisible
@@ -8270,7 +8276,6 @@ describe('dockviewComponent', () => {
             // The width should be preserved as 350px, not reverted to initial/minimal size
             expect(panel1.group.api.width).toBe(350);
         });
-
 
         test('issue 1050 variant: test that fix works with multiple size changes', () => {
             const container = document.createElement('div');

@@ -12,59 +12,70 @@ interface DropTargetRect {
     height: number;
 }
 
-function setGPUOptimizedBounds(element: HTMLElement, bounds: DropTargetRect): void {
+function setGPUOptimizedBounds(
+    element: HTMLElement,
+    bounds: DropTargetRect
+): void {
     const { top, left, width, height } = bounds;
     const topPx = `${Math.round(top)}px`;
     const leftPx = `${Math.round(left)}px`;
     const widthPx = `${Math.round(width)}px`;
     const heightPx = `${Math.round(height)}px`;
-    
+
     // Use traditional positioning but maintain GPU layer
     element.style.top = topPx;
     element.style.left = leftPx;
     element.style.width = widthPx;
     element.style.height = heightPx;
     element.style.visibility = 'visible';
-    
+
     // Ensure GPU layer is maintained
     if (!element.style.transform || element.style.transform === '') {
         element.style.transform = 'translate3d(0, 0, 0)';
     }
 }
 
-function setGPUOptimizedBoundsFromStrings(element: HTMLElement, bounds: {
-    top: string;
-    left: string;
-    width: string;
-    height: string;
-}): void {
+function setGPUOptimizedBoundsFromStrings(
+    element: HTMLElement,
+    bounds: {
+        top: string;
+        left: string;
+        width: string;
+        height: string;
+    }
+): void {
     const { top, left, width, height } = bounds;
-    
+
     // Use traditional positioning but maintain GPU layer
     element.style.top = top;
     element.style.left = left;
     element.style.width = width;
     element.style.height = height;
     element.style.visibility = 'visible';
-    
+
     // Ensure GPU layer is maintained
     if (!element.style.transform || element.style.transform === '') {
         element.style.transform = 'translate3d(0, 0, 0)';
     }
 }
 
-function checkBoundsChanged(element: HTMLElement, bounds: DropTargetRect): boolean {
+function checkBoundsChanged(
+    element: HTMLElement,
+    bounds: DropTargetRect
+): boolean {
     const { top, left, width, height } = bounds;
     const topPx = `${Math.round(top)}px`;
     const leftPx = `${Math.round(left)}px`;
     const widthPx = `${Math.round(width)}px`;
     const heightPx = `${Math.round(height)}px`;
-    
+
     // Check if position or size changed (back to traditional method)
-    return element.style.top !== topPx ||
-           element.style.left !== leftPx ||
-           element.style.width !== widthPx || 
-           element.style.height !== heightPx;
+    return (
+        element.style.top !== topPx ||
+        element.style.left !== leftPx ||
+        element.style.width !== widthPx ||
+        element.style.height !== heightPx
+    );
 }
 
 export interface DroptargetEvent {

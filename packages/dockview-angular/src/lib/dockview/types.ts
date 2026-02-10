@@ -7,7 +7,7 @@ import {
     IDockviewPanelProps,
     IDockviewPanelHeaderProps,
     IWatermarkPanelProps,
-    IDockviewHeaderActionsProps
+    IDockviewHeaderActionsProps,
 } from 'dockview-core';
 
 export interface IDockviewAngularPanelProps extends IDockviewPanelProps {
@@ -51,5 +51,5 @@ export {
     DockviewReadyEvent,
     DockviewDidDropEvent,
     DockviewWillDropEvent,
-    DockviewOptions
+    DockviewOptions,
 } from 'dockview-core';
