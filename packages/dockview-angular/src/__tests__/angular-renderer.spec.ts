@@ -7,6 +7,9 @@ import {
     EnvironmentInjector,
     inject,
     Injector,
+    TemplateRef,
+    ViewChild,
+    ViewContainerRef,
 } from '@angular/core';
 import { AngularRenderer } from '../lib/utils/angular-renderer';
 
@@ -36,6 +39,19 @@ class TestUpdateComponent {
     }
 }
 
+@Component({
+    selector: 'test-template-holder-component',
+    template: `
+        <ng-template #template>
+            <test-update-component />
+        </ng-template>
+    `,
+})
+class TemplateHolderComponent {
+    @ViewChild('template', { static: true })
+    public template?: TemplateRef<any>;
+}
+
 describe('AngularRenderer', () => {
     let injector: Injector;
     let environmentInjector: EnvironmentInjector;
@@ -43,7 +59,11 @@ describe('AngularRenderer', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [TestComponent, TestUpdateComponent],
+            declarations: [
+                TestComponent,
+                TestUpdateComponent,
+                TemplateHolderComponent,
+            ],
         }).compileComponents();
 
         injector = TestBed.inject(Injector);
@@ -171,5 +191,29 @@ describe('AngularRenderer', () => {
         (renderer.component.instance as TestUpdateComponent).updateCounter();
         application.tick();
         expect(renderer.element.innerHTML).toContain('Counter: 1');
+    });
+
+    it('should render view from template', () => {
+        // Create component with template
+        const templateRenderer = new AngularRenderer({
+            component: TemplateHolderComponent,
+            injector,
+        });
+        templateRenderer.init({});
+        const template = (
+            templateRenderer.component.instance as TemplateHolderComponent
+        ).template;
+
+        expect(template).toBeDefined();
+
+        // Create view from template
+        const renderer = new AngularRenderer({
+            component: template,
+            injector: templateRenderer.component.injector, // use container injector to ensure we have a view
+        });
+        renderer.init({});
+        application.tick();
+
+        expect(renderer.element.innerHTML).toContain('Counter: 0');
     });
 });
