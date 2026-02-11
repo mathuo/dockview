@@ -52,10 +52,12 @@
                 "commitMessage": "chore(release): publish {version}",
                 "tag": true
             }
+        },
+        "publish": {
+            "targetDefaults": {
+                "args": ["--package-manager=npm", "--provenance"]
+            }
         }
-    },
-    "cli": {
-        "packageManager": "npm"
     },
     "defaultBase": "master",
     "useInferencePlugins": false
