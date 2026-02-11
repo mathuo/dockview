@@ -4,12 +4,10 @@ import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
-    EnvironmentInjector,
     inject,
     Injector,
     TemplateRef,
     ViewChild,
-    ViewContainerRef,
 } from '@angular/core';
 import { AngularRenderer } from '../lib/utils/angular-renderer';
 
@@ -54,7 +52,6 @@ class TemplateHolderComponent {
 
 describe('AngularRenderer', () => {
     let injector: Injector;
-    let environmentInjector: EnvironmentInjector;
     let application: ApplicationRef;
 
     beforeEach(async () => {
@@ -67,7 +64,6 @@ describe('AngularRenderer', () => {
         }).compileComponents();
 
         injector = TestBed.inject(Injector);
-        environmentInjector = TestBed.inject(EnvironmentInjector);
         application = TestBed.inject(ApplicationRef);
     });
 
@@ -83,7 +79,6 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: TestComponent,
             injector,
-            environmentInjector,
         });
 
         renderer.init({ title: 'Updated Title', value: 'test-value' });
@@ -100,7 +95,6 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: TestComponent,
             injector,
-            environmentInjector,
         });
 
         renderer.init({ title: 'Initial Title' });
@@ -117,7 +111,6 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: TestComponent,
             injector,
-            environmentInjector,
         });
 
         renderer.init({ title: 'Test Title' });
@@ -138,7 +131,6 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: null as any,
             injector,
-            environmentInjector,
         });
 
         expect(() => {
@@ -150,7 +142,6 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: TestComponent,
             injector,
-            environmentInjector,
         });
 
         renderer.init({ title: 'Test Title' });
@@ -165,7 +156,6 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: TestComponent,
             injector,
-            environmentInjector,
         });
 
         renderer.init({ title: 'Test Title' });
@@ -181,7 +171,6 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: TestUpdateComponent,
             injector,
-            environmentInjector,
         });
 
         renderer.init({});
