@@ -55,10 +55,10 @@ export interface GridviewAngularOptions extends GridviewOptions {
 export class GridviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     private readonly componentRegistry: ComponentRegistryService = inject(ComponentRegistryService);
 
-    @ViewChild('gridviewContainer', { static: true }) 
+    @ViewChild('gridviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
-    @Input() components!: Record<string, Type<any>>;
+    @Input() components?: Record<string, Type<any>>;
 
     // Core gridview options as inputs
     @Input() className?: string;

@@ -63,10 +63,10 @@ export interface DockviewAngularOptions extends DockviewOptions {
 export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     private readonly componentRegistry: ComponentRegistryService = inject(ComponentRegistryService);
 
-    @ViewChild('dockviewContainer', { static: true }) 
+    @ViewChild('dockviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
-    @Input() components!: Record<string, Type<any>>;
+    @Input() components?: Record<string, Type<any>>;
     @Input() tabComponents?: Record<string, Type<any>>;
     @Input() watermarkComponent?: Type<any>;
     @Input() defaultTabComponent?: Type<any>;

@@ -55,10 +55,10 @@ export interface SplitviewAngularOptions extends SplitviewOptions {
 export class SplitviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     private readonly componentRegistry: ComponentRegistryService = inject(ComponentRegistryService);
 
-    @ViewChild('splitviewContainer', { static: true }) 
+    @ViewChild('splitviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
-    @Input() components!: Record<string, Type<any>>;
+    @Input() components?: Record<string, Type<any>>;
 
     // Core splitview options as inputs
     @Input() className?: string;
