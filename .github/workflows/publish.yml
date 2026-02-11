@@ -16,8 +16,6 @@ jobs:
     publish:
         if: github.event_name == 'release'
         runs-on: ubuntu-latest
-        env:
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         permissions:
             contents: read
             id-token: write
@@ -26,7 +24,6 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                   node-version: '20.x'
-                  registry-url: 'https://registry.npmjs.org'
 
             - uses: actions/cache@v4
               with:
@@ -42,8 +39,6 @@ jobs:
     publish-experimental:
         if: github.event_name == 'workflow_dispatch'
         runs-on: ubuntu-latest
-        env:
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         permissions:
             contents: read
             id-token: write
@@ -52,7 +47,6 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                   node-version: '20.x'
-                  registry-url: 'https://registry.npmjs.org'
 
             - uses: actions/cache@v4
               with:
