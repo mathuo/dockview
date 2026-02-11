@@ -13,10 +13,11 @@ import { AngularRenderer } from './angular-renderer';
 import { AngularGridviewPanel } from '../gridview/angular-gridview-panel';
 import { AngularSplitviewPanel } from '../splitview/angular-splitview-panel';
 import { AngularPanePart } from '../paneview/angular-pane-part';
+import { ComponentRegistryService } from './component-registry.service';
 
 export class AngularFrameworkComponentFactory {
     constructor(
-        private components: Record<string, Type<any>>,
+        private componentResolver: ComponentRegistryService,
         private injector: Injector,
         private environmentInjector?: EnvironmentInjector,
         private tabComponents?: Record<string, Type<any>>,
@@ -27,7 +28,7 @@ export class AngularFrameworkComponentFactory {
 
     // For DockviewComponent
     createDockviewComponent(options: CreateComponentOptions): IContentRenderer {
-        const component = this.components[options.name];
+        const component = this.componentResolver.resolveComponent(options.name);
         if (!component) {
             throw new Error(
                 `Component '${options.name}' not found in component registry`
@@ -46,7 +47,7 @@ export class AngularFrameworkComponentFactory {
 
     // For GridviewComponent
     createGridviewComponent(options: CreateComponentOptions): GridviewPanel {
-        const component = this.components[options.name];
+        const component = this.componentResolver.resolveComponent(options.name);
         if (!component) {
             throw new Error(
                 `Component '${options.name}' not found in component registry`
@@ -64,7 +65,7 @@ export class AngularFrameworkComponentFactory {
 
     // For SplitviewComponent
     createSplitviewComponent(options: CreateComponentOptions): SplitviewPanel {
-        const component = this.components[options.name];
+        const component = this.componentResolver.resolveComponent(options.name);
         if (!component) {
             throw new Error(
                 `Component '${options.name}' not found in component registry`
@@ -82,7 +83,7 @@ export class AngularFrameworkComponentFactory {
 
     // For PaneviewComponent
     createPaneviewComponent(options: CreateComponentOptions): IPanePart {
-        const component = this.components[options.name];
+        const component = this.componentResolver.resolveComponent(options.name);
         if (!component) {
             throw new Error(
                 `Component '${options.name}' not found in component registry`

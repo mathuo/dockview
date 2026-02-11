@@ -26,6 +26,7 @@ import {
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
 import { GridviewAngularReadyEvent } from './types';
+import { ComponentRegistryService } from '../utils/component-registry.service';
 
 export interface GridviewAngularOptions extends GridviewOptions {
     components: Record<string, Type<any>>;
@@ -52,7 +53,9 @@ export interface GridviewAngularOptions extends GridviewOptions {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GridviewAngularComponent implements OnInit, OnDestroy, OnChanges {
-    @ViewChild('gridviewContainer', { static: true })
+    private readonly componentRegistry: ComponentRegistryService = inject(ComponentRegistryService);
+
+    @ViewChild('gridviewContainer', { static: true }) 
     private containerRef!: ElementRef<HTMLDivElement>;
 
     @Input() components!: Record<string, Type<any>>;
@@ -140,7 +143,7 @@ export class GridviewAngularComponent implements OnInit, OnDestroy, OnChanges {
 
     private createFrameworkOptions(): GridviewFrameworkOptions {
         const componentFactory = new AngularFrameworkComponentFactory(
-            this.components,
+            this.componentRegistry,
             this.injector,
             this.environmentInjector
         );

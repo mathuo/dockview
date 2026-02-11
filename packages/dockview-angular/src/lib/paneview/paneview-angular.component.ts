@@ -28,6 +28,7 @@ import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
 import { PaneviewAngularReadyEvent } from './types';
 import { AngularPanePart } from './angular-pane-part';
+import { ComponentRegistryService } from '../utils/component-registry.service';
 
 export interface PaneviewAngularOptions extends PaneviewOptions {
     components: Record<string, Type<any>>;
@@ -55,7 +56,9 @@ export interface PaneviewAngularOptions extends PaneviewOptions {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
-    @ViewChild('paneviewContainer', { static: true })
+    private readonly componentRegistry: ComponentRegistryService = inject(ComponentRegistryService);
+
+    @ViewChild('paneviewContainer', { static: true }) 
     private containerRef!: ElementRef<HTMLDivElement>;
 
     @Input() components!: Record<string, Type<any>>;
@@ -147,7 +150,7 @@ export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
 
     private createFrameworkOptions(): PaneviewFrameworkOptions {
         const componentFactory = new AngularFrameworkComponentFactory(
-            this.components,
+            this.componentRegistry,
             this.injector,
             this.environmentInjector,
             this.headerComponents

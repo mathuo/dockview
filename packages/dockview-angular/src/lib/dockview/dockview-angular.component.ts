@@ -28,6 +28,7 @@ import {
 } from 'dockview-core';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
+import { ComponentRegistryService } from '../utils/component-registry.service';
 
 export interface DockviewAngularOptions extends DockviewOptions {
     components: Record<string, Type<any>>;
@@ -60,7 +61,9 @@ export interface DockviewAngularOptions extends DockviewOptions {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
-    @ViewChild('dockviewContainer', { static: true })
+    private readonly componentRegistry: ComponentRegistryService = inject(ComponentRegistryService);
+
+    @ViewChild('dockviewContainer', { static: true }) 
     private containerRef!: ElementRef<HTMLDivElement>;
 
     @Input() components!: Record<string, Type<any>>;
@@ -178,7 +181,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
         }
 
         const componentFactory = new AngularFrameworkComponentFactory(
-            this.components,
+            this.componentRegistry,
             this.injector,
             this.environmentInjector,
             this.tabComponents,

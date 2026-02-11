@@ -26,6 +26,7 @@ import {
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
 import { SplitviewAngularReadyEvent } from './types';
+import { ComponentRegistryService } from '../utils/component-registry.service';
 
 export interface SplitviewAngularOptions extends SplitviewOptions {
     components: Record<string, Type<any>>;
@@ -52,7 +53,9 @@ export interface SplitviewAngularOptions extends SplitviewOptions {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SplitviewAngularComponent implements OnInit, OnDestroy, OnChanges {
-    @ViewChild('splitviewContainer', { static: true })
+    private readonly componentRegistry: ComponentRegistryService = inject(ComponentRegistryService);
+
+    @ViewChild('splitviewContainer', { static: true }) 
     private containerRef!: ElementRef<HTMLDivElement>;
 
     @Input() components!: Record<string, Type<any>>;
@@ -140,7 +143,7 @@ export class SplitviewAngularComponent implements OnInit, OnDestroy, OnChanges {
 
     private createFrameworkOptions(): SplitviewFrameworkOptions {
         const componentFactory = new AngularFrameworkComponentFactory(
-            this.components,
+            this.componentRegistry,
             this.injector,
             this.environmentInjector
         );
