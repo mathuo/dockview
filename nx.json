@@ -54,6 +54,9 @@
             }
         }
     },
+    "cli": {
+        "packageManager": "npm"
+    },
     "defaultBase": "master",
     "useInferencePlugins": false
 }
