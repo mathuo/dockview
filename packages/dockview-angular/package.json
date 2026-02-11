@@ -42,7 +42,6 @@
     "build:css": "node scripts/copy-css.js",
     "build": "npm run build:angular && npm run build:css",
     "clean": "rimraf dist/ .build/ .rollup.cache/",
-    "prepublishOnly": "npm run rebuild && npm run test",
     "rebuild": "npm run clean && npm run build",
     "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-angular",
     "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-angular --coverage"
