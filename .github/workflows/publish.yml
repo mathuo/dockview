@@ -16,9 +16,8 @@ jobs:
     publish:
         if: github.event_name == 'release'
         runs-on: ubuntu-latest
-        env:
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         permissions:
+            contents: read
             id-token: write
         steps:
             - uses: actions/checkout@v4
@@ -41,9 +40,8 @@ jobs:
     publish-experimental:
         if: github.event_name == 'workflow_dispatch'
         runs-on: ubuntu-latest
-        env:
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         permissions:
+            contents: read
             id-token: write
         steps:
             - uses: actions/checkout@v4
