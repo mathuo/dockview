@@ -53,7 +53,9 @@ export interface SplitviewAngularOptions extends SplitviewOptions {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SplitviewAngularComponent implements OnInit, OnDestroy, OnChanges {
-    private readonly componentRegistry: ComponentRegistryService = inject(ComponentRegistryService);
+    private readonly componentRegistry: ComponentRegistryService = inject(
+        ComponentRegistryService
+    );
 
     @ViewChild('splitviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;

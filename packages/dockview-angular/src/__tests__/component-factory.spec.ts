@@ -268,11 +268,12 @@ describe('AngularFrameworkComponentFactory', () => {
         });
 
         it('should throw error when no watermark component provided', () => {
-            const factoryWithoutWatermark = new AngularFrameworkComponentFactory(
-                resolver,
-                injector,
-                environmentInjector
-            );
+            const factoryWithoutWatermark =
+                new AngularFrameworkComponentFactory(
+                    resolver,
+                    injector,
+                    environmentInjector
+                );
 
             expect(() => {
                 factoryWithoutWatermark.createWatermarkComponent();

@@ -53,7 +53,9 @@ export interface GridviewAngularOptions extends GridviewOptions {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GridviewAngularComponent implements OnInit, OnDestroy, OnChanges {
-    private readonly componentRegistry: ComponentRegistryService = inject(ComponentRegistryService);
+    private readonly componentRegistry: ComponentRegistryService = inject(
+        ComponentRegistryService
+    );
 
     @ViewChild('gridviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;

@@ -56,7 +56,9 @@ export interface PaneviewAngularOptions extends PaneviewOptions {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
-    private readonly componentRegistry: ComponentRegistryService = inject(ComponentRegistryService);
+    private readonly componentRegistry: ComponentRegistryService = inject(
+        ComponentRegistryService
+    );
 
     @ViewChild('paneviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;

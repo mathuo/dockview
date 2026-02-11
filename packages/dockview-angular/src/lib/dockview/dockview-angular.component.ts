@@ -61,7 +61,9 @@ export interface DockviewAngularOptions extends DockviewOptions {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
-    private readonly componentRegistry: ComponentRegistryService = inject(ComponentRegistryService);
+    private readonly componentRegistry: ComponentRegistryService = inject(
+        ComponentRegistryService
+    );
 
     @ViewChild('dockviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
