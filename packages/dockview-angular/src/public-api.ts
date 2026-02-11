@@ -44,3 +44,4 @@ export {
 export * from './lib/utils/angular-renderer';
 export * from './lib/utils/component-factory';
 export * from './lib/utils/lifecycle-utils';
+export * from './lib/utils/component-registry.service';
