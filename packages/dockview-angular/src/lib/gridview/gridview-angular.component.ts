@@ -110,10 +110,8 @@ export class GridviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     private initializeGridview(): void {
-        if (!this.components) {
-            throw new Error(
-                'GridviewAngularComponent: components input is required'
-            );
+        if (this.components) {
+            this.componentRegistry.registerComponents(this.components);
         }
 
         const coreOptions = this.extractCoreOptions();

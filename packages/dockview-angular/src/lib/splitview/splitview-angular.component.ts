@@ -110,10 +110,8 @@ export class SplitviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     private initializeSplitview(): void {
-        if (!this.components) {
-            throw new Error(
-                'SplitviewAngularComponent: components input is required'
-            );
+        if (this.components) {
+            this.componentRegistry.registerComponents(this.components);
         }
 
         const coreOptions = this.extractCoreOptions();

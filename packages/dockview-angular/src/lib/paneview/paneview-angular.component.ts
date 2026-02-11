@@ -114,10 +114,8 @@ export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     private initializePaneview(): void {
-        if (!this.components) {
-            throw new Error(
-                'PaneviewAngularComponent: components input is required'
-            );
+        if (this.components) {
+            this.componentRegistry.registerComponents(this.components);
         }
 
         const coreOptions = this.extractCoreOptions();

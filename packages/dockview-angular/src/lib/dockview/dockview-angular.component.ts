@@ -133,10 +133,8 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     private initializeDockview(): void {
-        if (!this.components) {
-            throw new Error(
-                'DockviewAngularComponent: components input is required'
-            );
+        if (this.components) {
+            this.componentRegistry.registerComponents(this.components);
         }
 
         const coreOptions = this.extractCoreOptions();
