@@ -47,7 +47,6 @@
     "build:css": "node scripts/copy-css.js",
     "build": "npm run build:js && npm run build:types && npm run build:css",
     "clean": "rimraf dist/ .build/ .rollup.cache/",
-    "prepublishOnly": "npm run rebuild && npm run build:bundle && npm run test",
     "rebuild": "npm run clean && npm run build",
     "test": "jest --selectProjects dockview-vue",
     "test:cov": "jest --selectProjects dockview-vue --coverage",

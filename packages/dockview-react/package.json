@@ -47,7 +47,6 @@
     "build:esm": "tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
     "build": "npm run build:cjs && npm run build:esm && npm run build:css",
     "clean": "rimraf dist/ .build/ .rollup.cache/",
-    "prepublishOnly": "npm run rebuild && npm run build:bundle && npm run test",
     "rebuild": "npm run clean && npm run build",
     "test": "jest --selectProjects dockview-react",
     "test:cov": "jest --selectProjects dockview-react --coverage",
