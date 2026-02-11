@@ -52,8 +52,7 @@
         "projectsRelationship": "fixed",
         "version": {
             "generatorOptions": {
-                "currentVersionSource": "git-tag",
-                "specifierSource": "prompt"
+                "currentVersionSource": "git-tag"
             },
             "git": {
                 "commit": true,
