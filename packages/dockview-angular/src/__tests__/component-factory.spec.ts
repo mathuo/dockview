@@ -2,6 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { Component, Injector, EnvironmentInjector } from '@angular/core';
 import { AngularFrameworkComponentFactory } from '../lib/utils/component-factory';
 import { CreateComponentOptions } from 'dockview-core';
+import { ComponentRegistryService } from '../lib/utils/component-registry.service';
 
 @Component({
     selector: 'test-dockview-component',
@@ -53,6 +54,7 @@ describe('AngularFrameworkComponentFactory', () => {
     let injector: Injector;
     let environmentInjector: EnvironmentInjector;
     let factory: AngularFrameworkComponentFactory;
+    let resolver: ComponentRegistryService;
 
     const components = {
         'dockview-test': TestDockviewComponent,
@@ -84,9 +86,11 @@ describe('AngularFrameworkComponentFactory', () => {
 
         injector = TestBed.inject(Injector);
         environmentInjector = TestBed.inject(EnvironmentInjector);
+        resolver = TestBed.inject(ComponentRegistryService);
+        resolver.registerComponents(components);
 
         factory = new AngularFrameworkComponentFactory(
-            components,
+            resolver,
             injector,
             environmentInjector,
             tabComponents,
@@ -237,7 +241,7 @@ describe('AngularFrameworkComponentFactory', () => {
 
         it('should return undefined when no component and no default', () => {
             const factoryWithoutDefault = new AngularFrameworkComponentFactory(
-                components,
+                resolver,
                 injector,
                 environmentInjector,
                 {}
@@ -264,12 +268,11 @@ describe('AngularFrameworkComponentFactory', () => {
         });
 
         it('should throw error when no watermark component provided', () => {
-            const factoryWithoutWatermark =
-                new AngularFrameworkComponentFactory(
-                    components,
-                    injector,
-                    environmentInjector
-                );
+            const factoryWithoutWatermark = new AngularFrameworkComponentFactory(
+                resolver,
+                injector,
+                environmentInjector
+            );
 
             expect(() => {
                 factoryWithoutWatermark.createWatermarkComponent();
@@ -299,7 +302,7 @@ describe('AngularFrameworkComponentFactory', () => {
         it('should return undefined when no header actions components provided', () => {
             const factoryWithoutHeaderActions =
                 new AngularFrameworkComponentFactory(
-                    components,
+                    resolver,
                     injector,
                     environmentInjector
                 );
