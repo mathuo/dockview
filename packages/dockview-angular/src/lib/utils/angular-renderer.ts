@@ -10,9 +10,10 @@ import {
     ViewContainerRef,
 } from '@angular/core';
 import { IContentRenderer, IFrameworkPart, Parameters } from 'dockview-core';
+import { ComponentReference } from '../types';
 
 export interface AngularRendererOptions {
-    component: Type<any> | TemplateRef<any>;
+    component: ComponentReference;
     injector: Injector;
     environmentInjector?: EnvironmentInjector;
 }
