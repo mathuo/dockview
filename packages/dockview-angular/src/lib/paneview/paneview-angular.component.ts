@@ -29,6 +29,7 @@ import { AngularLifecycleManager } from '../utils/lifecycle-utils';
 import { PaneviewAngularReadyEvent } from './types';
 import { AngularPanePart } from './angular-pane-part';
 import { ComponentRegistryService } from '../utils/component-registry.service';
+import { ComponentReference } from '../types';
 
 export interface PaneviewAngularOptions extends PaneviewOptions {
     components: Record<string, Type<any>>;
@@ -63,7 +64,7 @@ export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @ViewChild('paneviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
-    @Input() components?: Record<string, Type<any>>;
+    @Input() components?: Record<string, ComponentReference>;
     @Input() headerComponents?: Record<string, Type<any>>;
 
     // Core paneview options as inputs

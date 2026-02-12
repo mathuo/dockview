@@ -29,6 +29,7 @@ import {
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
 import { ComponentRegistryService } from '../utils/component-registry.service';
+import { ComponentReference } from '../types';
 
 export interface DockviewAngularOptions extends DockviewOptions {
     components: Record<string, Type<any>>;
@@ -68,7 +69,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @ViewChild('dockviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
-    @Input() components?: Record<string, Type<any>>;
+    @Input() components?: Record<string, ComponentReference>;
     @Input() tabComponents?: Record<string, Type<any>>;
     @Input() watermarkComponent?: Type<any>;
     @Input() defaultTabComponent?: Type<any>;

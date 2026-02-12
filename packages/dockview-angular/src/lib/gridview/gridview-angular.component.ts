@@ -27,6 +27,7 @@ import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
 import { GridviewAngularReadyEvent } from './types';
 import { ComponentRegistryService } from '../utils/component-registry.service';
+import { ComponentReference } from '../types';
 
 export interface GridviewAngularOptions extends GridviewOptions {
     components: Record<string, Type<any>>;
@@ -60,7 +61,7 @@ export class GridviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @ViewChild('gridviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
-    @Input() components?: Record<string, Type<any>>;
+    @Input() components?: Record<string, ComponentReference>;
 
     // Core gridview options as inputs
     @Input() className?: string;
