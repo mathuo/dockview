@@ -40,6 +40,8 @@ export {
     SplitviewAngularReadyEvent,
 } from './lib/splitview/types';
 
+export * from './lib/types';
+
 // Utilities
 export * from './lib/utils/angular-renderer';
 export * from './lib/utils/component-factory';
