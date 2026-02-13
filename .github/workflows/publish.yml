@@ -24,6 +24,7 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                   node-version: '22.x'
+            - run: npm install -g npm@latest
 
             - uses: actions/cache@v4
               with:
@@ -53,6 +54,7 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                   node-version: '22.x'
+            - run: npm install -g npm@latest
 
             - uses: actions/cache@v4
               with:
