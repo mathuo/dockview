@@ -2,6 +2,7 @@ import {
     DockviewApi,
     DockviewGroupLocation,
     DockviewGroupPanel,
+    IHeaderPosition,
 } from 'dockview';
 import * as React from 'react';
 
@@ -33,6 +34,8 @@ const GroupAction = (props: {
         };
     }, [props.api, props.groupId]);
 
+    const [headerPosition, setHeaderPosition] =
+        React.useState<IHeaderPosition>(group?.headerPosition ?? 'top');
     const [location, setLocation] =
         React.useState<DockviewGroupLocation | null>(null);
     const [isMaximized, setIsMaximized] = React.useState<boolean>(false);
@@ -59,6 +62,7 @@ const GroupAction = (props: {
         setLocation(group.api.location);
         setIsMaximized(group.api.isMaximized());
         setIsVisible(group.api.isVisible);
+        setHeaderPosition(group.headerPosition ?? 'top');
 
         return () => {
             disposable.dispose();
@@ -103,23 +107,22 @@ const GroupAction = (props: {
                 >
                     <span className="material-symbols-outlined">ad_group</span>
                 </button>
-                <button
-                  className="demo-icon-button"
-                  onClick={() => {
-                      const panel = props.api?.getGroup(props.groupId);
-                            const dir = ['top', 'left', 'bottom', 'right']
-                            if (panel) {
-                              const index = ((dir.indexOf(panel.headerPosition) + 1) % dir.length)
-
-                              panel.headerPosition = dir[index] as IHeaderPosition
-                              console.log(props.groupId, panel.headerPosition)
-                            }
-                        }}
-                    >
-                      <span className="material-symbols-outlined">
-                        loop
-                      </span>
-                </button>
+                <select
+                    className="demo-icon-button"
+                    value={headerPosition}
+                    onChange={(e) => {
+                        const value = e.target.value as IHeaderPosition;
+                        if (group) {
+                            group.headerPosition = value;
+                            setHeaderPosition(value);
+                        }
+                    }}
+                >
+                    <option value="top">top</option>
+                    <option value="bottom">bottom</option>
+                    <option value="left">left</option>
+                    <option value="right">right</option>
+                </select>
                 <button
                     className={
                         location?.type === 'popout'
