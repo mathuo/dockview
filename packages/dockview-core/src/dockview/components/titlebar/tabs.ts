@@ -17,7 +17,7 @@ import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { DockviewWillShowOverlayLocationEvent } from '../../events';
 import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
-import { IHeaderDirection } from '../../options';
+import { DockviewHeaderDirection } from '../../options';
 import { Tab } from '../tab/tab';
 import { TabDragEvent, TabDropIndexEvent } from './tabsContainer';
 
@@ -30,7 +30,7 @@ export class Tabs extends CompositeDisposable {
     private _tabs: IValueDisposable<Tab>[] = [];
     private selectedIndex = -1;
     private _showTabsOverflowControl = false;
-    private _direction: IHeaderDirection = 'horizontal';
+    private _direction: DockviewHeaderDirection = 'horizontal';
 
     private readonly _onTabDragStart = new Emitter<TabDragEvent>();
     readonly onTabDragStart: Event<TabDragEvent> = this._onTabDragStart.event;
@@ -92,11 +92,11 @@ export class Tabs extends CompositeDisposable {
         return this._tabs.map((_) => _.value);
     }
 
-    get direction(): IHeaderDirection {
+    get direction(): DockviewHeaderDirection {
         return this._direction;
     }
 
-    set direction(value: IHeaderDirection) {
+    set direction(value: DockviewHeaderDirection) {
         if(this._direction === value) {
             return;
         }

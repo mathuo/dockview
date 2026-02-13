@@ -33,8 +33,8 @@ export interface ViewFactoryData {
     tab?: string;
 }
 
-export type IHeaderPosition = 'top' | 'bottom' | 'left' | 'right';
-export type IHeaderDirection = 'horizontal' | 'vertical';
+export type DockviewHeaderPosition = 'top' | 'bottom' | 'left' | 'right';
+export type DockviewHeaderDirection = 'horizontal' | 'vertical';
 
 export interface DockviewOptions {
     /**

@@ -18,7 +18,7 @@ import {
     createDropdownElementHandle,
     DropdownElement,
 } from './tabOverflowControl';
-import { IHeaderDirection } from '../../options';
+import { DockviewHeaderDirection } from '../../options';
 
 export interface TabDropIndexEvent {
     readonly event: DragEvent;
@@ -44,7 +44,7 @@ export interface ITabsContainer extends IDisposable {
     readonly onGroupDragStart: Event<GroupDragEvent>;
     readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent>;
     hidden: boolean;
-    direction: IHeaderDirection;
+    direction: DockviewHeaderDirection;
     delete(id: string): void;
     indexOf(id: string): number;
     setActive(isGroupActive: boolean): void;
@@ -76,7 +76,7 @@ export class TabsContainer
     private preActions: HTMLElement | undefined;
 
     private _hidden = false;
-    private _direction: IHeaderDirection = 'horizontal';
+    private _direction: DockviewHeaderDirection = 'horizontal';
 
     private dropdownPart: DropdownElement | null = null;
     private _overflowTabs: string[] = [];
@@ -115,11 +115,11 @@ export class TabsContainer
         this.element.style.display = value ? 'none' : '';
     }
 
-    get direction(): IHeaderDirection {
+    get direction(): DockviewHeaderDirection {
         return this._direction;
     }
 
-    set direction(value: IHeaderDirection) {
+    set direction(value: DockviewHeaderDirection) {
         this._direction = value;
         if(value === 'vertical') {
           addClasses(this._element, 'dv-groupview-header-vertical');

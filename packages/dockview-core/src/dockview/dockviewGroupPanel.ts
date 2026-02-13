@@ -17,7 +17,7 @@ import {
     DockviewGroupPanelApi,
     DockviewGroupPanelApiImpl,
 } from '../api/dockviewGroupPanelApi';
-import { IHeaderPosition } from './options';
+import { DockviewHeaderPosition } from './options';
 
 const MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH = 100;
 const MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT = 100;
@@ -25,7 +25,7 @@ const MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT = 100;
 export interface IDockviewGroupPanel extends IGridviewPanel<DockviewGroupPanelApi> {
     model: IDockviewGroupPanelModel;
     locked: DockviewGroupPanelLocked;
-    headerPosition: IHeaderPosition;
+    headerPosition: DockviewHeaderPosition;
     readonly size: number;
     readonly panels: IDockviewPanel[];
     readonly activePanel: IDockviewPanel | undefined;
@@ -122,10 +122,10 @@ export class DockviewGroupPanel
         return this._model.header;
     }
 
-    get headerPosition(): IHeaderPosition {
+    get headerPosition(): DockviewHeaderPosition {
         return this._model.headerPosition;
     }
-    set headerPosition(value: IHeaderPosition) {
+    set headerPosition(value: DockviewHeaderPosition) {
         this._model.headerPosition = value;
     }
 

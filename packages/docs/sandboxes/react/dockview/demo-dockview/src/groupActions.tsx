@@ -2,7 +2,7 @@ import {
     DockviewApi,
     DockviewGroupLocation,
     DockviewGroupPanel,
-    IHeaderPosition,
+    DockviewHeaderPosition,
 } from 'dockview';
 import * as React from 'react';
 
@@ -35,7 +35,7 @@ const GroupAction = (props: {
     }, [props.api, props.groupId]);
 
     const [headerPosition, setHeaderPosition] =
-        React.useState<IHeaderPosition>(group?.headerPosition ?? 'top');
+        React.useState<DockviewHeaderPosition>(group?.headerPosition ?? 'top');
     const [location, setLocation] =
         React.useState<DockviewGroupLocation | null>(null);
     const [isMaximized, setIsMaximized] = React.useState<boolean>(false);
@@ -111,7 +111,7 @@ const GroupAction = (props: {
                     className="demo-icon-button"
                     value={headerPosition}
                     onChange={(e) => {
-                        const value = e.target.value as IHeaderPosition;
+                        const value = e.target.value as DockviewHeaderPosition;
                         if (group) {
                             group.headerPosition = value;
                             setHeaderPosition(value);

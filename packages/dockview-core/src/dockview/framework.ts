@@ -4,7 +4,7 @@ import { DockviewPanelApi } from '../api/dockviewPanelApi';
 import { PanelParameters } from '../framwork';
 import { DockviewGroupPanel, IDockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
-import { IHeaderPosition } from './options';
+import { DockviewHeaderPosition } from './options';
 
 export interface IGroupPanelBaseProps<
     T extends { [index: string]: any } = any,
@@ -29,7 +29,7 @@ export interface IDockviewHeaderActionsProps {
     activePanel: IDockviewPanel | undefined;
     isGroupActive: boolean;
     group: DockviewGroupPanel;
-    headerPosition: IHeaderPosition;
+    headerPosition: DockviewHeaderPosition;
 }
 
 export interface IGroupHeaderProps {

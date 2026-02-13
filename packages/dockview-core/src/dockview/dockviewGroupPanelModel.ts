@@ -40,8 +40,8 @@ import {
     DockviewDndOverlayEvent,
     DockviewUnhandledDragOverEvent,
     IHeaderActionsRenderer,
-    IHeaderDirection,
-    IHeaderPosition,
+    DockviewHeaderDirection,
+    DockviewHeaderPosition,
 } from './options';
 import { OverlayRenderContainer } from '../overlay/overlayRenderContainer';
 import { TitleEvent } from '../api/dockviewPanelApi';
@@ -144,7 +144,7 @@ export class DockviewWillDropEvent extends DockviewDidDropEvent {
 
 export interface IHeader {
     hidden: boolean;
-    direction: IHeaderDirection;
+    direction: DockviewHeaderDirection;
 }
 
 export type DockviewGroupPanelLocked = boolean | 'no-drop-target';
@@ -163,7 +163,7 @@ export interface IDockviewGroupPanelModel extends IPanel {
     readonly onDidActivePanelChange: Event<DockviewGroupChangeEvent>;
     readonly onMove: Event<GroupMoveEvent>;
     locked: DockviewGroupPanelLocked;
-    headerPosition: IHeaderPosition;
+    headerPosition: DockviewHeaderPosition;
     setActive(isActive: boolean): void;
     initialize(): void;
     // state
@@ -219,7 +219,7 @@ export class DockviewGroupPanelModel
     private _rightHeaderActionsDisposable: IDisposable | undefined;
     private _leftHeaderActionsDisposable: IDisposable | undefined;
     private _prefixHeaderActionsDisposable: IDisposable | undefined;
-    private _headerPosition: IHeaderPosition | undefined;
+    private _headerPosition: DockviewHeaderPosition | undefined;
     private _location: DockviewGroupLocation = { type: 'grid' };
 
     private mostRecentlyUsed: IDockviewPanel[] = [];
@@ -345,11 +345,11 @@ export class DockviewGroupPanelModel
         );
     }
 
-    get headerPosition(): IHeaderPosition {
+    get headerPosition(): DockviewHeaderPosition {
         return this._headerPosition ?? 'top';
     }
 
-    set headerPosition(value: IHeaderPosition) {
+    set headerPosition(value: DockviewHeaderPosition) {
         this._headerPosition = value;
         removeClasses(
           this.container,
