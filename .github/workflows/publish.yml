@@ -19,6 +19,8 @@ jobs:
             id-token: write
         steps:
             - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
             - uses: actions/setup-node@v4
               with:
                   node-version: '20.x'
@@ -36,7 +38,7 @@ jobs:
             - name: Publish to npm
               run: |
                   for pkg in dockview-core dockview dockview-vue dockview-react dockview-angular; do
-                    npm publish packages/$pkg --provenance --access public
+                    npm publish ./packages/$pkg --provenance --access public
                   done
     publish-experimental:
         if: github.event_name == 'workflow_dispatch'
@@ -46,6 +48,8 @@ jobs:
             id-token: write
         steps:
             - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
             - uses: actions/setup-node@v4
               with:
                   node-version: '20.x'
@@ -64,5 +68,5 @@ jobs:
             - name: Publish to npm
               run: |
                   for pkg in dockview-core dockview dockview-vue dockview-react dockview-angular; do
-                    npm publish packages/$pkg --provenance --access public --tag experimental ${{ inputs.dry-run && '--dry-run' || '' }}
+                    npm publish ./packages/$pkg --provenance --access public --tag experimental ${{ inputs.dry-run && '--dry-run' || '' }}
                   done
