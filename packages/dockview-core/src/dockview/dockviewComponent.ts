@@ -1513,7 +1513,7 @@ export class DockviewComponent
             const createGroupFromSerializedState = (
                 data: GroupPanelViewState
             ) => {
-                const { id, locked, hideHeader, views, activeView } = data;
+                const { id, locked, hideHeader, headerPosition, views, activeView } = data;
 
                 if (typeof id !== 'string') {
                     throw new Error(
@@ -1525,6 +1525,7 @@ export class DockviewComponent
                     id,
                     locked: !!locked,
                     hideHeader: !!hideHeader,
+                    headerPosition,
                 });
                 this._onDidAddGroup.fire(group);
 

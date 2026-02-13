@@ -1705,6 +1705,81 @@ describe('dockviewComponent', () => {
 
             updateSpy.mockRestore();
         });
+
+        test('serialization round-trip preserves headerPosition', () => {
+            dockview.layout(1000, 1000);
+
+            dockview.fromJSON({
+                activeGroup: 'group-1',
+                grid: {
+                    root: {
+                        type: 'branch',
+                        data: [
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panel1'],
+                                    id: 'group-1',
+                                    activeView: 'panel1',
+                                    headerPosition: 'left',
+                                },
+                                size: 500,
+                            },
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panel2'],
+                                    id: 'group-2',
+                                    activeView: 'panel2',
+                                },
+                                size: 500,
+                            },
+                        ],
+                        size: 1000,
+                    },
+                    height: 1000,
+                    width: 1000,
+                    orientation: Orientation.VERTICAL,
+                },
+                panels: {
+                    panel1: {
+                        id: 'panel1',
+                        contentComponent: 'default',
+                        title: 'panel1',
+                    },
+                    panel2: {
+                        id: 'panel2',
+                        contentComponent: 'default',
+                        title: 'panel2',
+                    },
+                },
+            });
+
+            const group1 = dockview.groups.find(
+                (g) => g.api.id === 'group-1'
+            )!;
+            expect(group1.headerPosition).toBe('left');
+
+            const group2 = dockview.groups.find(
+                (g) => g.api.id === 'group-2'
+            )!;
+            expect(group2.headerPosition).toBe('top');
+
+            const result = dockview.toJSON();
+            const group1Data = (
+                result.grid.root as any
+            ).data.find(
+                (d: any) => d.data?.id === 'group-1'
+            );
+            expect(group1Data.data.headerPosition).toBe('left');
+
+            const group2Data = (
+                result.grid.root as any
+            ).data.find(
+                (d: any) => d.data?.id === 'group-2'
+            );
+            expect(group2Data.data.headerPosition).toBeUndefined();
+        });
     });
 
     test('add panel', () => {

@@ -650,6 +650,10 @@ export class DockviewGroupPanelModel
             result.hideHeader = true;
         }
 
+        if (this.headerPosition !== 'top') {
+            result.headerPosition = this.headerPosition;
+        }
+
         return result;
     }
 

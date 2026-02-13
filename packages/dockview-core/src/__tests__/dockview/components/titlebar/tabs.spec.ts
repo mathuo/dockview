@@ -89,4 +89,51 @@ describe('tabs', () => {
             expect(mockTab2.updateDragAndDropState).toHaveBeenCalledTimes(1);
         });
     });
+
+    describe('direction', () => {
+        test('direction setter toggles CSS classes', () => {
+            const cut = new Tabs(
+                fromPartial<DockviewGroupPanel>({}),
+                fromPartial<DockviewComponent>({
+                    options: {},
+                }),
+                {
+                    showTabsOverflowControl: true,
+                }
+            );
+
+            const tabsList = cut.element.querySelector(
+                '.dv-tabs-container'
+            ) as HTMLElement;
+
+            expect(tabsList).toBeTruthy();
+
+            // default direction is horizontal
+            expect(cut.direction).toBe('horizontal');
+
+            cut.direction = 'vertical';
+            expect(cut.direction).toBe('vertical');
+            expect(
+                tabsList.classList.contains('dv-tabs-container-vertical')
+            ).toBeTruthy();
+            expect(
+                tabsList.classList.contains('dv-vertical')
+            ).toBeTruthy();
+            expect(
+                tabsList.classList.contains('dv-horizontal')
+            ).toBeFalsy();
+
+            cut.direction = 'horizontal';
+            expect(cut.direction).toBe('horizontal');
+            expect(
+                tabsList.classList.contains('dv-tabs-container-vertical')
+            ).toBeFalsy();
+            expect(
+                tabsList.classList.contains('dv-horizontal')
+            ).toBeTruthy();
+            expect(
+                tabsList.classList.contains('dv-vertical')
+            ).toBeFalsy();
+        });
+    });
 });
