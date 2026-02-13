@@ -1,16 +1,17 @@
-import { Type, Injector, EnvironmentInjector } from '@angular/core';
+import { Injector, EnvironmentInjector } from '@angular/core';
 import {
     IPanePart,
     PanelUpdateEvent,
     PanePanelComponentInitParameter,
 } from 'dockview-core';
 import { AngularRenderer } from '../utils/angular-renderer';
+import { ComponentReference } from '../types';
 
 export class AngularPanePart implements IPanePart {
     private renderer: AngularRenderer;
 
     constructor(
-        private readonly angularComponent: Type<any>,
+        private readonly angularComponent: ComponentReference,
         private readonly injector: Injector,
         private readonly environmentInjector?: EnvironmentInjector
     ) {

@@ -4,9 +4,10 @@ import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
-    EnvironmentInjector,
     inject,
     Injector,
+    TemplateRef,
+    ViewChild,
 } from '@angular/core';
 import { AngularRenderer } from '../lib/utils/angular-renderer';
 
@@ -36,18 +37,33 @@ class TestUpdateComponent {
     }
 }
 
+@Component({
+    selector: 'test-template-holder-component',
+    template: `
+        <ng-template #template>
+            <test-update-component />
+        </ng-template>
+    `,
+})
+class TemplateHolderComponent {
+    @ViewChild('template', { static: true })
+    public template?: TemplateRef<any>;
+}
+
 describe('AngularRenderer', () => {
     let injector: Injector;
-    let environmentInjector: EnvironmentInjector;
     let application: ApplicationRef;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [TestComponent],
+            declarations: [
+                TestComponent,
+                TestUpdateComponent,
+                TemplateHolderComponent,
+            ],
         }).compileComponents();
 
         injector = TestBed.inject(Injector);
-        environmentInjector = TestBed.inject(EnvironmentInjector);
         application = TestBed.inject(ApplicationRef);
     });
 
@@ -63,7 +79,6 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: TestComponent,
             injector,
-            environmentInjector,
         });
 
         renderer.init({ title: 'Updated Title', value: 'test-value' });
@@ -80,7 +95,6 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: TestComponent,
             injector,
-            environmentInjector,
         });
 
         renderer.init({ title: 'Initial Title' });
@@ -97,7 +111,6 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: TestComponent,
             injector,
-            environmentInjector,
         });
 
         renderer.init({ title: 'Test Title' });
@@ -118,7 +131,6 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: null as any,
             injector,
-            environmentInjector,
         });
 
         expect(() => {
@@ -130,7 +142,6 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: TestComponent,
             injector,
-            environmentInjector,
         });
 
         renderer.init({ title: 'Test Title' });
@@ -145,7 +156,6 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: TestComponent,
             injector,
-            environmentInjector,
         });
 
         renderer.init({ title: 'Test Title' });
@@ -161,7 +171,6 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: TestUpdateComponent,
             injector,
-            environmentInjector,
         });
 
         renderer.init({});
@@ -171,5 +180,29 @@ describe('AngularRenderer', () => {
         (renderer.component.instance as TestUpdateComponent).updateCounter();
         application.tick();
         expect(renderer.element.innerHTML).toContain('Counter: 1');
+    });
+
+    it('should render view from template', () => {
+        // Create component with template
+        const templateRenderer = new AngularRenderer({
+            component: TemplateHolderComponent,
+            injector,
+        });
+        templateRenderer.init({});
+        const template = (
+            templateRenderer.component.instance as TemplateHolderComponent
+        ).template;
+
+        expect(template).toBeDefined();
+
+        // Create view from template
+        const renderer = new AngularRenderer({
+            component: template,
+            injector: templateRenderer.component.injector, // use container injector to ensure we have a view
+        });
+        renderer.init({});
+        application.tick();
+
+        expect(renderer.element.innerHTML).toContain('Counter: 0');
     });
 });

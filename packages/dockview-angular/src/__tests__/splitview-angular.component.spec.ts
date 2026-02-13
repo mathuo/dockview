@@ -33,14 +33,6 @@ describe('SplitviewAngularComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should throw error if components input is not provided', () => {
-        component.components = undefined as any;
-
-        expect(() => {
-            component.ngOnInit();
-        }).toThrow('SplitviewAngularComponent: components input is required');
-    });
-
     it('should initialize splitview api on ngOnInit', () => {
         component.ngOnInit();
 

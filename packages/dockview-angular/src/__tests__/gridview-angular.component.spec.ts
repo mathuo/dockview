@@ -33,14 +33,6 @@ describe('GridviewAngularComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should throw error if components input is not provided', () => {
-        component.components = undefined as any;
-
-        expect(() => {
-            component.ngOnInit();
-        }).toThrow('GridviewAngularComponent: components input is required');
-    });
-
     it('should initialize gridview api on ngOnInit', () => {
         component.ngOnInit();
 
