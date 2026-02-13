@@ -7,10 +7,8 @@ import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
 import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
-import {
-    DockviewGroupDropLocation,
-    GroupOptions,
-} from './dockviewGroupPanelModel';
+import { GroupOptions } from './dockviewGroupPanelModel';
+import { DockviewGroupDropLocation } from './events';
 import { IDockviewPanel } from './dockviewPanel';
 import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
 import { IGroupHeaderProps } from './framework';

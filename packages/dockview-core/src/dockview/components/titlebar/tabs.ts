@@ -15,7 +15,7 @@ import {
 import { Scrollbar } from '../../../scrollbar';
 import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
-import { WillShowOverlayLocationEvent } from '../../dockviewGroupPanelModel';
+import { DockviewWillShowOverlayLocationEvent } from '../../events';
 import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
 import { IHeaderDirection } from '../../options';
 import { Tab } from '../tab/tab';
@@ -39,8 +39,8 @@ export class Tabs extends CompositeDisposable {
     readonly onDrop: Event<TabDropIndexEvent> = this._onDrop.event;
 
     private readonly _onWillShowOverlay =
-        new Emitter<WillShowOverlayLocationEvent>();
-    readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent> =
+        new Emitter<DockviewWillShowOverlayLocationEvent>();
+    readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent> =
         this._onWillShowOverlay.event;
 
     private readonly _onOverflowTabsChange = new Emitter<{
@@ -260,7 +260,7 @@ export class Tabs extends CompositeDisposable {
             }),
             tab.onWillShowOverlay((event) => {
                 this._onWillShowOverlay.fire(
-                    new WillShowOverlayLocationEvent(event, {
+                    new DockviewWillShowOverlayLocationEvent(event, {
                         kind: 'tab',
                         panel: this.group.activePanel,
                         api: this.accessor.api,
@@ -325,5 +325,11 @@ export class Tabs extends CompositeDisposable {
                   .map((x) => x.value.panel.id);
 
         this._onOverflowTabsChange.fire({ tabs, reset: options.reset });
+    }
+
+    updateDragAndDropState(): void {
+        for (const tab of this._tabs) {
+            tab.value.updateDragAndDropState();
+        }
     }
 }

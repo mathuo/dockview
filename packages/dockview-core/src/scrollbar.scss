@@ -6,6 +6,12 @@
         position: absolute;
         border-radius: 2px;
         background-color: transparent;
+        
+        /* GPU optimizations */
+        will-change: background-color, transform;
+        transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+        
         transition-property: background-color;
         transition-timing-function: ease-in-out;
         transition-duration: 1s;

@@ -6,7 +6,11 @@ import {
     DockviewGroupLocation,
 } from '../dockview/dockviewGroupPanelModel';
 import { Emitter, Event } from '../events';
-import { GridviewPanelApi, GridviewPanelApiImpl } from './gridviewPanelApi';
+import {
+    GridviewPanelApi,
+    GridviewPanelApiImpl,
+    SizeEvent,
+} from './gridviewPanelApi';
 
 export interface DockviewGroupMoveParams {
     group?: DockviewGroupPanel;
@@ -15,6 +19,10 @@ export interface DockviewGroupMoveParams {
      * The index to place the panel within a group, only applicable if the placement is within an existing group
      */
     index?: number;
+    /**
+     * Whether to skip setting the group as active after moving
+     */
+    skipSetActive?: boolean;
 }
 
 export interface DockviewGroupPanelApi extends GridviewPanelApi {
@@ -41,6 +49,7 @@ const NOT_INITIALIZED_MESSAGE =
 
 export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     private _group: DockviewGroupPanel | undefined;
+    private _pendingSize: SizeEvent | undefined;
 
     readonly _onDidLocationChange =
         new Emitter<DockviewGroupPanelFloatingChangeEvent>();
@@ -57,13 +66,31 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
         return this._group.model.location;
     }
 
-    constructor(id: string, private readonly accessor: DockviewComponent) {
+    constructor(
+        id: string,
+        private readonly accessor: DockviewComponent
+    ) {
         super(id, '__dockviewgroup__');
 
         this.addDisposables(
             this._onDidLocationChange,
-            this._onDidActivePanelChange
+            this._onDidActivePanelChange,
+            this._onDidVisibilityChange.event((event) => {
+                // When becoming visible, apply any pending size change
+                if (event.isVisible && this._pendingSize) {
+                    super.setSize(this._pendingSize);
+                    this._pendingSize = undefined;
+                }
+            })
         );
+    }
+
+    public override setSize(event: SizeEvent): void {
+        // Always store the requested size
+        this._pendingSize = { ...event };
+
+        // Apply the size change immediately
+        super.setSize(event);
     }
 
     close(): void {
@@ -88,7 +115,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             options.group ??
             this.accessor.addGroup({
                 direction: positionToDirection(options.position ?? 'right'),
-                skipSetActive: true,
+                skipSetActive: options.skipSetActive ?? false,
             });
 
         this.accessor.moveGroupOrPanel({
@@ -96,10 +123,11 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             to: {
                 group,
                 position: options.group
-                    ? options.position ?? 'center'
+                    ? (options.position ?? 'center')
                     : 'center',
                 index: options.index,
             },
+            skipSetActive: options.skipSetActive,
         });
     }
 

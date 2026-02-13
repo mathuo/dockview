@@ -2936,4 +2936,69 @@ describe('gridview', () => {
         expect(panel1.api.isVisible).toBeTruthy();
         expect(panel2.api.isVisible).toBeTruthy();
     });
+
+    test('registerPanel is called after doAddGroup - panel api events work immediately', () => {
+        // This test verifies the fix for the timing issue where registerPanel
+        // was called before doAddGroup, causing "Cannot read properties of undefined" errors
+        const gridview = new GridviewComponent(container, {
+            proportionalLayout: false,
+            orientation: Orientation.VERTICAL,
+            createComponent: (options) => {
+                switch (options.name) {
+                    case 'default':
+                        return new TestGridview(options.id, options.name);
+                    default:
+                        throw new Error('unsupported');
+                }
+            },
+        });
+
+        gridview.layout(800, 400);
+
+        // Add first panel
+        const panel1 = gridview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        // Verify the panel API is immediately accessible and functional
+        expect(panel1.api).toBeDefined();
+        expect(panel1.api.onDidFocusChange).toBeDefined();
+
+        // Subscribe to focus events to verify event subscription works
+        let focusEventCount = 0;
+        const disposable = panel1.api.onDidFocusChange((event) => {
+            focusEventCount++;
+        });
+
+        // This should not throw an error - before the fix, this would throw:
+        // "Cannot read properties of undefined (reading 'onDidFocusChange')"
+        const panel2 = gridview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            position: { referencePanel: panel1.id, direction: 'right' },
+        });
+
+        // Verify both panels have working APIs
+        expect(panel1.api).toBeDefined();
+        expect(panel2.api).toBeDefined();
+        expect(panel1.api.onDidFocusChange).toBeDefined();
+        expect(panel2.api.onDidFocusChange).toBeDefined();
+
+        // Verify that the API is functional by checking properties
+        expect(panel1.api.isVisible).toBeTruthy();
+        expect(panel2.api.isVisible).toBeTruthy();
+
+        // Verify we can subscribe to events on the second panel too
+        const disposable2 = panel2.api.onDidFocusChange((event) => {
+            focusEventCount++;
+        });
+
+        // Clean up
+        disposable.dispose();
+        disposable2.dispose();
+
+        // The main test is that we got this far without errors
+        expect(true).toBeTruthy();
+    });
 });

@@ -46,7 +46,9 @@ const SKIP_DOC = ['Event'];
 
 console.log('running docs');
 
-if (!existsSync(TYPEDOC_OUTPUT_FILE)) {
+const forceBuild = true
+
+if (forceBuild || !existsSync(TYPEDOC_OUTPUT_FILE)) {
     execSync(
         `typedoc --json ${TYPEDOC_OUTPUT_FILE}`,
         (error, stdout, stderr) => {

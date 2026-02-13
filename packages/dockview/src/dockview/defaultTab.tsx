@@ -10,6 +10,11 @@ function useTitle(api: DockviewPanelApi): string | undefined {
             setTitle(event.title);
         });
 
+        // Depending on the order in which React effects are run, the title may already be out of sync (cf. issue #1003).
+        if (title !== api.title) {
+            setTitle(api.title);
+        }
+
         return () => {
             disposable.dispose();
         };
@@ -19,7 +24,7 @@ function useTitle(api: DockviewPanelApi): string | undefined {
 }
 
 export type IDockviewDefaultTabProps = IDockviewPanelHeaderProps &
-    React.DOMAttributes<HTMLDivElement> & {
+    React.HtmlHTMLAttributes<HTMLDivElement> & {
         hideClose?: boolean;
         closeActionOverride?: () => void;
     };
@@ -97,7 +102,7 @@ export const DockviewDefaultTab: React.FunctionComponent<
             className="dv-default-tab"
         >
             <span className="dv-default-tab-content">{title}</span>
-            {!hideClose && tabLocation !== 'headerOverflow' && (
+            {!hideClose && (
                 <div
                     className="dv-default-tab-action"
                     onPointerDown={onBtnPointerDown}

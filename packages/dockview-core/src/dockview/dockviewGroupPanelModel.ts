@@ -1,6 +1,6 @@
 import { DockviewApi } from '../api/component.api';
 import { getPanelData, PanelTransfer } from '../dnd/dataTransfer';
-import { Position, WillShowOverlayEvent } from '../dnd/droptarget';
+import { Position } from '../dnd/droptarget';
 import { DockviewComponent } from './dockviewComponent';
 import { addClasses, isAncestor, removeClasses, toggleClass } from '../dom';
 import {
@@ -10,6 +10,11 @@ import {
     Event,
     IDockviewEvent,
 } from '../events';
+import {
+    DockviewGroupDropLocation,
+    DockviewWillShowOverlayLocationEvent,
+    DockviewWillShowOverlayLocationEventOptions,
+} from './events';
 import { IViewSize } from '../gridview/gridview';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import {
@@ -144,12 +149,6 @@ export interface IHeader {
 
 export type DockviewGroupPanelLocked = boolean | 'no-drop-target';
 
-export type DockviewGroupDropLocation =
-    | 'tab'
-    | 'header_space'
-    | 'content'
-    | 'edge';
-
 export interface IDockviewGroupPanelModel extends IPanel {
     readonly isActive: boolean;
     readonly size: number;
@@ -204,55 +203,6 @@ export type DockviewGroupLocation =
     | { type: 'floating' }
     | { type: 'popout'; getWindow: () => Window; popoutUrl?: string };
 
-export class WillShowOverlayLocationEvent implements IDockviewEvent {
-    get kind(): DockviewGroupDropLocation {
-        return this.options.kind;
-    }
-
-    get nativeEvent(): DragEvent {
-        return this.event.nativeEvent;
-    }
-
-    get position(): Position {
-        return this.event.position;
-    }
-
-    get defaultPrevented(): boolean {
-        return this.event.defaultPrevented;
-    }
-
-    get panel(): IDockviewPanel | undefined {
-        return this.options.panel;
-    }
-
-    get api(): DockviewApi {
-        return this.options.api;
-    }
-
-    get group(): DockviewGroupPanel | undefined {
-        return this.options.group;
-    }
-
-    preventDefault(): void {
-        this.event.preventDefault();
-    }
-
-    getData(): PanelTransfer | undefined {
-        return this.options.getData();
-    }
-
-    constructor(
-        private readonly event: WillShowOverlayEvent,
-        private readonly options: {
-            kind: DockviewGroupDropLocation;
-            panel: IDockviewPanel | undefined;
-            api: DockviewApi;
-            group: DockviewGroupPanel | undefined;
-            getData: () => PanelTransfer | undefined;
-        }
-    ) {}
-}
-
 export class DockviewGroupPanelModel
     extends CompositeDisposable
     implements IDockviewGroupPanelModel
@@ -297,8 +247,8 @@ export class DockviewGroupPanelModel
     readonly onWillDrop: Event<DockviewWillDropEvent> = this._onWillDrop.event;
 
     private readonly _onWillShowOverlay =
-        new Emitter<WillShowOverlayLocationEvent>();
-    readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent> =
+        new Emitter<DockviewWillShowOverlayLocationEvent>();
+    readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent> =
         this._onWillShowOverlay.event;
 
     private readonly _onTabDragStart = new Emitter<TabDragEvent>();
@@ -533,7 +483,7 @@ export class DockviewGroupPanelModel
             }),
             this.contentContainer.dropTarget.onWillShowOverlay((event) => {
                 this._onWillShowOverlay.fire(
-                    new WillShowOverlayLocationEvent(event, {
+                    new DockviewWillShowOverlayLocationEvent(event, {
                         kind: 'content',
                         panel: this.activePanel,
                         api: this._api,
@@ -1021,9 +971,14 @@ export class DockviewGroupPanelModel
         if (panel) {
             this.tabsContainer.setActivePanel(panel);
 
+            this.contentContainer.openPanel(panel);
+
             panel.layout(this._width, this._height);
 
             this.updateMru(panel);
+
+            // Refresh focus state to handle programmatic activation without DOM focus change
+            this.contentContainer.refreshFocusState();
 
             this._onDidActivePanelChange.fire({
                 panel,
@@ -1195,6 +1150,10 @@ export class DockviewGroupPanelModel
                 })
             );
         }
+    }
+
+    updateDragAndDropState(): void {
+        this.tabsContainer.updateDragAndDropState();
     }
 
     public dispose(): void {

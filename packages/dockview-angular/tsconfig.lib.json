@@ -1,0 +1,26 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "target": "es2022",
+        "module": "es2022",
+        "moduleResolution": "node",
+        "lib": ["es2022", "dom"],
+        "declaration": true,
+        "declarationMap": true,
+        "inlineSources": true,
+        "skipLibCheck": true,
+        "types": [],
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "strict": true,
+        "useDefineForClassFields": false
+    },
+    "include": ["src/**/*"],
+    "exclude": ["src/__tests__", "**/*.spec.ts"],
+    "angularCompilerOptions": {
+        "skipTemplateCodegen": true,
+        "strictMetadataEmit": true,
+        "enableResourceInlining": true,
+        "compilationMode": "partial"
+    }
+}

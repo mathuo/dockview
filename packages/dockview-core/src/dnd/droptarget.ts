@@ -5,6 +5,79 @@ import { DragAndDropObserver } from './dnd';
 import { clamp } from '../math';
 import { Direction } from '../gridview/baseComponentGridview';
 
+interface DropTargetRect {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+}
+
+function setGPUOptimizedBounds(
+    element: HTMLElement,
+    bounds: DropTargetRect
+): void {
+    const { top, left, width, height } = bounds;
+    const topPx = `${Math.round(top)}px`;
+    const leftPx = `${Math.round(left)}px`;
+    const widthPx = `${Math.round(width)}px`;
+    const heightPx = `${Math.round(height)}px`;
+
+    // Use traditional positioning but maintain GPU layer
+    element.style.top = topPx;
+    element.style.left = leftPx;
+    element.style.width = widthPx;
+    element.style.height = heightPx;
+    element.style.visibility = 'visible';
+
+    // Ensure GPU layer is maintained
+    if (!element.style.transform || element.style.transform === '') {
+        element.style.transform = 'translate3d(0, 0, 0)';
+    }
+}
+
+function setGPUOptimizedBoundsFromStrings(
+    element: HTMLElement,
+    bounds: {
+        top: string;
+        left: string;
+        width: string;
+        height: string;
+    }
+): void {
+    const { top, left, width, height } = bounds;
+
+    // Use traditional positioning but maintain GPU layer
+    element.style.top = top;
+    element.style.left = left;
+    element.style.width = width;
+    element.style.height = height;
+    element.style.visibility = 'visible';
+
+    // Ensure GPU layer is maintained
+    if (!element.style.transform || element.style.transform === '') {
+        element.style.transform = 'translate3d(0, 0, 0)';
+    }
+}
+
+function checkBoundsChanged(
+    element: HTMLElement,
+    bounds: DropTargetRect
+): boolean {
+    const { top, left, width, height } = bounds;
+    const topPx = `${Math.round(top)}px`;
+    const leftPx = `${Math.round(left)}px`;
+    const widthPx = `${Math.round(width)}px`;
+    const heightPx = `${Math.round(height)}px`;
+
+    // Check if position or size changed (back to traditional method)
+    return (
+        element.style.top !== topPx ||
+        element.style.left !== leftPx ||
+        element.style.width !== widthPx ||
+        element.style.height !== heightPx
+    );
+}
+
 export interface DroptargetEvent {
     readonly position: Position;
     readonly nativeEvent: DragEvent;
@@ -168,10 +241,10 @@ export class Droptarget extends CompositeDisposable {
             onDragOver: (e) => {
                 Droptarget.ACTUAL_TARGET = this;
 
-                const overrideTraget = this.options.getOverrideTarget?.();
+                const overrideTarget = this.options.getOverrideTarget?.();
 
                 if (this._acceptedTargetZonesSet.size === 0) {
-                    if (overrideTraget) {
+                    if (overrideTarget) {
                         return;
                     }
                     this.removeDropTarget();
@@ -214,7 +287,7 @@ export class Droptarget extends CompositeDisposable {
                 }
 
                 if (!this.options.canDisplayOverlay(e, quadrant)) {
-                    if (overrideTraget) {
+                    if (overrideTarget) {
                         return;
                     }
                     this.removeDropTarget();
@@ -239,7 +312,7 @@ export class Droptarget extends CompositeDisposable {
 
                 this.markAsUsed(e);
 
-                if (overrideTraget) {
+                if (overrideTarget) {
                     //
                 } else if (!this.targetElement) {
                     this.targetElement = document.createElement('div');
@@ -422,25 +495,12 @@ export class Droptarget extends CompositeDisposable {
                 box.width = 4;
             }
 
-            const topPx = `${Math.round(box.top)}px`;
-            const leftPx = `${Math.round(box.left)}px`;
-            const widthPx = `${Math.round(box.width)}px`;
-            const heightPx = `${Math.round(box.height)}px`;
-
-            if (
-                overlay.style.top === topPx &&
-                overlay.style.left === leftPx &&
-                overlay.style.width === widthPx &&
-                overlay.style.height === heightPx
-            ) {
+            // Use GPU-optimized bounds checking and setting
+            if (!checkBoundsChanged(overlay, box)) {
                 return;
             }
 
-            overlay.style.top = topPx;
-            overlay.style.left = leftPx;
-            overlay.style.width = widthPx;
-            overlay.style.height = heightPx;
-            overlay.style.visibility = 'visible';
+            setGPUOptimizedBounds(overlay, box);
 
             overlay.className = `dv-drop-target-anchor${
                 this.options.className ? ` ${this.options.className}` : ''
@@ -511,10 +571,7 @@ export class Droptarget extends CompositeDisposable {
             box.height = `${100 * size}%`;
         }
 
-        this.overlayElement.style.top = box.top;
-        this.overlayElement.style.left = box.left;
-        this.overlayElement.style.width = box.width;
-        this.overlayElement.style.height = box.height;
+        setGPUOptimizedBoundsFromStrings(this.overlayElement, box);
 
         toggleClass(
             this.overlayElement,

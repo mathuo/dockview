@@ -634,7 +634,7 @@ describe('splitview', () => {
             new MouseEvent('pointerdown', { clientX: 50, clientY: 100 })
         );
 
-        expect(addEventListenerSpy).toBeCalledTimes(3);
+        expect(addEventListenerSpy).toBeCalledTimes(4);
 
         // during a sash drag the views should have pointer-events disabled
         expect(view1.element.parentElement!.style.pointerEvents).toBe('none');
@@ -660,7 +660,7 @@ describe('splitview', () => {
             new MouseEvent('pointerup', { clientX: 70, clientY: 110 })
         );
 
-        expect(removeEventListenerSpy).toBeCalledTimes(3);
+        expect(removeEventListenerSpy).toBeCalledTimes(4);
 
         // expect pointer-eventes on views to be restored
         expect(view1.element.parentElement!.style.pointerEvents).toBe('');
@@ -673,8 +673,60 @@ describe('splitview', () => {
         // expect no additional resizes
         expect([view1.size, view2.size]).toEqual([225, 175]);
         // expect no additional document listeners
-        expect(addEventListenerSpy).toBeCalledTimes(3);
-        expect(removeEventListenerSpy).toBeCalledTimes(3);
+        expect(addEventListenerSpy).toBeCalledTimes(4);
+        expect(removeEventListenerSpy).toBeCalledTimes(4);
+    });
+
+    test('should restore iframe pointer events on contextmenu during sash drag', () => {
+        const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
+        const removeEventListenerSpy = jest.spyOn(
+            document,
+            'removeEventListener'
+        );
+
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+        });
+        splitview.layout(400, 500);
+
+        const view1 = new Testview(0, 1000);
+        const view2 = new Testview(0, 1000);
+
+        splitview.addView(view1, Sizing.Distribute);
+        splitview.addView(view2, Sizing.Distribute);
+
+        const sashElement = container
+            .getElementsByClassName('dv-sash')
+            .item(0) as HTMLElement;
+
+        // validate the expected state before drag
+        expect([view1.size, view2.size]).toEqual([200, 200]);
+        expect(view1.element.parentElement!.style.pointerEvents).toBe('');
+        expect(view2.element.parentElement!.style.pointerEvents).toBe('');
+
+        // start the drag event
+        fireEvent(
+            sashElement,
+            new MouseEvent('pointerdown', { clientX: 50, clientY: 100 })
+        );
+
+        // during a sash drag the views should have pointer-events disabled
+        expect(view1.element.parentElement!.style.pointerEvents).toBe('none');
+        expect(view2.element.parentElement!.style.pointerEvents).toBe('none');
+
+        // simulate contextmenu event (e.g., right-click during drag)
+        fireEvent(
+            document,
+            new MouseEvent('contextmenu', { clientX: 60, clientY: 105 })
+        );
+
+        // expect pointer-events on views to be restored after contextmenu
+        expect(view1.element.parentElement!.style.pointerEvents).toBe('');
+        expect(view2.element.parentElement!.style.pointerEvents).toBe('');
+
+        // cleanup
+        addEventListenerSpy.mockRestore();
+        removeEventListenerSpy.mockRestore();
     });
 
     test('setViewVisible', () => {

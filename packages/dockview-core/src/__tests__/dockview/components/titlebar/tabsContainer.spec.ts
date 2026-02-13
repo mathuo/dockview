@@ -864,4 +864,410 @@ describe('tabsContainer', () => {
         cut.closePanel(panel2);
         expect(cut.element.classList.contains('dv-single-tab')).toBeFalsy();
     });
+
+    describe('updateDragAndDropState', () => {
+        test('that updateDragAndDropState calls updateDragAndDropState on tabs and voidContainer', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                options: {},
+                onDidOptionsChange: jest.fn(),
+            });
+
+            const groupPanel = fromPartial<DockviewGroupPanel>({
+                id: 'testgroupid',
+                model: fromPartial<DockviewGroupPanelModel>({}),
+            });
+
+            const cut = new TabsContainer(accessor, groupPanel);
+
+            // Mock the tabs and voidContainer to verify methods are called
+            const mockTabs = { updateDragAndDropState: jest.fn() };
+            const mockVoidContainer = { updateDragAndDropState: jest.fn() };
+
+            (cut as any).tabs = mockTabs;
+            (cut as any).voidContainer = mockVoidContainer;
+
+            cut.updateDragAndDropState();
+
+            expect(mockTabs.updateDragAndDropState).toHaveBeenCalledTimes(1);
+            expect(
+                mockVoidContainer.updateDragAndDropState
+            ).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('tab overflow dropdown with close buttons', () => {
+        test('close button should be visible and clickable in dropdown tabs', () => {
+            const mockPopupService = {
+                openPopover: jest.fn(),
+                close: jest.fn(),
+            };
+
+            const accessor = fromPartial<DockviewComponent>({
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                options: {},
+                onDidOptionsChange: jest.fn(),
+                popupService: mockPopupService,
+            });
+
+            const mockClose = jest.fn();
+            const mockSetActive = jest.fn();
+            const mockScrollIntoView = jest.fn();
+
+            const mockPanel = fromPartial<IDockviewPanel>({
+                id: 'test-panel',
+                api: {
+                    isActive: false,
+                    close: mockClose,
+                    setActive: mockSetActive,
+                },
+                view: {
+                    createTabRenderer: jest.fn().mockReturnValue({
+                        element: (() => {
+                            const tabElement = document.createElement('div');
+                            tabElement.className = 'dv-default-tab';
+
+                            const content = document.createElement('div');
+                            content.className = 'dv-default-tab-content';
+                            content.textContent = 'Test Tab';
+
+                            const action = document.createElement('div');
+                            action.className = 'dv-default-tab-action';
+                            const closeButton = document.createElement('div');
+                            action.appendChild(closeButton);
+
+                            // Simulate close button functionality
+                            action.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                mockClose();
+                            });
+
+                            tabElement.appendChild(content);
+                            tabElement.appendChild(action);
+
+                            return tabElement;
+                        })(),
+                    }),
+                },
+            });
+
+            const mockTab = {
+                panel: mockPanel,
+                element: {
+                    scrollIntoView: mockScrollIntoView,
+                },
+            };
+
+            const mockTabs = {
+                tabs: [mockTab],
+                onDrop: jest.fn(),
+                onTabDragStart: jest.fn(),
+                onWillShowOverlay: jest.fn(),
+                onOverflowTabsChange: jest.fn(),
+                size: 1,
+                panels: ['test-panel'],
+                isActive: jest.fn(),
+                indexOf: jest.fn(),
+                delete: jest.fn(),
+                setActivePanel: jest.fn(),
+                openPanel: jest.fn(),
+                showTabsOverflowControl: true,
+                updateDragAndDropState: jest.fn(),
+                element: document.createElement('div'),
+                dispose: jest.fn(),
+            };
+
+            const groupPanel = fromPartial<DockviewGroupPanel>({
+                id: 'testgroupid',
+                panels: [mockPanel],
+                model: fromPartial<DockviewGroupPanelModel>({}),
+            });
+
+            const cut = new TabsContainer(accessor, groupPanel);
+            (cut as any).tabs = mockTabs;
+
+            // Simulate overflow tabs
+            (cut as any).toggleDropdown({ tabs: ['test-panel'], reset: false });
+
+            // Find the dropdown trigger and click it
+            const dropdownTrigger = cut.element.querySelector(
+                '.dv-tabs-overflow-dropdown-root'
+            );
+            expect(dropdownTrigger).toBeTruthy();
+
+            // Simulate clicking the dropdown trigger
+            fireEvent.click(dropdownTrigger!);
+
+            // Verify popup was opened
+            expect(mockPopupService.openPopover).toHaveBeenCalled();
+
+            // Get the popover content
+            const popoverContent =
+                mockPopupService.openPopover.mock.calls[0][0];
+            expect(popoverContent).toBeTruthy();
+
+            // Find the tab wrapper in the popover
+            const tabWrapper = popoverContent.querySelector('.dv-tab');
+            expect(tabWrapper).toBeTruthy();
+
+            // Verify the close button is visible in dropdown
+            const closeButton = tabWrapper!.querySelector(
+                '.dv-default-tab-action'
+            ) as HTMLElement;
+            expect(closeButton).toBeTruthy();
+            expect(closeButton.style.display).not.toBe('none');
+
+            // Simulate clicking the close button
+            fireEvent.click(closeButton!);
+
+            // Verify that the close method was called
+            expect(mockClose).toHaveBeenCalledTimes(1);
+
+            // Verify that tab activation methods were NOT called when clicking close button
+            expect(mockScrollIntoView).not.toHaveBeenCalled();
+            expect(mockSetActive).not.toHaveBeenCalled();
+        });
+
+        test('clicking tab content (not close button) should activate tab', () => {
+            const mockPopupService = {
+                openPopover: jest.fn(),
+                close: jest.fn(),
+            };
+
+            const accessor = fromPartial<DockviewComponent>({
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                options: {},
+                onDidOptionsChange: jest.fn(),
+                popupService: mockPopupService,
+            });
+
+            const mockClose = jest.fn();
+            const mockSetActive = jest.fn();
+            const mockScrollIntoView = jest.fn();
+
+            const mockPanel = fromPartial<IDockviewPanel>({
+                id: 'test-panel',
+                api: {
+                    isActive: false,
+                    close: mockClose,
+                    setActive: mockSetActive,
+                },
+                view: {
+                    createTabRenderer: jest.fn().mockReturnValue({
+                        element: (() => {
+                            const tabElement = document.createElement('div');
+                            tabElement.className = 'dv-default-tab';
+
+                            const content = document.createElement('div');
+                            content.className = 'dv-default-tab-content';
+                            content.textContent = 'Test Tab';
+
+                            const action = document.createElement('div');
+                            action.className = 'dv-default-tab-action';
+                            const closeButton = document.createElement('div');
+                            action.appendChild(closeButton);
+
+                            // Simulate close button functionality
+                            action.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                mockClose();
+                            });
+
+                            tabElement.appendChild(content);
+                            tabElement.appendChild(action);
+
+                            return tabElement;
+                        })(),
+                    }),
+                },
+            });
+
+            const mockTab = {
+                panel: mockPanel,
+                element: {
+                    scrollIntoView: mockScrollIntoView,
+                },
+            };
+
+            const mockTabs = {
+                tabs: [mockTab],
+                onDrop: jest.fn(),
+                onTabDragStart: jest.fn(),
+                onWillShowOverlay: jest.fn(),
+                onOverflowTabsChange: jest.fn(),
+                size: 1,
+                panels: ['test-panel'],
+                isActive: jest.fn(),
+                indexOf: jest.fn(),
+                delete: jest.fn(),
+                setActivePanel: jest.fn(),
+                openPanel: jest.fn(),
+                showTabsOverflowControl: true,
+                updateDragAndDropState: jest.fn(),
+                element: document.createElement('div'),
+                dispose: jest.fn(),
+            };
+
+            const groupPanel = fromPartial<DockviewGroupPanel>({
+                id: 'testgroupid',
+                panels: [mockPanel],
+                model: fromPartial<DockviewGroupPanelModel>({}),
+            });
+
+            const cut = new TabsContainer(accessor, groupPanel);
+            (cut as any).tabs = mockTabs;
+
+            // Simulate overflow tabs
+            (cut as any).toggleDropdown({ tabs: ['test-panel'], reset: false });
+
+            // Find the dropdown trigger and click it
+            const dropdownTrigger = cut.element.querySelector(
+                '.dv-tabs-overflow-dropdown-root'
+            );
+            expect(dropdownTrigger).toBeTruthy();
+
+            // Simulate clicking the dropdown trigger
+            fireEvent.click(dropdownTrigger!);
+
+            // Get the popover content
+            const popoverContent =
+                mockPopupService.openPopover.mock.calls[0][0];
+            const tabWrapper = popoverContent.querySelector('.dv-tab');
+
+            // Simulate clicking the tab content (not the close button)
+            const tabContent = tabWrapper!.querySelector(
+                '.dv-default-tab-content'
+            );
+            fireEvent.click(tabContent!);
+
+            // Verify that tab activation methods were called
+            expect(mockPopupService.close).toHaveBeenCalled();
+            expect(mockScrollIntoView).toHaveBeenCalled();
+            expect(mockSetActive).toHaveBeenCalled();
+
+            // Verify that close was NOT called when clicking content
+            expect(mockClose).not.toHaveBeenCalled();
+        });
+
+        test('click event should respect preventDefault in dropdown wrapper', () => {
+            const mockPopupService = {
+                openPopover: jest.fn(),
+                close: jest.fn(),
+            };
+
+            const accessor = fromPartial<DockviewComponent>({
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                options: {},
+                onDidOptionsChange: jest.fn(),
+                popupService: mockPopupService,
+            });
+
+            const mockClose = jest.fn();
+            const mockSetActive = jest.fn();
+            const mockScrollIntoView = jest.fn();
+
+            const mockPanel = fromPartial<IDockviewPanel>({
+                id: 'test-panel',
+                api: {
+                    isActive: false,
+                    close: mockClose,
+                    setActive: mockSetActive,
+                },
+                view: {
+                    createTabRenderer: jest.fn().mockReturnValue({
+                        element: (() => {
+                            const tabElement = document.createElement('div');
+                            tabElement.className = 'dv-default-tab';
+
+                            const content = document.createElement('div');
+                            content.className = 'dv-default-tab-content';
+                            content.textContent = 'Test Tab';
+
+                            const action = document.createElement('div');
+                            action.className = 'dv-default-tab-action';
+                            const closeButton = document.createElement('div');
+                            action.appendChild(closeButton);
+
+                            // Simulate close button functionality that prevents default
+                            action.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                mockClose();
+                            });
+
+                            tabElement.appendChild(content);
+                            tabElement.appendChild(action);
+
+                            return tabElement;
+                        })(),
+                    }),
+                },
+            });
+
+            const mockTab = {
+                panel: mockPanel,
+                element: {
+                    scrollIntoView: mockScrollIntoView,
+                },
+            };
+
+            const mockTabs = {
+                tabs: [mockTab],
+                onDrop: jest.fn(),
+                onTabDragStart: jest.fn(),
+                onWillShowOverlay: jest.fn(),
+                onOverflowTabsChange: jest.fn(),
+                size: 1,
+                panels: ['test-panel'],
+                isActive: jest.fn(),
+                indexOf: jest.fn(),
+                delete: jest.fn(),
+                setActivePanel: jest.fn(),
+                openPanel: jest.fn(),
+                showTabsOverflowControl: true,
+                updateDragAndDropState: jest.fn(),
+                element: document.createElement('div'),
+                dispose: jest.fn(),
+            };
+
+            const groupPanel = fromPartial<DockviewGroupPanel>({
+                id: 'testgroupid',
+                panels: [mockPanel],
+                model: fromPartial<DockviewGroupPanelModel>({}),
+            });
+
+            const cut = new TabsContainer(accessor, groupPanel);
+            (cut as any).tabs = mockTabs;
+
+            // Simulate overflow tabs
+            (cut as any).toggleDropdown({ tabs: ['test-panel'], reset: false });
+
+            // Find the dropdown trigger and click it
+            const dropdownTrigger = cut.element.querySelector(
+                '.dv-tabs-overflow-dropdown-root'
+            );
+            fireEvent.click(dropdownTrigger!);
+
+            // Get the popover content
+            const popoverContent =
+                mockPopupService.openPopover.mock.calls[0][0];
+            const tabWrapper = popoverContent.querySelector('.dv-tab');
+            const closeButton = tabWrapper!.querySelector(
+                '.dv-default-tab-action'
+            );
+
+            // Simulate clicking the close button (which calls preventDefault)
+            fireEvent.click(closeButton!);
+
+            // Verify close was called
+            expect(mockClose).toHaveBeenCalledTimes(1);
+
+            // Verify that tab activation methods were NOT called due to preventDefault
+            expect(mockScrollIntoView).not.toHaveBeenCalled();
+            expect(mockSetActive).not.toHaveBeenCalled();
+        });
+    });
 });

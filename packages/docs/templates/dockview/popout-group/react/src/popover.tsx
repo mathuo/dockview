@@ -1,54 +1,77 @@
-import { useLayer, Arrow } from 'react-laag';
-import { motion, AnimatePresence } from 'framer-motion';
 import React from 'react';
 
 export function PopoverMenu(props: { window: Window }) {
     const [isOpen, setOpen] = React.useState(false);
+    const buttonRef = React.useRef<HTMLButtonElement>(null);
 
     // helper function to close the menu
     function close() {
         setOpen(false);
     }
 
-    const { renderLayer, triggerProps, layerProps, arrowProps } = useLayer({
-        isOpen,
-        onOutsideClick: close, // close the menu when the user clicks outside
-        onDisappear: close, // close the menu when the menu gets scrolled out of sight
-        overflowContainer: false, // keep the menu positioned inside the container
-        auto: true, // automatically find the best placement
-        placement: 'top-end', // we prefer to place the menu "top-end"
-        triggerOffset: 12, // keep some distance to the trigger
-        containerOffset: 16, // give the menu some room to breath relative to the container
-        arrowOffset: 16, // let the arrow have some room to breath also,
-        environment: props.window,
-        container: props.window
-            ? () => {
-                  const el = props.window.document.body;
-                  Object.setPrototypeOf(el, HTMLElement.prototype);
-                  return el;
-              }
-            : undefined,
-    });
+    // Close on click outside
+    React.useEffect(() => {
+        if (!isOpen) return;
+        
+        function handleClickOutside(event: Event) {
+            if (buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
+                close();
+            }
+        }
 
-    // Again, we're using framer-motion for the transition effect
+        const doc = props.window?.document || document;
+        doc.addEventListener('mousedown', handleClickOutside);
+        return () => doc.removeEventListener('mousedown', handleClickOutside);
+    }, [isOpen, props.window]);
+
     return (
         <>
-            <button {...triggerProps} onClick={() => setOpen(!isOpen)}>
+            <button 
+                ref={buttonRef}
+                onClick={() => setOpen(!isOpen)}
+                style={{ position: 'relative' }}
+            >
                 {isOpen ? 'Hide' : 'Show'}
+                {isOpen && (
+                    <ul style={{
+                        position: 'absolute',
+                        top: '-120px',
+                        right: '0',
+                        backgroundColor: 'white',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                        listStyle: 'none',
+                        padding: '8px 0',
+                        margin: '0',
+                        minWidth: '120px',
+                        zIndex: 1000,
+                        transition: 'opacity 0.2s ease-in-out',
+                        opacity: 1
+                    }}>
+                        <li style={{ padding: '8px 16px', cursor: 'pointer' }} 
+                            onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                            Item 1
+                        </li>
+                        <li style={{ padding: '8px 16px', cursor: 'pointer' }}
+                            onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                            Item 2
+                        </li>
+                        <li style={{ padding: '8px 16px', cursor: 'pointer' }}
+                            onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                            Item 3
+                        </li>
+                        <li style={{ padding: '8px 16px', cursor: 'pointer' }}
+                            onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                            Item 4
+                        </li>
+                    </ul>
+                )}
             </button>
-            {renderLayer(
-                <AnimatePresence>
-                    {isOpen && (
-                        <motion.ul {...layerProps}>
-                            <li>Item 1</li>
-                            <li>Item 2</li>
-                            <li>Item 3</li>
-                            <li>Item 4</li>
-                            <Arrow {...arrowProps} />
-                        </motion.ul>
-                    )}
-                </AnimatePresence>
-            )}
         </>
     );
 }

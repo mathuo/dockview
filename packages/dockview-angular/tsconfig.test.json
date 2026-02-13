@@ -1,0 +1,10 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "module": "commonjs",
+        "types": ["jest", "node"],
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true
+    },
+    "include": ["src/**/*.spec.ts", "src/**/__tests__/**/*.ts", "src/**/*.d.ts"]
+}

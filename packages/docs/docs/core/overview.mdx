@@ -49,3 +49,20 @@ const App = {
 ```
 </FrameworkSpecific>
 
+<FrameworkSpecific framework='Angular'>
+```tsx
+export class AppComponent {
+    onReady(event: DockviewReadyEvent) {
+        /**
+         * You should store a reference to `api` as a class property
+         * for later interactions
+         */
+        const api: DockviewApi = event.api;
+    }
+}
+
+// In template:
+<dv-dockview (ready)="onReady($event)"></dv-dockview>
+```
+</FrameworkSpecific>
+

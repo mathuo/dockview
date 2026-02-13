@@ -29,12 +29,11 @@ export interface GroupChangedEvent {
 
 export type DockviewPanelMoveParams = DockviewGroupMoveParams;
 
-export interface DockviewPanelApi
-    extends Omit<
-        GridviewPanelApi,
-        // omit properties that do not make sense here
-        'setVisible' | 'onDidConstraintsChange' | 'setConstraints'
-    > {
+export interface DockviewPanelApi extends Omit<
+    GridviewPanelApi,
+    // omit properties that do not make sense here
+    'setVisible' | 'onDidConstraintsChange'
+> {
     /**
      * The id of the tab component renderer
      *
@@ -166,10 +165,11 @@ export class DockviewPanelApiImpl
             to: {
                 group: options.group ?? this._group,
                 position: options.group
-                    ? options.position ?? 'center'
+                    ? (options.position ?? 'center')
                     : 'center',
                 index: options.index,
             },
+            skipSetActive: options.skipSetActive,
         });
     }
 

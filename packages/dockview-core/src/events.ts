@@ -160,7 +160,9 @@ export class Emitter<T> implements IDisposable {
     }
 
     public fire(e: T): void {
-        this._last = e;
+        if (this.options?.replay) {
+            this._last = e;
+        }
         for (const listener of this._listeners) {
             listener.callback(e);
         }
@@ -206,7 +208,7 @@ export function addDisposableListener<K extends keyof HTMLElementEventMap>(
     options?: boolean | AddEventListenerOptions
 ): IDisposable;
 export function addDisposableListener<
-    K extends keyof HTMLElementEventMap | keyof WindowEventMap
+    K extends keyof HTMLElementEventMap | keyof WindowEventMap,
 >(
     element: HTMLElement | Window,
     type: K,
@@ -215,8 +217,8 @@ export function addDisposableListener<
         ev: K extends keyof HTMLElementEventMap
             ? HTMLElementEventMap[K]
             : K extends keyof WindowEventMap
-            ? WindowEventMap[K]
-            : never
+              ? WindowEventMap[K]
+              : never
     ) => any,
     options?: boolean | AddEventListenerOptions
 ): IDisposable {

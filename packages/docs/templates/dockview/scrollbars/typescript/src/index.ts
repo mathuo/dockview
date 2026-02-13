@@ -3,6 +3,7 @@ import {
     createDockview,
     GroupPanelPartInitParameters,
     IContentRenderer,
+    themeAbyss,
 } from 'dockview-core';
 
 const TEXT =
@@ -74,7 +75,7 @@ class UserDefinedOverflowContainer implements IContentRenderer {
 }
 
 const api = createDockview(document.getElementById('app'), {
-    className: 'dockview-theme-abyss',
+    theme: themeAbyss,
     createComponent: (options) => {
         switch (options.name) {
             case 'fixedHeightContainer':

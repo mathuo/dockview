@@ -6,6 +6,7 @@ import {
     IContentRenderer,
     IDockviewGroupPanel,
     IWatermarkRenderer,
+    themeAbyss,
     WatermarkRendererInitParameters,
 } from 'dockview-core';
 
@@ -105,7 +106,7 @@ const app = document.getElementById('app');
 app.append(root);
 
 const api = createDockview(container, {
-    className: 'dockview-theme-abyss',
+    theme: themeAbyss,
     createComponent: (options) => {
         switch (options.name) {
             case 'default':

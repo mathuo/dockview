@@ -2388,6 +2388,27 @@
                 }
             },
             {
+                "name": "onDidOpenPopoutWindowFail",
+                "code": "Event<void>",
+                "kind": "accessor",
+                "value": {
+                    "name": "onDidOpenPopoutWindowFail",
+                    "code": "Event<void>",
+                    "kind": "getSignature",
+                    "returnType": {
+                        "type": "reference",
+                        "value": "Event",
+                        "source": "dockview-core",
+                        "typeArguments": [
+                            {
+                                "type": "intrinsic",
+                                "value": "void"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
                 "name": "onDidPopoutGroupPositionChange",
                 "code": "Event<PopoutGroupChangePositionEvent>",
                 "kind": "accessor",
@@ -2539,7 +2560,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked before a group is dragged.\r\n\r\nCalling "
+                                "text": "Invoked before a group is dragged.\n\nCalling "
                             },
                             {
                                 "kind": "code",
@@ -2570,7 +2591,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked before a group is dragged.\r\n\r\nCalling "
+                            "text": "Invoked before a group is dragged.\n\nCalling "
                         },
                         {
                             "kind": "code",
@@ -2593,7 +2614,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked before a panel is dragged.\r\n\r\nCalling "
+                                "text": "Invoked before a panel is dragged.\n\nCalling "
                             },
                             {
                                 "kind": "code",
@@ -2624,7 +2645,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked before a panel is dragged.\r\n\r\nCalling "
+                            "text": "Invoked before a panel is dragged.\n\nCalling "
                         },
                         {
                             "kind": "code",
@@ -2647,7 +2668,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\r\nprevent the event from occuring using the standard "
+                                "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\nprevent the event from occuring using the standard "
                             },
                             {
                                 "kind": "code",
@@ -2655,7 +2676,7 @@
                             },
                             {
                                 "kind": "text",
-                                "text": " syntax.\r\n\r\nPreventing certain events may causes unexpected behaviours, use carefully."
+                                "text": " syntax.\n\nPreventing certain events may causes unexpected behaviours, use carefully."
                             }
                         ]
                     },
@@ -2678,7 +2699,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\r\nprevent the event from occuring using the standard "
+                            "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\nprevent the event from occuring using the standard "
                         },
                         {
                             "kind": "code",
@@ -2686,7 +2707,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": " syntax.\r\n\r\nPreventing certain events may causes unexpected behaviours, use carefully."
+                            "text": " syntax.\n\nPreventing certain events may causes unexpected behaviours, use carefully."
                         }
                     ]
                 }
@@ -2701,7 +2722,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked before an overlay is shown indicating a drop target.\r\n\r\nCalling "
+                                "text": "Invoked before an overlay is shown indicating a drop target.\n\nCalling "
                             },
                             {
                                 "kind": "code",
@@ -2709,7 +2730,7 @@
                             },
                             {
                                 "kind": "text",
-                                "text": " will prevent the overlay being shown and prevent\r\nthe any subsequent drop event."
+                                "text": " will prevent the overlay being shown and prevent\nthe any subsequent drop event."
                             }
                         ]
                     },
@@ -2732,7 +2753,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked before an overlay is shown indicating a drop target.\r\n\r\nCalling "
+                            "text": "Invoked before an overlay is shown indicating a drop target.\n\nCalling "
                         },
                         {
                             "kind": "code",
@@ -2740,7 +2761,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": " will prevent the overlay being shown and prevent\r\nthe any subsequent drop event."
+                            "text": " will prevent the overlay being shown and prevent\nthe any subsequent drop event."
                         }
                     ]
                 }
@@ -3523,7 +3544,7 @@
             },
             {
                 "name": "getGroup",
-                "code": "(id: string): DockviewGroupPanel | undefined",
+                "code": "(id: string): IDockviewGroupPanel | undefined",
                 "kind": "method",
                 "signature": [
                     {
@@ -3561,7 +3582,7 @@
                             "values": [
                                 {
                                     "type": "reference",
-                                    "value": "DockviewGroupPanel",
+                                    "value": "IDockviewGroupPanel",
                                     "source": "dockview-core"
                                 },
                                 {
@@ -3570,7 +3591,7 @@
                                 }
                             ]
                         },
-                        "code": "(id: string): DockviewGroupPanel | undefined",
+                        "code": "(id: string): IDockviewGroupPanel | undefined",
                         "kind": "callSignature"
                     }
                 ],
@@ -4417,6 +4438,25 @@
                             "type": "reference",
                             "value": "MovePanelEvent",
                             "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "onDidOpenPopoutWindowFail",
+                "code": "Event<void>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "intrinsic",
+                            "value": "void"
                         }
                     ]
                 },
@@ -8910,6 +8950,24 @@
                         "kind": "callSignature"
                     }
                 ]
+            },
+            {
+                "name": "updateDragAndDropState",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "updateDragAndDropState",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
             }
         ],
         "extends": [
@@ -11173,7 +11231,7 @@
                             "summary": [
                                 {
                                     "kind": "text",
-                                    "text": "If the root is orientated as a VERTICAL node then nest the existing root within a new HORIZIONTAL root node\r\nIf the root is orientated as a HORIZONTAL node then nest the existing root within a new VERITCAL root node"
+                                    "text": "If the root is orientated as a VERTICAL node then nest the existing root within a new HORIZIONTAL root node\nIf the root is orientated as a HORIZONTAL node then nest the existing root within a new VERITCAL root node"
                                 }
                             ]
                         },
@@ -11191,7 +11249,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "If the root is orientated as a VERTICAL node then nest the existing root within a new HORIZIONTAL root node\r\nIf the root is orientated as a HORIZONTAL node then nest the existing root within a new VERITCAL root node"
+                            "text": "If the root is orientated as a VERTICAL node then nest the existing root within a new HORIZIONTAL root node\nIf the root is orientated as a HORIZONTAL node then nest the existing root within a new VERITCAL root node"
                         }
                     ]
                 }
@@ -19908,7 +19966,7 @@
                         "summary": [
                             {
                                 "kind": "text",
-                                "text": "Invoked whenever any aspect of the layout changes.\r\nIf listening to this event it may be worth debouncing ouputs."
+                                "text": "Invoked whenever any aspect of the layout changes.\nIf listening to this event it may be worth debouncing ouputs."
                             }
                         ]
                     },
@@ -19930,7 +19988,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked whenever any aspect of the layout changes.\r\nIf listening to this event it may be worth debouncing ouputs."
+                            "text": "Invoked whenever any aspect of the layout changes.\nIf listening to this event it may be worth debouncing ouputs."
                         }
                     ]
                 }
@@ -20526,7 +20584,7 @@
                                 },
                                 {
                                     "kind": "text",
-                                    "text": " method\r\nfor the subsequent resize."
+                                    "text": " method\nfor the subsequent resize."
                                 }
                             ]
                         },
@@ -20588,7 +20646,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": " method\r\nfor the subsequent resize."
+                            "text": " method\nfor the subsequent resize."
                         }
                     ]
                 }
@@ -22296,178 +22354,14 @@
                         "kind": "callSignature"
                     }
                 ]
-            }
-        ],
-        "extends": [
-            "CompositeDisposable"
-        ]
-    },
-    "WillShowOverlayLocationEvent": {
-        "kind": "class",
-        "name": "WillShowOverlayLocationEvent",
-        "children": [
-            {
-                "name": "constructor",
-                "kind": "constructor",
-                "code": ""
             },
             {
-                "name": "api",
-                "code": "DockviewApi",
-                "kind": "accessor",
-                "value": {
-                    "name": "api",
-                    "code": "DockviewApi",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "reference",
-                        "value": "DockviewApi",
-                        "source": "dockview-core"
-                    }
-                }
-            },
-            {
-                "name": "defaultPrevented",
-                "code": "boolean",
-                "kind": "accessor",
-                "value": {
-                    "name": "defaultPrevented",
-                    "code": "boolean",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "intrinsic",
-                        "value": "boolean"
-                    }
-                }
-            },
-            {
-                "name": "group",
-                "code": "DockviewGroupPanel | undefined",
-                "kind": "accessor",
-                "value": {
-                    "name": "group",
-                    "code": "DockviewGroupPanel | undefined",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "or",
-                        "values": [
-                            {
-                                "type": "reference",
-                                "value": "DockviewGroupPanel",
-                                "source": "dockview-core"
-                            },
-                            {
-                                "type": "intrinsic",
-                                "value": "undefined"
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                "name": "kind",
-                "code": "DockviewGroupDropLocation",
-                "kind": "accessor",
-                "value": {
-                    "name": "kind",
-                    "code": "DockviewGroupDropLocation",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "reference",
-                        "value": "DockviewGroupDropLocation",
-                        "source": "dockview-core"
-                    }
-                }
-            },
-            {
-                "name": "nativeEvent",
-                "code": "DragEvent",
-                "kind": "accessor",
-                "value": {
-                    "name": "nativeEvent",
-                    "code": "DragEvent",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "reference",
-                        "value": "DragEvent",
-                        "source": "typescript"
-                    }
-                }
-            },
-            {
-                "name": "panel",
-                "code": "IDockviewPanel | undefined",
-                "kind": "accessor",
-                "value": {
-                    "name": "panel",
-                    "code": "IDockviewPanel | undefined",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "or",
-                        "values": [
-                            {
-                                "type": "reference",
-                                "value": "IDockviewPanel",
-                                "source": "dockview-core"
-                            },
-                            {
-                                "type": "intrinsic",
-                                "value": "undefined"
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                "name": "position",
-                "code": "Position",
-                "kind": "accessor",
-                "value": {
-                    "name": "position",
-                    "code": "Position",
-                    "kind": "getSignature",
-                    "returnType": {
-                        "type": "reference",
-                        "value": "Position",
-                        "source": "dockview-core"
-                    }
-                }
-            },
-            {
-                "name": "getData",
-                "code": "(): PanelTransfer | undefined",
-                "kind": "method",
-                "signature": [
-                    {
-                        "name": "getData",
-                        "typeParameters": [],
-                        "parameters": [],
-                        "returnType": {
-                            "type": "or",
-                            "values": [
-                                {
-                                    "type": "reference",
-                                    "value": "PanelTransfer",
-                                    "source": "dockview-core"
-                                },
-                                {
-                                    "type": "intrinsic",
-                                    "value": "undefined"
-                                }
-                            ]
-                        },
-                        "code": "(): PanelTransfer | undefined",
-                        "kind": "callSignature"
-                    }
-                ]
-            },
-            {
-                "name": "preventDefault",
+                "name": "updateDragAndDropState",
                 "code": "(): void",
                 "kind": "method",
                 "signature": [
                     {
-                        "name": "preventDefault",
+                        "name": "updateDragAndDropState",
                         "typeParameters": [],
                         "parameters": [],
                         "returnType": {
@@ -22480,7 +22374,9 @@
                 ]
             }
         ],
-        "extends": []
+        "extends": [
+            "CompositeDisposable"
+        ]
     },
     "ActiveEvent": {
         "kind": "interface",
@@ -23935,6 +23831,26 @@
                 "flags": {
                     "isOptional": true
                 }
+            },
+            {
+                "name": "skipSetActive",
+                "code": "boolean",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "boolean"
+                },
+                "flags": {
+                    "isOptional": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Whether to skip setting the group as active after moving"
+                        }
+                    ]
+                }
             }
         ],
         "extends": []
@@ -24725,7 +24641,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": ".\r\nCall "
+                            "text": ".\nCall "
                         },
                         {
                             "kind": "code",
@@ -24951,6 +24867,59 @@
                                     "text": " instead. To be removed in a future version."
                                 }
                             ]
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "scrollbars",
+                "code": "'custom' | 'native'",
+                "kind": "property",
+                "type": {
+                    "type": "or",
+                    "values": [
+                        {
+                            "type": "literal",
+                            "value": "custom"
+                        },
+                        {
+                            "type": "literal",
+                            "value": "native"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isOptional": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Select "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`native`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " to use built-in scrollbar behaviours and "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`custom`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " to use an internal implementation\nthat allows for improved scrollbar overlay UX.\n\nThis is only applied to the tab header section. Defaults to "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`custom`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": "."
                         }
                     ]
                 }
@@ -25411,7 +25380,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "The id of the tab component renderer\r\n\r\nUndefined if no custom tab renderer is provided"
+                            "text": "The id of the tab component renderer\n\nUndefined if no custom tab renderer is provided"
                         }
                     ]
                 }
@@ -25923,7 +25892,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "The same-origin path at which the popout window will be created\r\n\r\nDefaults to "
+                            "text": "The same-origin path at which the popout window will be created\n\nDefaults to "
                         },
                         {
                             "kind": "code",
@@ -25955,6 +25924,19 @@
                             "text": "The position of the popout group"
                         }
                     ]
+                }
+            },
+            {
+                "name": "referenceGroup",
+                "code": "DockviewGroupPanel",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "DockviewGroupPanel",
+                    "source": "dockview-core"
+                },
+                "flags": {
+                    "isOptional": true
                 }
             }
         ],
@@ -26032,7 +26014,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": "\r\nwill mount the overlay to root of the dockview component whereas "
+                            "text": "\nwill mount the overlay to root of the dockview component whereas "
                         },
                         {
                             "kind": "code",
@@ -29473,6 +29455,25 @@
                             "type": "reference",
                             "value": "MovePanelEvent",
                             "source": "dockview-core"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
+                "name": "onDidOpenPopoutWindowFail",
+                "code": "Event<void>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "intrinsic",
+                            "value": "void"
                         }
                     ]
                 },
@@ -42238,7 +42239,7 @@
                                     "summary": [
                                         {
                                             "kind": "text",
-                                            "text": "If true then add the panel without setting it as the active panel.\r\n\r\nDefaults to "
+                                            "text": "If true then add the panel without setting it as the active panel.\n\nDefaults to "
                                         },
                                         {
                                             "kind": "code",
@@ -42305,7 +42306,7 @@
                                     "summary": [
                                         {
                                             "kind": "text",
-                                            "text": "The rendering mode of the panel.\r\n\r\nThis dictates what happens to the HTML of the panel when it is hidden."
+                                            "text": "The rendering mode of the panel.\n\nThis dictates what happens to the HTML of the panel when it is hidden."
                                         }
                                     ]
                                 }
@@ -42345,7 +42346,7 @@
                                     "summary": [
                                         {
                                             "kind": "text",
-                                            "text": "The title for the panel which can be accessed within both the tab and component.\r\n\r\nIf using the default tab renderer this title will be displayed in the tab."
+                                            "text": "The title for the panel which can be accessed within both the tab and component.\n\nIf using the default tab renderer this title will be displayed in the tab."
                                         }
                                     ]
                                 }
@@ -42464,33 +42465,6 @@
                     "type": "reference",
                     "value": "DockviewOptions",
                     "source": "dockview-core"
-                }
-            ]
-        },
-        "kind": "typeAlias"
-    },
-    "DockviewGroupDropLocation": {
-        "name": "DockviewGroupDropLocation",
-        "code": "'edge' | 'content' | 'header_space' | 'tab'",
-        "typeParameters": [],
-        "type": {
-            "type": "or",
-            "values": [
-                {
-                    "type": "literal",
-                    "value": "edge"
-                },
-                {
-                    "type": "literal",
-                    "value": "content"
-                },
-                {
-                    "type": "literal",
-                    "value": "header_space"
-                },
-                {
-                    "type": "literal",
-                    "value": "tab"
                 }
             ]
         },
@@ -43319,7 +43293,7 @@
                 "summary": [
                     {
                         "kind": "text",
-                        "text": "Find the grid location of a specific DOM element by traversing the parent\r\nchain and finding each child index on the way.\r\n\r\nThis will break as soon as DOM structures of the Splitview or Gridview change."
+                        "text": "Find the grid location of a specific DOM element by traversing the parent\nchain and finding each child index on the way.\n\nThis will break as soon as DOM structures of the Splitview or Gridview change."
                     }
                 ]
             },
@@ -44709,7 +44683,7 @@
     },
     "IDockviewDefaultTabProps": {
         "name": "IDockviewDefaultTabProps",
-        "code": "{ closeActionOverride?: (): void, hideClose?: boolean } & React.DOMAttributes<HTMLDivElement> & IDockviewPanelHeaderProps",
+        "code": "{ closeActionOverride?: (): void, hideClose?: boolean } & React.HtmlHTMLAttributes<HTMLDivElement> & IDockviewPanelHeaderProps",
         "typeParameters": [],
         "type": {
             "type": "intersection",
@@ -44767,7 +44741,7 @@
                 },
                 {
                     "type": "reference",
-                    "value": "React.DOMAttributes",
+                    "value": "React.HtmlHTMLAttributes",
                     "source": "@types/react",
                     "typeArguments": [
                         {
@@ -45344,7 +45318,7 @@
                 "summary": [
                     {
                         "kind": "text",
-                        "text": "A React Hook that returns an array of portals to be rendered by the user of this hook\r\nand a disposable function to add a portal. Calling dispose removes this portal from the\r\nportal array"
+                        "text": "A React Hook that returns an array of portals to be rendered by the user of this hook\nand a disposable function to add a portal. Calling dispose removes this portal from the\nportal array"
                     }
                 ]
             },

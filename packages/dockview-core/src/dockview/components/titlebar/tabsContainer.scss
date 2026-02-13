@@ -28,7 +28,10 @@
     .dv-void-container {
         display: flex;
         flex-grow: 1;
-        cursor: grab;
+        
+        &.dv-draggable {
+            cursor: grab;
+        }
     }
 
     .dv-right-actions-container {

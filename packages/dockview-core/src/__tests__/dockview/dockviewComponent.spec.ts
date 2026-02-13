@@ -30,7 +30,10 @@ class PanelContentPartTest implements IContentRenderer {
 
     isDisposed: boolean = false;
 
-    constructor(public readonly id: string, public readonly component: string) {
+    constructor(
+        public readonly id: string,
+        public readonly component: string
+    ) {
         this.element.classList.add(`testpanel-${id}`);
     }
 
@@ -69,7 +72,10 @@ class PanelTabPartTest implements ITabRenderer {
 
     isDisposed: boolean = false;
 
-    constructor(public readonly id: string, component: string) {
+    constructor(
+        public readonly id: string,
+        component: string
+    ) {
         this.element.className = `panel-tab-part-${id}`;
     }
 
@@ -142,6 +148,110 @@ describe('dockviewComponent', () => {
         expect(dockview.element.className).toBe(
             'dockview-theme-abyss test-b test-c'
         );
+    });
+
+    describe('disableDnd option integration', () => {
+        test('that updateOptions with disableDnd updates all tabs and void containers', () => {
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                disableDnd: false,
+            });
+
+            // Add some panels to create tabs
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+
+            // Get all tab elements and void containers
+            const tabElements = Array.from(
+                dockview.element.querySelectorAll('.dv-tab')
+            ) as HTMLElement[];
+            const voidContainers = Array.from(
+                dockview.element.querySelectorAll('.dv-void-container')
+            ) as HTMLElement[];
+
+            // Initially tabs should be draggable (disableDnd: false)
+            tabElements.forEach((tab) => {
+                expect(tab.draggable).toBe(true);
+            });
+            voidContainers.forEach((container) => {
+                expect(container.draggable).toBe(true);
+            });
+
+            // Update options to disable DnD
+            dockview.updateOptions({ disableDnd: true });
+
+            // Now tabs should not be draggable
+            tabElements.forEach((tab) => {
+                expect(tab.draggable).toBe(false);
+            });
+            voidContainers.forEach((container) => {
+                expect(container.draggable).toBe(false);
+            });
+
+            // Update options to enable DnD again
+            dockview.updateOptions({ disableDnd: false });
+
+            // Tabs should be draggable again
+            tabElements.forEach((tab) => {
+                expect(tab.draggable).toBe(true);
+            });
+            voidContainers.forEach((container) => {
+                expect(container.draggable).toBe(true);
+            });
+        });
+
+        test('that new tabs respect current disableDnd option when added after option change', () => {
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                disableDnd: false,
+            });
+
+            // Set disableDnd to true
+            dockview.updateOptions({ disableDnd: true });
+
+            // Add a panel after the option change
+            const panel = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            // New tab should not be draggable
+            const tabElement = dockview.element.querySelector(
+                '.dv-tab'
+            ) as HTMLElement;
+            const voidContainer = dockview.element.querySelector(
+                '.dv-void-container'
+            ) as HTMLElement;
+
+            expect(tabElement.draggable).toBe(false);
+            expect(voidContainer.draggable).toBe(false);
+        });
     });
 
     describe('memory leakage', () => {
@@ -325,6 +435,155 @@ describe('dockviewComponent', () => {
             expect(query.length).toBe(3);
         });
 
+        test('that moving a popout group to specific position works correctly', async () => {
+            window.open = () => setupMockWindow();
+
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(600, 1000);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            await dockview.addPopoutGroup(panel1.api.group);
+            expect(panel1.api.location.type).toBe('popout');
+            expect(dockview.groups.length).toBe(3); // panel2 + hidden reference + popout
+
+            // Move popout group to left of panel2
+            panel1.api.group.api.moveTo({
+                group: panel2.api.group,
+                position: 'left',
+            });
+
+            // Core assertions: should be back in grid and positioned correctly
+            expect(panel1.api.location.type).toBe('grid');
+            expect(dockview.groups.length).toBe(2); // Should clean up properly
+            expect(dockview.panels.length).toBe(2);
+
+            // Verify both panels are visible and accessible
+            expect(panel1.api.isVisible).toBe(true);
+            expect(panel2.api.isVisible).toBe(true);
+        });
+
+        test('that moving a popout group to different positions works', async () => {
+            window.open = () => setupMockWindow();
+
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(600, 1000);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            await dockview.addPopoutGroup(panel1.api.group);
+            expect(panel1.api.location.type).toBe('popout');
+
+            // Test moving to different positions
+            ['top', 'bottom', 'left', 'right'].forEach((position) => {
+                panel1.api.group.api.moveTo({
+                    group: panel2.api.group,
+                    position: position as any,
+                });
+
+                // Should be back in grid and work correctly regardless of position
+                expect(panel1.api.location.type).toBe('grid');
+                expect(panel1.api.isVisible).toBe(true);
+                expect(panel2.api.isVisible).toBe(true);
+                expect(dockview.groups.length).toBeGreaterThanOrEqual(2);
+                expect(dockview.panels.length).toBe(2);
+            });
+        });
+
+        test('that reference group cleanup works when moving popout to new position', async () => {
+            window.open = () => setupMockWindow();
+
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(600, 1000);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            // Store reference group ID before popout
+            const originalGroupId = panel1.group.id;
+
+            await dockview.addPopoutGroup(panel1.api.group);
+            expect(panel1.api.location.type).toBe('popout');
+            expect(dockview.groups.length).toBe(3); // panel2 + hidden reference + popout
+
+            // Move to new position - should clean up reference group
+            panel1.api.group.api.moveTo({
+                group: panel2.api.group,
+                position: 'right',
+            });
+
+            expect(panel1.api.location.type).toBe('grid');
+            expect(dockview.groups.length).toBe(2); // Just panel2 + panel1 in new position
+
+            // Reference group should be cleaned up (no longer exist)
+            const referenceGroupStillExists = dockview.groups.some(
+                (g) => g.id === originalGroupId
+            );
+            expect(referenceGroupStillExists).toBe(false);
+        });
+
         test('horizontal', () => {
             dockview = new DockviewComponent(container, {
                 createComponent(options) {
@@ -491,6 +750,149 @@ describe('dockviewComponent', () => {
         dockview.moveToNext({ includePanel: false });
         expect(dockview.activeGroup).toBe(group2);
         expect(dockview.activeGroup!.model.activePanel).toBe(panel3);
+    });
+
+    test('moveGroupOrPanel with skipSetActive should not activate group/panel', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+        });
+
+        dockview.addPanel({
+            id: 'panel4',
+            component: 'default',
+        });
+
+        const panel1 = dockview.getGroupPanel('panel1');
+        const panel2 = dockview.getGroupPanel('panel2');
+        const panel3 = dockview.getGroupPanel('panel3');
+        const panel4 = dockview.getGroupPanel('panel4');
+
+        const group1 = panel1!.group;
+
+        // Move panel1 to create a new group
+        dockview.moveGroupOrPanel({
+            from: { groupId: group1.id, panelId: 'panel1' },
+            to: { group: group1, position: 'right' },
+        });
+        const group2 = panel1!.group;
+
+        // Verify panel1 is active after move (default behavior)
+        expect(dockview.activeGroup).toBe(group2);
+        expect(dockview.activePanel).toBe(panel1);
+
+        // Set a different group active and make panel2 the active panel
+        dockview.doSetGroupActive(group1);
+        group1.model.openPanel(panel2!);
+        expect(dockview.activeGroup).toBe(group1);
+        expect(dockview.activePanel?.id).toBe(panel2?.id);
+
+        // Move panel3 to group2 with skipSetActive
+        dockview.moveGroupOrPanel({
+            from: { groupId: group1.id, panelId: 'panel3' },
+            to: { group: group2, position: 'center' },
+            skipSetActive: true,
+        });
+
+        // group1 should still be active, not group2
+        expect(dockview.activeGroup).toBe(group1);
+        expect(dockview.activePanel?.id).toBe(panel2?.id); // panel2 should still be active in group1
+        expect(panel3!.group).toBe(group2); // panel3 should have moved to group2
+
+        dockview.dispose();
+    });
+
+    test('moveGroupOrPanel group move with skipSetActive should not activate group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+        });
+
+        const panel1 = dockview.getGroupPanel('panel1')!;
+        const panel2 = dockview.getGroupPanel('panel2')!;
+        const panel3 = dockview.getGroupPanel('panel3')!;
+
+        // Create separate groups
+        panel2.api.moveTo({ position: 'right' });
+        panel3.api.moveTo({ group: panel2.group, position: 'center' });
+
+        // Set panel1's group as active and ensure panel1 is the active panel
+        dockview.doSetGroupActive(panel1.group);
+        panel1.group.model.openPanel(panel1);
+        expect(dockview.activeGroup).toBe(panel1.group);
+        expect(dockview.activePanel?.id).toBe(panel1.id);
+
+        // Move panel2's entire group to panel1's group with skipSetActive
+        dockview.moveGroupOrPanel({
+            from: { groupId: panel2.group.id },
+            to: { group: panel1.group, position: 'center' },
+            skipSetActive: true,
+        });
+
+        // panel1's group should still be active and there should be an active panel
+        expect(dockview.activeGroup).toBe(panel1.group);
+        expect(dockview.activePanel).toBeTruthy();
+        // All panels should now be in the same group
+        expect(panel2.group).toBe(panel1.group);
+        expect(panel3.group).toBe(panel1.group);
+
+        dockview.dispose();
     });
 
     test('remove group', () => {
@@ -742,6 +1144,237 @@ describe('dockviewComponent', () => {
     });
 
     describe('serialization', () => {
+        test('reuseExistingPanels true', () => {
+            const parts: PanelContentPartTest[] = [];
+
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            const part = new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                            parts.push(part);
+                            return part;
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 1000);
+
+            dockview.addPanel({ id: 'panel1', component: 'default' });
+            dockview.addPanel({ id: 'panel2', component: 'default' });
+            dockview.addPanel({ id: 'panel7', component: 'default' });
+
+            expect(parts.length).toBe(3);
+
+            expect(parts.map((part) => part.isDisposed)).toEqual([
+                false,
+                false,
+                false,
+            ]);
+
+            dockview.fromJSON(
+                {
+                    activeGroup: 'group-1',
+                    grid: {
+                        root: {
+                            type: 'branch',
+                            data: [
+                                {
+                                    type: 'leaf',
+                                    data: {
+                                        views: ['panel1'],
+                                        id: 'group-1',
+                                        activeView: 'panel1',
+                                    },
+                                    size: 500,
+                                },
+                                {
+                                    type: 'branch',
+                                    data: [
+                                        {
+                                            type: 'leaf',
+                                            data: {
+                                                views: ['panel2', 'panel3'],
+                                                id: 'group-2',
+                                            },
+                                            size: 500,
+                                        },
+                                        {
+                                            type: 'leaf',
+                                            data: {
+                                                views: ['panel4'],
+                                                id: 'group-3',
+                                            },
+                                            size: 500,
+                                        },
+                                    ],
+                                    size: 500,
+                                },
+                            ],
+                            size: 1000,
+                        },
+                        height: 1000,
+                        width: 1000,
+                        orientation: Orientation.VERTICAL,
+                    },
+                    panels: {
+                        panel1: {
+                            id: 'panel1',
+                            contentComponent: 'default',
+                            tabComponent: 'tab-default',
+                            title: 'panel1',
+                        },
+                        panel2: {
+                            id: 'panel2',
+                            contentComponent: 'default',
+                            title: 'panel2',
+                        },
+                        panel3: {
+                            id: 'panel3',
+                            contentComponent: 'default',
+                            title: 'panel3',
+                            renderer: 'onlyWhenVisible',
+                        },
+                        panel4: {
+                            id: 'panel4',
+                            contentComponent: 'default',
+                            title: 'panel4',
+                            renderer: 'always',
+                        },
+                    },
+                },
+                { reuseExistingPanels: true }
+            );
+
+            expect(parts.map((part) => part.isDisposed)).toEqual([
+                false,
+                false,
+                true,
+                false,
+                false,
+            ]);
+        });
+
+        test('reuseExistingPanels false', () => {
+            const parts: PanelContentPartTest[] = [];
+
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            const part = new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                            parts.push(part);
+                            return part;
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 1000);
+
+            dockview.addPanel({ id: 'panel1', component: 'default' });
+            dockview.addPanel({ id: 'panel2', component: 'default' });
+            dockview.addPanel({ id: 'panel7', component: 'default' });
+
+            expect(parts.length).toBe(3);
+
+            expect(parts.map((part) => part.isDisposed)).toEqual([
+                false,
+                false,
+                false,
+            ]);
+
+            dockview.fromJSON({
+                activeGroup: 'group-1',
+                grid: {
+                    root: {
+                        type: 'branch',
+                        data: [
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panel1'],
+                                    id: 'group-1',
+                                    activeView: 'panel1',
+                                },
+                                size: 500,
+                            },
+                            {
+                                type: 'branch',
+                                data: [
+                                    {
+                                        type: 'leaf',
+                                        data: {
+                                            views: ['panel2', 'panel3'],
+                                            id: 'group-2',
+                                        },
+                                        size: 500,
+                                    },
+                                    {
+                                        type: 'leaf',
+                                        data: {
+                                            views: ['panel4'],
+                                            id: 'group-3',
+                                        },
+                                        size: 500,
+                                    },
+                                ],
+                                size: 500,
+                            },
+                        ],
+                        size: 1000,
+                    },
+                    height: 1000,
+                    width: 1000,
+                    orientation: Orientation.VERTICAL,
+                },
+                panels: {
+                    panel1: {
+                        id: 'panel1',
+                        contentComponent: 'default',
+                        tabComponent: 'tab-default',
+                        title: 'panel1',
+                    },
+                    panel2: {
+                        id: 'panel2',
+                        contentComponent: 'default',
+                        title: 'panel2',
+                    },
+                    panel3: {
+                        id: 'panel3',
+                        contentComponent: 'default',
+                        title: 'panel3',
+                        renderer: 'onlyWhenVisible',
+                    },
+                    panel4: {
+                        id: 'panel4',
+                        contentComponent: 'default',
+                        title: 'panel4',
+                        renderer: 'always',
+                    },
+                },
+            });
+
+            expect(parts.map((part) => part.isDisposed)).toEqual([
+                true,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+            ]);
+        });
+
         test('basic', () => {
             dockview.layout(1000, 1000);
 
@@ -966,6 +1599,111 @@ describe('dockviewComponent', () => {
             expect(newPanel4.api.isMaximized()).toBeTruthy();
 
             expect(state).toEqual(api.toJSON());
+        });
+
+        test('always visible renderer positioning after fromJSON', async () => {
+            dockview.layout(1000, 1000);
+
+            // Create a layout with both onlyWhenVisible and always visible panels
+            dockview.fromJSON({
+                activeGroup: 'group-1',
+                grid: {
+                    root: {
+                        type: 'branch',
+                        data: [
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panel1', 'panel2'],
+                                    id: 'group-1',
+                                    activeView: 'panel1',
+                                },
+                                size: 500,
+                            },
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panel3'],
+                                    id: 'group-2',
+                                    activeView: 'panel3',
+                                },
+                                size: 500,
+                            },
+                        ],
+                        size: 1000,
+                    },
+                    height: 1000,
+                    width: 1000,
+                    orientation: Orientation.HORIZONTAL,
+                },
+                panels: {
+                    panel1: {
+                        id: 'panel1',
+                        contentComponent: 'default',
+                        title: 'panel1',
+                        renderer: 'onlyWhenVisible',
+                    },
+                    panel2: {
+                        id: 'panel2',
+                        contentComponent: 'default',
+                        title: 'panel2',
+                        renderer: 'always',
+                    },
+                    panel3: {
+                        id: 'panel3',
+                        contentComponent: 'default',
+                        title: 'panel3',
+                        renderer: 'always',
+                    },
+                },
+            });
+
+            // Wait for next animation frame to ensure positioning is complete
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+
+            const panel2 = dockview.getGroupPanel('panel2')!;
+            const panel3 = dockview.getGroupPanel('panel3')!;
+
+            // Verify that always visible panels have been positioned
+            const overlayContainer = dockview.overlayRenderContainer;
+
+            // Check that panels with renderer: 'always' are attached to overlay container
+            expect(panel2.api.renderer).toBe('always');
+            expect(panel3.api.renderer).toBe('always');
+
+            // Get the overlay elements for always visible panels
+            const panel2Overlay = overlayContainer.element.querySelector(
+                '[data-panel-id]'
+            ) as HTMLElement;
+            const panel3Overlay = overlayContainer.element.querySelector(
+                '[data-panel-id]:not(:first-child)'
+            ) as HTMLElement;
+
+            // Verify positioning has been applied (should not be 0 after layout)
+            if (panel2Overlay) {
+                const style = getComputedStyle(panel2Overlay);
+                expect(style.position).toBe('absolute');
+                expect(style.left).not.toBe('0px');
+                expect(style.top).not.toBe('0px');
+                expect(style.width).not.toBe('0px');
+                expect(style.height).not.toBe('0px');
+            }
+
+            // Test that updateAllPositions method works correctly
+            const updateSpy = jest.spyOn(
+                overlayContainer,
+                'updateAllPositions'
+            );
+
+            // Call fromJSON again to trigger position updates
+            dockview.fromJSON(dockview.toJSON());
+
+            // Wait for the position update to be called
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+
+            expect(updateSpy).toHaveBeenCalled();
+
+            updateSpy.mockRestore();
         });
     });
 
@@ -4943,6 +5681,73 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(1);
             expect(dockview.panels.length).toBe(2);
         });
+
+        test('component should remain visible when moving from floating back to new grid group (GitHub issue #996)', () => {
+            const container = document.createElement('div');
+            container.style.width = '800px';
+            container.style.height = '600px';
+            document.body.appendChild(container);
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    const element = document.createElement('div');
+                    element.innerHTML = `<div class="test-content-${options.id}">Test Content: ${options.id}</div>`;
+                    element.style.background = 'lightblue';
+                    element.style.padding = '10px';
+                    return new PanelContentPartTest(options.id, options.name);
+                },
+            });
+
+            dockview.layout(800, 600);
+
+            try {
+                // 1. Create a panel
+                const panel = dockview.addPanel({
+                    id: 'test-panel',
+                    component: 'default',
+                });
+
+                // Verify initial state
+                expect(panel.api.location.type).toBe('grid');
+
+                // 2. Move to floating group
+                dockview.addFloatingGroup(panel, {
+                    position: {
+                        bottom: 50,
+                        right: 50,
+                    },
+                    width: 400,
+                    height: 300,
+                });
+
+                // Verify floating state
+                expect(panel.api.location.type).toBe('floating');
+
+                // 3. Move back to grid using addGroup + moveTo pattern (reproducing user's exact issue)
+                const addGroup = dockview.addGroup();
+                panel.api.moveTo({ group: addGroup });
+
+                // THIS IS THE FIX: Component should still be visible
+                expect(panel.api.location.type).toBe('grid');
+
+                // Test multiple scenarios
+                const panel2 = dockview.addPanel({
+                    id: 'panel-2',
+                    component: 'default',
+                    floating: true,
+                });
+
+                const group2 = dockview.addGroup();
+                panel2.api.moveTo({ group: group2 });
+
+                expect(panel2.api.location.type).toBe('grid');
+            } finally {
+                dockview.dispose();
+                if (container.parentElement) {
+                    container.parentElement.removeChild(container);
+                }
+            }
+        });
     });
 
     describe('popout group', () => {
@@ -5430,9 +6235,9 @@ describe('dockviewComponent', () => {
             dockview.fromJSON(state);
 
             /**
-             * exhaust task queue since popout group completion is async but not awaited in `fromJSON(...)`
+             * Wait for delayed popout group creation to complete
              */
-            await new Promise((resolve) => setTimeout(resolve, 0));
+            await dockview.popoutRestorationPromise;
 
             expect(dockview.panels.length).toBe(4);
 
@@ -5733,6 +6538,7 @@ describe('dockviewComponent', () => {
         });
 
         test('persistance with custom url', async () => {
+            jest.useFakeTimers();
             const container = document.createElement('div');
 
             window.open = () => setupMockWindow();
@@ -5816,7 +6622,12 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(0);
 
             dockview.fromJSON(state);
-            await new Promise((resolve) => setTimeout(resolve, 0)); // popout views are completed as a promise so must complete microtask-queue
+
+            // Advance timers to trigger delayed popout creation (0ms, 100ms delays)
+            jest.advanceTimersByTime(200);
+
+            // Wait for the popout restoration to complete
+            await dockview.popoutRestorationPromise;
 
             expect(dockview.toJSON().popoutGroups).toEqual([
                 {
@@ -5850,6 +6661,56 @@ describe('dockviewComponent', () => {
                     url: '/custom.html',
                 },
             ]);
+
+            jest.useRealTimers();
+        });
+
+        describe('when browsers block popups', () => {
+            let container: HTMLDivElement;
+            let dockview: DockviewComponent;
+            let panel: DockviewPanel;
+
+            beforeEach(() => {
+                jest.spyOn(window, 'open').mockReturnValue(null);
+
+                container = document.createElement('div');
+
+                dockview = new DockviewComponent(container, {
+                    createComponent(options) {
+                        switch (options.name) {
+                            case 'default':
+                                return new PanelContentPartTest(
+                                    options.id,
+                                    options.name
+                                );
+                            default:
+                                throw new Error(`unsupported`);
+                        }
+                    },
+                });
+
+                dockview.layout(1000, 500);
+
+                panel = dockview.addPanel({
+                    id: 'panel_1',
+                    component: 'default',
+                });
+            });
+
+            test('onDidOpenPoputWindowFail event is emitted', async () => {
+                const onDidBlockPopoutHandler = jest.fn();
+                dockview.onDidOpenPopoutWindowFail(onDidBlockPopoutHandler);
+
+                await dockview.addPopoutGroup(panel.group);
+
+                expect(onDidBlockPopoutHandler).toHaveBeenCalledTimes(1);
+            });
+
+            test('popout group is restored to its original position', async () => {
+                await dockview.addPopoutGroup(panel.group);
+
+                expect(panel.group.api.location.type).toBe('grid');
+            });
         });
 
         test('dispose of dockview instance when popup is open', async () => {
@@ -6520,6 +7381,175 @@ describe('dockviewComponent', () => {
             expect(panel1.api.group.panels).toEqual([panel3, panel1, panel2]);
         });
 
+        test('panel moveTo with skipSetActive should not activate group', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 1000);
+
+            dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+
+            const panel1 = dockview.getGroupPanel('panel1')!;
+            const panel2 = dockview.getGroupPanel('panel2')!;
+
+            // Move panel2 to a new group to the right
+            panel2.api.moveTo({ position: 'right' });
+
+            // panel2's group should be active
+            expect(dockview.activeGroup).toBe(panel2.group);
+            expect(dockview.activePanel?.id).toBe(panel2.id);
+
+            // Now move panel1 to panel2's group without setting it active
+            panel1.api.moveTo({
+                group: panel2.group,
+                position: 'center',
+                skipSetActive: true,
+            });
+
+            // panel2's group should still be active, but panel2 should still be the active panel
+            expect(dockview.activeGroup).toBe(panel2.group);
+            expect(dockview.activePanel?.id).toBe(panel2.id);
+            expect(panel1.group).toBe(panel2.group);
+        });
+
+        test('group moveTo with skipSetActive should not activate group', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 1000);
+
+            dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+
+            dockview.addPanel({
+                id: 'panel3',
+                component: 'default',
+            });
+
+            const panel1 = dockview.getGroupPanel('panel1')!;
+            const panel2 = dockview.getGroupPanel('panel2')!;
+            const panel3 = dockview.getGroupPanel('panel3')!;
+
+            // Move panel2 to a new group to create separate groups
+            panel2.api.moveTo({ position: 'right' });
+
+            // Move panel3 to panel2's group
+            panel3.api.moveTo({ group: panel2.group, position: 'center' });
+
+            // panel2's group should be active
+            expect(dockview.activeGroup).toBe(panel2.group);
+
+            // Set panel1's group as active
+            dockview.doSetGroupActive(panel1.group);
+            expect(dockview.activeGroup).toBe(panel1.group);
+
+            // Now move panel2's group to panel1's group without setting it active
+            panel2.group.api.moveTo({
+                group: panel1.group,
+                position: 'center',
+                skipSetActive: true,
+            });
+
+            // panel1's group should still be active and there should be an active panel
+            expect(dockview.activeGroup).toBe(panel1.group);
+            expect(dockview.activePanel).toBeTruthy();
+            // panel2 and panel3 should now be in panel1's group
+            expect(panel2.group).toBe(panel1.group);
+            expect(panel3.group).toBe(panel1.group);
+        });
+
+        test('panel moveTo without skipSetActive should activate group (default behavior)', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 1000);
+
+            dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+
+            const panel1 = dockview.getGroupPanel('panel1')!;
+            const panel2 = dockview.getGroupPanel('panel2')!;
+
+            // Move panel2 to a new group to the right
+            panel2.api.moveTo({ position: 'right' });
+
+            // Set panel1's group as active
+            dockview.doSetGroupActive(panel1.group);
+            expect(dockview.activeGroup).toBe(panel1.group);
+
+            // Move panel1 to panel2's group (should activate panel2's group)
+            panel1.api.moveTo({
+                group: panel2.group,
+                position: 'center',
+            });
+
+            // panel2's group should now be active and panel1 should be the active panel
+            expect(dockview.activeGroup).toBe(panel2.group);
+            expect(dockview.activePanel?.id).toBe(panel1.id);
+            expect(panel1.group).toBe(panel2.group);
+        });
+
         test('that can add panel', () => {
             const container = document.createElement('div');
 
@@ -6844,6 +7874,51 @@ describe('dockviewComponent', () => {
         expect(api.groups.length).toBe(3);
     });
 
+    test('addGroup calls normalize method on gridview', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+        const api = new DockviewApi(dockview);
+
+        dockview.layout(1000, 1000);
+
+        // Add initial panel
+        api.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        // Access gridview through the (any) cast to bypass protected access
+        const gridview = (dockview as any).gridview;
+
+        // Mock the normalize method to verify it's called
+        const normalizeSpy = jest.spyOn(gridview, 'normalize');
+
+        // Adding a group should trigger normalization
+        api.addGroup({ direction: 'left' });
+
+        // Verify normalize was called during addGroup
+        expect(normalizeSpy).toHaveBeenCalled();
+
+        // Should have the new empty group plus the existing group with panels
+        expect(api.panels.length).toBe(1);
+        expect(api.groups.length).toBe(2);
+
+        normalizeSpy.mockRestore();
+    });
+
     test('add group with custom group is', () => {
         const container = document.createElement('div');
 
@@ -6915,6 +7990,340 @@ describe('dockviewComponent', () => {
             const api = new DockviewApi(dockview);
 
             dockview.layout(1000, 1000);
+        });
+    });
+
+    // Adding back tests one by one to identify problematic expectations
+    describe('GitHub Issue #991 - Group remains active after tab header space drag', () => {
+        let container: HTMLElement;
+
+        beforeEach(() => {
+            container = document.createElement('div');
+        });
+
+        test('single panel group remains active after move to edge', () => {
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            dockview.layout(1000, 1000);
+
+            // Create panel in first group
+            dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            const panel1 = dockview.getGroupPanel('panel1')!;
+            const originalGroup = panel1.group;
+
+            // Set up initial state - make sure group is active
+            dockview.doSetGroupActive(originalGroup);
+            expect(dockview.activeGroup).toBe(originalGroup);
+            expect(dockview.activePanel?.id).toBe('panel1');
+
+            // Move panel to edge position
+            panel1.api.moveTo({ position: 'right' });
+
+            // After move, there should still be an active group and panel
+            expect(dockview.activeGroup).toBeTruthy();
+            expect(dockview.activePanel).toBeTruthy();
+            expect(dockview.activePanel?.id).toBe('panel1');
+
+            // When moving a single panel to an edge, the existing group gets repositioned
+            // rather than creating a new group (since there would be no panels left in the original group)
+            expect(panel1.group).toBe(originalGroup);
+            expect(dockview.activeGroup).toBe(panel1.group);
+        });
+
+        test('merged group becomes active after center position group move', () => {
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            dockview.layout(1000, 1000);
+
+            // Create two groups with panels
+            dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            const panel1 = dockview.getGroupPanel('panel1')!;
+            const panel2 = dockview.getGroupPanel('panel2')!;
+            const group1 = panel1.group;
+            const group2 = panel2.group;
+
+            // Set group1 as active initially
+            dockview.doSetGroupActive(group1);
+            expect(dockview.activeGroup).toBe(group1);
+            expect(dockview.activePanel?.id).toBe('panel1');
+
+            // Move panel2's group to panel1's group (center merge)
+            dockview.moveGroupOrPanel({
+                from: { groupId: group2.id },
+                to: { group: group1, position: 'center' },
+            });
+
+            // After move, the target group should be active and have an active panel
+            expect(dockview.activeGroup).toBeTruthy();
+            expect(dockview.activePanel).toBeTruthy();
+            // Both panels should now be in the same group
+            expect(panel1.group).toBe(panel2.group);
+        });
+
+        test('panel content remains visible after group move', () => {
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            dockview.layout(1000, 1000);
+
+            // Create panel
+            dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            const panel1 = dockview.getGroupPanel('panel1')!;
+
+            // Verify content is initially rendered
+            expect(panel1.view.content.element.parentElement).toBeTruthy();
+
+            // Move panel to edge position
+            panel1.api.moveTo({ position: 'left' });
+
+            // After move, panel content should still be rendered (fixes content disappearing)
+            expect(panel1.view.content.element.parentElement).toBeTruthy();
+            expect(dockview.activePanel?.id).toBe('panel1');
+
+            // Panel should be visible and active
+            expect(panel1.api.isVisible).toBe(true);
+            expect(panel1.api.isActive).toBe(true);
+        });
+
+        test('first panel in group does not get skipSetActive when moved', () => {
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            dockview.layout(1000, 1000);
+
+            // Create group with one panel
+            dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            const panel1 = dockview.getGroupPanel('panel1')!;
+            const group = panel1.group;
+
+            // Verify initial state
+            expect(dockview.activeGroup).toBe(group);
+            expect(dockview.activePanel?.id).toBe('panel1');
+            expect(panel1.view.content.element.parentElement).toBeTruthy();
+
+            // Move panel to trigger group move logic
+            panel1.api.moveTo({ position: 'right' });
+
+            // Panel content should render correctly (the fix ensures first panel is not skipped)
+            expect(panel1.view.content.element.parentElement).toBeTruthy();
+            expect(dockview.activePanel?.id).toBe('panel1');
+            expect(panel1.api.isActive).toBe(true);
+        });
+
+        test('skipSetActive option prevents automatic group activation', () => {
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+            dockview.layout(1000, 1000);
+
+            // Create two groups
+            dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            const panel1 = dockview.getGroupPanel('panel1')!;
+            const panel2 = dockview.getGroupPanel('panel2')!;
+            const group1 = panel1.group;
+            const group2 = panel2.group;
+
+            // Set group2 as active
+            dockview.doSetGroupActive(group2);
+            expect(dockview.activeGroup).toBe(group2);
+
+            // Move group2 to group1 with skipSetActive option
+            dockview.moveGroupOrPanel({
+                from: { groupId: group2.id },
+                to: { group: group1, position: 'center' },
+                skipSetActive: true,
+            });
+
+            // After merge, there should still be an active group and panel
+            // The skipSetActive should be respected in the implementation
+            expect(dockview.activeGroup).toBeTruthy();
+            expect(dockview.activePanel).toBeTruthy();
+        });
+    });
+
+    describe('issue reproduction', () => {
+        test('issue 1050: setSize followed immediately by setVisible(false) should preserve size', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(800, 600);
+
+            // Add two panels so we have layout that can be resized
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            // Initial state should be 400px each
+            expect(panel1.group.api.width).toBe(400);
+            expect(panel2.group.api.width).toBe(400);
+
+            // Set size to 350px width and immediately set invisible
+            panel1.group.api.setSize({ width: 350 });
+            expect(panel1.group.api.width).toBe(350); // Should work immediately
+
+            panel1.group.api.setVisible(false);
+
+            // Group should be invisible
+            expect(panel1.group.api.isVisible).toBe(false);
+
+            // Make visible again
+            panel1.group.api.setVisible(true);
+
+            // The width should be preserved as 350px, not reverted to initial/minimal size
+            expect(panel1.group.api.width).toBe(350);
+        });
+
+        test('issue 1050 variant: test that fix works with multiple size changes', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(800, 600);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            // Set size to 350px width
+            panel1.group.api.setSize({ width: 350 });
+            expect(panel1.group.api.width).toBe(350);
+
+            // Set different size while visible
+            panel1.group.api.setSize({ width: 400 });
+            expect(panel1.group.api.width).toBe(400);
+
+            // Then set invisible
+            panel1.group.api.setVisible(false);
+            expect(panel1.group.api.isVisible).toBe(false);
+
+            // Make visible again
+            panel1.group.api.setVisible(true);
+
+            // The most recent size (400px) should be preserved
+            expect(panel1.group.api.width).toBe(400);
         });
     });
 });

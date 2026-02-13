@@ -1,25 +1,30 @@
 name: Publish to npm
 
-env:
-    NPM_CONFIG_PROVENANCE: true
 on:
     workflow_dispatch:
+        inputs:
+            dry-run:
+                description: 'Dry run (skip actual publish)'
+                required: false
+                type: boolean
+                default: false
     release:
         types: [published]
 jobs:
     publish:
         if: github.event_name == 'release'
         runs-on: ubuntu-latest
-        env:
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         permissions:
+            contents: read
             id-token: write
         steps:
             - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
             - uses: actions/setup-node@v4
               with:
-                  node-version: '20.x'
-                  registry-url: 'https://registry.npmjs.org'
+                  node-version: '23.x'
+            - run: npm install -g npm@latest
 
             - uses: actions/cache@v4
               with:
@@ -29,31 +34,27 @@ jobs:
                       ${{ runner.os }}-node-
 
             - run: yarn
-            - name: Publish dockview-core
-              run: npm publish --provenance
-              working-directory: packages/dockview-core
-            - name: Publish dockview
-              run: npm publish --provenance
-              working-directory: packages/dockview
-            - name: Publish dockview-vue
-              run: npm publish --provenance
-              working-directory: packages/dockview-vue
-            - name: Publish dockview-react
-              run: npm publish --provenance
-              working-directory: packages/dockview-react
+            - run: npx nx run-many -t build --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
+            - run: npx nx run-many -t build:bundle --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
+            - name: Publish to npm
+              run: |
+                  for pkg in dockview-core dockview dockview-vue dockview-react dockview-angular; do
+                    npm publish ./packages/$pkg --provenance --access public
+                  done
     publish-experimental:
         if: github.event_name == 'workflow_dispatch'
         runs-on: ubuntu-latest
-        env:
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         permissions:
+            contents: read
             id-token: write
         steps:
             - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
             - uses: actions/setup-node@v4
               with:
-                  node-version: '20.x'
-                  registry-url: 'https://registry.npmjs.org'
+                  node-version: '23.x'
+            - run: npm install -g npm@latest
 
             - uses: actions/cache@v4
               with:
@@ -63,16 +64,11 @@ jobs:
                       ${{ runner.os }}-node-
 
             - run: yarn
-            - run: npm run set-experimental-versions
-            - name: Publish dockview-core
-              run: npm publish --provenance --tag experimental
-              working-directory: packages/dockview-core
-            - name: Publish dockview
-              run: npm publish --provenance --tag experimental
-              working-directory: packages/dockview
-            - name: Publish dockview-vue
-              run: npm publish --provenance --tag experimental
-              working-directory: packages/dockview-vue
-            - name: Publish dockview-react
-              run: npm publish --provenance --tag experimental
-              working-directory: packages/dockview-react
+            - run: npx nx run-many -t build --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
+            - run: npx nx run-many -t build:bundle --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
+            - run: npx nx release version 0.0.0-experimental-$(git rev-parse --short HEAD)-$(date +%Y%m%d) --git-commit=false --git-tag=false
+            - name: Publish to npm
+              run: |
+                  for pkg in dockview-core dockview dockview-vue dockview-react dockview-angular; do
+                    npm publish ./packages/$pkg --provenance --access public --tag experimental ${{ inputs.dry-run && '--dry-run' || '' }}
+                  done

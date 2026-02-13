@@ -31,8 +31,9 @@ export interface SerializedGridviewComponent {
     activePanel?: string;
 }
 
-export interface AddComponentOptions<T extends object = Parameters>
-    extends BaseComponentOptions<T> {
+export interface AddComponentOptions<
+    T extends object = Parameters,
+> extends BaseComponentOptions<T> {
     minimumWidth?: number;
     maximumWidth?: number;
     minimumHeight?: number;
@@ -366,9 +367,8 @@ export class GridviewComponent
             isVisible: true,
         });
 
-        this.registerPanel(view);
-
         this.doAddGroup(view, relativeLocation, options.size);
+        this.registerPanel(view);
         this.doSetGroupActive(view);
 
         return view;

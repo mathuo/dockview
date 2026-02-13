@@ -1,0 +1,73 @@
+import 'dockview-core/dist/styles/dockview.css';
+import {
+    createSplitview,
+    SplitviewPanel,
+    IFrameworkPart,
+    themeAbyss,
+} from 'dockview-core';
+
+class Panel extends SplitviewPanel {
+    private readonly _frameworkPart: IFrameworkPart;
+
+    constructor(id: string, component: string) {
+        super(id, component);
+
+        this.element.style.color = 'white';
+        this.element.style.padding = '10px';
+        this.element.style.background = '#1e1e1e';
+        this.element.style.border = '1px solid #333';
+
+        this._frameworkPart = {
+            update: (parameters) => {
+                this.element.textContent = `Panel ${parameters?.id || id}`;
+            },
+            dispose: () => {
+                // cleanup if needed
+            },
+        };
+
+        this.api.initialize(this);
+    }
+
+    getComponent(): IFrameworkPart {
+        return this._frameworkPart;
+    }
+}
+
+const container = document.getElementById('app');
+if (!container) {
+    throw new Error('Container element #app not found');
+}
+
+const api = createSplitview(container, {
+    className: themeAbyss.className,
+    createComponent: (options) => {
+        switch (options.name) {
+            case 'default':
+                return new Panel(options.id, options.name);
+            default:
+                throw new Error(`Unsupported component: ${options.name}`);
+        }
+    },
+});
+
+// Layout BEFORE adding panels (critical for splitview)
+api.layout(window.innerWidth, window.innerHeight);
+
+api.addPanel({
+    id: 'panel_1',
+    component: 'default',
+    size: 200,
+});
+
+api.addPanel({
+    id: 'panel_2',
+    component: 'default',
+    size: 300,
+});
+
+api.addPanel({
+    id: 'panel_3',
+    component: 'default',
+    size: 200,
+});

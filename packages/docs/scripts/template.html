@@ -90,8 +90,13 @@
               </button>
             </a>
             <img id="gh-logo" src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png"/>
+            <a target="_blank" rel="noopener noreferrer" href="{{codeSandboxLink}}">
+              <button id="header-btn">
+                Edit in Sandbox
+              </button>
+            </a>
           </div>
-          <div id="app"></div>
+          <div id="app">{{appElement}}</div>
         </div>
         <script type="systemjs-module" src="import:{{app}}"></script>
         <object
@@ -109,7 +114,7 @@
         <script id="loading-script">
             (function () {
                 const cleanupLoading = () => {
-                    if (document.querySelector('.dv-dockview')) {
+                    if (document.querySelector('{{componentSelector}}')) {
                         document.querySelector('#loading-spinner').remove();
                         document.querySelector('#loading-script').remove();
                     } else {

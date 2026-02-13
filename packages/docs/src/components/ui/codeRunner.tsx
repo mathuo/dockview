@@ -8,29 +8,21 @@ const BASE_SANDBOX_URL =
 export const _CodeRunner = (props: { id: string; height: number }) => {
     const [framework] = useActiveFramework();
 
+    let frameworkName = framework.label.toLowerCase();
+
+    if (frameworkName === 'javascript') {
+        frameworkName = 'typescript';
+    }
+
     const sandboxUrl = `${BASE_SANDBOX_URL}/templates/${
         props.id
     }/${framework.label.toLowerCase()}`;
-    const path = `/templates/${
-        props.id
-    }/${framework.value.toLowerCase()}/index.html`;
+    const path = `/templates/${props.id}/${frameworkName}/index.html`;
     return (
-        <div>
-            <iframe
-                src={path}
-                style={{ width: '100%', height: `${props.height ?? 300}px` }}
-            />
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <CodeSandbox url={sandboxUrl} />
-                <a
-                    target="#blank"
-                    href={path}
-                    className="material-symbols-outlined"
-                >
-                    open_in_new
-                </a>
-            </div>
-        </div>
+        <iframe
+            src={path}
+            style={{ width: '100%', height: `${props.height ?? 300}px` }}
+        />
     );
 };
 
