@@ -59,8 +59,27 @@
 .dv-tabs-overflow-container {
     flex-direction: column;
     height: unset;
+    max-height: min(50vh, 400px);
+    overflow-y: auto;
     border: 1px solid var(--dv-tab-divider-color);
     background-color: var(--dv-group-view-background-color);
+
+    /* Scrollbar styling for webkit browsers */
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--dv-tabs-container-scrollbar-color);
+        border-radius: 3px;
+    }
+
+    /* Firefox scrollbar */
+    scrollbar-width: thin;
 
     .dv-tab {
         &:not(:last-child) {
