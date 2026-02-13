@@ -73,7 +73,7 @@ export const RightControls = (props: IDockviewHeaderActionsProps) => {
         }
     };
 
-    const vertical = props.group.headerPosition === 'left' || props.group.headerPosition === 'right';
+    const vertical = props.group.api.getHeaderPosition() === 'left' || props.group.api.getHeaderPosition() === 'right';
 
     return (
         <div

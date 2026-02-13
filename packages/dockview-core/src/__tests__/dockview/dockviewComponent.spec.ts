@@ -1758,12 +1758,12 @@ describe('dockviewComponent', () => {
             const group1 = dockview.groups.find(
                 (g) => g.api.id === 'group-1'
             )!;
-            expect(group1.headerPosition).toBe('left');
+            expect(group1.api.getHeaderPosition()).toBe('left');
 
             const group2 = dockview.groups.find(
                 (g) => g.api.id === 'group-2'
             )!;
-            expect(group2.headerPosition).toBe('top');
+            expect(group2.api.getHeaderPosition()).toBe('top');
 
             const result = dockview.toJSON();
             const group1Data = (
@@ -1779,6 +1779,55 @@ describe('dockviewComponent', () => {
                 (d: any) => d.data?.id === 'group-2'
             );
             expect(group2Data.data.headerPosition).toBeUndefined();
+        });
+
+        test('defaultHeaderPosition applies to new groups', () => {
+            const dv = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error('unsupported');
+                    }
+                },
+                defaultHeaderPosition: 'bottom',
+            });
+            dv.layout(1000, 1000);
+
+            dv.addPanel({ id: 'panel1', component: 'default' });
+            expect(dv.groups[0].api.getHeaderPosition()).toBe('bottom');
+
+            dv.dispose();
+        });
+
+        test('explicit headerPosition overrides defaultHeaderPosition via api', () => {
+            const dv = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error('unsupported');
+                    }
+                },
+                defaultHeaderPosition: 'bottom',
+            });
+            dv.layout(1000, 1000);
+
+            dv.addPanel({ id: 'panel1', component: 'default' });
+            expect(dv.groups[0].api.getHeaderPosition()).toBe('bottom');
+
+            dv.groups[0].api.setHeaderPosition('left');
+            expect(dv.groups[0].api.getHeaderPosition()).toBe('left');
+
+            dv.dispose();
         });
     });
 

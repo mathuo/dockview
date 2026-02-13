@@ -53,6 +53,7 @@ export interface DockviewOptions {
           };
     popoutUrl?: string;
     defaultRenderer?: DockviewPanelRenderer;
+    defaultHeaderPosition?: DockviewHeaderPosition;
     debug?: boolean;
     // #start dnd
     dndEdges?: false | DroptargetOverlayModel;
@@ -115,6 +116,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         floatingGroupBounds: undefined,
         popoutUrl: undefined,
         defaultRenderer: undefined,
+        defaultHeaderPosition: undefined,
         debug: undefined,
         rootOverlayModel: undefined,
         locked: undefined,

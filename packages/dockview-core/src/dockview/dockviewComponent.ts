@@ -31,6 +31,7 @@ import {
     isPanelOptionsWithGroup,
     isPanelOptionsWithPanel,
     MovementOptions,
+    DockviewHeaderPosition,
 } from './options';
 import {
     BaseGrid,
@@ -401,6 +402,10 @@ export class DockviewComponent
 
     get renderer(): DockviewPanelRenderer {
         return this.options.defaultRenderer ?? 'onlyWhenVisible';
+    }
+
+    get defaultHeaderPosition(): DockviewHeaderPosition {
+        return this.options.defaultHeaderPosition ?? 'top';
     }
 
     get api(): DockviewApi {

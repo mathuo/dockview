@@ -35,7 +35,7 @@ const GroupAction = (props: {
     }, [props.api, props.groupId]);
 
     const [headerPosition, setHeaderPosition] =
-        React.useState<DockviewHeaderPosition>(group?.headerPosition ?? 'top');
+        React.useState<DockviewHeaderPosition>(group?.api.getHeaderPosition() ?? 'top');
     const [location, setLocation] =
         React.useState<DockviewGroupLocation | null>(null);
     const [isMaximized, setIsMaximized] = React.useState<boolean>(false);
@@ -62,7 +62,7 @@ const GroupAction = (props: {
         setLocation(group.api.location);
         setIsMaximized(group.api.isMaximized());
         setIsVisible(group.api.isVisible);
-        setHeaderPosition(group.headerPosition ?? 'top');
+        setHeaderPosition(group.api.getHeaderPosition());
 
         return () => {
             disposable.dispose();
@@ -113,7 +113,7 @@ const GroupAction = (props: {
                     onChange={(e) => {
                         const value = e.target.value as DockviewHeaderPosition;
                         if (group) {
-                            group.headerPosition = value;
+                            group.api.setHeaderPosition(value);
                             setHeaderPosition(value);
                         }
                     }}
