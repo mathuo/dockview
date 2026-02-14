@@ -8,7 +8,7 @@ import { addDisposableListener, Emitter, Event } from '../../../events';
 import { Tab } from '../tab/tab';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { VoidContainer } from './voidContainer';
-import { findRelativeZIndexParent, toggleClass } from '../../../dom';
+import { addClasses, findRelativeZIndexParent, removeClasses, toggleClass } from '../../../dom';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewWillShowOverlayLocationEvent } from '../../events';
@@ -18,6 +18,7 @@ import {
     createDropdownElementHandle,
     DropdownElement,
 } from './tabOverflowControl';
+import { DockviewHeaderDirection } from '../../options';
 
 export interface TabDropIndexEvent {
     readonly event: DragEvent;
@@ -43,6 +44,7 @@ export interface ITabsContainer extends IDisposable {
     readonly onGroupDragStart: Event<GroupDragEvent>;
     readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent>;
     hidden: boolean;
+    direction: DockviewHeaderDirection;
     delete(id: string): void;
     indexOf(id: string): number;
     setActive(isGroupActive: boolean): void;
@@ -74,6 +76,7 @@ export class TabsContainer
     private preActions: HTMLElement | undefined;
 
     private _hidden = false;
+    private _direction: DockviewHeaderDirection = 'horizontal';
 
     private dropdownPart: DropdownElement | null = null;
     private _overflowTabs: string[] = [];
@@ -110,6 +113,23 @@ export class TabsContainer
     set hidden(value: boolean) {
         this._hidden = value;
         this.element.style.display = value ? 'none' : '';
+    }
+
+    get direction(): DockviewHeaderDirection {
+        return this._direction;
+    }
+
+    set direction(value: DockviewHeaderDirection) {
+        this._direction = value;
+        if(value === 'vertical') {
+          addClasses(this._element, 'dv-groupview-header-vertical');
+          addClasses(this.rightActionsContainer, 'dv-right-actions-container-vertical');
+          this.tabs.direction = value;
+        } else {
+          removeClasses(this._element, 'dv-groupview-header-vertical');
+          removeClasses(this.rightActionsContainer, 'dv-right-actions-container-vertical');
+          this.tabs.direction = value;
+        }
     }
 
     get element(): HTMLElement {

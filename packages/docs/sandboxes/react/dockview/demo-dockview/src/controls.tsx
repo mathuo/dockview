@@ -73,12 +73,16 @@ export const RightControls = (props: IDockviewHeaderActionsProps) => {
         }
     };
 
+    const vertical = props.group.api.getHeaderPosition() === 'left' || props.group.api.getHeaderPosition() === 'right';
+
     return (
         <div
             className="group-control"
             style={{
                 display: 'flex',
+                flexDirection: vertical ? 'column' : 'row',
                 alignItems: 'center',
+                justifyContent: 'center',
                 padding: '0px 8px',
                 height: '100%',
                 color: 'var(--dv-activegroup-hiddenpanel-tab-color)',
@@ -120,6 +124,7 @@ export const LeftControls = (props: IDockviewHeaderActionsProps) => {
             style={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 padding: '0px 8px',
                 height: '100%',
                 color: 'var(--dv-activegroup-visiblepanel-tab-color)',
@@ -137,6 +142,7 @@ export const PrefixHeaderControls = (props: IDockviewHeaderActionsProps) => {
             style={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 padding: '0px 8px',
                 height: '100%',
                 color: 'var(--dv-activegroup-visiblepanel-tab-color)',

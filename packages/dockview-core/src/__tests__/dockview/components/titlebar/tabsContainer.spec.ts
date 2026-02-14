@@ -1270,4 +1270,62 @@ describe('tabsContainer', () => {
             expect(mockSetActive).not.toHaveBeenCalled();
         });
     });
+
+    test('direction setter toggles CSS classes', () => {
+        const accessor = fromPartial<DockviewComponent>({
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
+            options: {},
+            onDidOptionsChange: jest.fn(),
+        });
+
+        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    canDisplayOverlay: jest.fn(),
+                };
+            }
+        );
+
+        const groupView = new groupviewMock() as DockviewGroupPanelModel;
+
+        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
+            return {
+                model: groupView,
+            };
+        });
+
+        const groupPanel = new groupPanelMock() as DockviewGroupPanel;
+
+        const cut = new TabsContainer(accessor, groupPanel);
+
+        // default should not have vertical classes
+        expect(
+            cut.element.classList.contains('dv-groupview-header-vertical')
+        ).toBeFalsy();
+
+        cut.direction = 'vertical';
+        expect(
+            cut.element.classList.contains('dv-groupview-header-vertical')
+        ).toBeTruthy();
+
+        const rightActions = cut.element.querySelector(
+            '.dv-right-actions-container'
+        );
+        expect(
+            rightActions?.classList.contains(
+                'dv-right-actions-container-vertical'
+            )
+        ).toBeTruthy();
+
+        cut.direction = 'horizontal';
+        expect(
+            cut.element.classList.contains('dv-groupview-header-vertical')
+        ).toBeFalsy();
+        expect(
+            rightActions?.classList.contains(
+                'dv-right-actions-container-vertical'
+            )
+        ).toBeFalsy();
+    });
 });

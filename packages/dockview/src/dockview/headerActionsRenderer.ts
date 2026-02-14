@@ -65,6 +65,7 @@ export class ReactHeaderActionsRendererPart implements IHeaderActionsRenderer {
                 activePanel: this._group.model.activePanel,
                 isGroupActive: this._group.api.isActive,
                 group: this._group,
+                headerPosition: this._group.model.headerPosition,
             }
         );
     }
