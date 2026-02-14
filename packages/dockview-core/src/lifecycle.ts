@@ -24,7 +24,7 @@ export namespace Disposable {
 }
 
 export class CompositeDisposable {
-    private _disposables: Set<IDisposable>;
+    private readonly _disposables: Set<IDisposable>;
     private _isDisposed = false;
 
     get isDisposed(): boolean {
