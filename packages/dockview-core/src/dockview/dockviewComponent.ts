@@ -1313,6 +1313,16 @@ export class DockviewComponent
             this.updateTheme();
         }
 
+        if (
+            'createRightHeaderActionComponent' in options ||
+            'createLeftHeaderActionComponent' in options ||
+            'createPrefixHeaderActionComponent' in options
+        ) {
+            for (const group of this.groups) {
+                group.model.updateHeaderActions();
+            }
+        }
+
         this.layout(this.gridview.width, this.gridview.height, true);
     }
 

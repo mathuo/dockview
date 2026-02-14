@@ -16,7 +16,7 @@ import {
     DockviewWillShowOverlayLocationEventOptions,
 } from './events';
 import { IViewSize } from '../gridview/gridview';
-import { CompositeDisposable, IDisposable } from '../lifecycle';
+import { CompositeDisposable, IDisposable, MutableDisposable } from '../lifecycle';
 import {
     IPanel,
     PanelInitParameters,
@@ -216,9 +216,9 @@ export class DockviewGroupPanelModel
     private _rightHeaderActions: IHeaderActionsRenderer | undefined;
     private _leftHeaderActions: IHeaderActionsRenderer | undefined;
     private _prefixHeaderActions: IHeaderActionsRenderer | undefined;
-    private _rightHeaderActionsDisposable: IDisposable | undefined;
-    private _leftHeaderActionsDisposable: IDisposable | undefined;
-    private _prefixHeaderActionsDisposable: IDisposable | undefined;
+    private readonly _rightHeaderActionsDisposable = new MutableDisposable();
+    private readonly _leftHeaderActionsDisposable = new MutableDisposable();
+    private readonly _prefixHeaderActionsDisposable = new MutableDisposable();
     private _headerPosition: DockviewHeaderPosition | undefined;
     private _location: DockviewGroupLocation = { type: 'grid' };
 
@@ -450,6 +450,9 @@ export class DockviewGroupPanelModel
             this._onTabDragStart,
             this._onGroupDragStart,
             this._onWillShowOverlay,
+            this._rightHeaderActionsDisposable,
+            this._leftHeaderActionsDisposable,
+            this._prefixHeaderActionsDisposable,
             this.tabsContainer.onTabDragStart((event) => {
                 this._onTabDragStart.fire(event);
             }),
@@ -560,17 +563,11 @@ export class DockviewGroupPanelModel
 
     updateHeaderActions(): void {
         if (this.accessor.options.createRightHeaderActionComponent) {
-            if(this._rightHeaderActionsDisposable) {
-                this._rightHeaderActionsDisposable.dispose()
-                this.removeDisposable(this._rightHeaderActionsDisposable);
-            }
-
             this._rightHeaderActions =
                 this.accessor.options.createRightHeaderActionComponent(
                     this.groupPanel
                 );
-            this._rightHeaderActionsDisposable = this._rightHeaderActions;
-            this.addDisposables(this._rightHeaderActions);
+            this._rightHeaderActionsDisposable.value = this._rightHeaderActions;
             this._rightHeaderActions.init({
                 containerApi: this._api,
                 api: this.groupPanel.api,
@@ -579,20 +576,18 @@ export class DockviewGroupPanelModel
             this.tabsContainer.setRightActionsElement(
                 this._rightHeaderActions.element
             );
+        } else {
+            this._rightHeaderActions = undefined;
+            this._rightHeaderActionsDisposable.dispose();
+            this.tabsContainer.setRightActionsElement(undefined);
         }
 
         if (this.accessor.options.createLeftHeaderActionComponent) {
-            if(this._leftHeaderActionsDisposable) {
-                this._leftHeaderActionsDisposable.dispose()
-                this.removeDisposable(this._leftHeaderActionsDisposable);
-            }
-
             this._leftHeaderActions =
                 this.accessor.options.createLeftHeaderActionComponent(
                     this.groupPanel
                 );
-            this._leftHeaderActionsDisposable = this._leftHeaderActions;
-            this.addDisposables(this._leftHeaderActions);
+            this._leftHeaderActionsDisposable.value = this._leftHeaderActions;
             this._leftHeaderActions.init({
                 containerApi: this._api,
                 api: this.groupPanel.api,
@@ -601,20 +596,18 @@ export class DockviewGroupPanelModel
             this.tabsContainer.setLeftActionsElement(
                 this._leftHeaderActions.element
             );
+        } else {
+            this._leftHeaderActions = undefined;
+            this._leftHeaderActionsDisposable.dispose();
+            this.tabsContainer.setLeftActionsElement(undefined);
         }
 
         if (this.accessor.options.createPrefixHeaderActionComponent) {
-            if(this._prefixHeaderActionsDisposable) {
-                this._prefixHeaderActionsDisposable.dispose()
-                this.removeDisposable(this._prefixHeaderActionsDisposable);
-            }
-
             this._prefixHeaderActions =
                 this.accessor.options.createPrefixHeaderActionComponent(
                     this.groupPanel
                 );
-            this._prefixHeaderActionsDisposable = this._prefixHeaderActions;
-            this.addDisposables(this._prefixHeaderActions);
+            this._prefixHeaderActionsDisposable.value = this._prefixHeaderActions;
             this._prefixHeaderActions.init({
                 containerApi: this._api,
                 api: this.groupPanel.api,
@@ -623,8 +616,11 @@ export class DockviewGroupPanelModel
             this.tabsContainer.setPrefixActionsElement(
                 this._prefixHeaderActions.element
             );
+        } else {
+            this._prefixHeaderActions = undefined;
+            this._prefixHeaderActionsDisposable.dispose();
+            this.tabsContainer.setPrefixActionsElement(undefined);
         }
-
     }
 
     rerender(panel: IDockviewPanel): void {
