@@ -9,18 +9,20 @@ import {
 } from '@angular/core';
 import { IContentRenderer, IFrameworkPart, Parameters } from 'dockview-core';
 
-export interface AngularRendererOptions {
-    component: Type<any>;
+export interface AngularRendererOptions<T = any> {
+    component: Type<T>;
     injector: Injector;
     environmentInjector?: EnvironmentInjector;
 }
 
-export class AngularRenderer implements IContentRenderer, IFrameworkPart {
-    private componentRef: ComponentRef<any> | null = null;
+export class AngularRenderer<T = any>
+    implements IContentRenderer, IFrameworkPart
+{
+    private componentRef: ComponentRef<T> | null = null;
     private _element: HTMLElement | null = null;
     private appRef: ApplicationRef;
 
-    constructor(private options: AngularRendererOptions) {
+    constructor(private options: AngularRendererOptions<T>) {
         this.appRef = options.injector.get(ApplicationRef);
     }
 
@@ -31,16 +33,29 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
         return this._element;
     }
 
-    get component(): ComponentRef<any> | null {
+    get component(): ComponentRef<T> | null {
         return this.componentRef;
     }
 
     init(parameters: Parameters): void {
-        // If already initialized, just update the parameters
+        // Only forward params, api, and containerApi to the component
+        // (matching the React renderer). Other init parameters like
+        // 'title' are internal to the framework.
+        const filtered: Record<string, unknown> = {};
+        if ('params' in parameters) {
+            filtered['params'] = parameters['params'];
+        }
+        if ('api' in parameters) {
+            filtered['api'] = parameters['api'];
+        }
+        if ('containerApi' in parameters) {
+            filtered['containerApi'] = parameters['containerApi'];
+        }
+
         if (this.componentRef) {
-            this.update(parameters);
+            this.update(filtered);
         } else {
-            this.render(parameters);
+            this.render(filtered);
         }
     }
 
@@ -49,10 +64,11 @@ export class AngularRenderer implements IContentRenderer, IFrameworkPart {
             return;
         }
 
+        const instance = this.componentRef.instance as Record<string, unknown>;
+
         for (const key of Object.keys(params)) {
-            // Use 'in' operator instead of hasOwnProperty to support getter/setter properties
-            if (key in this.componentRef.instance) {
-                this.componentRef.instance[key] = params[key];
+            if (key in instance) {
+                instance[key] = params[key];
             }
         }
 
