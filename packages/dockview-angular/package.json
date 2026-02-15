@@ -41,7 +41,7 @@
     "build:angular": "ng-packagr -c tsconfig.lib.json -p ng-package.json",
     "build:css": "node scripts/copy-css.js",
     "build": "npm run build:angular && npm run build:css",
-    "clean": "rimraf dist/ .build/ .rollup.cache/",
+    "clean": "rimraf dist/ .build/",
     "prepublishOnly": "npm run rebuild && npm run test",
     "rebuild": "npm run clean && npm run build",
     "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-angular",

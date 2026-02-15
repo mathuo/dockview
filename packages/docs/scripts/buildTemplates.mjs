@@ -24,23 +24,26 @@ const local = 'http://localhost:1111';
 const DOCKVIEW_CDN = {
     react: {
         remote: {
-            dockview: `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}/dist/dockview.esm.js`,
+            'dockview-core': `https://esm.sh/dockview-core@${DOCKVIEW_VERSION}`,
+            dockview: `https://esm.sh/dockview@${DOCKVIEW_VERSION}?external=dockview-core`,
             'dockview/': `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}/`,
         },
         local: {
-            dockview: `${local}/dockview/dist/dockview.esm.js`,
+            'dockview-core': `${local}/dockview-core/dist/esm/index.js`,
+            'dockview-core/': `${local}/dockview-core/`,
+            dockview: `${local}/dockview/dist/esm/index.js`,
             'dockview/': `${local}/dockview/`,
         },
     },
     vue: {
         remote: {
-            'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/dist/dockview-core.esm.js`,
+            'dockview-core': `https://esm.sh/dockview-core@${DOCKVIEW_VERSION}`,
             'dockview-core/': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/`,
             'dockview-vue': `https://cdn.jsdelivr.net/npm/dockview-vue@${DOCKVIEW_VERSION}/dist/dockview-vue.es.js`,
             'dockview-vue/': `https://cdn.jsdelivr.net/npm/dockview-vue@${DOCKVIEW_VERSION}/`,
         },
         local: {
-            'dockview-core': `${local}/dockview-core/dist/dockview-core.esm.js`,
+            'dockview-core': `${local}/dockview-core/dist/esm/index.js`,
             'dockview-core/': `${local}/dockview-core/`,
             'dockview-vue': `${local}/dockview-vue/dist/dockview-vue.es.js`,
             'dockview-vue/': `${local}/dockview-vue/`,
@@ -48,23 +51,23 @@ const DOCKVIEW_CDN = {
     },
     typescript: {
         remote: {
-            'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/dist/dockview-core.esm.js`,
+            'dockview-core': `https://esm.sh/dockview-core@${DOCKVIEW_VERSION}`,
             'dockview-core/': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/`,
         },
         local: {
-            'dockview-core': `${local}/dockview-core/dist/dockview-core.esm.js`,
+            'dockview-core': `${local}/dockview-core/dist/esm/index.js`,
             'dockview-core/': `${local}/dockview-core/`,
         },
     },
     angular: {
         remote: {
-            'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/dist/dockview-core.esm.js`,
+            'dockview-core': `https://esm.sh/dockview-core@${DOCKVIEW_VERSION}`,
             'dockview-core/': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/`,
             'dockview-angular': `https://cdn.jsdelivr.net/npm/dockview-angular@${DOCKVIEW_VERSION}/dist/dockview-angular.esm.js`,
             'dockview-angular/': `https://cdn.jsdelivr.net/npm/dockview-angular@${DOCKVIEW_VERSION}/`,
         },
         local: {
-            'dockview-core': `${local}/dockview-core/dist/dockview-core.esm.js`,
+            'dockview-core': `${local}/dockview-core/dist/esm/index.js`,
             'dockview-core/': `${local}/dockview-core/`,
             'dockview-angular': `${local}/dockview-angular/dist/dockview-angular.esm.js`,
             'dockview-angular/': `${local}/dockview-angular/`,

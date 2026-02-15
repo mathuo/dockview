@@ -41,13 +41,12 @@
     "README.md"
   ],
   "scripts": {
-    "build:bundle": "rollup -c",
     "build:cjs": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
     "build:css": "node scripts/copy-css.js",
     "build:esm": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
     "build": "npm run build:cjs && npm run build:esm && npm run build:css",
-    "clean": "rimraf dist/ .build/ .rollup.cache/",
-    "prepublishOnly": "npm run rebuild && npm run build:bundle && npm run test",
+    "clean": "rimraf dist/ .build/",
+    "prepublishOnly": "npm run rebuild && npm run test",
     "rebuild": "npm run clean && npm run build",
     "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview",
     "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage"
