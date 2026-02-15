@@ -12,17 +12,19 @@ import { AngularRenderer } from '../lib/utils/angular-renderer';
 
 @Component({
     selector: 'test-component',
-    template: '<div class="test-component">{{ title }} - {{ value }}</div>',
+    template:
+        '<div class="test-component">{{ params?.title }} - {{ params?.value }}</div>',
 })
 class TestComponent {
-    // default values are required to ensure these properties are created on the component instance
-    title: string = 'Test';
-    value: string = 'default';
+    params: { title?: string; value?: string } = {};
+    api: any = undefined;
+    containerApi: any = undefined;
 }
 
 @Component({
     selector: 'test-update-component',
-    template: '<div class="test-update-component">Counter: {{ counter }}</div>',
+    template:
+        '<div class="test-update-component">Counter: {{ counter }}</div>',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class TestUpdateComponent {
@@ -60,13 +62,17 @@ describe('AngularRenderer', () => {
     });
 
     it('should initialize and render component', () => {
-        const renderer = new AngularRenderer({
+        const renderer = new AngularRenderer<TestComponent>({
             component: TestComponent,
             injector,
             environmentInjector,
         });
 
-        renderer.init({ title: 'Updated Title', value: 'test-value' });
+        renderer.init({
+            params: { title: 'Updated Title', value: 'test-value' },
+            api: {},
+            containerApi: {},
+        });
         application.tick(); // trigger change detection
 
         expect(renderer.element).toBeTruthy();
@@ -77,14 +83,20 @@ describe('AngularRenderer', () => {
     });
 
     it('should update component properties', () => {
-        const renderer = new AngularRenderer({
+        const renderer = new AngularRenderer<TestComponent>({
             component: TestComponent,
             injector,
             environmentInjector,
         });
 
-        renderer.init({ title: 'Initial Title' });
-        renderer.update({ title: 'Updated Title', value: 'new-value' });
+        renderer.init({
+            params: { title: 'Initial Title' },
+            api: {},
+            containerApi: {},
+        });
+        renderer.update({
+            params: { title: 'Updated Title', value: 'new-value' },
+        });
         application.tick(); // trigger change detection
 
         expect(renderer.element).toBeTruthy();
@@ -94,13 +106,13 @@ describe('AngularRenderer', () => {
     });
 
     it('should dispose correctly', () => {
-        const renderer = new AngularRenderer({
+        const renderer = new AngularRenderer<TestComponent>({
             component: TestComponent,
             injector,
             environmentInjector,
         });
 
-        renderer.init({ title: 'Test Title' });
+        renderer.init({ params: { title: 'Test Title' } });
         const element = renderer.element;
 
         expect(element).toBeTruthy();
@@ -127,28 +139,28 @@ describe('AngularRenderer', () => {
     });
 
     it('should not throw when updating after dispose', () => {
-        const renderer = new AngularRenderer({
+        const renderer = new AngularRenderer<TestComponent>({
             component: TestComponent,
             injector,
             environmentInjector,
         });
 
-        renderer.init({ title: 'Test Title' });
+        renderer.init({ params: { title: 'Test Title' } });
         renderer.dispose();
 
         expect(() => {
-            renderer.update({ title: 'Updated Title' });
+            renderer.update({ params: { title: 'Updated Title' } });
         }).not.toThrow();
     });
 
     it('should handle multiple dispose calls', () => {
-        const renderer = new AngularRenderer({
+        const renderer = new AngularRenderer<TestComponent>({
             component: TestComponent,
             injector,
             environmentInjector,
         });
 
-        renderer.init({ title: 'Test Title' });
+        renderer.init({ params: { title: 'Test Title' } });
 
         expect(() => {
             renderer.dispose();
@@ -158,7 +170,7 @@ describe('AngularRenderer', () => {
     });
 
     it('should render when component is marked for change detection', () => {
-        const renderer = new AngularRenderer({
+        const renderer = new AngularRenderer<TestUpdateComponent>({
             component: TestUpdateComponent,
             injector,
             environmentInjector,
@@ -168,8 +180,30 @@ describe('AngularRenderer', () => {
         application.tick(); // trigger change detection
 
         expect(renderer.element.innerHTML).toContain('Counter: 0');
-        (renderer.component.instance as TestUpdateComponent).updateCounter();
+        renderer.component!.instance.updateCounter();
         application.tick();
         expect(renderer.element.innerHTML).toContain('Counter: 1');
+    });
+
+    it('should only forward params, api, and containerApi from init', () => {
+        const renderer = new AngularRenderer<TestComponent>({
+            component: TestComponent,
+            injector,
+            environmentInjector,
+        });
+
+        renderer.init({
+            params: { title: 'Hello' },
+            api: { mockApi: true },
+            containerApi: { mockContainerApi: true },
+            title: 'should-be-filtered',
+        });
+        application.tick();
+
+        const instance = renderer.component!.instance;
+        expect(instance.params).toEqual({ title: 'Hello' });
+        expect(instance.api).toEqual({ mockApi: true });
+        expect(instance.containerApi).toEqual({ mockContainerApi: true });
+        expect((instance as any).title).toBeUndefined();
     });
 });
