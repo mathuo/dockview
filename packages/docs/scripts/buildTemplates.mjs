@@ -29,9 +29,11 @@ const FRAMEWORK_BOILERPLATE = {
 const DOCKVIEW_CDN = {
     react: {
         remote: {
+            'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}`,
             dockview: `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}`,
         },
         local: {
+            'dockview-core': `${local}/dockview-core`,
             dockview: `${local}/dockview`,
         },
     },

@@ -41,6 +41,7 @@
             },
             'dockview-core': {
                 main: './dist/cjs/index.js',
+                format: 'cjs',
                 defaultExtension: 'js',
             },
         },

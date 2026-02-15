@@ -45,10 +45,12 @@
             },
             'dockview-core': {
                 main: './dist/cjs/index.js',
+                format: 'cjs',
                 defaultExtension: 'js',
             },
             'dockview-vue': {
                 main: './dist/dockview-vue.es.js',
+                format: 'esm',
                 defaultExtension: 'js',
             },
         },

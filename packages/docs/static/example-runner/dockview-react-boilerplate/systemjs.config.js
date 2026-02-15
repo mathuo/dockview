@@ -46,8 +46,14 @@
             app: {
                 defaultExtension: 'tsx',
             },
+            'dockview-core': {
+                main: './dist/cjs/index.js',
+                format: 'cjs',
+                defaultExtension: 'js',
+            },
             dockview: {
                 main: './dist/cjs/index.js',
+                format: 'cjs',
                 defaultExtension: 'js',
             },
         },
