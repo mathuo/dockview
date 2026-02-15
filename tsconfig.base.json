@@ -1,11 +1,5 @@
 {
     "compilerOptions": {
-        "baseUrl": ".",
-        "paths": {
-            "dockview-core": ["packages/dockview-core/src/index.ts"],
-            "dockview": ["packages/dockview/src/index.ts"],
-            "dockview-react": ["packages/dockview-react/src/index.ts"]
-        },
         "module": "commonjs",
         "target": "es5",
         "declaration": true,
