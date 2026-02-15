@@ -28,6 +28,7 @@ import {
 } from 'dockview-core';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
+import { ComponentRegistryService } from '../utils/component-registry.service';
 
 export interface DockviewAngularOptions extends DockviewOptions {
     components: Record<string, Type<any>>;
@@ -60,10 +61,14 @@ export interface DockviewAngularOptions extends DockviewOptions {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
+    private readonly componentRegistry: ComponentRegistryService = inject(
+        ComponentRegistryService
+    );
+
     @ViewChild('dockviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
-    @Input() components!: Record<string, Type<any>>;
+    @Input() components?: Record<string, Type<any>>;
     @Input() tabComponents?: Record<string, Type<any>>;
     @Input() watermarkComponent?: Type<any>;
     @Input() defaultTabComponent?: Type<any>;
@@ -130,10 +135,8 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     private initializeDockview(): void {
-        if (!this.components) {
-            throw new Error(
-                'DockviewAngularComponent: components input is required'
-            );
+        if (this.components) {
+            this.componentRegistry.registerComponents(this.components);
         }
 
         const coreOptions = this.extractCoreOptions();
@@ -178,7 +181,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
         }
 
         const componentFactory = new AngularFrameworkComponentFactory(
-            this.components,
+            this.componentRegistry,
             this.injector,
             this.environmentInjector,
             this.tabComponents,
