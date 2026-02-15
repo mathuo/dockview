@@ -14,11 +14,11 @@ describe('SplitviewAngularComponent', () => {
     beforeEach(async () => {
         setupTestBed();
         await TestBed.compileComponents();
-        
+
         fixture = TestBed.createComponent(SplitviewAngularComponent);
         component = fixture.componentInstance;
         debugElement = fixture.debugElement;
-        
+
         component.components = getTestComponents();
     });
 
@@ -35,7 +35,7 @@ describe('SplitviewAngularComponent', () => {
 
     it('should throw error if components input is not provided', () => {
         component.components = undefined as any;
-        
+
         expect(() => {
             component.ngOnInit();
         }).toThrow('SplitviewAngularComponent: components input is required');
@@ -43,7 +43,7 @@ describe('SplitviewAngularComponent', () => {
 
     it('should initialize splitview api on ngOnInit', () => {
         component.ngOnInit();
-        
+
         expect(component.getSplitviewApi()).toBeDefined();
         expect(component.getSplitviewApi()).toBeInstanceOf(Object);
     });
@@ -60,8 +60,10 @@ describe('SplitviewAngularComponent', () => {
 
     it('should render container element', () => {
         fixture.detectChanges();
-        
-        const containerElement = debugElement.query(By.css('.splitview-container'));
+
+        const containerElement = debugElement.query(
+            By.css('.splitview-container')
+        );
         expect(containerElement).toBeTruthy();
         expect(containerElement.nativeElement.tagName).toBe('DIV');
     });
@@ -70,9 +72,9 @@ describe('SplitviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getSplitviewApi();
         const disposeSpy = jest.spyOn(api!, 'dispose');
-        
+
         component.ngOnDestroy();
-        
+
         expect(disposeSpy).toHaveBeenCalled();
     });
 
@@ -80,19 +82,19 @@ describe('SplitviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getSplitviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
-        
+
         component.className = 'test-class';
         component.ngOnChanges({
             className: {
                 currentValue: 'test-class',
                 previousValue: undefined,
                 firstChange: false,
-                isFirstChange: () => false
-            }
+                isFirstChange: () => false,
+            },
         });
-        
+
         expect(updateOptionsSpy).toHaveBeenCalledWith({
-            className: 'test-class'
+            className: 'test-class',
         });
     });
 
@@ -100,19 +102,19 @@ describe('SplitviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getSplitviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
-        
+
         component.orientation = 'vertical';
         component.ngOnChanges({
             orientation: {
                 currentValue: 'vertical',
                 previousValue: 'horizontal',
                 firstChange: false,
-                isFirstChange: () => false
-            }
+                isFirstChange: () => false,
+            },
         });
-        
+
         expect(updateOptionsSpy).toHaveBeenCalledWith({
-            orientation: 'vertical'
+            orientation: 'vertical',
         });
     });
 
@@ -120,19 +122,19 @@ describe('SplitviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getSplitviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
-        
+
         component.proportionalLayout = true;
         component.ngOnChanges({
             proportionalLayout: {
                 currentValue: true,
                 previousValue: false,
                 firstChange: false,
-                isFirstChange: () => false
-            }
+                isFirstChange: () => false,
+            },
         });
-        
+
         expect(updateOptionsSpy).toHaveBeenCalledWith({
-            proportionalLayout: true
+            proportionalLayout: true,
         });
     });
 
@@ -140,45 +142,44 @@ describe('SplitviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getSplitviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
-        
+
         component.disableAutoResizing = true;
         component.ngOnChanges({
             disableAutoResizing: {
                 currentValue: true,
                 previousValue: false,
                 firstChange: false,
-                isFirstChange: () => false
-            }
+                isFirstChange: () => false,
+            },
         });
-        
+
         expect(updateOptionsSpy).toHaveBeenCalledWith({
-            disableAutoResizing: true
+            disableAutoResizing: true,
         });
     });
-
 
     it('should not call updateOptions on first change', () => {
         component.ngOnInit();
         const api = component.getSplitviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
-        
+
         component.ngOnChanges({
             className: {
                 currentValue: 'test-class',
                 previousValue: undefined,
                 firstChange: true,
-                isFirstChange: () => true
-            }
+                isFirstChange: () => true,
+            },
         });
-        
+
         expect(updateOptionsSpy).not.toHaveBeenCalled();
     });
 
     it('should set up component registry correctly', () => {
         expect(component.components).toEqual(getTestComponents());
-        
+
         component.ngOnInit();
-        
+
         expect(component.getSplitviewApi()).toBeDefined();
     });
 
@@ -186,7 +187,7 @@ describe('SplitviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getSplitviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
-        
+
         component.className = 'test-class';
         component.proportionalLayout = true;
         component.ngOnChanges({
@@ -194,26 +195,26 @@ describe('SplitviewAngularComponent', () => {
                 currentValue: 'test-class',
                 previousValue: undefined,
                 firstChange: false,
-                isFirstChange: () => false
+                isFirstChange: () => false,
             },
             proportionalLayout: {
                 currentValue: true,
                 previousValue: false,
                 firstChange: false,
-                isFirstChange: () => false
-            }
+                isFirstChange: () => false,
+            },
         });
-        
+
         expect(updateOptionsSpy).toHaveBeenCalledWith({
             className: 'test-class',
-            proportionalLayout: true
+            proportionalLayout: true,
         });
     });
 });
 
 @Component({
     template: `
-        <dv-splitview 
+        <dv-splitview
             [components]="components"
             [className]="className"
             [orientation]="orientation"
@@ -221,9 +222,10 @@ describe('SplitviewAngularComponent', () => {
             [debug]="debug"
             [hideBorders]="hideBorders"
             [disableAutoResizing]="disableAutoResizing"
-            (ready)="onReady($event)">
+            (ready)="onReady($event)"
+        >
         </dv-splitview>
-    `
+    `,
 })
 class TestHostComponent {
     components = getTestComponents();
@@ -246,13 +248,13 @@ describe('SplitviewAngularComponent Integration', () => {
 
     beforeEach(async () => {
         setupTestBed();
-        
+
         TestBed.configureTestingModule({
-            declarations: [TestHostComponent]
+            declarations: [TestHostComponent],
         });
-        
+
         await TestBed.compileComponents();
-        
+
         fixture = TestBed.createComponent(TestHostComponent);
         hostComponent = fixture.componentInstance;
     });
@@ -264,7 +266,7 @@ describe('SplitviewAngularComponent Integration', () => {
 
     it('should create and initialize through template', () => {
         fixture.detectChanges();
-        
+
         expect(hostComponent).toBeTruthy();
         expect(hostComponent.api).toBeDefined();
     });
@@ -276,9 +278,9 @@ describe('SplitviewAngularComponent Integration', () => {
         hostComponent.proportionalLayout = true;
         hostComponent.hideBorders = true;
         hostComponent.disableAutoResizing = true;
-        
+
         fixture.detectChanges();
-        
+
         expect(hostComponent.api).toBeDefined();
     });
 });

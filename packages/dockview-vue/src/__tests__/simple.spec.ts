@@ -40,19 +40,19 @@ describe('Vue View Classes', () => {
 describe('Utility Functions', () => {
     test('should export utility functions', () => {
         const utils = require('../utils');
-        
+
         expect(utils.findComponent).toBeDefined();
         expect(utils.mountVueComponent).toBeDefined();
         expect(utils.VuePart).toBeDefined();
-        
+
         expect(typeof utils.findComponent).toBe('function');
         expect(typeof utils.mountVueComponent).toBe('function');
         expect(typeof utils.VuePart).toBe('function');
     });
-    
+
     test('findComponent should throw when component not found', () => {
         const { findComponent } = require('../utils');
-        
+
         const mockInstance = {
             components: {},
             parent: null,
@@ -60,7 +60,7 @@ describe('Utility Functions', () => {
                 components: {},
             },
         };
-        
+
         expect(() => findComponent(mockInstance, 'non-existent')).toThrow(
             "Failed to find Vue Component 'non-existent'"
         );

@@ -8,8 +8,7 @@ import { LayoutPriority, Orientation } from './splitview';
 import { FunctionOrValue } from '../types';
 import { Emitter, Event } from '../events';
 
-export interface ISplitviewPanel
-    extends BasePanelViewExported<SplitviewPanelApiImpl> {
+export interface ISplitviewPanel extends BasePanelViewExported<SplitviewPanelApiImpl> {
     readonly priority: LayoutPriority | undefined;
     readonly minimumSize: number;
     readonly maximumSize: number;

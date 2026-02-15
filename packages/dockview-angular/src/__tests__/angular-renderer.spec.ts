@@ -1,5 +1,13 @@
 import { TestBed } from '@angular/core/testing';
-import { ApplicationRef, ChangeDetectionStrategy, ChangeDetectorRef, Component, EnvironmentInjector, inject, Injector } from '@angular/core';
+import {
+    ApplicationRef,
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    EnvironmentInjector,
+    inject,
+    Injector,
+} from '@angular/core';
 import { AngularRenderer } from '../lib/utils/angular-renderer';
 
 @Component({
@@ -15,15 +23,13 @@ class TestComponent {
 @Component({
     selector: 'test-update-component',
     template: '<div class="test-update-component">Counter: {{ counter }}</div>',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
-class TestUpdateComponent
-{
-    private readonly cd: ChangeDetectorRef = inject( ChangeDetectorRef );
+class TestUpdateComponent {
+    private readonly cd: ChangeDetectorRef = inject(ChangeDetectorRef);
     protected counter: number = 0;
 
-    public updateCounter()
-    {
+    public updateCounter() {
         // use typical OnPush change handling
         this.counter++;
         this.cd.markForCheck();
@@ -37,9 +43,9 @@ describe('AngularRenderer', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [TestComponent]
+            declarations: [TestComponent],
         }).compileComponents();
-        
+
         injector = TestBed.inject(Injector);
         environmentInjector = TestBed.inject(EnvironmentInjector);
         application = TestBed.inject(ApplicationRef);
@@ -57,7 +63,7 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: TestComponent,
             injector,
-            environmentInjector
+            environmentInjector,
         });
 
         renderer.init({ title: 'Updated Title', value: 'test-value' });
@@ -65,14 +71,16 @@ describe('AngularRenderer', () => {
 
         expect(renderer.element).toBeTruthy();
         expect(renderer.element.tagName).toBe('TEST-COMPONENT');
-        expect(renderer.element.innerHTML).toContain('Updated Title - test-value');
+        expect(renderer.element.innerHTML).toContain(
+            'Updated Title - test-value'
+        );
     });
 
     it('should update component properties', () => {
         const renderer = new AngularRenderer({
             component: TestComponent,
             injector,
-            environmentInjector
+            environmentInjector,
         });
 
         renderer.init({ title: 'Initial Title' });
@@ -80,24 +88,28 @@ describe('AngularRenderer', () => {
         application.tick(); // trigger change detection
 
         expect(renderer.element).toBeTruthy();
-        expect(renderer.element.innerHTML).toContain('Updated Title - new-value');
+        expect(renderer.element.innerHTML).toContain(
+            'Updated Title - new-value'
+        );
     });
 
     it('should dispose correctly', () => {
         const renderer = new AngularRenderer({
             component: TestComponent,
             injector,
-            environmentInjector
+            environmentInjector,
         });
 
         renderer.init({ title: 'Test Title' });
         const element = renderer.element;
-        
+
         expect(element).toBeTruthy();
-        
+
         renderer.dispose();
-        
-        expect(() => renderer.element).toThrow('Angular renderer not initialized');
+
+        expect(() => renderer.element).toThrow(
+            'Angular renderer not initialized'
+        );
     });
 
     it('should handle component creation errors gracefully', () => {
@@ -106,7 +118,7 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: null as any,
             injector,
-            environmentInjector
+            environmentInjector,
         });
 
         expect(() => {
@@ -118,12 +130,12 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: TestComponent,
             injector,
-            environmentInjector
+            environmentInjector,
         });
 
         renderer.init({ title: 'Test Title' });
         renderer.dispose();
-        
+
         expect(() => {
             renderer.update({ title: 'Updated Title' });
         }).not.toThrow();
@@ -133,11 +145,11 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: TestComponent,
             injector,
-            environmentInjector
+            environmentInjector,
         });
 
         renderer.init({ title: 'Test Title' });
-        
+
         expect(() => {
             renderer.dispose();
             renderer.dispose();
@@ -149,7 +161,7 @@ describe('AngularRenderer', () => {
         const renderer = new AngularRenderer({
             component: TestUpdateComponent,
             injector,
-            environmentInjector
+            environmentInjector,
         });
 
         renderer.init({});
@@ -159,5 +171,5 @@ describe('AngularRenderer', () => {
         (renderer.component.instance as TestUpdateComponent).updateCounter();
         application.tick();
         expect(renderer.element.innerHTML).toContain('Counter: 1');
-    })
+    });
 });

@@ -22,10 +22,10 @@ describe('findComponent', () => {
         const testComponent = { template: '<div>Test</div>' };
         const mockInstance = {
             components: {
-                'test-component': testComponent
+                'test-component': testComponent,
             },
             appContext: { components: {} },
-            parent: null
+            parent: null,
         } as any;
 
         const found = findComponent(mockInstance, 'test-component');
@@ -38,10 +38,10 @@ describe('findComponent', () => {
             components: {},
             appContext: {
                 components: {
-                    'global-component': testComponent
-                }
+                    'global-component': testComponent,
+                },
             },
-            parent: null
+            parent: null,
         } as any;
 
         const found = findComponent(mockInstance, 'global-component');
@@ -52,7 +52,7 @@ describe('findComponent', () => {
         const mockInstance = {
             components: {},
             appContext: { components: {} },
-            parent: null
+            parent: null,
         } as any;
 
         expect(() => findComponent(mockInstance, 'non-existent')).toThrow(
@@ -69,24 +69,25 @@ describe('VuePart', () => {
 
     beforeEach(() => {
         container = document.createElement('div');
-        
+
         testComponent = {
-            template: '<div class="vue-part">{{ params.title }} - {{ params.data }}</div>',
-            props: ['params', 'api', 'containerApi']
+            template:
+                '<div class="vue-part">{{ params.title }} - {{ params.data }}</div>',
+            props: ['params', 'api', 'containerApi'],
         };
-        
+
         mockParent = {
             appContext: {
                 components: {},
-                provides: {}
+                provides: {},
             },
-            provides: {}
+            provides: {},
         };
-        
+
         const mockProps = {
             params: { title: 'Test Title', data: 'test data' },
             api: { id: 'test-api' },
-            containerApi: { id: 'container-api' }
+            containerApi: { id: 'container-api' },
         };
 
         vuePart = new VuePart(container, testComponent, mockParent, mockProps);
@@ -104,7 +105,9 @@ describe('VuePart', () => {
     });
 
     test('should handle update before init gracefully', () => {
-        expect(() => vuePart.update({ params: { title: 'New' } })).not.toThrow();
+        expect(() =>
+            vuePart.update({ params: { title: 'New' } })
+        ).not.toThrow();
     });
 
     test('should handle dispose before init gracefully', () => {

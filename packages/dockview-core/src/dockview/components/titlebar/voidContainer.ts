@@ -39,8 +39,12 @@ export class VoidContainer extends CompositeDisposable {
 
         this._element.className = 'dv-void-container';
         this._element.draggable = !this.accessor.options.disableDnd;
-        
-        toggleClass(this._element, 'dv-draggable', !this.accessor.options.disableDnd);
+
+        toggleClass(
+            this._element,
+            'dv-draggable',
+            !this.accessor.options.disableDnd
+        );
 
         this.addDisposables(
             this._onDrop,
@@ -50,7 +54,12 @@ export class VoidContainer extends CompositeDisposable {
             })
         );
 
-        this.handler = new GroupDragHandler(this._element, accessor, group, !!this.accessor.options.disableDnd);
+        this.handler = new GroupDragHandler(
+            this._element,
+            accessor,
+            group,
+            !!this.accessor.options.disableDnd
+        );
 
         this.dropTarget = new Droptarget(this._element, {
             acceptedTargetZones: ['center'],
@@ -86,7 +95,11 @@ export class VoidContainer extends CompositeDisposable {
 
     updateDragAndDropState(): void {
         this._element.draggable = !this.accessor.options.disableDnd;
-        toggleClass(this._element, 'dv-draggable', !this.accessor.options.disableDnd);
+        toggleClass(
+            this._element,
+            'dv-draggable',
+            !this.accessor.options.disableDnd
+        );
         this.handler.setDisabled(!!this.accessor.options.disableDnd);
     }
 }

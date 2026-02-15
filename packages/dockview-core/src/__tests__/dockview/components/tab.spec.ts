@@ -13,7 +13,7 @@ import { fromPartial } from '@total-typescript/shoehorn';
 describe('tab', () => {
     test('that empty tab has inactive-tab class', () => {
         const accessor = fromPartial<DockviewComponent>({
-            options: {}
+            options: {},
         });
         const groupMock = jest.fn();
 
@@ -28,7 +28,7 @@ describe('tab', () => {
 
     test('that active tab has active-tab class', () => {
         const accessor = fromPartial<DockviewComponent>({
-            options: {}
+            options: {},
         });
         const groupMock = jest.fn();
 
@@ -48,7 +48,7 @@ describe('tab', () => {
     test('that an external event does not render a drop target and calls through to the group model', () => {
         const accessor = fromPartial<DockviewComponent>({
             id: 'testcomponentid',
-            options: {}
+            options: {},
         });
 
         const groupView = fromPartial<DockviewGroupPanelModel>({
@@ -86,7 +86,7 @@ describe('tab', () => {
     test('that if you drag over yourself a drop target is shown', () => {
         const accessor = fromPartial<DockviewComponent>({
             id: 'testcomponentid',
-            options: {}
+            options: {},
         });
 
         const groupView = fromPartial<DockviewGroupPanelModel>({
@@ -129,7 +129,7 @@ describe('tab', () => {
     test('that if you drag over another tab a drop target is shown', () => {
         const accessor = fromPartial<DockviewComponent>({
             id: 'testcomponentid',
-            options: {}
+            options: {},
         });
 
         const groupView = fromPartial<DockviewGroupPanelModel>({
@@ -172,7 +172,7 @@ describe('tab', () => {
     test('that dropping on a tab with the same id but from a different component should not render a drop over and call through to the group model', () => {
         const accessor = fromPartial<DockviewComponent>({
             id: 'testcomponentid',
-            options: {}
+            options: {},
         });
 
         const groupView = fromPartial<DockviewGroupPanelModel>({
@@ -221,7 +221,7 @@ describe('tab', () => {
     test('that dropping on a tab from a different component should not render a drop over and call through to the group model', () => {
         const accessor = fromPartial<DockviewComponent>({
             id: 'testcomponentid',
-            options: {}
+            options: {},
         });
 
         const groupView = fromPartial<DockviewGroupPanelModel>({
@@ -270,7 +270,7 @@ describe('tab', () => {
     describe('disableDnd option', () => {
         test('that tab is draggable by default (disableDnd not set)', () => {
             const accessor = fromPartial<DockviewComponent>({
-                options: {}
+                options: {},
             });
             const groupMock = jest.fn();
 
@@ -285,7 +285,7 @@ describe('tab', () => {
 
         test('that tab is draggable when disableDnd is false', () => {
             const accessor = fromPartial<DockviewComponent>({
-                options: { disableDnd: false }
+                options: { disableDnd: false },
             });
             const groupMock = jest.fn();
 
@@ -300,7 +300,7 @@ describe('tab', () => {
 
         test('that tab is not draggable when disableDnd is true', () => {
             const accessor = fromPartial<DockviewComponent>({
-                options: { disableDnd: true }
+                options: { disableDnd: true },
             });
             const groupMock = jest.fn();
 
@@ -316,7 +316,7 @@ describe('tab', () => {
         test('that updateDragAndDropState updates draggable attribute based on disableDnd option', () => {
             const options = { disableDnd: false };
             const accessor = fromPartial<DockviewComponent>({
-                options
+                options,
             });
             const groupMock = jest.fn();
 
@@ -341,7 +341,7 @@ describe('tab', () => {
 
         test('that dragstart is prevented when disableDnd is true', () => {
             const accessor = fromPartial<DockviewComponent>({
-                options: { disableDnd: true }
+                options: { disableDnd: true },
             });
             const groupMock = jest.fn();
 
@@ -361,7 +361,7 @@ describe('tab', () => {
 
         test('that dragstart is not prevented when disableDnd is false', () => {
             const accessor = fromPartial<DockviewComponent>({
-                options: { disableDnd: false }
+                options: { disableDnd: false },
             });
             const groupMock = jest.fn();
 
@@ -382,7 +382,7 @@ describe('tab', () => {
         test('that updateDragAndDropState updates drag handler disabled state', () => {
             const options = { disableDnd: false };
             const accessor = fromPartial<DockviewComponent>({
-                options
+                options,
             });
             const groupMock = jest.fn();
 
@@ -419,7 +419,7 @@ describe('tab', () => {
 
         test('that onDragStart is not fired when disableDnd is true', () => {
             const accessor = fromPartial<DockviewComponent>({
-                options: { disableDnd: true }
+                options: { disableDnd: true },
             });
             const groupMock = jest.fn();
 

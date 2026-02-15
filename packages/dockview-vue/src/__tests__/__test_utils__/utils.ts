@@ -4,7 +4,7 @@ export function setMockRefElement() {
     const mockElement = document.createElement('div');
     mockElement.style.width = '1000px';
     mockElement.style.height = '800px';
-    
+
     Object.defineProperty(mockElement, 'clientWidth', {
         configurable: true,
         value: 1000,
@@ -33,9 +33,13 @@ export function createMockVueInstance(): ComponentInternalInstance {
             mixins: [],
             components: {
                 'test-component': {
-                    props: { params: Object, api: Object, containerApi: Object },
-                    template: '<div>Test Component</div>'
-                }
+                    props: {
+                        params: Object,
+                        api: Object,
+                        containerApi: Object,
+                    },
+                    template: '<div>Test Component</div>',
+                },
             },
             directives: {},
             provides: {},
@@ -45,8 +49,8 @@ export function createMockVueInstance(): ComponentInternalInstance {
         components: {
             'test-component': {
                 props: { params: Object, api: Object, containerApi: Object },
-                template: '<div>Test Component</div>'
-            }
+                template: '<div>Test Component</div>',
+            },
         },
         provides: {},
     } as any;

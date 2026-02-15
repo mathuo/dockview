@@ -42,14 +42,17 @@
   ],
   "scripts": {
     "build:bundle": "rollup -c",
-    "build:cjs": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
+    "build:cjs": "tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
     "build:css": "gulp sass",
-    "build:esm": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
+    "build:esm": "tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
     "build": "npm run build:cjs && npm run build:esm && npm run build:css",
     "clean": "rimraf dist/ .build/ .rollup.cache/",
-    "prepublishOnly": "npm run rebuild && npm run build:bundle && npm run test",
     "rebuild": "npm run clean && npm run build",
-    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core",
-    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core --coverage"
+    "test": "jest --selectProjects dockview-core",
+    "test:cov": "jest --selectProjects dockview-core --coverage",
+    "lint": "eslint 'src/**/*.{ts,tsx,js,jsx}'",
+    "lint:fix": "eslint 'src/**/*.{ts,tsx,js,jsx}' --fix",
+    "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx}'",
+    "format:check": "prettier --check 'src/**/*.{ts,tsx,js,jsx}'"
   }
 }

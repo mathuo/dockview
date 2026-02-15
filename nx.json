@@ -31,6 +31,14 @@
         },
         "clean": {
             "cache": false
+        },
+        "lint": {
+            "inputs": ["default"],
+            "cache": true
+        },
+        "format:check": {
+            "inputs": ["default"],
+            "cache": true
         }
     },
     "release": {
@@ -44,14 +52,18 @@
         "projectsRelationship": "fixed",
         "version": {
             "generatorOptions": {
-                "currentVersionSource": "git-tag",
-                "specifierSource": "prompt"
+                "currentVersionSource": "git-tag"
+            },
+            "git": {
+                "commit": true,
+                "commitMessage": "chore(release): publish {version}",
+                "tag": true
             }
         },
-        "git": {
-            "commit": true,
-            "commitMessage": "chore(release): publish {version}",
-            "tag": true
+        "publish": {
+            "targetDefaults": {
+                "args": ["--package-manager=npm", "--provenance"]
+            }
         }
     },
     "defaultBase": "master",

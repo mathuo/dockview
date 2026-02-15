@@ -24,7 +24,7 @@ export class AngularDisposable implements DockviewIDisposable {
         }
 
         this._isDisposed = true;
-        this.disposeCallbacks.forEach(callback => {
+        this.disposeCallbacks.forEach((callback) => {
             try {
                 callback();
             } catch (error) {
@@ -54,8 +54,8 @@ export class AngularLifecycleManager {
     destroy(): void {
         this.destroySubject.next();
         this.destroySubject.complete();
-        
-        this.disposables.forEach(disposable => {
+
+        this.disposables.forEach((disposable) => {
             try {
                 disposable.dispose();
             } catch (error) {
@@ -66,7 +66,9 @@ export class AngularLifecycleManager {
     }
 }
 
-export function createAngularDisposable(disposeCallback?: () => void): AngularDisposable {
+export function createAngularDisposable(
+    disposeCallback?: () => void
+): AngularDisposable {
     const disposable = new AngularDisposable();
     if (disposeCallback) {
         disposable.addDisposeCallback(disposeCallback);

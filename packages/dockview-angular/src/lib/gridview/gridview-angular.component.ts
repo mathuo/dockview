@@ -13,7 +13,7 @@ import {
     OnChanges,
     SimpleChanges,
     EnvironmentInjector,
-    inject
+    inject,
 } from '@angular/core';
 import {
     GridviewApi,
@@ -21,7 +21,7 @@ import {
     createGridview,
     PROPERTY_KEYS_GRIDVIEW,
     GridviewFrameworkOptions,
-    GridviewComponentOptions
+    GridviewComponentOptions,
 } from 'dockview-core';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
@@ -35,22 +35,24 @@ export interface GridviewAngularOptions extends GridviewOptions {
     selector: 'dv-gridview',
     standalone: true,
     template: '<div #gridviewContainer class="gridview-container"></div>',
-    styles: [`
-        :host {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
+    styles: [
+        `
+            :host {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
 
-        .gridview-container {
-            width: 100%;
-            height: 100%;
-        }
-    `],
-    changeDetection: ChangeDetectionStrategy.OnPush
+            .gridview-container {
+                width: 100%;
+                height: 100%;
+            }
+        `,
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GridviewAngularComponent implements OnInit, OnDestroy, OnChanges {
-    @ViewChild('gridviewContainer', { static: true }) 
+    @ViewChild('gridviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
     @Input() components!: Record<string, Type<any>>;
@@ -87,7 +89,7 @@ export class GridviewAngularComponent implements OnInit, OnDestroy, OnChanges {
             let hasChanges = false;
 
             // Check for changes in core gridview properties
-            PROPERTY_KEYS_GRIDVIEW.forEach(key => {
+            PROPERTY_KEYS_GRIDVIEW.forEach((key) => {
                 if (changes[key] && !changes[key].isFirstChange()) {
                     (coreChanges as any)[key] = changes[key].currentValue;
                     hasChanges = true;
@@ -106,19 +108,18 @@ export class GridviewAngularComponent implements OnInit, OnDestroy, OnChanges {
 
     private initializeGridview(): void {
         if (!this.components) {
-            throw new Error('GridviewAngularComponent: components input is required');
+            throw new Error(
+                'GridviewAngularComponent: components input is required'
+            );
         }
 
         const coreOptions = this.extractCoreOptions();
         const frameworkOptions = this.createFrameworkOptions();
 
-        this.gridviewApi = createGridview(
-            this.containerRef.nativeElement,
-            {
-                ...coreOptions,
-                ...frameworkOptions
-            }
-        );
+        this.gridviewApi = createGridview(this.containerRef.nativeElement, {
+            ...coreOptions,
+            ...frameworkOptions,
+        });
 
         // Emit ready event
         this.ready.emit({ api: this.gridviewApi });
@@ -127,7 +128,7 @@ export class GridviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     private extractCoreOptions(): GridviewOptions {
         const coreOptions: Partial<GridviewComponentOptions> = {};
 
-        PROPERTY_KEYS_GRIDVIEW.forEach(key => {
+        PROPERTY_KEYS_GRIDVIEW.forEach((key) => {
             const value = (this as any)[key];
             if (value !== undefined) {
                 (coreOptions as any)[key] = value;
@@ -147,7 +148,7 @@ export class GridviewAngularComponent implements OnInit, OnDestroy, OnChanges {
         return {
             createComponent: (options) => {
                 return componentFactory.createGridviewComponent(options);
-            }
+            },
         };
     }
 }

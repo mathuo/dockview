@@ -1208,7 +1208,7 @@ describe('gridview', () => {
     describe('normalize', () => {
         test('should normalize after structure correctly', () => {
             // This test verifies that the normalize method works correctly
-            // Since gridview already normalizes during remove operations, 
+            // Since gridview already normalizes during remove operations,
             // we'll test the method directly with known scenarios
             const gridview = new Gridview(
                 false,
@@ -1220,18 +1220,20 @@ describe('gridview', () => {
             // Create a simple structure and test that normalize doesn't break anything
             const view1 = new MockGridview('1');
             const view2 = new MockGridview('2');
-            
+
             gridview.addView(view1, Sizing.Distribute, [0]);
             gridview.addView(view2, Sizing.Distribute, [1]);
 
             const beforeNormalize = gridview.serialize();
-            
+
             // Normalize should not change a balanced structure
             gridview.normalize();
-            
+
             const afterNormalize = gridview.serialize();
             expect(afterNormalize).toEqual(beforeNormalize);
-            expect(gridview.element.querySelectorAll('.mock-grid-view').length).toBe(2);
+            expect(
+                gridview.element.querySelectorAll('.mock-grid-view').length
+            ).toBe(2);
         });
 
         test('should not normalize when root has single leaf child', () => {
@@ -1246,11 +1248,11 @@ describe('gridview', () => {
             gridview.addView(view1, Sizing.Distribute, [0]);
 
             const beforeNormalize = gridview.serialize();
-            
+
             gridview.normalize();
 
             const afterNormalize = gridview.serialize();
-            
+
             // Structure should remain unchanged
             expect(afterNormalize).toEqual(beforeNormalize);
         });
@@ -1272,11 +1274,11 @@ describe('gridview', () => {
             gridview.addView(view3, Sizing.Distribute, [2]);
 
             const beforeNormalize = gridview.serialize();
-            
+
             gridview.normalize();
 
             const afterNormalize = gridview.serialize();
-            
+
             // Structure should remain unchanged since root has multiple children
             expect(afterNormalize).toEqual(beforeNormalize);
         });
@@ -1291,12 +1293,14 @@ describe('gridview', () => {
 
             // Call normalize on empty gridview
             expect(() => gridview.normalize()).not.toThrow();
-            
+
             // Should still be able to add views after normalizing empty gridview
             const view1 = new MockGridview('1');
             gridview.addView(view1, Sizing.Distribute, [0]);
-            
-            expect(gridview.element.querySelectorAll('.mock-grid-view').length).toBe(1);
+
+            expect(
+                gridview.element.querySelectorAll('.mock-grid-view').length
+            ).toBe(1);
         });
 
         test('normalize method exists and is callable', () => {

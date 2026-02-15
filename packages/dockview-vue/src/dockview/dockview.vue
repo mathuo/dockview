@@ -4,7 +4,7 @@ import {
     type DockviewOptions,
     PROPERTY_KEYS_DOCKVIEW,
     type DockviewFrameworkOptions,
-createDockview,
+    createDockview,
 } from 'dockview-core';
 import {
     ref,
@@ -25,13 +25,12 @@ import {
 import type { IDockviewVueProps, VueEvents } from './types';
 
 function extractCoreOptions(props: IDockviewVueProps): DockviewOptions {
-    const coreOptions = (PROPERTY_KEYS_DOCKVIEW as (keyof DockviewOptions)[]).reduce(
-        (obj, key) => {
-            (obj as any)[key] = props[key];
-            return obj;
-        },
-        {} as Partial<DockviewOptions>
-    );
+    const coreOptions = (
+        PROPERTY_KEYS_DOCKVIEW as (keyof DockviewOptions)[]
+    ).reduce((obj, key) => {
+        (obj as any)[key] = props[key];
+        return obj;
+    }, {} as Partial<DockviewOptions>);
 
     return coreOptions as DockviewOptions;
 }
@@ -61,26 +60,20 @@ onMounted(() => {
 
     const inst = getCurrentInstance();
 
-    if(!inst) {
-      throw new Error('dockview-vue: getCurrentInstance() returned null')
+    if (!inst) {
+        throw new Error('dockview-vue: getCurrentInstance() returned null');
     }
 
     const frameworkOptions: DockviewFrameworkOptions = {
         createComponent(options) {
-            const component = findComponent(
-                inst,
-                options.name
-            );
+            const component = findComponent(inst, options.name);
             return new VueRenderer(component!, inst);
         },
         createTabComponent(options) {
             let component = findComponent(inst, options.name);
 
             if (!component && props.defaultTabComponent) {
-                component = findComponent(
-                    inst,
-                    props.defaultTabComponent
-                );
+                component = findComponent(inst, props.defaultTabComponent);
             }
 
             if (component) {
@@ -95,10 +88,7 @@ onMounted(() => {
                       props.watermarkComponent!
                   );
 
-                  return new VueWatermarkRenderer(
-                      component!,
-                      inst
-                  );
+                  return new VueWatermarkRenderer(component!, inst);
               }
             : undefined,
         createLeftHeaderActionComponent: props.leftHeaderActionsComponent
@@ -107,11 +97,7 @@ onMounted(() => {
                       inst,
                       props.leftHeaderActionsComponent!
                   );
-                  return new VueHeaderActionsRenderer(
-                      component!,
-                      inst,
-                      group
-                  );
+                  return new VueHeaderActionsRenderer(component!, inst, group);
               }
             : undefined,
         createPrefixHeaderActionComponent: props.prefixHeaderActionsComponent
@@ -120,11 +106,7 @@ onMounted(() => {
                       inst,
                       props.prefixHeaderActionsComponent!
                   );
-                  return new VueHeaderActionsRenderer(
-                      component!,
-                      inst,
-                      group
-                  );
+                  return new VueHeaderActionsRenderer(component!, inst, group);
               }
             : undefined,
         createRightHeaderActionComponent: props.rightHeaderActionsComponent
@@ -133,11 +115,7 @@ onMounted(() => {
                       inst,
                       props.rightHeaderActionsComponent!
                   );
-                  return new VueHeaderActionsRenderer(
-                      component!,
-                      inst,
-                      group
-                  );
+                  return new VueHeaderActionsRenderer(component!, inst, group);
               }
             : undefined,
     };
@@ -165,7 +143,7 @@ onMounted(() => {
      */
     instance.value = markRaw(api);
 
-    emit('ready', { api});
+    emit('ready', { api });
 });
 
 onBeforeUnmount(() => {
