@@ -1,0 +1,41 @@
+# Dockview
+
+> A zero dependency layout manager supporting tabs, groups, grids and splitviews for React, Vue, Angular, and vanilla TypeScript.
+
+Dockview is an open-source docking layout library that lets you build IDE-like and dashboard interfaces with resizable panels, draggable tabs, floating groups, and popout windows. It has zero runtime dependencies and works with React, Vue 3, Angular, and plain TypeScript.
+
+## Key Features
+
+- Zero runtime dependencies
+- Drag and drop with customizable drop zones
+- Floating/overlay groups
+- Popout windows (extracting panels to separate browser windows)
+- Full serialization and deserialization for state persistence
+- Theming system with CSS custom properties
+- Splitview, gridview, paneview, and dockview layout strategies
+- Comprehensive programmatic API
+- TypeScript-first with full type definitions
+
+## Packages
+
+| Package | Framework | Install |
+|---|---|---|
+| dockview-core | Vanilla TypeScript | `npm install dockview-core` |
+| dockview | React | `npm install dockview` |
+| dockview-react | React (alias) | `npm install dockview-react` |
+| dockview-vue | Vue 3 | `npm install dockview-vue` |
+| dockview-angular | Angular | `npm install dockview-angular` |
+
+## Optional
+
+- [Full documentation for LLMs](https://dockview.dev/llms-full.txt): Extended reference with code examples for every framework
+
+## Links
+
+- Documentation: https://dockview.dev/docs/overview/getStarted/installation
+- API Reference: https://dockview.dev/docs/api/dockview/overview
+- Live Demo: https://dockview.dev/demo
+- GitHub: https://github.com/mathuo/dockview
+- npm: https://www.npmjs.com/package/dockview
+- Blog / Release Notes: https://dockview.dev/blog
+- License: MIT
