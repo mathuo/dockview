@@ -4,20 +4,17 @@ import {
     Orientation,
 } from 'dockview-core';
 import { VueGridviewPanelView } from '../gridview/view';
+import * as gridviewTypes from '../gridview/types';
 
 describe('GridviewVue Component', () => {
     test('should export component types', () => {
-        const types = require('../gridview/types');
-
-        expect(types).toBeDefined();
-        expect(typeof types).toBe('object');
+        expect(gridviewTypes).toBeDefined();
+        expect(typeof gridviewTypes).toBe('object');
     });
 
     test('should export dockview-core functionality', () => {
-        const dockviewCore = require('dockview-core');
-
-        expect(dockviewCore.createGridview).toBeDefined();
-        expect(dockviewCore.PROPERTY_KEYS_GRIDVIEW).toBeDefined();
+        expect(createGridview).toBeDefined();
+        expect(PROPERTY_KEYS_GRIDVIEW).toBeDefined();
     });
 
     test('should have correct gridview properties', () => {

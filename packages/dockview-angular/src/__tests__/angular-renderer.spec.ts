@@ -23,8 +23,7 @@ class TestComponent {
 
 @Component({
     selector: 'test-update-component',
-    template:
-        '<div class="test-update-component">Counter: {{ counter }}</div>',
+    template: '<div class="test-update-component">Counter: {{ counter }}</div>',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class TestUpdateComponent {

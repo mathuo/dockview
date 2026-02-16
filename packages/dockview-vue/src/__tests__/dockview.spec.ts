@@ -1,11 +1,10 @@
 import { createDockview, PROPERTY_KEYS_DOCKVIEW } from 'dockview-core';
+import * as dockviewTypes from '../dockview/types';
 
 describe('DockviewVue Component', () => {
     test('should export component types', () => {
-        const types = require('../dockview/types');
-
-        expect(types).toBeDefined();
-        expect(typeof types).toBe('object');
+        expect(dockviewTypes).toBeDefined();
+        expect(typeof dockviewTypes).toBe('object');
     });
 
     test('should export dockview-core functionality', () => {

@@ -1,19 +1,16 @@
 import { createPaneview, PROPERTY_KEYS_PANEVIEW } from 'dockview-core';
 import { VuePaneviewPanelView } from '../paneview/view';
+import * as paneviewTypes from '../paneview/types';
 
 describe('PaneviewVue Component', () => {
     test('should export component types', () => {
-        const types = require('../paneview/types');
-
-        expect(types).toBeDefined();
-        expect(typeof types).toBe('object');
+        expect(paneviewTypes).toBeDefined();
+        expect(typeof paneviewTypes).toBe('object');
     });
 
     test('should export dockview-core functionality', () => {
-        const dockviewCore = require('dockview-core');
-
-        expect(dockviewCore.createPaneview).toBeDefined();
-        expect(dockviewCore.PROPERTY_KEYS_PANEVIEW).toBeDefined();
+        expect(createPaneview).toBeDefined();
+        expect(PROPERTY_KEYS_PANEVIEW).toBeDefined();
     });
 
     test('should have correct paneview properties', () => {

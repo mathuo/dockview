@@ -4,13 +4,12 @@ import {
     PROPERTY_KEYS_SPLITVIEW,
 } from 'dockview-core';
 import { VueSplitviewPanelView } from '../splitview/view';
+import * as splitviewTypes from '../splitview/types';
 
 describe('SplitviewVue Component', () => {
     test('should export component types', () => {
-        const types = require('../splitview/types');
-
-        expect(types).toBeDefined();
-        expect(typeof types).toBe('object');
+        expect(splitviewTypes).toBeDefined();
+        expect(typeof splitviewTypes).toBe('object');
     });
 
     test('should have access to orientation constants', () => {
@@ -19,10 +18,8 @@ describe('SplitviewVue Component', () => {
     });
 
     test('should export dockview-core functionality', () => {
-        const dockviewCore = require('dockview-core');
-
-        expect(dockviewCore.createSplitview).toBeDefined();
-        expect(dockviewCore.PROPERTY_KEYS_SPLITVIEW).toBeDefined();
+        expect(createSplitview).toBeDefined();
+        expect(PROPERTY_KEYS_SPLITVIEW).toBeDefined();
     });
 
     test('should have correct splitview properties', () => {

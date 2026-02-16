@@ -1,5 +1,9 @@
 // Import core functionality that we know works
 import * as core from 'dockview-core';
+import * as splitviewView from '../splitview/view';
+import * as gridviewView from '../gridview/view';
+import * as paneviewView from '../paneview/view';
+import * as utils from '../utils';
 
 // Simple unit tests that verify basic functionality without complex Vue component testing
 describe('Vue Components Basic Tests', () => {
@@ -27,20 +31,15 @@ describe('Vue Components Basic Tests', () => {
 // Test view classes - basic import test
 describe('Vue View Classes', () => {
     test('Vue view classes should be importable', () => {
-        // Just test that we can import them without errors
-        expect(() => {
-            require('../splitview/view');
-            require('../gridview/view');
-            require('../paneview/view');
-        }).not.toThrow();
+        expect(splitviewView).toBeDefined();
+        expect(gridviewView).toBeDefined();
+        expect(paneviewView).toBeDefined();
     });
 });
 
 // Test utility functions
 describe('Utility Functions', () => {
     test('should export utility functions', () => {
-        const utils = require('../utils');
-
         expect(utils.findComponent).toBeDefined();
         expect(utils.mountVueComponent).toBeDefined();
         expect(utils.VuePart).toBeDefined();
@@ -51,8 +50,6 @@ describe('Utility Functions', () => {
     });
 
     test('findComponent should throw when component not found', () => {
-        const { findComponent } = require('../utils');
-
         const mockInstance = {
             components: {},
             parent: null,
@@ -61,7 +58,7 @@ describe('Utility Functions', () => {
             },
         };
 
-        expect(() => findComponent(mockInstance, 'non-existent')).toThrow(
+        expect(() => utils.findComponent(mockInstance, 'non-existent')).toThrow(
             "Failed to find Vue Component 'non-existent'"
         );
     });
