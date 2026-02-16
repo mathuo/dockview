@@ -16,6 +16,9 @@ const config: JestConfigWithTsJest = {
         '<rootDir>/packages/dockview-angular/src/__tests__/setup-jest.ts'
     ],
     coveragePathIgnorePatterns: ['/node_modules/'],
+    moduleNameMapper: {
+        '^dockview-core$': '<rootDir>/packages/dockview-core/src/index.ts',
+    },
     modulePathIgnorePatterns: [
         '<rootDir>/packages/dockview-angular/src/__tests__/__mocks__',
         '<rootDir>/packages/dockview-angular/src/__tests__/__test_utils__',
