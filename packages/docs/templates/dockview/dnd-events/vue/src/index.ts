@@ -1,34 +1,50 @@
-import { createApp, ref, onMounted, onUnmounted, watchEffect } from 'vue';
-import { DockviewVue, DockviewReadyEvent, DockviewApi } from 'dockview-vue';
+import { createApp, ref, onUnmounted, watchEffect, defineComponent, PropType } from 'vue';
+import { DockviewVue, DockviewReadyEvent, DockviewApi, IDockviewPanelProps } from 'dockview-vue';
 import 'dockview-core/dist/styles/dockview.css';
 
-const DefaultPanelComponent = {
-    name: 'DefaultPanelComponent',
-    props: ['api'],
+const DefaultPanel = defineComponent({
+    name: 'DefaultPanel',
+    props: {
+        params: {
+            type: Object as PropType<IDockviewPanelProps>,
+            required: true,
+        },
+    },
+    data() {
+        return {
+            title: '',
+        };
+    },
+    mounted() {
+        const disposable = this.params.api.onDidTitleChange(() => {
+            this.title = this.params.api.title;
+        });
+        this.title = this.params.api.title;
+
+        return () => {
+            disposable.dispose();
+        };
+    },
     template: `
         <div style="height: 100%;">
-            <div>{{ api?.title || 'Panel' }}</div>
+            <div>{{ title || 'Panel' }}</div>
         </div>
     `
-};
+});
 
-const App = {
+const App = defineComponent({
     name: 'App',
     components: {
-        DockviewVue,
-        'default-panel': DefaultPanelComponent,
+        'dockview-vue': DockviewVue,
+        default: DefaultPanel,
     },
     setup() {
         const api = ref<DockviewApi | null>(null);
         const disablePanelDrag = ref(false);
         const disableGroupDrag = ref(false);
         const disableOverlay = ref(false);
-        
-        const disposables: any[] = [];
 
-        const components = {
-            default: DefaultPanelComponent,
-        };
+        const disposables: any[] = [];
 
         const setupEventListeners = () => {
             if (!api.value) return;
@@ -130,7 +146,6 @@ const App = {
         };
 
         return {
-            components,
             onReady,
             disablePanelDrag,
             disableGroupDrag,
@@ -141,7 +156,7 @@ const App = {
         };
     },
     template: `
-        <div style="display: flex; flex-direction: column; height: 100vh;">
+        <div style="display: flex; flex-direction: column; height: 100%;">
             <div>
                 <button @click="togglePanelDrag">
                     Panel Drag: {{ disablePanelDrag ? 'disabled' : 'enabled' }}
@@ -153,15 +168,13 @@ const App = {
                     Overlay: {{ disableOverlay ? 'disabled' : 'enabled' }}
                 </button>
             </div>
-            <div style="flex-grow: 1;">
-                <dockview-vue
-                    :components="components"
-                    class-name="dockview-theme-abyss"
-                    @ready="onReady">
-                </dockview-vue>
-            </div>
+            <dockview-vue
+                style="width: 100%; flex-grow: 1"
+                class="dockview-theme-abyss"
+                @ready="onReady">
+            </dockview-vue>
         </div>
     `
-};
+});
 
 createApp(App).mount('#app');

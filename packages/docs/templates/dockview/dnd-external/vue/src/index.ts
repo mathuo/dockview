@@ -1,18 +1,38 @@
-import { createApp, ref, onMounted, onUnmounted } from 'vue';
-import { DockviewVue, DockviewReadyEvent, DockviewApi, positionToDirection, DockviewDidDropEvent } from 'dockview-vue';
+import { createApp, ref, onUnmounted, defineComponent, PropType } from 'vue';
+import { DockviewVue, DockviewReadyEvent, DockviewApi, positionToDirection, DockviewDidDropEvent, IDockviewPanelProps } from 'dockview-vue';
 import 'dockview-core/dist/styles/dockview.css';
 
-const DefaultPanelComponent = {
-    name: 'DefaultPanelComponent',
-    props: ['params'],
+const DefaultPanel = defineComponent({
+    name: 'DefaultPanel',
+    props: {
+        params: {
+            type: Object as PropType<IDockviewPanelProps>,
+            required: true,
+        },
+    },
+    data() {
+        return {
+            title: '',
+        };
+    },
+    mounted() {
+        const disposable = this.params.api.onDidTitleChange(() => {
+            this.title = this.params.api.title;
+        });
+        this.title = this.params.api.title;
+
+        return () => {
+            disposable.dispose();
+        };
+    },
     template: `
         <div style="padding: 20px;">
-            <div>{{ params?.title || 'Panel' }}</div>
+            <div>{{ title || 'Panel' }}</div>
         </div>
     `
-};
+});
 
-const DraggableElement = {
+const DraggableElement = defineComponent({
     name: 'DraggableElement',
     template: `
         <span
@@ -31,22 +51,18 @@ const DraggableElement = {
             }
         }
     }
-};
+});
 
-const App = {
+const App = defineComponent({
     name: 'App',
     components: {
-        DockviewVue,
-        'default-panel': DefaultPanelComponent,
+        'dockview-vue': DockviewVue,
+        default: DefaultPanel,
         'draggable-element': DraggableElement,
     },
     setup() {
         const api = ref<DockviewApi | null>(null);
         const disposables: any[] = [];
-
-        const components = {
-            default: DefaultPanelComponent,
-        };
 
         const setupDragListeners = () => {
             if (!api.value) return;
@@ -129,7 +145,7 @@ const App = {
             if (!dataTransfer) return;
 
             let text = 'The following dataTransfer data was found:\n';
-            
+
             for (let i = 0; i < dataTransfer.items.length; i++) {
                 const item = dataTransfer.items[i];
                 const value = dataTransfer.getData(item.type);
@@ -140,31 +156,30 @@ const App = {
         };
 
         return {
-            components,
             onReady,
             onDidDrop,
             onDrop,
         };
     },
     template: `
-        <div style="display: flex; flex-direction: column; height: 100vh;">
+        <div style="display: flex; flex-direction: column; height: 100%;">
             <div style="margin: 2px 0px;">
                 <draggable-element />
-                <div 
+                <div
                     style="padding: 0px 4px; background-color: black; border-radius: 2px; color: white;"
                     @drop="onDrop">
                     Drop a tab or group here to inspect the attached metadata
                 </div>
             </div>
             <dockview-vue
-                :components="components"
-                class-name="dockview-theme-abyss"
+                style="width: 100%; flex-grow: 1"
+                class="dockview-theme-abyss"
                 :dnd-edges="{ size: { value: 100, type: 'pixels' }, activationSize: { value: 5, type: 'percentage' } }"
                 @ready="onReady"
                 @didDrop="onDidDrop">
             </dockview-vue>
         </div>
     `
-};
+});
 
 createApp(App).mount('#app');
