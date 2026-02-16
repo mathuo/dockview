@@ -1,4 +1,9 @@
-import { addClasses, removeClasses, toggleClass, watchElementResize } from './dom';
+import {
+    addClasses,
+    removeClasses,
+    toggleClass,
+    watchElementResize,
+} from './dom';
 import { addDisposableListener } from './events';
 import { CompositeDisposable } from './lifecycle';
 import { clamp } from './math';
@@ -19,19 +24,22 @@ export class Scrollbar extends CompositeDisposable {
         return this._orientation;
     }
     set orientation(value: 'horizontal' | 'vertical') {
-        if(this._orientation === value) {
-          return;
+        if (this._orientation === value) {
+            return;
         }
         this._scrollOffset = 0;
         this._orientation = value;
-        removeClasses(this._scrollbar, 'dv-scrollbar-vertical', 'dv-scrollbar-horizontal');
-        if(value === 'vertical') {
+        removeClasses(
+            this._scrollbar,
+            'dv-scrollbar-vertical',
+            'dv-scrollbar-horizontal'
+        );
+        if (value === 'vertical') {
             addClasses(this._scrollbar, 'dv-scrollbar-vertical');
         } else {
             addClasses(this._scrollbar, 'dv-scrollbar-horizontal');
         }
     }
-
 
     constructor(private readonly scrollableElement: HTMLElement) {
         super();
@@ -50,61 +58,57 @@ export class Scrollbar extends CompositeDisposable {
                 this._scrollOffset += event.deltaY * Scrollbar.MouseWheelSpeed;
                 this.calculateScrollbarStyles();
             }),
-            addDisposableListener(
-                this._scrollbar,
-                'pointerdown',
-                (event) => {
-                    event.preventDefault();
+            addDisposableListener(this._scrollbar, 'pointerdown', (event) => {
+                event.preventDefault();
 
-                    toggleClass(this.element, 'dv-scrollable-scrolling', true);
+                toggleClass(this.element, 'dv-scrollable-scrolling', true);
 
-                    const originalClient = this._orientation === 'horizontal' ? event.clientX : event.clientY;
-                    const originalScrollOffset = this._scrollOffset;
+                const originalClient =
+                    this._orientation === 'horizontal'
+                        ? event.clientX
+                        : event.clientY;
+                const originalScrollOffset = this._scrollOffset;
 
-                    const onPointerMove = (event: PointerEvent) => {
-                        const delta = this._orientation === 'horizontal'
+                const onPointerMove = (event: PointerEvent) => {
+                    const delta =
+                        this._orientation === 'horizontal'
                             ? event.clientX - originalClient
                             : event.clientY - originalClient;
 
-                        const clientSize = this._orientation === 'horizontal'
+                    const clientSize =
+                        this._orientation === 'horizontal'
                             ? this.element.clientWidth
                             : this.element.clientHeight;
-                        const scrollSize = this._orientation === 'horizontal'
+                    const scrollSize =
+                        this._orientation === 'horizontal'
                             ? this.scrollableElement.scrollWidth
                             : this.scrollableElement.scrollHeight;
-                        const p = clientSize / scrollSize;
+                    const p = clientSize / scrollSize;
 
-                        this._scrollOffset = originalScrollOffset + delta / p;
-                        this.calculateScrollbarStyles();
-                    };
+                    this._scrollOffset = originalScrollOffset + delta / p;
+                    this.calculateScrollbarStyles();
+                };
 
-                    const onEnd = () => {
-                        toggleClass(
-                            this.element,
-                            'dv-scrollable-scrolling',
-                            false
-                        );
+                const onEnd = () => {
+                    toggleClass(this.element, 'dv-scrollable-scrolling', false);
 
-                        document.removeEventListener(
-                            'pointermove',
-                            onPointerMove
-                        );
-                        document.removeEventListener('pointerup', onEnd);
-                        document.removeEventListener('pointercancel', onEnd);
-                    };
+                    document.removeEventListener('pointermove', onPointerMove);
+                    document.removeEventListener('pointerup', onEnd);
+                    document.removeEventListener('pointercancel', onEnd);
+                };
 
-                    document.addEventListener('pointermove', onPointerMove);
-                    document.addEventListener('pointerup', onEnd);
-                    document.addEventListener('pointercancel', onEnd);
-                }
-            ),
+                document.addEventListener('pointermove', onPointerMove);
+                document.addEventListener('pointerup', onEnd);
+                document.addEventListener('pointercancel', onEnd);
+            }),
             addDisposableListener(this.element, 'scroll', () => {
                 this.calculateScrollbarStyles();
             }),
             addDisposableListener(this.scrollableElement, 'scroll', () => {
-                this._scrollOffset = this._orientation === 'horizontal'
-                    ? this.scrollableElement.scrollLeft
-                    : this.scrollableElement.scrollTop;
+                this._scrollOffset =
+                    this._orientation === 'horizontal'
+                        ? this.scrollableElement.scrollLeft
+                        : this.scrollableElement.scrollTop;
                 this.calculateScrollbarStyles();
             }),
             watchElementResize(this.element, () => {
@@ -125,12 +129,14 @@ export class Scrollbar extends CompositeDisposable {
     }
 
     private calculateScrollbarStyles(): void {
-        const clientSize = this._orientation === 'horizontal'
-            ? this.element.clientWidth
-            : this.element.clientHeight;
-        const scrollSize = this._orientation === 'horizontal'
-            ? this.scrollableElement.scrollWidth
-            : this.scrollableElement.scrollHeight;
+        const clientSize =
+            this._orientation === 'horizontal'
+                ? this.element.clientWidth
+                : this.element.clientHeight;
+        const scrollSize =
+            this._orientation === 'horizontal'
+                ? this.scrollableElement.scrollWidth
+                : this.scrollableElement.scrollHeight;
 
         const hasScrollbar = scrollSize > clientSize;
 

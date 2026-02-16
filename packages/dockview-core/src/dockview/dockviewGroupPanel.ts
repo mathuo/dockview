@@ -18,7 +18,6 @@ import {
     DockviewGroupPanelApiImpl,
 } from '../api/dockviewGroupPanelApi';
 
-
 const MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH = 100;
 const MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT = 100;
 

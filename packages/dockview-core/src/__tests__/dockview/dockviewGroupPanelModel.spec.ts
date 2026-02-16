@@ -652,23 +652,41 @@ describe('dockviewGroupPanelModel', () => {
             null as any
         );
 
-        expect(container.classList.contains('dv-groupview-header-top')).toBeTruthy();
+        expect(
+            container.classList.contains('dv-groupview-header-top')
+        ).toBeTruthy();
 
         cut.headerPosition = 'left';
-        expect(container.classList.contains('dv-groupview-header-left')).toBeTruthy();
-        expect(container.classList.contains('dv-groupview-header-top')).toBeFalsy();
+        expect(
+            container.classList.contains('dv-groupview-header-left')
+        ).toBeTruthy();
+        expect(
+            container.classList.contains('dv-groupview-header-top')
+        ).toBeFalsy();
 
         cut.headerPosition = 'bottom';
-        expect(container.classList.contains('dv-groupview-header-bottom')).toBeTruthy();
-        expect(container.classList.contains('dv-groupview-header-left')).toBeFalsy();
+        expect(
+            container.classList.contains('dv-groupview-header-bottom')
+        ).toBeTruthy();
+        expect(
+            container.classList.contains('dv-groupview-header-left')
+        ).toBeFalsy();
 
         cut.headerPosition = 'right';
-        expect(container.classList.contains('dv-groupview-header-right')).toBeTruthy();
-        expect(container.classList.contains('dv-groupview-header-bottom')).toBeFalsy();
+        expect(
+            container.classList.contains('dv-groupview-header-right')
+        ).toBeTruthy();
+        expect(
+            container.classList.contains('dv-groupview-header-bottom')
+        ).toBeFalsy();
 
         cut.headerPosition = 'top';
-        expect(container.classList.contains('dv-groupview-header-top')).toBeTruthy();
-        expect(container.classList.contains('dv-groupview-header-right')).toBeFalsy();
+        expect(
+            container.classList.contains('dv-groupview-header-top')
+        ).toBeTruthy();
+        expect(
+            container.classList.contains('dv-groupview-header-right')
+        ).toBeFalsy();
     });
 
     test('headerPosition setter sets correct direction on tabsContainer', () => {
@@ -771,7 +789,9 @@ describe('dockviewGroupPanelModel', () => {
         );
 
         expect(cut.headerPosition).toBe('right');
-        expect(container.classList.contains('dv-groupview-header-right')).toBeTruthy();
+        expect(
+            container.classList.contains('dv-groupview-header-right')
+        ).toBeTruthy();
     });
 
     test("that openPanel with skipSetActive doesn't set panel to active", () => {
