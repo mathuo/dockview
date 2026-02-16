@@ -81,6 +81,16 @@ const config = {
                             ...config.resolve,
                             alias: {
                                 ...config.resolve.alias,
+                                ...(process.env.NODE_ENV !== 'production' && {
+                                    'dockview-core$': path.join(
+                                        __dirname,
+                                        '../dockview-core/src'
+                                    ),
+                                    'dockview$': path.join(
+                                        __dirname,
+                                        '../dockview/src'
+                                    ),
+                                }),
                                 react: path.join(
                                     __dirname,
                                     '../../node_modules',
