@@ -1,7 +1,7 @@
 {
   "name": "dockview-angular",
   "version": "4.13.1",
-  "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
+  "description": "Angular docking layout manager — tabs, groups, grids, splitviews, drag and drop, floating panels",
   "keywords": [
     "splitview",
     "split-view",
@@ -20,6 +20,14 @@
     "drag-and-drop",
     "drag",
     "drop",
+    "typescript",
+    "zero-dependency",
+    "ide-layout",
+    "panel",
+    "resizable",
+    "floating",
+    "serialization",
+    "workbench",
     "angular",
     "angular-component"
   ],

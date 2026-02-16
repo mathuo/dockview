@@ -32,7 +32,7 @@ console.log(`isCI: ${process.env.CI}`);
 const config = {
     title: 'Dockview',
     tagline:
-        'A zero dependency layout manager supporting ReactJS and Vanilla TypeScript',
+        'A zero dependency layout manager supporting React, Vue, Angular, and vanilla TypeScript',
     url: 'https://dockview.dev',
     baseUrl: process.env.CI ? `/` : '/',
     onBrokenLinks: 'throw',
@@ -142,6 +142,9 @@ const config = {
                     name: 'keywords',
                     content: [
                         'react',
+                        'vue',
+                        'vue3',
+                        'angular',
                         'components',
                         'typescript',
                         'drag-and-drop',
@@ -156,7 +159,16 @@ const config = {
                         'docking-library',
                         'layout-manager',
                         'docking-layout',
+                        'zero-dependency',
+                        'ide-layout',
+                        'floating-panels',
+                        'popout-windows',
                     ].join(' ,'),
+                },
+                {
+                    name: 'description',
+                    content:
+                        'Dockview is a zero dependency docking layout manager for building IDE-like interfaces with tabs, groups, grids, splitviews, drag and drop, floating panels, and popout windows. Supports React, Vue, Angular, and vanilla TypeScript.',
                 },
             ],
             docs: {

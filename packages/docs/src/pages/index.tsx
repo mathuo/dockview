@@ -11,7 +11,10 @@ import './index.scss';
 export default function Home(): JSX.Element {
     const { siteConfig } = useDocusaurusContext();
     return (
-        <Layout title={`${siteConfig.tagline}`}>
+        <Layout
+            title={`${siteConfig.tagline}`}
+            description="Dockview is a zero dependency docking layout manager for building IDE-like interfaces with tabs, groups, grids, splitviews, drag and drop, floating panels, and popout windows. Supports React, Vue, Angular, and vanilla TypeScript."
+        >
             <div className="home-page">
                 <main>
                     <div className="container">
