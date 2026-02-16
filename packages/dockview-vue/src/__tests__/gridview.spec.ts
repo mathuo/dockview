@@ -78,7 +78,9 @@ describe('GridviewVue Component', () => {
     });
 
     test('should add and manage grid panels', () => {
-        const initSpy = jest.spyOn(VuePart.prototype, 'init').mockImplementation(() => {});
+        const initSpy = jest
+            .spyOn(VuePart.prototype, 'init')
+            .mockImplementation(() => {});
 
         const element = document.createElement('div');
         document.body.appendChild(element);
@@ -155,7 +157,9 @@ describe('VueGridviewPanelView', () => {
     });
 
     test('should create framework part and call init when getComponent is called', () => {
-        const initSpy = jest.spyOn(VuePart.prototype, 'init').mockImplementation(() => {});
+        const initSpy = jest
+            .spyOn(VuePart.prototype, 'init')
+            .mockImplementation(() => {});
 
         // Mock _params to avoid accessor error
         (panelView as any)._params = {
@@ -172,7 +176,9 @@ describe('VueGridviewPanelView', () => {
     });
 
     test('should handle empty params', () => {
-        const initSpy = jest.spyOn(VuePart.prototype, 'init').mockImplementation(() => {});
+        const initSpy = jest
+            .spyOn(VuePart.prototype, 'init')
+            .mockImplementation(() => {});
 
         // Mock _params to avoid accessor error
         (panelView as any)._params = {

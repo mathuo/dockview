@@ -96,7 +96,9 @@ describe('VueSplitviewPanelView', () => {
     });
 
     test('should handle getComponent with mocked parameters and call init', () => {
-        const initSpy = jest.spyOn(VuePart.prototype, 'init').mockImplementation(() => {});
+        const initSpy = jest
+            .spyOn(VuePart.prototype, 'init')
+            .mockImplementation(() => {});
 
         const mockVueInstance = {
             appContext: { components: {} },
