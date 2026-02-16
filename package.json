@@ -50,6 +50,7 @@
     "@testing-library/react": "^14.1.2",
     "@total-typescript/shoehorn": "^0.1.1",
     "@types/jest": "^29.5.11",
+    "@types/node": "^25.2.3",
     "@types/react": "^18.2.46",
     "@types/react-dom": "^18.2.18",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
@@ -68,6 +69,7 @@
     "jsdom": "^23.0.1",
     "ng-packagr": "^17.0.0",
     "nx": "^20.4.0",
+    "postcss": "^8.5.6",
     "prettier": "^3.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -84,7 +86,8 @@
     "vite": "^5.1.5",
     "vue": "^3.4.21",
     "vue-sfc-loader": "^0.1.0",
-    "vue-tsc": "^2.0.5"
+    "vue-tsc": "^2.0.5",
+    "zone.js": "~0.14.0"
   },
   "engines": {
     "node": ">=18.0"
