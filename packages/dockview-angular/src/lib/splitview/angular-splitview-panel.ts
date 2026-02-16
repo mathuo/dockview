@@ -14,10 +14,16 @@ export class AngularSplitviewPanel extends SplitviewPanel {
     }
 
     getComponent(): IFrameworkPart {
-        return new AngularRenderer({
+        const renderer = new AngularRenderer({
             component: this.angularComponent,
             injector: this.injector,
             environmentInjector: this.environmentInjector,
         });
+        renderer.init({
+            params: this._params?.params ?? {},
+            api: this.api,
+        });
+        this.element.appendChild(renderer.element);
+        return renderer;
     }
 }

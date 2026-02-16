@@ -14,10 +14,12 @@ export class VueGridviewPanelView extends GridviewPanel {
     }
 
     getComponent(): IFrameworkPart {
-        return new VuePart(this.element, this.vueComponent, this.parent, {
+        const part = new VuePart(this.element, this.vueComponent, this.parent, {
             params: this._params?.params ?? {},
             api: this.api,
             containerApi: new GridviewApi((this._params as any).accessor),
         });
+        part.init();
+        return part;
     }
 }

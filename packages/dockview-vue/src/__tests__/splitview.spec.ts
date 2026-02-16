@@ -4,6 +4,7 @@ import {
     PROPERTY_KEYS_SPLITVIEW,
 } from 'dockview-core';
 import { VueSplitviewPanelView } from '../splitview/view';
+import { VuePart } from '../utils';
 import * as splitviewTypes from '../splitview/types';
 
 describe('SplitviewVue Component', () => {
@@ -94,7 +95,9 @@ describe('VueSplitviewPanelView', () => {
         expect(typeof panelView.getComponent).toBe('function');
     });
 
-    test('should handle getComponent with mocked parameters', () => {
+    test('should handle getComponent with mocked parameters and call init', () => {
+        const initSpy = jest.spyOn(VuePart.prototype, 'init').mockImplementation(() => {});
+
         const mockVueInstance = {
             appContext: { components: {} },
             components: {},
@@ -122,5 +125,8 @@ describe('VueSplitviewPanelView', () => {
         const component = panelView.getComponent();
         expect(component).toBeDefined();
         expect(component.constructor.name).toBe('VuePart');
+        expect(initSpy).toHaveBeenCalled();
+
+        initSpy.mockRestore();
     });
 });
