@@ -52,7 +52,7 @@ function createBundle(format, options) {
     const output = {
         file,
         format,
-        sourcemap: true,
+        sourcemap: isMinified && format === 'umd',
         globals: {},
         banner: [
             `/**`,
