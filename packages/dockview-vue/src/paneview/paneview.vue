@@ -12,13 +12,12 @@ import { VuePaneviewPanelView } from './view';
 import type { IPaneviewVueProps, PaneviewVueEvents } from './types';
 
 function extractCoreOptions(props: IPaneviewVueProps): PaneviewOptions {
-    const coreOptions = (PROPERTY_KEYS_PANEVIEW as (keyof PaneviewOptions)[]).reduce(
-        (obj, key) => {
-            (obj as any)[key] = props[key];
-            return obj;
-        },
-        {} as Partial<PaneviewOptions>
-    );
+    const coreOptions = (
+        PROPERTY_KEYS_PANEVIEW as (keyof PaneviewOptions)[]
+    ).reduce((obj, key) => {
+        (obj as any)[key] = props[key];
+        return obj;
+    }, {} as Partial<PaneviewOptions>);
 
     return coreOptions as PaneviewOptions;
 }
@@ -26,14 +25,18 @@ function extractCoreOptions(props: IPaneviewVueProps): PaneviewOptions {
 const emit = defineEmits<PaneviewVueEvents>();
 const props = defineProps<IPaneviewVueProps>();
 
-const { el } = useViewComponent({
-    componentName: 'paneview-vue',
-    propertyKeys: PROPERTY_KEYS_PANEVIEW,
-    createApi: createPaneview,
-    createView: (id, name, component, instance) => 
-        new VuePaneviewPanelView(id, component, instance),
-    extractCoreOptions,
-}, props, emit);
+const { el } = useViewComponent(
+    {
+        componentName: 'paneview-vue',
+        propertyKeys: PROPERTY_KEYS_PANEVIEW,
+        createApi: createPaneview,
+        createView: (id, name, component, instance) =>
+            new VuePaneviewPanelView(id, component, instance),
+        extractCoreOptions,
+    },
+    props,
+    emit
+);
 </script>
 
 <template>

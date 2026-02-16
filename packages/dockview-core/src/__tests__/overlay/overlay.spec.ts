@@ -420,7 +420,7 @@ describe('overlay', () => {
         test('resizing from left after extending beyond right edge should not snap to full width', () => {
             const container = document.createElement('div');
             const content = document.createElement('div');
-            
+
             document.body.appendChild(container);
             container.appendChild(content);
 
@@ -436,25 +436,39 @@ describe('overlay', () => {
             });
 
             const element = overlay.element;
-            
+
             // Mock container bounds (400x400 viewport)
-            jest.spyOn(container, 'getBoundingClientRect').mockImplementation(() =>
-                mockGetBoundingClientRect({ left: 0, top: 0, width: 400, height: 400 })
+            jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
+                () =>
+                    mockGetBoundingClientRect({
+                        left: 0,
+                        top: 0,
+                        width: 400,
+                        height: 400,
+                    })
             );
 
             // Mock overlay bounds extending beyond right edge
-            jest.spyOn(element, 'getBoundingClientRect').mockImplementation(() =>
-                mockGetBoundingClientRect({ left: 350, top: 50, width: 200, height: 100 })
+            jest.spyOn(element, 'getBoundingClientRect').mockImplementation(
+                () =>
+                    mockGetBoundingClientRect({
+                        left: 350,
+                        top: 50,
+                        width: 200,
+                        height: 100,
+                    })
             );
 
-            const leftHandle = container.querySelector('.dv-resize-handle-left') as HTMLElement;
+            const leftHandle = container.querySelector(
+                '.dv-resize-handle-left'
+            ) as HTMLElement;
             expect(leftHandle).toBeTruthy();
 
             // Simulate mousedown on left handle
             const pointerDownEvent = new MouseEvent('pointerdown', {
                 clientX: 350, // Start position at left edge of overlay
                 clientY: 100,
-                bubbles: true
+                bubbles: true,
             }) as any;
             pointerDownEvent.pointerId = 1;
             leftHandle.dispatchEvent(pointerDownEvent);
@@ -463,7 +477,7 @@ describe('overlay', () => {
             const pointerMoveEvent = new MouseEvent('pointermove', {
                 clientX: 300, // Drag 50px to the right
                 clientY: 100,
-                bubbles: true
+                bubbles: true,
             }) as any;
             pointerMoveEvent.pointerId = 1;
             window.dispatchEvent(pointerMoveEvent);
@@ -472,7 +486,9 @@ describe('overlay', () => {
             const bounds = overlay.toJSON();
             expect(bounds.width).toBeLessThan(400);
             // After the fix, left position should be constrained to >= 0 (not negative)
-            expect('left' in bounds ? bounds.left : 0).toBeGreaterThanOrEqual(0);
+            expect('left' in bounds ? bounds.left : 0).toBeGreaterThanOrEqual(
+                0
+            );
 
             overlay.dispose();
         });
@@ -480,7 +496,7 @@ describe('overlay', () => {
         test('resizing from top after extending beyond bottom edge should not snap to full height', () => {
             const container = document.createElement('div');
             const content = document.createElement('div');
-            
+
             document.body.appendChild(container);
             container.appendChild(content);
 
@@ -496,25 +512,39 @@ describe('overlay', () => {
             });
 
             const element = overlay.element;
-            
+
             // Mock container bounds (400x400 viewport)
-            jest.spyOn(container, 'getBoundingClientRect').mockImplementation(() =>
-                mockGetBoundingClientRect({ left: 0, top: 0, width: 400, height: 400 })
+            jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
+                () =>
+                    mockGetBoundingClientRect({
+                        left: 0,
+                        top: 0,
+                        width: 400,
+                        height: 400,
+                    })
             );
 
             // Mock overlay bounds extending beyond bottom edge
-            jest.spyOn(element, 'getBoundingClientRect').mockImplementation(() =>
-                mockGetBoundingClientRect({ left: 50, top: 350, width: 100, height: 200 })
+            jest.spyOn(element, 'getBoundingClientRect').mockImplementation(
+                () =>
+                    mockGetBoundingClientRect({
+                        left: 50,
+                        top: 350,
+                        width: 100,
+                        height: 200,
+                    })
             );
 
-            const topHandle = container.querySelector('.dv-resize-handle-top') as HTMLElement;
+            const topHandle = container.querySelector(
+                '.dv-resize-handle-top'
+            ) as HTMLElement;
             expect(topHandle).toBeTruthy();
 
             // Simulate mousedown on top handle
             const pointerDownEvent = new MouseEvent('pointerdown', {
                 clientX: 100,
                 clientY: 350, // Start position at top edge of overlay
-                bubbles: true
+                bubbles: true,
             }) as any;
             pointerDownEvent.pointerId = 1;
             topHandle.dispatchEvent(pointerDownEvent);
@@ -523,7 +553,7 @@ describe('overlay', () => {
             const pointerMoveEvent = new MouseEvent('pointermove', {
                 clientX: 100,
                 clientY: 300, // Drag 50px down
-                bubbles: true
+                bubbles: true,
             }) as any;
             pointerMoveEvent.pointerId = 1;
             window.dispatchEvent(pointerMoveEvent);
@@ -540,7 +570,7 @@ describe('overlay', () => {
         test('resizing should respect container bounds and not allow negative positions', () => {
             const container = document.createElement('div');
             const content = document.createElement('div');
-            
+
             document.body.appendChild(container);
             container.appendChild(content);
 
@@ -556,25 +586,39 @@ describe('overlay', () => {
             });
 
             const element = overlay.element;
-            
+
             // Mock container bounds (200x200 viewport)
-            jest.spyOn(container, 'getBoundingClientRect').mockImplementation(() =>
-                mockGetBoundingClientRect({ left: 0, top: 0, width: 200, height: 200 })
+            jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
+                () =>
+                    mockGetBoundingClientRect({
+                        left: 0,
+                        top: 0,
+                        width: 200,
+                        height: 200,
+                    })
             );
 
             // Mock overlay bounds
-            jest.spyOn(element, 'getBoundingClientRect').mockImplementation(() =>
-                mockGetBoundingClientRect({ left: 20, top: 20, width: 100, height: 100 })
+            jest.spyOn(element, 'getBoundingClientRect').mockImplementation(
+                () =>
+                    mockGetBoundingClientRect({
+                        left: 20,
+                        top: 20,
+                        width: 100,
+                        height: 100,
+                    })
             );
 
-            const leftHandle = container.querySelector('.dv-resize-handle-left') as HTMLElement;
+            const leftHandle = container.querySelector(
+                '.dv-resize-handle-left'
+            ) as HTMLElement;
             expect(leftHandle).toBeTruthy();
 
             // Simulate mousedown on left handle
             const pointerDownEvent = new MouseEvent('pointerdown', {
                 clientX: 20,
                 clientY: 70,
-                bubbles: true
+                bubbles: true,
             }) as any;
             pointerDownEvent.pointerId = 1;
             leftHandle.dispatchEvent(pointerDownEvent);
@@ -583,14 +627,16 @@ describe('overlay', () => {
             const pointerMoveEvent = new MouseEvent('pointermove', {
                 clientX: -100, // Try to drag beyond container
                 clientY: 70,
-                bubbles: true
+                bubbles: true,
             }) as any;
             pointerMoveEvent.pointerId = 1;
             window.dispatchEvent(pointerMoveEvent);
 
             // Check that left position is constrained to >= 0
             const bounds = overlay.toJSON();
-            expect('left' in bounds ? bounds.left : 0).toBeGreaterThanOrEqual(0);
+            expect('left' in bounds ? bounds.left : 0).toBeGreaterThanOrEqual(
+                0
+            );
 
             overlay.dispose();
         });
@@ -598,7 +644,7 @@ describe('overlay', () => {
         test('resizing should respect maximum dimensions when constrained by container size', () => {
             const container = document.createElement('div');
             const content = document.createElement('div');
-            
+
             document.body.appendChild(container);
             container.appendChild(content);
 
@@ -614,25 +660,39 @@ describe('overlay', () => {
             });
 
             const element = overlay.element;
-            
+
             // Mock small container bounds (100x100 viewport)
-            jest.spyOn(container, 'getBoundingClientRect').mockImplementation(() =>
-                mockGetBoundingClientRect({ left: 0, top: 0, width: 100, height: 100 })
+            jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
+                () =>
+                    mockGetBoundingClientRect({
+                        left: 0,
+                        top: 0,
+                        width: 100,
+                        height: 100,
+                    })
             );
 
             // Mock overlay bounds
-            jest.spyOn(element, 'getBoundingClientRect').mockImplementation(() =>
-                mockGetBoundingClientRect({ left: 10, top: 10, width: 50, height: 50 })
+            jest.spyOn(element, 'getBoundingClientRect').mockImplementation(
+                () =>
+                    mockGetBoundingClientRect({
+                        left: 10,
+                        top: 10,
+                        width: 50,
+                        height: 50,
+                    })
             );
 
-            const rightHandle = container.querySelector('.dv-resize-handle-right') as HTMLElement;
+            const rightHandle = container.querySelector(
+                '.dv-resize-handle-right'
+            ) as HTMLElement;
             expect(rightHandle).toBeTruthy();
 
             // Simulate mousedown on right handle
             const pointerDownEvent = new MouseEvent('pointerdown', {
                 clientX: 60,
                 clientY: 35,
-                bubbles: true
+                bubbles: true,
             }) as any;
             pointerDownEvent.pointerId = 1;
             rightHandle.dispatchEvent(pointerDownEvent);
@@ -641,7 +701,7 @@ describe('overlay', () => {
             const pointerMoveEvent = new MouseEvent('pointermove', {
                 clientX: 200, // Try to drag way beyond container width
                 clientY: 35,
-                bubbles: true
+                bubbles: true,
             }) as any;
             pointerMoveEvent.pointerId = 1;
             window.dispatchEvent(pointerMoveEvent);

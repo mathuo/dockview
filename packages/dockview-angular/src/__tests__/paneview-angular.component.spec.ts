@@ -14,11 +14,11 @@ describe('PaneviewAngularComponent', () => {
     beforeEach(async () => {
         setupTestBed();
         await TestBed.compileComponents();
-        
+
         fixture = TestBed.createComponent(PaneviewAngularComponent);
         component = fixture.componentInstance;
         debugElement = fixture.debugElement;
-        
+
         component.components = getTestComponents();
     });
 
@@ -35,7 +35,7 @@ describe('PaneviewAngularComponent', () => {
 
     it('should throw error if components input is not provided', () => {
         component.components = undefined as any;
-        
+
         expect(() => {
             component.ngOnInit();
         }).toThrow('PaneviewAngularComponent: components input is required');
@@ -43,7 +43,7 @@ describe('PaneviewAngularComponent', () => {
 
     it('should initialize paneview api on ngOnInit', () => {
         component.ngOnInit();
-        
+
         expect(component.getPaneviewApi()).toBeDefined();
         expect(component.getPaneviewApi()).toBeInstanceOf(Object);
     });
@@ -60,8 +60,10 @@ describe('PaneviewAngularComponent', () => {
 
     it('should render container element', () => {
         fixture.detectChanges();
-        
-        const containerElement = debugElement.query(By.css('.paneview-container'));
+
+        const containerElement = debugElement.query(
+            By.css('.paneview-container')
+        );
         expect(containerElement).toBeTruthy();
         expect(containerElement.nativeElement.tagName).toBe('DIV');
     });
@@ -70,9 +72,9 @@ describe('PaneviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getPaneviewApi();
         const disposeSpy = jest.spyOn(api!, 'dispose');
-        
+
         component.ngOnDestroy();
-        
+
         expect(disposeSpy).toHaveBeenCalled();
     });
 
@@ -80,46 +82,44 @@ describe('PaneviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getPaneviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
-        
+
         component.className = 'test-class';
         component.ngOnChanges({
             className: {
                 currentValue: 'test-class',
                 previousValue: undefined,
                 firstChange: false,
-                isFirstChange: () => false
-            }
+                isFirstChange: () => false,
+            },
         });
-        
+
         expect(updateOptionsSpy).toHaveBeenCalledWith({
-            className: 'test-class'
+            className: 'test-class',
         });
     });
-
-
 
     it('should not call updateOptions on first change', () => {
         component.ngOnInit();
         const api = component.getPaneviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
-        
+
         component.ngOnChanges({
             className: {
                 currentValue: 'test-class',
                 previousValue: undefined,
                 firstChange: true,
-                isFirstChange: () => true
-            }
+                isFirstChange: () => true,
+            },
         });
-        
+
         expect(updateOptionsSpy).not.toHaveBeenCalled();
     });
 
     it('should set up component registry correctly', () => {
         expect(component.components).toEqual(getTestComponents());
-        
+
         component.ngOnInit();
-        
+
         expect(component.getPaneviewApi()).toBeDefined();
     });
 
@@ -127,7 +127,7 @@ describe('PaneviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getPaneviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
-        
+
         component.className = 'test-class';
         component.disableAutoResizing = true;
         component.ngOnChanges({
@@ -135,41 +135,43 @@ describe('PaneviewAngularComponent', () => {
                 currentValue: 'test-class',
                 previousValue: undefined,
                 firstChange: false,
-                isFirstChange: () => false
+                isFirstChange: () => false,
             },
             disableAutoResizing: {
                 currentValue: true,
                 previousValue: false,
                 firstChange: false,
-                isFirstChange: () => false
-            }
+                isFirstChange: () => false,
+            },
         });
-        
+
         expect(updateOptionsSpy).toHaveBeenCalledWith({
             className: 'test-class',
-            disableAutoResizing: true
+            disableAutoResizing: true,
         });
     });
 
     it('should handle headerComponents input', () => {
-        const headerComponents = { 'test-header': getTestComponents()['test-tab'] };
+        const headerComponents = {
+            'test-header': getTestComponents()['test-tab'],
+        };
         component.headerComponents = headerComponents;
-        
+
         expect(component.headerComponents).toEqual(headerComponents);
-        
+
         component.ngOnInit();
         expect(component.getPaneviewApi()).toBeDefined();
     });
 
     it('should set up drop event listeners', () => {
         let dropHandlerSet = false;
-        
+
         component.drop.subscribe(() => {
             dropHandlerSet = true;
         });
 
         component.ngOnInit();
-        
+
         const api = component.getPaneviewApi();
         expect(api).toBeDefined();
         expect(component.drop.observers.length).toBeGreaterThan(0);
@@ -179,34 +181,35 @@ describe('PaneviewAngularComponent', () => {
         component.ngOnInit();
         const api = component.getPaneviewApi();
         const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
-        
+
         component.disableAutoResizing = true;
         component.ngOnChanges({
             disableAutoResizing: {
                 currentValue: true,
                 previousValue: false,
                 firstChange: false,
-                isFirstChange: () => false
-            }
+                isFirstChange: () => false,
+            },
         });
-        
+
         expect(updateOptionsSpy).toHaveBeenCalledWith({
-            disableAutoResizing: true
+            disableAutoResizing: true,
         });
     });
 });
 
 @Component({
     template: `
-        <dv-paneview 
+        <dv-paneview
             [components]="components"
             [headerComponents]="headerComponents"
             [className]="className"
             [disableAutoResizing]="disableAutoResizing"
             (ready)="onReady($event)"
-            (drop)="onDrop($event)">
+            (drop)="onDrop($event)"
+        >
         </dv-paneview>
-    `
+    `,
 })
 class TestHostComponent {
     components = getTestComponents();
@@ -231,13 +234,13 @@ describe('PaneviewAngularComponent Integration', () => {
 
     beforeEach(async () => {
         setupTestBed();
-        
+
         TestBed.configureTestingModule({
-            declarations: [TestHostComponent]
+            declarations: [TestHostComponent],
         });
-        
+
         await TestBed.compileComponents();
-        
+
         fixture = TestBed.createComponent(TestHostComponent);
         hostComponent = fixture.componentInstance;
     });
@@ -249,7 +252,7 @@ describe('PaneviewAngularComponent Integration', () => {
 
     it('should create and initialize through template', () => {
         fixture.detectChanges();
-        
+
         expect(hostComponent).toBeTruthy();
         expect(hostComponent.api).toBeDefined();
     });
@@ -257,15 +260,15 @@ describe('PaneviewAngularComponent Integration', () => {
     it('should pass properties correctly', () => {
         hostComponent.className = 'custom-class';
         hostComponent.disableAutoResizing = true;
-        
+
         fixture.detectChanges();
-        
+
         expect(hostComponent.api).toBeDefined();
     });
 
     it('should handle header components correctly', () => {
         fixture.detectChanges();
-        
+
         expect(hostComponent.api).toBeDefined();
         expect(hostComponent.headerComponents).toBeDefined();
     });

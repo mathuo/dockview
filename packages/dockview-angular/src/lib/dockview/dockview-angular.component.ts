@@ -13,7 +13,7 @@ import {
     OnChanges,
     SimpleChanges,
     EnvironmentInjector,
-    inject
+    inject,
 } from '@angular/core';
 import {
     DockviewApi,
@@ -24,7 +24,7 @@ import {
     createDockview,
     PROPERTY_KEYS_DOCKVIEW,
     DockviewFrameworkOptions,
-    DockviewComponentOptions
+    DockviewComponentOptions,
 } from 'dockview-core';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
@@ -43,22 +43,24 @@ export interface DockviewAngularOptions extends DockviewOptions {
     selector: 'dv-dockview',
     standalone: true,
     template: '<div #dockviewContainer class="dockview-container"></div>',
-    styles: [`
-        :host {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
+    styles: [
+        `
+            :host {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
 
-        .dockview-container {
-            width: 100%;
-            height: 100%;
-        }
-    `],
-    changeDetection: ChangeDetectionStrategy.OnPush
+            .dockview-container {
+                width: 100%;
+                height: 100%;
+            }
+        `,
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
-    @ViewChild('dockviewContainer', { static: true }) 
+    @ViewChild('dockviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
     @Input() components!: Record<string, Type<any>>;
@@ -110,7 +112,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
             let hasChanges = false;
 
             // Check for changes in core dockview properties
-            PROPERTY_KEYS_DOCKVIEW.forEach(key => {
+            PROPERTY_KEYS_DOCKVIEW.forEach((key) => {
                 if (changes[key] && !changes[key].isFirstChange()) {
                     (coreChanges as any)[key] = changes[key].currentValue;
                     hasChanges = true;
@@ -129,19 +131,18 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
 
     private initializeDockview(): void {
         if (!this.components) {
-            throw new Error('DockviewAngularComponent: components input is required');
+            throw new Error(
+                'DockviewAngularComponent: components input is required'
+            );
         }
 
         const coreOptions = this.extractCoreOptions();
         const frameworkOptions = this.createFrameworkOptions();
 
-        this.dockviewApi = createDockview(
-            this.containerRef.nativeElement,
-            {
-                ...coreOptions,
-                ...frameworkOptions
-            }
-        );
+        this.dockviewApi = createDockview(this.containerRef.nativeElement, {
+            ...coreOptions,
+            ...frameworkOptions,
+        });
 
         // Set up event listeners
         this.setupEventListeners();
@@ -153,7 +154,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     private extractCoreOptions(): DockviewOptions {
         const coreOptions: Partial<DockviewComponentOptions> = {};
 
-        PROPERTY_KEYS_DOCKVIEW.forEach(key => {
+        PROPERTY_KEYS_DOCKVIEW.forEach((key) => {
             const value = (this as any)[key];
             if (value !== undefined) {
                 (coreOptions as any)[key] = value;
@@ -172,7 +173,8 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
             headerActionsComponents['right'] = this.rightHeaderActionsComponent;
         }
         if (this.prefixHeaderActionsComponent) {
-            headerActionsComponents['prefix'] = this.prefixHeaderActionsComponent;
+            headerActionsComponents['prefix'] =
+                this.prefixHeaderActionsComponent;
         }
 
         const componentFactory = new AngularFrameworkComponentFactory(
@@ -194,24 +196,30 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
             },
             createWatermarkComponent: this.watermarkComponent
                 ? () => {
-                    return componentFactory.createWatermarkComponent();
-                }
+                      return componentFactory.createWatermarkComponent();
+                  }
                 : undefined,
             createLeftHeaderActionComponent: this.leftHeaderActionsComponent
                 ? (group) => {
-                    return componentFactory.createHeaderActionsComponent('left')!;
-                }
+                      return componentFactory.createHeaderActionsComponent(
+                          'left'
+                      )!;
+                  }
                 : undefined,
             createRightHeaderActionComponent: this.rightHeaderActionsComponent
                 ? (group) => {
-                    return componentFactory.createHeaderActionsComponent('right')!;
-                }
+                      return componentFactory.createHeaderActionsComponent(
+                          'right'
+                      )!;
+                  }
                 : undefined,
             createPrefixHeaderActionComponent: this.prefixHeaderActionsComponent
                 ? (group) => {
-                    return componentFactory.createHeaderActionsComponent('prefix')!;
-                }
-                : undefined
+                      return componentFactory.createHeaderActionsComponent(
+                          'prefix'
+                      )!;
+                  }
+                : undefined,
         };
     }
 
@@ -224,14 +232,14 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
         const api = this.dockviewApi;
 
         if (this.didDrop.observers.length > 0) {
-            const disposable = api.onDidDrop(event => {
+            const disposable = api.onDidDrop((event) => {
                 this.didDrop.emit(event);
             });
             this.lifecycleManager.addDisposable(disposable);
         }
 
         if (this.willDrop.observers.length > 0) {
-            const disposable = api.onWillDrop(event => {
+            const disposable = api.onWillDrop((event) => {
                 this.willDrop.emit(event);
             });
             this.lifecycleManager.addDisposable(disposable);

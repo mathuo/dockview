@@ -1,10 +1,5 @@
 import { Type, Injector, EnvironmentInjector } from '@angular/core';
-import {
-    SplitviewPanel,
-    SplitviewApi,
-    IFrameworkPart,
-    SplitviewComponent,
-} from 'dockview-core';
+import { SplitviewPanel, IFrameworkPart } from 'dockview-core';
 import { AngularRenderer } from '../utils/angular-renderer';
 
 export class AngularSplitviewPanel extends SplitviewPanel {
@@ -22,7 +17,7 @@ export class AngularSplitviewPanel extends SplitviewPanel {
         return new AngularRenderer({
             component: this.angularComponent,
             injector: this.injector,
-            environmentInjector: this.environmentInjector
+            environmentInjector: this.environmentInjector,
         });
     }
 }

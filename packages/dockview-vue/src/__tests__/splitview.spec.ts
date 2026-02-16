@@ -1,12 +1,15 @@
-import { createSplitview, Orientation, PROPERTY_KEYS_SPLITVIEW } from 'dockview-core';
+import {
+    createSplitview,
+    Orientation,
+    PROPERTY_KEYS_SPLITVIEW,
+} from 'dockview-core';
 import { VueSplitviewPanelView } from '../splitview/view';
+import * as splitviewTypes from '../splitview/types';
 
 describe('SplitviewVue Component', () => {
     test('should export component types', () => {
-        const types = require('../splitview/types');
-        
-        expect(types).toBeDefined();
-        expect(typeof types).toBe('object');
+        expect(splitviewTypes).toBeDefined();
+        expect(typeof splitviewTypes).toBe('object');
     });
 
     test('should have access to orientation constants', () => {
@@ -15,10 +18,8 @@ describe('SplitviewVue Component', () => {
     });
 
     test('should export dockview-core functionality', () => {
-        const dockviewCore = require('dockview-core');
-        
-        expect(dockviewCore.createSplitview).toBeDefined();
-        expect(dockviewCore.PROPERTY_KEYS_SPLITVIEW).toBeDefined();
+        expect(createSplitview).toBeDefined();
+        expect(PROPERTY_KEYS_SPLITVIEW).toBeDefined();
     });
 
     test('should have correct splitview properties', () => {
@@ -31,18 +32,18 @@ describe('SplitviewVue Component', () => {
         // Test that Vue-specific components can be created with proper type safety
         expect(typeof createSplitview).toBe('function');
         expect(typeof VueSplitviewPanelView).toBe('function');
-        
+
         // Test that a Vue splitview panel view can be instantiated
         const mockVueComponent = { template: '<div>Test</div>' } as any;
         const mockParent = {} as any;
-        
+
         const panelView = new VueSplitviewPanelView(
             'test-id',
             'test-component',
             mockVueComponent,
             mockParent
         );
-        
+
         expect(panelView.id).toBe('test-id');
         expect(panelView.element).toBeInstanceOf(HTMLElement);
         expect(typeof panelView.getComponent).toBe('function');
@@ -51,10 +52,11 @@ describe('SplitviewVue Component', () => {
     test('should handle Vue component integration', () => {
         // Test Vue component factory creation for splitview
         const mockComponent = {
-            template: '<div class="vue-splitview-panel">{{ params.title }}</div>',
-            props: ['params', 'api', 'containerApi']
+            template:
+                '<div class="vue-splitview-panel">{{ params.title }}</div>',
+            props: ['params', 'api', 'containerApi'],
         };
-        
+
         expect(mockComponent.template).toContain('vue-splitview-panel');
         expect(mockComponent.props).toContain('params');
         expect(mockComponent.props).toContain('api');
@@ -74,12 +76,12 @@ describe('VueSplitviewPanelView', () => {
             components: {},
             parent: null,
         };
-        
+
         const mockVueComponent = {
             props: { params: Object, api: Object, containerApi: Object },
             template: '<div>Test</div>',
         } as any;
-        
+
         const panelView = new VueSplitviewPanelView(
             'test-id',
             'test-component',
@@ -98,12 +100,12 @@ describe('VueSplitviewPanelView', () => {
             components: {},
             parent: null,
         };
-        
+
         const mockVueComponent = {
             props: { params: Object, api: Object, containerApi: Object },
             template: '<div>Test</div>',
         } as any;
-        
+
         const panelView = new VueSplitviewPanelView(
             'test-id',
             'test-component',
@@ -114,9 +116,9 @@ describe('VueSplitviewPanelView', () => {
         // Mock _params to avoid accessor error
         (panelView as any)._params = {
             params: {},
-            accessor: { id: 'test-accessor' }
+            accessor: { id: 'test-accessor' },
         };
-        
+
         const component = panelView.getComponent();
         expect(component).toBeDefined();
         expect(component.constructor.name).toBe('VuePart');

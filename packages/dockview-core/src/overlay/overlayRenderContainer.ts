@@ -11,11 +11,22 @@ import { IDockviewPanel } from '../dockview/dockviewPanel';
 import { DockviewComponent } from '../dockview/dockviewComponent';
 
 class PositionCache {
-    private cache = new Map<Element, { rect: { left: number; top: number; width: number; height: number }; frameId: number }>();
+    private cache = new Map<
+        Element,
+        {
+            rect: { left: number; top: number; width: number; height: number };
+            frameId: number;
+        }
+    >();
     private currentFrameId = 0;
     private rafId: number | null = null;
 
-    getPosition(element: Element): { left: number; top: number; width: number; height: number } {
+    getPosition(element: Element): {
+        left: number;
+        top: number;
+        width: number;
+        height: number;
+    } {
         const cached = this.cache.get(element);
         if (cached && cached.frameId === this.currentFrameId) {
             return cached.rect;
@@ -158,7 +169,9 @@ export class OverlayRenderContainer extends CompositeDisposable {
                     return;
                 }
 
-                const box = this.positionCache.getPosition(referenceContainer.element);
+                const box = this.positionCache.getPosition(
+                    referenceContainer.element
+                );
                 const box2 = this.positionCache.getPosition(this.element);
 
                 // Use traditional positioning for overlay containers

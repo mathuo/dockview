@@ -12,13 +12,12 @@ import { VueSplitviewPanelView } from './view';
 import type { ISplitviewVueProps, SplitviewVueEvents } from './types';
 
 function extractCoreOptions(props: ISplitviewVueProps): SplitviewOptions {
-    const coreOptions = (PROPERTY_KEYS_SPLITVIEW as (keyof SplitviewOptions)[]).reduce(
-        (obj, key) => {
-            (obj as any)[key] = props[key];
-            return obj;
-        },
-        {} as Partial<SplitviewOptions>
-    );
+    const coreOptions = (
+        PROPERTY_KEYS_SPLITVIEW as (keyof SplitviewOptions)[]
+    ).reduce((obj, key) => {
+        (obj as any)[key] = props[key];
+        return obj;
+    }, {} as Partial<SplitviewOptions>);
 
     return coreOptions as SplitviewOptions;
 }
@@ -26,14 +25,18 @@ function extractCoreOptions(props: ISplitviewVueProps): SplitviewOptions {
 const emit = defineEmits<SplitviewVueEvents>();
 const props = defineProps<ISplitviewVueProps>();
 
-const { el } = useViewComponent({
-    componentName: 'splitview-vue',
-    propertyKeys: PROPERTY_KEYS_SPLITVIEW,
-    createApi: createSplitview,
-    createView: (id, name, component, instance) => 
-        new VueSplitviewPanelView(id, name, component, instance),
-    extractCoreOptions,
-}, props, emit);
+const { el } = useViewComponent(
+    {
+        componentName: 'splitview-vue',
+        propertyKeys: PROPERTY_KEYS_SPLITVIEW,
+        createApi: createSplitview,
+        createView: (id, name, component, instance) =>
+            new VueSplitviewPanelView(id, name, component, instance),
+        extractCoreOptions,
+    },
+    props,
+    emit
+);
 </script>
 
 <template>

@@ -1,7 +1,9 @@
 import { getPanelData } from '../../../dnd/dataTransfer';
 import {
+    addClasses,
     isChildEntirelyVisibleWithinParent,
     OverflowObserver,
+    removeClasses,
 } from '../../../dom';
 import { addDisposableListener, Emitter, Event } from '../../../events';
 import {
@@ -15,6 +17,7 @@ import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { DockviewWillShowOverlayLocationEvent } from '../../events';
 import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
+import { DockviewHeaderDirection } from '../../options';
 import { Tab } from '../tab/tab';
 import { TabDragEvent, TabDropIndexEvent } from './tabsContainer';
 
@@ -22,10 +25,12 @@ export class Tabs extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private readonly _tabsList: HTMLElement;
     private readonly _observerDisposable = new MutableDisposable();
+    private readonly _scrollbar: Scrollbar | null = null;
 
     private _tabs: IValueDisposable<Tab>[] = [];
     private selectedIndex = -1;
     private _showTabsOverflowControl = false;
+    private _direction: DockviewHeaderDirection = 'horizontal';
 
     private readonly _onTabDragStart = new Emitter<TabDragEvent>();
     readonly onTabDragStart: Event<TabDragEvent> = this._onTabDragStart.event;
@@ -87,6 +92,32 @@ export class Tabs extends CompositeDisposable {
         return this._tabs.map((_) => _.value);
     }
 
+    get direction(): DockviewHeaderDirection {
+        return this._direction;
+    }
+
+    set direction(value: DockviewHeaderDirection) {
+        if (this._direction === value) {
+            return;
+        }
+
+        this._direction = value;
+        if (this._scrollbar) {
+            this._scrollbar.orientation = value;
+        }
+        removeClasses(this._tabsList, 'dv-horizontal', 'dv-vertical');
+        if (value === 'vertical') {
+            addClasses(
+                this._tabsList,
+                'dv-tabs-container-vertical',
+                'dv-vertical'
+            );
+        } else {
+            removeClasses(this._tabsList, 'dv-tabs-container-vertical');
+            addClasses(this._tabsList, 'dv-horizontal');
+        }
+    }
+
     constructor(
         private readonly group: DockviewGroupPanel,
         private readonly accessor: DockviewComponent,
@@ -97,16 +128,17 @@ export class Tabs extends CompositeDisposable {
         super();
 
         this._tabsList = document.createElement('div');
-        this._tabsList.className = 'dv-tabs-container dv-horizontal';
+        this._tabsList.className = 'dv-tabs-container';
 
         this.showTabsOverflowControl = options.showTabsOverflowControl;
 
         if (accessor.options.scrollbars === 'native') {
             this._element = this._tabsList;
         } else {
-            const scrollbar = new Scrollbar(this._tabsList);
-            this._element = scrollbar.element;
-            this.addDisposables(scrollbar);
+            this._scrollbar = new Scrollbar(this._tabsList);
+            this._scrollbar.orientation = this.direction;
+            this._element = this._scrollbar.element;
+            this.addDisposables(this._scrollbar);
         }
 
         this.addDisposables(

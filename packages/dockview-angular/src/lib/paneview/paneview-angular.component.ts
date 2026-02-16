@@ -13,7 +13,7 @@ import {
     OnChanges,
     SimpleChanges,
     EnvironmentInjector,
-    inject
+    inject,
 } from '@angular/core';
 import {
     PaneviewApi,
@@ -22,7 +22,7 @@ import {
     createPaneview,
     PROPERTY_KEYS_PANEVIEW,
     PaneviewFrameworkOptions,
-    PaneviewComponentOptions
+    PaneviewComponentOptions,
 } from 'dockview-core';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
@@ -38,22 +38,24 @@ export interface PaneviewAngularOptions extends PaneviewOptions {
     selector: 'dv-paneview',
     standalone: true,
     template: '<div #paneviewContainer class="paneview-container"></div>',
-    styles: [`
-        :host {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
+    styles: [
+        `
+            :host {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
 
-        .paneview-container {
-            width: 100%;
-            height: 100%;
-        }
-    `],
-    changeDetection: ChangeDetectionStrategy.OnPush
+            .paneview-container {
+                width: 100%;
+                height: 100%;
+            }
+        `,
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
-    @ViewChild('paneviewContainer', { static: true }) 
+    @ViewChild('paneviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
     @Input() components!: Record<string, Type<any>>;
@@ -91,7 +93,7 @@ export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
             let hasChanges = false;
 
             // Check for changes in core paneview properties
-            PROPERTY_KEYS_PANEVIEW.forEach(key => {
+            PROPERTY_KEYS_PANEVIEW.forEach((key) => {
                 if (changes[key] && !changes[key].isFirstChange()) {
                     (coreChanges as any)[key] = changes[key].currentValue;
                     hasChanges = true;
@@ -110,19 +112,18 @@ export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
 
     private initializePaneview(): void {
         if (!this.components) {
-            throw new Error('PaneviewAngularComponent: components input is required');
+            throw new Error(
+                'PaneviewAngularComponent: components input is required'
+            );
         }
 
         const coreOptions = this.extractCoreOptions();
         const frameworkOptions = this.createFrameworkOptions();
 
-        this.paneviewApi = createPaneview(
-            this.containerRef.nativeElement,
-            {
-                ...coreOptions,
-                ...frameworkOptions
-            }
-        );
+        this.paneviewApi = createPaneview(this.containerRef.nativeElement, {
+            ...coreOptions,
+            ...frameworkOptions,
+        });
 
         // Set up event listeners
         this.setupEventListeners();
@@ -134,7 +135,7 @@ export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     private extractCoreOptions(): PaneviewOptions {
         const coreOptions: Partial<PaneviewComponentOptions> = {};
 
-        PROPERTY_KEYS_PANEVIEW.forEach(key => {
+        PROPERTY_KEYS_PANEVIEW.forEach((key) => {
             const value = (this as any)[key];
             if (value !== undefined) {
                 (coreOptions as any)[key] = value;
@@ -158,13 +159,13 @@ export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
             },
             createHeaderComponent: this.headerComponents
                 ? (options) => {
-                    return new AngularPanePart(
-                        this.headerComponents![options.name],
-                        this.injector,
-                        this.environmentInjector
-                    );
-                }
-                : undefined
+                      return new AngularPanePart(
+                          this.headerComponents![options.name],
+                          this.injector,
+                          this.environmentInjector
+                      );
+                  }
+                : undefined,
         };
     }
 
@@ -177,7 +178,7 @@ export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
         const api = this.paneviewApi;
 
         if (this.drop.observers.length > 0) {
-            const disposable = api.onDidDrop(event => {
+            const disposable = api.onDidDrop((event) => {
                 this.drop.emit(event);
             });
             this.lifecycleManager.addDisposable(disposable);

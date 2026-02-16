@@ -31,6 +31,7 @@ import {
     isPanelOptionsWithGroup,
     isPanelOptionsWithPanel,
     MovementOptions,
+    DockviewHeaderPosition,
 } from './options';
 import {
     BaseGrid,
@@ -403,6 +404,10 @@ export class DockviewComponent
         return this.options.defaultRenderer ?? 'onlyWhenVisible';
     }
 
+    get defaultHeaderPosition(): DockviewHeaderPosition {
+        return this.options.defaultHeaderPosition ?? 'top';
+    }
+
     get api(): DockviewApi {
         return this._api;
     }
@@ -745,8 +750,8 @@ export class DockviewComponent
                 const referenceGroup = options?.referenceGroup
                     ? options.referenceGroup
                     : itemToPopout instanceof DockviewPanel
-                    ? itemToPopout.group
-                    : itemToPopout;
+                      ? itemToPopout.group
+                      : itemToPopout;
 
                 const referenceLocation = itemToPopout.api.location.type;
 
@@ -1144,15 +1149,15 @@ export class DockviewComponent
             minimumInViewportWidth:
                 this.options.floatingGroupBounds === 'boundedWithinViewport'
                     ? undefined
-                    : this.options.floatingGroupBounds
+                    : (this.options.floatingGroupBounds
                           ?.minimumWidthWithinViewport ??
-                      DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
+                      DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE),
             minimumInViewportHeight:
                 this.options.floatingGroupBounds === 'boundedWithinViewport'
                     ? undefined
-                    : this.options.floatingGroupBounds
+                    : (this.options.floatingGroupBounds
                           ?.minimumHeightWithinViewport ??
-                      DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
+                      DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE),
         });
 
         const el = group.element.querySelector('.dv-void-container');
@@ -1308,6 +1313,16 @@ export class DockviewComponent
             this.updateTheme();
         }
 
+        if (
+            'createRightHeaderActionComponent' in options ||
+            'createLeftHeaderActionComponent' in options ||
+            'createPrefixHeaderActionComponent' in options
+        ) {
+            for (const group of this.groups) {
+                group.model.updateHeaderActions();
+            }
+        }
+
         this.layout(this.gridview.width, this.gridview.height, true);
     }
 
@@ -1399,10 +1414,13 @@ export class DockviewComponent
     toJSON(): SerializedDockview {
         const data = this.gridview.serialize();
 
-        const panels = this.panels.reduce((collection, panel) => {
-            collection[panel.id] = panel.toJSON();
-            return collection;
-        }, {} as { [key: string]: GroupviewPanelState });
+        const panels = this.panels.reduce(
+            (collection, panel) => {
+                collection[panel.id] = panel.toJSON();
+                return collection;
+            },
+            {} as { [key: string]: GroupviewPanelState }
+        );
 
         const floats: SerializedFloatingGroup[] = this._floatingGroups.map(
             (group) => {
@@ -1510,7 +1528,14 @@ export class DockviewComponent
             const createGroupFromSerializedState = (
                 data: GroupPanelViewState
             ) => {
-                const { id, locked, hideHeader, views, activeView } = data;
+                const {
+                    id,
+                    locked,
+                    hideHeader,
+                    headerPosition,
+                    views,
+                    activeView,
+                } = data;
 
                 if (typeof id !== 'string') {
                     throw new Error(
@@ -1522,6 +1547,7 @@ export class DockviewComponent
                     id,
                     locked: !!locked,
                     hideHeader: !!hideHeader,
+                    headerPosition,
                 });
                 this._onDidAddGroup.fire(group);
 

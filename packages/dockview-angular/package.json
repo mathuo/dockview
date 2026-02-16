@@ -33,24 +33,22 @@
   },
   "license": "MIT",
   "author": "https://github.com/mathuo",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/cjs/index.d.ts",
   "files": [
     "dist",
     "README.md"
   ],
   "scripts": {
-    "build:bundle": "rollup -c",
-    "build:cjs": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
-    "build:esm": "cross-env ../../node_modules/.bin/tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
+    "build:angular": "ng-packagr -c tsconfig.lib.json -p ng-package.json",
     "build:css": "node scripts/copy-css.js",
-    "build": "npm run build:cjs && npm run build:esm && npm run build:css",
+    "build": "npm run build:angular && npm run build:css",
     "clean": "rimraf dist/ .build/ .rollup.cache/",
-    "prepublishOnly": "npm run rebuild && npm run build:bundle && npm run test",
     "rebuild": "npm run clean && npm run build",
-    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-angular",
-    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-angular --coverage"
+    "test": "jest --selectProjects dockview-angular",
+    "test:cov": "jest --selectProjects dockview-angular --coverage",
+    "lint": "eslint 'src/**/*.{ts,tsx,js,jsx}'",
+    "lint:fix": "eslint 'src/**/*.{ts,tsx,js,jsx}' --fix",
+    "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx}'",
+    "format:check": "prettier --check 'src/**/*.{ts,tsx,js,jsx}'"
   },
   "dependencies": {
     "dockview-core": "^4.13.1"

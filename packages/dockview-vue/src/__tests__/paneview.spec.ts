@@ -1,19 +1,16 @@
 import { createPaneview, PROPERTY_KEYS_PANEVIEW } from 'dockview-core';
 import { VuePaneviewPanelView } from '../paneview/view';
+import * as paneviewTypes from '../paneview/types';
 
 describe('PaneviewVue Component', () => {
     test('should export component types', () => {
-        const types = require('../paneview/types');
-        
-        expect(types).toBeDefined();
-        expect(typeof types).toBe('object');
+        expect(paneviewTypes).toBeDefined();
+        expect(typeof paneviewTypes).toBe('object');
     });
 
     test('should export dockview-core functionality', () => {
-        const dockviewCore = require('dockview-core');
-        
-        expect(dockviewCore.createPaneview).toBeDefined();
-        expect(dockviewCore.PROPERTY_KEYS_PANEVIEW).toBeDefined();
+        expect(createPaneview).toBeDefined();
+        expect(PROPERTY_KEYS_PANEVIEW).toBeDefined();
     });
 
     test('should have correct paneview properties', () => {
@@ -25,17 +22,17 @@ describe('PaneviewVue Component', () => {
         // Test that Vue-specific components can be created with proper type safety
         expect(typeof createPaneview).toBe('function');
         expect(typeof VuePaneviewPanelView).toBe('function');
-        
+
         // Test that a Vue paneview panel view can be instantiated
         const mockVueComponent = { template: '<div>Test</div>' } as any;
         const mockParent = {} as any;
-        
+
         const panelView = new VuePaneviewPanelView(
             'test-id',
             mockVueComponent,
             mockParent
         );
-        
+
         expect(panelView.id).toBe('test-id');
         expect(panelView.element).toBeInstanceOf(HTMLElement);
         expect(typeof panelView.init).toBe('function');
@@ -46,10 +43,11 @@ describe('PaneviewVue Component', () => {
     test('should handle Vue component integration for panes', () => {
         // Test Vue component factory creation for paneview
         const mockComponent = {
-            template: '<div class="vue-pane-panel">{{ title }}: {{ params.content }}</div>',
-            props: ['params', 'api', 'containerApi', 'title']
+            template:
+                '<div class="vue-pane-panel">{{ title }}: {{ params.content }}</div>',
+            props: ['params', 'api', 'containerApi', 'title'],
         };
-        
+
         expect(mockComponent.template).toContain('vue-pane-panel');
         expect(mockComponent.props).toContain('params');
         expect(mockComponent.props).toContain('api');
@@ -70,12 +68,17 @@ describe('VuePaneviewPanelView', () => {
             components: {},
             parent: null,
         };
-        
+
         const mockVueComponent = {
-            props: { params: Object, api: Object, containerApi: Object, title: String },
+            props: {
+                params: Object,
+                api: Object,
+                containerApi: Object,
+                title: String,
+            },
             template: '<div>{{ title }}: Test Paneview Panel</div>',
         } as any;
-        
+
         const panelView = new VuePaneviewPanelView(
             'paneview-test-id',
             mockVueComponent,
@@ -96,13 +99,13 @@ describe('VuePaneviewPanelView', () => {
             components: {},
             parent: null,
         };
-        
+
         const panelView = new VuePaneviewPanelView(
             'paneview-test-id',
             { template: '<div>Test</div>' } as any,
             mockVueInstance as any
         );
-        
+
         const json = panelView.toJSON();
         expect(json).toEqual({ id: 'paneview-test-id' });
     });
@@ -113,14 +116,16 @@ describe('VuePaneviewPanelView', () => {
             components: {},
             parent: null,
         };
-        
+
         const panelView = new VuePaneviewPanelView(
             'test-id',
             { template: '<div>Test</div>' } as any,
             mockVueInstance as any
         );
 
-        expect(() => panelView.update({ params: { data: 'test' } })).not.toThrow();
+        expect(() =>
+            panelView.update({ params: { data: 'test' } })
+        ).not.toThrow();
         expect(() => panelView.dispose()).not.toThrow();
     });
 });

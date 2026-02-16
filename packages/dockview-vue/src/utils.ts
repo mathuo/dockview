@@ -3,6 +3,7 @@ import type {
     DockviewGroupPanel,
     DockviewPanelApi,
     IContentRenderer,
+    IDockviewHeaderActionsProps,
     IDockviewPanelHeaderProps,
     IGroupHeaderProps,
     IHeaderActionsRenderer,
@@ -13,6 +14,10 @@ import type {
     Parameters,
     TabPartInitParameters,
     WatermarkRendererInitParameters,
+} from 'dockview-core';
+import {
+    DockviewCompositeDisposable,
+    DockviewMutableDisposable,
 } from 'dockview-core';
 import {
     createVNode,
@@ -204,6 +209,7 @@ export class VueHeaderActionsRenderer
     private _renderDisposable:
         | { update: (props: any) => void; dispose: () => void }
         | undefined;
+    private readonly _mutableDisposable = new DockviewMutableDisposable();
 
     get element(): HTMLElement {
         return this._element;
@@ -212,23 +218,66 @@ export class VueHeaderActionsRenderer
     constructor(
         component: VueComponent,
         parent: ComponentInternalInstance,
-        group: DockviewGroupPanel
+        private readonly group: DockviewGroupPanel
     ) {
         super(component, parent);
     }
 
     init(props: IGroupHeaderProps): void {
+        this._mutableDisposable.value = new DockviewCompositeDisposable(
+            this.group.model.onDidAddPanel(() => {
+                this.updatePanels();
+            }),
+            this.group.model.onDidRemovePanel(() => {
+                this.updatePanels();
+            }),
+            this.group.model.onDidActivePanelChange(() => {
+                this.updateActivePanel();
+            }),
+            props.api.onDidActiveChange(() => {
+                this.updateGroupActive();
+            })
+        );
+
+        const enrichedProps: IDockviewHeaderActionsProps = {
+            ...props,
+            panels: this.group.model.panels,
+            activePanel: this.group.model.activePanel,
+            isGroupActive: this.group.api.isActive,
+            group: this.group,
+            headerPosition: this.group.model.headerPosition,
+        };
+
         this._renderDisposable?.dispose();
         this._renderDisposable = mountVueComponent(
             this.component,
             this.parent,
-            { params: props },
+            { params: enrichedProps },
             this.element
         );
     }
 
     dispose(): void {
+        this._mutableDisposable.dispose();
         this._renderDisposable?.dispose();
+    }
+
+    private updatePanels(): void {
+        this._renderDisposable?.update({
+            params: { panels: this.group.model.panels },
+        });
+    }
+
+    private updateActivePanel(): void {
+        this._renderDisposable?.update({
+            params: { activePanel: this.group.model.activePanel },
+        });
+    }
+
+    private updateGroupActive(): void {
+        this._renderDisposable?.update({
+            params: { isGroupActive: this.group.api.isActive },
+        });
     }
 }
 

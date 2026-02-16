@@ -1,19 +1,3 @@
-// Mock Angular zone
-global.Zone = {
-    current: {
-        get: jest.fn(),
-        fork: jest.fn(() => ({
-            run: jest.fn((fn) => fn()),
-            runGuarded: jest.fn((fn) => fn()),
-        })),
-        run: jest.fn((fn) => fn()),
-        runGuarded: jest.fn((fn) => fn()),
-    },
-    root: {
-        run: jest.fn((fn) => fn()),
-    },
-};
-
 // Mock requestAnimationFrame
 global.requestAnimationFrame = jest.fn((cb) => setTimeout(cb, 16));
 global.cancelAnimationFrame = jest.fn((id) => clearTimeout(id));

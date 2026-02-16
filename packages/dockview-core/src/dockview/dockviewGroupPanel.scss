@@ -1,9 +1,9 @@
 .dv-groupview {
     display: flex;
-    flex-direction: column;
     height: 100%;
     background-color: var(--dv-group-view-background-color);
     overflow: hidden;
+    flex-direction: column;
 
     &:focus {
         outline: none;
@@ -13,5 +13,17 @@
         flex-grow: 1;
         min-height: 0;
         outline: none;
+    }
+
+    &.dv-groupview-header-bottom {
+        flex-direction: column-reverse;
+    }
+
+    &.dv-groupview-header-left {
+        flex-direction: row;
+    }
+
+    &.dv-groupview-header-right {
+        flex-direction: row-reverse;
     }
 }

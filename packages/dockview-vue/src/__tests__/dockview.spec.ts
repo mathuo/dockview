@@ -1,11 +1,10 @@
 import { createDockview, PROPERTY_KEYS_DOCKVIEW } from 'dockview-core';
+import * as dockviewTypes from '../dockview/types';
 
 describe('DockviewVue Component', () => {
     test('should export component types', () => {
-        const types = require('../dockview/types');
-        
-        expect(types).toBeDefined();
-        expect(typeof types).toBe('object');
+        expect(dockviewTypes).toBeDefined();
+        expect(typeof dockviewTypes).toBe('object');
     });
 
     test('should export dockview-core functionality', () => {
@@ -24,26 +23,26 @@ describe('DockviewVue Component', () => {
     test('should create dockview instance with DOM element', () => {
         const element = document.createElement('div');
         document.body.appendChild(element);
-        
+
         const mockRenderer = {
             element: document.createElement('div'),
             dispose: () => {},
             update: () => {},
-            init: () => {}
+            init: () => {},
         };
-        
+
         const api = createDockview(element, {
             disableAutoResizing: true,
             hideBorders: false,
-            createComponent: () => mockRenderer
+            createComponent: () => mockRenderer,
         });
-        
+
         expect(api).toBeDefined();
         expect(typeof api.layout).toBe('function');
         expect(typeof api.dispose).toBe('function');
         expect(typeof api.addPanel).toBe('function');
         expect(typeof api.updateOptions).toBe('function');
-        
+
         api.dispose();
         document.body.removeChild(element);
     });
@@ -51,31 +50,31 @@ describe('DockviewVue Component', () => {
     test('should handle framework component creation', () => {
         const element = document.createElement('div');
         document.body.appendChild(element);
-        
+
         let createdComponent: any;
-        
+
         const api = createDockview(element, {
             createComponent: (options) => {
                 createdComponent = {
                     element: document.createElement('div'),
                     dispose: jest.fn(),
                     update: jest.fn(),
-                    init: jest.fn()
+                    init: jest.fn(),
                 };
                 return createdComponent;
-            }
+            },
         });
-        
+
         // Add a panel to trigger component creation
         api.addPanel({
             id: 'test-panel',
             component: 'test-component',
-            title: 'Test Panel'
+            title: 'Test Panel',
         });
-        
+
         expect(createdComponent).toBeDefined();
         expect(createdComponent.element).toBeInstanceOf(HTMLElement);
-        
+
         api.dispose();
         document.body.removeChild(element);
     });
@@ -83,29 +82,29 @@ describe('DockviewVue Component', () => {
     test('should handle option updates', () => {
         const element = document.createElement('div');
         document.body.appendChild(element);
-        
+
         const mockRenderer = {
             element: document.createElement('div'),
             dispose: () => {},
             update: () => {},
-            init: () => {}
+            init: () => {},
         };
-        
+
         const api = createDockview(element, {
             disableAutoResizing: false,
             hideBorders: false,
-            createComponent: () => mockRenderer
+            createComponent: () => mockRenderer,
         });
-        
+
         // Update options
         api.updateOptions({
             disableAutoResizing: true,
-            hideBorders: true
+            hideBorders: true,
         });
-        
+
         // Test passes if no errors are thrown
         expect(true).toBe(true);
-        
+
         api.dispose();
         document.body.removeChild(element);
     });

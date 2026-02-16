@@ -15,29 +15,29 @@ export * from './lib/paneview/paneview-angular.component';
 export * from './lib/splitview/splitview-angular.component';
 
 // Types
-export { 
-    DockviewAngularOptions, 
+export {
+    DockviewAngularOptions,
     DockviewAngularEvents,
     IDockviewAngularPanelProps,
     IDockviewAngularPanelHeaderProps,
     IDockviewAngularWatermarkProps,
     IDockviewAngularHeaderActionsProps,
-    DockviewAngularComponentOptions
+    DockviewAngularComponentOptions,
 } from './lib/dockview/types';
-export { 
-    GridviewAngularOptions, 
+export {
+    GridviewAngularOptions,
     GridviewAngularEvents,
-    GridviewAngularReadyEvent
+    GridviewAngularReadyEvent,
 } from './lib/gridview/types';
-export { 
-    PaneviewAngularOptions, 
+export {
+    PaneviewAngularOptions,
     PaneviewAngularEvents,
-    PaneviewAngularReadyEvent
+    PaneviewAngularReadyEvent,
 } from './lib/paneview/types';
-export { 
-    SplitviewAngularOptions, 
+export {
+    SplitviewAngularOptions,
     SplitviewAngularEvents,
-    SplitviewAngularReadyEvent
+    SplitviewAngularReadyEvent,
 } from './lib/splitview/types';
 
 // Utilities

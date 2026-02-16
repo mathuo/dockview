@@ -1,16 +1,16 @@
 name: CI
 
-on: [push]
+on:
+    push:
+        branches: [master]
+    pull_request:
 
 jobs:
-    build:
+    format:
         runs-on: ubuntu-latest
 
         steps:
             - uses: actions/checkout@v4
-              # might be required for sonar to work correctly
-              with:
-                  fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
             - name: Use Node.js
               uses: actions/setup-node@v4
               with:
@@ -18,17 +18,150 @@ jobs:
 
             - uses: actions/cache@v4
               with:
-                  path: ~/.npm
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+                  path: |
+                      node_modules
+                      ~/.npm
+                  key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
                   restore-keys: |
-                      ${{ runner.os }}-node-
+                      ${{ runner.os }}-modules-
 
             - run: yarn
-            - run: npm run build
-            - run: npm run build:bundle
+            - name: Check formatting
+              run: npm run format:check
+
+    lint:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+            - name: Use Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20.x'
+
+            - uses: actions/cache@v4
+              with:
+                  path: |
+                      node_modules
+                      ~/.npm
+                  key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-modules-
+
+            - run: yarn
+            - name: Lint
+              run: npm run lint
+
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+            - name: Use Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20.x'
+
+            - uses: actions/cache@v4
+              with:
+                  path: |
+                      node_modules
+                      ~/.npm
+                  key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-modules-
+
+            - run: yarn
+            - run: npx nx run-many -t build --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
+
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: build-output
+                  path: packages/
+                  retention-days: 1
+
+    bundle:
+        runs-on: ubuntu-latest
+        needs: build
+
+        steps:
+            - uses: actions/checkout@v4
+            - name: Use Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20.x'
+
+            - uses: actions/cache@v4
+              with:
+                  path: |
+                      node_modules
+                      ~/.npm
+                  key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-modules-
+
+            - run: yarn
+
+            - uses: actions/download-artifact@v4
+              with:
+                  name: build-output
+                  path: packages/
+
+            - run: npx nx run-many -t build:bundle --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
+
+    test:
+        runs-on: ubuntu-latest
+        needs: build
+
+        steps:
+            - uses: actions/checkout@v4
+            - name: Use Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20.x'
+
+            - uses: actions/cache@v4
+              with:
+                  path: |
+                      node_modules
+                      ~/.npm
+                  key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-modules-
+
+            - run: yarn
+
+            - uses: actions/download-artifact@v4
+              with:
+                  name: build-output
+                  path: packages/
+
             - run: npm run test:cov
+
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: coverage-output
+                  path: |
+                      coverage/
+                      test-report.xml
+                  retention-days: 1
+
+    sonar:
+        runs-on: ubuntu-latest
+        needs: test
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - uses: actions/download-artifact@v4
+              with:
+                  name: coverage-output
+
             - name: SonarCloud Scan
+              if: env.SONAR_TOKEN != ''
               uses: sonarsource/sonarqube-scan-action@v5
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

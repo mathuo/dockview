@@ -12,13 +12,13 @@ import { SplitviewAngularComponent } from './splitview/splitview-angular.compone
         DockviewAngularComponent,
         GridviewAngularComponent,
         PaneviewAngularComponent,
-        SplitviewAngularComponent
+        SplitviewAngularComponent,
     ],
     exports: [
         DockviewAngularComponent,
         GridviewAngularComponent,
         PaneviewAngularComponent,
-        SplitviewAngularComponent
-    ]
+        SplitviewAngularComponent,
+    ],
 })
-export class DockviewAngularModule { }
+export class DockviewAngularModule {}

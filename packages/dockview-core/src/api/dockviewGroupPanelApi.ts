@@ -5,8 +5,13 @@ import {
     DockviewGroupChangeEvent,
     DockviewGroupLocation,
 } from '../dockview/dockviewGroupPanelModel';
+import { DockviewHeaderPosition } from '../dockview/options';
 import { Emitter, Event } from '../events';
-import { GridviewPanelApi, GridviewPanelApiImpl, SizeEvent } from './gridviewPanelApi';
+import {
+    GridviewPanelApi,
+    GridviewPanelApiImpl,
+    SizeEvent,
+} from './gridviewPanelApi';
 
 export interface DockviewGroupMoveParams {
     group?: DockviewGroupPanel;
@@ -30,6 +35,8 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
      */
     getWindow(): Window;
     moveTo(options: DockviewGroupMoveParams): void;
+    setHeaderPosition(position: DockviewHeaderPosition): void;
+    getHeaderPosition(): DockviewHeaderPosition;
     maximize(): void;
     isMaximized(): boolean;
     exitMaximized(): void;
@@ -62,7 +69,10 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
         return this._group.model.location;
     }
 
-    constructor(id: string, private readonly accessor: DockviewComponent) {
+    constructor(
+        id: string,
+        private readonly accessor: DockviewComponent
+    ) {
         super(id, '__dockviewgroup__');
 
         this.addDisposables(
@@ -81,7 +91,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     public override setSize(event: SizeEvent): void {
         // Always store the requested size
         this._pendingSize = { ...event };
-        
+
         // Apply the size change immediately
         super.setSize(event);
     }
@@ -97,6 +107,20 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
         return this.location.type === 'popout'
             ? this.location.getWindow()
             : window;
+    }
+
+    setHeaderPosition(position: DockviewHeaderPosition): void {
+        if (!this._group) {
+            throw new Error(NOT_INITIALIZED_MESSAGE);
+        }
+        this._group.model.headerPosition = position;
+    }
+
+    getHeaderPosition(): DockviewHeaderPosition {
+        if (!this._group) {
+            throw new Error(NOT_INITIALIZED_MESSAGE);
+        }
+        return this._group.model.headerPosition;
     }
 
     moveTo(options: DockviewGroupMoveParams): void {
@@ -116,7 +140,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             to: {
                 group,
                 position: options.group
-                    ? options.position ?? 'center'
+                    ? (options.position ?? 'center')
                     : 'center',
                 index: options.index,
             },

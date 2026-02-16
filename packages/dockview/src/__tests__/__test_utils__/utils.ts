@@ -8,5 +8,6 @@ export function setMockRefElement(node: Partial<HTMLElement>): void {
         },
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     jest.spyOn(require('react'), 'useRef').mockReturnValueOnce(mockRef);
 }

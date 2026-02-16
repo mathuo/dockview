@@ -1,11 +1,5 @@
 import { Type, Injector, EnvironmentInjector } from '@angular/core';
-import {
-    GridviewPanel,
-    GridviewApi,
-    GridviewInitParameters,
-    IFrameworkPart,
-    GridviewComponent,
-} from 'dockview-core';
+import { GridviewPanel, IFrameworkPart } from 'dockview-core';
 import { AngularRenderer } from '../utils/angular-renderer';
 
 export class AngularGridviewPanel extends GridviewPanel {
@@ -23,7 +17,7 @@ export class AngularGridviewPanel extends GridviewPanel {
         return new AngularRenderer({
             component: this.angularComponent,
             injector: this.injector,
-            environmentInjector: this.environmentInjector
+            environmentInjector: this.environmentInjector,
         });
     }
 }

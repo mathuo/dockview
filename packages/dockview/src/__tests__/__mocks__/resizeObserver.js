@@ -6,7 +6,7 @@ class ResizeObserver {
         // do nothing
     }
     disconnect() {
-      // do nothing
+        // do nothing
     }
 }
 

@@ -1,14 +1,13 @@
 import { Type } from '@angular/core';
 import {
     DockviewOptions,
-    DockviewApi,
     DockviewReadyEvent,
     DockviewDidDropEvent,
     DockviewWillDropEvent,
     IDockviewPanelProps,
     IDockviewPanelHeaderProps,
     IWatermarkPanelProps,
-    IDockviewHeaderActionsProps
+    IDockviewHeaderActionsProps,
 } from 'dockview-core';
 
 export interface IDockviewAngularPanelProps extends IDockviewPanelProps {
@@ -52,5 +51,5 @@ export {
     DockviewReadyEvent,
     DockviewDidDropEvent,
     DockviewWillDropEvent,
-    DockviewOptions
+    DockviewOptions,
 } from 'dockview-core';

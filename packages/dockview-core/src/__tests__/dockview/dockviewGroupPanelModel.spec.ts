@@ -187,7 +187,10 @@ export class TestPanel implements IDockviewPanel {
         return {};
     }
 
-    constructor(public readonly id: string, public api: DockviewPanelApi) {
+    constructor(
+        public readonly id: string,
+        public api: DockviewPanelApi
+    ) {
         this.view = new TestModel(id);
         this.init({
             title: `${id}`,
@@ -597,6 +600,198 @@ describe('dockviewGroupPanelModel', () => {
             locked: true,
             hideHeader: true,
         });
+    });
+
+    test('headerPosition defaults to top', () => {
+        const dockviewComponent = new DockviewComponent(
+            document.createElement('div'),
+            {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'component':
+                            return new TestContentPart(options.id);
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            }
+        );
+
+        const cut = new DockviewGroupPanelModel(
+            document.createElement('div'),
+            dockviewComponent,
+            'id',
+            {},
+            null as any
+        );
+
+        expect(cut.headerPosition).toBe('top');
+    });
+
+    test('headerPosition setter applies correct CSS class', () => {
+        const dockviewComponent = new DockviewComponent(
+            document.createElement('div'),
+            {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'component':
+                            return new TestContentPart(options.id);
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            }
+        );
+
+        const container = document.createElement('div');
+        const cut = new DockviewGroupPanelModel(
+            container,
+            dockviewComponent,
+            'id',
+            {},
+            null as any
+        );
+
+        expect(
+            container.classList.contains('dv-groupview-header-top')
+        ).toBeTruthy();
+
+        cut.headerPosition = 'left';
+        expect(
+            container.classList.contains('dv-groupview-header-left')
+        ).toBeTruthy();
+        expect(
+            container.classList.contains('dv-groupview-header-top')
+        ).toBeFalsy();
+
+        cut.headerPosition = 'bottom';
+        expect(
+            container.classList.contains('dv-groupview-header-bottom')
+        ).toBeTruthy();
+        expect(
+            container.classList.contains('dv-groupview-header-left')
+        ).toBeFalsy();
+
+        cut.headerPosition = 'right';
+        expect(
+            container.classList.contains('dv-groupview-header-right')
+        ).toBeTruthy();
+        expect(
+            container.classList.contains('dv-groupview-header-bottom')
+        ).toBeFalsy();
+
+        cut.headerPosition = 'top';
+        expect(
+            container.classList.contains('dv-groupview-header-top')
+        ).toBeTruthy();
+        expect(
+            container.classList.contains('dv-groupview-header-right')
+        ).toBeFalsy();
+    });
+
+    test('headerPosition setter sets correct direction on tabsContainer', () => {
+        const dockviewComponent = new DockviewComponent(
+            document.createElement('div'),
+            {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'component':
+                            return new TestContentPart(options.id);
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            }
+        );
+
+        const cut = new DockviewGroupPanelModel(
+            document.createElement('div'),
+            dockviewComponent,
+            'id',
+            {},
+            null as any
+        );
+
+        cut.headerPosition = 'top';
+        expect(cut.tabsContainer.direction).toBe('horizontal');
+
+        cut.headerPosition = 'bottom';
+        expect(cut.tabsContainer.direction).toBe('horizontal');
+
+        cut.headerPosition = 'left';
+        expect(cut.tabsContainer.direction).toBe('vertical');
+
+        cut.headerPosition = 'right';
+        expect(cut.tabsContainer.direction).toBe('vertical');
+    });
+
+    test('toJSON() includes headerPosition when non-default', () => {
+        const dockviewComponent = new DockviewComponent(
+            document.createElement('div'),
+            {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'component':
+                            return new TestContentPart(options.id);
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            }
+        );
+
+        const cut = new DockviewGroupPanelModel(
+            document.createElement('div'),
+            dockviewComponent,
+            'id',
+            {},
+            null as any
+        );
+
+        // default 'top' should not be included
+        expect(cut.toJSON()).toEqual({
+            views: [],
+            activeView: undefined,
+            id: 'id',
+        });
+
+        cut.headerPosition = 'left';
+        expect(cut.toJSON()).toEqual({
+            views: [],
+            activeView: undefined,
+            id: 'id',
+            headerPosition: 'left',
+        });
+    });
+
+    test('headerPosition from constructor options', () => {
+        const dockviewComponent = new DockviewComponent(
+            document.createElement('div'),
+            {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'component':
+                            return new TestContentPart(options.id);
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            }
+        );
+
+        const container = document.createElement('div');
+        const cut = new DockviewGroupPanelModel(
+            container,
+            dockviewComponent,
+            'id',
+            { headerPosition: 'right' },
+            null as any
+        );
+
+        expect(cut.headerPosition).toBe('right');
+        expect(
+            container.classList.contains('dv-groupview-header-right')
+        ).toBeTruthy();
     });
 
     test("that openPanel with skipSetActive doesn't set panel to active", () => {

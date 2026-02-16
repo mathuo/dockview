@@ -6,7 +6,11 @@ import {
     OverlayRenderContainer,
 } from '../../overlay/overlayRenderContainer';
 import { fromPartial } from '@total-typescript/shoehorn';
-import { Writable, exhaustMicrotaskQueue, exhaustAnimationFrame } from '../__test_utils__/utils';
+import {
+    Writable,
+    exhaustMicrotaskQueue,
+    exhaustAnimationFrame,
+} from '../__test_utils__/utils';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 
@@ -299,15 +303,17 @@ describe('overlayRenderContainer', () => {
             },
         });
 
-        jest.spyOn(referenceContainer.element, 'getBoundingClientRect')
-            .mockReturnValue(
-                fromPartial<DOMRect>({
-                    left: 100,
-                    top: 200,
-                    width: 150,
-                    height: 250,
-                })
-            );
+        jest.spyOn(
+            referenceContainer.element,
+            'getBoundingClientRect'
+        ).mockReturnValue(
+            fromPartial<DOMRect>({
+                left: 100,
+                top: 200,
+                width: 150,
+                height: 250,
+            })
+        );
 
         jest.spyOn(parentContainer, 'getBoundingClientRect').mockReturnValue(
             fromPartial<DOMRect>({
@@ -336,7 +342,7 @@ describe('overlayRenderContainer', () => {
 
         // Even with multiple rapid events, only one RAF should be scheduled
         await exhaustAnimationFrame();
-        
+
         expect(container.style.left).toBe('50px');
         expect(container.style.top).toBe('100px');
         expect(container.style.width).toBe('150px');
@@ -344,7 +350,9 @@ describe('overlayRenderContainer', () => {
 
         // Verify that DOM measurements are cached within the same frame
         // Should be called initially and possibly one more time for visibility change
-        expect(referenceContainer.element.getBoundingClientRect).toHaveBeenCalledTimes(2);
+        expect(
+            referenceContainer.element.getBoundingClientRect
+        ).toHaveBeenCalledTimes(2);
         expect(parentContainer.getBoundingClientRect).toHaveBeenCalledTimes(2);
     });
 
@@ -356,11 +364,11 @@ describe('overlayRenderContainer', () => {
 
         const panelContentEl1 = document.createElement('div');
         const panelContentEl2 = document.createElement('div');
-        
+
         const onDidVisibilityChange1 = new Emitter<any>();
         const onDidDimensionsChange1 = new Emitter<any>();
         const onDidLocationChange1 = new Emitter<any>();
-        
+
         const onDidVisibilityChange2 = new Emitter<any>();
         const onDidDimensionsChange2 = new Emitter<any>();
         const onDidLocationChange2 = new Emitter<any>();
@@ -408,15 +416,17 @@ describe('overlayRenderContainer', () => {
         });
 
         // Mock getBoundingClientRect for consistent testing
-        jest.spyOn(referenceContainer.element, 'getBoundingClientRect')
-            .mockReturnValue(
-                fromPartial<DOMRect>({
-                    left: 100,
-                    top: 200,
-                    width: 150,
-                    height: 250,
-                })
-            );
+        jest.spyOn(
+            referenceContainer.element,
+            'getBoundingClientRect'
+        ).mockReturnValue(
+            fromPartial<DOMRect>({
+                left: 100,
+                top: 200,
+                width: 150,
+                height: 250,
+            })
+        );
 
         jest.spyOn(parentContainer, 'getBoundingClientRect').mockReturnValue(
             fromPartial<DOMRect>({
@@ -451,7 +461,9 @@ describe('overlayRenderContainer', () => {
 
         // Verify getBoundingClientRect was called for visible panel only
         // updateAllPositions should call the resize function which triggers getBoundingClientRect
-        expect(referenceContainer.element.getBoundingClientRect).toHaveBeenCalled();
+        expect(
+            referenceContainer.element.getBoundingClientRect
+        ).toHaveBeenCalled();
         expect(parentContainer.getBoundingClientRect).toHaveBeenCalled();
     });
 });

@@ -19,17 +19,10 @@ export class VueSplitviewPanelView extends SplitviewPanel {
     }
 
     getComponent(): IFrameworkPart {
-        return new VuePart(
-            this.element,
-            this.vueComponent,
-            this.parent,
-            {
-                params: this._params?.params ?? {},
-                api: this.api,
-                containerApi: new SplitviewApi(
-                    (this._params as any).accessor
-                ),
-            }
-        );
+        return new VuePart(this.element, this.vueComponent, this.parent, {
+            params: this._params?.params ?? {},
+            api: this.api,
+            containerApi: new SplitviewApi((this._params as any).accessor),
+        });
     }
 }
