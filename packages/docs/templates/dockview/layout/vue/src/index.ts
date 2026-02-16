@@ -192,16 +192,14 @@ const App = defineComponent({
         <button @click="onSave">Save</button>
         <button @click="onClear">Clear</button>
       </div>
-      <div style="flex-grow:1;">
-        <dockview-vue
-          style="width:100%;height:100%"
-          class="dockview-theme-abyss"
-          @ready="onReady"
-          :floatingGroupBounds="bounds"
-          leftHeaderActionsComponent="leftAction"
-          :disableFloatingGroups="disableFloatingGroups"
-        </dockview-vue>
-      </div>
+      <dockview-vue
+        style="width:100%;flex-grow:1"
+        class="dockview-theme-abyss"
+        @ready="onReady"
+        :floatingGroupBounds="bounds"
+        leftHeaderActionsComponent="leftAction"
+        :disableFloatingGroups="disableFloatingGroups"
+      </dockview-vue>
     </div>`,
 });
 
