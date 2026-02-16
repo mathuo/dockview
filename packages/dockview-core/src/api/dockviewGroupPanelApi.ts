@@ -5,6 +5,7 @@ import {
     DockviewGroupChangeEvent,
     DockviewGroupLocation,
 } from '../dockview/dockviewGroupPanelModel';
+import { DockviewHeaderPosition } from '../dockview/options';
 import { Emitter, Event } from '../events';
 import {
     GridviewPanelApi,
@@ -34,6 +35,8 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
      */
     getWindow(): Window;
     moveTo(options: DockviewGroupMoveParams): void;
+    setHeaderPosition(position: DockviewHeaderPosition): void;
+    getHeaderPosition(): DockviewHeaderPosition;
     maximize(): void;
     isMaximized(): boolean;
     exitMaximized(): void;
@@ -104,6 +107,20 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
         return this.location.type === 'popout'
             ? this.location.getWindow()
             : window;
+    }
+
+    setHeaderPosition(position: DockviewHeaderPosition): void {
+        if (!this._group) {
+            throw new Error(NOT_INITIALIZED_MESSAGE);
+        }
+        this._group.model.headerPosition = position;
+    }
+
+    getHeaderPosition(): DockviewHeaderPosition {
+        if (!this._group) {
+            throw new Error(NOT_INITIALIZED_MESSAGE);
+        }
+        return this._group.model.headerPosition;
     }
 
     moveTo(options: DockviewGroupMoveParams): void {

@@ -31,6 +31,7 @@ import {
     isPanelOptionsWithGroup,
     isPanelOptionsWithPanel,
     MovementOptions,
+    DockviewHeaderPosition,
 } from './options';
 import {
     BaseGrid,
@@ -401,6 +402,10 @@ export class DockviewComponent
 
     get renderer(): DockviewPanelRenderer {
         return this.options.defaultRenderer ?? 'onlyWhenVisible';
+    }
+
+    get defaultHeaderPosition(): DockviewHeaderPosition {
+        return this.options.defaultHeaderPosition ?? 'top';
     }
 
     get api(): DockviewApi {
@@ -1308,6 +1313,16 @@ export class DockviewComponent
             this.updateTheme();
         }
 
+        if (
+            'createRightHeaderActionComponent' in options ||
+            'createLeftHeaderActionComponent' in options ||
+            'createPrefixHeaderActionComponent' in options
+        ) {
+            for (const group of this.groups) {
+                group.model.updateHeaderActions();
+            }
+        }
+
         this.layout(this.gridview.width, this.gridview.height, true);
     }
 
@@ -1513,7 +1528,7 @@ export class DockviewComponent
             const createGroupFromSerializedState = (
                 data: GroupPanelViewState
             ) => {
-                const { id, locked, hideHeader, views, activeView } = data;
+                const { id, locked, hideHeader, headerPosition, views, activeView } = data;
 
                 if (typeof id !== 'string') {
                     throw new Error(
@@ -1525,6 +1540,7 @@ export class DockviewComponent
                     id,
                     locked: !!locked,
                     hideHeader: !!hideHeader,
+                    headerPosition,
                 });
                 this._onDidAddGroup.fire(group);
 
