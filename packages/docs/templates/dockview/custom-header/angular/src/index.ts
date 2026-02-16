@@ -91,7 +91,7 @@ export class CustomTabComponent {
 @Component({
     selector: 'app-root',
     template: `
-        <div style="height: 100vh;">
+        <div style="height: 100%;">
             <dv-dockview
                 [components]="components"
                 [tabComponents]="tabComponents"

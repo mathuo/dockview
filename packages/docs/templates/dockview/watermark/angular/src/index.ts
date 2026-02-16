@@ -68,7 +68,7 @@ export class WatermarkComponent {
 @Component({
     selector: 'app-root',
     template: `
-        <div style="height: 100vh; display: flex; flex-direction: column;">
+        <div style="height: 100%; display: flex; flex-direction: column;">
             <div>
                 <button (click)="addEmptyGroup()" style="margin: 10px;">Add Empty Group</button>
             </div>

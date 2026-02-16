@@ -9,24 +9,34 @@ import {
 const Panel = defineComponent({
     name: 'Panel',
     props: {
-        params: {
-            type: Object as PropType<IPaneviewPanelProps>,
+        api: {
+            type: Object,
             required: true,
+        },
+        containerApi: {
+            type: Object,
+            required: true,
+        },
+        title: {
+            type: String,
+            required: true,
+        },
+        params: {
+            type: Object,
+            default: () => ({}),
         },
     },
     data() {
         return {
-            id: '',
-            title: '',
+            panelId: '',
         };
     },
     mounted() {
-        this.id = this.params.api.id;
-        this.title = this.params.api.title;
+        this.panelId = this.api.id;
     },
     template: `
     <div style="height: 100%; padding: 10px; color: white; background: #1e1e1e; border: 1px solid #333;">
-      Panel {{ id }}
+      Panel {{ panelId }}
     </div>`,
 });
 
@@ -64,7 +74,7 @@ const App = defineComponent({
       <paneview-vue
         style="width: 100%; height: 100%"
         class="dockview-theme-abyss"
-        orientation="vertical"
+        orientation="VERTICAL"
         @ready="onReady"
       >
       </paneview-vue>`,

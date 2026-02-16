@@ -7,7 +7,7 @@ import React from 'react';
 
 const Default = (props: ISplitviewPanelProps) => {
     return (
-        <div style={{ padding: '10px', color: 'white', background: '#1e1e1e' }}>
+        <div style={{ height: '100%', padding: '10px', color: 'white', background: '#1e1e1e' }}>
             Panel {props.api.id}
         </div>
     );
@@ -41,7 +41,7 @@ export default () => {
     return (
         <SplitviewReact
             className={'dockview-theme-abyss'}
-            orientation="horizontal"
+            orientation="VERTICAL"
             onReady={onReady}
             components={components}
         />

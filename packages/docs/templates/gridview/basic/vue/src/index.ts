@@ -9,22 +9,30 @@ import {
 const Panel = defineComponent({
     name: 'Panel',
     props: {
-        params: {
-            type: Object as PropType<IGridviewPanelProps>,
+        api: {
+            type: Object,
             required: true,
+        },
+        containerApi: {
+            type: Object,
+            required: true,
+        },
+        params: {
+            type: Object,
+            default: () => ({}),
         },
     },
     data() {
         return {
-            id: '',
+            panelId: '',
         };
     },
     mounted() {
-        this.id = this.params.api.id;
+        this.panelId = this.api.id;
     },
     template: `
     <div style="height: 100%; padding: 10px; color: white; background: #1e1e1e; border: 1px solid #333;">
-      Panel {{ id }}
+      Panel {{ panelId }}
     </div>`,
 });
 
@@ -44,19 +52,19 @@ const App = defineComponent({
             const panel2 = event.api.addPanel({
                 id: 'panel_2',
                 component: 'panel',
-                position: { referencePanel: panel1, direction: 'right' },
+                position: { referencePanel: panel1.id, direction: 'right' },
             });
 
             event.api.addPanel({
                 id: 'panel_3',
                 component: 'panel',
-                position: { referencePanel: panel1, direction: 'below' },
+                position: { referencePanel: panel1.id, direction: 'below' },
             });
 
             event.api.addPanel({
                 id: 'panel_4',
                 component: 'panel',
-                position: { referencePanel: panel2, direction: 'below' },
+                position: { referencePanel: panel2.id, direction: 'below' },
             });
         },
     },

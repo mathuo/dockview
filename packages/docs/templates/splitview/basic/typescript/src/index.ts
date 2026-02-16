@@ -6,16 +6,17 @@ import {
     themeAbyss,
 } from 'dockview-core';
 
+const PANEL_COLORS = ['#1e1e1e', '#252526', '#2d2d30'];
+
 class Panel extends SplitviewPanel {
     private readonly _frameworkPart: IFrameworkPart;
 
-    constructor(id: string, component: string) {
+    constructor(id: string, component: string, colorIndex: number) {
         super(id, component);
 
         this.element.style.color = 'white';
         this.element.style.padding = '10px';
-        this.element.style.background = '#1e1e1e';
-        this.element.style.border = '1px solid #333';
+        this.element.style.background = PANEL_COLORS[colorIndex % PANEL_COLORS.length];
 
         this._frameworkPart = {
             update: (parameters) => {
@@ -34,6 +35,7 @@ class Panel extends SplitviewPanel {
     }
 }
 
+let panelCount = 0;
 const container = document.getElementById('app');
 if (!container) {
     throw new Error('Container element #app not found');
@@ -44,7 +46,7 @@ const api = createSplitview(container, {
     createComponent: (options) => {
         switch (options.name) {
             case 'default':
-                return new Panel(options.id, options.name);
+                return new Panel(options.id, options.name, panelCount++);
             default:
                 throw new Error(`Unsupported component: ${options.name}`);
         }
@@ -52,7 +54,7 @@ const api = createSplitview(container, {
 });
 
 // Layout BEFORE adding panels (critical for splitview)
-api.layout(window.innerWidth, window.innerHeight);
+api.layout(container.clientWidth, container.clientHeight);
 
 api.addPanel({
     id: 'panel_1',

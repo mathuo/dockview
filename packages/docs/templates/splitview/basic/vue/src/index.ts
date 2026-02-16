@@ -9,22 +9,30 @@ import {
 const Panel = defineComponent({
     name: 'Panel',
     props: {
-        params: {
-            type: Object as PropType<ISplitviewPanelProps>,
+        api: {
+            type: Object,
             required: true,
+        },
+        containerApi: {
+            type: Object,
+            required: true,
+        },
+        params: {
+            type: Object,
+            default: () => ({}),
         },
     },
     data() {
         return {
-            id: '',
+            panelId: '',
         };
     },
     mounted() {
-        this.id = this.params.api.id;
+        this.panelId = this.api.id;
     },
     template: `
     <div style="height: 100%; padding: 10px; color: white; background: #1e1e1e;">
-      Panel {{ id }}
+      Panel {{ panelId }}
     </div>`,
 });
 
@@ -59,7 +67,7 @@ const App = defineComponent({
       <splitview-vue
         style="width: 100%; height: 100%"
         class="dockview-theme-abyss"
-        orientation="horizontal"
+        orientation="VERTICAL"
         @ready="onReady"
       >
       </splitview-vue>`,

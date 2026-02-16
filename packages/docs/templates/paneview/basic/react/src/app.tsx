@@ -50,7 +50,7 @@ export default () => {
     return (
         <PaneviewReact
             className={'dockview-theme-abyss'}
-            orientation="vertical"
+            orientation="VERTICAL"
             onReady={onReady}
             components={components}
         />

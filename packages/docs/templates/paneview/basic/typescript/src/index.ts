@@ -100,7 +100,7 @@ const api = createPaneview(container, {
 });
 
 // Layout BEFORE adding panels (critical for paneview)
-api.layout(window.innerWidth, window.innerHeight);
+api.layout(container.clientWidth, container.clientHeight);
 
 api.addPanel({
     id: 'panel_1',
