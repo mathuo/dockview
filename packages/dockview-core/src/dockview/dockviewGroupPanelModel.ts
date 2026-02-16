@@ -873,6 +873,8 @@ export class DockviewGroupPanelModel
 
         if (!options.skipSetActive) {
             this.contentContainer.openPanel(panel);
+        } else if (panel.api.renderer === 'always') {
+            this.contentContainer.renderPanel(panel, { asActive: false });
         }
 
         if (hasExistingPanel) {

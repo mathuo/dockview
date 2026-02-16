@@ -8326,4 +8326,128 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.width).toBe(400);
         });
     });
+
+    describe('renderer: always with fromJSON', () => {
+        test('inactive panel with defaultRenderer="always" is attached to DOM after fromJSON', () => {
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                defaultRenderer: 'always',
+            });
+            dockview.layout(1000, 1000);
+
+            dockview.fromJSON({
+                activeGroup: 'group-1',
+                grid: {
+                    root: {
+                        type: 'branch',
+                        data: [
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panel1', 'panel2'],
+                                    id: 'group-1',
+                                    activeView: 'panel1',
+                                },
+                                size: 1000,
+                            },
+                        ],
+                        size: 1000,
+                    },
+                    height: 1000,
+                    width: 1000,
+                    orientation: Orientation.HORIZONTAL,
+                },
+                panels: {
+                    panel1: {
+                        id: 'panel1',
+                        contentComponent: 'default',
+                        title: 'panel1',
+                    },
+                    panel2: {
+                        id: 'panel2',
+                        contentComponent: 'default',
+                        title: 'panel2',
+                    },
+                },
+            });
+
+            const panel1 = dockview.getGroupPanel('panel1')!;
+            const panel2 = dockview.getGroupPanel('panel2')!;
+
+            expect(panel1.api.isActive).toBe(true);
+            expect(panel2.api.isActive).toBe(false);
+
+            // Both panels should use "always" renderer via defaultRenderer
+            expect(panel1.api.renderer).toBe('always');
+            expect(panel2.api.renderer).toBe('always');
+
+            // The inactive panel's content should be attached to the DOM
+            // (via the overlay render container)
+            expect(panel2.view.content.element.parentElement).toBeTruthy();
+        });
+
+        test('inactive panel with per-panel renderer="always" is attached to DOM after fromJSON', () => {
+            dockview.layout(1000, 1000);
+
+            dockview.fromJSON({
+                activeGroup: 'group-1',
+                grid: {
+                    root: {
+                        type: 'branch',
+                        data: [
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panel1', 'panel2'],
+                                    id: 'group-1',
+                                    activeView: 'panel1',
+                                },
+                                size: 1000,
+                            },
+                        ],
+                        size: 1000,
+                    },
+                    height: 1000,
+                    width: 1000,
+                    orientation: Orientation.HORIZONTAL,
+                },
+                panels: {
+                    panel1: {
+                        id: 'panel1',
+                        contentComponent: 'default',
+                        title: 'panel1',
+                        renderer: 'onlyWhenVisible',
+                    },
+                    panel2: {
+                        id: 'panel2',
+                        contentComponent: 'default',
+                        title: 'panel2',
+                        renderer: 'always',
+                    },
+                },
+            });
+
+            const panel1 = dockview.getGroupPanel('panel1')!;
+            const panel2 = dockview.getGroupPanel('panel2')!;
+
+            expect(panel1.api.isActive).toBe(true);
+            expect(panel2.api.isActive).toBe(false);
+
+            expect(panel1.api.renderer).toBe('onlyWhenVisible');
+            expect(panel2.api.renderer).toBe('always');
+
+            // The inactive "always" panel's content should be attached to the DOM
+            expect(panel2.view.content.element.parentElement).toBeTruthy();
+        });
+    });
 });
