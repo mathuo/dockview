@@ -1,72 +1,72 @@
 {
-  "name": "dockview",
-  "version": "4.13.1",
-  "description": "React docking layout manager — tabs, groups, grids, splitviews, drag and drop, floating panels",
-  "keywords": [
-    "splitview",
-    "split-view",
-    "gridview",
-    "grid-view",
-    "dockview",
-    "dock-view",
-    "grid",
-    "tabs",
-    "layout",
-    "layout manager",
-    "dock layout",
-    "dock",
-    "docking",
-    "splitter",
-    "drag-and-drop",
-    "drag",
-    "drop",
-    "typescript",
-    "zero-dependency",
-    "ide-layout",
-    "panel",
-    "resizable",
-    "floating",
-    "serialization",
-    "workbench",
-    "react",
-    "react-component"
-  ],
-  "homepage": "https://github.com/mathuo/dockview",
-  "bugs": {
-    "url": "https://github.com/mathuo/dockview/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mathuo/dockview.git"
-  },
-  "license": "MIT",
-  "author": "https://github.com/mathuo",
-  "main": "./dist/package/main.cjs.js",
-  "module": "./dist/package/main.esm.mjs",
-  "types": "./dist/cjs/index.d.ts",
-  "files": [
-    "dist",
-    "README.md"
-  ],
-  "scripts": {
-    "build:bundle": "rollup -c",
-    "build:cjs": "tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
-    "build:css": "node scripts/copy-css.js",
-    "build:esm": "tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
-    "build": "npm run build:cjs && npm run build:esm && npm run build:css",
-    "clean": "rimraf dist/ .build/ .rollup.cache/",
-    "rebuild": "npm run clean && npm run build",
-    "test": "jest --selectProjects dockview",
-    "test:cov": "jest --selectProjects dockview --coverage",
-    "lint": "eslint 'src/**/*.{ts,tsx,js,jsx}'",
-    "lint:fix": "eslint 'src/**/*.{ts,tsx,js,jsx}' --fix",
-    "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx}'",
-    "format:check": "prettier --check 'src/**/*.{ts,tsx,js,jsx}'"
-  },
-  "dependencies": {
-    "dockview-core": "^4.13.1"
-  },
-  "peerDependencies": {
-    "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
-  }
+    "name": "dockview",
+    "version": "5.0.0",
+    "description": "React docking layout manager — tabs, groups, grids, splitviews, drag and drop, floating panels",
+    "keywords": [
+        "splitview",
+        "split-view",
+        "gridview",
+        "grid-view",
+        "dockview",
+        "dock-view",
+        "grid",
+        "tabs",
+        "layout",
+        "layout manager",
+        "dock layout",
+        "dock",
+        "docking",
+        "splitter",
+        "drag-and-drop",
+        "drag",
+        "drop",
+        "typescript",
+        "zero-dependency",
+        "ide-layout",
+        "panel",
+        "resizable",
+        "floating",
+        "serialization",
+        "workbench",
+        "react",
+        "react-component"
+    ],
+    "homepage": "https://github.com/mathuo/dockview",
+    "bugs": {
+        "url": "https://github.com/mathuo/dockview/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/mathuo/dockview.git"
+    },
+    "license": "MIT",
+    "author": "https://github.com/mathuo",
+    "main": "./dist/package/main.cjs.js",
+    "module": "./dist/package/main.esm.mjs",
+    "types": "./dist/cjs/index.d.ts",
+    "files": [
+        "dist",
+        "README.md"
+    ],
+    "scripts": {
+        "build:bundle": "rollup -c",
+        "build:cjs": "tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
+        "build:css": "node scripts/copy-css.js",
+        "build:esm": "tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
+        "build": "npm run build:cjs && npm run build:esm && npm run build:css",
+        "clean": "rimraf dist/ .build/ .rollup.cache/",
+        "rebuild": "npm run clean && npm run build",
+        "test": "jest --selectProjects dockview",
+        "test:cov": "jest --selectProjects dockview --coverage",
+        "lint": "eslint 'src/**/*.{ts,tsx,js,jsx}'",
+        "lint:fix": "eslint 'src/**/*.{ts,tsx,js,jsx}' --fix",
+        "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx}'",
+        "format:check": "prettier --check 'src/**/*.{ts,tsx,js,jsx}'"
+    },
+    "dependencies": {
+        "dockview-core": "^5.0.0"
+    },
+    "peerDependencies": {
+        "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+    }
 }
