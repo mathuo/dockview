@@ -89,7 +89,9 @@ jobs:
             - uses: actions/upload-artifact@v4
               with:
                   name: coverage-output
-                  path: coverage/
+                  path: |
+                      coverage/
+                      test-report.xml
                   retention-days: 1
 
     sonar:
@@ -104,7 +106,6 @@ jobs:
             - uses: actions/download-artifact@v4
               with:
                   name: coverage-output
-                  path: coverage/
 
             - name: SonarCloud Scan
               if: env.SONAR_TOKEN != ''
