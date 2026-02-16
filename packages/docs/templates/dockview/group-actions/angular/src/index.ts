@@ -115,7 +115,7 @@ export class PrefixHeaderActionsComponent {
 @Component({
     selector: 'app-root',
     template: `
-        <div style="height: 100vh;">
+        <div style="height: 100%;">
             <dv-dockview
                 [components]="components"
                 [prefixHeaderActionsComponent]="prefixHeaderActionsComponent"

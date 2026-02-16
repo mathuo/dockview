@@ -8,7 +8,8 @@ import 'dockview-core/dist/styles/dockview.css';
 
 @Component({
     selector: 'default-panel',
-    template: `<div style="padding: 10px; color: white; background: #1e1e1e;">Panel {{ api?.id || 'Unknown' }}</div>`
+    template: `<div style="height: 100%; padding: 10px; color: white; background: #1e1e1e;">Panel {{ api?.id || 'Unknown' }}</div>`,
+    styles: [`:host { display: block; height: 100%; }`]
 })
 export class DefaultPanelComponent {
     @Input() api: any;
@@ -19,11 +20,12 @@ export class DefaultPanelComponent {
 @Component({
     selector: 'app-root',
     template: `
-        <div style="height: 100vh;">
+        <div style="height: 100%;">
             <dv-splitview
+                style="width: 100%; height: 100%"
                 [components]="components"
                 className="dockview-theme-abyss"
-                orientation="horizontal"
+                orientation="VERTICAL"
                 (ready)="onReady($event)">
             </dv-splitview>
         </div>
@@ -40,6 +42,9 @@ export class AppComponent {
 
     onReady(event: any) {
         const api = event.api;
+
+        const el = document.getElementById('app')!;
+        api.layout(el.clientWidth, el.clientHeight);
 
         api.addPanel({
             id: 'panel_1',

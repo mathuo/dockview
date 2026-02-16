@@ -114,7 +114,7 @@ export class RightHeaderActionsComponent {
 @Component({
     selector: 'app-root',
     template: `
-        <div style="height: 100vh; display: flex; flex-direction: column;">
+        <div style="height: 100%; display: flex; flex-direction: column;">
             <div style="height: 25px;">
                 <button (click)="save()">Save</button>
                 <button (click)="load()">Load</button>

@@ -19,11 +19,11 @@ export class DefaultPanelComponent {
 @Component({
     selector: 'app-root',
     template: `
-        <div style="height: 100vh;">
+        <div style="height: 100%;">
             <dv-paneview
                 [components]="components"
                 className="dockview-theme-abyss"
-                orientation="vertical"
+                orientation="VERTICAL"
                 (ready)="onReady($event)">
             </dv-paneview>
         </div>

@@ -1,10 +1,11 @@
 import 'zone.js';
-import { bootstrapApplication } from '@angular/platform-browser';
-import { Component, OnInit, OnDestroy, Type } from '@angular/core';
+import '@angular/compiler';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { Component, OnInit, OnDestroy, Type, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DockviewAngularComponent } from 'dockview-angular';
+import { BrowserModule } from '@angular/platform-browser';
+import { DockviewAngularModule } from 'dockview-angular';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import 'dockview-core/dist/styles/dockview.css';
 
 // Default panel component with constraints
@@ -38,8 +39,6 @@ import 'dockview-core/dist/styles/dockview.css';
             </div>
         </div>
     `,
-    standalone: true,
-    imports: [CommonModule]
 })
 export class DefaultPanelComponent implements OnInit, OnDestroy {
     api: any;
@@ -75,11 +74,11 @@ export class DefaultPanelComponent implements OnInit, OnDestroy {
     }
 }
 
-// Main app component  
+// Main app component
 @Component({
     selector: 'app-root',
     template: `
-        <div style="height: 100vh;">
+        <div style="height: 100%;">
             <dv-dockview
                 [components]="components"
                 className="dockview-theme-abyss"
@@ -87,8 +86,6 @@ export class DefaultPanelComponent implements OnInit, OnDestroy {
             </dv-dockview>
         </div>
     `,
-    standalone: true,
-    imports: [DockviewAngularComponent]
 })
 export class AppComponent {
     components: Record<string, Type<any>>;
@@ -135,5 +132,11 @@ export class AppComponent {
     }
 }
 
-// Bootstrap the application
-bootstrapApplication(AppComponent).catch(err => console.error(err));
+@NgModule({
+    declarations: [AppComponent, DefaultPanelComponent],
+    imports: [BrowserModule, CommonModule, DockviewAngularModule],
+    bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+platformBrowserDynamic().bootstrapModule(AppModule).catch(err => console.error(err));
