@@ -217,17 +217,15 @@ const App = defineComponent({
         <button @click="onToggleBounds">{{'Bounds: ' + bounds}}</button>
         <button @click="onToggleEnabled">{{'Disabled: ' + disableFloatingGroups}}</button>
       </div>
-      <div style="flex-grow:1;">
-        <dockview-vue
-          style="width:100%;height:100%"
-          class="dockview-theme-abyss"
-          @ready="onReady"
-          :floatingGroupBounds="bounds"
-          leftHeaderActionsComponent="leftAction"
-          rightHeaderActionsComponent="rightAction"
-          :disableFloatingGroups="disableFloatingGroups"
-        </dockview-vue>
-      </div>
+      <dockview-vue
+        style="width:100%;flex-grow:1"
+        class="dockview-theme-abyss"
+        @ready="onReady"
+        :floatingGroupBounds="bounds"
+        leftHeaderActionsComponent="leftAction"
+        rightHeaderActionsComponent="rightAction"
+        :disableFloatingGroups="disableFloatingGroups"
+      </dockview-vue>
     </div>`,
 });
 

@@ -1,24 +1,29 @@
-import { createApp, ref, onMounted } from 'vue';
-import { DockviewVue, DockviewReadyEvent } from 'dockview-vue';
+import { createApp, ref, onMounted, defineComponent, PropType } from 'vue';
+import { DockviewVue, DockviewReadyEvent, IDockviewPanelProps } from 'dockview-vue';
 import 'dockview-core/dist/styles/dockview.css';
 
-const DefaultPanelComponent = {
-    name: 'DefaultPanelComponent',
-    props: ['api', 'containerApi'],
-    setup(props: any) {
+const DefaultPanel = defineComponent({
+    name: 'DefaultPanel',
+    props: {
+        params: {
+            type: Object as PropType<IDockviewPanelProps>,
+            required: true,
+        },
+    },
+    setup(props) {
         const constraints = ref<any>(null);
 
         onMounted(() => {
-            if (props.api?.group?.api) {
-                props.api.group.api.onDidConstraintsChange((event: any) => {
+            if (props.params?.api?.group?.api) {
+                props.params.api.group.api.onDidConstraintsChange((event: any) => {
                     constraints.value = event;
                 });
             }
         });
 
         const setConstraints = () => {
-            if (props.api?.group?.api) {
-                props.api.group.api.setConstraints({
+            if (props.params?.api?.group?.api) {
+                props.params.api.group.api.setConstraints({
                     maximumWidth: 300,
                     maximumHeight: 300,
                 });
@@ -34,7 +39,7 @@ const DefaultPanelComponent = {
         <div style="height: 100%; padding: 20px; background: var(--dv-group-view-background-color); color: white;">
             <button @click="setConstraints">Set</button>
             <div v-if="constraints" style="font-size: 13px;">
-                <div v-if="typeof constraints.maximumHeight === 'number'" 
+                <div v-if="typeof constraints.maximumHeight === 'number'"
                      style="border: 1px solid grey; margin: 2px; padding: 1px;">
                     <span style="color: grey;">Maximum Height: </span>
                     <span>{{ constraints.maximumHeight }}px</span>
@@ -57,19 +62,15 @@ const DefaultPanelComponent = {
             </div>
         </div>
     `
-};
+});
 
-const App = {
+const App = defineComponent({
     name: 'App',
     components: {
-        DockviewVue,
-        'default-panel': DefaultPanelComponent,
+        'dockview-vue': DockviewVue,
+        default: DefaultPanel,
     },
     setup() {
-        const components = {
-            default: DefaultPanelComponent,
-        };
-
         const onReady = (event: DockviewReadyEvent) => {
             const panel1 = event.api.addPanel({
                 id: 'panel_1',
@@ -104,18 +105,16 @@ const App = {
         };
 
         return {
-            components,
             onReady,
         };
     },
     template: `
         <dockview-vue
-            :components="components"
-            class-name="dockview-theme-abyss"
+            class="dockview-theme-abyss"
             @ready="onReady"
-            style="height: 100vh;">
+            style="height: 100%;">
         </dockview-vue>
     `
-};
+});
 
 createApp(App).mount('#app');
