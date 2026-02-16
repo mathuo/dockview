@@ -1,0 +1,252 @@
+# Dockview — Full Reference
+
+> A zero dependency layout manager supporting tabs, groups, grids and splitviews for React, Vue, Angular, and vanilla TypeScript.
+
+Dockview is an open-source docking layout library that lets you build IDE-like and dashboard interfaces with resizable panels, draggable tabs, floating groups, and popout windows. It has zero runtime dependencies and works with React, Vue 3, Angular, and plain TypeScript.
+
+## Key Features
+
+- Zero runtime dependencies
+- Drag and drop with customizable drop zones
+- Floating/overlay groups
+- Popout windows (extracting panels to separate browser windows)
+- Full serialization and deserialization for state persistence
+- Theming system with CSS custom properties
+- Splitview, gridview, paneview, and dockview layout strategies
+- Comprehensive programmatic API
+- TypeScript-first with full type definitions
+- Shadow DOM support
+
+## Packages
+
+| Package | Framework | Install |
+|---|---|---|
+| dockview-core | Vanilla TypeScript | `npm install dockview-core` |
+| dockview | React | `npm install dockview` |
+| dockview-react | React (alias) | `npm install dockview-react` |
+| dockview-vue | Vue 3 | `npm install dockview-vue` |
+| dockview-angular | Angular | `npm install dockview-angular` |
+
+## Quick Start — Vanilla TypeScript
+
+Install:
+
+```
+npm install dockview-core
+```
+
+Import the stylesheet:
+
+```css
+@import 'dockview-core/dist/styles/dockview.css';
+```
+
+Create a dockview instance:
+
+```ts
+import { DockviewComponent } from 'dockview-core';
+
+const element = document.getElementById('app');
+
+const dockview = new DockviewComponent(element, {
+    createComponent: (options) => {
+        switch (options.name) {
+            case 'my-component':
+                return {
+                    init: (params) => {
+                        params.containerElement.textContent = 'Hello World';
+                    },
+                };
+        }
+    },
+});
+
+dockview.addPanel({
+    id: 'panel_1',
+    component: 'my-component',
+});
+```
+
+Apply a theme to a parent element:
+
+```html
+<div id="app" class="dockview-theme-dark" style="height: 400px;"></div>
+```
+
+## Quick Start — React
+
+Install:
+
+```
+npm install dockview
+```
+
+Import the stylesheet:
+
+```css
+@import 'dockview/dist/styles/dockview.css';
+```
+
+Render the component:
+
+```tsx
+import { DockviewReact } from 'dockview';
+
+const components = {
+    myComponent: (props) => <div>Hello World</div>,
+};
+
+function App() {
+    return (
+        <div className="dockview-theme-dark" style={{ height: '400px' }}>
+            <DockviewReact
+                components={components}
+                onReady={(event) => {
+                    event.api.addPanel({
+                        id: 'panel_1',
+                        component: 'myComponent',
+                    });
+                }}
+            />
+        </div>
+    );
+}
+```
+
+## Quick Start — Vue 3
+
+Install:
+
+```
+npm install dockview-vue
+```
+
+Import the stylesheet:
+
+```css
+@import 'dockview-vue/dist/styles/dockview.css';
+```
+
+Use the component in a Vue SFC:
+
+```vue
+<template>
+    <div class="dockview-theme-dark" style="height: 400px">
+        <DockviewVue @ready="onReady">
+            <template #myComponent="{ params }">
+                <div>Hello World</div>
+            </template>
+        </DockviewVue>
+    </div>
+</template>
+
+<script setup lang="ts">
+import { DockviewVue } from 'dockview-vue';
+import type { DockviewReadyEvent } from 'dockview-core';
+
+function onReady(event: DockviewReadyEvent) {
+    event.api.addPanel({
+        id: 'panel_1',
+        component: 'myComponent',
+    });
+}
+</script>
+```
+
+## Quick Start — Angular
+
+Install:
+
+```
+npm install dockview-angular
+```
+
+Import the stylesheet in your `styles.css` or `angular.json`:
+
+```css
+@import 'dockview-angular/dist/dockview.css';
+```
+
+Use the component:
+
+```typescript
+import { Component } from '@angular/core';
+import { DockviewModule } from 'dockview-angular';
+import { DockviewReadyEvent } from 'dockview-core';
+
+@Component({
+    selector: 'app-root',
+    standalone: true,
+    imports: [DockviewModule],
+    template: `
+        <div class="dockview-theme-dark" style="height: 400px">
+            <dockview-angular
+                [components]="components"
+                (ready)="onReady($event)"
+            ></dockview-angular>
+        </div>
+    `,
+})
+export class AppComponent {
+    components = {
+        myComponent: /* your panel component */,
+    };
+
+    onReady(event: DockviewReadyEvent) {
+        event.api.addPanel({
+            id: 'panel_1',
+            component: 'myComponent',
+        });
+    }
+}
+```
+
+## API Overview
+
+### Core Components
+
+- **DockviewComponent** — Main container managing panels and groups
+- **DockviewGroupPanel** — Container for related panels with tabs
+- **DockviewPanel** — Individual content panels
+- **GridviewComponent** — Grid-based layout
+- **SplitviewComponent** — Split-based layout
+- **PaneviewComponent** — Accordion/pane-based layout
+
+### Key API Methods
+
+The `DockviewApi` (available via the `onReady` event) provides:
+
+- `addPanel(options)` — Add a new panel
+- `addGroup(options)` — Add a new group
+- `removePanel(panel)` — Remove a panel
+- `removeGroup(group)` — Remove a group
+- `getPanel(id)` — Get panel by ID
+- `getGroup(id)` — Get group by ID
+- `moveToNext()` / `moveToPrevious()` — Navigate between panels
+- `addFloatingGroup(panel, options)` — Create a floating group
+- `addPopoutGroup(panel, options)` — Popout a panel to a new window
+- `toJSON()` — Serialize the layout
+- `fromJSON(data)` — Deserialize/restore a layout
+- `onDidLayoutChange` — Event fired on layout changes
+
+### Themes
+
+Built-in themes applied via CSS class on a parent element:
+- `dockview-theme-dark` — Dark theme
+- `dockview-theme-light` — Light theme
+- `dockview-theme-abyss` — Abyss dark theme
+- `dockview-theme-dracula` — Dracula theme
+- `dockview-theme-replit` — Replit-inspired theme
+- `dockview-theme-vs` — VS Code light theme
+
+Custom themes can be created using CSS custom properties (CSS variables).
+
+## Links
+
+- Documentation: https://dockview.dev/docs/overview/getStarted/installation
+- API Reference: https://dockview.dev/docs/api/dockview/overview
+- Live Demo: https://dockview.dev/demo
+- GitHub: https://github.com/mathuo/dockview
+- npm: https://www.npmjs.com/package/dockview
+- Blog / Release Notes: https://dockview.dev/blog
+- License: MIT

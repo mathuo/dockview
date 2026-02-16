@@ -26,6 +26,10 @@ Dockview is an open-source docking layout library that lets you build IDE-like a
 | dockview-vue | Vue 3 | `npm install dockview-vue` |
 | dockview-angular | Angular | `npm install dockview-angular` |
 
+## Optional
+
+- [Full documentation for LLMs](https://dockview.dev/llms-full.txt): Extended reference with code examples for every framework
+
 ## Links
 
 - Documentation: https://dockview.dev/docs/overview/getStarted/installation
