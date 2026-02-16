@@ -16,7 +16,8 @@ module.exports = {
         '**/__mocks__/**',
         'dist/',
         'node_modules/',
-        '*.scss'
+        '*.scss',
+        '*.vue'
     ],
     rules: {
         'no-case-declarations': 'off',

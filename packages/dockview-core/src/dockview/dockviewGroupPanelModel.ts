@@ -16,7 +16,11 @@ import {
     DockviewWillShowOverlayLocationEventOptions,
 } from './events';
 import { IViewSize } from '../gridview/gridview';
-import { CompositeDisposable, IDisposable, MutableDisposable } from '../lifecycle';
+import {
+    CompositeDisposable,
+    IDisposable,
+    MutableDisposable,
+} from '../lifecycle';
 import {
     IPanel,
     PanelInitParameters,
@@ -352,18 +356,18 @@ export class DockviewGroupPanelModel
     set headerPosition(value: DockviewHeaderPosition) {
         this._headerPosition = value;
         removeClasses(
-          this.container,
-          'dv-groupview-header-top',
-          'dv-groupview-header-bottom',
-          'dv-groupview-header-left',
-          'dv-groupview-header-right'
+            this.container,
+            'dv-groupview-header-top',
+            'dv-groupview-header-bottom',
+            'dv-groupview-header-left',
+            'dv-groupview-header-right'
         );
         addClasses(this.container, `dv-groupview-header-${value}`);
 
-        const direction = value === 'top' || value === 'bottom' ? 'horizontal' : 'vertical';
+        const direction =
+            value === 'top' || value === 'bottom' ? 'horizontal' : 'vertical';
         this.tabsContainer.direction = direction;
         this.header.direction = direction;
-
 
         // resize the active panel to fit the new header direction
         // if not, the panel will overflow the tabs container
@@ -371,7 +375,11 @@ export class DockviewGroupPanelModel
             this._activePanel.layout(this._width, this._height);
         }
 
-        if(this._leftHeaderActions || this._rightHeaderActions || this._prefixHeaderActions) {
+        if (
+            this._leftHeaderActions ||
+            this._rightHeaderActions ||
+            this._prefixHeaderActions
+        ) {
             this.updateHeaderActions();
         }
     }
@@ -444,7 +452,8 @@ export class DockviewGroupPanelModel
 
         this.header.hidden = !!options.hideHeader;
         this.locked = options.locked ?? false;
-        this.headerPosition = options.headerPosition ?? accessor.defaultHeaderPosition;
+        this.headerPosition =
+            options.headerPosition ?? accessor.defaultHeaderPosition;
 
         this.addDisposables(
             this._onTabDragStart,
@@ -607,7 +616,8 @@ export class DockviewGroupPanelModel
                 this.accessor.options.createPrefixHeaderActionComponent(
                     this.groupPanel
                 );
-            this._prefixHeaderActionsDisposable.value = this._prefixHeaderActions;
+            this._prefixHeaderActionsDisposable.value =
+                this._prefixHeaderActions;
             this._prefixHeaderActions.init({
                 containerApi: this._api,
                 api: this.groupPanel.api,

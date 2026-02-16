@@ -116,24 +116,16 @@ describe('tabs', () => {
             expect(
                 tabsList.classList.contains('dv-tabs-container-vertical')
             ).toBeTruthy();
-            expect(
-                tabsList.classList.contains('dv-vertical')
-            ).toBeTruthy();
-            expect(
-                tabsList.classList.contains('dv-horizontal')
-            ).toBeFalsy();
+            expect(tabsList.classList.contains('dv-vertical')).toBeTruthy();
+            expect(tabsList.classList.contains('dv-horizontal')).toBeFalsy();
 
             cut.direction = 'horizontal';
             expect(cut.direction).toBe('horizontal');
             expect(
                 tabsList.classList.contains('dv-tabs-container-vertical')
             ).toBeFalsy();
-            expect(
-                tabsList.classList.contains('dv-horizontal')
-            ).toBeTruthy();
-            expect(
-                tabsList.classList.contains('dv-vertical')
-            ).toBeFalsy();
+            expect(tabsList.classList.contains('dv-horizontal')).toBeTruthy();
+            expect(tabsList.classList.contains('dv-vertical')).toBeFalsy();
         });
     });
 });

@@ -1,6 +1,6 @@
 import { getPanelData } from '../../../dnd/dataTransfer';
 import {
-  addClasses,
+    addClasses,
     isChildEntirelyVisibleWithinParent,
     OverflowObserver,
     removeClasses,
@@ -97,17 +97,21 @@ export class Tabs extends CompositeDisposable {
     }
 
     set direction(value: DockviewHeaderDirection) {
-        if(this._direction === value) {
+        if (this._direction === value) {
             return;
         }
 
         this._direction = value;
-        if(this._scrollbar) {
+        if (this._scrollbar) {
             this._scrollbar.orientation = value;
         }
         removeClasses(this._tabsList, 'dv-horizontal', 'dv-vertical');
-        if(value === 'vertical') {
-            addClasses(this._tabsList, 'dv-tabs-container-vertical', 'dv-vertical');
+        if (value === 'vertical') {
+            addClasses(
+                this._tabsList,
+                'dv-tabs-container-vertical',
+                'dv-vertical'
+            );
         } else {
             removeClasses(this._tabsList, 'dv-tabs-container-vertical');
             addClasses(this._tabsList, 'dv-horizontal');
@@ -132,7 +136,7 @@ export class Tabs extends CompositeDisposable {
             this._element = this._tabsList;
         } else {
             this._scrollbar = new Scrollbar(this._tabsList);
-            this._scrollbar.orientation = this.direction
+            this._scrollbar.orientation = this.direction;
             this._element = this._scrollbar.element;
             this.addDisposables(this._scrollbar);
         }

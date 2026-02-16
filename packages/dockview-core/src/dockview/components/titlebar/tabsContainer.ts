@@ -8,7 +8,12 @@ import { addDisposableListener, Emitter, Event } from '../../../events';
 import { Tab } from '../tab/tab';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { VoidContainer } from './voidContainer';
-import { addClasses, findRelativeZIndexParent, removeClasses, toggleClass } from '../../../dom';
+import {
+    addClasses,
+    findRelativeZIndexParent,
+    removeClasses,
+    toggleClass,
+} from '../../../dom';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewWillShowOverlayLocationEvent } from '../../events';
@@ -121,14 +126,20 @@ export class TabsContainer
 
     set direction(value: DockviewHeaderDirection) {
         this._direction = value;
-        if(value === 'vertical') {
-          addClasses(this._element, 'dv-groupview-header-vertical');
-          addClasses(this.rightActionsContainer, 'dv-right-actions-container-vertical');
-          this.tabs.direction = value;
+        if (value === 'vertical') {
+            addClasses(this._element, 'dv-groupview-header-vertical');
+            addClasses(
+                this.rightActionsContainer,
+                'dv-right-actions-container-vertical'
+            );
+            this.tabs.direction = value;
         } else {
-          removeClasses(this._element, 'dv-groupview-header-vertical');
-          removeClasses(this.rightActionsContainer, 'dv-right-actions-container-vertical');
-          this.tabs.direction = value;
+            removeClasses(this._element, 'dv-groupview-header-vertical');
+            removeClasses(
+                this.rightActionsContainer,
+                'dv-right-actions-container-vertical'
+            );
+            this.tabs.direction = value;
         }
     }
 

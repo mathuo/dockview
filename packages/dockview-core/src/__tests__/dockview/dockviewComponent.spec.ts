@@ -1755,27 +1755,19 @@ describe('dockviewComponent', () => {
                 },
             });
 
-            const group1 = dockview.groups.find(
-                (g) => g.api.id === 'group-1'
-            )!;
+            const group1 = dockview.groups.find((g) => g.api.id === 'group-1')!;
             expect(group1.api.getHeaderPosition()).toBe('left');
 
-            const group2 = dockview.groups.find(
-                (g) => g.api.id === 'group-2'
-            )!;
+            const group2 = dockview.groups.find((g) => g.api.id === 'group-2')!;
             expect(group2.api.getHeaderPosition()).toBe('top');
 
             const result = dockview.toJSON();
-            const group1Data = (
-                result.grid.root as any
-            ).data.find(
+            const group1Data = (result.grid.root as any).data.find(
                 (d: any) => d.data?.id === 'group-1'
             );
             expect(group1Data.data.headerPosition).toBe('left');
 
-            const group2Data = (
-                result.grid.root as any
-            ).data.find(
+            const group2Data = (result.grid.root as any).data.find(
                 (d: any) => d.data?.id === 'group-2'
             );
             expect(group2Data.data.headerPosition).toBeUndefined();
