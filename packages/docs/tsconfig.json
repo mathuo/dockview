@@ -3,6 +3,12 @@
     "extends": "@tsconfig/docusaurus/tsconfig.json",
     "compilerOptions": {
         "baseUrl": ".",
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "paths": {
+            "dockview-core": ["../dockview-core/src/index.ts"],
+            "dockview-core/*": ["../dockview-core/src/*"],
+            "dockview": ["../dockview/src/index.ts"],
+            "dockview/*": ["../dockview/src/*"]
+        }
     }
 }
