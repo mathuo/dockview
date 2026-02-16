@@ -2,7 +2,7 @@ import { DockviewApi } from '../api/component.api';
 import { getPanelData, PanelTransfer } from '../dnd/dataTransfer';
 import { Position } from '../dnd/droptarget';
 import { DockviewComponent } from './dockviewComponent';
-import { isAncestor, toggleClass } from '../dom';
+import { addClasses, isAncestor, removeClasses, toggleClass } from '../dom';
 import {
     addDisposableListener,
     DockviewEvent,
@@ -16,7 +16,7 @@ import {
     DockviewWillShowOverlayLocationEventOptions,
 } from './events';
 import { IViewSize } from '../gridview/gridview';
-import { CompositeDisposable, IDisposable } from '../lifecycle';
+import { CompositeDisposable, IDisposable, MutableDisposable } from '../lifecycle';
 import {
     IPanel,
     PanelInitParameters,
@@ -40,6 +40,8 @@ import {
     DockviewDndOverlayEvent,
     DockviewUnhandledDragOverEvent,
     IHeaderActionsRenderer,
+    DockviewHeaderDirection,
+    DockviewHeaderPosition,
 } from './options';
 import { OverlayRenderContainer } from '../overlay/overlayRenderContainer';
 import { TitleEvent } from '../api/dockviewPanelApi';
@@ -56,6 +58,7 @@ interface GroupMoveEvent {
 interface CoreGroupOptions {
     locked?: DockviewGroupPanelLocked;
     hideHeader?: boolean;
+    headerPosition?: 'top' | 'bottom' | 'left' | 'right';
     skipSetActive?: boolean;
     constraints?: Partial<Contraints>;
     initialWidth?: number;
@@ -141,6 +144,7 @@ export class DockviewWillDropEvent extends DockviewDidDropEvent {
 
 export interface IHeader {
     hidden: boolean;
+    direction: DockviewHeaderDirection;
 }
 
 export type DockviewGroupPanelLocked = boolean | 'no-drop-target';
@@ -159,6 +163,7 @@ export interface IDockviewGroupPanelModel extends IPanel {
     readonly onDidActivePanelChange: Event<DockviewGroupChangeEvent>;
     readonly onMove: Event<GroupMoveEvent>;
     locked: DockviewGroupPanelLocked;
+    headerPosition: DockviewHeaderPosition;
     setActive(isActive: boolean): void;
     initialize(): void;
     // state
@@ -211,7 +216,10 @@ export class DockviewGroupPanelModel
     private _rightHeaderActions: IHeaderActionsRenderer | undefined;
     private _leftHeaderActions: IHeaderActionsRenderer | undefined;
     private _prefixHeaderActions: IHeaderActionsRenderer | undefined;
-
+    private readonly _rightHeaderActionsDisposable = new MutableDisposable();
+    private readonly _leftHeaderActionsDisposable = new MutableDisposable();
+    private readonly _prefixHeaderActionsDisposable = new MutableDisposable();
+    private _headerPosition: DockviewHeaderPosition | undefined;
     private _location: DockviewGroupLocation = { type: 'grid' };
 
     private mostRecentlyUsed: IDockviewPanel[] = [];
@@ -337,6 +345,37 @@ export class DockviewGroupPanelModel
         );
     }
 
+    get headerPosition(): DockviewHeaderPosition {
+        return this._headerPosition ?? 'top';
+    }
+
+    set headerPosition(value: DockviewHeaderPosition) {
+        this._headerPosition = value;
+        removeClasses(
+          this.container,
+          'dv-groupview-header-top',
+          'dv-groupview-header-bottom',
+          'dv-groupview-header-left',
+          'dv-groupview-header-right'
+        );
+        addClasses(this.container, `dv-groupview-header-${value}`);
+
+        const direction = value === 'top' || value === 'bottom' ? 'horizontal' : 'vertical';
+        this.tabsContainer.direction = direction;
+        this.header.direction = direction;
+
+
+        // resize the active panel to fit the new header direction
+        // if not, the panel will overflow the tabs container
+        if (this._activePanel?.layout) {
+            this._activePanel.layout(this._width, this._height);
+        }
+
+        if(this._leftHeaderActions || this._rightHeaderActions || this._prefixHeaderActions) {
+            this.updateHeaderActions();
+        }
+    }
+
     get location(): DockviewGroupLocation {
         return this._location;
     }
@@ -405,11 +444,15 @@ export class DockviewGroupPanelModel
 
         this.header.hidden = !!options.hideHeader;
         this.locked = options.locked ?? false;
+        this.headerPosition = options.headerPosition ?? accessor.defaultHeaderPosition;
 
         this.addDisposables(
             this._onTabDragStart,
             this._onGroupDragStart,
             this._onWillShowOverlay,
+            this._rightHeaderActionsDisposable,
+            this._leftHeaderActionsDisposable,
+            this._prefixHeaderActionsDisposable,
             this.tabsContainer.onTabDragStart((event) => {
                 this._onTabDragStart.fire(event);
             }),
@@ -515,12 +558,16 @@ export class DockviewGroupPanelModel
         this.setActive(this.isActive, true);
         this.updateContainer();
 
+        this.updateHeaderActions();
+    }
+
+    updateHeaderActions(): void {
         if (this.accessor.options.createRightHeaderActionComponent) {
             this._rightHeaderActions =
                 this.accessor.options.createRightHeaderActionComponent(
                     this.groupPanel
                 );
-            this.addDisposables(this._rightHeaderActions);
+            this._rightHeaderActionsDisposable.value = this._rightHeaderActions;
             this._rightHeaderActions.init({
                 containerApi: this._api,
                 api: this.groupPanel.api,
@@ -529,6 +576,10 @@ export class DockviewGroupPanelModel
             this.tabsContainer.setRightActionsElement(
                 this._rightHeaderActions.element
             );
+        } else {
+            this._rightHeaderActions = undefined;
+            this._rightHeaderActionsDisposable.dispose();
+            this.tabsContainer.setRightActionsElement(undefined);
         }
 
         if (this.accessor.options.createLeftHeaderActionComponent) {
@@ -536,7 +587,7 @@ export class DockviewGroupPanelModel
                 this.accessor.options.createLeftHeaderActionComponent(
                     this.groupPanel
                 );
-            this.addDisposables(this._leftHeaderActions);
+            this._leftHeaderActionsDisposable.value = this._leftHeaderActions;
             this._leftHeaderActions.init({
                 containerApi: this._api,
                 api: this.groupPanel.api,
@@ -545,6 +596,10 @@ export class DockviewGroupPanelModel
             this.tabsContainer.setLeftActionsElement(
                 this._leftHeaderActions.element
             );
+        } else {
+            this._leftHeaderActions = undefined;
+            this._leftHeaderActionsDisposable.dispose();
+            this.tabsContainer.setLeftActionsElement(undefined);
         }
 
         if (this.accessor.options.createPrefixHeaderActionComponent) {
@@ -552,7 +607,7 @@ export class DockviewGroupPanelModel
                 this.accessor.options.createPrefixHeaderActionComponent(
                     this.groupPanel
                 );
-            this.addDisposables(this._prefixHeaderActions);
+            this._prefixHeaderActionsDisposable.value = this._prefixHeaderActions;
             this._prefixHeaderActions.init({
                 containerApi: this._api,
                 api: this.groupPanel.api,
@@ -561,6 +616,10 @@ export class DockviewGroupPanelModel
             this.tabsContainer.setPrefixActionsElement(
                 this._prefixHeaderActions.element
             );
+        } else {
+            this._prefixHeaderActions = undefined;
+            this._prefixHeaderActionsDisposable.dispose();
+            this.tabsContainer.setPrefixActionsElement(undefined);
         }
     }
 
@@ -585,6 +644,10 @@ export class DockviewGroupPanelModel
 
         if (this.header.hidden) {
             result.hideHeader = true;
+        }
+
+        if (this.headerPosition !== 'top') {
+            result.headerPosition = this.headerPosition;
         }
 
         return result;
@@ -873,6 +936,8 @@ export class DockviewGroupPanelModel
 
         if (!options.skipSetActive) {
             this.contentContainer.openPanel(panel);
+        } else if (panel.api.renderer === 'always') {
+            this.contentContainer.renderPanel(panel, { asActive: false });
         }
 
         if (hasExistingPanel) {

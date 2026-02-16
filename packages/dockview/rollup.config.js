@@ -12,19 +12,25 @@ const mainNoStyles = join(__dirname, './src/index.ts');
 const outputDir = join(__dirname, 'dist');
 
 function outputFile(format, isMinified, withStyles) {
-    let filename = join(outputDir, name);
-
-    if (format !== 'umd') {
-        filename += `.${format}`;
+    if (format === 'umd') {
+        // Browser bundles go to dist/{name}[.min].js
+        let filename = join(outputDir, name);
+        if (isMinified) {
+            filename += '.min';
+        }
+        if (!withStyles) {
+            filename += '.noStyle';
+        }
+        return `${filename}.js`;
     }
+
+    // Package bundles go to dist/package/main.{cjs|esm}[.min].{js|mjs}
+    const ext = format === 'esm' ? 'mjs' : 'js';
+    let filename = join(outputDir, 'package', `main.${format}`);
     if (isMinified) {
         filename += '.min';
     }
-    if (!withStyles) {
-        filename += '.noStyle';
-    }
-
-    return `${filename}.js`;
+    return `${filename}.${ext}`;
 }
 
 function getInput(options) {
@@ -47,7 +53,7 @@ function createBundle(format, options) {
     const output = {
         file,
         format,
-        sourcemap: true,
+        sourcemap: isMinified && format === 'umd',
         globals: {},
         banner: [
             `/**`,
@@ -95,19 +101,12 @@ function createBundle(format, options) {
 }
 
 module.exports = [
-    // amd
-    createBundle('amd', { withStyles: false, isMinified: false }),
-    createBundle('amd', { withStyles: true, isMinified: false }),
-    createBundle('amd', { withStyles: false, isMinified: true }),
-    createBundle('amd', { withStyles: true, isMinified: true }),
-    // umd
-    createBundle('umd', { withStyles: false, isMinified: false }),
+    // Browser bundles (UMD) — dist/
     createBundle('umd', { withStyles: true, isMinified: false }),
-    createBundle('umd', { withStyles: false, isMinified: true }),
     createBundle('umd', { withStyles: true, isMinified: true }),
-    // cjs
+    // Package bundles — dist/package/
     createBundle('cjs', { withStyles: true, isMinified: false }),
-    // esm
+    createBundle('cjs', { withStyles: true, isMinified: true }),
     createBundle('esm', { withStyles: true, isMinified: false }),
     createBundle('esm', { withStyles: true, isMinified: true }),
 ];

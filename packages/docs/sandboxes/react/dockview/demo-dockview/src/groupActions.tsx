@@ -2,6 +2,7 @@ import {
     DockviewApi,
     DockviewGroupLocation,
     DockviewGroupPanel,
+    DockviewHeaderPosition,
 } from 'dockview';
 import * as React from 'react';
 
@@ -33,6 +34,8 @@ const GroupAction = (props: {
         };
     }, [props.api, props.groupId]);
 
+    const [headerPosition, setHeaderPosition] =
+        React.useState<DockviewHeaderPosition>(group?.api.getHeaderPosition() ?? 'top');
     const [location, setLocation] =
         React.useState<DockviewGroupLocation | null>(null);
     const [isMaximized, setIsMaximized] = React.useState<boolean>(false);
@@ -59,6 +62,7 @@ const GroupAction = (props: {
         setLocation(group.api.location);
         setIsMaximized(group.api.isMaximized());
         setIsVisible(group.api.isVisible);
+        setHeaderPosition(group.api.getHeaderPosition());
 
         return () => {
             disposable.dispose();
@@ -103,6 +107,22 @@ const GroupAction = (props: {
                 >
                     <span className="material-symbols-outlined">ad_group</span>
                 </button>
+                <select
+                    className="demo-icon-button"
+                    value={headerPosition}
+                    onChange={(e) => {
+                        const value = e.target.value as DockviewHeaderPosition;
+                        if (group) {
+                            group.api.setHeaderPosition(value);
+                            setHeaderPosition(value);
+                        }
+                    }}
+                >
+                    <option value="top">top</option>
+                    <option value="bottom">bottom</option>
+                    <option value="left">left</option>
+                    <option value="right">right</option>
+                </select>
                 <button
                     className={
                         location?.type === 'popout'

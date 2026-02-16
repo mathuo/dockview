@@ -245,6 +245,7 @@ export class VueHeaderActionsRenderer
             activePanel: this.group.model.activePanel,
             isGroupActive: this.group.api.isActive,
             group: this.group,
+            headerPosition: this.group.model.headerPosition,
         };
 
         this._renderDisposable?.dispose();

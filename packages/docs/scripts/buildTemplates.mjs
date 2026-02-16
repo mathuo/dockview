@@ -1,7 +1,6 @@
 import fs from 'fs-extra';
 import * as path from 'path';
 import { argv } from 'process';
-import { execSync } from 'child_process';
 
 import { fileURLToPath } from 'url';
 
@@ -13,150 +12,79 @@ const { version } = JSON.parse(
     )
 );
 
-const REACT_VERSION = '18.2.0';
-const VUE_VERSION = '3.4.21';
-const ANGULAR_VERSION = '17.0.0';
-const DOCKVIEW_VERSION = version; //'latest';;
+const DOCKVIEW_VERSION = version;
 const USE_LOCAL_CDN = argv.slice(2).includes('--local');
 
 const local = 'http://localhost:1111';
 
+const BOILERPLATE_PATH_PREFIX = '/example-runner/';
+
+const FRAMEWORK_BOILERPLATE = {
+    react: 'dockview-react-boilerplate',
+    typescript: 'dockview-typescript-boilerplate',
+    vue: 'dockview-vue-boilerplate',
+    angular: 'dockview-angular-boilerplate',
+};
+
 const DOCKVIEW_CDN = {
     react: {
         remote: {
-            dockview: `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}/dist/dockview.esm.js`,
-            'dockview/': `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}/`,
+            'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}`,
+            dockview: `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}`,
         },
         local: {
-            dockview: `${local}/dockview/dist/dockview.esm.js`,
-            'dockview/': `${local}/dockview/`,
+            'dockview-core': `${local}/dockview-core`,
+            dockview: `${local}/dockview`,
         },
     },
     vue: {
         remote: {
-            'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/dist/dockview-core.esm.js`,
-            'dockview-core/': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/`,
-            'dockview-vue': `https://cdn.jsdelivr.net/npm/dockview-vue@${DOCKVIEW_VERSION}/dist/dockview-vue.es.js`,
-            'dockview-vue/': `https://cdn.jsdelivr.net/npm/dockview-vue@${DOCKVIEW_VERSION}/`,
+            'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}`,
+            'dockview-vue': `https://cdn.jsdelivr.net/npm/dockview-vue@${DOCKVIEW_VERSION}`,
         },
         local: {
-            'dockview-core': `${local}/dockview-core/dist/dockview-core.esm.js`,
-            'dockview-core/': `${local}/dockview-core/`,
-            'dockview-vue': `${local}/dockview-vue/dist/dockview-vue.es.js`,
-            'dockview-vue/': `${local}/dockview-vue/`,
+            'dockview-core': `${local}/dockview-core`,
+            'dockview-vue': `${local}/dockview-vue`,
         },
     },
     typescript: {
         remote: {
-            'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/dist/dockview-core.esm.js`,
-            'dockview-core/': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/`,
+            'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}`,
         },
         local: {
-            'dockview-core': `${local}/dockview-core/dist/dockview-core.esm.js`,
-            'dockview-core/': `${local}/dockview-core/`,
+            'dockview-core': `${local}/dockview-core`,
         },
     },
     angular: {
         remote: {
-            'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/dist/dockview-core.esm.js`,
-            'dockview-core/': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}/`,
-            'dockview-angular': `https://cdn.jsdelivr.net/npm/dockview-angular@${DOCKVIEW_VERSION}/dist/dockview-angular.esm.js`,
-            'dockview-angular/': `https://cdn.jsdelivr.net/npm/dockview-angular@${DOCKVIEW_VERSION}/`,
+            'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}`,
+            'dockview-angular': `https://cdn.jsdelivr.net/npm/dockview-angular@${DOCKVIEW_VERSION}`,
         },
         local: {
-            'dockview-core': `${local}/dockview-core/dist/dockview-core.esm.js`,
-            'dockview-core/': `${local}/dockview-core/`,
-            'dockview-angular': `${local}/dockview-angular/dist/dockview-angular.esm.js`,
-            'dockview-angular/': `${local}/dockview-angular/`,
+            'dockview-core': `${local}/dockview-core`,
+            'dockview-angular': `${local}/dockview-angular`,
         },
     },
 };
 
-const IMPORTS_PATHS = {
-    react: {
-        react: `https://esm.sh/react@${REACT_VERSION}`,
-        'react-dom': `https://esm.sh/react-dom@${REACT_VERSION}`,
-        'react-dom/client': `https://esm.sh/react-dom@${REACT_VERSION}/client`,
-    },
-    vue: {
-        vue: `https://cdn.jsdelivr.net/npm/vue@${VUE_VERSION}/dist/vue.esm-browser.js`,
-        '@vue/reactivity': `https://esm.sh/@vue/reactivity@${VUE_VERSION}`,
-        'vue-sfc-loader': `https://cdn.jsdelivr.net/npm/vue3-sfc-loader@0.9.5/dist/vue3-sfc-loader.js`,
-    },
-    typescript: {},
-    angular: {
-        '@angular/core': `https://esm.sh/@angular/core@${ANGULAR_VERSION}?target=es2018`,
-        '@angular/common': `https://esm.sh/@angular/common@${ANGULAR_VERSION}?target=es2018`,
-        '@angular/platform-browser-dynamic': `https://esm.sh/@angular/platform-browser-dynamic@${ANGULAR_VERSION}?target=es2018`,
-        '@angular/platform-browser': `https://esm.sh/@angular/platform-browser@${ANGULAR_VERSION}?target=es2018`,
-        '@angular/compiler': `https://esm.sh/@angular/compiler@${ANGULAR_VERSION}?target=es2018`,
-        rxjs: `https://esm.sh/rxjs@7.8.1?target=es2018`,
-        'zone.js': `https://esm.sh/zone.js@0.14.3?target=es2018`,
-    },
+const START_FILE = {
+    react: 'app/index.tsx',
+    typescript: 'app/index.ts',
+    vue: 'app/index.ts',
+    angular: 'app/index.ts',
 };
 
 const template = fs
     .readFileSync(path.join(__dirname, './template.html'))
     .toString();
 
-async function compileAngularTypeScript(inputPath, outputPath) {
-    try {
-        // Import TypeScript compiler
-        const ts = await import('typescript');
-
-        // Copy directory structure first
-        fs.copySync(inputPath, outputPath);
-
-        // Find all .ts files and transpile them
-        const tsFiles = fs
-            .readdirSync(outputPath)
-            .filter((file) => file.endsWith('.ts'));
-
-        for (const file of tsFiles) {
-            const filePath = path.join(outputPath, file);
-            const source = fs.readFileSync(filePath, 'utf8');
-
-            // Transpile with decorator support, keeping imports as-is
-            const result = ts.default.transpile(source, {
-                target: ts.default.ScriptTarget.ES5, // Use ES5 to ensure maximum compatibility
-                module: ts.default.ModuleKind.System,
-                experimentalDecorators: true,
-                emitDecoratorMetadata: true,
-                esModuleInterop: true,
-                allowSyntheticDefaultImports: true,
-                strict: false,
-                skipLibCheck: true,
-                noResolve: true, // Don't try to resolve imports
-                useDefineForClassFields: false, // Avoid class field initialization issues
-                downlevelIteration: true, // Ensure iterators work in older JS
-            });
-
-            // Write the transpiled file
-            fs.writeFileSync(filePath, result);
-        }
-
-        return true;
-    } catch (error) {
-        console.warn(
-            `Failed to compile Angular TypeScript for ${inputPath}:`,
-            error.message
-        );
-        // Fall back to copying source files as-is
-        fs.copySync(inputPath, outputPath);
-        return false;
-    }
-}
-
 function createIndexHTML(options) {
     return template
         .replace('{{title}}', options.title)
-        .replace(
-            '{{importPaths}}',
-            `${Object.entries(options.importPaths)
-                .map(([key, value]) => `"${key}": "${value}"`)
-                .join(',\n')}`
-        )
-        .replace('{{app}}', options.app)
+        .replace('{{appLocation}}', options.appLocation)
+        .replace(/\{\{boilerplatePath\}\}/g, options.boilerplatePath)
+        .replace('{{startFile}}', options.startFile)
+        .replace('{{systemJsMap}}', JSON.stringify(options.systemJsMap))
         .replace('{{appElement}}', options.appElement || '')
         .replace('{{componentSelector}}', options.componentSelector)
         .replace('{{githubLink}}', options.githubUrl)
@@ -171,7 +99,7 @@ const FRAMEWORKS = ['react', 'vue', 'typescript', 'angular'];
 
 const COMPONENT_SELECTORS = {
     'dockview': '.dv-dockview',
-    'splitview': '.dv-split-view-container', 
+    'splitview': '.dv-split-view-container',
     'gridview': '.dv-grid-view',
     'paneview': '.dv-pane-container'
 };
@@ -212,34 +140,29 @@ async function buildTemplates() {
                     'src'
                 );
 
-                if (framework === 'angular') {
-                    // Compile Angular TypeScript files with decorator support
-                    await compileAngularTypeScript(srcPath, destPath);
-                } else {
-                    // Copy other frameworks as-is
-                    fs.copySync(srcPath, destPath);
-                }
+                // Copy all frameworks as-is (no special Angular transpilation)
+                fs.copySync(srcPath, destPath);
 
                 const templateGithubUrl = `${githubUrl}/${component}/${folder}/${framework}/src`;
                 const templateCodeSandboxUrl = `${codeSandboxUrl}/${component}/${folder}/${framework}`;
 
-                const template = createIndexHTML({
+                const boilerplateName = FRAMEWORK_BOILERPLATE[framework];
+                const boilerplatePath = `${BOILERPLATE_PATH_PREFIX}${boilerplateName}/`;
+
+                const systemJsMap =
+                    DOCKVIEW_CDN[framework][
+                        USE_LOCAL_CDN ? 'local' : 'remote'
+                    ];
+
+                const html = createIndexHTML({
                     title: `Dockview | ${folder} ${framework}`,
-                    app:
-                        framework === 'react'
-                            ? './src/index.tsx'
-                            : framework === 'angular'
-                            ? './src/index.ts'
-                            : './src/index.ts',
+                    appLocation: './src',
+                    boilerplatePath: boilerplatePath,
+                    startFile: START_FILE[framework],
+                    systemJsMap: systemJsMap,
                     appElement:
                         framework === 'angular' ? '<app-root></app-root>' : '',
                     componentSelector: COMPONENT_SELECTORS[component],
-                    importPaths: {
-                        ...IMPORTS_PATHS[framework],
-                        ...DOCKVIEW_CDN[framework][
-                            USE_LOCAL_CDN ? 'local' : 'remote'
-                        ],
-                    },
                     githubUrl: templateGithubUrl,
                     codeSandboxUrl: templateCodeSandboxUrl,
                 });
@@ -251,7 +174,7 @@ async function buildTemplates() {
                         framework,
                         'index.html'
                     ),
-                    template
+                    html
                 );
 
                 list.push({
