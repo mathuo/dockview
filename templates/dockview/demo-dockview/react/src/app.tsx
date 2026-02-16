@@ -197,7 +197,9 @@ const DockviewDemo = (props: { theme?: string }) => {
             defaultConfig(api);
         }
 
-        return disposables.forEach((disposable) => disposable.dispose());
+        return () => {
+            disposables.forEach((disposable) => disposable.dispose());
+        };
     }, [api]);
 
     return (

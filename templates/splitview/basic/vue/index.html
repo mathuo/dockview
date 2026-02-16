@@ -42,6 +42,11 @@
               height: calc(100% - 25px);
             }
 
+            app-root {
+              display: block;
+              height: 100%;
+            }
+
             html {
                 position: absolute;
                 top: 0;
@@ -55,36 +60,14 @@
                 overflow: auto;
             }
         </style>
-        <script type="systemjs-importmap">
-            {
-              "imports": {
-                "vue": "https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.esm-browser.js",
-"@vue/reactivity": "https://esm.sh/@vue/reactivity@3.4.21",
-"vue-sfc-loader": "https://cdn.jsdelivr.net/npm/vue3-sfc-loader@0.9.5/dist/vue3-sfc-loader.js",
-"dockview-core": "https://cdn.jsdelivr.net/npm/dockview-core@4.13.1/dist/dockview-core.esm.js",
-"dockview-core/": "https://cdn.jsdelivr.net/npm/dockview-core@4.13.1/",
-"dockview-vue": "https://cdn.jsdelivr.net/npm/dockview-vue@4.13.1/dist/dockview-vue.es.js",
-"dockview-vue/": "https://cdn.jsdelivr.net/npm/dockview-vue@4.13.1/"
-              }
-            }
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/systemjs@6.8.0/dist/system.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/systemjs-babel@0.3.2/dist/systemjs-babel.js"></script>
         <script>
-            async function importCSSStyleSheet(uri) {
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = uri;
-                document.head.appendChild(link);
-            }
-
-            System.onload = function (err, id, deps, isErrSource) {
-                console.log(id);
-                if (id.endsWith('.css') && !err) {
-                    importCSSStyleSheet(id);
-                }
-            };
+            var defined_dockview_appLocation = './src';
+            var defined_dockview_boilerplatePath = '/example-runner/dockview-vue-boilerplate/';
+            var defined_dockview_startFile = 'app/index.ts';
+            var defined_dockview_systemJsMap = {"dockview-core":"https://cdn.jsdelivr.net/npm/dockview-core@5.0.0","dockview-vue":"https://cdn.jsdelivr.net/npm/dockview-vue@5.0.0"};
         </script>
+        <script src="https://cdn.jsdelivr.net/npm/systemjs@0.21.6/dist/system.js"></script>
+        <script src="/example-runner/dockview-vue-boilerplate/systemjs.config.js"></script>
     </head>
 
     <body>
@@ -104,7 +87,11 @@
           </div>
           <div id="app"></div>
         </div>
-        <script type="systemjs-module" src="import:./src/index.ts"></script>
+        <script>
+            System.import(defined_dockview_startFile).catch(function(err) {
+                console.error('Failed to load example:', err);
+            });
+        </script>
         <object
             id="loading-spinner"
             style="
