@@ -1,7 +1,7 @@
 {
   "name": "dockview-core",
   "version": "4.13.1",
-  "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
+  "description": "Zero dependency layout manager supporting tabs, groups, grids and splitviews for vanilla TypeScript",
   "keywords": [
     "splitview",
     "split-view",
@@ -20,8 +20,15 @@
     "drag-and-drop",
     "drag",
     "drop",
-    "react",
-    "react-component"
+    "typescript",
+    "zero-dependency",
+    "ide-layout",
+    "panel",
+    "resizable",
+    "floating",
+    "serialization",
+    "workbench",
+    "vanilla"
   ],
   "homepage": "https://github.com/mathuo/dockview",
   "bugs": {

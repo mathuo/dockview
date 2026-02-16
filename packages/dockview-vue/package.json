@@ -1,7 +1,7 @@
 {
   "name": "dockview-vue",
   "version": "4.13.1",
-  "description": "Zero dependency layout manager supporting tabs, grids and splitviews",
+  "description": "Vue 3 docking layout manager — tabs, groups, grids, splitviews, drag and drop, floating panels",
   "keywords": [
     "splitview",
     "split-view",
@@ -20,8 +20,18 @@
     "drag-and-drop",
     "drag",
     "drop",
-    "react",
-    "react-component"
+    "typescript",
+    "zero-dependency",
+    "ide-layout",
+    "panel",
+    "resizable",
+    "floating",
+    "serialization",
+    "workbench",
+    "vue",
+    "vue-component",
+    "vue3",
+    "composition-api"
   ],
   "main": "dist/dockview-vue.umd.js",
   "module": "dist/dockview-vue.es.js",

@@ -32,7 +32,7 @@ console.log(`isCI: ${process.env.CI}`);
 const config = {
     title: 'Dockview',
     tagline:
-        'A zero dependency layout manager supporting ReactJS and Vanilla TypeScript',
+        'A zero dependency layout manager supporting React, Vue, Angular, and vanilla TypeScript',
     url: 'https://dockview.dev',
     baseUrl: process.env.CI ? `/` : '/',
     onBrokenLinks: 'throw',
@@ -134,14 +134,56 @@ const config = {
         ],
     ],
 
+    headTags: [
+        {
+            tagName: 'script',
+            attributes: {
+                type: 'application/ld+json',
+            },
+            innerHTML: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'SoftwareSourceCode',
+                name: 'Dockview',
+                description:
+                    'A zero dependency docking layout manager for building IDE-like interfaces with tabs, groups, grids, splitviews, drag and drop, floating panels, and popout windows. Supports React, Vue, Angular, and vanilla TypeScript.',
+                url: 'https://dockview.dev',
+                codeRepository: 'https://github.com/mathuo/dockview',
+                programmingLanguage: ['TypeScript', 'JavaScript'],
+                runtimePlatform: ['Browser'],
+                license: 'https://opensource.org/licenses/MIT',
+                operatingSystem: 'Any',
+                applicationCategory: 'DeveloperApplication',
+                keywords: [
+                    'layout manager',
+                    'docking',
+                    'tabs',
+                    'drag and drop',
+                    'react',
+                    'vue',
+                    'angular',
+                    'typescript',
+                    'splitview',
+                    'gridview',
+                    'floating panels',
+                    'popout windows',
+                    'zero dependency',
+                ],
+            }),
+        },
+    ],
+
     themeConfig:
         /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
         ({
+            image: 'img/splashscreen.gif',
             metadata: [
                 {
                     name: 'keywords',
                     content: [
                         'react',
+                        'vue',
+                        'vue3',
+                        'angular',
                         'components',
                         'typescript',
                         'drag-and-drop',
@@ -156,7 +198,24 @@ const config = {
                         'docking-library',
                         'layout-manager',
                         'docking-layout',
+                        'zero-dependency',
+                        'ide-layout',
+                        'floating-panels',
+                        'popout-windows',
                     ].join(' ,'),
+                },
+                {
+                    name: 'description',
+                    content:
+                        'Dockview is a zero dependency docking layout manager for building IDE-like interfaces with tabs, groups, grids, splitviews, drag and drop, floating panels, and popout windows. Supports React, Vue, Angular, and vanilla TypeScript.',
+                },
+                {
+                    property: 'og:type',
+                    content: 'website',
+                },
+                {
+                    name: 'twitter:card',
+                    content: 'summary_large_image',
                 },
             ],
             docs: {
