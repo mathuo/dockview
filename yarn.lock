@@ -8728,6 +8728,18 @@ dns-packet@^5.2.2:
   dependencies:
     "@leichtgewicht/ip-codec" "^2.0.1"
 
+dockview-core@^4.13.1:
+  version "4.13.1"
+  resolved "https://registry.yarnpkg.com/dockview-core/-/dockview-core-4.13.1.tgz#619e20ca52d077b83e985c91ce434f404626584c"
+  integrity sha512-+7vR0ZEoL8CNck6NqDVUMqBT22niwBu5CMMI137dZ3c8NDc7c5Si+3dGEqQgM4lNtHBLAtvypo1C4p21J2wkiQ==
+
+dockview@^4.13.1:
+  version "4.13.1"
+  resolved "https://registry.yarnpkg.com/dockview/-/dockview-4.13.1.tgz#31b0e45d369516616bddfe0ea0e5f4aaa0388df7"
+  integrity sha512-K8xnYt3Rvkx8MYKHaEsb8aFaPyQclKRRkXS9JcpQPZUgqxumTLnSidgdd6uIfzEps6yJsXoZGQGJ9PtcaKyDcQ==
+  dependencies:
+    dockview-core "^4.13.1"
+
 doctrine@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/doctrine/-/doctrine-3.0.0.tgz"
