@@ -79,6 +79,13 @@ export {
 } from './dockview/deserializer';
 
 export * from './dockview/dockviewComponent';
+export {
+    FixedPanelView,
+    FixedPanelViewOptions,
+    FixedPanelPosition,
+    FixedPanelsConfig,
+    SerializedFixedPanels,
+} from './dockview/dockviewShell';
 export * from './gridview/gridviewComponent';
 export * from './splitview/splitviewComponent';
 export * from './paneview/paneviewComponent';

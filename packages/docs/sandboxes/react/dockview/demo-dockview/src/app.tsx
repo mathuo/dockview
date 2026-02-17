@@ -6,6 +6,7 @@ import {
     IDockviewPanelProps,
     DockviewApi,
     DockviewTheme,
+    FixedPanelsConfig,
 } from 'dockview';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
@@ -317,6 +318,34 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
 
     const onReady = (event: DockviewReadyEvent) => {
         setApi(event.api);
+
+        if (useFixedPanels) {
+            const positions = ['top', 'bottom', 'left', 'right'] as const;
+            const labels: Record<string, string> = {
+                top: 'Menu Bar / Toolbar',
+                bottom: 'Terminal / Output',
+                left: 'Explorer / Sidebar',
+                right: 'Outline / Properties',
+            };
+
+            for (const pos of positions) {
+                const el = event.api.getFixedPanel(pos);
+                if (el) {
+                    el.style.display = 'flex';
+                    el.style.alignItems = 'center';
+                    el.style.justifyContent = 'center';
+                    el.style.backgroundColor = 'var(--dv-background-color, #1e1e2e)';
+                    el.style.borderBottom = pos === 'top' ? '1px solid rgba(255,255,255,0.1)' : '';
+                    el.style.borderTop = pos === 'bottom' ? '1px solid rgba(255,255,255,0.1)' : '';
+                    el.style.borderRight = pos === 'left' ? '1px solid rgba(255,255,255,0.1)' : '';
+                    el.style.borderLeft = pos === 'right' ? '1px solid rgba(255,255,255,0.1)' : '';
+                    el.style.color = 'rgba(255,255,255,0.6)';
+                    el.style.fontSize = pos === 'top' ? '13px' : '14px';
+                    el.style.fontFamily = 'monospace';
+                    el.innerHTML = `<span>${labels[pos]}</span>`;
+                }
+            }
+        }
     };
 
     const [watermark, setWatermark] = React.useState<boolean>(false);
@@ -336,6 +365,16 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
 
     const [showLogs, setShowLogs] = React.useState<boolean>(false);
     const [debug, setDebug] = React.useState<boolean>(false);
+    const [useFixedPanels, setUseFixedPanels] = React.useState<boolean>(false);
+
+    const fixedPanelsConfig: FixedPanelsConfig | undefined = useFixedPanels
+        ? {
+              top: { id: 'top', initialSize: 40, minimumSize: 30, maximumSize: 60 },
+              bottom: { id: 'bottom', initialSize: 200, minimumSize: 100, snap: true },
+              left: { id: 'left', initialSize: 220, minimumSize: 150, snap: true },
+              right: { id: 'right', initialSize: 220, minimumSize: 150, snap: true },
+          }
+        : undefined;
 
     return (
         <div
@@ -372,15 +411,23 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                         activeGroup={activeGroup}
                     />
                 )}
-                {/* <div>
-                    <button
-                        onClick={() => {
-                            setGapCheck(!gapCheck);
-                        }}
-                    >
-                        {gapCheck ? 'Disable Gap Check' : 'Enable Gap Check'}
-                    </button>
-                </div> */}
+                {useFixedPanels && api && (
+                    <div className="action-container">
+                        <span style={{ fontSize: '12px', opacity: 0.7, marginRight: '8px' }}>Fixed Panels:</span>
+                        {(['top', 'bottom', 'left', 'right'] as const).map((pos) => (
+                            <button
+                                key={pos}
+                                className="text-button"
+                                onClick={() => {
+                                    const visible = api.isFixedPanelVisible(pos);
+                                    api.setFixedPanelVisible(pos, !visible);
+                                }}
+                            >
+                                Toggle {pos}
+                            </button>
+                        ))}
+                    </div>
+                )}
             </div>
             <div
                 className="action-container"
@@ -391,6 +438,19 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                     padding: '4px',
                 }}
             >
+                <button
+                    className={useFixedPanels ? 'text-button' : 'text-button'}
+                    style={useFixedPanels ? { backgroundColor: '#4864dc' } : {}}
+                    onClick={() => setUseFixedPanels(!useFixedPanels)}
+                    title="Toggle fixed side panels (IDE shell layout). Requires re-mount."
+                >
+                    <span style={{ paddingRight: '4px' }}>
+                        {useFixedPanels ? 'Disable' : 'Enable'} Shell
+                    </span>
+                    <span className="material-symbols-outlined">
+                        dashboard_customize
+                    </span>
+                </button>
                 <button
                     onClick={() => {
                         setDebug(!debug);
@@ -437,6 +497,7 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                     <DebugContext.Provider value={debug}>
                         <ThemeContext.Provider value={props.theme}>
                             <DockviewReact
+                                key={useFixedPanels ? 'shell' : 'no-shell'}
                                 components={components}
                                 defaultTabComponent={headerComponents.default}
                                 rightHeaderActionsComponent={RightControls}
@@ -449,6 +510,7 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                                 }
                                 onReady={onReady}
                                 theme={props.theme}
+                                fixedPanels={fixedPanelsConfig}
                             />
                         </ThemeContext.Provider>
                     </DebugContext.Provider>

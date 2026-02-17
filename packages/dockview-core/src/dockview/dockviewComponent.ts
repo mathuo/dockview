@@ -82,6 +82,11 @@ import { StrictEventsSequencing } from './strictEventsSequencing';
 import { PopupService } from './components/popupService';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import { themeAbyss } from './theme';
+import {
+    FixedPanelPosition,
+    SerializedFixedPanels,
+    ShellManager,
+} from './dockviewShell';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     activationSize: { type: 'pixels', value: 10 },
@@ -152,6 +157,7 @@ export interface SerializedDockview {
     activeGroup?: string;
     floatingGroups?: SerializedFloatingGroup[];
     popoutGroups?: SerializedPopoutGroup[];
+    fixedPanels?: SerializedFixedPanels;
 }
 
 export interface MovePanelEvent {
@@ -270,6 +276,9 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
         }
     ): Promise<boolean>;
     fromJSON(data: any, options?: { reuseExistingPanels: boolean }): void;
+    getFixedPanel(position: FixedPanelPosition): HTMLElement | undefined;
+    setFixedPanelVisible(position: FixedPanelPosition, visible: boolean): void;
+    isFixedPanelVisible(position: FixedPanelPosition): boolean;
 }
 
 export class DockviewComponent
@@ -346,6 +355,9 @@ export class DockviewComponent
     private readonly _onDidMaximizedGroupChange =
         new Emitter<DockviewMaximizedGroupChanged>();
     readonly onDidMaximizedGroupChange = this._onDidMaximizedGroupChange.event;
+
+    private _shellManager: ShellManager | undefined;
+    private _inShellLayout = false;
 
     private readonly _floatingGroups: DockviewFloatingGroupPanel[] = [];
     private readonly _popoutGroups: {
@@ -591,6 +603,8 @@ export class DockviewComponent
                 for (const group of [...this._popoutGroups]) {
                     group.disposable.dispose();
                 }
+
+                this._shellManager?.dispose();
             }),
             this._rootDropTarget,
             this._rootDropTarget.onWillShowOverlay((event) => {
@@ -654,6 +668,17 @@ export class DockviewComponent
             }),
             this._rootDropTarget
         );
+
+        if (options.fixedPanels) {
+            this.disableResizing = true;
+            container.removeChild(this.element);
+            this._shellManager = new ShellManager(
+                container,
+                this.element,
+                options.fixedPanels,
+                (w, h) => this._layoutFromShell(w, h)
+            );
+        }
     }
 
     override setVisible(panel: DockviewGroupPanel, visible: boolean): void {
@@ -1323,7 +1348,11 @@ export class DockviewComponent
             }
         }
 
-        this.layout(this.gridview.width, this.gridview.height, true);
+        if (this._shellManager) {
+            this._layoutFromShell(this.gridview.width, this.gridview.height);
+        } else {
+            this.layout(this.gridview.width, this.gridview.height, true);
+        }
     }
 
     override layout(
@@ -1331,7 +1360,11 @@ export class DockviewComponent
         height: number,
         forceResize?: boolean | undefined
     ): void {
-        super.layout(width, height, forceResize);
+        if (this._shellManager && !this._inShellLayout) {
+            this._shellManager.layout(width, height);
+        } else {
+            super.layout(width, height, forceResize);
+        }
 
         if (this._floatingGroups) {
             for (const floating of this._floatingGroups) {
@@ -1339,6 +1372,35 @@ export class DockviewComponent
                 floating.overlay.setBounds();
             }
         }
+    }
+
+    private _layoutFromShell(width: number, height: number): void {
+        this._inShellLayout = true;
+        this.layout(width, height, true);
+        this._inShellLayout = false;
+    }
+
+    protected override forceRelayout(): void {
+        if (this._shellManager) {
+            this._layoutFromShell(this.width, this.height);
+        } else {
+            super.forceRelayout();
+        }
+    }
+
+    getFixedPanel(position: FixedPanelPosition): HTMLElement | undefined {
+        return this._shellManager?.getFixedPanel(position);
+    }
+
+    setFixedPanelVisible(
+        position: FixedPanelPosition,
+        visible: boolean
+    ): void {
+        this._shellManager?.setFixedPanelVisible(position, visible);
+    }
+
+    isFixedPanelVisible(position: FixedPanelPosition): boolean {
+        return this._shellManager?.isFixedPanelVisible(position) ?? false;
     }
 
     private updateDragAndDropState(): void {
@@ -1457,6 +1519,10 @@ export class DockviewComponent
 
         if (popoutGroups.length > 0) {
             result.popoutGroups = popoutGroups;
+        }
+
+        if (this._shellManager) {
+            result.fixedPanels = this._shellManager.toJSON();
         }
 
         return result;
@@ -1620,7 +1686,15 @@ export class DockviewComponent
                 },
             });
 
-            this.layout(width, height, true);
+            if (this._shellManager) {
+                this._layoutFromShell(width, height);
+            } else {
+                this.layout(width, height, true);
+            }
+
+            if (this._shellManager && data.fixedPanels) {
+                this._shellManager.fromJSON(data.fixedPanels);
+            }
 
             const serializedFloatingGroups = data.floatingGroups ?? [];
 

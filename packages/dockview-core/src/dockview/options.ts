@@ -16,6 +16,7 @@ import { FloatingGroupOptions } from './dockviewComponent';
 import { Contraints } from '../gridview/gridviewPanel';
 import { AcceptableEvent, IAcceptableEvent } from '../events';
 import { DockviewTheme } from './theme';
+import { FixedPanelsConfig } from './dockviewShell';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -78,6 +79,11 @@ export interface DockviewOptions {
      * This is only applied to the tab header section. Defaults to `custom`.
      */
     scrollbars?: 'native' | 'custom';
+    /**
+     * Configure fixed side panels around the dockview grid (IDE shell layout).
+     * Panels can be placed at top, bottom, left, and/or right positions.
+     */
+    fixedPanels?: FixedPanelsConfig;
 }
 
 export interface DockviewDndOverlayEvent extends IAcceptableEvent {
@@ -127,6 +133,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         theme: undefined,
         disableTabsOverflowList: undefined,
         scrollbars: undefined,
+        fixedPanels: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];
