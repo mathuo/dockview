@@ -60,6 +60,7 @@ import {
 import { SplitviewComponentOptions } from '../splitview/options';
 import { GridviewComponentOptions } from '../gridview/options';
 import { FixedPanelPosition } from '../dockview/dockviewShell';
+import { DockviewGroupPanelApi } from './dockviewGroupPanelApi';
 
 export interface CommonApi<T = any> {
     readonly height: number;
@@ -929,10 +930,10 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     /**
-     * Get the HTML element for a fixed side panel at the given position.
+     * Get the group panel API for a fixed side panel at the given position.
      * Returns `undefined` if no fixed panel is configured at that position.
      */
-    getFixedPanel(position: FixedPanelPosition): HTMLElement | undefined {
+    getFixedPanel(position: FixedPanelPosition): DockviewGroupPanelApi | undefined {
         return this.component.getFixedPanel(position);
     }
 

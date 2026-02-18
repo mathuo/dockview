@@ -85,6 +85,7 @@ export {
     FixedPanelPosition,
     FixedPanelsConfig,
     SerializedFixedPanels,
+    IFixedPanelGroup,
 } from './dockview/dockviewShell';
 export * from './gridview/gridviewComponent';
 export * from './splitview/splitviewComponent';

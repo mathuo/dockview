@@ -125,6 +125,23 @@ const components = {
             />
         );
     },
+    fixedPlaceholder: (props: IDockviewPanelProps) => {
+        return (
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '100%',
+                    color: 'rgba(255,255,255,0.6)',
+                    fontFamily: 'monospace',
+                    fontSize: props.params?.position === 'top' ? '13px' : '14px',
+                }}
+            >
+                <span>{props.params?.label as string}</span>
+            </div>
+        );
+    },
     iframe: (props: IDockviewPanelProps) => {
         return (
             <iframe
@@ -237,6 +254,13 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
             return;
         }
 
+        // Reset tracked state for the new api instance to prevent stale IDs
+        // accumulating across remounts (e.g. when toggling shell mode).
+        setPanels([]);
+        setGroups([]);
+        setActivePanel(undefined);
+        setActiveGroup(undefined);
+
         const disposables = [
             api.onDidAddPanel((event) => {
                 setPanels((_) => [..._, event.id]);
@@ -329,20 +353,15 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
             };
 
             for (const pos of positions) {
-                const el = event.api.getFixedPanel(pos);
-                if (el) {
-                    el.style.display = 'flex';
-                    el.style.alignItems = 'center';
-                    el.style.justifyContent = 'center';
-                    el.style.backgroundColor = 'var(--dv-background-color, #1e1e2e)';
-                    el.style.borderBottom = pos === 'top' ? '1px solid rgba(255,255,255,0.1)' : '';
-                    el.style.borderTop = pos === 'bottom' ? '1px solid rgba(255,255,255,0.1)' : '';
-                    el.style.borderRight = pos === 'left' ? '1px solid rgba(255,255,255,0.1)' : '';
-                    el.style.borderLeft = pos === 'right' ? '1px solid rgba(255,255,255,0.1)' : '';
-                    el.style.color = 'rgba(255,255,255,0.6)';
-                    el.style.fontSize = pos === 'top' ? '13px' : '14px';
-                    el.style.fontFamily = 'monospace';
-                    el.innerHTML = `<span>${labels[pos]}</span>`;
+                const groupApi = event.api.getFixedPanel(pos);
+                if (groupApi) {
+                    event.api.addPanel({
+                        id: `fixed-placeholder-${pos}`,
+                        component: 'fixedPlaceholder',
+                        title: labels[pos],
+                        position: { referenceGroup: groupApi.id },
+                        params: { label: labels[pos], position: pos },
+                    });
                 }
             }
         }

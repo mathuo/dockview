@@ -26,14 +26,24 @@ export interface FixedPanelsConfig {
 }
 
 export interface SerializedFixedPanels {
-    top?: { size: number; visible: boolean };
-    bottom?: { size: number; visible: boolean };
-    left?: { size: number; visible: boolean };
-    right?: { size: number; visible: boolean };
+    top?: { size: number; visible: boolean; group?: unknown };
+    bottom?: { size: number; visible: boolean; group?: unknown };
+    left?: { size: number; visible: boolean; group?: unknown };
+    right?: { size: number; visible: boolean; group?: unknown };
+}
+
+/**
+ * Minimal interface for a fixed panel group host.
+ * Avoids circular imports by not referencing DockviewGroupPanel directly.
+ */
+export interface IFixedPanelGroup {
+    readonly element: HTMLElement;
+    layout(width: number, height: number): void;
 }
 
 export class FixedPanelView implements IView {
-    private readonly _element: HTMLElement;
+    private readonly _group: IFixedPanelGroup;
+    private readonly _orientation: 'horizontal' | 'vertical';
     private readonly _onDidChange = new Emitter<{
         size?: number;
         orthogonalSize?: number;
@@ -48,21 +58,33 @@ export class FixedPanelView implements IView {
     readonly priority = LayoutPriority.Low;
 
     get element(): HTMLElement {
-        return this._element;
+        return this._group.element;
     }
 
-    constructor(options: FixedPanelViewOptions) {
-        this._element = document.createElement('div');
-        this._element.className = 'dv-fixed-panel';
-        this._element.dataset.testid = `dv-fixed-panel-${options.id}`;
+    constructor(
+        options: FixedPanelViewOptions,
+        group: IFixedPanelGroup,
+        orientation: 'horizontal' | 'vertical'
+    ) {
+        this._group = group;
+        this._orientation = orientation;
+
+        group.element.classList.add('dv-fixed-panel');
+        group.element.dataset.testid = `dv-fixed-panel-${options.id}`;
 
         this.minimumSize = options.minimumSize ?? 0;
         this.maximumSize = options.maximumSize ?? Number.POSITIVE_INFINITY;
         this.snap = options.snap ?? true;
     }
 
-    layout(_size: number, _orthogonalSize: number): void {
-        // fixed panels don't need to propagate layout internally
+    layout(size: number, orthogonalSize: number): void {
+        // horizontal (left/right): size=width, orthogonalSize=height → layout(width, height)
+        // vertical (top/bottom): size=height, orthogonalSize=width → layout(width, height)
+        if (this._orientation === 'horizontal') {
+            this._group.layout(size, orthogonalSize);
+        } else {
+            this._group.layout(orthogonalSize, size);
+        }
     }
 
     setVisible(_visible: boolean): void {
@@ -228,6 +250,12 @@ export class ShellManager implements IDisposable {
         container: HTMLElement,
         dockviewElement: HTMLElement,
         config: FixedPanelsConfig,
+        groups: {
+            top?: IFixedPanelGroup;
+            bottom?: IFixedPanelGroup;
+            left?: IFixedPanelGroup;
+            right?: IFixedPanelGroup;
+        },
         layoutGrid: (width: number, height: number) => void
     ) {
         this._shellElement = document.createElement('div');
@@ -237,17 +265,17 @@ export class ShellManager implements IDisposable {
         container.appendChild(this._shellElement);
 
         // Create fixed panel views for configured positions
-        if (config.top) {
-            this._topView = new FixedPanelView(config.top);
+        if (config.top && groups.top) {
+            this._topView = new FixedPanelView(config.top, groups.top, 'vertical');
         }
-        if (config.bottom) {
-            this._bottomView = new FixedPanelView(config.bottom);
+        if (config.bottom && groups.bottom) {
+            this._bottomView = new FixedPanelView(config.bottom, groups.bottom, 'vertical');
         }
-        if (config.left) {
-            this._leftView = new FixedPanelView(config.left);
+        if (config.left && groups.left) {
+            this._leftView = new FixedPanelView(config.left, groups.left, 'horizontal');
         }
-        if (config.right) {
-            this._rightView = new FixedPanelView(config.right);
+        if (config.right && groups.right) {
+            this._rightView = new FixedPanelView(config.right, groups.right, 'horizontal');
         }
 
         // Create center view wrapping the dockview element
@@ -311,21 +339,25 @@ export class ShellManager implements IDisposable {
         );
     }
 
+    get element(): HTMLElement {
+        return this._shellElement;
+    }
+
     layout(width: number, height: number): void {
         // Outer splitview is VERTICAL: layout(size=height, orthogonalSize=width)
         this._outerSplitview.layout(height, width);
     }
 
-    getFixedPanel(position: FixedPanelPosition): HTMLElement | undefined {
+    hasFixedPanel(position: FixedPanelPosition): boolean {
         switch (position) {
             case 'top':
-                return this._topView?.element;
+                return this._topView !== undefined;
             case 'bottom':
-                return this._bottomView?.element;
+                return this._bottomView !== undefined;
             case 'left':
-                return this._leftView?.element;
+                return this._leftView !== undefined;
             case 'right':
-                return this._rightView?.element;
+                return this._rightView !== undefined;
         }
     }
 
