@@ -250,8 +250,24 @@ export class Tabs extends CompositeDisposable {
 
                 switch (event.button) {
                     case 0: // left click or touch
-                        if (this.group.activePanel !== panel) {
-                            this.group.model.openPanel(panel);
+                        if (this.group.api.location.type === 'fixed') {
+                            if (this.group.api.isCollapsed()) {
+                                // Expand, then activate the clicked tab
+                                this.group.api.expand();
+                                if (this.group.activePanel !== panel) {
+                                    this.group.model.openPanel(panel);
+                                }
+                            } else if (this.group.activePanel === panel) {
+                                // Clicking the active tab collapses the group
+                                this.group.api.collapse();
+                            } else {
+                                // Inactive tab: switch panel, don't collapse
+                                this.group.model.openPanel(panel);
+                            }
+                        } else {
+                            if (this.group.activePanel !== panel) {
+                                this.group.model.openPanel(panel);
+                            }
                         }
                         break;
                 }

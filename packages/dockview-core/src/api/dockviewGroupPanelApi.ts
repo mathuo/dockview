@@ -41,6 +41,19 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
     isMaximized(): boolean;
     exitMaximized(): void;
     close(): void;
+    /**
+     * Collapse this group (fixed groups only). No-op for non-fixed groups.
+     */
+    collapse(): void;
+    /**
+     * Expand this group (fixed groups only). No-op for non-fixed groups.
+     */
+    expand(): void;
+    /**
+     * Returns true if this fixed group is currently collapsed.
+     * Always returns false for non-fixed groups.
+     */
+    isCollapsed(): boolean;
 }
 
 export interface DockviewGroupPanelFloatingChangeEvent {
@@ -177,6 +190,27 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
         if (this.isMaximized()) {
             this.accessor.exitMaximizedGroup();
         }
+    }
+
+    collapse(): void {
+        if (!this._group) {
+            return;
+        }
+        this.accessor.setFixedGroupCollapsed(this._group, true);
+    }
+
+    expand(): void {
+        if (!this._group) {
+            return;
+        }
+        this.accessor.setFixedGroupCollapsed(this._group, false);
+    }
+
+    isCollapsed(): boolean {
+        if (!this._group) {
+            return false;
+        }
+        return this.accessor.isFixedGroupCollapsed(this._group);
     }
 
     initialize(group: DockviewGroupPanel): void {

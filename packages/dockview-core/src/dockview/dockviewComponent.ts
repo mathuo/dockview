@@ -698,6 +698,7 @@ export class DockviewComponent
                         type: 'fixed',
                         position: _position,
                     };
+                    group.model.headerPosition = _position;
                     this._fixedGroups.set(_position, group);
                     fixedGroupMap[_position] = group as IFixedPanelGroup;
                     this._onDidAddGroup.fire(group);
@@ -1445,6 +1446,33 @@ export class DockviewComponent
 
     isFixedPanelVisible(position: FixedPanelPosition): boolean {
         return this._shellManager?.isFixedPanelVisible(position) ?? false;
+    }
+
+    setFixedGroupCollapsed(
+        group: DockviewGroupPanel,
+        collapsed: boolean
+    ): void {
+        if (!this._shellManager) {
+            return;
+        }
+        for (const [position, fixedGroup] of this._fixedGroups) {
+            if (fixedGroup === group) {
+                this._shellManager.setFixedPanelCollapsed(position, collapsed);
+                return;
+            }
+        }
+    }
+
+    isFixedGroupCollapsed(group: DockviewGroupPanel): boolean {
+        if (!this._shellManager) {
+            return false;
+        }
+        for (const [position, fixedGroup] of this._fixedGroups) {
+            if (fixedGroup === group) {
+                return this._shellManager.isFixedPanelCollapsed(position);
+            }
+        }
+        return false;
     }
 
     private updateDragAndDropState(): void {
