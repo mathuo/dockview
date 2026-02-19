@@ -1,5 +1,5 @@
 import { Emitter, Event } from '../events';
-import { CompositeDisposable, Disposable, IDisposable } from '../lifecycle';
+import { CompositeDisposable, IDisposable } from '../lifecycle';
 import {
     IView,
     LayoutPriority,
@@ -15,7 +15,7 @@ export interface FixedPanelViewOptions {
     initialSize?: number;
     minimumSize?: number;
     maximumSize?: number;
-    snap?: boolean;
+    collapsedSize?: number;
 }
 
 export interface FixedPanelsConfig {
@@ -26,10 +26,10 @@ export interface FixedPanelsConfig {
 }
 
 export interface SerializedFixedPanels {
-    top?: { size: number; visible: boolean; group?: unknown };
-    bottom?: { size: number; visible: boolean; group?: unknown };
-    left?: { size: number; visible: boolean; group?: unknown };
-    right?: { size: number; visible: boolean; group?: unknown };
+    top?: { size: number; visible: boolean; collapsed?: boolean; group?: unknown };
+    bottom?: { size: number; visible: boolean; collapsed?: boolean; group?: unknown };
+    left?: { size: number; visible: boolean; collapsed?: boolean; group?: unknown };
+    right?: { size: number; visible: boolean; collapsed?: boolean; group?: unknown };
 }
 
 /**
@@ -52,13 +52,43 @@ export class FixedPanelView implements IView {
     readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
         this._onDidChange.event;
 
-    readonly minimumSize: number;
-    readonly maximumSize: number;
-    readonly snap: boolean;
+    readonly snap = false;
     readonly priority = LayoutPriority.Low;
+
+    private _isCollapsed = false;
+    private _lastExpandedSize: number;
+    private readonly _collapsedSize: number;
+    private readonly _expandedMinimumSize: number;
+    private readonly _expandedMaximumSize: number;
+
+    get minimumSize(): number {
+        // When collapsed, lock size to collapsedSize so sash can't drag it open
+        return this._isCollapsed
+            ? this._collapsedSize
+            : this._expandedMinimumSize;
+    }
+
+    get maximumSize(): number {
+        // When collapsed, lock size to collapsedSize so sash can't drag it open
+        return this._isCollapsed
+            ? this._collapsedSize
+            : this._expandedMaximumSize;
+    }
 
     get element(): HTMLElement {
         return this._group.element;
+    }
+
+    get isCollapsed(): boolean {
+        return this._isCollapsed;
+    }
+
+    get lastExpandedSize(): number {
+        return this._lastExpandedSize;
+    }
+
+    get collapsedSize(): number {
+        return this._collapsedSize;
     }
 
     constructor(
@@ -72,12 +102,26 @@ export class FixedPanelView implements IView {
         group.element.classList.add('dv-fixed-panel');
         group.element.dataset.testid = `dv-fixed-panel-${options.id}`;
 
-        this.minimumSize = options.minimumSize ?? 0;
-        this.maximumSize = options.maximumSize ?? Number.POSITIVE_INFINITY;
-        this.snap = options.snap ?? true;
+        this._collapsedSize = options.collapsedSize ?? 30;
+        this._expandedMaximumSize =
+            options.maximumSize ?? Number.POSITIVE_INFINITY;
+        // If the caller explicitly provides a minimumSize, respect it.
+        // Otherwise fall back to collapsedSize + 50 so the expanded state is
+        // visually distinguishable from the collapsed state.
+        this._expandedMinimumSize =
+            options.minimumSize !== undefined
+                ? options.minimumSize
+                : this._collapsedSize + 50;
+
+        this._lastExpandedSize = options.initialSize ?? 200;
     }
 
     layout(size: number, orthogonalSize: number): void {
+        // Track the last expanded size so we can restore it after collapsing
+        if (!this._isCollapsed) {
+            this._lastExpandedSize = size;
+        }
+
         // horizontal (left/right): size=width, orthogonalSize=height → layout(width, height)
         // vertical (top/bottom): size=height, orthogonalSize=width → layout(width, height)
         if (this._orientation === 'horizontal') {
@@ -85,6 +129,15 @@ export class FixedPanelView implements IView {
         } else {
             this._group.layout(orthogonalSize, size);
         }
+    }
+
+    setCollapsed(collapsed: boolean): void {
+        if (this._isCollapsed === collapsed) {
+            return;
+        }
+        this._isCollapsed = collapsed;
+        this._group.element.classList.toggle('dv-fixed-collapsed', collapsed);
+        // ShellManager calls resizeView directly after this; no _onDidChange needed
     }
 
     setVisible(_visible: boolean): void {
@@ -121,8 +174,9 @@ class CenterView implements IView {
     ) {}
 
     layout(size: number, orthogonalSize: number): void {
-        // Inner splitview is HORIZONTAL: size = width, orthogonalSize = height
-        this._layoutDockview(size, orthogonalSize);
+        // Lives in a VERTICAL middle-column splitview:
+        // size = height alloc, orthogonalSize = width
+        this._layoutDockview(orthogonalSize, size);
     }
 
     setVisible(_visible: boolean): void {
@@ -134,7 +188,12 @@ class CenterView implements IView {
     }
 }
 
-class MiddleRowView implements IView, IDisposable {
+/**
+ * The vertical centre column: top (optional) | center | bottom (optional).
+ * This view sits between the left and right fixed panels in the outer
+ * horizontal splitview, so its primary axis is width (horizontal).
+ */
+class MiddleColumnView implements IView, IDisposable {
     private readonly _element: HTMLElement;
     private readonly _splitview: Splitview;
     private readonly _onDidChange = new Emitter<{
@@ -148,80 +207,88 @@ class MiddleRowView implements IView, IDisposable {
     readonly maximumSize = Number.POSITIVE_INFINITY;
     readonly priority = LayoutPriority.High;
 
-    private readonly _leftIndex: number | undefined;
+    private readonly _topIndex: number | undefined;
     private readonly _centerIndex: number;
-    private readonly _rightIndex: number | undefined;
+    private readonly _bottomIndex: number | undefined;
 
     get element(): HTMLElement {
         return this._element;
     }
 
     constructor(
-        leftView: FixedPanelView | undefined,
+        topView: FixedPanelView | undefined,
         centerView: CenterView,
-        rightView: FixedPanelView | undefined,
-        leftSize: number,
-        rightSize: number
+        bottomView: FixedPanelView | undefined,
+        topSize: number,
+        bottomSize: number
     ) {
         this._element = document.createElement('div');
-        this._element.className = 'dv-shell-middle-row';
+        this._element.className = 'dv-shell-middle-column';
         this._element.style.height = '100%';
         this._element.style.width = '100%';
 
         this._splitview = new Splitview(this._element, {
-            orientation: Orientation.HORIZONTAL,
+            orientation: Orientation.VERTICAL,
             proportionalLayout: false,
         });
 
         let index = 0;
-        if (leftView) {
-            this._leftIndex = index;
-            this._splitview.addView(leftView, leftSize, index++);
+        if (topView) {
+            this._topIndex = index;
+            this._splitview.addView(topView, topSize, index++);
         }
 
         this._centerIndex = index;
         this._splitview.addView(centerView, { type: 'distribute' }, index++);
 
-        if (rightView) {
-            this._rightIndex = index;
-            this._splitview.addView(rightView, rightSize, index);
+        if (bottomView) {
+            this._bottomIndex = index;
+            this._splitview.addView(bottomView, bottomSize, index);
         }
     }
 
     layout(size: number, orthogonalSize: number): void {
-        // Outer splitview is VERTICAL: size = height, orthogonalSize = width
-        // Inner splitview is HORIZONTAL: layout(width, height)
+        // Outer horizontal splitview: size = width, orthogonalSize = height
+        // Inner vertical splitview: layout(height, width)
         this._splitview.layout(orthogonalSize, size);
     }
 
     setVisible(_visible: boolean): void {
-        // middle row is always visible
+        // middle column is always visible
     }
 
-    setViewVisible(position: 'left' | 'right', visible: boolean): void {
+    setViewVisible(position: 'top' | 'bottom', visible: boolean): void {
         const index =
-            position === 'left' ? this._leftIndex : this._rightIndex;
+            position === 'top' ? this._topIndex : this._bottomIndex;
         if (index !== undefined) {
             this._splitview.setViewVisible(index, visible);
         }
     }
 
-    isViewVisible(position: 'left' | 'right'): boolean {
+    isViewVisible(position: 'top' | 'bottom'): boolean {
         const index =
-            position === 'left' ? this._leftIndex : this._rightIndex;
+            position === 'top' ? this._topIndex : this._bottomIndex;
         if (index !== undefined) {
             return this._splitview.isViewVisible(index);
         }
         return false;
     }
 
-    getViewSize(position: 'left' | 'right'): number {
+    getViewSize(position: 'top' | 'bottom'): number {
         const index =
-            position === 'left' ? this._leftIndex : this._rightIndex;
+            position === 'top' ? this._topIndex : this._bottomIndex;
         if (index !== undefined) {
             return this._splitview.getViewSize(index);
         }
         return 0;
+    }
+
+    resizeView(position: 'top' | 'bottom', size: number): void {
+        const index =
+            position === 'top' ? this._topIndex : this._bottomIndex;
+        if (index !== undefined) {
+            this._splitview.resizeView(index, size);
+        }
     }
 
     dispose(): void {
@@ -232,7 +299,7 @@ class MiddleRowView implements IView, IDisposable {
 
 export class ShellManager implements IDisposable {
     private readonly _outerSplitview: Splitview;
-    private readonly _middleRow: MiddleRowView;
+    private readonly _middleColumn: MiddleColumnView;
     private readonly _shellElement: HTMLElement;
 
     private readonly _topView: FixedPanelView | undefined;
@@ -240,9 +307,10 @@ export class ShellManager implements IDisposable {
     private readonly _leftView: FixedPanelView | undefined;
     private readonly _rightView: FixedPanelView | undefined;
 
-    private readonly _topIndex: number | undefined;
+    // Indices in the outer HORIZONTAL splitview
+    private readonly _leftIndex: number | undefined;
     private readonly _middleIndex: number;
-    private readonly _bottomIndex: number | undefined;
+    private readonly _rightIndex: number | undefined;
 
     private readonly _disposables = new CompositeDisposable();
 
@@ -281,43 +349,43 @@ export class ShellManager implements IDisposable {
         // Create center view wrapping the dockview element
         const centerView = new CenterView(dockviewElement, layoutGrid);
 
-        // Create middle row with left | center | right
-        this._middleRow = new MiddleRowView(
-            this._leftView,
+        // Middle column: top | center | bottom (vertical splitview)
+        this._middleColumn = new MiddleColumnView(
+            this._topView,
             centerView,
-            this._rightView,
-            config.left?.initialSize ?? 200,
-            config.right?.initialSize ?? 200
+            this._bottomView,
+            this._topView?.lastExpandedSize ?? 200,
+            this._bottomView?.lastExpandedSize ?? 200
         );
 
-        // Create outer splitview (VERTICAL = top-to-bottom rows)
+        // Outer splitview: left | middle-column | right (horizontal)
         this._outerSplitview = new Splitview(this._shellElement, {
-            orientation: Orientation.VERTICAL,
+            orientation: Orientation.HORIZONTAL,
             proportionalLayout: false,
         });
 
         let index = 0;
-        if (this._topView) {
-            this._topIndex = index;
+        if (this._leftView) {
+            this._leftIndex = index;
             this._outerSplitview.addView(
-                this._topView,
-                config.top?.initialSize ?? 40,
+                this._leftView,
+                this._leftView.lastExpandedSize,
                 index++
             );
         }
 
         this._middleIndex = index;
         this._outerSplitview.addView(
-            this._middleRow,
+            this._middleColumn,
             { type: 'distribute' },
             index++
         );
 
-        if (this._bottomView) {
-            this._bottomIndex = index;
+        if (this._rightView) {
+            this._rightIndex = index;
             this._outerSplitview.addView(
-                this._bottomView,
-                config.bottom?.initialSize ?? 200,
+                this._rightView,
+                this._rightView.lastExpandedSize,
                 index
             );
         }
@@ -328,7 +396,7 @@ export class ShellManager implements IDisposable {
                 this.layout(width, height);
             }),
             this._outerSplitview,
-            this._middleRow,
+            this._middleColumn,
             centerView,
             ...[
                 this._topView,
@@ -344,8 +412,8 @@ export class ShellManager implements IDisposable {
     }
 
     layout(width: number, height: number): void {
-        // Outer splitview is VERTICAL: layout(size=height, orthogonalSize=width)
-        this._outerSplitview.layout(height, width);
+        // Outer splitview is HORIZONTAL: layout(size=width, orthogonalSize=height)
+        this._outerSplitview.layout(width, height);
     }
 
     hasFixedPanel(position: FixedPanelPosition): boolean {
@@ -366,76 +434,141 @@ export class ShellManager implements IDisposable {
         visible: boolean
     ): void {
         switch (position) {
-            case 'top':
-                if (this._topIndex !== undefined) {
-                    this._outerSplitview.setViewVisible(
-                        this._topIndex,
-                        visible
-                    );
-                }
-                break;
-            case 'bottom':
-                if (this._bottomIndex !== undefined) {
-                    this._outerSplitview.setViewVisible(
-                        this._bottomIndex,
-                        visible
-                    );
-                }
-                break;
             case 'left':
+                if (this._leftIndex !== undefined) {
+                    this._outerSplitview.setViewVisible(
+                        this._leftIndex,
+                        visible
+                    );
+                }
+                break;
             case 'right':
-                this._middleRow.setViewVisible(position, visible);
+                if (this._rightIndex !== undefined) {
+                    this._outerSplitview.setViewVisible(
+                        this._rightIndex,
+                        visible
+                    );
+                }
+                break;
+            case 'top':
+            case 'bottom':
+                this._middleColumn.setViewVisible(position, visible);
                 break;
         }
     }
 
     isFixedPanelVisible(position: FixedPanelPosition): boolean {
         switch (position) {
-            case 'top':
-                if (this._topIndex !== undefined) {
-                    return this._outerSplitview.isViewVisible(this._topIndex);
+            case 'left':
+                if (this._leftIndex !== undefined) {
+                    return this._outerSplitview.isViewVisible(this._leftIndex);
                 }
                 return false;
-            case 'bottom':
-                if (this._bottomIndex !== undefined) {
+            case 'right':
+                if (this._rightIndex !== undefined) {
                     return this._outerSplitview.isViewVisible(
-                        this._bottomIndex
+                        this._rightIndex
                     );
                 }
                 return false;
+            case 'top':
+            case 'bottom':
+                return this._middleColumn.isViewVisible(position);
+        }
+    }
+
+    setFixedPanelCollapsed(
+        position: FixedPanelPosition,
+        collapsed: boolean
+    ): void {
+        const view = this._getView(position);
+        if (!view) {
+            return;
+        }
+        view.setCollapsed(collapsed);
+        const targetSize = collapsed
+            ? view.collapsedSize
+            : view.lastExpandedSize;
+        switch (position) {
             case 'left':
+                if (this._leftIndex !== undefined) {
+                    this._outerSplitview.resizeView(
+                        this._leftIndex,
+                        targetSize
+                    );
+                }
+                break;
             case 'right':
-                return this._middleRow.isViewVisible(position);
+                if (this._rightIndex !== undefined) {
+                    this._outerSplitview.resizeView(
+                        this._rightIndex,
+                        targetSize
+                    );
+                }
+                break;
+            case 'top':
+            case 'bottom':
+                this._middleColumn.resizeView(position, targetSize);
+                break;
+        }
+    }
+
+    isFixedPanelCollapsed(position: FixedPanelPosition): boolean {
+        return this._getView(position)?.isCollapsed ?? false;
+    }
+
+    private _getView(
+        position: FixedPanelPosition
+    ): FixedPanelView | undefined {
+        switch (position) {
+            case 'top':
+                return this._topView;
+            case 'bottom':
+                return this._bottomView;
+            case 'left':
+                return this._leftView;
+            case 'right':
+                return this._rightView;
         }
     }
 
     toJSON(): SerializedFixedPanels {
         const fixedPanels: SerializedFixedPanels = {};
 
-        if (this._topView && this._topIndex !== undefined) {
-            fixedPanels.top = {
-                size: this._outerSplitview.getViewSize(this._topIndex),
-                visible: this._outerSplitview.isViewVisible(this._topIndex),
-            };
-        }
-        if (this._bottomView && this._bottomIndex !== undefined) {
-            fixedPanels.bottom = {
-                size: this._outerSplitview.getViewSize(this._bottomIndex),
-                visible: this._outerSplitview.isViewVisible(
-                    this._bottomIndex
-                ),
-            };
-        }
-        if (this._leftView) {
+        if (this._leftView && this._leftIndex !== undefined) {
             fixedPanels.left = {
-                size: this._middleRow.getViewSize('left'),
-                visible: this._middleRow.isViewVisible('left'),
+                size: this._leftView.isCollapsed
+                    ? this._leftView.lastExpandedSize
+                    : this._outerSplitview.getViewSize(this._leftIndex),
+                visible: this._outerSplitview.isViewVisible(this._leftIndex),
+                collapsed: this._leftView.isCollapsed || undefined,
             };
         }
-        if (this._rightView) {
+        if (this._rightView && this._rightIndex !== undefined) {
             fixedPanels.right = {
-                size: this._middleRow.getViewSize('right'),
-                visible: this._middleRow.isViewVisible('right'),
+                size: this._rightView.isCollapsed
+                    ? this._rightView.lastExpandedSize
+                    : this._outerSplitview.getViewSize(this._rightIndex),
+                visible: this._outerSplitview.isViewVisible(this._rightIndex),
+                collapsed: this._rightView.isCollapsed || undefined,
+            };
+        }
+        if (this._topView) {
+            fixedPanels.top = {
+                size: this._topView.isCollapsed
+                    ? this._topView.lastExpandedSize
+                    : this._middleColumn.getViewSize('top'),
+                visible: this._middleColumn.isViewVisible('top'),
+                collapsed: this._topView.isCollapsed || undefined,
+            };
+        }
+        if (this._bottomView) {
+            fixedPanels.bottom = {
+                size: this._bottomView.isCollapsed
+                    ? this._bottomView.lastExpandedSize
+                    : this._middleColumn.getViewSize('bottom'),
+                visible: this._middleColumn.isViewVisible('bottom'),
+                collapsed: this._bottomView.isCollapsed || undefined,
             };
         }
 
@@ -443,32 +576,40 @@ export class ShellManager implements IDisposable {
     }
 
     fromJSON(data: SerializedFixedPanels): void {
-        if (data.top && this._topIndex !== undefined) {
-            this._outerSplitview.resizeView(this._topIndex, data.top.size);
-            if (!data.top.visible) {
-                this._outerSplitview.setViewVisible(this._topIndex, false);
-            }
-        }
-        if (data.bottom && this._bottomIndex !== undefined) {
-            this._outerSplitview.resizeView(
-                this._bottomIndex,
-                data.bottom.size
-            );
-            if (!data.bottom.visible) {
-                this._outerSplitview.setViewVisible(
-                    this._bottomIndex,
-                    false
-                );
-            }
-        }
-        if (data.left) {
+        if (data.left && this._leftIndex !== undefined) {
+            this._outerSplitview.resizeView(this._leftIndex, data.left.size);
             if (!data.left.visible) {
-                this._middleRow.setViewVisible('left', false);
+                this._outerSplitview.setViewVisible(this._leftIndex, false);
+            }
+            if (data.left.collapsed) {
+                this._leftView?.setCollapsed(true);
             }
         }
-        if (data.right) {
+        if (data.right && this._rightIndex !== undefined) {
+            this._outerSplitview.resizeView(this._rightIndex, data.right.size);
             if (!data.right.visible) {
-                this._middleRow.setViewVisible('right', false);
+                this._outerSplitview.setViewVisible(this._rightIndex, false);
+            }
+            if (data.right.collapsed) {
+                this._rightView?.setCollapsed(true);
+            }
+        }
+        if (data.top) {
+            this._middleColumn.resizeView('top', data.top.size);
+            if (!data.top.visible) {
+                this._middleColumn.setViewVisible('top', false);
+            }
+            if (data.top.collapsed) {
+                this._topView?.setCollapsed(true);
+            }
+        }
+        if (data.bottom) {
+            this._middleColumn.resizeView('bottom', data.bottom.size);
+            if (!data.bottom.visible) {
+                this._middleColumn.setViewVisible('bottom', false);
+            }
+            if (data.bottom.collapsed) {
+                this._bottomView?.setCollapsed(true);
             }
         }
     }

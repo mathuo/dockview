@@ -135,7 +135,8 @@ const components = {
                     height: '100%',
                     color: 'rgba(255,255,255,0.6)',
                     fontFamily: 'monospace',
-                    fontSize: props.params?.position === 'top' ? '13px' : '14px',
+                    fontSize:
+                        props.params?.position === 'top' ? '13px' : '14px',
                 }}
             >
                 <span>{props.params?.label as string}</span>
@@ -388,10 +389,29 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
 
     const fixedPanelsConfig: FixedPanelsConfig | undefined = useFixedPanels
         ? {
-              top: { id: 'top', initialSize: 40, minimumSize: 30, maximumSize: 60 },
-              bottom: { id: 'bottom', initialSize: 200, minimumSize: 100, snap: true },
-              left: { id: 'left', initialSize: 220, minimumSize: 150, snap: true },
-              right: { id: 'right', initialSize: 220, minimumSize: 150, snap: true },
+              top: {
+                  id: 'top',
+                  initialSize: 100,
+                  minimumSize: 80,
+              },
+              bottom: {
+                  id: 'bottom',
+                  initialSize: 200,
+                  minimumSize: 100,
+                  snap: true,
+              },
+              left: {
+                  id: 'left',
+                  initialSize: 220,
+                  minimumSize: 150,
+                  snap: true,
+              },
+              right: {
+                  id: 'right',
+                  initialSize: 220,
+                  minimumSize: 150,
+                  snap: true,
+              },
           }
         : undefined;
 
@@ -416,7 +436,7 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                     toggleCustomWatermark={() => setWatermark(!watermark)}
                     hasCustomWatermark={watermark}
                 />
-                {api && (
+                {/* {api && (
                     <PanelActions
                         api={api}
                         panels={panels}
@@ -429,22 +449,33 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                         groups={groups}
                         activeGroup={activeGroup}
                     />
-                )}
+                )} */}
                 {useFixedPanels && api && (
                     <div className="action-container">
-                        <span style={{ fontSize: '12px', opacity: 0.7, marginRight: '8px' }}>Fixed Panels:</span>
-                        {(['top', 'bottom', 'left', 'right'] as const).map((pos) => (
-                            <button
-                                key={pos}
-                                className="text-button"
-                                onClick={() => {
-                                    const visible = api.isFixedPanelVisible(pos);
-                                    api.setFixedPanelVisible(pos, !visible);
-                                }}
-                            >
-                                Toggle {pos}
-                            </button>
-                        ))}
+                        <span
+                            style={{
+                                fontSize: '12px',
+                                opacity: 0.7,
+                                marginRight: '8px',
+                            }}
+                        >
+                            Fixed Panels:
+                        </span>
+                        {(['top', 'bottom', 'left', 'right'] as const).map(
+                            (pos) => (
+                                <button
+                                    key={pos}
+                                    className="text-button"
+                                    onClick={() => {
+                                        const visible =
+                                            api.isFixedPanelVisible(pos);
+                                        api.setFixedPanelVisible(pos, !visible);
+                                    }}
+                                >
+                                    Toggle {pos}
+                                </button>
+                            )
+                        )}
                     </div>
                 )}
             </div>
