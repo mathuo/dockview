@@ -356,6 +356,119 @@ describe('overlayRenderContainer', () => {
         expect(parentContainer.getBoundingClientRect).toHaveBeenCalledTimes(2);
     });
 
+    test('overlay element is hidden until first position is applied', async () => {
+        const cut = new OverlayRenderContainer(
+            parentContainer,
+            fromPartial<DockviewComponent>({})
+        );
+
+        const panelContentEl = document.createElement('div');
+        const onDidVisibilityChange = new Emitter<any>();
+        const onDidDimensionsChange = new Emitter<any>();
+        const onDidLocationChange = new Emitter<any>();
+
+        const panel = fromPartial<IDockviewPanel>({
+            api: {
+                id: 'test_panel_id',
+                onDidVisibilityChange: onDidVisibilityChange.event,
+                onDidDimensionsChange: onDidDimensionsChange.event,
+                onDidLocationChange: onDidLocationChange.event,
+                isVisible: true,
+                location: { type: 'grid' },
+            },
+            view: { content: { element: panelContentEl } },
+            group: { api: { location: { type: 'grid' } } },
+        });
+
+        jest.spyOn(
+            referenceContainer.element,
+            'getBoundingClientRect'
+        ).mockReturnValue(
+            fromPartial<DOMRect>({
+                left: 100,
+                top: 200,
+                width: 100,
+                height: 200,
+            })
+        );
+        jest.spyOn(parentContainer, 'getBoundingClientRect').mockReturnValue(
+            fromPartial<DOMRect>({ left: 0, top: 0, width: 1000, height: 1000 })
+        );
+
+        const container = cut.attach({ panel, referenceContainer });
+
+        // Immediately after attach: hidden to prevent a one-frame flash at 0,0
+        expect(container.style.visibility).toBe('hidden');
+
+        await exhaustMicrotaskQueue();
+        await exhaustAnimationFrame();
+
+        // After first position is applied: visible
+        expect(container.style.visibility).toBe('');
+        expect(container.style.left).toBe('100px');
+        expect(container.style.top).toBe('200px');
+    });
+
+    test('overlay element is hidden again on re-attach (e.g. after fromJSON)', async () => {
+        const cut = new OverlayRenderContainer(
+            parentContainer,
+            fromPartial<DockviewComponent>({})
+        );
+
+        const panelContentEl = document.createElement('div');
+        const onDidVisibilityChange = new Emitter<any>();
+        const onDidDimensionsChange = new Emitter<any>();
+        const onDidLocationChange = new Emitter<any>();
+
+        const panel = fromPartial<IDockviewPanel>({
+            api: {
+                id: 'test_panel_id',
+                onDidVisibilityChange: onDidVisibilityChange.event,
+                onDidDimensionsChange: onDidDimensionsChange.event,
+                onDidLocationChange: onDidLocationChange.event,
+                isVisible: true,
+                location: { type: 'grid' },
+            },
+            view: { content: { element: panelContentEl } },
+            group: { api: { location: { type: 'grid' } } },
+        });
+
+        jest.spyOn(
+            referenceContainer.element,
+            'getBoundingClientRect'
+        ).mockReturnValue(
+            fromPartial<DOMRect>({
+                left: 100,
+                top: 200,
+                width: 100,
+                height: 200,
+            })
+        );
+        jest.spyOn(parentContainer, 'getBoundingClientRect').mockReturnValue(
+            fromPartial<DOMRect>({ left: 0, top: 0, width: 1000, height: 1000 })
+        );
+
+        const container = cut.attach({ panel, referenceContainer });
+        await exhaustMicrotaskQueue();
+        await exhaustAnimationFrame();
+
+        // Fully positioned and visible after first attach
+        expect(container.style.visibility).toBe('');
+
+        // Simulate what fromJSON does: detach then re-attach the panel
+        cut.detatch(panel);
+        const container2 = cut.attach({ panel, referenceContainer });
+
+        // A fresh overlay element is created — must be hidden until positioned
+        expect(container2.style.visibility).toBe('hidden');
+
+        await exhaustMicrotaskQueue();
+        await exhaustAnimationFrame();
+
+        // Visible again after repositioning
+        expect(container2.style.visibility).toBe('');
+    });
+
     test('updateAllPositions forces position recalculation for visible panels', async () => {
         const cut = new OverlayRenderContainer(
             parentContainer,
