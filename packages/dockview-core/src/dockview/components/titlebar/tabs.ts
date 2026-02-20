@@ -222,13 +222,17 @@ export class Tabs extends CompositeDisposable {
                 if (this.group.api.location.type !== 'fixed') {
                     return;
                 }
-                if (this.group.api.isCollapsed()) {
-                    this.group.api.expand();
-                    if (this.group.activePanel !== panel) {
-                        this.group.model.openPanel(panel);
+                if (this.group.activePanel === panel) {
+                    // Clicking the active tab toggles expansion
+                    if (this.group.api.isCollapsed()) {
+                        this.group.api.expand();
+                    } else {
+                        this.group.api.collapse();
                     }
-                } else if (this.group.activePanel === panel) {
-                    this.group.api.collapse();
+                } else {
+                    // Clicking a non-active tab only switches the active tab,
+                    // never changes the collapsed/expanded state
+                    this.group.model.openPanel(panel);
                 }
             }),
             tab.onPointerDown((event) => {
@@ -267,14 +271,8 @@ export class Tabs extends CompositeDisposable {
                 switch (event.button) {
                     case 0:
                         if (this.group.api.location.type === 'fixed') {
-                            // Toggle (expand/collapse) is handled by onTabClick.
-                            // Only switch to an inactive tab on pointerdown.
-                            if (
-                                !this.group.api.isCollapsed() &&
-                                this.group.activePanel !== panel
-                            ) {
-                                this.group.model.openPanel(panel);
-                            }
+                            // All tab interaction for fixed groups is handled by
+                            // onTabClick to avoid race conditions with active panel state
                         } else {
                             if (this.group.activePanel !== panel) {
                                 this.group.model.openPanel(panel);

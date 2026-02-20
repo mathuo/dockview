@@ -933,17 +933,16 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      * Get the group panel API for a fixed side panel at the given position.
      * Returns `undefined` if no fixed panel is configured at that position.
      */
-    getFixedPanel(position: FixedPanelPosition): DockviewGroupPanelApi | undefined {
+    getFixedPanel(
+        position: FixedPanelPosition
+    ): DockviewGroupPanelApi | undefined {
         return this.component.getFixedPanel(position);
     }
 
     /**
      * Set the visibility of a fixed side panel.
      */
-    setFixedPanelVisible(
-        position: FixedPanelPosition,
-        visible: boolean
-    ): void {
+    setFixedPanelVisible(position: FixedPanelPosition, visible: boolean): void {
         this.component.setFixedPanelVisible(position, visible);
     }
 

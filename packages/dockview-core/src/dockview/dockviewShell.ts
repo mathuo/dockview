@@ -26,10 +26,30 @@ export interface FixedPanelsConfig {
 }
 
 export interface SerializedFixedPanels {
-    top?: { size: number; visible: boolean; collapsed?: boolean; group?: unknown };
-    bottom?: { size: number; visible: boolean; collapsed?: boolean; group?: unknown };
-    left?: { size: number; visible: boolean; collapsed?: boolean; group?: unknown };
-    right?: { size: number; visible: boolean; collapsed?: boolean; group?: unknown };
+    top?: {
+        size: number;
+        visible: boolean;
+        collapsed?: boolean;
+        group?: unknown;
+    };
+    bottom?: {
+        size: number;
+        visible: boolean;
+        collapsed?: boolean;
+        group?: unknown;
+    };
+    left?: {
+        size: number;
+        visible: boolean;
+        collapsed?: boolean;
+        group?: unknown;
+    };
+    right?: {
+        size: number;
+        visible: boolean;
+        collapsed?: boolean;
+        group?: unknown;
+    };
 }
 
 /**
@@ -258,16 +278,14 @@ class MiddleColumnView implements IView, IDisposable {
     }
 
     setViewVisible(position: 'top' | 'bottom', visible: boolean): void {
-        const index =
-            position === 'top' ? this._topIndex : this._bottomIndex;
+        const index = position === 'top' ? this._topIndex : this._bottomIndex;
         if (index !== undefined) {
             this._splitview.setViewVisible(index, visible);
         }
     }
 
     isViewVisible(position: 'top' | 'bottom'): boolean {
-        const index =
-            position === 'top' ? this._topIndex : this._bottomIndex;
+        const index = position === 'top' ? this._topIndex : this._bottomIndex;
         if (index !== undefined) {
             return this._splitview.isViewVisible(index);
         }
@@ -275,8 +293,7 @@ class MiddleColumnView implements IView, IDisposable {
     }
 
     getViewSize(position: 'top' | 'bottom'): number {
-        const index =
-            position === 'top' ? this._topIndex : this._bottomIndex;
+        const index = position === 'top' ? this._topIndex : this._bottomIndex;
         if (index !== undefined) {
             return this._splitview.getViewSize(index);
         }
@@ -284,8 +301,7 @@ class MiddleColumnView implements IView, IDisposable {
     }
 
     resizeView(position: 'top' | 'bottom', size: number): void {
-        const index =
-            position === 'top' ? this._topIndex : this._bottomIndex;
+        const index = position === 'top' ? this._topIndex : this._bottomIndex;
         if (index !== undefined) {
             this._splitview.resizeView(index, size);
         }
@@ -334,16 +350,32 @@ export class ShellManager implements IDisposable {
 
         // Create fixed panel views for configured positions
         if (config.top && groups.top) {
-            this._topView = new FixedPanelView(config.top, groups.top, 'vertical');
+            this._topView = new FixedPanelView(
+                config.top,
+                groups.top,
+                'vertical'
+            );
         }
         if (config.bottom && groups.bottom) {
-            this._bottomView = new FixedPanelView(config.bottom, groups.bottom, 'vertical');
+            this._bottomView = new FixedPanelView(
+                config.bottom,
+                groups.bottom,
+                'vertical'
+            );
         }
         if (config.left && groups.left) {
-            this._leftView = new FixedPanelView(config.left, groups.left, 'horizontal');
+            this._leftView = new FixedPanelView(
+                config.left,
+                groups.left,
+                'horizontal'
+            );
         }
         if (config.right && groups.right) {
-            this._rightView = new FixedPanelView(config.right, groups.right, 'horizontal');
+            this._rightView = new FixedPanelView(
+                config.right,
+                groups.right,
+                'horizontal'
+            );
         }
 
         // Create center view wrapping the dockview element
@@ -429,10 +461,7 @@ export class ShellManager implements IDisposable {
         }
     }
 
-    setFixedPanelVisible(
-        position: FixedPanelPosition,
-        visible: boolean
-    ): void {
+    setFixedPanelVisible(position: FixedPanelPosition, visible: boolean): void {
         switch (position) {
             case 'left':
                 if (this._leftIndex !== undefined) {
@@ -466,9 +495,7 @@ export class ShellManager implements IDisposable {
                 return false;
             case 'right':
                 if (this._rightIndex !== undefined) {
-                    return this._outerSplitview.isViewVisible(
-                        this._rightIndex
-                    );
+                    return this._outerSplitview.isViewVisible(this._rightIndex);
                 }
                 return false;
             case 'top':
@@ -517,9 +544,7 @@ export class ShellManager implements IDisposable {
         return this._getView(position)?.isCollapsed ?? false;
     }
 
-    private _getView(
-        position: FixedPanelPosition
-    ): FixedPanelView | undefined {
+    private _getView(position: FixedPanelPosition): FixedPanelView | undefined {
         switch (position) {
             case 'top':
                 return this._topView;

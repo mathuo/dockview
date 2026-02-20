@@ -278,7 +278,9 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
         }
     ): Promise<boolean>;
     fromJSON(data: any, options?: { reuseExistingPanels: boolean }): void;
-    getFixedPanel(position: FixedPanelPosition): DockviewGroupPanelApi | undefined;
+    getFixedPanel(
+        position: FixedPanelPosition
+    ): DockviewGroupPanelApi | undefined;
     setFixedPanelVisible(position: FixedPanelPosition, visible: boolean): void;
     isFixedPanelVisible(position: FixedPanelPosition): boolean;
 }
@@ -361,7 +363,10 @@ export class DockviewComponent
 
     private _shellManager: ShellManager | undefined;
     private _inShellLayout = false;
-    private readonly _fixedGroups = new Map<FixedPanelPosition, DockviewGroupPanel>();
+    private readonly _fixedGroups = new Map<
+        FixedPanelPosition,
+        DockviewGroupPanel
+    >();
 
     private readonly _floatingGroups: DockviewFloatingGroupPanel[] = [];
     private readonly _popoutGroups: {
@@ -1433,14 +1438,13 @@ export class DockviewComponent
         }
     }
 
-    getFixedPanel(position: FixedPanelPosition): DockviewGroupPanelApi | undefined {
+    getFixedPanel(
+        position: FixedPanelPosition
+    ): DockviewGroupPanelApi | undefined {
         return this._fixedGroups.get(position)?.api;
     }
 
-    setFixedPanelVisible(
-        position: FixedPanelPosition,
-        visible: boolean
-    ): void {
+    setFixedPanelVisible(position: FixedPanelPosition, visible: boolean): void {
         this._shellManager?.setFixedPanelVisible(position, visible);
     }
 
