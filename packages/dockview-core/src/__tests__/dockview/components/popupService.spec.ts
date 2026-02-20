@@ -146,9 +146,7 @@ describe('PopupService', () => {
             el.className = 'my-popup';
             service.openPopover(el, { x: 0, y: 0 });
 
-            el.dispatchEvent(
-                new MouseEvent('pointerdown', { bubbles: true })
-            );
+            el.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
 
             const anchor = root.querySelector('.dv-popover-anchor')!;
             expect(anchor.querySelector('.my-popup')).not.toBeNull();
