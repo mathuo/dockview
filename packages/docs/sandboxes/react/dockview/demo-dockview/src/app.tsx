@@ -318,12 +318,41 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
             }),
         ];
 
+        const fixedPanelDefs: {
+            pos: 'bottom' | 'left' | 'right';
+            id: string;
+            title: string;
+        }[] = [
+            { pos: 'left', id: 'left-1', title: 'Explorer' },
+            { pos: 'right', id: 'right-1', title: 'Outline' },
+            { pos: 'right', id: 'right-2', title: 'Properties' },
+            { pos: 'bottom', id: 'bottom-1', title: 'Terminal' },
+            { pos: 'bottom', id: 'bottom-2', title: 'Output' },
+            { pos: 'bottom', id: 'bottom-3', title: 'Problems' },
+        ];
+
+        const populateFixedPanels = () => {
+            for (const { pos, id, title } of fixedPanelDefs) {
+                const groupApi = api.getFixedPanel(pos);
+                if (groupApi && !api.panels.find((p) => p.id === id)) {
+                    api.addPanel({
+                        id,
+                        component: 'fixedPlaceholder',
+                        title,
+                        position: { referenceGroup: groupApi.id },
+                        params: { label: title, position: pos },
+                    });
+                }
+            }
+        };
+
         const loadLayout = () => {
             const state = localStorage.getItem('dv-demo-state');
 
             if (state) {
                 try {
                     api.fromJSON(JSON.parse(state));
+                    populateFixedPanels();
                     return;
                 } catch {
                     localStorage.removeItem('dv-demo-state');
@@ -332,6 +361,7 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
             }
 
             defaultConfig(api);
+            populateFixedPanels();
         };
 
         loadLayout();
@@ -343,29 +373,6 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
 
     const onReady = (event: DockviewReadyEvent) => {
         setApi(event.api);
-
-        if (useFixedPanels) {
-            const positions = ['top', 'bottom', 'left', 'right'] as const;
-            const labels: Record<string, string> = {
-                top: 'Menu Bar / Toolbar',
-                bottom: 'Terminal / Output',
-                left: 'Explorer / Sidebar',
-                right: 'Outline / Properties',
-            };
-
-            for (const pos of positions) {
-                const groupApi = event.api.getFixedPanel(pos);
-                if (groupApi) {
-                    event.api.addPanel({
-                        id: `fixed-placeholder-${pos}`,
-                        component: 'fixedPlaceholder',
-                        title: labels[pos],
-                        position: { referenceGroup: groupApi.id },
-                        params: { label: labels[pos], position: pos },
-                    });
-                }
-            }
-        }
     };
 
     const [watermark, setWatermark] = React.useState<boolean>(false);
@@ -385,32 +392,27 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
 
     const [showLogs, setShowLogs] = React.useState<boolean>(false);
     const [debug, setDebug] = React.useState<boolean>(false);
-    const [useFixedPanels, setUseFixedPanels] = React.useState<boolean>(false);
+    const [useFixedPanels, setUseFixedPanels] = React.useState<boolean>(true);
 
     const fixedPanelsConfig: FixedPanelsConfig | undefined = useFixedPanels
         ? {
-              top: {
-                  id: 'top',
-                  initialSize: 100,
-                  minimumSize: 80,
-              },
               bottom: {
                   id: 'bottom',
                   initialSize: 200,
                   minimumSize: 100,
-                  snap: true,
+                  initiallyCollapsed: true,
               },
               left: {
                   id: 'left',
                   initialSize: 220,
                   minimumSize: 150,
-                  snap: true,
+                  initiallyCollapsed: true,
               },
               right: {
                   id: 'right',
                   initialSize: 220,
                   minimumSize: 150,
-                  snap: true,
+                  initiallyCollapsed: true,
               },
           }
         : undefined;
@@ -436,7 +438,7 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                     toggleCustomWatermark={() => setWatermark(!watermark)}
                     hasCustomWatermark={watermark}
                 />
-                {/* {api && (
+                {api && (
                     <PanelActions
                         api={api}
                         panels={panels}
@@ -449,7 +451,7 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                         groups={groups}
                         activeGroup={activeGroup}
                     />
-                )} */}
+                )}
                 {useFixedPanels && api && (
                     <div className="action-container">
                         <span
@@ -461,7 +463,7 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                         >
                             Fixed Panels:
                         </span>
-                        {(['top', 'bottom', 'left', 'right'] as const).map(
+                        {(['bottom', 'left', 'right'] as const).map(
                             (pos) => (
                                 <button
                                     key={pos}

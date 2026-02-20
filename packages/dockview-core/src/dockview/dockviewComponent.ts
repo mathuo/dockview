@@ -707,6 +707,18 @@ export class DockviewComponent
                     this._fixedGroups.set(_position, group);
                     fixedGroupMap[_position] = group as IFixedPanelGroup;
                     this._onDidAddGroup.fire(group);
+
+                    // Collapse when the group becomes empty
+                    this.addDisposables(
+                        group.model.onDidRemovePanel(() => {
+                            if (group.model.isEmpty) {
+                                this._shellManager?.setFixedPanelCollapsed(
+                                    _position,
+                                    true
+                                );
+                            }
+                        })
+                    );
                 }
             }
 

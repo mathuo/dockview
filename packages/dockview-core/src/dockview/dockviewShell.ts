@@ -16,6 +16,7 @@ export interface FixedPanelViewOptions {
     minimumSize?: number;
     maximumSize?: number;
     collapsedSize?: number;
+    initiallyCollapsed?: boolean;
 }
 
 export interface FixedPanelsConfig {
@@ -134,6 +135,11 @@ export class FixedPanelView implements IView {
                 : this._collapsedSize + 50;
 
         this._lastExpandedSize = options.initialSize ?? 200;
+
+        if (options.initiallyCollapsed) {
+            this._isCollapsed = true;
+            group.element.classList.add('dv-fixed-collapsed');
+        }
     }
 
     layout(size: number, orthogonalSize: number): void {
@@ -386,8 +392,16 @@ export class ShellManager implements IDisposable {
             this._topView,
             centerView,
             this._bottomView,
-            this._topView?.lastExpandedSize ?? 200,
-            this._bottomView?.lastExpandedSize ?? 200
+            this._topView
+                ? this._topView.isCollapsed
+                    ? this._topView.collapsedSize
+                    : this._topView.lastExpandedSize
+                : 200,
+            this._bottomView
+                ? this._bottomView.isCollapsed
+                    ? this._bottomView.collapsedSize
+                    : this._bottomView.lastExpandedSize
+                : 200
         );
 
         // Outer splitview: left | middle-column | right (horizontal)
@@ -401,7 +415,9 @@ export class ShellManager implements IDisposable {
             this._leftIndex = index;
             this._outerSplitview.addView(
                 this._leftView,
-                this._leftView.lastExpandedSize,
+                this._leftView.isCollapsed
+                    ? this._leftView.collapsedSize
+                    : this._leftView.lastExpandedSize,
                 index++
             );
         }
@@ -417,7 +433,9 @@ export class ShellManager implements IDisposable {
             this._rightIndex = index;
             this._outerSplitview.addView(
                 this._rightView,
-                this._rightView.lastExpandedSize,
+                this._rightView.isCollapsed
+                    ? this._rightView.collapsedSize
+                    : this._rightView.lastExpandedSize,
                 index
             );
         }
@@ -602,39 +620,31 @@ export class ShellManager implements IDisposable {
 
     fromJSON(data: SerializedFixedPanels): void {
         if (data.left && this._leftIndex !== undefined) {
+            this._leftView?.setCollapsed(data.left.collapsed ?? false);
             this._outerSplitview.resizeView(this._leftIndex, data.left.size);
             if (!data.left.visible) {
                 this._outerSplitview.setViewVisible(this._leftIndex, false);
             }
-            if (data.left.collapsed) {
-                this._leftView?.setCollapsed(true);
-            }
         }
         if (data.right && this._rightIndex !== undefined) {
+            this._rightView?.setCollapsed(data.right.collapsed ?? false);
             this._outerSplitview.resizeView(this._rightIndex, data.right.size);
             if (!data.right.visible) {
                 this._outerSplitview.setViewVisible(this._rightIndex, false);
             }
-            if (data.right.collapsed) {
-                this._rightView?.setCollapsed(true);
-            }
         }
         if (data.top) {
+            this._topView?.setCollapsed(data.top.collapsed ?? false);
             this._middleColumn.resizeView('top', data.top.size);
             if (!data.top.visible) {
                 this._middleColumn.setViewVisible('top', false);
             }
-            if (data.top.collapsed) {
-                this._topView?.setCollapsed(true);
-            }
         }
         if (data.bottom) {
+            this._bottomView?.setCollapsed(data.bottom.collapsed ?? false);
             this._middleColumn.resizeView('bottom', data.bottom.size);
             if (!data.bottom.visible) {
                 this._middleColumn.setViewVisible('bottom', false);
-            }
-            if (data.bottom.collapsed) {
-                this._bottomView?.setCollapsed(true);
             }
         }
     }
