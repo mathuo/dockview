@@ -159,6 +159,7 @@ describe('VueHeaderActionsRenderer', () => {
     let onDidRemovePanel: DockviewEmitter<any>;
     let onDidActivePanelChange: DockviewEmitter<any>;
     let onDidActiveChange: DockviewEmitter<any>;
+    let onDidLocationChange: DockviewEmitter<any>;
     let groupPanel: DockviewGroupPanel;
     let mockParent: any;
     let mockComponent: any;
@@ -171,6 +172,7 @@ describe('VueHeaderActionsRenderer', () => {
         onDidRemovePanel = new DockviewEmitter();
         onDidActivePanelChange = new DockviewEmitter();
         onDidActiveChange = new DockviewEmitter();
+        onDidLocationChange = new DockviewEmitter();
 
         panels = [{ id: 'panel-1' } as IDockviewPanel];
         activePanel = panels[0];
@@ -190,6 +192,8 @@ describe('VueHeaderActionsRenderer', () => {
 
         const groupApi = {
             onDidActiveChange: onDidActiveChange.event,
+            onDidLocationChange: onDidLocationChange.event,
+            location: { type: 'grid' },
             get isActive() {
                 return isGroupActive;
             },
@@ -216,6 +220,7 @@ describe('VueHeaderActionsRenderer', () => {
         onDidRemovePanel.dispose();
         onDidActivePanelChange.dispose();
         onDidActiveChange.dispose();
+        onDidLocationChange.dispose();
         createVNodeMock.mockClear();
         vueRenderMock.mockClear();
         (cloneVNode as jest.Mock).mockClear();
@@ -426,7 +431,7 @@ describe('VueHeaderActionsRenderer', () => {
         expect(() => renderer.dispose()).not.toThrow();
     });
 
-    test('should subscribe to all four group events', () => {
+    test('should subscribe to all five group events', () => {
         const renderer = new VueHeaderActionsRenderer(
             mockComponent,
             mockParent,
@@ -453,6 +458,9 @@ describe('VueHeaderActionsRenderer', () => {
 
         onDidActiveChange.fire(undefined);
         expect(vueRenderMock).toHaveBeenCalledTimes(4);
+
+        onDidLocationChange.fire({ location: { type: 'fixed', position: 'left' } });
+        expect(vueRenderMock).toHaveBeenCalledTimes(5);
 
         renderer.dispose();
     });

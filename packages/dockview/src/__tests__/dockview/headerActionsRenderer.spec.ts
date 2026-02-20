@@ -44,6 +44,8 @@ describe('headerActionsRenderer', () => {
             containerApi: <any>jest.fn(),
             api: <any>{
                 onDidActiveChange: jest.fn(),
+                onDidLocationChange: jest.fn(),
+                location: { type: 'grid' },
             },
         });
 
