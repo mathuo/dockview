@@ -133,6 +133,9 @@ export class OverlayRenderContainer extends CompositeDisposable {
         if (!this.map[panel.api.id]) {
             const element = createFocusableElement();
             element.className = 'dv-render-overlay';
+            // Hide until the first RAF-based position is applied to prevent a
+            // one-frame flash at position 0,0 when the element is first attached.
+            element.style.visibility = 'hidden';
 
             this.map[panel.api.id] = {
                 panel,
@@ -184,6 +187,11 @@ export class OverlayRenderContainer extends CompositeDisposable {
                 focusContainer.style.top = `${top}px`;
                 focusContainer.style.width = `${width}px`;
                 focusContainer.style.height = `${height}px`;
+                // Reveal after the first position is applied (was hidden to
+                // prevent a flash at 0,0 before the initial layout fires).
+                if (focusContainer.style.visibility === 'hidden') {
+                    focusContainer.style.visibility = '';
+                }
 
                 toggleClass(
                     focusContainer,
