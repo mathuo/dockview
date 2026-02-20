@@ -102,7 +102,7 @@ export class FixedPanelView implements IView {
         group.element.classList.add('dv-fixed-panel');
         group.element.dataset.testid = `dv-fixed-panel-${options.id}`;
 
-        this._collapsedSize = options.collapsedSize ?? 30;
+        this._collapsedSize = options.collapsedSize ?? 35;
         this._expandedMaximumSize =
             options.maximumSize ?? Number.POSITIVE_INFINITY;
         // If the caller explicitly provides a minimumSize, respect it.

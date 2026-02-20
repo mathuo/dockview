@@ -51,6 +51,7 @@ export {
     DockviewDidDropEvent,
     DockviewWillDropEvent,
     DockviewGroupChangeEvent,
+    DockviewGroupLocation,
 } from './dockview/dockviewGroupPanelModel';
 export { DockviewWillShowOverlayLocationEvent } from './dockview/events';
 export {
