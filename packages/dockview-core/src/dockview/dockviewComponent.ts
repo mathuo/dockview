@@ -717,6 +717,9 @@ export class DockviewComponent
                 fixedGroupMap,
                 (w, h) => this._layoutFromShell(w, h)
             );
+            // The shell wraps the dockview element, so move the popup anchor
+            // into the shell so overflow dropdowns in fixed panels position correctly
+            this.popupService.updateRoot(this._shellManager.element);
             this._shellThemeClassnames = new Classnames(
                 this._shellManager.element
             );
