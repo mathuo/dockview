@@ -215,6 +215,22 @@ export class Tabs extends CompositeDisposable {
             tab.onDragStart((event) => {
                 this._onTabDragStart.fire({ nativeEvent: event, panel });
             }),
+            tab.onTabClick((event) => {
+                if (event.defaultPrevented) {
+                    return;
+                }
+                if (this.group.api.location.type !== 'fixed') {
+                    return;
+                }
+                if (this.group.api.isCollapsed()) {
+                    this.group.api.expand();
+                    if (this.group.activePanel !== panel) {
+                        this.group.model.openPanel(panel);
+                    }
+                } else if (this.group.activePanel === panel) {
+                    this.group.api.collapse();
+                }
+            }),
             tab.onPointerDown((event) => {
                 if (event.defaultPrevented) {
                     return;
@@ -249,19 +265,14 @@ export class Tabs extends CompositeDisposable {
                 }
 
                 switch (event.button) {
-                    case 0: // left click or touch
+                    case 0:
                         if (this.group.api.location.type === 'fixed') {
-                            if (this.group.api.isCollapsed()) {
-                                // Expand, then activate the clicked tab
-                                this.group.api.expand();
-                                if (this.group.activePanel !== panel) {
-                                    this.group.model.openPanel(panel);
-                                }
-                            } else if (this.group.activePanel === panel) {
-                                // Clicking the active tab collapses the group
-                                this.group.api.collapse();
-                            } else {
-                                // Inactive tab: switch panel, don't collapse
+                            // Toggle (expand/collapse) is handled by onTabClick.
+                            // Only switch to an inactive tab on pointerdown.
+                            if (
+                                !this.group.api.isCollapsed() &&
+                                this.group.activePanel !== panel
+                            ) {
                                 this.group.model.openPanel(panel);
                             }
                         } else {
