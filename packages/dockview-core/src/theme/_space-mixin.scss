@@ -43,12 +43,13 @@
     }
 
     // In writing-mode: vertical-rl (used by vertical tab bars), physical
-    // margin-left/right become the cross-axis margins and shrink the tab's
-    // width inside the strip. Zero them out so the tab fills the full
-    // available width; keep only vertical (between-tab) spacing.
+    // margin-left/right become the cross-axis margins and reduce the tab's
+    // physical width inside the strip. Use a small value so the tab fills
+    // most of the available width while keeping a thin breathing gap between
+    // the tab pill and the strip edges.
     .dv-tabs-container-vertical {
         .dv-tab {
-            margin: 0.25rem 0;
+            margin: 0.25rem 2px;
         }
     }
 
