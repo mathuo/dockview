@@ -727,7 +727,9 @@ export class DockviewComponent
                 this.element,
                 options.fixedPanels,
                 fixedGroupMap,
-                (w, h) => this._layoutFromShell(w, h)
+                (w, h) => this._layoutFromShell(w, h),
+                options.theme?.gap ?? 0,
+                options.theme?.fixedPanelCollapsedSize
             );
             // The shell wraps the dockview element, so move the popup anchor
             // into the shell so overflow dropdowns in fixed panels position correctly

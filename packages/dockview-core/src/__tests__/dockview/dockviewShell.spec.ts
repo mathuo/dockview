@@ -513,6 +513,65 @@ describe('ShellManager', () => {
         });
     });
 
+    describe('defaultCollapsedSize', () => {
+        test('panels use defaultCollapsedSize when no per-panel collapsedSize is set', () => {
+            const shell = new ShellManager(
+                container,
+                dockviewElement,
+                { left: { id: 'left' } },
+                { left: makeGroup() },
+                layoutGrid,
+                0,
+                48
+            );
+            const leftView = (shell as any)._leftView as FixedPanelView;
+            expect(leftView.collapsedSize).toBe(48);
+            shell.dispose();
+        });
+
+        test('per-panel collapsedSize overrides defaultCollapsedSize', () => {
+            const shell = new ShellManager(
+                container,
+                dockviewElement,
+                { left: { id: 'left', collapsedSize: 60 } },
+                { left: makeGroup() },
+                layoutGrid,
+                0,
+                48
+            );
+            const leftView = (shell as any)._leftView as FixedPanelView;
+            expect(leftView.collapsedSize).toBe(60);
+            shell.dispose();
+        });
+
+        test('applies to all four positions', () => {
+            const shell = new ShellManager(
+                container,
+                dockviewElement,
+                {
+                    top: { id: 'top' },
+                    bottom: { id: 'bottom' },
+                    left: { id: 'left' },
+                    right: { id: 'right' },
+                },
+                {
+                    top: makeGroup(),
+                    bottom: makeGroup(),
+                    left: makeGroup(),
+                    right: makeGroup(),
+                },
+                layoutGrid,
+                0,
+                48
+            );
+            expect((shell as any)._topView.collapsedSize).toBe(48);
+            expect((shell as any)._bottomView.collapsedSize).toBe(48);
+            expect((shell as any)._leftView.collapsedSize).toBe(48);
+            expect((shell as any)._rightView.collapsedSize).toBe(48);
+            shell.dispose();
+        });
+    });
+
     describe('dispose', () => {
         test('removes the shell element from the container', () => {
             const shell = makeShell(

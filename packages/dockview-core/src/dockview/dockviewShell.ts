@@ -246,7 +246,8 @@ class MiddleColumnView implements IView, IDisposable {
         centerView: CenterView,
         bottomView: FixedPanelView | undefined,
         topSize: number,
-        bottomSize: number
+        bottomSize: number,
+        gap = 0
     ) {
         this._element = document.createElement('div');
         this._element.className = 'dv-shell-middle-column';
@@ -256,6 +257,7 @@ class MiddleColumnView implements IView, IDisposable {
         this._splitview = new Splitview(this._element, {
             orientation: Orientation.VERTICAL,
             proportionalLayout: false,
+            margin: gap,
         });
 
         let index = 0;
@@ -346,7 +348,9 @@ export class ShellManager implements IDisposable {
             left?: IFixedPanelGroup;
             right?: IFixedPanelGroup;
         },
-        layoutGrid: (width: number, height: number) => void
+        layoutGrid: (width: number, height: number) => void,
+        gap = 0,
+        defaultCollapsedSize = 35
     ) {
         this._shellElement = document.createElement('div');
         this._shellElement.className = 'dv-shell';
@@ -354,31 +358,45 @@ export class ShellManager implements IDisposable {
         this._shellElement.style.width = '100%';
         container.appendChild(this._shellElement);
 
-        // Create fixed panel views for configured positions
+        // Create fixed panel views for configured positions.
+        // Per-panel collapsedSize takes precedence; theme defaultCollapsedSize
+        // is used as the fallback so spaced themes can show their taller header.
         if (config.top && groups.top) {
             this._topView = new FixedPanelView(
-                config.top,
+                {
+                    collapsedSize: defaultCollapsedSize,
+                    ...config.top,
+                },
                 groups.top,
                 'vertical'
             );
         }
         if (config.bottom && groups.bottom) {
             this._bottomView = new FixedPanelView(
-                config.bottom,
+                {
+                    collapsedSize: defaultCollapsedSize,
+                    ...config.bottom,
+                },
                 groups.bottom,
                 'vertical'
             );
         }
         if (config.left && groups.left) {
             this._leftView = new FixedPanelView(
-                config.left,
+                {
+                    collapsedSize: defaultCollapsedSize,
+                    ...config.left,
+                },
                 groups.left,
                 'horizontal'
             );
         }
         if (config.right && groups.right) {
             this._rightView = new FixedPanelView(
-                config.right,
+                {
+                    collapsedSize: defaultCollapsedSize,
+                    ...config.right,
+                },
                 groups.right,
                 'horizontal'
             );
@@ -401,13 +419,15 @@ export class ShellManager implements IDisposable {
                 ? this._bottomView.isCollapsed
                     ? this._bottomView.collapsedSize
                     : this._bottomView.lastExpandedSize
-                : 200
+                : 200,
+            gap
         );
 
         // Outer splitview: left | middle-column | right (horizontal)
         this._outerSplitview = new Splitview(this._shellElement, {
             orientation: Orientation.HORIZONTAL,
             proportionalLayout: false,
+            margin: gap,
         });
 
         let index = 0;
