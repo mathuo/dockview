@@ -6,6 +6,7 @@ import {
     DockviewApi,
     DockviewGroupPanel,
     DockviewGroupPanelApi,
+    DockviewGroupLocation,
     PanelUpdateEvent,
     IHeaderActionsRenderer,
     IDockviewHeaderActionsProps,
@@ -51,6 +52,9 @@ export class ReactHeaderActionsRendererPart implements IHeaderActionsRenderer {
             }),
             parameters.api.onDidActiveChange(() => {
                 this.updateGroupActive();
+            }),
+            parameters.api.onDidLocationChange((event) => {
+                this.updateLocation(event.location);
             })
         );
 
@@ -66,6 +70,7 @@ export class ReactHeaderActionsRendererPart implements IHeaderActionsRenderer {
                 isGroupActive: this._group.api.isActive,
                 group: this._group,
                 headerPosition: this._group.model.headerPosition,
+                location: parameters.api.location,
             }
         );
     }
@@ -97,5 +102,9 @@ export class ReactHeaderActionsRendererPart implements IHeaderActionsRenderer {
                 isGroupActive: this._group.api.isActive,
             },
         });
+    }
+
+    private updateLocation(location: DockviewGroupLocation): void {
+        this.update({ params: { location } });
     }
 }

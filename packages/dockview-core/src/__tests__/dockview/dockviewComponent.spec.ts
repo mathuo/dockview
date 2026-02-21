@@ -21,6 +21,7 @@ import { DockviewApi } from '../../api/component.api';
 import { DockviewDndOverlayEvent } from '../../dockview/options';
 import { SizeEvent } from '../../api/gridviewPanelApi';
 import { setupMockWindow } from '../__mocks__/mockWindow';
+import { FixedPanelsConfig } from '../../dockview/dockviewShell';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
@@ -8564,6 +8565,301 @@ describe('dockviewComponent', () => {
 
             // The inactive "always" panel's content should be attached to the DOM
             expect(panel2.view.content.element.parentElement).toBeTruthy();
+        });
+    });
+
+    describe('fixed panels', () => {
+        function createFixedDockview(
+            c: HTMLElement,
+            positions: ('left' | 'right' | 'top' | 'bottom')[],
+            overrideConfig?: Partial<FixedPanelsConfig>
+        ) {
+            const fixedPanels: FixedPanelsConfig = {};
+            for (const pos of positions) {
+                fixedPanels[pos] = { id: `${pos}-group` };
+            }
+            Object.assign(fixedPanels, overrideConfig);
+            return new DockviewComponent(c, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                fixedPanels,
+            });
+        }
+
+        test('getFixedPanel returns DockviewGroupPanelApi for configured positions', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left', 'right']);
+            expect(dv.getFixedPanel('left')).toBeDefined();
+            expect(dv.getFixedPanel('right')).toBeDefined();
+            dv.dispose();
+        });
+
+        test('getFixedPanel returns undefined for unconfigured positions', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left']);
+            expect(dv.getFixedPanel('right')).toBeUndefined();
+            expect(dv.getFixedPanel('top')).toBeUndefined();
+            expect(dv.getFixedPanel('bottom')).toBeUndefined();
+            dv.dispose();
+        });
+
+        test('getFixedPanel returns undefined when no fixedPanels option provided', () => {
+            const c = document.createElement('div');
+            const dv = new DockviewComponent(c, {
+                createComponent(options) {
+                    return new PanelContentPartTest(options.id, options.name);
+                },
+            });
+            expect(dv.getFixedPanel('left')).toBeUndefined();
+            dv.dispose();
+        });
+
+        test('fixed group has location.type === fixed with correct position', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left', 'top']);
+
+            const leftApi = dv.getFixedPanel('left')!;
+            expect(leftApi.location.type).toBe('fixed');
+            expect(
+                (leftApi.location as { type: 'fixed'; position: string })
+                    .position
+            ).toBe('left');
+
+            const topApi = dv.getFixedPanel('top')!;
+            expect(topApi.location.type).toBe('fixed');
+            expect(
+                (topApi.location as { type: 'fixed'; position: string })
+                    .position
+            ).toBe('top');
+
+            dv.dispose();
+        });
+
+        test('setFixedPanelVisible / isFixedPanelVisible delegates correctly for left', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left']);
+            expect(dv.isFixedPanelVisible('left')).toBe(true);
+            dv.setFixedPanelVisible('left', false);
+            expect(dv.isFixedPanelVisible('left')).toBe(false);
+            dv.setFixedPanelVisible('left', true);
+            expect(dv.isFixedPanelVisible('left')).toBe(true);
+            dv.dispose();
+        });
+
+        test('setFixedPanelVisible / isFixedPanelVisible delegates correctly for right', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['right']);
+            dv.setFixedPanelVisible('right', false);
+            expect(dv.isFixedPanelVisible('right')).toBe(false);
+            dv.dispose();
+        });
+
+        test('setFixedPanelVisible / isFixedPanelVisible delegates correctly for top', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['top']);
+            dv.setFixedPanelVisible('top', false);
+            expect(dv.isFixedPanelVisible('top')).toBe(false);
+            dv.dispose();
+        });
+
+        test('setFixedPanelVisible / isFixedPanelVisible delegates correctly for bottom', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['bottom']);
+            dv.setFixedPanelVisible('bottom', false);
+            expect(dv.isFixedPanelVisible('bottom')).toBe(false);
+            dv.dispose();
+        });
+
+        test('isFixedPanelVisible returns false for unconfigured positions', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left']);
+            expect(dv.isFixedPanelVisible('right')).toBe(false);
+            dv.dispose();
+        });
+
+        test('group.api.collapse() and group.api.expand() toggle collapsed state', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left']);
+
+            const leftApi = dv.getFixedPanel('left')!;
+            expect(leftApi.isCollapsed()).toBe(false);
+
+            leftApi.collapse();
+            expect(leftApi.isCollapsed()).toBe(true);
+
+            leftApi.expand();
+            expect(leftApi.isCollapsed()).toBe(false);
+
+            dv.dispose();
+        });
+
+        test('setFixedGroupCollapsed / isFixedGroupCollapsed work end-to-end via component', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['right']);
+
+            const rightApi = dv.getFixedPanel('right')!;
+            expect(rightApi.isCollapsed()).toBe(false);
+
+            rightApi.collapse();
+            expect(rightApi.isCollapsed()).toBe(true);
+
+            rightApi.expand();
+            expect(rightApi.isCollapsed()).toBe(false);
+
+            dv.dispose();
+        });
+
+        test('toJSON includes fixedPanels field for configured positions', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left', 'top']);
+            dv.layout(1000, 800);
+
+            const json = dv.toJSON();
+            expect(json.fixedPanels).toBeDefined();
+            expect(json.fixedPanels!.left).toBeDefined();
+            expect(json.fixedPanels!.top).toBeDefined();
+            expect(json.fixedPanels!.right).toBeUndefined();
+            expect(json.fixedPanels!.bottom).toBeUndefined();
+            dv.dispose();
+        });
+
+        test('toJSON fixedPanels entries have visible and size fields', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left']);
+            dv.layout(1000, 800);
+
+            const json = dv.toJSON();
+            expect(typeof json.fixedPanels!.left!.visible).toBe('boolean');
+            expect(typeof json.fixedPanels!.left!.size).toBe('number');
+            dv.dispose();
+        });
+
+        test('toJSON fixedPanels includes collapsed: true after collapsing', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left']);
+            dv.layout(1000, 800);
+
+            dv.getFixedPanel('left')!.collapse();
+            const json = dv.toJSON();
+            expect(json.fixedPanels!.left!.collapsed).toBe(true);
+            dv.dispose();
+        });
+
+        test('fromJSON restores fixed panel visibility state', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left']);
+            dv.layout(1000, 800);
+
+            dv.fromJSON({
+                activeGroup: 'center-group',
+                grid: {
+                    root: {
+                        type: 'branch',
+                        data: [
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: [],
+                                    id: 'center-group',
+                                },
+                                size: 500,
+                            },
+                        ],
+                        size: 1000,
+                    },
+                    height: 800,
+                    width: 1000,
+                    orientation: Orientation.HORIZONTAL,
+                },
+                panels: {},
+                fixedPanels: {
+                    left: {
+                        size: 200,
+                        visible: false,
+                    },
+                },
+            });
+
+            expect(dv.isFixedPanelVisible('left')).toBe(false);
+            dv.dispose();
+        });
+
+        test('fromJSON restores fixed panel panels via group state', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left']);
+            dv.layout(1000, 800);
+
+            dv.fromJSON({
+                activeGroup: 'center-group',
+                grid: {
+                    root: {
+                        type: 'branch',
+                        data: [
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: [],
+                                    id: 'center-group',
+                                },
+                                size: 500,
+                            },
+                        ],
+                        size: 1000,
+                    },
+                    height: 800,
+                    width: 1000,
+                    orientation: Orientation.HORIZONTAL,
+                },
+                panels: {
+                    'fixed-panel-1': {
+                        id: 'fixed-panel-1',
+                        contentComponent: 'default',
+                        title: 'Fixed Panel 1',
+                    },
+                },
+                fixedPanels: {
+                    left: {
+                        size: 200,
+                        visible: true,
+                        group: {
+                            id: 'left-group',
+                            views: ['fixed-panel-1'],
+                            activeView: 'fixed-panel-1',
+                        },
+                    },
+                },
+            });
+
+            // The fixed group should now contain the deserialized panel
+            const leftGroup = dv.getFixedPanel('left')!;
+            // group is accessible; verify the panel is in the dockview panels list
+            expect(
+                dv.panels.find((p) => p.id === 'fixed-panel-1')
+            ).toBeDefined();
+            dv.dispose();
+        });
+
+        test('dispose removes the shell element from the DOM', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left']);
+            dv.layout(1000, 800);
+
+            // After construction the container should have a child (shell element)
+            expect(c.childNodes.length).toBeGreaterThan(0);
+
+            dv.dispose();
+
+            // After dispose the shell should be removed
+            expect(c.childNodes.length).toBe(0);
         });
     });
 });

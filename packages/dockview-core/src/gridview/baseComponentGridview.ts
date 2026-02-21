@@ -194,7 +194,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
                 this._onDidViewVisibilityChangeMicroTaskQueue.fire()
             ),
             this.onDidViewVisibilityChangeMicroTaskQueue(() => {
-                this.layout(this.width, this.height, true);
+                this.forceRelayout();
             }),
             Disposable.from(() => {
                 this.element.parentElement?.removeChild(this.element);
@@ -366,6 +366,10 @@ export abstract class BaseGrid<T extends IGridPanelView>
         const location = getGridLocation(options.group.element);
         const next = this.gridview.previous(location)?.view;
         this.doSetGroupActive(next as T);
+    }
+
+    protected forceRelayout(): void {
+        this.layout(this.width, this.height, true);
     }
 
     public layout(width: number, height: number, forceResize?: boolean): void {

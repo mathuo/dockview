@@ -42,11 +42,30 @@
         }
     }
 
+    // In writing-mode: vertical-rl (used by vertical tab bars), physical
+    // margin-left/right become the cross-axis margins and reduce the tab's
+    // physical width inside the strip. Use a small value so the tab fills
+    // most of the available width while keeping a thin breathing gap between
+    // the tab pill and the strip edges.
+    .dv-tabs-container-vertical {
+        .dv-tab {
+            margin: 0.25rem 4px;
+        }
+    }
+
     .dv-groupview {
         border-radius: var(--dv-border-radius);
 
         .dv-tabs-and-actions-container {
             padding: 0px calc(var(--dv-border-radius) / 2);
+
+            // Vertical tab bars (left/right fixed panels): swap the padding
+            // axes. Horizontal padding would squeeze the tab into a fraction
+            // of the 44px strip width, so use vertical padding instead to
+            // provide breathing room at the top and bottom of the strip.
+            &.dv-groupview-header-vertical {
+                padding: calc(var(--dv-border-radius) / 2) 0;
+            }
         }
 
         .dv-content-container {

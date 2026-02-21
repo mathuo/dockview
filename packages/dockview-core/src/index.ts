@@ -51,6 +51,7 @@ export {
     DockviewDidDropEvent,
     DockviewWillDropEvent,
     DockviewGroupChangeEvent,
+    DockviewGroupLocation,
 } from './dockview/dockviewGroupPanelModel';
 export { DockviewWillShowOverlayLocationEvent } from './dockview/events';
 export {
@@ -79,6 +80,14 @@ export {
 } from './dockview/deserializer';
 
 export * from './dockview/dockviewComponent';
+export {
+    FixedPanelView,
+    FixedPanelViewOptions,
+    FixedPanelPosition,
+    FixedPanelsConfig,
+    SerializedFixedPanels,
+    IFixedPanelGroup,
+} from './dockview/dockviewShell';
 export * from './gridview/gridviewComponent';
 export * from './splitview/splitviewComponent';
 export * from './paneview/paneviewComponent';

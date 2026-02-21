@@ -82,6 +82,13 @@ import { StrictEventsSequencing } from './strictEventsSequencing';
 import { PopupService } from './components/popupService';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import { themeAbyss } from './theme';
+import {
+    FixedPanelPosition,
+    SerializedFixedPanels,
+    ShellManager,
+    IFixedPanelGroup,
+} from './dockviewShell';
+import { DockviewGroupPanelApi } from '../api/dockviewGroupPanelApi';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     activationSize: { type: 'pixels', value: 10 },
@@ -152,6 +159,7 @@ export interface SerializedDockview {
     activeGroup?: string;
     floatingGroups?: SerializedFloatingGroup[];
     popoutGroups?: SerializedPopoutGroup[];
+    fixedPanels?: SerializedFixedPanels;
 }
 
 export interface MovePanelEvent {
@@ -270,6 +278,11 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
         }
     ): Promise<boolean>;
     fromJSON(data: any, options?: { reuseExistingPanels: boolean }): void;
+    getFixedPanel(
+        position: FixedPanelPosition
+    ): DockviewGroupPanelApi | undefined;
+    setFixedPanelVisible(position: FixedPanelPosition, visible: boolean): void;
+    isFixedPanelVisible(position: FixedPanelPosition): boolean;
 }
 
 export class DockviewComponent
@@ -282,6 +295,7 @@ export class DockviewComponent
     private _options: Exclude<DockviewComponentOptions, 'orientation'>;
     private _watermark: IWatermarkRenderer | null = null;
     private readonly _themeClassnames: Classnames;
+    private _shellThemeClassnames: Classnames | undefined;
 
     readonly overlayRenderContainer: OverlayRenderContainer;
     readonly popupService: PopupService;
@@ -346,6 +360,13 @@ export class DockviewComponent
     private readonly _onDidMaximizedGroupChange =
         new Emitter<DockviewMaximizedGroupChanged>();
     readonly onDidMaximizedGroupChange = this._onDidMaximizedGroupChange.event;
+
+    private _shellManager: ShellManager | undefined;
+    private _inShellLayout = false;
+    private readonly _fixedGroups = new Map<
+        FixedPanelPosition,
+        DockviewGroupPanel
+    >();
 
     private readonly _floatingGroups: DockviewFloatingGroupPanel[] = [];
     private readonly _popoutGroups: {
@@ -591,6 +612,8 @@ export class DockviewComponent
                 for (const group of [...this._popoutGroups]) {
                     group.disposable.dispose();
                 }
+
+                this._shellManager?.dispose();
             }),
             this._rootDropTarget,
             this._rootDropTarget.onWillShowOverlay((event) => {
@@ -654,6 +677,72 @@ export class DockviewComponent
             }),
             this._rootDropTarget
         );
+
+        if (options.fixedPanels) {
+            this.disableResizing = true;
+            container.removeChild(this.element);
+
+            // Create a DockviewGroupPanel for each configured fixed position
+            const fixedGroupMap: {
+                top?: IFixedPanelGroup;
+                bottom?: IFixedPanelGroup;
+                left?: IFixedPanelGroup;
+                right?: IFixedPanelGroup;
+            } = {};
+
+            for (const _position of [
+                'top',
+                'bottom',
+                'left',
+                'right',
+            ] as FixedPanelPosition[]) {
+                const cfg = options.fixedPanels[_position];
+                if (cfg) {
+                    const group = this.createGroup({ id: cfg.id });
+                    group.model.location = {
+                        type: 'fixed',
+                        position: _position,
+                    };
+                    group.model.headerPosition = _position;
+                    this._fixedGroups.set(_position, group);
+                    fixedGroupMap[_position] = group as IFixedPanelGroup;
+                    this._onDidAddGroup.fire(group);
+
+                    // Collapse when the group becomes empty
+                    this.addDisposables(
+                        group.model.onDidRemovePanel(() => {
+                            if (group.model.isEmpty) {
+                                this._shellManager?.setFixedPanelCollapsed(
+                                    _position,
+                                    true
+                                );
+                            }
+                        })
+                    );
+                }
+            }
+
+            this._shellManager = new ShellManager(
+                container,
+                this.element,
+                options.fixedPanels,
+                fixedGroupMap,
+                (w, h) => this._layoutFromShell(w, h),
+                options.theme?.gap ?? 0,
+                options.theme?.fixedPanelCollapsedSize
+            );
+            // The shell wraps the dockview element, so move the popup anchor
+            // into the shell so overflow dropdowns in fixed panels position correctly
+            this.popupService.updateRoot(this._shellManager.element);
+            this._shellThemeClassnames = new Classnames(
+                this._shellManager.element
+            );
+            // updateTheme() was already called before the shell was created,
+            // so apply the current theme to the shell element now.
+            this._shellThemeClassnames.setClassNames(
+                (this._options.theme ?? themeAbyss).className
+            );
+        }
     }
 
     override setVisible(panel: DockviewGroupPanel, visible: boolean): void {
@@ -678,6 +767,9 @@ export class DockviewComponent
                 console.warn(
                     'dockview: You cannot hide a group that is in a popout window'
                 );
+                break;
+            case 'fixed':
+                // Fixed group visibility is managed via setFixedPanelVisible
                 break;
         }
     }
@@ -1323,7 +1415,11 @@ export class DockviewComponent
             }
         }
 
-        this.layout(this.gridview.width, this.gridview.height, true);
+        if (this._shellManager) {
+            this._layoutFromShell(this.gridview.width, this.gridview.height);
+        } else {
+            this.layout(this.gridview.width, this.gridview.height, true);
+        }
     }
 
     override layout(
@@ -1331,7 +1427,11 @@ export class DockviewComponent
         height: number,
         forceResize?: boolean | undefined
     ): void {
-        super.layout(width, height, forceResize);
+        if (this._shellManager && !this._inShellLayout) {
+            this._shellManager.layout(width, height);
+        } else {
+            super.layout(width, height, forceResize);
+        }
 
         if (this._floatingGroups) {
             for (const floating of this._floatingGroups) {
@@ -1339,6 +1439,61 @@ export class DockviewComponent
                 floating.overlay.setBounds();
             }
         }
+    }
+
+    private _layoutFromShell(width: number, height: number): void {
+        this._inShellLayout = true;
+        this.layout(width, height, true);
+        this._inShellLayout = false;
+    }
+
+    protected override forceRelayout(): void {
+        if (this._shellManager) {
+            this._layoutFromShell(this.width, this.height);
+        } else {
+            super.forceRelayout();
+        }
+    }
+
+    getFixedPanel(
+        position: FixedPanelPosition
+    ): DockviewGroupPanelApi | undefined {
+        return this._fixedGroups.get(position)?.api;
+    }
+
+    setFixedPanelVisible(position: FixedPanelPosition, visible: boolean): void {
+        this._shellManager?.setFixedPanelVisible(position, visible);
+    }
+
+    isFixedPanelVisible(position: FixedPanelPosition): boolean {
+        return this._shellManager?.isFixedPanelVisible(position) ?? false;
+    }
+
+    setFixedGroupCollapsed(
+        group: DockviewGroupPanel,
+        collapsed: boolean
+    ): void {
+        if (!this._shellManager) {
+            return;
+        }
+        for (const [position, fixedGroup] of this._fixedGroups) {
+            if (fixedGroup === group) {
+                this._shellManager.setFixedPanelCollapsed(position, collapsed);
+                return;
+            }
+        }
+    }
+
+    isFixedGroupCollapsed(group: DockviewGroupPanel): boolean {
+        if (!this._shellManager) {
+            return false;
+        }
+        for (const [position, fixedGroup] of this._fixedGroups) {
+            if (fixedGroup === group) {
+                return this._shellManager.isFixedPanelCollapsed(position);
+            }
+        }
+        return false;
     }
 
     private updateDragAndDropState(): void {
@@ -1457,6 +1612,20 @@ export class DockviewComponent
 
         if (popoutGroups.length > 0) {
             result.popoutGroups = popoutGroups;
+        }
+
+        if (this._shellManager) {
+            const shellSerialized = this._shellManager.toJSON();
+
+            // Augment each entry with the serialized group state
+            for (const [position, group] of this._fixedGroups) {
+                const entry = shellSerialized[position];
+                if (entry) {
+                    entry.group = group.toJSON();
+                }
+            }
+
+            result.fixedPanels = shellSerialized;
         }
 
         return result;
@@ -1620,7 +1789,56 @@ export class DockviewComponent
                 },
             });
 
-            this.layout(width, height, true);
+            if (this._shellManager) {
+                this._layoutFromShell(width, height);
+            } else {
+                this.layout(width, height, true);
+            }
+
+            if (this._shellManager && data.fixedPanels) {
+                // Restore panel contents of fixed groups
+                for (const [position, fixedGroup] of this._fixedGroups) {
+                    const fixedData = data.fixedPanels[position];
+                    const groupState = fixedData?.group as
+                        | GroupPanelViewState
+                        | undefined;
+                    if (groupState) {
+                        const { views, activeView } = groupState;
+                        const createdPanels: IDockviewPanel[] = [];
+
+                        for (const panelId of views) {
+                            if (panels[panelId]) {
+                                const panel = this._deserializer.fromJSON(
+                                    panels[panelId],
+                                    fixedGroup
+                                );
+                                createdPanels.push(panel);
+                            }
+                        }
+
+                        for (let i = 0; i < createdPanels.length; i++) {
+                            const panel = createdPanels[i];
+                            const isActive = activeView === panel.id;
+                            fixedGroup.model.openPanel(panel, {
+                                skipSetActive: !isActive,
+                                skipSetGroupActive: true,
+                            });
+                        }
+
+                        if (
+                            !fixedGroup.activePanel &&
+                            fixedGroup.panels.length > 0
+                        ) {
+                            fixedGroup.model.openPanel(
+                                fixedGroup.panels[fixedGroup.panels.length - 1],
+                                { skipSetGroupActive: true }
+                            );
+                        }
+                    }
+                }
+
+                this._shellManager.fromJSON(data.fixedPanels);
+            }
 
             const serializedFloatingGroups = data.floatingGroups ?? [];
 
@@ -1743,6 +1961,14 @@ export class DockviewComponent
         const hasActiveGroup = !!this.activeGroup;
 
         for (const group of groups) {
+            if ([...this._fixedGroups.values()].includes(group)) {
+                // Fixed groups are structural - only clear their panels, not the group itself
+                const panels = [...group.panels];
+                for (const panel of panels) {
+                    this.removePanel(panel, { removeEmptyGroup: false });
+                }
+                continue;
+            }
             // remove the group will automatically remove the panels
             this.removeGroup(group, { skipActive: true });
         }
@@ -1874,6 +2100,7 @@ export class DockviewComponent
                 });
             } else if (
                 referenceGroup.api.location.type === 'floating' ||
+                referenceGroup.api.location.type === 'fixed' ||
                 target === 'center'
             ) {
                 panel = this.createPanel(options, referenceGroup);
@@ -2135,6 +2362,11 @@ export class DockviewComponent
               }
             | undefined
     ): DockviewGroupPanel {
+        // Fixed groups are permanent structural elements - never remove them from the layout
+        if ([...this._fixedGroups.values()].includes(group)) {
+            return group;
+        }
+
         const panels = [...group.panels]; // reassign since group panels will mutate
 
         if (!options?.skipDispose) {
@@ -2910,6 +3142,11 @@ export class DockviewComponent
     private updateTheme(): void {
         const theme = this._options.theme ?? themeAbyss;
         this._themeClassnames.setClassNames(theme.className);
+        // When shell mode is active, fixed panel groups are siblings of
+        // .dv-dockview so they don't inherit theme CSS from it. Apply the
+        // same theme class to the shell element so all fixed panels and the
+        // main grid share the same CSS custom properties and theme rules.
+        this._shellThemeClassnames?.setClassNames(theme.className);
 
         this.gridview.margin = theme.gap ?? 0;
 

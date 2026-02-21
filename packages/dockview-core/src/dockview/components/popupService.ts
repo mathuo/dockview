@@ -10,15 +10,17 @@ export class PopupService extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private _active: HTMLElement | null = null;
     private readonly _activeDisposable = new MutableDisposable();
+    private _root: HTMLElement;
 
-    constructor(private readonly root: HTMLElement) {
+    constructor(root: HTMLElement) {
         super();
 
+        this._root = root;
         this._element = document.createElement('div');
         this._element.className = 'dv-popover-anchor';
         this._element.style.position = 'relative';
 
-        this.root.prepend(this._element);
+        this._root.prepend(this._element);
 
         this.addDisposables(
             Disposable.from(() => {
@@ -26,6 +28,16 @@ export class PopupService extends CompositeDisposable {
             }),
             this._activeDisposable
         );
+    }
+
+    /**
+     * Move the popup anchor into a new root element. Call this when a shell
+     * wraps the dockview component so that fixed-panel overflow dropdowns
+     * position correctly relative to the full layout area.
+     */
+    updateRoot(newRoot: HTMLElement): void {
+        newRoot.prepend(this._element);
+        this._root = newRoot;
     }
 
     openPopover(
@@ -76,7 +88,7 @@ export class PopupService extends CompositeDisposable {
         );
 
         requestAnimationFrame(() => {
-            shiftAbsoluteElementIntoView(wrapper, this.root);
+            shiftAbsoluteElementIntoView(wrapper, this._root);
         });
     }
 

@@ -215,6 +215,29 @@ export class Tabs extends CompositeDisposable {
             tab.onDragStart((event) => {
                 this._onTabDragStart.fire({ nativeEvent: event, panel });
             }),
+            tab.onTabClick((event) => {
+                if (event.defaultPrevented) {
+                    return;
+                }
+                if (this.group.api.location.type !== 'fixed') {
+                    return;
+                }
+                if (this.group.activePanel === panel) {
+                    // Clicking the active tab toggles expansion
+                    if (this.group.api.isCollapsed()) {
+                        this.group.api.expand();
+                    } else {
+                        this.group.api.collapse();
+                    }
+                } else {
+                    // Clicking a non-active tab switches the active tab.
+                    // If the group is collapsed, also expand it.
+                    this.group.model.openPanel(panel);
+                    if (this.group.api.isCollapsed()) {
+                        this.group.api.expand();
+                    }
+                }
+            }),
             tab.onPointerDown((event) => {
                 if (event.defaultPrevented) {
                     return;
@@ -249,9 +272,14 @@ export class Tabs extends CompositeDisposable {
                 }
 
                 switch (event.button) {
-                    case 0: // left click or touch
-                        if (this.group.activePanel !== panel) {
-                            this.group.model.openPanel(panel);
+                    case 0:
+                        if (this.group.api.location.type === 'fixed') {
+                            // All tab interaction for fixed groups is handled by
+                            // onTabClick to avoid race conditions with active panel state
+                        } else {
+                            if (this.group.activePanel !== panel) {
+                                this.group.model.openPanel(panel);
+                            }
                         }
                         break;
                 }

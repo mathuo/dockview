@@ -59,6 +59,8 @@ import {
 } from '../paneview/options';
 import { SplitviewComponentOptions } from '../splitview/options';
 import { GridviewComponentOptions } from '../gridview/options';
+import { FixedPanelPosition } from '../dockview/dockviewShell';
+import { DockviewGroupPanelApi } from './dockviewGroupPanelApi';
 
 export interface CommonApi<T = any> {
     readonly height: number;
@@ -925,6 +927,30 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         }
     ): Promise<boolean> {
         return this.component.addPopoutGroup(item, options);
+    }
+
+    /**
+     * Get the group panel API for a fixed side panel at the given position.
+     * Returns `undefined` if no fixed panel is configured at that position.
+     */
+    getFixedPanel(
+        position: FixedPanelPosition
+    ): DockviewGroupPanelApi | undefined {
+        return this.component.getFixedPanel(position);
+    }
+
+    /**
+     * Set the visibility of a fixed side panel.
+     */
+    setFixedPanelVisible(position: FixedPanelPosition, visible: boolean): void {
+        this.component.setFixedPanelVisible(position, visible);
+    }
+
+    /**
+     * Check whether a fixed side panel is currently visible.
+     */
+    isFixedPanelVisible(position: FixedPanelPosition): boolean {
+        return this.component.isFixedPanelVisible(position);
     }
 
     updateOptions(options: Partial<DockviewComponentOptions>) {
