@@ -2,6 +2,8 @@ import { Tabs } from '../../../../dockview/components/titlebar/tabs';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewGroupPanel } from '../../../../dockview/dockviewGroupPanel';
 import { DockviewComponent } from '../../../../dockview/dockviewComponent';
+import { IDockviewPanel } from '../../../../dockview/dockviewPanel';
+import { fireEvent } from '@testing-library/dom';
 
 describe('tabs', () => {
     describe('disableCustomScrollbars', () => {
@@ -87,6 +89,156 @@ describe('tabs', () => {
 
             expect(mockTab1.updateDragAndDropState).toHaveBeenCalledTimes(1);
             expect(mockTab2.updateDragAndDropState).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('fixed panel tab click behaviour', () => {
+        function makePanel(id: string): IDockviewPanel {
+            return fromPartial<IDockviewPanel>({
+                id,
+                view: {
+                    tab: { element: document.createElement('div') },
+                },
+            });
+        }
+
+        function makeGroup(
+            activePanel: IDockviewPanel,
+            isCollapsedFn: () => boolean,
+            expandMock: jest.Mock,
+            collapseMock: jest.Mock,
+            openPanelMock: jest.Mock
+        ): DockviewGroupPanel {
+            return fromPartial<DockviewGroupPanel>({
+                activePanel,
+                api: {
+                    location: { type: 'fixed' },
+                    isCollapsed: isCollapsedFn,
+                    expand: expandMock,
+                    collapse: collapseMock,
+                },
+                model: {
+                    openPanel: openPanelMock,
+                    canDisplayOverlay: jest.fn(),
+                    dropTargetContainer: undefined,
+                },
+                locked: false,
+            });
+        }
+
+        function makeAccessor(): DockviewComponent {
+            return fromPartial<DockviewComponent>({
+                options: {},
+                doSetGroupActive: jest.fn(),
+            });
+        }
+
+        test('clicking active tab in collapsed fixed group expands it', () => {
+            const panel1 = makePanel('panel1');
+            const panel2 = makePanel('panel2');
+            const expandMock = jest.fn();
+            const collapseMock = jest.fn();
+            const openPanelMock = jest.fn();
+
+            const group = makeGroup(
+                panel1,
+                () => true,
+                expandMock,
+                collapseMock,
+                openPanelMock
+            );
+            const cut = new Tabs(group, makeAccessor(), {
+                showTabsOverflowControl: false,
+            });
+            cut.openPanel(panel1);
+            cut.openPanel(panel2);
+
+            fireEvent.click(cut.tabs[0].element);
+
+            expect(expandMock).toHaveBeenCalledTimes(1);
+            expect(collapseMock).not.toHaveBeenCalled();
+            expect(openPanelMock).not.toHaveBeenCalled();
+        });
+
+        test('clicking active tab in expanded fixed group collapses it', () => {
+            const panel1 = makePanel('panel1');
+            const panel2 = makePanel('panel2');
+            const expandMock = jest.fn();
+            const collapseMock = jest.fn();
+            const openPanelMock = jest.fn();
+
+            const group = makeGroup(
+                panel1,
+                () => false,
+                expandMock,
+                collapseMock,
+                openPanelMock
+            );
+            const cut = new Tabs(group, makeAccessor(), {
+                showTabsOverflowControl: false,
+            });
+            cut.openPanel(panel1);
+            cut.openPanel(panel2);
+
+            fireEvent.click(cut.tabs[0].element);
+
+            expect(collapseMock).toHaveBeenCalledTimes(1);
+            expect(expandMock).not.toHaveBeenCalled();
+            expect(openPanelMock).not.toHaveBeenCalled();
+        });
+
+        test('clicking non-active tab in collapsed fixed group activates panel and expands group', () => {
+            const panel1 = makePanel('panel1');
+            const panel2 = makePanel('panel2');
+            const expandMock = jest.fn();
+            const collapseMock = jest.fn();
+            const openPanelMock = jest.fn();
+
+            const group = makeGroup(
+                panel1,
+                () => true,
+                expandMock,
+                collapseMock,
+                openPanelMock
+            );
+            const cut = new Tabs(group, makeAccessor(), {
+                showTabsOverflowControl: false,
+            });
+            cut.openPanel(panel1);
+            cut.openPanel(panel2);
+
+            fireEvent.click(cut.tabs[1].element);
+
+            expect(openPanelMock).toHaveBeenCalledWith(panel2);
+            expect(expandMock).toHaveBeenCalledTimes(1);
+            expect(collapseMock).not.toHaveBeenCalled();
+        });
+
+        test('clicking non-active tab in expanded fixed group only activates panel', () => {
+            const panel1 = makePanel('panel1');
+            const panel2 = makePanel('panel2');
+            const expandMock = jest.fn();
+            const collapseMock = jest.fn();
+            const openPanelMock = jest.fn();
+
+            const group = makeGroup(
+                panel1,
+                () => false,
+                expandMock,
+                collapseMock,
+                openPanelMock
+            );
+            const cut = new Tabs(group, makeAccessor(), {
+                showTabsOverflowControl: false,
+            });
+            cut.openPanel(panel1);
+            cut.openPanel(panel2);
+
+            fireEvent.click(cut.tabs[1].element);
+
+            expect(openPanelMock).toHaveBeenCalledWith(panel2);
+            expect(expandMock).not.toHaveBeenCalled();
+            expect(collapseMock).not.toHaveBeenCalled();
         });
     });
 

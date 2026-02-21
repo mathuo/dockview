@@ -230,9 +230,12 @@ export class Tabs extends CompositeDisposable {
                         this.group.api.collapse();
                     }
                 } else {
-                    // Clicking a non-active tab only switches the active tab,
-                    // never changes the collapsed/expanded state
+                    // Clicking a non-active tab switches the active tab.
+                    // If the group is collapsed, also expand it.
                     this.group.model.openPanel(panel);
+                    if (this.group.api.isCollapsed()) {
+                        this.group.api.expand();
+                    }
                 }
             }),
             tab.onPointerDown((event) => {
