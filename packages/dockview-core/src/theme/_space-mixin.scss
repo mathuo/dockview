@@ -47,6 +47,12 @@
 
         .dv-tabs-and-actions-container {
             padding: 0px calc(var(--dv-border-radius) / 2);
+
+            // Vertical tab bars (left/right fixed panels) are narrow; horizontal
+            // padding would squeeze the tab content to a fraction of the bar width.
+            &.dv-groupview-header-vertical {
+                padding: 0;
+            }
         }
 
         .dv-content-container {
