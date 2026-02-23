@@ -28,6 +28,7 @@ import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
 import { PaneviewAngularReadyEvent } from './types';
 import { AngularPanePart } from './angular-pane-part';
+import { ComponentRegistryService } from '../utils/component-registry.service';
 
 export interface PaneviewAngularOptions extends PaneviewOptions {
     components: Record<string, Type<any>>;
@@ -55,10 +56,14 @@ export interface PaneviewAngularOptions extends PaneviewOptions {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
+    private readonly componentRegistry: ComponentRegistryService = inject(
+        ComponentRegistryService
+    );
+
     @ViewChild('paneviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
-    @Input() components!: Record<string, Type<any>>;
+    @Input() components?: Record<string, Type<any>>;
     @Input() headerComponents?: Record<string, Type<any>>;
 
     // Core paneview options as inputs
@@ -111,10 +116,8 @@ export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     private initializePaneview(): void {
-        if (!this.components) {
-            throw new Error(
-                'PaneviewAngularComponent: components input is required'
-            );
+        if (this.components) {
+            this.componentRegistry.registerComponents(this.components);
         }
 
         const coreOptions = this.extractCoreOptions();
@@ -147,7 +150,7 @@ export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
 
     private createFrameworkOptions(): PaneviewFrameworkOptions {
         const componentFactory = new AngularFrameworkComponentFactory(
-            this.components,
+            this.componentRegistry,
             this.injector,
             this.environmentInjector,
             this.headerComponents

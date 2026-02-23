@@ -44,7 +44,7 @@ describe('AngularRenderer', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [TestComponent],
+            declarations: [TestComponent, TestUpdateComponent],
         }).compileComponents();
 
         injector = TestBed.inject(Injector);

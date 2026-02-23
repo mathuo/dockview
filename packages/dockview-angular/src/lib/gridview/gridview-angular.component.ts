@@ -26,6 +26,7 @@ import {
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
 import { GridviewAngularReadyEvent } from './types';
+import { ComponentRegistryService } from '../utils/component-registry.service';
 
 export interface GridviewAngularOptions extends GridviewOptions {
     components: Record<string, Type<any>>;
@@ -52,10 +53,14 @@ export interface GridviewAngularOptions extends GridviewOptions {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GridviewAngularComponent implements OnInit, OnDestroy, OnChanges {
+    private readonly componentRegistry: ComponentRegistryService = inject(
+        ComponentRegistryService
+    );
+
     @ViewChild('gridviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
-    @Input() components!: Record<string, Type<any>>;
+    @Input() components?: Record<string, Type<any>>;
 
     // Core gridview options as inputs
     @Input() className?: string;
@@ -107,10 +112,8 @@ export class GridviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     private initializeGridview(): void {
-        if (!this.components) {
-            throw new Error(
-                'GridviewAngularComponent: components input is required'
-            );
+        if (this.components) {
+            this.componentRegistry.registerComponents(this.components);
         }
 
         const coreOptions = this.extractCoreOptions();
@@ -140,7 +143,7 @@ export class GridviewAngularComponent implements OnInit, OnDestroy, OnChanges {
 
     private createFrameworkOptions(): GridviewFrameworkOptions {
         const componentFactory = new AngularFrameworkComponentFactory(
-            this.components,
+            this.componentRegistry,
             this.injector,
             this.environmentInjector
         );

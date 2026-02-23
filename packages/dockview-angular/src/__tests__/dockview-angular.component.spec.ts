@@ -33,14 +33,6 @@ describe('DockviewAngularComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should throw error if components input is not provided', () => {
-        component.components = undefined as any;
-
-        expect(() => {
-            component.ngOnInit();
-        }).toThrow('DockviewAngularComponent: components input is required');
-    });
-
     it('should initialize dockview api on ngOnInit', () => {
         component.ngOnInit();
 
