@@ -1316,4 +1316,24 @@ describe('gridview', () => {
             expect(() => gridview.normalize()).not.toThrow();
         });
     });
+
+    test('that serialize does not cause an onDidMaximizedNodeChange event', () => {
+        const gridview = new Gridview(
+            true,
+            { separatorBorder: '' },
+            Orientation.HORIZONTAL
+        );
+        gridview.layout(1000, 1000);
+
+        let counter = 0;
+        const subscription = gridview.onDidMaximizedNodeChange(() => {
+            counter++;
+        });
+
+        gridview.serialize();
+
+        expect(counter).toBe(0);
+
+        subscription.dispose();
+    });
 });
