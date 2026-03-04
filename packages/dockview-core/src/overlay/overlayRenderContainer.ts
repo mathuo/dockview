@@ -205,9 +205,11 @@ export class OverlayRenderContainer extends CompositeDisposable {
             if (panel.api.isVisible) {
                 this.positionCache.invalidate();
                 resize();
+                focusContainer.style.pointerEvents = '';
+            } else {
+                focusContainer.style.visibility = 'hidden';
+                focusContainer.style.pointerEvents = 'none';
             }
-
-            focusContainer.style.display = panel.api.isVisible ? '' : 'none';
         };
 
         const observerDisposable = new MutableDisposable();
@@ -261,7 +263,7 @@ export class OverlayRenderContainer extends CompositeDisposable {
              * the dnd events for the expect behaviours to continue to occur in terms of dnd
              *
              * the dnd observer does not need to be conditional on whether the panel is visible since
-             * non-visible panels are 'display: none' and in such case the dnd observer will not fire.
+             * non-visible panels have 'pointer-events: none' and in such case the dnd observer will not fire.
              */
             new DragAndDropObserver(focusContainer, {
                 onDragEnd: (e) => {
