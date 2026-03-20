@@ -8566,4 +8566,132 @@ describe('dockviewComponent', () => {
             expect(panel2.view.content.element.parentElement).toBeTruthy();
         });
     });
+
+    describe('tab groups edge cases', () => {
+        test('tab moved to another group panel leaves its tab group', () => {
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+            const panel3 = dockview.addPanel({
+                id: 'panel3',
+                component: 'default',
+                position: {
+                    direction: 'right',
+                    referencePanel: 'panel1',
+                },
+            });
+
+            const groupId = panel1.group.id;
+            const tabGroup = dockview.api.createTabGroup({
+                groupId,
+                label: 'Test',
+                color: 'blue',
+            });
+
+            dockview.api.addPanelToTabGroup({
+                groupId,
+                tabGroupId: tabGroup.id,
+                panelId: 'panel1',
+            });
+            dockview.api.addPanelToTabGroup({
+                groupId,
+                tabGroupId: tabGroup.id,
+                panelId: 'panel2',
+            });
+
+            expect(tabGroup.panelIds).toEqual(['panel1', 'panel2']);
+
+            // Move panel2 to the other group
+            dockview.moveGroupOrPanel({
+                from: { groupId: groupId, panelId: 'panel2' },
+                to: { group: panel3.group, position: 'center' },
+            });
+
+            // panel2 should no longer be in the tab group
+            expect(tabGroup.containsPanel('panel2')).toBe(false);
+            expect(tabGroup.panelIds).toEqual(['panel1']);
+        });
+
+        test('collapsed group with single tab auto-destroys when tab is closed', () => {
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+
+            const groupId = panel1.group.id;
+            const tabGroup = dockview.api.createTabGroup({
+                groupId,
+                label: 'Solo',
+                color: 'red',
+            });
+
+            dockview.api.addPanelToTabGroup({
+                groupId,
+                tabGroupId: tabGroup.id,
+                panelId: 'panel1',
+            });
+
+            tabGroup.collapse();
+            expect(tabGroup.collapsed).toBe(true);
+
+            // Close the only panel in the group
+            dockview.removePanel(panel1);
+
+            // Tab group should have been auto-destroyed (isEmpty triggers dispose)
+            expect(
+                dockview.api.getTabGroups(panel2.group.id).length
+            ).toBe(0);
+        });
+
+        test('no-label group chip renders with empty label class', () => {
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            const groupId = panel1.group.id;
+            const tabGroup = dockview.api.createTabGroup({
+                groupId,
+                color: 'green',
+            });
+
+            dockview.api.addPanelToTabGroup({
+                groupId,
+                tabGroupId: tabGroup.id,
+                panelId: 'panel1',
+            });
+
+            // Force synchronous chip rendering (updateTabGroups is
+            // normally batched via queueMicrotask)
+            (panel1.group.model as any).tabsContainer.tabs.updateTabGroups();
+
+            // The tab group was created without a label
+            expect(tabGroup.label).toBe('');
+
+            // Verify the chip exists with empty label class via DOM
+            const chips =
+                panel1.group.element.querySelectorAll('.dv-tab-group-chip');
+            expect(chips.length).toBeGreaterThan(0);
+
+            const labelEl = chips[0].querySelector(
+                '.dv-tab-group-chip-label'
+            );
+            expect(labelEl).toBeTruthy();
+            expect(labelEl!.textContent).toBe('');
+            expect(
+                labelEl!.classList.contains(
+                    'dv-tab-group-chip-label--empty'
+                )
+            ).toBe(true);
+        });
+    });
 });

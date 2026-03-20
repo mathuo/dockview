@@ -19,6 +19,7 @@ import {
 import {
     VueHeaderActionsRenderer,
     VueContextMenuItemRenderer,
+    VueTabGroupChipRenderer,
     VueRenderer,
     VueWatermarkRenderer,
     findComponent,
@@ -128,8 +129,18 @@ onMounted(() => {
         },
     };
 
+    const coreOptions = extractCoreOptions(props);
+
+    if (props.tabGroupChipComponent) {
+        const chipComponentName = props.tabGroupChipComponent;
+        coreOptions.createTabGroupChipComponent = () => {
+            const component = findComponent(inst, chipComponentName);
+            return new VueTabGroupChipRenderer(component!, inst);
+        };
+    }
+
     const api = createDockview(el.value, {
-        ...extractCoreOptions(props),
+        ...coreOptions,
         ...frameworkOptions,
     });
 

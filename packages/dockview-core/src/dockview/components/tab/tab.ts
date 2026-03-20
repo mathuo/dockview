@@ -103,10 +103,12 @@ export class Tab extends CompositeDisposable {
                 const data = getPanelData();
 
                 if (data && this.accessor.id === data.viewId) {
-                    if (
-                        this.accessor.options.tabAnimation === 'smooth' &&
-                        data.groupId === this.group.id
-                    ) {
+                    if (this.accessor.options.tabAnimation === 'smooth') {
+                        // When smooth reorder is enabled, the Tabs
+                        // container handles all intra-accessor drops
+                        // (both same-group and cross-group) via
+                        // animation.  Suppress the per-tab overlay so
+                        // the tab is dropped *beside* rather than *on*.
                         return false;
                     }
                     return true;
@@ -198,7 +200,4 @@ export class Tab extends CompositeDisposable {
         this.dragHandler.setDisabled(!!this.accessor.options.disableDnd);
     }
 
-    public dispose(): void {
-        super.dispose();
-    }
 }

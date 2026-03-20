@@ -28,6 +28,7 @@ import { DockviewHeaderDirection } from '../../options';
 export interface TabDropIndexEvent {
     readonly event: DragEvent;
     readonly index: number;
+    readonly targetTabGroupId?: string | null;
 }
 
 export interface TabDragEvent {
@@ -63,6 +64,7 @@ export interface ITabsContainer extends IDisposable {
     show(): void;
     hide(): void;
     updateDragAndDropState(): void;
+    updateTabGroups(): void;
 }
 
 export class TabsContainer
@@ -176,6 +178,7 @@ export class TabsContainer
         });
 
         this.voidContainer = new VoidContainer(this.accessor, this.group);
+        this.tabs.voidContainer = this.voidContainer.element;
 
         this._element.appendChild(this.preActionsContainer);
         this._element.appendChild(this.tabs.element);
@@ -205,6 +208,10 @@ export class TabsContainer
                 });
             }),
             this.voidContainer.onDrop((event) => {
+                // If an active group drag is in progress, let Tabs handle it
+                if (this.tabs.handleVoidDrop()) {
+                    return;
+                }
                 this._onDrop.fire({
                     event: event.nativeEvent,
                     index: this.tabs.size,
@@ -441,5 +448,9 @@ export class TabsContainer
     updateDragAndDropState(): void {
         this.tabs.updateDragAndDropState();
         this.voidContainer.updateDragAndDropState();
+    }
+
+    updateTabGroups(): void {
+        this.tabs.updateTabGroups();
     }
 }

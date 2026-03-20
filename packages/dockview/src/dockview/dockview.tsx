@@ -26,6 +26,10 @@ import { ReactPortalStore, usePortalsLifecycle } from '../react';
 import { ReactWatermarkPart } from './reactWatermarkPart';
 import { ReactHeaderActionsRendererPart } from './headerActionsRenderer';
 import { ReactContextMenuItemPart } from './reactContextMenuItemPart';
+import {
+    IDockviewTabGroupChipProps,
+    ReactTabGroupChipPart,
+} from './reactTabGroupChipPart';
 
 function createGroupControlElement(
     component: React.FunctionComponent<IDockviewHeaderActionsProps> | undefined,
@@ -65,6 +69,7 @@ export interface IDockviewReactProps extends DockviewOptions {
     getTabContextMenuItems?: (
         params: GetTabContextMenuItemsParams
     ) => (BuiltInContextMenuItem | ReactContextMenuItemConfig)[];
+    tabGroupChipComponent?: React.FunctionComponent<IDockviewTabGroupChipProps>;
     //
     onReady: (event: DockviewReadyEvent) => void;
     onDidDrop?: (event: DockviewDidDropEvent) => void;
@@ -185,8 +190,19 @@ export const DockviewReact = React.forwardRef(
                 },
             };
 
+            const coreOptions = extractCoreOptions(props);
+
+            if (props.tabGroupChipComponent) {
+                const chipComponent = props.tabGroupChipComponent;
+                coreOptions.createTabGroupChipComponent = () => {
+                    return new ReactTabGroupChipPart(chipComponent, {
+                        addPortal,
+                    });
+                };
+            }
+
             const api = createDockview(domRef.current, {
-                ...extractCoreOptions(props),
+                ...coreOptions,
                 ...frameworkOptions,
             });
 

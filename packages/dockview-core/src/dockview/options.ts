@@ -11,11 +11,12 @@ import { GroupOptions } from './dockviewGroupPanelModel';
 import { DockviewGroupDropLocation } from './events';
 import { IDockviewPanel } from './dockviewPanel';
 import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
-import { IGroupHeaderProps } from './framework';
+import { IGroupHeaderProps, ITabGroupChipRenderer } from './framework';
 import { FloatingGroupOptions } from './dockviewComponent';
 import { Contraints } from '../gridview/gridviewPanel';
 import { AcceptableEvent, IAcceptableEvent } from '../events';
 import { DockviewTheme } from './theme';
+import { ITabGroup } from './tabGroup';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -141,6 +142,13 @@ export interface DockviewOptions {
     getTabContextMenuItems?: (
         params: GetTabContextMenuItemsParams
     ) => ContextMenuItem[];
+    /**
+     * Factory to create custom tab group chip renderers.
+     * If not provided, the default chip renderer is used.
+     */
+    createTabGroupChipComponent?: (
+        tabGroup: ITabGroup
+    ) => ITabGroupChipRenderer;
 }
 
 export type TabAnimation = 'smooth' | 'default';
@@ -195,6 +203,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         scrollbars: undefined,
         tabAnimation: undefined,
         getTabContextMenuItems: undefined,
+        createTabGroupChipComponent: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];

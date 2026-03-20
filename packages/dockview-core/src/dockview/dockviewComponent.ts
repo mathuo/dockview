@@ -1614,6 +1614,11 @@ export class DockviewComponent
                     );
                 }
 
+                // Restore tab groups if present (backward-compatible: absent = no groups)
+                if (data.tabGroups && data.tabGroups.length > 0) {
+                    group.model.restoreTabGroups(data.tabGroups);
+                }
+
                 return group;
             };
 

@@ -52,7 +52,12 @@ import {
     DockviewDidDropEvent,
     DockviewWillDropEvent,
 } from '../dockview/dockviewGroupPanelModel';
-import { DockviewWillShowOverlayLocationEvent } from '../dockview/events';
+import {
+    DockviewWillShowOverlayLocationEvent,
+    TabGroupChangeEvent,
+    TabGroupPanelChangeEvent,
+} from '../dockview/events';
+import { ITabGroup, TabGroupColor } from '../dockview/tabGroup';
 import {
     PaneviewComponentOptions,
     PaneviewDndOverlayEvent,
@@ -929,6 +934,80 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     updateOptions(options: Partial<DockviewComponentOptions>) {
         this.component.updateOptions(options);
+    }
+
+    // === Tab Group API ===
+
+    private _getGroupModel(groupId: string) {
+        const group = this.component.getPanel(groupId);
+        if (!group) {
+            throw new Error(`dockview: group '${groupId}' not found`);
+        }
+        return group.model;
+    }
+
+    createTabGroup(options: {
+        groupId: string;
+        label?: string;
+        color?: TabGroupColor;
+    }): ITabGroup {
+        const model = this._getGroupModel(options.groupId);
+        return model.createTabGroup({
+            label: options.label,
+            color: options.color,
+        });
+    }
+
+    dissolveTabGroup(options: {
+        groupId: string;
+        tabGroupId: string;
+    }): void {
+        const model = this._getGroupModel(options.groupId);
+        model.dissolveTabGroup(options.tabGroupId);
+    }
+
+    addPanelToTabGroup(options: {
+        groupId: string;
+        tabGroupId: string;
+        panelId: string;
+        index?: number;
+    }): void {
+        const model = this._getGroupModel(options.groupId);
+        model.addPanelToTabGroup(
+            options.tabGroupId,
+            options.panelId,
+            options.index
+        );
+    }
+
+    removePanelFromTabGroup(options: {
+        groupId: string;
+        panelId: string;
+    }): void {
+        const model = this._getGroupModel(options.groupId);
+        model.removePanelFromTabGroup(options.panelId);
+    }
+
+    getTabGroups(groupId: string): readonly ITabGroup[] {
+        const model = this._getGroupModel(groupId);
+        return model.getTabGroups();
+    }
+
+    getTabGroupForPanel(options: {
+        groupId: string;
+        panelId: string;
+    }): ITabGroup | undefined {
+        const model = this._getGroupModel(options.groupId);
+        return model.getTabGroupForPanel(options.panelId);
+    }
+
+    moveTabGroup(options: {
+        groupId: string;
+        tabGroupId: string;
+        index: number;
+    }): void {
+        const model = this._getGroupModel(options.groupId);
+        model.moveTabGroup(options.tabGroupId, options.index);
     }
 
     /**

@@ -51,6 +51,12 @@ import { OverlayRenderContainer } from '../overlay/overlayRenderContainer';
 import { TitleEvent } from '../api/dockviewPanelApi';
 import { Contraints } from '../gridview/gridviewPanel';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
+import {
+    TabGroup,
+    ITabGroup,
+    TabGroupColor,
+    SerializedTabGroup,
+} from './tabGroup';
 
 interface GroupMoveEvent {
     groupId: string;
@@ -79,6 +85,7 @@ export interface GroupPanelViewState extends CoreGroupOptions {
     views: string[];
     activeView?: string;
     id: string;
+    tabGroups?: SerializedTabGroup[];
 }
 
 export interface DockviewGroupChangeEvent {
@@ -289,7 +296,45 @@ export class DockviewGroupPanelModel
     readonly onUnhandledDragOverEvent: Event<DockviewDndOverlayEvent> =
         this._onUnhandledDragOverEvent.event;
 
+    private readonly _tabGroups: TabGroup[] = [];
+    private readonly _tabGroupMap = new Map<string, TabGroup>();
+    private readonly _panelToTabGroup = new Map<string, TabGroup>();
+    private _tabGroupIdCounter = 0;
+    private _pendingTabGroupUpdate = false;
+
+    private readonly _onDidCreateTabGroup = new Emitter<{
+        tabGroup: ITabGroup;
+    }>();
+    readonly onDidCreateTabGroup = this._onDidCreateTabGroup.event;
+
+    private readonly _onDidDestroyTabGroup = new Emitter<{
+        tabGroup: ITabGroup;
+    }>();
+    readonly onDidDestroyTabGroup = this._onDidDestroyTabGroup.event;
+
+    private readonly _onDidAddPanelToTabGroup = new Emitter<{
+        tabGroup: ITabGroup;
+        panelId: string;
+    }>();
+    readonly onDidAddPanelToTabGroup = this._onDidAddPanelToTabGroup.event;
+
+    private readonly _onDidRemovePanelFromTabGroup = new Emitter<{
+        tabGroup: ITabGroup;
+        panelId: string;
+    }>();
+    readonly onDidRemovePanelFromTabGroup =
+        this._onDidRemovePanelFromTabGroup.event;
+
+    private readonly _onDidTabGroupChange = new Emitter<{
+        tabGroup: ITabGroup;
+    }>();
+    readonly onDidTabGroupChange = this._onDidTabGroupChange.event;
+
     private readonly _api: DockviewApi;
+
+    get tabGroups(): readonly ITabGroup[] {
+        return this._tabGroups;
+    }
 
     get element(): HTMLElement {
         throw new Error('dockview: not supported');
@@ -469,12 +514,56 @@ export class DockviewGroupPanelModel
                 this._onGroupDragStart.fire(event);
             }),
             this.tabsContainer.onDrop((event) => {
+                // Capture panel data before handleDropEvent (which may trigger moves)
+                const dragData = getPanelData();
+                const draggedPanelId = dragData?.panelId ?? null;
+
                 this.handleDropEvent(
                     'header',
                     event.event,
                     'center',
                     event.index
                 );
+
+                // Update tab group membership after the move completes
+                if (draggedPanelId && event.targetTabGroupId) {
+                    // Compute the local index within the target tab group
+                    // from the global panel index so the panel is inserted
+                    // at the correct position, not just appended.
+                    const tabGroup = this._tabGroupMap.get(
+                        event.targetTabGroupId
+                    );
+                    let localIndex: number | undefined;
+                    if (tabGroup) {
+                        const globalIdx = this._panels.findIndex(
+                            (p) => p.id === draggedPanelId
+                        );
+                        if (globalIdx !== -1) {
+                            // Count how many of this group's panels
+                            // appear before the dragged panel
+                            localIndex = 0;
+                            for (const pid of tabGroup.panelIds) {
+                                const pidIdx = this._panels.findIndex(
+                                    (p) => p.id === pid
+                                );
+                                if (pidIdx < globalIdx) {
+                                    localIndex++;
+                                }
+                            }
+                        }
+                    }
+                    this.addPanelToTabGroup(
+                        event.targetTabGroupId,
+                        draggedPanelId,
+                        localIndex
+                    );
+                } else if (
+                    draggedPanelId &&
+                    event.targetTabGroupId === null
+                ) {
+                    // Dropped outside any group — remove from current group
+                    this.removePanelFromTabGroup(draggedPanelId);
+                }
             }),
 
             this.contentContainer.onDidFocus(() => {
@@ -513,8 +602,409 @@ export class DockviewGroupPanelModel
             this._onDidActivePanelChange,
             this._onUnhandledDragOverEvent,
             this._onDidPanelTitleChange,
-            this._onDidPanelParametersChange
+            this._onDidPanelParametersChange,
+            this._onDidCreateTabGroup,
+            this._onDidDestroyTabGroup,
+            this._onDidAddPanelToTabGroup,
+            this._onDidRemovePanelFromTabGroup,
+            this._onDidTabGroupChange,
+            this._onDidCreateTabGroup.event(() => {
+                this._scheduleTabGroupUpdate();
+            }),
+            this._onDidDestroyTabGroup.event(() => {
+                this._scheduleTabGroupUpdate();
+            }),
+            this._onDidAddPanelToTabGroup.event(() => {
+                this._scheduleTabGroupUpdate();
+            }),
+            this._onDidRemovePanelFromTabGroup.event(() => {
+                this._scheduleTabGroupUpdate();
+            }),
+            this._onDidTabGroupChange.event(() => {
+                this._scheduleTabGroupUpdate();
+            })
         );
+    }
+
+    private _scheduleTabGroupUpdate(): void {
+        if (this._pendingTabGroupUpdate) {
+            return;
+        }
+        this._pendingTabGroupUpdate = true;
+        queueMicrotask(() => {
+            this._pendingTabGroupUpdate = false;
+            this.tabsContainer.updateTabGroups();
+        });
+    }
+
+    createTabGroup(options?: {
+        label?: string;
+        color?: TabGroupColor;
+        id?: string;
+    }): ITabGroup {
+        const id = options?.id ?? `tg-${this.id}-${this._tabGroupIdCounter++}`;
+        const tabGroup = new TabGroup(id, {
+            label: options?.label,
+            color: options?.color,
+        });
+        this._tabGroups.push(tabGroup);
+        this._tabGroupMap.set(id, tabGroup);
+
+        tabGroup.onDidChange(() => {
+            this._onDidTabGroupChange.fire({ tabGroup });
+        });
+
+        tabGroup.onDidCollapseChange((collapsed) => {
+            if (collapsed) {
+                this._handleGroupCollapse(tabGroup);
+            }
+        });
+
+        tabGroup.onDidDestroy(() => {
+            this._removeTabGroupInternal(tabGroup);
+        });
+
+        this._onDidCreateTabGroup.fire({ tabGroup });
+        return tabGroup;
+    }
+
+    dissolveTabGroup(tabGroupId: string): void {
+        const tabGroup = this._tabGroupMap.get(tabGroupId);
+        if (!tabGroup) {
+            return;
+        }
+
+        // Remove all panels from the group (they stay in the flat panel list)
+        const panelIds = [...tabGroup.panelIds];
+        for (const panelId of panelIds) {
+            tabGroup.removePanel(panelId);
+            this._panelToTabGroup.delete(panelId);
+            this._onDidRemovePanelFromTabGroup.fire({ tabGroup, panelId });
+        }
+
+        tabGroup.dispose();
+    }
+
+    addPanelToTabGroup(
+        tabGroupId: string,
+        panelId: string,
+        index?: number
+    ): void {
+        const tabGroup = this._tabGroupMap.get(tabGroupId);
+        if (!tabGroup) {
+            return;
+        }
+
+        // Remove from any existing group first
+        const existingGroup = this.getTabGroupForPanel(panelId);
+        if (existingGroup) {
+            if (existingGroup.id === tabGroupId) {
+                return; // already in this group
+            }
+            this.removePanelFromTabGroup(panelId);
+        }
+
+        tabGroup.addPanel(panelId, index);
+        this._panelToTabGroup.set(panelId, tabGroup);
+
+        // Enforce contiguity: move the panel in the flat _panels array
+        // to the correct global position matching its group-local index
+        this._enforceContiguity(tabGroup, panelId);
+
+        this._onDidAddPanelToTabGroup.fire({ tabGroup, panelId });
+    }
+
+    /**
+     * Move a panel to a new index within its tab group.
+     * Updates both the group's panelIds order and the flat _panels array.
+     */
+    movePanelWithinGroup(
+        tabGroupId: string,
+        panelId: string,
+        newIndex: number
+    ): void {
+        const tabGroup = this._tabGroupMap.get(tabGroupId);
+        if (!tabGroup || !tabGroup.containsPanel(panelId)) {
+            return;
+        }
+
+        // Remove and re-add at new index within the group
+        tabGroup.removePanel(panelId);
+        tabGroup.addPanel(panelId, newIndex);
+
+        // Re-enforce contiguity in the flat array
+        this._enforceContiguity(tabGroup, panelId);
+
+        this.tabsContainer.updateTabGroups();
+    }
+
+    /**
+     * Move a panel from one tab group to another.
+     */
+    movePanelBetweenGroups(
+        sourcePanelId: string,
+        targetTabGroupId: string,
+        targetIndex?: number
+    ): void {
+        const sourceGroup = this._findTabGroupForPanel(sourcePanelId);
+        const targetGroup = this._tabGroupMap.get(targetTabGroupId);
+
+        if (!targetGroup) {
+            return;
+        }
+
+        if (sourceGroup) {
+            sourceGroup.removePanel(sourcePanelId);
+            this._panelToTabGroup.delete(sourcePanelId);
+            this._onDidRemovePanelFromTabGroup.fire({
+                tabGroup: sourceGroup,
+                panelId: sourcePanelId,
+            });
+
+            // Auto-destroy empty source group
+            if (sourceGroup.isEmpty) {
+                sourceGroup.dispose();
+            }
+        }
+
+        targetGroup.addPanel(sourcePanelId, targetIndex);
+        this._panelToTabGroup.set(sourcePanelId, targetGroup);
+        this._enforceContiguity(targetGroup, sourcePanelId);
+        this._onDidAddPanelToTabGroup.fire({
+            tabGroup: targetGroup,
+            panelId: sourcePanelId,
+        });
+    }
+
+    /**
+     * Move an entire tab group to a new position in the tab bar.
+     * The group's internal panel order is preserved.
+     */
+    moveTabGroup(tabGroupId: string, targetIndex: number): void {
+        const tabGroup = this._tabGroupMap.get(tabGroupId);
+        if (!tabGroup || tabGroup.panelIds.length === 0) {
+            return;
+        }
+
+        // Collect group panels in their current order
+        const groupPanelIds = new Set(tabGroup.panelIds);
+        const groupPanels = tabGroup.panelIds
+            .map((pid) => this._panels.find((p) => p.id === pid))
+            .filter((p): p is IDockviewPanel => p !== undefined);
+
+        if (groupPanels.length === 0) {
+            return;
+        }
+
+        // Count how many group panels sit before the target index so
+        // we can compensate after removing them from the array.
+        let groupPanelsBefore = 0;
+        for (let i = 0; i < Math.min(targetIndex, this._panels.length); i++) {
+            if (groupPanelIds.has(this._panels[i].id)) {
+                groupPanelsBefore++;
+            }
+        }
+
+        // Remove group panels from the flat array
+        for (const panel of groupPanels) {
+            const idx = this._panels.indexOf(panel);
+            if (idx !== -1) {
+                this._panels.splice(idx, 1);
+            }
+        }
+
+        // Adjust target index to account for removed panels
+        const adjustedIndex = targetIndex - groupPanelsBefore;
+
+        // Clamp target index to valid range after removal
+        const insertAt = Math.max(
+            0,
+            Math.min(adjustedIndex, this._panels.length)
+        );
+
+        // Insert group panels at the target position
+        this._panels.splice(insertAt, 0, ...groupPanels);
+
+        // Rebuild the tabs container to match new order
+        for (const panel of this._panels) {
+            this.tabsContainer.delete(panel.id);
+        }
+        for (let i = 0; i < this._panels.length; i++) {
+            this.tabsContainer.openPanel(this._panels[i], i);
+        }
+
+        this.tabsContainer.updateTabGroups();
+    }
+
+    /**
+     * Ensure a panel is at the correct global index in _panels
+     * to maintain contiguity of its tab group members.
+     */
+    private _enforceContiguity(tabGroup: TabGroup, panelId: string): void {
+        const panel = this._panels.find((p) => p.id === panelId);
+        if (!panel) {
+            return;
+        }
+
+        const localIndex = tabGroup.indexOfPanel(panelId);
+        const globalIndex = this._computeGlobalIndex(tabGroup, localIndex);
+
+        const currentIndex = this._panels.indexOf(panel);
+        if (currentIndex === globalIndex) {
+            return;
+        }
+
+        // Move panel in the flat array
+        this._panels.splice(currentIndex, 1);
+        const adjustedIndex =
+            globalIndex > currentIndex ? globalIndex - 1 : globalIndex;
+        this._panels.splice(adjustedIndex, 0, panel);
+
+        // Reorder in the tabs container to match
+        this.tabsContainer.delete(panelId);
+        this.tabsContainer.openPanel(panel, adjustedIndex);
+    }
+
+    /**
+     * Compute the global index in _panels for a group-local index.
+     * Finds where the group's panels start in the flat array and offsets.
+     */
+    private _computeGlobalIndex(
+        tabGroup: TabGroup,
+        localIndex: number
+    ): number {
+        const groupPanelIds = tabGroup.panelIds;
+
+        if (groupPanelIds.length <= 1) {
+            // Only one panel (the one being added), keep current position
+            const panel = this._panels.find(
+                (p) => p.id === groupPanelIds[0]
+            );
+            return panel ? this._panels.indexOf(panel) : this._panels.length;
+        }
+
+        // Find the first existing group member (other than the one at localIndex)
+        // to anchor the group position
+        for (let i = 0; i < groupPanelIds.length; i++) {
+            if (i === localIndex) {
+                continue;
+            }
+            const existingPanel = this._panels.find(
+                (p) => p.id === groupPanelIds[i]
+            );
+            if (existingPanel) {
+                const existingGlobalIndex = this._panels.indexOf(existingPanel);
+                // Offset based on relative position within group
+                return existingGlobalIndex + (localIndex - i);
+            }
+        }
+
+        return this._panels.length;
+    }
+
+    removePanelFromTabGroup(panelId: string): void {
+        const tabGroup = this._findTabGroupForPanel(panelId);
+        if (!tabGroup) {
+            return;
+        }
+
+        tabGroup.removePanel(panelId);
+        this._panelToTabGroup.delete(panelId);
+        this._onDidRemovePanelFromTabGroup.fire({ tabGroup, panelId });
+
+        // Auto-destroy empty groups
+        if (tabGroup.isEmpty) {
+            tabGroup.dispose();
+        }
+    }
+
+    getTabGroups(): readonly ITabGroup[] {
+        return this._tabGroups;
+    }
+
+    getTabGroupForPanel(panelId: string): ITabGroup | undefined {
+        return this._findTabGroupForPanel(panelId);
+    }
+
+    private _findTabGroupForPanel(panelId: string): TabGroup | undefined {
+        return this._panelToTabGroup.get(panelId);
+    }
+
+    private _removeTabGroupInternal(tabGroup: TabGroup): void {
+        const index = this._tabGroups.indexOf(tabGroup);
+        if (index !== -1) {
+            this._tabGroups.splice(index, 1);
+            this._tabGroupMap.delete(tabGroup.id);
+            for (const panelId of tabGroup.panelIds) {
+                this._panelToTabGroup.delete(panelId);
+            }
+            this._onDidDestroyTabGroup.fire({ tabGroup });
+        }
+    }
+
+    private _handleGroupCollapse(tabGroup: TabGroup): void {
+        if (!this._activePanel) {
+            return;
+        }
+
+        // Only act if the active panel belongs to the collapsed group
+        if (!tabGroup.containsPanel(this._activePanel.id)) {
+            return;
+        }
+
+        const activePanelIndex = this._panels.indexOf(this._activePanel);
+
+        // Search right first, then left, for a visible (non-collapsed-group) panel
+        for (let i = activePanelIndex + 1; i < this._panels.length; i++) {
+            const candidate = this._panels[i];
+            const candidateGroup = this._findTabGroupForPanel(candidate.id);
+            if (!candidateGroup || !candidateGroup.collapsed) {
+                this.doSetActivePanel(candidate);
+                this.updateContainer();
+                return;
+            }
+        }
+
+        for (let i = activePanelIndex - 1; i >= 0; i--) {
+            const candidate = this._panels[i];
+            const candidateGroup = this._findTabGroupForPanel(candidate.id);
+            if (!candidateGroup || !candidateGroup.collapsed) {
+                this.doSetActivePanel(candidate);
+                this.updateContainer();
+                return;
+            }
+        }
+
+        // All tabs are in collapsed groups — no visible tab to activate
+    }
+
+    /** Restore tab groups from serialized data (used by fromJSON) */
+    restoreTabGroups(serializedGroups: SerializedTabGroup[]): void {
+        for (const data of serializedGroups) {
+            const tabGroup = this.createTabGroup({
+                id: data.id,
+                label: data.label,
+                color: data.color,
+            });
+
+            const concreteGroup = this._tabGroupMap.get(tabGroup.id)!;
+            for (const panelId of data.tabIds) {
+                // Only add panels that actually exist in this group model
+                if (this._panels.some((p) => p.id === panelId)) {
+                    tabGroup.addPanel(panelId);
+                    this._panelToTabGroup.set(panelId, concreteGroup);
+                }
+            }
+
+            if (data.collapsed) {
+                tabGroup.collapse();
+            }
+
+            // Auto-destroy if no valid panels were added
+            if (tabGroup.isEmpty) {
+                tabGroup.dispose();
+            }
+        }
     }
 
     focusContent(): void {
@@ -658,6 +1148,10 @@ export class DockviewGroupPanelModel
 
         if (this.headerPosition !== 'top') {
             result.headerPosition = this.headerPosition;
+        }
+
+        if (this._tabGroups.length > 0) {
+            result.tabGroups = this._tabGroups.map((tg) => tg.toJSON());
         }
 
         return result;
@@ -926,6 +1420,9 @@ export class DockviewGroupPanelModel
             this._panelDisposables.delete(panel.id);
         }
 
+        // Remove panel from its tab group (auto-destroys empty groups)
+        this.removePanelFromTabGroup(panel.id);
+
         this._onDidRemovePanel.fire({ panel });
     }
 
@@ -1174,6 +1671,11 @@ export class DockviewGroupPanelModel
         this.watermark?.element.remove();
         this.watermark?.dispose?.();
         this.watermark = undefined;
+
+        // Dispose all tab groups
+        for (const tabGroup of [...this._tabGroups]) {
+            tabGroup.dispose();
+        }
 
         for (const panel of this.panels) {
             panel.dispose();

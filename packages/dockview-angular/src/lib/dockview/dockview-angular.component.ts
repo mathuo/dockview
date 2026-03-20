@@ -32,6 +32,7 @@ import {
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularRenderer } from '../utils/angular-renderer';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
+import { AngularTabGroupChipRenderer } from './angular-tab-group-chip-renderer';
 
 export interface DockviewAngularOptions extends DockviewOptions {
     components: Record<string, Type<any>>;
@@ -77,6 +78,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() leftHeaderActionsComponent?: Type<any>;
     @Input() rightHeaderActionsComponent?: Type<any>;
     @Input() prefixHeaderActionsComponent?: Type<any>;
+    @Input() tabGroupChipComponent?: Type<any>;
 
     // Core dockview options as inputs
     @Input() className?: string;
@@ -171,6 +173,17 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
                 (coreOptions as any)[key] = value;
             }
         });
+
+        if (this.tabGroupChipComponent) {
+            const chipComponent = this.tabGroupChipComponent;
+            coreOptions.createTabGroupChipComponent = () => {
+                return new AngularTabGroupChipRenderer(
+                    chipComponent,
+                    this.injector,
+                    this.environmentInjector
+                );
+            };
+        }
 
         return coreOptions as DockviewOptions;
     }

@@ -1,5 +1,6 @@
 .dv-tabs-container {
     display: flex;
+    position: relative;
     height: 100%;
     overflow: auto;
     scrollbar-width: thin; // firefox
@@ -98,12 +99,110 @@
                     margin var(--dv-transition-duration, 200ms) ease-out,
                     opacity var(--dv-transition-duration, 200ms) ease-out;
     }
+
+    &.dv-tab--group-collapsed {
+        width: 0 !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transition: width var(--dv-transition-duration, 200ms) ease-out,
+                    padding var(--dv-transition-duration, 200ms) ease-out,
+                    margin var(--dv-transition-duration, 200ms) ease-out,
+                    opacity var(--dv-transition-duration, 200ms) ease-out;
+    }
+
+    &.dv-tab--group-expanding {
+        transition: width var(--dv-transition-duration, 200ms) ease-out,
+                    padding var(--dv-transition-duration, 200ms) ease-out,
+                    margin var(--dv-transition-duration, 200ms) ease-out,
+                    opacity var(--dv-transition-duration, 200ms) ease-out;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .dv-tab {
         transition: none !important;
     }
+    .dv-tab-group-chip {
+        transition: none !important;
+    }
+}
+
+// Tab group chip
+.dv-tab-group-chip {
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
+    margin: 0 4px;
+    padding: var(--dv-tab-group-chip-padding);
+    border-radius: var(--dv-tab-group-chip-border-radius);
+    font-size: var(--dv-tab-group-chip-font-size);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    box-sizing: border-box;
+    line-height: 1;
+
+    &.dv-tab-group-chip--collapsed {
+        opacity: 0.7;
+    }
+
+    &.dv-tab-group-chip--shifting {
+        will-change: margin-left;
+        transition: margin-left var(--dv-transition-duration, 200ms) ease-out;
+    }
+
+    &.dv-tab-group-chip--dragging {
+        width: 0 !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transition: width var(--dv-transition-duration, 200ms) ease-out,
+                    padding var(--dv-transition-duration, 200ms) ease-out,
+                    margin var(--dv-transition-duration, 200ms) ease-out,
+                    opacity var(--dv-transition-duration, 200ms) ease-out;
+    }
+
+    .dv-tab-group-chip-label--empty {
+        display: none;
+    }
+
+    &:has(.dv-tab-group-chip-label--empty) {
+        width: 12px;
+        height: 12px;
+        padding: 0;
+        border-radius: 50%;
+    }
+}
+
+// Color variants
+@each $color in grey, blue, red, yellow, green, pink, purple, cyan {
+    .dv-tab-group-chip--#{$color} {
+        background-color: var(--dv-tab-group-color-#{$color});
+        color: white;
+    }
+}
+
+// Single underline element per tab group (positioned by JS)
+.dv-tab-group-underline {
+    position: absolute;
+    bottom: 0;
+    height: var(--dv-tab-group-line-height);
+    opacity: var(--dv-tab-group-line-opacity);
+    pointer-events: none;
+    z-index: 10;
+}
+
+// Header-bottom: overline instead of underline
+.dv-groupview-header-bottom .dv-tab-group-underline {
+    bottom: auto;
+    top: 0;
 }
 
 .dv-tabs-container-vertical {

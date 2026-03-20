@@ -33,6 +33,25 @@
     --dv-floating-group-border: none;
     --dv-drag-over-border: none;
     --dv-floating-group-dragging-opacity: 0.5;
+
+    // Tab group color palette
+    --dv-tab-group-color-grey: #5f6368;
+    --dv-tab-group-color-blue: #1a73e8;
+    --dv-tab-group-color-red: #d93025;
+    --dv-tab-group-color-yellow: #f9ab00;
+    --dv-tab-group-color-green: #188038;
+    --dv-tab-group-color-pink: #d01884;
+    --dv-tab-group-color-purple: #a142f4;
+    --dv-tab-group-color-cyan: #007b83;
+
+    // Tab group chip dimensions
+    --dv-tab-group-chip-padding: 4px 8px;
+    --dv-tab-group-chip-border-radius: 6px;
+    --dv-tab-group-chip-font-size: 11px;
+
+    // Tab group underline/overline
+    --dv-tab-group-line-height: 2px;
+    --dv-tab-group-line-opacity: 0.6;
 }
 
 @mixin dockview-theme-dark-mixin {

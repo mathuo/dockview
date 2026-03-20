@@ -52,7 +52,11 @@ export {
     DockviewWillDropEvent,
     DockviewGroupChangeEvent,
 } from './dockview/dockviewGroupPanelModel';
-export { DockviewWillShowOverlayLocationEvent } from './dockview/events';
+export {
+    DockviewWillShowOverlayLocationEvent,
+    TabGroupChangeEvent,
+    TabGroupPanelChangeEvent,
+} from './dockview/events';
 export {
     TabDragEvent,
     GroupDragEvent,
@@ -67,11 +71,19 @@ export {
     IGroupHeaderProps,
     IWatermarkPanelProps,
     DockviewReadyEvent,
+    ITabGroupChipRenderer,
 } from './dockview/framework';
 
 export * from './dockview/options';
 export * from './dockview/theme';
 export * from './dockview/dockviewPanel';
+export {
+    TabGroupColor,
+    TAB_GROUP_COLORS,
+    ITabGroup,
+    SerializedTabGroup,
+    isValidTabGroupColor,
+} from './dockview/tabGroup';
 export { DefaultTab } from './dockview/components/tab/defaultTab';
 export {
     DefaultDockviewDeserialzier,

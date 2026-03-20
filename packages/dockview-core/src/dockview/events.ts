@@ -4,6 +4,7 @@ import { DockviewApi } from '../api/component.api';
 import { IDockviewPanel } from './dockviewPanel';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewEvent } from '../events';
+import { ITabGroup } from './tabGroup';
 
 export type DockviewGroupDropLocation =
     | 'tab'
@@ -17,6 +18,15 @@ export interface DockviewWillShowOverlayLocationEventOptions {
     readonly api: DockviewApi;
     readonly group: DockviewGroupPanel | undefined;
     getData: () => PanelTransfer | undefined;
+}
+
+export interface TabGroupChangeEvent {
+    readonly tabGroup: ITabGroup;
+}
+
+export interface TabGroupPanelChangeEvent {
+    readonly tabGroup: ITabGroup;
+    readonly panelId: string;
 }
 
 export class DockviewWillShowOverlayLocationEvent implements IDockviewEvent {
