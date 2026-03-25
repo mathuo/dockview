@@ -286,7 +286,7 @@ export default () => {
                 className={'dockview-theme-abyss'}
                 onReady={onReady}
                 components={components}
-                smoothTabReorder={true}
+                tabAnimation={'smooth'}
                 disableFloatingGroups={true}
             />
             {menu && dockviewContainer && (

@@ -510,7 +510,7 @@ describe('tabs - animation', () => {
             //
             // Layout: [Feature chip][A][B][C][D][Monitoring chip][E]
             // Drag D → cursor over Monitoring chip → should target Monitoring group
-            const { tabs, group } = createTabs({ smoothTabReorder: true });
+            const { tabs, group } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
             const panelC = createMockPanel('panel-c');
@@ -595,7 +595,7 @@ describe('tabs - animation', () => {
             //
             // Layout: [Feature chip][A][B][Monitoring chip][C]
             // Drag Feature group → cursor between C's tabs area
-            const { tabs, group } = createTabs({ smoothTabReorder: true });
+            const { tabs, group } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
             const panelC = createMockPanel('panel-c');

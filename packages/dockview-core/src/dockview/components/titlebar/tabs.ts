@@ -776,7 +776,7 @@ export class Tabs extends CompositeDisposable {
         if (chip instanceof TabGroupChip) {
             disposables.push(
                 chip.onDragStart((event) => {
-                    if (this.accessor.options.smoothTabReorder) {
+                    if (this.accessor.options.tabAnimation === 'smooth') {
                         const firstPanelId = tabGroup.panelIds[0];
                         const firstIdx = firstPanelId
                             ? this._tabs.findIndex(
