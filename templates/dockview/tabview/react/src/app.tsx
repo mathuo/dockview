@@ -20,6 +20,13 @@ const components = {
 
 const Component = (props: { theme?: string }) => {
     const [api, setApi] = React.useState<DockviewApi>();
+    const [tabAnimation, setTabAnimation] = React.useState<'smooth' | 'default'>('default');
+
+    const toggleMode = () => {
+        const next = tabAnimation === 'smooth' ? 'default' : 'smooth';
+        setTabAnimation(next);
+        api?.updateOptions({ tabAnimation: next });
+    };
 
     React.useEffect(() => {
         if (!api) {
@@ -70,12 +77,28 @@ const Component = (props: { theme?: string }) => {
     };
 
     return (
-        <DockviewReact
-            className={`${props.theme || 'dockview-theme-abyss'}`}
-            onReady={onReady}
-            components={components}
-            disableFloatingGroups={true}
-        />
+        <div
+            style={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+            }}
+        >
+            <div style={{ padding: '4px 8px' }}>
+                <button onClick={toggleMode}>
+                    {`tabAnimation: ${tabAnimation}`}
+                </button>
+            </div>
+            <div style={{ flexGrow: 1 }}>
+                <DockviewReact
+                    className={`${props.theme || 'dockview-theme-abyss'}`}
+                    onReady={onReady}
+                    components={components}
+                    tabAnimation={tabAnimation}
+                    disableFloatingGroups={true}
+                />
+            </div>
+        </div>
     );
 };
 
