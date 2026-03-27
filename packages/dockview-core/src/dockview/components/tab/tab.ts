@@ -199,5 +199,4 @@ export class Tab extends CompositeDisposable {
         this._element.draggable = !this.accessor.options.disableDnd;
         this.dragHandler.setDisabled(!!this.accessor.options.disableDnd);
     }
-
 }

@@ -45,7 +45,10 @@ export interface ITabGroup {
     readonly size: number;
     readonly isEmpty: boolean;
     readonly onDidChange: Event<void>;
-    readonly onDidPanelChange: Event<{ panelId: string; type: 'add' | 'remove' }>;
+    readonly onDidPanelChange: Event<{
+        panelId: string;
+        type: 'add' | 'remove';
+    }>;
     readonly onDidCollapseChange: Event<boolean>;
     readonly onDidDestroy: Event<void>;
     addPanel(panelId: string, index?: number): void;

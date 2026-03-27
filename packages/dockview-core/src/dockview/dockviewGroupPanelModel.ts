@@ -557,10 +557,7 @@ export class DockviewGroupPanelModel
                         draggedPanelId,
                         localIndex
                     );
-                } else if (
-                    draggedPanelId &&
-                    event.targetTabGroupId === null
-                ) {
+                } else if (draggedPanelId && event.targetTabGroupId === null) {
                     // Dropped outside any group — remove from current group
                     this.removePanelFromTabGroup(draggedPanelId);
                 }
@@ -877,9 +874,7 @@ export class DockviewGroupPanelModel
 
         if (groupPanelIds.length <= 1) {
             // Only one panel (the one being added), keep current position
-            const panel = this._panels.find(
-                (p) => p.id === groupPanelIds[0]
-            );
+            const panel = this._panels.find((p) => p.id === groupPanelIds[0]);
             return panel ? this._panels.indexOf(panel) : this._panels.length;
         }
 

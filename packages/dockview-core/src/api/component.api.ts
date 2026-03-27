@@ -958,10 +958,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         });
     }
 
-    dissolveTabGroup(options: {
-        groupId: string;
-        tabGroupId: string;
-    }): void {
+    dissolveTabGroup(options: { groupId: string; tabGroupId: string }): void {
         const model = this._getGroupModel(options.groupId);
         model.dissolveTabGroup(options.tabGroupId);
     }

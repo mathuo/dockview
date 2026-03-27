@@ -1428,9 +1428,7 @@ describe('dockviewGroupPanelModel', () => {
             groupview.model.addPanelToTabGroup(tabGroup.id, 'panel1');
 
             const events: any[] = [];
-            groupview.model.onDidRemovePanelFromTabGroup((e) =>
-                events.push(e)
-            );
+            groupview.model.onDidRemovePanelFromTabGroup((e) => events.push(e));
 
             groupview.model.removePanelFromTabGroup('panel1');
 
@@ -1447,9 +1445,7 @@ describe('dockviewGroupPanelModel', () => {
             groupview.model.addPanelToTabGroup(tabGroup.id, 'panel1');
 
             const destroyEvents: any[] = [];
-            groupview.model.onDidDestroyTabGroup((e) =>
-                destroyEvents.push(e)
-            );
+            groupview.model.onDidDestroyTabGroup((e) => destroyEvents.push(e));
 
             groupview.model.removePanelFromTabGroup('panel1');
 

@@ -50,12 +50,7 @@ export interface DockviewReadyEvent {
 
 export interface ITabGroupChipRenderer {
     readonly element: HTMLElement;
-    init(params: {
-        tabGroup: ITabGroup;
-        api: DockviewApi;
-    }): void;
-    update?(params: {
-        tabGroup: ITabGroup;
-    }): void;
+    init(params: { tabGroup: ITabGroup; api: DockviewApi }): void;
+    update?(params: { tabGroup: ITabGroup }): void;
     dispose(): void;
 }

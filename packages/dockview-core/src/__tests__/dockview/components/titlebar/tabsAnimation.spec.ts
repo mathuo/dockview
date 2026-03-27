@@ -527,11 +527,11 @@ describe('tabs - animation', () => {
 
             // Feature chip (30px) + 4 tabs (80px each) + Monitoring chip (30px) + 1 tab (80px)
             // Positions: chip@0, A@30, B@110, C@190, D@270, chip@350, E@380
-            mockTabRect(elements[0], { left: 30, width: 80 });   // A
-            mockTabRect(elements[1], { left: 110, width: 80 });  // B
-            mockTabRect(elements[2], { left: 190, width: 80 });  // C
-            mockTabRect(elements[3], { left: 270, width: 80 });  // D (source)
-            mockTabRect(elements[4], { left: 380, width: 80 });  // E
+            mockTabRect(elements[0], { left: 30, width: 80 }); // A
+            mockTabRect(elements[1], { left: 110, width: 80 }); // B
+            mockTabRect(elements[2], { left: 190, width: 80 }); // C
+            mockTabRect(elements[3], { left: 270, width: 80 }); // D (source)
+            mockTabRect(elements[4], { left: 380, width: 80 }); // E
 
             // Mock tab groups returned by the model
             const featureGroup = {
@@ -544,10 +544,16 @@ describe('tabs - animation', () => {
                 panelIds: ['panel-e'],
                 collapsed: false,
             };
-            (group.model as any).getTabGroups = () => [featureGroup, monitoringGroup];
+            (group.model as any).getTabGroups = () => [
+                featureGroup,
+                monitoringGroup,
+            ];
 
             // Set up chip renderers map so the code knows there are chips
-            const chipRenderers = (tabs as any)._chipRenderers as Map<string, any>;
+            const chipRenderers = (tabs as any)._chipRenderers as Map<
+                string,
+                any
+            >;
             chipRenderers.set('feature-group', {
                 chip: { element: document.createElement('span') },
                 disposable: { dispose: jest.fn() },
@@ -585,7 +591,9 @@ describe('tabs - animation', () => {
             //     threshold = 270 + 30 = 300, mouseX=330 ≥ 300 → target = monitoring
             (tabs as any).handleDragOver({ clientX: 330 } as DragEvent);
 
-            expect(getAnimState(tabs).targetTabGroupId).toBe('monitoring-group');
+            expect(getAnimState(tabs).targetTabGroupId).toBe(
+                'monitoring-group'
+            );
         });
 
         test('dragging a group chip never targets another group', () => {
@@ -608,10 +616,10 @@ describe('tabs - animation', () => {
 
             const elements = getTabElements(tabs);
 
-            mockTabRect(elements[0], { left: 30, width: 80 });   // A
-            mockTabRect(elements[1], { left: 110, width: 80 });   // B
-            mockTabRect(elements[2], { left: 220, width: 80 });   // C
-            mockTabRect(elements[3], { left: 300, width: 80 });   // D
+            mockTabRect(elements[0], { left: 30, width: 80 }); // A
+            mockTabRect(elements[1], { left: 110, width: 80 }); // B
+            mockTabRect(elements[2], { left: 220, width: 80 }); // C
+            mockTabRect(elements[3], { left: 300, width: 80 }); // D
 
             const featureGroup = {
                 id: 'feature-group',
@@ -623,9 +631,15 @@ describe('tabs - animation', () => {
                 panelIds: ['panel-c', 'panel-d'],
                 collapsed: false,
             };
-            (group.model as any).getTabGroups = () => [featureGroup, monitoringGroup];
+            (group.model as any).getTabGroups = () => [
+                featureGroup,
+                monitoringGroup,
+            ];
 
-            const chipRenderers = (tabs as any)._chipRenderers as Map<string, any>;
+            const chipRenderers = (tabs as any)._chipRenderers as Map<
+                string,
+                any
+            >;
             chipRenderers.set('feature-group', {
                 chip: { element: document.createElement('span') },
                 disposable: { dispose: jest.fn() },
@@ -640,7 +654,10 @@ describe('tabs - animation', () => {
                 sourceTabId: '',
                 sourceIndex: 0,
                 tabPositions: (tabs as any).snapshotTabPositions(),
-                chipPositions: new Map([['feature-group', 30], ['monitoring-group', 30]]),
+                chipPositions: new Map([
+                    ['feature-group', 30],
+                    ['monitoring-group', 30],
+                ]),
                 currentInsertionIndex: null,
                 targetTabGroupId: null,
                 sourceTabGroupId: 'feature-group',

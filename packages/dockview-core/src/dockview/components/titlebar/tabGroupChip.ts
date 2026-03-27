@@ -46,11 +46,19 @@ export class TabGroupChip
                 // Delay collapse to next frame so the browser
                 // captures the full drag image first
                 requestAnimationFrame(() => {
-                    toggleClass(this._element, 'dv-tab-group-chip--dragging', true);
+                    toggleClass(
+                        this._element,
+                        'dv-tab-group-chip--dragging',
+                        true
+                    );
                 });
             }),
             addDisposableListener(this._element, 'dragend', () => {
-                toggleClass(this._element, 'dv-tab-group-chip--dragging', false);
+                toggleClass(
+                    this._element,
+                    'dv-tab-group-chip--dragging',
+                    false
+                );
             })
         );
     }
@@ -98,5 +106,4 @@ export class TabGroupChip
     private updateCollapsed(collapsed: boolean): void {
         toggleClass(this._element, 'dv-tab-group-chip--collapsed', collapsed);
     }
-
 }

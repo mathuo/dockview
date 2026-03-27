@@ -8647,9 +8647,7 @@ describe('dockviewComponent', () => {
             dockview.removePanel(panel1);
 
             // Tab group should have been auto-destroyed (isEmpty triggers dispose)
-            expect(
-                dockview.api.getTabGroups(panel2.group.id).length
-            ).toBe(0);
+            expect(dockview.api.getTabGroups(panel2.group.id).length).toBe(0);
         });
 
         test('no-label group chip renders with empty label class', () => {
@@ -8682,15 +8680,11 @@ describe('dockviewComponent', () => {
                 panel1.group.element.querySelectorAll('.dv-tab-group-chip');
             expect(chips.length).toBeGreaterThan(0);
 
-            const labelEl = chips[0].querySelector(
-                '.dv-tab-group-chip-label'
-            );
+            const labelEl = chips[0].querySelector('.dv-tab-group-chip-label');
             expect(labelEl).toBeTruthy();
             expect(labelEl!.textContent).toBe('');
             expect(
-                labelEl!.classList.contains(
-                    'dv-tab-group-chip-label--empty'
-                )
+                labelEl!.classList.contains('dv-tab-group-chip-label--empty')
             ).toBe(true);
         });
     });
