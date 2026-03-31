@@ -252,6 +252,14 @@ function Features() {
                         <FeatureCard key={f.title} {...f} />
                     ))}
                 </div>
+                <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+                    <Link
+                        to="/features"
+                        className="button button--secondary button--lg"
+                    >
+                        View all features →
+                    </Link>
+                </div>
             </div>
         </section>
     );

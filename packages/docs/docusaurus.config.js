@@ -247,6 +247,7 @@ const config = {
                         position: 'right',
                         label: 'Docs',
                     },
+                    { to: '/features', label: 'Features', position: 'right' },
                     {
                         type: 'docSidebar',
                         position: 'right',
