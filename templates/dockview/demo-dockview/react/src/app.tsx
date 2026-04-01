@@ -5,6 +5,7 @@ import {
     IDockviewPanelHeaderProps,
     IDockviewPanelProps,
     DockviewApi,
+    IContextMenuItemComponentProps,
 } from 'dockview';
 import React from 'react';
 import './app.css';
@@ -19,6 +20,31 @@ import {
 } from './controls.tsx';
 import { usePanelApiMetadata } from './debugPanel.tsx';
 import { LogLine, LogLines } from './logLines.tsx';
+
+const FloatMenuItem = ({
+    panel,
+    api,
+    close,
+}: IContextMenuItemComponentProps) => {
+    return (
+        <div
+            className="dv-context-menu-item"
+            onClick={() => {
+                api.addFloatingGroup(panel);
+                close();
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+        >
+            <span
+                className="material-symbols-outlined"
+                style={{ fontSize: '14px' }}
+            >
+                ad_group
+            </span>
+            Float tab
+        </div>
+    );
+};
 
 const components = {
     default: (props: IDockviewPanelProps) => {
@@ -70,11 +96,7 @@ const components = {
 
 const headerComponents = {
     default: (props: IDockviewPanelHeaderProps) => {
-        const onContextMenu = (event: React.MouseEvent) => {
-            event.preventDefault();
-            alert('context menu');
-        };
-        return <DockviewDefaultTab onContextMenu={onContextMenu} {...props} />;
+        return <DockviewDefaultTab {...props} />;
     },
 };
 
@@ -244,6 +266,13 @@ const DockviewDemo = (props: { theme?: string }) => {
                     prefixHeaderActionsComponent={PrefixHeaderControls}
                     onReady={onReady}
                     className={props.theme || 'dockview-theme-abyss'}
+                    getTabContextMenuItems={() => [
+                        'close',
+                        'closeOthers',
+                        'closeAll',
+                        'separator',
+                        { component: FloatMenuItem },
+                    ]}
                 />
                 <div
                     style={{
