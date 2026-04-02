@@ -164,13 +164,12 @@ export class ContextMenuController {
             return;
         }
 
-        const items =
-            this.accessor.options.getTabGroupChipContextMenuItems({
-                tabGroup,
-                group,
-                api: this.accessor.api,
-                event,
-            });
+        const items = this.accessor.options.getTabGroupChipContextMenuItems({
+            tabGroup,
+            group,
+            api: this.accessor.api,
+            event,
+        });
 
         if (items.length === 0) {
             return;
