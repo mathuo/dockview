@@ -49,32 +49,33 @@ export function buildTabContextMenuItems(
             label: `Remove from "${tabGroup.label || tabGroup.id}"`,
             onClick: () => api.removePanelFromTabGroup({ groupId, panelId }),
         });
-    } else {
-        for (const tg of allTabGroups) {
-            items.push({
-                label: `Add to "${tg.label || tg.id}"`,
-                colorClass: tg.color,
-                onClick: () =>
-                    api.addPanelToTabGroup({
-                        groupId,
-                        tabGroupId: tg.id,
-                        panelId,
-                    }),
-            });
-        }
+    }
+
+    const otherTabGroups = allTabGroups.filter((tg) => tg.id !== tabGroup?.id);
+    for (const tg of otherTabGroups) {
         items.push({
-            label: 'Add to new group',
-            onClick: () => {
-                const label = window.prompt('Group name:') || '';
-                const color =
-                    TAB_GROUP_COLORS[
-                        Math.floor(Math.random() * TAB_GROUP_COLORS.length)
-                    ] as TabGroupColor;
-                const newGroup = api.createTabGroup({ groupId, label, color });
-                api.addPanelToTabGroup({ groupId, tabGroupId: newGroup.id, panelId });
-            },
+            label: `Add to "${tg.label || tg.id}"`,
+            colorClass: tg.color,
+            onClick: () =>
+                api.addPanelToTabGroup({
+                    groupId,
+                    tabGroupId: tg.id,
+                    panelId,
+                }),
         });
     }
+    items.push({
+        label: 'Add to new group',
+        onClick: () => {
+            const label = window.prompt('Group name:') || '';
+            const color =
+                TAB_GROUP_COLORS[
+                    Math.floor(Math.random() * TAB_GROUP_COLORS.length)
+                ] as TabGroupColor;
+            const newGroup = api.createTabGroup({ groupId, label, color });
+            api.addPanelToTabGroup({ groupId, tabGroupId: newGroup.id, panelId });
+        },
+    });
 
     items.push({
         label: 'Close tab',

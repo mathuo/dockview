@@ -605,9 +605,14 @@ export class Tabs extends CompositeDisposable {
                         );
                     }
                 } else {
+                    const targetTabGroupId =
+                        this.group.model.getTabGroupForPanel(
+                            tab.panel.id
+                        )?.id ?? null;
                     this._onDrop.fire({
                         event: event.nativeEvent,
                         index: dropIndex,
+                        targetTabGroupId,
                     });
                 }
             }),

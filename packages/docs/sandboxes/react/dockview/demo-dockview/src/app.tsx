@@ -8,6 +8,9 @@ import {
     DockviewTheme,
     themeAbyss,
     IContextMenuItemComponentProps,
+    GetTabContextMenuItemsParams,
+    TAB_GROUP_COLORS,
+    TabGroupColor,
 } from 'dockview';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
@@ -458,6 +461,80 @@ const DockviewDemo = (props: {
         [effectiveTheme]
     );
 
+    const getTabContextMenuItems = React.useCallback(
+        ({ panel, group }: GetTabContextMenuItemsParams) => {
+            const items: (
+                | 'close'
+                | 'closeOthers'
+                | 'closeAll'
+                | 'separator'
+                | { component: React.FC<IContextMenuItemComponentProps> }
+                | { label: string; action: () => void }
+            )[] = [
+                'close',
+                'closeOthers',
+                'closeAll',
+                'separator',
+                { component: FloatMenuItem },
+            ];
+
+            if (api) {
+                const groupId = group.id;
+                const panelId = panel.id;
+                const tabGroup = api.getTabGroupForPanel({ groupId, panelId });
+                const allTabGroups = api.getTabGroups(groupId);
+                const otherTabGroups = allTabGroups.filter(
+                    (tg) => tg.id !== tabGroup?.id
+                );
+
+                items.push('separator');
+
+                if (tabGroup) {
+                    items.push({
+                        label: `Remove from "${tabGroup.label || tabGroup.id}"`,
+                        action: () =>
+                            api.removePanelFromTabGroup({ groupId, panelId }),
+                    });
+                }
+
+                for (const tg of otherTabGroups) {
+                    items.push({
+                        label: `Add to "${tg.label || tg.id}"`,
+                        action: () =>
+                            api.addPanelToTabGroup({
+                                groupId,
+                                tabGroupId: tg.id,
+                                panelId,
+                            }),
+                    });
+                }
+
+                items.push({
+                    label: 'Add to new group',
+                    action: () => {
+                        const label = window.prompt('Group name:') || '';
+                        const color = TAB_GROUP_COLORS[
+                            Math.floor(Math.random() * TAB_GROUP_COLORS.length)
+                        ] as TabGroupColor;
+                        const newGroup = api.createTabGroup({
+                            groupId,
+                            label,
+                            color,
+                        });
+                        api.addPanelToTabGroup({
+                            groupId,
+                            tabGroupId: newGroup.id,
+                            panelId,
+                        });
+                    },
+                });
+            }
+
+            return items;
+        },
+        [api]
+    );
+
     const [watermark, setWatermark] = React.useState<boolean>(false);
 
     const [gapCheck, setGapCheck] = React.useState<boolean>(false);
@@ -515,6 +592,7 @@ const DockviewDemo = (props: {
                                     >
                                         <DockviewReact
                                             components={components}
+                                            // tabAnimation={'smooth'}
                                             defaultTabComponent={
                                                 headerComponents.default
                                             }
@@ -534,13 +612,9 @@ const DockviewDemo = (props: {
                                             }
                                             onReady={onReady}
                                             theme={effectiveTheme}
-                                            getTabContextMenuItems={() => [
-                                                'close',
-                                                'closeOthers',
-                                                'closeAll',
-                                                'separator',
-                                                { component: FloatMenuItem },
-                                            ]}
+                                            getTabContextMenuItems={
+                                                getTabContextMenuItems
+                                            }
                                         />
                                     </ThemeContext.Provider>
                                 </DebugContext.Provider>
