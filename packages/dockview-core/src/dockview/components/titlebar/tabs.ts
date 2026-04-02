@@ -336,7 +336,7 @@ export class Tabs extends CompositeDisposable {
                 'drop',
                 (event) => {
                     if (
-                        this.accessor.options.tabAnimation === 'smooth' ||
+                        this.accessor.options.tabAnimation !== 'smooth' ||
                         !this._animState ||
                         this._animState.currentInsertionIndex === null
                     ) {
@@ -585,23 +585,25 @@ export class Tabs extends CompositeDisposable {
                         targetTabGroupId: animState.targetTabGroupId,
                     });
 
-                    this.runFlipAnimation(
-                        firstPositions,
-                        animState.sourceTabId,
-                        animState.sourceIndex === -1,
-                        animState.sourceIndex !== -1
-                            ? {
-                                  from: Math.min(
-                                      animState.sourceIndex,
-                                      dropIndex
-                                  ),
-                                  to: Math.max(
-                                      animState.sourceIndex,
-                                      dropIndex
-                                  ),
-                              }
-                            : undefined
-                    );
+                    if (this.accessor.options.tabAnimation === 'smooth') {
+                        this.runFlipAnimation(
+                            firstPositions,
+                            animState.sourceTabId,
+                            animState.sourceIndex === -1,
+                            animState.sourceIndex !== -1
+                                ? {
+                                      from: Math.min(
+                                          animState.sourceIndex,
+                                          dropIndex
+                                      ),
+                                      to: Math.max(
+                                          animState.sourceIndex,
+                                          dropIndex
+                                      ),
+                                  }
+                                : undefined
+                        );
+                    }
                 } else {
                     this._onDrop.fire({
                         event: event.nativeEvent,
@@ -771,6 +773,19 @@ export class Tabs extends CompositeDisposable {
                 this._updateTabGroupClasses();
             }),
         ];
+
+        // Wire chip context menu for default chip (has onContextMenu)
+        if (chip instanceof TabGroupChip) {
+            disposables.push(
+                chip.onContextMenu((event) => {
+                    this.accessor.contextMenuController.showForChip(
+                        tabGroup,
+                        this.group,
+                        event
+                    );
+                })
+            );
+        }
 
         // Wire chip drag for default chip (has onDragStart)
         if (chip instanceof TabGroupChip) {

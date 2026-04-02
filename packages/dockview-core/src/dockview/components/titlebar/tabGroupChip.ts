@@ -16,6 +16,9 @@ export class TabGroupChip
     private readonly _onClick = new Emitter<MouseEvent>();
     readonly onClick: Event<MouseEvent> = this._onClick.event;
 
+    private readonly _onContextMenu = new Emitter<MouseEvent>();
+    readonly onContextMenu: Event<MouseEvent> = this._onContextMenu.event;
+
     private readonly _onDragStart = new Emitter<DragEvent>();
     readonly onDragStart: Event<DragEvent> = this._onDragStart.event;
 
@@ -37,9 +40,13 @@ export class TabGroupChip
 
         this.addDisposables(
             this._onClick,
+            this._onContextMenu,
             this._onDragStart,
             addDisposableListener(this._element, 'click', (event) => {
                 this._onClick.fire(event);
+            }),
+            addDisposableListener(this._element, 'contextmenu', (event) => {
+                this._onContextMenu.fire(event);
             }),
             addDisposableListener(this._element, 'dragstart', (event) => {
                 this._onDragStart.fire(event);

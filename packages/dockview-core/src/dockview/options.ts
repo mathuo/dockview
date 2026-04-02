@@ -29,6 +29,8 @@ export type BuiltInContextMenuItem =
     | 'closeAll'
     | 'separator';
 
+export type BuiltInChipContextMenuItem = BuiltInContextMenuItem | 'colorPicker';
+
 export interface ContextMenuItemConfig {
     label?: string;
     /**
@@ -37,6 +39,11 @@ export interface ContextMenuItemConfig {
      */
     component?: unknown;
     componentProps?: object;
+    /**
+     * A raw DOM element to embed as-is in the context menu.
+     * Use this when you want to render custom content without a framework component.
+     */
+    element?: HTMLElement;
     action?: () => void;
     disabled?: boolean;
 }
@@ -45,6 +52,13 @@ export type ContextMenuItem = BuiltInContextMenuItem | ContextMenuItemConfig;
 
 export interface GetTabContextMenuItemsParams {
     panel: IDockviewPanel;
+    group: DockviewGroupPanel;
+    api: DockviewApi;
+    event: MouseEvent;
+}
+
+export interface GetTabGroupChipContextMenuItemsParams {
+    tabGroup: ITabGroup;
     group: DockviewGroupPanel;
     api: DockviewApi;
     event: MouseEvent;
@@ -143,6 +157,19 @@ export interface DockviewOptions {
         params: GetTabContextMenuItemsParams
     ) => ContextMenuItem[];
     /**
+     * Return the items to display in the tab group chip context menu on right-click.
+     *
+     * Use built-in string shortcuts (`'separator'`, `'colorPicker'`) or provide a
+     * `ContextMenuItemConfig` object for custom items.
+     * `'colorPicker'` renders a native grid of color swatches for the tab group.
+     *
+     * If omitted, no context menu is shown on chip right-click.
+     * Return an empty array to suppress the menu for specific cases.
+     */
+    getTabGroupChipContextMenuItems?: (
+        params: GetTabGroupChipContextMenuItemsParams
+    ) => (BuiltInChipContextMenuItem | ContextMenuItemConfig)[];
+    /**
      * Factory to create custom tab group chip renderers.
      * If not provided, the default chip renderer is used.
      */
@@ -203,6 +230,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         scrollbars: undefined,
         tabAnimation: undefined,
         getTabContextMenuItems: undefined,
+        getTabGroupChipContextMenuItems: undefined,
         createTabGroupChipComponent: undefined,
     };
 
