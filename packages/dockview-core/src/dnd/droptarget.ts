@@ -151,6 +151,18 @@ export type MeasuredValue = { value: number; type: 'pixels' | 'percentage' };
 export type DroptargetOverlayModel = {
     size?: MeasuredValue;
     activationSize?: MeasuredValue;
+    /**
+     * Override the width threshold (in pixels) below which the overlay switches
+     * to a thin-border indicator instead of a half-width highlight. Set to 0 to
+     * always show the half-width overlay regardless of element size.
+     */
+    smallWidthBoundary?: number;
+    /**
+     * Override the height threshold (in pixels) below which the overlay switches
+     * to a thin-border indicator instead of a half-height highlight. Set to 0 to
+     * always show the half-height overlay regardless of element size.
+     */
+    smallHeightBoundary?: number;
 };
 
 const DEFAULT_ACTIVATION_SIZE: MeasuredValue = {
@@ -426,8 +438,14 @@ export class Droptarget extends CompositeDisposable {
             return;
         }
 
-        const isSmallX = width < SMALL_WIDTH_BOUNDARY;
-        const isSmallY = height < SMALL_HEIGHT_BOUNDARY;
+        const smallWidthBoundary =
+            this.options.overlayModel?.smallWidthBoundary ??
+            SMALL_WIDTH_BOUNDARY;
+        const smallHeightBoundary =
+            this.options.overlayModel?.smallHeightBoundary ??
+            SMALL_HEIGHT_BOUNDARY;
+        const isSmallX = width < smallWidthBoundary;
+        const isSmallY = height < smallHeightBoundary;
 
         const isLeft = quadrant === 'left';
         const isRight = quadrant === 'right';
@@ -494,6 +512,13 @@ export class Droptarget extends CompositeDisposable {
                 box.left = rootLeft + width - 4;
                 box.width = 4;
             }
+            if (isSmallY && isTop) {
+                box.height = 4;
+            }
+            if (isSmallY && isBottom) {
+                box.top = rootTop + height - 4;
+                box.height = 4;
+            }
 
             // Use GPU-optimized bounds checking and setting
             if (!checkBoundsChanged(overlay, box)) {
@@ -510,6 +535,12 @@ export class Droptarget extends CompositeDisposable {
             toggleClass(overlay, 'dv-drop-target-right', isRight);
             toggleClass(overlay, 'dv-drop-target-top', isTop);
             toggleClass(overlay, 'dv-drop-target-bottom', isBottom);
+            toggleClass(
+                overlay,
+                'dv-drop-target-anchor-line',
+                (isSmallX && (isLeft || isRight)) ||
+                    (isSmallY && (isTop || isBottom))
+            );
             toggleClass(
                 overlay,
                 'dv-drop-target-center',
@@ -571,7 +602,26 @@ export class Droptarget extends CompositeDisposable {
             box.height = `${100 * size}%`;
         }
 
+        if (isSmallX && isLeft) {
+            box.width = '4px';
+        }
+        if (isSmallX && isRight) {
+            box.left = `${width - 4}px`;
+            box.width = '4px';
+        }
+        if (isSmallY && isTop) {
+            box.height = '4px';
+        }
+        if (isSmallY && isBottom) {
+            box.top = `${height - 4}px`;
+            box.height = '4px';
+        }
+
         setGPUOptimizedBoundsFromStrings(this.overlayElement, box);
+
+        const isLine =
+            (isSmallX && (isLeft || isRight)) ||
+            (isSmallY && (isTop || isBottom));
 
         toggleClass(
             this.overlayElement,
@@ -582,6 +632,11 @@ export class Droptarget extends CompositeDisposable {
             this.overlayElement,
             'dv-drop-target-small-horizontal',
             isSmallX
+        );
+        toggleClass(
+            this.overlayElement,
+            'dv-drop-target-selection-line',
+            isLine
         );
         toggleClass(this.overlayElement, 'dv-drop-target-left', isLeft);
         toggleClass(this.overlayElement, 'dv-drop-target-right', isRight);

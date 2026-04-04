@@ -17,6 +17,7 @@ import {
 import { DragHandler } from '../../../dnd/abstractDragHandler';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { addGhostImage } from '../../../dnd/ghost';
+import { DockviewHeaderDirection } from '../../options';
 
 class TabDragHandler extends DragHandler {
     private readonly panelTransfer =
@@ -54,6 +55,9 @@ export class Tab extends CompositeDisposable {
 
     private readonly _onPointDown = new Emitter<MouseEvent>();
     readonly onPointerDown: Event<MouseEvent> = this._onPointDown.event;
+
+    private readonly _onTabClick = new Emitter<MouseEvent>();
+    readonly onTabClick: Event<MouseEvent> = this._onTabClick.event;
 
     private readonly _onDropped = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDropped.event;
@@ -94,7 +98,7 @@ export class Tab extends CompositeDisposable {
 
         this.dropTarget = new Droptarget(this._element, {
             acceptedTargetZones: ['left', 'right'],
-            overlayModel: { activationSize: { value: 50, type: 'percentage' } },
+            overlayModel: this._buildOverlayModel(),
             canDisplayOverlay: (event, position) => {
                 if (this.group.locked) {
                     return false;
@@ -127,9 +131,13 @@ export class Tab extends CompositeDisposable {
 
         this.addDisposables(
             this._onPointDown,
+            this._onTabClick,
             this._onDropped,
             this._onDragStart,
             this._onDragEnd,
+            this.accessor.onDidOptionsChange(() => {
+                this.dropTarget.setOverlayModel(this._buildOverlayModel());
+            }),
             this.dragHandler.onDragStart((event) => {
                 if (event.dataTransfer) {
                     const style = getComputedStyle(this.element);
@@ -168,6 +176,9 @@ export class Tab extends CompositeDisposable {
             addDisposableListener(this._element, 'pointerdown', (event) => {
                 this._onPointDown.fire(event);
             }),
+            addDisposableListener(this._element, 'click', (event) => {
+                this._onTabClick.fire(event);
+            }),
             addDisposableListener(this._element, 'contextmenu', (event) => {
                 this.accessor.contextMenuController.show(
                     this.panel,
@@ -193,6 +204,28 @@ export class Tab extends CompositeDisposable {
         }
         this.content = part;
         this._element.appendChild(this.content.element);
+    }
+
+    private _buildOverlayModel() {
+        // 'line' themes render a 4px insertion strip at the tab edge via the
+        // anchor container's small-boundary path.  'fill' themes render a
+        // half-width highlighted area, so we disable the small-boundary path
+        // entirely (boundary = 0 ⟹ isSmall always false).
+        const smallBoundary =
+            this.accessor.options.theme?.dndTabIndicator === 'line'
+                ? Number.POSITIVE_INFINITY
+                : 0;
+        return {
+            activationSize: { value: 50, type: 'percentage' as const },
+            smallWidthBoundary: smallBoundary,
+            smallHeightBoundary: smallBoundary,
+        };
+    }
+
+    public setDirection(direction: DockviewHeaderDirection): void {
+        this.dropTarget.setTargetZones(
+            direction === 'vertical' ? ['top', 'bottom'] : ['left', 'right']
+        );
     }
 
     public updateDragAndDropState(): void {

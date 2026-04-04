@@ -18,6 +18,7 @@
             width: 100%;
             border: var(--dv-drag-over-border);
             background-color: var(--dv-drag-over-background-color);
+
             transition: top var(--dv-transition-duration) ease-out,
                 left var(--dv-transition-duration) ease-out,
                 width var(--dv-transition-duration) ease-out,

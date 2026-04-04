@@ -186,6 +186,8 @@ export class TabsContainer
         this._element.appendChild(this.voidContainer.element);
         this._element.appendChild(this.rightActionsContainer);
 
+        this.tabs.setExtendedDropZone(this._element);
+
         this.addDisposables(
             this.tabs.onDrop((e) => this._onDrop.fire(e)),
             this.tabs.onWillShowOverlay((e) => this._onWillShowOverlay.fire(e)),
@@ -228,6 +230,36 @@ export class TabsContainer
                     })
                 );
             }),
+            addDisposableListener(
+                this.leftActionsContainer,
+                'dragleave',
+                (event) => {
+                    const related = event.relatedTarget as HTMLElement | null;
+                    if (
+                        !this.leftActionsContainer.contains(related) &&
+                        !this._element.contains(related)
+                    ) {
+                        // Left the header entirely
+                        this.tabs.clearExternalAnimState();
+                    }
+                }
+            ),
+            addDisposableListener(
+                this.voidContainer.element,
+                'dragleave',
+                (event) => {
+                    const related = event.relatedTarget as HTMLElement | null;
+                    if (!this.voidContainer.element.contains(related)) {
+                        if (this._element.contains(related)) {
+                            // Moved to another part of the header — keep state
+                            this.tabs.setExternalInsertionIndex(null);
+                        } else {
+                            // Left the header entirely
+                            this.tabs.clearExternalAnimState();
+                        }
+                    }
+                }
+            ),
             addDisposableListener(
                 this.voidContainer.element,
                 'pointerdown',

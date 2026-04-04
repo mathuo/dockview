@@ -3,6 +3,7 @@ import * as React from 'react';
 import { GridActions } from './gridActions';
 import { PanelActions } from './panelActions';
 import { GroupActions } from './groupActions';
+import { ToggleRow } from './toggleRow';
 
 const Section = (props: { title: string; children: React.ReactNode }) => (
     <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
@@ -37,6 +38,8 @@ export const SettingsModal = (props: {
     showLogs: boolean;
     onToggleShowLogs: () => void;
     onClearLogs: () => void;
+    tabAnimation: 'smooth' | 'default';
+    onToggleTabAnimation: (v: 'smooth' | 'default') => void;
 }) => {
     if (!props.open) return null;
 
@@ -172,6 +175,15 @@ export const SettingsModal = (props: {
                             </button>
                         )}
                     </div>
+                    <ToggleRow
+                        label="Tab Animation"
+                        value={props.tabAnimation}
+                        options={[
+                            { value: 'default', label: 'default' },
+                            { value: 'smooth', label: 'smooth' },
+                        ]}
+                        onChange={props.onToggleTabAnimation}
+                    />
                 </Section>
             </div>
         </div>

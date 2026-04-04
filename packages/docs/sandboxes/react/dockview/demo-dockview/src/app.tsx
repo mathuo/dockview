@@ -148,6 +148,24 @@ const components = {
             />
         );
     },
+    fixedPlaceholder: (props: IDockviewPanelProps) => {
+        return (
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '100%',
+                    color: 'rgba(255,255,255,0.6)',
+                    fontFamily: 'monospace',
+                    fontSize:
+                        props.params?.position === 'top' ? '13px' : '14px',
+                }}
+            >
+                <span>{props.params?.label as string}</span>
+            </div>
+        );
+    },
     iframe: (props: IDockviewPanelProps) => {
         return (
             <iframe
@@ -328,6 +346,13 @@ const DockviewDemo = (props: {
             return;
         }
 
+        // Reset tracked state for the new api instance to prevent stale IDs
+        // accumulating across remounts (e.g. when toggling shell mode).
+        setPanels([]);
+        setGroups([]);
+        setActivePanel(undefined);
+        setActiveGroup(undefined);
+
         const disposables = [
             api.onDidAddPanel((event) => {
                 setPanels((_) => [..._, event.id]);
@@ -384,8 +409,51 @@ const DockviewDemo = (props: {
             }),
         ];
 
+        const edgeGroupDefs: {
+            pos: 'bottom' | 'left' | 'right';
+            id: string;
+            title: string;
+        }[] = [
+            { pos: 'left', id: 'left-1', title: 'Explorer' },
+            { pos: 'right', id: 'right-1', title: 'Outline' },
+            { pos: 'right', id: 'right-2', title: 'Properties' },
+            { pos: 'bottom', id: 'bottom-1', title: 'Terminal' },
+            { pos: 'bottom', id: 'bottom-2', title: 'Output' },
+            { pos: 'bottom', id: 'bottom-3', title: 'Problems' },
+        ];
+
+        const populateEdgeGroups = () => {
+            for (const { pos, id, title } of edgeGroupDefs) {
+                const groupApi = api.getEdgeGroup(pos);
+                if (groupApi && !api.panels.find((p) => p.id === id)) {
+                    api.addPanel({
+                        id,
+                        component: 'fixedPlaceholder',
+                        title,
+                        position: { referenceGroup: groupApi.id },
+                        params: { label: title, position: pos },
+                    });
+                }
+            }
+        };
+
         const loadLayout = () => {
+            const state = localStorage.getItem('dv-demo-state');
+
+            if (state) {
+                try {
+                    api.fromJSON(JSON.parse(state));
+                    populateEdgeGroups();
+                    setLayoutReady(true);
+                    return;
+                } catch {
+                    localStorage.removeItem('dv-demo-state');
+                }
+                return;
+            }
+
             defaultConfig(api);
+            populateEdgeGroups();
             setLayoutReady(true);
         };
 
@@ -397,6 +465,26 @@ const DockviewDemo = (props: {
     }, [api]);
 
     const onReady = (event: DockviewReadyEvent) => {
+        if (useEdgeGroups) {
+            event.api.addEdgeGroup('bottom', {
+                id: 'bottom',
+                initialSize: 200,
+                minimumSize: 100,
+                collapsed: true,
+            });
+            event.api.addEdgeGroup('left', {
+                id: 'left',
+                initialSize: 220,
+                minimumSize: 150,
+                collapsed: true,
+            });
+            event.api.addEdgeGroup('right', {
+                id: 'right',
+                initialSize: 220,
+                minimumSize: 150,
+                collapsed: true,
+            });
+        }
         setApi(event.api);
     };
 
@@ -552,6 +640,10 @@ const DockviewDemo = (props: {
 
     const [showLogs, setShowLogs] = React.useState<boolean>(false);
     const [debug, setDebug] = React.useState<boolean>(false);
+    const [useEdgeGroups, setUseEdgeGroups] = React.useState<boolean>(true);
+    const [tabAnimation, setTabAnimation] = React.useState<
+        'smooth' | 'default'
+    >('default');
 
     return (
         <div
@@ -591,8 +683,13 @@ const DockviewDemo = (props: {
                                         value={effectiveTheme}
                                     >
                                         <DockviewReact
+                                            key={
+                                                useEdgeGroups
+                                                    ? 'shell'
+                                                    : 'no-shell'
+                                            }
                                             components={components}
-                                            // tabAnimation={'smooth'}
+                                            tabAnimation={tabAnimation}
                                             defaultTabComponent={
                                                 headerComponents.default
                                             }
@@ -732,6 +829,8 @@ const DockviewDemo = (props: {
                 showLogs={showLogs}
                 onToggleShowLogs={() => setShowLogs(!showLogs)}
                 onClearLogs={() => setLogLines([])}
+                tabAnimation={tabAnimation}
+                onToggleTabAnimation={(v) => setTabAnimation(v)}
             />
         </div>
     );

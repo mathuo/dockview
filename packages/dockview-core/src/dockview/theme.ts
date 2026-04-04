@@ -16,6 +16,12 @@ export interface DockviewTheme {
      */
     gap?: number;
     /**
+     * The collapsed size (in px) for edge groups when using this theme.
+     * When set, this overrides the default 35px collapsed size so that
+     * collapsed edge groups match the theme's tab strip height.
+     */
+    edgeGroupCollapsedSize?: number;
+    /**
      * The mouting position of the overlay shown when dragging a panel. `absolute`
      * will mount the overlay to root of the dockview component whereas `relative` will mount the overlay to the group container.
      */
@@ -24,6 +30,19 @@ export interface DockviewTheme {
      * When dragging a panel, the overlay can either encompass the panel contents or the entire group including the tab header space.
      */
     dndPanelOverlay?: 'content' | 'group';
+    /**
+     * The style of the drop indicator shown when dragging a tab over another tab.
+     * `'line'` renders a thin 4px insertion strip at the tab edge (suited to bordered/spaced themes).
+     * `'fill'` renders a half-width highlighted area (suited to themes that use a background fill).
+     * Defaults to `'fill'`.
+     */
+    dndTabIndicator?: 'line' | 'fill';
+    /**
+     * The CSS value applied to `--dv-drag-over-border` when this theme is active.
+     * For example `'2px solid var(--dv-active-sash-color)'`.
+     * When unset the CSS variable is left to the stylesheet default (`none`).
+     */
+    dndOverlayBorder?: string;
 }
 
 export const themeDark: DockviewTheme = {
@@ -42,6 +61,9 @@ export const themeVisualStudio: DockviewTheme = {
     name: 'visualStudio',
     className: 'dockview-theme-vs',
     colorScheme: 'dark',
+    // --dv-tabs-and-actions-container-height is 20px, but the VS theme applies
+    // box-sizing: content-box + border-bottom: 2px, so the rendered strip is 22px.
+    edgeGroupCollapsedSize: 22,
 };
 
 export const themeAbyss: DockviewTheme = {
@@ -61,8 +83,11 @@ export const themeAbyssSpaced: DockviewTheme = {
     className: 'dockview-theme-abyss-spaced',
     colorScheme: 'dark',
     gap: 10,
+    edgeGroupCollapsedSize: 44,
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
+    dndTabIndicator: 'line',
+    dndOverlayBorder: '2px solid var(--dv-active-sash-color)',
 };
 
 export const themeLightSpaced: DockviewTheme = {
@@ -72,6 +97,8 @@ export const themeLightSpaced: DockviewTheme = {
     gap: 10,
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
+    dndTabIndicator: 'line',
+    dndOverlayBorder: '2px solid var(--dv-active-sash-color)',
 };
 
 export const themeNord: DockviewTheme = {
@@ -87,6 +114,8 @@ export const themeNordSpaced: DockviewTheme = {
     gap: 10,
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
+    dndTabIndicator: 'line',
+    dndOverlayBorder: '2px solid var(--dv-active-sash-color)',
 };
 
 export const themeCatppuccinMocha: DockviewTheme = {
@@ -102,6 +131,8 @@ export const themeCatppuccinMochaSpaced: DockviewTheme = {
     gap: 10,
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
+    dndTabIndicator: 'line',
+    dndOverlayBorder: '2px solid var(--dv-active-sash-color)',
 };
 
 export const themeMonokai: DockviewTheme = {
@@ -123,6 +154,8 @@ export const themeSolarizedLightSpaced: DockviewTheme = {
     gap: 10,
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
+    dndTabIndicator: 'line',
+    dndOverlayBorder: '2px solid var(--dv-active-sash-color)',
 };
 
 export const themeGithubDark: DockviewTheme = {
@@ -138,6 +171,8 @@ export const themeGithubDarkSpaced: DockviewTheme = {
     gap: 10,
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
+    dndTabIndicator: 'line',
+    dndOverlayBorder: '2px solid var(--dv-active-sash-color)',
 };
 
 export const themeGithubLight: DockviewTheme = {
@@ -151,6 +186,9 @@ export const themeGithubLightSpaced: DockviewTheme = {
     className: 'dockview-theme-github-light-spaced',
     colorScheme: 'light',
     gap: 10,
+    edgeGroupCollapsedSize: 44,
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
+    dndTabIndicator: 'line',
+    dndOverlayBorder: '2px solid var(--dv-active-sash-color)',
 };

@@ -64,6 +64,8 @@ import {
 } from '../paneview/options';
 import { SplitviewComponentOptions } from '../splitview/options';
 import { GridviewComponentOptions } from '../gridview/options';
+import { EdgeGroupPosition, EdgeGroupOptions } from '../dockview/dockviewShell';
+import { DockviewGroupPanelApi } from './dockviewGroupPanelApi';
 
 export interface CommonApi<T = any> {
     readonly height: number;
@@ -930,6 +932,49 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         }
     ): Promise<boolean> {
         return this.component.addPopoutGroup(item, options);
+    }
+
+    /**
+     * Add an edge group at the given position. Returns the group panel API
+     * for the newly created group. Throws if a group already exists there.
+     */
+    addEdgeGroup(
+        position: EdgeGroupPosition,
+        options: EdgeGroupOptions
+    ): DockviewGroupPanelApi {
+        return this.component.addEdgeGroup(position, options);
+    }
+
+    /**
+     * Get the group panel API for a fixed side group at the given position.
+     * Returns `undefined` if no edge group is configured at that position.
+     */
+    getEdgeGroup(
+        position: EdgeGroupPosition
+    ): DockviewGroupPanelApi | undefined {
+        return this.component.getEdgeGroup(position);
+    }
+
+    /**
+     * Set the visibility of a fixed side group.
+     */
+    setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void {
+        this.component.setEdgeGroupVisible(position, visible);
+    }
+
+    /**
+     * Check whether a fixed side group is currently visible.
+     */
+    isEdgeGroupVisible(position: EdgeGroupPosition): boolean {
+        return this.component.isEdgeGroupVisible(position);
+    }
+
+    /**
+     * Remove an edge group and reclaim its slot in the layout.
+     * All panels inside the group are disposed. Throws if no group exists at position.
+     */
+    removeEdgeGroup(position: EdgeGroupPosition): void {
+        this.component.removeEdgeGroup(position);
     }
 
     updateOptions(options: Partial<DockviewComponentOptions>) {

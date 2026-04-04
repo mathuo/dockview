@@ -57,6 +57,7 @@ import {
     TabGroupColor,
     SerializedTabGroup,
 } from './tabGroup';
+import { EdgeGroupPosition } from './dockviewShell';
 
 interface GroupMoveEvent {
     groupId: string;
@@ -212,7 +213,8 @@ export interface IDockviewGroupPanelModel extends IPanel {
 export type DockviewGroupLocation =
     | { type: 'grid' }
     | { type: 'floating' }
-    | { type: 'popout'; getWindow: () => Window; popoutUrl?: string };
+    | { type: 'popout'; getWindow: () => Window; popoutUrl?: string }
+    | { type: 'fixed'; position: EdgeGroupPosition };
 
 export class DockviewGroupPanelModel
     extends CompositeDisposable
@@ -438,6 +440,7 @@ export class DockviewGroupPanelModel
 
         toggleClass(this.container, 'dv-groupview-floating', false);
         toggleClass(this.container, 'dv-groupview-popout', false);
+        toggleClass(this.container, 'dv-groupview-fixed', false);
 
         switch (value.type) {
             case 'grid':
@@ -464,6 +467,12 @@ export class DockviewGroupPanelModel
                 this.contentContainer.dropTarget.setTargetZones(['center']);
 
                 toggleClass(this.container, 'dv-groupview-popout', true);
+
+                break;
+            case 'fixed':
+                this.contentContainer.dropTarget.setTargetZones(['center']);
+
+                toggleClass(this.container, 'dv-groupview-fixed', true);
 
                 break;
         }

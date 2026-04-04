@@ -5,6 +5,7 @@ import {
     ThemeCssOverrides,
     generateCodeSnippet,
 } from './themeBuilder';
+import { ToggleRow } from './toggleRow';
 
 const Section = (props: { title: string; children: React.ReactNode }) => (
     <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
@@ -67,58 +68,6 @@ const SliderRow = (props: {
     </div>
 );
 
-const ToggleRow = (props: {
-    label: string;
-    value: string;
-    options: { value: string; label: string }[];
-    onChange: (v: string) => void;
-}) => (
-    <div
-        style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '4px 16px',
-            minHeight: 30,
-        }}
-    >
-        <span style={{ flex: 1, fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>
-            {props.label}
-        </span>
-        <div
-            style={{
-                display: 'flex',
-                background: 'rgba(255,255,255,0.05)',
-                borderRadius: 4,
-                border: '1px solid rgba(255,255,255,0.1)',
-                overflow: 'hidden',
-            }}
-        >
-            {props.options.map((opt) => (
-                <button
-                    key={opt.value}
-                    onClick={() => props.onChange(opt.value)}
-                    style={{
-                        padding: '3px 8px',
-                        fontSize: 11,
-                        border: 'none',
-                        cursor: 'pointer',
-                        background:
-                            props.value === opt.value
-                                ? 'rgba(255,255,255,0.15)'
-                                : 'transparent',
-                        color:
-                            props.value === opt.value
-                                ? 'white'
-                                : 'rgba(255,255,255,0.5)',
-                    }}
-                >
-                    {opt.label}
-                </button>
-            ))}
-        </div>
-    </div>
-);
 
 const TextRow = (props: {
     label: string;
@@ -577,6 +526,30 @@ export const ThemeBuilderModal = (props: {
                         })
                     }
                 />
+                <ToggleRow
+                    label="Tab Indicator"
+                    value={props.state.dndTabIndicator}
+                    options={[
+                        { value: 'fill', label: 'fill' },
+                        { value: 'line', label: 'line' },
+                    ]}
+                    onChange={(v) =>
+                        props.onChange({
+                            dndTabIndicator: v as 'fill' | 'line',
+                        })
+                    }
+                />
+                {colorRow('Drag-over bg', '--dv-drag-over-background-color')}
+                <TextRow
+                    label="Drag-over border"
+                    varName="--dv-drag-over-border"
+                    value={props.state.dndOverlayBorder}
+                    containerEl={props.containerEl}
+                    themeKey={props.baseTheme.name}
+                    onChange={(v) =>
+                        props.onChange({ dndOverlayBorder: v })
+                    }
+                />
             </Section>
 
             {/* Backgrounds */}
@@ -640,17 +613,6 @@ export const ThemeBuilderModal = (props: {
             <Section title="Chrome">
                 {colorRow('Tab divider', '--dv-tab-divider-color')}
                 {colorRow('Icon hover bg', '--dv-icon-hover-background-color')}
-                {colorRow('Drag-over bg', '--dv-drag-over-background-color')}
-                <TextRow
-                    label="Drag-over border"
-                    varName="--dv-drag-over-border"
-                    value={css['--dv-drag-over-border'] ?? ''}
-                    containerEl={props.containerEl}
-                    themeKey={props.baseTheme.name}
-                    onChange={(v) =>
-                        set({ '--dv-drag-over-border': v || undefined })
-                    }
-                />
                 {colorRow('Active sash', '--dv-active-sash-color')}
                 {colorRow('Sash', '--dv-sash-color')}
                 {colorRow('Scrollbar', '--dv-scrollbar-background-color')}

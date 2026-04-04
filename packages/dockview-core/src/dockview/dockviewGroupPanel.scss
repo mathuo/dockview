@@ -26,4 +26,8 @@
     &.dv-groupview-header-right {
         flex-direction: row-reverse;
     }
+
+    &.dv-groupview-fixed.dv-fixed-collapsed > .dv-content-container {
+        display: none;
+    }
 }

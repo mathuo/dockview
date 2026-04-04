@@ -26,6 +26,10 @@ const groupControlsComponents: Record<string, React.FC> = {
 };
 
 export const RightControls = (props: IDockviewHeaderActionsProps) => {
+    if (props.location.type === 'fixed') {
+        return null;
+    }
+
     const Component = React.useMemo(() => {
         if (!props.isGroupActive || !props.activePanel) {
             return null;
@@ -107,6 +111,10 @@ export const RightControls = (props: IDockviewHeaderActionsProps) => {
 };
 
 export const LeftControls = (props: IDockviewHeaderActionsProps) => {
+    if (props.location.type === 'fixed') {
+        return null;
+    }
+
     const onClick = () => {
         props.containerApi.addPanel({
             id: `id_${Date.now().toString()}`,
@@ -136,6 +144,10 @@ export const LeftControls = (props: IDockviewHeaderActionsProps) => {
 };
 
 export const PrefixHeaderControls = (props: IDockviewHeaderActionsProps) => {
+    if (props.location.type === 'fixed') {
+        return null;
+    }
+
     return (
         <div
             className="group-control"

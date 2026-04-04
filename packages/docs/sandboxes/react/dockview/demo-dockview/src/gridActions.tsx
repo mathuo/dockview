@@ -1,6 +1,56 @@
-import { DockviewApi } from 'dockview';
+import { DockviewApi, EdgeGroupPosition } from 'dockview';
 import * as React from 'react';
 import { defaultConfig, nextId } from './defaultLayout';
+
+const EDGE_POSITIONS: EdgeGroupPosition[] = ['top', 'bottom', 'left', 'right'];
+
+const EdgeGroupToggles = (props: { api: DockviewApi }) => {
+    const [active, setActive] = React.useState<
+        Partial<Record<EdgeGroupPosition, boolean>>
+    >(() =>
+        Object.fromEntries(
+            EDGE_POSITIONS.map((pos) => [
+                pos,
+                props.api.getEdgeGroup(pos) !== undefined,
+            ])
+        )
+    );
+
+    const toggle = (position: EdgeGroupPosition) => {
+        if (active[position]) {
+            props.api.removeEdgeGroup(position);
+            setActive((s) => ({ ...s, [position]: false }));
+        } else {
+            const groupApi = props.api.addEdgeGroup(position, {
+                id: `edge-${position}`,
+                initialSize: 200,
+                minimumSize: 100,
+            });
+            props.api.addPanel({
+                id: `edge-panel-${position}-${Date.now()}`,
+                component: 'fixedPlaceholder',
+                title: `Tab ${nextId()}`,
+                position: { referenceGroup: groupApi.id },
+                params: { label: position, position },
+            });
+            setActive((s) => ({ ...s, [position]: true }));
+        }
+    };
+
+    return (
+        <div className="action-row">
+            {EDGE_POSITIONS.map((pos) => (
+                <button
+                    key={pos}
+                    style={active[pos] ? { backgroundColor: '#4864dc' } : {}}
+                    onClick={() => toggle(pos)}
+                >
+                    {pos}
+                </button>
+            ))}
+        </div>
+    );
+};
 
 import { createRoot } from 'react-dom/client';
 import { PanelBuilder } from './panelBuilder';
@@ -167,6 +217,7 @@ export const GridActions = (props: {
                     Reset
                 </button>
             </div>
+            {props.api && <EdgeGroupToggles api={props.api} />}
             <div className="action-row">
                 <div className="button-group">
                     <button

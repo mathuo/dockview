@@ -3,6 +3,7 @@ import { DockviewGroupPanelApi } from '../api/dockviewGroupPanelApi';
 import { DockviewPanelApi } from '../api/dockviewPanelApi';
 import { PanelParameters } from '../framwork';
 import { DockviewGroupPanel, IDockviewGroupPanel } from './dockviewGroupPanel';
+import { DockviewGroupLocation } from './dockviewGroupPanelModel';
 import { IDockviewPanel } from './dockviewPanel';
 import { DockviewHeaderPosition } from './options';
 import { ITabGroup } from './tabGroup';
@@ -31,6 +32,7 @@ export interface IDockviewHeaderActionsProps {
     isGroupActive: boolean;
     group: DockviewGroupPanel;
     headerPosition: DockviewHeaderPosition;
+    location: DockviewGroupLocation;
 }
 
 export interface IGroupHeaderProps {

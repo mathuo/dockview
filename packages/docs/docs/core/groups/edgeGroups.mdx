@@ -1,0 +1,113 @@
+---
+title: Edge Groups
+description: How to create and manage edge groups in Dockview — groups that are pinned to the edges of the layout, like a VS Code sidebar or panel.
+---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+Edge groups are `DockviewGroupPanel` instances pinned to one of the four edges of the layout (`'left'`, `'right'`, `'top'`, `'bottom'`). They support tabs, drag-and-drop, overflow, and the full group panel API — and their state is included in `toJSON` / `fromJSON`.
+
+:::info
+Edge groups **cannot** be maximized or converted into floating/popout windows. They are structural elements of the layout.
+:::
+
+## Adding Edge Groups
+
+Call `addEdgeGroup` in your `onReady` handler (or any time after initialization):
+
+```ts
+// Vanilla TypeScript
+dockview.addEdgeGroup('left',   { id: 'left-group',   initialSize: 220, minimumSize: 150 });
+dockview.addEdgeGroup('right',  { id: 'right-group',  initialSize: 220, minimumSize: 150 });
+dockview.addEdgeGroup('bottom', { id: 'bottom-group', initialSize: 200, minimumSize: 100 });
+```
+
+```tsx
+// React
+<DockviewReact
+    onReady={(event) => {
+        event.api.addEdgeGroup('left',   { id: 'left-group',   initialSize: 220, minimumSize: 150 });
+        event.api.addEdgeGroup('bottom', { id: 'bottom-group', initialSize: 200, minimumSize: 100 });
+    }}
+    components={components}
+/>
+```
+
+Calling `addEdgeGroup` for a position that is already registered throws an error.
+
+## Edge Group Options
+
+<DocRef declaration="EdgeGroupOptions" />
+
+## Adding Panels into an Edge Group
+
+Use `addPanel` with a `position.referenceGroup` pointing at the edge group's `id`:
+
+```ts
+const leftApi = api.addEdgeGroup('left', { id: 'left-group', initialSize: 220 });
+
+api.addPanel({
+    id: 'explorer',
+    component: 'Explorer',
+    title: 'Explorer',
+    position: { referenceGroup: leftApi.id },
+});
+```
+
+## API
+
+<DocRef declaration="DockviewApi" methods={['addEdgeGroup', 'getEdgeGroup', 'setEdgeGroupVisible', 'isEdgeGroupVisible', 'removeEdgeGroup']} />
+
+## Collapse and Expand
+
+Edge groups can be collapsed to their header strip and expanded back to their last size programmatically, or by the user clicking the active tab.
+
+- Clicking the **active tab** toggles collapse/expand.
+- Clicking a **non-active tab** switches to that tab, and expands the group if it was collapsed.
+- Removing all panels from an edge group automatically collapses it.
+
+<DocRef declaration="DockviewGroupPanelApi" methods={['collapse', 'expand', 'isCollapsed', 'onDidCollapsedChange']} />
+
+```ts
+const groupApi = api.getEdgeGroup('left');
+
+groupApi?.collapse();
+groupApi?.expand();
+const isCollapsed = groupApi?.isCollapsed(); // boolean
+```
+
+The `collapsedSize` (the pixel height/width of the header when collapsed) defaults to 35px and can be configured per-group via `EdgeGroupOptions.collapsedSize`, or per-theme via `DockviewTheme.edgeGroupCollapsedSize`.
+
+## Custom Header Actions
+
+The `location` prop in `rightHeaderActionsComponent`, `leftHeaderActionsComponent`, and `prefixHeaderActionsComponent` updates reactively when a group moves. Use it to show controls specific to edge groups:
+
+```tsx
+// React: show a collapse button only in edge groups
+const MyRightActions = (props: IDockviewGroupHeaderActionsProps) => {
+    if (props.location.type !== 'fixed') return null;
+    return (
+        <button onClick={() => props.api.collapse()}>
+            Collapse
+        </button>
+    );
+};
+```
+
+`DockviewGroupLocation` is exported from all framework packages.
+
+## Serialization
+
+Edge group state (size, visibility, collapsed state, and panel contents) is included in `toJSON` / `fromJSON` automatically.
+
+On `fromJSON`, edge groups are auto-created for any positions present in the serialized state that were not pre-registered via `addEdgeGroup`, so restoring a saved layout works without calling `addEdgeGroup` first:
+
+```ts
+const state = api.toJSON();
+// state.edgeGroups = {
+//   left:   { size: 220, visible: true,  collapsed: false, group: { ... } },
+//   bottom: { size: 200, visible: false, collapsed: false, group: { ... } },
+// }
+
+api.fromJSON(state); // auto-creates and restores edge groups
+```

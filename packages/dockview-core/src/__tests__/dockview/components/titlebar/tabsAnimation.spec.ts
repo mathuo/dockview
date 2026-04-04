@@ -56,6 +56,7 @@ function createTabs(
             tabAnimation: options.tabAnimation,
             disableDnd: options.disableDnd,
         },
+        onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
     });
 
     const group = fromPartial<DockviewGroupPanel>({
@@ -947,6 +948,121 @@ describe('tabs - animation', () => {
 
             // External drag: state should be fully cleared (not just insertionIndex)
             expect(getAnimState(tabs)).toBeNull();
+
+            spy.mockRestore();
+        });
+
+        test('dragleave clears dropTargetContainer overlay for external drags', () => {
+            const clearMock = jest.fn();
+            const { tabs, group } = createTabs({ tabAnimation: 'smooth' });
+
+            // Set up a dropTargetContainer with a model that tracks clear() calls
+            (group.model as any).dropTargetContainer = {
+                model: { clear: clearMock, exists: () => true },
+            };
+
+            const panelA = createMockPanel('panel-a');
+            tabs.openPanel(panelA, 0);
+
+            const elements = getTabElements(tabs);
+            mockTabRect(elements[0], { left: 0, width: 80 });
+
+            const spy = jest
+                .spyOn(dataTransfer, 'getPanelData')
+                .mockReturnValue(
+                    new dataTransfer.PanelTransfer(
+                        'test-accessor',
+                        'other-group',
+                        'external-panel'
+                    )
+                );
+
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            fireEvent.dragOver(tabsList);
+            expect(getAnimState(tabs)).not.toBeNull();
+
+            // Simulate dragleave (cursor leaves container entirely, e.g. back to edge group)
+            const dragLeaveEvent = new Event('dragleave', { bubbles: true });
+            tabsList.dispatchEvent(dragLeaveEvent);
+
+            // The anchor overlay must be cleared so it doesn't remain stranded
+            // in the main dockview when the drag returns to the source edge group
+            expect(clearMock).toHaveBeenCalledTimes(1);
+            expect(getAnimState(tabs)).toBeNull();
+
+            spy.mockRestore();
+        });
+
+        test('intra-group dragover clears dropTargetContainer overlay (panel→tab)', () => {
+            // When an intra-group drag passes over the panel content area the
+            // anchor overlay may be set there. On re-entering the tab strip the
+            // gap animation takes over and the overlay must be cleared.
+            const clearMock = jest.fn();
+            const { tabs, group } = createTabs({ tabAnimation: 'smooth' });
+
+            (group.model as any).dropTargetContainer = {
+                model: { clear: clearMock, exists: () => true },
+            };
+
+            const panelA = createMockPanel('panel-a');
+            tabs.openPanel(panelA, 0);
+
+            const elements = getTabElements(tabs);
+            mockTabRect(elements[0], { left: 0, width: 80 });
+
+            // Simulate intra-group drag start
+            const dragStartEvent = new MouseEvent('dragstart', {
+                bubbles: true,
+            });
+            elements[0].dispatchEvent(dragStartEvent);
+
+            // _animState should now be set with sourceIndex >= 0
+            expect(getAnimState(tabs)).not.toBeNull();
+            expect(getAnimState(tabs).sourceIndex).toBe(0);
+
+            // Cursor re-enters the tab strip (e.g. coming back from panel area)
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            fireEvent.dragOver(tabsList);
+
+            // The anchor overlay from the panel content area must be cleared
+            expect(clearMock).toHaveBeenCalled();
+        });
+
+        test('external (cross-group) dragover does NOT clear dropTargetContainer overlay', () => {
+            // For cross-group drag the individual tab Droptargets manage the
+            // anchor overlay (smooth animation between groups). The capturing
+            // dragover must not clear it.
+            const clearMock = jest.fn();
+            const { tabs, group } = createTabs({ tabAnimation: 'smooth' });
+
+            (group.model as any).dropTargetContainer = {
+                model: { clear: clearMock, exists: () => true },
+            };
+
+            const panelA = createMockPanel('panel-a');
+            tabs.openPanel(panelA, 0);
+
+            const elements = getTabElements(tabs);
+            mockTabRect(elements[0], { left: 0, width: 80 });
+
+            const spy = jest
+                .spyOn(dataTransfer, 'getPanelData')
+                .mockReturnValue(
+                    new dataTransfer.PanelTransfer(
+                        'test-accessor',
+                        'other-group',
+                        'external-panel'
+                    )
+                );
+
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            fireEvent.dragOver(tabsList);
+
+            // _animState set with sourceIndex === -1 (external drag)
+            expect(getAnimState(tabs)?.sourceIndex).toBe(-1);
+
+            // Must NOT clear — cross-group animation depends on the overlay persisting
+            expect(clearMock).not.toHaveBeenCalled();
 
             spy.mockRestore();
         });

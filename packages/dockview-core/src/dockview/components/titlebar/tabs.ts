@@ -64,6 +64,7 @@ export class Tabs extends CompositeDisposable {
     private _skipNextCollapseAnimation = false;
     private _voidContainer: HTMLElement | null = null;
     private _voidContainerListeners: IDisposable | null = null;
+    private _extendedDropZone: HTMLElement | null = null;
 
     private readonly _chipRenderers = new Map<
         string,
@@ -200,6 +201,10 @@ export class Tabs extends CompositeDisposable {
             removeClasses(this._tabsList, 'dv-tabs-container-vertical');
             addClasses(this._tabsList, 'dv-horizontal');
         }
+
+        for (const tab of this._tabs) {
+            tab.value.setDirection(value);
+        }
     }
 
     constructor(
@@ -281,6 +286,16 @@ export class Tabs extends CompositeDisposable {
                         }
                     }
                     event.preventDefault(); // allow drop to fire on the container
+                    // For intra-group drag (sourceIndex >= 0) the gap
+                    // animation is the sole visual indicator — clear any
+                    // stale anchor overlay that may have been set while the
+                    // cursor was over the panel content area or another zone.
+                    // External drags (sourceIndex === -1) leave the overlay
+                    // to the individual tab Droptargets so cross-group
+                    // animation is not disrupted.
+                    if (this._animState!.sourceIndex !== -1) {
+                        this.group.model.dropTargetContainer?.model?.clear();
+                    }
                     this.handleDragOver(event);
                 },
                 true
@@ -292,13 +307,17 @@ export class Tabs extends CompositeDisposable {
                     if (!this._animState) {
                         return;
                     }
-                    // Only handle if leaving the container itself, not moving between children
-                    if (
-                        event.relatedTarget &&
-                        this._tabsList.contains(
-                            event.relatedTarget as HTMLElement
-                        )
-                    ) {
+                    const related = event.relatedTarget as HTMLElement | null;
+                    // Ignore moves between children of the tabs list
+                    if (related && this._tabsList.contains(related)) {
+                        return;
+                    }
+                    // If moving into the broader drop zone (e.g. void container,
+                    // left actions), keep _animState alive so the external
+                    // dragover listeners can continue the gap animation.
+                    if (related && this._extendedDropZone?.contains(related)) {
+                        this.resetTabTransforms();
+                        this._animState.currentInsertionIndex = null;
                         return;
                     }
                     // When leaving toward the void container (empty header space
@@ -316,8 +335,15 @@ export class Tabs extends CompositeDisposable {
                     this.resetTabTransforms();
                     if (this._animState) {
                         if (this._animState.sourceIndex === -1) {
-                            // External drag left — clear state entirely
-                            // (no dragend will fire on this tab list)
+                            // External drag left the header entirely — clear
+                            // state (no dragend will fire on this tab list).
+                            // Also clear the anchor overlay: the tab-level
+                            // Droptarget onDragLeave does not clear the
+                            // override target, so if the drag re-enters
+                            // another group's header where canDisplayOverlay
+                            // returns false (e.g. same-group smooth mode) the
+                            // overlay would remain stranded here.
+                            this.group.model.dropTargetContainer?.model?.clear();
                             this._animState = null;
                         } else {
                             this._animState.currentInsertionIndex = null;
@@ -345,6 +371,12 @@ export class Tabs extends CompositeDisposable {
 
                     event.stopPropagation();
                     event.preventDefault();
+
+                    // The capturing stopPropagation above prevents the
+                    // individual tab's Droptarget.onDrop from firing, so
+                    // the anchor overlay won't be cleared by that path.
+                    // Clear it explicitly here before processing the drop.
+                    this.group.model.dropTargetContainer?.model?.clear();
 
                     const animState = this._animState;
                     this._animState = null;
@@ -430,7 +462,8 @@ export class Tabs extends CompositeDisposable {
     }
 
     setActivePanel(panel: IDockviewPanel): void {
-        let runningWidth = 0;
+        const isVertical = this._direction === 'vertical';
+        let running = 0;
 
         for (const tab of this._tabs) {
             const isActivePanel = panel.id === tab.value.panel.id;
@@ -440,16 +473,28 @@ export class Tabs extends CompositeDisposable {
                 const element = tab.value.element;
                 const parentElement = element.parentElement!;
 
-                if (
-                    runningWidth < parentElement.scrollLeft ||
-                    runningWidth + element.clientWidth >
-                        parentElement.scrollLeft + parentElement.clientWidth
-                ) {
-                    parentElement.scrollLeft = runningWidth;
+                if (isVertical) {
+                    if (
+                        running < parentElement.scrollTop ||
+                        running + element.clientHeight >
+                            parentElement.scrollTop + parentElement.clientHeight
+                    ) {
+                        parentElement.scrollTop = running;
+                    }
+                } else {
+                    if (
+                        running < parentElement.scrollLeft ||
+                        running + element.clientWidth >
+                            parentElement.scrollLeft + parentElement.clientWidth
+                    ) {
+                        parentElement.scrollLeft = running;
+                    }
                 }
             }
 
-            runningWidth += tab.value.element.clientWidth;
+            running += isVertical
+                ? tab.value.element.clientHeight
+                : tab.value.element.clientWidth;
         }
 
         // Reposition underlines so the wrap-around follows the new active tab
@@ -464,6 +509,9 @@ export class Tabs extends CompositeDisposable {
         }
         const tab = new Tab(panel, this.accessor, this.group);
         tab.setContent(panel.view.tab);
+        if (this._direction !== 'horizontal') {
+            tab.setDirection(this._direction);
+        }
 
         const disposable = new CompositeDisposable(
             tab.onDragStart((event) => {
@@ -517,6 +565,29 @@ export class Tabs extends CompositeDisposable {
                     });
                 }
             }),
+            tab.onTabClick((event) => {
+                if (event.defaultPrevented) {
+                    return;
+                }
+                if (this.group.api.location.type !== 'fixed') {
+                    return;
+                }
+                if (this.group.activePanel === panel) {
+                    // Clicking the active tab toggles expansion
+                    if (this.group.api.isCollapsed()) {
+                        this.group.api.expand();
+                    } else {
+                        this.group.api.collapse();
+                    }
+                } else {
+                    // Clicking a non-active tab switches the active tab.
+                    // If the group is collapsed, also expand it.
+                    this.group.model.openPanel(panel);
+                    if (this.group.api.isCollapsed()) {
+                        this.group.api.expand();
+                    }
+                }
+            }),
             tab.onPointerDown((event) => {
                 if (event.defaultPrevented) {
                     return;
@@ -551,9 +622,14 @@ export class Tabs extends CompositeDisposable {
                 }
 
                 switch (event.button) {
-                    case 0: // left click or touch
-                        if (this.group.activePanel !== panel) {
-                            this.group.model.openPanel(panel);
+                    case 0:
+                        if (this.group.api.location.type === 'fixed') {
+                            // All tab interaction for fixed groups is handled by
+                            // onTabClick to avoid race conditions with active panel state
+                        } else {
+                            if (this.group.activePanel !== panel) {
+                                this.group.model.openPanel(panel);
+                            }
                         }
                         break;
                 }
@@ -563,9 +639,12 @@ export class Tabs extends CompositeDisposable {
                 this._animState = null;
                 this._pendingCollapse = false;
 
-                const dropIndex = this._tabs.findIndex((x) => x.value === tab);
+                const tabIndex = this._tabs.findIndex((x) => x.value === tab);
 
                 if (animState) {
+                    const dropIndex =
+                        event.position === 'right' ? tabIndex + 1 : tabIndex;
+
                     if (animState.sourceTabGroupId) {
                         this._commitGroupMove(
                             animState.sourceTabGroupId,
@@ -605,13 +684,34 @@ export class Tabs extends CompositeDisposable {
                         );
                     }
                 } else {
+                    // Compute insertion index based on which half of the tab
+                    // the pointer is over, then adjust for same-group removal:
+                    // when the source tab sits before the insertion point,
+                    // removing it shifts all subsequent indices down by one.
+                    const afterPosition =
+                        this._direction === 'vertical' ? 'bottom' : 'right';
+                    const insertionIndex =
+                        event.position === afterPosition
+                            ? tabIndex + 1
+                            : tabIndex;
+                    const data = getPanelData();
+                    const sourceIndex = data
+                        ? this._tabs.findIndex(
+                              (x) => x.value.panel.id === data.panelId
+                          )
+                        : -1;
+                    const adjustedIndex =
+                        insertionIndex -
+                        (sourceIndex !== -1 && sourceIndex < insertionIndex
+                            ? 1
+                            : 0);
                     const targetTabGroupId =
                         this.group.model.getTabGroupForPanel(
                             tab.panel.id
                         )?.id ?? null;
                     this._onDrop.fire({
                         event: event.nativeEvent,
-                        index: dropIndex,
+                        index: adjustedIndex,
                         targetTabGroupId,
                     });
                 }
@@ -1347,6 +1447,49 @@ export class Tabs extends CompositeDisposable {
         this._groupUnderlines.clear();
     }
 
+    /**
+     * Sets the broader container that is part of the same logical drop surface
+     * as this tab list (e.g. the full header element).  When a dragleave from
+     * the tabs list lands inside this container, `_animState` is preserved so
+     * that external dragover listeners can continue the animation.
+     */
+    setExtendedDropZone(el: HTMLElement): void {
+        this._extendedDropZone = el;
+    }
+
+    /**
+     * Allows external elements (e.g. void container, left actions) to push an
+     * insertion index into the animation while the cursor is outside the tabs
+     * list itself.  Pass `null` to clear the indicator.
+     */
+    setExternalInsertionIndex(index: number | null): void {
+        if (!this._animState) {
+            return;
+        }
+        if (index === this._animState.currentInsertionIndex) {
+            return;
+        }
+        this._animState.currentInsertionIndex = index;
+        this.applyDragOverTransforms();
+    }
+
+    /**
+     * Called when the drag cursor leaves the entire header area (not just the
+     * tabs list).  Clears animation state for cross-group drags, which never
+     * receive a `dragend` event on this tab list.
+     */
+    clearExternalAnimState(): void {
+        if (!this._animState) {
+            return;
+        }
+        this.resetTabTransforms();
+        if (this._animState.sourceIndex === -1) {
+            this._animState = null;
+        } else {
+            this._animState.currentInsertionIndex = null;
+        }
+    }
+
     private snapshotTabPositions(): Map<string, DOMRect> {
         const positions = new Map<string, DOMRect>();
         for (const tab of this._tabs) {
@@ -1373,11 +1516,13 @@ export class Tabs extends CompositeDisposable {
         if (this._tabs.length === 0) {
             return 0;
         }
-        let totalWidth = 0;
+        const isVertical = this._direction === 'vertical';
+        let total = 0;
         for (const tab of this._tabs) {
-            totalWidth += tab.value.element.getBoundingClientRect().width;
+            const rect = tab.value.element.getBoundingClientRect();
+            total += isVertical ? rect.height : rect.width;
         }
-        return totalWidth / this._tabs.length;
+        return total / this._tabs.length;
     }
 
     private handleDragOver(event: DragEvent): void {
@@ -1766,7 +1911,6 @@ export class Tabs extends CompositeDisposable {
             }
         };
 
-        // Find the first non-source tab at insertionIndex to receive the gap margin
         let gapApplied = false;
 
         // Reset all non-source chip margins first
@@ -1805,6 +1949,9 @@ export class Tabs extends CompositeDisposable {
     private resetTabTransforms(): void {
         for (const tab of this._tabs) {
             tab.value.element.style.removeProperty('margin-left');
+            tab.value.element.style.removeProperty('margin-right');
+            tab.value.element.style.removeProperty('margin-top');
+            tab.value.element.style.removeProperty('margin-bottom');
             tab.value.element.style.removeProperty('transform');
             toggleClass(tab.value.element, 'dv-tab--shifting', false);
         }
@@ -1998,6 +2145,7 @@ export class Tabs extends CompositeDisposable {
         isCrossGroup: boolean = false,
         animRange?: { from: number; to: number }
     ): void {
+        const isVertical = this._direction === 'vertical';
         let hasAnimation = false;
 
         for (let i = 0; i < this._tabs.length; i++) {
@@ -2006,9 +2154,11 @@ export class Tabs extends CompositeDisposable {
 
             if (panelId === sourceTabId) {
                 if (isCrossGroup) {
-                    // Newly inserted tab: slide in from the right
+                    // Newly inserted tab: slide in from the end
                     const rect = tab.value.element.getBoundingClientRect();
-                    tab.value.element.style.transform = `translateX(${rect.width}px)`;
+                    tab.value.element.style.transform = isVertical
+                        ? `translateY(${rect.height}px)`
+                        : `translateX(${rect.width}px)`;
                     toggleClass(tab.value.element, 'dv-tab--shifting', true);
                     hasAnimation = true;
                 }
@@ -2029,13 +2179,17 @@ export class Tabs extends CompositeDisposable {
             }
 
             const lastRect = tab.value.element.getBoundingClientRect();
-            const deltaX = firstRect.left - lastRect.left;
+            const delta = isVertical
+                ? firstRect.top - lastRect.top
+                : firstRect.left - lastRect.left;
 
-            if (Math.abs(deltaX) < 1) {
+            if (Math.abs(delta) < 1) {
                 continue;
             }
 
-            tab.value.element.style.transform = `translateX(${deltaX}px)`;
+            tab.value.element.style.transform = isVertical
+                ? `translateY(${delta}px)`
+                : `translateX(${delta}px)`;
             toggleClass(tab.value.element, 'dv-tab--shifting', true);
             hasAnimation = true;
         }

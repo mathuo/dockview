@@ -81,9 +81,12 @@
     margin: var(--dv-tab-margin);
 
     &.dv-tab--shifting {
-        will-change: margin-left;
+        will-change: transform, margin-left, margin-right, margin-top, margin-bottom;
         transition: transform var(--dv-transition-duration, 200ms) ease-out,
-                    margin-left var(--dv-transition-duration, 200ms) ease-out;
+                    margin-left var(--dv-transition-duration, 200ms) ease-out,
+                    margin-right var(--dv-transition-duration, 200ms) ease-out,
+                    margin-top var(--dv-transition-duration, 200ms) ease-out,
+                    margin-bottom var(--dv-transition-duration, 200ms) ease-out;
     }
 
     &.dv-tab--dragging {
@@ -208,6 +211,22 @@
 .dv-tabs-container-vertical {
     .dv-tab {
         padding: 0.5rem 0.25rem;
+
+        &.dv-tab--dragging {
+            // In vertical mode the flex main axis is physical height, so
+            // height (not width) must be zeroed to remove the tab from flow.
+            height: 0 !important;
+            min-height: 0 !important;
+            // Cancel the base rule's width: 0 — collapsing width in vertical
+            // mode causes the dragging tab to animate on the x-axis, which is
+            // wrong. Width should stay at its natural (auto) value.
+            width: auto !important;
+            min-width: initial !important;
+            transition: height var(--dv-transition-duration, 200ms) ease-out,
+                        padding var(--dv-transition-duration, 200ms) ease-out,
+                        margin var(--dv-transition-duration, 200ms) ease-out,
+                        opacity var(--dv-transition-duration, 200ms) ease-out;
+        }
     }
 }
 
