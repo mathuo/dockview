@@ -706,9 +706,8 @@ export class Tabs extends CompositeDisposable {
                             ? 1
                             : 0);
                     const targetTabGroupId =
-                        this.group.model.getTabGroupForPanel(
-                            tab.panel.id
-                        )?.id ?? null;
+                        this.group.model.getTabGroupForPanel(tab.panel.id)
+                            ?.id ?? null;
                     this._onDrop.fire({
                         event: event.nativeEvent,
                         index: adjustedIndex,
@@ -1837,8 +1836,7 @@ export class Tabs extends CompositeDisposable {
                 // Skip the group that the dragged tab belongs to — the
                 // gap should appear after the chip (where the tab was),
                 // not before it.
-                if (tg.panelIds.includes(this._animState.sourceTabId))
-                    continue;
+                if (tg.panelIds.includes(this._animState.sourceTabId)) continue;
                 const effectivePids = tg.panelIds.filter(
                     (pid) =>
                         pid !== this._animState!.sourceTabId &&
