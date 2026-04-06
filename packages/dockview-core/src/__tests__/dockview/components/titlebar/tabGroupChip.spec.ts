@@ -34,9 +34,9 @@ describe('TabGroupChip', () => {
 
         const label = chip.element.querySelector('.dv-tab-group-chip-label');
         expect(label!.textContent).toBe('Feature');
-        expect(
-            chip.element.classList.contains('dv-tab-group-chip--blue')
-        ).toBe(true);
+        expect(chip.element.classList.contains('dv-tab-group-chip--blue')).toBe(
+            true
+        );
     });
 
     test('init with empty label adds empty class', () => {
@@ -81,18 +81,18 @@ describe('TabGroupChip', () => {
             api: fromPartial<DockviewApi>({}),
         });
 
-        expect(
-            chip.element.classList.contains('dv-tab-group-chip--blue')
-        ).toBe(true);
+        expect(chip.element.classList.contains('dv-tab-group-chip--blue')).toBe(
+            true
+        );
 
         tabGroup.color = 'red';
 
-        expect(
-            chip.element.classList.contains('dv-tab-group-chip--red')
-        ).toBe(true);
-        expect(
-            chip.element.classList.contains('dv-tab-group-chip--blue')
-        ).toBe(false);
+        expect(chip.element.classList.contains('dv-tab-group-chip--red')).toBe(
+            true
+        );
+        expect(chip.element.classList.contains('dv-tab-group-chip--blue')).toBe(
+            false
+        );
     });
 
     test('updates label when tab group label changes', () => {
