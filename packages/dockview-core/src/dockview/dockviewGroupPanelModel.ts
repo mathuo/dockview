@@ -249,6 +249,7 @@ export class DockviewGroupPanelModel
 
     private readonly _panels: IDockviewPanel[] = [];
     private readonly _panelDisposables = new Map<string, IDisposable>();
+    private readonly _tabGroupDisposables = new Map<string, IDisposable>();
 
     private readonly _onMove = new Emitter<GroupMoveEvent>();
     readonly onMove: Event<GroupMoveEvent> = this._onMove.event;
@@ -656,19 +657,22 @@ export class DockviewGroupPanelModel
         this._tabGroups.push(tabGroup);
         this._tabGroupMap.set(id, tabGroup);
 
-        tabGroup.onDidChange(() => {
-            this._onDidTabGroupChange.fire({ tabGroup });
-        });
-
-        tabGroup.onDidCollapseChange((collapsed) => {
-            if (collapsed) {
-                this._handleGroupCollapse(tabGroup);
-            }
-        });
-
-        tabGroup.onDidDestroy(() => {
-            this._removeTabGroupInternal(tabGroup);
-        });
+        this._tabGroupDisposables.set(
+            id,
+            new CompositeDisposable(
+                tabGroup.onDidChange(() => {
+                    this._onDidTabGroupChange.fire({ tabGroup });
+                }),
+                tabGroup.onDidCollapseChange((collapsed) => {
+                    if (collapsed) {
+                        this._handleGroupCollapse(tabGroup);
+                    }
+                }),
+                tabGroup.onDidDestroy(() => {
+                    this._removeTabGroupInternal(tabGroup);
+                })
+            )
+        );
 
         this._onDidCreateTabGroup.fire({ tabGroup });
         return tabGroup;
@@ -942,7 +946,15 @@ export class DockviewGroupPanelModel
             for (const panelId of tabGroup.panelIds) {
                 this._panelToTabGroup.delete(panelId);
             }
+
             this._onDidDestroyTabGroup.fire({ tabGroup });
+
+            // Remove the disposable entry — the actual disposal happens
+            // via tabGroup.dispose() → super.dispose() which clears all
+            // emitter listeners. We must not call dispose() here because
+            // this method runs inside the onDidDestroy fire loop, and
+            // splicing listeners mid-iteration would skip subsequent ones.
+            this._tabGroupDisposables.delete(tabGroup.id);
         }
     }
 
@@ -1680,6 +1692,10 @@ export class DockviewGroupPanelModel
         for (const tabGroup of [...this._tabGroups]) {
             tabGroup.dispose();
         }
+        for (const disposable of this._tabGroupDisposables.values()) {
+            disposable.dispose();
+        }
+        this._tabGroupDisposables.clear();
 
         for (const panel of this.panels) {
             panel.dispose();

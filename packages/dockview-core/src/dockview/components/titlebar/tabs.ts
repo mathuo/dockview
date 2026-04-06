@@ -62,6 +62,7 @@ export class Tabs extends CompositeDisposable {
     private _animState: TabAnimationState | null = null;
     private _pendingCollapse = false;
     private _skipNextCollapseAnimation = false;
+    private readonly _pendingTransitionCleanups = new Map<string, () => void>();
     private _voidContainer: HTMLElement | null = null;
     private _voidContainerListeners: IDisposable | null = null;
     private _extendedDropZone: HTMLElement | null = null;
@@ -754,6 +755,12 @@ export class Tabs extends CompositeDisposable {
             this._animState = null;
         }
 
+        // Force-clean any pending transitionend listener
+        const pendingCleanup = this._pendingTransitionCleanups.get(id);
+        if (pendingCleanup) {
+            pendingCleanup();
+        }
+
         const index = this.indexOf(id);
         const tabToRemove = this._tabs.splice(index, 1)[0];
         this._tabMap.delete(id);
@@ -1084,7 +1091,9 @@ export class Tabs extends CompositeDisposable {
                         tab.element.classList.remove('dv-tab--group-expanding');
                         tab.element.style.removeProperty('width');
                         tab.element.removeEventListener('transitionend', onEnd);
+                        this._pendingTransitionCleanups.delete(panelId);
                     };
+                    this._pendingTransitionCleanups.set(panelId, onEnd);
                     tab.element.addEventListener('transitionend', onEnd);
                 }
             } else {
@@ -1140,6 +1149,7 @@ export class Tabs extends CompositeDisposable {
                     }
                 } else {
                     hasAnimation = true;
+                    const isVert = this._direction === 'vertical';
                     for (const pid of tg.panelIds) {
                         const te = this._tabMap.get(pid);
                         if (
@@ -1148,9 +1158,13 @@ export class Tabs extends CompositeDisposable {
                                 'dv-tab--group-collapsed'
                             )
                         ) {
-                            const w =
-                                te.value.element.getBoundingClientRect().width;
-                            te.value.element.style.width = `${w}px`;
+                            const rect =
+                                te.value.element.getBoundingClientRect();
+                            if (isVert) {
+                                te.value.element.style.height = `${rect.height}px`;
+                            } else {
+                                te.value.element.style.width = `${rect.width}px`;
+                            }
                             te.value.element.offsetHeight; // force reflow
                             te.value.element.classList.add(
                                 'dv-tab--group-collapsed'
@@ -1182,7 +1196,10 @@ export class Tabs extends CompositeDisposable {
     private _positionUnderlinesSync(): void {
         const containerRect = this._tabsList.getBoundingClientRect();
         const tabGroups = this.group.model.getTabGroups();
-        const containerHeight = containerRect.height;
+        const isVertical = this._direction === 'vertical';
+        const containerCrossSize = isVertical
+            ? containerRect.width
+            : containerRect.height;
         const activePanelId = this.group.activePanel?.id;
 
         for (const tg of tabGroups) {
@@ -1202,17 +1219,29 @@ export class Tabs extends CompositeDisposable {
             const chipEntry = this._chipRenderers.get(tg.id);
             const chipEl = chipEntry?.chip.element;
 
-            let leftEdge: number;
+            // In vertical mode, compute top/bottom edges; in horizontal, left/right.
+            let startEdge: number;
             if (chipEl) {
-                leftEdge =
-                    chipEl.getBoundingClientRect().left - containerRect.left;
+                const chipRect = chipEl.getBoundingClientRect();
+                const chipStyle = getComputedStyle(chipEl);
+                const leadingMargin = isVertical
+                    ? parseFloat(chipStyle.marginTop) || 0
+                    : parseFloat(chipStyle.marginLeft) || 0;
+                startEdge = isVertical
+                    ? chipRect.top - containerRect.top - leadingMargin
+                    : chipRect.left - containerRect.left - leadingMargin;
             } else {
                 const firstPanelId = panelIds[0];
                 const firstTabEntry = this._tabMap.get(firstPanelId);
-                leftEdge = firstTabEntry
-                    ? firstTabEntry.value.element.getBoundingClientRect().left -
-                      containerRect.left
-                    : 0;
+                if (firstTabEntry) {
+                    const firstRect =
+                        firstTabEntry.value.element.getBoundingClientRect();
+                    startEdge = isVertical
+                        ? firstRect.top - containerRect.top
+                        : firstRect.left - containerRect.left;
+                } else {
+                    startEdge = 0;
+                }
             }
 
             // Measure the actual last tab position (follows CSS transitions in real-time)
@@ -1220,16 +1249,26 @@ export class Tabs extends CompositeDisposable {
             const lastTabEntry = this._tabMap.get(lastPanelId);
 
             if (!lastTabEntry) {
-                underline.style.left = `${leftEdge}px`;
-                underline.style.width = '0px';
-                underline.style.clipPath = '';
+                if (isVertical) {
+                    underline.style.top = `${startEdge}px`;
+                    underline.style.height = '0px';
+                    underline.style.left = '';
+                    underline.style.width = '';
+                } else {
+                    underline.style.left = `${startEdge}px`;
+                    underline.style.width = '0px';
+                    underline.style.top = '';
+                    underline.style.height = '';
+                }
                 continue;
             }
 
             const lastTabRect =
                 lastTabEntry.value.element.getBoundingClientRect();
-            let rightEdge = lastTabRect.right - containerRect.left;
-            let width = rightEdge - leftEdge;
+            let endEdge = isVertical
+                ? lastTabRect.bottom - containerRect.top
+                : lastTabRect.right - containerRect.left;
+            let span = endEdge - startEdge;
 
             // During collapse or expand: converge both edges toward chip center
             const isAnimating =
@@ -1246,90 +1285,97 @@ export class Tabs extends CompositeDisposable {
 
             if (isAnimating && chipEl) {
                 const chipRect = chipEl.getBoundingClientRect();
-                const chipCenter =
-                    chipRect.left + chipRect.width / 2 - containerRect.left;
+                const chipCenter = isVertical
+                    ? chipRect.top + chipRect.height / 2 - containerRect.top
+                    : chipRect.left + chipRect.width / 2 - containerRect.left;
 
-                // Sum of current visible tab widths (shrinking or growing)
-                let currentTabWidth = 0;
-                let fullTabWidth = 0;
+                // Sum of current visible tab sizes (shrinking or growing)
+                let currentTabSize = 0;
+                let fullTabSize = 0;
                 for (const pid of tg.panelIds) {
                     const te = this._tabMap.get(pid);
                     if (!te) continue;
                     const el = te.value.element;
-                    currentTabWidth += el.getBoundingClientRect().width;
-                    fullTabWidth += el.scrollWidth;
+                    if (isVertical) {
+                        currentTabSize +=
+                            el.getBoundingClientRect().height;
+                        fullTabSize += el.scrollHeight;
+                    } else {
+                        currentTabSize +=
+                            el.getBoundingClientRect().width;
+                        fullTabSize += el.scrollWidth;
+                    }
                 }
 
-                // progress: 0 when tabs at 0 width, 1 when fully open
+                // progress: 0 when tabs at 0 size, 1 when fully open
                 const progress =
-                    fullTabWidth > 0
-                        ? Math.min(1, currentTabWidth / fullTabWidth)
+                    fullTabSize > 0
+                        ? Math.min(1, currentTabSize / fullTabSize)
                         : 0;
 
-                // Interpolate left and right edges toward chip center
-                leftEdge = chipCenter + (leftEdge - chipCenter) * progress;
-                rightEdge = chipCenter + (rightEdge - chipCenter) * progress;
-                width = Math.max(0, rightEdge - leftEdge);
+                // Interpolate start and end edges toward chip center
+                startEdge =
+                    chipCenter + (startEdge - chipCenter) * progress;
+                endEdge = chipCenter + (endEdge - chipCenter) * progress;
+                span = Math.max(0, endEdge - startEdge);
             }
 
-            underline.style.left = `${leftEdge}px`;
-            underline.style.width = `${Math.max(0, width)}px`;
+            if (isVertical) {
+                underline.style.top = `${startEdge}px`;
+                underline.style.height = `${Math.max(0, span)}px`;
+                // Clear horizontal properties
+                underline.style.left = '';
+                underline.style.width = '';
+            } else {
+                underline.style.left = `${startEdge}px`;
+                underline.style.width = `${Math.max(0, span)}px`;
+                // Clear vertical properties
+                underline.style.top = '';
+                underline.style.height = '';
+            }
 
             // Chrome-style wrap-around: contour the active tab if it belongs to this group
             this._applyUnderlineShape(
                 underline,
                 tg,
-                leftEdge,
-                width,
-                containerHeight,
+                startEdge,
+                span,
+                containerCrossSize,
                 activePanelId,
-                containerRect
+                containerRect,
+                isVertical
             );
         }
     }
 
     /**
-     * Position the underline as a Chrome-style wrap-around: bottom line
-     * everywhere, but goes up-left, across-top, down-right around the
-     * active tab. Uses 3 child elements: left line, U-wrap, right line.
+     * Chrome-style wrap-around underline: a stroked SVG path that runs
+     * along the bottom (or left edge in vertical mode), curving up and
+     * over the active tab with rounded corners.
+     *
+     * The SVG and path elements are created once per underline and reused;
+     * only the `d`, `stroke`, and viewport attributes are updated each frame.
      */
     private _applyUnderlineShape(
         underline: HTMLElement,
         tg: ITabGroup,
-        groupLeft: number,
-        groupWidth: number,
-        containerHeight: number,
+        groupStart: number,
+        groupSpan: number,
+        containerCrossSize: number,
         activePanelId: string | undefined,
-        containerRect: DOMRect
+        containerRect: DOMRect,
+        isVertical: boolean
     ): void {
         const t = 2; // line thickness in px
-        const h = containerHeight;
-        const w = groupWidth;
+        const crossSize = containerCrossSize;
+        const mainSize = groupSpan;
+        const color = `var(--dv-tab-group-color-${tg.color})`;
 
-        // Ensure child structure exists (left-line, wrap, right-line)
-        if (underline.children.length !== 3) {
-            underline.innerHTML = '';
-            const leftLine = document.createElement('div');
-            leftLine.className = 'dv-tab-group-underline-left';
-            const wrap = document.createElement('div');
-            wrap.className = 'dv-tab-group-underline-wrap';
-            const rightLine = document.createElement('div');
-            rightLine.className = 'dv-tab-group-underline-right';
-            underline.appendChild(leftLine);
-            underline.appendChild(wrap);
-            underline.appendChild(rightLine);
-        }
-
-        const leftLine = underline.children[0] as HTMLElement;
-        const wrap = underline.children[1] as HTMLElement;
-        const rightLine = underline.children[2] as HTMLElement;
-
-        if (w <= 0 || h <= 0) {
-            leftLine.style.display = 'none';
-            wrap.style.display = 'none';
-            rightLine.style.display = 'none';
+        if (mainSize <= 0 || crossSize <= 0) {
+            underline.style.display = 'none';
             return;
         }
+        underline.style.display = '';
 
         // Find the active tab within this group
         let activeTabEntry: IValueDisposable<Tab> | undefined;
@@ -1337,64 +1383,141 @@ export class Tabs extends CompositeDisposable {
             activeTabEntry = this._tabMap.get(activePanelId);
         }
 
-        const color = `var(--dv-tab-group-color-${tg.color})`;
+        // Ensure SVG + path child exists (created once, reused)
+        let svg = underline.firstElementChild as SVGSVGElement | null;
+        let path: SVGPathElement;
+        if (!svg || svg.tagName !== 'svg') {
+            underline.innerHTML = '';
+            svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.style.display = 'block';
+            path = document.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'path'
+            );
+            path.setAttribute('fill', 'none');
+            svg.appendChild(path);
+            underline.appendChild(svg);
+        } else {
+            path = svg.firstElementChild as SVGPathElement;
+        }
+
+        path.setAttribute('stroke', color);
+        path.setAttribute('stroke-width', String(t));
 
         if (!activeTabEntry) {
-            // No active tab in this group: single bottom line (use left line for full width)
-            leftLine.style.cssText = `position:absolute;bottom:0;left:0;width:${w}px;height:${t}px;background:${color}`;
-            wrap.style.display = 'none';
-            rightLine.style.display = 'none';
+            // No active tab: straight line along the edge
+            if (isVertical) {
+                svg.setAttribute('width', String(t));
+                svg.setAttribute('height', String(mainSize));
+                underline.style.width = `${t}px`;
+                underline.style.height = `${mainSize}px`;
+                path.setAttribute('d', `M ${t / 2},0 L ${t / 2},${mainSize}`);
+            } else {
+                svg.setAttribute('width', String(mainSize));
+                svg.setAttribute('height', String(t));
+                underline.style.width = `${mainSize}px`;
+                underline.style.height = `${t}px`;
+                path.setAttribute('d', `M 0,${t / 2} L ${mainSize},${t / 2}`);
+            }
             return;
         }
 
         const activeRect = activeTabEntry.value.element.getBoundingClientRect();
-        const aL = Math.max(
-            0,
-            activeRect.left - containerRect.left - groupLeft
-        );
-        const aR = Math.min(
-            w,
-            activeRect.right - containerRect.left - groupLeft
-        );
 
-        if (aR <= aL) {
-            leftLine.style.cssText = `position:absolute;bottom:0;left:0;width:${w}px;height:${t}px;background:${color}`;
-            wrap.style.display = 'none';
-            rightLine.style.display = 'none';
+        // Compute active tab start/end relative to the group start
+        let aStart: number;
+        let aEnd: number;
+        if (isVertical) {
+            aStart = Math.max(
+                0,
+                activeRect.top - containerRect.top - groupStart
+            );
+            aEnd = Math.min(
+                mainSize,
+                activeRect.bottom - containerRect.top - groupStart
+            );
+        } else {
+            aStart = Math.max(
+                0,
+                activeRect.left - containerRect.left - groupStart
+            );
+            aEnd = Math.min(
+                mainSize,
+                activeRect.right - containerRect.left - groupStart
+            );
+        }
+
+        if (aEnd <= aStart) {
+            if (isVertical) {
+                svg.setAttribute('width', String(t));
+                svg.setAttribute('height', String(mainSize));
+                underline.style.width = `${t}px`;
+                underline.style.height = `${mainSize}px`;
+                path.setAttribute('d', `M ${t / 2},0 L ${t / 2},${mainSize}`);
+            } else {
+                svg.setAttribute('width', String(mainSize));
+                svg.setAttribute('height', String(t));
+                underline.style.width = `${mainSize}px`;
+                underline.style.height = `${t}px`;
+                path.setAttribute('d', `M 0,${t / 2} L ${mainSize},${t / 2}`);
+            }
             return;
         }
 
-        const r = 6; // corner radius where the line curves up
-
-        // Hide the separate line elements — we draw everything in the wrap SVG
-        leftLine.style.display = 'none';
-        rightLine.style.display = 'none';
-
-        // Draw the full underline as an SVG path:
-        // bottom-left → right along bottom → curve up at aL → up left side →
-        // curve at top-left → across top → curve at top-right → down right side →
-        // curve at aR → right along bottom → bottom-right
-        const svgW = w;
-        const svgH = h;
+        const r = 6; // corner radius
         const half = t / 2;
-        const yBot = svgH - half; // bottom line center (stroke centered)
-        const yTop = half; // top line center
 
-        const d = [
-            `M 0,${yBot}`, // start at left
-            `L ${aL - r},${yBot}`, // bottom line left segment
-            `Q ${aL},${yBot} ${aL},${yBot - r}`, // curve up (bottom-left of U)
-            `L ${aL},${yTop + r}`, // left side going up
-            `Q ${aL},${yTop} ${aL + r},${yTop}`, // curve at top-left
-            `L ${aR - r},${yTop}`, // top of U
-            `Q ${aR},${yTop} ${aR},${yTop + r}`, // curve at top-right
-            `L ${aR},${yBot - r}`, // right side going down
-            `Q ${aR},${yBot} ${aR + r},${yBot}`, // curve at bottom-right of U
-            `L ${svgW},${yBot}`, // bottom line right segment
-        ].join(' ');
+        if (isVertical) {
+            const svgW = crossSize;
+            const svgH = mainSize;
+            svg.setAttribute('width', String(svgW));
+            svg.setAttribute('height', String(svgH));
+            underline.style.width = `${svgW}px`;
+            underline.style.height = `${svgH}px`;
 
-        wrap.style.cssText = `position:absolute;bottom:0;left:0;width:${svgW}px;height:${svgH}px`;
-        wrap.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="${svgW}" height="${svgH}" style="display:block"><path d="${d}" fill="none" stroke="${color}" stroke-width="${t}"/></svg>`;
+            const xLeft = half;
+            const xRight = svgW - half;
+
+            const d = [
+                `M ${xLeft},0`,
+                `L ${xLeft},${aStart - r}`,
+                `Q ${xLeft},${aStart} ${xLeft + r},${aStart}`,
+                `L ${xRight - r},${aStart}`,
+                `Q ${xRight},${aStart} ${xRight},${aStart + r}`,
+                `L ${xRight},${aEnd - r}`,
+                `Q ${xRight},${aEnd} ${xRight - r},${aEnd}`,
+                `L ${xLeft + r},${aEnd}`,
+                `Q ${xLeft},${aEnd} ${xLeft},${aEnd + r}`,
+                `L ${xLeft},${svgH}`,
+            ].join(' ');
+
+            path.setAttribute('d', d);
+        } else {
+            const svgW = mainSize;
+            const svgH = crossSize;
+            svg.setAttribute('width', String(svgW));
+            svg.setAttribute('height', String(svgH));
+            underline.style.width = `${svgW}px`;
+            underline.style.height = `${svgH}px`;
+
+            const yBot = svgH - half;
+            const yTop = half;
+
+            const d = [
+                `M 0,${yBot}`,
+                `L ${aStart - r},${yBot}`,
+                `Q ${aStart},${yBot} ${aStart},${yBot - r}`,
+                `L ${aStart},${yTop + r}`,
+                `Q ${aStart},${yTop} ${aStart + r},${yTop}`,
+                `L ${aEnd - r},${yTop}`,
+                `Q ${aEnd},${yTop} ${aEnd},${yTop + r}`,
+                `L ${aEnd},${yBot - r}`,
+                `Q ${aEnd},${yBot} ${aEnd + r},${yBot}`,
+                `L ${svgW},${yBot}`,
+            ].join(' ');
+
+            path.setAttribute('d', d);
+        }
     }
 
     private _positionUnderlines(): void {

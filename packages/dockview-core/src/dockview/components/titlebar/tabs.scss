@@ -139,7 +139,7 @@
     display: inline-flex;
     align-items: center;
     align-self: center;
-    margin: 0 4px;
+    margin: 0 8px 0 8px;
     padding: var(--dv-tab-group-chip-padding);
     border-radius: var(--dv-tab-group-chip-border-radius);
     font-size: var(--dv-tab-group-chip-font-size);
@@ -192,11 +192,10 @@
     }
 }
 
-// Single underline element per tab group (positioned by JS)
+// Tab group underline — positioned by CSS, sized and drawn by JS via SVG
 .dv-tab-group-underline {
     position: absolute;
     bottom: 0;
-    height: var(--dv-tab-group-line-height);
     opacity: var(--dv-tab-group-line-opacity);
     pointer-events: none;
     z-index: 10;
@@ -208,9 +207,37 @@
     top: 0;
 }
 
+// Vertical tabs: sideline instead of underline
+.dv-tabs-container-vertical .dv-tab-group-underline {
+    bottom: auto;
+    left: 0;
+}
+
 .dv-tabs-container-vertical {
+    .dv-tab-group-chip {
+        margin: 8px 0 8px 0;
+    }
+
     .dv-tab {
         padding: 0.5rem 0.25rem;
+
+        &.dv-tab--group-collapsed {
+            height: 0 !important;
+            min-height: 0 !important;
+            width: auto !important;
+            min-width: initial !important;
+            transition: height var(--dv-transition-duration, 200ms) ease-out,
+                        padding var(--dv-transition-duration, 200ms) ease-out,
+                        margin var(--dv-transition-duration, 200ms) ease-out,
+                        opacity var(--dv-transition-duration, 200ms) ease-out;
+        }
+
+        &.dv-tab--group-expanding {
+            transition: height var(--dv-transition-duration, 200ms) ease-out,
+                        padding var(--dv-transition-duration, 200ms) ease-out,
+                        margin var(--dv-transition-duration, 200ms) ease-out,
+                        opacity var(--dv-transition-duration, 200ms) ease-out;
+        }
 
         &.dv-tab--dragging {
             // In vertical mode the flex main axis is physical height, so

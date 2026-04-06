@@ -16,8 +16,10 @@ import {
     DockviewReadyEvent,
     createDockview,
     BuiltInContextMenuItem,
+    BuiltInChipContextMenuItem,
     ContextMenuItemConfig,
     GetTabContextMenuItemsParams,
+    GetTabGroupChipContextMenuItemsParams,
     IContextMenuItemComponentProps,
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
@@ -69,6 +71,9 @@ export interface IDockviewReactProps extends DockviewOptions {
     getTabContextMenuItems?: (
         params: GetTabContextMenuItemsParams
     ) => (BuiltInContextMenuItem | ReactContextMenuItemConfig)[];
+    getTabGroupChipContextMenuItems?: (
+        params: GetTabGroupChipContextMenuItemsParams
+    ) => (BuiltInChipContextMenuItem | ReactContextMenuItemConfig)[];
     tabGroupChipComponent?: React.FunctionComponent<IDockviewTabGroupChipProps>;
     //
     onReady: (event: DockviewReadyEvent) => void;

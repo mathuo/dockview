@@ -27,6 +27,9 @@ import {
     DockviewComponentOptions,
     TabAnimation,
     GetTabContextMenuItemsParams,
+    GetTabGroupChipContextMenuItemsParams,
+    BuiltInChipContextMenuItem,
+    ContextMenuItemConfig,
     ContextMenuItem,
 } from 'dockview-core';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
@@ -98,6 +101,9 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() getTabContextMenuItems?: (
         params: GetTabContextMenuItemsParams
     ) => (ContextMenuItem | { component: Type<any> })[];
+    @Input() getTabGroupChipContextMenuItems?: (
+        params: GetTabGroupChipContextMenuItemsParams
+    ) => (BuiltInChipContextMenuItem | ContextMenuItemConfig | { component: Type<any> })[];
 
     @Output() ready = new EventEmitter<DockviewReadyEvent>();
     @Output() didDrop = new EventEmitter<DockviewDidDropEvent>();
