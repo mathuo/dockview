@@ -103,7 +103,11 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     ) => (ContextMenuItem | { component: Type<any> })[];
     @Input() getTabGroupChipContextMenuItems?: (
         params: GetTabGroupChipContextMenuItemsParams
-    ) => (BuiltInChipContextMenuItem | ContextMenuItemConfig | { component: Type<any> })[];
+    ) => (
+        | BuiltInChipContextMenuItem
+        | ContextMenuItemConfig
+        | { component: Type<any> }
+    )[];
 
     @Output() ready = new EventEmitter<DockviewReadyEvent>();
     @Output() didDrop = new EventEmitter<DockviewDidDropEvent>();

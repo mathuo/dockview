@@ -1297,12 +1297,10 @@ export class Tabs extends CompositeDisposable {
                     if (!te) continue;
                     const el = te.value.element;
                     if (isVertical) {
-                        currentTabSize +=
-                            el.getBoundingClientRect().height;
+                        currentTabSize += el.getBoundingClientRect().height;
                         fullTabSize += el.scrollHeight;
                     } else {
-                        currentTabSize +=
-                            el.getBoundingClientRect().width;
+                        currentTabSize += el.getBoundingClientRect().width;
                         fullTabSize += el.scrollWidth;
                     }
                 }
@@ -1314,8 +1312,7 @@ export class Tabs extends CompositeDisposable {
                         : 0;
 
                 // Interpolate start and end edges toward chip center
-                startEdge =
-                    chipCenter + (startEdge - chipCenter) * progress;
+                startEdge = chipCenter + (startEdge - chipCenter) * progress;
                 endEdge = chipCenter + (endEdge - chipCenter) * progress;
                 span = Math.max(0, endEdge - startEdge);
             }
