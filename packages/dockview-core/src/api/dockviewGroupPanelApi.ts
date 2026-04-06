@@ -34,8 +34,8 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
     readonly onDidLocationChange: Event<DockviewGroupPanelFloatingChangeEvent>;
     readonly onDidActivePanelChange: Event<DockviewGroupChangeEvent>;
     /**
-     * Fired when a edge panel's collapsed state changes.
-     * Never fires for non-fixed groups.
+     * Fired when an edge group's collapsed state changes.
+     * Never fires for non-edge groups.
      */
     readonly onDidCollapsedChange: Event<DockviewGroupPanelCollapsedChangeEvent>;
     readonly location: DockviewGroupLocation;
@@ -51,16 +51,16 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
     exitMaximized(): void;
     close(): void;
     /**
-     * Collapse this group (fixed groups only). No-op for non-fixed groups.
+     * Collapse this group (edge groups only). No-op for non-edge groups.
      */
     collapse(): void;
     /**
-     * Expand this group (fixed groups only). No-op for non-fixed groups.
+     * Expand this group (edge groups only). No-op for non-edge groups.
      */
     expand(): void;
     /**
-     * Returns true if this fixed group is currently collapsed.
-     * Always returns false for non-fixed groups.
+     * Returns true if this edge group is currently collapsed.
+     * Always returns false for non-edge groups.
      */
     isCollapsed(): boolean;
 }
@@ -211,21 +211,21 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
         if (!this._group) {
             return;
         }
-        this.accessor.setFixedGroupCollapsed(this._group, true);
+        this.accessor.setEdgeGroupCollapsed(this._group, true);
     }
 
     expand(): void {
         if (!this._group) {
             return;
         }
-        this.accessor.setFixedGroupCollapsed(this._group, false);
+        this.accessor.setEdgeGroupCollapsed(this._group, false);
     }
 
     isCollapsed(): boolean {
         if (!this._group) {
             return false;
         }
-        return this.accessor.isFixedGroupCollapsed(this._group);
+        return this.accessor.isEdgeGroupCollapsed(this._group);
     }
 
     initialize(group: DockviewGroupPanel): void {

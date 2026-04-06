@@ -29,7 +29,7 @@ export type BuiltInContextMenuItem =
     | 'closeAll'
     | 'separator';
 
-export type BuiltInChipContextMenuItem = BuiltInContextMenuItem | 'colorPicker';
+export type BuiltInChipContextMenuItem = 'separator' | 'colorPicker';
 
 export interface ContextMenuItemConfig {
     label?: string;

@@ -32,7 +32,7 @@ export interface IDockviewHeaderActionsProps {
     isGroupActive: boolean;
     group: DockviewGroupPanel;
     headerPosition: DockviewHeaderPosition;
-    location: DockviewGroupLocation;
+    location?: DockviewGroupLocation;
 }
 
 export interface IGroupHeaderProps {

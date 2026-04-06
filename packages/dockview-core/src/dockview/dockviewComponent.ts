@@ -13,7 +13,7 @@ import {
 } from '../dnd/droptarget';
 import { tail, sequenceEquals, remove } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
-import { CompositeDisposable, Disposable } from '../lifecycle';
+import { CompositeDisposable, Disposable, IDisposable } from '../lifecycle';
 import { Event, Emitter, addDisposableListener } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import { IWatermarkRenderer, GroupviewPanelState } from './types';
@@ -371,9 +371,13 @@ export class DockviewComponent
 
     private _shellManager: ShellManager | undefined;
     private _inShellLayout = false;
-    private readonly _fixedGroups = new Map<
+    private readonly _edgeGroups = new Map<
         EdgeGroupPosition,
         DockviewGroupPanel
+    >();
+    private readonly _edgeGroupDisposables = new Map<
+        EdgeGroupPosition,
+        IDisposable
     >();
 
     private readonly _floatingGroups: DockviewFloatingGroupPanel[] = [];
@@ -643,6 +647,11 @@ export class DockviewComponent
                 }
 
                 this._shellManager?.dispose();
+
+                for (const d of this._edgeGroupDisposables.values()) {
+                    d.dispose();
+                }
+                this._edgeGroupDisposables.clear();
             }),
             this._rootDropTarget,
             this._rootDropTarget.onWillShowOverlay((event) => {
@@ -731,8 +740,8 @@ export class DockviewComponent
                     'dockview: You cannot hide a group that is in a popout window'
                 );
                 break;
-            case 'fixed':
-                // Fixed group visibility is managed via setEdgeGroupVisible
+            case 'edge':
+                // Edge group visibility is managed via setEdgeGroupVisible
                 break;
         }
     }
@@ -1420,26 +1429,25 @@ export class DockviewComponent
         position: EdgeGroupPosition,
         options: EdgeGroupOptions
     ): DockviewGroupPanelApi {
-        if (this._fixedGroups.has(position)) {
+        if (this._edgeGroups.has(position)) {
             throw new Error(
                 `dockview: edge group already exists at position '${position}'`
             );
         }
 
         const group = this.createGroup({ id: options.id });
-        group.model.location = { type: 'fixed', position };
+        group.model.location = { type: 'edge', position };
         group.model.headerPosition = position;
-        this._fixedGroups.set(position, group);
+        this._edgeGroups.set(position, group);
         this._onDidAddGroup.fire(group);
 
         // Collapse when the group becomes empty
-        this.addDisposables(
-            group.model.onDidRemovePanel(() => {
-                if (group.model.isEmpty) {
-                    this._shellManager!.setEdgeGroupCollapsed(position, true);
-                }
-            })
-        );
+        const autoCollapseDisposable = group.model.onDidRemovePanel(() => {
+            if (group.model.isEmpty) {
+                this._shellManager!.setEdgeGroupCollapsed(position, true);
+            }
+        });
+        this._edgeGroupDisposables.set(position, autoCollapseDisposable);
 
         this._shellManager!.addEdgeView(
             position,
@@ -1453,7 +1461,7 @@ export class DockviewComponent
     getEdgeGroup(
         position: EdgeGroupPosition
     ): DockviewGroupPanelApi | undefined {
-        return this._fixedGroups.get(position)?.api;
+        return this._edgeGroups.get(position)?.api;
     }
 
     setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void {
@@ -1465,7 +1473,7 @@ export class DockviewComponent
     }
 
     removeEdgeGroup(position: EdgeGroupPosition): void {
-        const group = this._fixedGroups.get(position);
+        const group = this._edgeGroups.get(position);
         if (!group) {
             throw new Error(
                 `dockview: no edge group exists at position '${position}'`
@@ -1480,21 +1488,22 @@ export class DockviewComponent
             });
         }
 
+        // Dispose the auto-collapse listener
+        this._edgeGroupDisposables.get(position)?.dispose();
+        this._edgeGroupDisposables.delete(position);
+
         // Remove from the shell splitview
         this._shellManager!.removeEdgeView(position);
 
         // Clean up group state
-        this._fixedGroups.delete(position);
+        this._edgeGroups.delete(position);
         group.dispose();
         this._groups.delete(group.id);
         this._onDidRemoveGroup.fire(group);
     }
 
-    setFixedGroupCollapsed(
-        group: DockviewGroupPanel,
-        collapsed: boolean
-    ): void {
-        for (const [position, fixedGroup] of this._fixedGroups) {
+    setEdgeGroupCollapsed(group: DockviewGroupPanel, collapsed: boolean): void {
+        for (const [position, fixedGroup] of this._edgeGroups) {
             if (fixedGroup === group) {
                 this._shellManager!.setEdgeGroupCollapsed(position, collapsed);
                 fixedGroup.api._onDidCollapsedChange.fire({
@@ -1505,8 +1514,8 @@ export class DockviewComponent
         }
     }
 
-    isFixedGroupCollapsed(group: DockviewGroupPanel): boolean {
-        for (const [position, fixedGroup] of this._fixedGroups) {
+    isEdgeGroupCollapsed(group: DockviewGroupPanel): boolean {
+        for (const [position, fixedGroup] of this._edgeGroups) {
             if (fixedGroup === group) {
                 return this._shellManager!.isEdgeGroupCollapsed(position);
             }
@@ -1632,11 +1641,11 @@ export class DockviewComponent
             result.popoutGroups = popoutGroups;
         }
 
-        if (this._fixedGroups.size > 0) {
+        if (this._edgeGroups.size > 0) {
             const shellSerialized = this._shellManager!.toJSON();
 
             // Augment each entry with the serialized group state
-            for (const [position, group] of this._fixedGroups) {
+            for (const [position, group] of this._edgeGroups) {
                 const entry = shellSerialized[position];
                 if (entry) {
                     entry.group = group.toJSON();
@@ -1825,7 +1834,7 @@ export class DockviewComponent
                     'right',
                 ] as EdgeGroupPosition[]) {
                     const fixedData = data.edgeGroups[_position];
-                    if (fixedData && !this._fixedGroups.has(_position)) {
+                    if (fixedData && !this._edgeGroups.has(_position)) {
                         const groupState = fixedData.group as
                             | GroupPanelViewState
                             | undefined;
@@ -1834,8 +1843,8 @@ export class DockviewComponent
                     }
                 }
 
-                // Restore panel contents of fixed groups
-                for (const [position, fixedGroup] of this._fixedGroups) {
+                // Restore panel contents of edge groups
+                for (const [position, fixedGroup] of this._edgeGroups) {
                     const fixedData = data.edgeGroups[position];
                     const groupState = fixedData?.group as
                         | GroupPanelViewState
@@ -1870,6 +1879,16 @@ export class DockviewComponent
                             fixedGroup.model.openPanel(
                                 fixedGroup.panels[fixedGroup.panels.length - 1],
                                 { skipSetGroupActive: true }
+                            );
+                        }
+
+                        // Restore tab groups if present
+                        if (
+                            groupState.tabGroups &&
+                            groupState.tabGroups.length > 0
+                        ) {
+                            fixedGroup.model.restoreTabGroups(
+                                groupState.tabGroups
                             );
                         }
                     }
@@ -1999,8 +2018,8 @@ export class DockviewComponent
         const hasActiveGroup = !!this.activeGroup;
 
         for (const group of groups) {
-            if ([...this._fixedGroups.values()].includes(group)) {
-                // Fixed groups are structural - only clear their panels, not the group itself
+            if ([...this._edgeGroups.values()].includes(group)) {
+                // Edge groups are structural - only clear their panels, not the group itself
                 const panels = [...group.panels];
                 for (const panel of panels) {
                     this.removePanel(panel, { removeEmptyGroup: false });
@@ -2138,7 +2157,7 @@ export class DockviewComponent
                 });
             } else if (
                 referenceGroup.api.location.type === 'floating' ||
-                referenceGroup.api.location.type === 'fixed' ||
+                referenceGroup.api.location.type === 'edge' ||
                 target === 'center'
             ) {
                 panel = this.createPanel(options, referenceGroup);
@@ -2400,8 +2419,8 @@ export class DockviewComponent
               }
             | undefined
     ): DockviewGroupPanel {
-        // Fixed groups are permanent structural elements - never remove them from the layout
-        if ([...this._fixedGroups.values()].includes(group)) {
+        // Edge groups are permanent structural elements - never remove them from the layout
+        if ([...this._edgeGroups.values()].includes(group)) {
             return group;
         }
 
@@ -2690,11 +2709,11 @@ export class DockviewComponent
                     return;
                 }
 
-                if (sourceGroup.api.location.type === 'fixed') {
+                if (sourceGroup.api.location.type === 'edge') {
                     /**
-                     * Fixed groups are permanent structural elements — never move the
+                     * Edge groups are permanent structural elements — never move the
                      * group itself. Instead extract the panel and create a new grid group,
-                     * leaving the fixed slot intact (same behaviour as the size >= 2 path).
+                     * leaving the edge slot intact (same behaviour as the size >= 2 path).
                      */
                     const removedPanel: IDockviewPanel | undefined =
                         this.movingLock(() =>

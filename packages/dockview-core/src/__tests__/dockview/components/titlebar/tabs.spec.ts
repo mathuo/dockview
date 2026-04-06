@@ -195,7 +195,7 @@ describe('tabs', () => {
             return fromPartial<DockviewGroupPanel>({
                 activePanel,
                 api: {
-                    location: { type: 'fixed' },
+                    location: { type: 'edge' },
                     isCollapsed: isCollapsedFn,
                     expand: expandMock,
                     collapse: collapseMock,

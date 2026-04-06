@@ -61,7 +61,6 @@
     &::-webkit-scrollbar-thumb {
         background: var(--dv-tabs-container-scrollbar-color);
     }
-
 }
 
 .dv-scrollable {
@@ -81,12 +80,14 @@
     margin: var(--dv-tab-margin);
 
     &.dv-tab--shifting {
-        will-change: transform, margin-left, margin-right, margin-top, margin-bottom;
-        transition: transform var(--dv-transition-duration, 200ms) ease-out,
-                    margin-left var(--dv-transition-duration, 200ms) ease-out,
-                    margin-right var(--dv-transition-duration, 200ms) ease-out,
-                    margin-top var(--dv-transition-duration, 200ms) ease-out,
-                    margin-bottom var(--dv-transition-duration, 200ms) ease-out;
+        will-change:
+            transform, margin-left, margin-right, margin-top, margin-bottom;
+        transition:
+            transform var(--dv-transition-duration, 200ms) ease-out,
+            margin-left var(--dv-transition-duration, 200ms) ease-out,
+            margin-right var(--dv-transition-duration, 200ms) ease-out,
+            margin-top var(--dv-transition-duration, 200ms) ease-out,
+            margin-bottom var(--dv-transition-duration, 200ms) ease-out;
     }
 
     &.dv-tab--dragging {
@@ -97,10 +98,11 @@
         overflow: hidden;
         opacity: 0;
         pointer-events: none;
-        transition: width var(--dv-transition-duration, 200ms) ease-out,
-                    padding var(--dv-transition-duration, 200ms) ease-out,
-                    margin var(--dv-transition-duration, 200ms) ease-out,
-                    opacity var(--dv-transition-duration, 200ms) ease-out;
+        transition:
+            width var(--dv-transition-duration, 200ms) ease-out,
+            padding var(--dv-transition-duration, 200ms) ease-out,
+            margin var(--dv-transition-duration, 200ms) ease-out,
+            opacity var(--dv-transition-duration, 200ms) ease-out;
     }
 
     &.dv-tab--group-collapsed {
@@ -111,17 +113,19 @@
         overflow: hidden;
         opacity: 0;
         pointer-events: none;
-        transition: width var(--dv-transition-duration, 200ms) ease-out,
-                    padding var(--dv-transition-duration, 200ms) ease-out,
-                    margin var(--dv-transition-duration, 200ms) ease-out,
-                    opacity var(--dv-transition-duration, 200ms) ease-out;
+        transition:
+            width var(--dv-transition-duration, 200ms) ease-out,
+            padding var(--dv-transition-duration, 200ms) ease-out,
+            margin var(--dv-transition-duration, 200ms) ease-out,
+            opacity var(--dv-transition-duration, 200ms) ease-out;
     }
 
     &.dv-tab--group-expanding {
-        transition: width var(--dv-transition-duration, 200ms) ease-out,
-                    padding var(--dv-transition-duration, 200ms) ease-out,
-                    margin var(--dv-transition-duration, 200ms) ease-out,
-                    opacity var(--dv-transition-duration, 200ms) ease-out;
+        transition:
+            width var(--dv-transition-duration, 200ms) ease-out,
+            padding var(--dv-transition-duration, 200ms) ease-out,
+            margin var(--dv-transition-duration, 200ms) ease-out,
+            opacity var(--dv-transition-duration, 200ms) ease-out;
     }
 }
 
@@ -166,10 +170,11 @@
         overflow: hidden;
         opacity: 0;
         pointer-events: none;
-        transition: width var(--dv-transition-duration, 200ms) ease-out,
-                    padding var(--dv-transition-duration, 200ms) ease-out,
-                    margin var(--dv-transition-duration, 200ms) ease-out,
-                    opacity var(--dv-transition-duration, 200ms) ease-out;
+        transition:
+            width var(--dv-transition-duration, 200ms) ease-out,
+            padding var(--dv-transition-duration, 200ms) ease-out,
+            margin var(--dv-transition-duration, 200ms) ease-out,
+            opacity var(--dv-transition-duration, 200ms) ease-out;
     }
 
     .dv-tab-group-chip-label--empty {
@@ -226,17 +231,19 @@
             min-height: 0 !important;
             width: auto !important;
             min-width: initial !important;
-            transition: height var(--dv-transition-duration, 200ms) ease-out,
-                        padding var(--dv-transition-duration, 200ms) ease-out,
-                        margin var(--dv-transition-duration, 200ms) ease-out,
-                        opacity var(--dv-transition-duration, 200ms) ease-out;
+            transition:
+                height var(--dv-transition-duration, 200ms) ease-out,
+                padding var(--dv-transition-duration, 200ms) ease-out,
+                margin var(--dv-transition-duration, 200ms) ease-out,
+                opacity var(--dv-transition-duration, 200ms) ease-out;
         }
 
         &.dv-tab--group-expanding {
-            transition: height var(--dv-transition-duration, 200ms) ease-out,
-                        padding var(--dv-transition-duration, 200ms) ease-out,
-                        margin var(--dv-transition-duration, 200ms) ease-out,
-                        opacity var(--dv-transition-duration, 200ms) ease-out;
+            transition:
+                height var(--dv-transition-duration, 200ms) ease-out,
+                padding var(--dv-transition-duration, 200ms) ease-out,
+                margin var(--dv-transition-duration, 200ms) ease-out,
+                opacity var(--dv-transition-duration, 200ms) ease-out;
         }
 
         &.dv-tab--dragging {
@@ -249,10 +256,11 @@
             // wrong. Width should stay at its natural (auto) value.
             width: auto !important;
             min-width: initial !important;
-            transition: height var(--dv-transition-duration, 200ms) ease-out,
-                        padding var(--dv-transition-duration, 200ms) ease-out,
-                        margin var(--dv-transition-duration, 200ms) ease-out,
-                        opacity var(--dv-transition-duration, 200ms) ease-out;
+            transition:
+                height var(--dv-transition-duration, 200ms) ease-out,
+                padding var(--dv-transition-duration, 200ms) ease-out,
+                margin var(--dv-transition-duration, 200ms) ease-out,
+                opacity var(--dv-transition-duration, 200ms) ease-out;
         }
     }
 }

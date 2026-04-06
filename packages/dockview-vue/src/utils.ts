@@ -320,6 +320,13 @@ export class VueTabGroupChipRenderer
         return this._element;
     }
 
+    constructor(component: VueComponent, parent: ComponentInternalInstance) {
+        super(component, parent);
+        this.element.style.height = '';
+        this.element.style.width = '';
+        this.element.style.display = 'inline-flex';
+    }
+
     init(params: { tabGroup: ITabGroup; api: DockviewApi }): void {
         this._renderDisposable?.dispose();
         this._renderDisposable = mountVueComponent(

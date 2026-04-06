@@ -68,12 +68,15 @@ export function buildTabContextMenuItems(
         label: 'Add to new group',
         onClick: () => {
             const label = window.prompt('Group name:') || '';
-            const color =
-                TAB_GROUP_COLORS[
-                    Math.floor(Math.random() * TAB_GROUP_COLORS.length)
-                ] as TabGroupColor;
+            const color = TAB_GROUP_COLORS[
+                Math.floor(Math.random() * TAB_GROUP_COLORS.length)
+            ] as TabGroupColor;
             const newGroup = api.createTabGroup({ groupId, label, color });
-            api.addPanelToTabGroup({ groupId, tabGroupId: newGroup.id, panelId });
+            api.addPanelToTabGroup({
+                groupId,
+                tabGroupId: newGroup.id,
+                panelId,
+            });
         },
     });
 

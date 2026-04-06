@@ -7,12 +7,12 @@ describe('DockviewGroupPanelApiImpl', () => {
     describe('collapse / expand / isCollapsed', () => {
         function makeAccessor() {
             return fromPartial<DockviewComponent>({
-                setFixedGroupCollapsed: jest.fn(),
-                isFixedGroupCollapsed: jest.fn().mockReturnValue(false),
+                setEdgeGroupCollapsed: jest.fn(),
+                isEdgeGroupCollapsed: jest.fn().mockReturnValue(false),
             });
         }
 
-        test('collapse() calls accessor.setFixedGroupCollapsed(group, true)', () => {
+        test('collapse() calls accessor.setEdgeGroupCollapsed(group, true)', () => {
             const accessor = makeAccessor();
             const cut = new DockviewGroupPanelApiImpl(
                 'test-id',
@@ -23,14 +23,14 @@ describe('DockviewGroupPanelApiImpl', () => {
 
             cut.collapse();
 
-            expect(accessor.setFixedGroupCollapsed).toHaveBeenCalledWith(
+            expect(accessor.setEdgeGroupCollapsed).toHaveBeenCalledWith(
                 group,
                 true
             );
-            expect(accessor.setFixedGroupCollapsed).toHaveBeenCalledTimes(1);
+            expect(accessor.setEdgeGroupCollapsed).toHaveBeenCalledTimes(1);
         });
 
-        test('expand() calls accessor.setFixedGroupCollapsed(group, false)', () => {
+        test('expand() calls accessor.setEdgeGroupCollapsed(group, false)', () => {
             const accessor = makeAccessor();
             const cut = new DockviewGroupPanelApiImpl(
                 'test-id',
@@ -41,16 +41,16 @@ describe('DockviewGroupPanelApiImpl', () => {
 
             cut.expand();
 
-            expect(accessor.setFixedGroupCollapsed).toHaveBeenCalledWith(
+            expect(accessor.setEdgeGroupCollapsed).toHaveBeenCalledWith(
                 group,
                 false
             );
-            expect(accessor.setFixedGroupCollapsed).toHaveBeenCalledTimes(1);
+            expect(accessor.setEdgeGroupCollapsed).toHaveBeenCalledTimes(1);
         });
 
-        test('isCollapsed() delegates to accessor.isFixedGroupCollapsed and returns its value', () => {
+        test('isCollapsed() delegates to accessor.isEdgeGroupCollapsed and returns its value', () => {
             const accessor = makeAccessor();
-            (accessor.isFixedGroupCollapsed as jest.Mock).mockReturnValue(true);
+            (accessor.isEdgeGroupCollapsed as jest.Mock).mockReturnValue(true);
             const cut = new DockviewGroupPanelApiImpl(
                 'test-id',
                 accessor as unknown as DockviewComponent
@@ -59,14 +59,12 @@ describe('DockviewGroupPanelApiImpl', () => {
             cut.initialize(group);
 
             expect(cut.isCollapsed()).toBe(true);
-            expect(accessor.isFixedGroupCollapsed).toHaveBeenCalledWith(group);
+            expect(accessor.isEdgeGroupCollapsed).toHaveBeenCalledWith(group);
         });
 
         test('isCollapsed() returns false when accessor returns false', () => {
             const accessor = makeAccessor();
-            (accessor.isFixedGroupCollapsed as jest.Mock).mockReturnValue(
-                false
-            );
+            (accessor.isEdgeGroupCollapsed as jest.Mock).mockReturnValue(false);
             const cut = new DockviewGroupPanelApiImpl(
                 'test-id',
                 accessor as unknown as DockviewComponent
@@ -86,7 +84,7 @@ describe('DockviewGroupPanelApiImpl', () => {
             // _group is undefined — no initialize() call
 
             expect(() => cut.collapse()).not.toThrow();
-            expect(accessor.setFixedGroupCollapsed).not.toHaveBeenCalled();
+            expect(accessor.setEdgeGroupCollapsed).not.toHaveBeenCalled();
         });
 
         test('expand() is a no-op (does not throw) when group is not initialized', () => {
@@ -97,7 +95,7 @@ describe('DockviewGroupPanelApiImpl', () => {
             );
 
             expect(() => cut.expand()).not.toThrow();
-            expect(accessor.setFixedGroupCollapsed).not.toHaveBeenCalled();
+            expect(accessor.setEdgeGroupCollapsed).not.toHaveBeenCalled();
         });
 
         test('isCollapsed() returns false when group is not initialized', () => {
@@ -109,15 +107,15 @@ describe('DockviewGroupPanelApiImpl', () => {
 
             expect(cut.isCollapsed()).toBe(false);
             // accessor should NOT have been called since there is no group
-            expect(accessor.isFixedGroupCollapsed).not.toHaveBeenCalled();
+            expect(accessor.isEdgeGroupCollapsed).not.toHaveBeenCalled();
         });
     });
 
     describe('onDidCollapsedChange', () => {
         function makeAccessor() {
             return fromPartial<DockviewComponent>({
-                setFixedGroupCollapsed: jest.fn(),
-                isFixedGroupCollapsed: jest.fn().mockReturnValue(false),
+                setEdgeGroupCollapsed: jest.fn(),
+                isEdgeGroupCollapsed: jest.fn().mockReturnValue(false),
             });
         }
 
@@ -133,7 +131,7 @@ describe('DockviewGroupPanelApiImpl', () => {
             const events: { isCollapsed: boolean }[] = [];
             cut.onDidCollapsedChange((e) => events.push(e));
 
-            // Simulate the component firing the event after setFixedGroupCollapsed
+            // Simulate the component firing the event after setEdgeGroupCollapsed
             cut._onDidCollapsedChange.fire({ isCollapsed: true });
 
             expect(events).toHaveLength(1);

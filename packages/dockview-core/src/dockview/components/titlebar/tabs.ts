@@ -437,6 +437,7 @@ export class Tabs extends CompositeDisposable {
                 true
             ),
             Disposable.from(() => {
+                this._voidContainerListeners?.dispose();
                 this.resetDragAnimation();
                 this._disposeAllChips();
 
@@ -570,7 +571,7 @@ export class Tabs extends CompositeDisposable {
                 if (event.defaultPrevented) {
                     return;
                 }
-                if (this.group.api.location.type !== 'fixed') {
+                if (this.group.api.location.type !== 'edge') {
                     return;
                 }
                 if (this.group.activePanel === panel) {
@@ -624,8 +625,8 @@ export class Tabs extends CompositeDisposable {
 
                 switch (event.button) {
                     case 0:
-                        if (this.group.api.location.type === 'fixed') {
-                            // All tab interaction for fixed groups is handled by
+                        if (this.group.api.location.type === 'edge') {
+                            // All tab interaction for edge groups is handled by
                             // onTabClick to avoid race conditions with active panel state
                         } else {
                             if (this.group.activePanel !== panel) {

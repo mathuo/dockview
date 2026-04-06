@@ -187,12 +187,6 @@ export class ContextMenuController {
                 menuEl.appendChild(buildSeparator());
             } else if (item === 'colorPicker') {
                 menuEl.appendChild(buildColorPicker(tabGroup, close));
-            } else if (
-                item === 'close' ||
-                item === 'closeOthers' ||
-                item === 'closeAll'
-            ) {
-                // built-in tab shortcuts not applicable for chip menus
             } else if (isItemConfig(item) && item.element) {
                 menuEl.appendChild(item.element);
             } else if (isItemConfig(item) && item.label) {

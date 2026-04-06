@@ -946,7 +946,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     /**
-     * Get the group panel API for a fixed side group at the given position.
+     * Get the group panel API for an edge group at the given position.
      * Returns `undefined` if no edge group is configured at that position.
      */
     getEdgeGroup(
@@ -956,14 +956,14 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     /**
-     * Set the visibility of a fixed side group.
+     * Set the visibility of an edge group.
      */
     setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void {
         this.component.setEdgeGroupVisible(position, visible);
     }
 
     /**
-     * Check whether a fixed side group is currently visible.
+     * Check whether an edge group is currently visible.
      */
     isEdgeGroupVisible(position: EdgeGroupPosition): boolean {
         return this.component.isEdgeGroupVisible(position);

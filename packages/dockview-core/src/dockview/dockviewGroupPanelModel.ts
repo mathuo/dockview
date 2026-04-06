@@ -214,7 +214,7 @@ export type DockviewGroupLocation =
     | { type: 'grid' }
     | { type: 'floating' }
     | { type: 'popout'; getWindow: () => Window; popoutUrl?: string }
-    | { type: 'fixed'; position: EdgeGroupPosition };
+    | { type: 'edge'; position: EdgeGroupPosition };
 
 export class DockviewGroupPanelModel
     extends CompositeDisposable
@@ -441,7 +441,7 @@ export class DockviewGroupPanelModel
 
         toggleClass(this.container, 'dv-groupview-floating', false);
         toggleClass(this.container, 'dv-groupview-popout', false);
-        toggleClass(this.container, 'dv-groupview-fixed', false);
+        toggleClass(this.container, 'dv-groupview-edge', false);
 
         switch (value.type) {
             case 'grid':
@@ -470,10 +470,10 @@ export class DockviewGroupPanelModel
                 toggleClass(this.container, 'dv-groupview-popout', true);
 
                 break;
-            case 'fixed':
+            case 'edge':
                 this.contentContainer.dropTarget.setTargetZones(['center']);
 
-                toggleClass(this.container, 'dv-groupview-fixed', true);
+                toggleClass(this.container, 'dv-groupview-edge', true);
 
                 break;
         }
@@ -640,7 +640,9 @@ export class DockviewGroupPanelModel
         this._pendingTabGroupUpdate = true;
         queueMicrotask(() => {
             this._pendingTabGroupUpdate = false;
-            this.tabsContainer.updateTabGroups();
+            if (!this.isDisposed) {
+                this.tabsContainer.updateTabGroups();
+            }
         });
     }
 
@@ -949,12 +951,19 @@ export class DockviewGroupPanelModel
 
             this._onDidDestroyTabGroup.fire({ tabGroup });
 
-            // Remove the disposable entry — the actual disposal happens
-            // via tabGroup.dispose() → super.dispose() which clears all
-            // emitter listeners. We must not call dispose() here because
-            // this method runs inside the onDidDestroy fire loop, and
-            // splicing listeners mid-iteration would skip subsequent ones.
+            // Dispose the external listeners (onDidChange, onDidCollapseChange)
+            // we registered on this group. We cannot dispose synchronously
+            // here because this method runs inside the onDidDestroy fire
+            // loop — disposing the CompositeDisposable that holds the
+            // onDidDestroy subscription would splice listeners mid-iteration.
+            // Schedule cleanup on the next microtask instead.
+            const tabGroupDisposable = this._tabGroupDisposables.get(
+                tabGroup.id
+            );
             this._tabGroupDisposables.delete(tabGroup.id);
+            if (tabGroupDisposable) {
+                queueMicrotask(() => tabGroupDisposable.dispose());
+            }
         }
     }
 
@@ -996,6 +1005,17 @@ export class DockviewGroupPanelModel
 
     /** Restore tab groups from serialized data (used by fromJSON) */
     restoreTabGroups(serializedGroups: SerializedTabGroup[]): void {
+        // Bump counter past any restored numeric suffixes to avoid ID collisions
+        for (const data of serializedGroups) {
+            const match = data.id.match(/-(\d+)$/);
+            if (match) {
+                const num = parseInt(match[1], 10) + 1;
+                if (num > this._tabGroupIdCounter) {
+                    this._tabGroupIdCounter = num;
+                }
+            }
+        }
+
         for (const data of serializedGroups) {
             const tabGroup = this.createTabGroup({
                 id: data.id,

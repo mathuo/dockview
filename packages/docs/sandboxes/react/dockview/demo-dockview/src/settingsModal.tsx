@@ -145,7 +145,9 @@ export const SettingsModal = (props: {
                         <button
                             onClick={props.onToggleDebug}
                             style={
-                                props.debug ? { backgroundColor: '#4864dc' } : {}
+                                props.debug
+                                    ? { backgroundColor: '#4864dc' }
+                                    : {}
                             }
                         >
                             <span className="material-symbols-outlined">

@@ -8761,7 +8761,7 @@ describe('dockviewComponent', () => {
             });
             const api = dv.addEdgeGroup('left', { id: 'left-group' });
             expect(api).toBeDefined();
-            expect(api.location.type).toBe('fixed');
+            expect(api.location.type).toBe('edge');
             dv.dispose();
         });
 
@@ -8779,22 +8779,21 @@ describe('dockviewComponent', () => {
             dv.dispose();
         });
 
-        test('fixed group has location.type === fixed with correct position', () => {
+        test('edge group has location.type === edge with correct position', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left', 'top']);
 
             const leftApi = dv.getEdgeGroup('left')!;
-            expect(leftApi.location.type).toBe('fixed');
+            expect(leftApi.location.type).toBe('edge');
             expect(
-                (leftApi.location as { type: 'fixed'; position: string })
+                (leftApi.location as { type: 'edge'; position: string })
                     .position
             ).toBe('left');
 
             const topApi = dv.getEdgeGroup('top')!;
-            expect(topApi.location.type).toBe('fixed');
+            expect(topApi.location.type).toBe('edge');
             expect(
-                (topApi.location as { type: 'fixed'; position: string })
-                    .position
+                (topApi.location as { type: 'edge'; position: string }).position
             ).toBe('top');
 
             dv.dispose();
@@ -8858,7 +8857,7 @@ describe('dockviewComponent', () => {
             dv.dispose();
         });
 
-        test('setFixedGroupCollapsed / isFixedGroupCollapsed work end-to-end via component', () => {
+        test('setEdgeGroupCollapsed / isEdgeGroupCollapsed work end-to-end via component', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['right']);
 

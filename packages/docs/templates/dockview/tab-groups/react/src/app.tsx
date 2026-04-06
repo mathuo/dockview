@@ -160,7 +160,9 @@ export default () => {
                 tabAnimation={'smooth'}
                 disableFloatingGroups={true}
                 getTabContextMenuItems={getTabContextMenuItems}
-                getTabGroupChipContextMenuItems={getTabGroupChipContextMenuItems}
+                getTabGroupChipContextMenuItems={
+                    getTabGroupChipContextMenuItems
+                }
             />
         </div>
     );

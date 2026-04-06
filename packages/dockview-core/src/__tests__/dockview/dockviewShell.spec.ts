@@ -79,7 +79,7 @@ describe('EdgeGroupView', () => {
                 'horizontal'
             );
             expect(view.isCollapsed).toBe(true);
-            expect(group.element.classList.contains('dv-fixed-collapsed')).toBe(
+            expect(group.element.classList.contains('dv-edge-collapsed')).toBe(
                 true
             );
         });
@@ -138,23 +138,23 @@ describe('EdgeGroupView', () => {
     });
 
     describe('setCollapsed', () => {
-        test('setCollapsed(true): isCollapsed becomes true and adds dv-fixed-collapsed class', () => {
+        test('setCollapsed(true): isCollapsed becomes true and adds dv-edge-collapsed class', () => {
             const group = makeGroup();
             const view = new EdgeGroupView({ id: 'test' }, group, 'horizontal');
             view.setCollapsed(true);
             expect(view.isCollapsed).toBe(true);
-            expect(group.element.classList.contains('dv-fixed-collapsed')).toBe(
+            expect(group.element.classList.contains('dv-edge-collapsed')).toBe(
                 true
             );
         });
 
-        test('setCollapsed(false): isCollapsed becomes false and removes dv-fixed-collapsed class', () => {
+        test('setCollapsed(false): isCollapsed becomes false and removes dv-edge-collapsed class', () => {
             const group = makeGroup();
             const view = new EdgeGroupView({ id: 'test' }, group, 'horizontal');
             view.setCollapsed(true);
             view.setCollapsed(false);
             expect(view.isCollapsed).toBe(false);
-            expect(group.element.classList.contains('dv-fixed-collapsed')).toBe(
+            expect(group.element.classList.contains('dv-edge-collapsed')).toBe(
                 false
             );
         });
