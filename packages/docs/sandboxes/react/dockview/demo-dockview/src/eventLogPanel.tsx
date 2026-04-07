@@ -6,7 +6,7 @@ type LogEntry = {
     id: number;
     text: string;
     timestamp: Date;
-    category: 'panel' | 'group' | 'layout' | 'tabGroup';
+    category: 'panel' | 'group' | 'layout' | 'tab grp';
 };
 
 let entryId = 0;
@@ -19,7 +19,7 @@ const categoryColor = (cat: LogEntry['category']) => {
             return '#a78bfa';
         case 'layout':
             return '#34d399';
-        case 'tabGroup':
+        case 'tab grp':
             return '#f472b6';
     }
 };
@@ -69,25 +69,25 @@ export const EventLogPanel: React.FC<{ api: DockviewApi }> = ({ api }) => {
             ),
             api.onDidLayoutChange(() => add('Layout changed', 'layout')),
             api.onDidCreateTabGroup((e) =>
-                add(`Tab group created: ${e.tabGroup.id}`, 'tabGroup')
+                add(`Tab group created: ${e.tabGroup.id}`, 'tab grp')
             ),
             api.onDidDestroyTabGroup((e) =>
-                add(`Tab group destroyed: ${e.tabGroup.id}`, 'tabGroup')
+                add(`Tab group destroyed: ${e.tabGroup.id}`, 'tab grp')
             ),
             api.onDidAddPanelToTabGroup((e) =>
                 add(
                     `Panel ${e.panelId} → tab group ${e.tabGroup.id}`,
-                    'tabGroup'
+                    'tab grp'
                 )
             ),
             api.onDidRemovePanelFromTabGroup((e) =>
                 add(
                     `Panel ${e.panelId} left tab group ${e.tabGroup.id}`,
-                    'tabGroup'
+                    'tab grp'
                 )
             ),
             api.onDidTabGroupChange((e) =>
-                add(`Tab group changed: ${e.tabGroup.id}`, 'tabGroup')
+                add(`Tab group changed: ${e.tabGroup.id}`, 'tab grp')
             ),
         ];
 
@@ -127,7 +127,7 @@ export const EventLogPanel: React.FC<{ api: DockviewApi }> = ({ api }) => {
                         Events
                     </span>
                     <div style={{ display: 'flex', gap: 8 }}>
-                        {(['panel', 'group', 'layout', 'tabGroup'] as const).map((cat) => (
+                        {(['panel', 'group', 'layout', 'tab grp'] as const).map((cat) => (
                             <span
                                 key={cat}
                                 style={{
@@ -195,7 +195,7 @@ export const EventLogPanel: React.FC<{ api: DockviewApi }> = ({ api }) => {
                             style={{
                                 color: categoryColor(entry.category),
                                 flexShrink: 0,
-                                width: 44,
+                                width: 48,
                                 fontSize: 10,
                             }}
                         >
