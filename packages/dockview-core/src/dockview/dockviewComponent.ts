@@ -50,6 +50,7 @@ import {
 import {
     DockviewWillShowOverlayLocationEvent,
     DockviewTabGroupChangeEvent,
+    DockviewTabGroupCollapsedChangeEvent,
     DockviewTabGroupPanelChangeEvent,
 } from './events';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
@@ -252,6 +253,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidAddPanelToTabGroup: Event<DockviewTabGroupPanelChangeEvent>;
     readonly onDidRemovePanelFromTabGroup: Event<DockviewTabGroupPanelChangeEvent>;
     readonly onDidTabGroupChange: Event<DockviewTabGroupChangeEvent>;
+    readonly onDidTabGroupCollapsedChange: Event<DockviewTabGroupCollapsedChangeEvent>;
     readonly options: DockviewComponentOptions;
     updateOptions(options: DockviewOptions): void;
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void;
@@ -394,6 +396,11 @@ export class DockviewComponent
     private readonly _onDidTabGroupChange =
         new Emitter<DockviewTabGroupChangeEvent>();
     readonly onDidTabGroupChange = this._onDidTabGroupChange.event;
+
+    private readonly _onDidTabGroupCollapsedChange =
+        new Emitter<DockviewTabGroupCollapsedChangeEvent>();
+    readonly onDidTabGroupCollapsedChange =
+        this._onDidTabGroupCollapsedChange.event;
 
     private readonly _onDidMaximizedGroupChange =
         new Emitter<DockviewMaximizedGroupChanged>();
@@ -628,6 +635,7 @@ export class DockviewComponent
             this._onDidAddPanelToTabGroup,
             this._onDidRemovePanelFromTabGroup,
             this._onDidTabGroupChange,
+            this._onDidTabGroupCollapsedChange,
             this.onDidViewVisibilityChangeMicroTaskQueue(() => {
                 this.updateWatermark();
             }),
@@ -3177,6 +3185,9 @@ export class DockviewComponent
                 }),
                 view.model.onDidTabGroupChange((e) => {
                     this._onDidTabGroupChange.fire(e);
+                }),
+                view.model.onDidTabGroupCollapsedChange((e) => {
+                    this._onDidTabGroupCollapsedChange.fire(e);
                 }),
                 Event.any(
                     view.model.onDidPanelTitleChange,

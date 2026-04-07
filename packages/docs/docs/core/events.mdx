@@ -145,6 +145,11 @@ api.onDidRemovePanelFromTabGroup((event: DockviewTabGroupPanelChangeEvent) => { 
 
 // Fires when a tab group's properties change (label, color)
 api.onDidTabGroupChange((event: DockviewTabGroupChangeEvent) => { });
+
+// Fires when a tab group is collapsed or expanded
+api.onDidTabGroupCollapsedChange((event: DockviewTabGroupCollapsedChangeEvent) => {
+    console.log(event.tabGroup.id, event.isCollapsed ? 'collapsed' : 'expanded');
+});
 ```
 
 > See [Tab Groups](/docs/core/panels/tabs#tab-groups) for the full API.

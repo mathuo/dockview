@@ -29,6 +29,11 @@ export interface DockviewTabGroupPanelChangeEvent {
     readonly panelId: string;
 }
 
+export interface DockviewTabGroupCollapsedChangeEvent {
+    readonly tabGroup: ITabGroup;
+    readonly isCollapsed: boolean;
+}
+
 export class DockviewWillShowOverlayLocationEvent implements IDockviewEvent {
     get kind(): DockviewGroupDropLocation {
         return this.options.kind;

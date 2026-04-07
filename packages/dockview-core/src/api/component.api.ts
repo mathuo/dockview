@@ -55,6 +55,7 @@ import {
 import {
     DockviewWillShowOverlayLocationEvent,
     DockviewTabGroupChangeEvent,
+    DockviewTabGroupCollapsedChangeEvent,
     DockviewTabGroupPanelChangeEvent,
 } from '../dockview/events';
 import { ITabGroup, TabGroupColor } from '../dockview/tabGroup';
@@ -797,6 +798,13 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     get onDidTabGroupChange(): Event<DockviewTabGroupChangeEvent> {
         return this.component.onDidTabGroupChange;
+    }
+
+    /**
+     * Invoked when a tab group is collapsed or expanded.
+     */
+    get onDidTabGroupCollapsedChange(): Event<DockviewTabGroupCollapsedChangeEvent> {
+        return this.component.onDidTabGroupCollapsedChange;
     }
 
     /**

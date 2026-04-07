@@ -333,6 +333,13 @@ export class DockviewGroupPanelModel
     }>();
     readonly onDidTabGroupChange = this._onDidTabGroupChange.event;
 
+    private readonly _onDidTabGroupCollapsedChange = new Emitter<{
+        tabGroup: ITabGroup;
+        isCollapsed: boolean;
+    }>();
+    readonly onDidTabGroupCollapsedChange =
+        this._onDidTabGroupCollapsedChange.event;
+
     private readonly _api: DockviewApi;
 
     get tabGroups(): readonly ITabGroup[] {
@@ -615,6 +622,7 @@ export class DockviewGroupPanelModel
             this._onDidAddPanelToTabGroup,
             this._onDidRemovePanelFromTabGroup,
             this._onDidTabGroupChange,
+            this._onDidTabGroupCollapsedChange,
             this._onDidCreateTabGroup.event(() => {
                 this._scheduleTabGroupUpdate();
             }),
@@ -628,6 +636,9 @@ export class DockviewGroupPanelModel
                 this._scheduleTabGroupUpdate();
             }),
             this._onDidTabGroupChange.event(() => {
+                this._scheduleTabGroupUpdate();
+            }),
+            this._onDidTabGroupCollapsedChange.event(() => {
                 this._scheduleTabGroupUpdate();
             })
         );
@@ -665,10 +676,14 @@ export class DockviewGroupPanelModel
                 tabGroup.onDidChange(() => {
                     this._onDidTabGroupChange.fire({ tabGroup });
                 }),
-                tabGroup.onDidCollapseChange((collapsed) => {
-                    if (collapsed) {
+                tabGroup.onDidCollapseChange((isCollapsed) => {
+                    if (isCollapsed) {
                         this._handleGroupCollapse(tabGroup);
                     }
+                    this._onDidTabGroupCollapsedChange.fire({
+                        tabGroup,
+                        isCollapsed,
+                    });
                 }),
                 tabGroup.onDidDestroy(() => {
                     this._removeTabGroupInternal(tabGroup);

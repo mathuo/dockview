@@ -56,6 +56,7 @@ export {
 export {
     DockviewWillShowOverlayLocationEvent,
     DockviewTabGroupChangeEvent,
+    DockviewTabGroupCollapsedChangeEvent,
     DockviewTabGroupPanelChangeEvent,
 } from './dockview/events';
 export {

@@ -89,6 +89,12 @@ export const EventLogPanel: React.FC<{ api: DockviewApi }> = ({ api }) => {
             api.onDidTabGroupChange((e) =>
                 add(`Tab group changed: ${e.tabGroup.id}`, 'tab grp')
             ),
+            api.onDidTabGroupCollapsedChange((e) =>
+                add(
+                    `Tab group ${e.tabGroup.id} ${e.isCollapsed ? 'collapsed' : 'expanded'}`,
+                    'tab grp'
+                )
+            ),
         ];
 
         return () => disposables.forEach((d) => d.dispose());
