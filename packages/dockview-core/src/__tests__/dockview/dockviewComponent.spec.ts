@@ -8802,7 +8802,6 @@ describe('dockviewComponent', () => {
             dockview.fromJSON(state);
 
             const restoredGroup = dockview.api.panels[0].group;
-            const model = restoredGroup.model;
 
             const created: string[] = [];
             const destroyed: string[] = [];
@@ -8811,23 +8810,27 @@ describe('dockviewComponent', () => {
             const changes: string[] = [];
 
             const disposable = new CompositeDisposable(
-                model.onDidCreateTabGroup((e) => created.push(e.tabGroup.id)),
-                model.onDidDestroyTabGroup((e) =>
+                dockview.api.onDidCreateTabGroup((e) =>
+                    created.push(e.tabGroup.id)
+                ),
+                dockview.api.onDidDestroyTabGroup((e) =>
                     destroyed.push(e.tabGroup.id)
                 ),
-                model.onDidAddPanelToTabGroup((e) =>
+                dockview.api.onDidAddPanelToTabGroup((e) =>
                     panelsAdded.push({
                         tgId: e.tabGroup.id,
                         panelId: e.panelId,
                     })
                 ),
-                model.onDidRemovePanelFromTabGroup((e) =>
+                dockview.api.onDidRemovePanelFromTabGroup((e) =>
                     panelsRemoved.push({
                         tgId: e.tabGroup.id,
                         panelId: e.panelId,
                     })
                 ),
-                model.onDidTabGroupChange((e) => changes.push(e.tabGroup.id))
+                dockview.api.onDidTabGroupChange((e) =>
+                    changes.push(e.tabGroup.id)
+                )
             );
 
             // Create a new tab group and verify events fire
@@ -8892,7 +8895,6 @@ describe('dockviewComponent', () => {
             });
 
             const groupId = panel1.group.id;
-            const model = panel1.group.model;
 
             const created: string[] = [];
             const destroyed: string[] = [];
@@ -8901,23 +8903,27 @@ describe('dockviewComponent', () => {
             const changes: string[] = [];
 
             const disposable = new CompositeDisposable(
-                model.onDidCreateTabGroup((e) => created.push(e.tabGroup.id)),
-                model.onDidDestroyTabGroup((e) =>
+                dockview.api.onDidCreateTabGroup((e) =>
+                    created.push(e.tabGroup.id)
+                ),
+                dockview.api.onDidDestroyTabGroup((e) =>
                     destroyed.push(e.tabGroup.id)
                 ),
-                model.onDidAddPanelToTabGroup((e) =>
+                dockview.api.onDidAddPanelToTabGroup((e) =>
                     panelsAdded.push({
                         tgId: e.tabGroup.id,
                         panelId: e.panelId,
                     })
                 ),
-                model.onDidRemovePanelFromTabGroup((e) =>
+                dockview.api.onDidRemovePanelFromTabGroup((e) =>
                     panelsRemoved.push({
                         tgId: e.tabGroup.id,
                         panelId: e.panelId,
                     })
                 ),
-                model.onDidTabGroupChange((e) => changes.push(e.tabGroup.id))
+                dockview.api.onDidTabGroupChange((e) =>
+                    changes.push(e.tabGroup.id)
+                )
             );
 
             // 1. Create

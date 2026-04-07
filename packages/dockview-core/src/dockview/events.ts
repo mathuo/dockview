@@ -20,11 +20,11 @@ export interface DockviewWillShowOverlayLocationEventOptions {
     getData: () => PanelTransfer | undefined;
 }
 
-export interface TabGroupChangeEvent {
+export interface DockviewTabGroupChangeEvent {
     readonly tabGroup: ITabGroup;
 }
 
-export interface TabGroupPanelChangeEvent {
+export interface DockviewTabGroupPanelChangeEvent {
     readonly tabGroup: ITabGroup;
     readonly panelId: string;
 }

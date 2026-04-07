@@ -47,7 +47,11 @@ import {
     DockviewDidDropEvent,
     DockviewWillDropEvent,
 } from './dockviewGroupPanelModel';
-import { DockviewWillShowOverlayLocationEvent } from './events';
+import {
+    DockviewWillShowOverlayLocationEvent,
+    DockviewTabGroupChangeEvent,
+    DockviewTabGroupPanelChangeEvent,
+} from './events';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
@@ -243,6 +247,11 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidPopoutGroupSizeChange: Event<PopoutGroupChangeSizeEvent>;
     readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent>;
     readonly onDidOpenPopoutWindowFail: Event<void>;
+    readonly onDidCreateTabGroup: Event<DockviewTabGroupChangeEvent>;
+    readonly onDidDestroyTabGroup: Event<DockviewTabGroupChangeEvent>;
+    readonly onDidAddPanelToTabGroup: Event<DockviewTabGroupPanelChangeEvent>;
+    readonly onDidRemovePanelFromTabGroup: Event<DockviewTabGroupPanelChangeEvent>;
+    readonly onDidTabGroupChange: Event<DockviewTabGroupChangeEvent>;
     readonly options: DockviewComponentOptions;
     updateOptions(options: DockviewOptions): void;
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void;
@@ -364,6 +373,27 @@ export class DockviewComponent
 
     private readonly _onDidMovePanel = new Emitter<MovePanelEvent>();
     readonly onDidMovePanel = this._onDidMovePanel.event;
+
+    private readonly _onDidCreateTabGroup =
+        new Emitter<DockviewTabGroupChangeEvent>();
+    readonly onDidCreateTabGroup = this._onDidCreateTabGroup.event;
+
+    private readonly _onDidDestroyTabGroup =
+        new Emitter<DockviewTabGroupChangeEvent>();
+    readonly onDidDestroyTabGroup = this._onDidDestroyTabGroup.event;
+
+    private readonly _onDidAddPanelToTabGroup =
+        new Emitter<DockviewTabGroupPanelChangeEvent>();
+    readonly onDidAddPanelToTabGroup = this._onDidAddPanelToTabGroup.event;
+
+    private readonly _onDidRemovePanelFromTabGroup =
+        new Emitter<DockviewTabGroupPanelChangeEvent>();
+    readonly onDidRemovePanelFromTabGroup =
+        this._onDidRemovePanelFromTabGroup.event;
+
+    private readonly _onDidTabGroupChange =
+        new Emitter<DockviewTabGroupChangeEvent>();
+    readonly onDidTabGroupChange = this._onDidTabGroupChange.event;
 
     private readonly _onDidMaximizedGroupChange =
         new Emitter<DockviewMaximizedGroupChanged>();
@@ -593,6 +623,11 @@ export class DockviewComponent
             this._onDidPopoutGroupSizeChange,
             this._onDidPopoutGroupPositionChange,
             this._onDidOpenPopoutWindowFail,
+            this._onDidCreateTabGroup,
+            this._onDidDestroyTabGroup,
+            this._onDidAddPanelToTabGroup,
+            this._onDidRemovePanelFromTabGroup,
+            this._onDidTabGroupChange,
             this.onDidViewVisibilityChangeMicroTaskQueue(() => {
                 this.updateWatermark();
             }),
@@ -3127,6 +3162,21 @@ export class DockviewComponent
                     if (this._onDidActivePanelChange.value !== event.panel) {
                         this._onDidActivePanelChange.fire(event.panel);
                     }
+                }),
+                view.model.onDidCreateTabGroup((e) => {
+                    this._onDidCreateTabGroup.fire(e);
+                }),
+                view.model.onDidDestroyTabGroup((e) => {
+                    this._onDidDestroyTabGroup.fire(e);
+                }),
+                view.model.onDidAddPanelToTabGroup((e) => {
+                    this._onDidAddPanelToTabGroup.fire(e);
+                }),
+                view.model.onDidRemovePanelFromTabGroup((e) => {
+                    this._onDidRemovePanelFromTabGroup.fire(e);
+                }),
+                view.model.onDidTabGroupChange((e) => {
+                    this._onDidTabGroupChange.fire(e);
                 }),
                 Event.any(
                     view.model.onDidPanelTitleChange,

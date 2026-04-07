@@ -54,8 +54,8 @@ import {
 } from '../dockview/dockviewGroupPanelModel';
 import {
     DockviewWillShowOverlayLocationEvent,
-    TabGroupChangeEvent,
-    TabGroupPanelChangeEvent,
+    DockviewTabGroupChangeEvent,
+    DockviewTabGroupPanelChangeEvent,
 } from '../dockview/events';
 import { ITabGroup, TabGroupColor } from '../dockview/tabGroup';
 import {
@@ -758,6 +758,41 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     get onDidOpenPopoutWindowFail(): Event<void> {
         return this.component.onDidOpenPopoutWindowFail;
+    }
+
+    /**
+     * Invoked when a tab group is created in any group.
+     */
+    get onDidCreateTabGroup(): Event<DockviewTabGroupChangeEvent> {
+        return this.component.onDidCreateTabGroup;
+    }
+
+    /**
+     * Invoked when a tab group is destroyed in any group.
+     */
+    get onDidDestroyTabGroup(): Event<DockviewTabGroupChangeEvent> {
+        return this.component.onDidDestroyTabGroup;
+    }
+
+    /**
+     * Invoked when a panel is added to a tab group.
+     */
+    get onDidAddPanelToTabGroup(): Event<DockviewTabGroupPanelChangeEvent> {
+        return this.component.onDidAddPanelToTabGroup;
+    }
+
+    /**
+     * Invoked when a panel is removed from a tab group.
+     */
+    get onDidRemovePanelFromTabGroup(): Event<DockviewTabGroupPanelChangeEvent> {
+        return this.component.onDidRemovePanelFromTabGroup;
+    }
+
+    /**
+     * Invoked when a tab group's properties (label, color) change.
+     */
+    get onDidTabGroupChange(): Event<DockviewTabGroupChangeEvent> {
+        return this.component.onDidTabGroupChange;
     }
 
     /**

@@ -55,8 +55,8 @@ export {
 } from './dockview/dockviewGroupPanelModel';
 export {
     DockviewWillShowOverlayLocationEvent,
-    TabGroupChangeEvent,
-    TabGroupPanelChangeEvent,
+    DockviewTabGroupChangeEvent,
+    DockviewTabGroupPanelChangeEvent,
 } from './dockview/events';
 export {
     TabDragEvent,
