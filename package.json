@@ -83,7 +83,7 @@
     "tslib": "^2.6.2",
     "typedoc": "^0.25.6",
     "typescript": "^5.3.3",
-    "vite": "^5.1.5",
+    "vite": "^6.4.2",
     "vue": "^3.4.21",
     "vue-sfc-loader": "^0.1.0",
     "vue-tsc": "^2.0.5",
