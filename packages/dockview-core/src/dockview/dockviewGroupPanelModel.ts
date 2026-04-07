@@ -905,7 +905,7 @@ export class DockviewGroupPanelModel
             if (existingPanel) {
                 const existingGlobalIndex = this._panels.indexOf(existingPanel);
                 // Offset based on relative position within group
-                return existingGlobalIndex + (localIndex - i);
+                return Math.max(0, existingGlobalIndex + (localIndex - i));
             }
         }
 

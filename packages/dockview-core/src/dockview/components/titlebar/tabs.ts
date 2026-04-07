@@ -60,6 +60,7 @@ export class Tabs extends CompositeDisposable {
     private _showTabsOverflowControl = false;
     private _direction: DockviewHeaderDirection = 'horizontal';
     private _animState: TabAnimationState | null = null;
+    private readonly _pendingMarginCleanups = new Map<HTMLElement, () => void>();
     private _pendingCollapse = false;
     private _voidContainer: HTMLElement | null = null;
     private _voidContainerListeners: IDisposable | null = null;
@@ -1393,6 +1394,13 @@ export class Tabs extends CompositeDisposable {
 
         const clearMargin = (el: HTMLElement) => {
             const cls = shiftingClass(el);
+
+            // Remove any previous pending listener for this element
+            const prev = this._pendingMarginCleanups.get(el);
+            if (prev) {
+                prev();
+            }
+
             if (skipTransition || !el.style.marginLeft) {
                 el.style.removeProperty('margin-left');
                 toggleClass(el, cls, false);
@@ -1403,7 +1411,9 @@ export class Tabs extends CompositeDisposable {
                     el.style.removeProperty('margin-left');
                     toggleClass(el, cls, false);
                     el.removeEventListener('transitionend', onEnd);
+                    this._pendingMarginCleanups.delete(el);
                 };
+                this._pendingMarginCleanups.set(el, onEnd);
                 el.addEventListener('transitionend', onEnd);
             }
         };
@@ -1444,6 +1454,12 @@ export class Tabs extends CompositeDisposable {
     }
 
     private resetTabTransforms(): void {
+        // Cancel any pending margin transitionend listeners
+        for (const [, cleanup] of this._pendingMarginCleanups) {
+            cleanup();
+        }
+        this._pendingMarginCleanups.clear();
+
         for (const tab of this._tabs) {
             tab.value.element.style.removeProperty('margin-left');
             tab.value.element.style.removeProperty('margin-right');

@@ -266,6 +266,11 @@ export class TabGroupManager {
             this._underlineRafId = null;
         }
 
+        for (const [, cleanup] of this._pendingTransitionCleanups) {
+            cleanup();
+        }
+        this._pendingTransitionCleanups.clear();
+
         for (const [, entry] of this._chipRenderers) {
             entry.chip.element.remove();
             entry.chip.dispose();
@@ -394,6 +399,15 @@ export class TabGroupManager {
                     hasAnimation = true;
                     tab.element.classList.remove('dv-tab--group-collapsed');
                     tab.element.classList.add('dv-tab--group-expanding');
+
+                    // Clean up any previous transitionend listener
+                    // from a rapid collapse/expand cycle
+                    const existingCleanup =
+                        this._pendingTransitionCleanups.get(panelId);
+                    if (existingCleanup) {
+                        existingCleanup();
+                    }
+
                     const onEnd = () => {
                         tab.element.classList.remove('dv-tab--group-expanding');
                         tab.element.style.removeProperty('width');

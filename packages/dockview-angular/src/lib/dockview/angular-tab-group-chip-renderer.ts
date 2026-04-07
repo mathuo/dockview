@@ -66,6 +66,7 @@ export class AngularTabGroupChipRenderer implements ITabGroupChipRenderer {
 
     dispose(): void {
         if (this.componentRef) {
+            this.appRef.detachView(this.componentRef.hostView);
             this.componentRef.destroy();
             this.componentRef = null;
         }
