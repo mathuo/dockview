@@ -38,10 +38,7 @@ export class TabGroupManager {
     private readonly _groupUnderlines = new Map<string, HTMLElement>();
     private _underlineRafId: number | null = null;
     private _skipNextCollapseAnimation = false;
-    private readonly _pendingTransitionCleanups = new Map<
-        string,
-        () => void
-    >();
+    private readonly _pendingTransitionCleanups = new Map<string, () => void>();
 
     get chipRenderers(): ReadonlyMap<
         string,
@@ -183,9 +180,9 @@ export class TabGroupManager {
                 continue; // keep the chip and underline
             }
             if (real.classList.contains('dv-tab')) {
-                const tabEntry = this._ctx.getTabs().find(
-                    (t) => t.value.element === real
-                );
+                const tabEntry = this._ctx
+                    .getTabs()
+                    .find((t) => t.value.element === real);
                 if (tabEntry && groupPanelIds.has(tabEntry.value.panel.id)) {
                     continue; // keep
                 }
@@ -459,8 +456,7 @@ export class TabGroupManager {
                     }
                 } else {
                     hasAnimation = true;
-                    const isVert =
-                        this._ctx.getDirection() === 'vertical';
+                    const isVert = this._ctx.getDirection() === 'vertical';
                     for (const pid of tg.panelIds) {
                         const te = tabMap.get(pid);
                         if (
@@ -598,12 +594,8 @@ export class TabGroupManager {
             if (isAnimating && chipEl) {
                 const chipRect = chipEl.getBoundingClientRect();
                 const chipCenter = isVertical
-                    ? chipRect.top +
-                      chipRect.height / 2 -
-                      containerRect.top
-                    : chipRect.left +
-                      chipRect.width / 2 -
-                      containerRect.left;
+                    ? chipRect.top + chipRect.height / 2 - containerRect.top
+                    : chipRect.left + chipRect.width / 2 - containerRect.left;
 
                 // Sum of current visible tab sizes (shrinking or growing)
                 let currentTabSize = 0;
@@ -613,12 +605,10 @@ export class TabGroupManager {
                     if (!te) continue;
                     const el = te.value.element;
                     if (isVertical) {
-                        currentTabSize +=
-                            el.getBoundingClientRect().height;
+                        currentTabSize += el.getBoundingClientRect().height;
                         fullTabSize += el.scrollHeight;
                     } else {
-                        currentTabSize +=
-                            el.getBoundingClientRect().width;
+                        currentTabSize += el.getBoundingClientRect().width;
                         fullTabSize += el.scrollWidth;
                     }
                 }
@@ -630,10 +620,8 @@ export class TabGroupManager {
                         : 0;
 
                 // Interpolate start and end edges toward chip center
-                startEdge =
-                    chipCenter + (startEdge - chipCenter) * progress;
-                endEdge =
-                    chipCenter + (endEdge - chipCenter) * progress;
+                startEdge = chipCenter + (startEdge - chipCenter) * progress;
+                endEdge = chipCenter + (endEdge - chipCenter) * progress;
                 span = Math.max(0, endEdge - startEdge);
             }
 
@@ -705,10 +693,7 @@ export class TabGroupManager {
         let path: SVGPathElement;
         if (!svg || svg.tagName !== 'svg') {
             underline.innerHTML = '';
-            svg = document.createElementNS(
-                'http://www.w3.org/2000/svg',
-                'svg'
-            );
+            svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.style.display = 'block';
             path = document.createElementNS(
                 'http://www.w3.org/2000/svg',
@@ -731,25 +716,18 @@ export class TabGroupManager {
                 svg.setAttribute('height', String(mainSize));
                 underline.style.width = `${t}px`;
                 underline.style.height = `${mainSize}px`;
-                path.setAttribute(
-                    'd',
-                    `M ${t / 2},0 L ${t / 2},${mainSize}`
-                );
+                path.setAttribute('d', `M ${t / 2},0 L ${t / 2},${mainSize}`);
             } else {
                 svg.setAttribute('width', String(mainSize));
                 svg.setAttribute('height', String(t));
                 underline.style.width = `${mainSize}px`;
                 underline.style.height = `${t}px`;
-                path.setAttribute(
-                    'd',
-                    `M 0,${t / 2} L ${mainSize},${t / 2}`
-                );
+                path.setAttribute('d', `M 0,${t / 2} L ${mainSize},${t / 2}`);
             }
             return;
         }
 
-        const activeRect =
-            activeTabEntry.value.element.getBoundingClientRect();
+        const activeRect = activeTabEntry.value.element.getBoundingClientRect();
 
         // Compute active tab start/end relative to the group start
         let aStart: number;
@@ -780,19 +758,13 @@ export class TabGroupManager {
                 svg.setAttribute('height', String(mainSize));
                 underline.style.width = `${t}px`;
                 underline.style.height = `${mainSize}px`;
-                path.setAttribute(
-                    'd',
-                    `M ${t / 2},0 L ${t / 2},${mainSize}`
-                );
+                path.setAttribute('d', `M ${t / 2},0 L ${t / 2},${mainSize}`);
             } else {
                 svg.setAttribute('width', String(mainSize));
                 svg.setAttribute('height', String(t));
                 underline.style.width = `${mainSize}px`;
                 underline.style.height = `${t}px`;
-                path.setAttribute(
-                    'd',
-                    `M 0,${t / 2} L ${mainSize},${t / 2}`
-                );
+                path.setAttribute('d', `M 0,${t / 2} L ${mainSize},${t / 2}`);
             }
             return;
         }

@@ -286,7 +286,8 @@ export class Tabs extends CompositeDisposable {
                                 sourceTabId: data.panelId,
                                 sourceIndex: -1,
                                 tabPositions: this.snapshotTabPositions(),
-                                chipPositions: this._tabGroupManager.snapshotChipWidths(),
+                                chipPositions:
+                                    this._tabGroupManager.snapshotChipWidths(),
                                 currentInsertionIndex: null,
                                 targetTabGroupId: null,
                                 sourceTabGroupId: null,
@@ -544,7 +545,8 @@ export class Tabs extends CompositeDisposable {
                         sourceTabId: panel.id,
                         sourceIndex,
                         tabPositions: this.snapshotTabPositions(),
-                        chipPositions: this._tabGroupManager.snapshotChipWidths(),
+                        chipPositions:
+                            this._tabGroupManager.snapshotChipWidths(),
                         currentInsertionIndex: null,
                         targetTabGroupId: null,
                         sourceTabGroupId: null,
@@ -756,7 +758,8 @@ export class Tabs extends CompositeDisposable {
         // If a tab was added during active drag, refresh positions
         if (this._animState) {
             this._animState.tabPositions = this.snapshotTabPositions();
-            this._animState.chipPositions = this._tabGroupManager.snapshotChipWidths();
+            this._animState.chipPositions =
+                this._tabGroupManager.snapshotChipWidths();
             this.applyDragOverTransforms();
         }
     }
@@ -783,7 +786,8 @@ export class Tabs extends CompositeDisposable {
         // If a non-source tab was removed during active drag, refresh positions
         if (this._animState) {
             this._animState.tabPositions = this.snapshotTabPositions();
-            this._animState.chipPositions = this._tabGroupManager.snapshotChipWidths();
+            this._animState.chipPositions =
+                this._tabGroupManager.snapshotChipWidths();
             this.applyDragOverTransforms();
         }
     }
@@ -845,7 +849,6 @@ export class Tabs extends CompositeDisposable {
         this._tabGroupManager.update();
     }
 
-
     private _handleChipDragStart(
         tabGroup: ITabGroup,
         chip: TabGroupChip,
@@ -854,9 +857,7 @@ export class Tabs extends CompositeDisposable {
         if (this.accessor.options.tabAnimation === 'smooth') {
             const firstPanelId = tabGroup.panelIds[0];
             const firstIdx = firstPanelId
-                ? this._tabs.findIndex(
-                      (t) => t.value.panel.id === firstPanelId
-                  )
+                ? this._tabs.findIndex((t) => t.value.panel.id === firstPanelId)
                 : -1;
             const chipRect = chip.element.getBoundingClientRect();
 
@@ -899,16 +900,13 @@ export class Tabs extends CompositeDisposable {
                 for (const t of this._tabs) {
                     if (groupPanelIds.has(t.value.panel.id)) {
                         t.value.element.style.transition = 'none';
-                        toggleClass(
-                            t.value.element,
-                            'dv-tab--dragging',
-                            true
-                        );
+                        toggleClass(t.value.element, 'dv-tab--dragging', true);
                     }
                 }
                 // Collapse the group chip instantly
-                const chipEntry =
-                    this._tabGroupManager.chipRenderers.get(tabGroup.id);
+                const chipEntry = this._tabGroupManager.chipRenderers.get(
+                    tabGroup.id
+                );
                 if (chipEntry) {
                     chipEntry.chip.element.style.transition = 'none';
                     toggleClass(
@@ -920,8 +918,9 @@ export class Tabs extends CompositeDisposable {
                 // Single reflow for the entire batch
                 this._tabsList.offsetHeight;
 
-                const underline =
-                    this._tabGroupManager.groupUnderlines.get(tabGroup.id);
+                const underline = this._tabGroupManager.groupUnderlines.get(
+                    tabGroup.id
+                );
                 if (underline) {
                     underline.style.display = 'none';
                 }
@@ -945,11 +944,7 @@ export class Tabs extends CompositeDisposable {
         }
 
         // Build a composite drag image showing chip + group tabs
-        this._tabGroupManager.setGroupDragImage(
-            event,
-            tabGroup,
-            chip.element
-        );
+        this._tabGroupManager.setGroupDragImage(event, tabGroup, chip.element);
     }
 
     /**
@@ -1104,7 +1099,10 @@ export class Tabs extends CompositeDisposable {
         // above) to compute original chip boundaries.  This avoids reading
         // getBoundingClientRect() on chips whose live position is shifted by
         // the drag gap margin, which caused oscillation / visual jumps.
-        if (insertionIndex !== null && this._tabGroupManager.chipRenderers.size > 0) {
+        if (
+            insertionIndex !== null &&
+            this._tabGroupManager.chipRenderers.size > 0
+        ) {
             const isGroupDrag = !!this._animState.sourceTabGroupId;
             const tabGroups = this.group.model.getTabGroups();
 
@@ -1362,7 +1360,8 @@ export class Tabs extends CompositeDisposable {
                         break;
                     }
                     if (!hasTabs) {
-                        const chipEntry = this._tabGroupManager.chipRenderers.get(tg.id);
+                        const chipEntry =
+                            this._tabGroupManager.chipRenderers.get(tg.id);
                         if (chipEntry) {
                             chipToShift = chipEntry.chip.element;
                         }
@@ -1480,9 +1479,8 @@ export class Tabs extends CompositeDisposable {
     }
 
     private _clearGroupDragClasses(sourceTabGroupId: string): void {
-        const chipEntry = this._tabGroupManager.chipRenderers.get(
-            sourceTabGroupId
-        );
+        const chipEntry =
+            this._tabGroupManager.chipRenderers.get(sourceTabGroupId);
         if (chipEntry) {
             this._removeClassInstantlyBatch(
                 [chipEntry.chip.element],
@@ -1494,9 +1492,8 @@ export class Tabs extends CompositeDisposable {
             'dv-tab--dragging'
         );
         // Restore underline
-        const underline = this._tabGroupManager.groupUnderlines.get(
-            sourceTabGroupId
-        );
+        const underline =
+            this._tabGroupManager.groupUnderlines.get(sourceTabGroupId);
         if (underline) {
             underline.style.removeProperty('display');
         }
