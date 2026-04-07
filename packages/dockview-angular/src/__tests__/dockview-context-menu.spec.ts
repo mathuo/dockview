@@ -123,7 +123,8 @@ describe('DockviewAngularComponent – context menu', () => {
         const renderer: AngularRenderer<TestContextMenuItemWithInputsComponent> =
             factory({
                 id: 'test-id',
-                component: TestContextMenuItemWithInputsComponent as Type<never>,
+                component:
+                    TestContextMenuItemWithInputsComponent as Type<never>,
             } as CreateContextMenuItemComponentOptions);
 
         const panel = {} as IDockviewPanel;
