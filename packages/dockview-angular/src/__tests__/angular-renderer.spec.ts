@@ -146,7 +146,7 @@ describe('AngularRenderer', () => {
         jest.spyOn(console, 'error').mockImplementation();
 
         const renderer = new AngularRenderer({
-            component: null as any,
+            component: null as never,
             injector,
             environmentInjector,
         });
