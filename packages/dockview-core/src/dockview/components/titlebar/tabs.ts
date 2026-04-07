@@ -60,7 +60,10 @@ export class Tabs extends CompositeDisposable {
     private _showTabsOverflowControl = false;
     private _direction: DockviewHeaderDirection = 'horizontal';
     private _animState: TabAnimationState | null = null;
-    private readonly _pendingMarginCleanups = new Map<HTMLElement, () => void>();
+    private readonly _pendingMarginCleanups = new Map<
+        HTMLElement,
+        () => void
+    >();
     private _pendingCollapse = false;
     private _voidContainer: HTMLElement | null = null;
     private _voidContainerListeners: IDisposable | null = null;

@@ -8652,7 +8652,9 @@ describe('dockviewComponent', () => {
             dockview.removePanel(panel1);
 
             // Tab group should have been auto-destroyed (isEmpty triggers dispose)
-            expect(dockview.api.getTabGroups({ groupId: panel2.group.id }).length).toBe(0);
+            expect(
+                dockview.api.getTabGroups({ groupId: panel2.group.id }).length
+            ).toBe(0);
         });
 
         test('no-label group chip renders with empty label class', () => {
@@ -8745,7 +8747,9 @@ describe('dockviewComponent', () => {
 
             // Verify tab groups survived the round-trip
             const restoredGroup = dockview.api.panels[0].group;
-            const restored = dockview.api.getTabGroups({ groupId: restoredGroup.id });
+            const restored = dockview.api.getTabGroups({
+                groupId: restoredGroup.id,
+            });
             expect(restored.length).toBe(2);
 
             const r1 = restored.find((tg) => tg.label === 'Alpha')!;
@@ -8761,9 +8765,9 @@ describe('dockviewComponent', () => {
             expect(r2.panelIds).toEqual(['panel3']);
 
             // Second round-trip to ensure stability
-            expect(
-                JSON.parse(JSON.stringify(dockview.toJSON()))
-            ).toEqual(JSON.parse(JSON.stringify(state)));
+            expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual(
+                JSON.parse(JSON.stringify(state))
+            );
         });
 
         test('fromJSON with tab groups fires correct events', () => {
@@ -8971,9 +8975,7 @@ describe('dockviewComponent', () => {
                 groupId,
                 panelId: 'panel2',
             });
-            expect(panelsRemoved).toEqual([
-                { tgId: tg.id, panelId: 'panel2' },
-            ]);
+            expect(panelsRemoved).toEqual([{ tgId: tg.id, panelId: 'panel2' }]);
 
             // 6. Dissolve — should remove remaining panels and destroy
             panelsRemoved.length = 0;
