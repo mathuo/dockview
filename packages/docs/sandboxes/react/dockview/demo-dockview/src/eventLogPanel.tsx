@@ -6,7 +6,7 @@ type LogEntry = {
     id: number;
     text: string;
     timestamp: Date;
-    category: 'panel' | 'group' | 'layout';
+    category: 'panel' | 'group' | 'layout' | 'tabGroup';
 };
 
 let entryId = 0;
@@ -19,6 +19,8 @@ const categoryColor = (cat: LogEntry['category']) => {
             return '#a78bfa';
         case 'layout':
             return '#34d399';
+        case 'tabGroup':
+            return '#f472b6';
     }
 };
 
@@ -66,6 +68,27 @@ export const EventLogPanel: React.FC<{ api: DockviewApi }> = ({ api }) => {
                 )
             ),
             api.onDidLayoutChange(() => add('Layout changed', 'layout')),
+            api.onDidCreateTabGroup((e) =>
+                add(`Tab group created: ${e.tabGroup.id}`, 'tabGroup')
+            ),
+            api.onDidDestroyTabGroup((e) =>
+                add(`Tab group destroyed: ${e.tabGroup.id}`, 'tabGroup')
+            ),
+            api.onDidAddPanelToTabGroup((e) =>
+                add(
+                    `Panel ${e.panelId} → tab group ${e.tabGroup.id}`,
+                    'tabGroup'
+                )
+            ),
+            api.onDidRemovePanelFromTabGroup((e) =>
+                add(
+                    `Panel ${e.panelId} left tab group ${e.tabGroup.id}`,
+                    'tabGroup'
+                )
+            ),
+            api.onDidTabGroupChange((e) =>
+                add(`Tab group changed: ${e.tabGroup.id}`, 'tabGroup')
+            ),
         ];
 
         return () => disposables.forEach((d) => d.dispose());
@@ -104,7 +127,7 @@ export const EventLogPanel: React.FC<{ api: DockviewApi }> = ({ api }) => {
                         Events
                     </span>
                     <div style={{ display: 'flex', gap: 8 }}>
-                        {(['panel', 'group', 'layout'] as const).map((cat) => (
+                        {(['panel', 'group', 'layout', 'tabGroup'] as const).map((cat) => (
                             <span
                                 key={cat}
                                 style={{
