@@ -7,6 +7,8 @@ import {
     EnvironmentInjector,
     inject,
     Injector,
+    TemplateRef,
+    ViewChild,
 } from '@angular/core';
 import { AngularRenderer } from '../lib/utils/angular-renderer';
 
@@ -37,6 +39,19 @@ class TestUpdateComponent {
     }
 }
 
+@Component({
+    selector: 'test-template-holder-component',
+    template: `
+        <ng-template #template>
+            <test-update-component />
+        </ng-template>
+    `,
+})
+class TemplateHolderComponent {
+    @ViewChild('template', { static: true })
+    public template?: TemplateRef<any>;
+}
+
 describe('AngularRenderer', () => {
     let injector: Injector;
     let environmentInjector: EnvironmentInjector;
@@ -44,7 +59,11 @@ describe('AngularRenderer', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [TestComponent],
+            declarations: [
+                TestComponent,
+                TestUpdateComponent,
+                TemplateHolderComponent,
+            ],
         }).compileComponents();
 
         injector = TestBed.inject(Injector);
@@ -168,6 +187,31 @@ describe('AngularRenderer', () => {
         }).not.toThrow();
     });
 
+    it('should render view from template', () => {
+        // Create component with template
+        const templateRenderer = new AngularRenderer({
+            component: TemplateHolderComponent,
+            injector,
+            environmentInjector,
+        });
+        templateRenderer.init({});
+        const template = (
+            templateRenderer.component.instance as TemplateHolderComponent
+        ).template;
+
+        expect(template).toBeDefined();
+
+        // Create view from template
+        const renderer = new AngularRenderer({
+            component: template,
+            injector: templateRenderer.component.injector, // use container injector to ensure we have a view
+        });
+        renderer.init({});
+        application.tick();
+
+        expect(renderer.element.innerHTML).toContain('Counter: 0');
+    });
+
     it('should render when component is marked for change detection', () => {
         const renderer = new AngularRenderer<TestUpdateComponent>({
             component: TestUpdateComponent,
@@ -179,7 +223,7 @@ describe('AngularRenderer', () => {
         application.tick(); // trigger change detection
 
         expect(renderer.element.innerHTML).toContain('Counter: 0');
-        renderer.component!.instance.updateCounter();
+        renderer.component.instance.updateCounter();
         application.tick();
         expect(renderer.element.innerHTML).toContain('Counter: 1');
     });
@@ -199,7 +243,7 @@ describe('AngularRenderer', () => {
         });
         application.tick();
 
-        const instance = renderer.component!.instance;
+        const instance = renderer.component.instance;
         expect(instance.params).toEqual({ title: 'Hello' });
         expect(instance.api).toEqual({ mockApi: true });
         expect(instance.containerApi).toEqual({ mockContainerApi: true });
