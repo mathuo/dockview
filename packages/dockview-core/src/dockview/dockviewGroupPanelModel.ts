@@ -1029,6 +1029,7 @@ export class DockviewGroupPanelModel
                 if (this._panels.some((p) => p.id === panelId)) {
                     tabGroup.addPanel(panelId);
                     this._panelToTabGroup.set(panelId, concreteGroup);
+                    this._enforceContiguity(concreteGroup, panelId);
                 }
             }
 

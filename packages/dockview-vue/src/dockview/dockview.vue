@@ -55,12 +55,28 @@ PROPERTY_KEYS_DOCKVIEW.forEach((coreOptionKey) => {
     );
 });
 
+const inst = getCurrentInstance()!;
+
+watch(
+    () => props.tabGroupChipComponent,
+    (newValue) => {
+        if (instance.value) {
+            instance.value.updateOptions({
+                createTabGroupChipComponent: newValue
+                    ? () => {
+                          const component = findComponent(inst, newValue);
+                          return new VueTabGroupChipRenderer(component!, inst);
+                      }
+                    : undefined,
+            });
+        }
+    }
+);
+
 onMounted(() => {
     if (!el.value) {
         throw new Error('dockview-vue: element is not mounted');
     }
-
-    const inst = getCurrentInstance();
 
     if (!inst) {
         throw new Error('dockview-vue: getCurrentInstance() returned null');

@@ -142,6 +142,24 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
                 }
             });
 
+            // Handle tabGroupChipComponent → createTabGroupChipComponent mapping
+            if (
+                changes['tabGroupChipComponent'] &&
+                !changes['tabGroupChipComponent'].isFirstChange()
+            ) {
+                const chipComponent =
+                    changes['tabGroupChipComponent'].currentValue;
+                coreChanges.createTabGroupChipComponent = chipComponent
+                    ? () =>
+                          new AngularTabGroupChipRenderer(
+                              chipComponent,
+                              this.injector,
+                              this.environmentInjector
+                          )
+                    : undefined;
+                hasChanges = true;
+            }
+
             if (hasChanges) {
                 this.dockviewApi.updateOptions(coreChanges);
             }

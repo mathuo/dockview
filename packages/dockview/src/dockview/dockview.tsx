@@ -268,6 +268,25 @@ export const DockviewReact = React.forwardRef(
             }
 
             dockviewRef.current.updateOptions({
+                createTabGroupChipComponent: props.tabGroupChipComponent
+                    ? () => {
+                          return new ReactTabGroupChipPart(
+                              props.tabGroupChipComponent!,
+                              {
+                                  addPortal,
+                              }
+                          );
+                      }
+                    : undefined,
+            });
+        }, [props.tabGroupChipComponent]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+
+            dockviewRef.current.updateOptions({
                 createComponent: (options) => {
                     return new ReactPanelContentPart(
                         options.id,
