@@ -122,6 +122,33 @@ api.onDidOpenPopoutWindowFail(() => {
 
 > See [Popout Windows](/docs/core/groups/popoutGroups) for more.
 
+## Tab Groups
+
+These events fire when tab groups are created, destroyed, or modified across any group.
+
+```ts
+// Fires when a tab group is created
+api.onDidCreateTabGroup((event: DockviewTabGroupChangeEvent) => {
+    console.log('tab group created:', event.tabGroup.id);
+});
+
+// Fires when a tab group is destroyed (including auto-destroy when emptied)
+api.onDidDestroyTabGroup((event: DockviewTabGroupChangeEvent) => { });
+
+// Fires when a panel is added to a tab group
+api.onDidAddPanelToTabGroup((event: DockviewTabGroupPanelChangeEvent) => {
+    console.log(`panel ${event.panelId} added to group ${event.tabGroup.id}`);
+});
+
+// Fires when a panel is removed from a tab group
+api.onDidRemovePanelFromTabGroup((event: DockviewTabGroupPanelChangeEvent) => { });
+
+// Fires when a tab group's properties change (label, color)
+api.onDidTabGroupChange((event: DockviewTabGroupChangeEvent) => { });
+```
+
+> See [Tab Groups](/docs/core/panels/tabs#tab-groups) for the full API.
+
 ## Panel API Events
 
 Individual panels also expose events via `panel.api`:

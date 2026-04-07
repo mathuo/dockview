@@ -645,6 +645,103 @@ Right-click a chip or tab to see available actions.
 
 <CodeRunner id="dockview/tab-groups" height={400}/>
 
+### Creating and Managing Tab Groups
+
+Use `DockviewApi` to create tab groups and assign panels to them:
+
+```ts
+// Create a tab group in a specific group panel
+const tabGroup = api.createTabGroup({
+    groupId: 'group-1',
+    label: 'My Group',
+    color: 'blue',
+});
+
+// Add panels to the tab group
+api.addPanelToTabGroup({
+    groupId: 'group-1',
+    tabGroupId: tabGroup.id,
+    panelId: 'panel-1',
+});
+
+// Remove a panel from its tab group
+api.removePanelFromTabGroup({
+    groupId: 'group-1',
+    panelId: 'panel-1',
+});
+
+// Dissolve a tab group (removes all panels from it and destroys it)
+api.dissolveTabGroup({
+    groupId: 'group-1',
+    tabGroupId: tabGroup.id,
+});
+```
+
+### Querying Tab Groups
+
+```ts
+// Get all tab groups in a group panel
+const tabGroups = api.getTabGroups({ groupId: 'group-1' });
+
+// Find which tab group a panel belongs to
+const tabGroup = api.getTabGroupForPanel({
+    groupId: 'group-1',
+    panelId: 'panel-1',
+});
+```
+
+### ITabGroup
+
+The `ITabGroup` interface provides methods to read and modify a tab group:
+
+```ts
+tabGroup.id;           // readonly string
+tabGroup.label;        // readonly string
+tabGroup.color;        // readonly TabGroupColor
+tabGroup.collapsed;    // readonly boolean
+tabGroup.panelIds;     // readonly string[]
+tabGroup.size;         // readonly number (panel count)
+tabGroup.isEmpty;      // readonly boolean
+
+// Modify properties
+tabGroup.setLabel('New Label');
+tabGroup.setColor('red');
+
+// Collapse and expand
+tabGroup.collapse();
+tabGroup.expand();
+tabGroup.toggle();
+
+// Panel membership
+tabGroup.containsPanel('panel-1');
+tabGroup.indexOfPanel('panel-1');
+```
+
+Available colors: `'grey'`, `'red'`, `'orange'`, `'yellow'`, `'green'`, `'cyan'`, `'blue'`, `'purple'`, `'pink'`.
+
+### Events
+
+Tab group lifecycle events are available on `DockviewApi`:
+
+```ts
+api.onDidCreateTabGroup((event) => { });
+api.onDidDestroyTabGroup((event) => { });
+api.onDidAddPanelToTabGroup((event) => { });
+api.onDidRemovePanelFromTabGroup((event) => { });
+api.onDidTabGroupChange((event) => { });
+```
+
+Individual tab groups also expose events:
+
+```ts
+tabGroup.onDidChange(() => { });          // label or color changed
+tabGroup.onDidCollapseChange((collapsed) => { });
+tabGroup.onDidPanelChange(({ panelId, type }) => { });  // 'add' | 'remove'
+tabGroup.onDidDestroy(() => { });
+```
+
+> See [Events](/docs/core/events#tab-groups) for the full event reference.
+
 ## Tab Height
 
 Tab height can be controlled through CSS.
