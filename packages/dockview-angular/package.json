@@ -45,6 +45,8 @@
         "dist",
         "README.md"
     ],
+    "module": "./dist/fesm2022/dockview-angular.mjs",
+    "typings": "./dist/index.d.ts",
     "scripts": {
         "build:angular": "ng-packagr -c tsconfig.lib.json -p ng-package.json",
         "build:css": "node scripts/copy-css.js",
@@ -70,5 +72,11 @@
         "jest-preset-angular": "^14.6.1",
         "ng-packagr": "^17.0.0",
         "zone.js": "^0.15.1"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/fesm2022/dockview-angular.mjs"
+        }
     }
 }
