@@ -41,7 +41,7 @@ export function buildTabContextMenuItems(
     panelId: string
 ): ContextMenuItem[] {
     const tabGroup = api.getTabGroupForPanel({ groupId, panelId });
-    const allTabGroups = api.getTabGroups(groupId);
+    const allTabGroups = api.getTabGroups({ groupId });
     const items: ContextMenuItem[] = [];
 
     if (tabGroup) {

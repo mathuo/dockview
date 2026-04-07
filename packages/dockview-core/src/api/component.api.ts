@@ -574,6 +574,10 @@ export class GridviewApi implements CommonApi<SerializedGridviewComponent> {
     }
 }
 
+export interface DockviewGetTabGroupsOptions {
+    groupId: string;
+}
+
 export class DockviewApi implements CommonApi<SerializedDockview> {
     /**
      * The unique identifier for this instance. Used to manage scope of Drag'n'Drop events.
@@ -1065,8 +1069,8 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         model.removePanelFromTabGroup(options.panelId);
     }
 
-    getTabGroups(groupId: string): readonly ITabGroup[] {
-        const model = this._getGroupModel(groupId);
+    getTabGroups(options: DockviewGetTabGroupsOptions): readonly ITabGroup[] {
+        const model = this._getGroupModel(options.groupId);
         return model.getTabGroups();
     }
 

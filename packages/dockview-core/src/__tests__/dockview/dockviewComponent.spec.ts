@@ -8652,7 +8652,7 @@ describe('dockviewComponent', () => {
             dockview.removePanel(panel1);
 
             // Tab group should have been auto-destroyed (isEmpty triggers dispose)
-            expect(dockview.api.getTabGroups(panel2.group.id).length).toBe(0);
+            expect(dockview.api.getTabGroups({ groupId: panel2.group.id }).length).toBe(0);
         });
 
         test('no-label group chip renders with empty label class', () => {
@@ -8745,7 +8745,7 @@ describe('dockviewComponent', () => {
 
             // Verify tab groups survived the round-trip
             const restoredGroup = dockview.api.panels[0].group;
-            const restored = dockview.api.getTabGroups(restoredGroup.id);
+            const restored = dockview.api.getTabGroups({ groupId: restoredGroup.id });
             expect(restored.length).toBe(2);
 
             const r1 = restored.find((tg) => tg.label === 'Alpha')!;

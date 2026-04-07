@@ -570,7 +570,7 @@ const DockviewDemo = (props: {
                 const groupId = group.id;
                 const panelId = panel.id;
                 const tabGroup = api.getTabGroupForPanel({ groupId, panelId });
-                const allTabGroups = api.getTabGroups(groupId);
+                const allTabGroups = api.getTabGroups({ groupId });
                 const otherTabGroups = allTabGroups.filter(
                     (tg) => tg.id !== tabGroup?.id
                 );

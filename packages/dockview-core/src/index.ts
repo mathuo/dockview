@@ -160,6 +160,7 @@ export {
     PaneviewApi,
     GridviewApi,
     DockviewApi,
+    DockviewGetTabGroupsOptions,
 } from './api/component.api';
 export {
     createDockview,
