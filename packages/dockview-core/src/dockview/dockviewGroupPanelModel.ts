@@ -335,7 +335,6 @@ export class DockviewGroupPanelModel
 
     private readonly _onDidTabGroupCollapsedChange = new Emitter<{
         tabGroup: ITabGroup;
-        isCollapsed: boolean;
     }>();
     readonly onDidTabGroupCollapsedChange =
         this._onDidTabGroupCollapsedChange.event;
@@ -682,7 +681,6 @@ export class DockviewGroupPanelModel
                     }
                     this._onDidTabGroupCollapsedChange.fire({
                         tabGroup,
-                        isCollapsed,
                     });
                 }),
                 tabGroup.onDidDestroy(() => {

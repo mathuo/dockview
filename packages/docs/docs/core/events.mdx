@@ -148,7 +148,7 @@ api.onDidTabGroupChange((event: DockviewTabGroupChangeEvent) => { });
 
 // Fires when a tab group is collapsed or expanded
 api.onDidTabGroupCollapsedChange((event: DockviewTabGroupCollapsedChangeEvent) => {
-    console.log(event.tabGroup.id, event.isCollapsed ? 'collapsed' : 'expanded');
+    console.log(event.tabGroup.id, event.tabGroup.collapsed ? 'collapsed' : 'expanded');
 });
 ```
 

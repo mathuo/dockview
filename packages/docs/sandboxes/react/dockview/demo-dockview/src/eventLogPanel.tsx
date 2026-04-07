@@ -91,7 +91,7 @@ export const EventLogPanel: React.FC<{ api: DockviewApi }> = ({ api }) => {
             ),
             api.onDidTabGroupCollapsedChange((e) =>
                 add(
-                    `Tab group ${e.tabGroup.id} ${e.isCollapsed ? 'collapsed' : 'expanded'}`,
+                    `Tab group ${e.tabGroup.id} ${e.tabGroup.collapsed ? 'collapsed' : 'expanded'}`,
                     'tab grp'
                 )
             ),
