@@ -14,6 +14,7 @@ import {
     SimpleChanges,
     EnvironmentInjector,
     inject,
+    TemplateRef,
 } from '@angular/core';
 import {
     PaneviewApi,
@@ -30,8 +31,8 @@ import { PaneviewAngularReadyEvent } from './types';
 import { AngularPanePart } from './angular-pane-part';
 
 export interface PaneviewAngularOptions extends PaneviewOptions {
-    components: Record<string, Type<any>>;
-    headerComponents?: Record<string, Type<any>>;
+    components: Record<string, Type<any> | TemplateRef<any>>;
+    headerComponents?: Record<string, Type<any> | TemplateRef<any>>;
 }
 
 @Component({
@@ -58,8 +59,8 @@ export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @ViewChild('paneviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
-    @Input() components!: Record<string, Type<any>>;
-    @Input() headerComponents?: Record<string, Type<any>>;
+    @Input() components!: Record<string, Type<any> | TemplateRef<any>>;
+    @Input() headerComponents?: Record<string, Type<any> | TemplateRef<any>>;
 
     // Core paneview options as inputs
     @Input() className?: string;

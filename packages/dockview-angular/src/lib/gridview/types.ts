@@ -1,4 +1,4 @@
-import { Type } from '@angular/core';
+import { TemplateRef, Type } from '@angular/core';
 import { GridviewOptions, GridviewApi } from 'dockview-core';
 
 export interface GridviewAngularReadyEvent {
@@ -6,7 +6,7 @@ export interface GridviewAngularReadyEvent {
 }
 
 export interface GridviewAngularOptions extends GridviewOptions {
-    components: Record<string, Type<any>>;
+    components: Record<string, Type<any> | TemplateRef<any>>;
 }
 
 export interface GridviewAngularEvents {

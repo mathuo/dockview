@@ -1,4 +1,4 @@
-import { Type } from '@angular/core';
+import { TemplateRef, Type } from '@angular/core';
 import { PaneviewOptions, PaneviewApi, PaneviewDropEvent } from 'dockview-core';
 
 export interface PaneviewAngularReadyEvent {
@@ -6,8 +6,8 @@ export interface PaneviewAngularReadyEvent {
 }
 
 export interface PaneviewAngularOptions extends PaneviewOptions {
-    components: Record<string, Type<any>>;
-    headerComponents?: Record<string, Type<any>>;
+    components: Record<string, Type<any> | TemplateRef<any>>;
+    headerComponents?: Record<string, Type<any> | TemplateRef<any>>;
 }
 
 export interface PaneviewAngularEvents {

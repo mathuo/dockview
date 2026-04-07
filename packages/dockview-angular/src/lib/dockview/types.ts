@@ -1,4 +1,4 @@
-import { Type } from '@angular/core';
+import { TemplateRef, Type } from '@angular/core';
 import {
     DockviewOptions,
     DockviewReadyEvent,
@@ -27,13 +27,13 @@ export interface IDockviewAngularHeaderActionsProps extends IDockviewHeaderActio
 }
 
 export interface DockviewAngularOptions extends DockviewOptions {
-    components: Record<string, Type<any>>;
-    tabComponents?: Record<string, Type<any>>;
-    watermarkComponent?: Type<any>;
-    defaultTabComponent?: Type<any>;
-    leftHeaderActionsComponent?: Type<any>;
-    rightHeaderActionsComponent?: Type<any>;
-    prefixHeaderActionsComponent?: Type<any>;
+    components: Record<string, Type<any> | TemplateRef<any>>;
+    tabComponents?: Record<string, Type<any> | TemplateRef<any>>;
+    watermarkComponent?: Type<any> | TemplateRef<any>;
+    defaultTabComponent?: Type<any> | TemplateRef<any>;
+    leftHeaderActionsComponent?: Type<any> | TemplateRef<any>;
+    rightHeaderActionsComponent?: Type<any> | TemplateRef<any>;
+    prefixHeaderActionsComponent?: Type<any> | TemplateRef<any>;
 }
 
 // Alias for backward compatibility

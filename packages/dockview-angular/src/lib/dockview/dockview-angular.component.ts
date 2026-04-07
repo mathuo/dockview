@@ -14,6 +14,7 @@ import {
     SimpleChanges,
     EnvironmentInjector,
     inject,
+    TemplateRef,
 } from '@angular/core';
 import {
     DockviewApi,
@@ -70,13 +71,13 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @ViewChild('dockviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
-    @Input() components!: Record<string, Type<any>>;
-    @Input() tabComponents?: Record<string, Type<any>>;
-    @Input() watermarkComponent?: Type<any>;
-    @Input() defaultTabComponent?: Type<any>;
-    @Input() leftHeaderActionsComponent?: Type<any>;
-    @Input() rightHeaderActionsComponent?: Type<any>;
-    @Input() prefixHeaderActionsComponent?: Type<any>;
+    @Input() components!: Record<string, Type<any> | TemplateRef<any>>;
+    @Input() tabComponents?: Record<string, Type<any> | TemplateRef<any>>;
+    @Input() watermarkComponent?: Type<any> | TemplateRef<any>;
+    @Input() defaultTabComponent?: Type<any> | TemplateRef<any>;
+    @Input() leftHeaderActionsComponent?: Type<any> | TemplateRef<any>;
+    @Input() rightHeaderActionsComponent?: Type<any> | TemplateRef<any>;
+    @Input() prefixHeaderActionsComponent?: Type<any> | TemplateRef<any>;
 
     // Core dockview options as inputs
     @Input() className?: string;
@@ -95,7 +96,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() tabAnimation?: TabAnimation;
     @Input() getTabContextMenuItems?: (
         params: GetTabContextMenuItemsParams
-    ) => (ContextMenuItem | { component: Type<any> })[];
+    ) => (ContextMenuItem | { component: Type<any> | TemplateRef<any> })[];
 
     @Output() ready = new EventEmitter<DockviewReadyEvent>();
     @Output() didDrop = new EventEmitter<DockviewDidDropEvent>();
@@ -176,7 +177,10 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     private createFrameworkOptions(): DockviewFrameworkOptions {
-        const headerActionsComponents: Record<string, Type<any>> = {};
+        const headerActionsComponents: Record<
+            string,
+            Type<any> | TemplateRef<any>
+        > = {};
         if (this.leftHeaderActionsComponent) {
             headerActionsComponents['left'] = this.leftHeaderActionsComponent;
         }
@@ -236,7 +240,9 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
                     return undefined;
                 }
                 const renderer = new AngularRenderer({
-                    component: options.component as Type<any>,
+                    component: options.component as
+                        | Type<any>
+                        | TemplateRef<any>,
                     injector: this.injector,
                     environmentInjector: this.environmentInjector,
                 });

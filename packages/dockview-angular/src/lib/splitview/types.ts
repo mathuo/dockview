@@ -1,4 +1,4 @@
-import { Type } from '@angular/core';
+import { TemplateRef, Type } from '@angular/core';
 import { SplitviewOptions, SplitviewApi } from 'dockview-core';
 
 export interface SplitviewAngularReadyEvent {
@@ -6,7 +6,7 @@ export interface SplitviewAngularReadyEvent {
 }
 
 export interface SplitviewAngularOptions extends SplitviewOptions {
-    components: Record<string, Type<any>>;
+    components: Record<string, Type<any> | TemplateRef<any>>;
 }
 
 export interface SplitviewAngularEvents {

@@ -14,6 +14,7 @@ import {
     SimpleChanges,
     EnvironmentInjector,
     inject,
+    TemplateRef,
 } from '@angular/core';
 import {
     GridviewApi,
@@ -28,7 +29,7 @@ import { AngularLifecycleManager } from '../utils/lifecycle-utils';
 import { GridviewAngularReadyEvent } from './types';
 
 export interface GridviewAngularOptions extends GridviewOptions {
-    components: Record<string, Type<any>>;
+    components: Record<string, Type<any> | TemplateRef<any>>;
 }
 
 @Component({
@@ -55,7 +56,7 @@ export class GridviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @ViewChild('gridviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
-    @Input() components!: Record<string, Type<any>>;
+    @Input() components!: Record<string, Type<any> | TemplateRef<any>>;
 
     // Core gridview options as inputs
     @Input() className?: string;

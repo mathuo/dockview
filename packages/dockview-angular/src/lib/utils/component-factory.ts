@@ -1,4 +1,9 @@
-import { Type, Injector, EnvironmentInjector } from '@angular/core';
+import {
+    Type,
+    Injector,
+    EnvironmentInjector,
+    TemplateRef,
+} from '@angular/core';
 import {
     IContentRenderer,
     ITabRenderer,
@@ -16,13 +21,16 @@ import { AngularPanePart } from '../paneview/angular-pane-part';
 
 export class AngularFrameworkComponentFactory {
     constructor(
-        private components: Record<string, Type<any>>,
+        private components: Record<string, Type<any> | TemplateRef<any>>,
         private injector: Injector,
         private environmentInjector?: EnvironmentInjector,
-        private tabComponents?: Record<string, Type<any>>,
-        private watermarkComponent?: Type<any>,
-        private headerActionsComponents?: Record<string, Type<any>>,
-        private defaultTabComponent?: Type<any>
+        private tabComponents?: Record<string, Type<any> | TemplateRef<any>>,
+        private watermarkComponent?: Type<any> | TemplateRef<any>,
+        private headerActionsComponents?: Record<
+            string,
+            Type<any> | TemplateRef<any>
+        >,
+        private defaultTabComponent?: Type<any> | TemplateRef<any>
     ) {}
 
     // For DockviewComponent
