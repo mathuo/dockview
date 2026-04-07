@@ -24,7 +24,7 @@ import { Tab } from '../tab/tab';
 import { TabDragEvent, TabDropIndexEvent } from './tabsContainer';
 import { ITabGroup } from '../../tabGroup';
 import { TabGroupChip } from './tabGroupChip';
-import { ITabGroupChipRenderer } from '../../framework';
+import { TabGroupManager } from './tabGroups';
 
 interface TabAnimationState {
     sourceTabId: string;
@@ -61,19 +61,11 @@ export class Tabs extends CompositeDisposable {
     private _direction: DockviewHeaderDirection = 'horizontal';
     private _animState: TabAnimationState | null = null;
     private _pendingCollapse = false;
-    private _skipNextCollapseAnimation = false;
-    private readonly _pendingTransitionCleanups = new Map<string, () => void>();
     private _voidContainer: HTMLElement | null = null;
     private _voidContainerListeners: IDisposable | null = null;
     private _extendedDropZone: HTMLElement | null = null;
 
-    private readonly _chipRenderers = new Map<
-        string,
-        { chip: ITabGroupChipRenderer; disposable: IDisposable }
-    >();
-
-    private readonly _groupUnderlines = new Map<string, HTMLElement>();
-    private _underlineRafId: number | null = null;
+    private readonly _tabGroupManager: TabGroupManager;
 
     private readonly _onTabDragStart = new Emitter<TabDragEvent>();
     readonly onTabDragStart: Event<TabDragEvent> = this._onTabDragStart.event;
@@ -231,6 +223,29 @@ export class Tabs extends CompositeDisposable {
             this.addDisposables(this._scrollbar);
         }
 
+        this._tabGroupManager = new TabGroupManager(
+            {
+                group: this.group,
+                accessor: this.accessor,
+                tabsList: this._tabsList,
+                getTabs: () => this._tabs,
+                getTabMap: () => this._tabMap,
+                getDirection: () => this._direction,
+            },
+            {
+                onChipContextMenu: (tabGroup, event) => {
+                    this.accessor.contextMenuController.showForChip(
+                        tabGroup,
+                        this.group,
+                        event
+                    );
+                },
+                onChipDragStart: (tabGroup, chip, event) => {
+                    this._handleChipDragStart(tabGroup, chip, event);
+                },
+            }
+        );
+
         this.addDisposables(
             this._onOverflowTabsChange,
             this._observerDisposable,
@@ -271,7 +286,7 @@ export class Tabs extends CompositeDisposable {
                                 sourceTabId: data.panelId,
                                 sourceIndex: -1,
                                 tabPositions: this.snapshotTabPositions(),
-                                chipPositions: this.snapshotChipWidths(),
+                                chipPositions: this._tabGroupManager.snapshotChipWidths(),
                                 currentInsertionIndex: null,
                                 targetTabGroupId: null,
                                 sourceTabGroupId: null,
@@ -439,7 +454,7 @@ export class Tabs extends CompositeDisposable {
             Disposable.from(() => {
                 this._voidContainerListeners?.dispose();
                 this.resetDragAnimation();
-                this._disposeAllChips();
+                this._tabGroupManager.disposeAll();
 
                 for (const { value, disposable } of this._tabs) {
                     disposable.dispose();
@@ -500,8 +515,8 @@ export class Tabs extends CompositeDisposable {
         }
 
         // Reposition underlines so the wrap-around follows the new active tab
-        if (this._groupUnderlines.size > 0) {
-            this._positionUnderlines();
+        if (this._tabGroupManager.groupUnderlines.size > 0) {
+            this._tabGroupManager.positionUnderlines();
         }
     }
 
@@ -529,7 +544,7 @@ export class Tabs extends CompositeDisposable {
                         sourceTabId: panel.id,
                         sourceIndex,
                         tabPositions: this.snapshotTabPositions(),
-                        chipPositions: this.snapshotChipWidths(),
+                        chipPositions: this._tabGroupManager.snapshotChipWidths(),
                         currentInsertionIndex: null,
                         targetTabGroupId: null,
                         sourceTabGroupId: null,
@@ -736,16 +751,12 @@ export class Tabs extends CompositeDisposable {
 
         // A new tab may have been inserted between a chip and its
         // group's first tab — reposition all chips to stay correct.
-        if (this._chipRenderers.size > 0) {
-            for (const tabGroup of this.group.model.getTabGroups()) {
-                this._positionChipForGroup(tabGroup);
-            }
-        }
+        this._tabGroupManager.positionAllChips();
 
         // If a tab was added during active drag, refresh positions
         if (this._animState) {
             this._animState.tabPositions = this.snapshotTabPositions();
-            this._animState.chipPositions = this.snapshotChipWidths();
+            this._animState.chipPositions = this._tabGroupManager.snapshotChipWidths();
             this.applyDragOverTransforms();
         }
     }
@@ -757,10 +768,7 @@ export class Tabs extends CompositeDisposable {
         }
 
         // Force-clean any pending transitionend listener
-        const pendingCleanup = this._pendingTransitionCleanups.get(id);
-        if (pendingCleanup) {
-            pendingCleanup();
-        }
+        this._tabGroupManager.cleanupTransition(id);
 
         const index = this.indexOf(id);
         const tabToRemove = this._tabs.splice(index, 1)[0];
@@ -775,7 +783,7 @@ export class Tabs extends CompositeDisposable {
         // If a non-source tab was removed during active drag, refresh positions
         if (this._animState) {
             this._animState.tabPositions = this.snapshotTabPositions();
-            this._animState.chipPositions = this.snapshotChipWidths();
+            this._animState.chipPositions = this._tabGroupManager.snapshotChipWidths();
             this.applyDragOverTransforms();
         }
     }
@@ -834,737 +842,114 @@ export class Tabs extends CompositeDisposable {
      * in the parent group model. Call after any tab group mutation.
      */
     updateTabGroups(): void {
-        const model = this.group.model;
-        const tabGroups = model.getTabGroups();
-
-        // Track which group IDs are still active
-        const activeGroupIds = new Set<string>();
-
-        for (const tabGroup of tabGroups) {
-            activeGroupIds.add(tabGroup.id);
-            this._ensureChipForGroup(tabGroup);
-            this._positionChipForGroup(tabGroup);
-        }
-
-        // Remove chips for dissolved/destroyed groups
-        for (const [groupId, entry] of this._chipRenderers) {
-            if (!activeGroupIds.has(groupId)) {
-                entry.chip.element.remove();
-                entry.chip.dispose();
-                entry.disposable.dispose();
-                this._chipRenderers.delete(groupId);
-            }
-        }
-
-        // Update CSS classes on all tabs
-        this._updateTabGroupClasses();
+        this._tabGroupManager.update();
     }
 
-    private _ensureChipForGroup(tabGroup: ITabGroup): void {
-        if (this._chipRenderers.has(tabGroup.id)) {
-            return;
-        }
 
-        const createChip = this.accessor.options.createTabGroupChipComponent;
-        const chip: ITabGroupChipRenderer = createChip
-            ? createChip(tabGroup)
-            : new TabGroupChip();
-
-        chip.init({ tabGroup, api: this.accessor.api });
-
-        const disposables: IDisposable[] = [
-            tabGroup.onDidChange(() => {
-                chip.update?.({ tabGroup });
-                this._updateTabGroupClasses();
-            }),
-            tabGroup.onDidPanelChange(() => {
-                this._positionChipForGroup(tabGroup);
-                this._updateTabGroupClasses();
-            }),
-            tabGroup.onDidCollapseChange(() => {
-                this._updateTabGroupClasses();
-            }),
-        ];
-
-        // Wire chip context menu for default chip (has onContextMenu)
-        if (chip instanceof TabGroupChip) {
-            disposables.push(
-                chip.onContextMenu((event) => {
-                    this.accessor.contextMenuController.showForChip(
-                        tabGroup,
-                        this.group,
-                        event
-                    );
-                })
-            );
-        }
-
-        // Wire chip drag for default chip (has onDragStart)
-        if (chip instanceof TabGroupChip) {
-            disposables.push(
-                chip.onDragStart((event) => {
-                    if (this.accessor.options.tabAnimation === 'smooth') {
-                        const firstPanelId = tabGroup.panelIds[0];
-                        const firstIdx = firstPanelId
-                            ? this._tabs.findIndex(
-                                  (t) => t.value.panel.id === firstPanelId
-                              )
-                            : -1;
-                        const chipRect = chip.element.getBoundingClientRect();
-
-                        // Compute total group width (chip + all tabs)
-                        let groupGapWidth = chipRect.width;
-                        for (const pid of tabGroup.panelIds) {
-                            const tabEntry = this._tabMap.get(pid);
-                            if (tabEntry) {
-                                groupGapWidth +=
-                                    tabEntry.value.element.getBoundingClientRect()
-                                        .width;
-                            }
-                        }
-
-                        this._animState = {
-                            sourceTabId: '',
-                            sourceIndex: firstIdx,
-                            tabPositions: this.snapshotTabPositions(),
-                            chipPositions: this.snapshotChipWidths(),
-                            currentInsertionIndex: null,
-                            targetTabGroupId: null,
-                            sourceTabGroupId: tabGroup.id,
-                            sourceGroupPanelIds: new Set(tabGroup.panelIds),
-                            sourceChipWidth: chipRect.width,
-                            cursorOffsetFromDragLeft:
-                                event.clientX - chipRect.left,
-                            sourceGapWidth: groupGapWidth,
-                            containerLeft:
-                                this._tabsList.getBoundingClientRect().left,
-                        };
-
-                        // Collapse group tabs + chip after the browser
-                        // captures the drag image, then open the gap at the
-                        // source position — all instant (no transitions).
-                        const groupPanelIds = new Set(tabGroup.panelIds);
-                        this._pendingCollapse = true;
-                        requestAnimationFrame(() => {
-                            this._pendingCollapse = false;
-                            if (!this._animState) {
-                                return;
-                            }
-                            // Collapse all group tabs instantly
-                            for (const t of this._tabs) {
-                                if (groupPanelIds.has(t.value.panel.id)) {
-                                    t.value.element.style.transition = 'none';
-                                    toggleClass(
-                                        t.value.element,
-                                        'dv-tab--dragging',
-                                        true
-                                    );
-                                }
-                            }
-                            // Collapse the group chip instantly
-                            const chipEntry = this._chipRenderers.get(
-                                tabGroup.id
-                            );
-                            if (chipEntry) {
-                                chipEntry.chip.element.style.transition =
-                                    'none';
-                                toggleClass(
-                                    chipEntry.chip.element,
-                                    'dv-tab-group-chip--dragging',
-                                    true
-                                );
-                            }
-                            // Single reflow for the entire batch
-                            this._tabsList.offsetHeight;
-
-                            const underline = this._groupUnderlines.get(
-                                tabGroup.id
-                            );
-                            if (underline) {
-                                underline.style.display = 'none';
-                            }
-
-                            if (
-                                this._animState.currentInsertionIndex === null
-                            ) {
-                                this._animState.currentInsertionIndex =
-                                    firstIdx;
-                            }
-                            // Apply gap with transitions disabled
-                            this.applyDragOverTransforms(true);
-
-                            // Re-enable transitions for subsequent moves
-                            for (const t of this._tabs) {
-                                if (groupPanelIds.has(t.value.panel.id)) {
-                                    t.value.element.style.removeProperty(
-                                        'transition'
-                                    );
-                                }
-                            }
-                            if (chipEntry) {
-                                chipEntry.chip.element.style.removeProperty(
-                                    'transition'
-                                );
-                            }
-                        });
-                    }
-
-                    // Build a composite drag image showing chip + group tabs
-                    this._setGroupDragImage(event, tabGroup, chip.element);
-                })
-            );
-        }
-
-        const disposable = new CompositeDisposable(...disposables);
-
-        this._chipRenderers.set(tabGroup.id, { chip, disposable });
-    }
-
-    private _positionChipForGroup(tabGroup: ITabGroup): void {
-        const entry = this._chipRenderers.get(tabGroup.id);
-        if (!entry) {
-            return;
-        }
-
-        const chipEl = entry.chip.element;
-        const panelIds = tabGroup.panelIds;
-
-        if (panelIds.length === 0) {
-            chipEl.remove();
-            return;
-        }
-
-        // Find the first tab element of this group
-        const firstPanelId = panelIds[0];
-        const firstTabEntry = this._tabMap.get(firstPanelId);
-
-        if (!firstTabEntry) {
-            chipEl.remove();
-            return;
-        }
-
-        // Insert chip before the first tab of the group
-        const firstTabEl = firstTabEntry.value.element;
-        if (chipEl.nextSibling !== firstTabEl) {
-            this._tabsList.insertBefore(chipEl, firstTabEl);
-        }
-    }
-
-    private _updateTabGroupClasses(): void {
-        const model = this.group.model;
-        const tabGroups = model.getTabGroups();
-        let hasAnimation = false;
-
-        // Build a lookup: panelId → tabGroup
-        const panelGroupMap = new Map<string, ITabGroup>();
-        for (const tg of tabGroups) {
-            for (const pid of tg.panelIds) {
-                panelGroupMap.set(pid, tg);
-            }
-        }
-
-        for (const tabEntry of this._tabs) {
-            const tab = tabEntry.value;
-            const panelId = tab.panel.id;
-            const tg = panelGroupMap.get(panelId);
-
-            const isGrouped = !!tg;
-            toggleClass(tab.element, 'dv-tab--grouped', isGrouped);
-
-            if (tg) {
-                const ids = tg.panelIds;
-                const isFirst = ids[0] === panelId;
-                const isLast = ids[ids.length - 1] === panelId;
-
-                toggleClass(tab.element, 'dv-tab--group-first', isFirst);
-                toggleClass(tab.element, 'dv-tab--group-last', isLast);
-
-                // Collapse / expand with animation
-                const isCollapsed = tab.element.classList.contains(
-                    'dv-tab--group-collapsed'
-                );
-                if (!tg.collapsed && isCollapsed) {
-                    // Collapsed → expanding: animate back
-                    hasAnimation = true;
-                    tab.element.classList.remove('dv-tab--group-collapsed');
-                    tab.element.classList.add('dv-tab--group-expanding');
-                    const onEnd = () => {
-                        tab.element.classList.remove('dv-tab--group-expanding');
-                        tab.element.style.removeProperty('width');
-                        tab.element.removeEventListener('transitionend', onEnd);
-                        this._pendingTransitionCleanups.delete(panelId);
-                    };
-                    this._pendingTransitionCleanups.set(panelId, onEnd);
-                    tab.element.addEventListener('transitionend', onEnd);
-                }
-            } else {
-                toggleClass(tab.element, 'dv-tab--group-first', false);
-                toggleClass(tab.element, 'dv-tab--group-last', false);
-                tab.element.classList.remove(
-                    'dv-tab--group-collapsed',
-                    'dv-tab--group-expanding'
-                );
-                tab.element.style.removeProperty('width');
-            }
-        }
-
-        // Track active group IDs for underline cleanup
-        const activeGroupIds = new Set<string>();
-
-        // Handle collapse animation + underline per group
-        for (const tg of tabGroups) {
-            activeGroupIds.add(tg.id);
-
-            // Ensure underline element exists
-            let underline = this._groupUnderlines.get(tg.id);
-            if (!underline) {
-                underline = document.createElement('div');
-                underline.className = 'dv-tab-group-underline';
-                this._tabsList.appendChild(underline);
-                this._groupUnderlines.set(tg.id, underline);
-            }
-
-            // Collapse animation
-            const hasNewCollapse =
-                tg.collapsed &&
-                tg.panelIds.some((pid) => {
-                    const te = this._tabMap.get(pid);
-                    return (
-                        te &&
-                        !te.value.element.classList.contains(
-                            'dv-tab--group-collapsed'
-                        )
-                    );
-                });
-
-            if (hasNewCollapse) {
-                if (this._skipNextCollapseAnimation) {
-                    // Apply collapsed state instantly (no animation)
-                    for (const pid of tg.panelIds) {
-                        const te = this._tabMap.get(pid);
-                        if (te) {
-                            te.value.element.classList.add(
-                                'dv-tab--group-collapsed'
-                            );
-                        }
-                    }
-                } else {
-                    hasAnimation = true;
-                    const isVert = this._direction === 'vertical';
-                    for (const pid of tg.panelIds) {
-                        const te = this._tabMap.get(pid);
-                        if (
-                            te &&
-                            !te.value.element.classList.contains(
-                                'dv-tab--group-collapsed'
-                            )
-                        ) {
-                            const rect =
-                                te.value.element.getBoundingClientRect();
-                            if (isVert) {
-                                te.value.element.style.height = `${rect.height}px`;
-                            } else {
-                                te.value.element.style.width = `${rect.width}px`;
-                            }
-                            te.value.element.offsetHeight; // force reflow
-                            te.value.element.classList.add(
-                                'dv-tab--group-collapsed'
-                            );
-                        }
-                    }
-                }
-            }
-        }
-
-        // Remove underlines for dissolved groups
-        for (const [groupId, el] of this._groupUnderlines) {
-            if (!activeGroupIds.has(groupId)) {
-                el.remove();
-                this._groupUnderlines.delete(groupId);
-            }
-        }
-
-        this._skipNextCollapseAnimation = false;
-
-        // Position underlines: use rAF loop during animations for fluid tracking
-        if (hasAnimation) {
-            this._trackUnderlines();
-        } else {
-            this._positionUnderlines();
-        }
-    }
-
-    private _positionUnderlinesSync(): void {
-        const containerRect = this._tabsList.getBoundingClientRect();
-        const tabGroups = this.group.model.getTabGroups();
-        const isVertical = this._direction === 'vertical';
-        const containerCrossSize = isVertical
-            ? containerRect.width
-            : containerRect.height;
-        const activePanelId = this.group.activePanel?.id;
-
-        for (const tg of tabGroups) {
-            const underline = this._groupUnderlines.get(tg.id);
-            if (!underline) {
-                continue;
-            }
-
-            const panelIds = tg.panelIds;
-            if (panelIds.length === 0) {
-                underline.style.display = 'none';
-                continue;
-            }
-
-            underline.style.display = '';
-
-            const chipEntry = this._chipRenderers.get(tg.id);
-            const chipEl = chipEntry?.chip.element;
-
-            // In vertical mode, compute top/bottom edges; in horizontal, left/right.
-            let startEdge: number;
-            if (chipEl) {
-                const chipRect = chipEl.getBoundingClientRect();
-                const chipStyle = getComputedStyle(chipEl);
-                const leadingMargin = isVertical
-                    ? parseFloat(chipStyle.marginTop) || 0
-                    : parseFloat(chipStyle.marginLeft) || 0;
-                startEdge = isVertical
-                    ? chipRect.top - containerRect.top - leadingMargin
-                    : chipRect.left - containerRect.left - leadingMargin;
-            } else {
-                const firstPanelId = panelIds[0];
-                const firstTabEntry = this._tabMap.get(firstPanelId);
-                if (firstTabEntry) {
-                    const firstRect =
-                        firstTabEntry.value.element.getBoundingClientRect();
-                    startEdge = isVertical
-                        ? firstRect.top - containerRect.top
-                        : firstRect.left - containerRect.left;
-                } else {
-                    startEdge = 0;
-                }
-            }
-
-            // Measure the actual last tab position (follows CSS transitions in real-time)
-            const lastPanelId = panelIds[panelIds.length - 1];
-            const lastTabEntry = this._tabMap.get(lastPanelId);
-
-            if (!lastTabEntry) {
-                if (isVertical) {
-                    underline.style.top = `${startEdge}px`;
-                    underline.style.height = '0px';
-                    underline.style.left = '';
-                    underline.style.width = '';
-                } else {
-                    underline.style.left = `${startEdge}px`;
-                    underline.style.width = '0px';
-                    underline.style.top = '';
-                    underline.style.height = '';
-                }
-                continue;
-            }
-
-            const lastTabRect =
-                lastTabEntry.value.element.getBoundingClientRect();
-            let endEdge = isVertical
-                ? lastTabRect.bottom - containerRect.top
-                : lastTabRect.right - containerRect.left;
-            let span = endEdge - startEdge;
-
-            // During collapse or expand: converge both edges toward chip center
-            const isAnimating =
-                tg.collapsed ||
-                tg.panelIds.some((pid) => {
-                    const te = this._tabMap.get(pid);
-                    return (
-                        te &&
-                        te.value.element.classList.contains(
-                            'dv-tab--group-expanding'
-                        )
-                    );
-                });
-
-            if (isAnimating && chipEl) {
-                const chipRect = chipEl.getBoundingClientRect();
-                const chipCenter = isVertical
-                    ? chipRect.top + chipRect.height / 2 - containerRect.top
-                    : chipRect.left + chipRect.width / 2 - containerRect.left;
-
-                // Sum of current visible tab sizes (shrinking or growing)
-                let currentTabSize = 0;
-                let fullTabSize = 0;
-                for (const pid of tg.panelIds) {
-                    const te = this._tabMap.get(pid);
-                    if (!te) continue;
-                    const el = te.value.element;
-                    if (isVertical) {
-                        currentTabSize += el.getBoundingClientRect().height;
-                        fullTabSize += el.scrollHeight;
-                    } else {
-                        currentTabSize += el.getBoundingClientRect().width;
-                        fullTabSize += el.scrollWidth;
-                    }
-                }
-
-                // progress: 0 when tabs at 0 size, 1 when fully open
-                const progress =
-                    fullTabSize > 0
-                        ? Math.min(1, currentTabSize / fullTabSize)
-                        : 0;
-
-                // Interpolate start and end edges toward chip center
-                startEdge = chipCenter + (startEdge - chipCenter) * progress;
-                endEdge = chipCenter + (endEdge - chipCenter) * progress;
-                span = Math.max(0, endEdge - startEdge);
-            }
-
-            if (isVertical) {
-                underline.style.top = `${startEdge}px`;
-                underline.style.height = `${Math.max(0, span)}px`;
-                // Clear horizontal properties
-                underline.style.left = '';
-                underline.style.width = '';
-            } else {
-                underline.style.left = `${startEdge}px`;
-                underline.style.width = `${Math.max(0, span)}px`;
-                // Clear vertical properties
-                underline.style.top = '';
-                underline.style.height = '';
-            }
-
-            // Chrome-style wrap-around: contour the active tab if it belongs to this group
-            this._applyUnderlineShape(
-                underline,
-                tg,
-                startEdge,
-                span,
-                containerCrossSize,
-                activePanelId,
-                containerRect,
-                isVertical
-            );
-        }
-    }
-
-    /**
-     * Chrome-style wrap-around underline: a stroked SVG path that runs
-     * along the bottom (or left edge in vertical mode), curving up and
-     * over the active tab with rounded corners.
-     *
-     * The SVG and path elements are created once per underline and reused;
-     * only the `d`, `stroke`, and viewport attributes are updated each frame.
-     */
-    private _applyUnderlineShape(
-        underline: HTMLElement,
-        tg: ITabGroup,
-        groupStart: number,
-        groupSpan: number,
-        containerCrossSize: number,
-        activePanelId: string | undefined,
-        containerRect: DOMRect,
-        isVertical: boolean
+    private _handleChipDragStart(
+        tabGroup: ITabGroup,
+        chip: TabGroupChip,
+        event: DragEvent
     ): void {
-        const t = 2; // line thickness in px
-        const crossSize = containerCrossSize;
-        const mainSize = groupSpan;
-        const color = `var(--dv-tab-group-color-${tg.color})`;
+        if (this.accessor.options.tabAnimation === 'smooth') {
+            const firstPanelId = tabGroup.panelIds[0];
+            const firstIdx = firstPanelId
+                ? this._tabs.findIndex(
+                      (t) => t.value.panel.id === firstPanelId
+                  )
+                : -1;
+            const chipRect = chip.element.getBoundingClientRect();
 
-        if (mainSize <= 0 || crossSize <= 0) {
-            underline.style.display = 'none';
-            return;
-        }
-        underline.style.display = '';
-
-        // Find the active tab within this group
-        let activeTabEntry: IValueDisposable<Tab> | undefined;
-        if (activePanelId && tg.panelIds.includes(activePanelId)) {
-            activeTabEntry = this._tabMap.get(activePanelId);
-        }
-
-        // Ensure SVG + path child exists (created once, reused)
-        let svg = underline.firstElementChild as SVGSVGElement | null;
-        let path: SVGPathElement;
-        if (!svg || svg.tagName !== 'svg') {
-            underline.innerHTML = '';
-            svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.style.display = 'block';
-            path = document.createElementNS(
-                'http://www.w3.org/2000/svg',
-                'path'
-            );
-            path.setAttribute('fill', 'none');
-            svg.appendChild(path);
-            underline.appendChild(svg);
-        } else {
-            path = svg.firstElementChild as SVGPathElement;
-        }
-
-        path.setAttribute('stroke', color);
-        path.setAttribute('stroke-width', String(t));
-
-        if (!activeTabEntry) {
-            // No active tab: straight line along the edge
-            if (isVertical) {
-                svg.setAttribute('width', String(t));
-                svg.setAttribute('height', String(mainSize));
-                underline.style.width = `${t}px`;
-                underline.style.height = `${mainSize}px`;
-                path.setAttribute('d', `M ${t / 2},0 L ${t / 2},${mainSize}`);
-            } else {
-                svg.setAttribute('width', String(mainSize));
-                svg.setAttribute('height', String(t));
-                underline.style.width = `${mainSize}px`;
-                underline.style.height = `${t}px`;
-                path.setAttribute('d', `M 0,${t / 2} L ${mainSize},${t / 2}`);
+            // Compute total group width (chip + all tabs)
+            let groupGapWidth = chipRect.width;
+            for (const pid of tabGroup.panelIds) {
+                const tabEntry = this._tabMap.get(pid);
+                if (tabEntry) {
+                    groupGapWidth +=
+                        tabEntry.value.element.getBoundingClientRect().width;
+                }
             }
-            return;
+
+            this._animState = {
+                sourceTabId: '',
+                sourceIndex: firstIdx,
+                tabPositions: this.snapshotTabPositions(),
+                chipPositions: this._tabGroupManager.snapshotChipWidths(),
+                currentInsertionIndex: null,
+                targetTabGroupId: null,
+                sourceTabGroupId: tabGroup.id,
+                sourceGroupPanelIds: new Set(tabGroup.panelIds),
+                sourceChipWidth: chipRect.width,
+                cursorOffsetFromDragLeft: event.clientX - chipRect.left,
+                sourceGapWidth: groupGapWidth,
+                containerLeft: this._tabsList.getBoundingClientRect().left,
+            };
+
+            // Collapse group tabs + chip after the browser
+            // captures the drag image, then open the gap at the
+            // source position — all instant (no transitions).
+            const groupPanelIds = new Set(tabGroup.panelIds);
+            this._pendingCollapse = true;
+            requestAnimationFrame(() => {
+                this._pendingCollapse = false;
+                if (!this._animState) {
+                    return;
+                }
+                // Collapse all group tabs instantly
+                for (const t of this._tabs) {
+                    if (groupPanelIds.has(t.value.panel.id)) {
+                        t.value.element.style.transition = 'none';
+                        toggleClass(
+                            t.value.element,
+                            'dv-tab--dragging',
+                            true
+                        );
+                    }
+                }
+                // Collapse the group chip instantly
+                const chipEntry =
+                    this._tabGroupManager.chipRenderers.get(tabGroup.id);
+                if (chipEntry) {
+                    chipEntry.chip.element.style.transition = 'none';
+                    toggleClass(
+                        chipEntry.chip.element,
+                        'dv-tab-group-chip--dragging',
+                        true
+                    );
+                }
+                // Single reflow for the entire batch
+                this._tabsList.offsetHeight;
+
+                const underline =
+                    this._tabGroupManager.groupUnderlines.get(tabGroup.id);
+                if (underline) {
+                    underline.style.display = 'none';
+                }
+
+                if (this._animState.currentInsertionIndex === null) {
+                    this._animState.currentInsertionIndex = firstIdx;
+                }
+                // Apply gap with transitions disabled
+                this.applyDragOverTransforms(true);
+
+                // Re-enable transitions for subsequent moves
+                for (const t of this._tabs) {
+                    if (groupPanelIds.has(t.value.panel.id)) {
+                        t.value.element.style.removeProperty('transition');
+                    }
+                }
+                if (chipEntry) {
+                    chipEntry.chip.element.style.removeProperty('transition');
+                }
+            });
         }
 
-        const activeRect = activeTabEntry.value.element.getBoundingClientRect();
-
-        // Compute active tab start/end relative to the group start
-        let aStart: number;
-        let aEnd: number;
-        if (isVertical) {
-            aStart = Math.max(
-                0,
-                activeRect.top - containerRect.top - groupStart
-            );
-            aEnd = Math.min(
-                mainSize,
-                activeRect.bottom - containerRect.top - groupStart
-            );
-        } else {
-            aStart = Math.max(
-                0,
-                activeRect.left - containerRect.left - groupStart
-            );
-            aEnd = Math.min(
-                mainSize,
-                activeRect.right - containerRect.left - groupStart
-            );
-        }
-
-        if (aEnd <= aStart) {
-            if (isVertical) {
-                svg.setAttribute('width', String(t));
-                svg.setAttribute('height', String(mainSize));
-                underline.style.width = `${t}px`;
-                underline.style.height = `${mainSize}px`;
-                path.setAttribute('d', `M ${t / 2},0 L ${t / 2},${mainSize}`);
-            } else {
-                svg.setAttribute('width', String(mainSize));
-                svg.setAttribute('height', String(t));
-                underline.style.width = `${mainSize}px`;
-                underline.style.height = `${t}px`;
-                path.setAttribute('d', `M 0,${t / 2} L ${mainSize},${t / 2}`);
-            }
-            return;
-        }
-
-        const r = 6; // corner radius
-        const half = t / 2;
-
-        if (isVertical) {
-            const svgW = crossSize;
-            const svgH = mainSize;
-            svg.setAttribute('width', String(svgW));
-            svg.setAttribute('height', String(svgH));
-            underline.style.width = `${svgW}px`;
-            underline.style.height = `${svgH}px`;
-
-            const xLeft = half;
-            const xRight = svgW - half;
-
-            const d = [
-                `M ${xLeft},0`,
-                `L ${xLeft},${aStart - r}`,
-                `Q ${xLeft},${aStart} ${xLeft + r},${aStart}`,
-                `L ${xRight - r},${aStart}`,
-                `Q ${xRight},${aStart} ${xRight},${aStart + r}`,
-                `L ${xRight},${aEnd - r}`,
-                `Q ${xRight},${aEnd} ${xRight - r},${aEnd}`,
-                `L ${xLeft + r},${aEnd}`,
-                `Q ${xLeft},${aEnd} ${xLeft},${aEnd + r}`,
-                `L ${xLeft},${svgH}`,
-            ].join(' ');
-
-            path.setAttribute('d', d);
-        } else {
-            const svgW = mainSize;
-            const svgH = crossSize;
-            svg.setAttribute('width', String(svgW));
-            svg.setAttribute('height', String(svgH));
-            underline.style.width = `${svgW}px`;
-            underline.style.height = `${svgH}px`;
-
-            const yBot = svgH - half;
-            const yTop = half;
-
-            const d = [
-                `M 0,${yBot}`,
-                `L ${aStart - r},${yBot}`,
-                `Q ${aStart},${yBot} ${aStart},${yBot - r}`,
-                `L ${aStart},${yTop + r}`,
-                `Q ${aStart},${yTop} ${aStart + r},${yTop}`,
-                `L ${aEnd - r},${yTop}`,
-                `Q ${aEnd},${yTop} ${aEnd},${yTop + r}`,
-                `L ${aEnd},${yBot - r}`,
-                `Q ${aEnd},${yBot} ${aEnd + r},${yBot}`,
-                `L ${svgW},${yBot}`,
-            ].join(' ');
-
-            path.setAttribute('d', d);
-        }
-    }
-
-    private _positionUnderlines(): void {
-        requestAnimationFrame(() => {
-            this._positionUnderlinesSync();
-        });
-    }
-
-    /**
-     * Continuously reposition underlines every frame for the duration
-     * of a tab transition (~200ms), so the underline tracks tab sizes.
-     */
-    private _trackUnderlines(): void {
-        if (this._underlineRafId !== null) {
-            cancelAnimationFrame(this._underlineRafId);
-        }
-
-        const start = performance.now();
-        const duration = 250; // slightly longer than transition to ensure we catch the end
-
-        const tick = () => {
-            this._positionUnderlinesSync();
-            if (performance.now() - start < duration) {
-                this._underlineRafId = requestAnimationFrame(tick);
-            } else {
-                this._underlineRafId = null;
-            }
-        };
-
-        this._underlineRafId = requestAnimationFrame(tick);
-    }
-
-    private _disposeAllChips(): void {
-        if (this._underlineRafId !== null) {
-            cancelAnimationFrame(this._underlineRafId);
-            this._underlineRafId = null;
-        }
-
-        for (const [, entry] of this._chipRenderers) {
-            entry.chip.element.remove();
-            entry.chip.dispose();
-            entry.disposable.dispose();
-        }
-        this._chipRenderers.clear();
-
-        for (const [, el] of this._groupUnderlines) {
-            el.remove();
-        }
-        this._groupUnderlines.clear();
+        // Build a composite drag image showing chip + group tabs
+        this._tabGroupManager.setGroupDragImage(
+            event,
+            tabGroup,
+            chip.element
+        );
     }
 
     /**
@@ -1621,17 +1006,6 @@ export class Tabs extends CompositeDisposable {
         return positions;
     }
 
-    private snapshotChipWidths(): Map<string, number> {
-        const widths = new Map<string, number>();
-        for (const [groupId, entry] of this._chipRenderers) {
-            widths.set(
-                groupId,
-                entry.chip.element.getBoundingClientRect().width
-            );
-        }
-        return widths;
-    }
-
     private getAverageTabWidth(): number {
         if (this._tabs.length === 0) {
             return 0;
@@ -1668,7 +1042,7 @@ export class Tabs extends CompositeDisposable {
         // Build lookup: first panel ID of each non-source group → group ID
         // so we can add chip widths when we encounter a group's first tab.
         const firstPanelToGroup = new Map<string, string>();
-        if (this._chipRenderers.size > 0) {
+        if (this._tabGroupManager.chipRenderers.size > 0) {
             const tabGroups = this.group.model.getTabGroups();
             for (const tg of tabGroups) {
                 if (tg.id === this._animState.sourceTabGroupId) {
@@ -1730,7 +1104,7 @@ export class Tabs extends CompositeDisposable {
         // above) to compute original chip boundaries.  This avoids reading
         // getBoundingClientRect() on chips whose live position is shifted by
         // the drag gap margin, which caused oscillation / visual jumps.
-        if (insertionIndex !== null && this._chipRenderers.size > 0) {
+        if (insertionIndex !== null && this._tabGroupManager.chipRenderers.size > 0) {
             const isGroupDrag = !!this._animState.sourceTabGroupId;
             const tabGroups = this.group.model.getTabGroups();
 
@@ -1950,7 +1324,7 @@ export class Tabs extends CompositeDisposable {
         //    because the collapsed tabs are invisible, so putting the gap on
         //    them has no visual effect.
         let chipToShift: HTMLElement | null = null;
-        if (this._chipRenderers.size > 0) {
+        if (this._tabGroupManager.chipRenderers.size > 0) {
             const tabGroups = this.group.model.getTabGroups();
             for (const tg of tabGroups) {
                 if (tg.id === this._animState.sourceTabGroupId) continue;
@@ -1988,7 +1362,7 @@ export class Tabs extends CompositeDisposable {
                         break;
                     }
                     if (!hasTabs) {
-                        const chipEntry = this._chipRenderers.get(tg.id);
+                        const chipEntry = this._tabGroupManager.chipRenderers.get(tg.id);
                         if (chipEntry) {
                             chipToShift = chipEntry.chip.element;
                         }
@@ -2038,7 +1412,7 @@ export class Tabs extends CompositeDisposable {
         let gapApplied = false;
 
         // Reset all non-source chip margins first
-        for (const [groupId, entry] of this._chipRenderers) {
+        for (const [groupId, entry] of this._tabGroupManager.chipRenderers) {
             if (groupId === this._animState.sourceTabGroupId) continue;
             clearMargin(entry.chip.element);
         }
@@ -2067,7 +1441,7 @@ export class Tabs extends CompositeDisposable {
         }
 
         // Reposition underlines to follow shifted chips/tabs
-        this._trackUnderlines();
+        this._tabGroupManager.trackUnderlines();
     }
 
     private resetTabTransforms(): void {
@@ -2079,7 +1453,7 @@ export class Tabs extends CompositeDisposable {
             tab.value.element.style.removeProperty('transform');
             toggleClass(tab.value.element, 'dv-tab--shifting', false);
         }
-        for (const [, entry] of this._chipRenderers) {
+        for (const [, entry] of this._tabGroupManager.chipRenderers) {
             entry.chip.element.style.removeProperty('margin-left');
             toggleClass(
                 entry.chip.element,
@@ -2087,121 +1461,9 @@ export class Tabs extends CompositeDisposable {
                 false
             );
         }
-        this._positionUnderlines();
+        this._tabGroupManager.positionUnderlines();
     }
 
-    private _setGroupDragImage(
-        event: DragEvent,
-        tabGroup: ITabGroup,
-        chipEl: HTMLElement
-    ): void {
-        if (!event.dataTransfer) {
-            return;
-        }
-
-        const groupPanelIds = new Set(tabGroup.panelIds);
-        const underlineEl = this._groupUnderlines.get(tabGroup.id);
-
-        // Clone the entire tabs list so cloned nodes inherit all
-        // theme styles, CSS variables and class-based rules.
-        const clone = this._tabsList.cloneNode(true) as HTMLElement;
-        clone.style.height = `${this._tabsList.offsetHeight}px`;
-        clone.style.width = 'auto';
-        clone.style.overflow = 'visible';
-        clone.style.pointerEvents = 'none';
-
-        // Remove elements not belonging to this group.
-        // Keep: chip, group tabs, group underline.
-        // Walk backwards so removals don't shift indices.
-        const children = Array.from(clone.children);
-        const realChildren = Array.from(this._tabsList.children);
-        for (let i = children.length - 1; i >= 0; i--) {
-            const real = realChildren[i];
-            if (!real) {
-                children[i].remove();
-                continue;
-            }
-            if (real === chipEl || real === underlineEl) {
-                continue; // keep the chip and underline
-            }
-            if (real.classList.contains('dv-tab')) {
-                const tabEntry = this._tabs.find(
-                    (t) => t.value.element === real
-                );
-                if (tabEntry && groupPanelIds.has(tabEntry.value.panel.id)) {
-                    continue; // keep
-                }
-            }
-            children[i].remove();
-        }
-
-        // Re-position the underline clone as a simple bottom line for the drag ghost
-        const underlineClone = clone.querySelector('.dv-tab-group-underline');
-        if (underlineClone instanceof HTMLElement) {
-            underlineClone.innerHTML = '';
-            underlineClone.style.left = '0px';
-            underlineClone.style.width = '100%';
-            underlineClone.style.top = 'auto';
-            underlineClone.style.bottom = '0';
-            underlineClone.style.height = '2px';
-            underlineClone.style.backgroundColor = `var(--dv-tab-group-color-${tabGroup.color})`;
-        }
-
-        // Wrap the clone in a minimal ancestor chain so that CSS
-        // selectors like `.dv-groupview.dv-active-group > .dv-tabs-and-actions-container .dv-tabs-container > .dv-tab`
-        // match the cloned tabs and apply correct color/background.
-        const wrapper = document.createElement('div');
-        wrapper.className = 'dv-groupview dv-active-group';
-        wrapper.style.position = 'fixed';
-        wrapper.style.top = '-10000px';
-        wrapper.style.left = '0px';
-        wrapper.style.height = 'auto';
-        wrapper.style.width = 'auto';
-        wrapper.style.pointerEvents = 'none';
-
-        const actionsWrapper = document.createElement('div');
-        actionsWrapper.className = 'dv-tabs-and-actions-container';
-        actionsWrapper.style.height = 'auto';
-        actionsWrapper.style.width = 'auto';
-        wrapper.appendChild(actionsWrapper);
-        actionsWrapper.appendChild(clone);
-
-        // Append inside the dockview root so CSS variables are inherited
-        this.accessor.element.appendChild(wrapper);
-
-        // Compute cursor offset relative to the wrapper element.
-        // The cloned chip is the first .dv-tab-group-chip in the clone.
-        const clonedChip = clone.querySelector('.dv-tab-group-chip');
-        const chipRect = chipEl.getBoundingClientRect();
-        const cursorInChipX = event.clientX - chipRect.left;
-        const cursorInChipY = event.clientY - chipRect.top;
-
-        if (clonedChip) {
-            const clonedChipRect = clonedChip.getBoundingClientRect();
-            const wrapperRect = wrapper.getBoundingClientRect();
-            const offsetX =
-                clonedChipRect.left - wrapperRect.left + cursorInChipX;
-            const offsetY =
-                clonedChipRect.top - wrapperRect.top + cursorInChipY;
-            event.dataTransfer.setDragImage(wrapper, offsetX, offsetY);
-        } else {
-            event.dataTransfer.setDragImage(
-                wrapper,
-                cursorInChipX,
-                cursorInChipY
-            );
-        }
-
-        // Clean up after the browser captures the image
-        requestAnimationFrame(() => {
-            wrapper.remove();
-        });
-    }
-
-    /**
-     * Instantly remove drag-collapse classes from a group's chip and tabs
-     * so that the subsequent rebuild doesn't trigger expand animations.
-     */
     /**
      * Commit a group-drag drop: clear drag classes, move the group
      * in the model, and run a FLIP animation.
@@ -2218,7 +1480,9 @@ export class Tabs extends CompositeDisposable {
     }
 
     private _clearGroupDragClasses(sourceTabGroupId: string): void {
-        const chipEntry = this._chipRenderers.get(sourceTabGroupId);
+        const chipEntry = this._tabGroupManager.chipRenderers.get(
+            sourceTabGroupId
+        );
         if (chipEntry) {
             this._removeClassInstantlyBatch(
                 [chipEntry.chip.element],
@@ -2230,7 +1494,9 @@ export class Tabs extends CompositeDisposable {
             'dv-tab--dragging'
         );
         // Restore underline
-        const underline = this._groupUnderlines.get(sourceTabGroupId);
+        const underline = this._tabGroupManager.groupUnderlines.get(
+            sourceTabGroupId
+        );
         if (underline) {
             underline.style.removeProperty('display');
         }
@@ -2238,7 +1504,7 @@ export class Tabs extends CompositeDisposable {
         // updateTabGroups → _updateTabGroupClasses. For collapsed groups
         // the new tabs don't have dv-tab--group-collapsed yet, which
         // would trigger the collapse animation. Skip it.
-        this._skipNextCollapseAnimation = true;
+        this._tabGroupManager.skipNextCollapseAnimation = true;
     }
 
     private resetDragAnimation(): void {
@@ -2258,7 +1524,7 @@ export class Tabs extends CompositeDisposable {
         this._animState = null;
 
         // Restore any hidden underlines from group drags
-        for (const [, el] of this._groupUnderlines) {
+        for (const [, el] of this._tabGroupManager.groupUnderlines) {
             el.style.removeProperty('display');
         }
     }
@@ -2331,7 +1597,7 @@ export class Tabs extends CompositeDisposable {
 
             // Track underlines during the FLIP transition so they
             // follow tabs as they slide to their final positions.
-            this._trackUnderlines();
+            this._tabGroupManager.trackUnderlines();
 
             const onTransitionEnd = (event: TransitionEvent) => {
                 if (event.propertyName === 'transform') {
@@ -2347,7 +1613,7 @@ export class Tabs extends CompositeDisposable {
                         );
                     }
                     // Final reposition after animation settles
-                    this._positionUnderlines();
+                    this._tabGroupManager.positionUnderlines();
                 }
             };
 

@@ -551,7 +551,7 @@ describe('tabs - animation', () => {
             ];
 
             // Set up chip renderers map so the code knows there are chips
-            const chipRenderers = (tabs as any)._chipRenderers as Map<
+            const chipRenderers = (tabs as any)._tabGroupManager._chipRenderers as Map<
                 string,
                 any
             >;
@@ -637,7 +637,7 @@ describe('tabs - animation', () => {
                 monitoringGroup,
             ];
 
-            const chipRenderers = (tabs as any)._chipRenderers as Map<
+            const chipRenderers = (tabs as any)._tabGroupManager._chipRenderers as Map<
                 string,
                 any
             >;
