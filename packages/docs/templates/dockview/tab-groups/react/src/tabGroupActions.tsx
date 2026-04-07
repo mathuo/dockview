@@ -19,7 +19,7 @@ export function buildChipContextMenuItems(
             onClick: () => {
                 const name = window.prompt('Group name:', tabGroup.label);
                 if (name !== null) {
-                    tabGroup.label = name;
+                    tabGroup.setLabel(name);
                 }
             },
         },

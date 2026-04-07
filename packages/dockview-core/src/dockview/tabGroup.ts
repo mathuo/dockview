@@ -38,8 +38,8 @@ export interface SerializedTabGroup {
 
 export interface ITabGroup {
     readonly id: string;
-    label: string;
-    color: TabGroupColor;
+    readonly label: string;
+    readonly color: TabGroupColor;
     readonly collapsed: boolean;
     readonly panelIds: readonly string[];
     readonly size: number;
@@ -55,6 +55,8 @@ export interface ITabGroup {
     removePanel(panelId: string): boolean;
     indexOfPanel(panelId: string): number;
     containsPanel(panelId: string): boolean;
+    setLabel(value: string): void;
+    setColor(value: TabGroupColor): void;
     collapse(): void;
     expand(): void;
     toggle(): void;
@@ -88,7 +90,11 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
         return this._label;
     }
 
-    set label(value: string) {
+    get color(): TabGroupColor {
+        return this._color;
+    }
+
+    setLabel(value: string): void {
         if (this._label === value) {
             return;
         }
@@ -96,11 +102,7 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
         this._onDidChange.fire();
     }
 
-    get color(): TabGroupColor {
-        return this._color;
-    }
-
-    set color(value: TabGroupColor) {
+    setColor(value: TabGroupColor): void {
         const validColor = isValidTabGroupColor(value) ? value : 'grey';
         if (this._color === validColor) {
             return;

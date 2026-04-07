@@ -138,10 +138,10 @@ describe('TabGroup', () => {
         const group = new TabGroup('g1');
         const changes: void[] = [];
         group.onDidChange(() => changes.push(undefined));
-        group.label = 'New Label';
+        group.setLabel('New Label');
         expect(changes.length).toBe(1);
         // Setting same label should not fire
-        group.label = 'New Label';
+        group.setLabel('New Label');
         expect(changes.length).toBe(1);
         group.dispose();
     });
@@ -150,17 +150,17 @@ describe('TabGroup', () => {
         const group = new TabGroup('g1');
         const changes: void[] = [];
         group.onDidChange(() => changes.push(undefined));
-        group.color = 'blue';
+        group.setColor('blue');
         expect(changes.length).toBe(1);
         // Setting same color should not fire
-        group.color = 'blue';
+        group.setColor('blue');
         expect(changes.length).toBe(1);
         group.dispose();
     });
 
     test('should default to grey on invalid color set', () => {
         const group = new TabGroup('g1', { color: 'blue' });
-        group.color = 'invalid' as TabGroupColor;
+        group.setColor('invalid' as TabGroupColor);
         expect(group.color).toBe('grey');
         group.dispose();
     });

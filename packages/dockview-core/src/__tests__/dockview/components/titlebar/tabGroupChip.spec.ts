@@ -85,7 +85,7 @@ describe('TabGroupChip', () => {
             true
         );
 
-        tabGroup.color = 'red';
+        tabGroup.setColor('red');
 
         expect(chip.element.classList.contains('dv-tab-group-chip--red')).toBe(
             true
@@ -110,7 +110,7 @@ describe('TabGroupChip', () => {
         const label = chip.element.querySelector('.dv-tab-group-chip-label');
         expect(label!.textContent).toBe('Old');
 
-        tabGroup.label = 'New';
+        tabGroup.setLabel('New');
 
         expect(label!.textContent).toBe('New');
     });
@@ -198,7 +198,7 @@ describe('TabGroupChip', () => {
         });
 
         for (const color of TAB_GROUP_COLORS) {
-            tabGroup.color = color;
+            tabGroup.setColor(color);
 
             for (const c of TAB_GROUP_COLORS) {
                 expect(

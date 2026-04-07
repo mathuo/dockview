@@ -58,7 +58,7 @@ function buildColorPicker(tabGroup: ITabGroup, close: () => void): HTMLElement {
             swatch.classList.add('dv-context-menu-color-swatch--selected');
         }
         swatch.addEventListener('click', () => {
-            tabGroup.color = color;
+            tabGroup.setColor(color);
             close();
         });
         wrapper.appendChild(swatch);

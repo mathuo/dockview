@@ -8692,6 +8692,300 @@ describe('dockviewComponent', () => {
                 labelEl!.classList.contains('dv-tab-group-chip-label--empty')
             ).toBe(true);
         });
+
+        test('toJSON/fromJSON round-trip preserves tab groups', () => {
+            dockview.layout(1000, 1000);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+            const panel3 = dockview.addPanel({
+                id: 'panel3',
+                component: 'default',
+            });
+
+            const groupId = panel1.group.id;
+
+            const tg1 = dockview.api.createTabGroup({
+                groupId,
+                label: 'Alpha',
+                color: 'blue',
+            });
+            dockview.api.addPanelToTabGroup({
+                groupId,
+                tabGroupId: tg1.id,
+                panelId: 'panel1',
+            });
+            dockview.api.addPanelToTabGroup({
+                groupId,
+                tabGroupId: tg1.id,
+                panelId: 'panel2',
+            });
+            tg1.collapse();
+
+            const tg2 = dockview.api.createTabGroup({
+                groupId,
+                label: 'Beta',
+                color: 'red',
+            });
+            dockview.api.addPanelToTabGroup({
+                groupId,
+                tabGroupId: tg2.id,
+                panelId: 'panel3',
+            });
+
+            // Snapshot and restore
+            const state = dockview.toJSON();
+            dockview.fromJSON(state);
+
+            // Verify tab groups survived the round-trip
+            const restoredGroup = dockview.api.panels[0].group;
+            const restored = dockview.api.getTabGroups(restoredGroup.id);
+            expect(restored.length).toBe(2);
+
+            const r1 = restored.find((tg) => tg.label === 'Alpha')!;
+            expect(r1).toBeDefined();
+            expect(r1.color).toBe('blue');
+            expect(r1.collapsed).toBe(true);
+            expect(r1.panelIds).toEqual(['panel1', 'panel2']);
+
+            const r2 = restored.find((tg) => tg.label === 'Beta')!;
+            expect(r2).toBeDefined();
+            expect(r2.color).toBe('red');
+            expect(r2.collapsed).toBe(false);
+            expect(r2.panelIds).toEqual(['panel3']);
+
+            // Second round-trip to ensure stability
+            expect(
+                JSON.parse(JSON.stringify(dockview.toJSON()))
+            ).toEqual(JSON.parse(JSON.stringify(state)));
+        });
+
+        test('fromJSON with tab groups fires correct events', () => {
+            dockview.layout(1000, 1000);
+
+            // Set up panels and tab groups first
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+
+            const groupId = panel1.group.id;
+            const tg = dockview.api.createTabGroup({
+                groupId,
+                label: 'Events',
+                color: 'green',
+            });
+            dockview.api.addPanelToTabGroup({
+                groupId,
+                tabGroupId: tg.id,
+                panelId: 'panel1',
+            });
+            dockview.api.addPanelToTabGroup({
+                groupId,
+                tabGroupId: tg.id,
+                panelId: 'panel2',
+            });
+
+            const state = dockview.toJSON();
+
+            // Now restore from JSON and track events on the new groups
+            dockview.fromJSON(state);
+
+            const restoredGroup = dockview.api.panels[0].group;
+            const model = restoredGroup.model;
+
+            const created: string[] = [];
+            const destroyed: string[] = [];
+            const panelsAdded: { tgId: string; panelId: string }[] = [];
+            const panelsRemoved: { tgId: string; panelId: string }[] = [];
+            const changes: string[] = [];
+
+            const disposable = new CompositeDisposable(
+                model.onDidCreateTabGroup((e) => created.push(e.tabGroup.id)),
+                model.onDidDestroyTabGroup((e) =>
+                    destroyed.push(e.tabGroup.id)
+                ),
+                model.onDidAddPanelToTabGroup((e) =>
+                    panelsAdded.push({
+                        tgId: e.tabGroup.id,
+                        panelId: e.panelId,
+                    })
+                ),
+                model.onDidRemovePanelFromTabGroup((e) =>
+                    panelsRemoved.push({
+                        tgId: e.tabGroup.id,
+                        panelId: e.panelId,
+                    })
+                ),
+                model.onDidTabGroupChange((e) => changes.push(e.tabGroup.id))
+            );
+
+            // Create a new tab group and verify events fire
+            const newTg = dockview.api.createTabGroup({
+                groupId: restoredGroup.id,
+                label: 'New',
+                color: 'purple',
+            });
+            expect(created).toEqual([newTg.id]);
+
+            // Add a panel to the new group (panel1 is already in the
+            // restored tab group, so it will be removed from there first)
+            dockview.api.addPanelToTabGroup({
+                groupId: restoredGroup.id,
+                tabGroupId: newTg.id,
+                panelId: 'panel1',
+            });
+            // One removal from the restored group, one addition to newTg
+            expect(panelsRemoved.length).toBe(1);
+            expect(panelsAdded.length).toBe(1);
+            expect(panelsAdded[0]).toEqual({
+                tgId: newTg.id,
+                panelId: 'panel1',
+            });
+
+            // Change the group label — should fire change event
+            newTg.setLabel('Updated');
+            expect(changes).toContain(newTg.id);
+
+            // Remove the panel
+            panelsRemoved.length = 0;
+            dockview.api.removePanelFromTabGroup({
+                groupId: restoredGroup.id,
+                panelId: 'panel1',
+            });
+            expect(panelsRemoved.length).toBe(1);
+            expect(panelsRemoved[0]).toEqual({
+                tgId: newTg.id,
+                panelId: 'panel1',
+            });
+
+            // Tab group should auto-destroy when empty
+            expect(destroyed).toContain(newTg.id);
+
+            disposable.dispose();
+        });
+
+        test('tab group events fire for all lifecycle operations', () => {
+            dockview.layout(1000, 1000);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+            const panel3 = dockview.addPanel({
+                id: 'panel3',
+                component: 'default',
+            });
+
+            const groupId = panel1.group.id;
+            const model = panel1.group.model;
+
+            const created: string[] = [];
+            const destroyed: string[] = [];
+            const panelsAdded: { tgId: string; panelId: string }[] = [];
+            const panelsRemoved: { tgId: string; panelId: string }[] = [];
+            const changes: string[] = [];
+
+            const disposable = new CompositeDisposable(
+                model.onDidCreateTabGroup((e) => created.push(e.tabGroup.id)),
+                model.onDidDestroyTabGroup((e) =>
+                    destroyed.push(e.tabGroup.id)
+                ),
+                model.onDidAddPanelToTabGroup((e) =>
+                    panelsAdded.push({
+                        tgId: e.tabGroup.id,
+                        panelId: e.panelId,
+                    })
+                ),
+                model.onDidRemovePanelFromTabGroup((e) =>
+                    panelsRemoved.push({
+                        tgId: e.tabGroup.id,
+                        panelId: e.panelId,
+                    })
+                ),
+                model.onDidTabGroupChange((e) => changes.push(e.tabGroup.id))
+            );
+
+            // 1. Create
+            const tg = dockview.api.createTabGroup({
+                groupId,
+                label: 'Test',
+                color: 'blue',
+            });
+            expect(created).toEqual([tg.id]);
+
+            // 2. Add panels
+            dockview.api.addPanelToTabGroup({
+                groupId,
+                tabGroupId: tg.id,
+                panelId: 'panel1',
+            });
+            dockview.api.addPanelToTabGroup({
+                groupId,
+                tabGroupId: tg.id,
+                panelId: 'panel2',
+            });
+            dockview.api.addPanelToTabGroup({
+                groupId,
+                tabGroupId: tg.id,
+                panelId: 'panel3',
+            });
+            expect(panelsAdded).toEqual([
+                { tgId: tg.id, panelId: 'panel1' },
+                { tgId: tg.id, panelId: 'panel2' },
+                { tgId: tg.id, panelId: 'panel3' },
+            ]);
+
+            // 3. Change label and color
+            changes.length = 0;
+            tg.setLabel('Updated');
+            tg.setColor('red');
+            expect(changes.length).toBe(2);
+
+            // 4. Collapse and expand
+            tg.collapse();
+            tg.expand();
+
+            // 5. Remove one panel
+            dockview.api.removePanelFromTabGroup({
+                groupId,
+                panelId: 'panel2',
+            });
+            expect(panelsRemoved).toEqual([
+                { tgId: tg.id, panelId: 'panel2' },
+            ]);
+
+            // 6. Dissolve — should remove remaining panels and destroy
+            panelsRemoved.length = 0;
+            dockview.api.dissolveTabGroup({
+                groupId,
+                tabGroupId: tg.id,
+            });
+
+            expect(panelsRemoved).toEqual(
+                expect.arrayContaining([
+                    { tgId: tg.id, panelId: 'panel1' },
+                    { tgId: tg.id, panelId: 'panel3' },
+                ])
+            );
+            expect(destroyed).toEqual([tg.id]);
+
+            disposable.dispose();
+        });
     });
 
     describe('edge panels', () => {

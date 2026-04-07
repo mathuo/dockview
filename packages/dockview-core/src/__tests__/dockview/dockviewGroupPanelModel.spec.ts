@@ -1514,8 +1514,8 @@ describe('dockviewGroupPanelModel', () => {
             const events: any[] = [];
             groupview.model.onDidTabGroupChange((e) => events.push(e));
 
-            tabGroup.label = 'Updated';
-            tabGroup.color = 'red';
+            tabGroup.setLabel('Updated');
+            tabGroup.setColor('red');
 
             expect(events).toHaveLength(2);
             expect(events[0].tabGroup).toBe(tabGroup);
