@@ -1546,10 +1546,10 @@ export class DockviewComponent
     }
 
     setEdgeGroupCollapsed(group: DockviewGroupPanel, collapsed: boolean): void {
-        for (const [position, fixedGroup] of this._edgeGroups) {
-            if (fixedGroup === group) {
+        for (const [position, edgeGroup] of this._edgeGroups) {
+            if (edgeGroup === group) {
                 this._shellManager!.setEdgeGroupCollapsed(position, collapsed);
-                fixedGroup.api._onDidCollapsedChange.fire({
+                edgeGroup.api._onDidCollapsedChange.fire({
                     isCollapsed: collapsed,
                 });
                 return;
@@ -1558,8 +1558,8 @@ export class DockviewComponent
     }
 
     isEdgeGroupCollapsed(group: DockviewGroupPanel): boolean {
-        for (const [position, fixedGroup] of this._edgeGroups) {
-            if (fixedGroup === group) {
+        for (const [position, edgeGroup] of this._edgeGroups) {
+            if (edgeGroup === group) {
                 return this._shellManager!.isEdgeGroupCollapsed(position);
             }
         }
@@ -1887,9 +1887,9 @@ export class DockviewComponent
                 }
 
                 // Restore panel contents of edge groups
-                for (const [position, fixedGroup] of this._edgeGroups) {
-                    const fixedData = data.edgeGroups[position];
-                    const groupState = fixedData?.group as
+                for (const [position, edgeGroup] of this._edgeGroups) {
+                    const edgeData = data.edgeGroups[position];
+                    const groupState = edgeData?.group as
                         | GroupPanelViewState
                         | undefined;
                     if (groupState) {
@@ -1900,7 +1900,7 @@ export class DockviewComponent
                             if (panels[panelId]) {
                                 const panel = this._deserializer.fromJSON(
                                     panels[panelId],
-                                    fixedGroup
+                                    edgeGroup
                                 );
                                 createdPanels.push(panel);
                             }
@@ -1909,18 +1909,18 @@ export class DockviewComponent
                         for (let i = 0; i < createdPanels.length; i++) {
                             const panel = createdPanels[i];
                             const isActive = activeView === panel.id;
-                            fixedGroup.model.openPanel(panel, {
+                            edgeGroup.model.openPanel(panel, {
                                 skipSetActive: !isActive,
                                 skipSetGroupActive: true,
                             });
                         }
 
                         if (
-                            !fixedGroup.activePanel &&
-                            fixedGroup.panels.length > 0
+                            !edgeGroup.activePanel &&
+                            edgeGroup.panels.length > 0
                         ) {
-                            fixedGroup.model.openPanel(
-                                fixedGroup.panels[fixedGroup.panels.length - 1],
+                            edgeGroup.model.openPanel(
+                                edgeGroup.panels[edgeGroup.panels.length - 1],
                                 { skipSetGroupActive: true }
                             );
                         }
@@ -1930,7 +1930,7 @@ export class DockviewComponent
                             groupState.tabGroups &&
                             groupState.tabGroups.length > 0
                         ) {
-                            fixedGroup.model.restoreTabGroups(
+                            edgeGroup.model.restoreTabGroups(
                                 groupState.tabGroups
                             );
                         }

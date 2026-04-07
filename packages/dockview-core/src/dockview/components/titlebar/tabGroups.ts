@@ -412,8 +412,12 @@ export class TabGroupManager {
                         tab.element.classList.remove('dv-tab--group-expanding');
                         tab.element.style.removeProperty('width');
                         tab.element.removeEventListener('transitionend', onEnd);
+                        clearTimeout(fallbackTimer);
                         this._pendingTransitionCleanups.delete(panelId);
                     };
+                    // Fallback in case transitionend never fires
+                    // (e.g. element removed from DOM mid-transition)
+                    const fallbackTimer = setTimeout(onEnd, 300);
                     this._pendingTransitionCleanups.set(panelId, onEnd);
                     tab.element.addEventListener('transitionend', onEnd);
                 }

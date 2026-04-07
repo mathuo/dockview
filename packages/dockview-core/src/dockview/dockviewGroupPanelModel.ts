@@ -678,6 +678,8 @@ export class DockviewGroupPanelModel
                 tabGroup.onDidCollapseChange((isCollapsed) => {
                     if (isCollapsed) {
                         this._handleGroupCollapse(tabGroup);
+                    } else {
+                        this._handleGroupExpand(tabGroup);
                     }
                     this._onDidTabGroupCollapsedChange.fire({
                         tabGroup,
@@ -1013,7 +1015,27 @@ export class DockviewGroupPanelModel
             }
         }
 
-        // All tabs are in collapsed groups — no visible tab to activate
+        // All tabs are in collapsed groups — show watermark
+        this.contentContainer.closePanel();
+        this.doSetActivePanel(undefined);
+        this.updateContainer();
+    }
+
+    private _handleGroupExpand(tabGroup: TabGroup): void {
+        if (this._activePanel) {
+            return;
+        }
+
+        // Watermark is showing because all groups were collapsed.
+        // Activate the first panel in the newly expanded group.
+        const firstPanelId = tabGroup.panelIds[0];
+        if (firstPanelId) {
+            const panel = this._panels.find((p) => p.id === firstPanelId);
+            if (panel) {
+                this.doSetActivePanel(panel);
+                this.updateContainer();
+            }
+        }
     }
 
     /** Restore tab groups from serialized data (used by fromJSON) */
@@ -1558,7 +1580,9 @@ export class DockviewGroupPanelModel
     private updateContainer(): void {
         this.panels.forEach((panel) => panel.runEvents());
 
-        if (this.isEmpty && !this.watermark) {
+        const shouldShowWatermark = this.isEmpty || !this._activePanel;
+
+        if (shouldShowWatermark && !this.watermark) {
             const watermark = this.accessor.createWatermarkComponent();
             watermark.init({
                 containerApi: this._api,
@@ -1574,7 +1598,7 @@ export class DockviewGroupPanelModel
 
             this.contentContainer.element.appendChild(this.watermark.element);
         }
-        if (!this.isEmpty && this.watermark) {
+        if (!shouldShowWatermark && this.watermark) {
             this.watermark.element.remove();
             this.watermark.dispose?.();
             this.watermark = undefined;

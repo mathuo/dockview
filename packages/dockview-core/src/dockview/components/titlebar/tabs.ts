@@ -1414,8 +1414,12 @@ export class Tabs extends CompositeDisposable {
                     el.style.removeProperty('margin-left');
                     toggleClass(el, cls, false);
                     el.removeEventListener('transitionend', onEnd);
+                    clearTimeout(fallbackTimer);
                     this._pendingMarginCleanups.delete(el);
                 };
+                // Fallback in case transitionend never fires
+                // (e.g. element removed from DOM mid-transition)
+                const fallbackTimer = setTimeout(onEnd, 300);
                 this._pendingMarginCleanups.set(el, onEnd);
                 el.addEventListener('transitionend', onEnd);
             }
