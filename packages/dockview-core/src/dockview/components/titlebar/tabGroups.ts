@@ -490,7 +490,7 @@ export class TabGroupManager {
                             } else {
                                 te.value.element.style.width = `${rect.width}px`;
                             }
-                            te.value.element.offsetHeight; // force reflow
+                            void te.value.element.offsetHeight; // force reflow
                             te.value.element.classList.add(
                                 'dv-tab--group-collapsed'
                             );

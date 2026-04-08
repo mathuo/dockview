@@ -581,7 +581,7 @@ export class Tabs extends CompositeDisposable {
                         // Collapse source tab instantly (no transition)
                         tab.element.style.transition = 'none';
                         toggleClass(tab.element, 'dv-tab--dragging', true);
-                        tab.element.offsetHeight; // force reflow
+                        void tab.element.offsetHeight; // force reflow
 
                         if (this._animState.currentInsertionIndex === null) {
                             this._animState.currentInsertionIndex = sourceIndex;
@@ -926,7 +926,7 @@ export class Tabs extends CompositeDisposable {
                     );
                 }
                 // Single reflow for the entire batch
-                this._tabsList.offsetHeight;
+                void this._tabsList.offsetHeight;
 
                 const underline = this._tabGroupManager.groupUnderlines.get(
                     tabGroup.id
@@ -1271,7 +1271,7 @@ export class Tabs extends CompositeDisposable {
             }
         }
         if (affected.length > 0) {
-            affected[0].offsetHeight; // single reflow for entire batch
+            void affected[0].offsetHeight; // single reflow for entire batch
             for (const el of affected) {
                 el.style.removeProperty('transition');
             }
@@ -1393,7 +1393,7 @@ export class Tabs extends CompositeDisposable {
             if (skipTransition) {
                 el.style.transition = 'none';
                 el.style.marginLeft = value;
-                el.offsetHeight;
+                void el.offsetHeight;
                 el.style.removeProperty('transition');
             } else {
                 el.style.marginLeft = value;
