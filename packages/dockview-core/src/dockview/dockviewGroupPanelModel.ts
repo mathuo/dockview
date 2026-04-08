@@ -250,6 +250,7 @@ export class DockviewGroupPanelModel
     private readonly _panels: IDockviewPanel[] = [];
     private readonly _panelDisposables = new Map<string, IDisposable>();
     private readonly _tabGroupDisposables = new Map<string, IDisposable>();
+    private readonly _pendingMicrotaskDisposables = new Set<IDisposable>();
 
     private readonly _onMove = new Emitter<GroupMoveEvent>();
     readonly onMove: Event<GroupMoveEvent> = this._onMove.event;
@@ -722,6 +723,11 @@ export class DockviewGroupPanelModel
             return;
         }
 
+        // Ensure the panel actually exists in this group model
+        if (!this._panels.some((p) => p.id === panelId)) {
+            return;
+        }
+
         // Remove from any existing group first
         const existingGroup = this.getTabGroupForPanel(panelId);
         if (existingGroup) {
@@ -977,7 +983,13 @@ export class DockviewGroupPanelModel
             );
             this._tabGroupDisposables.delete(tabGroup.id);
             if (tabGroupDisposable) {
-                queueMicrotask(() => tabGroupDisposable.dispose());
+                this._pendingMicrotaskDisposables.add(tabGroupDisposable);
+                queueMicrotask(() => {
+                    this._pendingMicrotaskDisposables.delete(
+                        tabGroupDisposable
+                    );
+                    tabGroupDisposable.dispose();
+                });
             }
         }
     }
@@ -1059,7 +1071,7 @@ export class DockviewGroupPanelModel
             });
 
             const concreteGroup = this._tabGroupMap.get(tabGroup.id)!;
-            for (const panelId of data.tabIds) {
+            for (const panelId of data.panelIds) {
                 // Only add panels that actually exist in this group model
                 if (this._panels.some((p) => p.id === panelId)) {
                     tabGroup.addPanel(panelId);
@@ -1754,6 +1766,12 @@ export class DockviewGroupPanelModel
             disposable.dispose();
         }
         this._tabGroupDisposables.clear();
+
+        // Dispose any microtask-deferred disposables that haven't run yet
+        for (const disposable of this._pendingMicrotaskDisposables) {
+            disposable.dispose();
+        }
+        this._pendingMicrotaskDisposables.clear();
 
         for (const panel of this.panels) {
             panel.dispose();

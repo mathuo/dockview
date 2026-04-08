@@ -12,6 +12,7 @@ export class TabGroupChip
     private readonly _element: HTMLElement;
     private readonly _label: HTMLSpanElement;
     private _tabGroup: ITabGroup | undefined;
+    private _dragStartRafId: number | undefined;
 
     private readonly _onClick = new Emitter<MouseEvent>();
     readonly onClick: Event<MouseEvent> = this._onClick.event;
@@ -52,7 +53,8 @@ export class TabGroupChip
                 this._onDragStart.fire(event);
                 // Delay collapse to next frame so the browser
                 // captures the full drag image first
-                requestAnimationFrame(() => {
+                this._dragStartRafId = requestAnimationFrame(() => {
+                    this._dragStartRafId = undefined;
                     toggleClass(
                         this._element,
                         'dv-tab-group-chip--dragging',
@@ -97,6 +99,14 @@ export class TabGroupChip
         this.updateColor(params.tabGroup.color);
         this.updateLabel(params.tabGroup.label);
         this.updateCollapsed(params.tabGroup.collapsed);
+    }
+
+    override dispose(): void {
+        if (this._dragStartRafId !== undefined) {
+            cancelAnimationFrame(this._dragStartRafId);
+            this._dragStartRafId = undefined;
+        }
+        super.dispose();
     }
 
     private updateColor(color: TabGroupColor): void {

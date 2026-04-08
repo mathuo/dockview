@@ -33,7 +33,7 @@ export interface SerializedTabGroup {
     label?: string;
     color: TabGroupColor;
     collapsed: boolean;
-    tabIds: string[];
+    panelIds: string[];
 }
 
 export interface ITabGroup {
@@ -207,7 +207,7 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
             id: this.id,
             color: this._color,
             collapsed: this._collapsed,
-            tabIds: [...this._panelIds],
+            panelIds: [...this._panelIds],
         };
         if (this._label) {
             result.label = this._label;

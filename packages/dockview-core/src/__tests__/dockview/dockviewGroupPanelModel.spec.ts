@@ -1560,7 +1560,7 @@ describe('dockviewGroupPanelModel', () => {
             expect(json.tabGroups![0].label).toBe('Group A');
             expect(json.tabGroups![0].color).toBe('blue');
             expect(json.tabGroups![0].collapsed).toBe(true);
-            expect(json.tabGroups![0].tabIds).toEqual(['panel1', 'panel2']);
+            expect(json.tabGroups![0].panelIds).toEqual(['panel1', 'panel2']);
         });
 
         test('toJSON omits tabGroups when no groups exist', () => {
@@ -1585,7 +1585,7 @@ describe('dockviewGroupPanelModel', () => {
                     label: 'Restored',
                     color: 'red',
                     collapsed: true,
-                    tabIds: ['panel1', 'panel2'],
+                    panelIds: ['panel1', 'panel2'],
                 },
             ]);
 
@@ -1607,7 +1607,7 @@ describe('dockviewGroupPanelModel', () => {
                     id: 'tg-orphan',
                     color: 'green',
                     collapsed: false,
-                    tabIds: ['panel1', 'non-existent-panel'],
+                    panelIds: ['panel1', 'non-existent-panel'],
                 },
             ]);
 
@@ -1625,7 +1625,7 @@ describe('dockviewGroupPanelModel', () => {
                     id: 'tg-empty',
                     color: 'grey',
                     collapsed: false,
-                    tabIds: ['non-existent-a', 'non-existent-b'],
+                    panelIds: ['non-existent-a', 'non-existent-b'],
                 },
             ]);
 

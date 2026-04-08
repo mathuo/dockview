@@ -65,6 +65,7 @@ export class Tabs extends CompositeDisposable {
         () => void
     >();
     private _pendingCollapse = false;
+    private _flipTransitionCleanup: (() => void) | null = null;
     private _voidContainer: HTMLElement | null = null;
     private _voidContainerListeners: IDisposable | null = null;
     private _extendedDropZone: HTMLElement | null = null;
@@ -256,6 +257,11 @@ export class Tabs extends CompositeDisposable {
             this._onWillShowOverlay,
             this._onDrop,
             this._onTabDragStart,
+            {
+                dispose: () => {
+                    this._flipTransitionCleanup?.();
+                },
+            },
             addDisposableListener(this.element, 'pointerdown', (event) => {
                 if (event.defaultPrevented) {
                     return;
@@ -1619,12 +1625,12 @@ export class Tabs extends CompositeDisposable {
             // follow tabs as they slide to their final positions.
             this._tabGroupManager.trackUnderlines();
 
+            // Clean up any previous flip transition listener
+            this._flipTransitionCleanup?.();
+
             const onTransitionEnd = (event: TransitionEvent) => {
                 if (event.propertyName === 'transform') {
-                    this._tabsList.removeEventListener(
-                        'transitionend',
-                        onTransitionEnd
-                    );
+                    cleanup();
                     for (const tab of this._tabs) {
                         toggleClass(
                             tab.value.element,
@@ -1637,6 +1643,15 @@ export class Tabs extends CompositeDisposable {
                 }
             };
 
+            const cleanup = () => {
+                this._tabsList.removeEventListener(
+                    'transitionend',
+                    onTransitionEnd
+                );
+                this._flipTransitionCleanup = null;
+            };
+
+            this._flipTransitionCleanup = cleanup;
             this._tabsList.addEventListener('transitionend', onTransitionEnd);
         });
     }

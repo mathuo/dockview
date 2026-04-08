@@ -206,7 +206,7 @@ describe('TabGroup', () => {
             label: 'Test',
             color: 'red',
             collapsed: true,
-            tabIds: ['p1', 'p2'],
+            panelIds: ['p1', 'p2'],
         });
         group.dispose();
     });
