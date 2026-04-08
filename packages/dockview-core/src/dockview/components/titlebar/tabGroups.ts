@@ -254,7 +254,7 @@ export class TabGroupManager {
     }
 
     cleanupTransition(panelId: string): void {
-        this._pendingTransitionCleanups.get(panelId)?.()
+        this._pendingTransitionCleanups.get(panelId)?.();
     }
 
     disposeAll(): void {
@@ -397,7 +397,7 @@ export class TabGroupManager {
 
                     // Clean up any previous transitionend listener
                     // from a rapid collapse/expand cycle
-                    this._pendingTransitionCleanups.get(panelId)?.()
+                    this._pendingTransitionCleanups.get(panelId)?.();
 
                     const onEnd = () => {
                         tab.element.classList.remove('dv-tab--group-expanding');
