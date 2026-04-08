@@ -17,7 +17,7 @@ export interface IDockviewAngularTabGroupChipProps {
 export class AngularTabGroupChipRenderer implements ITabGroupChipRenderer {
     private readonly _element: HTMLElement;
     private componentRef: ComponentRef<any> | null = null;
-    private appRef: ApplicationRef;
+    private readonly appRef: ApplicationRef;
 
     get element(): HTMLElement {
         return this._element;

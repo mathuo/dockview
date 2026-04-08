@@ -583,9 +583,7 @@ export class Tabs extends CompositeDisposable {
                         toggleClass(tab.element, 'dv-tab--dragging', true);
                         void tab.element.offsetHeight; // force reflow
 
-                        if (this._animState.currentInsertionIndex === null) {
-                            this._animState.currentInsertionIndex = sourceIndex;
-                        }
+                        this._animState.currentInsertionIndex ??= sourceIndex;
                         // Apply gap with transitions disabled on the target
                         this.applyDragOverTransforms(true);
 
@@ -935,9 +933,7 @@ export class Tabs extends CompositeDisposable {
                     underline.style.display = 'none';
                 }
 
-                if (this._animState.currentInsertionIndex === null) {
-                    this._animState.currentInsertionIndex = firstIdx;
-                }
+                this._animState.currentInsertionIndex ??= firstIdx;
                 // Apply gap with transitions disabled
                 this.applyDragOverTransforms(true);
 
@@ -1076,9 +1072,7 @@ export class Tabs extends CompositeDisposable {
                     this._animState.chipPositions.get(groupId) ?? 0;
                 if (accWidth + chipWidth > availableSpace) {
                     // Chip alone overflows — gap goes before this group
-                    if (insertionIndex === null) {
-                        insertionIndex = i;
-                    }
+                    insertionIndex ??= i;
                     break;
                 }
                 accWidth += chipWidth;
@@ -1096,9 +1090,7 @@ export class Tabs extends CompositeDisposable {
                 accWidth += tabWidth;
                 insertionIndex = i + 1;
             } else {
-                if (insertionIndex === null) {
-                    insertionIndex = i;
-                }
+                insertionIndex ??= i;
                 break;
             }
         }

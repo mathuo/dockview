@@ -254,10 +254,7 @@ export class TabGroupManager {
     }
 
     cleanupTransition(panelId: string): void {
-        const cleanup = this._pendingTransitionCleanups.get(panelId);
-        if (cleanup) {
-            cleanup();
-        }
+        this._pendingTransitionCleanups.get(panelId)?.()
     }
 
     disposeAll(): void {
@@ -316,9 +313,7 @@ export class TabGroupManager {
             disposables.push(
                 chip.onContextMenu((event) => {
                     this._callbacks.onChipContextMenu(tabGroup, event);
-                })
-            );
-            disposables.push(
+                }),
                 chip.onDragStart((event) => {
                     this._callbacks.onChipDragStart(tabGroup, chip, event);
                 })
@@ -402,11 +397,7 @@ export class TabGroupManager {
 
                     // Clean up any previous transitionend listener
                     // from a rapid collapse/expand cycle
-                    const existingCleanup =
-                        this._pendingTransitionCleanups.get(panelId);
-                    if (existingCleanup) {
-                        existingCleanup();
-                    }
+                    this._pendingTransitionCleanups.get(panelId)?.()
 
                     const onEnd = () => {
                         tab.element.classList.remove('dv-tab--group-expanding');
@@ -551,8 +542,8 @@ export class TabGroupManager {
                 const chipRect = chipEl.getBoundingClientRect();
                 const chipStyle = getComputedStyle(chipEl);
                 const leadingMargin = isVertical
-                    ? parseFloat(chipStyle.marginTop) || 0
-                    : parseFloat(chipStyle.marginLeft) || 0;
+                    ? Number.parseFloat(chipStyle.marginTop) || 0
+                    : Number.parseFloat(chipStyle.marginLeft) || 0;
                 startEdge = isVertical
                     ? chipRect.top - containerRect.top - leadingMargin
                     : chipRect.left - containerRect.left - leadingMargin;
