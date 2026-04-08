@@ -95,7 +95,7 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
     }
 
     setLabel(value: string): void {
-        if (this._label === value) {
+        if (this.isDisposed || this._label === value) {
             return;
         }
         this._label = value;
@@ -103,6 +103,9 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
     }
 
     setColor(value: TabGroupColor): void {
+        if (this.isDisposed) {
+            return;
+        }
         const validColor = isValidTabGroupColor(value) ? value : 'grey';
         if (this._color === validColor) {
             return;
@@ -147,6 +150,9 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
     }
 
     addPanel(panelId: string, index?: number): void {
+        if (this.isDisposed) {
+            return;
+        }
         if (this._panelIds.includes(panelId)) {
             return;
         }
@@ -161,6 +167,9 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
     }
 
     removePanel(panelId: string): boolean {
+        if (this.isDisposed) {
+            return false;
+        }
         const index = this._panelIds.indexOf(panelId);
         if (index === -1) {
             return false;
@@ -179,7 +188,7 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
     }
 
     collapse(): void {
-        if (this._collapsed) {
+        if (this.isDisposed || this._collapsed) {
             return;
         }
         this._collapsed = true;
@@ -187,7 +196,7 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
     }
 
     expand(): void {
-        if (!this._collapsed) {
+        if (this.isDisposed || !this._collapsed) {
             return;
         }
         this._collapsed = false;

@@ -255,6 +255,7 @@ export class TabGroupManager {
 
     cleanupTransition(panelId: string): void {
         this._pendingTransitionCleanups.get(panelId)?.();
+        this._pendingTransitionCleanups.delete(panelId);
     }
 
     disposeAll(): void {
