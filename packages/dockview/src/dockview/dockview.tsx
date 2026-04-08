@@ -271,7 +271,7 @@ export const DockviewReact = React.forwardRef(
                 createTabGroupChipComponent: props.tabGroupChipComponent
                     ? () => {
                           return new ReactTabGroupChipPart(
-                              props.tabGroupChipComponent,
+                              props.tabGroupChipComponent!,
                               {
                                   addPortal,
                               }
