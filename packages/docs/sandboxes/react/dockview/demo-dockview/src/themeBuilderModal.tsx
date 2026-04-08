@@ -68,7 +68,6 @@ const SliderRow = (props: {
     </div>
 );
 
-
 const TextRow = (props: {
     label: string;
     varName?: keyof ThemeCssOverrides;
@@ -546,9 +545,7 @@ export const ThemeBuilderModal = (props: {
                     value={props.state.dndOverlayBorder}
                     containerEl={props.containerEl}
                     themeKey={props.baseTheme.name}
-                    onChange={(v) =>
-                        props.onChange({ dndOverlayBorder: v })
-                    }
+                    onChange={(v) => props.onChange({ dndOverlayBorder: v })}
                 />
             </Section>
 

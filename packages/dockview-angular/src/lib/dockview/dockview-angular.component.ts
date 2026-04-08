@@ -27,11 +27,15 @@ import {
     DockviewComponentOptions,
     TabAnimation,
     GetTabContextMenuItemsParams,
+    GetTabGroupChipContextMenuItemsParams,
+    BuiltInChipContextMenuItem,
+    ContextMenuItemConfig,
     ContextMenuItem,
 } from 'dockview-core';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularRenderer } from '../utils/angular-renderer';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
+import { AngularTabGroupChipRenderer } from './angular-tab-group-chip-renderer';
 
 export interface DockviewAngularOptions extends DockviewOptions {
     components: Record<string, Type<any>>;
@@ -77,6 +81,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() leftHeaderActionsComponent?: Type<any>;
     @Input() rightHeaderActionsComponent?: Type<any>;
     @Input() prefixHeaderActionsComponent?: Type<any>;
+    @Input() tabGroupChipComponent?: Type<any>;
 
     // Core dockview options as inputs
     @Input() className?: string;
@@ -96,6 +101,13 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() getTabContextMenuItems?: (
         params: GetTabContextMenuItemsParams
     ) => (ContextMenuItem | { component: Type<any> })[];
+    @Input() getTabGroupChipContextMenuItems?: (
+        params: GetTabGroupChipContextMenuItemsParams
+    ) => (
+        | BuiltInChipContextMenuItem
+        | ContextMenuItemConfig
+        | { component: Type<any> }
+    )[];
 
     @Output() ready = new EventEmitter<DockviewReadyEvent>();
     @Output() didDrop = new EventEmitter<DockviewDidDropEvent>();
@@ -129,6 +141,24 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
                     hasChanges = true;
                 }
             });
+
+            // Handle tabGroupChipComponent → createTabGroupChipComponent mapping
+            if (
+                changes['tabGroupChipComponent'] &&
+                !changes['tabGroupChipComponent'].isFirstChange()
+            ) {
+                const chipComponent =
+                    changes['tabGroupChipComponent'].currentValue;
+                coreChanges.createTabGroupChipComponent = chipComponent
+                    ? () =>
+                          new AngularTabGroupChipRenderer(
+                              chipComponent,
+                              this.injector,
+                              this.environmentInjector
+                          )
+                    : undefined;
+                hasChanges = true;
+            }
 
             if (hasChanges) {
                 this.dockviewApi.updateOptions(coreChanges);
@@ -171,6 +201,17 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
                 (coreOptions as any)[key] = value;
             }
         });
+
+        if (this.tabGroupChipComponent) {
+            const chipComponent = this.tabGroupChipComponent;
+            coreOptions.createTabGroupChipComponent = () => {
+                return new AngularTabGroupChipRenderer(
+                    chipComponent,
+                    this.injector,
+                    this.environmentInjector
+                );
+            };
+        }
 
         return coreOptions as DockviewOptions;
     }

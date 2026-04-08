@@ -131,7 +131,7 @@ export class EdgeGroupView implements IView {
 
         if (options.collapsed) {
             this._isCollapsed = true;
-            group.element.classList.add('dv-fixed-collapsed');
+            group.element.classList.add('dv-edge-collapsed');
         }
     }
 
@@ -155,7 +155,7 @@ export class EdgeGroupView implements IView {
             return;
         }
         this._isCollapsed = collapsed;
-        this._group.element.classList.toggle('dv-fixed-collapsed', collapsed);
+        this._group.element.classList.toggle('dv-edge-collapsed', collapsed);
         // ShellManager calls resizeView directly after this; no _onDidChange needed
     }
 

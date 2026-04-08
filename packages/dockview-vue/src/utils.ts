@@ -8,6 +8,8 @@ import type {
     IDockviewPanelHeaderProps,
     IGroupHeaderProps,
     IHeaderActionsRenderer,
+    ITabGroupChipRenderer,
+    ITabGroup,
     ITabRenderer,
     IWatermarkPanelProps,
     IWatermarkRenderer,
@@ -299,6 +301,51 @@ export class VueContextMenuItemRenderer
             { params: props },
             this.element
         );
+    }
+
+    dispose(): void {
+        this._renderDisposable?.dispose();
+    }
+}
+
+export class VueTabGroupChipRenderer
+    extends AbstractVueRenderer
+    implements ITabGroupChipRenderer
+{
+    private _renderDisposable:
+        | { update: (props: any) => void; dispose: () => void }
+        | undefined;
+
+    get element(): HTMLElement {
+        return this._element;
+    }
+
+    constructor(component: VueComponent, parent: ComponentInternalInstance) {
+        super(component, parent);
+        this.element.style.height = '';
+        this.element.style.width = '';
+        this.element.style.display = 'inline-flex';
+    }
+
+    init(params: { tabGroup: ITabGroup; api: DockviewApi }): void {
+        this._renderDisposable?.dispose();
+        this._renderDisposable = mountVueComponent(
+            this.component,
+            this.parent,
+            {
+                params: {
+                    tabGroup: params.tabGroup,
+                    api: params.api,
+                },
+            },
+            this.element
+        );
+    }
+
+    update(params: { tabGroup: ITabGroup }): void {
+        this._renderDisposable?.update({
+            params: { tabGroup: params.tabGroup },
+        });
     }
 
     dispose(): void {

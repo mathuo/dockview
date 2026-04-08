@@ -1,10 +1,21 @@
 import { DockviewComponent } from './dockviewComponent';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
-import { ContextMenuItem } from './options';
+import {
+    BuiltInChipContextMenuItem,
+    ContextMenuItemConfig,
+    ContextMenuItem,
+} from './options';
+import { TAB_GROUP_COLORS, ITabGroup } from './tabGroup';
 
 let _nextId = 0;
 const nextContextMenuItemId = () => `dv-ctx-menu-item-${_nextId++}`;
+
+function isItemConfig(
+    item: BuiltInChipContextMenuItem | ContextMenuItemConfig | ContextMenuItem
+): item is ContextMenuItemConfig {
+    return typeof item === 'object';
+}
 
 function buildItem(
     label: string,
@@ -34,6 +45,26 @@ function buildSeparator(): HTMLElement {
     el.className = 'dv-context-menu-separator';
     el.setAttribute('role', 'separator');
     return el;
+}
+
+function buildColorPicker(tabGroup: ITabGroup, close: () => void): HTMLElement {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'dv-context-menu-color-picker';
+
+    for (const color of TAB_GROUP_COLORS) {
+        const swatch = document.createElement('div');
+        swatch.className = `dv-context-menu-color-swatch dv-tab-group-chip--${color}`;
+        if (tabGroup.color === color) {
+            swatch.classList.add('dv-context-menu-color-swatch--selected');
+        }
+        swatch.addEventListener('click', () => {
+            tabGroup.setColor(color);
+            close();
+        });
+        wrapper.appendChild(swatch);
+    }
+
+    return wrapper;
 }
 
 export class ContextMenuController {
@@ -88,7 +119,9 @@ export class ContextMenuController {
                         [...group.panels].forEach((p) => p.api.close());
                     })
                 );
-            } else if (item.component) {
+            } else if (isItemConfig(item) && item.element) {
+                menuEl.appendChild(item.element);
+            } else if (isItemConfig(item) && item.component) {
                 const renderer =
                     this.accessor.options.createContextMenuItemComponent?.({
                         id: nextContextMenuItemId(),
@@ -104,7 +137,59 @@ export class ContextMenuController {
                     });
                     menuEl.appendChild(renderer.element);
                 }
-            } else if (item.label) {
+            } else if (isItemConfig(item) && item.label) {
+                menuEl.appendChild(
+                    buildItem(
+                        item.label,
+                        close,
+                        () => item.action?.(),
+                        item.disabled
+                    )
+                );
+            }
+        }
+
+        this.accessor.popupService.openPopover(menuEl, {
+            x: event.clientX,
+            y: event.clientY,
+        });
+    }
+
+    showForChip(
+        tabGroup: ITabGroup,
+        group: DockviewGroupPanel,
+        event: MouseEvent
+    ): void {
+        if (!this.accessor.options.getTabGroupChipContextMenuItems) {
+            return;
+        }
+
+        const items = this.accessor.options.getTabGroupChipContextMenuItems({
+            tabGroup,
+            group,
+            api: this.accessor.api,
+            event,
+        });
+
+        if (items.length === 0) {
+            return;
+        }
+
+        event.preventDefault();
+
+        const close = () => this.accessor.popupService.close();
+        const menuEl = document.createElement('div');
+        menuEl.className = 'dv-context-menu';
+        menuEl.setAttribute('role', 'menu');
+
+        for (const item of items) {
+            if (item === 'separator') {
+                menuEl.appendChild(buildSeparator());
+            } else if (item === 'colorPicker') {
+                menuEl.appendChild(buildColorPicker(tabGroup, close));
+            } else if (isItemConfig(item) && item.element) {
+                menuEl.appendChild(item.element);
+            } else if (isItemConfig(item) && item.label) {
                 menuEl.appendChild(
                     buildItem(
                         item.label,

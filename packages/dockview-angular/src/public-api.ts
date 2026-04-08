@@ -24,6 +24,7 @@ export {
     IDockviewAngularHeaderActionsProps,
     DockviewAngularComponentOptions,
 } from './lib/dockview/types';
+export { IDockviewAngularTabGroupChipProps } from './lib/dockview/angular-tab-group-chip-renderer';
 export {
     GridviewAngularOptions,
     GridviewAngularEvents,
