@@ -6,7 +6,8 @@ export class PanelTransfer extends TransferObject {
     constructor(
         public readonly viewId: string,
         public readonly groupId: string,
-        public readonly panelId: string | null
+        public readonly panelId: string | null,
+        public readonly tabGroupId?: string
     ) {
         super();
     }

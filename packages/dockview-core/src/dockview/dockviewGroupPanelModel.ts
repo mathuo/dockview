@@ -64,6 +64,7 @@ interface GroupMoveEvent {
     itemId?: string;
     target: Position;
     index?: number;
+    tabGroupId?: string;
 }
 
 interface CoreGroupOptions {
@@ -1707,6 +1708,7 @@ export class DockviewGroupPanelModel
                     target: position,
                     groupId: groupId,
                     index,
+                    tabGroupId: data.tabGroupId,
                 });
                 return;
             }
