@@ -8,6 +8,8 @@ import { IDockviewPanelModel } from '../../../../dockview/dockviewPanelModel';
 import { fireEvent } from '@testing-library/dom';
 import * as dataTransfer from '../../../../dnd/dataTransfer';
 import { TabAnimation } from '../../../../dockview/options';
+import { TabGroupChip } from '../../../../dockview/components/titlebar/tabGroupChip';
+import { TabGroup } from '../../../../dockview/tabGroup';
 
 function makeDOMRect(
     x: number,
@@ -1220,6 +1222,274 @@ describe('tabs - animation', () => {
 
             // Cleanup
             document.body.removeChild(tabsList);
+        });
+    });
+
+    describe('chip drag (tab group)', () => {
+        function setupChipDrag(
+            tabAnimation: TabAnimation | undefined,
+            panelIds: string[] = ['panel-a', 'panel-b']
+        ) {
+            const { tabs, accessor, group } = createTabs({ tabAnimation });
+            // setGroupDragImage needs accessor.element to append the ghost
+            (accessor as any).element = document.createElement('div');
+
+            for (let i = 0; i < panelIds.length; i++) {
+                const panel = createMockPanel(panelIds[i]);
+                tabs.openPanel(panel, i);
+            }
+
+            const elements = getTabElements(tabs);
+            for (let i = 0; i < elements.length; i++) {
+                mockTabRect(elements[i], {
+                    left: i * 80,
+                    width: 80,
+                });
+            }
+
+            const tabGroup = new TabGroup('tg-1', {
+                label: 'Feature',
+                color: 'blue',
+            });
+            tabGroup.addPanel(panelIds[0]);
+
+            (group.model as any).getTabGroups = () => [tabGroup];
+            (group.model as any).getTabGroupForPanel = (pid: string) =>
+                tabGroup.containsPanel(pid) ? tabGroup : undefined;
+
+            const chip = new TabGroupChip();
+            chip.init({
+                tabGroup,
+                api: fromPartial({}),
+            });
+            mockTabRect(chip.element, { left: 0, width: 30 });
+
+            const chipRenderers = (tabs as any)._tabGroupManager
+                ._chipRenderers as Map<string, any>;
+            chipRenderers.set('tg-1', {
+                chip,
+                disposable: { dispose: jest.fn() },
+            });
+
+            return { tabs, accessor, group, tabGroup, chip, elements };
+        }
+
+        function triggerChipDragStart(
+            tabs: Tabs,
+            tabGroup: TabGroup,
+            chip: TabGroupChip
+        ) {
+            const event = {
+                clientX: 15,
+                clientY: 15,
+                dataTransfer: {
+                    effectAllowed: 'uninitialized',
+                    items: { length: 0 },
+                    setData: jest.fn(),
+                    setDragImage: jest.fn(),
+                },
+            } as unknown as DragEvent;
+            (tabs as any)._handleChipDragStart(tabGroup, chip, event);
+            return event;
+        }
+
+        test('chip dragstart initializes _animState in smooth mode', () => {
+            const { tabs, tabGroup, chip } = setupChipDrag('smooth');
+
+            expect(getAnimState(tabs)).toBeNull();
+            triggerChipDragStart(tabs, tabGroup, chip);
+
+            const state = getAnimState(tabs);
+            expect(state).not.toBeNull();
+            expect(state.sourceTabGroupId).toBe('tg-1');
+            expect(state.sourceGroupPanelIds).toEqual(new Set(['panel-a']));
+            expect(state.sourceTabId).toBe('');
+        });
+
+        test('chip dragstart initializes _animState in default mode', () => {
+            const { tabs, tabGroup, chip } = setupChipDrag('default');
+
+            expect(getAnimState(tabs)).toBeNull();
+            triggerChipDragStart(tabs, tabGroup, chip);
+
+            const state = getAnimState(tabs);
+            expect(state).not.toBeNull();
+            expect(state.sourceTabGroupId).toBe('tg-1');
+            expect(state.sourceGroupPanelIds).toEqual(new Set(['panel-a']));
+        });
+
+        test('chip dragstart initializes _animState when tabAnimation is undefined', () => {
+            const { tabs, tabGroup, chip } = setupChipDrag(undefined);
+
+            triggerChipDragStart(tabs, tabGroup, chip);
+
+            const state = getAnimState(tabs);
+            expect(state).not.toBeNull();
+            expect(state.sourceTabGroupId).toBe('tg-1');
+        });
+
+        test('chip dragstart sets LocalSelectionTransfer with tabGroupId', () => {
+            const { tabs, accessor, group, tabGroup, chip } =
+                setupChipDrag('smooth');
+
+            triggerChipDragStart(tabs, tabGroup, chip);
+
+            const panelData = dataTransfer.getPanelData();
+            expect(panelData).toBeDefined();
+            expect(panelData!.viewId).toBe(accessor.id);
+            expect(panelData!.groupId).toBe(group.id);
+            expect(panelData!.panelId).toBeNull();
+            expect(panelData!.tabGroupId).toBe('tg-1');
+
+            // cleanup
+            dataTransfer
+                .LocalSelectionTransfer.getInstance()
+                .clearData(dataTransfer.PanelTransfer.prototype);
+        });
+
+        test('chip dragstart sets dataTransfer properties', () => {
+            const { tabs, tabGroup, chip } = setupChipDrag('smooth');
+
+            const event = triggerChipDragStart(tabs, tabGroup, chip);
+
+            expect(event.dataTransfer!.effectAllowed).toBe('move');
+
+            // cleanup
+            dataTransfer
+                .LocalSelectionTransfer.getInstance()
+                .clearData(dataTransfer.PanelTransfer.prototype);
+        });
+
+        test('chip dragstart does not collapse tabs in default mode', () => {
+            const { tabs, tabGroup, chip, elements } =
+                setupChipDrag('default');
+
+            triggerChipDragStart(tabs, tabGroup, chip);
+            flushRAF();
+
+            // In default mode, no dv-tab--dragging class should be added
+            expect(
+                elements[0].classList.contains('dv-tab--dragging')
+            ).toBeFalsy();
+
+            // cleanup
+            dataTransfer
+                .LocalSelectionTransfer.getInstance()
+                .clearData(dataTransfer.PanelTransfer.prototype);
+        });
+
+        test('chip dragstart collapses tabs in smooth mode', () => {
+            const { tabs, tabGroup, chip, elements } =
+                setupChipDrag('smooth');
+
+            triggerChipDragStart(tabs, tabGroup, chip);
+            flushRAF();
+
+            // In smooth mode, source group tabs should get dv-tab--dragging
+            expect(
+                elements[0].classList.contains('dv-tab--dragging')
+            ).toBeTruthy();
+
+            // cleanup
+            dataTransfer
+                .LocalSelectionTransfer.getInstance()
+                .clearData(dataTransfer.PanelTransfer.prototype);
+        });
+
+        test('chip dragover computes insertion index in default mode', () => {
+            const { tabs, tabGroup, chip, elements } = setupChipDrag(
+                'default',
+                ['panel-a', 'panel-b', 'panel-c']
+            );
+
+            // Re-mock with 3 panels
+            for (let i = 0; i < elements.length; i++) {
+                mockTabRect(elements[i], {
+                    left: i * 80,
+                    width: 80,
+                });
+            }
+
+            triggerChipDragStart(tabs, tabGroup, chip);
+
+            // Drag over — cursor past panel-b midpoint
+            // dragLeftEdge = 200 - cursorOffset, should place insertion after panel-b
+            (tabs as any).handleDragOver({ clientX: 200 } as DragEvent);
+
+            const state = getAnimState(tabs);
+            expect(state.currentInsertionIndex).not.toBeNull();
+
+            // cleanup
+            dataTransfer
+                .LocalSelectionTransfer.getInstance()
+                .clearData(dataTransfer.PanelTransfer.prototype);
+        });
+
+        test('chip dragover does not apply transforms in default mode', () => {
+            const { tabs, tabGroup, chip, elements } = setupChipDrag(
+                'default',
+                ['panel-a', 'panel-b', 'panel-c']
+            );
+
+            for (let i = 0; i < elements.length; i++) {
+                mockTabRect(elements[i], {
+                    left: i * 80,
+                    width: 80,
+                });
+            }
+
+            triggerChipDragStart(tabs, tabGroup, chip);
+            (tabs as any).handleDragOver({ clientX: 200 } as DragEvent);
+
+            // In default mode, no margins should be applied
+            for (const el of elements) {
+                expect(el.style.marginLeft).toBe('');
+            }
+
+            // cleanup
+            dataTransfer
+                .LocalSelectionTransfer.getInstance()
+                .clearData(dataTransfer.PanelTransfer.prototype);
+        });
+
+        test('resetDragAnimation clears LocalSelectionTransfer', () => {
+            const { tabs, tabGroup, chip } = setupChipDrag('default');
+
+            triggerChipDragStart(tabs, tabGroup, chip);
+
+            // PanelTransfer should be set
+            expect(dataTransfer.getPanelData()).toBeDefined();
+
+            // Simulate drag cancel
+            (tabs as any).resetDragAnimation();
+
+            // PanelTransfer should be cleared
+            expect(dataTransfer.getPanelData()).toBeUndefined();
+        });
+
+        test('drop handler processes group drop in default mode', () => {
+            const { tabs, tabGroup, chip } = setupChipDrag(
+                'default',
+                ['panel-a', 'panel-b']
+            );
+
+            const moveTabGroupMock = jest.fn();
+            (tabs as any).group.model.moveTabGroup = moveTabGroupMock;
+
+            triggerChipDragStart(tabs, tabGroup, chip);
+            (tabs as any).handleDragOver({ clientX: 200 } as DragEvent);
+
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            fireEvent.drop(tabsList);
+
+            expect(moveTabGroupMock).toHaveBeenCalledWith(
+                'tg-1',
+                expect.any(Number)
+            );
+
+            // State should be cleared
+            expect(getAnimState(tabs)).toBeNull();
+            expect(dataTransfer.getPanelData()).toBeUndefined();
         });
     });
 });

@@ -185,6 +185,17 @@ describe('TabGroupChip', () => {
         expect(handler).toHaveBeenCalledTimes(1);
     });
 
+    test('dragstart does not add dv-tab-group-chip--dragging class', () => {
+        const chip = new TabGroupChip();
+
+        fireEvent.dragStart(chip.element);
+
+        // Class management is handled by Tabs, not the chip itself
+        expect(
+            chip.element.classList.contains('dv-tab-group-chip--dragging')
+        ).toBe(false);
+    });
+
     test('only one color class is active at a time', () => {
         const chip = new TabGroupChip();
         const tabGroup = new TabGroup('tg-1', {

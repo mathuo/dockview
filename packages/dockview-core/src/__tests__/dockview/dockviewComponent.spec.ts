@@ -975,6 +975,235 @@ describe('dockviewComponent', () => {
         dockview.dispose();
     });
 
+    test('moveGroupOrPanel with tabGroupId moves only tab group panels to center', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                return new PanelContentPartTest(options.id, options.name);
+            },
+        });
+
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({ id: 'panel1', component: 'default' });
+        dockview.addPanel({ id: 'panel2', component: 'default' });
+        dockview.addPanel({ id: 'panel3', component: 'default' });
+
+        const panel1 = dockview.getGroupPanel('panel1')!;
+        const panel2 = dockview.getGroupPanel('panel2')!;
+        const panel3 = dockview.getGroupPanel('panel3')!;
+        const sourceGroup = panel1.group;
+
+        // Create a tab group containing panel1 and panel2
+        const tabGroup = sourceGroup.model.createTabGroup({
+            label: 'Feature',
+            color: 'blue',
+        });
+        sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel1');
+        sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel2');
+
+        // Create a second group to be the destination by moving panel1 out
+        // and then moving it back — use moveGroupOrPanel to ensure a
+        // separate group exists
+        dockview.moveGroupOrPanel({
+            from: { groupId: sourceGroup.id, panelId: 'panel3' },
+            to: { group: sourceGroup, position: 'right' },
+        });
+        const destGroup = panel3.group;
+        expect(destGroup).not.toBe(sourceGroup);
+
+        // Move the tab group to the destination group
+        dockview.moveGroupOrPanel({
+            from: {
+                groupId: sourceGroup.id,
+                tabGroupId: tabGroup.id,
+            },
+            to: { group: destGroup, position: 'center' },
+        });
+
+        // panel3 should remain, plus the two moved panels
+        expect(destGroup.model.size).toBe(3);
+        expect(panel1.group).toBe(destGroup);
+        expect(panel2.group).toBe(destGroup);
+
+        // Source group should be removed (was empty after move)
+        expect(dockview.groups.length).toBe(1);
+
+        // Tab group should be recreated in destination
+        const destTabGroups = destGroup.model.getTabGroups();
+        expect(destTabGroups.length).toBe(1);
+        expect(destTabGroups[0].label).toBe('Feature');
+        expect(destTabGroups[0].color).toBe('blue');
+        expect(destTabGroups[0].panelIds).toContain('panel1');
+        expect(destTabGroups[0].panelIds).toContain('panel2');
+        expect(destTabGroups[0].panelIds).not.toContain('panel3');
+
+        dockview.dispose();
+    });
+
+    test('moveGroupOrPanel with tabGroupId preserves collapsed state', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                return new PanelContentPartTest(options.id, options.name);
+            },
+        });
+
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({ id: 'panel1', component: 'default' });
+        dockview.addPanel({ id: 'panel2', component: 'default' });
+
+        const panel1 = dockview.getGroupPanel('panel1')!;
+        const sourceGroup = panel1.group;
+
+        const tabGroup = sourceGroup.model.createTabGroup({
+            label: 'Collapsed Group',
+            color: 'red',
+        });
+        sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel1');
+        tabGroup.collapse();
+
+        // Create destination by splitting panel2 out
+        dockview.moveGroupOrPanel({
+            from: { groupId: sourceGroup.id, panelId: 'panel2' },
+            to: { group: sourceGroup, position: 'right' },
+        });
+        const panel2 = dockview.getGroupPanel('panel2')!;
+        const destGroup = panel2.group;
+        expect(destGroup).not.toBe(sourceGroup);
+
+        dockview.moveGroupOrPanel({
+            from: {
+                groupId: sourceGroup.id,
+                tabGroupId: tabGroup.id,
+            },
+            to: { group: destGroup, position: 'center' },
+        });
+
+        const destTabGroups = destGroup.model.getTabGroups();
+        expect(destTabGroups.length).toBe(1);
+        expect(destTabGroups[0].collapsed).toBe(true);
+        expect(destTabGroups[0].color).toBe('red');
+
+        dockview.dispose();
+    });
+
+    test('moveGroupOrPanel with tabGroupId to extremity creates new group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                return new PanelContentPartTest(options.id, options.name);
+            },
+        });
+
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({ id: 'panel1', component: 'default' });
+        dockview.addPanel({ id: 'panel2', component: 'default' });
+        dockview.addPanel({ id: 'panel3', component: 'default' });
+
+        const panel1 = dockview.getGroupPanel('panel1')!;
+        const panel2 = dockview.getGroupPanel('panel2')!;
+        const panel3 = dockview.getGroupPanel('panel3')!;
+        const sourceGroup = panel1.group;
+
+        const tabGroup = sourceGroup.model.createTabGroup({
+            label: 'Split',
+            color: 'green',
+        });
+        sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel1');
+        sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel2');
+
+        // Move tab group to the right (creates a new group)
+        dockview.moveGroupOrPanel({
+            from: {
+                groupId: sourceGroup.id,
+                tabGroupId: tabGroup.id,
+            },
+            to: { group: sourceGroup, position: 'right' },
+        });
+
+        // Should have 2 groups now
+        expect(dockview.groups.length).toBe(2);
+
+        // panel3 stays in source
+        expect(panel3.group).toBe(sourceGroup);
+        expect(sourceGroup.model.size).toBe(1);
+
+        // panel1 and panel2 are in the new group with tab group preserved
+        const newGroup = panel1.group;
+        expect(newGroup).not.toBe(sourceGroup);
+        expect(panel2.group).toBe(newGroup);
+        expect(newGroup.model.size).toBe(2);
+
+        const newTabGroups = newGroup.model.getTabGroups();
+        expect(newTabGroups.length).toBe(1);
+        expect(newTabGroups[0].label).toBe('Split');
+        expect(newTabGroups[0].color).toBe('green');
+
+        dockview.dispose();
+    });
+
+    test('moveGroupOrPanel with tabGroupId leaves other panels in source', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                return new PanelContentPartTest(options.id, options.name);
+            },
+        });
+
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({ id: 'panel1', component: 'default' });
+        dockview.addPanel({ id: 'panel2', component: 'default' });
+        dockview.addPanel({ id: 'panel3', component: 'default' });
+        dockview.addPanel({ id: 'panel4', component: 'default' });
+
+        const panel1 = dockview.getGroupPanel('panel1')!;
+        const panel3 = dockview.getGroupPanel('panel3')!;
+        const panel4 = dockview.getGroupPanel('panel4')!;
+        const sourceGroup = panel1.group;
+
+        // Create tab group with only panel1 and panel2
+        const tabGroup = sourceGroup.model.createTabGroup({
+            label: 'Partial',
+            color: 'purple',
+        });
+        sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel1');
+        sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel2');
+
+        // Create destination by moving panel4 via moveGroupOrPanel
+        dockview.moveGroupOrPanel({
+            from: { groupId: sourceGroup.id, panelId: 'panel4' },
+            to: { group: sourceGroup, position: 'right' },
+        });
+        const destGroup = panel4.group;
+        expect(destGroup).not.toBe(sourceGroup);
+
+        dockview.moveGroupOrPanel({
+            from: {
+                groupId: sourceGroup.id,
+                tabGroupId: tabGroup.id,
+            },
+            to: { group: destGroup, position: 'center' },
+        });
+
+        // Source group should still exist with panel3
+        expect(sourceGroup.model.size).toBe(1);
+        expect(panel3.group).toBe(sourceGroup);
+
+        // Destination should have panel1, panel2, and panel4
+        expect(destGroup.model.size).toBe(3);
+        expect(panel1.group).toBe(destGroup);
+
+        dockview.dispose();
+    });
+
     test('remove group', () => {
         dockview.layout(500, 1000);
 
