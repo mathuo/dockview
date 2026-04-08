@@ -343,6 +343,85 @@ describe('dockviewComponent', () => {
                 position: 'center',
             });
 
+            // tab groups: create, collapse, move panels between groups, and destroy
+            const targetGroup = panel6.api.group;
+            const tg1 = dockview.api.createTabGroup({
+                groupId: targetGroup.id,
+                label: 'Leak Test',
+                color: 'red',
+            });
+            const tg2 = dockview.api.createTabGroup({
+                groupId: targetGroup.id,
+                label: 'Leak Test 2',
+                color: 'blue',
+            });
+
+            dockview.api.addPanelToTabGroup({
+                groupId: targetGroup.id,
+                tabGroupId: tg1.id,
+                panelId: panel1.id,
+            });
+            dockview.api.addPanelToTabGroup({
+                groupId: targetGroup.id,
+                tabGroupId: tg1.id,
+                panelId: panel4.id,
+            });
+            dockview.api.addPanelToTabGroup({
+                groupId: targetGroup.id,
+                tabGroupId: tg2.id,
+                panelId: panel3.id,
+            });
+
+            tg1.collapse();
+
+            // remove a panel from its tab group
+            dockview.api.removePanelFromTabGroup({
+                groupId: targetGroup.id,
+                panelId: panel4.id,
+            });
+
+            // explicitly dissolve a tab group
+            dockview.api.dissolveTabGroup({
+                groupId: targetGroup.id,
+                tabGroupId: tg2.id,
+            });
+
+            // edge groups: add, toggle visibility, collapse, add panels, remove
+            dockview.addEdgeGroup('left', {
+                id: 'edge-left',
+                initialSize: 200,
+            });
+            dockview.addEdgeGroup('bottom', {
+                id: 'edge-bottom',
+                initialSize: 150,
+                collapsed: true,
+            });
+
+            const edgePanel1 = dockview.addPanel({
+                id: 'edgePanel1',
+                component: 'default',
+                position: {
+                    referenceGroup: 'edge-left',
+                    direction: 'within',
+                },
+            });
+
+            dockview.addPanel({
+                id: 'edgePanel2',
+                component: 'default',
+                position: {
+                    referenceGroup: 'edge-left',
+                    direction: 'within',
+                },
+            });
+
+            dockview.setEdgeGroupVisible('left', false);
+            dockview.setEdgeGroupVisible('left', true);
+
+            dockview.removePanel(edgePanel1);
+
+            dockview.removeEdgeGroup('bottom');
+
             dockview.dispose();
 
             if (Emitter.MEMORY_LEAK_WATCHER.size > 0) {
