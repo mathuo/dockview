@@ -54,6 +54,8 @@ export interface IContentRenderer extends Optional<
 > {
     readonly element: HTMLElement;
     init(parameters: GroupPanelPartInitParameters): void;
+    onShow?(): void;
+    onHide?(): void;
 }
 
 // watermark component
