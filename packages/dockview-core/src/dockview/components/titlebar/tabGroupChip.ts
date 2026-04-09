@@ -1,7 +1,11 @@
 import { addDisposableListener, Emitter, Event } from '../../../events';
 import { CompositeDisposable } from '../../../lifecycle';
 import { toggleClass } from '../../../dom';
-import { ITabGroup, DockviewTabGroupColor, DockviewTabGroupColors } from '../../tabGroup';
+import {
+    ITabGroup,
+    DockviewTabGroupColor,
+    DockviewTabGroupColors,
+} from '../../tabGroup';
 import { ITabGroupChipRenderer } from '../../framework';
 import { DockviewApi } from '../../../api/component.api';
 

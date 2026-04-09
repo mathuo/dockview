@@ -1,6 +1,9 @@
 import { fireEvent } from '@testing-library/dom';
 import { TabGroupChip } from '../../../../dockview/components/titlebar/tabGroupChip';
-import { TabGroup, DockviewTabGroupColors } from '../../../../dockview/tabGroup';
+import {
+    TabGroup,
+    DockviewTabGroupColors,
+} from '../../../../dockview/tabGroup';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewApi } from '../../../../api/component.api';
 
