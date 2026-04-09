@@ -179,7 +179,7 @@ export interface DockviewOptions {
 }
 
 export type TabAnimation = 'smooth' | 'default';
-export const DEFAULT_TAB_ANIMATION: TabAnimation = 'default';
+const DEFAULT_TAB_ANIMATION: TabAnimation = 'default';
 
 export interface DockviewDndOverlayEvent extends IAcceptableEvent {
     nativeEvent: DragEvent;

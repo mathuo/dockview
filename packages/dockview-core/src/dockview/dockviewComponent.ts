@@ -203,7 +203,7 @@ export interface FloatingGroupOptions {
     position?: AnchorPosition;
 }
 
-export interface FloatingGroupOptionsInternal extends FloatingGroupOptions {
+interface FloatingGroupOptionsInternal extends FloatingGroupOptions {
     skipRemoveGroup?: boolean;
     inDragMode?: boolean;
     skipActiveGroup?: boolean;
