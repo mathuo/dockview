@@ -19,7 +19,6 @@ ContextMenuItemConfig
 Contraints
 CreateComponentOptions
 CreateContextMenuItemComponentOptions
-DEFAULT_TAB_ANIMATION
 DefaultDockviewDeserialzier
 DefaultTab
 Direction
@@ -70,7 +69,6 @@ EdgeGroupOptions
 EdgeGroupPosition
 ExpansionEvent
 FloatingGroupOptions
-FloatingGroupOptionsInternal
 FocusEvent
 GetTabContextMenuItemsParams
 GetTabGroupChipContextMenuItemsParams
