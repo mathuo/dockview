@@ -83,6 +83,15 @@ jobs:
                   fi
                   echo "Generated files are up to date."
 
+            - name: Remove stale gen comment
+              if: always() && github.event_name == 'pull_request'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+                    --paginate --jq '.[] | select(.body | contains("<!-- gen-check -->")) | .id' \
+                  | xargs -I{} gh api -X DELETE "repos/${{ github.repository }}/issues/comments/{}"
+
             - name: Comment diff on PR
               if: failure() && github.event_name == 'pull_request'
               env:
@@ -90,6 +99,7 @@ jobs:
               run: |
                   DIFF=$(cat /tmp/gen-diff.txt)
                   gh pr comment ${{ github.event.pull_request.number }} --body "$(cat <<EOF
+                  <!-- gen-check -->
                   ## ⚠️ Generated files are out of date
 
                   Run \`npm run gen\` and commit the result.
