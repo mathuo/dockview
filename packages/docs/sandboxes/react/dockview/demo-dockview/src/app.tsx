@@ -9,6 +9,7 @@ import {
     themeAbyss,
     IContextMenuItemComponentProps,
     GetTabContextMenuItemsParams,
+    GetTabGroupChipContextMenuItemsParams,
     TAB_GROUP_COLORS,
     TabGroupColor,
 } from 'dockview';
@@ -623,6 +624,51 @@ const DockviewDemo = (props: {
         [api]
     );
 
+    const getTabGroupChipContextMenuItems = React.useCallback(
+        ({ group, tabGroup }: GetTabGroupChipContextMenuItemsParams) => {
+            const items: (
+                | 'colorPicker'
+                | 'separator'
+                | { label: string; action: () => void }
+            )[] = ['colorPicker'];
+
+            if (api) {
+                items.push(
+                    'separator',
+                    {
+                        label: 'Rename group',
+                        action: () => {
+                            const label = window.prompt(
+                                'New group name:',
+                                tabGroup.label
+                            );
+                            if (label !== null) {
+                                tabGroup.setLabel(label);
+                            }
+                        },
+                    },
+                    {
+                        label: tabGroup.collapsed
+                            ? 'Expand group'
+                            : 'Collapse group',
+                        action: () => tabGroup.toggle(),
+                    },
+                    {
+                        label: 'Dissolve group',
+                        action: () =>
+                            api.dissolveTabGroup({
+                                groupId: group.id,
+                                tabGroupId: tabGroup.id,
+                            }),
+                    }
+                );
+            }
+
+            return items;
+        },
+        [api]
+    );
+
     const [watermark, setWatermark] = React.useState<boolean>(false);
 
     const [gapCheck, setGapCheck] = React.useState<boolean>(false);
@@ -711,6 +757,9 @@ const DockviewDemo = (props: {
                                             theme={effectiveTheme}
                                             getTabContextMenuItems={
                                                 getTabContextMenuItems
+                                            }
+                                            getTabGroupChipContextMenuItems={
+                                                getTabGroupChipContextMenuItems
                                             }
                                         />
                                     </ThemeContext.Provider>
