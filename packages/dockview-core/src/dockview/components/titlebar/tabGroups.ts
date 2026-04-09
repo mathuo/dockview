@@ -322,24 +322,12 @@ export class TabGroupManager {
             );
         } else {
             disposables.push(
-                addDisposableListener(
-                    chip.element,
-                    'contextmenu',
-                    (event) => {
-                        this._callbacks.onChipContextMenu(tabGroup, event);
-                    }
-                ),
-                addDisposableListener(
-                    chip.element,
-                    'dragstart',
-                    (event) => {
-                        this._callbacks.onChipDragStart(
-                            tabGroup,
-                            chip,
-                            event
-                        );
-                    }
-                )
+                addDisposableListener(chip.element, 'contextmenu', (event) => {
+                    this._callbacks.onChipContextMenu(tabGroup, event);
+                }),
+                addDisposableListener(chip.element, 'dragstart', (event) => {
+                    this._callbacks.onChipDragStart(tabGroup, chip, event);
+                })
             );
         }
 
