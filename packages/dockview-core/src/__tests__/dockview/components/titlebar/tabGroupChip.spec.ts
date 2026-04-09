@@ -1,6 +1,6 @@
 import { fireEvent } from '@testing-library/dom';
 import { TabGroupChip } from '../../../../dockview/components/titlebar/tabGroupChip';
-import { TabGroup, TAB_GROUP_COLORS } from '../../../../dockview/tabGroup';
+import { TabGroup, DockviewTabGroupColors } from '../../../../dockview/tabGroup';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewApi } from '../../../../api/component.api';
 
@@ -208,10 +208,10 @@ describe('TabGroupChip', () => {
             api: fromPartial<DockviewApi>({}),
         });
 
-        for (const color of TAB_GROUP_COLORS) {
+        for (const color of Object.values(DockviewTabGroupColors)) {
             tabGroup.setColor(color);
 
-            for (const c of TAB_GROUP_COLORS) {
+            for (const c of Object.values(DockviewTabGroupColors)) {
                 expect(
                     chip.element.classList.contains(`dv-tab-group-chip--${c}`)
                 ).toBe(c === color);

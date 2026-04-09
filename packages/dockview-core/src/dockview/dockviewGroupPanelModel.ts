@@ -54,7 +54,7 @@ import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import {
     TabGroup,
     ITabGroup,
-    TabGroupColor,
+    DockviewTabGroupColor,
     SerializedTabGroup,
 } from './tabGroup';
 import { EdgeGroupPosition } from './dockviewShell';
@@ -660,7 +660,7 @@ export class DockviewGroupPanelModel
 
     createTabGroup(options?: {
         label?: string;
-        color?: TabGroupColor;
+        color?: DockviewTabGroupColor;
         id?: string;
     }): ITabGroup {
         const id = options?.id ?? `tg-${this.id}-${this._tabGroupIdCounter++}`;

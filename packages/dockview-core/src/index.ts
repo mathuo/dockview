@@ -80,8 +80,8 @@ export * from './dockview/options';
 export * from './dockview/theme';
 export * from './dockview/dockviewPanel';
 export {
-    TabGroupColor,
-    TAB_GROUP_COLORS,
+    DockviewTabGroupColor,
+    DockviewTabGroupColors,
     ITabGroup,
     SerializedTabGroup,
     isValidTabGroupColor,

@@ -6,7 +6,7 @@ import {
     ContextMenuItemConfig,
     ContextMenuItem,
 } from './options';
-import { TAB_GROUP_COLORS, ITabGroup } from './tabGroup';
+import { DockviewTabGroupColors, ITabGroup } from './tabGroup';
 
 let _nextId = 0;
 const nextContextMenuItemId = () => `dv-ctx-menu-item-${_nextId++}`;
@@ -51,7 +51,7 @@ function buildColorPicker(tabGroup: ITabGroup, close: () => void): HTMLElement {
     const wrapper = document.createElement('div');
     wrapper.className = 'dv-context-menu-color-picker';
 
-    for (const color of TAB_GROUP_COLORS) {
+    for (const color of Object.values(DockviewTabGroupColors)) {
         const swatch = document.createElement('div');
         swatch.className = `dv-context-menu-color-swatch dv-tab-group-chip--${color}`;
         if (tabGroup.color === color) {
