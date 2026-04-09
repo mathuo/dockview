@@ -72,8 +72,38 @@ jobs:
                       ${{ runner.os }}-modules-
 
             - run: yarn
-            - name: Check generated files are up to date
-              run: npm run gen:check
+            - name: Generate and check for diff
+              run: |
+                  npm run gen
+                  git diff __generated__/ > /tmp/gen-diff.txt
+                  if [ -s /tmp/gen-diff.txt ]; then
+                    echo "::error::Generated files are out of date. Run 'npm run gen' and commit the changes."
+                    cat /tmp/gen-diff.txt
+                    exit 1
+                  fi
+                  echo "Generated files are up to date."
+
+            - name: Comment diff on PR
+              if: failure() && github.event_name == 'pull_request'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  DIFF=$(cat /tmp/gen-diff.txt)
+                  gh pr comment ${{ github.event.pull_request.number }} --body "$(cat <<EOF
+                  ## ⚠️ Generated files are out of date
+
+                  Run \`npm run gen\` and commit the result.
+
+                  <details>
+                  <summary>Diff</summary>
+
+                  \`\`\`diff
+                  ${DIFF}
+                  \`\`\`
+
+                  </details>
+                  EOF
+                  )"
 
     build:
         runs-on: ubuntu-latest
