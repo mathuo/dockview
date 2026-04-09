@@ -1,7 +1,7 @@
 import { Emitter, Event } from '../events';
 import { CompositeDisposable } from '../lifecycle';
 
-export type DockviewDockviewTabGroupColor =
+export type DockviewTabGroupColor =
     | 'grey'
     | 'blue'
     | 'red'
@@ -11,7 +11,7 @@ export type DockviewDockviewTabGroupColor =
     | 'purple'
     | 'cyan';
 
-export const DockviewDockviewTabGroupColors: Record<string, DockviewDockviewTabGroupColor> = {
+export const DockviewTabGroupColors: Record<string, DockviewTabGroupColor> = {
     Grey: 'grey',
     Blue: 'blue',
     Red: 'red',
@@ -23,12 +23,12 @@ export const DockviewDockviewTabGroupColors: Record<string, DockviewDockviewTabG
 } as const;
 
 const VALID_COLORS: Set<string> = new Set<string>(
-    Object.values(DockviewDockviewTabGroupColors)
+    Object.values(DockviewTabGroupColors)
 );
 
-export function isValidDockviewTabGroupColor(
+export function isValidTabGroupColor(
     value: string
-): value is DockviewDockviewTabGroupColor {
+): value is DockviewTabGroupColor {
     return VALID_COLORS.has(value);
 }
 
@@ -110,7 +110,7 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
         if (this.isDisposed) {
             return;
         }
-        const validColor = isValidDockviewTabGroupColor(value) ? value : 'grey';
+        const validColor = isValidTabGroupColor(value) ? value : 'grey';
         if (this._color === validColor) {
             return;
         }
@@ -141,7 +141,7 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
         super();
 
         this._label = options?.label ?? '';
-        this._color = isValidDockviewTabGroupColor(options?.color ?? '')
+        this._color = isValidTabGroupColor(options?.color ?? '')
             ? (options!.color as DockviewTabGroupColor)
             : 'grey';
 

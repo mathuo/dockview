@@ -57,6 +57,8 @@ DockviewPopoutGroupOptions
 DockviewReadyEvent
 DockviewTabGroupChangeEvent
 DockviewTabGroupCollapsedChangeEvent
+DockviewTabGroupColor
+DockviewTabGroupColors
 DockviewTabGroupPanelChangeEvent
 DockviewTheme
 DockviewUnhandledDragOverEvent
@@ -206,11 +208,9 @@ SplitviewFrameworkOptions
 SplitviewOptions
 SplitviewPanel
 SplitviewPanelApi
-TAB_GROUP_COLORS
 Tab
 TabAnimation
 TabDragEvent
-TabGroupColor
 TabPartInitParameters
 TitleEvent
 ViewFactoryData
