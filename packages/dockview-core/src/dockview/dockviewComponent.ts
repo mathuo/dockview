@@ -2939,10 +2939,7 @@ export class DockviewComponent
                 color,
             });
             for (const panel of removedPanels) {
-                targetGroup.model.addPanelToTabGroup(
-                    newTabGroup.id,
-                    panel.id
-                );
+                targetGroup.model.addPanelToTabGroup(newTabGroup.id, panel.id);
             }
             if (collapsed) {
                 newTabGroup.collapse();
@@ -2963,9 +2960,7 @@ export class DockviewComponent
         if (!destinationTarget || destinationTarget === 'center') {
             addPanelsToGroup(destinationGroup);
         } else {
-            const referenceLocation = getGridLocation(
-                destinationGroup.element
-            );
+            const referenceLocation = getGridLocation(destinationGroup.element);
             const dropLocation = getRelativeLocation(
                 this.gridview.orientation,
                 referenceLocation,

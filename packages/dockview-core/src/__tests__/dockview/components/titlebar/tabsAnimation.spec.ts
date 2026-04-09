@@ -1342,9 +1342,9 @@ describe('tabs - animation', () => {
             expect(panelData!.tabGroupId).toBe('tg-1');
 
             // cleanup
-            dataTransfer
-                .LocalSelectionTransfer.getInstance()
-                .clearData(dataTransfer.PanelTransfer.prototype);
+            dataTransfer.LocalSelectionTransfer.getInstance().clearData(
+                dataTransfer.PanelTransfer.prototype
+            );
         });
 
         test('chip dragstart sets dataTransfer properties', () => {
@@ -1355,14 +1355,13 @@ describe('tabs - animation', () => {
             expect(event.dataTransfer!.effectAllowed).toBe('move');
 
             // cleanup
-            dataTransfer
-                .LocalSelectionTransfer.getInstance()
-                .clearData(dataTransfer.PanelTransfer.prototype);
+            dataTransfer.LocalSelectionTransfer.getInstance().clearData(
+                dataTransfer.PanelTransfer.prototype
+            );
         });
 
         test('chip dragstart does not collapse tabs in default mode', () => {
-            const { tabs, tabGroup, chip, elements } =
-                setupChipDrag('default');
+            const { tabs, tabGroup, chip, elements } = setupChipDrag('default');
 
             triggerChipDragStart(tabs, tabGroup, chip);
             flushRAF();
@@ -1373,14 +1372,13 @@ describe('tabs - animation', () => {
             ).toBeFalsy();
 
             // cleanup
-            dataTransfer
-                .LocalSelectionTransfer.getInstance()
-                .clearData(dataTransfer.PanelTransfer.prototype);
+            dataTransfer.LocalSelectionTransfer.getInstance().clearData(
+                dataTransfer.PanelTransfer.prototype
+            );
         });
 
         test('chip dragstart collapses tabs in smooth mode', () => {
-            const { tabs, tabGroup, chip, elements } =
-                setupChipDrag('smooth');
+            const { tabs, tabGroup, chip, elements } = setupChipDrag('smooth');
 
             triggerChipDragStart(tabs, tabGroup, chip);
             flushRAF();
@@ -1391,9 +1389,9 @@ describe('tabs - animation', () => {
             ).toBeTruthy();
 
             // cleanup
-            dataTransfer
-                .LocalSelectionTransfer.getInstance()
-                .clearData(dataTransfer.PanelTransfer.prototype);
+            dataTransfer.LocalSelectionTransfer.getInstance().clearData(
+                dataTransfer.PanelTransfer.prototype
+            );
         });
 
         test('chip dragover computes insertion index in default mode', () => {
@@ -1420,9 +1418,9 @@ describe('tabs - animation', () => {
             expect(state.currentInsertionIndex).not.toBeNull();
 
             // cleanup
-            dataTransfer
-                .LocalSelectionTransfer.getInstance()
-                .clearData(dataTransfer.PanelTransfer.prototype);
+            dataTransfer.LocalSelectionTransfer.getInstance().clearData(
+                dataTransfer.PanelTransfer.prototype
+            );
         });
 
         test('chip dragover does not apply transforms in default mode', () => {
@@ -1447,9 +1445,9 @@ describe('tabs - animation', () => {
             }
 
             // cleanup
-            dataTransfer
-                .LocalSelectionTransfer.getInstance()
-                .clearData(dataTransfer.PanelTransfer.prototype);
+            dataTransfer.LocalSelectionTransfer.getInstance().clearData(
+                dataTransfer.PanelTransfer.prototype
+            );
         });
 
         test('resetDragAnimation clears LocalSelectionTransfer', () => {
@@ -1468,10 +1466,10 @@ describe('tabs - animation', () => {
         });
 
         test('drop handler processes group drop in default mode', () => {
-            const { tabs, tabGroup, chip } = setupChipDrag(
-                'default',
-                ['panel-a', 'panel-b']
-            );
+            const { tabs, tabGroup, chip } = setupChipDrag('default', [
+                'panel-a',
+                'panel-b',
+            ]);
 
             const moveTabGroupMock = jest.fn();
             (tabs as any).group.model.moveTabGroup = moveTabGroupMock;
