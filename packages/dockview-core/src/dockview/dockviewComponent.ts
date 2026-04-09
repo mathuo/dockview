@@ -184,6 +184,7 @@ type MoveGroupOrPanelOptions = {
     from: {
         groupId: string;
         panelId?: string;
+        tabGroupId?: string;
     };
     to: {
         group: DockviewGroupPanel;
@@ -2609,18 +2610,32 @@ export class DockviewComponent
         }
 
         if (sourceItemId === undefined) {
-            /**
-             * Moving an entire group into another group
-             */
-
-            this.moveGroup({
-                from: { group: sourceGroup },
-                to: {
-                    group: destinationGroup,
-                    position: destinationTarget,
-                },
-                skipSetActive: options.skipSetActive,
-            });
+            if (options.from.tabGroupId) {
+                /**
+                 * Moving a tab group (subset of panels) into another group
+                 */
+                this.moveTabGroupToGroup({
+                    sourceGroup,
+                    tabGroupId: options.from.tabGroupId,
+                    destinationGroup,
+                    destinationTarget,
+                    destinationIndex,
+                    skipSetActive: options.skipSetActive,
+                    keepEmptyGroups: options.keepEmptyGroups,
+                });
+            } else {
+                /**
+                 * Moving an entire group into another group
+                 */
+                this.moveGroup({
+                    from: { group: sourceGroup },
+                    to: {
+                        group: destinationGroup,
+                        position: destinationTarget,
+                    },
+                    skipSetActive: options.skipSetActive,
+                });
+            }
             return;
         }
 
@@ -2850,6 +2865,109 @@ export class DockviewComponent
                     from: sourceGroup,
                 });
             }
+        }
+    }
+
+    private moveTabGroupToGroup(options: {
+        sourceGroup: DockviewGroupPanel;
+        tabGroupId: string;
+        destinationGroup: DockviewGroupPanel;
+        destinationTarget: Position;
+        destinationIndex?: number;
+        skipSetActive?: boolean;
+        keepEmptyGroups?: boolean;
+    }): void {
+        const {
+            sourceGroup,
+            tabGroupId,
+            destinationGroup,
+            destinationTarget,
+            destinationIndex,
+        } = options;
+
+        const tabGroup = sourceGroup.model
+            .getTabGroups()
+            .find((tg) => tg.id === tabGroupId);
+        if (!tabGroup || tabGroup.panelIds.length === 0) {
+            return;
+        }
+
+        // Snapshot tab group metadata before removing panels
+        const label = tabGroup.label;
+        const color = tabGroup.color;
+        const collapsed = tabGroup.collapsed;
+        const panelIds = [...tabGroup.panelIds];
+
+        // Remove panels from the source group
+        const removedPanels = this.movingLock(() =>
+            panelIds
+                .map((pid) =>
+                    sourceGroup.model.removePanel(pid, {
+                        skipSetActive: false,
+                        skipSetActiveGroup: true,
+                    })
+                )
+                .filter((p): p is IDockviewPanel => p !== undefined)
+        );
+
+        if (removedPanels.length === 0) {
+            return;
+        }
+
+        if (
+            !options.keepEmptyGroups &&
+            sourceGroup.model.size === 0 &&
+            sourceGroup !== destinationGroup
+        ) {
+            this.doRemoveGroup(sourceGroup, { skipActive: true });
+        }
+
+        const addPanelsToGroup = (targetGroup: DockviewGroupPanel) => {
+            this.movingLock(() => {
+                for (const panel of removedPanels) {
+                    targetGroup.model.openPanel(panel, {
+                        index: destinationIndex,
+                        skipSetActive: true,
+                        skipSetGroupActive: true,
+                    });
+                }
+            });
+
+            // Recreate the tab group in the destination
+            const newTabGroup = targetGroup.model.createTabGroup({
+                label,
+                color,
+            });
+            for (const panel of removedPanels) {
+                targetGroup.model.addPanelToTabGroup(newTabGroup.id, panel.id);
+            }
+            if (collapsed) {
+                newTabGroup.collapse();
+            }
+
+            if (!options.skipSetActive) {
+                this.doSetGroupAndPanelActive(targetGroup);
+            }
+
+            for (const panel of removedPanels) {
+                this._onDidMovePanel.fire({
+                    panel,
+                    from: sourceGroup,
+                });
+            }
+        };
+
+        if (!destinationTarget || destinationTarget === 'center') {
+            addPanelsToGroup(destinationGroup);
+        } else {
+            const referenceLocation = getGridLocation(destinationGroup.element);
+            const dropLocation = getRelativeLocation(
+                this.gridview.orientation,
+                referenceLocation,
+                destinationTarget
+            );
+            const newGroup = this.createGroupAtLocation(dropLocation);
+            addPanelsToGroup(newGroup);
         }
     }
 
@@ -3119,9 +3237,14 @@ export class DockviewComponent
                     this._onWillDragGroup.fire(event);
                 }),
                 view.model.onMove((event) => {
-                    const { groupId, itemId, target, index } = event;
+                    const { groupId, itemId, target, index, tabGroupId } =
+                        event;
                     this.moveGroupOrPanel({
-                        from: { groupId: groupId, panelId: itemId },
+                        from: {
+                            groupId: groupId,
+                            panelId: itemId,
+                            tabGroupId,
+                        },
                         to: {
                             group: view,
                             position: target,
