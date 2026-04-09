@@ -1,7 +1,11 @@
 import { addDisposableListener, Emitter, Event } from '../../../events';
 import { CompositeDisposable } from '../../../lifecycle';
 import { toggleClass } from '../../../dom';
-import { ITabGroup, TabGroupColor, TAB_GROUP_COLORS } from '../../tabGroup';
+import {
+    ITabGroup,
+    DockviewTabGroupColor,
+    DockviewTabGroupColors,
+} from '../../tabGroup';
 import { ITabGroupChipRenderer } from '../../framework';
 import { DockviewApi } from '../../../api/component.api';
 
@@ -83,8 +87,8 @@ export class TabGroupChip
         this.updateCollapsed(params.tabGroup.collapsed);
     }
 
-    private updateColor(color: TabGroupColor): void {
-        for (const c of TAB_GROUP_COLORS) {
+    private updateColor(color: DockviewTabGroupColor): void {
+        for (const c of Object.values(DockviewTabGroupColors)) {
             toggleClass(this._element, `dv-tab-group-chip--${c}`, c === color);
         }
     }

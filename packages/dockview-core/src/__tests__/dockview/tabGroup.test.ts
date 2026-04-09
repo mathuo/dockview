@@ -1,6 +1,6 @@
 import {
     TabGroup,
-    TabGroupColor,
+    DockviewTabGroupColor,
     isValidTabGroupColor,
 } from '../../dockview/tabGroup';
 
@@ -26,7 +26,7 @@ describe('TabGroup', () => {
 
     test('should default invalid color to grey', () => {
         const group = new TabGroup('g3', {
-            color: 'invalid' as TabGroupColor,
+            color: 'invalid' as DockviewTabGroupColor,
         });
         expect(group.color).toBe('grey');
         group.dispose();
@@ -160,7 +160,7 @@ describe('TabGroup', () => {
 
     test('should default to grey on invalid color set', () => {
         const group = new TabGroup('g1', { color: 'blue' });
-        group.setColor('invalid' as TabGroupColor);
+        group.setColor('invalid' as DockviewTabGroupColor);
         expect(group.color).toBe('grey');
         group.dispose();
     });

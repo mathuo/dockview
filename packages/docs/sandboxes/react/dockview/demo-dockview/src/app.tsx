@@ -10,8 +10,8 @@ import {
     IContextMenuItemComponentProps,
     GetTabContextMenuItemsParams,
     GetTabGroupChipContextMenuItemsParams,
-    TAB_GROUP_COLORS,
-    TabGroupColor,
+    DockviewTabGroupColors,
+    DockviewTabGroupColor,
 } from 'dockview';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
@@ -602,9 +602,10 @@ const DockviewDemo = (props: {
                     label: 'Add to new group',
                     action: () => {
                         const label = window.prompt('Group name:') || '';
-                        const color = TAB_GROUP_COLORS[
-                            Math.floor(Math.random() * TAB_GROUP_COLORS.length)
-                        ] as TabGroupColor;
+                        const colors = Object.values(DockviewTabGroupColors);
+                        const color = colors[
+                            Math.floor(Math.random() * colors.length)
+                        ] as DockviewTabGroupColor;
                         const newGroup = api.createTabGroup({
                             groupId,
                             label,
