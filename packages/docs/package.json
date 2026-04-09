@@ -36,7 +36,7 @@
     "@radix-ui/react-popover": "^1.0.7",
     "ag-grid-community": "^31.0.2",
     "ag-grid-react": "^31.0.2",
-    "axios": "^1.6.3",
+    "axios": "^1.15.0",
     "clsx": "^2.1.0",
     "dockview": "^5.0.0",
     "dockview-core": "^5.0.0",
