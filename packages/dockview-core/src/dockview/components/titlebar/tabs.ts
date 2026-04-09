@@ -30,6 +30,7 @@ import { TabDragEvent, TabDropIndexEvent } from './tabsContainer';
 import { ITabGroup } from '../../tabGroup';
 import { TabGroupChip } from './tabGroupChip';
 import { TabGroupManager } from './tabGroups';
+import { ITabGroupChipRenderer } from '../../framework';
 
 interface TabAnimationState {
     sourceTabId: string;
@@ -873,7 +874,7 @@ export class Tabs extends CompositeDisposable {
 
     private _handleChipDragStart(
         tabGroup: ITabGroup,
-        chip: TabGroupChip,
+        chip: ITabGroupChipRenderer,
         event: DragEvent
     ): void {
         const firstPanelId = tabGroup.panelIds[0];
