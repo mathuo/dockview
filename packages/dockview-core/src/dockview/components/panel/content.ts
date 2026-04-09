@@ -121,6 +121,7 @@ export class ContentContainer
              * If the currently attached panel is mounted directly to the content then remove it
              */
             this._element.removeChild(this.panel.view.content.element);
+            this.panel.view.content.onHide?.();
         }
 
         this.panel = panel;
@@ -135,6 +136,7 @@ export class ContentContainer
                         this._element.appendChild(
                             this.panel.view.content.element
                         );
+                        this.panel.view.content.onShow?.();
                     }
                 }
                 container = this._element;
@@ -189,6 +191,7 @@ export class ContentContainer
                 this.panel.view.content.element.parentElement?.removeChild(
                     this.panel.view.content.element
                 );
+                this.panel.view.content.onHide?.();
             }
         }
         this.panel = undefined;

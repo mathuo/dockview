@@ -13,7 +13,7 @@ import {
 } from '../dnd/droptarget';
 import { tail, sequenceEquals, remove } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
-import { CompositeDisposable, Disposable } from '../lifecycle';
+import { CompositeDisposable, Disposable, IDisposable } from '../lifecycle';
 import { Event, Emitter, addDisposableListener } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import { IWatermarkRenderer, GroupviewPanelState } from './types';
@@ -47,7 +47,12 @@ import {
     DockviewDidDropEvent,
     DockviewWillDropEvent,
 } from './dockviewGroupPanelModel';
-import { DockviewWillShowOverlayLocationEvent } from './events';
+import {
+    DockviewWillShowOverlayLocationEvent,
+    DockviewTabGroupChangeEvent,
+    DockviewTabGroupCollapsedChangeEvent,
+    DockviewTabGroupPanelChangeEvent,
+} from './events';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
@@ -243,6 +248,12 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidPopoutGroupSizeChange: Event<PopoutGroupChangeSizeEvent>;
     readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent>;
     readonly onDidOpenPopoutWindowFail: Event<void>;
+    readonly onDidCreateTabGroup: Event<DockviewTabGroupChangeEvent>;
+    readonly onDidDestroyTabGroup: Event<DockviewTabGroupChangeEvent>;
+    readonly onDidAddPanelToTabGroup: Event<DockviewTabGroupPanelChangeEvent>;
+    readonly onDidRemovePanelFromTabGroup: Event<DockviewTabGroupPanelChangeEvent>;
+    readonly onDidTabGroupChange: Event<DockviewTabGroupChangeEvent>;
+    readonly onDidTabGroupCollapsedChange: Event<DockviewTabGroupCollapsedChangeEvent>;
     readonly options: DockviewComponentOptions;
     updateOptions(options: DockviewOptions): void;
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void;
@@ -365,15 +376,45 @@ export class DockviewComponent
     private readonly _onDidMovePanel = new Emitter<MovePanelEvent>();
     readonly onDidMovePanel = this._onDidMovePanel.event;
 
+    private readonly _onDidCreateTabGroup =
+        new Emitter<DockviewTabGroupChangeEvent>();
+    readonly onDidCreateTabGroup = this._onDidCreateTabGroup.event;
+
+    private readonly _onDidDestroyTabGroup =
+        new Emitter<DockviewTabGroupChangeEvent>();
+    readonly onDidDestroyTabGroup = this._onDidDestroyTabGroup.event;
+
+    private readonly _onDidAddPanelToTabGroup =
+        new Emitter<DockviewTabGroupPanelChangeEvent>();
+    readonly onDidAddPanelToTabGroup = this._onDidAddPanelToTabGroup.event;
+
+    private readonly _onDidRemovePanelFromTabGroup =
+        new Emitter<DockviewTabGroupPanelChangeEvent>();
+    readonly onDidRemovePanelFromTabGroup =
+        this._onDidRemovePanelFromTabGroup.event;
+
+    private readonly _onDidTabGroupChange =
+        new Emitter<DockviewTabGroupChangeEvent>();
+    readonly onDidTabGroupChange = this._onDidTabGroupChange.event;
+
+    private readonly _onDidTabGroupCollapsedChange =
+        new Emitter<DockviewTabGroupCollapsedChangeEvent>();
+    readonly onDidTabGroupCollapsedChange =
+        this._onDidTabGroupCollapsedChange.event;
+
     private readonly _onDidMaximizedGroupChange =
         new Emitter<DockviewMaximizedGroupChanged>();
     readonly onDidMaximizedGroupChange = this._onDidMaximizedGroupChange.event;
 
     private _shellManager: ShellManager | undefined;
     private _inShellLayout = false;
-    private readonly _fixedGroups = new Map<
+    private readonly _edgeGroups = new Map<
         EdgeGroupPosition,
         DockviewGroupPanel
+    >();
+    private readonly _edgeGroupDisposables = new Map<
+        EdgeGroupPosition,
+        IDisposable
     >();
 
     private readonly _floatingGroups: DockviewFloatingGroupPanel[] = [];
@@ -589,6 +630,12 @@ export class DockviewComponent
             this._onDidPopoutGroupSizeChange,
             this._onDidPopoutGroupPositionChange,
             this._onDidOpenPopoutWindowFail,
+            this._onDidCreateTabGroup,
+            this._onDidDestroyTabGroup,
+            this._onDidAddPanelToTabGroup,
+            this._onDidRemovePanelFromTabGroup,
+            this._onDidTabGroupChange,
+            this._onDidTabGroupCollapsedChange,
             this.onDidViewVisibilityChangeMicroTaskQueue(() => {
                 this.updateWatermark();
             }),
@@ -643,6 +690,11 @@ export class DockviewComponent
                 }
 
                 this._shellManager?.dispose();
+
+                for (const d of this._edgeGroupDisposables.values()) {
+                    d.dispose();
+                }
+                this._edgeGroupDisposables.clear();
             }),
             this._rootDropTarget,
             this._rootDropTarget.onWillShowOverlay((event) => {
@@ -731,8 +783,8 @@ export class DockviewComponent
                     'dockview: You cannot hide a group that is in a popout window'
                 );
                 break;
-            case 'fixed':
-                // Fixed group visibility is managed via setEdgeGroupVisible
+            case 'edge':
+                // Edge group visibility is managed via setEdgeGroupVisible
                 break;
         }
     }
@@ -1420,26 +1472,25 @@ export class DockviewComponent
         position: EdgeGroupPosition,
         options: EdgeGroupOptions
     ): DockviewGroupPanelApi {
-        if (this._fixedGroups.has(position)) {
+        if (this._edgeGroups.has(position)) {
             throw new Error(
                 `dockview: edge group already exists at position '${position}'`
             );
         }
 
         const group = this.createGroup({ id: options.id });
-        group.model.location = { type: 'fixed', position };
+        group.model.location = { type: 'edge', position };
         group.model.headerPosition = position;
-        this._fixedGroups.set(position, group);
+        this._edgeGroups.set(position, group);
         this._onDidAddGroup.fire(group);
 
         // Collapse when the group becomes empty
-        this.addDisposables(
-            group.model.onDidRemovePanel(() => {
-                if (group.model.isEmpty) {
-                    this._shellManager!.setEdgeGroupCollapsed(position, true);
-                }
-            })
-        );
+        const autoCollapseDisposable = group.model.onDidRemovePanel(() => {
+            if (group.model.isEmpty) {
+                this._shellManager!.setEdgeGroupCollapsed(position, true);
+            }
+        });
+        this._edgeGroupDisposables.set(position, autoCollapseDisposable);
 
         this._shellManager!.addEdgeView(
             position,
@@ -1453,7 +1504,7 @@ export class DockviewComponent
     getEdgeGroup(
         position: EdgeGroupPosition
     ): DockviewGroupPanelApi | undefined {
-        return this._fixedGroups.get(position)?.api;
+        return this._edgeGroups.get(position)?.api;
     }
 
     setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void {
@@ -1465,7 +1516,7 @@ export class DockviewComponent
     }
 
     removeEdgeGroup(position: EdgeGroupPosition): void {
-        const group = this._fixedGroups.get(position);
+        const group = this._edgeGroups.get(position);
         if (!group) {
             throw new Error(
                 `dockview: no edge group exists at position '${position}'`
@@ -1480,24 +1531,25 @@ export class DockviewComponent
             });
         }
 
+        // Dispose the auto-collapse listener
+        this._edgeGroupDisposables.get(position)?.dispose();
+        this._edgeGroupDisposables.delete(position);
+
         // Remove from the shell splitview
         this._shellManager!.removeEdgeView(position);
 
         // Clean up group state
-        this._fixedGroups.delete(position);
+        this._edgeGroups.delete(position);
         group.dispose();
         this._groups.delete(group.id);
         this._onDidRemoveGroup.fire(group);
     }
 
-    setFixedGroupCollapsed(
-        group: DockviewGroupPanel,
-        collapsed: boolean
-    ): void {
-        for (const [position, fixedGroup] of this._fixedGroups) {
-            if (fixedGroup === group) {
+    setEdgeGroupCollapsed(group: DockviewGroupPanel, collapsed: boolean): void {
+        for (const [position, edgeGroup] of this._edgeGroups) {
+            if (edgeGroup === group) {
                 this._shellManager!.setEdgeGroupCollapsed(position, collapsed);
-                fixedGroup.api._onDidCollapsedChange.fire({
+                edgeGroup.api._onDidCollapsedChange.fire({
                     isCollapsed: collapsed,
                 });
                 return;
@@ -1505,9 +1557,9 @@ export class DockviewComponent
         }
     }
 
-    isFixedGroupCollapsed(group: DockviewGroupPanel): boolean {
-        for (const [position, fixedGroup] of this._fixedGroups) {
-            if (fixedGroup === group) {
+    isEdgeGroupCollapsed(group: DockviewGroupPanel): boolean {
+        for (const [position, edgeGroup] of this._edgeGroups) {
+            if (edgeGroup === group) {
                 return this._shellManager!.isEdgeGroupCollapsed(position);
             }
         }
@@ -1632,11 +1684,11 @@ export class DockviewComponent
             result.popoutGroups = popoutGroups;
         }
 
-        if (this._fixedGroups.size > 0) {
+        if (this._edgeGroups.size > 0) {
             const shellSerialized = this._shellManager!.toJSON();
 
             // Augment each entry with the serialized group state
-            for (const [position, group] of this._fixedGroups) {
+            for (const [position, group] of this._edgeGroups) {
                 const entry = shellSerialized[position];
                 if (entry) {
                     entry.group = group.toJSON();
@@ -1798,6 +1850,11 @@ export class DockviewComponent
                     );
                 }
 
+                // Restore tab groups if present (backward-compatible: absent = no groups)
+                if (data.tabGroups && data.tabGroups.length > 0) {
+                    group.model.restoreTabGroups(data.tabGroups);
+                }
+
                 return group;
             };
 
@@ -1820,7 +1877,7 @@ export class DockviewComponent
                     'right',
                 ] as EdgeGroupPosition[]) {
                     const fixedData = data.edgeGroups[_position];
-                    if (fixedData && !this._fixedGroups.has(_position)) {
+                    if (fixedData && !this._edgeGroups.has(_position)) {
                         const groupState = fixedData.group as
                             | GroupPanelViewState
                             | undefined;
@@ -1829,10 +1886,10 @@ export class DockviewComponent
                     }
                 }
 
-                // Restore panel contents of fixed groups
-                for (const [position, fixedGroup] of this._fixedGroups) {
-                    const fixedData = data.edgeGroups[position];
-                    const groupState = fixedData?.group as
+                // Restore panel contents of edge groups
+                for (const [position, edgeGroup] of this._edgeGroups) {
+                    const edgeData = data.edgeGroups[position];
+                    const groupState = edgeData?.group as
                         | GroupPanelViewState
                         | undefined;
                     if (groupState) {
@@ -1843,7 +1900,7 @@ export class DockviewComponent
                             if (panels[panelId]) {
                                 const panel = this._deserializer.fromJSON(
                                     panels[panelId],
-                                    fixedGroup
+                                    edgeGroup
                                 );
                                 createdPanels.push(panel);
                             }
@@ -1852,19 +1909,29 @@ export class DockviewComponent
                         for (let i = 0; i < createdPanels.length; i++) {
                             const panel = createdPanels[i];
                             const isActive = activeView === panel.id;
-                            fixedGroup.model.openPanel(panel, {
+                            edgeGroup.model.openPanel(panel, {
                                 skipSetActive: !isActive,
                                 skipSetGroupActive: true,
                             });
                         }
 
                         if (
-                            !fixedGroup.activePanel &&
-                            fixedGroup.panels.length > 0
+                            !edgeGroup.activePanel &&
+                            edgeGroup.panels.length > 0
                         ) {
-                            fixedGroup.model.openPanel(
-                                fixedGroup.panels[fixedGroup.panels.length - 1],
+                            edgeGroup.model.openPanel(
+                                edgeGroup.panels[edgeGroup.panels.length - 1],
                                 { skipSetGroupActive: true }
+                            );
+                        }
+
+                        // Restore tab groups if present
+                        if (
+                            groupState.tabGroups &&
+                            groupState.tabGroups.length > 0
+                        ) {
+                            edgeGroup.model.restoreTabGroups(
+                                groupState.tabGroups
                             );
                         }
                     }
@@ -1994,8 +2061,8 @@ export class DockviewComponent
         const hasActiveGroup = !!this.activeGroup;
 
         for (const group of groups) {
-            if ([...this._fixedGroups.values()].includes(group)) {
-                // Fixed groups are structural - only clear their panels, not the group itself
+            if ([...this._edgeGroups.values()].includes(group)) {
+                // Edge groups are structural - only clear their panels, not the group itself
                 const panels = [...group.panels];
                 for (const panel of panels) {
                     this.removePanel(panel, { removeEmptyGroup: false });
@@ -2133,7 +2200,7 @@ export class DockviewComponent
                 });
             } else if (
                 referenceGroup.api.location.type === 'floating' ||
-                referenceGroup.api.location.type === 'fixed' ||
+                referenceGroup.api.location.type === 'edge' ||
                 target === 'center'
             ) {
                 panel = this.createPanel(options, referenceGroup);
@@ -2395,8 +2462,8 @@ export class DockviewComponent
               }
             | undefined
     ): DockviewGroupPanel {
-        // Fixed groups are permanent structural elements - never remove them from the layout
-        if ([...this._fixedGroups.values()].includes(group)) {
+        // Edge groups are permanent structural elements - never remove them from the layout
+        if ([...this._edgeGroups.values()].includes(group)) {
             return group;
         }
 
@@ -2685,11 +2752,11 @@ export class DockviewComponent
                     return;
                 }
 
-                if (sourceGroup.api.location.type === 'fixed') {
+                if (sourceGroup.api.location.type === 'edge') {
                     /**
-                     * Fixed groups are permanent structural elements — never move the
+                     * Edge groups are permanent structural elements — never move the
                      * group itself. Instead extract the panel and create a new grid group,
-                     * leaving the fixed slot intact (same behaviour as the size >= 2 path).
+                     * leaving the edge slot intact (same behaviour as the size >= 2 path).
                      */
                     const removedPanel: IDockviewPanel | undefined =
                         this.movingLock(() =>
@@ -3103,6 +3170,24 @@ export class DockviewComponent
                     if (this._onDidActivePanelChange.value !== event.panel) {
                         this._onDidActivePanelChange.fire(event.panel);
                     }
+                }),
+                view.model.onDidCreateTabGroup((e) => {
+                    this._onDidCreateTabGroup.fire(e);
+                }),
+                view.model.onDidDestroyTabGroup((e) => {
+                    this._onDidDestroyTabGroup.fire(e);
+                }),
+                view.model.onDidAddPanelToTabGroup((e) => {
+                    this._onDidAddPanelToTabGroup.fire(e);
+                }),
+                view.model.onDidRemovePanelFromTabGroup((e) => {
+                    this._onDidRemovePanelFromTabGroup.fire(e);
+                }),
+                view.model.onDidTabGroupChange((e) => {
+                    this._onDidTabGroupChange.fire(e);
+                }),
+                view.model.onDidTabGroupCollapsedChange((e) => {
+                    this._onDidTabGroupCollapsedChange.fire(e);
                 }),
                 Event.any(
                     view.model.onDidPanelTitleChange,

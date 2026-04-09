@@ -503,6 +503,194 @@ describe('tabs - animation', () => {
             // panel-c (index 2): midpoint = 200, 120 < 200 → true, insertionIndex = 2
             expect(getAnimState(tabs).currentInsertionIndex).toBe(2);
         });
+
+        test('dragging tab adjacent to a group chip allows drop at position 0 of that group', () => {
+            // Regression: dragging the tab immediately left of a group chip
+            // into position 0 of the group was impossible because the
+            // sourceInBetween check incorrectly skipped the group.
+            //
+            // Layout: [Feature chip][A][B][C][D][Monitoring chip][E]
+            // Drag D → cursor over Monitoring chip → should target Monitoring group
+            const { tabs, group } = createTabs({ tabAnimation: 'smooth' });
+            const panelA = createMockPanel('panel-a');
+            const panelB = createMockPanel('panel-b');
+            const panelC = createMockPanel('panel-c');
+            const panelD = createMockPanel('panel-d');
+            const panelE = createMockPanel('panel-e');
+
+            tabs.openPanel(panelA, 0);
+            tabs.openPanel(panelB, 1);
+            tabs.openPanel(panelC, 2);
+            tabs.openPanel(panelD, 3);
+            tabs.openPanel(panelE, 4);
+
+            const elements = getTabElements(tabs);
+
+            // Feature chip (30px) + 4 tabs (80px each) + Monitoring chip (30px) + 1 tab (80px)
+            // Positions: chip@0, A@30, B@110, C@190, D@270, chip@350, E@380
+            mockTabRect(elements[0], { left: 30, width: 80 }); // A
+            mockTabRect(elements[1], { left: 110, width: 80 }); // B
+            mockTabRect(elements[2], { left: 190, width: 80 }); // C
+            mockTabRect(elements[3], { left: 270, width: 80 }); // D (source)
+            mockTabRect(elements[4], { left: 380, width: 80 }); // E
+
+            // Mock tab groups returned by the model
+            const featureGroup = {
+                id: 'feature-group',
+                panelIds: ['panel-a', 'panel-b', 'panel-c', 'panel-d'],
+                collapsed: false,
+            };
+            const monitoringGroup = {
+                id: 'monitoring-group',
+                panelIds: ['panel-e'],
+                collapsed: false,
+            };
+            (group.model as any).getTabGroups = () => [
+                featureGroup,
+                monitoringGroup,
+            ];
+
+            // Set up chip renderers map so the code knows there are chips
+            const chipRenderers = (tabs as any)._tabGroupManager
+                ._chipRenderers as Map<string, any>;
+            chipRenderers.set('feature-group', {
+                chip: { element: document.createElement('span') },
+                disposable: { dispose: jest.fn() },
+            });
+            chipRenderers.set('monitoring-group', {
+                chip: { element: document.createElement('span') },
+                disposable: { dispose: jest.fn() },
+            });
+
+            // Start drag on panel-d (index 3)
+            fireEvent.dragStart(elements[3]);
+            flushRAF();
+
+            // Override _animState chip positions
+            const state = getAnimState(tabs);
+            state.chipPositions.set('feature-group', 30);
+            state.chipPositions.set('monitoring-group', 30);
+            // containerLeft = 0 for simplicity
+            state.containerLeft = 0;
+            // cursorOffsetFromDragLeft = 40 (half of 80)
+            state.cursorOffsetFromDragLeft = 40;
+
+            // Position cursor just before the Monitoring chip so the chip
+            // overflows but all Feature tabs fit:
+            //   dragLeftEdge = 330 - 40 = 290, availableSpace = 290
+            //   Feature chip(30) + A(80) + B(80) + C(80) = 270 ≤ 290
+            //   Monitoring chip: 270 + 30 = 300 > 290 → overflow → break
+            //   insertionIndex stays at 3 (D's raw index)
+            //
+            // Group matching for Monitoring:
+            //   effectivePanelIds = [E], firstIdx = 4, lastIdx = 4
+            //   isJustBeforeGroup = (3 === 4-1) = true
+            //   j=3: tabs[3] = D = source → allInBetweenAreSource = true
+            //   → threshold check: chipWidth=30, containerLeft+accUpTo=270
+            //     threshold = 270 + 30 = 300, mouseX=330 ≥ 300 → target = monitoring
+            (tabs as any).handleDragOver({ clientX: 330 } as DragEvent);
+
+            expect(getAnimState(tabs).targetTabGroupId).toBe(
+                'monitoring-group'
+            );
+        });
+
+        test('dragging a group chip never targets another group', () => {
+            // Regression: dragging a group chip between two tabs of another
+            // group should NOT set targetTabGroupId — groups cannot be
+            // dropped inside other groups.
+            //
+            // Layout: [Feature chip][A][B][Monitoring chip][C]
+            // Drag Feature group → cursor between C's tabs area
+            const { tabs, group } = createTabs({ tabAnimation: 'smooth' });
+            const panelA = createMockPanel('panel-a');
+            const panelB = createMockPanel('panel-b');
+            const panelC = createMockPanel('panel-c');
+            const panelD = createMockPanel('panel-d');
+
+            tabs.openPanel(panelA, 0);
+            tabs.openPanel(panelB, 1);
+            tabs.openPanel(panelC, 2);
+            tabs.openPanel(panelD, 3);
+
+            const elements = getTabElements(tabs);
+
+            mockTabRect(elements[0], { left: 30, width: 80 }); // A
+            mockTabRect(elements[1], { left: 110, width: 80 }); // B
+            mockTabRect(elements[2], { left: 220, width: 80 }); // C
+            mockTabRect(elements[3], { left: 300, width: 80 }); // D
+
+            const featureGroup = {
+                id: 'feature-group',
+                panelIds: ['panel-a', 'panel-b'],
+                collapsed: false,
+            };
+            const monitoringGroup = {
+                id: 'monitoring-group',
+                panelIds: ['panel-c', 'panel-d'],
+                collapsed: false,
+            };
+            (group.model as any).getTabGroups = () => [
+                featureGroup,
+                monitoringGroup,
+            ];
+
+            const chipRenderers = (tabs as any)._tabGroupManager
+                ._chipRenderers as Map<string, any>;
+            chipRenderers.set('feature-group', {
+                chip: { element: document.createElement('span') },
+                disposable: { dispose: jest.fn() },
+            });
+            chipRenderers.set('monitoring-group', {
+                chip: { element: document.createElement('span') },
+                disposable: { dispose: jest.fn() },
+            });
+
+            // Manually initialize a group drag (sourceTabGroupId is set)
+            (tabs as any)._animState = {
+                sourceTabId: '',
+                sourceIndex: 0,
+                tabPositions: (tabs as any).snapshotTabPositions(),
+                chipPositions: new Map([
+                    ['feature-group', 30],
+                    ['monitoring-group', 30],
+                ]),
+                currentInsertionIndex: null,
+                targetTabGroupId: null,
+                sourceTabGroupId: 'feature-group',
+                sourceGroupPanelIds: new Set(['panel-a', 'panel-b']),
+                sourceChipWidth: 30,
+                cursorOffsetFromDragLeft: 40,
+                sourceGapWidth: 190,
+                containerLeft: 0,
+            };
+
+            // Position cursor between C and D (inside Monitoring group range)
+            // Without the fix, targetTabGroupId would be 'monitoring-group'
+            // and insertionIndex would land inside the group.
+            //
+            // Accumulation (A,B are source → skipped):
+            //   Monitoring chip: 0+30=30, C: 30+40=70 ≤ availableSpace
+            //   For clientX=280: dragLeftEdge=280-40=240, availableSpace=240
+            //   chip(30)+C(80)=110+D_mid: 110+40=150 ≤ 240 → acc=190, ins=4 (past D)
+            // Actually let's use clientX=270 so insertion lands at index 3 (between C and D)
+            //   dragLeftEdge=270-40=230, availableSpace=230
+            //   chip(30)+C(80): acc=110, ins=3. D_mid: 110+40=150 ≤ 230 → acc=190, ins=4
+            // Hmm, both land past D. Let's use clientX=180:
+            //   dragLeftEdge=180-40=140, availableSpace=140
+            //   chip(30): acc=30. C_mid: 30+40=70 ≤ 140 → acc=110, ins=3.
+            //   D_mid: 110+40=150 > 140 → break. insertionIndex=3
+            //   Monitoring effectivePanelIds=[C,D], firstIdx=2, lastIdx=3
+            //   isInsideRange = (3 >= 2 && 3 <= 3) = true → snap
+            //   groupMid = (2+3+1)/2 = 3. insertionIndex(3) >= 3 → snap to lastIdx+1 = 4
+            (tabs as any).handleDragOver({ clientX: 180 } as DragEvent);
+
+            // Group drags must never target another group
+            expect(getAnimState(tabs).targetTabGroupId).toBeNull();
+            // Insertion index should be snapped outside the Monitoring group
+            // (to lastIdx + 1 = 4, i.e. after the group)
+            expect(getAnimState(tabs).currentInsertionIndex).toBe(4);
+        });
     });
 
     describe('dragover gap transforms', () => {
@@ -528,22 +716,22 @@ describe('tabs - animation', () => {
 
             // Start drag on panel-b (index 1)
             fireEvent.dragStart(elements[1]);
+            flushRAF(); // let collapse rAF run so _pendingCollapse is cleared
             expect(getAnimState(tabs)).not.toBeNull();
 
             // Source tab width was captured as 80px
+            // cursorOffsetFromDragLeft = 40 (half of source tab width)
             // Simulate cursor at position 200 (right half of panel-c)
             (tabs as any).handleDragOver({ clientX: 200 } as DragEvent);
 
             // panel-a (index 0): 0 < insertionIndex → no margin
             expect(elements[0].style.marginLeft).toBe('');
 
-            // panel-b (index 1, source): skipped
-            // panel-c (index 2): check if shifted depends on insertionIndex
-            // panel-d (index 3): should get margin-left
-
-            // cursor 200: A(skip? no, not source), midpoint=40 → 200>40 → continue
-            // B(source, skip), C midpoint=200 → 200<200=false → insertionIndex=3
-            // D midpoint=280 → 200<280=true → insertionIndex=3. break.
+            // Accumulation: dragLeftEdge=200-40=160, availableSpace=160
+            // A(i=0): accWidth+40=40<=160 → acc=80, ins=1
+            // B(i=1, source): skip
+            // C(i=2): acc+40=120<=160 → acc=160, ins=3
+            // D(i=3): acc+40=200>160 → break
             expect(getAnimState(tabs).currentInsertionIndex).toBe(3);
 
             // First non-source tab at index >= 3: panel-d gets margin-left of 80
@@ -552,8 +740,9 @@ describe('tabs - animation', () => {
                 elements[3].classList.contains('dv-tab--shifting')
             ).toBeTruthy();
 
-            // panel-c (index 2 < 3): no margin
-            expect(elements[2].style.marginLeft).toBe('');
+            // panel-c (index 2 < 3): no margin (may be '0px' in JSDOM
+            // because transitionend never fires to remove the property)
+            expect(['', '0px']).toContain(elements[2].style.marginLeft);
         });
 
         test('gap moves when cursor moves to different position', () => {
@@ -574,22 +763,29 @@ describe('tabs - animation', () => {
 
             // Start drag on panel-a (source, width 80)
             fireEvent.dragStart(elements[0]);
+            flushRAF(); // let collapse rAF run so _pendingCollapse is cleared
 
-            // Move cursor to left half of panel-b (insert before B)
+            // Move cursor: cursorOffsetFromDragLeft = 40
+            // clientX=90 → dragLeftEdge=50, availableSpace=50
             (tabs as any).handleDragOver({ clientX: 90 } as DragEvent);
 
-            // A(source, skip). B midpoint=120, 90<120 → insertionIndex=1
-            expect(getAnimState(tabs).currentInsertionIndex).toBe(1);
-            // First non-source tab at index >= 1: panel-b gets margin-left
-            expect(elements[1].style.marginLeft).toBe('80px');
-            // panel-c: not the first tab at >= insertionIndex, no margin
-            expect(elements[2].style.marginLeft).toBe('');
+            // Accumulation: A(source, skip).
+            // B(i=1): accWidth+40=40<=50 → acc=80, ins=2
+            // C(i=2): accWidth+40=120>50 → break
+            expect(getAnimState(tabs).currentInsertionIndex).toBe(2);
+            // First non-source tab at index >= 2: panel-c gets margin-left
+            expect(elements[2].style.marginLeft).toBe('80px');
+            // panel-b: index 1 < 2 → no margin (may be '0px' in JSDOM
+            // because transitionend never fires to remove the property)
+            expect(['', '0px']).toContain(elements[1].style.marginLeft);
 
             // Now move cursor to right half of panel-c (insert after C)
+            // clientX=220 → dragLeftEdge=180, availableSpace=180
             (tabs as any).handleDragOver({ clientX: 220 } as DragEvent);
 
-            // A(source, skip). B midpoint=120, 220>120 → continue, insertionIndex=2.
-            // C midpoint=200, 220>200 → continue, insertionIndex=3. Loop ends.
+            // Accumulation: A(source, skip).
+            // B(i=1): acc+40=40<=180 → acc=80, ins=2
+            // C(i=2): acc+40=120<=180 → acc=160, ins=3. Loop ends.
             expect(getAnimState(tabs).currentInsertionIndex).toBe(3);
             // No tabs at index >= 3 → margins animate to 0 (transition pending in real
             // browser; in JSDOM without CSS transitions the value is '0px' until

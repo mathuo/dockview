@@ -462,7 +462,7 @@ describe('VueHeaderActionsRenderer', () => {
         expect(vueRenderMock).toHaveBeenCalledTimes(4);
 
         onDidLocationChange.fire({
-            location: { type: 'fixed', position: 'left' },
+            location: { type: 'edge', position: 'left' },
         });
         expect(vueRenderMock).toHaveBeenCalledTimes(5);
 

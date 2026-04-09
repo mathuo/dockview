@@ -38,6 +38,7 @@ function createTabsForDropTest() {
         model: fromPartial({
             canDisplayOverlay: jest.fn().mockReturnValue(true),
             dropTargetContainer: undefined,
+            getTabGroupForPanel: jest.fn().mockReturnValue(null),
         }),
     });
     const tabs = new Tabs(group, accessor, { showTabsOverflowControl: false });
@@ -194,7 +195,7 @@ describe('tabs', () => {
             return fromPartial<DockviewGroupPanel>({
                 activePanel,
                 api: {
-                    location: { type: 'fixed' },
+                    location: { type: 'edge' },
                     isCollapsed: isCollapsedFn,
                     expand: expandMock,
                     collapse: collapseMock,
@@ -356,6 +357,7 @@ describe('tabs', () => {
                 model: fromPartial({
                     canDisplayOverlay: jest.fn().mockReturnValue(true),
                     dropTargetContainer: undefined,
+                    getTabGroupForPanel: jest.fn().mockReturnValue(null),
                 }),
             });
             const tabs = new Tabs(group, accessor, {
@@ -383,7 +385,15 @@ describe('tabs', () => {
                 sourceTabId: 'panel-a',
                 sourceIndex: 0,
                 tabPositions: (tabs as any).snapshotTabPositions(),
+                chipPositions: new Map(),
                 currentInsertionIndex: null,
+                targetTabGroupId: null,
+                sourceTabGroupId: null,
+                sourceGroupPanelIds: null,
+                sourceChipWidth: 0,
+                cursorOffsetFromDragLeft: 0,
+                sourceGapWidth: 0,
+                containerLeft: 0,
             };
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;

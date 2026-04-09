@@ -19,6 +19,7 @@ import {
 import {
     VueHeaderActionsRenderer,
     VueContextMenuItemRenderer,
+    VueTabGroupChipRenderer,
     VueRenderer,
     VueWatermarkRenderer,
     findComponent,
@@ -54,12 +55,28 @@ PROPERTY_KEYS_DOCKVIEW.forEach((coreOptionKey) => {
     );
 });
 
+const inst = getCurrentInstance()!;
+
+watch(
+    () => props.tabGroupChipComponent,
+    (newValue) => {
+        if (instance.value) {
+            instance.value.updateOptions({
+                createTabGroupChipComponent: newValue
+                    ? () => {
+                          const component = findComponent(inst, newValue);
+                          return new VueTabGroupChipRenderer(component!, inst);
+                      }
+                    : undefined,
+            });
+        }
+    }
+);
+
 onMounted(() => {
     if (!el.value) {
         throw new Error('dockview-vue: element is not mounted');
     }
-
-    const inst = getCurrentInstance();
 
     if (!inst) {
         throw new Error('dockview-vue: getCurrentInstance() returned null');
@@ -128,8 +145,18 @@ onMounted(() => {
         },
     };
 
+    const coreOptions = extractCoreOptions(props);
+
+    if (props.tabGroupChipComponent) {
+        const chipComponentName = props.tabGroupChipComponent;
+        coreOptions.createTabGroupChipComponent = () => {
+            const component = findComponent(inst, chipComponentName);
+            return new VueTabGroupChipRenderer(component!, inst);
+        };
+    }
+
     const api = createDockview(el.value, {
-        ...extractCoreOptions(props),
+        ...coreOptions,
         ...frameworkOptions,
     });
 

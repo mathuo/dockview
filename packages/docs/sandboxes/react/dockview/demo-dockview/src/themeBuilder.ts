@@ -139,9 +139,7 @@ export function generateCodeSnippet(
         themeFields.push(`  dndTabIndicator: '${state.dndTabIndicator}',`);
     }
     if (state.dndOverlayBorder !== (baseTheme.dndOverlayBorder ?? '')) {
-        themeFields.push(
-            `  dndOverlayBorder: '${state.dndOverlayBorder}',`
-        );
+        themeFields.push(`  dndOverlayBorder: '${state.dndOverlayBorder}',`);
     }
 
     let out = `import { ${importName} } from 'dockview';\n\n`;

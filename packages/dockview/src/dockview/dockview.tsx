@@ -16,8 +16,10 @@ import {
     DockviewReadyEvent,
     createDockview,
     BuiltInContextMenuItem,
+    BuiltInChipContextMenuItem,
     ContextMenuItemConfig,
     GetTabContextMenuItemsParams,
+    GetTabGroupChipContextMenuItemsParams,
     IContextMenuItemComponentProps,
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
@@ -26,6 +28,10 @@ import { ReactPortalStore, usePortalsLifecycle } from '../react';
 import { ReactWatermarkPart } from './reactWatermarkPart';
 import { ReactHeaderActionsRendererPart } from './headerActionsRenderer';
 import { ReactContextMenuItemPart } from './reactContextMenuItemPart';
+import {
+    IDockviewTabGroupChipProps,
+    ReactTabGroupChipPart,
+} from './reactTabGroupChipPart';
 
 function createGroupControlElement(
     component: React.FunctionComponent<IDockviewHeaderActionsProps> | undefined,
@@ -65,6 +71,10 @@ export interface IDockviewReactProps extends DockviewOptions {
     getTabContextMenuItems?: (
         params: GetTabContextMenuItemsParams
     ) => (BuiltInContextMenuItem | ReactContextMenuItemConfig)[];
+    getTabGroupChipContextMenuItems?: (
+        params: GetTabGroupChipContextMenuItemsParams
+    ) => (BuiltInChipContextMenuItem | ReactContextMenuItemConfig)[];
+    tabGroupChipComponent?: React.FunctionComponent<IDockviewTabGroupChipProps>;
     //
     onReady: (event: DockviewReadyEvent) => void;
     onDidDrop?: (event: DockviewDidDropEvent) => void;
@@ -185,8 +195,19 @@ export const DockviewReact = React.forwardRef(
                 },
             };
 
+            const coreOptions = extractCoreOptions(props);
+
+            if (props.tabGroupChipComponent) {
+                const chipComponent = props.tabGroupChipComponent;
+                coreOptions.createTabGroupChipComponent = () => {
+                    return new ReactTabGroupChipPart(chipComponent, {
+                        addPortal,
+                    });
+                };
+            }
+
             const api = createDockview(domRef.current, {
-                ...extractCoreOptions(props),
+                ...coreOptions,
                 ...frameworkOptions,
             });
 
@@ -240,6 +261,25 @@ export const DockviewReact = React.forwardRef(
                 disposable.dispose();
             };
         }, [props.onWillDrop]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+
+            dockviewRef.current.updateOptions({
+                createTabGroupChipComponent: props.tabGroupChipComponent
+                    ? () => {
+                          return new ReactTabGroupChipPart(
+                              props.tabGroupChipComponent!,
+                              {
+                                  addPortal,
+                              }
+                          );
+                      }
+                    : undefined,
+            });
+        }, [props.tabGroupChipComponent]);
 
         React.useEffect(() => {
             if (!dockviewRef.current) {

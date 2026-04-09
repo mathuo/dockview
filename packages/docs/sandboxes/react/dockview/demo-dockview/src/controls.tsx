@@ -26,7 +26,7 @@ const groupControlsComponents: Record<string, React.FC> = {
 };
 
 export const RightControls = (props: IDockviewHeaderActionsProps) => {
-    if (props.location.type === 'fixed') {
+    if (props.location.type === 'edge') {
         return null;
     }
 
@@ -77,7 +77,9 @@ export const RightControls = (props: IDockviewHeaderActionsProps) => {
         }
     };
 
-    const vertical = props.group.api.getHeaderPosition() === 'left' || props.group.api.getHeaderPosition() === 'right';
+    const vertical =
+        props.group.api.getHeaderPosition() === 'left' ||
+        props.group.api.getHeaderPosition() === 'right';
 
     return (
         <div
@@ -111,7 +113,7 @@ export const RightControls = (props: IDockviewHeaderActionsProps) => {
 };
 
 export const LeftControls = (props: IDockviewHeaderActionsProps) => {
-    if (props.location.type === 'fixed') {
+    if (props.location.type === 'edge') {
         return null;
     }
 
@@ -144,7 +146,7 @@ export const LeftControls = (props: IDockviewHeaderActionsProps) => {
 };
 
 export const PrefixHeaderControls = (props: IDockviewHeaderActionsProps) => {
-    if (props.location.type === 'fixed') {
+    if (props.location.type === 'edge') {
         return null;
     }
 

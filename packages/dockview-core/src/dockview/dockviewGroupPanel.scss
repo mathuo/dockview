@@ -27,7 +27,7 @@
         flex-direction: row-reverse;
     }
 
-    &.dv-groupview-fixed.dv-fixed-collapsed > .dv-content-container {
+    &.dv-groupview-edge.dv-edge-collapsed > .dv-content-container {
         display: none;
     }
 }

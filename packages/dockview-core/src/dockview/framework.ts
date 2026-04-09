@@ -6,6 +6,7 @@ import { DockviewGroupPanel, IDockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewGroupLocation } from './dockviewGroupPanelModel';
 import { IDockviewPanel } from './dockviewPanel';
 import { DockviewHeaderPosition } from './options';
+import { ITabGroup } from './tabGroup';
 
 export interface IGroupPanelBaseProps<
     T extends { [index: string]: any } = any,
@@ -31,7 +32,7 @@ export interface IDockviewHeaderActionsProps {
     isGroupActive: boolean;
     group: DockviewGroupPanel;
     headerPosition: DockviewHeaderPosition;
-    location: DockviewGroupLocation;
+    location?: DockviewGroupLocation;
 }
 
 export interface IGroupHeaderProps {
@@ -47,4 +48,11 @@ export interface IWatermarkPanelProps {
 
 export interface DockviewReadyEvent {
     api: DockviewApi;
+}
+
+export interface ITabGroupChipRenderer {
+    readonly element: HTMLElement;
+    init(params: { tabGroup: ITabGroup; api: DockviewApi }): void;
+    update?(params: { tabGroup: ITabGroup }): void;
+    dispose(): void;
 }
