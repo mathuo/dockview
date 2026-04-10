@@ -9,7 +9,8 @@ export type DockviewTabGroupColor =
     | 'green'
     | 'pink'
     | 'purple'
-    | 'cyan';
+    | 'cyan'
+    | 'orange';
 
 export const DockviewTabGroupColors: Record<string, DockviewTabGroupColor> = {
     Grey: 'grey',
@@ -20,6 +21,7 @@ export const DockviewTabGroupColors: Record<string, DockviewTabGroupColor> = {
     Pink: 'pink',
     Purple: 'purple',
     Cyan: 'cyan',
+    Orange: 'orange',
 } as const;
 
 const VALID_COLORS: Set<string> = new Set<string>(

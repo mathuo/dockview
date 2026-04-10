@@ -140,12 +140,13 @@ export default () => {
         ({ tabGroup, group }: GetTabGroupChipContextMenuItemsParams) => {
             const items = buildChipContextMenuItems(api!, group.id, tabGroup);
             return [
+                'rename' as const,
+                'colorPicker' as const,
+                'separator' as const,
                 ...items.map((item) => ({
                     label: item.label,
                     action: item.onClick,
                 })),
-                'separator' as const,
-                'colorPicker' as const,
             ];
         },
         [api]

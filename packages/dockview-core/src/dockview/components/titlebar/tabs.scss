@@ -197,7 +197,7 @@
 }
 
 // Color variants
-@each $color in grey, blue, red, yellow, green, pink, purple, cyan {
+@each $color in grey, blue, red, yellow, green, pink, purple, cyan, orange {
     .dv-tab-group-chip--#{$color} {
         background-color: var(--dv-tab-group-color-#{$color});
         color: white;

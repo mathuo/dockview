@@ -115,9 +115,15 @@ export class Tabs extends CompositeDisposable {
                 observer.onDidChange((event) => {
                     const hasOverflow = event.hasScrollX || event.hasScrollY;
                     this.toggleDropdown({ reset: !hasOverflow });
+                    if (this._tabGroupManager.groupUnderlines.size > 0) {
+                        this._tabGroupManager.positionUnderlines();
+                    }
                 }),
                 addDisposableListener(this._tabsList, 'scroll', () => {
                     this.toggleDropdown({ reset: false });
+                    if (this._tabGroupManager.groupUnderlines.size > 0) {
+                        this._tabGroupManager.positionUnderlines();
+                    }
                 })
             );
         }
@@ -1554,6 +1560,7 @@ export class Tabs extends CompositeDisposable {
             this.group.model.moveTabGroup(sourceTabGroupId, insertionIndex);
             this.runFlipAnimation(firstPositions, '', false);
         } else {
+            this._tabGroupManager.skipNextCollapseAnimation = true;
             this.group.model.moveTabGroup(sourceTabGroupId, insertionIndex);
         }
     }

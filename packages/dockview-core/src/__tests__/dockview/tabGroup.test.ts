@@ -249,6 +249,6 @@ describe('isValidTabGroupColor', () => {
     test('should reject invalid colors', () => {
         expect(isValidTabGroupColor('')).toBe(false);
         expect(isValidTabGroupColor('invalid')).toBe(false);
-        expect(isValidTabGroupColor('orange')).toBe(false);
+        expect(isValidTabGroupColor('orange')).toBe(true);
     });
 });

@@ -629,25 +629,14 @@ const DockviewDemo = (props: {
         ({ group, tabGroup }: GetTabGroupChipContextMenuItemsParams) => {
             const items: (
                 | 'colorPicker'
+                | 'rename'
                 | 'separator'
                 | { label: string; action: () => void }
-            )[] = ['colorPicker'];
+            )[] = ['rename', 'colorPicker'];
 
             if (api) {
                 items.push(
                     'separator',
-                    {
-                        label: 'Rename group',
-                        action: () => {
-                            const label = window.prompt(
-                                'New group name:',
-                                tabGroup.label
-                            );
-                            if (label !== null) {
-                                tabGroup.setLabel(label);
-                            }
-                        },
-                    },
                     {
                         label: tabGroup.collapsed
                             ? 'Expand group'

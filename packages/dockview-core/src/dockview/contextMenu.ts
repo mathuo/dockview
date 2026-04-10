@@ -47,7 +47,38 @@ function buildSeparator(): HTMLElement {
     return el;
 }
 
-function buildColorPicker(tabGroup: ITabGroup, close: () => void): HTMLElement {
+function buildRenameInput(tabGroup: ITabGroup): HTMLElement {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'dv-context-menu-rename';
+
+    const input = document.createElement('input');
+    input.className = 'dv-context-menu-rename-input';
+    input.type = 'text';
+    input.placeholder = 'Name This Group';
+    input.value = tabGroup.label;
+    input.addEventListener('input', () => {
+        tabGroup.setLabel(input.value);
+    });
+    input.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape' && e.key !== 'Enter') {
+            e.stopPropagation();
+        }
+    });
+    input.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    wrapper.appendChild(input);
+
+    requestAnimationFrame(() => {
+        input.focus();
+        input.select();
+    });
+
+    return wrapper;
+}
+
+function buildColorPicker(tabGroup: ITabGroup): HTMLElement {
     const wrapper = document.createElement('div');
     wrapper.className = 'dv-context-menu-color-picker';
 
@@ -59,7 +90,6 @@ function buildColorPicker(tabGroup: ITabGroup, close: () => void): HTMLElement {
         }
         swatch.addEventListener('click', () => {
             tabGroup.setColor(color);
-            close();
         });
         wrapper.appendChild(swatch);
     }
@@ -185,8 +215,10 @@ export class ContextMenuController {
         for (const item of items) {
             if (item === 'separator') {
                 menuEl.appendChild(buildSeparator());
+            } else if (item === 'rename') {
+                menuEl.appendChild(buildRenameInput(tabGroup));
             } else if (item === 'colorPicker') {
-                menuEl.appendChild(buildColorPicker(tabGroup, close));
+                menuEl.appendChild(buildColorPicker(tabGroup));
             } else if (isItemConfig(item) && item.element) {
                 menuEl.appendChild(item.element);
             } else if (isItemConfig(item) && item.label) {

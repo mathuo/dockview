@@ -14,13 +14,13 @@ export function defaultConfig(api: DockviewApi) {
         renderer: 'always',
     });
 
-    // Price alert as a floating panel
+    // Price alert in the same group as watchlist
     const pricealert = api.addPanel({
         id: 'pricealert',
         component: 'pricealert',
         title: 'Price Alert',
         renderer: 'always',
-        floating: { width: 360, height: 280, x: 60, y: 140 },
+        position: { referencePanel: watchlist },
     });
 
     // Centre column: order book (top) + orders grid (bottom)
@@ -78,6 +78,24 @@ export function defaultConfig(api: DockviewApi) {
         title: 'Panel Debug',
         renderer: 'always',
         position: { referencePanel: eventlog },
+    });
+
+    // Create a tab group in the watchlist group to demonstrate the feature
+    const watchlistGroupId = watchlist.api.group.id;
+    const marketData = api.createTabGroup({
+        groupId: watchlistGroupId,
+        label: 'Market Data',
+        color: 'blue',
+    });
+    api.addPanelToTabGroup({
+        groupId: watchlistGroupId,
+        tabGroupId: marketData.id,
+        panelId: 'watchlist',
+    });
+    api.addPanelToTabGroup({
+        groupId: watchlistGroupId,
+        tabGroupId: marketData.id,
+        panelId: 'pricealert',
     });
 
     // Set active panels

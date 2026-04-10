@@ -83,7 +83,7 @@ export class PopupService extends CompositeDisposable {
                 this.close();
             }),
             addDisposableListener(window, 'keydown', (event) => {
-                if (event.key === 'Escape') {
+                if (event.key === 'Escape' || event.key === 'Enter') {
                     this.close();
                 }
             }),

@@ -153,6 +153,47 @@ describe('PopupService', () => {
         });
     });
 
+    describe('keyboard', () => {
+        test('Escape closes the popover', () => {
+            const el = document.createElement('div');
+            el.className = 'my-popup';
+            service.openPopover(el, { x: 0, y: 0 });
+
+            window.dispatchEvent(
+                new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+            );
+
+            const anchor = root.querySelector('.dv-popover-anchor')!;
+            expect(anchor.querySelector('.my-popup')).toBeNull();
+        });
+
+        test('Enter closes the popover', () => {
+            const el = document.createElement('div');
+            el.className = 'my-popup';
+            service.openPopover(el, { x: 0, y: 0 });
+
+            window.dispatchEvent(
+                new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
+            );
+
+            const anchor = root.querySelector('.dv-popover-anchor')!;
+            expect(anchor.querySelector('.my-popup')).toBeNull();
+        });
+
+        test('other keys do not close the popover', () => {
+            const el = document.createElement('div');
+            el.className = 'my-popup';
+            service.openPopover(el, { x: 0, y: 0 });
+
+            window.dispatchEvent(
+                new KeyboardEvent('keydown', { key: 'a', bubbles: true })
+            );
+
+            const anchor = root.querySelector('.dv-popover-anchor')!;
+            expect(anchor.querySelector('.my-popup')).not.toBeNull();
+        });
+    });
+
     describe('window resize', () => {
         test('closes the popover', () => {
             const el = document.createElement('div');

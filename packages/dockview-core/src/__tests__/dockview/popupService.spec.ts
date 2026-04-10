@@ -47,11 +47,21 @@ describe('PopupService', () => {
         expect(root.contains(el)).toBe(false);
     });
 
+    test('Enter key closes the popup', () => {
+        const { service, root } = makeService();
+        const el = openMenu(service);
+
+        expect(root.contains(el)).toBe(true);
+
+        fireEvent.keyDown(window, { key: 'Enter' });
+
+        expect(root.contains(el)).toBe(false);
+    });
+
     test('other keys do not close the popup', () => {
         const { service, root } = makeService();
         const el = openMenu(service);
 
-        fireEvent.keyDown(window, { key: 'Enter' });
         fireEvent.keyDown(window, { key: 'ArrowDown' });
 
         expect(root.contains(el)).toBe(true);
