@@ -1,23 +1,22 @@
 import {
-    ComponentRef,
-    Injector,
-    Type,
-    EmbeddedViewRef,
-    createComponent,
-    EnvironmentInjector,
     ApplicationRef,
+    ComponentRef,
+    createComponent,
+    EmbeddedViewRef,
+    EnvironmentInjector,
+    Injector,
     TemplateRef,
-    ViewContainerRef,
+    Type,
 } from '@angular/core';
 import { IContentRenderer, IFrameworkPart, Parameters } from 'dockview-core';
 
-export interface AngularRendererOptions<T = any> {
+export interface AngularRendererOptions<T = unknown> {
     component: Type<T> | TemplateRef<T>;
     injector: Injector;
     environmentInjector?: EnvironmentInjector;
 }
 
-export class AngularRenderer<T = any>
+export class AngularRenderer<T = unknown>
     implements IContentRenderer, IFrameworkPart
 {
     private componentRef: ComponentRef<T> | null = null;
@@ -123,26 +122,15 @@ export class AngularRenderer<T = any>
         // Get the DOM element
         const hostView = this.componentRef.hostView as EmbeddedViewRef<T>;
         this._element = hostView.rootNodes[0] as HTMLElement;
-
-        // Attach to change detection
-        this.appRef.attachView(hostView);
-
-        // Trigger change detection
-        this.componentRef.changeDetectorRef.markForCheck();
     }
 
     private setupView(template: TemplateRef<T>): void {
-        // Get factory for template instances
-        const vcr = this.options.injector.get(ViewContainerRef);
-
         // Create embedded view from template
-        this.viewRef = vcr.createEmbeddedView(template);
+        this.viewRef = template.createEmbeddedView(
+            <never>{},
+            this.options.injector
+        );
         this._element = this.viewRef.rootNodes[0] as HTMLElement;
-
-        // Already attached to change detection (of injector, usually dockview)
-
-        // Trigger change detection
-        this.viewRef.markForCheck();
     }
 
     dispose(): void {
