@@ -117,6 +117,19 @@ export interface DockviewOptions {
      * */
     rootOverlayModel?: DroptargetOverlayModel;
     disableDnd?: boolean;
+    /**
+     * Controls how tabs interact with floating groups during drag-and-drop.
+     *
+     * - `"default"`: Standard behavior — floating-to-floating tab merge is not
+     *   supported and tab tear-off from floating groups docks to the grid.
+     * - `"browser"`: Browser-style tab management — dragging a tab from one
+     *   floating group onto another merges it into the target group, and
+     *   tearing a tab out of a multi-tab floating group creates a new floating
+     *   group at the drop position instead of docking to the grid.
+     *
+     * Defaults to `"default"`.
+     */
+    floatingTabBehavior?: 'default' | 'browser';
     // #end dnd
     locked?: boolean;
     className?: string;
@@ -222,6 +235,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         rootOverlayModel: undefined,
         locked: undefined,
         disableDnd: undefined,
+        floatingTabBehavior: undefined,
         className: undefined,
         noPanelsOverlay: undefined,
         dndEdges: undefined,
