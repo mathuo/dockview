@@ -124,6 +124,10 @@ export class AngularRenderer<T = unknown>
         // Get the DOM element
         this.viewRef = this.componentRef.hostView as EmbeddedViewRef<T>;
         this._element = this.viewRef.rootNodes[0] as HTMLElement;
+
+        // always attach for now
+        this.appRef.attachView(this.viewRef);
+        this.viewRef.markForCheck();
     }
 
     private setupView(template: TemplateRef<T>): void {
@@ -133,6 +137,10 @@ export class AngularRenderer<T = unknown>
             this.options.injector
         );
         this._element = this.viewRef.rootNodes[0] as HTMLElement;
+
+        // always attach for now
+        this.appRef.attachView(this.viewRef);
+        this.viewRef.markForCheck();
     }
 
     dispose(): void {
