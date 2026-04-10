@@ -167,10 +167,7 @@ export class TabGroupManager {
         if (isVertical) {
             // Force horizontal orientation for the drag ghost by
             // removing vertical CSS classes and overriding writing-mode.
-            clone.classList.remove(
-                'dv-tabs-container-vertical',
-                'dv-vertical'
-            );
+            clone.classList.remove('dv-tabs-container-vertical', 'dv-vertical');
             clone.classList.add('dv-horizontal');
             clone.style.writingMode = 'horizontal-tb';
             clone.style.height = `${this._ctx.tabsList.offsetWidth}px`;
