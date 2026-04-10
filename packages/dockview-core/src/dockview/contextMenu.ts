@@ -60,7 +60,9 @@ function buildRenameInput(tabGroup: ITabGroup): HTMLElement {
         tabGroup.setLabel(input.value);
     });
     input.addEventListener('keydown', (e) => {
-        e.stopPropagation();
+        if (e.key !== 'Escape' && e.key !== 'Enter') {
+            e.stopPropagation();
+        }
     });
     input.addEventListener('click', (e) => {
         e.stopPropagation();
