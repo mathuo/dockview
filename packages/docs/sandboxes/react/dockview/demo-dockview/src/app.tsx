@@ -9,8 +9,9 @@ import {
     themeAbyss,
     IContextMenuItemComponentProps,
     GetTabContextMenuItemsParams,
-    TAB_GROUP_COLORS,
-    TabGroupColor,
+    GetTabGroupChipContextMenuItemsParams,
+    DockviewTabGroupColors,
+    DockviewTabGroupColor,
 } from 'dockview';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
@@ -601,9 +602,10 @@ const DockviewDemo = (props: {
                     label: 'Add to new group',
                     action: () => {
                         const label = window.prompt('Group name:') || '';
-                        const color = TAB_GROUP_COLORS[
-                            Math.floor(Math.random() * TAB_GROUP_COLORS.length)
-                        ] as TabGroupColor;
+                        const colors = Object.values(DockviewTabGroupColors);
+                        const color = colors[
+                            Math.floor(Math.random() * colors.length)
+                        ] as DockviewTabGroupColor;
                         const newGroup = api.createTabGroup({
                             groupId,
                             label,
@@ -616,6 +618,51 @@ const DockviewDemo = (props: {
                         });
                     },
                 });
+            }
+
+            return items;
+        },
+        [api]
+    );
+
+    const getTabGroupChipContextMenuItems = React.useCallback(
+        ({ group, tabGroup }: GetTabGroupChipContextMenuItemsParams) => {
+            const items: (
+                | 'colorPicker'
+                | 'separator'
+                | { label: string; action: () => void }
+            )[] = ['colorPicker'];
+
+            if (api) {
+                items.push(
+                    'separator',
+                    {
+                        label: 'Rename group',
+                        action: () => {
+                            const label = window.prompt(
+                                'New group name:',
+                                tabGroup.label
+                            );
+                            if (label !== null) {
+                                tabGroup.setLabel(label);
+                            }
+                        },
+                    },
+                    {
+                        label: tabGroup.collapsed
+                            ? 'Expand group'
+                            : 'Collapse group',
+                        action: () => tabGroup.toggle(),
+                    },
+                    {
+                        label: 'Dissolve group',
+                        action: () =>
+                            api.dissolveTabGroup({
+                                groupId: group.id,
+                                tabGroupId: tabGroup.id,
+                            }),
+                    }
+                );
             }
 
             return items;
@@ -711,6 +758,9 @@ const DockviewDemo = (props: {
                                             theme={effectiveTheme}
                                             getTabContextMenuItems={
                                                 getTabContextMenuItems
+                                            }
+                                            getTabGroupChipContextMenuItems={
+                                                getTabGroupChipContextMenuItems
                                             }
                                         />
                                     </ThemeContext.Provider>

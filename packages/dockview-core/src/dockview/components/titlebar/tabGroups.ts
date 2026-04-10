@@ -1,4 +1,5 @@
 import { toggleClass } from '../../../dom';
+import { addDisposableListener } from '../../../events';
 import {
     CompositeDisposable,
     IDisposable,
@@ -25,7 +26,7 @@ export interface TabGroupManagerCallbacks {
     onChipContextMenu(tabGroup: ITabGroup, event: MouseEvent): void;
     onChipDragStart(
         tabGroup: ITabGroup,
-        chip: TabGroupChip,
+        chip: ITabGroupChipRenderer,
         event: DragEvent
     ): void;
 }
@@ -309,13 +310,22 @@ export class TabGroupManager {
             }),
         ];
 
-        // Wire chip context menu and drag for default chip
+        // Wire chip context menu and drag for all chip renderers
         if (chip instanceof TabGroupChip) {
             disposables.push(
                 chip.onContextMenu((event) => {
                     this._callbacks.onChipContextMenu(tabGroup, event);
                 }),
                 chip.onDragStart((event) => {
+                    this._callbacks.onChipDragStart(tabGroup, chip, event);
+                })
+            );
+        } else {
+            disposables.push(
+                addDisposableListener(chip.element, 'contextmenu', (event) => {
+                    this._callbacks.onChipContextMenu(tabGroup, event);
+                }),
+                addDisposableListener(chip.element, 'dragstart', (event) => {
                     this._callbacks.onChipDragStart(tabGroup, chip, event);
                 })
             );

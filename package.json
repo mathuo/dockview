@@ -26,6 +26,8 @@
     "format:check": "nx run-many -t format:check",
     "test": "nx run-many -t test",
     "test:cov": "jest --coverage --passWithNoTests",
+    "gen": "node scripts/gen/index.mjs",
+    "gen:check": "npm run gen && git diff --exit-code __generated__/",
     "release": "nx release",
     "release:version": "nx release version",
     "release:publish": "nx release publish"

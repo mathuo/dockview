@@ -1,6 +1,11 @@
-import { getPanelData } from '../../../dnd/dataTransfer';
+import {
+    getPanelData,
+    LocalSelectionTransfer,
+    PanelTransfer,
+} from '../../../dnd/dataTransfer';
 import {
     addClasses,
+    disableIframePointEvents,
     isChildEntirelyVisibleWithinParent,
     OverflowObserver,
     removeClasses,
@@ -25,6 +30,7 @@ import { TabDragEvent, TabDropIndexEvent } from './tabsContainer';
 import { ITabGroup } from '../../tabGroup';
 import { TabGroupChip } from './tabGroupChip';
 import { TabGroupManager } from './tabGroups';
+import { ITabGroupChipRenderer } from '../../framework';
 
 interface TabAnimationState {
     sourceTabId: string;
@@ -69,6 +75,7 @@ export class Tabs extends CompositeDisposable {
     private _voidContainer: HTMLElement | null = null;
     private _voidContainerListeners: IDisposable | null = null;
     private _extendedDropZone: HTMLElement | null = null;
+    private _chipDragCleanup: IDisposable | null = null;
 
     private readonly _tabGroupManager: TabGroupManager;
 
@@ -389,9 +396,17 @@ export class Tabs extends CompositeDisposable {
                 'drop',
                 (event) => {
                     if (
-                        this.accessor.options.tabAnimation !== 'smooth' ||
                         !this._animState ||
                         this._animState.currentInsertionIndex === null
+                    ) {
+                        return;
+                    }
+
+                    // In non-smooth mode only handle group drags here;
+                    // individual tab drops are handled by tab Droptargets.
+                    if (
+                        this.accessor.options.tabAnimation !== 'smooth' &&
+                        !this._animState.sourceTabGroupId
                     ) {
                         return;
                     }
@@ -859,41 +874,75 @@ export class Tabs extends CompositeDisposable {
 
     private _handleChipDragStart(
         tabGroup: ITabGroup,
-        chip: TabGroupChip,
+        chip: ITabGroupChipRenderer,
         event: DragEvent
     ): void {
-        if (this.accessor.options.tabAnimation === 'smooth') {
-            const firstPanelId = tabGroup.panelIds[0];
-            const firstIdx = firstPanelId
-                ? this._tabs.findIndex((t) => t.value.panel.id === firstPanelId)
-                : -1;
-            const chipRect = chip.element.getBoundingClientRect();
+        const firstPanelId = tabGroup.panelIds[0];
+        const firstIdx = firstPanelId
+            ? this._tabs.findIndex((t) => t.value.panel.id === firstPanelId)
+            : -1;
+        const chipRect = chip.element.getBoundingClientRect();
 
-            // Compute total group width (chip + all tabs)
-            let groupGapWidth = chipRect.width;
-            for (const pid of tabGroup.panelIds) {
-                const tabEntry = this._tabMap.get(pid);
-                if (tabEntry) {
-                    groupGapWidth +=
-                        tabEntry.value.element.getBoundingClientRect().width;
-                }
+        // Compute total group width (chip + all tabs)
+        let groupGapWidth = chipRect.width;
+        for (const pid of tabGroup.panelIds) {
+            const tabEntry = this._tabMap.get(pid);
+            if (tabEntry) {
+                groupGapWidth +=
+                    tabEntry.value.element.getBoundingClientRect().width;
             }
+        }
 
-            this._animState = {
-                sourceTabId: '',
-                sourceIndex: firstIdx,
-                tabPositions: this.snapshotTabPositions(),
-                chipPositions: this._tabGroupManager.snapshotChipWidths(),
-                currentInsertionIndex: null,
-                targetTabGroupId: null,
-                sourceTabGroupId: tabGroup.id,
-                sourceGroupPanelIds: new Set(tabGroup.panelIds),
-                sourceChipWidth: chipRect.width,
-                cursorOffsetFromDragLeft: event.clientX - chipRect.left,
-                sourceGapWidth: groupGapWidth,
-                containerLeft: this._tabsList.getBoundingClientRect().left,
-            };
+        this._animState = {
+            sourceTabId: '',
+            sourceIndex: firstIdx,
+            tabPositions: this.snapshotTabPositions(),
+            chipPositions: this._tabGroupManager.snapshotChipWidths(),
+            currentInsertionIndex: null,
+            targetTabGroupId: null,
+            sourceTabGroupId: tabGroup.id,
+            sourceGroupPanelIds: new Set(tabGroup.panelIds),
+            sourceChipWidth: chipRect.width,
+            cursorOffsetFromDragLeft: event.clientX - chipRect.left,
+            sourceGapWidth: groupGapWidth,
+            containerLeft: this._tabsList.getBoundingClientRect().left,
+        };
 
+        // Set LocalSelectionTransfer so drop targets recognise this as
+        // an internal dockview drag.  panelId is null (group-level),
+        // tabGroupId identifies which tab group is being dragged.
+        const panelTransfer =
+            LocalSelectionTransfer.getInstance<PanelTransfer>();
+        panelTransfer.setData(
+            [
+                new PanelTransfer(
+                    this.accessor.id,
+                    this.group.id,
+                    null,
+                    tabGroup.id
+                ),
+            ],
+            PanelTransfer.prototype
+        );
+
+        const iframes = disableIframePointEvents();
+
+        this._chipDragCleanup = {
+            dispose: () => {
+                panelTransfer.clearData(PanelTransfer.prototype);
+                iframes.release();
+            },
+        };
+
+        if (event.dataTransfer) {
+            event.dataTransfer.effectAllowed = 'move';
+
+            if (event.dataTransfer.items.length === 0) {
+                event.dataTransfer.setData('text/plain', '');
+            }
+        }
+
+        if (this.accessor.options.tabAnimation === 'smooth') {
             // Collapse group tabs + chip after the browser
             // captures the drag image, then open the gap at the
             // source position — all instant (no transitions).
@@ -1243,7 +1292,10 @@ export class Tabs extends CompositeDisposable {
 
         this._animState.currentInsertionIndex = insertionIndex;
         this._animState.targetTabGroupId = targetTabGroupId;
-        this.applyDragOverTransforms();
+
+        if (this.accessor.options.tabAnimation === 'smooth') {
+            this.applyDragOverTransforms();
+        }
     }
 
     /**
@@ -1492,11 +1544,18 @@ export class Tabs extends CompositeDisposable {
         sourceTabGroupId: string,
         insertionIndex: number
     ): void {
-        this._clearGroupDragClasses(sourceTabGroupId);
-        const firstPositions = this.snapshotTabPositions();
-        this.resetTabTransforms();
-        this.group.model.moveTabGroup(sourceTabGroupId, insertionIndex);
-        this.runFlipAnimation(firstPositions, '', false);
+        this._chipDragCleanup?.dispose();
+        this._chipDragCleanup = null;
+
+        if (this.accessor.options.tabAnimation === 'smooth') {
+            this._clearGroupDragClasses(sourceTabGroupId);
+            const firstPositions = this.snapshotTabPositions();
+            this.resetTabTransforms();
+            this.group.model.moveTabGroup(sourceTabGroupId, insertionIndex);
+            this.runFlipAnimation(firstPositions, '', false);
+        } else {
+            this.group.model.moveTabGroup(sourceTabGroupId, insertionIndex);
+        }
     }
 
     private _clearGroupDragClasses(sourceTabGroupId: string): void {
@@ -1540,6 +1599,9 @@ export class Tabs extends CompositeDisposable {
         }
 
         this._animState = null;
+
+        this._chipDragCleanup?.dispose();
+        this._chipDragCleanup = null;
 
         // Restore any hidden underlines from group drags
         for (const [, el] of this._tabGroupManager.groupUnderlines) {

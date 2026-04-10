@@ -1,6 +1,9 @@
 import { fireEvent } from '@testing-library/dom';
 import { TabGroupChip } from '../../../../dockview/components/titlebar/tabGroupChip';
-import { TabGroup, TAB_GROUP_COLORS } from '../../../../dockview/tabGroup';
+import {
+    TabGroup,
+    DockviewTabGroupColors,
+} from '../../../../dockview/tabGroup';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewApi } from '../../../../api/component.api';
 
@@ -185,6 +188,17 @@ describe('TabGroupChip', () => {
         expect(handler).toHaveBeenCalledTimes(1);
     });
 
+    test('dragstart does not add dv-tab-group-chip--dragging class', () => {
+        const chip = new TabGroupChip();
+
+        fireEvent.dragStart(chip.element);
+
+        // Class management is handled by Tabs, not the chip itself
+        expect(
+            chip.element.classList.contains('dv-tab-group-chip--dragging')
+        ).toBe(false);
+    });
+
     test('only one color class is active at a time', () => {
         const chip = new TabGroupChip();
         const tabGroup = new TabGroup('tg-1', {
@@ -197,10 +211,10 @@ describe('TabGroupChip', () => {
             api: fromPartial<DockviewApi>({}),
         });
 
-        for (const color of TAB_GROUP_COLORS) {
+        for (const color of Object.values(DockviewTabGroupColors)) {
             tabGroup.setColor(color);
 
-            for (const c of TAB_GROUP_COLORS) {
+            for (const c of Object.values(DockviewTabGroupColors)) {
                 expect(
                     chip.element.classList.contains(`dv-tab-group-chip--${c}`)
                 ).toBe(c === color);

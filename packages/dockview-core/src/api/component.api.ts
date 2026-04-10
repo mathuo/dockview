@@ -58,7 +58,7 @@ import {
     DockviewTabGroupCollapsedChangeEvent,
     DockviewTabGroupPanelChangeEvent,
 } from '../dockview/events';
-import { ITabGroup, TabGroupColor } from '../dockview/tabGroup';
+import { ITabGroup, DockviewTabGroupColor } from '../dockview/tabGroup';
 import {
     PaneviewComponentOptions,
     PaneviewDndOverlayEvent,
@@ -1041,7 +1041,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     createTabGroup(options: {
         groupId: string;
         label?: string;
-        color?: TabGroupColor;
+        color?: DockviewTabGroupColor;
     }): ITabGroup {
         const model = this._getGroupModel(options.groupId);
         return model.createTabGroup({

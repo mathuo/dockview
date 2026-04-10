@@ -1,7 +1,7 @@
 import { Emitter, Event } from '../events';
 import { CompositeDisposable } from '../lifecycle';
 
-export type TabGroupColor =
+export type DockviewTabGroupColor =
     | 'grey'
     | 'blue'
     | 'red'
@@ -11,27 +11,31 @@ export type TabGroupColor =
     | 'purple'
     | 'cyan';
 
-export const TAB_GROUP_COLORS: readonly TabGroupColor[] = [
-    'grey',
-    'blue',
-    'red',
-    'yellow',
-    'green',
-    'pink',
-    'purple',
-    'cyan',
-] as const;
+export const DockviewTabGroupColors: Record<string, DockviewTabGroupColor> = {
+    Grey: 'grey',
+    Blue: 'blue',
+    Red: 'red',
+    Yellow: 'yellow',
+    Green: 'green',
+    Pink: 'pink',
+    Purple: 'purple',
+    Cyan: 'cyan',
+} as const;
 
-const VALID_COLORS: Set<string> = new Set<string>(TAB_GROUP_COLORS);
+const VALID_COLORS: Set<string> = new Set<string>(
+    Object.values(DockviewTabGroupColors)
+);
 
-export function isValidTabGroupColor(value: string): value is TabGroupColor {
+export function isValidTabGroupColor(
+    value: string
+): value is DockviewTabGroupColor {
     return VALID_COLORS.has(value);
 }
 
 export interface SerializedTabGroup {
     id: string;
     label?: string;
-    color: TabGroupColor;
+    color: DockviewTabGroupColor;
     collapsed: boolean;
     panelIds: string[];
 }
@@ -39,7 +43,7 @@ export interface SerializedTabGroup {
 export interface ITabGroup {
     readonly id: string;
     readonly label: string;
-    readonly color: TabGroupColor;
+    readonly color: DockviewTabGroupColor;
     readonly collapsed: boolean;
     readonly panelIds: readonly string[];
     readonly size: number;
@@ -56,7 +60,7 @@ export interface ITabGroup {
     indexOfPanel(panelId: string): number;
     containsPanel(panelId: string): boolean;
     setLabel(value: string): void;
-    setColor(value: TabGroupColor): void;
+    setColor(value: DockviewTabGroupColor): void;
     collapse(): void;
     expand(): void;
     toggle(): void;
@@ -66,7 +70,7 @@ export interface ITabGroup {
 
 export class TabGroup extends CompositeDisposable implements ITabGroup {
     private _label: string;
-    private _color: TabGroupColor;
+    private _color: DockviewTabGroupColor;
     private _collapsed = false;
     private readonly _panelIds: string[] = [];
 
@@ -90,7 +94,7 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
         return this._label;
     }
 
-    get color(): TabGroupColor {
+    get color(): DockviewTabGroupColor {
         return this._color;
     }
 
@@ -102,7 +106,7 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
         this._onDidChange.fire();
     }
 
-    setColor(value: TabGroupColor): void {
+    setColor(value: DockviewTabGroupColor): void {
         if (this.isDisposed) {
             return;
         }
@@ -132,13 +136,13 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
 
     constructor(
         readonly id: string,
-        options?: { label?: string; color?: TabGroupColor }
+        options?: { label?: string; color?: DockviewTabGroupColor }
     ) {
         super();
 
         this._label = options?.label ?? '';
         this._color = isValidTabGroupColor(options?.color ?? '')
-            ? (options!.color as TabGroupColor)
+            ? (options!.color as DockviewTabGroupColor)
             : 'grey';
 
         this.addDisposables(
