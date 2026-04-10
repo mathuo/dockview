@@ -465,13 +465,24 @@ export class TabGroupManager {
 
             if (hasNewCollapse) {
                 if (this._skipNextCollapseAnimation) {
-                    // Apply collapsed state instantly (no animation)
+                    // Apply collapsed state instantly (no animation).
+                    // Disable transitions so the CSS transition on
+                    // dv-tab--group-collapsed doesn't fire.
+                    const affected: HTMLElement[] = [];
                     for (const pid of tg.panelIds) {
                         const te = tabMap.get(pid);
                         if (te) {
+                            te.value.element.style.transition = 'none';
                             te.value.element.classList.add(
                                 'dv-tab--group-collapsed'
                             );
+                            affected.push(te.value.element);
+                        }
+                    }
+                    if (affected.length > 0) {
+                        void affected[0].offsetHeight; // single reflow
+                        for (const el of affected) {
+                            el.style.removeProperty('transition');
                         }
                     }
                 } else {

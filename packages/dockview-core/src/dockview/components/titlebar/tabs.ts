@@ -1560,6 +1560,7 @@ export class Tabs extends CompositeDisposable {
             this.group.model.moveTabGroup(sourceTabGroupId, insertionIndex);
             this.runFlipAnimation(firstPositions, '', false);
         } else {
+            this._tabGroupManager.skipNextCollapseAnimation = true;
             this.group.model.moveTabGroup(sourceTabGroupId, insertionIndex);
         }
     }
