@@ -43,6 +43,7 @@
     --dv-tab-group-color-pink: #d01884;
     --dv-tab-group-color-purple: #a142f4;
     --dv-tab-group-color-cyan: #007b83;
+    --dv-tab-group-color-orange: #e8710a;
 
     // Tab group chip dimensions
     --dv-tab-group-chip-padding: 4px 8px;
@@ -1058,20 +1059,45 @@
     margin: 4px 0;
 }
 
+.dv-context-menu-rename {
+    padding: 8px 12px 4px;
+}
+
+.dv-context-menu-rename-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border: 1px solid var(--dv-tab-divider-color);
+    border-radius: var(--dv-border-radius);
+    background: inherit;
+    color: var(--dv-activegroup-visiblepanel-tab-color);
+    font-size: var(--dv-tabs-and-actions-container-font-size);
+    outline: none;
+
+    &:focus {
+        border-color: var(--dv-activegroup-visiblepanel-tab-color);
+    }
+
+    &::placeholder {
+        color: var(--dv-activegroup-hiddenpanel-tab-color);
+    }
+}
+
 .dv-context-menu-color-picker {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 4px;
-    padding: 6px 8px;
-    justify-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    padding: 8px 12px;
+    align-items: center;
 }
 
 .dv-context-menu-color-swatch {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid transparent;
+    flex-shrink: 0;
 
     &:hover {
         opacity: 0.85;
