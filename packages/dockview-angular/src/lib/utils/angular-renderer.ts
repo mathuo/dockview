@@ -91,7 +91,9 @@ export class AngularRenderer<T = unknown>
         }
 
         // Trigger change detection
-        this.componentRef.changeDetectorRef.markForCheck();
+        if (this.viewRef) {
+            this.viewRef.markForCheck();
+        }
     }
 
     private render(parameters: Parameters): void {
@@ -120,8 +122,8 @@ export class AngularRenderer<T = unknown>
         this.update(parameters);
 
         // Get the DOM element
-        const hostView = this.componentRef.hostView as EmbeddedViewRef<T>;
-        this._element = hostView.rootNodes[0] as HTMLElement;
+        this.viewRef = this.componentRef.hostView as EmbeddedViewRef<T>;
+        this._element = this.viewRef.rootNodes[0] as HTMLElement;
     }
 
     private setupView(template: TemplateRef<T>): void {
