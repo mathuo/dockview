@@ -158,10 +158,25 @@ export class TabGroupManager {
         const groupPanelIds = new Set(tabGroup.panelIds);
         const underlineEl = this._groupUnderlines.get(tabGroup.id);
 
+        const isVertical = this._ctx.getDirection() === 'vertical';
+
         // Clone the entire tabs list so cloned nodes inherit all
         // theme styles, CSS variables and class-based rules.
         const clone = this._ctx.tabsList.cloneNode(true) as HTMLElement;
-        clone.style.height = `${this._ctx.tabsList.offsetHeight}px`;
+
+        if (isVertical) {
+            // Force horizontal orientation for the drag ghost by
+            // removing vertical CSS classes and overriding writing-mode.
+            clone.classList.remove(
+                'dv-tabs-container-vertical',
+                'dv-vertical'
+            );
+            clone.classList.add('dv-horizontal');
+            clone.style.writingMode = 'horizontal-tb';
+            clone.style.height = `${this._ctx.tabsList.offsetWidth}px`;
+        } else {
+            clone.style.height = `${this._ctx.tabsList.offsetHeight}px`;
+        }
         clone.style.width = 'auto';
         clone.style.overflow = 'visible';
         clone.style.pointerEvents = 'none';
