@@ -497,6 +497,23 @@ export const ThemeBuilderModal = (props: {
                 />
             </Section>
 
+            {/* Tab Groups */}
+            <Section title="Tab Groups">
+                <ToggleRow
+                    label="Group Indicator"
+                    value={props.state.tabGroupIndicator}
+                    options={[
+                        { value: 'wrap', label: 'wrap' },
+                        { value: 'none', label: 'none' },
+                    ]}
+                    onChange={(v) =>
+                        props.onChange({
+                            tabGroupIndicator: v as 'wrap' | 'none',
+                        })
+                    }
+                />
+            </Section>
+
             {/* DnD */}
             <Section title="Drag & Drop">
                 <ToggleRow
