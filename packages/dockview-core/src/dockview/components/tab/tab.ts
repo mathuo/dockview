@@ -52,6 +52,7 @@ export class Tab extends CompositeDisposable {
     private readonly dropTarget: Droptarget;
     private content: ITabRenderer | undefined = undefined;
     private readonly dragHandler: TabDragHandler;
+    private _direction: DockviewHeaderDirection = 'horizontal';
 
     private readonly _onPointDown = new Emitter<MouseEvent>();
     readonly onPointerDown: Event<MouseEvent> = this._onPointDown.event;
@@ -142,13 +143,60 @@ export class Tab extends CompositeDisposable {
                 if (event.dataTransfer) {
                     const style = getComputedStyle(this.element);
                     const newNode = this.element.cloneNode(true) as HTMLElement;
-                    Array.from(style).forEach((key) =>
+                    const isVertical = this._direction === 'vertical';
+
+                    /**
+                     * Properties to skip when copying computed styles for a
+                     * vertical tab ghost.  `writing-mode` is excluded so we
+                     * can force `horizontal-tb`.  Size and margin logical
+                     * properties are excluded because their physical meaning
+                     * flips when writing-mode changes, which would produce
+                     * incorrect dimensions.
+                     */
+                    const verticalSkip = new Set([
+                        'writing-mode',
+                        'inline-size',
+                        'block-size',
+                        'min-inline-size',
+                        'min-block-size',
+                        'max-inline-size',
+                        'max-block-size',
+                        'margin-inline',
+                        'margin-inline-start',
+                        'margin-inline-end',
+                        'margin-block',
+                        'margin-block-start',
+                        'margin-block-end',
+                        'padding-inline',
+                        'padding-inline-start',
+                        'padding-inline-end',
+                        'padding-block',
+                        'padding-block-start',
+                        'padding-block-end',
+                    ]);
+
+                    Array.from(style).forEach((key) => {
+                        if (isVertical && verticalSkip.has(key)) {
+                            return;
+                        }
                         newNode.style.setProperty(
                             key,
                             style.getPropertyValue(key),
                             style.getPropertyPriority(key)
-                        )
-                    );
+                        );
+                    });
+
+                    if (isVertical) {
+                        // Force horizontal text flow and swap the physical
+                        // dimensions so the ghost appears as a horizontal tab.
+                        newNode.style.setProperty(
+                            'writing-mode',
+                            'horizontal-tb'
+                        );
+                        newNode.style.setProperty('width', style.height);
+                        newNode.style.setProperty('height', style.width);
+                    }
+
                     newNode.style.position = 'absolute';
                     newNode.classList.add('dv-tab-ghost-drag');
 
@@ -223,6 +271,7 @@ export class Tab extends CompositeDisposable {
     }
 
     public setDirection(direction: DockviewHeaderDirection): void {
+        this._direction = direction;
         this.dropTarget.setTargetZones(
             direction === 'vertical' ? ['top', 'bottom'] : ['left', 'right']
         );
