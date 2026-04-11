@@ -249,6 +249,29 @@ export class WrapTabGroupIndicator implements ITabGroupIndicator {
         }
     }
 
+    private _applyStraightLine(
+        svg: SVGSVGElement,
+        path: SVGPathElement,
+        underline: HTMLElement,
+        t: number,
+        mainSize: number,
+        isVertical: boolean
+    ): void {
+        if (isVertical) {
+            svg.setAttribute('width', String(t));
+            svg.setAttribute('height', String(mainSize));
+            underline.style.width = `${t}px`;
+            underline.style.height = `${mainSize}px`;
+            path.setAttribute('d', `M ${t / 2},0 L ${t / 2},${mainSize}`);
+        } else {
+            svg.setAttribute('width', String(mainSize));
+            svg.setAttribute('height', String(t));
+            underline.style.width = `${mainSize}px`;
+            underline.style.height = `${t}px`;
+            path.setAttribute('d', `M 0,${t / 2} L ${mainSize},${t / 2}`);
+        }
+    }
+
     /**
      * Chrome-style wrap-around underline: a stroked SVG path that runs
      * along the bottom (or left edge in vertical mode), curving up and
@@ -306,20 +329,7 @@ export class WrapTabGroupIndicator implements ITabGroupIndicator {
         path.setAttribute('stroke-width', String(t));
 
         if (!activeTabEntry) {
-            // No active tab: straight line along the edge
-            if (isVertical) {
-                svg.setAttribute('width', String(t));
-                svg.setAttribute('height', String(mainSize));
-                underline.style.width = `${t}px`;
-                underline.style.height = `${mainSize}px`;
-                path.setAttribute('d', `M ${t / 2},0 L ${t / 2},${mainSize}`);
-            } else {
-                svg.setAttribute('width', String(mainSize));
-                svg.setAttribute('height', String(t));
-                underline.style.width = `${mainSize}px`;
-                underline.style.height = `${t}px`;
-                path.setAttribute('d', `M 0,${t / 2} L ${mainSize},${t / 2}`);
-            }
+            this._applyStraightLine(svg, path, underline, t, mainSize, isVertical);
             return;
         }
 
@@ -349,19 +359,7 @@ export class WrapTabGroupIndicator implements ITabGroupIndicator {
         }
 
         if (aEnd <= aStart) {
-            if (isVertical) {
-                svg.setAttribute('width', String(t));
-                svg.setAttribute('height', String(mainSize));
-                underline.style.width = `${t}px`;
-                underline.style.height = `${mainSize}px`;
-                path.setAttribute('d', `M ${t / 2},0 L ${t / 2},${mainSize}`);
-            } else {
-                svg.setAttribute('width', String(mainSize));
-                svg.setAttribute('height', String(t));
-                underline.style.width = `${mainSize}px`;
-                underline.style.height = `${t}px`;
-                path.setAttribute('d', `M 0,${t / 2} L ${mainSize},${t / 2}`);
-            }
+            this._applyStraightLine(svg, path, underline, t, mainSize, isVertical);
             return;
         }
 
