@@ -12,10 +12,7 @@ import { Tab } from '../tab/tab';
 import { ITabGroup } from '../../tabGroup';
 import { TabGroupChip } from './tabGroupChip';
 import { ITabGroupChipRenderer } from '../../framework';
-import {
-    ITabGroupIndicator,
-    WrapTabGroupIndicator,
-} from './tabGroupIndicator';
+import { ITabGroupIndicator, WrapTabGroupIndicator } from './tabGroupIndicator';
 
 const EMPTY_MAP: ReadonlyMap<string, HTMLElement> = new Map();
 
