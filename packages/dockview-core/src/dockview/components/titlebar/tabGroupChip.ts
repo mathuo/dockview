@@ -91,6 +91,10 @@ export class TabGroupChip
         for (const c of Object.values(DockviewTabGroupColors)) {
             toggleClass(this._element, `dv-tab-group-chip--${c}`, c === color);
         }
+        this._element.style.setProperty(
+            '--dv-tab-group-color',
+            `var(--dv-tab-group-color-${color})`
+        );
     }
 
     private updateLabel(label: string): void {

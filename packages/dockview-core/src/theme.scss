@@ -221,6 +221,30 @@
     --dv-paneview-header-border-color: var(--dv-color-abyss-lighter);
 
     --dv-paneview-active-outline-color: #596f99;
+
+    // Pure-CSS tab group indicator (used with tabGroupIndicator: 'none')
+    .dv-tab.dv-tab--grouped {
+        box-shadow: inset 0 -2px 0 var(--dv-tab-group-color);
+    }
+
+    // The chip has no position:relative so ::after anchors to
+    // .dv-tabs-container, placing the line at the container bottom.
+    // The dot variant (:has(.dv-tab-group-chip-label--empty)) sets
+    // position:relative for its hit-area ::before — override it here
+    // so the line anchors correctly in both cases.
+    .dv-tab-group-chip {
+        position: static !important;
+
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--dv-tab-group-color);
+        }
+    }
 }
 
 @mixin dockview-theme-dracula-mixin {

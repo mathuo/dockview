@@ -3455,5 +3455,10 @@ export class DockviewComponent
                 this.rootDropTargetContainer.disabled = true;
                 break;
         }
+
+        // Re-render tab group indicators so the new tabGroupIndicator mode takes effect
+        for (const group of this.groups) {
+            group.model.updateTabGroups();
+        }
     }
 }
