@@ -3458,8 +3458,7 @@ export class DockviewComponent
 
         // Toggle a CSS class so theme stylesheets can scope pure-CSS
         // tab group indicator rules to the 'none' mode only.
-        const indicatorNone =
-            (theme.tabGroupIndicator ?? 'wrap') === 'none';
+        const indicatorNone = (theme.tabGroupIndicator ?? 'wrap') === 'none';
         toggleClass(this.element, 'dv-tab-group-indicator-none', indicatorNone);
         if (this._shellManager) {
             toggleClass(
