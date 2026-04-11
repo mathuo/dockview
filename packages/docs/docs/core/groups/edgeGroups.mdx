@@ -5,10 +5,18 @@ description: How to create and manage edge groups in Dockview — groups that ar
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
+import { CodeRunner } from '@site/src/components/ui/codeRunner';
+
 Edge groups are `DockviewGroupPanel` instances pinned to one of the four edges of the layout (`'left'`, `'right'`, `'top'`, `'bottom'`). They support tabs, drag-and-drop, overflow, and the full group panel API — and their state is included in `toJSON` / `fromJSON`.
+
+<CodeRunner id="dockview/edge-groups" height={500}/>
 
 :::info
 Edge groups **cannot** be maximized or converted into floating/popout windows. They are structural elements of the layout.
+:::
+
+:::tip
+The `dndEdges` prop controls the drag-and-drop overlay that appears when dragging panels to the far edges of the layout. See [Drag and Drop](/docs/core/dnd/dragAndDrop#drag-and-drop) for configuration details.
 :::
 
 ## Adding Edge Groups
@@ -113,19 +121,100 @@ const isCollapsed = groupApi?.isCollapsed(); // boolean
 
 The `collapsedSize` (the pixel height/width of the header when collapsed) defaults to 35px and can be configured per-group via `EdgeGroupOptions.collapsedSize`, or per-theme via `DockviewTheme.edgeGroupCollapsedSize`.
 
+Themes that set a custom `edgeGroupCollapsedSize`:
+
+| Theme | `edgeGroupCollapsedSize` |
+| --- | --- |
+| `themeVisualStudio` | `22` |
+| `themeAbyssSpaced` | `44` |
+| `themeGithubLightSpaced` | `44` |
+| All other themes | `35` (default) |
+
+:::tip
+When an edge group loses all of its panels it is automatically collapsed. Adding a new panel to it will expand it again.
+:::
+
 ## Custom Header Actions
 
-The `location` prop in `rightHeaderActionsComponent`, `leftHeaderActionsComponent`, and `prefixHeaderActionsComponent` updates reactively when a group moves. Use it to show controls specific to edge groups:
+The `location` prop in `rightHeaderActionsComponent`, `leftHeaderActionsComponent`, and `prefixHeaderActionsComponent` updates reactively when a group moves. Use it to show controls specific to edge groups.
 
-```tsx
-// React: show a collapse button only in edge groups
-const MyRightActions = (props: IDockviewGroupHeaderActionsProps) => {
-    if (props.location.type !== 'fixed') return null;
-    return <button onClick={() => props.api.collapse()}>Collapse</button>;
-};
+The `DockviewGroupLocation` type is a discriminated union:
+
+```ts
+type DockviewGroupLocation =
+    | { type: 'grid' }
+    | { type: 'floating' }
+    | { type: 'popout'; getWindow: () => Window }
+    | { type: 'edge'; position: EdgeGroupPosition }; // 'top' | 'bottom' | 'left' | 'right'
 ```
 
+Check `location.type` to distinguish edge groups, and `location.position` to know which edge:
+
+<FrameworkSpecific framework="React">
+```tsx
+const MyRightActions = (props: IDockviewHeaderActionsProps) => {
+    if (props.location?.type !== 'edge') return null;
+
+    const position = props.location.position; // 'left' | 'right' | 'top' | 'bottom'
+    return <button onClick={() => props.api.collapse()}>Collapse {position}</button>;
+};
+
+<DockviewReact rightHeaderActionsComponent={MyRightActions} />
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+```vue
+<template>
+    <button v-if="params?.location?.type === 'edge'" @click="params.api.collapse()">
+        Collapse {{ params.location.position }}
+    </button>
+</template>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+```ts
+@Component({
+    selector: 'my-right-actions',
+    template: `
+        <button *ngIf="location?.type === 'edge'" (click)="api.collapse()">
+            Collapse {{ location.position }}
+        </button>
+    `,
+})
+export class MyRightActionsComponent {
+    @Input() api: DockviewGroupPanelApi;
+    @Input() location: DockviewGroupLocation;
+}
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+```ts
+const api = createDockview(parentElement, {
+    createRightHeaderActionsElement: (group) => {
+        const element = document.createElement('div');
+        return {
+            element,
+            init(params) {
+                if (params.location?.type === 'edge') {
+                    const btn = document.createElement('button');
+                    btn.textContent = `Collapse ${params.location.position}`;
+                    btn.addEventListener('click', () => params.api.collapse());
+                    element.appendChild(btn);
+                }
+            },
+            dispose() {},
+        };
+    },
+});
+```
+</FrameworkSpecific>
+
 `DockviewGroupLocation` is exported from all framework packages.
+
+> See [Group Controls](/docs/core/groups/controls) for the full header actions reference.
 
 ## Serialization
 

@@ -159,9 +159,10 @@ export interface DockviewOptions {
     /**
      * Return the items to display in the tab group chip context menu on right-click.
      *
-     * Use built-in string shortcuts (`'separator'`, `'colorPicker'`) or provide a
+     * Use built-in string shortcuts (`'separator'`, `'colorPicker'`, `'rename'`) or provide a
      * `ContextMenuItemConfig` object for custom items.
      * `'colorPicker'` renders a native grid of color swatches for the tab group.
+     * `'rename'` renders an inline text input to rename the tab group.
      *
      * If omitted, no context menu is shown on chip right-click.
      * Return an empty array to suppress the menu for specific cases.
