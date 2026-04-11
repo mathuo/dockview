@@ -329,7 +329,14 @@ export class WrapTabGroupIndicator implements ITabGroupIndicator {
         path.setAttribute('stroke-width', String(t));
 
         if (!activeTabEntry) {
-            this._applyStraightLine(svg, path, underline, t, mainSize, isVertical);
+            this._applyStraightLine(
+                svg,
+                path,
+                underline,
+                t,
+                mainSize,
+                isVertical
+            );
             return;
         }
 
@@ -359,7 +366,14 @@ export class WrapTabGroupIndicator implements ITabGroupIndicator {
         }
 
         if (aEnd <= aStart) {
-            this._applyStraightLine(svg, path, underline, t, mainSize, isVertical);
+            this._applyStraightLine(
+                svg,
+                path,
+                underline,
+                t,
+                mainSize,
+                isVertical
+            );
             return;
         }
 
