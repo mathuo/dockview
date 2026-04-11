@@ -83,7 +83,7 @@ describe('AngularDisposable', () => {
         expect(errorCallback).toHaveBeenCalledTimes(1);
         expect(successCallback).toHaveBeenCalledTimes(1);
         expect(consoleSpy).toHaveBeenCalledWith(
-            'Error in dispose callback:',
+            'dockview: error in dispose callback',
             expect.any(Error)
         );
 
@@ -190,7 +190,7 @@ describe('AngularLifecycleManager', () => {
         expect(errorDisposable.dispose).toHaveBeenCalledTimes(1);
         expect(successDisposable.dispose).toHaveBeenCalledTimes(1);
         expect(consoleSpy).toHaveBeenCalledWith(
-            'Error disposing resource:',
+            'dockview: error disposing resource',
             expect.any(Error)
         );
 
