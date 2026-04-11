@@ -28,7 +28,7 @@ export class AngularDisposable implements DockviewIDisposable {
             try {
                 callback();
             } catch (error) {
-                console.error('Error in dispose callback:', error);
+                console.error('dockview: error in dispose callback', error);
             }
         });
         this.disposeCallbacks = [];
@@ -59,7 +59,7 @@ export class AngularLifecycleManager {
             try {
                 disposable.dispose();
             } catch (error) {
-                console.error('Error disposing resource:', error);
+                console.error('dockview: error disposing resource', error);
             }
         });
         this.disposables = [];
