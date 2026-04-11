@@ -104,7 +104,7 @@ export class AngularRenderer<T = unknown>
                 this.setupComponent(this.options.component, parameters);
             }
         } catch (error) {
-            console.error('Error creating Angular component:', error);
+            console.error('dockview: error creating Angular component', error);
             throw error;
         }
     }
