@@ -72,7 +72,7 @@ describe('DockviewAngularComponent – context menu', () => {
 
         const renderer = factory({
             id: 'test-id',
-            component: TestContextMenuItemComponent as Type<any>,
+            component: TestContextMenuItemComponent as Type<never>,
         } as CreateContextMenuItemComponentOptions);
 
         expect(renderer).toBeInstanceOf(AngularRenderer);
@@ -100,13 +100,13 @@ describe('DockviewAngularComponent – context menu', () => {
 
         const renderer: AngularRenderer = factory({
             id: 'test-id',
-            component: TestContextMenuItemComponent as Type<any>,
+            component: TestContextMenuItemComponent as Type<never>,
         } as CreateContextMenuItemComponentOptions);
 
         const props: IContextMenuItemComponentProps = {
-            panel: {} as any,
-            group: {} as any,
-            api: {} as any,
+            panel: {} as never,
+            group: {} as never,
+            api: {} as never,
             close: jest.fn(),
         };
 
@@ -123,7 +123,8 @@ describe('DockviewAngularComponent – context menu', () => {
         const renderer: AngularRenderer<TestContextMenuItemWithInputsComponent> =
             factory({
                 id: 'test-id',
-                component: TestContextMenuItemWithInputsComponent as Type<any>,
+                component:
+                    TestContextMenuItemWithInputsComponent as Type<never>,
             } as CreateContextMenuItemComponentOptions);
 
         const panel = {} as IDockviewPanel;
@@ -134,14 +135,14 @@ describe('DockviewAngularComponent – context menu', () => {
         const props: IContextMenuItemComponentProps = {
             panel,
             group,
-            api: {} as any,
+            api: {} as never,
             close: closeFn,
             componentProps: extraProps,
         };
 
         renderer.init(props);
 
-        const instance = renderer.component!.instance;
+        const instance = renderer.component.instance;
         expect(instance.panel).toBe(panel);
         expect(instance.group).toBe(group);
         expect(instance.close).toBe(closeFn);

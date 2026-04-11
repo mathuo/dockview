@@ -1,4 +1,9 @@
-import { Type, Injector, EnvironmentInjector } from '@angular/core';
+import {
+    Type,
+    Injector,
+    EnvironmentInjector,
+    TemplateRef,
+} from '@angular/core';
 import {
     IPanePart,
     PanelUpdateEvent,
@@ -10,7 +15,7 @@ export class AngularPanePart implements IPanePart {
     private renderer: AngularRenderer;
 
     constructor(
-        private readonly angularComponent: Type<any>,
+        private readonly angularComponent: Type<any> | TemplateRef<any>,
         private readonly injector: Injector,
         private readonly environmentInjector?: EnvironmentInjector
     ) {

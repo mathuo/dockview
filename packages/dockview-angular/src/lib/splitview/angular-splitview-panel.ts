@@ -1,4 +1,9 @@
-import { Type, Injector, EnvironmentInjector } from '@angular/core';
+import {
+    Type,
+    Injector,
+    EnvironmentInjector,
+    TemplateRef,
+} from '@angular/core';
 import { SplitviewPanel, IFrameworkPart } from 'dockview-core';
 import { AngularRenderer } from '../utils/angular-renderer';
 
@@ -6,7 +11,7 @@ export class AngularSplitviewPanel extends SplitviewPanel {
     constructor(
         id: string,
         component: string,
-        private readonly angularComponent: Type<any>,
+        private readonly angularComponent: Type<any> | TemplateRef<any>,
         private readonly injector: Injector,
         private readonly environmentInjector?: EnvironmentInjector
     ) {

@@ -1,24 +1,26 @@
 import {
-    ComponentRef,
-    Injector,
-    Type,
-    EmbeddedViewRef,
-    createComponent,
-    EnvironmentInjector,
     ApplicationRef,
+    ComponentRef,
+    createComponent,
+    EmbeddedViewRef,
+    EnvironmentInjector,
+    Injector,
+    TemplateRef,
+    Type,
 } from '@angular/core';
 import { IContentRenderer, IFrameworkPart, Parameters } from 'dockview-core';
 
-export interface AngularRendererOptions<T = any> {
-    component: Type<T>;
+export interface AngularRendererOptions<T = unknown> {
+    component: Type<T> | TemplateRef<T>;
     injector: Injector;
     environmentInjector?: EnvironmentInjector;
 }
 
-export class AngularRenderer<T = any>
+export class AngularRenderer<T = unknown>
     implements IContentRenderer, IFrameworkPart
 {
     private componentRef: ComponentRef<T> | null = null;
+    private viewRef: EmbeddedViewRef<T> | null = null;
     private _element: HTMLElement | null = null;
     private appRef: ApplicationRef;
 
@@ -35,6 +37,9 @@ export class AngularRenderer<T = any>
 
     get component(): ComponentRef<T> | null {
         return this.componentRef;
+    }
+    get view(): EmbeddedViewRef<T> | null {
+        return this.viewRef;
     }
 
     init(parameters: Parameters): void {
@@ -66,7 +71,7 @@ export class AngularRenderer<T = any>
             filtered['componentProps'] = parameters['componentProps'];
         }
 
-        if (this.componentRef) {
+        if (this._element) {
             this.update(filtered);
         } else {
             this.render(filtered);
@@ -74,6 +79,7 @@ export class AngularRenderer<T = any>
     }
 
     update(params: Parameters): void {
+        // Only component can have parameters
         if (!this.componentRef) {
             return;
         }
@@ -84,42 +90,67 @@ export class AngularRenderer<T = any>
             instance[key] = params[key];
         }
 
-        // trigger change detection
-        this.componentRef.changeDetectorRef.markForCheck();
+        // Trigger change detection
+        if (this.viewRef) {
+            this.viewRef.markForCheck();
+        }
     }
 
     private render(parameters: Parameters): void {
         try {
-            // Create the component using modern Angular API
-            this.componentRef = createComponent(this.options.component, {
-                environmentInjector:
-                    this.options.environmentInjector ||
-                    (this.options.injector as EnvironmentInjector),
-                elementInjector: this.options.injector,
-            });
-
-            // Set initial parameters
-            this.update(parameters);
-
-            // Get the DOM element
-            const hostView = this.componentRef.hostView as EmbeddedViewRef<any>;
-            this._element = hostView.rootNodes[0] as HTMLElement;
-
-            // attach to change detection
-            this.appRef.attachView(hostView);
-
-            // trigger change detection
-            this.componentRef.changeDetectorRef.markForCheck();
+            if (this.options.component instanceof TemplateRef) {
+                this.setupView(this.options.component);
+            } else {
+                this.setupComponent(this.options.component, parameters);
+            }
         } catch (error) {
             console.error('Error creating Angular component:', error);
             throw error;
         }
     }
 
+    private setupComponent(component: Type<T>, parameters: Parameters): void {
+        // Create the component using modern Angular API
+        this.componentRef = createComponent(component, {
+            environmentInjector:
+                this.options.environmentInjector ||
+                (this.options.injector as EnvironmentInjector),
+            elementInjector: this.options.injector,
+        });
+
+        // Set initial parameters
+        this.update(parameters);
+
+        // Get the DOM element
+        this.viewRef = this.componentRef.hostView as EmbeddedViewRef<T>;
+        this._element = this.viewRef.rootNodes[0] as HTMLElement;
+
+        // always attach for now
+        this.appRef.attachView(this.viewRef);
+        this.viewRef.markForCheck();
+    }
+
+    private setupView(template: TemplateRef<T>): void {
+        // Create embedded view from template
+        this.viewRef = template.createEmbeddedView(
+            <never>{},
+            this.options.injector
+        );
+        this._element = this.viewRef.rootNodes[0] as HTMLElement;
+
+        // always attach for now
+        this.appRef.attachView(this.viewRef);
+        this.viewRef.markForCheck();
+    }
+
     dispose(): void {
         if (this.componentRef) {
             this.componentRef.destroy();
             this.componentRef = null;
+        }
+        if (this.viewRef) {
+            this.viewRef.destroy();
+            this.viewRef = null;
         }
         this._element = null;
     }

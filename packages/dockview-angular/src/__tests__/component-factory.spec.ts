@@ -1,4 +1,4 @@
-import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { Component, Injector, EnvironmentInjector } from '@angular/core';
 import { AngularFrameworkComponentFactory } from '../lib/utils/component-factory';
 import { CreateComponentOptions } from 'dockview-core';
@@ -218,8 +218,8 @@ describe('AngularFrameworkComponentFactory', () => {
             const renderer = factory.createTabComponent(options);
 
             expect(renderer).toBeDefined();
-            expect(renderer!.element).toBeTruthy();
-            expect(renderer!.element.tagName).toBe('TEST-TAB-COMPONENT');
+            expect(renderer.element).toBeTruthy();
+            expect(renderer.element.tagName).toBe('TEST-TAB-COMPONENT');
         });
 
         it('should use default tab component when specific component not found', () => {
@@ -231,8 +231,8 @@ describe('AngularFrameworkComponentFactory', () => {
             const renderer = factory.createTabComponent(options);
 
             expect(renderer).toBeDefined();
-            expect(renderer!.element).toBeTruthy();
-            expect(renderer!.element.tagName).toBe('TEST-TAB-COMPONENT');
+            expect(renderer.element).toBeTruthy();
+            expect(renderer.element.tagName).toBe('TEST-TAB-COMPONENT');
         });
 
         it('should return undefined when no component and no default', () => {
@@ -283,8 +283,8 @@ describe('AngularFrameworkComponentFactory', () => {
                 factory.createHeaderActionsComponent('header-test');
 
             expect(renderer).toBeDefined();
-            expect(renderer!.element).toBeTruthy();
-            expect(renderer!.element.tagName).toBe(
+            expect(renderer.element).toBeTruthy();
+            expect(renderer.element.tagName).toBe(
                 'TEST-HEADER-ACTIONS-COMPONENT'
             );
         });
@@ -350,7 +350,7 @@ describe('AngularFrameworkComponentFactory', () => {
             const renderer = factory.createTabComponent(options);
 
             expect(renderer).toBeDefined();
-            expect(renderer!.element).toBeTruthy();
+            expect(renderer.element).toBeTruthy();
         });
     });
 
