@@ -260,8 +260,7 @@ const config = {
                     },
                     // { to: '/blog', label: 'Blog', position: 'right' },
                     {
-                        href: '/templates',
-                        target: '_blank',
+                        to: '/examples',
                         label: 'Examples',
                         position: 'right',
                     },
