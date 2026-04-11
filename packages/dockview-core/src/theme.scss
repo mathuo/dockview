@@ -221,6 +221,7 @@
     --dv-paneview-header-border-color: var(--dv-color-abyss-lighter);
 
     --dv-paneview-active-outline-color: #596f99;
+
 }
 
 @mixin dockview-theme-dracula-mixin {
@@ -1106,5 +1107,27 @@
     &.dv-context-menu-color-swatch--selected {
         outline: 2px solid var(--dv-tab-divider-color);
         outline-offset: 2px;
+    }
+}
+
+// Pure-CSS tab group indicator — active when tabGroupIndicator is 'none'.
+// Applied generically so any theme can opt in via the theme property.
+.dv-tab-group-indicator-none {
+    .dv-tab.dv-tab--grouped {
+        box-shadow: inset 0 -2px 0 var(--dv-tab-group-color);
+    }
+
+    .dv-tab-group-chip {
+        position: static !important;
+
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--dv-tab-group-color);
+        }
     }
 }

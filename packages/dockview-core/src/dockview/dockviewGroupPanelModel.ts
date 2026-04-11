@@ -954,6 +954,10 @@ export class DockviewGroupPanelModel
         return this._tabGroups;
     }
 
+    updateTabGroups(): void {
+        this.tabsContainer.updateTabGroups();
+    }
+
     getTabGroupForPanel(panelId: string): ITabGroup | undefined {
         return this._findTabGroupForPanel(panelId);
     }

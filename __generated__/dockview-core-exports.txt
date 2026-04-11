@@ -58,6 +58,7 @@ DockviewTabGroupChangeEvent
 DockviewTabGroupCollapsedChangeEvent
 DockviewTabGroupColor
 DockviewTabGroupColors
+DockviewTabGroupIndicator
 DockviewTabGroupPanelChangeEvent
 DockviewTheme
 DockviewUnhandledDragOverEvent

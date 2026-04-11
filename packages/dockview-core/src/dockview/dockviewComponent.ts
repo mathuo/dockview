@@ -3455,5 +3455,22 @@ export class DockviewComponent
                 this.rootDropTargetContainer.disabled = true;
                 break;
         }
+
+        // Toggle a CSS class so theme stylesheets can scope pure-CSS
+        // tab group indicator rules to the 'none' mode only.
+        const indicatorNone = (theme.tabGroupIndicator ?? 'wrap') === 'none';
+        toggleClass(this.element, 'dv-tab-group-indicator-none', indicatorNone);
+        if (this._shellManager) {
+            toggleClass(
+                this._shellManager.element,
+                'dv-tab-group-indicator-none',
+                indicatorNone
+            );
+        }
+
+        // Re-render tab group indicators so the new tabGroupIndicator mode takes effect
+        for (const group of this.groups) {
+            group.model.updateTabGroups();
+        }
     }
 }

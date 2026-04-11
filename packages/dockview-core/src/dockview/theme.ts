@@ -1,3 +1,5 @@
+export type DockviewTabGroupIndicator = 'wrap' | 'none';
+
 export interface DockviewTheme {
     /**
      *  The name of the theme
@@ -43,6 +45,17 @@ export interface DockviewTheme {
      * When unset the CSS variable is left to the stylesheet default (`none`).
      */
     dndOverlayBorder?: string;
+    /**
+     * Controls how tab groups are visually indicated in the tab bar.
+     *
+     * - `'wrap'` (default): Chrome-style SVG underline that wraps around the active tab
+     *   with rounded corners. Requires JavaScript for positioning and path computation.
+     * - `'none'`: No JS-drawn indicator. The theme relies purely on CSS using the
+     *   classes and custom property applied to tab elements:
+     *   `dv-tab--grouped`, `dv-tab--group-first`, `dv-tab--group-last`,
+     *   and `--dv-tab-group-color` (resolved color for the tab's group).
+     */
+    tabGroupIndicator?: DockviewTabGroupIndicator;
 }
 
 export const themeDark: DockviewTheme = {
@@ -70,6 +83,7 @@ export const themeAbyss: DockviewTheme = {
     name: 'abyss',
     className: 'dockview-theme-abyss',
     colorScheme: 'dark',
+    tabGroupIndicator: 'none',
 };
 
 export const themeDracula: DockviewTheme = {
