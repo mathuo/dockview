@@ -795,6 +795,14 @@ export class DockviewComponent
         options?: DockviewPopoutGroupOptions
     ): Promise<boolean> {
         if (
+            itemToPopout instanceof DockviewGroupPanel &&
+            itemToPopout.model.location.type === 'edge'
+        ) {
+            // edge groups are permanent structural elements and cannot be popped out
+            return Promise.resolve(false);
+        }
+
+        if (
             itemToPopout instanceof DockviewPanel &&
             itemToPopout.group.size === 1
         ) {
@@ -1140,6 +1148,14 @@ export class DockviewComponent
         item: DockviewPanel | DockviewGroupPanel,
         options?: FloatingGroupOptionsInternal
     ): void {
+        if (
+            item instanceof DockviewGroupPanel &&
+            item.model.location.type === 'edge'
+        ) {
+            // edge groups are permanent structural elements and cannot be floated
+            return;
+        }
+
         let group: DockviewGroupPanel;
 
         if (item instanceof DockviewPanel) {
