@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IDockviewPanelProps } from 'dockview';
+import { IDockviewPanelProps } from 'dockview-react';
 import { usePanelApiMetadata } from './debugPanel';
 import { usePanelColors } from './panelTheme';
 

@@ -362,7 +362,7 @@ default implementation as a base. This could include:
 
 <FrameworkSpecific framework='React'>
 ```tsx
-import { IDockviewPanelHeaderProps, DockviewDefaultTab } from 'dockview';
+import { IDockviewPanelHeaderProps, DockviewDefaultTab } from 'dockview-react';
 
 const MyCustomTab = (props: IDockviewPanelHeaderProps) => {
 const onContextMenu = (event: React.MouseEvent) => {
@@ -447,7 +447,7 @@ The component receives `panel`, `group`, `api`, `close`, and an optional `compon
 
 <FrameworkSpecific framework="React">
 ```tsx
-import { IContextMenuItemComponentProps } from 'dockview';
+import { IContextMenuItemComponentProps } from 'dockview-react';
 
 const FloatMenuItem = ({ panel, api, close }: IContextMenuItemComponentProps) => (
     <div
@@ -866,7 +866,7 @@ interface SerializedTabGroup {
 Use `isValidTabGroupColor` to validate a string as a tab group color at runtime:
 
 ```ts
-import { isValidTabGroupColor } from 'dockview';
+import { isValidTabGroupColor } from 'dockview-react';
 
 isValidTabGroupColor('blue');   // true
 isValidTabGroupColor('foo');    // false — type narrows to never

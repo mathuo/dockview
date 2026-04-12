@@ -6,7 +6,7 @@ import {
     DockviewReadyEvent,
     IDockviewPanelProps,
     positionToDirection,
-} from 'dockview';
+} from 'dockview-react';
 import * as React from 'react';
 
 const components = {

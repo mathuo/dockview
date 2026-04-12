@@ -1,4 +1,4 @@
-import { DockviewApi } from 'dockview';
+import { DockviewApi } from 'dockview-react';
 import React from 'react';
 import { defaultConfig, nextId } from './defaultLayout.ts';
 

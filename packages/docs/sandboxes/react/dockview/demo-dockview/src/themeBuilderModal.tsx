@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DockviewApi, DockviewTheme } from 'dockview';
+import { DockviewApi, DockviewTheme } from 'dockview-react';
 import {
     ThemeBuilderState,
     ThemeCssOverrides,

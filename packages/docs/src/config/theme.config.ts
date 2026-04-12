@@ -17,7 +17,7 @@ import {
     themeGithubDarkSpaced,
     themeGithubLight,
     themeGithubLightSpaced,
-} from 'dockview';
+} from 'dockview-react';
 
 export const themeConfig = [
     {

@@ -6,7 +6,7 @@ import {
     IDockviewPanelProps,
     DockviewApi,
     IContextMenuItemComponentProps,
-} from 'dockview';
+} from 'dockview-react';
 import React from 'react';
 import './app.css';
 import { defaultConfig } from './defaultLayout.ts';

@@ -12,7 +12,7 @@ import {
     GetTabGroupChipContextMenuItemsParams,
     DockviewTabGroupColors,
     DockviewTabGroupColor,
-} from 'dockview';
+} from 'dockview-react';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import './app.scss';

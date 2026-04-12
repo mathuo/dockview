@@ -6,7 +6,7 @@ import {
     LayoutPriority,
     Orientation,
     SerializedGridviewComponent,
-} from 'dockview';
+} from 'dockview-react';
 import * as React from 'react';
 import './app.scss';
 

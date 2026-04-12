@@ -19,7 +19,7 @@ import {
     themeSolarizedLight,
     themeSolarizedLightSpaced,
     themeVisualStudio,
-} from 'dockview';
+} from 'dockview-react';
 
 export const BUILTIN_THEMES: { theme: DockviewTheme; label: string }[] = [
     { theme: themeDark, label: 'Dark' },
@@ -160,7 +160,7 @@ export function generateCodeSnippet(
         themeFields.push(`  tabAnimation: '${state.tabAnimation}',`);
     }
 
-    let out = `import { ${importName} } from 'dockview';\n\n`;
+    let out = `import { ${importName} } from 'dockview-react';\n\n`;
 
     if (themeFields.length > 0) {
         out += `const myTheme = {\n  ...${importName},\n${themeFields.join('\n')}\n};\n`;

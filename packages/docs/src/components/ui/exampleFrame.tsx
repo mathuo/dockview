@@ -1,6 +1,6 @@
 import * as React from 'react';
 import BrowserOnly from '@docusaurus/BrowserOnly';
-import { DockviewTheme } from 'dockview';
+import { DockviewTheme } from 'dockview-react';
 
 const ExampleFrame = (props: {
     framework: string;
