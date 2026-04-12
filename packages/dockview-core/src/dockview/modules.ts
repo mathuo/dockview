@@ -10,6 +10,8 @@
  * @see {@link ModuleRegistry} for runtime registration
  */
 
+import { IFloatingGroupService } from './floatingGroupService';
+
 /**
  * A dockview module declares a named feature bundle with optional services,
  * CSS dependencies, and module dependencies.
@@ -19,14 +21,14 @@
  * through the component's `ServiceCollection`.
  */
 export interface DockviewModule {
-    /** Unique identifier for this module (e.g. 'FloatingGroupModule') */
+    /** Unique identifier for this module (e.g. 'FloatingGroup') */
     moduleName: string;
     /**
-     * Map of service name to service constructor.
-     * These are instantiated and registered in the ServiceCollection
-     * when the module is loaded.
+     * Map of service name to service factory function.
+     * Each factory receives the host component and returns a service instance.
+     * The returned service is registered in the ServiceCollection.
      */
-    services?: Record<string, new (...args: any[]) => any>;
+    services?: Record<string, (host: any) => any>;
     /** CSS file paths that this module requires */
     css?: string[];
     /** Other modules that must be registered before this one */
@@ -38,12 +40,9 @@ export interface DockviewModule {
  *
  * Core code accesses these via optional chaining (`services.floatingGroupService?.doThing()`).
  * Slots are populated at runtime when the corresponding module is registered.
- *
- * This will be expanded as modules are extracted in later phases.
  */
 export interface ServiceCollection {
-    // Phase 1+ will add optional service slots here, e.g.:
-    // floatingGroupService?: IFloatingGroupService;
+    floatingGroupService?: IFloatingGroupService;
 }
 
 /**
@@ -55,7 +54,7 @@ export class ModuleRegistry {
     private readonly _services: ServiceCollection = {};
 
     /** Read-only view of the service collection */
-    get services(): Readonly<ServiceCollection> {
+    get services(): ServiceCollection {
         return this._services;
     }
 
@@ -76,6 +75,21 @@ export class ModuleRegistry {
         }
 
         this._modules.set(module.moduleName, module);
+    }
+
+    /**
+     * Initialize all registered modules by creating their service instances.
+     * Must be called after all modules are registered and before the component
+     * is used. The host is passed to service factory functions.
+     */
+    initialize(host: any): void {
+        for (const module of this._modules.values()) {
+            if (module.services) {
+                for (const [name, factory] of Object.entries(module.services)) {
+                    (this._services as any)[name] = factory(host);
+                }
+            }
+        }
     }
 
     /** Check whether a module has been registered */

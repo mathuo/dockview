@@ -82,6 +82,11 @@ export {
     ServiceCollection,
     ModuleRegistry,
 } from './dockview/modules';
+export {
+    IFloatingGroupService,
+    IFloatingGroupHost,
+} from './dockview/floatingGroupService';
+export { FloatingGroupModule } from './dockview/floatingGroupModule';
 export * from './dockview/theme';
 export * from './dockview/dockviewPanel';
 export {
