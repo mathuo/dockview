@@ -6,7 +6,7 @@ import {
     IDockviewPanelProps,
     SerializedDockview,
     DockviewPanelApi,
-} from 'dockview';
+} from 'dockview-react';
 import React from 'react';
 import { Icon } from './utils.tsx';
 import { PopoverMenu } from './popover.tsx';

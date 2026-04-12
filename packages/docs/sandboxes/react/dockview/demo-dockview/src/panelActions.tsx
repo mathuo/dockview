@@ -1,4 +1,4 @@
-import { DockviewApi, IDockviewPanel } from 'dockview';
+import { DockviewApi, IDockviewPanel } from 'dockview-react';
 import * as React from 'react';
 
 const PanelAction = (props: {

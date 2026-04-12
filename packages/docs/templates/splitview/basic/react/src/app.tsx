@@ -2,7 +2,7 @@ import {
     SplitviewReact,
     SplitviewReadyEvent,
     ISplitviewPanelProps,
-} from 'dockview';
+} from 'dockview-react';
 import React from 'react';
 
 const Default = (props: ISplitviewPanelProps) => {

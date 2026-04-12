@@ -2,7 +2,7 @@ import {
     DockviewReact,
     DockviewReadyEvent,
     IDockviewPanelProps,
-} from 'dockview';
+} from 'dockview-react';
 import * as React from 'react';
 import './resize.scss';
 

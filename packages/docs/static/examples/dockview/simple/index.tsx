@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import React from 'react';
 
-import { DockviewReact } from 'dockview';
+import { DockviewReact } from 'dockview-react';
 
 import 'dockview/dist/styles/dockview.css';
 

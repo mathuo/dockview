@@ -3,7 +3,7 @@ import {
     DockviewReadyEvent,
     IDockviewPanelHeaderProps,
     IDockviewPanelProps,
-} from 'dockview';
+} from 'dockview-react';
 import React from 'react';
 
 interface CustomParams {

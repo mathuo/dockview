@@ -5,7 +5,7 @@ import {
     IDockviewHeaderActionsProps,
     IDockviewPanelProps,
     SerializedDockview,
-} from 'dockview';
+} from 'dockview-react';
 import React from 'react';
 
 const Icon = (props: {

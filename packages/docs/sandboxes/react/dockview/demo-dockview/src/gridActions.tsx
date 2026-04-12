@@ -1,4 +1,4 @@
-import { DockviewApi, EdgeGroupPosition } from 'dockview';
+import { DockviewApi, EdgeGroupPosition } from 'dockview-react';
 import * as React from 'react';
 import { defaultConfig, nextId } from './defaultLayout';
 

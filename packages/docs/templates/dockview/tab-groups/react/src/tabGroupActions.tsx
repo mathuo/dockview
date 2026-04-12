@@ -1,4 +1,4 @@
-import { DockviewApi, DockviewTabGroupColors, DockviewTabGroupColor } from 'dockview';
+import { DockviewApi, DockviewTabGroupColors, DockviewTabGroupColor } from 'dockview-react';
 
 export interface ContextMenuItem {
     label: string;

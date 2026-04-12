@@ -4,7 +4,7 @@ import Head from '@docusaurus/Head';
 import { themeConfig } from '../config/theme.config';
 import ExampleFrame from '../components/ui/exampleFrame';
 import BrowserOnly from '@docusaurus/BrowserOnly';
-import { DockviewTheme, themeAbyss } from 'dockview';
+import { DockviewTheme, themeAbyss } from 'dockview-react';
 import styles from './demo.module.css';
 
 const CODESANDBOX_URL =

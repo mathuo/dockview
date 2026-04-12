@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DockviewApi } from 'dockview';
+import { DockviewApi } from 'dockview-react';
 import { usePanelColors } from './panelTheme';
 
 type LogEntry = {

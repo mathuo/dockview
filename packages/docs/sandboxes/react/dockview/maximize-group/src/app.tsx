@@ -6,7 +6,7 @@ import {
     IDockviewHeaderActionsProps,
     IDockviewPanelProps,
     SerializedDockview,
-} from 'dockview';
+} from 'dockview-react';
 import * as React from 'react';
 import { Icon } from './utils';
 

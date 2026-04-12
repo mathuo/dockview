@@ -2,7 +2,7 @@ import {
     DockviewReact,
     DockviewReadyEvent,
     IDockviewPanelProps,
-} from 'dockview';
+} from 'dockview-react';
 import * as React from 'react';
 import TreeComponent from './treeview';
 import { getBackendOptions, MultiBackend } from '@minoru/react-dnd-treeview';

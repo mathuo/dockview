@@ -3,7 +3,7 @@ import {
     DockviewGroupLocation,
     DockviewGroupPanel,
     DockviewHeaderPosition,
-} from 'dockview';
+} from 'dockview-react';
 import * as React from 'react';
 
 const GroupAction = (props: {
