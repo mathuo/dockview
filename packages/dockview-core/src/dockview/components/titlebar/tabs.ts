@@ -293,7 +293,7 @@ export class Tabs extends CompositeDisposable {
                     if (!this._animState) {
                         // Check for external drag from another group
                         if (
-                            this.accessor.options.tabAnimation === 'default' ||
+                            this.accessor.options.theme?.tabAnimation === 'default' ||
                             this.accessor.options.disableDnd
                         ) {
                             return;
@@ -411,7 +411,7 @@ export class Tabs extends CompositeDisposable {
                     // In non-smooth mode only handle group drags here;
                     // individual tab drops are handled by tab Droptargets.
                     if (
-                        this.accessor.options.tabAnimation !== 'smooth' &&
+                        this.accessor.options.theme?.tabAnimation !== 'smooth' &&
                         !this._animState.sourceTabGroupId
                     ) {
                         return;
@@ -566,7 +566,7 @@ export class Tabs extends CompositeDisposable {
             tab.onDragStart((event) => {
                 this._onTabDragStart.fire({ nativeEvent: event, panel });
 
-                if (this.accessor.options.tabAnimation === 'smooth') {
+                if (this.accessor.options.theme?.tabAnimation === 'smooth') {
                     const tabWidth = tab.element.getBoundingClientRect().width;
                     const sourceIndex = this._tabs.findIndex(
                         (x) => x.value === tab
@@ -712,7 +712,7 @@ export class Tabs extends CompositeDisposable {
                         targetTabGroupId: animState.targetTabGroupId,
                     });
 
-                    if (this.accessor.options.tabAnimation === 'smooth') {
+                    if (this.accessor.options.theme?.tabAnimation === 'smooth') {
                         this.runFlipAnimation(
                             firstPositions,
                             animState.sourceTabId,
@@ -948,7 +948,7 @@ export class Tabs extends CompositeDisposable {
             }
         }
 
-        if (this.accessor.options.tabAnimation === 'smooth') {
+        if (this.accessor.options.theme?.tabAnimation === 'smooth') {
             // Collapse group tabs + chip after the browser
             // captures the drag image, then open the gap at the
             // source position — all instant (no transitions).
@@ -1299,7 +1299,7 @@ export class Tabs extends CompositeDisposable {
         this._animState.currentInsertionIndex = insertionIndex;
         this._animState.targetTabGroupId = targetTabGroupId;
 
-        if (this.accessor.options.tabAnimation === 'smooth') {
+        if (this.accessor.options.theme?.tabAnimation === 'smooth') {
             this.applyDragOverTransforms();
         }
     }
@@ -1553,7 +1553,7 @@ export class Tabs extends CompositeDisposable {
         this._chipDragCleanup?.dispose();
         this._chipDragCleanup = null;
 
-        if (this.accessor.options.tabAnimation === 'smooth') {
+        if (this.accessor.options.theme?.tabAnimation === 'smooth') {
             this._clearGroupDragClasses(sourceTabGroupId);
             const firstPositions = this.snapshotTabPositions();
             this.resetTabTransforms();

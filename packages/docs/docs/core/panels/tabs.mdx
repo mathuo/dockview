@@ -592,48 +592,26 @@ Controls how tabs animate when reordered via drag-and-drop.
 
 <CodeRunner id="dockview/tabview" height={300} />
 
-<FrameworkSpecific framework="React">
-    <DocRef declaration="IDockviewReactProps" methods={['tabAnimation']} />
-</FrameworkSpecific>
-
-<FrameworkSpecific framework="Vue">
-    <DocRef declaration="IDockviewVueProps" methods={['tabAnimation']} />
-</FrameworkSpecific>
-
-<FrameworkSpecific framework="Angular">
-    <DocRef declaration="IDockviewAngularProps" methods={['tabAnimation']} />
-</FrameworkSpecific>
-
-<FrameworkSpecific framework="JavaScript">
-    <DocRef declaration="DockviewComponentOptions" methods={['tabAnimation']} />
-</FrameworkSpecific>
+<DocRef declaration="DockviewTheme" methods={['tabAnimation']} />
 
 <FrameworkSpecific framework="React">
-    ```tsx return <DockviewReactComponent tabAnimation="smooth" />
-    ```
-</FrameworkSpecific>
+```tsx
+import { themeAbyss } from 'dockview';
 
-<FrameworkSpecific framework="Vue">
-    ```html
-    <dockview-vue tabAnimation="smooth" />
-    ```
-</FrameworkSpecific>
+const myTheme = { ...themeAbyss, tabAnimation: 'smooth' };
 
-<FrameworkSpecific framework="Angular">
-    ```html
-    <dv-dockview tabAnimation="smooth"></dv-dockview>
-    ```
+return <DockviewReact theme={myTheme} />
+```
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
 ```ts
 const api = createDockview(parentElement, {
-    tabAnimation: 'smooth',
+    theme: { ...themeAbyss, tabAnimation: 'smooth' },
 });
 
 // or toggle at runtime
-api.updateOptions({ tabAnimation: 'smooth' });
-
+api.updateOptions({ theme: { ...themeAbyss, tabAnimation: 'smooth' } });
 ```
 </FrameworkSpecific>
 

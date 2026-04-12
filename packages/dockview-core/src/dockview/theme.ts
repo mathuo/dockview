@@ -1,3 +1,5 @@
+import { TabAnimation } from './options';
+
 export type DockviewTabGroupIndicator = 'wrap' | 'none';
 
 export interface DockviewTheme {
@@ -56,6 +58,17 @@ export interface DockviewTheme {
      *   and `--dv-tab-group-color` (resolved color for the tab's group).
      */
     tabGroupIndicator?: DockviewTabGroupIndicator;
+    /**
+     * Controls tab drag-and-drop reorder animation style.
+     *
+     * - `"smooth"`: tabs animate smoothly during drag-and-drop reorder —
+     *   tabs slide apart to reveal the insertion gap, then animate to their
+     *   final positions on drop (Chrome-like behavior).
+     * - `"default"`: standard tab reorder behavior without animation.
+     *
+     * Defaults to `"default"`.
+     */
+    tabAnimation?: TabAnimation;
 }
 
 export const themeDark: DockviewTheme = {

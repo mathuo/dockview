@@ -26,7 +26,6 @@ import {
     PROPERTY_KEYS_DOCKVIEW,
     DockviewFrameworkOptions,
     DockviewComponentOptions,
-    TabAnimation,
     GetTabContextMenuItemsParams,
     GetTabGroupChipContextMenuItemsParams,
     BuiltInChipContextMenuItem,
@@ -98,7 +97,6 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() locked?: boolean;
     @Input() disableAutoResizing?: boolean;
     @Input() singleTabMode?: 'fullwidth' | 'default';
-    @Input() tabAnimation?: TabAnimation;
     @Input() getTabContextMenuItems?: (
         params: GetTabContextMenuItemsParams
     ) => (ContextMenuItem | { component: Type<any> | TemplateRef<any> })[];

@@ -29,7 +29,7 @@ function createMockPanel(id: string): IDockviewPanel {
 function createTabsForDropTest() {
     const accessor = fromPartial<DockviewComponent>({
         id: 'test-accessor-id',
-        options: {}, // tabAnimation: undefined = default (no smooth animation)
+        options: {}, // theme?.tabAnimation: undefined = default (no smooth animation)
         onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
     });
     const group = fromPartial<DockviewGroupPanel>({
@@ -346,7 +346,7 @@ describe('tabs', () => {
         test('dragover on tab strip calls preventDefault, enabling drop on empty space', () => {
             const accessor = fromPartial<DockviewComponent>({
                 id: 'test-accessor-id',
-                options: { tabAnimation: 'smooth' },
+                options: { theme: { name: 'test', className: 'test', tabAnimation: 'smooth' } },
                 onDidOptionsChange: jest
                     .fn()
                     .mockReturnValue({ dispose: jest.fn() }),
