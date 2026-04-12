@@ -1,5 +1,5 @@
 import React from 'react';
-import { DockviewApi } from 'dockview';
+import { DockviewApi } from 'dockview-react';
 
 export const PanelActions = (props: {
     panels: string[];

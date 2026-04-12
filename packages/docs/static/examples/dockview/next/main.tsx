@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { DockviewReact } from 'dockview';
+import { DockviewReact } from 'dockview-react';
 import 'dockview/dist/styles/dockview.css';
 import './main.css';
 

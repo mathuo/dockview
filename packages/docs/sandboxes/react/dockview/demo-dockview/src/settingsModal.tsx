@@ -1,4 +1,4 @@
-import { DockviewApi } from 'dockview';
+import { DockviewApi } from 'dockview-react';
 import * as React from 'react';
 import { GridActions } from './gridActions';
 import { PanelActions } from './panelActions';

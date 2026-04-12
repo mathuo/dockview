@@ -5,7 +5,7 @@ import {
     DockviewApi,
     GetTabContextMenuItemsParams,
     GetTabGroupChipContextMenuItemsParams,
-} from 'dockview';
+} from 'dockview-react';
 import React from 'react';
 import {
     buildChipContextMenuItems,
