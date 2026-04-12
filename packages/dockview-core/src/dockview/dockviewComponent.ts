@@ -96,6 +96,7 @@ import {
     IEdgeGroupHost,
 } from './dockviewShell';
 import { DockviewGroupPanelApi } from '../api/dockviewGroupPanelApi';
+import { ModuleRegistry } from './modules';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     activationSize: { type: 'pixels', value: 10 },
@@ -227,6 +228,7 @@ export interface PopoutGroupChangePositionEvent {
 }
 
 export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
+    readonly moduleRegistry: ModuleRegistry;
     readonly activePanel: IDockviewPanel | undefined;
     readonly totalPanels: number;
     readonly panels: IDockviewPanel[];
@@ -311,6 +313,7 @@ export class DockviewComponent
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
     private readonly _api: DockviewApi;
+    private readonly _moduleRegistry = new ModuleRegistry();
     private _options: Exclude<DockviewComponentOptions, 'orientation'>;
     private _watermark: IWatermarkRenderer | null = null;
     private readonly _themeClassnames: Classnames;
@@ -483,6 +486,10 @@ export class DockviewComponent
         return this._api;
     }
 
+    get moduleRegistry(): ModuleRegistry {
+        return this._moduleRegistry;
+    }
+
     get floatingGroups(): DockviewFloatingGroupPanel[] {
         return this._floatingGroups;
     }
@@ -509,6 +516,12 @@ export class DockviewComponent
         });
 
         this._options = options;
+
+        if (options.modules) {
+            for (const module of options.modules) {
+                this._moduleRegistry.register(module);
+            }
+        }
 
         this.popupService = new PopupService(this.element);
         this.contextMenuController = new ContextMenuController(this);

@@ -32,6 +32,7 @@ import {
     BuiltInChipContextMenuItem,
     ContextMenuItemConfig,
     ContextMenuItem,
+    DockviewModule,
 } from 'dockview-core';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularRenderer } from '../utils/angular-renderer';
@@ -109,6 +110,8 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
         | ContextMenuItemConfig
         | { component: Type<any> | TemplateRef<any> }
     )[];
+
+    @Input() modules?: DockviewModule[];
 
     @Output() ready = new EventEmitter<DockviewReadyEvent>();
     @Output() didDrop = new EventEmitter<DockviewDidDropEvent>();

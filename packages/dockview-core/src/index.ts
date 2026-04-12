@@ -77,6 +77,11 @@ export {
 } from './dockview/framework';
 
 export * from './dockview/options';
+export {
+    DockviewModule,
+    ServiceCollection,
+    ModuleRegistry,
+} from './dockview/modules';
 export * from './dockview/theme';
 export * from './dockview/dockviewPanel';
 export {

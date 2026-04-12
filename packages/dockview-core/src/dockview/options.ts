@@ -17,6 +17,7 @@ import { Contraints } from '../gridview/gridviewPanel';
 import { AcceptableEvent, IAcceptableEvent } from '../events';
 import { DockviewTheme } from './theme';
 import { ITabGroup } from './tabGroup';
+import { DockviewModule } from './modules';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -177,6 +178,14 @@ export interface DockviewOptions {
     createTabGroupChipComponent?: (
         tabGroup: ITabGroup
     ) => ITabGroupChipRenderer;
+    /**
+     * Modules to register with this dockview instance.
+     *
+     * Modules provide optional feature bundles (e.g. floating groups,
+     * popout windows) that register services into the component.
+     * Pass an array of `DockviewModule` objects.
+     */
+    modules?: DockviewModule[];
 }
 
 export type TabAnimation = 'smooth' | 'default';
@@ -233,6 +242,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         getTabContextMenuItems: undefined,
         getTabGroupChipContextMenuItems: undefined,
         createTabGroupChipComponent: undefined,
+        modules: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];
