@@ -108,7 +108,9 @@ export class Tab extends CompositeDisposable {
                 const data = getPanelData();
 
                 if (data && this.accessor.id === data.viewId) {
-                    if (this.accessor.options.theme?.tabAnimation === 'smooth') {
+                    if (
+                        this.accessor.options.theme?.tabAnimation === 'smooth'
+                    ) {
                         // When smooth reorder is enabled, the Tabs
                         // container handles all intra-accessor drops
                         // (both same-group and cross-group) via

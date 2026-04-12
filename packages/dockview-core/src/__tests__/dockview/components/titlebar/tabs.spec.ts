@@ -346,7 +346,13 @@ describe('tabs', () => {
         test('dragover on tab strip calls preventDefault, enabling drop on empty space', () => {
             const accessor = fromPartial<DockviewComponent>({
                 id: 'test-accessor-id',
-                options: { theme: { name: 'test', className: 'test', tabAnimation: 'smooth' } },
+                options: {
+                    theme: {
+                        name: 'test',
+                        className: 'test',
+                        tabAnimation: 'smooth',
+                    },
+                },
                 onDidOptionsChange: jest
                     .fn()
                     .mockReturnValue({ dispose: jest.fn() }),

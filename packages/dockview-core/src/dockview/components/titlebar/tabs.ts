@@ -293,7 +293,8 @@ export class Tabs extends CompositeDisposable {
                     if (!this._animState) {
                         // Check for external drag from another group
                         if (
-                            this.accessor.options.theme?.tabAnimation === 'default' ||
+                            this.accessor.options.theme?.tabAnimation ===
+                                'default' ||
                             this.accessor.options.disableDnd
                         ) {
                             return;
@@ -411,7 +412,8 @@ export class Tabs extends CompositeDisposable {
                     // In non-smooth mode only handle group drags here;
                     // individual tab drops are handled by tab Droptargets.
                     if (
-                        this.accessor.options.theme?.tabAnimation !== 'smooth' &&
+                        this.accessor.options.theme?.tabAnimation !==
+                            'smooth' &&
                         !this._animState.sourceTabGroupId
                     ) {
                         return;
@@ -712,7 +714,9 @@ export class Tabs extends CompositeDisposable {
                         targetTabGroupId: animState.targetTabGroupId,
                     });
 
-                    if (this.accessor.options.theme?.tabAnimation === 'smooth') {
+                    if (
+                        this.accessor.options.theme?.tabAnimation === 'smooth'
+                    ) {
                         this.runFlipAnimation(
                             firstPositions,
                             animState.sourceTabId,
