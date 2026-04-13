@@ -1858,6 +1858,12 @@ export class DockviewComponent
                     }
                 }
 
+                // Restore tab groups before activating a fallback panel so
+                // that collapsed groups can clear the active panel correctly.
+                if (data.tabGroups && data.tabGroups.length > 0) {
+                    group.model.restoreTabGroups(data.tabGroups);
+                }
+
                 if (!group.activePanel && group.panels.length > 0) {
                     group.model.openPanel(
                         group.panels[group.panels.length - 1],
@@ -1865,11 +1871,6 @@ export class DockviewComponent
                             skipSetGroupActive: true,
                         }
                     );
-                }
-
-                // Restore tab groups if present (backward-compatible: absent = no groups)
-                if (data.tabGroups && data.tabGroups.length > 0) {
-                    group.model.restoreTabGroups(data.tabGroups);
                 }
 
                 return group;
@@ -1932,6 +1933,16 @@ export class DockviewComponent
                             });
                         }
 
+                        // Restore tab groups before activating a fallback panel
+                        if (
+                            groupState.tabGroups &&
+                            groupState.tabGroups.length > 0
+                        ) {
+                            edgeGroup.model.restoreTabGroups(
+                                groupState.tabGroups
+                            );
+                        }
+
                         if (
                             !edgeGroup.activePanel &&
                             edgeGroup.panels.length > 0
@@ -1939,16 +1950,6 @@ export class DockviewComponent
                             edgeGroup.model.openPanel(
                                 edgeGroup.panels[edgeGroup.panels.length - 1],
                                 { skipSetGroupActive: true }
-                            );
-                        }
-
-                        // Restore tab groups if present
-                        if (
-                            groupState.tabGroups &&
-                            groupState.tabGroups.length > 0
-                        ) {
-                            edgeGroup.model.restoreTabGroups(
-                                groupState.tabGroups
                             );
                         }
                     }

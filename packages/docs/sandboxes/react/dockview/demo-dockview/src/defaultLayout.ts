@@ -6,21 +6,36 @@ export const nextId = (() => {
 })();
 
 export function defaultConfig(api: DockviewApi) {
-    // Left column: watchlist (full height)
+    // Left column: standalone tab before the Market Data group
+    const news = api.addPanel({
+        id: 'news',
+        component: 'default',
+        title: 'News',
+    });
+
+    // Watchlist and Price Alert will be grouped under "Market Data"
     const watchlist = api.addPanel({
         id: 'watchlist',
         component: 'watchlist',
         title: 'Watchlist',
         renderer: 'always',
+        position: { referencePanel: news },
     });
 
-    // Price alert in the same group as watchlist
     const pricealert = api.addPanel({
         id: 'pricealert',
         component: 'pricealert',
         title: 'Price Alert',
         renderer: 'always',
         position: { referencePanel: watchlist },
+    });
+
+    // Standalone tab after the Market Data group
+    api.addPanel({
+        id: 'research',
+        component: 'default',
+        title: 'Research',
+        position: { referencePanel: pricealert },
     });
 
     // Centre column: order book (top) + orders grid (bottom)
@@ -98,10 +113,28 @@ export function defaultConfig(api: DockviewApi) {
         panelId: 'pricealert',
     });
 
-    // Set active panels
+    // Create a collapsed tab group in the orders/vesselfinder group
+    const ordersGroupId = orders.api.group.id;
+    const shipping = api.createTabGroup({
+        groupId: ordersGroupId,
+        label: 'Shipping',
+        color: 'green',
+    });
+    api.addPanelToTabGroup({
+        groupId: ordersGroupId,
+        tabGroupId: shipping.id,
+        panelId: 'orders',
+    });
+    api.addPanelToTabGroup({
+        groupId: ordersGroupId,
+        tabGroupId: shipping.id,
+        panelId: 'vesselfinder',
+    });
+    shipping.collapse();
+
+    // Set active panels (skip orders group — all its panels are collapsed)
     watchlist.api.setActive();
     orderbook.api.setActive();
-    orders.api.setActive();
     positionsummary.api.setActive();
     eventlog.api.setActive();
 }
