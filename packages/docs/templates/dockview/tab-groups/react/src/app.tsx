@@ -5,6 +5,7 @@ import {
     DockviewApi,
     GetTabContextMenuItemsParams,
     GetTabGroupChipContextMenuItemsParams,
+    themeAbyss,
 } from 'dockview-react';
 import React from 'react';
 import {
@@ -158,7 +159,7 @@ export default () => {
                 className={'dockview-theme-abyss'}
                 onReady={onReady}
                 components={components}
-                tabAnimation={'smooth'}
+                theme={{ ...themeAbyss, tabAnimation: 'smooth' }}
                 disableFloatingGroups={true}
                 getTabContextMenuItems={getTabContextMenuItems}
                 getTabGroupChipContextMenuItems={

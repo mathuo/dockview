@@ -55,7 +55,11 @@ function createTabs(
     const accessor = fromPartial<DockviewComponent>({
         id: 'test-accessor',
         options: {
-            tabAnimation: options.tabAnimation,
+            theme: {
+                name: 'test',
+                className: 'test',
+                tabAnimation: options.tabAnimation,
+            },
             disableDnd: options.disableDnd,
         },
         onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),

@@ -134,17 +134,6 @@ export interface DockviewOptions {
      */
     scrollbars?: 'native' | 'custom';
     /**
-     * Controls tab drag-and-drop reorder animation style.
-     *
-     * - `"smooth"`: tabs animate smoothly during drag-and-drop reorder —
-     *   tabs slide apart to reveal the insertion gap, then animate to their
-     *   final positions on drop (Chrome-like behavior).
-     * - `"default"`: standard tab reorder behavior without animation.
-     *
-     * Defaults to `"default"`.
-     */
-    tabAnimation?: TabAnimation;
-    /**
      * Return the items to display in the tab context menu on right-click.
      *
      * Use built-in string shortcuts (`'close'`, `'closeOthers'`, `'closeAll'`, `'separator'`)
@@ -180,7 +169,6 @@ export interface DockviewOptions {
 }
 
 export type TabAnimation = 'smooth' | 'default';
-const DEFAULT_TAB_ANIMATION: TabAnimation = 'default';
 
 export interface DockviewDndOverlayEvent extends IAcceptableEvent {
     nativeEvent: DragEvent;
@@ -229,7 +217,6 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         theme: undefined,
         disableTabsOverflowList: undefined,
         scrollbars: undefined,
-        tabAnimation: undefined,
         getTabContextMenuItems: undefined,
         getTabGroupChipContextMenuItems: undefined,
         createTabGroupChipComponent: undefined,

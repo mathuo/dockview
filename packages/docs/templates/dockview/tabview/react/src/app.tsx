@@ -2,7 +2,10 @@ import {
     DockviewApi,
     DockviewReact,
     DockviewReadyEvent,
+    DockviewTheme,
     IDockviewPanelProps,
+    themeAbyss,
+    TabAnimation,
 } from 'dockview-react';
 import React from 'react';
 
@@ -20,12 +23,15 @@ const components = {
 
 const Component = (props: { theme?: string }) => {
     const [api, setApi] = React.useState<DockviewApi>();
-    const [tabAnimation, setTabAnimation] = React.useState<'smooth' | 'default'>('default');
+    const [tabAnimation, setTabAnimation] = React.useState<TabAnimation>('default');
+
+    const theme: DockviewTheme = React.useMemo(
+        () => ({ ...themeAbyss, tabAnimation }),
+        [tabAnimation]
+    );
 
     const toggleMode = () => {
-        const next = tabAnimation === 'smooth' ? 'default' : 'smooth';
-        setTabAnimation(next);
-        api?.updateOptions({ tabAnimation: next });
+        setTabAnimation((prev) => (prev === 'smooth' ? 'default' : 'smooth'));
     };
 
     React.useEffect(() => {
@@ -94,7 +100,7 @@ const Component = (props: { theme?: string }) => {
                     className={`${props.theme || 'dockview-theme-abyss'}`}
                     onReady={onReady}
                     components={components}
-                    tabAnimation={tabAnimation}
+                    theme={theme}
                     disableFloatingGroups={true}
                 />
             </div>

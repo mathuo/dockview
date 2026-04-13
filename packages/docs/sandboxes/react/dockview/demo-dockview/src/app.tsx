@@ -19,7 +19,6 @@ import './app.scss';
 import { defaultConfig } from './defaultLayout';
 import { LeftControls, PrefixHeaderControls, RightControls } from './controls';
 import { Table, usePanelApiMetadata } from './debugPanel';
-import { SettingsModal } from './settingsModal';
 import { OrdersPanel } from './ordersPanel';
 import { OrderBookPanel } from './orderBookPanel';
 import { EventLogPanel } from './eventLogPanel';
@@ -36,7 +35,7 @@ import {
     buildEffectiveTheme,
     getInitialStateFromTheme,
 } from './themeBuilder';
-import { ThemeBuilderModal } from './themeBuilderModal';
+import { Sidebar } from './themeBuilderModal';
 
 export const ApiContext = React.createContext<DockviewApi | undefined>(
     undefined
@@ -301,10 +300,8 @@ const ThemeContext = React.createContext<DockviewTheme | undefined>(undefined);
 
 const DockviewDemo = (props: {
     theme?: DockviewTheme;
-    showSettings?: boolean;
-    onCloseSettings?: () => void;
-    showThemeBuilder?: boolean;
-    onCloseThemeBuilder?: () => void;
+    showSidebar?: boolean;
+    onCloseSidebar?: () => void;
     onChangeTheme?: (theme: DockviewTheme) => void;
 }) => {
     const [logLines, setLogLines] = React.useState<
@@ -677,10 +674,6 @@ const DockviewDemo = (props: {
     const [showLogs, setShowLogs] = React.useState<boolean>(false);
     const [debug, setDebug] = React.useState<boolean>(false);
     const [useEdgeGroups, setUseEdgeGroups] = React.useState<boolean>(true);
-    const [tabAnimation, setTabAnimation] = React.useState<
-        'smooth' | 'default'
-    >('default');
-
     return (
         <div
             className="dockview-demo"
@@ -725,7 +718,6 @@ const DockviewDemo = (props: {
                                                     : 'no-shell'
                                             }
                                             components={components}
-                                            tabAnimation={tabAnimation}
                                             defaultTabComponent={
                                                 headerComponents.default
                                             }
@@ -837,9 +829,9 @@ const DockviewDemo = (props: {
                         </div>
                     </div>
                 )}
-                <ThemeBuilderModal
-                    open={props.showThemeBuilder ?? false}
-                    onClose={props.onCloseThemeBuilder ?? (() => {})}
+                <Sidebar
+                    open={props.showSidebar ?? false}
+                    onClose={props.onCloseSidebar ?? (() => {})}
                     state={builderState}
                     onChange={updateBuilder}
                     onCssChange={updateCss}
@@ -850,27 +842,20 @@ const DockviewDemo = (props: {
                     }
                     baseTheme={props.theme ?? themeAbyss}
                     containerEl={containerRef.current}
+                    api={api}
+                    panels={panels}
+                    groups={groups}
+                    activePanel={activePanel}
+                    activeGroup={activeGroup}
+                    hasCustomWatermark={watermark}
+                    toggleCustomWatermark={() => setWatermark(!watermark)}
+                    debug={debug}
+                    onToggleDebug={() => setDebug(!debug)}
+                    showLogs={showLogs}
+                    onToggleShowLogs={() => setShowLogs(!showLogs)}
+                    onClearLogs={() => setLogLines([])}
                 />
             </div>
-
-            <SettingsModal
-                open={props.showSettings ?? false}
-                onClose={props.onCloseSettings ?? (() => {})}
-                api={api}
-                panels={panels}
-                groups={groups}
-                activePanel={activePanel}
-                activeGroup={activeGroup}
-                hasCustomWatermark={watermark}
-                toggleCustomWatermark={() => setWatermark(!watermark)}
-                debug={debug}
-                onToggleDebug={() => setDebug(!debug)}
-                showLogs={showLogs}
-                onToggleShowLogs={() => setShowLogs(!showLogs)}
-                onClearLogs={() => setLogLines([])}
-                tabAnimation={tabAnimation}
-                onToggleTabAnimation={(v) => setTabAnimation(v)}
-            />
         </div>
     );
 };

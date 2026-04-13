@@ -1,4 +1,5 @@
 import {
+    TabAnimation,
     DockviewTheme,
     themeAbyss,
     themeAbyssSpaced,
@@ -80,6 +81,7 @@ export interface ThemeBuilderState {
     dndTabIndicator: 'line' | 'fill';
     dndOverlayBorder: string;
     tabGroupIndicator: 'wrap' | 'none';
+    tabAnimation: TabAnimation;
     cssOverrides: ThemeCssOverrides;
 }
 
@@ -93,6 +95,7 @@ export function getInitialStateFromTheme(
         dndTabIndicator: theme.dndTabIndicator ?? 'fill',
         dndOverlayBorder: theme.dndOverlayBorder ?? '',
         tabGroupIndicator: theme.tabGroupIndicator ?? 'wrap',
+        tabAnimation: theme.tabAnimation ?? 'default',
         cssOverrides: {},
     };
 }
@@ -109,6 +112,7 @@ export function buildEffectiveTheme(
         dndTabIndicator: state.dndTabIndicator,
         dndOverlayBorder: state.dndOverlayBorder || undefined,
         tabGroupIndicator: state.tabGroupIndicator,
+        tabAnimation: state.tabAnimation,
     };
 }
 
@@ -151,6 +155,9 @@ export function generateCodeSnippet(
         themeFields.push(
             `  tabGroupIndicator: '${state.tabGroupIndicator}',`
         );
+    }
+    if (state.tabAnimation !== (baseTheme.tabAnimation ?? 'default')) {
+        themeFields.push(`  tabAnimation: '${state.tabAnimation}',`);
     }
 
     let out = `import { ${importName} } from 'dockview-react';\n\n`;

@@ -3,7 +3,6 @@ import * as React from 'react';
 import { GridActions } from './gridActions';
 import { PanelActions } from './panelActions';
 import { GroupActions } from './groupActions';
-import { ToggleRow } from './toggleRow';
 
 const Section = (props: { title: string; children: React.ReactNode }) => (
     <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
@@ -23,9 +22,25 @@ const Section = (props: { title: string; children: React.ReactNode }) => (
     </div>
 );
 
-export const SettingsModal = (props: {
-    open: boolean;
-    onClose: () => void;
+const toggleBtn = (active: boolean): React.CSSProperties => ({
+    padding: '4px 10px',
+    fontSize: 11,
+    border: '1px solid rgba(255,255,255,0.12)',
+    borderRadius: 4,
+    background: active
+        ? 'rgba(72,100,220,0.25)'
+        : 'rgba(255,255,255,0.04)',
+    borderColor: active
+        ? 'rgba(72,100,220,0.5)'
+        : 'rgba(255,255,255,0.12)',
+    color: active ? 'white' : 'rgba(255,255,255,0.7)',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 4,
+});
+
+export const ControlsContent = (props: {
     api?: DockviewApi;
     panels: string[];
     groups: string[];
@@ -38,156 +53,86 @@ export const SettingsModal = (props: {
     showLogs: boolean;
     onToggleShowLogs: () => void;
     onClearLogs: () => void;
-    tabAnimation: 'smooth' | 'default';
-    onToggleTabAnimation: (v: 'smooth' | 'default') => void;
 }) => {
-    if (!props.open) return null;
-
     return (
-        <div
-            style={{
-                position: 'absolute',
-                inset: 0,
-                zIndex: 9999,
-                backgroundColor: 'rgba(0,0,0,0.4)',
-            }}
-            onClick={props.onClose}
-        >
-            <div
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                    width: '320px',
-                    backgroundColor: '#0d1117',
-                    borderLeft: '1px solid rgba(255,255,255,0.1)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    overflowY: 'auto',
-                }}
-                onClick={(e) => e.stopPropagation()}
-            >
+        <>
+            <Section title="Grid">
+                <GridActions
+                    api={props.api}
+                    hasCustomWatermark={props.hasCustomWatermark}
+                    toggleCustomWatermark={props.toggleCustomWatermark}
+                />
+            </Section>
+
+            {props.api && props.activePanel && (
+                <Section title="Active Panel">
+                    <PanelActions
+                        api={props.api}
+                        panels={[props.activePanel]}
+                        activePanel={props.activePanel}
+                    />
+                </Section>
+            )}
+
+            {props.api && props.activeGroup && (
+                <Section title="Active Group">
+                    <GroupActions
+                        api={props.api}
+                        groups={[props.activeGroup]}
+                        activeGroup={props.activeGroup}
+                    />
+                </Section>
+            )}
+
+            <Section title="View">
                 <div
                     style={{
-                        padding: '12px 16px',
-                        borderBottom: '1px solid rgba(255,255,255,0.1)',
                         display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        flexShrink: 0,
+                        gap: 6,
+                        padding: '6px 16px 8px',
+                        flexWrap: 'wrap',
                     }}
                 >
-                    <span
-                        style={{
-                            color: 'white',
-                            fontWeight: 600,
-                            fontSize: '14px',
-                        }}
-                    >
-                        Controls
-                    </span>
                     <button
-                        onClick={props.onClose}
-                        style={{
-                            background: 'none',
-                            outline: 'none',
-                            border: 'none',
-                            color: 'rgba(255,255,255,0.6)',
-                            cursor: 'pointer',
-                            padding: '4px',
-                            display: 'flex',
-                            alignItems: 'center',
-                        }}
+                        onClick={props.onToggleDebug}
+                        style={toggleBtn(props.debug)}
                     >
                         <span
                             className="material-symbols-outlined"
-                            style={{ fontSize: '18px' }}
+                            style={{ fontSize: 14 }}
                         >
-                            close
+                            engineering
                         </span>
+                        <span>Debug</span>
                     </button>
-                </div>
-
-                <Section title="Grid">
-                    <GridActions
-                        api={props.api}
-                        hasCustomWatermark={props.hasCustomWatermark}
-                        toggleCustomWatermark={props.toggleCustomWatermark}
-                    />
-                </Section>
-
-                {props.api && props.activePanel && (
-                    <Section title="Active Panel">
-                        <PanelActions
-                            api={props.api}
-                            panels={[props.activePanel]}
-                            activePanel={props.activePanel}
-                        />
-                    </Section>
-                )}
-
-                {props.api && props.activeGroup && (
-                    <Section title="Active Group">
-                        <GroupActions
-                            api={props.api}
-                            groups={[props.activeGroup]}
-                            activeGroup={props.activeGroup}
-                        />
-                    </Section>
-                )}
-
-                <Section title="View">
-                    <div
-                        className="action-container"
-                        style={{ flexWrap: 'wrap', gap: '4px' }}
+                    <button
+                        onClick={props.onToggleShowLogs}
+                        style={toggleBtn(props.showLogs)}
                     >
-                        <button
-                            onClick={props.onToggleDebug}
-                            style={
-                                props.debug
-                                    ? { backgroundColor: '#4864dc' }
-                                    : {}
-                            }
+                        <span
+                            className="material-symbols-outlined"
+                            style={{ fontSize: 14 }}
                         >
-                            <span className="material-symbols-outlined">
-                                engineering
-                            </span>
-                        </button>
+                            terminal
+                        </span>
+                        <span>Events Log</span>
+                    </button>
+                    {props.showLogs && (
                         <button
-                            onClick={props.onToggleShowLogs}
-                            style={
-                                props.showLogs
-                                    ? { backgroundColor: '#4864dc' }
-                                    : {}
-                            }
+                            onClick={props.onClearLogs}
+                            style={toggleBtn(false)}
                         >
-                            <span style={{ paddingRight: '4px' }}>
-                                Events Log
+                            <span
+                                className="material-symbols-outlined"
+                                style={{ fontSize: 14 }}
+                            >
+                                undo
                             </span>
-                            <span className="material-symbols-outlined">
-                                terminal
-                            </span>
+                            <span>Clear</span>
                         </button>
-                        {props.showLogs && (
-                            <button onClick={props.onClearLogs}>
-                                <span className="material-symbols-outlined">
-                                    undo
-                                </span>
-                            </button>
-                        )}
-                    </div>
-                    <ToggleRow
-                        label="Tab Animation"
-                        value={props.tabAnimation}
-                        options={[
-                            { value: 'default', label: 'default' },
-                            { value: 'smooth', label: 'smooth' },
-                        ]}
-                        onChange={props.onToggleTabAnimation}
-                    />
-                </Section>
-            </div>
-        </div>
+                    )}
+                </div>
+            </Section>
+        </>
     );
 };

@@ -6,6 +6,32 @@ import {
 } from 'dockview-react';
 import * as React from 'react';
 
+const iconBtn = (active?: boolean): React.CSSProperties => ({
+    padding: '3px 6px',
+    fontSize: 11,
+    border: '1px solid rgba(255,255,255,0.12)',
+    borderRadius: 4,
+    background: active
+        ? 'rgba(72,100,220,0.25)'
+        : 'rgba(255,255,255,0.04)',
+    color: active ? 'white' : 'rgba(255,255,255,0.6)',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+});
+
+const selectStyle: React.CSSProperties = {
+    padding: '3px 4px',
+    fontSize: 11,
+    border: '1px solid rgba(255,255,255,0.12)',
+    borderRadius: 4,
+    background: 'rgba(255,255,255,0.04)',
+    color: 'rgba(255,255,255,0.7)',
+    cursor: 'pointer',
+    outline: 'none',
+};
+
 const GroupAction = (props: {
     groupId: string;
     groups: string[];
@@ -29,9 +55,7 @@ const GroupAction = (props: {
 
         setGroup(props.api.getGroup(props.groupId));
 
-        return () => {
-            disposable.dispose();
-        };
+        return () => disposable.dispose();
     }, [props.api, props.groupId]);
 
     const [headerPosition, setHeaderPosition] =
@@ -72,43 +96,144 @@ const GroupAction = (props: {
     }, [group]);
 
     return (
-        <div className="button-action">
-            <div style={{ display: 'flex' }}>
+        <div style={{ padding: '3px 16px' }}>
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    minHeight: 28,
+                }}
+            >
                 <button
                     onClick={onClick}
-                    className={
-                        isActive ? 'demo-button selected' : 'demo-button'
-                    }
+                    style={{
+                        flex: 1,
+                        padding: '3px 8px',
+                        fontSize: 11,
+                        border: '1px solid rgba(255,255,255,0.12)',
+                        borderRadius: 4,
+                        background: isActive
+                            ? 'rgba(72,100,220,0.25)'
+                            : 'rgba(255,255,255,0.04)',
+                        color: isActive ? 'white' : 'rgba(255,255,255,0.7)',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                    }}
                 >
                     {props.groupId}
                 </button>
+                <div style={{ display: 'flex', gap: 2 }}>
+                    <button
+                        style={iconBtn(location?.type === 'floating')}
+                        onClick={() => {
+                            if (group) {
+                                props.api.addFloatingGroup(group, {
+                                    width: 400,
+                                    height: 300,
+                                    x: 50,
+                                    y: 50,
+                                    position: { bottom: 50, right: 50 },
+                                });
+                            }
+                        }}
+                        title="Float"
+                    >
+                        <span
+                            className="material-symbols-outlined"
+                            style={{ fontSize: 14 }}
+                        >
+                            ad_group
+                        </span>
+                    </button>
+                    <button
+                        style={iconBtn(location?.type === 'popout')}
+                        onClick={() => {
+                            if (group) props.api.addPopoutGroup(group);
+                        }}
+                        title="Popout"
+                    >
+                        <span
+                            className="material-symbols-outlined"
+                            style={{ fontSize: 14 }}
+                        >
+                            open_in_new
+                        </span>
+                    </button>
+                    <button
+                        style={iconBtn(isMaximized)}
+                        onClick={() => {
+                            if (group) {
+                                if (group.api.isMaximized()) {
+                                    group.api.exitMaximized();
+                                } else {
+                                    group.api.maximize();
+                                }
+                            }
+                        }}
+                        title="Maximize"
+                    >
+                        <span
+                            className="material-symbols-outlined"
+                            style={{ fontSize: 14 }}
+                        >
+                            fullscreen
+                        </span>
+                    </button>
+                    <button
+                        style={iconBtn()}
+                        onClick={() => {
+                            if (group) {
+                                group.api.setVisible(!group.api.isVisible);
+                            }
+                        }}
+                        title="Toggle visibility"
+                    >
+                        <span
+                            className="material-symbols-outlined"
+                            style={{ fontSize: 14 }}
+                        >
+                            {isVisible ? 'visibility' : 'visibility_off'}
+                        </span>
+                    </button>
+                    <button
+                        style={iconBtn()}
+                        onClick={() => {
+                            props.api?.getGroup(props.groupId)?.api.close();
+                        }}
+                        title="Close"
+                    >
+                        <span
+                            className="material-symbols-outlined"
+                            style={{ fontSize: 14 }}
+                        >
+                            close
+                        </span>
+                    </button>
+                </div>
             </div>
-            <div style={{ display: 'flex' }}>
-                <button
-                    className={
-                        location?.type === 'floating'
-                            ? 'demo-icon-button selected'
-                            : 'demo-icon-button'
-                    }
-                    onClick={() => {
-                        if (group) {
-                            props.api.addFloatingGroup(group, {
-                                width: 400,
-                                height: 300,
-                                x: 50,
-                                y: 50,
-                                position: {
-                                    bottom: 50,
-                                    right: 50,
-                                },
-                            });
-                        }
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    paddingTop: 4,
+                    paddingBottom: 2,
+                }}
+            >
+                <span
+                    style={{
+                        fontSize: 11,
+                        color: 'rgba(255,255,255,0.4)',
                     }}
                 >
-                    <span className="material-symbols-outlined">ad_group</span>
-                </button>
+                    Header
+                </span>
                 <select
-                    className="demo-icon-button"
+                    style={selectStyle}
                     value={headerPosition}
                     onChange={(e) => {
                         const value = e.target.value as DockviewHeaderPosition;
@@ -123,68 +248,6 @@ const GroupAction = (props: {
                     <option value="left">left</option>
                     <option value="right">right</option>
                 </select>
-                <button
-                    className={
-                        location?.type === 'popout'
-                            ? 'demo-icon-button selected'
-                            : 'demo-icon-button'
-                    }
-                    onClick={() => {
-                        if (group) {
-                            props.api.addPopoutGroup(group);
-                        }
-                    }}
-                >
-                    <span className="material-symbols-outlined">
-                        open_in_new
-                    </span>
-                </button>
-                <button
-                    className={
-                        isMaximized
-                            ? 'demo-icon-button selected'
-                            : 'demo-icon-button'
-                    }
-                    onClick={() => {
-                        if (group) {
-                            if (group.api.isMaximized()) {
-                                group.api.exitMaximized();
-                            } else {
-                                group.api.maximize();
-                            }
-                        }
-                    }}
-                >
-                    <span className="material-symbols-outlined">
-                        fullscreen
-                    </span>
-                </button>
-                <button
-                    className="demo-icon-button"
-                    onClick={() => {
-                        console.log(group);
-                        if (group) {
-                            if (group.api.isVisible) {
-                                group.api.setVisible(false);
-                            } else {
-                                group.api.setVisible(true);
-                            }
-                        }
-                    }}
-                >
-                    <span className="material-symbols-outlined">
-                        {isVisible ? 'visibility' : 'visibility_off'}
-                    </span>
-                </button>
-                <button
-                    className="demo-icon-button"
-                    onClick={() => {
-                        const panel = props.api?.getGroup(props.groupId);
-                        panel?.api.close();
-                    }}
-                >
-                    <span className="material-symbols-outlined">close</span>
-                </button>
             </div>
         </div>
     );
@@ -196,12 +259,10 @@ export const GroupActions = (props: {
     activeGroup?: string;
 }) => {
     return (
-        <div className="action-container">
-            {props.groups.map((groupId) => {
-                return (
-                    <GroupAction key={groupId} {...props} groupId={groupId} />
-                );
-            })}
+        <div style={{ padding: '2px 0' }}>
+            {props.groups.map((groupId) => (
+                <GroupAction key={groupId} {...props} groupId={groupId} />
+            ))}
         </div>
     );
 };
