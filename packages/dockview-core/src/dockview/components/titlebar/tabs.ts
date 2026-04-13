@@ -310,13 +310,12 @@ export class Tabs extends CompositeDisposable {
                             if (data.tabGroupId) {
                                 // External group drag — look up the
                                 // source tab group to size the gap
-                                const sourceGroup =
-                                    this.accessor.getPanel(data.groupId);
+                                const sourceGroup = this.accessor.getPanel(
+                                    data.groupId
+                                );
                                 const sourceTg = sourceGroup?.model
                                     .getTabGroups()
-                                    .find(
-                                        (tg) => tg.id === data.tabGroupId
-                                    );
+                                    .find((tg) => tg.id === data.tabGroupId);
                                 const panelCount =
                                     sourceTg?.panelIds.length ?? 1;
                                 const groupGapWidth =
@@ -325,8 +324,7 @@ export class Tabs extends CompositeDisposable {
                                 this._animState = {
                                     sourceTabId: '',
                                     sourceIndex: -1,
-                                    tabPositions:
-                                        this.snapshotTabPositions(),
+                                    tabPositions: this.snapshotTabPositions(),
                                     chipPositions:
                                         this._tabGroupManager.snapshotChipWidths(),
                                     currentInsertionIndex: null,
@@ -336,8 +334,7 @@ export class Tabs extends CompositeDisposable {
                                         ? new Set(sourceTg.panelIds)
                                         : new Set<string>(),
                                     sourceChipWidth: avgWidth,
-                                    cursorOffsetFromDragLeft:
-                                        groupGapWidth / 2,
+                                    cursorOffsetFromDragLeft: groupGapWidth / 2,
                                     sourceGapWidth: groupGapWidth,
                                     containerLeft:
                                         this._tabsList.getBoundingClientRect()
@@ -347,8 +344,7 @@ export class Tabs extends CompositeDisposable {
                                 this._animState = {
                                     sourceTabId: data.panelId!,
                                     sourceIndex: -1,
-                                    tabPositions:
-                                        this.snapshotTabPositions(),
+                                    tabPositions: this.snapshotTabPositions(),
                                     chipPositions:
                                         this._tabGroupManager.snapshotChipWidths(),
                                     currentInsertionIndex: null,
@@ -356,8 +352,7 @@ export class Tabs extends CompositeDisposable {
                                     sourceTabGroupId: null,
                                     sourceGroupPanelIds: null,
                                     sourceChipWidth: 0,
-                                    cursorOffsetFromDragLeft:
-                                        avgWidth / 2,
+                                    cursorOffsetFromDragLeft: avgWidth / 2,
                                     sourceGapWidth: avgWidth,
                                     containerLeft:
                                         this._tabsList.getBoundingClientRect()
