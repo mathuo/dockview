@@ -135,9 +135,6 @@ export class TabGroupManager {
             return;
         }
 
-        const groupPanelIds = new Set(tabGroup.panelIds);
-        const underlineEl = this._indicator?.getUnderline(tabGroup.id);
-
         const isVertical = this._ctx.getDirection() === 'vertical';
 
         // Clone the entire tabs list so cloned nodes inherit all
@@ -158,41 +155,16 @@ export class TabGroupManager {
         clone.style.overflow = 'visible';
         clone.style.pointerEvents = 'none';
 
-        // Remove elements not belonging to this group.
-        // Keep: chip, group tabs, group underline.
-        // Walk backwards so removals don't shift indices.
+        // Remove all elements except the chip so the drag ghost
+        // shows only the chip regardless of the group's expanded state.
         const children = Array.from(clone.children);
         const realChildren = Array.from(this._ctx.tabsList.children);
         for (let i = children.length - 1; i >= 0; i--) {
             const real = realChildren[i];
-            if (!real) {
-                children[i].remove();
-                continue;
-            }
-            if (real === chipEl || real === underlineEl) {
-                continue; // keep the chip and underline
-            }
-            if (real.classList.contains('dv-tab')) {
-                const tabEntry = this._ctx
-                    .getTabs()
-                    .find((t) => t.value.element === real);
-                if (tabEntry && groupPanelIds.has(tabEntry.value.panel.id)) {
-                    continue; // keep
-                }
+            if (real === chipEl) {
+                continue; // keep the chip only
             }
             children[i].remove();
-        }
-
-        // Re-position the underline clone as a simple bottom line for the drag ghost
-        const underlineClone = clone.querySelector('.dv-tab-group-underline');
-        if (underlineClone instanceof HTMLElement) {
-            underlineClone.innerHTML = '';
-            underlineClone.style.left = '0px';
-            underlineClone.style.width = '100%';
-            underlineClone.style.top = 'auto';
-            underlineClone.style.bottom = '0';
-            underlineClone.style.height = '2px';
-            underlineClone.style.backgroundColor = `var(--dv-tab-group-color-${tabGroup.color})`;
         }
 
         // Wrap the clone in a minimal ancestor chain so that CSS

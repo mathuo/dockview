@@ -302,26 +302,63 @@ export class Tabs extends CompositeDisposable {
                         const data = getPanelData();
                         if (
                             data &&
-                            data.panelId &&
+                            (data.panelId || data.tabGroupId) &&
                             data.groupId !== this.group.id
                         ) {
                             const avgWidth = this.getAverageTabWidth();
-                            this._animState = {
-                                sourceTabId: data.panelId,
-                                sourceIndex: -1,
-                                tabPositions: this.snapshotTabPositions(),
-                                chipPositions:
-                                    this._tabGroupManager.snapshotChipWidths(),
-                                currentInsertionIndex: null,
-                                targetTabGroupId: null,
-                                sourceTabGroupId: null,
-                                sourceGroupPanelIds: null,
-                                sourceChipWidth: 0,
-                                cursorOffsetFromDragLeft: avgWidth / 2,
-                                sourceGapWidth: avgWidth,
-                                containerLeft:
-                                    this._tabsList.getBoundingClientRect().left,
-                            };
+
+                            if (data.tabGroupId) {
+                                // External group drag — look up the
+                                // source tab group to size the gap
+                                const sourceGroup = this.accessor.getPanel(
+                                    data.groupId
+                                );
+                                const sourceTg = sourceGroup?.model
+                                    .getTabGroups()
+                                    .find((tg) => tg.id === data.tabGroupId);
+                                const panelCount =
+                                    sourceTg?.panelIds.length ?? 1;
+                                const groupGapWidth =
+                                    avgWidth * panelCount + avgWidth;
+
+                                this._animState = {
+                                    sourceTabId: '',
+                                    sourceIndex: -1,
+                                    tabPositions: this.snapshotTabPositions(),
+                                    chipPositions:
+                                        this._tabGroupManager.snapshotChipWidths(),
+                                    currentInsertionIndex: null,
+                                    targetTabGroupId: null,
+                                    sourceTabGroupId: data.tabGroupId,
+                                    sourceGroupPanelIds: sourceTg
+                                        ? new Set(sourceTg.panelIds)
+                                        : new Set<string>(),
+                                    sourceChipWidth: avgWidth,
+                                    cursorOffsetFromDragLeft: groupGapWidth / 2,
+                                    sourceGapWidth: groupGapWidth,
+                                    containerLeft:
+                                        this._tabsList.getBoundingClientRect()
+                                            .left,
+                                };
+                            } else {
+                                this._animState = {
+                                    sourceTabId: data.panelId!,
+                                    sourceIndex: -1,
+                                    tabPositions: this.snapshotTabPositions(),
+                                    chipPositions:
+                                        this._tabGroupManager.snapshotChipWidths(),
+                                    currentInsertionIndex: null,
+                                    targetTabGroupId: null,
+                                    sourceTabGroupId: null,
+                                    sourceGroupPanelIds: null,
+                                    sourceChipWidth: 0,
+                                    cursorOffsetFromDragLeft: avgWidth / 2,
+                                    sourceGapWidth: avgWidth,
+                                    containerLeft:
+                                        this._tabsList.getBoundingClientRect()
+                                            .left,
+                                };
+                            }
                         } else {
                             return;
                         }
