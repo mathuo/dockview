@@ -536,6 +536,55 @@ describe('tabsContainer', () => {
         expect(eventPreventDefaultSpy2).toHaveBeenCalledTimes(0);
     });
 
+    test('that an edge group cannot be floated via shift+click', () => {
+        const accessor = fromPartial<DockviewComponent>({
+            options: {},
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
+            element: document.createElement('div'),
+            addFloatingGroup: jest.fn(),
+            doSetGroupActive: jest.fn(),
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
+        });
+
+        const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+            return (<Partial<DockviewGroupPanel>>{
+                api: {
+                    location: { type: 'edge', position: 'left' },
+                } as any,
+            }) as DockviewGroupPanel;
+        });
+
+        const groupPanel = new groupPanelMock();
+
+        const cut = new TabsContainer(accessor, groupPanel);
+
+        const container = cut.element.querySelector('.dv-void-container')!;
+        expect(container).toBeTruthy();
+
+        jest.spyOn(cut.element, 'getBoundingClientRect').mockImplementation(
+            () => {
+                return { top: 50, left: 100, width: 0, height: 0 } as any;
+            }
+        );
+        jest.spyOn(
+            accessor.element,
+            'getBoundingClientRect'
+        ).mockImplementation(() => {
+            return { top: 10, left: 20, width: 0, height: 0 } as any;
+        });
+
+        const event = new KeyboardEvent('pointerdown', { shiftKey: true });
+        const eventPreventDefaultSpy = jest.spyOn(event, 'preventDefault');
+        fireEvent(container, event);
+
+        expect(accessor.doSetGroupActive).toHaveBeenCalledWith(groupPanel);
+        expect(accessor.addFloatingGroup).toHaveBeenCalledTimes(0);
+        expect(eventPreventDefaultSpy).toHaveBeenCalledTimes(0);
+    });
+
     test('that a tab that is already floating cannot be floated again', () => {
         const accessor = fromPartial<DockviewComponent>({
             options: {},

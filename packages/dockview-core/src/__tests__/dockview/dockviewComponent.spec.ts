@@ -9680,6 +9680,43 @@ describe('dockviewComponent', () => {
             dv.dispose();
         });
 
+        test('edge group cannot be floated via addFloatingGroup', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left']);
+
+            const edgeGroupApi = dv.getEdgeGroup('left')!;
+            const edgeGroup = dv.groups.find((g) => g.id === 'left-group')!;
+
+            expect(edgeGroupApi.location.type).toBe('edge');
+
+            // attempt to float the edge group — should be a no-op
+            dv.addFloatingGroup(edgeGroup);
+
+            // group should still be an edge group, not floating
+            expect(edgeGroupApi.location.type).toBe('edge');
+            expect(dv.groups.length).toBeGreaterThanOrEqual(1);
+
+            dv.dispose();
+        });
+
+        test('edge group cannot be popped out via addPopoutGroup', async () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left']);
+
+            const edgeGroupApi = dv.getEdgeGroup('left')!;
+            const edgeGroup = dv.groups.find((g) => g.id === 'left-group')!;
+
+            expect(edgeGroupApi.location.type).toBe('edge');
+
+            // attempt to popout the edge group — should return false
+            const result = await dv.addPopoutGroup(edgeGroup);
+
+            expect(result).toBe(false);
+            expect(edgeGroupApi.location.type).toBe('edge');
+
+            dv.dispose();
+        });
+
         test('fromJSON auto-creates edge groups from serialized state', () => {
             const c = document.createElement('div');
             // No addEdgeGroup called before fromJSON
