@@ -73,6 +73,105 @@ watch(
     }
 );
 
+watch(
+    () => props.defaultTabComponent,
+    (newValue) => {
+        if (instance.value) {
+            instance.value.updateOptions({
+                defaultTabComponent: newValue,
+                createTabComponent(options) {
+                    let component = findComponent(inst, options.name);
+
+                    if (!component && newValue) {
+                        component = findComponent(inst, newValue);
+                    }
+
+                    if (component) {
+                        return new VueRenderer(component, inst);
+                    }
+                    return undefined;
+                },
+            });
+        }
+    }
+);
+
+watch(
+    () => props.watermarkComponent,
+    (newValue) => {
+        if (instance.value) {
+            instance.value.updateOptions({
+                createWatermarkComponent: newValue
+                    ? () => {
+                          const component = findComponent(inst, newValue);
+                          return new VueWatermarkRenderer(component!, inst);
+                      }
+                    : undefined,
+            });
+        }
+    }
+);
+
+watch(
+    () => props.rightHeaderActionsComponent,
+    (newValue) => {
+        if (instance.value) {
+            instance.value.updateOptions({
+                createRightHeaderActionComponent: newValue
+                    ? (group) => {
+                          const component = findComponent(inst, newValue);
+                          return new VueHeaderActionsRenderer(
+                              component!,
+                              inst,
+                              group
+                          );
+                      }
+                    : undefined,
+            });
+        }
+    }
+);
+
+watch(
+    () => props.leftHeaderActionsComponent,
+    (newValue) => {
+        if (instance.value) {
+            instance.value.updateOptions({
+                createLeftHeaderActionComponent: newValue
+                    ? (group) => {
+                          const component = findComponent(inst, newValue);
+                          return new VueHeaderActionsRenderer(
+                              component!,
+                              inst,
+                              group
+                          );
+                      }
+                    : undefined,
+            });
+        }
+    }
+);
+
+watch(
+    () => props.prefixHeaderActionsComponent,
+    (newValue) => {
+        if (instance.value) {
+            instance.value.updateOptions({
+                createPrefixHeaderActionComponent: newValue
+                    ? (group) => {
+                          const component = findComponent(inst, newValue);
+                          return new VueHeaderActionsRenderer(
+                              component!,
+                              inst,
+                              group
+                          );
+                      }
+                    : undefined,
+            });
+        }
+    }
+);
+
 onMounted(() => {
     if (!el.value) {
         throw new Error('dockview-vue: element is not mounted');
@@ -146,6 +245,10 @@ onMounted(() => {
     };
 
     const coreOptions = extractCoreOptions(props);
+
+    if (props.defaultTabComponent) {
+        frameworkOptions.defaultTabComponent = props.defaultTabComponent;
+    }
 
     if (props.tabGroupChipComponent) {
         const chipComponentName = props.tabGroupChipComponent;
