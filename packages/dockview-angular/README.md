@@ -28,6 +28,8 @@ Please see the website: https://dockview.dev
 -   Tab and Group docking / Drag n' Drop
 -   Popout Windows
 -   Floating Groups
+-   Edge Groups
+-   Tab Groups
 -   Extensive API
 -   Supports Shadow DOMs
 -   High test coverage

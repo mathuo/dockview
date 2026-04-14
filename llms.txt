@@ -9,6 +9,8 @@ Dockview is an open-source docking layout library that lets you build IDE-like a
 - Zero runtime dependencies
 - Drag and drop with customizable drop zones
 - Floating/overlay groups
+- Edge groups (panels pinned to layout edges with collapse/expand)
+- Tab groups (visual tab organization with colored chips)
 - Popout windows (extracting panels to separate browser windows)
 - Full serialization and deserialization for state persistence
 - Theming system with CSS custom properties
