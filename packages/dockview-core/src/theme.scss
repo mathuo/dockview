@@ -24,7 +24,6 @@
     --dv-active-sash-transition-delay: 0.5s;
 
     // spacing variables — overridden by dockview-design-space-mixin / .dockview-spaced
-    --dv-gap: 0px;
     --dv-spacing-padding: 0px;
     --dv-tab-border-radius: 0px;
     --dv-sash-border-radius: 0px;
@@ -1007,7 +1006,7 @@
 // ─── Utility class ───────────────────────────────────────────────────────────
 // Apply to any dockview root to enable the spaced layout (rounded corners,
 // inter-group gaps, padded edges). Can be combined with any theme class.
-// Individual spacing variables (--dv-gap, --dv-spacing-padding, etc.) can be
+// Individual spacing variables (--dv-spacing-padding, etc.) can be
 // overridden on the element after this class is applied.
 
 .dockview-spaced {
