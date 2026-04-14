@@ -9078,6 +9078,109 @@ describe('dockviewComponent', () => {
             );
         });
 
+        test('fromJSON with collapsed tab groups does not activate collapsed panels', () => {
+            dockview.layout(1000, 1000);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+            const panel3 = dockview.addPanel({
+                id: 'panel3',
+                component: 'default',
+            });
+
+            const groupId = panel1.group.id;
+
+            // Create a collapsed tab group containing panel1 and panel2
+            const tg1 = dockview.api.createTabGroup({
+                groupId,
+                label: 'Collapsed',
+                color: 'blue',
+            });
+            dockview.api.addPanelToTabGroup({
+                groupId,
+                tabGroupId: tg1.id,
+                panelId: 'panel1',
+            });
+            dockview.api.addPanelToTabGroup({
+                groupId,
+                tabGroupId: tg1.id,
+                panelId: 'panel2',
+            });
+            tg1.collapse();
+
+            // panel3 is ungrouped and should be the active panel
+            expect(panel1.group.activePanel?.id).toBe('panel3');
+
+            // Snapshot and restore
+            const state = dockview.toJSON();
+            dockview.fromJSON(state);
+
+            // After restore, the active panel should NOT be in the collapsed group
+            const restoredGroup = dockview.api.panels[0].group;
+            const activeId = restoredGroup.activePanel?.id;
+
+            expect(activeId).toBe('panel3');
+
+            // Verify collapsed group was restored correctly
+            const restored = dockview.api.getTabGroups({
+                groupId: restoredGroup.id,
+            });
+            const collapsedGroup = restored.find(
+                (tg) => tg.label === 'Collapsed'
+            );
+            expect(collapsedGroup).toBeDefined();
+            expect(collapsedGroup!.collapsed).toBe(true);
+        });
+
+        test('fromJSON with all panels in collapsed groups shows watermark', () => {
+            dockview.layout(1000, 1000);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel2',
+                component: 'default',
+            });
+
+            const groupId = panel1.group.id;
+
+            const tg = dockview.api.createTabGroup({
+                groupId,
+                label: 'AllCollapsed',
+                color: 'red',
+            });
+            dockview.api.addPanelToTabGroup({
+                groupId,
+                tabGroupId: tg.id,
+                panelId: 'panel1',
+            });
+            dockview.api.addPanelToTabGroup({
+                groupId,
+                tabGroupId: tg.id,
+                panelId: 'panel2',
+            });
+            tg.collapse();
+
+            const state = dockview.toJSON();
+            dockview.fromJSON(state);
+
+            // All panels are in collapsed groups — no active panel,
+            // watermark should be shown
+            const restoredGroup = dockview.api.panels[0].group;
+            const restored = dockview.api.getTabGroups({
+                groupId: restoredGroup.id,
+            });
+            expect(restored[0].collapsed).toBe(true);
+        });
+
         test('fromJSON with tab groups fires correct events', () => {
             dockview.layout(1000, 1000);
 
