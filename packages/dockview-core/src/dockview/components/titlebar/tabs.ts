@@ -302,8 +302,7 @@ export class Tabs extends CompositeDisposable {
                         if (
                             data?.tabGroupId &&
                             data.groupId !== this.group.id &&
-                            this._animState.sourceTabGroupId !==
-                                data.tabGroupId
+                            this._animState.sourceTabGroupId !== data.tabGroupId
                         ) {
                             this._animState = null;
                         }
@@ -1621,17 +1620,11 @@ export class Tabs extends CompositeDisposable {
                 this._clearGroupDragClasses(sourceTabGroupId);
                 const firstPositions = this.snapshotTabPositions();
                 this.resetTabTransforms();
-                this.group.model.moveTabGroup(
-                    sourceTabGroupId,
-                    insertionIndex
-                );
+                this.group.model.moveTabGroup(sourceTabGroupId, insertionIndex);
                 this.runFlipAnimation(firstPositions, '', false);
             } else {
                 this._tabGroupManager.skipNextCollapseAnimation = true;
-                this.group.model.moveTabGroup(
-                    sourceTabGroupId,
-                    insertionIndex
-                );
+                this.group.model.moveTabGroup(sourceTabGroupId, insertionIndex);
             }
         } else if (data) {
             // Cross-group: delegate to the component-level move which
