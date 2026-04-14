@@ -72,8 +72,7 @@ describe('DockviewVue Component', () => {
         });
         await flushPromises();
 
-        const api = (wrapper.emitted('ready')![0][0] as any)
-            .api as DockviewApi;
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
 
         api.addPanel({
             id: 'panel-1',
@@ -91,8 +90,7 @@ describe('DockviewVue Component', () => {
         });
         await flushPromises();
 
-        const api = (wrapper.emitted('ready')![0][0] as any)
-            .api as DockviewApi;
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
         const updateSpy = vi.spyOn(api, 'updateOptions');
 
         await wrapper.setProps({ defaultTabComponent: 'MockTab2' });
@@ -110,8 +108,7 @@ describe('DockviewVue Component', () => {
         wrapper = mountDockview();
         await flushPromises();
 
-        const api = (wrapper.emitted('ready')![0][0] as any)
-            .api as DockviewApi;
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
         const updateSpy = vi.spyOn(api, 'updateOptions');
 
         await wrapper.setProps({ watermarkComponent: 'MockWatermark' });
@@ -130,8 +127,7 @@ describe('DockviewVue Component', () => {
         });
         await flushPromises();
 
-        const api = (wrapper.emitted('ready')![0][0] as any)
-            .api as DockviewApi;
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
         const updateSpy = vi.spyOn(api, 'updateOptions');
 
         await wrapper.setProps({ watermarkComponent: undefined });
@@ -148,8 +144,7 @@ describe('DockviewVue Component', () => {
         wrapper = mountDockview();
         await flushPromises();
 
-        const api = (wrapper.emitted('ready')![0][0] as any)
-            .api as DockviewApi;
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
         const updateSpy = vi.spyOn(api, 'updateOptions');
 
         await wrapper.setProps({
@@ -168,8 +163,7 @@ describe('DockviewVue Component', () => {
         wrapper = mountDockview();
         await flushPromises();
 
-        const api = (wrapper.emitted('ready')![0][0] as any)
-            .api as DockviewApi;
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
         const updateSpy = vi.spyOn(api, 'updateOptions');
 
         await wrapper.setProps({
@@ -188,8 +182,7 @@ describe('DockviewVue Component', () => {
         wrapper = mountDockview();
         await flushPromises();
 
-        const api = (wrapper.emitted('ready')![0][0] as any)
-            .api as DockviewApi;
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
         const updateSpy = vi.spyOn(api, 'updateOptions');
 
         await wrapper.setProps({
@@ -208,8 +201,7 @@ describe('DockviewVue Component', () => {
         wrapper = mountDockview();
         await flushPromises();
 
-        const api = (wrapper.emitted('ready')![0][0] as any)
-            .api as DockviewApi;
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
         const updateSpy = vi.spyOn(api, 'updateOptions');
 
         await wrapper.setProps({
@@ -228,8 +220,7 @@ describe('DockviewVue Component', () => {
         wrapper = mountDockview();
         await flushPromises();
 
-        const api = (wrapper.emitted('ready')![0][0] as any)
-            .api as DockviewApi;
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
         const disposeSpy = vi.spyOn(api, 'dispose');
 
         wrapper.unmount();

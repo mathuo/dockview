@@ -1,4 +1,12 @@
-import { vi, describe, test, expect, beforeEach, afterEach, Mock } from 'vitest';
+import {
+    vi,
+    describe,
+    test,
+    expect,
+    beforeEach,
+    afterEach,
+    Mock,
+} from 'vitest';
 import {
     DockviewEmitter,
     DockviewGroupPanel,

@@ -44,6 +44,7 @@
         "type": "git",
         "url": "git+https://github.com/mathuo/dockview.git"
     },
+    "type": "module",
     "license": "MIT",
     "author": "https://github.com/mathuo",
     "files": [
@@ -54,7 +55,7 @@
         "build:bundle": "echo 'noop'",
         "build:js": "vite build",
         "build:types": "vue-tsc --project tsconfig.build-types.json --declaration --emitDeclarationOnly --outDir dist/types",
-        "build:css": "node scripts/copy-css.js",
+        "build:css": "node scripts/copy-css.cjs",
         "build": "npm run build:js && npm run build:types && npm run build:css",
         "clean": "rimraf dist/ .build/ .rollup.cache/",
         "rebuild": "npm run clean && npm run build",
