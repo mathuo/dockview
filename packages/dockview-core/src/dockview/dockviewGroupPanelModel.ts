@@ -1441,7 +1441,13 @@ export class DockviewGroupPanelModel
         this.tabsContainer.setActive(this.isActive);
 
         if (!this._activePanel && this.panels.length > 0) {
-            this.doSetActivePanel(this.panels[0]);
+            const candidate = this._panels.find((p) => {
+                const tg = this._findTabGroupForPanel(p.id);
+                return !tg || !tg.collapsed;
+            });
+            if (candidate) {
+                this.doSetActivePanel(candidate);
+            }
         }
 
         this.updateContainer();

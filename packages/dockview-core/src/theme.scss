@@ -1110,30 +1110,15 @@
     }
 }
 
-// Pure-CSS tab group indicator — active when tabGroupIndicator is 'none'.
-// Applied generically so any theme can opt in via the theme property.
+// Tab group indicator 'none' mode — uses a JS-positioned continuous bar
+// (NoneTabGroupIndicator) instead of per-tab box-shadows, so the indicator
+// spans the full tab group width without gaps in spaced themes.
+// The flat bar always sits at the bottom (or left for vertical) edge of
+// the tab bar, so we undo the header-bottom override that moves the
+// wrap indicator's full-height SVG to top: 0.
 .dv-tab-group-indicator-none {
-    .dv-tab.dv-tab--grouped {
-        box-shadow: inset 0 -2px 0 var(--dv-tab-group-color);
-    }
-
-    .dv-tab-group-chip {
-        box-shadow: inset 0 -2px 0 var(--dv-tab-group-color);
-    }
-
-    // Header-bottom: overline instead of underline
-    .dv-groupview-header-bottom {
-        .dv-tab.dv-tab--grouped,
-        .dv-tab-group-chip {
-            box-shadow: inset 0 2px 0 var(--dv-tab-group-color);
-        }
-    }
-
-    // Vertical tabs: sideline instead of underline
-    .dv-tabs-container-vertical {
-        .dv-tab.dv-tab--grouped,
-        .dv-tab-group-chip {
-            box-shadow: inset 2px 0 0 var(--dv-tab-group-color);
-        }
+    .dv-groupview-header-bottom .dv-tab-group-underline {
+        top: auto;
+        bottom: 0;
     }
 }

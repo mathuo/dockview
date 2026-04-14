@@ -21,15 +21,19 @@ export interface ITabGroupIndicator {
     dispose(): void;
 }
 
-export class WrapTabGroupIndicator implements ITabGroupIndicator {
-    private readonly _underlines = new Map<string, HTMLElement>();
+/**
+ * Shared positioning logic for tab group indicators.
+ * Subclasses implement `applyShape` to control the visual output.
+ */
+abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
+    protected readonly _underlines = new Map<string, HTMLElement>();
     private _rafId: number | null = null;
 
     get underlines(): ReadonlyMap<string, HTMLElement> {
         return this._underlines;
     }
 
-    constructor(private readonly _ctx: TabGroupIndicatorContext) {}
+    constructor(protected readonly _ctx: TabGroupIndicatorContext) {}
 
     positionUnderlines(): void {
         requestAnimationFrame(() => {
@@ -96,6 +100,21 @@ export class WrapTabGroupIndicator implements ITabGroupIndicator {
         }
         this._underlines.clear();
     }
+
+    /**
+     * Apply the visual shape to the underline element.
+     * Called once per tab group per frame with the computed geometry.
+     */
+    protected abstract applyShape(
+        underline: HTMLElement,
+        tg: ITabGroup,
+        startEdge: number,
+        span: number,
+        containerCrossSize: number,
+        activePanelId: string | undefined,
+        containerRect: DOMRect,
+        isVertical: boolean
+    ): void;
 
     private _positionUnderlinesSync(): void {
         const containerRect = this._ctx.tabsList.getBoundingClientRect();
@@ -235,8 +254,7 @@ export class WrapTabGroupIndicator implements ITabGroupIndicator {
                 underline.style.height = '';
             }
 
-            // Chrome-style wrap-around contour
-            this._applyUnderlineShape(
+            this.applyShape(
                 underline,
                 tg,
                 startEdge,
@@ -248,7 +266,12 @@ export class WrapTabGroupIndicator implements ITabGroupIndicator {
             );
         }
     }
+}
 
+/**
+ * Chrome-style wrap-around indicator using SVG paths.
+ */
+export class WrapTabGroupIndicator extends BaseTabGroupIndicator {
     private _applyStraightLine(
         svg: SVGSVGElement,
         path: SVGPathElement,
@@ -280,7 +303,7 @@ export class WrapTabGroupIndicator implements ITabGroupIndicator {
      * The SVG and path elements are created once per underline and reused;
      * only the `d`, `stroke`, and viewport attributes are updated each frame.
      */
-    private _applyUnderlineShape(
+    protected applyShape(
         underline: HTMLElement,
         tg: ITabGroup,
         groupStart: number,
@@ -430,6 +453,47 @@ export class WrapTabGroupIndicator implements ITabGroupIndicator {
             ].join(' ');
 
             path.setAttribute('d', d);
+        }
+    }
+}
+
+/**
+ * Flat continuous bar indicator — no wrap-around, just a colored line
+ * spanning the full tab group width.
+ */
+export class NoneTabGroupIndicator extends BaseTabGroupIndicator {
+    protected applyShape(
+        underline: HTMLElement,
+        tg: ITabGroup,
+        _startEdge: number,
+        span: number,
+        _containerCrossSize: number,
+        _activePanelId: string | undefined,
+        _containerRect: DOMRect,
+        isVertical: boolean
+    ): void {
+        const t = 2; // line thickness in px
+        const color = `var(--dv-tab-group-color-${tg.color})`;
+
+        if (span <= 0) {
+            underline.style.display = 'none';
+            return;
+        }
+        underline.style.display = '';
+
+        // Clear any SVG content left over from a mode switch
+        if (underline.firstElementChild) {
+            underline.innerHTML = '';
+        }
+
+        underline.style.backgroundColor = color;
+
+        if (isVertical) {
+            underline.style.width = `${t}px`;
+            underline.style.height = `${span}px`;
+        } else {
+            underline.style.width = `${span}px`;
+            underline.style.height = `${t}px`;
         }
     }
 }

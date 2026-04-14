@@ -290,16 +290,37 @@ export class Tabs extends CompositeDisposable {
                 this._tabsList,
                 'dragover',
                 (event) => {
+                    if (this.accessor.options.disableDnd) {
+                        return;
+                    }
+
+                    // If _animState exists but belongs to a different
+                    // drag (stale from a previous operation), replace it
+                    // so the current drag is handled correctly.
+                    if (this._animState) {
+                        const data = getPanelData();
+                        if (
+                            data?.tabGroupId &&
+                            data.groupId !== this.group.id &&
+                            this._animState.sourceTabGroupId !== data.tabGroupId
+                        ) {
+                            this._animState = null;
+                        }
+                    }
+
                     if (!this._animState) {
-                        // Check for external drag from another group
+                        const data = getPanelData();
+                        // In default animation mode, individual tab drops
+                        // are handled by per-tab Droptargets. But tab group
+                        // chip drags still need tab-list-level handling so
+                        // that drops on gaps / void space work.
                         if (
                             this.accessor.options.theme?.tabAnimation ===
-                                'default' ||
-                            this.accessor.options.disableDnd
+                                'default' &&
+                            !data?.tabGroupId
                         ) {
                             return;
                         }
-                        const data = getPanelData();
                         if (
                             data &&
                             (data.panelId || data.tabGroupId) &&
@@ -413,14 +434,6 @@ export class Tabs extends CompositeDisposable {
                     this.resetTabTransforms();
                     if (this._animState) {
                         if (this._animState.sourceIndex === -1) {
-                            // External drag left the header entirely — clear
-                            // state (no dragend will fire on this tab list).
-                            // Also clear the anchor overlay: the tab-level
-                            // Droptarget onDragLeave does not clear the
-                            // override target, so if the drag re-enters
-                            // another group's header where canDisplayOverlay
-                            // returns false (e.g. same-group smooth mode) the
-                            // overlay would remain stranded here.
                             this.group.model.dropTargetContainer?.model?.clear();
                             this._animState = null;
                         } else {
@@ -431,8 +444,6 @@ export class Tabs extends CompositeDisposable {
                 true
             ),
             addDisposableListener(this._tabsList, 'dragend', () => {
-                // Only fires for cancel (not after successful drop, since
-                // source tab is removed from DOM and doesn't bubble)
                 this.resetDragAnimation();
             }),
             addDisposableListener(
@@ -727,7 +738,6 @@ export class Tabs extends CompositeDisposable {
                 this._pendingCollapse = false;
 
                 const tabIndex = this._tabs.findIndex((x) => x.value === tab);
-
                 if (animState) {
                     const dropIndex =
                         event.position === 'right' ? tabIndex + 1 : tabIndex;
@@ -1591,18 +1601,47 @@ export class Tabs extends CompositeDisposable {
         sourceTabGroupId: string,
         insertionIndex: number
     ): void {
+        // Read transfer data BEFORE disposing cleanup — disposing
+        // _chipDragCleanup clears the global LocalSelectionTransfer
+        // singleton which getPanelData() reads from.
+        const data = getPanelData();
+
         this._chipDragCleanup?.dispose();
         this._chipDragCleanup = null;
 
-        if (this.accessor.options.theme?.tabAnimation === 'smooth') {
-            this._clearGroupDragClasses(sourceTabGroupId);
-            const firstPositions = this.snapshotTabPositions();
-            this.resetTabTransforms();
-            this.group.model.moveTabGroup(sourceTabGroupId, insertionIndex);
-            this.runFlipAnimation(firstPositions, '', false);
-        } else {
-            this._tabGroupManager.skipNextCollapseAnimation = true;
-            this.group.model.moveTabGroup(sourceTabGroupId, insertionIndex);
+        // Check if the tab group exists in this group (within-group reorder)
+        // or in another group (cross-group move).
+        const isLocal = this.group.model
+            .getTabGroups()
+            .some((tg) => tg.id === sourceTabGroupId);
+
+        if (isLocal) {
+            if (this.accessor.options.theme?.tabAnimation === 'smooth') {
+                this._clearGroupDragClasses(sourceTabGroupId);
+                const firstPositions = this.snapshotTabPositions();
+                this.resetTabTransforms();
+                this.group.model.moveTabGroup(sourceTabGroupId, insertionIndex);
+                this.runFlipAnimation(firstPositions, '', false);
+            } else {
+                this._tabGroupManager.skipNextCollapseAnimation = true;
+                this.group.model.moveTabGroup(sourceTabGroupId, insertionIndex);
+            }
+        } else if (data) {
+            // Cross-group: delegate to the component-level move which
+            // handles panel transfer and tab group recreation.
+            // Use the REAL tab group ID from transfer data, not the
+            // potentially stale one from _animState.
+            this.accessor.moveGroupOrPanel({
+                from: {
+                    groupId: data.groupId,
+                    tabGroupId: data.tabGroupId ?? sourceTabGroupId,
+                },
+                to: {
+                    group: this.group,
+                    position: 'center',
+                    index: insertionIndex,
+                },
+            });
         }
     }
 

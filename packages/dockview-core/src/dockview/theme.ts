@@ -52,10 +52,8 @@ export interface DockviewTheme {
      *
      * - `'wrap'` (default): Chrome-style SVG underline that wraps around the active tab
      *   with rounded corners. Requires JavaScript for positioning and path computation.
-     * - `'none'`: No JS-drawn indicator. The theme relies purely on CSS using the
-     *   classes and custom property applied to tab elements:
-     *   `dv-tab--grouped`, `dv-tab--group-first`, `dv-tab--group-last`,
-     *   and `--dv-tab-group-color` (resolved color for the tab's group).
+     * - `'none'`: Flat continuous colored bar spanning the full tab group width.
+     *   Unlike `'wrap'`, the bar does not curve around the active tab.
      */
     tabGroupIndicator?: DockviewTabGroupIndicator;
     /**

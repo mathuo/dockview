@@ -452,6 +452,27 @@ const DockviewDemo = (props: {
 
             defaultConfig(api);
             populateEdgeGroups();
+
+            // Create a tab group in the bottom edge group
+            const bottomEdge = api.getEdgeGroup('bottom');
+            if (bottomEdge) {
+                const logs = api.createTabGroup({
+                    groupId: bottomEdge.id,
+                    label: 'Logs',
+                    color: 'purple',
+                });
+                api.addPanelToTabGroup({
+                    groupId: bottomEdge.id,
+                    tabGroupId: logs.id,
+                    panelId: 'bottom-1',
+                });
+                api.addPanelToTabGroup({
+                    groupId: bottomEdge.id,
+                    tabGroupId: logs.id,
+                    panelId: 'bottom-2',
+                });
+            }
+
             setLayoutReady(true);
         };
 
