@@ -1715,6 +1715,73 @@ describe('dockviewGroupPanelModel', () => {
             expect(groupview.model.activePanel?.id).toBe('panel2');
         });
 
+        test('setActive selects first non-collapsed panel as fallback', () => {
+            const panel1 = new TestPanel('panel1', panelApi);
+            const panel2 = new TestPanel('panel2', panelApi);
+            const panel3 = new TestPanel('panel3', panelApi);
+            groupview.model.openPanel(panel1);
+            groupview.model.openPanel(panel2);
+            groupview.model.openPanel(panel3);
+
+            const tg1 = groupview.model.createTabGroup({ label: 'G1' });
+            const tg2 = groupview.model.createTabGroup({ label: 'G2' });
+            groupview.model.addPanelToTabGroup(tg1.id, 'panel1');
+            groupview.model.addPanelToTabGroup(tg1.id, 'panel2');
+            groupview.model.addPanelToTabGroup(tg2.id, 'panel3');
+
+            // Collapse tg1 (which contains panel1 and panel2)
+            tg1.collapse();
+
+            // Clear the active panel to simulate the setActive fallback path
+            (groupview.model as any)._activePanel = undefined;
+
+            // Force setActive to re-evaluate
+            groupview.model.setActive(true, true);
+
+            // panel3 is in a non-collapsed group, so it should be selected
+            expect(groupview.model.activePanel?.id).toBe('panel3');
+        });
+
+        test('setActive skips all panels when all groups are collapsed', () => {
+            const panel1 = new TestPanel('panel1', panelApi);
+            const panel2 = new TestPanel('panel2', panelApi);
+            groupview.model.openPanel(panel1);
+            groupview.model.openPanel(panel2);
+
+            const tg = groupview.model.createTabGroup({ label: 'All' });
+            groupview.model.addPanelToTabGroup(tg.id, 'panel1');
+            groupview.model.addPanelToTabGroup(tg.id, 'panel2');
+
+            tg.collapse();
+
+            // Clear active panel
+            (groupview.model as any)._activePanel = undefined;
+
+            groupview.model.setActive(true, true);
+
+            // No non-collapsed panel exists, so no fallback
+            expect(groupview.model.activePanel).toBeUndefined();
+        });
+
+        test('setActive selects ungrouped panel over collapsed group panel', () => {
+            const panel1 = new TestPanel('panel1', panelApi);
+            const panel2 = new TestPanel('panel2', panelApi);
+            groupview.model.openPanel(panel1);
+            groupview.model.openPanel(panel2);
+
+            // panel1 is in a collapsed group, panel2 is ungrouped
+            const tg = groupview.model.createTabGroup({ label: 'Collapsed' });
+            groupview.model.addPanelToTabGroup(tg.id, 'panel1');
+            tg.collapse();
+
+            (groupview.model as any)._activePanel = undefined;
+
+            groupview.model.setActive(true, true);
+
+            // panel2 is ungrouped (no tab group) so it qualifies as a fallback
+            expect(groupview.model.activePanel?.id).toBe('panel2');
+        });
+
         test('toJSON/restoreTabGroups round-trip preserves state', () => {
             const panel1 = new TestPanel('panel1', panelApi);
             const panel2 = new TestPanel('panel2', panelApi);

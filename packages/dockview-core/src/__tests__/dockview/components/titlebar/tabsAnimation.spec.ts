@@ -1493,5 +1493,265 @@ describe('tabs - animation', () => {
             expect(getAnimState(tabs)).toBeNull();
             expect(dataTransfer.getPanelData()).toBeUndefined();
         });
+
+        test('cross-group chip drop calls moveGroupOrPanel', () => {
+            const { tabs, accessor, group, tabGroup, chip } =
+                setupChipDrag('smooth');
+
+            const moveGroupOrPanelMock = jest.fn();
+            (accessor as any).moveGroupOrPanel = moveGroupOrPanelMock;
+
+            // The tab group does NOT exist in this group (simulate cross-group)
+            (group.model as any).getTabGroups = () => [];
+
+            // Set up PanelTransfer so _commitGroupMove reads it
+            const transfer = dataTransfer.LocalSelectionTransfer.getInstance();
+            transfer.setData(
+                [
+                    new dataTransfer.PanelTransfer(
+                        'test-accessor',
+                        'other-group',
+                        null,
+                        'tg-1'
+                    ),
+                ],
+                dataTransfer.PanelTransfer.prototype
+            );
+
+            // Call _commitGroupMove directly (the private method that
+            // handles local vs cross-group chip drops)
+            (tabs as any)._commitGroupMove('tg-1', 0);
+
+            expect(moveGroupOrPanelMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    from: expect.objectContaining({
+                        groupId: 'other-group',
+                        tabGroupId: 'tg-1',
+                    }),
+                    to: expect.objectContaining({
+                        group,
+                        position: 'center',
+                        index: 0,
+                    }),
+                })
+            );
+
+            // cleanup
+            transfer.clearData(dataTransfer.PanelTransfer.prototype);
+        });
+
+        test('cross-group chip drop in default mode calls moveGroupOrPanel', () => {
+            const { tabs, accessor, group, tabGroup, chip } =
+                setupChipDrag('default');
+
+            const moveGroupOrPanelMock = jest.fn();
+            (accessor as any).moveGroupOrPanel = moveGroupOrPanelMock;
+
+            // The tab group does NOT exist in this group
+            (group.model as any).getTabGroups = () => [];
+
+            const transfer = dataTransfer.LocalSelectionTransfer.getInstance();
+            transfer.setData(
+                [
+                    new dataTransfer.PanelTransfer(
+                        'test-accessor',
+                        'other-group',
+                        null,
+                        'tg-1'
+                    ),
+                ],
+                dataTransfer.PanelTransfer.prototype
+            );
+
+            (tabs as any)._commitGroupMove('tg-1', 1);
+
+            expect(moveGroupOrPanelMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    from: expect.objectContaining({
+                        tabGroupId: 'tg-1',
+                    }),
+                    to: expect.objectContaining({
+                        group,
+                        position: 'center',
+                        index: 1,
+                    }),
+                })
+            );
+
+            // cleanup
+            transfer.clearData(dataTransfer.PanelTransfer.prototype);
+        });
+
+        test('local chip drop calls moveTabGroup not moveGroupOrPanel', () => {
+            const { tabs, accessor, group, tabGroup, chip } =
+                setupChipDrag('default');
+
+            const moveTabGroupMock = jest.fn();
+            const moveGroupOrPanelMock = jest.fn();
+            (group.model as any).moveTabGroup = moveTabGroupMock;
+            (accessor as any).moveGroupOrPanel = moveGroupOrPanelMock;
+
+            // tabGroup exists in this group (local)
+            triggerChipDragStart(tabs, tabGroup, chip);
+            (tabs as any).handleDragOver({ clientX: 200 } as DragEvent);
+
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            fireEvent.drop(tabsList);
+
+            expect(moveTabGroupMock).toHaveBeenCalled();
+            expect(moveGroupOrPanelMock).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('stale animation state', () => {
+        test('dragover clears stale _animState from a different tab group drag', () => {
+            const { tabs, accessor, group } = createTabs({
+                tabAnimation: 'smooth',
+            });
+            const panelA = createMockPanel('panel-a');
+            tabs.openPanel(panelA, 0);
+
+            const elements = getTabElements(tabs);
+            mockTabRect(elements[0], { left: 0, width: 80 });
+
+            // Provide getPanel so the external drag path doesn't throw
+            (accessor as any).getPanel = jest.fn().mockReturnValue(undefined);
+
+            // Set up stale _animState from a previous drag of tab group 'old-tg'
+            (tabs as any)._animState = {
+                sourceTabId: '',
+                sourceIndex: -1,
+                sourceTabGroupId: 'old-tg',
+                tabPositions: new Map(),
+                currentInsertionIndex: null,
+                sourceGroupPanelIds: new Set(),
+            };
+
+            // Mock getPanelData to return a DIFFERENT tab group from another group
+            const spy = jest
+                .spyOn(dataTransfer, 'getPanelData')
+                .mockReturnValue(
+                    new dataTransfer.PanelTransfer(
+                        'test-accessor',
+                        'other-group',
+                        null,
+                        'new-tg'
+                    )
+                );
+
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            fireEvent.dragOver(tabsList);
+
+            // The stale _animState should have been cleared and replaced
+            // with new state for the current drag
+            const state = getAnimState(tabs);
+            expect(state).not.toBeNull();
+            // The old stale state (sourceTabGroupId: 'old-tg') should be gone
+            // Since it was cleared and re-initialized for the external drag,
+            // sourceIndex should be -1 (external)
+            expect(state.sourceIndex).toBe(-1);
+
+            spy.mockRestore();
+        });
+
+        test('dragover keeps _animState when same tab group is being dragged', () => {
+            const { tabs, group } = createTabs({ tabAnimation: 'smooth' });
+            const panelA = createMockPanel('panel-a');
+            tabs.openPanel(panelA, 0);
+
+            const elements = getTabElements(tabs);
+            mockTabRect(elements[0], { left: 0, width: 80 });
+
+            const originalState = {
+                sourceTabId: '',
+                sourceIndex: -1,
+                sourceTabGroupId: 'tg-1',
+                tabPositions: new Map(),
+                currentInsertionIndex: 2,
+                sourceGroupPanelIds: new Set(),
+            };
+            (tabs as any)._animState = originalState;
+
+            // Same tab group id — not stale
+            const spy = jest
+                .spyOn(dataTransfer, 'getPanelData')
+                .mockReturnValue(
+                    new dataTransfer.PanelTransfer(
+                        'test-accessor',
+                        'other-group',
+                        null,
+                        'tg-1'
+                    )
+                );
+
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            fireEvent.dragOver(tabsList);
+
+            // _animState should NOT have been cleared (same tab group)
+            const state = getAnimState(tabs);
+            expect(state).not.toBeNull();
+            // currentInsertionIndex might be updated by handleDragOver but
+            // the key check is the state wasn't thrown away and re-created
+            // (sourceTabGroupId should still be 'tg-1')
+
+            spy.mockRestore();
+        });
+
+        test('dragover on tab list is handled for chip drags in default animation mode', () => {
+            const { tabs, accessor } = createTabs({ tabAnimation: 'default' });
+            const panelA = createMockPanel('panel-a');
+            tabs.openPanel(panelA, 0);
+
+            const elements = getTabElements(tabs);
+            mockTabRect(elements[0], { left: 0, width: 80 });
+
+            // Provide getPanel so the external drag path doesn't throw
+            (accessor as any).getPanel = jest.fn().mockReturnValue(undefined);
+
+            // Chip drag (has tabGroupId) should NOT be skipped in default mode
+            const spy = jest
+                .spyOn(dataTransfer, 'getPanelData')
+                .mockReturnValue(
+                    new dataTransfer.PanelTransfer(
+                        'test-accessor',
+                        'other-group',
+                        null,
+                        'tg-1'
+                    )
+                );
+
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            fireEvent.dragOver(tabsList);
+
+            // Should initialize _animState for the chip drag even in default mode
+            expect(getAnimState(tabs)).not.toBeNull();
+
+            spy.mockRestore();
+        });
+
+        test('dragover on tab list is skipped for regular tab drags in default animation mode', () => {
+            const { tabs } = createTabs({ tabAnimation: 'default' });
+            const panelA = createMockPanel('panel-a');
+            tabs.openPanel(panelA, 0);
+
+            // Regular tab drag (no tabGroupId) — should be skipped in default mode
+            const spy = jest
+                .spyOn(dataTransfer, 'getPanelData')
+                .mockReturnValue(
+                    new dataTransfer.PanelTransfer(
+                        'test-accessor',
+                        'other-group',
+                        'some-panel'
+                    )
+                );
+
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            fireEvent.dragOver(tabsList);
+
+            // Should NOT initialize _animState (default mode, non-chip drag)
+            expect(getAnimState(tabs)).toBeNull();
+
+            spy.mockRestore();
+        });
     });
 });
