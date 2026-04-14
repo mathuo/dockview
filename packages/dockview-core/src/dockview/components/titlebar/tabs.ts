@@ -92,6 +92,7 @@ export class Tabs extends CompositeDisposable {
 
     private readonly _onOverflowTabsChange = new Emitter<{
         tabs: string[];
+        tabGroups: string[];
         reset: boolean;
     }>();
     readonly onOverflowTabsChange = this._onOverflowTabsChange.event;
@@ -900,19 +901,63 @@ export class Tabs extends CompositeDisposable {
     }
 
     private toggleDropdown(options: { reset: boolean }): void {
-        const tabs = options.reset
-            ? []
-            : this._tabs
-                  .filter(
-                      (tab) =>
-                          !isChildEntirelyVisibleWithinParent(
-                              tab.value.element,
-                              this._tabsList
-                          )
-                  )
-                  .map((x) => x.value.panel.id);
+        if (options.reset) {
+            this._onOverflowTabsChange.fire({
+                tabs: [],
+                tabGroups: [],
+                reset: true,
+            });
+            return;
+        }
 
-        this._onOverflowTabsChange.fire({ tabs, reset: options.reset });
+        const tabs = this._tabs
+            .filter(
+                (tab) =>
+                    !isChildEntirelyVisibleWithinParent(
+                        tab.value.element,
+                        this._tabsList
+                    )
+            )
+            .map((x) => x.value.panel.id);
+
+        // Detect tab groups whose chip is clipped or whose tabs are all
+        // in the overflow set (e.g. collapsed groups scrolled out of view).
+        const overflowTabSet = new Set(tabs);
+        const tabGroups: string[] = [];
+
+        for (const tg of this.group.model.getTabGroups()) {
+            const chipEntry = this._tabGroupManager.chipRenderers.get(tg.id);
+            const chipClipped =
+                chipEntry &&
+                !isChildEntirelyVisibleWithinParent(
+                    chipEntry.chip.element,
+                    this._tabsList
+                );
+
+            // A group is in overflow if its chip is clipped OR all its
+            // visible tabs are in the overflow set.
+            const allTabsOverflow =
+                tg.panelIds.length > 0 &&
+                tg.panelIds.every((pid) => overflowTabSet.has(pid));
+
+            if (chipClipped || allTabsOverflow) {
+                tabGroups.push(tg.id);
+
+                // For collapsed groups whose chip is clipped, ensure all
+                // member tabs are included in the overflow list so they
+                // appear in the dropdown.
+                if (tg.collapsed) {
+                    for (const pid of tg.panelIds) {
+                        if (!overflowTabSet.has(pid)) {
+                            overflowTabSet.add(pid);
+                            tabs.push(pid);
+                        }
+                    }
+                }
+            }
+        }
+
+        this._onOverflowTabsChange.fire({ tabs, tabGroups, reset: false });
     }
 
     updateDragAndDropState(): void {

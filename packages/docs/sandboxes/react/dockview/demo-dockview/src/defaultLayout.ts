@@ -130,11 +130,42 @@ export function defaultConfig(api: DockviewApi) {
         tabGroupId: shipping.id,
         panelId: 'vesselfinder',
     });
-    shipping.collapse();
+    // Create a collapsed tab group in the eventlog group for "Logs"
+    const eventlogGroupId = eventlog.api.group.id;
 
-    // Set active panels (skip orders group — all its panels are collapsed)
+    // Add a standalone tab before the Logs tab group
+    api.addPanel({
+        id: 'console',
+        component: 'default',
+        title: 'Console',
+        position: { referencePanel: eventlog },
+    });
+
+    const logs = api.createTabGroup({
+        groupId: eventlogGroupId,
+        label: 'Logs',
+        color: 'orange',
+    });
+    api.addPanelToTabGroup({
+        groupId: eventlogGroupId,
+        tabGroupId: logs.id,
+        panelId: 'eventlog',
+    });
+    api.addPanelToTabGroup({
+        groupId: eventlogGroupId,
+        tabGroupId: logs.id,
+        panelId: 'layoutinspector',
+    });
+    api.addPanelToTabGroup({
+        groupId: eventlogGroupId,
+        tabGroupId: logs.id,
+        panelId: 'debuginfo',
+    });
+    logs.collapse();
+
+    // Set active panels
     watchlist.api.setActive();
     orderbook.api.setActive();
+    orders.api.setActive();
     positionsummary.api.setActive();
-    eventlog.api.setActive();
 }

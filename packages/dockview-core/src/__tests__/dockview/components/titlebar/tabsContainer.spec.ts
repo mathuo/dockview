@@ -955,7 +955,9 @@ describe('tabsContainer', () => {
 
             const groupPanel = fromPartial<DockviewGroupPanel>({
                 id: 'testgroupid',
-                model: fromPartial<DockviewGroupPanelModel>({}),
+                model: fromPartial<DockviewGroupPanelModel>({
+                    getTabGroups: () => [],
+                }),
             });
 
             const cut = new TabsContainer(accessor, groupPanel);
@@ -1063,14 +1065,20 @@ describe('tabsContainer', () => {
             const groupPanel = fromPartial<DockviewGroupPanel>({
                 id: 'testgroupid',
                 panels: [mockPanel],
-                model: fromPartial<DockviewGroupPanelModel>({}),
+                model: fromPartial<DockviewGroupPanelModel>({
+                    getTabGroups: () => [],
+                }),
             });
 
             const cut = new TabsContainer(accessor, groupPanel);
             (cut as any).tabs = mockTabs;
 
             // Simulate overflow tabs
-            (cut as any).toggleDropdown({ tabs: ['test-panel'], reset: false });
+            (cut as any).toggleDropdown({
+                tabs: ['test-panel'],
+                tabGroups: [],
+                reset: false,
+            });
 
             // Find the dropdown trigger and click it
             const dropdownTrigger = cut.element.querySelector(
@@ -1197,14 +1205,20 @@ describe('tabsContainer', () => {
             const groupPanel = fromPartial<DockviewGroupPanel>({
                 id: 'testgroupid',
                 panels: [mockPanel],
-                model: fromPartial<DockviewGroupPanelModel>({}),
+                model: fromPartial<DockviewGroupPanelModel>({
+                    getTabGroups: () => [],
+                }),
             });
 
             const cut = new TabsContainer(accessor, groupPanel);
             (cut as any).tabs = mockTabs;
 
             // Simulate overflow tabs
-            (cut as any).toggleDropdown({ tabs: ['test-panel'], reset: false });
+            (cut as any).toggleDropdown({
+                tabs: ['test-panel'],
+                tabGroups: [],
+                reset: false,
+            });
 
             // Find the dropdown trigger and click it
             const dropdownTrigger = cut.element.querySelector(
@@ -1321,14 +1335,20 @@ describe('tabsContainer', () => {
             const groupPanel = fromPartial<DockviewGroupPanel>({
                 id: 'testgroupid',
                 panels: [mockPanel],
-                model: fromPartial<DockviewGroupPanelModel>({}),
+                model: fromPartial<DockviewGroupPanelModel>({
+                    getTabGroups: () => [],
+                }),
             });
 
             const cut = new TabsContainer(accessor, groupPanel);
             (cut as any).tabs = mockTabs;
 
             // Simulate overflow tabs
-            (cut as any).toggleDropdown({ tabs: ['test-panel'], reset: false });
+            (cut as any).toggleDropdown({
+                tabs: ['test-panel'],
+                tabGroups: [],
+                reset: false,
+            });
 
             // Find the dropdown trigger and click it
             const dropdownTrigger = cut.element.querySelector(
