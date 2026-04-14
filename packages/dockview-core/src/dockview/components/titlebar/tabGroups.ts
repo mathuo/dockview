@@ -12,7 +12,7 @@ import { Tab } from '../tab/tab';
 import { ITabGroup } from '../../tabGroup';
 import { TabGroupChip } from './tabGroupChip';
 import { ITabGroupChipRenderer } from '../../framework';
-import { ITabGroupIndicator, WrapTabGroupIndicator } from './tabGroupIndicator';
+import { ITabGroupIndicator, NoneTabGroupIndicator, WrapTabGroupIndicator } from './tabGroupIndicator';
 
 const EMPTY_MAP: ReadonlyMap<string, HTMLElement> = new Map();
 
@@ -244,16 +244,17 @@ export class TabGroupManager {
         const mode =
             this._ctx.accessor.options.theme?.tabGroupIndicator ?? 'wrap';
 
-        if (mode === 'none') {
-            if (this._indicator) {
-                this._indicator.dispose();
-                this._indicator = null;
-            }
-            return;
+        const Ctor =
+            mode === 'none' ? NoneTabGroupIndicator : WrapTabGroupIndicator;
+
+        // Re-create if the indicator type changed (e.g. theme switch)
+        if (this._indicator && !(this._indicator instanceof Ctor)) {
+            this._indicator.dispose();
+            this._indicator = null;
         }
 
         if (!this._indicator) {
-            this._indicator = new WrapTabGroupIndicator({
+            this._indicator = new Ctor({
                 tabsList: this._ctx.tabsList,
                 getTabGroups: () => this._ctx.group.model.getTabGroups(),
                 getActivePanelId: () => this._ctx.group.activePanel?.id,
