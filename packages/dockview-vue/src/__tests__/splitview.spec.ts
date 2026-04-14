@@ -1,3 +1,4 @@
+import { vi, describe, test, expect } from 'vitest';
 import {
     createSplitview,
     Orientation,
@@ -96,7 +97,7 @@ describe('VueSplitviewPanelView', () => {
     });
 
     test('should handle getComponent with mocked parameters and call init', () => {
-        const initSpy = jest
+        const initSpy = vi
             .spyOn(VuePart.prototype, 'init')
             .mockImplementation(() => {});
 

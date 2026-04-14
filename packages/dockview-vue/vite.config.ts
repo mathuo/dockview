@@ -6,6 +6,18 @@ import vue from '@vitejs/plugin-vue';
 export default defineConfig({
     plugins: [vue()],
 
+    test: {
+        globals: true,
+        environment: 'jsdom',
+        include: ['src/__tests__/**/*.spec.ts'],
+        alias: {
+            'dockview-core': resolve(__dirname, '../dockview-core/src/index.ts'),
+        },
+        setupFiles: [
+            'src/__tests__/__mocks__/resizeObserver.vitest.ts',
+        ],
+    },
+
     build: {
         minify: false,
         lib: {

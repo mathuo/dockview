@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest';
 import { createPaneview, PROPERTY_KEYS_PANEVIEW } from 'dockview-core';
 import { VuePaneviewPanelView } from '../paneview/view';
 import * as paneviewTypes from '../paneview/types';
