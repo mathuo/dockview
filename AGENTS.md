@@ -83,6 +83,8 @@ NX handles build ordering automatically via `dependsOn: ["^build"]`. The depende
 
 -   Drag and drop with customizable drop zones
 -   Floating groups and popout windows
+-   Edge groups (pinned to layout edges with collapse/expand)
+-   Tab groups (colored chip-based visual tab organization)
 -   Serialization/deserialization for state persistence
 -   Theming system with CSS custom properties
 -   Comprehensive API for programmatic control
