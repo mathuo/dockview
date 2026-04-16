@@ -26,6 +26,7 @@ import {
     PROPERTY_KEYS_DOCKVIEW,
     DockviewFrameworkOptions,
     DockviewComponentOptions,
+    CspNonce,
     GetTabContextMenuItemsParams,
     GetTabGroupChipContextMenuItemsParams,
     BuiltInChipContextMenuItem,
@@ -93,6 +94,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() disableFloatingGroups?: boolean;
     @Input() floatingGroupBounds?: 'boundedWithinViewport';
     @Input() popoutUrl?: string;
+    @Input() nonce?: CspNonce;
     @Input() debug?: boolean;
     @Input() locked?: boolean;
     @Input() disableAutoResizing?: boolean;
