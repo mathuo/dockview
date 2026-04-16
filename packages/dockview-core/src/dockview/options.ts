@@ -17,6 +17,8 @@ import { Contraints } from '../gridview/gridviewPanel';
 import { AcceptableEvent, IAcceptableEvent } from '../events';
 import { DockviewTheme } from './theme';
 import { ITabGroup } from './tabGroup';
+import { CspNonce } from '../dom';
+export { CspNonce } from '../dom';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -107,6 +109,7 @@ export interface DockviewOptions {
               minimumWidthWithinViewport?: number;
           };
     popoutUrl?: string;
+    nonce?: CspNonce;
     defaultRenderer?: DockviewPanelRenderer;
     defaultHeaderPosition?: DockviewHeaderPosition;
     debug?: boolean;
@@ -205,6 +208,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         disableFloatingGroups: undefined,
         floatingGroupBounds: undefined,
         popoutUrl: undefined,
+        nonce: undefined,
         defaultRenderer: undefined,
         defaultHeaderPosition: undefined,
         debug: undefined,
