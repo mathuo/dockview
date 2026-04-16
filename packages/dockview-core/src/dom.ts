@@ -209,8 +209,23 @@ export function quasiDefaultPrevented(event: Event): boolean {
     return (event as any)[QUASI_PREVENT_DEFAULT_KEY];
 }
 
-export function addStyles(document: Document, styleSheetList: StyleSheetList) {
+export type CspNonce =
+    | string
+    | ((targetDocument: Document) => string | undefined);
+
+export interface AddStylesOptions {
+    nonce?: CspNonce;
+}
+
+export function addStyles(
+    document: Document,
+    styleSheetList: StyleSheetList,
+    options: AddStylesOptions = {}
+) {
     const styleSheets = Array.from(styleSheetList);
+    const { nonce } = options;
+    const resolvedNonce =
+        typeof nonce === 'function' ? nonce(document) : nonce;
 
     for (const styleSheet of styleSheets) {
         if (styleSheet.href) {
@@ -236,11 +251,16 @@ export function addStyles(document: Document, styleSheetList: StyleSheetList) {
             );
         }
 
+        const fragment = document.createDocumentFragment();
         for (const rule of cssTexts) {
             const style = document.createElement('style');
+            if (resolvedNonce) {
+                style.setAttribute('nonce', resolvedNonce);
+            }
             style.appendChild(document.createTextNode(rule));
-            document.head.appendChild(style);
+            fragment.appendChild(style);
         }
+        document.head.appendChild(fragment);
     }
 }
 
