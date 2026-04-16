@@ -540,7 +540,7 @@ export class DockviewComponent
             { disabled: true }
         );
         this.overlayRenderContainer = new OverlayRenderContainer(
-            this.gridview.element,
+            this._shellManager.element,
             this
         );
 

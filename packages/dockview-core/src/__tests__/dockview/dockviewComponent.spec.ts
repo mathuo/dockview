@@ -6472,8 +6472,10 @@ describe('dockviewComponent', () => {
             panel3.api.moveTo({ group: panel1.api.group, position: 'right' });
 
             // confirm panel is rendered to always overlay container
+            // Query from `container` because the overlay render container is
+            // anchored to the shell element (parent of dockview.element).
             expect(
-                dockview.element.querySelectorAll(
+                container.querySelectorAll(
                     '.dv-render-overlay > .testpanel-panel_3'
                 ).length
             ).toBe(1);
@@ -9779,6 +9781,122 @@ describe('dockviewComponent', () => {
             const api = dv.addEdgeGroup('left', { id: 'left-group-new' });
             expect(api).toBeDefined();
             expect(dv.getEdgeGroup('left')).toBeDefined();
+
+            dv.dispose();
+        });
+
+        test('panel content is rendered after moving from grid group to edge group', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left']);
+            dv.layout(1000, 1000);
+
+            dv.addPanel({
+                id: 'explorer',
+                component: 'default',
+                title: 'Explorer',
+                position: { referenceGroup: 'left-group' },
+            });
+
+            const panel1 = dv.addPanel({
+                id: 'panel1',
+                component: 'default',
+                title: 'Panel 1',
+            });
+
+            const contentEl = panel1.view.content.element;
+            expect(contentEl.parentElement).toBeTruthy();
+
+            const edgeGroup = dv.groups.find(
+                (g) => g.api.location.type === 'edge'
+            )!;
+
+            panel1.api.moveTo({ group: edgeGroup });
+
+            expect(panel1.group).toBe(edgeGroup);
+            expect(panel1.group.api.location.type).toBe('edge');
+            expect(contentEl.parentElement).toBeTruthy();
+            expect(edgeGroup.activePanel?.id).toBe('panel1');
+
+            dv.dispose();
+        });
+
+        test('panel content is rendered with always renderer after moving to edge group', () => {
+            const c = document.createElement('div');
+            const dv = new DockviewComponent(c, {
+                createComponent(options) {
+                    return new PanelContentPartTest(options.id, options.name);
+                },
+                defaultRenderer: 'always',
+            });
+            dv.addEdgeGroup('left', { id: 'left-group', initialSize: 200 });
+            dv.layout(1000, 1000);
+
+            dv.addPanel({
+                id: 'explorer',
+                component: 'default',
+                title: 'Explorer',
+                position: { referenceGroup: 'left-group' },
+            });
+
+            const panel1 = dv.addPanel({
+                id: 'panel1',
+                component: 'default',
+                title: 'Panel 1',
+            });
+
+            expect(panel1.api.renderer).toBe('always');
+
+            const contentEl = panel1.view.content.element;
+            expect(contentEl.parentElement).toBeTruthy();
+
+            const edgeGroup = dv.groups.find(
+                (g) => g.api.location.type === 'edge'
+            )!;
+
+            panel1.api.moveTo({ group: edgeGroup });
+
+            expect(panel1.group).toBe(edgeGroup);
+            expect(contentEl.parentElement).toBeTruthy();
+            expect(edgeGroup.activePanel?.id).toBe('panel1');
+
+            // The overlay render container should be anchored to the shell
+            // element (not the gridview) so edge group panels are not clipped
+            const shellEl = (dv as any)._shellManager.element;
+            expect(dv.overlayRenderContainer.element).toBe(shellEl);
+
+            dv.dispose();
+        });
+
+        test('panel content is rendered after moving to empty collapsed edge group', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['right'], {
+                right: {
+                    id: 'right-group',
+                    collapsed: true,
+                    initialSize: 200,
+                },
+            });
+            dv.layout(1000, 1000);
+
+            const panel1 = dv.addPanel({
+                id: 'panel1',
+                component: 'default',
+                title: 'Panel 1',
+            });
+
+            const contentEl = panel1.view.content.element;
+            const edgeGroup = dv.groups.find(
+                (g) => g.api.location.type === 'edge'
+            )!;
+
+            panel1.api.moveTo({ group: edgeGroup });
+
+            expect(panel1.group).toBe(edgeGroup);
+            expect(contentEl.parentElement).toBeTruthy();
+
+            edgeGroup.api.expand();
+            expect(contentEl.parentElement).toBeTruthy();
+            expect(edgeGroup.activePanel?.id).toBe('panel1');
 
             dv.dispose();
         });
