@@ -858,11 +858,13 @@ export class Tabs extends CompositeDisposable {
         const tabToRemove = this._tabs.splice(index, 1)[0];
         this._tabMap.delete(id);
 
-        const { value, disposable } = tabToRemove;
+        if (tabToRemove) {
+            const { value, disposable } = tabToRemove;
 
-        disposable.dispose();
-        value.dispose();
-        value.element.remove();
+            disposable.dispose();
+            value.dispose();
+            value.element.remove();
+        }
 
         // If a non-source tab was removed during active drag, refresh positions
         if (this._animState) {
