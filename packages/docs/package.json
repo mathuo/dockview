@@ -44,7 +44,7 @@
     "react-dnd": "^16.0.1",
     "recoil": "^0.7.7",
     "source-map-loader": "^4.0.2",
-    "uuid": "^9.0.1"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@tsconfig/docusaurus": "^2.0.2",
