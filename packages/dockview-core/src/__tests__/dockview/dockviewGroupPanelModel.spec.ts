@@ -1669,7 +1669,7 @@ describe('dockviewGroupPanelModel', () => {
             expect(groupview.model.hasWatermark).toBe(true);
         });
 
-        test('expanding a tab group removes watermark and activates panel', () => {
+        test('expanding a tab group removes watermark and restores previously active panel', () => {
             const panel1 = new TestPanel('panel1', panelApi);
             const panel2 = new TestPanel('panel2', panelApi);
             groupview.model.openPanel(panel1);
@@ -1679,13 +1679,57 @@ describe('dockviewGroupPanelModel', () => {
             groupview.model.addPanelToTabGroup(tg.id, 'panel1');
             groupview.model.addPanelToTabGroup(tg.id, 'panel2');
 
+            // panel2 was the active panel before collapse — expand should restore it
             tg.collapse();
             expect(groupview.model.hasWatermark).toBe(true);
 
             tg.expand();
             expect(groupview.model.hasWatermark).toBe(false);
             expect(groupview.model.activePanel).toBeDefined();
-            expect(groupview.model.activePanel!.id).toBe('panel1');
+            expect(groupview.model.activePanel!.id).toBe('panel2');
+        });
+
+        test('expanding restores the most recently activated tab, not the first one', () => {
+            const panel1 = new TestPanel('panel1', panelApi);
+            const panel2 = new TestPanel('panel2', panelApi);
+            const panel3 = new TestPanel('panel3', panelApi);
+            groupview.model.openPanel(panel1);
+            groupview.model.openPanel(panel2);
+            groupview.model.openPanel(panel3);
+
+            const tg = groupview.model.createTabGroup({ label: 'All' });
+            groupview.model.addPanelToTabGroup(tg.id, 'panel1');
+            groupview.model.addPanelToTabGroup(tg.id, 'panel2');
+            groupview.model.addPanelToTabGroup(tg.id, 'panel3');
+
+            // Simulate the user clicking the middle tab
+            groupview.model.openPanel(panel2);
+            expect(groupview.model.activePanel?.id).toBe('panel2');
+
+            tg.collapse();
+            expect(groupview.model.hasWatermark).toBe(true);
+
+            tg.expand();
+            expect(groupview.model.activePanel?.id).toBe('panel2');
+        });
+
+        test('expanding falls back to first panel when last-active panel was removed', () => {
+            const panel1 = new TestPanel('panel1', panelApi);
+            const panel2 = new TestPanel('panel2', panelApi);
+            groupview.model.openPanel(panel1);
+            groupview.model.openPanel(panel2);
+
+            const tg = groupview.model.createTabGroup({ label: 'All' });
+            groupview.model.addPanelToTabGroup(tg.id, 'panel1');
+            groupview.model.addPanelToTabGroup(tg.id, 'panel2');
+
+            // panel2 is last-active; collapsing then removing it should make
+            // expand fall back to the only remaining panel
+            tg.collapse();
+            tg.removePanel('panel2');
+
+            tg.expand();
+            expect(groupview.model.activePanel?.id).toBe('panel1');
         });
 
         test('collapsing group with active panel activates panel in another group', () => {
@@ -1838,6 +1882,32 @@ describe('dockviewGroupPanelModel', () => {
             expect(restored[1].color).toBe('cyan');
             expect(restored[1].collapsed).toBe(true);
             expect(restored[1].panelIds).toEqual(['panel2']);
+        });
+
+        test('toJSON/restoreTabGroups round-trip preserves last-active panel', () => {
+            const panel1 = new TestPanel('panel1', panelApi);
+            const panel2 = new TestPanel('panel2', panelApi);
+            const panel3 = new TestPanel('panel3', panelApi);
+            groupview.model.openPanel(panel1);
+            groupview.model.openPanel(panel2);
+            groupview.model.openPanel(panel3);
+
+            const tg = groupview.model.createTabGroup({ label: 'G' });
+            groupview.model.addPanelToTabGroup(tg.id, 'panel1');
+            groupview.model.addPanelToTabGroup(tg.id, 'panel2');
+            groupview.model.addPanelToTabGroup(tg.id, 'panel3');
+
+            // panel2 is active when we serialize
+            groupview.model.openPanel(panel2);
+            expect(tg.lastActivePanelId).toBe('panel2');
+
+            const json = groupview.model.toJSON();
+            expect(json.tabGroups![0].lastActivePanelId).toBe('panel2');
+
+            groupview.model.dissolveTabGroup(tg.id);
+            groupview.model.restoreTabGroups(json.tabGroups!);
+            const restored = groupview.model.getTabGroups();
+            expect(restored[0].lastActivePanelId).toBe('panel2');
         });
     });
 });

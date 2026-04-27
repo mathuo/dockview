@@ -747,6 +747,12 @@ export class DockviewGroupPanelModel
         // to the correct global position matching its group-local index
         this._enforceContiguity(tabGroup, panelId);
 
+        // If we just added the currently-active panel, record it so a
+        // collapse/expand cycle restores the right tab.
+        if (this._activePanel?.id === panelId) {
+            tabGroup.setLastActivePanelId(panelId);
+        }
+
         this._onDidAddPanelToTabGroup.fire({ tabGroup, panelId });
     }
 
@@ -1046,13 +1052,21 @@ export class DockviewGroupPanelModel
         }
 
         // Watermark is showing because all groups were collapsed.
-        // Activate the first panel in the newly expanded group.
-        const firstPanelId = tabGroup.panelIds[0];
-        if (firstPanelId) {
-            const panel = this._panels.find((p) => p.id === firstPanelId);
+        // Restore the panel that was last active in this tab group, falling
+        // back to the first available panel if that record is gone.
+        const candidateIds = [
+            tabGroup.lastActivePanelId,
+            ...tabGroup.panelIds,
+        ];
+        for (const panelId of candidateIds) {
+            if (!panelId) {
+                continue;
+            }
+            const panel = this._panels.find((p) => p.id === panelId);
             if (panel) {
                 this.doSetActivePanel(panel);
                 this.updateContainer();
+                return;
             }
         }
     }
@@ -1085,6 +1099,10 @@ export class DockviewGroupPanelModel
                     this._panelToTabGroup.set(panelId, concreteGroup);
                     this._enforceContiguity(concreteGroup, panelId);
                 }
+            }
+
+            if (data.lastActivePanelId) {
+                tabGroup.setLastActivePanelId(data.lastActivePanelId);
             }
 
             if (data.collapsed) {
@@ -1575,6 +1593,11 @@ export class DockviewGroupPanelModel
         this._activePanel = panel;
 
         if (panel) {
+            const tabGroup = this._findTabGroupForPanel(panel.id);
+            if (tabGroup) {
+                tabGroup.setLastActivePanelId(panel.id);
+            }
+
             this.tabsContainer.setActivePanel(panel);
 
             this.contentContainer.openPanel(panel);

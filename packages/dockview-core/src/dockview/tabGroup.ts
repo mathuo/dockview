@@ -40,6 +40,7 @@ export interface SerializedTabGroup {
     color: DockviewTabGroupColor;
     collapsed: boolean;
     panelIds: string[];
+    lastActivePanelId?: string;
 }
 
 export interface TabGroupOptions {
@@ -63,12 +64,14 @@ export interface ITabGroup {
     }>;
     readonly onDidCollapseChange: Event<boolean>;
     readonly onDidDestroy: Event<void>;
+    readonly lastActivePanelId: string | undefined;
     addPanel(panelId: string, index?: number): void;
     removePanel(panelId: string): boolean;
     indexOfPanel(panelId: string): number;
     containsPanel(panelId: string): boolean;
     setLabel(value: string): void;
     setColor(value: DockviewTabGroupColor): void;
+    setLastActivePanelId(panelId: string | undefined): void;
     collapse(): void;
     expand(): void;
     toggle(): void;
@@ -80,6 +83,7 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
     private _label: string;
     private _color: DockviewTabGroupColor;
     private _collapsed = false;
+    private _lastActivePanelId: string | undefined;
     private readonly _panelIds: string[] = [];
 
     private readonly _onDidChange = new Emitter<void>();
@@ -142,6 +146,23 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
         return this._panelIds.length === 0;
     }
 
+    get lastActivePanelId(): string | undefined {
+        return this._lastActivePanelId;
+    }
+
+    setLastActivePanelId(panelId: string | undefined): void {
+        if (this.isDisposed) {
+            return;
+        }
+        if (panelId === undefined) {
+            this._lastActivePanelId = undefined;
+            return;
+        }
+        if (this._panelIds.includes(panelId)) {
+            this._lastActivePanelId = panelId;
+        }
+    }
+
     constructor(
         readonly id: string,
         options?: TabGroupOptions
@@ -188,6 +209,9 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
             return false;
         }
         this._panelIds.splice(index, 1);
+        if (this._lastActivePanelId === panelId) {
+            this._lastActivePanelId = undefined;
+        }
         this._onDidPanelChange.fire({ panelId, type: 'remove' });
         return true;
     }
@@ -233,6 +257,9 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
         };
         if (this._label) {
             result.label = this._label;
+        }
+        if (this._lastActivePanelId) {
+            result.lastActivePanelId = this._lastActivePanelId;
         }
         return result;
     }
