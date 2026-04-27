@@ -2954,12 +2954,10 @@ export class DockviewComponent
             const newTabGroup = targetGroup.model.createTabGroup({
                 label,
                 color,
+                collapsed,
             });
             for (const panel of removedPanels) {
                 targetGroup.model.addPanelToTabGroup(newTabGroup.id, panel.id);
-            }
-            if (collapsed) {
-                newTabGroup.collapse();
             }
 
             if (!options.skipSetActive) {

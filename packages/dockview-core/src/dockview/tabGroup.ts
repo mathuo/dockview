@@ -42,6 +42,12 @@ export interface SerializedTabGroup {
     panelIds: string[];
 }
 
+export interface TabGroupOptions {
+    label?: string;
+    color?: DockviewTabGroupColor;
+    collapsed?: boolean;
+}
+
 export interface ITabGroup {
     readonly id: string;
     readonly label: string;
@@ -138,7 +144,7 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
 
     constructor(
         readonly id: string,
-        options?: { label?: string; color?: DockviewTabGroupColor }
+        options?: TabGroupOptions
     ) {
         super();
 
@@ -146,6 +152,7 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
         this._color = isValidTabGroupColor(options?.color ?? '')
             ? (options!.color as DockviewTabGroupColor)
             : 'grey';
+        this._collapsed = options?.collapsed ?? false;
 
         this.addDisposables(
             this._onDidChange,

@@ -1091,6 +1091,83 @@ describe('dockviewComponent', () => {
         dockview.dispose();
     });
 
+    test('moveGroupOrPanel with collapsed tabGroupId does not transition through expanded state on destination', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                return new PanelContentPartTest(options.id, options.name);
+            },
+        });
+
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({ id: 'panel1', component: 'default' });
+        dockview.addPanel({ id: 'panel2', component: 'default' });
+
+        const panel1 = dockview.getGroupPanel('panel1')!;
+        const sourceGroup = panel1.group;
+
+        const tabGroup = sourceGroup.model.createTabGroup({
+            label: 'Born collapsed',
+            color: 'red',
+        });
+        sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel1');
+        tabGroup.collapse();
+
+        // Split panel2 out to make a destination group
+        dockview.moveGroupOrPanel({
+            from: { groupId: sourceGroup.id, panelId: 'panel2' },
+            to: { group: sourceGroup, position: 'right' },
+        });
+        const panel2 = dockview.getGroupPanel('panel2')!;
+        const destGroup = panel2.group;
+
+        // Track collapse-change events fired on destination during the move
+        const destCollapseEvents: any[] = [];
+        destGroup.model.onDidTabGroupCollapsedChange((e) =>
+            destCollapseEvents.push(e)
+        );
+
+        dockview.moveGroupOrPanel({
+            from: {
+                groupId: sourceGroup.id,
+                tabGroupId: tabGroup.id,
+            },
+            to: { group: destGroup, position: 'center' },
+        });
+
+        // Regression: previously the destination group was created uncollapsed
+        // and then `.collapse()` was called, firing a transition event that
+        // animated the chip/tabs from expanded → collapsed. The new tab group
+        // should be born collapsed, so no transition event fires.
+        expect(destCollapseEvents).toHaveLength(0);
+
+        const destTabGroups = destGroup.model.getTabGroups();
+        expect(destTabGroups.length).toBe(1);
+        expect(destTabGroups[0].collapsed).toBe(true);
+
+        // Force synchronous chip rendering (updateTabGroups is normally
+        // batched via queueMicrotask).
+        (destGroup.model as any).tabsContainer.tabs.updateTabGroups();
+
+        // Tabs of the moved group should land in the collapsed state instantly
+        // (no animation). The animation path sets an inline width/height to
+        // measure-then-collapse; the instant path leaves both unset.
+        const movedTabs =
+            destGroup.element.querySelectorAll('.dv-tab--grouped');
+        expect(movedTabs.length).toBeGreaterThan(0);
+        for (const tabEl of Array.from(movedTabs) as HTMLElement[]) {
+            expect(tabEl.classList.contains('dv-tab--group-collapsed')).toBe(
+                true
+            );
+            expect(tabEl.style.width).toBe('');
+            expect(tabEl.style.height).toBe('');
+        }
+
+        dockview.dispose();
+    });
+
     test('moveGroupOrPanel with tabGroupId to extremity creates new group', () => {
         const container = document.createElement('div');
 

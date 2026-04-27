@@ -56,6 +56,7 @@ import {
     ITabGroup,
     DockviewTabGroupColor,
     SerializedTabGroup,
+    TabGroupOptions,
 } from './tabGroup';
 import { EdgeGroupPosition } from './dockviewShell';
 
@@ -92,6 +93,10 @@ export interface GroupPanelViewState extends CoreGroupOptions {
 
 export interface DockviewGroupChangeEvent {
     readonly panel: IDockviewPanel;
+}
+
+export interface CreateTabGroupOptions extends TabGroupOptions {
+    id?: string;
 }
 
 export class DockviewDidDropEvent extends DockviewEvent {
@@ -658,15 +663,12 @@ export class DockviewGroupPanelModel
         });
     }
 
-    createTabGroup(options?: {
-        label?: string;
-        color?: DockviewTabGroupColor;
-        id?: string;
-    }): ITabGroup {
+    createTabGroup(options?: CreateTabGroupOptions): ITabGroup {
         const id = options?.id ?? `tg-${this.id}-${this._tabGroupIdCounter++}`;
         const tabGroup = new TabGroup(id, {
             label: options?.label,
             color: options?.color,
+            collapsed: options?.collapsed,
         });
         this._tabGroups.push(tabGroup);
         this._tabGroupMap.set(id, tabGroup);
