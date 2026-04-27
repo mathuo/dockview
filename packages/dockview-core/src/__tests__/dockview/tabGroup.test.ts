@@ -24,6 +24,22 @@ describe('TabGroup', () => {
         group.dispose();
     });
 
+    test('should create with collapsed option', () => {
+        const group = new TabGroup('g-collapsed', { collapsed: true });
+        expect(group.collapsed).toBe(true);
+        group.dispose();
+    });
+
+    test('should not fire onDidCollapseChange when constructed collapsed', () => {
+        const group = new TabGroup('g-collapsed', { collapsed: true });
+        const events: boolean[] = [];
+        group.onDidCollapseChange((c) => events.push(c));
+        // collapse() on an already-collapsed group is a no-op
+        group.collapse();
+        expect(events).toEqual([]);
+        group.dispose();
+    });
+
     test('should default invalid color to grey', () => {
         const group = new TabGroup('g3', {
             color: 'invalid' as DockviewTabGroupColor,
