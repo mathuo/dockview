@@ -59,6 +59,42 @@
     outline-offset: 2px;
 }
 
+.toggleButton {
+    display: flex;
+    align-items: center;
+    background: var(--ifm-hover-overlay);
+    border: 1px solid var(--ifm-toc-border-color);
+    color: var(--ifm-navbar-link-color);
+    cursor: pointer;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    line-height: 1.4;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.toggleButton:hover {
+    color: var(--ifm-navbar-link-hover-color);
+    border-color: var(--ifm-color-emphasis-400);
+}
+
+.toggleButton:focus-visible {
+    outline: 2px solid var(--ifm-color-primary);
+    outline-offset: 2px;
+}
+
+.toggleButtonActive {
+    background: var(--ifm-color-primary);
+    border-color: var(--ifm-color-primary);
+    color: var(--ifm-color-white, #fff);
+}
+
+.toggleButtonActive:hover {
+    background: var(--ifm-color-primary-dark, var(--ifm-color-primary));
+    border-color: var(--ifm-color-primary-dark, var(--ifm-color-primary));
+    color: var(--ifm-color-white, #fff);
+}
+
 .tip {
     display: flex;
     align-items: center;
