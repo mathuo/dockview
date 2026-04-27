@@ -1154,9 +1154,8 @@ describe('dockviewComponent', () => {
         // Tabs of the moved group should land in the collapsed state instantly
         // (no animation). The animation path sets an inline width/height to
         // measure-then-collapse; the instant path leaves both unset.
-        const movedTabs = destGroup.element.querySelectorAll(
-            '.dv-tab--grouped'
-        );
+        const movedTabs =
+            destGroup.element.querySelectorAll('.dv-tab--grouped');
         expect(movedTabs.length).toBeGreaterThan(0);
         for (const tabEl of Array.from(movedTabs) as HTMLElement[]) {
             expect(tabEl.classList.contains('dv-tab--group-collapsed')).toBe(

@@ -142,7 +142,10 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
         return this._panelIds.length === 0;
     }
 
-    constructor(readonly id: string, options?: TabGroupOptions) {
+    constructor(
+        readonly id: string,
+        options?: TabGroupOptions
+    ) {
         super();
 
         this._label = options?.label ?? '';
