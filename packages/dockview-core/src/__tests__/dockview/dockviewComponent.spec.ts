@@ -4630,13 +4630,59 @@ describe('dockviewComponent', () => {
 
         panel1.api.setSize({ height: 123, width: 256 });
 
-        const items = dockview.element.querySelectorAll('.dv-resize-container');
+        const items = container.querySelectorAll('.dv-resize-container');
         expect(items.length).toBe(1);
 
         const el = items[0] as HTMLElement;
 
         expect(el.style.height).toBe('123px');
         expect(el.style.width).toBe('256px');
+    });
+
+    test('floating overlays share a stacking context with render overlays (issue: positions blocks other floating tabs)', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+
+        dockview.layout(1000, 500);
+
+        dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+            floating: true,
+        });
+
+        const overlay = container.querySelector(
+            '.dv-resize-container'
+        ) as HTMLElement;
+        expect(overlay).toBeTruthy();
+
+        const host = overlay.parentElement!;
+        expect(host.classList.contains('dv-floating-overlay-host')).toBe(true);
+
+        // Host must share a parent with the OverlayRenderContainer (the shell)
+        // so floating overlay z-indexes and `dv-render-overlay` z-indexes
+        // resolve in the same stacking context.
+        expect(host.parentElement).toBe(
+            dockview.overlayRenderContainer.element
+        );
+
+        // Host must NOT live inside `.dv-dockview` — that element has
+        // `contain: layout` which forms a stacking context that would trap
+        // floating z-indexes below shell-level render overlays.
+        expect(dockview.element.contains(overlay)).toBe(false);
     });
 
     test('that external dnd events do not trigger the top-level center dnd target unless empty', () => {
@@ -5007,7 +5053,7 @@ describe('dockviewComponent', () => {
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(2);
 
-        el = dockview.element.querySelector('.dv-resize-container');
+        el = container.querySelector('.dv-resize-container');
         expect(el).toBeTruthy();
 
         el = dockview.element.querySelector('.dv-view-container');
@@ -5087,7 +5133,7 @@ describe('dockviewComponent', () => {
         expect(dockview.groups.length).toBe(0);
         expect(dockview.panels.length).toBe(0);
 
-        el = dockview.element.querySelector('.dv-resize-container');
+        el = container.querySelector('.dv-resize-container');
         expect(el).toBeFalsy();
 
         el = dockview.element.querySelector('.dv-view-container');
