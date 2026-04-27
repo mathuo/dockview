@@ -87,45 +87,14 @@ const DemoPage: React.FC = () => {
                 />
                 <div className={styles.divider} />
                 <button
-                    className={styles.iconButton}
+                    className={`${styles.toggleButton} ${
+                        showSidebar ? styles.toggleButtonActive : ''
+                    }`}
                     title={showSidebar ? 'Close sidebar' : 'Open sidebar'}
+                    aria-pressed={showSidebar}
                     onClick={() => setShowSidebar((v) => !v)}
                 >
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    >
-                        <line x1="4" y1="6" x2="20" y2="6" />
-                        <line x1="4" y1="12" x2="20" y2="12" />
-                        <line x1="4" y1="18" x2="20" y2="18" />
-                        <circle
-                            cx="9"
-                            cy="6"
-                            r="2"
-                            fill="currentColor"
-                            stroke="none"
-                        />
-                        <circle
-                            cx="15"
-                            cy="12"
-                            r="2"
-                            fill="currentColor"
-                            stroke="none"
-                        />
-                        <circle
-                            cx="9"
-                            cy="18"
-                            r="2"
-                            fill="currentColor"
-                            stroke="none"
-                        />
-                    </svg>
+                    Controls & Theme
                 </button>
             </div>
             <ExampleFrame
