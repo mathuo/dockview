@@ -320,6 +320,14 @@ export class TabGroupManager {
 
         const disposable = new CompositeDisposable(...disposables);
         this._chipRenderers.set(tabGroup.id, { chip, disposable });
+
+        // Group is born collapsed (cross-group drop, layout restore, etc.):
+        // its tabs are about to be added without the collapsed class. Skip
+        // the animation in the upcoming _updateTabGroupClasses call so they
+        // apply the class instantly instead of transitioning from expanded.
+        if (tabGroup.collapsed) {
+            this._skipNextCollapseAnimation = true;
+        }
     }
 
     private _positionChipForGroup(tabGroup: ITabGroup): void {
