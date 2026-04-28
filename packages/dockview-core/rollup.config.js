@@ -95,9 +95,10 @@ module.exports = [
     createBundle('umd', { withStyles: true, isMinified: true }),
     createBundle('umd', { withStyles: false, isMinified: false }),
     createBundle('umd', { withStyles: false, isMinified: true }),
-    // Package bundles — dist/package/
-    createBundle('cjs', { withStyles: true, isMinified: false }),
-    createBundle('cjs', { withStyles: true, isMinified: true }),
-    createBundle('esm', { withStyles: true, isMinified: false }),
-    createBundle('esm', { withStyles: true, isMinified: true }),
+    // Package bundles — dist/package/ (no auto-injected CSS; consumers
+    // import 'dockview-core/dist/styles/dockview.css' explicitly)
+    createBundle('cjs', { withStyles: false, isMinified: false }),
+    createBundle('cjs', { withStyles: false, isMinified: true }),
+    createBundle('esm', { withStyles: false, isMinified: false }),
+    createBundle('esm', { withStyles: false, isMinified: true }),
 ];

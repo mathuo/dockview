@@ -44,6 +44,10 @@
     "main": "./dist/package/main.cjs.js",
     "module": "./dist/package/main.esm.mjs",
     "types": "./dist/cjs/index.d.ts",
+    "sideEffects": [
+        "**/*.css",
+        "**/*.scss"
+    ],
     "files": [
         "dist",
         "README.md"
