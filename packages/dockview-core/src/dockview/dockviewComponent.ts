@@ -408,6 +408,7 @@ export class DockviewComponent
     readonly onDidMaximizedGroupChange = this._onDidMaximizedGroupChange.event;
 
     private _shellManager: ShellManager | undefined;
+    private _floatingOverlayHost: HTMLDivElement | undefined;
     private _inShellLayout = false;
     private readonly _edgeGroups = new Map<
         EdgeGroupPosition,
@@ -543,6 +544,13 @@ export class DockviewComponent
             this._shellManager.element,
             this
         );
+
+        // Hosted in the shell (not inside `.dv-dockview`) so floating overlays
+        // share a stacking context with `dv-render-overlay` panels; sized to
+        // mirror the gridview rect so saved positions remain valid.
+        this._floatingOverlayHost = document.createElement('div');
+        this._floatingOverlayHost.className = 'dv-floating-overlay-host';
+        this._shellManager.element.appendChild(this._floatingOverlayHost);
 
         this._rootDropTarget = new Droptarget(this.element, {
             className: 'dv-drop-target-edge',
@@ -1267,7 +1275,7 @@ export class DockviewComponent
         const anchoredBox = getAnchoredBox();
 
         const overlay = new Overlay({
-            container: this.gridview.element,
+            container: this._floatingOverlayHost ?? this.gridview.element,
             content: group.element,
             ...anchoredBox,
             minimumInViewportWidth:
@@ -1463,12 +1471,27 @@ export class DockviewComponent
             super.layout(width, height, forceResize);
         }
 
+        this._syncFloatingOverlayHost();
+
         if (this._floatingGroups) {
             for (const floating of this._floatingGroups) {
                 // ensure floting groups stay within visible boundaries
                 floating.overlay.setBounds();
             }
         }
+    }
+
+    private _syncFloatingOverlayHost(): void {
+        if (!this._floatingOverlayHost || !this._shellManager) {
+            return;
+        }
+        const shellRect = this._shellManager.element.getBoundingClientRect();
+        const gridRect = this.element.getBoundingClientRect();
+        const host = this._floatingOverlayHost;
+        host.style.left = `${gridRect.left - shellRect.left}px`;
+        host.style.top = `${gridRect.top - shellRect.top}px`;
+        host.style.width = `${gridRect.width}px`;
+        host.style.height = `${gridRect.height}px`;
     }
 
     private _layoutFromShell(width: number, height: number): void {
