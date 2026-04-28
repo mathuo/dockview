@@ -138,7 +138,8 @@ export class ContextMenuController {
 
         event.preventDefault();
 
-        const close = () => this.accessor.popupService.close();
+        const popupService = this.accessor.getPopupServiceForGroup(group);
+        const close = () => popupService.close();
         const menuEl = document.createElement('div');
         menuEl.className = 'dv-context-menu';
         menuEl.setAttribute('role', 'menu');
@@ -194,7 +195,7 @@ export class ContextMenuController {
             }
         }
 
-        this.accessor.popupService.openPopover(menuEl, {
+        popupService.openPopover(menuEl, {
             x: event.clientX,
             y: event.clientY,
             zIndex: popoverZIndexFor(event.target),
@@ -223,7 +224,8 @@ export class ContextMenuController {
 
         event.preventDefault();
 
-        const close = () => this.accessor.popupService.close();
+        const popupService = this.accessor.getPopupServiceForGroup(group);
+        const close = () => popupService.close();
         const menuEl = document.createElement('div');
         menuEl.className = 'dv-context-menu';
         menuEl.setAttribute('role', 'menu');
@@ -249,7 +251,7 @@ export class ContextMenuController {
             }
         }
 
-        this.accessor.popupService.openPopover(menuEl, {
+        popupService.openPopover(menuEl, {
             x: event.clientX,
             y: event.clientY,
             zIndex: popoverZIndexFor(event.target),

@@ -27,6 +27,7 @@ function makeAccessor(
         },
         api: {} as any,
         popupService,
+        getPopupServiceForGroup: () => popupService,
     });
 
     return { accessor, openPopover, close };
@@ -701,11 +702,7 @@ describe('ContextMenuController', () => {
                 });
                 chip.dispatchEvent(event);
 
-                controller.showForChip(
-                    fromPartial({}),
-                    makeGroup(),
-                    event
-                );
+                controller.showForChip(fromPartial({}), makeGroup(), event);
 
                 expect(openPopover).toHaveBeenCalledWith(
                     expect.any(HTMLElement),

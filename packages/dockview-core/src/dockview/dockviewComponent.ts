@@ -318,6 +318,7 @@ export class DockviewComponent
 
     readonly overlayRenderContainer: OverlayRenderContainer;
     readonly popupService: PopupService;
+    private readonly _popoutPopupServices = new Map<string, PopupService>();
     readonly contextMenuController: ContextMenuController;
     readonly rootDropTargetContainer: DropTargetAnchorContainer;
 
@@ -798,6 +799,16 @@ export class DockviewComponent
         }
     }
 
+    /**
+     * Returns the {@link PopupService} that should host popovers (context
+     * menus, tab overflow menus) for the given group. Popout groups have their
+     * own service rooted in their popout window so the popover renders there
+     * and dismisses on events from that window.
+     */
+    getPopupServiceForGroup(group: DockviewGroupPanel): PopupService {
+        return this._popoutPopupServices.get(group.id) ?? this.popupService;
+    }
+
     addPopoutGroup(
         itemToPopout: DockviewPanel | DockviewGroupPanel,
         options?: DockviewPopoutGroupOptions
@@ -990,6 +1001,23 @@ export class DockviewComponent
                 popoutContainer.appendChild(anchor);
 
                 group.model.dropTargetContainer = dropTargetContainer;
+
+                // Each popout group needs its own popover service so that
+                // tab context menus, chip menus, and tab overflow menus
+                // render in the popout window (not the main window) and
+                // their pointerdown/keydown listeners fire on the right
+                // window for outside-click and Escape dismissal.
+                const popoutPopupService = new PopupService(
+                    popoutContainer,
+                    _window.window!
+                );
+                this._popoutPopupServices.set(group.id, popoutPopupService);
+                popoutWindowDisposable.addDisposables(
+                    popoutPopupService,
+                    Disposable.from(() => {
+                        this._popoutPopupServices.delete(group.id);
+                    })
+                );
 
                 group.model.location = {
                     type: 'popout',
