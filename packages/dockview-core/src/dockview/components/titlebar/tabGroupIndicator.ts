@@ -1,7 +1,7 @@
 import { IValueDisposable } from '../../../lifecycle';
 import { DockviewHeaderDirection } from '../../options';
 import { Tab } from '../tab/tab';
-import { ITabGroup } from '../../tabGroup';
+import { ITabGroup, resolveTabGroupAccent } from '../../tabGroup';
 
 export interface TabGroupIndicatorContext {
     readonly tabsList: HTMLElement;
@@ -316,9 +316,9 @@ export class WrapTabGroupIndicator extends BaseTabGroupIndicator {
         const t = 2; // line thickness in px
         const crossSize = containerCrossSize;
         const mainSize = groupSpan;
-        const color = `var(--dv-tab-group-color-${tg.color})`;
+        const color = resolveTabGroupAccent(tg.color);
 
-        if (mainSize <= 0 || crossSize <= 0) {
+        if (mainSize <= 0 || crossSize <= 0 || !color) {
             underline.style.display = 'none';
             return;
         }
@@ -473,9 +473,9 @@ export class NoneTabGroupIndicator extends BaseTabGroupIndicator {
         isVertical: boolean
     ): void {
         const t = 2; // line thickness in px
-        const color = `var(--dv-tab-group-color-${tg.color})`;
+        const color = resolveTabGroupAccent(tg.color);
 
-        if (span <= 0) {
+        if (span <= 0 || !color) {
             underline.style.display = 'none';
             return;
         }

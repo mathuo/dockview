@@ -24,6 +24,7 @@ import {
     DropdownElement,
 } from './tabOverflowControl';
 import { DockviewHeaderDirection } from '../../options';
+import { resolveTabGroupAccent } from '../../tabGroup';
 
 export interface TabDropIndexEvent {
     readonly event: DragEvent;
@@ -467,10 +468,13 @@ export class TabsContainer
 
                         const colorDot = document.createElement('span');
                         colorDot.className = 'dv-tabs-overflow-group-color';
-                        colorDot.style.setProperty(
-                            '--dv-tab-group-color',
-                            `var(--dv-tab-group-color-${tg.color})`
-                        );
+                        const accent = resolveTabGroupAccent(tg.color);
+                        if (accent) {
+                            colorDot.style.setProperty(
+                                '--dv-tab-group-color',
+                                accent
+                            );
+                        }
                         groupHeader.appendChild(colorDot);
 
                         const labelSpan = document.createElement('span');

@@ -74,6 +74,7 @@ export {
     IWatermarkPanelProps,
     DockviewReadyEvent,
     ITabGroupChipRenderer,
+    TabGroupChipRendererParams,
 } from './dockview/framework';
 
 export * from './dockview/options';
@@ -84,7 +85,10 @@ export {
     DockviewTabGroupColors,
     ITabGroup,
     SerializedTabGroup,
+    TabGroupOptions,
+    isBuiltInTabGroupColor,
     isValidTabGroupColor,
+    resolveTabGroupAccent,
 } from './dockview/tabGroup';
 export { DefaultTab } from './dockview/components/tab/defaultTab';
 export {

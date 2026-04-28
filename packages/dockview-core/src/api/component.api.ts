@@ -1042,11 +1042,13 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         groupId: string;
         label?: string;
         color?: DockviewTabGroupColor;
+        componentParams?: Record<string, unknown>;
     }): ITabGroup {
         const model = this._getGroupModel(options.groupId);
         return model.createTabGroup({
             label: options.label,
             color: options.color,
+            componentParams: options.componentParams,
         });
     }
 

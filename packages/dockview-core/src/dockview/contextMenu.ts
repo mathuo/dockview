@@ -4,10 +4,15 @@ import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
 import {
     BuiltInChipContextMenuItem,
+    ColorPickerConfig,
     ContextMenuItemConfig,
     ContextMenuItem,
 } from './options';
-import { DockviewTabGroupColors, ITabGroup } from './tabGroup';
+import {
+    DockviewTabGroupColors,
+    ITabGroup,
+    resolveTabGroupAccent,
+} from './tabGroup';
 
 function popoverZIndexFor(target: EventTarget | null): string | undefined {
     if (!(target instanceof HTMLElement)) {
@@ -93,13 +98,28 @@ function buildRenameInput(tabGroup: ITabGroup): HTMLElement {
     return wrapper;
 }
 
-function buildColorPicker(tabGroup: ITabGroup): HTMLElement {
+const DEFAULT_PALETTE: readonly string[] = Object.freeze(
+    Object.values(DockviewTabGroupColors)
+);
+
+function buildColorPicker(
+    tabGroup: ITabGroup,
+    config?: ColorPickerConfig
+): HTMLElement {
     const wrapper = document.createElement('div');
     wrapper.className = 'dv-context-menu-color-picker';
 
-    for (const color of Object.values(DockviewTabGroupColors)) {
+    const palette = config?.palette ?? DEFAULT_PALETTE;
+    const allowCustom = config?.allowCustom ?? false;
+    const allowClear = config?.allowClear ?? false;
+
+    for (const color of palette) {
         const swatch = document.createElement('div');
-        swatch.className = `dv-context-menu-color-swatch dv-tab-group-chip--${color}`;
+        swatch.className = 'dv-context-menu-color-swatch';
+        const accent = resolveTabGroupAccent(color);
+        if (accent) {
+            swatch.style.backgroundColor = accent;
+        }
         if (tabGroup.color === color) {
             swatch.classList.add('dv-context-menu-color-swatch--selected');
         }
@@ -109,7 +129,51 @@ function buildColorPicker(tabGroup: ITabGroup): HTMLElement {
         wrapper.appendChild(swatch);
     }
 
+    if (allowClear) {
+        const clear = document.createElement('div');
+        clear.className =
+            'dv-context-menu-color-swatch dv-context-menu-color-swatch--clear';
+        if (tabGroup.color === undefined) {
+            clear.classList.add('dv-context-menu-color-swatch--selected');
+        }
+        clear.addEventListener('click', () => {
+            tabGroup.setColor(undefined);
+        });
+        wrapper.appendChild(clear);
+    }
+
+    if (allowCustom) {
+        const custom = document.createElement('label');
+        custom.className =
+            'dv-context-menu-color-swatch dv-context-menu-color-swatch--custom';
+        const input = document.createElement('input');
+        input.type = 'color';
+        input.className = 'dv-context-menu-color-swatch-input';
+        if (tabGroup.color && !palette.includes(tabGroup.color)) {
+            const accent = resolveTabGroupAccent(tabGroup.color);
+            if (accent) {
+                custom.style.backgroundColor = accent;
+            }
+            custom.classList.add('dv-context-menu-color-swatch--selected');
+        }
+        input.addEventListener('input', () => {
+            tabGroup.setColor(input.value);
+            custom.style.backgroundColor = input.value;
+        });
+        custom.appendChild(input);
+        wrapper.appendChild(custom);
+    }
+
     return wrapper;
+}
+
+function isColorPickerConfig(
+    item: BuiltInChipContextMenuItem | ContextMenuItemConfig | ColorPickerConfig
+): item is ColorPickerConfig {
+    return (
+        typeof item === 'object' &&
+        (item as ColorPickerConfig).kind === 'colorPicker'
+    );
 }
 
 export class ContextMenuController {
@@ -237,6 +301,8 @@ export class ContextMenuController {
                 menuEl.appendChild(buildRenameInput(tabGroup));
             } else if (item === 'colorPicker') {
                 menuEl.appendChild(buildColorPicker(tabGroup));
+            } else if (isColorPickerConfig(item)) {
+                menuEl.appendChild(buildColorPicker(tabGroup, item));
             } else if (isItemConfig(item) && item.element) {
                 menuEl.appendChild(item.element);
             } else if (isItemConfig(item) && item.label) {

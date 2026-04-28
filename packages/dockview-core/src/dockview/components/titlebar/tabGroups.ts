@@ -9,7 +9,7 @@ import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { DockviewHeaderDirection } from '../../options';
 import { Tab } from '../tab/tab';
-import { ITabGroup } from '../../tabGroup';
+import { ITabGroup, resolveTabGroupAccent } from '../../tabGroup';
 import { TabGroupChip } from './tabGroupChip';
 import { ITabGroupChipRenderer } from '../../framework';
 import {
@@ -281,11 +281,18 @@ export class TabGroupManager {
             ? createChip(tabGroup)
             : new TabGroupChip();
 
-        chip.init({ tabGroup, api: this._ctx.accessor.api });
+        const buildParams = () => ({
+            tabGroup,
+            api: this._ctx.accessor.api,
+            accent: resolveTabGroupAccent(tabGroup.color),
+            componentParams: tabGroup.componentParams,
+        });
+
+        chip.init(buildParams());
 
         const disposables: IDisposable[] = [
             tabGroup.onDidChange(() => {
-                chip.update?.({ tabGroup });
+                chip.update?.(buildParams());
                 this._updateTabGroupClasses();
             }),
             tabGroup.onDidPanelChange(() => {
@@ -393,10 +400,15 @@ export class TabGroupManager {
 
                 // Expose the resolved group color as a CSS custom property
                 // so pure-CSS themes can use it for borders, backgrounds, etc.
-                tab.element.style.setProperty(
-                    '--dv-tab-group-color',
-                    `var(--dv-tab-group-color-${tg.color})`
-                );
+                const accent = resolveTabGroupAccent(tg.color);
+                if (accent) {
+                    tab.element.style.setProperty(
+                        '--dv-tab-group-color',
+                        accent
+                    );
+                } else {
+                    tab.element.style.removeProperty('--dv-tab-group-color');
+                }
 
                 // Collapse / expand with animation
                 const isCollapsed = tab.element.classList.contains(

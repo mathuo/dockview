@@ -31,6 +31,25 @@ export type BuiltInContextMenuItem =
 
 export type BuiltInChipContextMenuItem = 'separator' | 'colorPicker' | 'rename';
 
+export interface ColorPickerConfig {
+    kind: 'colorPicker';
+    /**
+     * Colours to render as swatches. Each entry may be a built-in preset name
+     * (see `DockviewTabGroupColors`) or any CSS colour string. Defaults to
+     * the built-in preset palette.
+     */
+    palette?: readonly string[];
+    /**
+     * If true, append a `<input type="color">` swatch so the user can pick
+     * an arbitrary colour outside the palette.
+     */
+    allowCustom?: boolean;
+    /**
+     * If true, append a swatch that clears the tab group's accent colour.
+     */
+    allowClear?: boolean;
+}
+
 export interface ContextMenuItemConfig {
     label?: string;
     /**
@@ -158,7 +177,11 @@ export interface DockviewOptions {
      */
     getTabGroupChipContextMenuItems?: (
         params: GetTabGroupChipContextMenuItemsParams
-    ) => (BuiltInChipContextMenuItem | ContextMenuItemConfig)[];
+    ) => (
+        | BuiltInChipContextMenuItem
+        | ContextMenuItemConfig
+        | ColorPickerConfig
+    )[];
     /**
      * Factory to create custom tab group chip renderers.
      * If not provided, the default chip renderer is used.

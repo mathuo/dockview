@@ -1,10 +1,17 @@
 import React from 'react';
 import { ReactPart, ReactPortalStore } from '../react';
-import { ITabGroupChipRenderer, ITabGroup, DockviewApi } from 'dockview-core';
+import {
+    ITabGroupChipRenderer,
+    ITabGroup,
+    DockviewApi,
+    TabGroupChipRendererParams,
+} from 'dockview-core';
 
 export interface IDockviewTabGroupChipProps {
     tabGroup: ITabGroup;
     api: DockviewApi;
+    accent: string | undefined;
+    componentParams: Record<string, unknown> | undefined;
 }
 
 export class ReactTabGroupChipPart implements ITabGroupChipRenderer {
@@ -24,7 +31,7 @@ export class ReactTabGroupChipPart implements ITabGroupChipRenderer {
         this._element.style.display = 'inline-flex';
     }
 
-    init(params: { tabGroup: ITabGroup; api: DockviewApi }): void {
+    init(params: TabGroupChipRendererParams): void {
         this.part = new ReactPart(
             this._element,
             this.reactPortalStore,
@@ -32,12 +39,19 @@ export class ReactTabGroupChipPart implements ITabGroupChipRenderer {
             {
                 tabGroup: params.tabGroup,
                 api: params.api,
+                accent: params.accent,
+                componentParams: params.componentParams,
             }
         );
     }
 
-    update(params: { tabGroup: ITabGroup }): void {
-        this.part?.update({ tabGroup: params.tabGroup });
+    update(params: TabGroupChipRendererParams): void {
+        this.part?.update({
+            tabGroup: params.tabGroup,
+            api: params.api,
+            accent: params.accent,
+            componentParams: params.componentParams,
+        });
     }
 
     dispose(): void {

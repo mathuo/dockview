@@ -1,7 +1,7 @@
 import {
     TabGroup,
-    DockviewTabGroupColor,
-    isValidTabGroupColor,
+    isBuiltInTabGroupColor,
+    resolveTabGroupAccent,
 } from '../../dockview/tabGroup';
 
 describe('TabGroup', () => {
@@ -9,7 +9,7 @@ describe('TabGroup', () => {
         const group = new TabGroup('g1');
         expect(group.id).toBe('g1');
         expect(group.label).toBe('');
-        expect(group.color).toBe('grey');
+        expect(group.color).toBeUndefined();
         expect(group.collapsed).toBe(false);
         expect(group.panelIds).toEqual([]);
         expect(group.size).toBe(0);
@@ -40,11 +40,15 @@ describe('TabGroup', () => {
         group.dispose();
     });
 
-    test('should default invalid color to grey', () => {
-        const group = new TabGroup('g3', {
-            color: 'invalid' as DockviewTabGroupColor,
-        });
-        expect(group.color).toBe('grey');
+    test('should accept arbitrary CSS colour values', () => {
+        const group = new TabGroup('g3', { color: '#ff0080' });
+        expect(group.color).toBe('#ff0080');
+        group.dispose();
+    });
+
+    test('should accept var() expressions as colour', () => {
+        const group = new TabGroup('g4', { color: 'var(--my-accent)' });
+        expect(group.color).toBe('var(--my-accent)');
         group.dispose();
     });
 
@@ -174,10 +178,17 @@ describe('TabGroup', () => {
         group.dispose();
     });
 
-    test('should default to grey on invalid color set', () => {
+    test('should clear colour when set to undefined', () => {
         const group = new TabGroup('g1', { color: 'blue' });
-        group.setColor('invalid' as DockviewTabGroupColor);
-        expect(group.color).toBe('grey');
+        group.setColor(undefined);
+        expect(group.color).toBeUndefined();
+        group.dispose();
+    });
+
+    test('should accept arbitrary CSS colour via setColor', () => {
+        const group = new TabGroup('g1', { color: 'blue' });
+        group.setColor('rgb(10, 20, 30)');
+        expect(group.color).toBe('rgb(10, 20, 30)');
         group.dispose();
     });
 
@@ -243,11 +254,37 @@ describe('TabGroup', () => {
         group.dispose();
         expect(destroyed).toBe(true);
     });
+
+    test('should serialize componentParams when present', () => {
+        const group = new TabGroup('g1', {
+            componentParams: { icon: 'star', badge: 3 },
+        });
+        const json = group.toJSON();
+        expect(json.componentParams).toEqual({ icon: 'star', badge: 3 });
+        group.dispose();
+    });
+
+    test('should omit componentParams from JSON when unset', () => {
+        const group = new TabGroup('g1');
+        const json = group.toJSON();
+        expect(json.componentParams).toBeUndefined();
+        group.dispose();
+    });
+
+    test('setComponentParams fires onDidChange', () => {
+        const group = new TabGroup('g1');
+        const changes: void[] = [];
+        group.onDidChange(() => changes.push(undefined));
+        group.setComponentParams({ icon: 'star' });
+        expect(group.componentParams).toEqual({ icon: 'star' });
+        expect(changes.length).toBe(1);
+        group.dispose();
+    });
 });
 
-describe('isValidTabGroupColor', () => {
-    test('should validate all valid colors', () => {
-        const validColors = [
+describe('isBuiltInTabGroupColor', () => {
+    test('should accept built-in preset names', () => {
+        const presets = [
             'grey',
             'blue',
             'red',
@@ -256,15 +293,36 @@ describe('isValidTabGroupColor', () => {
             'pink',
             'purple',
             'cyan',
+            'orange',
         ];
-        for (const color of validColors) {
-            expect(isValidTabGroupColor(color)).toBe(true);
+        for (const color of presets) {
+            expect(isBuiltInTabGroupColor(color)).toBe(true);
         }
     });
 
-    test('should reject invalid colors', () => {
-        expect(isValidTabGroupColor('')).toBe(false);
-        expect(isValidTabGroupColor('invalid')).toBe(false);
-        expect(isValidTabGroupColor('orange')).toBe(true);
+    test('should reject non-presets', () => {
+        expect(isBuiltInTabGroupColor('')).toBe(false);
+        expect(isBuiltInTabGroupColor(undefined)).toBe(false);
+        expect(isBuiltInTabGroupColor('#ff0080')).toBe(false);
+        expect(isBuiltInTabGroupColor('rgb(0,0,0)')).toBe(false);
+    });
+});
+
+describe('resolveTabGroupAccent', () => {
+    test('preset names map to themed CSS variables', () => {
+        expect(resolveTabGroupAccent('blue')).toBe(
+            'var(--dv-tab-group-color-blue)'
+        );
+    });
+
+    test('arbitrary CSS values are returned verbatim', () => {
+        expect(resolveTabGroupAccent('#ff0080')).toBe('#ff0080');
+        expect(resolveTabGroupAccent('rgb(1,2,3)')).toBe('rgb(1,2,3)');
+        expect(resolveTabGroupAccent('var(--mine)')).toBe('var(--mine)');
+    });
+
+    test('undefined and empty resolve to undefined', () => {
+        expect(resolveTabGroupAccent(undefined)).toBeUndefined();
+        expect(resolveTabGroupAccent('')).toBeUndefined();
     });
 });

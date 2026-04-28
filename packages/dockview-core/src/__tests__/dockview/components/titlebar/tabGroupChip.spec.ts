@@ -3,9 +3,19 @@ import { TabGroupChip } from '../../../../dockview/components/titlebar/tabGroupC
 import {
     TabGroup,
     DockviewTabGroupColors,
+    resolveTabGroupAccent,
 } from '../../../../dockview/tabGroup';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewApi } from '../../../../api/component.api';
+
+function paramsFor(tabGroup: TabGroup) {
+    return {
+        tabGroup,
+        api: fromPartial<DockviewApi>({}),
+        accent: resolveTabGroupAccent(tabGroup.color),
+        componentParams: tabGroup.componentParams,
+    };
+}
 
 describe('TabGroupChip', () => {
     test('creates element with correct class', () => {
@@ -23,22 +33,22 @@ describe('TabGroupChip', () => {
         expect(label).toBeTruthy();
     });
 
-    test('init sets label and color', () => {
+    test('init sets label and accent', () => {
         const chip = new TabGroupChip();
         const tabGroup = new TabGroup('tg-1', {
             label: 'Feature',
             color: 'blue',
         });
 
-        chip.init({
-            tabGroup,
-            api: fromPartial<DockviewApi>({}),
-        });
+        chip.init(paramsFor(tabGroup));
 
         const label = chip.element.querySelector('.dv-tab-group-chip-label');
         expect(label!.textContent).toBe('Feature');
-        expect(chip.element.classList.contains('dv-tab-group-chip--blue')).toBe(
-            true
+        expect(
+            chip.element.classList.contains('dv-tab-group-chip--accent')
+        ).toBe(true);
+        expect(chip.element.style.getPropertyValue('--dv-tab-group-color')).toBe(
+            'var(--dv-tab-group-color-blue)'
         );
     });
 
@@ -46,10 +56,7 @@ describe('TabGroupChip', () => {
         const chip = new TabGroupChip();
         const tabGroup = new TabGroup('tg-1', { color: 'red' });
 
-        chip.init({
-            tabGroup,
-            api: fromPartial<DockviewApi>({}),
-        });
+        chip.init(paramsFor(tabGroup));
 
         const label = chip.element.querySelector('.dv-tab-group-chip-label');
         expect(
@@ -62,39 +69,70 @@ describe('TabGroupChip', () => {
         const tabGroup = new TabGroup('tg-1', { color: 'green' });
         tabGroup.collapse();
 
-        chip.init({
-            tabGroup,
-            api: fromPartial<DockviewApi>({}),
-        });
+        chip.init(paramsFor(tabGroup));
 
         expect(
             chip.element.classList.contains('dv-tab-group-chip--collapsed')
         ).toBe(true);
     });
 
-    test('updates color when tab group color changes', () => {
+    test('updates accent when tab group color changes', () => {
         const chip = new TabGroupChip();
         const tabGroup = new TabGroup('tg-1', {
             label: 'Test',
             color: 'blue',
         });
 
-        chip.init({
-            tabGroup,
-            api: fromPartial<DockviewApi>({}),
-        });
+        chip.init(paramsFor(tabGroup));
 
-        expect(chip.element.classList.contains('dv-tab-group-chip--blue')).toBe(
-            true
+        expect(chip.element.style.getPropertyValue('--dv-tab-group-color')).toBe(
+            'var(--dv-tab-group-color-blue)'
         );
 
         tabGroup.setColor('red');
 
-        expect(chip.element.classList.contains('dv-tab-group-chip--red')).toBe(
-            true
+        expect(chip.element.style.getPropertyValue('--dv-tab-group-color')).toBe(
+            'var(--dv-tab-group-color-red)'
         );
-        expect(chip.element.classList.contains('dv-tab-group-chip--blue')).toBe(
-            false
+        expect(
+            chip.element.classList.contains('dv-tab-group-chip--accent')
+        ).toBe(true);
+    });
+
+    test('accepts arbitrary CSS colour values', () => {
+        const chip = new TabGroupChip();
+        const tabGroup = new TabGroup('tg-1', {
+            label: 'Custom',
+            color: '#ff0080',
+        });
+
+        chip.init(paramsFor(tabGroup));
+
+        expect(chip.element.style.getPropertyValue('--dv-tab-group-color')).toBe(
+            '#ff0080'
+        );
+        expect(
+            chip.element.classList.contains('dv-tab-group-chip--accent')
+        ).toBe(true);
+    });
+
+    test('clears accent when colour is undefined', () => {
+        const chip = new TabGroupChip();
+        const tabGroup = new TabGroup('tg-1', { color: 'blue' });
+
+        chip.init(paramsFor(tabGroup));
+
+        expect(
+            chip.element.classList.contains('dv-tab-group-chip--accent')
+        ).toBe(true);
+
+        tabGroup.setColor(undefined);
+
+        expect(
+            chip.element.classList.contains('dv-tab-group-chip--accent')
+        ).toBe(false);
+        expect(chip.element.style.getPropertyValue('--dv-tab-group-color')).toBe(
+            ''
         );
     });
 
@@ -105,10 +143,7 @@ describe('TabGroupChip', () => {
             color: 'grey',
         });
 
-        chip.init({
-            tabGroup,
-            api: fromPartial<DockviewApi>({}),
-        });
+        chip.init(paramsFor(tabGroup));
 
         const label = chip.element.querySelector('.dv-tab-group-chip-label');
         expect(label!.textContent).toBe('Old');
@@ -125,10 +160,7 @@ describe('TabGroupChip', () => {
             color: 'grey',
         });
 
-        chip.init({
-            tabGroup,
-            api: fromPartial<DockviewApi>({}),
-        });
+        chip.init(paramsFor(tabGroup));
 
         expect(
             chip.element.classList.contains('dv-tab-group-chip--collapsed')
@@ -154,10 +186,7 @@ describe('TabGroupChip', () => {
             color: 'grey',
         });
 
-        chip.init({
-            tabGroup,
-            api: fromPartial<DockviewApi>({}),
-        });
+        chip.init(paramsFor(tabGroup));
 
         expect(tabGroup.collapsed).toBe(false);
 
@@ -199,26 +228,24 @@ describe('TabGroupChip', () => {
         ).toBe(false);
     });
 
-    test('only one color class is active at a time', () => {
+    test('every preset colour resolves to its CSS variable', () => {
         const chip = new TabGroupChip();
         const tabGroup = new TabGroup('tg-1', {
             label: 'Test',
             color: 'blue',
         });
 
-        chip.init({
-            tabGroup,
-            api: fromPartial<DockviewApi>({}),
-        });
+        chip.init(paramsFor(tabGroup));
 
         for (const color of Object.values(DockviewTabGroupColors)) {
             tabGroup.setColor(color);
 
-            for (const c of Object.values(DockviewTabGroupColors)) {
-                expect(
-                    chip.element.classList.contains(`dv-tab-group-chip--${c}`)
-                ).toBe(c === color);
-            }
+            expect(
+                chip.element.style.getPropertyValue('--dv-tab-group-color')
+            ).toBe(`var(--dv-tab-group-color-${color})`);
+            expect(
+                chip.element.classList.contains('dv-tab-group-chip--accent')
+            ).toBe(true);
         }
     });
 
@@ -229,10 +256,7 @@ describe('TabGroupChip', () => {
             color: 'blue',
         });
 
-        chip.init({
-            tabGroup: tabGroup1,
-            api: fromPartial<DockviewApi>({}),
-        });
+        chip.init(paramsFor(tabGroup1));
 
         const tabGroup2 = new TabGroup('tg-2', {
             label: 'Second',
@@ -240,13 +264,13 @@ describe('TabGroupChip', () => {
         });
         tabGroup2.collapse();
 
-        chip.update({ tabGroup: tabGroup2 });
+        chip.update(paramsFor(tabGroup2));
 
         const label = chip.element.querySelector('.dv-tab-group-chip-label');
         expect(label!.textContent).toBe('Second');
-        expect(
-            chip.element.classList.contains('dv-tab-group-chip--purple')
-        ).toBe(true);
+        expect(chip.element.style.getPropertyValue('--dv-tab-group-color')).toBe(
+            'var(--dv-tab-group-color-purple)'
+        );
         expect(
             chip.element.classList.contains('dv-tab-group-chip--collapsed')
         ).toBe(true);
@@ -259,10 +283,7 @@ describe('TabGroupChip', () => {
             color: 'grey',
         });
 
-        chip.init({
-            tabGroup,
-            api: fromPartial<DockviewApi>({}),
-        });
+        chip.init(paramsFor(tabGroup));
 
         expect(() => chip.dispose()).not.toThrow();
     });

@@ -669,6 +669,7 @@ export class DockviewGroupPanelModel
             label: options?.label,
             color: options?.color,
             collapsed: options?.collapsed,
+            componentParams: options?.componentParams,
         });
         this._tabGroups.push(tabGroup);
         this._tabGroupMap.set(id, tabGroup);
@@ -1075,6 +1076,7 @@ export class DockviewGroupPanelModel
                 id: data.id,
                 label: data.label,
                 color: data.color,
+                componentParams: data.componentParams,
             });
 
             const concreteGroup = this._tabGroupMap.get(tabGroup.id)!;

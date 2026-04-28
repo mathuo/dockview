@@ -1265,6 +1265,8 @@ describe('tabs - animation', () => {
             chip.init({
                 tabGroup,
                 api: fromPartial({}),
+                accent: 'var(--dv-tab-group-color-blue)',
+                componentParams: undefined,
             });
             mockTabRect(chip.element, { left: 0, width: 30 });
 

@@ -50,9 +50,27 @@ export interface DockviewReadyEvent {
     api: DockviewApi;
 }
 
+export interface TabGroupChipRendererParams {
+    tabGroup: ITabGroup;
+    api: DockviewApi;
+    /**
+     * The tab group's resolved accent colour as a CSS expression (e.g.
+     * `"var(--dv-tab-group-color-blue)"` or `"#ff8800"`), or `undefined`
+     * if no colour is set. Custom renderers may honour or ignore this.
+     */
+    accent: string | undefined;
+    /**
+     * Arbitrary parameters supplied when the tab group was created or
+     * updated via `setComponentParams`. Pass-through; not interpreted by
+     * core. Use this to drive a fully custom chip renderer without
+     * abusing the `color` field.
+     */
+    componentParams: Record<string, unknown> | undefined;
+}
+
 export interface ITabGroupChipRenderer {
     readonly element: HTMLElement;
-    init(params: { tabGroup: ITabGroup; api: DockviewApi }): void;
-    update?(params: { tabGroup: ITabGroup }): void;
+    init(params: TabGroupChipRendererParams): void;
+    update?(params: TabGroupChipRendererParams): void;
     dispose(): void;
 }
