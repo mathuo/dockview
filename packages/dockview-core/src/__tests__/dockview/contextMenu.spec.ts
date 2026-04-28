@@ -9,6 +9,7 @@ import { PopupService } from '../../dockview/components/popupService';
 function makeAccessor(
     overrides: {
         getTabContextMenuItems?: jest.Mock;
+        getTabGroupChipContextMenuItems?: jest.Mock;
         createContextMenuItemComponent?: jest.Mock;
     } = {}
 ) {
@@ -19,6 +20,8 @@ function makeAccessor(
     const accessor = fromPartial<DockviewComponent>({
         options: {
             getTabContextMenuItems: overrides.getTabContextMenuItems,
+            getTabGroupChipContextMenuItems:
+                overrides.getTabGroupChipContextMenuItems,
             createContextMenuItemComponent:
                 overrides.createContextMenuItemComponent,
         },
@@ -152,6 +155,129 @@ describe('ContextMenuController', () => {
 
             const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
             expect(menuEl.getAttribute('role')).toBe('menu');
+        });
+    });
+
+    describe('popover z-index for floating groups', () => {
+        // Floating overlays live in the shell as siblings of the popover anchor
+        // and AriaLevelTracker sets their inline z-index. Without bumping the
+        // popover above that, a context menu opened from inside a floating
+        // group renders behind it (#1203 regression).
+        function dispatchContextMenu(target: HTMLElement): MouseEvent {
+            const event = new MouseEvent('contextmenu', {
+                bubbles: true,
+                cancelable: true,
+            });
+            target.dispatchEvent(event);
+            return event;
+        }
+
+        test('passes zIndex above the floating overlay when target is inside one', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['close']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            const floating = document.createElement('div');
+            floating.style.zIndex = '1001'; // simulates AriaLevelTracker output
+            const tab = document.createElement('div');
+            floating.appendChild(tab);
+            document.body.appendChild(floating);
+
+            try {
+                const event = dispatchContextMenu(tab);
+                controller.show(makePanel(), makeGroup(), event);
+
+                expect(openPopover).toHaveBeenCalledWith(
+                    expect.any(HTMLElement),
+                    expect.objectContaining({
+                        zIndex: 'calc(1001 * 2)',
+                    })
+                );
+            } finally {
+                document.body.removeChild(floating);
+            }
+        });
+
+        test('does not pass zIndex when target has no z-indexed ancestor', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['close']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            const tab = document.createElement('div');
+            document.body.appendChild(tab);
+
+            try {
+                const event = dispatchContextMenu(tab);
+                controller.show(makePanel(), makeGroup(), event);
+
+                const args = openPopover.mock.calls[0][1];
+                expect(args.zIndex).toBeUndefined();
+            } finally {
+                document.body.removeChild(tab);
+            }
+        });
+
+        test('walks up multiple levels to find the z-indexed ancestor', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['close']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            const floating = document.createElement('div');
+            floating.style.zIndex = '999';
+            const group = document.createElement('div');
+            const tabsContainer = document.createElement('div');
+            const tab = document.createElement('div');
+            floating.appendChild(group);
+            group.appendChild(tabsContainer);
+            tabsContainer.appendChild(tab);
+            document.body.appendChild(floating);
+
+            try {
+                const event = dispatchContextMenu(tab);
+                controller.show(makePanel(), makeGroup(), event);
+
+                expect(openPopover).toHaveBeenCalledWith(
+                    expect.any(HTMLElement),
+                    expect.objectContaining({
+                        zIndex: 'calc(999 * 2)',
+                    })
+                );
+            } finally {
+                document.body.removeChild(floating);
+            }
+        });
+
+        test('uses the nearest z-indexed ancestor when several are stacked', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['close']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            const outer = document.createElement('div');
+            outer.style.zIndex = '500';
+            const inner = document.createElement('div');
+            inner.style.zIndex = '1003';
+            const tab = document.createElement('div');
+            outer.appendChild(inner);
+            inner.appendChild(tab);
+            document.body.appendChild(outer);
+
+            try {
+                const event = dispatchContextMenu(tab);
+                controller.show(makePanel(), makeGroup(), event);
+
+                expect(openPopover).toHaveBeenCalledWith(
+                    expect.any(HTMLElement),
+                    expect.objectContaining({
+                        zIndex: 'calc(1003 * 2)',
+                    })
+                );
+            } finally {
+                document.body.removeChild(outer);
+            }
         });
     });
 
@@ -550,6 +676,46 @@ describe('ContextMenuController', () => {
             );
             expect(menuEl.children[2].className).toBe('dv-context-menu-item');
             expect(menuEl.children[3].className).toBe('dv-context-menu-item');
+        });
+    });
+
+    describe('showForChip()', () => {
+        test('passes zIndex above the floating overlay when chip is inside one', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabGroupChipContextMenuItems: jest
+                    .fn()
+                    .mockReturnValue([{ label: 'Rename', action: jest.fn() }]),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            const floating = document.createElement('div');
+            floating.style.zIndex = '1001';
+            const chip = document.createElement('div');
+            floating.appendChild(chip);
+            document.body.appendChild(floating);
+
+            try {
+                const event = new MouseEvent('contextmenu', {
+                    bubbles: true,
+                    cancelable: true,
+                });
+                chip.dispatchEvent(event);
+
+                controller.showForChip(
+                    fromPartial({}),
+                    makeGroup(),
+                    event
+                );
+
+                expect(openPopover).toHaveBeenCalledWith(
+                    expect.any(HTMLElement),
+                    expect.objectContaining({
+                        zIndex: 'calc(1001 * 2)',
+                    })
+                );
+            } finally {
+                document.body.removeChild(floating);
+            }
         });
     });
 });
