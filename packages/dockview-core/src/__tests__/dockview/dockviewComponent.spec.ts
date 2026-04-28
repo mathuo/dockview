@@ -6308,8 +6308,12 @@ describe('dockviewComponent', () => {
                 fromPartial<Window>({
                     document: fromPartial<Document>({
                         body: document.createElement('body'),
+                        createElement: (tag: string) =>
+                            document.createElement(tag),
                     }),
                     focus: jest.fn(),
+                    requestAnimationFrame: (cb: FrameRequestCallback) =>
+                        window.requestAnimationFrame(cb),
                     addEventListener: jest
                         .fn()
                         .mockImplementation((name, cb) => {
@@ -6954,6 +6958,55 @@ describe('dockviewComponent', () => {
 
             expect(dockview.panels.length).toBe(0);
             expect(dockview.groups.length).toBe(0);
+        });
+
+        test('getPopupServiceForGroup returns a per-popout service rooted in the popout window', async () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+            const dockedGroup = panel1.api.group;
+
+            // Before popout, the group shares the main popupService
+            expect(dockview.getPopupServiceForGroup(dockedGroup)).toBe(
+                dockview.popupService
+            );
+
+            expect(await dockview.addPopoutGroup(panel1)).toBeTruthy();
+
+            // addPopoutGroup creates a new group for the popout window —
+            // panel1's group reference now points at it
+            const popoutGroup = panel1.api.group;
+            expect(popoutGroup).not.toBe(dockedGroup);
+
+            // The popout group has a dedicated popupService — required so
+            // its context menus render in the popout window, not the main one
+            const popoutService = dockview.getPopupServiceForGroup(popoutGroup);
+            expect(popoutService).not.toBe(dockview.popupService);
+
+            // Closing the popout removes its popupService from the registry
+            dockview.removePanel(panel1);
+            expect(dockview.getPopupServiceForGroup(popoutGroup)).toBe(
+                dockview.popupService
+            );
         });
 
         test('popout single panel -> save layout -> load layout', async () => {

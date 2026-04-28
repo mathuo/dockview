@@ -282,6 +282,31 @@ const FloatMenuItem = ({
     );
 };
 
+const PopoutMenuItem = ({
+    panel,
+    api,
+    close,
+}: IContextMenuItemComponentProps) => {
+    return (
+        <div
+            className="dv-context-menu-item"
+            onClick={() => {
+                api.addPopoutGroup(panel);
+                close();
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+        >
+            <span
+                className="material-symbols-outlined"
+                style={{ fontSize: '14px' }}
+            >
+                open_in_new
+            </span>
+            Popout tab
+        </div>
+    );
+};
+
 const colors = [
     'rgba(255,0,0,0.2)',
     'rgba(0,255,0,0.2)',
@@ -583,6 +608,7 @@ const DockviewDemo = (props: {
                 'closeAll',
                 'separator',
                 { component: FloatMenuItem },
+                { component: PopoutMenuItem },
             ];
 
             if (api) {

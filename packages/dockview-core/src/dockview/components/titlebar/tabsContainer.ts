@@ -487,7 +487,9 @@ export class TabsContainer
                         }
 
                         groupHeader.addEventListener('click', () => {
-                            this.accessor.popupService.close();
+                            this.accessor
+                                .getPopupServiceForGroup(this.group)
+                                .close();
                             if (tg.collapsed) {
                                 tg.expand();
                             }
@@ -530,7 +532,9 @@ export class TabsContainer
                     }
 
                     wrapper.addEventListener('click', (event) => {
-                        this.accessor.popupService.close();
+                        this.accessor
+                            .getPopupServiceForGroup(this.group)
+                            .close();
 
                         if (event.defaultPrevented) {
                             return;
@@ -549,13 +553,15 @@ export class TabsContainer
 
                 const relativeParent = findRelativeZIndexParent(root);
 
-                this.accessor.popupService.openPopover(el, {
-                    x: event.clientX,
-                    y: event.clientY,
-                    zIndex: relativeParent?.style.zIndex
-                        ? `calc(${relativeParent.style.zIndex} * 2)`
-                        : undefined,
-                });
+                this.accessor
+                    .getPopupServiceForGroup(this.group)
+                    .openPopover(el, {
+                        x: event.clientX,
+                        y: event.clientY,
+                        zIndex: relativeParent?.style.zIndex
+                            ? `calc(${relativeParent.style.zIndex} * 2)`
+                            : undefined,
+                    });
             })
         );
     }

@@ -1,3 +1,4 @@
+import { findRelativeZIndexParent } from '../dom';
 import { DockviewComponent } from './dockviewComponent';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
@@ -7,6 +8,20 @@ import {
     ContextMenuItem,
 } from './options';
 import { DockviewTabGroupColors, ITabGroup } from './tabGroup';
+
+function popoverZIndexFor(target: EventTarget | null): string | undefined {
+    if (!(target instanceof HTMLElement)) {
+        return undefined;
+    }
+    // Floating overlays live in the shell as siblings of the popover anchor
+    // and the AriaLevelTracker sets their inline z-index. Without this, a
+    // popover opened from inside a floating group would render behind it
+    // because they share the shell stacking context.
+    const relativeParent = findRelativeZIndexParent(target);
+    return relativeParent?.style.zIndex
+        ? `calc(${relativeParent.style.zIndex} * 2)`
+        : undefined;
+}
 
 let _nextId = 0;
 const nextContextMenuItemId = () => `dv-ctx-menu-item-${_nextId++}`;
@@ -123,7 +138,8 @@ export class ContextMenuController {
 
         event.preventDefault();
 
-        const close = () => this.accessor.popupService.close();
+        const popupService = this.accessor.getPopupServiceForGroup(group);
+        const close = () => popupService.close();
         const menuEl = document.createElement('div');
         menuEl.className = 'dv-context-menu';
         menuEl.setAttribute('role', 'menu');
@@ -179,9 +195,10 @@ export class ContextMenuController {
             }
         }
 
-        this.accessor.popupService.openPopover(menuEl, {
+        popupService.openPopover(menuEl, {
             x: event.clientX,
             y: event.clientY,
+            zIndex: popoverZIndexFor(event.target),
         });
     }
 
@@ -207,7 +224,8 @@ export class ContextMenuController {
 
         event.preventDefault();
 
-        const close = () => this.accessor.popupService.close();
+        const popupService = this.accessor.getPopupServiceForGroup(group);
+        const close = () => popupService.close();
         const menuEl = document.createElement('div');
         menuEl.className = 'dv-context-menu';
         menuEl.setAttribute('role', 'menu');
@@ -233,9 +251,10 @@ export class ContextMenuController {
             }
         }
 
-        this.accessor.popupService.openPopover(menuEl, {
+        popupService.openPopover(menuEl, {
             x: event.clientX,
             y: event.clientY,
+            zIndex: popoverZIndexFor(event.target),
         });
     }
 }
