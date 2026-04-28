@@ -7,11 +7,18 @@ import {
     EmbeddedViewRef,
     createComponent,
 } from '@angular/core';
-import { ITabGroupChipRenderer, ITabGroup, DockviewApi } from 'dockview-core';
+import {
+    ITabGroupChipRenderer,
+    ITabGroup,
+    DockviewApi,
+    TabGroupChipRendererParams,
+} from 'dockview-core';
 
 export interface IDockviewAngularTabGroupChipProps {
     tabGroup: ITabGroup;
     api: DockviewApi;
+    accent: string | undefined;
+    componentParams: Record<string, unknown> | undefined;
 }
 
 export class AngularTabGroupChipRenderer implements ITabGroupChipRenderer {
@@ -34,7 +41,7 @@ export class AngularTabGroupChipRenderer implements ITabGroupChipRenderer {
         this.appRef = injector.get(ApplicationRef);
     }
 
-    init(params: { tabGroup: ITabGroup; api: DockviewApi }): void {
+    init(params: TabGroupChipRendererParams): void {
         this.componentRef = createComponent(this.component, {
             environmentInjector:
                 this.environmentInjector ||
@@ -45,6 +52,8 @@ export class AngularTabGroupChipRenderer implements ITabGroupChipRenderer {
         const instance = this.componentRef.instance as Record<string, unknown>;
         instance['tabGroup'] = params.tabGroup;
         instance['api'] = params.api;
+        instance['accent'] = params.accent;
+        instance['componentParams'] = params.componentParams;
 
         const hostView = this.componentRef.hostView as EmbeddedViewRef<any>;
         const rootNode = hostView.rootNodes[0] as HTMLElement;
@@ -54,13 +63,15 @@ export class AngularTabGroupChipRenderer implements ITabGroupChipRenderer {
         this.componentRef.changeDetectorRef.markForCheck();
     }
 
-    update(params: { tabGroup: ITabGroup }): void {
+    update(params: TabGroupChipRendererParams): void {
         if (!this.componentRef) {
             return;
         }
 
         const instance = this.componentRef.instance as Record<string, unknown>;
         instance['tabGroup'] = params.tabGroup;
+        instance['accent'] = params.accent;
+        instance['componentParams'] = params.componentParams;
         this.componentRef.changeDetectorRef.markForCheck();
     }
 

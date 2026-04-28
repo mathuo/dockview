@@ -11,6 +11,7 @@ import type {
     ITabGroupChipRenderer,
     ITabGroup,
     ITabRenderer,
+    TabGroupChipRendererParams,
     IWatermarkPanelProps,
     IWatermarkRenderer,
     IContextMenuItemRenderer,
@@ -327,7 +328,7 @@ export class VueTabGroupChipRenderer
         this.element.style.display = 'inline-flex';
     }
 
-    init(params: { tabGroup: ITabGroup; api: DockviewApi }): void {
+    init(params: TabGroupChipRendererParams): void {
         this._renderDisposable?.dispose();
         this._renderDisposable = mountVueComponent(
             this.component,
@@ -336,15 +337,22 @@ export class VueTabGroupChipRenderer
                 params: {
                     tabGroup: params.tabGroup,
                     api: params.api,
+                    accent: params.accent,
+                    componentParams: params.componentParams,
                 },
             },
             this.element
         );
     }
 
-    update(params: { tabGroup: ITabGroup }): void {
+    update(params: TabGroupChipRendererParams): void {
         this._renderDisposable?.update({
-            params: { tabGroup: params.tabGroup },
+            params: {
+                tabGroup: params.tabGroup,
+                api: params.api,
+                accent: params.accent,
+                componentParams: params.componentParams,
+            },
         });
     }
 
