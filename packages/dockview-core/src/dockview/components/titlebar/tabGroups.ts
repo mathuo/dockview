@@ -10,6 +10,7 @@ import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { DockviewHeaderDirection } from '../../options';
 import { Tab } from '../tab/tab';
 import { ITabGroup } from '../../tabGroup';
+import { applyTabGroupAccent } from '../../tabGroupAccent';
 import { TabGroupChip } from './tabGroupChip';
 import { ITabGroupChipRenderer } from '../../framework';
 import {
@@ -99,6 +100,19 @@ export class TabGroupManager {
         }
 
         // Update CSS classes on all tabs
+        this._updateTabGroupClasses();
+    }
+
+    /**
+     * Re-read the active palette and re-apply colors to chips, tabs and
+     * the indicator. Called when `tabGroupColors` / `tabGroupAccent`
+     * options change at runtime.
+     */
+    refreshAccents(): void {
+        for (const tabGroup of this._ctx.group.model.getTabGroups()) {
+            const entry = this._chipRenderers.get(tabGroup.id);
+            entry?.chip.update?.({ tabGroup });
+        }
         this._updateTabGroupClasses();
     }
 
@@ -266,6 +280,7 @@ export class TabGroupManager {
                 getChipElement: (id) =>
                     this._chipRenderers.get(id)?.chip.element,
                 getDirection: () => this._ctx.getDirection(),
+                getColorPalette: () => this._ctx.accessor.tabGroupColorPalette,
             });
         }
     }
@@ -279,7 +294,7 @@ export class TabGroupManager {
             this._ctx.accessor.options.createTabGroupChipComponent;
         const chip: ITabGroupChipRenderer = createChip
             ? createChip(tabGroup)
-            : new TabGroupChip();
+            : new TabGroupChip(this._ctx.accessor.tabGroupColorPalette);
 
         chip.init({ tabGroup, api: this._ctx.accessor.api });
 
@@ -393,9 +408,10 @@ export class TabGroupManager {
 
                 // Expose the resolved group color as a CSS custom property
                 // so pure-CSS themes can use it for borders, backgrounds, etc.
-                tab.element.style.setProperty(
-                    '--dv-tab-group-color',
-                    `var(--dv-tab-group-color-${tg.color})`
+                applyTabGroupAccent(
+                    tab.element,
+                    tg.color,
+                    this._ctx.accessor.tabGroupColorPalette
                 );
 
                 // Collapse / expand with animation

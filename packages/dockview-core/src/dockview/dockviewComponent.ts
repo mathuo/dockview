@@ -96,11 +96,25 @@ import {
     IEdgeGroupHost,
 } from './dockviewShell';
 import { DockviewGroupPanelApi } from '../api/dockviewGroupPanelApi';
+import {
+    DEFAULT_TAB_GROUP_COLORS,
+    DockviewTabGroupColorEntry,
+    TabGroupColorPalette,
+} from './tabGroupAccent';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     activationSize: { type: 'pixels', value: 10 },
     size: { type: 'pixels', value: 20 },
 };
+
+function buildTabGroupColorPalette(options: {
+    tabGroupColors?: DockviewTabGroupColorEntry[];
+    tabGroupAccent?: 'palette' | 'off';
+}): TabGroupColorPalette {
+    const entries = options.tabGroupColors ?? DEFAULT_TAB_GROUP_COLORS;
+    const enabled = options.tabGroupAccent !== 'off';
+    return new TabGroupColorPalette(entries, enabled);
+}
 
 function moveGroupWithoutDestroying(options: {
     from: DockviewGroupPanel;
@@ -256,6 +270,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidTabGroupChange: Event<DockviewTabGroupChangeEvent>;
     readonly onDidTabGroupCollapsedChange: Event<DockviewTabGroupCollapsedChangeEvent>;
     readonly options: DockviewComponentOptions;
+    readonly tabGroupColorPalette: TabGroupColorPalette;
     updateOptions(options: DockviewOptions): void;
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void;
     moveGroup(options: MoveGroupOptions): void;
@@ -312,6 +327,7 @@ export class DockviewComponent
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
     private readonly _api: DockviewApi;
     private _options: Exclude<DockviewComponentOptions, 'orientation'>;
+    private _tabGroupColorPalette: TabGroupColorPalette;
     private _watermark: IWatermarkRenderer | null = null;
     private readonly _themeClassnames: Classnames;
     private _shellThemeClassnames: Classnames | undefined;
@@ -463,6 +479,10 @@ export class DockviewComponent
         return this._options;
     }
 
+    get tabGroupColorPalette(): TabGroupColorPalette {
+        return this._tabGroupColorPalette;
+    }
+
     get activePanel(): IDockviewPanel | undefined {
         const activeGroup = this.activeGroup;
 
@@ -511,6 +531,7 @@ export class DockviewComponent
         });
 
         this._options = options;
+        this._tabGroupColorPalette = buildTabGroupColorPalette(options);
 
         this.popupService = new PopupService(this.element);
         this.contextMenuController = new ContextMenuController(this);
@@ -1480,6 +1501,17 @@ export class DockviewComponent
         ) {
             for (const group of this.groups) {
                 group.model.updateHeaderActions();
+            }
+        }
+
+        if ('tabGroupColors' in options || 'tabGroupAccent' in options) {
+            this._tabGroupColorPalette.setEntries(
+                this._options.tabGroupColors ?? DEFAULT_TAB_GROUP_COLORS
+            );
+            this._tabGroupColorPalette.enabled =
+                this._options.tabGroupAccent !== 'off';
+            for (const group of this.groups) {
+                group.model.refreshTabGroupAccent();
             }
         }
 

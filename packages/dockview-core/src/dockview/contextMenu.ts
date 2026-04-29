@@ -7,7 +7,8 @@ import {
     ContextMenuItemConfig,
     ContextMenuItem,
 } from './options';
-import { DockviewTabGroupColors, ITabGroup } from './tabGroup';
+import { ITabGroup } from './tabGroup';
+import { TabGroupColorPalette } from './tabGroupAccent';
 
 function popoverZIndexFor(target: EventTarget | null): string | undefined {
     if (!(target instanceof HTMLElement)) {
@@ -93,18 +94,36 @@ function buildRenameInput(tabGroup: ITabGroup): HTMLElement {
     return wrapper;
 }
 
-function buildColorPicker(tabGroup: ITabGroup): HTMLElement {
+function buildColorPicker(
+    tabGroup: ITabGroup,
+    palette: TabGroupColorPalette
+): HTMLElement {
     const wrapper = document.createElement('div');
     wrapper.className = 'dv-context-menu-color-picker';
 
-    for (const color of Object.values(DockviewTabGroupColors)) {
+    if (!palette.enabled) {
+        // Opt-out: render no swatches. Returning a wrapper rather than null
+        // keeps the call site simple; the wrapper is empty and visually inert.
+        return wrapper;
+    }
+
+    for (const entry of palette.entries()) {
         const swatch = document.createElement('div');
-        swatch.className = `dv-context-menu-color-swatch dv-tab-group-chip--${color}`;
-        if (tabGroup.color === color) {
+        swatch.className = 'dv-context-menu-color-swatch';
+        // Use a CSS custom property rather than setting `backgroundColor`
+        // directly: the IDL setter validates the value against a color
+        // grammar and rejects `var(...)` references in some environments
+        // (notably jsdom; some browsers have historically had similar
+        // quirks). The matching SCSS rule reads the var at use time.
+        swatch.style.setProperty('--dv-tab-group-color', entry.value);
+        if (entry.label) {
+            swatch.title = entry.label;
+        }
+        if (tabGroup.color === entry.id) {
             swatch.classList.add('dv-context-menu-color-swatch--selected');
         }
         swatch.addEventListener('click', () => {
-            tabGroup.setColor(color);
+            tabGroup.setColor(entry.id);
         });
         wrapper.appendChild(swatch);
     }
@@ -236,7 +255,12 @@ export class ContextMenuController {
             } else if (item === 'rename') {
                 menuEl.appendChild(buildRenameInput(tabGroup));
             } else if (item === 'colorPicker') {
-                menuEl.appendChild(buildColorPicker(tabGroup));
+                menuEl.appendChild(
+                    buildColorPicker(
+                        tabGroup,
+                        this.accessor.tabGroupColorPalette
+                    )
+                );
             } else if (isItemConfig(item) && item.element) {
                 menuEl.appendChild(item.element);
             } else if (isItemConfig(item) && item.label) {

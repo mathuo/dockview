@@ -24,6 +24,7 @@ import {
     DropdownElement,
 } from './tabOverflowControl';
 import { DockviewHeaderDirection } from '../../options';
+import { applyTabGroupAccent } from '../../tabGroupAccent';
 
 export interface TabDropIndexEvent {
     readonly event: DragEvent;
@@ -65,6 +66,7 @@ export interface ITabsContainer extends IDisposable {
     hide(): void;
     updateDragAndDropState(): void;
     updateTabGroups(): void;
+    refreshTabGroupAccent(): void;
 }
 
 export class TabsContainer
@@ -467,9 +469,10 @@ export class TabsContainer
 
                         const colorDot = document.createElement('span');
                         colorDot.className = 'dv-tabs-overflow-group-color';
-                        colorDot.style.setProperty(
-                            '--dv-tab-group-color',
-                            `var(--dv-tab-group-color-${tg.color})`
+                        applyTabGroupAccent(
+                            colorDot,
+                            tg.color,
+                            this.accessor.tabGroupColorPalette
                         );
                         groupHeader.appendChild(colorDot);
 
@@ -573,5 +576,9 @@ export class TabsContainer
 
     updateTabGroups(): void {
         this.tabs.updateTabGroups();
+    }
+
+    refreshTabGroupAccent(): void {
+        this.tabs.refreshTabGroupAccent();
     }
 }

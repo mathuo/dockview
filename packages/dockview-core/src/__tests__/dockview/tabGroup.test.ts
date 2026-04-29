@@ -1,19 +1,16 @@
-import {
-    TabGroup,
-    DockviewTabGroupColor,
-    isValidTabGroupColor,
-} from '../../dockview/tabGroup';
+import { TabGroup } from '../../dockview/tabGroup';
 
 describe('TabGroup', () => {
     test('should create with default values', () => {
         const group = new TabGroup('g1');
         expect(group.id).toBe('g1');
         expect(group.label).toBe('');
-        expect(group.color).toBe('grey');
+        expect(group.color).toBeUndefined();
         expect(group.collapsed).toBe(false);
         expect(group.panelIds).toEqual([]);
         expect(group.size).toBe(0);
         expect(group.isEmpty).toBe(true);
+        expect(group.componentParams).toBeUndefined();
         group.dispose();
     });
 
@@ -40,11 +37,21 @@ describe('TabGroup', () => {
         group.dispose();
     });
 
-    test('should default invalid color to grey', () => {
-        const group = new TabGroup('g3', {
-            color: 'invalid' as DockviewTabGroupColor,
-        });
-        expect(group.color).toBe('grey');
+    test('should store any color string verbatim', () => {
+        const group = new TabGroup('g3', { color: '#abc123' });
+        expect(group.color).toBe('#abc123');
+        group.setColor('rgb(0, 0, 0)');
+        expect(group.color).toBe('rgb(0, 0, 0)');
+        group.dispose();
+    });
+
+    test('should treat empty string as undefined color', () => {
+        const group = new TabGroup('g4', { color: '' });
+        expect(group.color).toBeUndefined();
+        group.setColor('blue');
+        expect(group.color).toBe('blue');
+        group.setColor('');
+        expect(group.color).toBeUndefined();
         group.dispose();
     });
 
@@ -174,10 +181,16 @@ describe('TabGroup', () => {
         group.dispose();
     });
 
-    test('should default to grey on invalid color set', () => {
-        const group = new TabGroup('g1', { color: 'blue' });
-        group.setColor('invalid' as DockviewTabGroupColor);
-        expect(group.color).toBe('grey');
+    test('should fire onDidChange when componentParams change', () => {
+        const group = new TabGroup('g1');
+        const changes: void[] = [];
+        group.onDidChange(() => changes.push(undefined));
+        group.setComponentParams({ icon: 'star' });
+        expect(group.componentParams).toEqual({ icon: 'star' });
+        expect(changes.length).toBe(1);
+        group.setComponentParams(undefined);
+        expect(group.componentParams).toBeUndefined();
+        expect(changes.length).toBe(2);
         group.dispose();
     });
 
@@ -212,7 +225,11 @@ describe('TabGroup', () => {
     });
 
     test('should serialize to JSON', () => {
-        const group = new TabGroup('g1', { label: 'Test', color: 'red' });
+        const group = new TabGroup('g1', {
+            label: 'Test',
+            color: 'red',
+            componentParams: { icon: 'star' },
+        });
         group.addPanel('p1');
         group.addPanel('p2');
         group.collapse();
@@ -223,14 +240,17 @@ describe('TabGroup', () => {
             color: 'red',
             collapsed: true,
             panelIds: ['p1', 'p2'],
+            componentParams: { icon: 'star' },
         });
         group.dispose();
     });
 
-    test('should omit label from JSON when empty', () => {
+    test('should omit optional fields from JSON when unset', () => {
         const group = new TabGroup('g1');
         const json = group.toJSON();
         expect(json.label).toBeUndefined();
+        expect(json.color).toBeUndefined();
+        expect(json.componentParams).toBeUndefined();
         group.dispose();
     });
 
@@ -242,29 +262,5 @@ describe('TabGroup', () => {
         });
         group.dispose();
         expect(destroyed).toBe(true);
-    });
-});
-
-describe('isValidTabGroupColor', () => {
-    test('should validate all valid colors', () => {
-        const validColors = [
-            'grey',
-            'blue',
-            'red',
-            'yellow',
-            'green',
-            'pink',
-            'purple',
-            'cyan',
-        ];
-        for (const color of validColors) {
-            expect(isValidTabGroupColor(color)).toBe(true);
-        }
-    });
-
-    test('should reject invalid colors', () => {
-        expect(isValidTabGroupColor('')).toBe(false);
-        expect(isValidTabGroupColor('invalid')).toBe(false);
-        expect(isValidTabGroupColor('orange')).toBe(true);
     });
 });

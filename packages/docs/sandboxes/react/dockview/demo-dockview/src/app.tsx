@@ -10,8 +10,6 @@ import {
     IContextMenuItemComponentProps,
     GetTabContextMenuItemsParams,
     GetTabGroupChipContextMenuItemsParams,
-    DockviewTabGroupColors,
-    DockviewTabGroupColor,
 } from 'dockview-react';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
@@ -36,6 +34,7 @@ import {
     getInitialStateFromTheme,
 } from './themeBuilder';
 import { Sidebar } from './themeBuilderModal';
+import { DemoTabGroupChip } from './customTabChip';
 
 export const ApiContext = React.createContext<DockviewApi | undefined>(
     undefined
@@ -646,14 +645,16 @@ const DockviewDemo = (props: {
                     label: 'Add to new group',
                     action: () => {
                         const label = window.prompt('Group name:') || '';
-                        const colors = Object.values(DockviewTabGroupColors);
-                        const color = colors[
-                            Math.floor(Math.random() * colors.length)
-                        ] as DockviewTabGroupColor;
+                        // Color is intentionally omitted — the demo runs
+                        // with `tabGroupAccent: 'off'`, so the custom chip
+                        // owns its own visual.
+                        const ICONS = ['📁', '⭐️', '🔥', '🚀', '🎯'];
+                        const icon =
+                            ICONS[Math.floor(Math.random() * ICONS.length)];
                         const newGroup = api.createTabGroup({
                             groupId,
                             label,
-                            color,
+                            componentParams: { icon },
                         });
                         api.addPanelToTabGroup({
                             groupId,
@@ -676,7 +677,7 @@ const DockviewDemo = (props: {
                 | 'rename'
                 | 'separator'
                 | { label: string; action: () => void }
-            )[] = ['rename', 'colorPicker'];
+            )[] = ['rename'];
 
             if (api) {
                 items.push(
@@ -789,6 +790,10 @@ const DockviewDemo = (props: {
                                             }
                                             getTabGroupChipContextMenuItems={
                                                 getTabGroupChipContextMenuItems
+                                            }
+                                            tabGroupAccent="off"
+                                            tabGroupChipComponent={
+                                                DemoTabGroupChip
                                             }
                                         />
                                     </ThemeContext.Provider>
