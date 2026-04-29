@@ -680,17 +680,21 @@ const tabGroup = api.getTabGroupForPanel({
 The `ITabGroup` interface provides methods to read and modify a tab group:
 
 ```ts
-tabGroup.id;           // readonly string
-tabGroup.label;        // readonly string
-tabGroup.color;        // readonly DockviewTabGroupColor
-tabGroup.collapsed;    // readonly boolean
-tabGroup.panelIds;     // readonly string[]
-tabGroup.size;         // readonly number (panel count)
-tabGroup.isEmpty;      // readonly boolean
+tabGroup.id;               // readonly string
+tabGroup.label;            // readonly string
+tabGroup.color;            // readonly string | undefined
+tabGroup.collapsed;        // readonly boolean
+tabGroup.panelIds;         // readonly string[]
+tabGroup.size;             // readonly number (panel count)
+tabGroup.isEmpty;          // readonly boolean
+tabGroup.componentParams;  // readonly Record<string, unknown> | undefined
 
 // Modify properties
 tabGroup.setLabel('New Label');
-tabGroup.setColor('red');
+tabGroup.setColor('red');                     // palette id
+tabGroup.setColor('#abc123');                 // raw CSS literal
+tabGroup.setColor(undefined);                 // clear
+tabGroup.setComponentParams({ icon: 'star' });
 
 // Collapse and expand
 tabGroup.collapse();
@@ -702,7 +706,105 @@ tabGroup.containsPanel('panel-1');
 tabGroup.indexOfPanel('panel-1');
 ```
 
-Available colors: `'grey'`, `'red'`, `'orange'`, `'yellow'`, `'green'`, `'cyan'`, `'blue'`, `'purple'`, `'pink'`.
+### Color palette
+
+`tabGroup.color` is any CSS color string — either an id from the active palette
+or a raw CSS literal (`'#abc123'`, `'rgb(...)'`). Resolution to a concrete value
+is handled by the dockview's color palette.
+
+The default palette ships with 9 named entries:
+
+| Id | CSS variable |
+| --- | --- |
+| `grey` | `--dv-tab-group-color-grey` |
+| `blue` | `--dv-tab-group-color-blue` |
+| `red` | `--dv-tab-group-color-red` |
+| `yellow` | `--dv-tab-group-color-yellow` |
+| `green` | `--dv-tab-group-color-green` |
+| `pink` | `--dv-tab-group-color-pink` |
+| `purple` | `--dv-tab-group-color-purple` |
+| `cyan` | `--dv-tab-group-color-cyan` |
+| `orange` | `--dv-tab-group-color-orange` |
+
+The default palette references these CSS vars, so you can re-skin the defaults
+purely via CSS overrides. The full set is exported as `DEFAULT_TAB_GROUP_COLORS`.
+
+#### Custom palette
+
+Replace the default palette with `tabGroupColors`. The list fully replaces the
+defaults — there is no merge. Each entry needs an `id` (stored on `tabGroup.color`
+and serialized) and a `value` (any CSS color expression). An optional `label`
+appears as a tooltip in the context-menu picker.
+
+```ts
+const tabGroupColors = [
+    { id: 'sunset', value: '#ff6b35', label: 'Sunset' },
+    { id: 'ocean', value: '#118ab2', label: 'Ocean' },
+    { id: 'forest', value: '#06d6a0', label: 'Forest' },
+];
+```
+
+<FrameworkSpecific framework="React">
+```tsx
+<DockviewReact tabGroupColors={tabGroupColors} {...rest} />
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+```ts
+const api = createDockview(parentElement, { tabGroupColors });
+
+// or swap at runtime
+api.updateOptions({ tabGroupColors: [/* new entries */] });
+```
+</FrameworkSpecific>
+
+The active palette is exposed on the api as `api.tabGroupColors` for custom
+chip renderers that want to read from it (e.g. to render their own picker).
+
+#### Disabling color
+
+Set `tabGroupAccent: 'off'` to opt out of the built-in color concept entirely.
+The dockview stops writing the `--dv-tab-group-color` custom property, hides
+the color picker, and applies `dv-tab-group-chip--accent-off` to chips. The
+`tabGroup.color` field is still preserved as data — pair this with a
+`createTabGroupChipComponent` to own the chip visual end-to-end.
+
+<FrameworkSpecific framework="React">
+```tsx
+<DockviewReact
+    tabGroupAccent="off"
+    tabGroupChipComponent={MyCustomChip}
+    {...rest}
+/>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+```ts
+const api = createDockview(parentElement, {
+    tabGroupAccent: 'off',
+    createTabGroupChipComponent: (tabGroup) => new MyChipRenderer(),
+});
+```
+</FrameworkSpecific>
+
+### Component params
+
+Use `componentParams` to attach free-form data to a tab group — typically
+consumed by a custom chip renderer. The value is a `Record<string, unknown>`
+that round-trips through `toJSON` / `fromJSON`, so it must be JSON-serializable.
+
+```ts
+const tabGroup = api.createTabGroup({
+    groupId: 'group-1',
+    label: 'Trading',
+    componentParams: { icon: '📊', priority: 1 },
+});
+
+// Update at runtime — fires onDidChange so a custom chip can re-render
+tabGroup.setComponentParams({ icon: '⭐️', priority: 1 });
+```
 
 ### Events
 
@@ -798,10 +900,14 @@ The renderer must implement:
 interface ITabGroupChipRenderer {
     readonly element: HTMLElement;   // the chip DOM element
     init(params: { tabGroup: ITabGroup; api: DockviewApi }): void;
-    update?(params: { tabGroup: ITabGroup }): void; // called when label or color changes
+    update?(params: { tabGroup: ITabGroup }): void; // called when label, color or componentParams change
     dispose(): void;
 }
 ```
+
+Read `tabGroup.componentParams` inside `init` / `update` to access free-form
+data attached to the group, and listen on `tabGroup.onDidChange` to re-render
+when the value mutates.
 
 <FrameworkSpecific framework="JavaScript">
 ```ts
@@ -855,21 +961,11 @@ Tab groups are included in `toJSON` / `fromJSON` automatically. Each tab group i
 interface SerializedTabGroup {
     id: string;
     label?: string;
-    color: DockviewTabGroupColor;
+    color?: string;
     collapsed: boolean;
     panelIds: string[];
+    componentParams?: Record<string, unknown>;
 }
-```
-
-### Utilities
-
-Use `isValidTabGroupColor` to validate a string as a tab group color at runtime:
-
-```ts
-import { isValidTabGroupColor } from 'dockview-react';
-
-isValidTabGroupColor('blue');   // true
-isValidTabGroupColor('foo');    // false — type narrows to never
 ```
 
 ## Tab Height

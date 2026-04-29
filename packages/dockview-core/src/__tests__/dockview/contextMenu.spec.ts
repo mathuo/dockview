@@ -5,6 +5,11 @@ import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import { IDockviewPanel } from '../../dockview/dockviewPanel';
 import { PopupService } from '../../dockview/components/popupService';
+import {
+    DEFAULT_TAB_GROUP_COLORS,
+    TabGroupColorPalette,
+} from '../../dockview/tabGroupAccent';
+import { ITabGroup } from '../../dockview/tabGroup';
 
 function makeAccessor(
     overrides: {
@@ -677,6 +682,125 @@ describe('ContextMenuController', () => {
             );
             expect(menuEl.children[2].className).toBe('dv-context-menu-item');
             expect(menuEl.children[3].className).toBe('dv-context-menu-item');
+        });
+    });
+
+    describe('color picker', () => {
+        function makeChipAccessor(palette: TabGroupColorPalette) {
+            const openPopover = jest.fn();
+            const close = jest.fn();
+            const popupService = fromPartial<PopupService>({
+                openPopover,
+                close,
+            });
+            const accessor = fromPartial<DockviewComponent>({
+                options: {
+                    getTabGroupChipContextMenuItems: jest
+                        .fn()
+                        .mockReturnValue(['colorPicker']),
+                },
+                api: {} as any,
+                popupService,
+                getPopupServiceForGroup: () => popupService,
+                tabGroupColorPalette: palette,
+            });
+            return { accessor, openPopover };
+        }
+
+        function getMenuEl(openPopover: jest.Mock): HTMLElement {
+            const call = openPopover.mock.calls[0];
+            return call[0] as HTMLElement;
+        }
+
+        test('renders one swatch per palette entry with backgroundColor set', () => {
+            const palette = new TabGroupColorPalette(DEFAULT_TAB_GROUP_COLORS);
+            const { accessor, openPopover } = makeChipAccessor(palette);
+            const controller = new ContextMenuController(accessor);
+
+            const tabGroup = fromPartial<ITabGroup>({
+                color: 'blue',
+                setColor: jest.fn(),
+            });
+            const event = new MouseEvent('contextmenu', { cancelable: true });
+            controller.showForChip(tabGroup, makeGroup(), event);
+
+            const menuEl = getMenuEl(openPopover);
+            const picker = menuEl.querySelector(
+                '.dv-context-menu-color-picker'
+            )!;
+            const swatches = picker.querySelectorAll(
+                '.dv-context-menu-color-swatch'
+            );
+            expect(swatches.length).toBe(DEFAULT_TAB_GROUP_COLORS.length);
+
+            const first = swatches[0] as HTMLElement;
+            expect(first.style.getPropertyValue('--dv-tab-group-color')).toBe(
+                DEFAULT_TAB_GROUP_COLORS[0].value
+            );
+
+            // The 'blue' swatch is the second entry in defaults; it should be
+            // marked as selected.
+            const blueIndex = DEFAULT_TAB_GROUP_COLORS.findIndex(
+                (e) => e.id === 'blue'
+            );
+            expect(
+                (swatches[blueIndex] as HTMLElement).classList.contains(
+                    'dv-context-menu-color-swatch--selected'
+                )
+            ).toBe(true);
+        });
+
+        test('renders custom palette entries', () => {
+            const palette = new TabGroupColorPalette([
+                { id: 'brand', value: '#123456', label: 'Brand' },
+                { id: 'accent', value: '#abcdef', label: 'Accent' },
+            ]);
+            const { accessor, openPopover } = makeChipAccessor(palette);
+            const controller = new ContextMenuController(accessor);
+
+            const tabGroup = fromPartial<ITabGroup>({
+                color: 'brand',
+                setColor: jest.fn(),
+            });
+            const event = new MouseEvent('contextmenu', { cancelable: true });
+            controller.showForChip(tabGroup, makeGroup(), event);
+
+            const menuEl = getMenuEl(openPopover);
+            const swatches = menuEl.querySelectorAll(
+                '.dv-context-menu-color-swatch'
+            );
+            expect(swatches.length).toBe(2);
+            expect((swatches[0] as HTMLElement).title).toBe('Brand');
+            expect(
+                (swatches[0] as HTMLElement).style.getPropertyValue(
+                    '--dv-tab-group-color'
+                )
+            ).toBe('#123456');
+        });
+
+        test('renders empty wrapper when palette is disabled', () => {
+            const palette = new TabGroupColorPalette(
+                DEFAULT_TAB_GROUP_COLORS,
+                false
+            );
+            const { accessor, openPopover } = makeChipAccessor(palette);
+            const controller = new ContextMenuController(accessor);
+
+            const tabGroup = fromPartial<ITabGroup>({
+                color: 'blue',
+                setColor: jest.fn(),
+            });
+            const event = new MouseEvent('contextmenu', { cancelable: true });
+            controller.showForChip(tabGroup, makeGroup(), event);
+
+            const menuEl = getMenuEl(openPopover);
+            const picker = menuEl.querySelector(
+                '.dv-context-menu-color-picker'
+            )!;
+            expect(picker).toBeTruthy();
+            expect(
+                picker.querySelectorAll('.dv-context-menu-color-swatch').length
+            ).toBe(0);
         });
     });
 

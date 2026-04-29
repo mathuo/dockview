@@ -1,11 +1,11 @@
 import { addDisposableListener, Emitter, Event } from '../../../events';
 import { CompositeDisposable } from '../../../lifecycle';
 import { toggleClass } from '../../../dom';
+import { ITabGroup } from '../../tabGroup';
 import {
-    ITabGroup,
-    DockviewTabGroupColor,
-    DockviewTabGroupColors,
-} from '../../tabGroup';
+    applyTabGroupAccent,
+    TabGroupColorPalette,
+} from '../../tabGroupAccent';
 import { ITabGroupChipRenderer } from '../../framework';
 import { DockviewApi } from '../../../api/component.api';
 
@@ -30,7 +30,7 @@ export class TabGroupChip
         return this._element;
     }
 
-    constructor() {
+    constructor(private readonly _palette?: TabGroupColorPalette) {
         super();
 
         this._element = document.createElement('div');
@@ -87,13 +87,12 @@ export class TabGroupChip
         this.updateCollapsed(params.tabGroup.collapsed);
     }
 
-    private updateColor(color: DockviewTabGroupColor): void {
-        for (const c of Object.values(DockviewTabGroupColors)) {
-            toggleClass(this._element, `dv-tab-group-chip--${c}`, c === color);
-        }
-        this._element.style.setProperty(
-            '--dv-tab-group-color',
-            `var(--dv-tab-group-color-${color})`
+    private updateColor(color: string | undefined): void {
+        applyTabGroupAccent(this._element, color, this._palette);
+        toggleClass(
+            this._element,
+            'dv-tab-group-chip--accent-off',
+            this._palette?.enabled === false
         );
     }
 

@@ -3,15 +3,17 @@ import {
     WrapTabGroupIndicator,
     TabGroupIndicatorContext,
 } from '../../../../dockview/components/titlebar/tabGroupIndicator';
-import { ITabGroup } from '../../../../dockview/tabGroup';
 import { TabGroup } from '../../../../dockview/tabGroup';
-import { Tab } from '../../../../dockview/components/tab/tab';
-import { IValueDisposable } from '../../../../lifecycle';
+import {
+    DEFAULT_TAB_GROUP_COLORS,
+    TabGroupColorPalette,
+} from '../../../../dockview/tabGroupAccent';
 
 function createContext(
     overrides: Partial<TabGroupIndicatorContext> = {}
 ): TabGroupIndicatorContext {
     const tabsList = document.createElement('div');
+    const palette = new TabGroupColorPalette(DEFAULT_TAB_GROUP_COLORS, true);
     return {
         tabsList,
         getTabGroups: () => [],
@@ -19,6 +21,7 @@ function createContext(
         getTabMap: () => new Map(),
         getChipElement: () => undefined,
         getDirection: () => 'horizontal',
+        getColorPalette: () => palette,
         ...overrides,
     };
 }
