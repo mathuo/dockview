@@ -86,9 +86,7 @@
     "typedoc": "^0.25.6",
     "typescript": "~5.4.0",
     "vite": "^5.1.5",
-    "vue": "^3.4.21",
     "vue-sfc-loader": "^0.1.0",
-    "vue-tsc": "^2.0.5",
     "zone.js": "~0.14.0"
   },
   "engines": {
