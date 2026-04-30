@@ -36,8 +36,7 @@
     "@types/react": "^18.2.46",
     "@types/react-dom": "^18.2.18",
     "@vue/test-utils": "2.4.6",
-    "vue": "3.4.21",
-    "cliui/string-width": "^4.2.3"
+    "vue": "3.4.21"
   },
   "devDependencies": {
     "@angular/common": "^17.0.0",
@@ -46,7 +45,7 @@
     "@angular/core": "^17.0.0",
     "@angular/platform-browser": "^17.0.0",
     "@angular/platform-browser-dynamic": "^17.0.0",
-    "@nx/js": "^20.4.0",
+    "@nx/js": "^22.7.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.5",
@@ -73,7 +72,7 @@
     "jest-sonar-reporter": "^2.0.0",
     "jsdom": "^23.0.1",
     "ng-packagr": "^17.0.0",
-    "nx": "^20.4.0",
+    "nx": "^22.7.1",
     "postcss": "^8.5.6",
     "prettier": "^3.8.1",
     "react": "^18.2.0",
