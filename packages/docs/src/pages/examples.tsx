@@ -61,7 +61,7 @@ const COMPONENTS: ComponentGroup[] = [
             { name: 'resize', frameworks: ['react', 'vue'] },
             { name: 'resize-container', frameworks: ['react', 'vue'] },
             { name: 'scrollbars', frameworks: ['react', 'vue', 'typescript'] },
-            { name: 'tab-groups', frameworks: ['react'] },
+            { name: 'tab-groups', frameworks: ['react', 'vue', 'angular', 'typescript'] },
             { name: 'tabview', frameworks: ['react', 'vue', 'typescript'] },
             { name: 'update-parameters', frameworks: ['react', 'vue', 'typescript'] },
             { name: 'update-title', frameworks: ['react', 'vue', 'typescript'] },
