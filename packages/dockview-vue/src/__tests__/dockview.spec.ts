@@ -216,6 +216,28 @@ describe('DockviewVue Component', () => {
         );
     });
 
+    test('should update tabGroupColors and tabGroupAccent when props change', async () => {
+        wrapper = mountDockview();
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const updateSpy = vi.spyOn(api, 'updateOptions');
+
+        const tabGroupColors = [{ name: 'cyan', value: '#00ffff' }];
+        await wrapper.setProps({
+            tabGroupColors,
+            tabGroupAccent: 'off',
+        });
+        await nextTick();
+
+        expect(updateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({ tabGroupColors })
+        );
+        expect(updateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({ tabGroupAccent: 'off' })
+        );
+    });
+
     test('should dispose api on unmount', async () => {
         wrapper = mountDockview();
         await flushPromises();
