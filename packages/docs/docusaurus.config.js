@@ -186,7 +186,7 @@ const config = {
     themeConfig:
         /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
         ({
-            image: 'img/splashscreen.gif',
+            image: 'img/splashscreen.png',
             metadata: [
                 {
                     name: 'keywords',
