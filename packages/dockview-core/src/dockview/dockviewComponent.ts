@@ -329,7 +329,6 @@ export class DockviewComponent
     private _options: Exclude<DockviewComponentOptions, 'orientation'>;
     private _tabGroupColorPalette: TabGroupColorPalette;
     private _watermark: IWatermarkRenderer | null = null;
-    private readonly _themeClassnames: Classnames;
     private _shellThemeClassnames: Classnames | undefined;
 
     readonly overlayRenderContainer: OverlayRenderContainer;
@@ -535,7 +534,6 @@ export class DockviewComponent
 
         this.popupService = new PopupService(this.element);
         this.contextMenuController = new ContextMenuController(this);
-        this._themeClassnames = new Classnames(this.element);
         this._api = new DockviewApi(this);
 
         // The shell always wraps the dockview element so edge groups can be
@@ -3522,11 +3520,10 @@ export class DockviewComponent
 
     private updateTheme(): void {
         const theme = this._options.theme ?? themeAbyss;
-        this._themeClassnames.setClassNames(theme.className);
-        // When shell mode is active, edge group groups are siblings of
-        // .dv-dockview so they don't inherit theme CSS from it. Apply the
-        // same theme class to the shell element so all edge groups and the
-        // main grid share the same CSS custom properties and theme rules.
+        // Apply the theme class only to the shell so edge groups and the
+        // main grid both inherit its CSS custom properties via the cascade.
+        // Re-declaring it on `.dv-dockview` would block consumer overrides
+        // set on the shell from reaching the dockview subtree.
         this._shellThemeClassnames?.setClassNames(theme.className);
 
         this.gridview.margin = theme.gap ?? 0;
