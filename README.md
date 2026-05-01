@@ -16,7 +16,7 @@
 
 ##
 
-![](packages/docs/static/img/splashscreen.png)
+![](packages/docs/static/img/splashscreenv2.png)
 
 Please see the website: https://dockview.dev
 
