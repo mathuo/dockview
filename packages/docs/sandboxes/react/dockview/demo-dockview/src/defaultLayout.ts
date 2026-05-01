@@ -1,4 +1,4 @@
-import { DockviewApi } from 'dockview-react';
+import { DockviewApi, EdgeGroupPosition } from 'dockview-react';
 
 export const nextId = (() => {
     let counter = 0;
@@ -168,4 +168,86 @@ export function defaultConfig(api: DockviewApi) {
     orderbook.api.setActive();
     orders.api.setActive();
     positionsummary.api.setActive();
+}
+
+const EDGE_GROUP_DEFS: {
+    pos: 'bottom' | 'left' | 'right';
+    options: { id: string; initialSize: number; minimumSize: number };
+}[] = [
+    {
+        pos: 'bottom',
+        options: { id: 'bottom', initialSize: 200, minimumSize: 100 },
+    },
+    {
+        pos: 'left',
+        options: { id: 'left', initialSize: 220, minimumSize: 150 },
+    },
+    {
+        pos: 'right',
+        options: { id: 'right', initialSize: 220, minimumSize: 150 },
+    },
+];
+
+const EDGE_GROUP_PANELS: {
+    pos: 'bottom' | 'left' | 'right';
+    id: string;
+    title: string;
+}[] = [
+    { pos: 'left', id: 'left-1', title: 'Explorer' },
+    { pos: 'right', id: 'right-1', title: 'Outline' },
+    { pos: 'right', id: 'right-2', title: 'Properties' },
+    { pos: 'bottom', id: 'bottom-1', title: 'Terminal' },
+    { pos: 'bottom', id: 'bottom-2', title: 'Output' },
+    { pos: 'bottom', id: 'bottom-3', title: 'Problems' },
+];
+
+export function setupEdgeGroups(api: DockviewApi) {
+    for (const position of [
+        'top',
+        'bottom',
+        'left',
+        'right',
+    ] as EdgeGroupPosition[]) {
+        if (api.getEdgeGroup(position)) {
+            api.removeEdgeGroup(position);
+        }
+    }
+
+    for (const { pos, options } of EDGE_GROUP_DEFS) {
+        api.addEdgeGroup(pos, { ...options, collapsed: true });
+    }
+}
+
+export function populateEdgeGroups(api: DockviewApi) {
+    for (const { pos, id, title } of EDGE_GROUP_PANELS) {
+        const groupApi = api.getEdgeGroup(pos);
+        if (groupApi && !api.panels.find((p) => p.id === id)) {
+            api.addPanel({
+                id,
+                component: 'fixedPlaceholder',
+                title,
+                position: { referenceGroup: groupApi.id },
+                params: { label: title, position: pos },
+            });
+        }
+    }
+
+    const bottomEdge = api.getEdgeGroup('bottom');
+    if (bottomEdge) {
+        const logs = api.createTabGroup({
+            groupId: bottomEdge.id,
+            label: 'Logs',
+            color: 'purple',
+        });
+        api.addPanelToTabGroup({
+            groupId: bottomEdge.id,
+            tabGroupId: logs.id,
+            panelId: 'bottom-1',
+        });
+        api.addPanelToTabGroup({
+            groupId: bottomEdge.id,
+            tabGroupId: logs.id,
+            panelId: 'bottom-2',
+        });
+    }
 }
