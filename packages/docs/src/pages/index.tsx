@@ -263,7 +263,7 @@ function Hero() {
                 </div>
                 <div className="hero-preview">
                     <img
-                        src={useBaseUrl('/img/splashscreen.png')}
+                        src={useBaseUrl('/img/splashscreenv2.png')}
                         alt="Dockview layout demo"
                         className="hero-gif"
                     />
