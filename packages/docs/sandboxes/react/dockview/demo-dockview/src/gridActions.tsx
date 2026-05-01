@@ -1,6 +1,11 @@
 import { DockviewApi, EdgeGroupPosition } from 'dockview-react';
 import * as React from 'react';
-import { defaultConfig, nextId } from './defaultLayout';
+import {
+    defaultConfig,
+    nextId,
+    populateEdgeGroups,
+    setupEdgeGroups,
+} from './defaultLayout';
 
 const btnStyle: React.CSSProperties = {
     padding: '4px 10px',
@@ -59,22 +64,28 @@ const Row = (props: {
 
 const EDGE_POSITIONS: EdgeGroupPosition[] = ['top', 'bottom', 'left', 'right'];
 
+const readEdgeState = (
+    api: DockviewApi
+): Partial<Record<EdgeGroupPosition, boolean>> =>
+    Object.fromEntries(
+        EDGE_POSITIONS.map((pos) => [pos, api.getEdgeGroup(pos) !== undefined])
+    );
+
 const EdgeGroupToggles = (props: { api: DockviewApi }) => {
     const [active, setActive] = React.useState<
         Partial<Record<EdgeGroupPosition, boolean>>
-    >(() =>
-        Object.fromEntries(
-            EDGE_POSITIONS.map((pos) => [
-                pos,
-                props.api.getEdgeGroup(pos) !== undefined,
-            ])
-        )
-    );
+    >(() => readEdgeState(props.api));
+
+    React.useEffect(() => {
+        const sync = () => setActive(readEdgeState(props.api));
+        sync();
+        const disposable = props.api.onDidLayoutChange(sync);
+        return () => disposable.dispose();
+    }, [props.api]);
 
     const toggle = (position: EdgeGroupPosition) => {
         if (active[position]) {
             props.api.removeEdgeGroup(position);
-            setActive((s) => ({ ...s, [position]: false }));
         } else {
             const groupApi = props.api.addEdgeGroup(position, {
                 id: `edge-${position}`,
@@ -88,7 +99,6 @@ const EdgeGroupToggles = (props: { api: DockviewApi }) => {
                 position: { referenceGroup: groupApi.id },
                 params: { label: position, position },
             });
-            setActive((s) => ({ ...s, [position]: true }));
         }
     };
 
@@ -250,7 +260,9 @@ export const GridActions = (props: {
         if (props.api) {
             try {
                 props.api.clear();
+                setupEdgeGroups(props.api);
                 defaultConfig(props.api);
+                populateEdgeGroups(props.api);
             } catch (err) {
                 localStorage.removeItem('dv-demo-state');
             }
