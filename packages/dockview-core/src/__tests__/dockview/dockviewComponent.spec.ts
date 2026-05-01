@@ -7516,6 +7516,87 @@ describe('dockviewComponent', () => {
 
             disposeDidLayoutChangeHandler();
         });
+
+        test('when edge groups are added or removed (including empty)', () => {
+            const didLayoutChangeHandler = jest.fn();
+            dockview.onDidLayoutChange(didLayoutChangeHandler);
+
+            // add edge group
+            dockview.addEdgeGroup('left', { id: 'edge-left' });
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(1);
+
+            // remove an empty edge group — fires only _onDidRemoveGroup (no
+            // panel events). Without _onDidRemoveGroup in the composition
+            // this would not fire.
+            dockview.removeEdgeGroup('left');
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(2);
+        });
+
+        test('when tab groups are created, mutated, collapsed, or destroyed', () => {
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: { referenceGroup: panel1.group },
+            });
+            jest.runAllTimers();
+
+            const didLayoutChangeHandler = jest.fn();
+            dockview.onDidLayoutChange(didLayoutChangeHandler);
+
+            // create tab group
+            const tg = dockview.api.createTabGroup({
+                groupId: panel1.group.id,
+                label: 'My Group',
+                color: 'red',
+            });
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(1);
+
+            // add panels to tab group
+            dockview.api.addPanelToTabGroup({
+                groupId: panel1.group.id,
+                tabGroupId: tg.id,
+                panelId: panel1.id,
+            });
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(2);
+
+            dockview.api.addPanelToTabGroup({
+                groupId: panel1.group.id,
+                tabGroupId: tg.id,
+                panelId: panel2.id,
+            });
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(3);
+
+            // collapse tab group
+            tg.collapse();
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(4);
+
+            // remove a panel from the tab group (group still has panel2 so
+            // it is not auto-destroyed)
+            dockview.api.removePanelFromTabGroup({
+                groupId: panel1.group.id,
+                panelId: panel1.id,
+            });
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(5);
+
+            // explicitly dissolve the tab group
+            dockview.api.dissolveTabGroup({
+                groupId: panel1.group.id,
+                tabGroupId: tg.id,
+            });
+            jest.runAllTimers();
+            expect(didLayoutChangeHandler).toHaveBeenCalledTimes(6);
+        });
     });
 
     describe('panel visibility', () => {
