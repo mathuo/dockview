@@ -54,6 +54,7 @@
             "generatorOptions": {
                 "currentVersionSource": "git-tag"
             },
+            "preserveMatchingDependencyRanges": false,
             "git": {
                 "commit": true,
                 "commitMessage": "chore(release): publish {version}",
