@@ -79,12 +79,8 @@ const EdgeGroupToggles = (props: { api: DockviewApi }) => {
     React.useEffect(() => {
         const sync = () => setActive(readEdgeState(props.api));
         sync();
-        const disposables = [
-            props.api.onDidLayoutChange(sync),
-            props.api.onDidAddGroup(sync),
-            props.api.onDidRemoveGroup(sync),
-        ];
-        return () => disposables.forEach((d) => d.dispose());
+        const disposable = props.api.onDidLayoutChange(sync);
+        return () => disposable.dispose();
     }, [props.api]);
 
     const toggle = (position: EdgeGroupPosition) => {
