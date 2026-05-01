@@ -32,7 +32,7 @@ const ReactComponentBridge: React.ForwardRefRenderFunction<
     IPanelWrapperRef,
     IPanelWrapperProps
 > = (props, ref) => {
-    const [_, triggerRender] = React.useState<number>();
+    const [, triggerRender] = React.useState<number>(0);
     const _props = React.useRef<object>(props.componentProps);
 
     React.useImperativeHandle(
@@ -45,8 +45,12 @@ const ReactComponentBridge: React.ForwardRefRenderFunction<
                  * trigger a re-render.
                  * we use this rather than updating through a prop since we can
                  * pass a ref into the vanilla-js world.
+                 *
+                 * Use a monotonic counter rather than `Date.now()` so two
+                 * updates within the same millisecond still produce distinct
+                 * state values and avoid React's bailout.
                  */
-                triggerRender(Date.now());
+                triggerRender((n) => n + 1);
             },
         }),
         []
