@@ -1,7 +1,9 @@
 .dv-dockview {
     position: relative;
     background-color: var(--dv-group-view-background-color);
-    contain: layout;
+    // Avoid `contain: layout` here: it creates a stacking context that traps
+    // inner sash z-index inside the dockview's SC, so render-overlays mounted
+    // at the shell level paint on top of the sashes (and separators).
 
     .dv-watermark-container {
         position: absolute;
