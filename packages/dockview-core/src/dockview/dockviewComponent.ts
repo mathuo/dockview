@@ -702,10 +702,17 @@ export class DockviewComponent
                 this.onDidRemovePanel,
                 this.onDidAddGroup,
                 this.onDidRemove,
+                this.onDidRemoveGroup,
                 this.onDidMovePanel,
                 this.onDidActivePanelChange,
                 this.onDidPopoutGroupPositionChange,
-                this.onDidPopoutGroupSizeChange
+                this.onDidPopoutGroupSizeChange,
+                this.onDidCreateTabGroup,
+                this.onDidDestroyTabGroup,
+                this.onDidAddPanelToTabGroup,
+                this.onDidRemovePanelFromTabGroup,
+                this.onDidTabGroupChange,
+                this.onDidTabGroupCollapsedChange
             )(() => {
                 this._bufferOnDidLayoutChange.fire();
             }),
