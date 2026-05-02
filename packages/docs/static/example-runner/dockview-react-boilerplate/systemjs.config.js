@@ -56,6 +56,11 @@
                 format: 'cjs',
                 defaultExtension: 'js',
             },
+            'dockview-react': {
+                main: './dist/cjs/index.js',
+                format: 'cjs',
+                defaultExtension: 'js',
+            },
         },
     });
 })(window);
