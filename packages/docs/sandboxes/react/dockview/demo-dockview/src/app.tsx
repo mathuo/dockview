@@ -436,7 +436,7 @@ const DockviewDemo = (props: {
         ];
 
         const loadLayout = () => {
-            const state = localStorage.getItem('dv-demo-state');
+            const state = localStorage.getItem('dv-demo-state-v6');
 
             if (state) {
                 try {
@@ -445,7 +445,7 @@ const DockviewDemo = (props: {
                     setLayoutReady(true);
                     return;
                 } catch {
-                    localStorage.removeItem('dv-demo-state');
+                    localStorage.removeItem('dv-demo-state-v6');
                 }
                 return;
             }
