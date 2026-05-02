@@ -108,6 +108,7 @@ describe('DockviewAngularComponent', () => {
 });
 
 @Component({
+    standalone: false,
     template: `
         <dv-dockview
             [components]="components"

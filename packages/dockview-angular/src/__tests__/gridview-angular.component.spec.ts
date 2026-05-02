@@ -213,6 +213,7 @@ describe('GridviewAngularComponent', () => {
 });
 
 @Component({
+    standalone: false,
     template: `
         <dv-gridview
             [components]="components"

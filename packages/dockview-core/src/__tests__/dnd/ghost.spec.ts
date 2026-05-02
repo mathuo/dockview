@@ -20,8 +20,8 @@ describe('ghost', () => {
 
         expect(element.className).toBe('dv-dragged');
         expect(element.parentElement).toBe(document.body);
-        expect(dataTransfer.setDragImage).toBeCalledTimes(1);
-        expect(dataTransfer.setDragImage).toBeCalledWith(element, 0, 0);
+        expect(dataTransfer.setDragImage).toHaveBeenCalledTimes(1);
+        expect(dataTransfer.setDragImage).toHaveBeenCalledWith(element, 0, 0);
 
         jest.runAllTimers();
 

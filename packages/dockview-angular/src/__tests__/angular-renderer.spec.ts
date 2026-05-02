@@ -13,6 +13,7 @@ import {
 import { AngularRenderer } from '../lib/utils/angular-renderer';
 
 @Component({
+    standalone: false,
     selector: 'test-component',
     template:
         '<div class="test-component">{{ params?.title }} - {{ params?.value }}</div>',
@@ -24,6 +25,7 @@ class TestComponent {
 }
 
 @Component({
+    standalone: false,
     selector: 'test-update-component',
     template: '<div class="test-update-component">Counter: {{ counter }}</div>',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,6 +42,7 @@ class TestUpdateComponent {
 }
 
 @Component({
+    standalone: false,
     selector: 'test-template-holder-component',
     template: `
         <ng-template #template>

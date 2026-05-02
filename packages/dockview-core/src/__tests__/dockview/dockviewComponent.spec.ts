@@ -456,7 +456,7 @@ describe('dockviewComponent', () => {
                 id: 'panel1',
                 component: 'default',
             });
-        }).toThrowError('panel with id panel1 already exists');
+        }).toThrow('panel with id panel1 already exists');
 
         dockview.dispose();
     });
@@ -2803,7 +2803,7 @@ describe('dockviewComponent', () => {
 
         panel1.api.close();
 
-        expect(panel1Spy).toBeCalledTimes(1);
+        expect(panel1Spy).toHaveBeenCalledTimes(1);
     });
 
     test('can add panel of same id if already removed', () => {
@@ -2897,7 +2897,7 @@ describe('dockviewComponent', () => {
 
         dockview.removePanel(panel1);
 
-        expect(panel1Spy).toBeCalledTimes(1);
+        expect(panel1Spy).toHaveBeenCalledTimes(1);
     });
 
     test('panel is not disposed of when moved to a new group', () => {
@@ -3109,8 +3109,8 @@ describe('dockviewComponent', () => {
 
         dockview.removeGroup(panel1.group);
 
-        expect(panel1Spy).toBeCalledTimes(1);
-        expect(panel2Spy).toBeCalledTimes(1);
+        expect(panel1Spy).toHaveBeenCalledTimes(1);
+        expect(panel2Spy).toHaveBeenCalledTimes(1);
     });
 
     test('panel is disposed of when component is disposed', () => {
@@ -3159,8 +3159,8 @@ describe('dockviewComponent', () => {
 
         dockview.dispose();
 
-        expect(panel1Spy).toBeCalledTimes(1);
-        // expect(panel2Spy).toBeCalledTimes(1);
+        expect(panel1Spy).toHaveBeenCalledTimes(1);
+        // expect(panel2Spy).toHaveBeenCalledTimes(1);
     });
 
     test('panel is disposed of when from JSON is called', () => {
@@ -3218,9 +3218,9 @@ describe('dockviewComponent', () => {
             panels: {},
         });
 
-        expect(groupSpy).toBeCalledTimes(1);
-        expect(panel1Spy).toBeCalledTimes(1);
-        expect(panel2Spy).toBeCalledTimes(1);
+        expect(groupSpy).toHaveBeenCalledTimes(1);
+        expect(panel1Spy).toHaveBeenCalledTimes(1);
+        expect(panel2Spy).toHaveBeenCalledTimes(1);
     });
 
     test('move entire group into another group', () => {
@@ -3283,7 +3283,7 @@ describe('dockviewComponent', () => {
         });
 
         expect(dockview.groups.length).toBe(1);
-        expect(panel1Spy).toBeCalledTimes(1);
+        expect(panel1Spy).toHaveBeenCalledTimes(1);
     });
 
     test('fromJSON events should still fire', () => {
