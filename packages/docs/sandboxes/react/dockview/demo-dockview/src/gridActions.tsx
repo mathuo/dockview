@@ -237,13 +237,13 @@ export const GridActions = (props: {
     };
 
     const onLoad = () => {
-        const state = localStorage.getItem('dv-demo-state');
+        const state = localStorage.getItem('dv-demo-state-v6');
         if (state) {
             try {
                 props.api?.fromJSON(JSON.parse(state));
             } catch (err) {
                 console.error('failed to load state', err);
-                localStorage.removeItem('dv-demo-state');
+                localStorage.removeItem('dv-demo-state-v6');
             }
         }
     };
@@ -252,20 +252,19 @@ export const GridActions = (props: {
         if (props.api) {
             const state = props.api.toJSON();
             console.log(state);
-            localStorage.setItem('dv-demo-state', JSON.stringify(state));
+            localStorage.setItem('dv-demo-state-v6', JSON.stringify(state));
         }
     };
 
     const onReset = () => {
         if (props.api) {
+            localStorage.removeItem('dv-demo-state-v6');
             try {
                 props.api.clear();
                 setupEdgeGroups(props.api);
                 defaultConfig(props.api);
                 populateEdgeGroups(props.api);
-            } catch (err) {
-                localStorage.removeItem('dv-demo-state');
-            }
+            } catch {}
         }
     };
 
