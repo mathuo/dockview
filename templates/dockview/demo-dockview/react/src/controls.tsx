@@ -1,4 +1,4 @@
-import { IDockviewHeaderActionsProps } from 'dockview';
+import { IDockviewHeaderActionsProps } from 'dockview-react';
 import React from 'react';
 import { nextId } from './defaultLayout.ts';
 

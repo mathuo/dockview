@@ -14,13 +14,13 @@
             <guid>https://dockview.dev/blog/dockview-4.11.0-release</guid>
             <pubDate>Tue, 04 Nov 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.11.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.11.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.11.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.11.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Bug: Fix constraints persistence and precedence issues <a href="https://github.com/mathuo/dockview/pull/967" target="_blank" rel="noopener noreferrer">#967</a></li>
+<li class="">Bug: Fix constraints persistence and precedence issues <a href="https://github.com/mathuo/dockview/pull/967" target="_blank" rel="noopener noreferrer" class="">#967</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.11.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.11.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -29,19 +29,19 @@
             <guid>https://dockview.dev/blog/dockview-4.10.0-release</guid>
             <pubDate>Thu, 30 Oct 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.10.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.10.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
 <ul>
-<li>Template docs <a href="https://github.com/mathuo/dockview/pull/1027" target="_blank" rel="noopener noreferrer">#1027</a></li>
-<li>Angular docs</li>
-<li>Enhanced Vue component tests with comprehensive DOM and API testing <a href="https://github.com/mathuo/dockview/pull/1024" target="_blank" rel="noopener noreferrer">#1024</a></li>
+<li class="">Template docs <a href="https://github.com/mathuo/dockview/pull/1027" target="_blank" rel="noopener noreferrer" class="">#1027</a></li>
+<li class="">Angular docs</li>
+<li class="">Enhanced Vue component tests with comprehensive DOM and API testing <a href="https://github.com/mathuo/dockview/pull/1024" target="_blank" rel="noopener noreferrer" class="">#1024</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.10.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.10.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Bug: Fix registerPanel timing to prevent undefined API errors <a href="https://github.com/mathuo/dockview/pull/1026" target="_blank" rel="noopener noreferrer">#1026</a></li>
-<li>Bug: Fix title possibly out of sync in DockviewDefaultTab <a href="https://github.com/mathuo/dockview/pull/1015" target="_blank" rel="noopener noreferrer">#1015</a></li>
+<li class="">Bug: Fix registerPanel timing to prevent undefined API errors <a href="https://github.com/mathuo/dockview/pull/1026" target="_blank" rel="noopener noreferrer" class="">#1026</a></li>
+<li class="">Bug: Fix title possibly out of sync in DockviewDefaultTab <a href="https://github.com/mathuo/dockview/pull/1015" target="_blank" rel="noopener noreferrer" class="">#1015</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.10.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.10.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -50,13 +50,13 @@
             <guid>https://dockview.dev/blog/dockview-4.8.0-release</guid>
             <pubDate>Mon, 22 Sep 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.8.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.8.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
 <ul>
-<li>Angular framework wrapper support <a href="https://github.com/mathuo/dockview/pull/1001" target="_blank" rel="noopener noreferrer">#1001</a></li>
+<li class="">Angular framework wrapper support <a href="https://github.com/mathuo/dockview/pull/1001" target="_blank" rel="noopener noreferrer" class="">#1001</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.8.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.8.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.8.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.8.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -65,14 +65,14 @@
             <guid>https://dockview.dev/blog/dockview-4.7.1-release</guid>
             <pubDate>Fri, 29 Aug 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.7.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.7.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.7.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.7.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Bug: Fix disableDnd issues in Chrom <a href="https://github.com/mathuo/dockview/pull/999" target="_blank" rel="noopener noreferrer">#999</a></li>
-<li>Bug: Fix component disappearing when moving from floating to new grid group <a href="https://github.com/mathuo/dockview/pull/1000" target="_blank" rel="noopener noreferrer">#1000</a></li>
+<li class="">Bug: Fix disableDnd issues in Chrom <a href="https://github.com/mathuo/dockview/pull/999" target="_blank" rel="noopener noreferrer" class="">#999</a></li>
+<li class="">Bug: Fix component disappearing when moving from floating to new grid group <a href="https://github.com/mathuo/dockview/pull/1000" target="_blank" rel="noopener noreferrer" class="">#1000</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.7.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.7.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -81,17 +81,17 @@
             <guid>https://dockview.dev/blog/dockview-4.7.0-release</guid>
             <pubDate>Fri, 22 Aug 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.7.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.7.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
 <ul>
-<li>Enhance layouting flow <a href="https://github.com/mathuo/dockview/pull/992" target="_blank" rel="noopener noreferrer">#992</a></li>
+<li class="">Enhance layouting flow <a href="https://github.com/mathuo/dockview/pull/992" target="_blank" rel="noopener noreferrer" class="">#992</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.7.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.7.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Bug: Fix group positioning issues <a href="https://github.com/mathuo/dockview/pull/993" target="_blank" rel="noopener noreferrer">#993</a> <a href="https://github.com/mathuo/dockview/pull/998" target="_blank" rel="noopener noreferrer">#998</a></li>
-<li>Bug: Delay popout groups to prevent browser blocking <a href="https://github.com/mathuo/dockview/pull/983" target="_blank" rel="noopener noreferrer">#983</a></li>
+<li class="">Bug: Fix group positioning issues <a href="https://github.com/mathuo/dockview/pull/993" target="_blank" rel="noopener noreferrer" class="">#993</a> <a href="https://github.com/mathuo/dockview/pull/998" target="_blank" rel="noopener noreferrer" class="">#998</a></li>
+<li class="">Bug: Delay popout groups to prevent browser blocking <a href="https://github.com/mathuo/dockview/pull/983" target="_blank" rel="noopener noreferrer" class="">#983</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.7.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.7.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -100,17 +100,17 @@
             <guid>https://dockview.dev/blog/dockview-4.6.2-release</guid>
             <pubDate>Sat, 02 Aug 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.6.2-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.6.2-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.6.2-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.6.2-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Bug: Fix close button functionality in tab overflow dropdown <a href="https://github.com/mathuo/dockview/pull/985" target="_blank" rel="noopener noreferrer">#985</a></li>
-<li>Bug: Fix cursor behavior on empty container spaces <a href="https://github.com/mathuo/dockview/pull/978" target="_blank" rel="noopener noreferrer">#978</a></li>
-<li>Bug: Fix theming consistency between JavaScript and React implementations <a href="https://github.com/mathuo/dockview/pull/970" target="_blank" rel="noopener noreferrer">#970</a></li>
-<li>Bug: Fix themes with gap overflow issues <a href="https://github.com/mathuo/dockview/pull/963" target="_blank" rel="noopener noreferrer">#963</a></li>
-<li>Chore: Project maintenance and build script improvements <a href="https://github.com/mathuo/dockview/pull/982" target="_blank" rel="noopener noreferrer">#982</a>, <a href="https://github.com/mathuo/dockview/pull/980" target="_blank" rel="noopener noreferrer">#980</a></li>
+<li class="">Bug: Fix close button functionality in tab overflow dropdown <a href="https://github.com/mathuo/dockview/pull/985" target="_blank" rel="noopener noreferrer" class="">#985</a></li>
+<li class="">Bug: Fix cursor behavior on empty container spaces <a href="https://github.com/mathuo/dockview/pull/978" target="_blank" rel="noopener noreferrer" class="">#978</a></li>
+<li class="">Bug: Fix theming consistency between JavaScript and React implementations <a href="https://github.com/mathuo/dockview/pull/970" target="_blank" rel="noopener noreferrer" class="">#970</a></li>
+<li class="">Bug: Fix themes with gap overflow issues <a href="https://github.com/mathuo/dockview/pull/963" target="_blank" rel="noopener noreferrer" class="">#963</a></li>
+<li class="">Chore: Project maintenance and build script improvements <a href="https://github.com/mathuo/dockview/pull/982" target="_blank" rel="noopener noreferrer" class="">#982</a>, <a href="https://github.com/mathuo/dockview/pull/980" target="_blank" rel="noopener noreferrer" class="">#980</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.6.2-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.6.2-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -119,17 +119,17 @@
             <guid>https://dockview.dev/blog/dockview-4.5.0-release</guid>
             <pubDate>Sat, 19 Jul 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.5.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.5.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
 <ul>
-<li>Add <code>skipSetActive</code> parameter to moveTo functions <a href="https://github.com/mathuo/dockview/pull/962" target="_blank" rel="noopener noreferrer">#962</a></li>
+<li class="">Add <code>skipSetActive</code> parameter to moveTo functions <a href="https://github.com/mathuo/dockview/pull/962" target="_blank" rel="noopener noreferrer" class="">#962</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.5.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.5.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Bug: Prevent ghost group creation when dragging popout groups back to grid <a href="https://github.com/mathuo/dockview/pull/966" target="_blank" rel="noopener noreferrer">#966</a></li>
-<li>Bug: Correct positioning when dragging groups from popout to main window <a href="https://github.com/mathuo/dockview/pull/964" target="_blank" rel="noopener noreferrer">#964</a></li>
+<li class="">Bug: Prevent ghost group creation when dragging popout groups back to grid <a href="https://github.com/mathuo/dockview/pull/966" target="_blank" rel="noopener noreferrer" class="">#966</a></li>
+<li class="">Bug: Correct positioning when dragging groups from popout to main window <a href="https://github.com/mathuo/dockview/pull/964" target="_blank" rel="noopener noreferrer" class="">#964</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.5.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.5.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -138,16 +138,16 @@
             <guid>https://dockview.dev/blog/dockview-4.4.1-release</guid>
             <pubDate>Thu, 17 Jul 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.4.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.4.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
 <ul>
-<li>Export <code>WillShowOverlayLocationEventOptions</code> interface <a href="https://github.com/mathuo/dockview/pull/959" target="_blank" rel="noopener noreferrer">#959</a></li>
+<li class="">Export <code>WillShowOverlayLocationEventOptions</code> interface <a href="https://github.com/mathuo/dockview/pull/959" target="_blank" rel="noopener noreferrer" class="">#959</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.4.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.4.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Bug: Respect disableDnd option for tab draggable attribute <a href="https://github.com/mathuo/dockview/pull/961" target="_blank" rel="noopener noreferrer">#961</a></li>
+<li class="">Bug: Respect disableDnd option for tab draggable attribute <a href="https://github.com/mathuo/dockview/pull/961" target="_blank" rel="noopener noreferrer" class="">#961</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.4.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.4.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -156,16 +156,16 @@
             <guid>https://dockview.dev/blog/dockview-4.4.0-release</guid>
             <pubDate>Thu, 19 Jun 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.4.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.4.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
 <ul>
-<li>Add <code>onDidOpenPopoutWindowFail</code> event to handle blocked popups <a href="https://github.com/mathuo/dockview/pull/937" target="_blank" rel="noopener noreferrer">#937</a></li>
+<li class="">Add <code>onDidOpenPopoutWindowFail</code> event to handle blocked popups <a href="https://github.com/mathuo/dockview/pull/937" target="_blank" rel="noopener noreferrer" class="">#937</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.4.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.4.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Docs: Fix typo <a href="https://github.com/mathuo/dockview/pull/948" target="_blank" rel="noopener noreferrer">#948</a></li>
+<li class="">Docs: Fix typo <a href="https://github.com/mathuo/dockview/pull/948" target="_blank" rel="noopener noreferrer" class="">#948</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.4.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.4.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -174,13 +174,13 @@
             <guid>https://dockview.dev/blog/dockview-4.3.1-release</guid>
             <pubDate>Thu, 05 Jun 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.3.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.3.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.3.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.3.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Internal: Improve GC cleanup by only retaining previously emitted event values when event is in replay mode <a href="https://github.com/mathuo/dockview/pull/947" target="_blank" rel="noopener noreferrer">#947</a></li>
+<li class="">Internal: Improve GC cleanup by only retaining previously emitted event values when event is in replay mode <a href="https://github.com/mathuo/dockview/pull/947" target="_blank" rel="noopener noreferrer" class="">#947</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.3.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.3.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -189,17 +189,17 @@
             <guid>https://dockview.dev/blog/dockview-4.3.0-release</guid>
             <pubDate>Tue, 03 Jun 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.3.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.3.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
 <ul>
-<li>Hide group private methods from public API <a href="https://github.com/mathuo/dockview/pull/925" target="_blank" rel="noopener noreferrer">#925</a></li>
+<li class="">Hide group private methods from public API <a href="https://github.com/mathuo/dockview/pull/925" target="_blank" rel="noopener noreferrer" class="">#925</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.3.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.3.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Bug: Fix the restoring of popout groups from layout <a href="https://github.com/mathuo/dockview/pull/933" target="_blank" rel="noopener noreferrer">#933</a></li>
-<li>Internals: Variable name typo <a href="https://github.com/mathuo/dockview/pull/940" target="_blank" rel="noopener noreferrer">#940</a></li>
+<li class="">Bug: Fix the restoring of popout groups from layout <a href="https://github.com/mathuo/dockview/pull/933" target="_blank" rel="noopener noreferrer" class="">#933</a></li>
+<li class="">Internals: Variable name typo <a href="https://github.com/mathuo/dockview/pull/940" target="_blank" rel="noopener noreferrer" class="">#940</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.3.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.3.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -208,14 +208,14 @@
             <guid>https://dockview.dev/blog/dockview-4.2.5-release</guid>
             <pubDate>Thu, 01 May 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.2.5-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.2.5-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.2.5-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.2.5-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Bug: Tab overflow dropdown positions on boundaries of viewport <a href="https://github.com/mathuo/dockview/pull/921" target="_blank" rel="noopener noreferrer">#921</a></li>
-<li>Bug: Dnd Ghost image rendering interactivity issues <a href="https://github.com/mathuo/dockview/pull/920" target="_blank" rel="noopener noreferrer">#920</a></li>
+<li class="">Bug: Tab overflow dropdown positions on boundaries of viewport <a href="https://github.com/mathuo/dockview/pull/921" target="_blank" rel="noopener noreferrer" class="">#921</a></li>
+<li class="">Bug: Dnd Ghost image rendering interactivity issues <a href="https://github.com/mathuo/dockview/pull/920" target="_blank" rel="noopener noreferrer" class="">#920</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.2.5-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.2.5-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -224,15 +224,15 @@
             <guid>https://dockview.dev/blog/dockview-4.2.4-release</guid>
             <pubDate>Tue, 29 Apr 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.2.4-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.2.4-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.2.4-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.2.4-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Bug: Ghost groups appearing when in popout mode <a href="https://github.com/mathuo/dockview/pull/917" target="_blank" rel="noopener noreferrer">#917</a></li>
-<li>Bug: Tab overflow dropdown rendering fixes <a href="https://github.com/mathuo/dockview/pull/916" target="_blank" rel="noopener noreferrer">#916</a></li>
-<li>Update docs <a href="https://github.com/mathuo/dockview/pull/828" target="_blank" rel="noopener noreferrer">#828</a> <a href="https://github.com/mathuo/dockview/pull/827" target="_blank" rel="noopener noreferrer">#827</a></li>
+<li class="">Bug: Ghost groups appearing when in popout mode <a href="https://github.com/mathuo/dockview/pull/917" target="_blank" rel="noopener noreferrer" class="">#917</a></li>
+<li class="">Bug: Tab overflow dropdown rendering fixes <a href="https://github.com/mathuo/dockview/pull/916" target="_blank" rel="noopener noreferrer" class="">#916</a></li>
+<li class="">Update docs <a href="https://github.com/mathuo/dockview/pull/828" target="_blank" rel="noopener noreferrer" class="">#828</a> <a href="https://github.com/mathuo/dockview/pull/827" target="_blank" rel="noopener noreferrer" class="">#827</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.2.4-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.2.4-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -241,13 +241,13 @@
             <guid>https://dockview.dev/blog/dockview-4.2.3-release</guid>
             <pubDate>Tue, 08 Apr 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.2.3-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.2.3-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.2.3-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.2.3-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Bug: React disposable issues <a href="https://github.com/mathuo/dockview/pull/892" target="_blank" rel="noopener noreferrer">#892</a></li>
+<li class="">Bug: React disposable issues <a href="https://github.com/mathuo/dockview/pull/892" target="_blank" rel="noopener noreferrer" class="">#892</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.2.3-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.2.3-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -256,13 +256,13 @@
             <guid>https://dockview.dev/blog/dockview-4.2.2-release</guid>
             <pubDate>Wed, 26 Mar 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.2.2-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.2.2-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.2.2-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.2.2-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Bug: React disposable issues <a href="https://github.com/mathuo/dockview/pull/892" target="_blank" rel="noopener noreferrer">#892</a></li>
+<li class="">Bug: React disposable issues <a href="https://github.com/mathuo/dockview/pull/892" target="_blank" rel="noopener noreferrer" class="">#892</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.2.2-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.2.2-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -271,14 +271,14 @@
             <guid>https://dockview.dev/blog/dockview-4.2.1-release</guid>
             <pubDate>Tue, 18 Mar 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.2.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.2.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.2.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.2.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Bug: Fix styles and dnd issues <a href="https://github.com/mathuo/dockview/pull/887" target="_blank" rel="noopener noreferrer">#887</a></li>
-<li>Bug: Fix options init issues <a href="https://github.com/mathuo/dockview/pull/888" target="_blank" rel="noopener noreferrer">#888</a></li>
+<li class="">Bug: Fix styles and dnd issues <a href="https://github.com/mathuo/dockview/pull/887" target="_blank" rel="noopener noreferrer" class="">#887</a></li>
+<li class="">Bug: Fix options init issues <a href="https://github.com/mathuo/dockview/pull/888" target="_blank" rel="noopener noreferrer" class="">#888</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.2.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.2.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -287,16 +287,16 @@
             <guid>https://dockview.dev/blog/dockview-4.2.0-release</guid>
             <pubDate>Mon, 17 Mar 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.2.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.2.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
 <ul>
-<li><code>scrollbars</code> options <a href="https://github.com/mathuo/dockview/pull/885" target="_blank" rel="noopener noreferrer">#885</a></li>
+<li class=""><code>scrollbars</code> options <a href="https://github.com/mathuo/dockview/pull/885" target="_blank" rel="noopener noreferrer" class="">#885</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.2.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.2.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Bug: Fix group dnd <a href="https://github.com/mathuo/dockview/pull/885" target="_blank" rel="noopener noreferrer">#885</a></li>
+<li class="">Bug: Fix group dnd <a href="https://github.com/mathuo/dockview/pull/885" target="_blank" rel="noopener noreferrer" class="">#885</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.2.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.2.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -305,19 +305,19 @@
             <guid>https://dockview.dev/blog/dockview-4.1.0-release</guid>
             <pubDate>Sun, 16 Mar 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.1.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.1.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
 <ul>
-<li>Custom header size for Paneview components <a href="https://github.com/mathuo/dockview/pull/875" target="_blank" rel="noopener noreferrer">#875</a></li>
-<li>Add events <code>onDidPopoutGroupSizeChange</code> and <code>onDidPopoutGroupPositionChange</code> <a href="https://github.com/mathuo/dockview/pull/876" target="_blank" rel="noopener noreferrer">#876</a></li>
+<li class="">Custom header size for Paneview components <a href="https://github.com/mathuo/dockview/pull/875" target="_blank" rel="noopener noreferrer" class="">#875</a></li>
+<li class="">Add events <code>onDidPopoutGroupSizeChange</code> and <code>onDidPopoutGroupPositionChange</code> <a href="https://github.com/mathuo/dockview/pull/876" target="_blank" rel="noopener noreferrer" class="">#876</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.1.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.1.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Bug: Prevent ghost DOM elements after <code>fromJSON</code> calls on Splitview components <a href="https://github.com/mathuo/dockview/pull/881" target="_blank" rel="noopener noreferrer">#881</a></li>
-<li>Bug: Disable point-events for iframes within shadow DOMs during tab dnd events <a href="https://github.com/mathuo/dockview/pull/791" target="_blank" rel="noopener noreferrer">#791</a></li>
-<li>Bug: Custom group id when no reference panel nor group is provided <a href="https://github.com/mathuo/dockview/pull/882" target="_blank" rel="noopener noreferrer">#882</a></li>
+<li class="">Bug: Prevent ghost DOM elements after <code>fromJSON</code> calls on Splitview components <a href="https://github.com/mathuo/dockview/pull/881" target="_blank" rel="noopener noreferrer" class="">#881</a></li>
+<li class="">Bug: Disable point-events for iframes within shadow DOMs during tab dnd events <a href="https://github.com/mathuo/dockview/pull/791" target="_blank" rel="noopener noreferrer" class="">#791</a></li>
+<li class="">Bug: Custom group id when no reference panel nor group is provided <a href="https://github.com/mathuo/dockview/pull/882" target="_blank" rel="noopener noreferrer" class="">#882</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.1.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.1.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -326,14 +326,14 @@
             <guid>https://dockview.dev/blog/dockview-4.0.1-release</guid>
             <pubDate>Fri, 14 Mar 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.0.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.0.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.0.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.0.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Bug: Fix full-width tab CSS <a href="https://github.com/mathuo/dockview/pull/880" target="_blank" rel="noopener noreferrer">#880</a></li>
-<li>Bug: Fix tab divider CSS <a href="https://github.com/mathuo/dockview/pull/879" target="_blank" rel="noopener noreferrer">#879</a></li>
+<li class="">Bug: Fix full-width tab CSS <a href="https://github.com/mathuo/dockview/pull/880" target="_blank" rel="noopener noreferrer" class="">#880</a></li>
+<li class="">Bug: Fix tab divider CSS <a href="https://github.com/mathuo/dockview/pull/879" target="_blank" rel="noopener noreferrer" class="">#879</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.0.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.0.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>]]></content:encoded>
             <category>release</category>
         </item>
         <item>
@@ -342,22 +342,22 @@
             <guid>https://dockview.dev/blog/dockview-4.0.0-release</guid>
             <pubDate>Wed, 12 Mar 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference docs @ dockview.dev.]]></description>
-            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.0.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+            <content:encoded><![CDATA[<p>Please reference docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">dockview.dev</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-4.0.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features" translate="no">​</a></h2>
 <ul>
-<li>To control the theme of dockview you should no longer pass a <code>dv-theme-*</code> class, instead directly use the <code>theme</code> property. See <a href="https://dockview.dev/demo" target="_blank" rel="noopener noreferrer">Themes</a> for more details. <a href="https://github.com/mathuo/dockview/pull/850" target="_blank" rel="noopener noreferrer">#850</a></li>
-<li>Introduces a new dnd overlay model with improved animations and customization options allowing themes to take more fine grained control over the dnd overlay styles. <a href="https://github.com/mathuo/dockview/pull/850" target="_blank" rel="noopener noreferrer">#850</a></li>
-<li>Custom scrollbar on tab headers for better UX <a href="https://github.com/mathuo/dockview/pull/822" target="_blank" rel="noopener noreferrer">#822</a></li>
-<li>When tabs are hidden within scrollbar hidden tabs can be selected from a dropdown that appears in header <a href="https://github.com/mathuo/dockview/pull/822" target="_blank" rel="noopener noreferrer">#822</a></li>
+<li class="">To control the theme of dockview you should no longer pass a <code>dv-theme-*</code> class, instead directly use the <code>theme</code> property. See <a href="https://dockview.dev/demo" target="_blank" rel="noopener noreferrer" class="">Themes</a> for more details. <a href="https://github.com/mathuo/dockview/pull/850" target="_blank" rel="noopener noreferrer" class="">#850</a></li>
+<li class="">Introduces a new dnd overlay model with improved animations and customization options allowing themes to take more fine grained control over the dnd overlay styles. <a href="https://github.com/mathuo/dockview/pull/850" target="_blank" rel="noopener noreferrer" class="">#850</a></li>
+<li class="">Custom scrollbar on tab headers for better UX <a href="https://github.com/mathuo/dockview/pull/822" target="_blank" rel="noopener noreferrer" class="">#822</a></li>
+<li class="">When tabs are hidden within scrollbar hidden tabs can be selected from a dropdown that appears in header <a href="https://github.com/mathuo/dockview/pull/822" target="_blank" rel="noopener noreferrer" class="">#822</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.0.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-4.0.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs" translate="no">​</a></h2>
 <ul>
-<li>Bug: Remove elements from DOM after disposable for Splitview and Paneview components <a href="https://github.com/mathuo/dockview/pull/870" target="_blank" rel="noopener noreferrer">#870</a></li>
+<li class="">Bug: Remove elements from DOM after disposable for Splitview and Paneview components <a href="https://github.com/mathuo/dockview/pull/870" target="_blank" rel="noopener noreferrer" class="">#870</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.0.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_SAay" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-4.0.0-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes" translate="no">​</a></h2>
 <ul>
-<li><code>setGap(gap: number | undefined): void</code> and <code>gap(): number</code> have been removed. The gap property is now controlled directly within the chosen Theme. See <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">Themes</a>  for more details.</li>
-<li><code>DockviewDefaultTab</code> requires a <code>tabLocation</code> field, to mimic existing behaviour use <code>tabLocation="header"</code>.</li>
+<li class=""><code>setGap(gap: number | undefined): void</code> and <code>gap(): number</code> have been removed. The gap property is now controlled directly within the chosen Theme. See <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer" class="">Themes</a>  for more details.</li>
+<li class=""><code>DockviewDefaultTab</code> requires a <code>tabLocation</code> field, to mimic existing behaviour use <code>tabLocation="header"</code>.</li>
 </ul>]]></content:encoded>
             <category>release</category>
         </item>

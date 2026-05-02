@@ -1,5 +1,5 @@
 import React from 'react';
-import { DockviewApi } from 'dockview';
+import { DockviewApi } from 'dockview-react';
 
 export const nextId = (() => {
     let counter = 0;

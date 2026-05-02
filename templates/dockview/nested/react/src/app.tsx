@@ -4,7 +4,7 @@ import {
     DockviewReact,
     DockviewReadyEvent,
     IDockviewPanelProps,
-} from 'dockview';
+} from 'dockview-react';
 import React from 'react';
 
 const InnerDockview = () => {
