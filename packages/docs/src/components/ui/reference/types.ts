@@ -39,6 +39,8 @@ export function firstLevelTypes(value: TypeDescriptor.Type | null) {
             return (value as any).value.flatMap(firstLevelTypes);
         case 'namedTupleMember':
             return firstLevelTypes((value as any).values);
+        case 'typeOperator':
+            return firstLevelTypes((value as any).value);
         default:
             throw new Error('unreachable');
     }
@@ -154,6 +156,8 @@ export function codifyType(value: TypeDescriptor.Type | null, tabs = 0) {
                 .join(' | ')}`;
         case 'namedTupleMember':
             return codifyType((value as any).values);
+        case 'typeOperator':
+            return `${(value as any).operator} ${codifyType((value as any).value, tabs)}`;
         default:
             throw new Error('unreachable');
     }
