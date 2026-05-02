@@ -128,4 +128,4 @@ export const themeConfig = [
         key: '**[GitHub Light Spaced](/demo?theme=githubLightSpaced)**',
         text: '',
     },
-];
+].filter((entry) => entry.id != null);
