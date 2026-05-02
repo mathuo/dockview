@@ -143,7 +143,7 @@ describe('abstractDragHandler', () => {
         const event = new Event('dragstart');
         const spy = jest.spyOn(event, 'preventDefault');
         fireEvent(element, event);
-        expect(spy).toBeCalledTimes(1);
+        expect(spy).toHaveBeenCalledTimes(1);
 
         handler.dispose();
     });
@@ -197,7 +197,7 @@ describe('abstractDragHandler', () => {
         const event = new Event('dragstart');
         const spy = jest.spyOn(event, 'preventDefault');
         fireEvent(element, event);
-        expect(spy).toBeCalledTimes(1);
+        expect(spy).toHaveBeenCalledTimes(1);
 
         handler.dispose();
     });
@@ -255,7 +255,7 @@ describe('abstractDragHandler', () => {
         event = new Event('dragstart');
         spy = jest.spyOn(event, 'preventDefault');
         fireEvent(element, event);
-        expect(spy).toBeCalledTimes(1);
+        expect(spy).toHaveBeenCalledTimes(1);
 
         // Re-enable and test
         handler.setDisabled(false);

@@ -199,6 +199,7 @@ describe('PaneviewAngularComponent', () => {
 });
 
 @Component({
+    standalone: false,
     template: `
         <dv-paneview
             [components]="components"

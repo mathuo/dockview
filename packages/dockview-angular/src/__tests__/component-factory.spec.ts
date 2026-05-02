@@ -4,6 +4,7 @@ import { AngularFrameworkComponentFactory } from '../lib/utils/component-factory
 import { CreateComponentOptions } from 'dockview-core';
 
 @Component({
+    standalone: false,
     selector: 'test-dockview-component',
     template: '<div class="test-dockview">{{ data?.title || "Default" }}</div>',
 })
@@ -12,24 +13,28 @@ class TestDockviewComponent {
 }
 
 @Component({
+    standalone: false,
     selector: 'test-gridview-component',
     template: '<div class="test-gridview">Gridview Panel</div>',
 })
 class TestGridviewComponent {}
 
 @Component({
+    standalone: false,
     selector: 'test-splitview-component',
     template: '<div class="test-splitview">Splitview Panel</div>',
 })
 class TestSplitviewComponent {}
 
 @Component({
+    standalone: false,
     selector: 'test-paneview-component',
     template: '<div class="test-paneview">Paneview Part</div>',
 })
 class TestPaneviewComponent {}
 
 @Component({
+    standalone: false,
     selector: 'test-tab-component',
     template: '<div class="test-tab">{{ title || "Tab" }}</div>',
 })
@@ -38,12 +43,14 @@ class TestTabComponent {
 }
 
 @Component({
+    standalone: false,
     selector: 'test-watermark-component',
     template: '<div class="test-watermark">Watermark</div>',
 })
 class TestWatermarkComponent {}
 
 @Component({
+    standalone: false,
     selector: 'test-header-actions-component',
     template: '<div class="test-header-actions">Actions</div>',
 })

@@ -69,8 +69,8 @@
         "rxjs": ">=7.0.0"
     },
     "devDependencies": {
-        "jest-preset-angular": "^14.6.1",
-        "ng-packagr": "^17.0.0",
+        "jest-preset-angular": "^16.0.0",
+        "ng-packagr": "^21.0.0",
         "zone.js": "^0.15.1"
     },
     "exports": {

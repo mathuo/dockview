@@ -55,6 +55,6 @@ describe('headerActionsRenderer', () => {
 
         cut.update({ params: { valueA: 'A' } });
 
-        expect(update).toBeCalledWith({ valueA: 'A' });
+        expect(update).toHaveBeenCalledWith({ valueA: 'A' });
     });
 });

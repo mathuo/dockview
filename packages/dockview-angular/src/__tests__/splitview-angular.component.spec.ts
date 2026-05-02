@@ -213,6 +213,7 @@ describe('SplitviewAngularComponent', () => {
 });
 
 @Component({
+    standalone: false,
     template: `
         <dv-splitview
             [components]="components"

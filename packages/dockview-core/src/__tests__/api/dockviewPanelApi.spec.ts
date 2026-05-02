@@ -37,8 +37,8 @@ describe('groupPanelApi', () => {
         );
 
         cut.setTitle('test_title');
-        expect(panel.setTitle).toBeCalledTimes(1);
-        expect(panel.setTitle).toBeCalledWith('test_title');
+        expect(panel.setTitle).toHaveBeenCalledTimes(1);
+        expect(panel.setTitle).toHaveBeenCalledWith('test_title');
     });
 
     test('updateParameters', () => {

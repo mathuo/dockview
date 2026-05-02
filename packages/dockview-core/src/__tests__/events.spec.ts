@@ -166,19 +166,19 @@ describe('events', () => {
             true
         );
 
-        expect(element.addEventListener).toBeCalledTimes(1);
+        expect(element.addEventListener).toHaveBeenCalledTimes(1);
         expect(element.addEventListener).toHaveBeenCalledWith(
             'pointerdown',
             handler,
             true
         );
-        expect(element.removeEventListener).toBeCalledTimes(0);
+        expect(element.removeEventListener).toHaveBeenCalledTimes(0);
 
         disposable.dispose();
 
-        expect(element.addEventListener).toBeCalledTimes(1);
-        expect(element.removeEventListener).toBeCalledTimes(1);
-        expect(element.removeEventListener).toBeCalledWith(
+        expect(element.addEventListener).toHaveBeenCalledTimes(1);
+        expect(element.removeEventListener).toHaveBeenCalledTimes(1);
+        expect(element.removeEventListener).toHaveBeenCalledWith(
             'pointerdown',
             handler,
             true
@@ -199,19 +199,19 @@ describe('events', () => {
             handler
         );
 
-        expect(element.addEventListener).toBeCalledTimes(1);
+        expect(element.addEventListener).toHaveBeenCalledTimes(1);
         expect(element.addEventListener).toHaveBeenCalledWith(
             'pointerdown',
             handler,
             undefined
         );
-        expect(element.removeEventListener).toBeCalledTimes(0);
+        expect(element.removeEventListener).toHaveBeenCalledTimes(0);
 
         disposable.dispose();
 
-        expect(element.addEventListener).toBeCalledTimes(1);
-        expect(element.removeEventListener).toBeCalledTimes(1);
-        expect(element.removeEventListener).toBeCalledWith(
+        expect(element.addEventListener).toHaveBeenCalledTimes(1);
+        expect(element.removeEventListener).toHaveBeenCalledTimes(1);
+        expect(element.removeEventListener).toHaveBeenCalledWith(
             'pointerdown',
             handler,
             undefined
@@ -233,19 +233,19 @@ describe('events', () => {
             true
         );
 
-        expect(element.addEventListener).toBeCalledTimes(1);
+        expect(element.addEventListener).toHaveBeenCalledTimes(1);
         expect(element.addEventListener).toHaveBeenCalledWith(
             'pointerdown',
             handler,
             true
         );
-        expect(element.removeEventListener).toBeCalledTimes(0);
+        expect(element.removeEventListener).toHaveBeenCalledTimes(0);
 
         disposable.dispose();
 
-        expect(element.addEventListener).toBeCalledTimes(1);
-        expect(element.removeEventListener).toBeCalledTimes(1);
-        expect(element.removeEventListener).toBeCalledWith(
+        expect(element.addEventListener).toHaveBeenCalledTimes(1);
+        expect(element.removeEventListener).toHaveBeenCalledTimes(1);
+        expect(element.removeEventListener).toHaveBeenCalledWith(
             'pointerdown',
             handler,
             true
@@ -266,19 +266,19 @@ describe('events', () => {
             handler
         );
 
-        expect(element.addEventListener).toBeCalledTimes(1);
+        expect(element.addEventListener).toHaveBeenCalledTimes(1);
         expect(element.addEventListener).toHaveBeenCalledWith(
             'pointerdown',
             handler,
             undefined
         );
-        expect(element.removeEventListener).toBeCalledTimes(0);
+        expect(element.removeEventListener).toHaveBeenCalledTimes(0);
 
         disposable.dispose();
 
-        expect(element.addEventListener).toBeCalledTimes(1);
-        expect(element.removeEventListener).toBeCalledTimes(1);
-        expect(element.removeEventListener).toBeCalledWith(
+        expect(element.addEventListener).toHaveBeenCalledTimes(1);
+        expect(element.removeEventListener).toHaveBeenCalledTimes(1);
+        expect(element.removeEventListener).toHaveBeenCalledWith(
             'pointerdown',
             handler,
             undefined

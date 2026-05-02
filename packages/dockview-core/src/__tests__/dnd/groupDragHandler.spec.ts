@@ -69,13 +69,13 @@ describe('groupDragHandler', () => {
 
         const spy = jest.spyOn(event, 'preventDefault');
         fireEvent(element, event);
-        expect(spy).toBeCalledTimes(1);
+        expect(spy).toHaveBeenCalledTimes(1);
 
         const event2 = new KeyboardEvent('dragstart', { shiftKey: true });
 
         const spy2 = jest.spyOn(event2, 'preventDefault');
         fireEvent(element, event);
-        expect(spy2).toBeCalledTimes(0);
+        expect(spy2).toHaveBeenCalledTimes(0);
 
         cut.dispose();
     });
@@ -101,13 +101,13 @@ describe('groupDragHandler', () => {
 
         const spy = jest.spyOn(event, 'preventDefault');
         fireEvent(element, event);
-        expect(spy).toBeCalledTimes(0);
+        expect(spy).toHaveBeenCalledTimes(0);
 
         const event2 = new KeyboardEvent('dragstart', { shiftKey: true });
 
         const spy2 = jest.spyOn(event2, 'preventDefault');
         fireEvent(element, event);
-        expect(spy2).toBeCalledTimes(0);
+        expect(spy2).toHaveBeenCalledTimes(0);
 
         cut.dispose();
     });

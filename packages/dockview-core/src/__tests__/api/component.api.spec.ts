@@ -38,7 +38,7 @@ describe('component.api', () => {
 
                 (cut as any)[_];
 
-                expect(f).toBeCalledTimes(1);
+                expect(f).toHaveBeenCalledTimes(1);
             }
         });
     });
@@ -69,7 +69,7 @@ describe('component.api', () => {
 
                 (cut as any)[_];
 
-                expect(f).toBeCalledTimes(1);
+                expect(f).toHaveBeenCalledTimes(1);
             }
         });
     });
@@ -104,7 +104,7 @@ describe('component.api', () => {
 
                 (cut as any)[_];
 
-                expect(f).toBeCalledTimes(1);
+                expect(f).toHaveBeenCalledTimes(1);
             }
         });
     });
@@ -148,7 +148,7 @@ describe('component.api', () => {
 
                 (cut as any)[_];
 
-                expect(f).toBeCalledTimes(1);
+                expect(f).toHaveBeenCalledTimes(1);
             }
         });
     });
