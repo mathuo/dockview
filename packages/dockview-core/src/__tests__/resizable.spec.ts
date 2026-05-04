@@ -1,8 +1,7 @@
 import { Resizable } from '../resizable';
 
 class TestResizable extends Resizable {
-    public readonly layoutCalls: Array<{ width: number; height: number }> =
-        [];
+    public readonly layoutCalls: Array<{ width: number; height: number }> = [];
 
     layout(width: number, height: number): void {
         this.layoutCalls.push({ width, height });
