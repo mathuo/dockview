@@ -1370,10 +1370,20 @@ export class DockviewComponent
                     overlay.bringToFront();
                 }
             }),
-            watchElementResize(group.element, (entry) => {
-                const { width, height } = entry.contentRect;
-                group.layout(width, height); // let the group know it's size is changing so it can fire events to the panel
-            })
+            (() => {
+                let lastWidth = -1;
+                let lastHeight = -1;
+                return watchElementResize(group.element, (entry) => {
+                    const width = Math.round(entry.contentRect.width);
+                    const height = Math.round(entry.contentRect.height);
+                    if (width === lastWidth && height === lastHeight) {
+                        return;
+                    }
+                    lastWidth = width;
+                    lastHeight = height;
+                    group.layout(width, height); // let the group know it's size is changing so it can fire events to the panel
+                });
+            })()
         );
 
         floatingGroupPanel.addDisposables(
