@@ -80,6 +80,62 @@ describe('groupDragHandler', () => {
         cut.dispose();
     });
 
+    test('that the event is cancelled when the group is an empty edge group', () => {
+        const element = document.createElement('div');
+
+        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
+            const partial: Partial<DockviewGroupPanel> = {
+                api: {
+                    location: { type: 'edge', position: 'left' },
+                } as any,
+                size: 0,
+            };
+            return partial as DockviewGroupPanel;
+        });
+        const group = new groupMock();
+
+        const cut = new GroupDragHandler(
+            element,
+            { id: 'accessor_id' } as DockviewComponent,
+            group
+        );
+
+        const event = new KeyboardEvent('dragstart', { shiftKey: false });
+        const spy = jest.spyOn(event, 'preventDefault');
+        fireEvent(element, event);
+        expect(spy).toHaveBeenCalledTimes(1);
+
+        cut.dispose();
+    });
+
+    test('that the event is not cancelled when the edge group has panels', () => {
+        const element = document.createElement('div');
+
+        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
+            const partial: Partial<DockviewGroupPanel> = {
+                api: {
+                    location: { type: 'edge', position: 'left' },
+                } as any,
+                size: 1,
+            };
+            return partial as DockviewGroupPanel;
+        });
+        const group = new groupMock();
+
+        const cut = new GroupDragHandler(
+            element,
+            { id: 'accessor_id' } as DockviewComponent,
+            group
+        );
+
+        const event = new KeyboardEvent('dragstart', { shiftKey: false });
+        const spy = jest.spyOn(event, 'preventDefault');
+        fireEvent(element, event);
+        expect(spy).toHaveBeenCalledTimes(0);
+
+        cut.dispose();
+    });
+
     test('that the event is never cancelled when the group is not floating', () => {
         const element = document.createElement('div');
 
