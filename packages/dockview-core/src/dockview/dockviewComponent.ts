@@ -3146,13 +3146,12 @@ export class DockviewComponent
             } else {
                 switch (from.api.location.type) {
                     case 'grid':
-                        this.gridview.removeView(
-                            getGridLocation(from.element)
-                        );
+                        this.gridview.removeView(getGridLocation(from.element));
                         break;
                     case 'floating': {
-                        const selectedFloatingGroup =
-                            this._floatingGroups.find((x) => x.group === from);
+                        const selectedFloatingGroup = this._floatingGroups.find(
+                            (x) => x.group === from
+                        );
                         if (!selectedFloatingGroup) {
                             throw new Error(
                                 'dockview: failed to find floating group'
