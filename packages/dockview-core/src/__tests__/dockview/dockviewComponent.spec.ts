@@ -10195,6 +10195,92 @@ describe('dockviewComponent', () => {
             dv.dispose();
         });
 
+        test('moveGroup from edge to grid leaves edge group empty and collapsed (#1235)', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left']);
+            dv.layout(1000, 800);
+
+            const edgeGroup = dv.groups.find(
+                (g) => g.api.location.type === 'edge'
+            )!;
+
+            const target = dv.addPanel({ id: 'center', component: 'default' });
+            const edgeP1 = dv.addPanel({
+                id: 'edge-p1',
+                component: 'default',
+                position: { referenceGroup: edgeGroup.id },
+            });
+            dv.addPanel({
+                id: 'edge-p2',
+                component: 'default',
+                position: { referenceGroup: edgeGroup.id },
+            });
+            edgeP1.api.setActive();
+
+            expect(edgeGroup.panels.length).toBe(2);
+            expect(edgeGroup.activePanel?.id).toBe('edge-p1');
+
+            dv.moveGroup({
+                from: { group: edgeGroup },
+                to: { group: target.api.group, position: 'right' },
+            });
+
+            // Edge group still exists at its position, now empty
+            expect(dv.getEdgeGroup('left')).toBeDefined();
+            expect(edgeGroup.api.location.type).toBe('edge');
+            expect(edgeGroup.panels.length).toBe(0);
+            // ...and auto-collapsed via the addEdgeGroup listener
+            expect((dv as any)._shellManager.isEdgeGroupCollapsed('left')).toBe(
+                true
+            );
+
+            // Panels moved into a new grid group at the target
+            const movedPanel = dv.getGroupPanel('edge-p1')!;
+            expect(movedPanel.group.api.location.type).toBe('grid');
+            expect(movedPanel.group).not.toBe(edgeGroup);
+            expect(movedPanel.group.panels.map((p) => p.id).sort()).toEqual([
+                'edge-p1',
+                'edge-p2',
+            ]);
+
+            // The originally-active panel remains active in the new group
+            expect(movedPanel.group.activePanel?.id).toBe(edgeP1.id);
+
+            dv.dispose();
+        });
+
+        test('moveGroup from edge to grid does not destroy the edge group', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['right']);
+            dv.layout(1000, 800);
+
+            const edgeGroup = dv.groups.find(
+                (g) => g.api.location.type === 'edge'
+            )!;
+
+            const target = dv.addPanel({ id: 'center', component: 'default' });
+            dv.addPanel({
+                id: 'edge-p1',
+                component: 'default',
+                position: { referenceGroup: edgeGroup.id },
+            });
+
+            const removed: string[] = [];
+            dv.onDidRemoveGroup((g) => removed.push(g.id));
+
+            dv.moveGroup({
+                from: { group: edgeGroup },
+                to: { group: target.api.group, position: 'left' },
+            });
+
+            // The edge group must not be removed
+            expect(removed).not.toContain(edgeGroup.id);
+            expect(dv.getEdgeGroup('right')).toBeDefined();
+            expect(dv.groups).toContain(edgeGroup);
+
+            dv.dispose();
+        });
+
         test('fromJSON auto-creates edge groups from serialized state', () => {
             const c = document.createElement('div');
             // No addEdgeGroup called before fromJSON
