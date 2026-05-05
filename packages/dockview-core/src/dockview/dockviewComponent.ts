@@ -3079,6 +3079,11 @@ export class DockviewComponent
         const to = options.to.group;
         const target = options.to.position;
 
+        // The group whose panels end up at the target. For non-edge moves
+        // we relocate `from` itself; for edge moves we move panels into a
+        // freshly created group so the edge slot stays anchored.
+        let source: DockviewGroupPanel = from;
+
         if (target === 'center') {
             const activePanel = from.activePanel;
 
@@ -3116,11 +3121,12 @@ export class DockviewComponent
         } else {
             if (from.api.location.type === 'edge') {
                 /**
-                 * Edge groups are permanent structural elements and must stay
-                 * anchored in their edge slot. Move the panels into a new
-                 * group at the target location; the auto-collapse listener
-                 * registered in addEdgeGroup will collapse the now-empty
-                 * edge slot once the last panel leaves.
+                 * Edge groups are permanent structural elements and must
+                 * stay anchored in their edge slot. Move the panels into a
+                 * new group; the auto-collapse listener registered in
+                 * addEdgeGroup will collapse the now-empty edge slot once
+                 * the last panel leaves. The placement code below then
+                 * positions `source` like any other moved group.
                  */
                 const activePanel = from.activePanel;
                 const movedPanels = this.movingLock(() =>
@@ -3128,137 +3134,85 @@ export class DockviewComponent
                         from.model.removePanel(p.id, { skipSetActive: true })
                     )
                 );
-
-                let newGroup: DockviewGroupPanel;
-
-                if (to.api.location.type === 'grid') {
-                    const referenceLocation = getGridLocation(to.element);
-                    const dropLocation = getRelativeLocation(
-                        this.gridview.orientation,
-                        referenceLocation,
-                        target
-                    );
-                    newGroup = this.createGroupAtLocation(dropLocation);
-                } else if (to.api.location.type === 'floating') {
-                    newGroup = this.createGroup();
-                    const targetFloatingGroup = this._floatingGroups.find(
-                        (x) => x.group === to
-                    );
-                    if (targetFloatingGroup) {
-                        const box = targetFloatingGroup.overlay.toJSON();
-                        let left: number, top: number;
-                        if ('left' in box) {
-                            left = box.left + 50;
-                        } else if ('right' in box) {
-                            left = Math.max(0, box.right - box.width - 50);
-                        } else {
-                            left = 50;
-                        }
-                        if ('top' in box) {
-                            top = box.top + 50;
-                        } else if ('bottom' in box) {
-                            top = Math.max(0, box.bottom - box.height - 50);
-                        } else {
-                            top = 50;
-                        }
-                        this.addFloatingGroup(newGroup, {
-                            height: box.height,
-                            width: box.width,
-                            position: { left, top },
-                        });
-                    } else {
-                        this.addFloatingGroup(newGroup);
-                    }
-                } else {
-                    return;
-                }
-
+                source = this.createGroup();
                 this.movingLock(() => {
                     for (const panel of movedPanels) {
-                        newGroup.model.openPanel(panel, {
+                        source.model.openPanel(panel, {
                             skipSetActive: panel !== activePanel,
                             skipSetGroupActive: true,
                         });
                     }
                 });
-
-                for (const panel of movedPanels) {
-                    this._onDidMovePanel.fire({ panel, from });
-                }
-
-                this.debouncedUpdateAllPositions();
-
-                if (options.skipSetActive !== true) {
-                    this.doSetGroupAndPanelActive(newGroup);
-                }
-
-                return;
-            }
-
-            switch (from.api.location.type) {
-                case 'grid':
-                    this.gridview.removeView(getGridLocation(from.element));
-                    break;
-                case 'floating': {
-                    const selectedFloatingGroup = this._floatingGroups.find(
-                        (x) => x.group === from
-                    );
-                    if (!selectedFloatingGroup) {
-                        throw new Error(
-                            'dockview: failed to find floating group'
+            } else {
+                switch (from.api.location.type) {
+                    case 'grid':
+                        this.gridview.removeView(
+                            getGridLocation(from.element)
                         );
-                    }
-                    selectedFloatingGroup.dispose();
-                    break;
-                }
-                case 'popout': {
-                    const selectedPopoutGroup = this._popoutGroups.find(
-                        (x) => x.popoutGroup === from
-                    );
-                    if (!selectedPopoutGroup) {
-                        throw new Error(
-                            'dockview: failed to find popout group'
-                        );
-                    }
-
-                    // Remove from popout groups list to prevent automatic restoration
-                    const index =
-                        this._popoutGroups.indexOf(selectedPopoutGroup);
-                    if (index >= 0) {
-                        this._popoutGroups.splice(index, 1);
-                    }
-
-                    // Clean up the reference group (ghost) if it exists and is hidden
-                    if (selectedPopoutGroup.referenceGroup) {
-                        const referenceGroup = this.getPanel(
-                            selectedPopoutGroup.referenceGroup
-                        );
-                        if (referenceGroup && !referenceGroup.api.isVisible) {
-                            this.doRemoveGroup(referenceGroup, {
-                                skipActive: true,
-                            });
+                        break;
+                    case 'floating': {
+                        const selectedFloatingGroup =
+                            this._floatingGroups.find((x) => x.group === from);
+                        if (!selectedFloatingGroup) {
+                            throw new Error(
+                                'dockview: failed to find floating group'
+                            );
                         }
+                        selectedFloatingGroup.dispose();
+                        break;
                     }
+                    case 'popout': {
+                        const selectedPopoutGroup = this._popoutGroups.find(
+                            (x) => x.popoutGroup === from
+                        );
+                        if (!selectedPopoutGroup) {
+                            throw new Error(
+                                'dockview: failed to find popout group'
+                            );
+                        }
 
-                    // Manually dispose the window without triggering restoration
-                    selectedPopoutGroup.window.dispose();
+                        // Remove from popout groups list to prevent automatic restoration
+                        const index =
+                            this._popoutGroups.indexOf(selectedPopoutGroup);
+                        if (index >= 0) {
+                            this._popoutGroups.splice(index, 1);
+                        }
 
-                    // Update group's location and containers for target
-                    if (to.api.location.type === 'grid') {
-                        from.model.renderContainer =
-                            this.overlayRenderContainer;
-                        from.model.dropTargetContainer =
-                            this.rootDropTargetContainer;
-                        from.model.location = { type: 'grid' };
-                    } else if (to.api.location.type === 'floating') {
-                        from.model.renderContainer =
-                            this.overlayRenderContainer;
-                        from.model.dropTargetContainer =
-                            this.rootDropTargetContainer;
-                        from.model.location = { type: 'floating' };
+                        // Clean up the reference group (ghost) if it exists and is hidden
+                        if (selectedPopoutGroup.referenceGroup) {
+                            const referenceGroup = this.getPanel(
+                                selectedPopoutGroup.referenceGroup
+                            );
+                            if (
+                                referenceGroup &&
+                                !referenceGroup.api.isVisible
+                            ) {
+                                this.doRemoveGroup(referenceGroup, {
+                                    skipActive: true,
+                                });
+                            }
+                        }
+
+                        // Manually dispose the window without triggering restoration
+                        selectedPopoutGroup.window.dispose();
+
+                        // Update group's location and containers for target
+                        if (to.api.location.type === 'grid') {
+                            from.model.renderContainer =
+                                this.overlayRenderContainer;
+                            from.model.dropTargetContainer =
+                                this.rootDropTargetContainer;
+                            from.model.location = { type: 'grid' };
+                        } else if (to.api.location.type === 'floating') {
+                            from.model.renderContainer =
+                                this.overlayRenderContainer;
+                            from.model.dropTargetContainer =
+                                this.rootDropTargetContainer;
+                            from.model.location = { type: 'floating' };
+                        }
+
+                        break;
                     }
-
-                    break;
                 }
             }
 
@@ -3290,7 +3244,7 @@ export class DockviewComponent
                         break;
                 }
 
-                this.gridview.addView(from, size, dropLocation);
+                this.gridview.addView(source, size, dropLocation);
             } else if (to.api.location.type === 'floating') {
                 // For moves to floating locations, add as floating group
                 // Get the position/size from the target floating group
@@ -3318,7 +3272,7 @@ export class DockviewComponent
                         top = 50; // Default fallback
                     }
 
-                    this.addFloatingGroup(from, {
+                    this.addFloatingGroup(source, {
                         height: box.height,
                         width: box.width,
                         position: {
@@ -3330,7 +3284,7 @@ export class DockviewComponent
             }
         }
 
-        from.panels.forEach((panel) => {
+        source.panels.forEach((panel) => {
             this._onDidMovePanel.fire({ panel, from });
         });
 
@@ -3342,6 +3296,10 @@ export class DockviewComponent
             // Use 'to' group for non-center moves since 'from' may have been destroyed
             const targetGroup = to ?? from;
             this.doSetGroupAndPanelActive(targetGroup);
+        } else if (source !== from && options.skipSetActive !== true) {
+            // Edge group moves create a fresh `source` group; activate it
+            // by default so the moved panels receive focus.
+            this.doSetGroupAndPanelActive(source);
         }
     }
 
