@@ -42,6 +42,12 @@ export class GroupDragHandler extends DragHandler {
         if (this.group.api.location.type === 'floating' && !_event.shiftKey) {
             return true;
         }
+        if (
+            this.group.api.location.type === 'edge' &&
+            this.group.size === 0
+        ) {
+            return true;
+        }
         return false;
     }
 

@@ -3114,6 +3114,87 @@ export class DockviewComponent
                 this.doSetGroupAndPanelActive(to);
             }
         } else {
+            if (from.api.location.type === 'edge') {
+                /**
+                 * Edge groups are permanent structural elements and must stay
+                 * anchored in their edge slot. Move the panels into a new
+                 * group at the target location; the auto-collapse listener
+                 * registered in addEdgeGroup will collapse the now-empty
+                 * edge slot once the last panel leaves.
+                 */
+                const activePanel = from.activePanel;
+                const movedPanels = this.movingLock(() =>
+                    [...from.panels].map((p) =>
+                        from.model.removePanel(p.id, { skipSetActive: true })
+                    )
+                );
+
+                let newGroup: DockviewGroupPanel;
+
+                if (to.api.location.type === 'grid') {
+                    const referenceLocation = getGridLocation(to.element);
+                    const dropLocation = getRelativeLocation(
+                        this.gridview.orientation,
+                        referenceLocation,
+                        target
+                    );
+                    newGroup = this.createGroupAtLocation(dropLocation);
+                } else if (to.api.location.type === 'floating') {
+                    newGroup = this.createGroup();
+                    const targetFloatingGroup = this._floatingGroups.find(
+                        (x) => x.group === to
+                    );
+                    if (targetFloatingGroup) {
+                        const box = targetFloatingGroup.overlay.toJSON();
+                        let left: number, top: number;
+                        if ('left' in box) {
+                            left = box.left + 50;
+                        } else if ('right' in box) {
+                            left = Math.max(0, box.right - box.width - 50);
+                        } else {
+                            left = 50;
+                        }
+                        if ('top' in box) {
+                            top = box.top + 50;
+                        } else if ('bottom' in box) {
+                            top = Math.max(0, box.bottom - box.height - 50);
+                        } else {
+                            top = 50;
+                        }
+                        this.addFloatingGroup(newGroup, {
+                            height: box.height,
+                            width: box.width,
+                            position: { left, top },
+                        });
+                    } else {
+                        this.addFloatingGroup(newGroup);
+                    }
+                } else {
+                    return;
+                }
+
+                this.movingLock(() => {
+                    for (const panel of movedPanels) {
+                        newGroup.model.openPanel(panel, {
+                            skipSetActive: panel !== activePanel,
+                            skipSetGroupActive: true,
+                        });
+                    }
+                });
+
+                for (const panel of movedPanels) {
+                    this._onDidMovePanel.fire({ panel, from });
+                }
+
+                this.debouncedUpdateAllPositions();
+
+                if (options.skipSetActive !== true) {
+                    this.doSetGroupAndPanelActive(newGroup);
+                }
+
+                return;
+            }
+
             switch (from.api.location.type) {
                 case 'grid':
                     this.gridview.removeView(getGridLocation(from.element));
