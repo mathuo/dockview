@@ -152,6 +152,10 @@ export class AngularRenderer<T = unknown>
             this.viewRef.destroy();
             this.viewRef = null;
         }
-        this._element = null;
+        // Intentionally retain `_element` after dispose. Dockview's overlay
+        // teardown reads `panel.view.content.element` while removing the node
+        // from its overlay parent — nulling here would make the getter throw
+        // mid-cascade. The HTMLElement reference is cheap and will be GC'd
+        // when the renderer itself is collected.
     }
 }
