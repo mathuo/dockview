@@ -87,10 +87,7 @@ describe('dom', () => {
             return document.implementation.createHTMLDocument('target');
         }
 
-        function makeStyleSheet(
-            rules: string[],
-            href?: string
-        ): CSSStyleSheet {
+        function makeStyleSheet(rules: string[], href?: string): CSSStyleSheet {
             return {
                 href,
                 type: 'text/css',
@@ -137,7 +134,7 @@ describe('dom', () => {
             expect(style.hasAttribute('nonce')).toBe(false);
         });
 
-        test('appends <link> for external stylesheet hrefs', () => {
+        test('appends <link> for external stylesheet hrefs and does not duplicate rules inline', () => {
             const targetDoc = makeTargetDocument();
             const sheets = makeStyleSheetList([
                 makeStyleSheet(
@@ -154,6 +151,9 @@ describe('dom', () => {
             expect(link?.getAttribute('href')).toBe(
                 'https://example.test/main.css'
             );
+            // The <link> already loads the sheet in the target document;
+            // we must not also inject inline <style> for the same rules.
+            expect(targetDoc.head.querySelectorAll('style').length).toBe(0);
         });
 
         test('preserves source order across readable and unreadable sheets', () => {
@@ -162,10 +162,7 @@ describe('dom', () => {
                 href: 'https://cdn.test/blocked.css',
                 type: 'text/css',
                 get cssRules(): CSSRuleList {
-                    throw new DOMException(
-                        'SecurityError',
-                        'SecurityError'
-                    );
+                    throw new DOMException('SecurityError', 'SecurityError');
                 },
             };
 
@@ -189,9 +186,9 @@ describe('dom', () => {
             expect(appended[0].tagName).toBe('STYLE');
             expect(appended[0].textContent).toBe('.first { color: red; }');
             expect(appended[1].tagName).toBe('LINK');
-            expect(
-                (appended[1] as HTMLLinkElement).getAttribute('href')
-            ).toBe('https://cdn.test/blocked.css');
+            expect((appended[1] as HTMLLinkElement).getAttribute('href')).toBe(
+                'https://cdn.test/blocked.css'
+            );
             expect(appended[2].tagName).toBe('STYLE');
             expect(appended[2].textContent).toBe('.third { color: green; }');
 
@@ -212,7 +209,9 @@ describe('dom', () => {
             const nonceFn = jest.fn(
                 (doc: Document) =>
                     doc
-                        .querySelector<HTMLMetaElement>('meta[name="csp-nonce"]')
+                        .querySelector<HTMLMetaElement>(
+                            'meta[name="csp-nonce"]'
+                        )
                         ?.getAttribute('content') ?? undefined
             );
 

@@ -224,8 +224,7 @@ export function addStyles(
 ) {
     const styleSheets = Array.from(styleSheetList);
     const { nonce } = options;
-    const resolvedNonce =
-        typeof nonce === 'function' ? nonce(document) : nonce;
+    const resolvedNonce = typeof nonce === 'function' ? nonce(document) : nonce;
 
     for (const styleSheet of styleSheets) {
         if (styleSheet.href) {
@@ -234,6 +233,10 @@ export function addStyles(
             link.type = styleSheet.type;
             link.rel = 'stylesheet';
             document.head.appendChild(link);
+            // The <link> will load and apply its rules in the target
+            // document. Reading cssRules here would duplicate them
+            // (and throws for cross-origin sheets).
+            continue;
         }
 
         let cssTexts: string[] = [];
