@@ -4,6 +4,7 @@ import {
     type DockviewOptions,
     PROPERTY_KEYS_DOCKVIEW,
     type DockviewFrameworkOptions,
+    type DockviewIDisposable,
     createDockview,
 } from 'dockview-core';
 import {
@@ -43,6 +44,7 @@ const props = defineProps<IDockviewVueProps>();
 
 const el = ref<HTMLElement | null>(null);
 const instance = ref<DockviewApi | null>(null);
+const eventDisposables: DockviewIDisposable[] = [];
 
 PROPERTY_KEYS_DOCKVIEW.forEach((coreOptionKey) => {
     watch(
@@ -281,10 +283,17 @@ onMounted(() => {
      */
     instance.value = markRaw(api);
 
+    eventDisposables.push(
+        api.onDidDrop((event) => emit('didDrop', event)),
+        api.onWillDrop((event) => emit('willDrop', event))
+    );
+
     emit('ready', { api });
 });
 
 onBeforeUnmount(() => {
+    eventDisposables.forEach((d) => d.dispose());
+    eventDisposables.length = 0;
     if (instance.value) {
         instance.value.dispose();
     }

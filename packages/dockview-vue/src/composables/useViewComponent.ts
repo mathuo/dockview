@@ -7,6 +7,7 @@ import {
     getCurrentInstance,
     type ComponentInternalInstance,
 } from 'vue';
+import type { DockviewIDisposable } from 'dockview-core';
 import { findComponent } from '../utils';
 
 export interface ViewComponentConfig<
@@ -30,6 +31,7 @@ export interface ViewComponentConfig<
         instance: ComponentInternalInstance
     ) => TView;
     extractCoreOptions: (props: TProps) => TOptions;
+    onApiCreated?: (api: TApi) => DockviewIDisposable[];
 }
 
 export function useViewComponent<
@@ -57,6 +59,7 @@ export function useViewComponent<
 ) {
     const el = ref<HTMLElement | null>(null);
     const instance = ref<TApi | null>(null);
+    const eventDisposables: DockviewIDisposable[] = [];
 
     config.propertyKeys.forEach((coreOptionKey) => {
         watch(
@@ -135,10 +138,16 @@ export function useViewComponent<
 
         instance.value = markRaw(api) as any;
 
+        if (config.onApiCreated) {
+            eventDisposables.push(...config.onApiCreated(api));
+        }
+
         emit('ready', { api });
     });
 
     onBeforeUnmount(() => {
+        eventDisposables.forEach((d) => d.dispose());
+        eventDisposables.length = 0;
         if (instance.value) {
             instance.value.dispose();
         }
