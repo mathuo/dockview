@@ -1341,6 +1341,23 @@ describe('dockviewGroupPanelModel', () => {
             expect(groupview.model.getTabGroups()[0]).toBe(tabGroup);
         });
 
+        test('createTabGroup with collapsed option creates collapsed group without firing onDidTabGroupCollapsedChange', () => {
+            const collapseEvents: any[] = [];
+            groupview.model.onDidTabGroupCollapsedChange((e) =>
+                collapseEvents.push(e)
+            );
+
+            const tabGroup = groupview.model.createTabGroup({
+                label: 'Born collapsed',
+                color: 'red',
+                collapsed: true,
+            });
+
+            expect(tabGroup.collapsed).toBe(true);
+            // No transition occurred — chip / tabs render collapsed from the start.
+            expect(collapseEvents).toHaveLength(0);
+        });
+
         test('createTabGroup fires onDidCreateTabGroup', () => {
             const events: any[] = [];
             groupview.model.onDidCreateTabGroup((e) => events.push(e));

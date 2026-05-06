@@ -177,7 +177,7 @@ describe('tab', () => {
         fireEvent.dragEnter(cut.element);
         fireEvent.dragOver(cut.element);
 
-        expect(groupView.canDisplayOverlay).toBeCalledTimes(0);
+        expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(0);
 
         expect(
             cut.element.getElementsByClassName('dv-drop-target-dropzone').length
@@ -229,7 +229,7 @@ describe('tab', () => {
         fireEvent.dragEnter(cut.element);
         fireEvent.dragOver(cut.element);
 
-        expect(groupView.canDisplayOverlay).toBeCalledTimes(1);
+        expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(1);
 
         expect(
             cut.element.getElementsByClassName('dv-drop-target-dropzone').length
@@ -281,7 +281,7 @@ describe('tab', () => {
         fireEvent.dragEnter(cut.element);
         fireEvent.dragOver(cut.element);
 
-        expect(groupView.canDisplayOverlay).toBeCalledTimes(1);
+        expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(1);
 
         expect(
             cut.element.getElementsByClassName('dv-drop-target-dropzone').length

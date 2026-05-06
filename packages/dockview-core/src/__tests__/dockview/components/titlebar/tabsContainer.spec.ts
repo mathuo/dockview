@@ -993,6 +993,7 @@ describe('tabsContainer', () => {
                     .fn()
                     .mockReturnValue({ dispose: jest.fn() }),
                 popupService: mockPopupService,
+                getPopupServiceForGroup: () => mockPopupService,
             });
 
             const mockClose = jest.fn();
@@ -1133,6 +1134,7 @@ describe('tabsContainer', () => {
                     .fn()
                     .mockReturnValue({ dispose: jest.fn() }),
                 popupService: mockPopupService,
+                getPopupServiceForGroup: () => mockPopupService,
             });
 
             const mockClose = jest.fn();
@@ -1263,6 +1265,7 @@ describe('tabsContainer', () => {
                     .fn()
                     .mockReturnValue({ dispose: jest.fn() }),
                 popupService: mockPopupService,
+                getPopupServiceForGroup: () => mockPopupService,
             });
 
             const mockClose = jest.fn();

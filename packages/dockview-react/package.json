@@ -1,6 +1,6 @@
 {
     "name": "dockview-react",
-    "version": "5.2.0",
+    "version": "6.0.5",
     "description": "React docking layout manager — tabs, groups, grids, splitviews, drag and drop, floating panels",
     "keywords": [
         "splitview",
@@ -44,6 +44,10 @@
     "main": "./dist/package/main.cjs.js",
     "module": "./dist/package/main.esm.mjs",
     "types": "./dist/cjs/index.d.ts",
+    "sideEffects": [
+        "**/*.css",
+        "**/*.scss"
+    ],
     "files": [
         "dist",
         "README.md"
@@ -64,6 +68,6 @@
         "format:check": "prettier --check 'src/**/*.{ts,tsx,js,jsx}'"
     },
     "dependencies": {
-        "dockview": "^5.2.0"
+        "dockview": "^6.0.5"
     }
 }

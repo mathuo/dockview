@@ -96,11 +96,25 @@ import {
     IEdgeGroupHost,
 } from './dockviewShell';
 import { DockviewGroupPanelApi } from '../api/dockviewGroupPanelApi';
+import {
+    DEFAULT_TAB_GROUP_COLORS,
+    DockviewTabGroupColorEntry,
+    TabGroupColorPalette,
+} from './tabGroupAccent';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     activationSize: { type: 'pixels', value: 10 },
     size: { type: 'pixels', value: 20 },
 };
+
+function buildTabGroupColorPalette(options: {
+    tabGroupColors?: DockviewTabGroupColorEntry[];
+    tabGroupAccent?: 'palette' | 'off';
+}): TabGroupColorPalette {
+    const entries = options.tabGroupColors ?? DEFAULT_TAB_GROUP_COLORS;
+    const enabled = options.tabGroupAccent !== 'off';
+    return new TabGroupColorPalette(entries, enabled);
+}
 
 function moveGroupWithoutDestroying(options: {
     from: DockviewGroupPanel;
@@ -256,6 +270,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidTabGroupChange: Event<DockviewTabGroupChangeEvent>;
     readonly onDidTabGroupCollapsedChange: Event<DockviewTabGroupCollapsedChangeEvent>;
     readonly options: DockviewComponentOptions;
+    readonly tabGroupColorPalette: TabGroupColorPalette;
     updateOptions(options: DockviewOptions): void;
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void;
     moveGroup(options: MoveGroupOptions): void;
@@ -312,12 +327,13 @@ export class DockviewComponent
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
     private readonly _api: DockviewApi;
     private _options: Exclude<DockviewComponentOptions, 'orientation'>;
+    private _tabGroupColorPalette: TabGroupColorPalette;
     private _watermark: IWatermarkRenderer | null = null;
-    private readonly _themeClassnames: Classnames;
     private _shellThemeClassnames: Classnames | undefined;
 
     readonly overlayRenderContainer: OverlayRenderContainer;
     readonly popupService: PopupService;
+    private readonly _popoutPopupServices = new Map<string, PopupService>();
     readonly contextMenuController: ContextMenuController;
     readonly rootDropTargetContainer: DropTargetAnchorContainer;
 
@@ -408,6 +424,7 @@ export class DockviewComponent
     readonly onDidMaximizedGroupChange = this._onDidMaximizedGroupChange.event;
 
     private _shellManager: ShellManager | undefined;
+    private _floatingOverlayHost: HTMLDivElement | undefined;
     private _inShellLayout = false;
     private readonly _edgeGroups = new Map<
         EdgeGroupPosition,
@@ -461,6 +478,10 @@ export class DockviewComponent
         return this._options;
     }
 
+    get tabGroupColorPalette(): TabGroupColorPalette {
+        return this._tabGroupColorPalette;
+    }
+
     get activePanel(): IDockviewPanel | undefined {
         const activeGroup = this.activeGroup;
 
@@ -509,10 +530,10 @@ export class DockviewComponent
         });
 
         this._options = options;
+        this._tabGroupColorPalette = buildTabGroupColorPalette(options);
 
         this.popupService = new PopupService(this.element);
         this.contextMenuController = new ContextMenuController(this);
-        this._themeClassnames = new Classnames(this.element);
         this._api = new DockviewApi(this);
 
         // The shell always wraps the dockview element so edge groups can be
@@ -540,9 +561,16 @@ export class DockviewComponent
             { disabled: true }
         );
         this.overlayRenderContainer = new OverlayRenderContainer(
-            this.gridview.element,
+            this._shellManager.element,
             this
         );
+
+        // Hosted in the shell (not inside `.dv-dockview`) so floating overlays
+        // share a stacking context with `dv-render-overlay` panels; sized to
+        // mirror the gridview rect so saved positions remain valid.
+        this._floatingOverlayHost = document.createElement('div');
+        this._floatingOverlayHost.className = 'dv-floating-overlay-host';
+        this._shellManager.element.appendChild(this._floatingOverlayHost);
 
         this._rootDropTarget = new Droptarget(this.element, {
             className: 'dv-drop-target-edge',
@@ -672,10 +700,17 @@ export class DockviewComponent
                 this.onDidRemovePanel,
                 this.onDidAddGroup,
                 this.onDidRemove,
+                this.onDidRemoveGroup,
                 this.onDidMovePanel,
                 this.onDidActivePanelChange,
                 this.onDidPopoutGroupPositionChange,
-                this.onDidPopoutGroupSizeChange
+                this.onDidPopoutGroupSizeChange,
+                this.onDidCreateTabGroup,
+                this.onDidDestroyTabGroup,
+                this.onDidAddPanelToTabGroup,
+                this.onDidRemovePanelFromTabGroup,
+                this.onDidTabGroupChange,
+                this.onDidTabGroupCollapsedChange
             )(() => {
                 this._bufferOnDidLayoutChange.fire();
             }),
@@ -788,6 +823,16 @@ export class DockviewComponent
                 // Edge group visibility is managed via setEdgeGroupVisible
                 break;
         }
+    }
+
+    /**
+     * Returns the {@link PopupService} that should host popovers (context
+     * menus, tab overflow menus) for the given group. Popout groups have their
+     * own service rooted in their popout window so the popover renders there
+     * and dismisses on events from that window.
+     */
+    getPopupServiceForGroup(group: DockviewGroupPanel): PopupService {
+        return this._popoutPopupServices.get(group.id) ?? this.popupService;
     }
 
     addPopoutGroup(
@@ -983,6 +1028,23 @@ export class DockviewComponent
                 popoutContainer.appendChild(anchor);
 
                 group.model.dropTargetContainer = dropTargetContainer;
+
+                // Each popout group needs its own popover service so that
+                // tab context menus, chip menus, and tab overflow menus
+                // render in the popout window (not the main window) and
+                // their pointerdown/keydown listeners fire on the right
+                // window for outside-click and Escape dismissal.
+                const popoutPopupService = new PopupService(
+                    popoutContainer,
+                    _window.window!
+                );
+                this._popoutPopupServices.set(group.id, popoutPopupService);
+                popoutWindowDisposable.addDisposables(
+                    popoutPopupService,
+                    Disposable.from(() => {
+                        this._popoutPopupServices.delete(group.id);
+                    })
+                );
 
                 group.model.location = {
                     type: 'popout',
@@ -1268,7 +1330,7 @@ export class DockviewComponent
         const anchoredBox = getAnchoredBox();
 
         const overlay = new Overlay({
-            container: this.gridview.element,
+            container: this._floatingOverlayHost ?? this.gridview.element,
             content: group.element,
             ...anchoredBox,
             minimumInViewportWidth:
@@ -1309,10 +1371,20 @@ export class DockviewComponent
                     overlay.bringToFront();
                 }
             }),
-            watchElementResize(group.element, (entry) => {
-                const { width, height } = entry.contentRect;
-                group.layout(width, height); // let the group know it's size is changing so it can fire events to the panel
-            })
+            (() => {
+                let lastWidth = -1;
+                let lastHeight = -1;
+                return watchElementResize(group.element, (entry) => {
+                    const width = Math.round(entry.contentRect.width);
+                    const height = Math.round(entry.contentRect.height);
+                    if (width === lastWidth && height === lastHeight) {
+                        return;
+                    }
+                    lastWidth = width;
+                    lastHeight = height;
+                    group.layout(width, height); // let the group know it's size is changing so it can fire events to the panel
+                });
+            })()
         );
 
         floatingGroupPanel.addDisposables(
@@ -1448,6 +1520,17 @@ export class DockviewComponent
             }
         }
 
+        if ('tabGroupColors' in options || 'tabGroupAccent' in options) {
+            this._tabGroupColorPalette.setEntries(
+                this._options.tabGroupColors ?? DEFAULT_TAB_GROUP_COLORS
+            );
+            this._tabGroupColorPalette.enabled =
+                this._options.tabGroupAccent !== 'off';
+            for (const group of this.groups) {
+                group.model.refreshTabGroupAccent();
+            }
+        }
+
         this._onDidOptionsChange.fire();
 
         this._layoutFromShell(this.gridview.width, this.gridview.height);
@@ -1464,12 +1547,27 @@ export class DockviewComponent
             super.layout(width, height, forceResize);
         }
 
+        this._syncFloatingOverlayHost();
+
         if (this._floatingGroups) {
             for (const floating of this._floatingGroups) {
                 // ensure floting groups stay within visible boundaries
                 floating.overlay.setBounds();
             }
         }
+    }
+
+    private _syncFloatingOverlayHost(): void {
+        if (!this._floatingOverlayHost || !this._shellManager) {
+            return;
+        }
+        const shellRect = this._shellManager.element.getBoundingClientRect();
+        const gridRect = this.element.getBoundingClientRect();
+        const host = this._floatingOverlayHost;
+        host.style.left = `${gridRect.left - shellRect.left}px`;
+        host.style.top = `${gridRect.top - shellRect.top}px`;
+        host.style.width = `${gridRect.width}px`;
+        host.style.height = `${gridRect.height}px`;
     }
 
     private _layoutFromShell(width: number, height: number): void {
@@ -2955,12 +3053,10 @@ export class DockviewComponent
             const newTabGroup = targetGroup.model.createTabGroup({
                 label,
                 color,
+                collapsed,
             });
             for (const panel of removedPanels) {
                 targetGroup.model.addPanelToTabGroup(newTabGroup.id, panel.id);
-            }
-            if (collapsed) {
-                newTabGroup.collapse();
             }
 
             if (!options.skipSetActive) {
@@ -2993,6 +3089,11 @@ export class DockviewComponent
         const from = options.from.group;
         const to = options.to.group;
         const target = options.to.position;
+
+        // The group whose panels end up at the target. For non-edge moves
+        // we relocate `from` itself; for edge moves we move panels into a
+        // freshly created group so the edge slot stays anchored.
+        let source: DockviewGroupPanel = from;
 
         if (target === 'center') {
             const activePanel = from.activePanel;
@@ -3029,70 +3130,99 @@ export class DockviewComponent
                 this.doSetGroupAndPanelActive(to);
             }
         } else {
-            switch (from.api.location.type) {
-                case 'grid':
-                    this.gridview.removeView(getGridLocation(from.element));
-                    break;
-                case 'floating': {
-                    const selectedFloatingGroup = this._floatingGroups.find(
-                        (x) => x.group === from
-                    );
-                    if (!selectedFloatingGroup) {
-                        throw new Error(
-                            'dockview: failed to find floating group'
-                        );
+            if (from.api.location.type === 'edge') {
+                /**
+                 * Edge groups are permanent structural elements and must
+                 * stay anchored in their edge slot. Move the panels into a
+                 * new group; the auto-collapse listener registered in
+                 * addEdgeGroup will collapse the now-empty edge slot once
+                 * the last panel leaves. The placement code below then
+                 * positions `source` like any other moved group.
+                 */
+                const activePanel = from.activePanel;
+                const movedPanels = this.movingLock(() =>
+                    [...from.panels].map((p) =>
+                        from.model.removePanel(p.id, { skipSetActive: true })
+                    )
+                );
+                source = this.createGroup();
+                this.movingLock(() => {
+                    for (const panel of movedPanels) {
+                        source.model.openPanel(panel, {
+                            skipSetActive: panel !== activePanel,
+                            skipSetGroupActive: true,
+                        });
                     }
-                    selectedFloatingGroup.dispose();
-                    break;
-                }
-                case 'popout': {
-                    const selectedPopoutGroup = this._popoutGroups.find(
-                        (x) => x.popoutGroup === from
-                    );
-                    if (!selectedPopoutGroup) {
-                        throw new Error(
-                            'dockview: failed to find popout group'
+                });
+            } else {
+                switch (from.api.location.type) {
+                    case 'grid':
+                        this.gridview.removeView(getGridLocation(from.element));
+                        break;
+                    case 'floating': {
+                        const selectedFloatingGroup = this._floatingGroups.find(
+                            (x) => x.group === from
                         );
-                    }
-
-                    // Remove from popout groups list to prevent automatic restoration
-                    const index =
-                        this._popoutGroups.indexOf(selectedPopoutGroup);
-                    if (index >= 0) {
-                        this._popoutGroups.splice(index, 1);
-                    }
-
-                    // Clean up the reference group (ghost) if it exists and is hidden
-                    if (selectedPopoutGroup.referenceGroup) {
-                        const referenceGroup = this.getPanel(
-                            selectedPopoutGroup.referenceGroup
-                        );
-                        if (referenceGroup && !referenceGroup.api.isVisible) {
-                            this.doRemoveGroup(referenceGroup, {
-                                skipActive: true,
-                            });
+                        if (!selectedFloatingGroup) {
+                            throw new Error(
+                                'dockview: failed to find floating group'
+                            );
                         }
+                        selectedFloatingGroup.dispose();
+                        break;
                     }
+                    case 'popout': {
+                        const selectedPopoutGroup = this._popoutGroups.find(
+                            (x) => x.popoutGroup === from
+                        );
+                        if (!selectedPopoutGroup) {
+                            throw new Error(
+                                'dockview: failed to find popout group'
+                            );
+                        }
 
-                    // Manually dispose the window without triggering restoration
-                    selectedPopoutGroup.window.dispose();
+                        // Remove from popout groups list to prevent automatic restoration
+                        const index =
+                            this._popoutGroups.indexOf(selectedPopoutGroup);
+                        if (index >= 0) {
+                            this._popoutGroups.splice(index, 1);
+                        }
 
-                    // Update group's location and containers for target
-                    if (to.api.location.type === 'grid') {
-                        from.model.renderContainer =
-                            this.overlayRenderContainer;
-                        from.model.dropTargetContainer =
-                            this.rootDropTargetContainer;
-                        from.model.location = { type: 'grid' };
-                    } else if (to.api.location.type === 'floating') {
-                        from.model.renderContainer =
-                            this.overlayRenderContainer;
-                        from.model.dropTargetContainer =
-                            this.rootDropTargetContainer;
-                        from.model.location = { type: 'floating' };
+                        // Clean up the reference group (ghost) if it exists and is hidden
+                        if (selectedPopoutGroup.referenceGroup) {
+                            const referenceGroup = this.getPanel(
+                                selectedPopoutGroup.referenceGroup
+                            );
+                            if (
+                                referenceGroup &&
+                                !referenceGroup.api.isVisible
+                            ) {
+                                this.doRemoveGroup(referenceGroup, {
+                                    skipActive: true,
+                                });
+                            }
+                        }
+
+                        // Manually dispose the window without triggering restoration
+                        selectedPopoutGroup.window.dispose();
+
+                        // Update group's location and containers for target
+                        if (to.api.location.type === 'grid') {
+                            from.model.renderContainer =
+                                this.overlayRenderContainer;
+                            from.model.dropTargetContainer =
+                                this.rootDropTargetContainer;
+                            from.model.location = { type: 'grid' };
+                        } else if (to.api.location.type === 'floating') {
+                            from.model.renderContainer =
+                                this.overlayRenderContainer;
+                            from.model.dropTargetContainer =
+                                this.rootDropTargetContainer;
+                            from.model.location = { type: 'floating' };
+                        }
+
+                        break;
                     }
-
-                    break;
                 }
             }
 
@@ -3124,7 +3254,7 @@ export class DockviewComponent
                         break;
                 }
 
-                this.gridview.addView(from, size, dropLocation);
+                this.gridview.addView(source, size, dropLocation);
             } else if (to.api.location.type === 'floating') {
                 // For moves to floating locations, add as floating group
                 // Get the position/size from the target floating group
@@ -3152,7 +3282,7 @@ export class DockviewComponent
                         top = 50; // Default fallback
                     }
 
-                    this.addFloatingGroup(from, {
+                    this.addFloatingGroup(source, {
                         height: box.height,
                         width: box.width,
                         position: {
@@ -3164,7 +3294,7 @@ export class DockviewComponent
             }
         }
 
-        from.panels.forEach((panel) => {
+        source.panels.forEach((panel) => {
             this._onDidMovePanel.fire({ panel, from });
         });
 
@@ -3176,6 +3306,10 @@ export class DockviewComponent
             // Use 'to' group for non-center moves since 'from' may have been destroyed
             const targetGroup = to ?? from;
             this.doSetGroupAndPanelActive(targetGroup);
+        } else if (source !== from && options.skipSetActive !== true) {
+            // Edge group moves create a fresh `source` group; activate it
+            // by default so the moved panels receive focus.
+            this.doSetGroupAndPanelActive(source);
         }
     }
 
@@ -3435,11 +3569,10 @@ export class DockviewComponent
 
     private updateTheme(): void {
         const theme = this._options.theme ?? themeAbyss;
-        this._themeClassnames.setClassNames(theme.className);
-        // When shell mode is active, edge group groups are siblings of
-        // .dv-dockview so they don't inherit theme CSS from it. Apply the
-        // same theme class to the shell element so all edge groups and the
-        // main grid share the same CSS custom properties and theme rules.
+        // Apply the theme class only to the shell so edge groups and the
+        // main grid both inherit its CSS custom properties via the cascade.
+        // Re-declaring it on `.dv-dockview` would block consumer overrides
+        // set on the shell from reaching the dockview subtree.
         this._shellThemeClassnames?.setClassNames(theme.className);
 
         this.gridview.margin = theme.gap ?? 0;

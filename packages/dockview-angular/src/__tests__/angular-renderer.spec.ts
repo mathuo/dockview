@@ -13,6 +13,7 @@ import {
 import { AngularRenderer } from '../lib/utils/angular-renderer';
 
 @Component({
+    standalone: false,
     selector: 'test-component',
     template:
         '<div class="test-component">{{ params?.title }} - {{ params?.value }}</div>',
@@ -24,6 +25,7 @@ class TestComponent {
 }
 
 @Component({
+    standalone: false,
     selector: 'test-update-component',
     template: '<div class="test-update-component">Counter: {{ counter }}</div>',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,6 +42,7 @@ class TestUpdateComponent {
 }
 
 @Component({
+    standalone: false,
     selector: 'test-template-holder-component',
     template: `
         <ng-template #template>
@@ -136,6 +139,40 @@ describe('AngularRenderer', () => {
         expect(element).toBeTruthy();
 
         renderer.dispose();
+
+        // Element reference is intentionally retained after dispose so that
+        // dockview's overlay teardown can still detach the node from its
+        // parent without the getter throwing mid-cascade. See issue #1220.
+        expect(renderer.element).toBe(element);
+        expect(renderer.component).toBeNull();
+        expect(renderer.view).toBeNull();
+    });
+
+    it('should still expose its element after dispose (regression #1220)', () => {
+        // Reproduces the disposal-order bug from issue #1220: dockview-core's
+        // OverlayRenderContainer reads `panel.view.content.element` while
+        // tearing down its own disposables — by which point the renderer has
+        // already been disposed. Previously the getter threw "Angular
+        // renderer not initialized" here.
+        const renderer = new AngularRenderer<TestComponent>({
+            component: TestComponent,
+            injector,
+            environmentInjector,
+        });
+
+        renderer.init({ params: { title: 'Test Title' } });
+        renderer.dispose();
+
+        expect(() => renderer.element).not.toThrow();
+        expect(renderer.element).toBeInstanceOf(HTMLElement);
+    });
+
+    it('still throws from the element getter when accessed before init', () => {
+        const renderer = new AngularRenderer<TestComponent>({
+            component: TestComponent,
+            injector,
+            environmentInjector,
+        });
 
         expect(() => renderer.element).toThrow(
             'Angular renderer not initialized'

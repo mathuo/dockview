@@ -59,6 +59,14 @@ choose a new location.
 
 <CodeRunner id="dockview/popout-group"/>
 
+## Overlays Inside Popout Windows
+
+Floating overlays — including drag-target indicators, the tab context menu, and tab group chip popovers (color picker, rename) — render inside the DOM of the window that hosts them. When a group lives in a popout window, those overlays render in the popout window's document, not the parent. This means:
+
+- Custom chip components and context menu components are mounted in the popout window's DOM tree.
+- CSS that you load into the main page is automatically copied into popout windows; if you ship custom styles outside the standard import pipeline (for example, lazily injected stylesheets), make sure they are also available in the popout window.
+- Event handlers and portals inside custom components should not assume the document is the main window — use the element's `ownerDocument` when you need a reference.
+
 ## Popout Window Events
 
 `DockviewApi` exposes three events specific to popout windows:

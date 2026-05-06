@@ -93,6 +93,25 @@ const IconTheme = () => (
     </svg>
 );
 
+const IconTabGroups = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="6" width="6" height="3" rx="1" />
+        <rect x="10" y="6" width="6" height="3" rx="1" />
+        <rect x="3" y="12" width="13" height="8" rx="1" />
+        <line x1="18" y1="6" x2="21" y2="6" />
+        <line x1="18" y1="9" x2="21" y2="9" />
+    </svg>
+);
+
+const IconEdgeGroups = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <line x1="3" y1="8" x2="21" y2="8" />
+        <line x1="8" y1="8" x2="8" y2="21" />
+        <line x1="16" y1="8" x2="16" y2="21" />
+    </svg>
+);
+
 // ─── Feature cards ────────────────────────────────────────────────────────────
 
 const FEATURES = [
@@ -131,6 +150,18 @@ const FEATURES = [
         title: 'Theming',
         description:
             'Built-in themes with full CSS variable customization. Override individual properties or build your own theme from scratch.',
+    },
+    {
+        icon: <IconTabGroups />,
+        title: 'Tab Groups',
+        description:
+            'Cluster related tabs into named, color-coded groups within a tab strip. Collapse, drag, and reorder groups; bring your own chip renderer.',
+    },
+    {
+        icon: <IconEdgeGroups />,
+        title: 'Edge Groups',
+        description:
+            'IDE-style collapsible side panels docked to any edge of the layout. Toggle via the API, persist their state, and host any panel content.',
     },
 ];
 
@@ -232,7 +263,7 @@ function Hero() {
                 </div>
                 <div className="hero-preview">
                     <img
-                        src={useBaseUrl('/img/Animation.gif')}
+                        src={useBaseUrl('/img/splashscreenv2.png')}
                         alt="Dockview layout demo"
                         className="hero-gif"
                     />

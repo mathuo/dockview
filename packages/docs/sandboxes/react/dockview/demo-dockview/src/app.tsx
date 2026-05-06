@@ -10,13 +10,16 @@ import {
     IContextMenuItemComponentProps,
     GetTabContextMenuItemsParams,
     GetTabGroupChipContextMenuItemsParams,
-    DockviewTabGroupColors,
-    DockviewTabGroupColor,
+    DEFAULT_TAB_GROUP_COLORS,
 } from 'dockview-react';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import './app.scss';
-import { defaultConfig } from './defaultLayout';
+import {
+    defaultConfig,
+    populateEdgeGroups,
+    setupEdgeGroups,
+} from './defaultLayout';
 import { LeftControls, PrefixHeaderControls, RightControls } from './controls';
 import { Table, usePanelApiMetadata } from './debugPanel';
 import { OrdersPanel } from './ordersPanel';
@@ -282,6 +285,31 @@ const FloatMenuItem = ({
     );
 };
 
+const PopoutMenuItem = ({
+    panel,
+    api,
+    close,
+}: IContextMenuItemComponentProps) => {
+    return (
+        <div
+            className="dv-context-menu-item"
+            onClick={() => {
+                api.addPopoutGroup(panel);
+                close();
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+        >
+            <span
+                className="material-symbols-outlined"
+                style={{ fontSize: '14px' }}
+            >
+                open_in_new
+            </span>
+            Popout tab
+        </div>
+    );
+};
+
 const colors = [
     'rgba(255,0,0,0.2)',
     'rgba(0,255,0,0.2)',
@@ -407,71 +435,23 @@ const DockviewDemo = (props: {
             }),
         ];
 
-        const edgeGroupDefs: {
-            pos: 'bottom' | 'left' | 'right';
-            id: string;
-            title: string;
-        }[] = [
-            { pos: 'left', id: 'left-1', title: 'Explorer' },
-            { pos: 'right', id: 'right-1', title: 'Outline' },
-            { pos: 'right', id: 'right-2', title: 'Properties' },
-            { pos: 'bottom', id: 'bottom-1', title: 'Terminal' },
-            { pos: 'bottom', id: 'bottom-2', title: 'Output' },
-            { pos: 'bottom', id: 'bottom-3', title: 'Problems' },
-        ];
-
-        const populateEdgeGroups = () => {
-            for (const { pos, id, title } of edgeGroupDefs) {
-                const groupApi = api.getEdgeGroup(pos);
-                if (groupApi && !api.panels.find((p) => p.id === id)) {
-                    api.addPanel({
-                        id,
-                        component: 'fixedPlaceholder',
-                        title,
-                        position: { referenceGroup: groupApi.id },
-                        params: { label: title, position: pos },
-                    });
-                }
-            }
-        };
-
         const loadLayout = () => {
-            const state = localStorage.getItem('dv-demo-state');
+            const state = localStorage.getItem('dv-demo-state-v6');
 
             if (state) {
                 try {
                     api.fromJSON(JSON.parse(state));
-                    populateEdgeGroups();
+                    populateEdgeGroups(api);
                     setLayoutReady(true);
                     return;
                 } catch {
-                    localStorage.removeItem('dv-demo-state');
+                    localStorage.removeItem('dv-demo-state-v6');
                 }
                 return;
             }
 
             defaultConfig(api);
-            populateEdgeGroups();
-
-            // Create a tab group in the bottom edge group
-            const bottomEdge = api.getEdgeGroup('bottom');
-            if (bottomEdge) {
-                const logs = api.createTabGroup({
-                    groupId: bottomEdge.id,
-                    label: 'Logs',
-                    color: 'purple',
-                });
-                api.addPanelToTabGroup({
-                    groupId: bottomEdge.id,
-                    tabGroupId: logs.id,
-                    panelId: 'bottom-1',
-                });
-                api.addPanelToTabGroup({
-                    groupId: bottomEdge.id,
-                    tabGroupId: logs.id,
-                    panelId: 'bottom-2',
-                });
-            }
+            populateEdgeGroups(api);
 
             setLayoutReady(true);
         };
@@ -484,26 +464,7 @@ const DockviewDemo = (props: {
     }, [api]);
 
     const onReady = (event: DockviewReadyEvent) => {
-        if (useEdgeGroups) {
-            event.api.addEdgeGroup('bottom', {
-                id: 'bottom',
-                initialSize: 200,
-                minimumSize: 100,
-                collapsed: true,
-            });
-            event.api.addEdgeGroup('left', {
-                id: 'left',
-                initialSize: 220,
-                minimumSize: 150,
-                collapsed: true,
-            });
-            event.api.addEdgeGroup('right', {
-                id: 'right',
-                initialSize: 220,
-                minimumSize: 150,
-                collapsed: true,
-            });
-        }
+        setupEdgeGroups(event.api);
         setApi(event.api);
     };
 
@@ -583,6 +544,7 @@ const DockviewDemo = (props: {
                 'closeAll',
                 'separator',
                 { component: FloatMenuItem },
+                { component: PopoutMenuItem },
             ];
 
             if (api) {
@@ -620,10 +582,10 @@ const DockviewDemo = (props: {
                     label: 'Add to new group',
                     action: () => {
                         const label = window.prompt('Group name:') || '';
-                        const colors = Object.values(DockviewTabGroupColors);
-                        const color = colors[
-                            Math.floor(Math.random() * colors.length)
-                        ] as DockviewTabGroupColor;
+                        const colors = DEFAULT_TAB_GROUP_COLORS;
+                        const color =
+                            colors[Math.floor(Math.random() * colors.length)]
+                                .id;
                         const newGroup = api.createTabGroup({
                             groupId,
                             label,
@@ -694,7 +656,6 @@ const DockviewDemo = (props: {
 
     const [showLogs, setShowLogs] = React.useState<boolean>(false);
     const [debug, setDebug] = React.useState<boolean>(false);
-    const [useEdgeGroups, setUseEdgeGroups] = React.useState<boolean>(true);
     return (
         <div
             className="dockview-demo"
@@ -733,11 +694,6 @@ const DockviewDemo = (props: {
                                         value={effectiveTheme}
                                     >
                                         <DockviewReact
-                                            key={
-                                                useEdgeGroups
-                                                    ? 'shell'
-                                                    : 'no-shell'
-                                            }
                                             components={components}
                                             defaultTabComponent={
                                                 headerComponents.default

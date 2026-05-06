@@ -54,8 +54,8 @@ import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import {
     TabGroup,
     ITabGroup,
-    DockviewTabGroupColor,
     SerializedTabGroup,
+    TabGroupOptions,
 } from './tabGroup';
 import { EdgeGroupPosition } from './dockviewShell';
 
@@ -92,6 +92,10 @@ export interface GroupPanelViewState extends CoreGroupOptions {
 
 export interface DockviewGroupChangeEvent {
     readonly panel: IDockviewPanel;
+}
+
+export interface CreateTabGroupOptions extends TabGroupOptions {
+    id?: string;
 }
 
 export class DockviewDidDropEvent extends DockviewEvent {
@@ -658,15 +662,13 @@ export class DockviewGroupPanelModel
         });
     }
 
-    createTabGroup(options?: {
-        label?: string;
-        color?: DockviewTabGroupColor;
-        id?: string;
-    }): ITabGroup {
+    createTabGroup(options?: CreateTabGroupOptions): ITabGroup {
         const id = options?.id ?? `tg-${this.id}-${this._tabGroupIdCounter++}`;
         const tabGroup = new TabGroup(id, {
             label: options?.label,
             color: options?.color,
+            collapsed: options?.collapsed,
+            componentParams: options?.componentParams,
         });
         this._tabGroups.push(tabGroup);
         this._tabGroupMap.set(id, tabGroup);
@@ -958,6 +960,10 @@ export class DockviewGroupPanelModel
         this.tabsContainer.updateTabGroups();
     }
 
+    refreshTabGroupAccent(): void {
+        this.tabsContainer.refreshTabGroupAccent();
+    }
+
     getTabGroupForPanel(panelId: string): ITabGroup | undefined {
         return this._findTabGroupForPanel(panelId);
     }
@@ -1073,6 +1079,7 @@ export class DockviewGroupPanelModel
                 id: data.id,
                 label: data.label,
                 color: data.color,
+                componentParams: data.componentParams,
             });
 
             const concreteGroup = this._tabGroupMap.get(tabGroup.id)!;

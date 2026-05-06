@@ -974,6 +974,10 @@ export class Tabs extends CompositeDisposable {
         this._tabGroupManager.update();
     }
 
+    refreshTabGroupAccent(): void {
+        this._tabGroupManager.refreshAccents();
+    }
+
     private _handleChipDragStart(
         tabGroup: ITabGroup,
         chip: ITabGroupChipRenderer,

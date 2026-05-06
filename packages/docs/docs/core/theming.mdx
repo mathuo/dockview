@@ -60,6 +60,53 @@ You can define your own `DockviewTheme` object and pass it to the `theme` proper
 
 <DocRef declaration="DockviewTheme" />
 
+## Theme properties
+
+The `DockviewTheme` object accepts a number of optional properties beyond `name` / `className` that change layout behaviour rather than CSS-variable values. The most commonly used ones are listed below.
+
+### `tabAnimation`
+
+Controls how tabs animate when they are reordered or moved across groups.
+
+- `'none'` (default) — no animation, tabs snap to their new position.
+- `'smooth'` — animated FLIP transition between positions, including for vertical tab strips and cross-group moves.
+
+```ts
+import { themeAbyss } from 'dockview-react';
+
+const theme = { ...themeAbyss, tabAnimation: 'smooth' as const };
+```
+
+### `tabGroupIndicator`
+
+Controls how the indicator under a tab group's tabs is rendered.
+
+- `'wrap'` (default) — a continuous coloured bar wraps the group's tabs.
+- `'none'` — no indicator is drawn.
+
+### `dndOverlayBorder`
+
+Controls whether drop-target overlays (the highlight that appears when dragging a panel over a group) render an outline border. Themes can opt out for a flatter look. Boolean, default depends on the theme.
+
+### `dndTabIndicator`
+
+Controls how the drop position indicator within a tab strip is drawn while dragging a tab.
+
+- `'line'` — a thin coloured line marks the insertion point.
+- `'fill'` — the target slot is filled with the active accent colour.
+
+### `edgeGroupCollapsedSize`
+
+Per-theme override for the pixel size of an [edge group](/docs/core/groups/edgeGroups) when it is collapsed. The default differs between compact and spaced themes; override this when you need an exact rail size.
+
+### `colorScheme`
+
+Hint passed to the browser via the `color-scheme` CSS property — `'light'` or `'dark'`. Native form controls and scrollbars adapt accordingly.
+
+## Interactive theme builder
+
+The [live demo](/demo) includes an interactive theme builder that lets you tweak any CSS variable and the theme properties above, then copy the resulting theme object and CSS. This is the fastest way to author a custom theme without writing CSS by hand.
+
 
 ## Customizing Theme
 

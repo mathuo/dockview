@@ -1098,6 +1098,10 @@
     cursor: pointer;
     border: 2px solid transparent;
     flex-shrink: 0;
+    // Each swatch sets `--dv-tab-group-color` inline; this rule reads it
+    // here so `var(...)` references resolve in the CSS engine at use time
+    // instead of at JS-IDL parse time.
+    background-color: var(--dv-tab-group-color);
 
     &:hover {
         opacity: 0.85;

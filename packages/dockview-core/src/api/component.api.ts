@@ -58,7 +58,8 @@ import {
     DockviewTabGroupCollapsedChangeEvent,
     DockviewTabGroupPanelChangeEvent,
 } from '../dockview/events';
-import { ITabGroup, DockviewTabGroupColor } from '../dockview/tabGroup';
+import { ITabGroup } from '../dockview/tabGroup';
+import { DockviewTabGroupColorEntry } from '../dockview/tabGroupAccent';
 import {
     PaneviewComponentOptions,
     PaneviewDndOverlayEvent,
@@ -637,6 +638,16 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     /**
+     * The active tab-group color palette. Reflects the configured
+     * `tabGroupColors` option, or the built-in defaults when unset.
+     * Useful for custom chip renderers that want to roll their own
+     * picker UI.
+     */
+    get tabGroupColors(): readonly DockviewTabGroupColorEntry[] {
+        return this.component.tabGroupColorPalette.entries();
+    }
+
+    /**
      * Total number of panels.
      */
     get totalPanels(): number {
@@ -1041,12 +1052,14 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     createTabGroup(options: {
         groupId: string;
         label?: string;
-        color?: DockviewTabGroupColor;
+        color?: string;
+        componentParams?: Record<string, unknown>;
     }): ITabGroup {
         const model = this._getGroupModel(options.groupId);
         return model.createTabGroup({
             label: options.label,
             color: options.color,
+            componentParams: options.componentParams,
         });
     }
 

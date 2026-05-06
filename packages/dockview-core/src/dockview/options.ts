@@ -19,6 +19,7 @@ import { DockviewTheme } from './theme';
 import { ITabGroup } from './tabGroup';
 import { CspNonce } from '../dom';
 export { CspNonce } from '../dom';
+import { DockviewTabGroupColorEntry } from './tabGroupAccent';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -169,6 +170,28 @@ export interface DockviewOptions {
     createTabGroupChipComponent?: (
         tabGroup: ITabGroup
     ) => ITabGroupChipRenderer;
+    /**
+     * Replace the built-in tab group color palette with a user-defined list.
+     *
+     * Each entry has an `id` (stored on `tabGroup.color` and serialized),
+     * a `value` (any CSS color expression — hex, rgb(), `var(...)`, etc.),
+     * and an optional `label` shown in the context menu picker.
+     *
+     * If omitted, the default 9-color palette is used. The list fully
+     * replaces the defaults — there is no merge.
+     */
+    tabGroupColors?: DockviewTabGroupColorEntry[];
+    /**
+     * Controls how dockview applies tab group color accents.
+     *
+     * - `'palette'` (default): write `--dv-tab-group-color`, render the
+     *   color picker, and apply built-in accent styling.
+     * - `'off'`: opt out entirely. No `--dv-tab-group-color` is written,
+     *   the color picker is suppressed, and chips/indicators render
+     *   without the accent. The `tg.color` data field is preserved so
+     *   custom chip renderers can still read it and roll their own visual.
+     */
+    tabGroupAccent?: 'palette' | 'off';
 }
 
 export type TabAnimation = 'smooth' | 'default';
@@ -224,6 +247,8 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         getTabContextMenuItems: undefined,
         getTabGroupChipContextMenuItems: undefined,
         createTabGroupChipComponent: undefined,
+        tabGroupColors: undefined,
+        tabGroupAccent: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];

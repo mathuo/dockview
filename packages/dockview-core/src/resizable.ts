@@ -4,6 +4,8 @@ import { CompositeDisposable } from './lifecycle';
 export abstract class Resizable extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private _disableResizing: boolean;
+    private _lastWidth = -1;
+    private _lastHeight = -1;
 
     get element(): HTMLElement {
         return this._element;
@@ -63,7 +65,16 @@ export abstract class Resizable extends CompositeDisposable {
                     return;
                 }
 
-                const { width, height } = entry.contentRect;
+                // Round to integers to absorb sub-pixel jitter from
+                // fractional devicePixelRatio (e.g. multi-monitor setups),
+                // which would otherwise re-fire layout in a feedback loop.
+                const width = Math.round(entry.contentRect.width);
+                const height = Math.round(entry.contentRect.height);
+                if (width === this._lastWidth && height === this._lastHeight) {
+                    return;
+                }
+                this._lastWidth = width;
+                this._lastHeight = height;
                 this.layout(width, height);
             })
         );

@@ -10,6 +10,7 @@ import { DockviewApi, ITabGroup } from 'dockview-core';
 import { AngularTabGroupChipRenderer } from '../lib/dockview/angular-tab-group-chip-renderer';
 
 @Component({
+    standalone: false,
     selector: 'test-chip',
     template:
         '<span class="test-chip">{{ tabGroup?.label }} - {{ tabGroup?.color }}</span>',

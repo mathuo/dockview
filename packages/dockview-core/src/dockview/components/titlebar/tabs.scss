@@ -153,6 +153,18 @@
     box-sizing: border-box;
     line-height: 1;
 
+    // The accent value is set inline by `applyTabGroupAccent` at render time.
+    // When the palette is disabled or the group has no color, the var is
+    // unset and `background-color` falls back to its initial value
+    // (transparent), so the chip is invisible by default.
+    background-color: var(--dv-tab-group-color);
+    color: white;
+
+    &.dv-tab-group-chip--accent-off {
+        background-color: transparent;
+        color: inherit;
+    }
+
     &.dv-tab-group-chip--collapsed {
     }
 
@@ -192,14 +204,6 @@
             position: absolute;
             inset: -8px;
         }
-    }
-}
-
-// Color variants
-@each $color in grey, blue, red, yellow, green, pink, purple, cyan, orange {
-    .dv-tab-group-chip--#{$color} {
-        background-color: var(--dv-tab-group-color-#{$color});
-        color: white;
     }
 }
 

@@ -438,7 +438,14 @@ export class ShellManager implements IDisposable {
 
         this._disposables.addDisposables(
             watchElementResize(this._shellElement, (entry) => {
-                const { width, height } = entry.contentRect;
+                const width = Math.round(entry.contentRect.width);
+                const height = Math.round(entry.contentRect.height);
+                if (
+                    width === this._currentWidth &&
+                    height === this._currentHeight
+                ) {
+                    return;
+                }
                 this._currentWidth = width;
                 this._currentHeight = height;
                 this.layout(width, height);

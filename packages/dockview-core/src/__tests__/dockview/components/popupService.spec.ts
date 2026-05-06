@@ -278,4 +278,52 @@ describe('PopupService', () => {
             expect(anchor.querySelector('.my-popup')).toBeNull();
         });
     });
+
+    describe('alternate window', () => {
+        // Popout groups host their popovers in a different window. The service
+        // must use that window's document for created elements and that
+        // window for resize/pointerdown/keydown listeners; otherwise popovers
+        // opened in a popout group render in the main window.
+        test('uses the provided window for outside-pointerdown dismissal', () => {
+            const altRoot = document.createElement('div');
+            document.body.appendChild(altRoot);
+
+            const altListeners: Record<string, Array<(e: any) => void>> = {};
+            const altWindow = {
+                document,
+                requestAnimationFrame: (cb: FrameRequestCallback) =>
+                    window.requestAnimationFrame(cb),
+                addEventListener: (type: string, cb: (e: any) => void) => {
+                    (altListeners[type] = altListeners[type] || []).push(cb);
+                },
+                removeEventListener: (type: string, cb: (e: any) => void) => {
+                    altListeners[type] = (altListeners[type] || []).filter(
+                        (l) => l !== cb
+                    );
+                },
+            } as unknown as Window;
+
+            const altService = new PopupService(altRoot, altWindow);
+            try {
+                const el = document.createElement('div');
+                el.className = 'alt-popup';
+                altService.openPopover(el, { x: 0, y: 0 });
+
+                expect(altRoot.querySelector('.alt-popup')).not.toBeNull();
+                expect(altListeners['pointerdown']?.length).toBe(1);
+                expect(altListeners['keydown']?.length).toBe(1);
+                expect(altListeners['resize']?.length).toBe(1);
+
+                // pointerdown outside on the alternate window should close
+                const outside = document.createElement('div');
+                document.body.appendChild(outside);
+                altListeners['pointerdown'][0]({ target: outside });
+                expect(altRoot.querySelector('.alt-popup')).toBeNull();
+                outside.remove();
+            } finally {
+                altService.dispose();
+                altRoot.remove();
+            }
+        });
+    });
 });

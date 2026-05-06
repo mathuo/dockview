@@ -81,11 +81,17 @@ export * from './dockview/theme';
 export * from './dockview/dockviewPanel';
 export {
     DockviewTabGroupColor,
-    DockviewTabGroupColors,
     ITabGroup,
     SerializedTabGroup,
-    isValidTabGroupColor,
+    TabGroupOptions,
 } from './dockview/tabGroup';
+export {
+    DEFAULT_TAB_GROUP_COLORS,
+    DockviewTabGroupColorEntry,
+    TabGroupColorPalette,
+    applyTabGroupAccent,
+    resolveTabGroupAccent,
+} from './dockview/tabGroupAccent';
 export { DefaultTab } from './dockview/components/tab/defaultTab';
 export {
     DefaultDockviewDeserialzier,

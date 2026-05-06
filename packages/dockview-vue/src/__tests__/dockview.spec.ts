@@ -216,6 +216,28 @@ describe('DockviewVue Component', () => {
         );
     });
 
+    test('should update tabGroupColors and tabGroupAccent when props change', async () => {
+        wrapper = mountDockview();
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const updateSpy = vi.spyOn(api, 'updateOptions');
+
+        const tabGroupColors = [{ name: 'cyan', value: '#00ffff' }];
+        await wrapper.setProps({
+            tabGroupColors,
+            tabGroupAccent: 'off',
+        });
+        await nextTick();
+
+        expect(updateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({ tabGroupColors })
+        );
+        expect(updateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({ tabGroupAccent: 'off' })
+        );
+    });
+
     test('should dispose api on unmount', async () => {
         wrapper = mountDockview();
         await flushPromises();
@@ -226,5 +248,33 @@ describe('DockviewVue Component', () => {
         wrapper.unmount();
 
         expect(disposeSpy).toHaveBeenCalled();
+    });
+
+    test('should forward didDrop events from the api', async () => {
+        wrapper = mountDockview();
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const fakeEvent = { id: 'fake-did-drop' } as any;
+
+        (api as any).component._onDidDrop.fire(fakeEvent);
+
+        const emitted = wrapper.emitted('didDrop');
+        expect(emitted).toBeTruthy();
+        expect(emitted![0][0]).toBe(fakeEvent);
+    });
+
+    test('should forward willDrop events from the api', async () => {
+        wrapper = mountDockview();
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const fakeEvent = { id: 'fake-will-drop' } as any;
+
+        (api as any).component._onWillDrop.fire(fakeEvent);
+
+        const emitted = wrapper.emitted('willDrop');
+        expect(emitted).toBeTruthy();
+        expect(emitted![0][0]).toBe(fakeEvent);
     });
 });

@@ -25,6 +25,15 @@
     }
 }
 
+.dv-floating-overlay-host {
+    position: absolute;
+    pointer-events: none;
+
+    > .dv-resize-container {
+        pointer-events: auto;
+    }
+}
+
 .dv-resize-container {
     --dv-overlay-z-index: var(--dv-overlay-z-index, 999);
 

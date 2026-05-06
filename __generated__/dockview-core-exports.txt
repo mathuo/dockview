@@ -20,6 +20,7 @@ Contraints
 CreateComponentOptions
 CreateContextMenuItemComponentOptions
 CspNonce
+DEFAULT_TAB_GROUP_COLORS
 DefaultDockviewDeserialzier
 DefaultTab
 Direction
@@ -58,7 +59,7 @@ DockviewReadyEvent
 DockviewTabGroupChangeEvent
 DockviewTabGroupCollapsedChangeEvent
 DockviewTabGroupColor
-DockviewTabGroupColors
+DockviewTabGroupColorEntry
 DockviewTabGroupIndicator
 DockviewTabGroupPanelChangeEvent
 DockviewTheme
@@ -211,11 +212,14 @@ SplitviewPanelApi
 Tab
 TabAnimation
 TabDragEvent
+TabGroupColorPalette
+TabGroupOptions
 TabPartInitParameters
 TitleEvent
 ViewFactoryData
 VisibilityEvent
 WatermarkRendererInitParameters
+applyTabGroupAccent
 createDockview
 createGridview
 createPaneview
@@ -233,9 +237,9 @@ isGroupOptionsWithGroup
 isGroupOptionsWithPanel
 isPanelOptionsWithGroup
 isPanelOptionsWithPanel
-isValidTabGroupColor
 orthogonal
 positionToDirection
+resolveTabGroupAccent
 themeAbyss
 themeAbyssSpaced
 themeCatppuccinMocha

@@ -1,4 +1,4 @@
-import { DockviewApi, DockviewTabGroupColors, DockviewTabGroupColor } from 'dockview-react';
+import { DockviewApi, DEFAULT_TAB_GROUP_COLORS } from 'dockview-react';
 
 export interface ContextMenuItem {
     label: string;
@@ -68,10 +68,9 @@ export function buildTabContextMenuItems(
         label: 'Add to new group',
         onClick: () => {
             const label = window.prompt('Group name:') || '';
-            const colors = Object.values(DockviewTabGroupColors);
-            const color = colors[
-                Math.floor(Math.random() * colors.length)
-            ] as DockviewTabGroupColor;
+            const colors = DEFAULT_TAB_GROUP_COLORS;
+            const color =
+                colors[Math.floor(Math.random() * colors.length)].id;
             const newGroup = api.createTabGroup({ groupId, label, color });
             api.addPanelToTabGroup({
                 groupId,
