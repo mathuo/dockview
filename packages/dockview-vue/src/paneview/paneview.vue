@@ -33,6 +33,9 @@ const { el } = useViewComponent(
         createView: (id, name, component, instance) =>
             new VuePaneviewPanelView(id, component, instance),
         extractCoreOptions,
+        onApiCreated: (api) => [
+            api.onDidDrop((event) => emit('didDrop', event)),
+        ],
     },
     props,
     emit
