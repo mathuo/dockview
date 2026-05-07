@@ -1,6 +1,7 @@
 import { addDisposableListener } from '../../events';
 import { CompositeDisposable, IDisposable } from '../../lifecycle';
 import { PointerDragController } from './pointerDragController';
+import { PointerGhost } from './pointerGhost';
 import { PointerDragEvent } from './types';
 
 export interface PointerDragSourceOptions {
@@ -38,6 +39,14 @@ export interface PointerDragSourceOptions {
      * mouse pointers.
      */
     touchOnly?: boolean;
+    /**
+     * Optional factory for a follow-finger ghost. Called once at drag start
+     * (after the threshold is crossed). Return a `PointerGhost` and the
+     * controller will keep it positioned under the pointer for the lifetime
+     * of the drag. If omitted, no ghost is shown — the user only sees drop
+     * overlays.
+     */
+    createGhost?: (event: PointerEvent) => PointerGhost | undefined;
 }
 
 const DEFAULT_THRESHOLD = 5;
@@ -171,10 +180,13 @@ export class PointerDragSource extends CompositeDisposable {
 
         this.options.onDragStart?.(startEvent);
 
+        const ghost = this.options.createGhost?.(startEvent);
+
         PointerDragController.getInstance().beginDrag({
             pointerEvent: triggerEvent,
             source: this.element,
             getData: () => this.options.getData(startEvent),
+            ghost,
             onDragMove: this.options.onDragMove,
             onDragEnd: this.options.onDragEnd,
         });

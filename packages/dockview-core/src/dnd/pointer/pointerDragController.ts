@@ -1,5 +1,6 @@
 import { addDisposableListener, Emitter, Event } from '../../events';
 import { CompositeDisposable, IDisposable } from '../../lifecycle';
+import { PointerGhost } from './pointerGhost';
 import { IPointerDropTargetHandle, PointerDragEvent } from './types';
 
 export interface ActiveDrag {
@@ -34,6 +35,7 @@ export class PointerDragController extends CompositeDisposable {
     private _active: ActiveDrag | undefined;
     private _currentTarget: IPointerDropTargetHandle | undefined;
     private _dataDisposable: IDisposable | undefined;
+    private _ghost: PointerGhost | undefined;
     private _moveListener: IDisposable | undefined;
     private _upListener: IDisposable | undefined;
     private _cancelListener: IDisposable | undefined;
@@ -76,6 +78,7 @@ export class PointerDragController extends CompositeDisposable {
         pointerEvent: PointerEvent;
         source: HTMLElement;
         getData: () => IDisposable;
+        ghost?: PointerGhost;
         onDragMove?: (e: PointerDragEvent) => void;
         onDragEnd?: (e: PointerDragEvent, dropped: boolean) => void;
     }): void {
@@ -94,6 +97,7 @@ export class PointerDragController extends CompositeDisposable {
         this._onDragMoveCallback = args.onDragMove;
         this._onDragEndCallback = args.onDragEnd;
         this._dataDisposable = args.getData();
+        this._ghost = args.ghost;
 
         const startEvent: PointerDragEvent = {
             clientX: pointerEvent.clientX,
@@ -158,6 +162,8 @@ export class PointerDragController extends CompositeDisposable {
     }
 
     private _handleMove(e: PointerEvent): void {
+        this._ghost?.update(e.clientX, e.clientY);
+
         const dragEvent: PointerDragEvent = {
             clientX: e.clientX,
             clientY: e.clientY,
@@ -210,6 +216,8 @@ export class PointerDragController extends CompositeDisposable {
         this._active = undefined;
         this._onDragMoveCallback = undefined;
         this._onDragEndCallback = undefined;
+        this._ghost?.dispose();
+        this._ghost = undefined;
         this._moveListener?.dispose();
         this._upListener?.dispose();
         this._cancelListener?.dispose();

@@ -17,6 +17,8 @@ import {
 import { DragHandler } from '../../../dnd/abstractDragHandler';
 import { PointerDragSource } from '../../../dnd/pointer/pointerDragSource';
 import { PointerDropTarget } from '../../../dnd/pointer/pointerDropTarget';
+import { LongPressDetector } from '../../../dnd/pointer/longPress';
+import { PointerGhost } from '../../../dnd/pointer/pointerGhost';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { addGhostImage } from '../../../dnd/ghost';
 import { DockviewHeaderDirection } from '../../options';
@@ -170,6 +172,18 @@ export class Tab extends CompositeDisposable {
                     },
                 };
             },
+            createGhost: (event) => {
+                // Position the pointer 30px in from the left edge and 10px
+                // up from the top — same offset as the HTML5 ghost so the
+                // drag image looks consistent across input methods.
+                return new PointerGhost({
+                    element: this._buildGhostElement(),
+                    initialX: event.clientX,
+                    initialY: event.clientY,
+                    offsetX: 30,
+                    offsetY: -10,
+                });
+            },
             onDragStart: (event) => {
                 this._onDragStart.fire(event);
             },
@@ -198,66 +212,7 @@ export class Tab extends CompositeDisposable {
             }),
             this.dragHandler.onDragStart((event) => {
                 if (event.dataTransfer) {
-                    const style = getComputedStyle(this.element);
-                    const newNode = this.element.cloneNode(true) as HTMLElement;
-                    const isVertical = this._direction === 'vertical';
-
-                    /**
-                     * Properties to skip when copying computed styles for a
-                     * vertical tab ghost.  `writing-mode` is excluded so we
-                     * can force `horizontal-tb`.  Size and margin logical
-                     * properties are excluded because their physical meaning
-                     * flips when writing-mode changes, which would produce
-                     * incorrect dimensions.
-                     */
-                    const verticalSkip = new Set([
-                        'writing-mode',
-                        'inline-size',
-                        'block-size',
-                        'min-inline-size',
-                        'min-block-size',
-                        'max-inline-size',
-                        'max-block-size',
-                        'margin-inline',
-                        'margin-inline-start',
-                        'margin-inline-end',
-                        'margin-block',
-                        'margin-block-start',
-                        'margin-block-end',
-                        'padding-inline',
-                        'padding-inline-start',
-                        'padding-inline-end',
-                        'padding-block',
-                        'padding-block-start',
-                        'padding-block-end',
-                    ]);
-
-                    Array.from(style).forEach((key) => {
-                        if (isVertical && verticalSkip.has(key)) {
-                            return;
-                        }
-                        newNode.style.setProperty(
-                            key,
-                            style.getPropertyValue(key),
-                            style.getPropertyPriority(key)
-                        );
-                    });
-
-                    if (isVertical) {
-                        // Force horizontal text flow and swap the physical
-                        // dimensions so the ghost appears as a horizontal tab.
-                        newNode.style.setProperty(
-                            'writing-mode',
-                            'horizontal-tb'
-                        );
-                        newNode.style.setProperty('width', style.height);
-                        newNode.style.setProperty('height', style.width);
-                    }
-
-                    newNode.style.position = 'absolute';
-                    newNode.classList.add('dv-tab-ghost-drag');
-
-                    addGhostImage(event.dataTransfer, newNode, {
+                    addGhostImage(event.dataTransfer, this._buildGhostElement(), {
                         y: -10,
                         x: 30,
                     });
@@ -290,6 +245,15 @@ export class Tab extends CompositeDisposable {
                     this.group,
                     event
                 );
+            }),
+            new LongPressDetector(this._element, {
+                onLongPress: (event) => {
+                    this.accessor.contextMenuController.show(
+                        this.panel,
+                        this.group,
+                        event
+                    );
+                },
             }),
             this.dropTarget.onDrop((event) => {
                 this._onDropped.fire(event);
@@ -345,5 +309,64 @@ export class Tab extends CompositeDisposable {
         this._element.draggable = !disabled;
         this.dragHandler.setDisabled(disabled);
         this.pointerDragSource.setDisabled(disabled);
+    }
+
+    /**
+     * Build a styled clone of this tab for use as a drag ghost. Used by
+     * both the HTML5 path (via `setDragImage`) and the pointer path (via
+     * `PointerGhost`).
+     *
+     * Vertical tabs are flipped to horizontal so the ghost looks the same
+     * as it would in a docked horizontal header — the alternative is a
+     * sideways-rotated ghost that's hard to read mid-drag.
+     */
+    private _buildGhostElement(): HTMLElement {
+        const style = getComputedStyle(this.element);
+        const newNode = this.element.cloneNode(true) as HTMLElement;
+        const isVertical = this._direction === 'vertical';
+
+        const verticalSkip = new Set([
+            'writing-mode',
+            'inline-size',
+            'block-size',
+            'min-inline-size',
+            'min-block-size',
+            'max-inline-size',
+            'max-block-size',
+            'margin-inline',
+            'margin-inline-start',
+            'margin-inline-end',
+            'margin-block',
+            'margin-block-start',
+            'margin-block-end',
+            'padding-inline',
+            'padding-inline-start',
+            'padding-inline-end',
+            'padding-block',
+            'padding-block-start',
+            'padding-block-end',
+        ]);
+
+        Array.from(style).forEach((key) => {
+            if (isVertical && verticalSkip.has(key)) {
+                return;
+            }
+            newNode.style.setProperty(
+                key,
+                style.getPropertyValue(key),
+                style.getPropertyPriority(key)
+            );
+        });
+
+        if (isVertical) {
+            newNode.style.setProperty('writing-mode', 'horizontal-tb');
+            newNode.style.setProperty('width', style.height);
+            newNode.style.setProperty('height', style.width);
+        }
+
+        newNode.style.position = 'absolute';
+        newNode.classList.add('dv-tab-ghost-drag');
+
+        return newNode;
     }
 }

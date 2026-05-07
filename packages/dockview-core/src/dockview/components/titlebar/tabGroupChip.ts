@@ -9,6 +9,7 @@ import {
 import { ITabGroupChipRenderer } from '../../framework';
 import { DockviewApi } from '../../../api/component.api';
 import { PointerDragSource } from '../../../dnd/pointer/pointerDragSource';
+import { LongPressDetector } from '../../../dnd/pointer/longPress';
 
 export class TabGroupChip
     extends CompositeDisposable
@@ -65,6 +66,11 @@ export class TabGroupChip
             this._onContextMenu,
             this._onDragStart,
             pointerSource,
+            new LongPressDetector(this._element, {
+                onLongPress: (event) => {
+                    this._onContextMenu.fire(event);
+                },
+            }),
             addDisposableListener(this._element, 'click', (event) => {
                 this._onClick.fire(event);
             }),

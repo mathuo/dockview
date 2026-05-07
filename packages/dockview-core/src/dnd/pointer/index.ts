@@ -9,3 +9,7 @@ export type {
     PointerDroptargetEvent,
     IPointerDropTargetHandle,
 } from './types';
+export { LongPressDetector } from './longPress';
+export type { LongPressOptions } from './longPress';
+export { PointerGhost } from './pointerGhost';
+export type { PointerGhostOptions } from './pointerGhost';
