@@ -130,8 +130,7 @@ export class PointerDropTarget extends CompositeDisposable {
             return;
         }
 
-        const outlineEl =
-            this.options.getOverlayOutline?.() ?? this.element;
+        const outlineEl = this.options.getOverlayOutline?.() ?? this.element;
         const width = outlineEl.offsetWidth;
         const height = outlineEl.offsetHeight;
 
@@ -150,9 +149,7 @@ export class PointerDropTarget extends CompositeDisposable {
             return;
         }
 
-        if (
-            !this.options.canDisplayOverlay(event.pointerEvent, quadrant)
-        ) {
+        if (!this.options.canDisplayOverlay(event.pointerEvent, quadrant)) {
             if (overrideTarget) {
                 return;
             }

@@ -7,10 +7,7 @@ describe('PointerDropTarget', () => {
         PointerDragController.getInstance().cancel();
     });
 
-    function makeDragEvent(
-        clientX: number,
-        clientY: number
-    ): PointerDragEvent {
+    function makeDragEvent(clientX: number, clientY: number): PointerDragEvent {
         return {
             clientX,
             clientY,

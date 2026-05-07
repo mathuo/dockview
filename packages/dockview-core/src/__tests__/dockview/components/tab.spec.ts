@@ -336,7 +336,8 @@ describe('tab', () => {
             });
 
             expect(onDragStart).toHaveBeenCalledTimes(1);
-            const transfer = LocalSelectionTransfer.getInstance<PanelTransfer>();
+            const transfer =
+                LocalSelectionTransfer.getInstance<PanelTransfer>();
             expect(transfer.hasData(PanelTransfer.prototype)).toBe(true);
             const data = transfer.getData(PanelTransfer.prototype)!;
             expect(data[0].viewId).toBe('componentId');

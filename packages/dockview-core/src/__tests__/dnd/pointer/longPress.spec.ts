@@ -100,10 +100,7 @@ describe('LongPressDetector', () => {
             delay: 500,
         });
 
-        fireEvent.pointerDown(
-            element,
-            pointerInit({ pointerType: 'mouse' })
-        );
+        fireEvent.pointerDown(element, pointerInit({ pointerType: 'mouse' }));
         jest.advanceTimersByTime(1000);
 
         expect(onLongPress).not.toHaveBeenCalled();
@@ -124,10 +121,7 @@ describe('LongPressDetector', () => {
             touchOnly: false,
         });
 
-        fireEvent.pointerDown(
-            element,
-            pointerInit({ pointerType: 'mouse' })
-        );
+        fireEvent.pointerDown(element, pointerInit({ pointerType: 'mouse' }));
         jest.advanceTimersByTime(100);
 
         expect(onLongPress).toHaveBeenCalledTimes(1);

@@ -130,11 +130,7 @@ export class Tab extends CompositeDisposable {
                 return true;
             }
 
-            return this.group.model.canDisplayOverlay(
-                event,
-                position,
-                'tab'
-            );
+            return this.group.model.canDisplayOverlay(event, position, 'tab');
         };
 
         this.dropTarget = new Droptarget(this._element, {
@@ -212,10 +208,14 @@ export class Tab extends CompositeDisposable {
             }),
             this.dragHandler.onDragStart((event) => {
                 if (event.dataTransfer) {
-                    addGhostImage(event.dataTransfer, this._buildGhostElement(), {
-                        y: -10,
-                        x: 30,
-                    });
+                    addGhostImage(
+                        event.dataTransfer,
+                        this._buildGhostElement(),
+                        {
+                            y: -10,
+                            x: 30,
+                        }
+                    );
                 }
 
                 this._onDragStart.fire(event);

@@ -7,7 +7,8 @@ if (typeof window.PointerEvent === 'undefined') {
             super(type, init);
             this.pointerId = init.pointerId !== undefined ? init.pointerId : 0;
             this.pointerType = init.pointerType || '';
-            this.isPrimary = init.isPrimary !== undefined ? init.isPrimary : true;
+            this.isPrimary =
+                init.isPrimary !== undefined ? init.isPrimary : true;
             this.width = init.width !== undefined ? init.width : 1;
             this.height = init.height !== undefined ? init.height : 1;
             this.pressure = init.pressure !== undefined ? init.pressure : 0;

@@ -81,7 +81,11 @@ export class VoidContainer extends CompositeDisposable {
                 return true;
             }
 
-            return group.model.canDisplayOverlay(event, position, 'header_space');
+            return group.model.canDisplayOverlay(
+                event,
+                position,
+                'header_space'
+            );
         };
 
         this.dropTarget = new Droptarget(this._element, {
@@ -118,13 +122,7 @@ export class VoidContainer extends CompositeDisposable {
             },
             getData: () => {
                 this.panelTransfer.setData(
-                    [
-                        new PanelTransfer(
-                            this.accessor.id,
-                            this.group.id,
-                            null
-                        ),
-                    ],
+                    [new PanelTransfer(this.accessor.id, this.group.id, null)],
                     PanelTransfer.prototype
                 );
                 return {

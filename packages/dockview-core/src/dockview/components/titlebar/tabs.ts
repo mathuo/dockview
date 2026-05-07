@@ -986,7 +986,8 @@ export class Tabs extends CompositeDisposable {
         event: DragEvent | PointerEvent
     ): void {
         const isPointer =
-            typeof PointerEvent !== 'undefined' && event instanceof PointerEvent;
+            typeof PointerEvent !== 'undefined' &&
+            event instanceof PointerEvent;
         const firstPanelId = tabGroup.panelIds[0];
         const firstIdx = firstPanelId
             ? this._tabs.findIndex((t) => t.value.panel.id === firstPanelId)
@@ -1061,7 +1062,10 @@ export class Tabs extends CompositeDisposable {
             }
         }
 
-        if (!isPointer && this.accessor.options.theme?.tabAnimation === 'smooth') {
+        if (
+            !isPointer &&
+            this.accessor.options.theme?.tabAnimation === 'smooth'
+        ) {
             // Collapse group tabs + chip after the browser
             // captures the drag image, then open the gap at the
             // source position — all instant (no transitions).

@@ -40,7 +40,10 @@ export class PointerDragController extends CompositeDisposable {
     private _upListener: IDisposable | undefined;
     private _cancelListener: IDisposable | undefined;
     private _onDragMoveCallback?: (e: PointerDragEvent) => void;
-    private _onDragEndCallback?: (e: PointerDragEvent, dropped: boolean) => void;
+    private _onDragEndCallback?: (
+        e: PointerDragEvent,
+        dropped: boolean
+    ) => void;
 
     private readonly _onDragStart = new Emitter<PointerDragEvent>();
     readonly onDragStart: Event<PointerDragEvent> = this._onDragStart.event;
