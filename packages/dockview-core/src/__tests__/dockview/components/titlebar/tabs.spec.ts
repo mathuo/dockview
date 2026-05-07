@@ -338,12 +338,12 @@ describe('tabs', () => {
 
         /**
          * Regression: after the source tab collapses to height:0 in vertical
-         * smooth mode, the cursor may be over the empty space in _tabsList
-         * rather than over a child tab element. The smooth-tab pointer
-         * driver must still treat the move as a valid dragover so the
-         * subsequent drop can land on _tabsList.
+         * smooth mode, the cursor may be over the empty space in _tabsList rather
+         * than over a child tab element. The _tabsList dragover listener must call
+         * event.preventDefault() so the browser treats _tabsList as a valid drop
+         * target; without it the drop event never fires.
          */
-        test('pointer drag-over on tab strip while collapsed lets a drop land on empty space', () => {
+        test('dragover on tab strip calls preventDefault, enabling drop on empty space', () => {
             const accessor = fromPartial<DockviewComponent>({
                 id: 'test-accessor-id',
                 options: {
@@ -402,28 +402,23 @@ describe('tabs', () => {
                 containerLeft: 0,
             };
 
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
             const drops: TabDropIndexEvent[] = [];
             tabs.onDrop((e) => drops.push(e));
 
-            // Drive smooth-anim dragover via the pointer-driven private
-            // method (the public surface is `controller.onDragMove`, but
-            // the test wants a deterministic clientX so we call directly).
-            (tabs as any)._handleSmoothDragOver(0);
+            // Fire dragover on _tabsList (empty space where source tab collapsed)
+            const dragOverEvent = createOffsetDragOverEvent({
+                clientX: 0,
+                clientY: 5,
+            });
+            tabsList.dispatchEvent(dragOverEvent);
 
-            // The smooth-anim drop handler needs `currentInsertionIndex`
-            // populated; the dragOver above does that based on the
-            // _animState we set up.
-            expect(
-                (tabs as any)._animState.currentInsertionIndex
-            ).not.toBeNull();
+            // The fix: preventDefault must have been called so _tabsList is a
+            // valid drop target even when the cursor is not over a child tab.
+            expect(dragOverEvent.defaultPrevented).toBe(true);
 
-            // Drop fires through the controller-level handler.
-            (tabs as any)._handleSmoothDrop(
-                new PointerEvent('pointerup', {
-                    pointerId: 1,
-                    pointerType: 'mouse',
-                })
-            );
+            // drop should now fire and emit the correct index
+            fireEvent.drop(tabsList);
             expect(drops.length).toBe(1);
         });
     });

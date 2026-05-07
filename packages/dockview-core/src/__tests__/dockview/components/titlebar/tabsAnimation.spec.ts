@@ -10,35 +10,6 @@ import * as dataTransfer from '../../../../dnd/dataTransfer';
 import { TabAnimation } from '../../../../dockview/options';
 import { TabGroupChip } from '../../../../dockview/components/titlebar/tabGroupChip';
 import { TabGroup } from '../../../../dockview/tabGroup';
-import { PointerDragController } from '../../../../dnd/pointer/pointerDragController';
-
-/**
- * Phase 4: internal drags are pointer-driven, so tests that previously fired
- * HTML5 dragstart now drive the same flow via mouse pointer events. Mouse
- * arms the drag immediately (no initiation delay) so we don't need fake
- * timers for the long-press machinery.
- */
-function startPointerDrag(element: HTMLElement): void {
-    fireEvent.pointerDown(element, {
-        pointerId: 1,
-        pointerType: 'mouse',
-        clientX: 0,
-        clientY: 0,
-    });
-    fireEvent.pointerMove(window, {
-        pointerId: 1,
-        pointerType: 'mouse',
-        clientX: 50,
-        clientY: 0,
-    });
-}
-
-function endPointerDrag(): void {
-    fireEvent.pointerUp(window, {
-        pointerId: 1,
-        pointerType: 'mouse',
-    });
-}
 
 function makeDOMRect(
     x: number,
@@ -92,24 +63,14 @@ function createTabs(
             disableDnd: options.disableDnd,
         },
         onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
-        doSetGroupActive: jest.fn(),
-        contextMenuController: {
-            show: jest.fn(),
-            showForChip: jest.fn(),
-        } as any,
     });
 
     const group = fromPartial<DockviewGroupPanel>({
         id: 'test-group',
         locked: false,
-        api: { location: { type: 'grid' } } as any,
-        activePanel: undefined,
         model: fromPartial({
             canDisplayOverlay: jest.fn().mockReturnValue(true),
             dropTargetContainer: undefined,
-            getTabGroupForPanel: jest.fn().mockReturnValue(undefined),
-            getTabGroups: jest.fn().mockReturnValue([]),
-            openPanel: jest.fn(),
         }),
     });
 
@@ -175,7 +136,7 @@ describe('tabs - animation', () => {
 
             expect(getAnimState(tabs)).toBeNull();
 
-            startPointerDrag(elements[0]);
+            fireEvent.dragStart(elements[0]);
 
             const state = getAnimState(tabs);
             expect(state).not.toBeNull();
@@ -193,7 +154,7 @@ describe('tabs - animation', () => {
             tabs.openPanel(panel, 0);
 
             const elements = getTabElements(tabs);
-            startPointerDrag(elements[0]);
+            fireEvent.dragStart(elements[0]);
 
             expect(getAnimState(tabs)).toBeNull();
         });
@@ -205,7 +166,7 @@ describe('tabs - animation', () => {
             tabs.openPanel(panel, 0);
 
             const elements = getTabElements(tabs);
-            startPointerDrag(elements[0]);
+            fireEvent.dragStart(elements[0]);
 
             // disableDnd prevents DragHandler from processing the event
             // so Tab's onDragStart never fires, and _animState stays null
@@ -225,7 +186,7 @@ describe('tabs - animation', () => {
                 elements[0].classList.contains('dv-tab--dragging')
             ).toBeFalsy();
 
-            startPointerDrag(elements[0]);
+            fireEvent.dragStart(elements[0]);
             flushRAF();
 
             expect(
@@ -240,7 +201,7 @@ describe('tabs - animation', () => {
             tabs.openPanel(panel, 0);
 
             const elements = getTabElements(tabs);
-            startPointerDrag(elements[0]);
+            fireEvent.dragStart(elements[0]);
 
             expect(
                 elements[0].classList.contains('dv-tab--dragging')
@@ -260,7 +221,7 @@ describe('tabs - animation', () => {
             const elements = getTabElements(tabs);
 
             // Start drag
-            startPointerDrag(elements[0]);
+            fireEvent.dragStart(elements[0]);
             flushRAF();
             expect(getAnimState(tabs)).not.toBeNull();
             expect(
@@ -269,7 +230,7 @@ describe('tabs - animation', () => {
 
             // Cancel drag (dragend on container - simulating cancel)
             const tabsList = (tabs as any)._tabsList as HTMLElement;
-            endPointerDrag();
+            fireEvent.dragEnd(tabsList);
 
             expect(getAnimState(tabs)).toBeNull();
             expect(
@@ -301,9 +262,9 @@ describe('tabs - animation', () => {
                 currentInsertionIndex: null,
             };
 
-            // Trigger reset directly (drag was set up manually above so
-            // there's no controller-level drag to "end").
-            (tabs as any).resetDragAnimation();
+            // Trigger dragend
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            fireEvent.dragEnd(tabsList);
 
             expect(elements[0].style.transform).toBe('');
             expect(elements[1].style.transform).toBe('');
@@ -460,7 +421,7 @@ describe('tabs - animation', () => {
             const elements = getTabElements(tabs);
 
             // Start drag
-            startPointerDrag(elements[0]);
+            fireEvent.dragStart(elements[0]);
             expect(getAnimState(tabs)).not.toBeNull();
 
             // Dispose
@@ -482,7 +443,7 @@ describe('tabs - animation', () => {
             const elements = getTabElements(tabs);
 
             // Simulate drag start
-            startPointerDrag(elements[0]);
+            fireEvent.dragStart(elements[0]);
             expect(getAnimState(tabs)).not.toBeNull();
             expect(getAnimState(tabs).sourceTabId).toBe('panel-a');
 
@@ -505,7 +466,7 @@ describe('tabs - animation', () => {
             const elements = getTabElements(tabs);
 
             // Start drag on panel-a
-            startPointerDrag(elements[0]);
+            fireEvent.dragStart(elements[0]);
             expect(getAnimState(tabs)).not.toBeNull();
 
             // Delete a different tab
@@ -536,12 +497,12 @@ describe('tabs - animation', () => {
             mockTabRect(elements[2], { left: 160, width: 80 });
 
             // Start drag on panel-a
-            startPointerDrag(elements[0]);
+            fireEvent.dragStart(elements[0]);
             expect(getAnimState(tabs)).not.toBeNull();
 
             // Call handleDragOver directly with a mock event
-            /* mock event removed: handleDragOver now takes clientX directly */
-            (tabs as any).handleDragOver(120);
+            const mockEvent = { clientX: 120 } as DragEvent;
+            (tabs as any).handleDragOver(mockEvent);
 
             // panel-a (index 0) is source → skipped
             // panel-b (index 1): midpoint = 120, 120 < 120 → false, insertionIndex = 2
@@ -608,7 +569,7 @@ describe('tabs - animation', () => {
             });
 
             // Start drag on panel-d (index 3)
-            startPointerDrag(elements[3]);
+            fireEvent.dragStart(elements[3]);
             flushRAF();
 
             // Override _animState chip positions
@@ -633,7 +594,7 @@ describe('tabs - animation', () => {
             //   j=3: tabs[3] = D = source → allInBetweenAreSource = true
             //   → threshold check: chipWidth=30, containerLeft+accUpTo=270
             //     threshold = 270 + 30 = 300, mouseX=330 ≥ 300 → target = monitoring
-            (tabs as any).handleDragOver(330);
+            (tabs as any).handleDragOver({ clientX: 330 } as DragEvent);
 
             expect(getAnimState(tabs).targetTabGroupId).toBe(
                 'monitoring-group'
@@ -728,7 +689,7 @@ describe('tabs - animation', () => {
             //   Monitoring effectivePanelIds=[C,D], firstIdx=2, lastIdx=3
             //   isInsideRange = (3 >= 2 && 3 <= 3) = true → snap
             //   groupMid = (2+3+1)/2 = 3. insertionIndex(3) >= 3 → snap to lastIdx+1 = 4
-            (tabs as any).handleDragOver(180);
+            (tabs as any).handleDragOver({ clientX: 180 } as DragEvent);
 
             // Group drags must never target another group
             expect(getAnimState(tabs).targetTabGroupId).toBeNull();
@@ -760,14 +721,14 @@ describe('tabs - animation', () => {
             mockTabRect(elements[3], { left: 240, width: 80 });
 
             // Start drag on panel-b (index 1)
-            startPointerDrag(elements[1]);
+            fireEvent.dragStart(elements[1]);
             flushRAF(); // let collapse rAF run so _pendingCollapse is cleared
             expect(getAnimState(tabs)).not.toBeNull();
 
             // Source tab width was captured as 80px
             // cursorOffsetFromDragLeft = 40 (half of source tab width)
             // Simulate cursor at position 200 (right half of panel-c)
-            (tabs as any).handleDragOver(200);
+            (tabs as any).handleDragOver({ clientX: 200 } as DragEvent);
 
             // panel-a (index 0): 0 < insertionIndex → no margin
             expect(elements[0].style.marginLeft).toBe('');
@@ -807,12 +768,12 @@ describe('tabs - animation', () => {
             mockTabRect(elements[2], { left: 160, width: 80 });
 
             // Start drag on panel-a (source, width 80)
-            startPointerDrag(elements[0]);
+            fireEvent.dragStart(elements[0]);
             flushRAF(); // let collapse rAF run so _pendingCollapse is cleared
 
             // Move cursor: cursorOffsetFromDragLeft = 40
             // clientX=90 → dragLeftEdge=50, availableSpace=50
-            (tabs as any).handleDragOver(90);
+            (tabs as any).handleDragOver({ clientX: 90 } as DragEvent);
 
             // Accumulation: A(source, skip).
             // B(i=1): accWidth+40=40<=50 → acc=80, ins=2
@@ -826,7 +787,7 @@ describe('tabs - animation', () => {
 
             // Now move cursor to right half of panel-c (insert after C)
             // clientX=220 → dragLeftEdge=180, availableSpace=180
-            (tabs as any).handleDragOver(220);
+            (tabs as any).handleDragOver({ clientX: 220 } as DragEvent);
 
             // Accumulation: A(source, skip).
             // B(i=1): acc+40=40<=180 → acc=80, ins=2
@@ -852,17 +813,17 @@ describe('tabs - animation', () => {
             mockTabRect(elements[0], { left: 0, width: 80 });
             mockTabRect(elements[1], { left: 80, width: 80 });
 
-            startPointerDrag(elements[0]);
+            fireEvent.dragStart(elements[0]);
 
             // First dragover
-            (tabs as any).handleDragOver(90);
+            (tabs as any).handleDragOver({ clientX: 90 } as DragEvent);
             const firstIndex = getAnimState(tabs).currentInsertionIndex;
 
             // Spy on applyDragOverTransforms to check if it's called again
             const applySpy = jest.spyOn(tabs as any, 'applyDragOverTransforms');
 
             // Second dragover with same result
-            (tabs as any).handleDragOver(95);
+            (tabs as any).handleDragOver({ clientX: 95 } as DragEvent);
 
             // Same insertion index → applyDragOverTransforms should not be called
             expect(getAnimState(tabs).currentInsertionIndex).toBe(firstIndex);
@@ -897,7 +858,7 @@ describe('tabs - animation', () => {
                 );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
-            (tabs as any)._handleSmoothDragOver(0);
+            fireEvent.dragOver(tabsList);
 
             const state = getAnimState(tabs);
             expect(state).not.toBeNull();
@@ -924,7 +885,7 @@ describe('tabs - animation', () => {
                 );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
-            (tabs as any)._handleSmoothDragOver(0);
+            fireEvent.dragOver(tabsList);
 
             expect(getAnimState(tabs)).toBeNull();
 
@@ -952,7 +913,7 @@ describe('tabs - animation', () => {
             };
 
             // cursor at 30 → left half of panel-a (midpoint 50) → insert at index 0
-            (tabs as any).handleDragOver(30);
+            (tabs as any).handleDragOver({ clientX: 30 } as DragEvent);
 
             // Average width: (100 + 60) / 2 = 80
             // First non-source tab at index >= 0: panel-a gets margin-left of 80
@@ -980,12 +941,12 @@ describe('tabs - animation', () => {
                 );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
-            (tabs as any)._handleSmoothDragOver(0);
+            fireEvent.dragOver(tabsList);
             expect(getAnimState(tabs)).not.toBeNull();
 
             // Simulate dragleave (cursor leaves container entirely)
-            /* dragleave converted to direct call */
-            (tabs as any)._handleSmoothDragLeave(9999, 9999);
+            const dragLeaveEvent = new Event('dragleave', { bubbles: true });
+            tabsList.dispatchEvent(dragLeaveEvent);
 
             // External drag: state should be fully cleared (not just insertionIndex)
             expect(getAnimState(tabs)).toBeNull();
@@ -1019,12 +980,12 @@ describe('tabs - animation', () => {
                 );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
-            (tabs as any)._handleSmoothDragOver(0);
+            fireEvent.dragOver(tabsList);
             expect(getAnimState(tabs)).not.toBeNull();
 
             // Simulate dragleave (cursor leaves container entirely, e.g. back to edge group)
-            /* dragleave converted to direct call */
-            (tabs as any)._handleSmoothDragLeave(9999, 9999);
+            const dragLeaveEvent = new Event('dragleave', { bubbles: true });
+            tabsList.dispatchEvent(dragLeaveEvent);
 
             // The anchor overlay must be cleared so it doesn't remain stranded
             // in the main dockview when the drag returns to the source edge group
@@ -1052,7 +1013,10 @@ describe('tabs - animation', () => {
             mockTabRect(elements[0], { left: 0, width: 80 });
 
             // Simulate intra-group drag start
-            startPointerDrag(elements[0]);
+            const dragStartEvent = new MouseEvent('dragstart', {
+                bubbles: true,
+            });
+            elements[0].dispatchEvent(dragStartEvent);
 
             // _animState should now be set with sourceIndex >= 0
             expect(getAnimState(tabs)).not.toBeNull();
@@ -1060,7 +1024,7 @@ describe('tabs - animation', () => {
 
             // Cursor re-enters the tab strip (e.g. coming back from panel area)
             const tabsList = (tabs as any)._tabsList as HTMLElement;
-            (tabs as any)._handleSmoothDragOver(0);
+            fireEvent.dragOver(tabsList);
 
             // The anchor overlay from the panel content area must be cleared
             expect(clearMock).toHaveBeenCalled();
@@ -1094,7 +1058,7 @@ describe('tabs - animation', () => {
                 );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
-            (tabs as any)._handleSmoothDragOver(0);
+            fireEvent.dragOver(tabsList);
 
             // _animState set with sourceIndex === -1 (external drag)
             expect(getAnimState(tabs)?.sourceIndex).toBe(-1);
@@ -1122,7 +1086,7 @@ describe('tabs - animation', () => {
                 );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
-            (tabs as any)._handleSmoothDragOver(0);
+            fireEvent.dragOver(tabsList);
 
             // Should NOT initialize _animState (same group)
             expect(getAnimState(tabs)).toBeNull();
@@ -1207,7 +1171,7 @@ describe('tabs - animation', () => {
             const elements = getTabElements(tabs);
 
             // Start drag
-            startPointerDrag(elements[0]);
+            fireEvent.dragStart(elements[0]);
 
             // Manually set some state to verify it's cleared
             (tabs as any)._animState.currentInsertionIndex = 1;
@@ -1215,7 +1179,12 @@ describe('tabs - animation', () => {
             elements[1].classList.add('dv-tab--shifting');
 
             // Simulate dragleave (cursor leaves the container entirely)
-            (tabs as any)._handleSmoothDragLeave(9999, 9999);
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            const dragLeaveEvent = new Event('dragleave', {
+                bubbles: true,
+            });
+            // relatedTarget is null by default → cursor left the container entirely
+            tabsList.dispatchEvent(dragLeaveEvent);
 
             expect(elements[1].style.marginLeft).toBe('');
             expect(
@@ -1224,11 +1193,40 @@ describe('tabs - animation', () => {
             expect(getAnimState(tabs).currentInsertionIndex).toBeNull();
         });
 
-        // The phase-4 pointer-driven `_handleSmoothDragLeave` only fires
-        // when the cursor is OUTSIDE the tabs list rect — internal moves
-        // route through `_handleSmoothDragOver` instead, so the
-        // "moving between child elements does not reset state" property
-        // is guaranteed by the architecture rather than a runtime check.
+        test('does not reset when moving between child elements', () => {
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
+            const panelA = createMockPanel('panel-a');
+            const panelB = createMockPanel('panel-b');
+
+            tabs.openPanel(panelA, 0);
+            tabs.openPanel(panelB, 1);
+
+            const elements = getTabElements(tabs);
+
+            // Append tabsList to document so contains() works
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            document.body.appendChild(tabsList);
+
+            // Start drag
+            fireEvent.dragStart(elements[0]);
+
+            (tabs as any)._animState.currentInsertionIndex = 1;
+            elements[1].style.marginLeft = '80px';
+
+            // Dispatch dragleave with relatedTarget being a child element
+            const dragLeaveEvent = new MouseEvent('dragleave', {
+                bubbles: true,
+                relatedTarget: elements[1],
+            });
+            tabsList.dispatchEvent(dragLeaveEvent);
+
+            // State should NOT be reset since relatedTarget is a child
+            expect(elements[1].style.marginLeft).toBe('80px');
+            expect(getAnimState(tabs).currentInsertionIndex).toBe(1);
+
+            // Cleanup
+            document.body.removeChild(tabsList);
+        });
     });
 
     describe('chip drag (tab group)', () => {
@@ -1285,12 +1283,16 @@ describe('tabs - animation', () => {
             tabGroup: TabGroup,
             chip: TabGroupChip
         ) {
-            const event = new PointerEvent('pointerdown', {
+            const event = {
                 clientX: 15,
                 clientY: 15,
-                pointerId: 1,
-                pointerType: 'mouse',
-            });
+                dataTransfer: {
+                    effectAllowed: 'uninitialized',
+                    items: { length: 0 },
+                    setData: jest.fn(),
+                    setDragImage: jest.fn(),
+                },
+            } as unknown as DragEvent;
             (tabs as any)._handleChipDragStart(tabGroup, chip, event);
             return event;
         }
@@ -1349,11 +1351,18 @@ describe('tabs - animation', () => {
             );
         });
 
-        // Note: a previous test asserted that chip dragstart configured
-        // dataTransfer.effectAllowed = 'move'. After phase 4 chip drags are
-        // pointer-driven and never touch dataTransfer, so the assertion is
-        // obsolete. The LocalSelectionTransfer side is covered by the test
-        // above ("chip dragstart sets LocalSelectionTransfer with tabGroupId").
+        test('chip dragstart sets dataTransfer properties', () => {
+            const { tabs, tabGroup, chip } = setupChipDrag('smooth');
+
+            const event = triggerChipDragStart(tabs, tabGroup, chip);
+
+            expect(event.dataTransfer!.effectAllowed).toBe('move');
+
+            // cleanup
+            dataTransfer.LocalSelectionTransfer.getInstance().clearData(
+                dataTransfer.PanelTransfer.prototype
+            );
+        });
 
         test('chip dragstart does not collapse tabs in default mode', () => {
             const { tabs, tabGroup, chip, elements } = setupChipDrag('default');
@@ -1407,7 +1416,7 @@ describe('tabs - animation', () => {
 
             // Drag over — cursor past panel-b midpoint
             // dragLeftEdge = 200 - cursorOffset, should place insertion after panel-b
-            (tabs as any).handleDragOver(200);
+            (tabs as any).handleDragOver({ clientX: 200 } as DragEvent);
 
             const state = getAnimState(tabs);
             expect(state.currentInsertionIndex).not.toBeNull();
@@ -1432,7 +1441,7 @@ describe('tabs - animation', () => {
             }
 
             triggerChipDragStart(tabs, tabGroup, chip);
-            (tabs as any).handleDragOver(200);
+            (tabs as any).handleDragOver({ clientX: 200 } as DragEvent);
 
             // In default mode, no margins should be applied
             for (const el of elements) {
@@ -1470,10 +1479,10 @@ describe('tabs - animation', () => {
             (tabs as any).group.model.moveTabGroup = moveTabGroupMock;
 
             triggerChipDragStart(tabs, tabGroup, chip);
-            (tabs as any).handleDragOver(200);
+            (tabs as any).handleDragOver({ clientX: 200 } as DragEvent);
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
-            (tabs as any)._handleSmoothDrop(new PointerEvent('pointerup'));
+            fireEvent.drop(tabsList);
 
             expect(moveTabGroupMock).toHaveBeenCalledWith(
                 'tg-1',
@@ -1584,10 +1593,10 @@ describe('tabs - animation', () => {
 
             // tabGroup exists in this group (local)
             triggerChipDragStart(tabs, tabGroup, chip);
-            (tabs as any).handleDragOver(200);
+            (tabs as any).handleDragOver({ clientX: 200 } as DragEvent);
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
-            (tabs as any)._handleSmoothDrop(new PointerEvent('pointerup'));
+            fireEvent.drop(tabsList);
 
             expect(moveTabGroupMock).toHaveBeenCalled();
             expect(moveGroupOrPanelMock).not.toHaveBeenCalled();
@@ -1631,7 +1640,7 @@ describe('tabs - animation', () => {
                 );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
-            (tabs as any)._handleSmoothDragOver(0);
+            fireEvent.dragOver(tabsList);
 
             // The stale _animState should have been cleared and replaced
             // with new state for the current drag
@@ -1676,7 +1685,7 @@ describe('tabs - animation', () => {
                 );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
-            (tabs as any)._handleSmoothDragOver(0);
+            fireEvent.dragOver(tabsList);
 
             // _animState should NOT have been cleared (same tab group)
             const state = getAnimState(tabs);
@@ -1712,7 +1721,7 @@ describe('tabs - animation', () => {
                 );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
-            (tabs as any)._handleSmoothDragOver(0);
+            fireEvent.dragOver(tabsList);
 
             // Should initialize _animState for the chip drag even in default mode
             expect(getAnimState(tabs)).not.toBeNull();
@@ -1737,7 +1746,7 @@ describe('tabs - animation', () => {
                 );
 
             const tabsList = (tabs as any)._tabsList as HTMLElement;
-            (tabs as any)._handleSmoothDragOver(0);
+            fireEvent.dragOver(tabsList);
 
             // Should NOT initialize _animState (default mode, non-chip drag)
             expect(getAnimState(tabs)).toBeNull();

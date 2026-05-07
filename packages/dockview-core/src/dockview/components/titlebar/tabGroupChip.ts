@@ -26,8 +26,9 @@ export class TabGroupChip
     private readonly _onContextMenu = new Emitter<MouseEvent>();
     readonly onContextMenu: Event<MouseEvent> = this._onContextMenu.event;
 
-    private readonly _onDragStart = new Emitter<PointerEvent>();
-    readonly onDragStart: Event<PointerEvent> = this._onDragStart.event;
+    private readonly _onDragStart = new Emitter<DragEvent | PointerEvent>();
+    readonly onDragStart: Event<DragEvent | PointerEvent> =
+        this._onDragStart.event;
 
     get element(): HTMLElement {
         return this._element;
@@ -39,18 +40,19 @@ export class TabGroupChip
         this._element = document.createElement('div');
         this._element.className = 'dv-tab-group-chip';
         this._element.tabIndex = 0;
+        this._element.draggable = true;
 
         this._label = document.createElement('span');
         this._label.className = 'dv-tab-group-chip-label';
         this._element.appendChild(this._label);
 
         const pointerSource = new PointerDragSource(this._element, {
-            // Mouse uses the pointer path now too — no HTML5 fallback.
-            touchOnly: false,
             getData: () => ({
                 // The actual transfer payload is set up by the consumer's
                 // onDragStart callback (in tabs.ts: _handleChipDragStart),
-                // which has access to the tab group identity.
+                // which has access to the tab group identity. We just emit
+                // the event and let the consumer populate
+                // LocalSelectionTransfer.
                 dispose: () => {
                     /* noop */
                 },
@@ -76,6 +78,9 @@ export class TabGroupChip
             pointerSource,
             new LongPressDetector(this._element, {
                 onLongPress: (event) => {
+                    // Dismiss any in-flight pointer-drag arming so a
+                    // subsequent finger move doesn't start a drag on top
+                    // of the menu.
                     pointerSource.cancelPending();
                     this._onContextMenu.fire(event);
                 },
@@ -85,6 +90,9 @@ export class TabGroupChip
             }),
             addDisposableListener(this._element, 'contextmenu', (event) => {
                 this._onContextMenu.fire(event);
+            }),
+            addDisposableListener(this._element, 'dragstart', (event) => {
+                this._onDragStart.fire(event);
             })
         );
     }

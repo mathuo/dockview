@@ -38,7 +38,7 @@ export interface TabGroupManagerCallbacks {
     onChipDragStart(
         tabGroup: ITabGroup,
         chip: ITabGroupChipRenderer,
-        event: PointerEvent
+        event: DragEvent | PointerEvent
     ): void;
 }
 
@@ -147,6 +147,98 @@ export class TabGroupManager {
         this._indicator?.trackUnderlines();
     }
 
+    setGroupDragImage(
+        event: DragEvent,
+        tabGroup: ITabGroup,
+        chipEl: HTMLElement
+    ): void {
+        if (!event.dataTransfer) {
+            return;
+        }
+
+        const isVertical = this._ctx.getDirection() === 'vertical';
+
+        // Clone the entire tabs list so cloned nodes inherit all
+        // theme styles, CSS variables and class-based rules.
+        const clone = this._ctx.tabsList.cloneNode(true) as HTMLElement;
+
+        if (isVertical) {
+            // Force horizontal orientation for the drag ghost by
+            // removing vertical CSS classes and overriding writing-mode.
+            clone.classList.remove('dv-tabs-container-vertical', 'dv-vertical');
+            clone.classList.add('dv-horizontal');
+            clone.style.writingMode = 'horizontal-tb';
+            clone.style.height = `${this._ctx.tabsList.offsetWidth}px`;
+        } else {
+            clone.style.height = `${this._ctx.tabsList.offsetHeight}px`;
+        }
+        clone.style.width = 'auto';
+        clone.style.overflow = 'visible';
+        clone.style.pointerEvents = 'none';
+
+        // Remove all elements except the chip so the drag ghost
+        // shows only the chip regardless of the group's expanded state.
+        const children = Array.from(clone.children);
+        const realChildren = Array.from(this._ctx.tabsList.children);
+        for (let i = children.length - 1; i >= 0; i--) {
+            const real = realChildren[i];
+            if (real === chipEl) {
+                continue; // keep the chip only
+            }
+            children[i].remove();
+        }
+
+        // Wrap the clone in a minimal ancestor chain so that CSS
+        // selectors like `.dv-groupview.dv-active-group > .dv-tabs-and-actions-container .dv-tabs-container > .dv-tab`
+        // match the cloned tabs and apply correct color/background.
+        const wrapper = document.createElement('div');
+        wrapper.className = 'dv-groupview dv-active-group';
+        wrapper.style.position = 'fixed';
+        wrapper.style.top = '-10000px';
+        wrapper.style.left = '0px';
+        wrapper.style.height = 'auto';
+        wrapper.style.width = 'auto';
+        wrapper.style.pointerEvents = 'none';
+
+        const actionsWrapper = document.createElement('div');
+        actionsWrapper.className = 'dv-tabs-and-actions-container';
+        actionsWrapper.style.height = 'auto';
+        actionsWrapper.style.width = 'auto';
+        wrapper.appendChild(actionsWrapper);
+        actionsWrapper.appendChild(clone);
+
+        // Append inside the dockview root so CSS variables are inherited
+        this._ctx.accessor.element.appendChild(wrapper);
+
+        // Compute cursor offset relative to the wrapper element.
+        // The cloned chip is the first .dv-tab-group-chip in the clone.
+        const clonedChip = clone.querySelector('.dv-tab-group-chip');
+        const chipRect = chipEl.getBoundingClientRect();
+        const cursorInChipX = event.clientX - chipRect.left;
+        const cursorInChipY = event.clientY - chipRect.top;
+
+        if (clonedChip) {
+            const clonedChipRect = clonedChip.getBoundingClientRect();
+            const wrapperRect = wrapper.getBoundingClientRect();
+            const offsetX =
+                clonedChipRect.left - wrapperRect.left + cursorInChipX;
+            const offsetY =
+                clonedChipRect.top - wrapperRect.top + cursorInChipY;
+            event.dataTransfer.setDragImage(wrapper, offsetX, offsetY);
+        } else {
+            event.dataTransfer.setDragImage(
+                wrapper,
+                cursorInChipX,
+                cursorInChipY
+            );
+        }
+
+        // Clean up after the browser captures the image
+        requestAnimationFrame(() => {
+            wrapper.remove();
+        });
+    }
+
     cleanupTransition(panelId: string): void {
         this._pendingTransitionCleanups.get(panelId)?.();
         this._pendingTransitionCleanups.delete(panelId);
@@ -235,10 +327,10 @@ export class TabGroupManager {
             );
         } else {
             // Custom chip renderers don't expose dockview's PointerDragSource,
-            // so we attach one to the rendered element here. Mouse and touch
-            // both go through it.
+            // so we attach one to the rendered element here. This gives
+            // touch users the same drag affordance the built-in TabGroupChip
+            // gets.
             const customPointerSource = new PointerDragSource(chip.element, {
-                touchOnly: false,
                 getData: () => ({
                     // The transfer payload is set by the consumer's
                     // onChipDragStart callback (in tabs.ts:
@@ -281,6 +373,9 @@ export class TabGroupManager {
                 customLongPress,
                 addDisposableListener(chip.element, 'contextmenu', (event) => {
                     this._callbacks.onChipContextMenu(tabGroup, event);
+                }),
+                addDisposableListener(chip.element, 'dragstart', (event) => {
+                    this._callbacks.onChipDragStart(tabGroup, chip, event);
                 })
             );
         }

@@ -397,7 +397,7 @@ describe('tab', () => {
             jest.useRealTimers();
         });
 
-        test('a mouse pointerdown also engages the pointer flow (mouse arms immediately, no initiation delay)', () => {
+        test('a mouse pointerdown does not engage the pointer flow (HTML5 path stays in charge)', () => {
             const accessor = fromPartial<DockviewComponent>({
                 onDidOptionsChange: jest
                     .fn()
@@ -431,7 +431,12 @@ describe('tab', () => {
                 clientY: 0,
             });
 
-            expect(onDragStart).toHaveBeenCalledTimes(1);
+            expect(onDragStart).not.toHaveBeenCalled();
+            expect(
+                LocalSelectionTransfer.getInstance().hasData(
+                    PanelTransfer.prototype
+                )
+            ).toBe(false);
 
             cut.dispose();
         });
@@ -461,68 +466,172 @@ describe('tab', () => {
     });
 
     describe('disableDnd option', () => {
-        afterEach(() => {
-            PointerDragController.getInstance().cancel();
-            LocalSelectionTransfer.getInstance().clearData(
-                PanelTransfer.prototype
+        test('that tab is draggable by default (disableDnd not set)', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+                options: {},
+            });
+            const groupMock = jest.fn();
+
+            const cut = new Tab(
+                { id: 'panelId' } as IDockviewPanel,
+                accessor,
+                new groupMock()
             );
-            jest.useRealTimers();
+
+            expect(cut.element.draggable).toBe(true);
         });
 
-        test('that updateDragAndDropState toggles the pointer-drag-source disabled state', () => {
-            jest.useFakeTimers();
+        test('that tab is draggable when disableDnd is false', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+                options: { disableDnd: false },
+            });
+            const groupMock = jest.fn();
+
+            const cut = new Tab(
+                { id: 'panelId' } as IDockviewPanel,
+                accessor,
+                new groupMock()
+            );
+
+            expect(cut.element.draggable).toBe(true);
+        });
+
+        test('that tab is not draggable when disableDnd is true', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+                options: { disableDnd: true },
+            });
+            const groupMock = jest.fn();
+
+            const cut = new Tab(
+                { id: 'panelId' } as IDockviewPanel,
+                accessor,
+                new groupMock()
+            );
+
+            expect(cut.element.draggable).toBe(false);
+        });
+
+        test('that updateDragAndDropState updates draggable attribute based on disableDnd option', () => {
             const options = { disableDnd: false };
             const accessor = fromPartial<DockviewComponent>({
                 options,
-                id: 'componentId',
                 onDidOptionsChange: jest
                     .fn()
                     .mockReturnValue({ dispose: jest.fn() }),
             });
-            const groupPanel = fromPartial<DockviewGroupPanel>({
-                id: 'groupId',
-            });
+            const groupMock = jest.fn();
+
             const cut = new Tab(
                 { id: 'panelId' } as IDockviewPanel,
                 accessor,
-                groupPanel
+                new groupMock()
             );
-            const onDragStart = jest.fn();
-            cut.onDragStart(onDragStart);
 
-            const startDrag = () => {
-                fireEvent.pointerDown(cut.element, {
-                    pointerId: 1,
-                    pointerType: 'touch',
-                    clientX: 0,
-                    clientY: 0,
-                });
-                jest.advanceTimersByTime(300);
-                fireEvent.pointerMove(window, {
-                    pointerId: 1,
-                    pointerType: 'touch',
-                    clientX: 50,
-                    clientY: 0,
-                });
-            };
+            expect(cut.element.draggable).toBe(true);
 
-            // Enabled — drag fires.
-            startDrag();
-            expect(onDragStart).toHaveBeenCalledTimes(1);
-            PointerDragController.getInstance().cancel();
-            onDragStart.mockClear();
-
-            // Disable — drag is suppressed.
+            // Simulate option change
             options.disableDnd = true;
             cut.updateDragAndDropState();
-            startDrag();
-            expect(onDragStart).not.toHaveBeenCalled();
+            expect(cut.element.draggable).toBe(false);
 
-            // Re-enable — drag fires again.
+            // Change back
             options.disableDnd = false;
             cut.updateDragAndDropState();
-            startDrag();
-            expect(onDragStart).toHaveBeenCalledTimes(1);
+            expect(cut.element.draggable).toBe(true);
+        });
+
+        test('that dragstart is prevented when disableDnd is true', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+                options: { disableDnd: true },
+            });
+            const groupMock = jest.fn();
+
+            const cut = new Tab(
+                { id: 'panelId' } as IDockviewPanel,
+                accessor,
+                new groupMock()
+            );
+
+            const event = new Event('dragstart');
+            const spy = jest.spyOn(event, 'preventDefault');
+            fireEvent(cut.element, event);
+            expect(spy).toHaveBeenCalledTimes(1);
+
+            cut.dispose();
+        });
+
+        test('that dragstart is not prevented when disableDnd is false', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+                options: { disableDnd: false },
+            });
+            const groupMock = jest.fn();
+
+            const cut = new Tab(
+                { id: 'panelId' } as IDockviewPanel,
+                accessor,
+                new groupMock()
+            );
+
+            const event = new Event('dragstart');
+            const spy = jest.spyOn(event, 'preventDefault');
+            fireEvent(cut.element, event);
+            expect(spy).toHaveBeenCalledTimes(0);
+
+            cut.dispose();
+        });
+
+        test('that updateDragAndDropState updates drag handler disabled state', () => {
+            const options = { disableDnd: false };
+            const accessor = fromPartial<DockviewComponent>({
+                options,
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+            });
+            const groupMock = jest.fn();
+
+            const cut = new Tab(
+                { id: 'panelId' } as IDockviewPanel,
+                accessor,
+                new groupMock()
+            );
+
+            // Initially not disabled
+            let event = new Event('dragstart');
+            let spy = jest.spyOn(event, 'preventDefault');
+            fireEvent(cut.element, event);
+            expect(spy).toHaveBeenCalledTimes(0);
+
+            // Simulate option change to disabled
+            options.disableDnd = true;
+            cut.updateDragAndDropState();
+            event = new Event('dragstart');
+            spy = jest.spyOn(event, 'preventDefault');
+            fireEvent(cut.element, event);
+            expect(spy).toHaveBeenCalledTimes(1);
+
+            // Change back to enabled
+            options.disableDnd = false;
+            cut.updateDragAndDropState();
+            event = new Event('dragstart');
+            spy = jest.spyOn(event, 'preventDefault');
+            fireEvent(cut.element, event);
+            expect(spy).toHaveBeenCalledTimes(0);
 
             cut.dispose();
         });
@@ -571,6 +680,30 @@ describe('tab', () => {
 
             cut.dispose();
             PointerDragController.getInstance().cancel();
+        });
+
+        test('that onDragStart is not fired when disableDnd is true', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+                options: { disableDnd: true },
+            });
+            const groupMock = jest.fn();
+
+            const cut = new Tab(
+                { id: 'panelId' } as IDockviewPanel,
+                accessor,
+                new groupMock()
+            );
+
+            const spy = jest.fn();
+            cut.onDragStart(spy);
+
+            fireEvent.dragStart(cut.element);
+            expect(spy).toHaveBeenCalledTimes(0);
+
+            cut.dispose();
         });
     });
 });

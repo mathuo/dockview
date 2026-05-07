@@ -26,7 +26,3 @@ if (typeof document.elementsFromPoint !== 'function') {
     // pointer should override this via jest.spyOn.
     document.elementsFromPoint = () => [];
 }
-
-if (typeof document.elementFromPoint !== 'function') {
-    document.elementFromPoint = () => null;
-}
