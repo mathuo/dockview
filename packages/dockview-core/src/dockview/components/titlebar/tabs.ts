@@ -20,6 +20,7 @@ import {
     MutableDisposable,
 } from '../../../lifecycle';
 import { Scrollbar } from '../../../scrollbar';
+import { PointerDragController } from '../../../dnd/pointer/pointerDragController';
 import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { DockviewWillShowOverlayLocationEvent } from '../../events';
@@ -73,7 +74,6 @@ export class Tabs extends CompositeDisposable {
     private _pendingCollapse = false;
     private _flipTransitionCleanup: (() => void) | null = null;
     private _voidContainer: HTMLElement | null = null;
-    private _voidContainerListeners: IDisposable | null = null;
     private _extendedDropZone: HTMLElement | null = null;
     private _chipDragCleanup: IDisposable | null = null;
 
@@ -135,29 +135,12 @@ export class Tabs extends CompositeDisposable {
     }
 
     set voidContainer(el: HTMLElement | null) {
-        this._voidContainerListeners?.dispose();
-        this._voidContainerListeners = null;
+        // Pointer-driven drops on the void container are handled by the
+        // VoidContainer's PointerDropTarget — see tabsContainer.ts where
+        // `this.voidContainer.onDrop` is forwarded to `tabs.handleVoidDrop`.
+        // No HTML5 listeners are needed here for internal drags now that the
+        // pointer path handles them.
         this._voidContainer = el;
-
-        if (el) {
-            this._voidContainerListeners = new CompositeDisposable(
-                addDisposableListener(el, 'dragover', (event) => {
-                    if (this._animState) {
-                        event.preventDefault();
-                    }
-                }),
-                addDisposableListener(el, 'drop', (event) => {
-                    if (
-                        this._animState?.sourceTabGroupId &&
-                        this._animState.currentInsertionIndex !== null
-                    ) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        this.handleVoidDrop();
-                    }
-                })
-            );
-        }
     }
 
     /**
@@ -287,255 +270,36 @@ export class Tabs extends CompositeDisposable {
                     this.accessor.doSetGroupActive(this.group);
                 }
             }),
-            addDisposableListener(
-                this._tabsList,
-                'dragover',
-                (event) => {
-                    if (this.accessor.options.disableDnd) {
-                        return;
-                    }
-
-                    // If _animState exists but belongs to a different
-                    // drag (stale from a previous operation), replace it
-                    // so the current drag is handled correctly.
-                    if (this._animState) {
-                        const data = getPanelData();
-                        if (
-                            data?.tabGroupId &&
-                            data.groupId !== this.group.id &&
-                            this._animState.sourceTabGroupId !== data.tabGroupId
-                        ) {
-                            this._animState = null;
-                        }
-                    }
-
-                    if (!this._animState) {
-                        const data = getPanelData();
-                        // In default animation mode, individual tab drops
-                        // are handled by per-tab Droptargets. But tab group
-                        // chip drags still need tab-list-level handling so
-                        // that drops on gaps / void space work.
-                        if (
-                            this.accessor.options.theme?.tabAnimation ===
-                                'default' &&
-                            !data?.tabGroupId
-                        ) {
-                            return;
-                        }
-                        if (
-                            data &&
-                            (data.panelId || data.tabGroupId) &&
-                            data.groupId !== this.group.id
-                        ) {
-                            const avgWidth = this.getAverageTabWidth();
-
-                            if (data.tabGroupId) {
-                                // External group drag — look up the
-                                // source tab group to size the gap
-                                const sourceGroup = this.accessor.getPanel(
-                                    data.groupId
-                                );
-                                const sourceTg = sourceGroup?.model
-                                    .getTabGroups()
-                                    .find((tg) => tg.id === data.tabGroupId);
-                                const panelCount =
-                                    sourceTg?.panelIds.length ?? 1;
-                                const groupGapWidth =
-                                    avgWidth * panelCount + avgWidth;
-
-                                this._animState = {
-                                    sourceTabId: '',
-                                    sourceIndex: -1,
-                                    tabPositions: this.snapshotTabPositions(),
-                                    chipPositions:
-                                        this._tabGroupManager.snapshotChipWidths(),
-                                    currentInsertionIndex: null,
-                                    targetTabGroupId: null,
-                                    sourceTabGroupId: data.tabGroupId,
-                                    sourceGroupPanelIds: sourceTg
-                                        ? new Set(sourceTg.panelIds)
-                                        : new Set<string>(),
-                                    sourceChipWidth: avgWidth,
-                                    cursorOffsetFromDragLeft: groupGapWidth / 2,
-                                    sourceGapWidth: groupGapWidth,
-                                    containerLeft:
-                                        this._tabsList.getBoundingClientRect()
-                                            .left,
-                                };
-                            } else {
-                                this._animState = {
-                                    sourceTabId: data.panelId!,
-                                    sourceIndex: -1,
-                                    tabPositions: this.snapshotTabPositions(),
-                                    chipPositions:
-                                        this._tabGroupManager.snapshotChipWidths(),
-                                    currentInsertionIndex: null,
-                                    targetTabGroupId: null,
-                                    sourceTabGroupId: null,
-                                    sourceGroupPanelIds: null,
-                                    sourceChipWidth: 0,
-                                    cursorOffsetFromDragLeft: avgWidth / 2,
-                                    sourceGapWidth: avgWidth,
-                                    containerLeft:
-                                        this._tabsList.getBoundingClientRect()
-                                            .left,
-                                };
-                            }
-                        } else {
-                            return;
-                        }
-                    }
-                    event.preventDefault(); // allow drop to fire on the container
-                    // For intra-group drag (sourceIndex >= 0) the gap
-                    // animation is the sole visual indicator — clear any
-                    // stale anchor overlay that may have been set while the
-                    // cursor was over the panel content area or another zone.
-                    // External drags (sourceIndex === -1) leave the overlay
-                    // to the individual tab Droptargets so cross-group
-                    // animation is not disrupted.
-                    if (this._animState!.sourceIndex !== -1) {
-                        this.group.model.dropTargetContainer?.model?.clear();
-                    }
-                    this.handleDragOver(event);
-                },
-                true
-            ),
-            addDisposableListener(
-                this._tabsList,
-                'dragleave',
-                (event) => {
-                    if (!this._animState) {
-                        return;
-                    }
-                    const related = event.relatedTarget as HTMLElement | null;
-                    // Ignore moves between children of the tabs list
-                    if (related && this._tabsList.contains(related)) {
-                        return;
-                    }
-                    // If moving into the broader drop zone (e.g. void container,
-                    // left actions), keep _animState alive so the external
-                    // dragover listeners can continue the gap animation.
-                    if (related && this._extendedDropZone?.contains(related)) {
-                        this.resetTabTransforms();
-                        this._animState.currentInsertionIndex = null;
-                        return;
-                    }
-                    // When leaving toward the void container (empty header space
-                    // to the right), keep the animation state so the drop can
-                    // still land at the end position.
-                    const rt = event.relatedTarget as HTMLElement | null;
-                    const isVoid =
-                        this._voidContainer &&
-                        rt &&
-                        (rt === this._voidContainer ||
-                            this._voidContainer.contains(rt));
-                    if (isVoid) {
-                        return;
-                    }
-                    this.resetTabTransforms();
-                    if (this._animState) {
-                        if (this._animState.sourceIndex === -1) {
-                            this.group.model.dropTargetContainer?.model?.clear();
-                            this._animState = null;
-                        } else {
-                            this._animState.currentInsertionIndex = null;
-                        }
-                    }
-                },
-                true
-            ),
-            addDisposableListener(this._tabsList, 'dragend', () => {
+            // Pointer-driven smooth-tab animation. The HTML5 dragover /
+            // dragleave / dragend / drop listeners that previously hung off
+            // _tabsList have been replaced with these global controller
+            // subscriptions. The dragover handler is now driven by
+            // pointermove (with rect hit-testing); the drop handler runs
+            // after per-target onDrop and only commits if the drop landed
+            // on gap space (per-tab onDrop will have cleared _animState
+            // for drops that landed on a tab).
+            PointerDragController.getInstance().onDragMove((event) => {
+                if (this.accessor.options.disableDnd) {
+                    return;
+                }
+                const inside = this._isPointInElement(
+                    event.clientX,
+                    event.clientY,
+                    this._tabsList
+                );
+                if (inside) {
+                    this._handleSmoothDragOver(event.clientX);
+                } else if (this._animState) {
+                    this._handleSmoothDragLeave(event.clientX, event.clientY);
+                }
+            }),
+            PointerDragController.getInstance().onDrop((event) => {
+                this._handleSmoothDrop(event.pointerEvent);
+            }),
+            PointerDragController.getInstance().onDragEnd(() => {
                 this.resetDragAnimation();
             }),
-            addDisposableListener(
-                this._tabsList,
-                'drop',
-                (event) => {
-                    if (
-                        !this._animState ||
-                        this._animState.currentInsertionIndex === null
-                    ) {
-                        return;
-                    }
-
-                    // In non-smooth mode only handle group drags here;
-                    // individual tab drops are handled by tab Droptargets.
-                    if (
-                        this.accessor.options.theme?.tabAnimation !==
-                            'smooth' &&
-                        !this._animState.sourceTabGroupId
-                    ) {
-                        return;
-                    }
-
-                    event.stopPropagation();
-                    event.preventDefault();
-
-                    // The capturing stopPropagation above prevents the
-                    // individual tab's Droptarget.onDrop from firing, so
-                    // the anchor overlay won't be cleared by that path.
-                    // Clear it explicitly here before processing the drop.
-                    this.group.model.dropTargetContainer?.model?.clear();
-
-                    const animState = this._animState;
-                    this._animState = null;
-                    this._pendingCollapse = false;
-
-                    // Handle group drag (entire group repositioned)
-                    if (animState.sourceTabGroupId) {
-                        this._commitGroupMove(
-                            animState.sourceTabGroupId,
-                            animState.currentInsertionIndex as number
-                        );
-                        return;
-                    }
-
-                    const insertionIndex =
-                        animState.currentInsertionIndex as number;
-                    const sourceIndex = animState.sourceIndex;
-                    const adjustedIndex =
-                        insertionIndex -
-                        (sourceIndex !== -1 && sourceIndex < insertionIndex
-                            ? 1
-                            : 0);
-
-                    const sourceCurrentGroup =
-                        this.group.model.getTabGroupForPanel(
-                            animState.sourceTabId
-                        );
-                    if (
-                        adjustedIndex === sourceIndex &&
-                        !animState.targetTabGroupId &&
-                        !sourceCurrentGroup
-                    ) {
-                        this._uncollapsSourceTab(animState.sourceTabId);
-                        this.resetTabTransforms();
-                        return;
-                    }
-
-                    this._uncollapsSourceTab(animState.sourceTabId);
-
-                    const firstPositions = this.snapshotTabPositions();
-                    this.resetTabTransforms();
-                    this._onDrop.fire({
-                        event,
-                        index: adjustedIndex,
-                        targetTabGroupId: animState.targetTabGroupId,
-                    });
-                    this.runFlipAnimation(
-                        firstPositions,
-                        animState.sourceTabId,
-                        animState.sourceIndex === -1,
-                        {
-                            from: Math.min(sourceIndex, adjustedIndex),
-                            to: Math.max(sourceIndex, adjustedIndex),
-                        }
-                    );
-                },
-                true
-            ),
             Disposable.from(() => {
-                this._voidContainerListeners?.dispose();
                 this.resetDragAnimation();
                 this._tabGroupManager.disposeAll();
 
@@ -734,6 +498,20 @@ export class Tabs extends CompositeDisposable {
                 }
             }),
             tab.onDrop((event) => {
+                // When smooth-anim is active and has a precise insertion
+                // index, let the controller-level _handleSmoothDrop commit
+                // it (it uses currentInsertionIndex which is more accurate
+                // than the per-tab quadrant). The old HTML5 path achieved
+                // this via stopPropagation; with pointer events we just
+                // bail here.
+                if (
+                    this._animState &&
+                    this._animState.currentInsertionIndex !== null &&
+                    this.accessor.options.theme?.tabAnimation === 'smooth'
+                ) {
+                    return;
+                }
+
                 const animState = this._animState;
                 this._animState = null;
                 this._pendingCollapse = false;
@@ -983,11 +761,8 @@ export class Tabs extends CompositeDisposable {
     private _handleChipDragStart(
         tabGroup: ITabGroup,
         chip: ITabGroupChipRenderer,
-        event: DragEvent | PointerEvent
+        event: PointerEvent
     ): void {
-        const isPointer =
-            typeof PointerEvent !== 'undefined' &&
-            event instanceof PointerEvent;
         const firstPanelId = tabGroup.panelIds[0];
         const firstIdx = firstPanelId
             ? this._tabs.findIndex((t) => t.value.panel.id === firstPanelId)
@@ -1004,30 +779,24 @@ export class Tabs extends CompositeDisposable {
             }
         }
 
-        // Smooth-tab animation depends on HTML5 dragend lifecycle, which the
-        // pointer path does not produce. Skip animState (and the rAF collapse
-        // below) entirely for touch drags — the user still gets per-target
-        // overlays from PointerDropTarget.
-        if (!isPointer) {
-            this._animState = {
-                sourceTabId: '',
-                sourceIndex: firstIdx,
-                tabPositions: this.snapshotTabPositions(),
-                chipPositions: this._tabGroupManager.snapshotChipWidths(),
-                currentInsertionIndex: null,
-                targetTabGroupId: null,
-                sourceTabGroupId: tabGroup.id,
-                sourceGroupPanelIds: new Set(tabGroup.panelIds),
-                sourceChipWidth: chipRect.width,
-                cursorOffsetFromDragLeft: event.clientX - chipRect.left,
-                sourceGapWidth: groupGapWidth,
-                containerLeft: this._tabsList.getBoundingClientRect().left,
-            };
-        }
+        this._animState = {
+            sourceTabId: '',
+            sourceIndex: firstIdx,
+            tabPositions: this.snapshotTabPositions(),
+            chipPositions: this._tabGroupManager.snapshotChipWidths(),
+            currentInsertionIndex: null,
+            targetTabGroupId: null,
+            sourceTabGroupId: tabGroup.id,
+            sourceGroupPanelIds: new Set(tabGroup.panelIds),
+            sourceChipWidth: chipRect.width,
+            cursorOffsetFromDragLeft: event.clientX - chipRect.left,
+            sourceGapWidth: groupGapWidth,
+            containerLeft: this._tabsList.getBoundingClientRect().left,
+        };
 
-        // Set LocalSelectionTransfer so drop targets recognise this as
-        // an internal dockview drag.  panelId is null (group-level),
-        // tabGroupId identifies which tab group is being dragged.
+        // Set LocalSelectionTransfer so drop targets recognise this as an
+        // internal dockview drag. panelId is null (group-level), tabGroupId
+        // identifies which tab group is being dragged.
         const panelTransfer =
             LocalSelectionTransfer.getInstance<PanelTransfer>();
         panelTransfer.setData(
@@ -1051,24 +820,10 @@ export class Tabs extends CompositeDisposable {
             },
         };
 
-        if (!isPointer) {
-            const dragEvent = event as DragEvent;
-            if (dragEvent.dataTransfer) {
-                dragEvent.dataTransfer.effectAllowed = 'move';
-
-                if (dragEvent.dataTransfer.items.length === 0) {
-                    dragEvent.dataTransfer.setData('text/plain', '');
-                }
-            }
-        }
-
-        if (
-            !isPointer &&
-            this.accessor.options.theme?.tabAnimation === 'smooth'
-        ) {
-            // Collapse group tabs + chip after the browser
-            // captures the drag image, then open the gap at the
-            // source position — all instant (no transitions).
+        if (this.accessor.options.theme?.tabAnimation === 'smooth') {
+            // Collapse group tabs + chip in the next frame so the ghost is
+            // captured first, then open the gap at the source position —
+            // all instant (no transitions).
             const groupPanelIds = new Set(tabGroup.panelIds);
             this._pendingCollapse = true;
             requestAnimationFrame(() => {
@@ -1076,14 +831,12 @@ export class Tabs extends CompositeDisposable {
                 if (!this._animState) {
                     return;
                 }
-                // Collapse all group tabs instantly
                 for (const t of this._tabs) {
                     if (groupPanelIds.has(t.value.panel.id)) {
                         t.value.element.style.transition = 'none';
                         toggleClass(t.value.element, 'dv-tab--dragging', true);
                     }
                 }
-                // Collapse the group chip instantly
                 const chipEntry = this._tabGroupManager.chipRenderers.get(
                     tabGroup.id
                 );
@@ -1095,7 +848,6 @@ export class Tabs extends CompositeDisposable {
                         true
                     );
                 }
-                // Single reflow for the entire batch
                 void this._tabsList.offsetHeight;
 
                 const underline = this._tabGroupManager.groupUnderlines.get(
@@ -1106,10 +858,8 @@ export class Tabs extends CompositeDisposable {
                 }
 
                 this._animState.currentInsertionIndex ??= firstIdx;
-                // Apply gap with transitions disabled
                 this.applyDragOverTransforms(true);
 
-                // Re-enable transitions for subsequent moves
                 for (const t of this._tabs) {
                     if (groupPanelIds.has(t.value.panel.id)) {
                         t.value.element.style.removeProperty('transition');
@@ -1119,17 +869,6 @@ export class Tabs extends CompositeDisposable {
                     chipEntry.chip.element.style.removeProperty('transition');
                 }
             });
-        }
-
-        // Build a composite drag image showing chip + group tabs.
-        // Only meaningful for HTML5 drags — pointer drags have no native
-        // drag image and the controller doesn't support setDragImage.
-        if (!isPointer) {
-            this._tabGroupManager.setGroupDragImage(
-                event as DragEvent,
-                tabGroup,
-                chip.element
-            );
         }
     }
 
@@ -1200,12 +939,238 @@ export class Tabs extends CompositeDisposable {
         return total / this._tabs.length;
     }
 
-    private handleDragOver(event: DragEvent): void {
+    private _isPointInElement(
+        clientX: number,
+        clientY: number,
+        el: HTMLElement
+    ): boolean {
+        const rect = el.getBoundingClientRect();
+        return (
+            clientX >= rect.left &&
+            clientX <= rect.right &&
+            clientY >= rect.top &&
+            clientY <= rect.bottom
+        );
+    }
+
+    /** Pointer equivalent of the old `_tabsList` 'dragover' listener. */
+    private _handleSmoothDragOver(clientX: number): void {
+        if (this.accessor.options.disableDnd) {
+            return;
+        }
+
+        // If _animState exists but belongs to a different drag (stale from
+        // a previous operation), replace it so the current drag is handled
+        // correctly.
+        if (this._animState) {
+            const data = getPanelData();
+            if (
+                data?.tabGroupId &&
+                data.groupId !== this.group.id &&
+                this._animState.sourceTabGroupId !== data.tabGroupId
+            ) {
+                this._animState = null;
+            }
+        }
+
+        if (!this._animState) {
+            const data = getPanelData();
+            // In default animation mode, individual tab drops are handled by
+            // per-tab Droptargets. But tab group chip drags still need
+            // tab-list-level handling so that drops on gaps / void space work.
+            if (
+                this.accessor.options.theme?.tabAnimation === 'default' &&
+                !data?.tabGroupId
+            ) {
+                return;
+            }
+            if (
+                data &&
+                (data.panelId || data.tabGroupId) &&
+                data.groupId !== this.group.id
+            ) {
+                const avgWidth = this.getAverageTabWidth();
+
+                if (data.tabGroupId) {
+                    // External group drag — look up the source tab group
+                    // to size the gap.
+                    const sourceGroup = this.accessor.getPanel(data.groupId);
+                    const sourceTg = sourceGroup?.model
+                        .getTabGroups()
+                        .find((tg) => tg.id === data.tabGroupId);
+                    const panelCount = sourceTg?.panelIds.length ?? 1;
+                    const groupGapWidth = avgWidth * panelCount + avgWidth;
+
+                    this._animState = {
+                        sourceTabId: '',
+                        sourceIndex: -1,
+                        tabPositions: this.snapshotTabPositions(),
+                        chipPositions:
+                            this._tabGroupManager.snapshotChipWidths(),
+                        currentInsertionIndex: null,
+                        targetTabGroupId: null,
+                        sourceTabGroupId: data.tabGroupId,
+                        sourceGroupPanelIds: sourceTg
+                            ? new Set(sourceTg.panelIds)
+                            : new Set<string>(),
+                        sourceChipWidth: avgWidth,
+                        cursorOffsetFromDragLeft: groupGapWidth / 2,
+                        sourceGapWidth: groupGapWidth,
+                        containerLeft:
+                            this._tabsList.getBoundingClientRect().left,
+                    };
+                } else {
+                    this._animState = {
+                        sourceTabId: data.panelId!,
+                        sourceIndex: -1,
+                        tabPositions: this.snapshotTabPositions(),
+                        chipPositions:
+                            this._tabGroupManager.snapshotChipWidths(),
+                        currentInsertionIndex: null,
+                        targetTabGroupId: null,
+                        sourceTabGroupId: null,
+                        sourceGroupPanelIds: null,
+                        sourceChipWidth: 0,
+                        cursorOffsetFromDragLeft: avgWidth / 2,
+                        sourceGapWidth: avgWidth,
+                        containerLeft:
+                            this._tabsList.getBoundingClientRect().left,
+                    };
+                }
+            } else {
+                return;
+            }
+        }
+
+        // For intra-group drag (sourceIndex >= 0) the gap animation is the
+        // sole visual indicator — clear any stale anchor overlay that may
+        // have been set while the cursor was over the panel content area
+        // or another zone. External drags (sourceIndex === -1) leave the
+        // overlay to the individual tab Droptargets so cross-group
+        // animation is not disrupted.
+        if (this._animState!.sourceIndex !== -1) {
+            this.group.model.dropTargetContainer?.model?.clear();
+        }
+        this.handleDragOver(clientX);
+    }
+
+    /** Pointer equivalent of the old `_tabsList` 'dragleave' listener. */
+    private _handleSmoothDragLeave(clientX: number, clientY: number): void {
+        if (!this._animState) {
+            return;
+        }
+        const elementUnderCursor = document.elementFromPoint(clientX, clientY);
+        // If still over the broader drop zone (e.g. left actions container),
+        // keep _animState alive but reset the visible gap.
+        if (
+            elementUnderCursor &&
+            this._extendedDropZone?.contains(elementUnderCursor)
+        ) {
+            this.resetTabTransforms();
+            this._animState.currentInsertionIndex = null;
+            return;
+        }
+        // If the cursor is over the void container, keep _animState as-is so
+        // the drop can land at the end position.
+        if (
+            this._voidContainer &&
+            elementUnderCursor &&
+            (elementUnderCursor === this._voidContainer ||
+                this._voidContainer.contains(elementUnderCursor))
+        ) {
+            return;
+        }
+        this.resetTabTransforms();
+        if (this._animState.sourceIndex === -1) {
+            this.group.model.dropTargetContainer?.model?.clear();
+            this._animState = null;
+        } else {
+            this._animState.currentInsertionIndex = null;
+        }
+    }
+
+    /**
+     * Pointer equivalent of the old `_tabsList` 'drop' listener. Fires after
+     * any per-target onDrop, so if a tab drop already committed the move
+     * (and cleared `_animState`), this is a no-op.
+     */
+    private _handleSmoothDrop(event: PointerEvent): void {
+        if (
+            !this._animState ||
+            this._animState.currentInsertionIndex === null
+        ) {
+            return;
+        }
+
+        // In non-smooth mode only handle group drags here; individual tab
+        // drops are handled by tab Droptargets.
+        if (
+            this.accessor.options.theme?.tabAnimation !== 'smooth' &&
+            !this._animState.sourceTabGroupId
+        ) {
+            return;
+        }
+
+        this.group.model.dropTargetContainer?.model?.clear();
+
+        const animState = this._animState;
+        this._animState = null;
+        this._pendingCollapse = false;
+
+        // Whole-group drag.
+        if (animState.sourceTabGroupId) {
+            this._commitGroupMove(
+                animState.sourceTabGroupId,
+                animState.currentInsertionIndex as number
+            );
+            return;
+        }
+
+        const insertionIndex = animState.currentInsertionIndex as number;
+        const sourceIndex = animState.sourceIndex;
+        const adjustedIndex =
+            insertionIndex -
+            (sourceIndex !== -1 && sourceIndex < insertionIndex ? 1 : 0);
+
+        const sourceCurrentGroup = this.group.model.getTabGroupForPanel(
+            animState.sourceTabId
+        );
+        if (
+            adjustedIndex === sourceIndex &&
+            !animState.targetTabGroupId &&
+            !sourceCurrentGroup
+        ) {
+            this._uncollapsSourceTab(animState.sourceTabId);
+            this.resetTabTransforms();
+            return;
+        }
+
+        this._uncollapsSourceTab(animState.sourceTabId);
+
+        const firstPositions = this.snapshotTabPositions();
+        this.resetTabTransforms();
+        this._onDrop.fire({
+            event,
+            index: adjustedIndex,
+            targetTabGroupId: animState.targetTabGroupId,
+        });
+        this.runFlipAnimation(
+            firstPositions,
+            animState.sourceTabId,
+            animState.sourceIndex === -1,
+            {
+                from: Math.min(sourceIndex, adjustedIndex),
+                to: Math.max(sourceIndex, adjustedIndex),
+            }
+        );
+    }
+
+    private handleDragOver(clientX: number): void {
         if (!this._animState) {
             return;
         }
 
-        const mouseX = event.clientX;
+        const mouseX = clientX;
 
         let insertionIndex: number | null = null;
         let targetTabGroupId: string | null = null;

@@ -1,5 +1,4 @@
 import { PaneviewApi } from '../api/component.api';
-import { DragHandler } from '../dnd/abstractDragHandler';
 import {
     getPaneData,
     LocalSelectionTransfer,
@@ -9,7 +8,6 @@ import { Droptarget, DroptargetEvent } from '../dnd/droptarget';
 import { PointerDragSource } from '../dnd/pointer/pointerDragSource';
 import { PointerDropTarget } from '../dnd/pointer/pointerDropTarget';
 import { Emitter, Event } from '../events';
-import { IDisposable } from '../lifecycle';
 import { Orientation } from '../splitview/splitview';
 import {
     PaneviewDndOverlayEvent,
@@ -29,8 +27,12 @@ export interface PaneviewDidDropEvent extends DroptargetEvent {
 }
 
 export abstract class DraggablePaneviewPanel extends PaneviewPanel {
-    private handler: DragHandler | undefined;
     private pointerSource: PointerDragSource | undefined;
+    /**
+     * The HTML5 drop target stays for external drops (OS file drops,
+     * third-party HTML5-DnD libraries). Internal drags are pointer-driven
+     * and routed through `pointerTarget`.
+     */
     private target: Droptarget | undefined;
     private pointerTarget: PointerDropTarget | undefined;
 
@@ -84,26 +86,10 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
 
         const id = this.id;
         const accessorId = this.accessor.id;
-        this.header.draggable = true;
-
-        this.handler = new (class PaneDragHandler extends DragHandler {
-            getData(): IDisposable {
-                LocalSelectionTransfer.getInstance().setData(
-                    [new PaneTransfer(accessorId, id)],
-                    PaneTransfer.prototype
-                );
-
-                return {
-                    dispose: () => {
-                        LocalSelectionTransfer.getInstance().clearData(
-                            PaneTransfer.prototype
-                        );
-                    },
-                };
-            }
-        })(this.header);
 
         this.pointerSource = new PointerDragSource(this.header, {
+            // Mouse pane drags use the pointer path too.
+            touchOnly: false,
             getData: () => {
                 LocalSelectionTransfer.getInstance().setData(
                     [new PaneTransfer(accessorId, id)],
@@ -164,7 +150,6 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
 
         this.addDisposables(
             this._onDidDrop,
-            this.handler,
             this.pointerSource,
             this.target,
             this.pointerTarget,

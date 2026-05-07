@@ -48,12 +48,23 @@ export class PointerDragController extends CompositeDisposable {
     private readonly _onDragStart = new Emitter<PointerDragEvent>();
     readonly onDragStart: Event<PointerDragEvent> = this._onDragStart.event;
 
+    private readonly _onDragMove = new Emitter<PointerDragEvent>();
+    readonly onDragMove: Event<PointerDragEvent> = this._onDragMove.event;
+
+    private readonly _onDrop = new Emitter<PointerDragEvent>();
+    readonly onDrop: Event<PointerDragEvent> = this._onDrop.event;
+
     private readonly _onDragEnd = new Emitter<PointerDragEvent>();
     readonly onDragEnd: Event<PointerDragEvent> = this._onDragEnd.event;
 
     private constructor() {
         super();
-        this.addDisposables(this._onDragStart, this._onDragEnd);
+        this.addDisposables(
+            this._onDragStart,
+            this._onDragMove,
+            this._onDrop,
+            this._onDragEnd
+        );
     }
 
     get active(): ActiveDrag | undefined {
@@ -185,6 +196,7 @@ export class PointerDragController extends CompositeDisposable {
         }
 
         this._onDragMoveCallback?.(dragEvent);
+        this._onDragMove.fire(dragEvent);
     }
 
     private _handleEnd(e: PointerEvent, dropped: boolean): void {
@@ -211,6 +223,9 @@ export class PointerDragController extends CompositeDisposable {
         setTimeout(() => dataDisposable?.dispose(), 0);
 
         onEnd?.(dragEvent, dropped);
+        if (dropped) {
+            this._onDrop.fire(dragEvent);
+        }
         this._onDragEnd.fire(dragEvent);
     }
 

@@ -8,7 +8,6 @@ import {
     DroptargetEvent,
     WillShowOverlayEvent,
 } from '../../../dnd/droptarget';
-import { GroupDragHandler } from '../../../dnd/groupDragHandler';
 import { PointerDragSource } from '../../../dnd/pointer/pointerDragSource';
 import { PointerDropTarget } from '../../../dnd/pointer/pointerDropTarget';
 import { DockviewComponent } from '../../dockviewComponent';
@@ -20,9 +19,13 @@ import { toggleClass } from '../../../dom';
 
 export class VoidContainer extends CompositeDisposable {
     private readonly _element: HTMLElement;
+    /**
+     * The HTML5 drop target stays for external drops (OS file drops,
+     * third-party HTML5-DnD libraries). Internal drags are pointer-driven
+     * and routed through `pointerDropTarget`.
+     */
     private readonly dropTarget: Droptarget;
     private readonly pointerDropTarget: PointerDropTarget;
-    private readonly handler: GroupDragHandler;
     private readonly pointerDragSource: PointerDragSource;
     private readonly panelTransfer =
         LocalSelectionTransfer.getInstance<PanelTransfer>();
@@ -30,7 +33,7 @@ export class VoidContainer extends CompositeDisposable {
     private readonly _onDrop = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDrop.event;
 
-    private readonly _onDragStart = new Emitter<DragEvent | PointerEvent>();
+    private readonly _onDragStart = new Emitter<PointerEvent>();
     readonly onDragStart = this._onDragStart.event;
 
     readonly onWillShowOverlay: Event<WillShowOverlayEvent>;
@@ -48,7 +51,6 @@ export class VoidContainer extends CompositeDisposable {
         this._element = document.createElement('div');
 
         this._element.className = 'dv-void-container';
-        this._element.draggable = !this.accessor.options.disableDnd;
 
         toggleClass(
             this._element,
@@ -62,13 +64,6 @@ export class VoidContainer extends CompositeDisposable {
             addDisposableListener(this._element, 'pointerdown', () => {
                 this.accessor.doSetGroupActive(this.group);
             })
-        );
-
-        this.handler = new GroupDragHandler(
-            this._element,
-            accessor,
-            group,
-            !!this.accessor.options.disableDnd
         );
 
         const canDisplayOverlay = (
@@ -101,19 +96,14 @@ export class VoidContainer extends CompositeDisposable {
         });
 
         this.pointerDragSource = new PointerDragSource(this._element, {
+            // Mouse drags now go through the pointer path too.
+            touchOnly: false,
             isCancelled: () => {
                 if (this.accessor.options.disableDnd) {
                     return true;
                 }
-                // Floating groups: HTML5 requires a shift modifier to
-                // tear out a panel (without it, the click moves the
-                // floating window). Touch has no shift modifier, but the
-                // long-press initiation in PointerDragSource provides the
-                // same "deliberate gesture" semantics — only a held press
-                // arms the drag, brief taps fall through to floating
-                // window movement.
                 if (
-                    this.group.api.location.type === 'edge' &&
+                    this.group.api?.location?.type === 'edge' &&
                     this.group.size === 0
                 ) {
                     return true;
@@ -142,10 +132,6 @@ export class VoidContainer extends CompositeDisposable {
         );
 
         this.addDisposables(
-            this.handler,
-            this.handler.onDragStart((event) => {
-                this._onDragStart.fire(event);
-            }),
             this.dropTarget.onDrop((event) => {
                 this._onDrop.fire(event);
             }),
@@ -160,9 +146,7 @@ export class VoidContainer extends CompositeDisposable {
 
     updateDragAndDropState(): void {
         const disabled = !!this.accessor.options.disableDnd;
-        this._element.draggable = !disabled;
         toggleClass(this._element, 'dv-draggable', !disabled);
-        this.handler.setDisabled(disabled);
         this.pointerDragSource.setDisabled(disabled);
     }
 }

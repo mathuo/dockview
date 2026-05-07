@@ -18,7 +18,6 @@ describe('TabGroupChip', () => {
 
         expect(chip.element.className).toBe('dv-tab-group-chip');
         expect(chip.element.tabIndex).toBe(0);
-        expect(chip.element.draggable).toBe(true);
     });
 
     test('element contains a label span', () => {
@@ -214,12 +213,24 @@ describe('TabGroupChip', () => {
         expect(handler).toHaveBeenCalledTimes(1);
     });
 
-    test('fires onDragStart event', () => {
+    test('fires onDragStart event when a pointer drag begins', () => {
         const chip = new TabGroupChip(createPalette());
         const handler = jest.fn();
         chip.onDragStart(handler);
 
-        fireEvent.dragStart(chip.element);
+        // Mouse arms immediately — no fake-timer dance needed.
+        fireEvent.pointerDown(chip.element, {
+            pointerId: 1,
+            pointerType: 'mouse',
+            clientX: 0,
+            clientY: 0,
+        });
+        fireEvent.pointerMove(window, {
+            pointerId: 1,
+            pointerType: 'mouse',
+            clientX: 50,
+            clientY: 0,
+        });
 
         expect(handler).toHaveBeenCalledTimes(1);
     });
@@ -227,7 +238,18 @@ describe('TabGroupChip', () => {
     test('dragstart does not add dv-tab-group-chip--dragging class', () => {
         const chip = new TabGroupChip(createPalette());
 
-        fireEvent.dragStart(chip.element);
+        fireEvent.pointerDown(chip.element, {
+            pointerId: 1,
+            pointerType: 'mouse',
+            clientX: 0,
+            clientY: 0,
+        });
+        fireEvent.pointerMove(window, {
+            pointerId: 1,
+            pointerType: 'mouse',
+            clientX: 50,
+            clientY: 0,
+        });
 
         // Class management is handled by Tabs, not the chip itself
         expect(

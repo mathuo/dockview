@@ -178,42 +178,31 @@ describe('dockviewComponent', () => {
                 component: 'default',
             });
 
-            // Get all tab elements and void containers
-            const tabElements = Array.from(
-                dockview.element.querySelectorAll('.dv-tab')
-            ) as HTMLElement[];
+            // Phase 4: internal drags are pointer-driven and the
+            // `draggable` HTML5 attribute is no longer set. The disableDnd
+            // option toggles the `dv-draggable` class on void containers,
+            // which is the visible affordance / external API contract for
+            // "is this draggable?".
             const voidContainers = Array.from(
                 dockview.element.querySelectorAll('.dv-void-container')
             ) as HTMLElement[];
 
-            // Initially tabs should be draggable (disableDnd: false)
-            tabElements.forEach((tab) => {
-                expect(tab.draggable).toBe(true);
-            });
             voidContainers.forEach((container) => {
-                expect(container.draggable).toBe(true);
+                expect(container.classList.contains('dv-draggable')).toBe(true);
             });
 
-            // Update options to disable DnD
             dockview.updateOptions({ disableDnd: true });
 
-            // Now tabs should not be draggable
-            tabElements.forEach((tab) => {
-                expect(tab.draggable).toBe(false);
-            });
             voidContainers.forEach((container) => {
-                expect(container.draggable).toBe(false);
+                expect(container.classList.contains('dv-draggable')).toBe(
+                    false
+                );
             });
 
-            // Update options to enable DnD again
             dockview.updateOptions({ disableDnd: false });
 
-            // Tabs should be draggable again
-            tabElements.forEach((tab) => {
-                expect(tab.draggable).toBe(true);
-            });
             voidContainers.forEach((container) => {
-                expect(container.draggable).toBe(true);
+                expect(container.classList.contains('dv-draggable')).toBe(true);
             });
         });
 
@@ -4872,10 +4861,22 @@ describe('dockviewComponent', () => {
             groupDragEvents.push(event);
         });
 
-        const el = dockview.element.querySelector('.dv-tab')!;
+        const el = dockview.element.querySelector('.dv-tab')! as HTMLElement;
         expect(el).toBeTruthy();
 
-        fireEvent.dragStart(el);
+        // Mouse arms immediately — no fake timers needed.
+        fireEvent.pointerDown(el, {
+            pointerId: 1,
+            pointerType: 'mouse',
+            clientX: 0,
+            clientY: 0,
+        });
+        fireEvent.pointerMove(window, {
+            pointerId: 1,
+            pointerType: 'mouse',
+            clientX: 50,
+            clientY: 0,
+        });
 
         expect(tabDragEvents.length).toBe(1);
         expect(groupDragEvents.length).toBe(0);
@@ -4915,10 +4916,23 @@ describe('dockviewComponent', () => {
             groupDragEvents.push(event);
         });
 
-        const el = dockview.element.querySelector('.dv-void-container')!;
+        const el = dockview.element.querySelector(
+            '.dv-void-container'
+        )! as HTMLElement;
         expect(el).toBeTruthy();
 
-        fireEvent.dragStart(el);
+        fireEvent.pointerDown(el, {
+            pointerId: 1,
+            pointerType: 'mouse',
+            clientX: 0,
+            clientY: 0,
+        });
+        fireEvent.pointerMove(window, {
+            pointerId: 1,
+            pointerType: 'mouse',
+            clientX: 50,
+            clientY: 0,
+        });
 
         expect(tabDragEvents.length).toBe(0);
         expect(groupDragEvents.length).toBe(1);
