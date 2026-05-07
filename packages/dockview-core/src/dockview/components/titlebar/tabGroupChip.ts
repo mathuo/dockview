@@ -10,6 +10,7 @@ import { ITabGroupChipRenderer } from '../../framework';
 import { DockviewApi } from '../../../api/component.api';
 import { PointerDragSource } from '../../../dnd/pointer/pointerDragSource';
 import { LongPressDetector } from '../../../dnd/pointer/longPress';
+import { PointerGhost } from '../../../dnd/pointer/pointerGhost';
 
 export class TabGroupChip
     extends CompositeDisposable
@@ -54,6 +55,15 @@ export class TabGroupChip
                     /* noop */
                 },
             }),
+            createGhost: (event) => {
+                return new PointerGhost({
+                    element: this._buildGhostElement(),
+                    initialX: event.clientX,
+                    initialY: event.clientY,
+                    offsetX: 8,
+                    offsetY: 8,
+                });
+            },
             onDragStart: (event) => {
                 this._onDragStart.fire(event);
             },
@@ -124,5 +134,24 @@ export class TabGroupChip
 
     private updateCollapsed(collapsed: boolean): void {
         toggleClass(this._element, 'dv-tab-group-chip--collapsed', collapsed);
+    }
+
+    /**
+     * Clone the chip with computed styles for use as a follow-finger ghost
+     * during a pointer drag. Append-to-body + position:absolute are applied
+     * by `PointerGhost`; we just need the visual fidelity of the live chip.
+     */
+    private _buildGhostElement(): HTMLElement {
+        const style = getComputedStyle(this._element);
+        const clone = this._element.cloneNode(true) as HTMLElement;
+        Array.from(style).forEach((key) => {
+            clone.style.setProperty(
+                key,
+                style.getPropertyValue(key),
+                style.getPropertyPriority(key)
+            );
+        });
+        clone.style.position = 'absolute';
+        return clone;
     }
 }

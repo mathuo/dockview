@@ -2,6 +2,7 @@ import { toggleClass } from '../../../dom';
 import { addDisposableListener } from '../../../events';
 import { PointerDragSource } from '../../../dnd/pointer/pointerDragSource';
 import { LongPressDetector } from '../../../dnd/pointer/longPress';
+import { PointerGhost } from '../../../dnd/pointer/pointerGhost';
 import {
     CompositeDisposable,
     IDisposable,
@@ -246,6 +247,25 @@ export class TabGroupManager {
                         /* noop */
                     },
                 }),
+                createGhost: (event) => {
+                    const style = getComputedStyle(chip.element);
+                    const clone = chip.element.cloneNode(true) as HTMLElement;
+                    Array.from(style).forEach((key) => {
+                        clone.style.setProperty(
+                            key,
+                            style.getPropertyValue(key),
+                            style.getPropertyPriority(key)
+                        );
+                    });
+                    clone.style.position = 'absolute';
+                    return new PointerGhost({
+                        element: clone,
+                        initialX: event.clientX,
+                        initialY: event.clientY,
+                        offsetX: 8,
+                        offsetY: 8,
+                    });
+                },
                 onDragStart: (event) => {
                     this._callbacks.onChipDragStart(tabGroup, chip, event);
                 },
