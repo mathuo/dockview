@@ -30,9 +30,23 @@ export interface PointerDragSourceOptions {
     isCancelled?: (event: PointerEvent) => boolean;
     /**
      * Pixel distance the pointer must travel before a drag is recognised.
-     * Default 5.
+     * Default 5. Mouse pointers use this threshold immediately. Touch /
+     * pen pointers must first satisfy `touchInitiationDelay` before this
+     * threshold is checked.
      */
     threshold?: number;
+    /**
+     * Touch-only: how long (ms) the pointer must be held before the drag
+     * is "armed". Before this delay elapses, any movement past
+     * `pressTolerance` cancels the press, allowing the browser's native
+     * scroll gesture to claim the touch. Default 250ms.
+     */
+    touchInitiationDelay?: number;
+    /**
+     * Touch-only: pixel jitter allowed during the initiation delay before
+     * the press is cancelled. Default 8.
+     */
+    pressTolerance?: number;
     /**
      * If true (default), only touch/pen pointers initiate a drag — mouse
      * defers to the existing HTML5 drag path. Set to false to also handle
@@ -50,6 +64,8 @@ export interface PointerDragSourceOptions {
 }
 
 const DEFAULT_THRESHOLD = 5;
+const DEFAULT_TOUCH_INITIATION_DELAY = 250;
+const DEFAULT_PRESS_TOLERANCE = 8;
 
 /**
  * Pointer-event-based drag source. Replaces AbstractDragHandler for any
@@ -64,6 +80,8 @@ export class PointerDragSource extends CompositeDisposable {
     private _pendingMoveListener: IDisposable | undefined;
     private _pendingUpListener: IDisposable | undefined;
     private _pendingCancelListener: IDisposable | undefined;
+    private _armTimer: ReturnType<typeof setTimeout> | undefined;
+    private _armed = false;
     private _startX = 0;
     private _startY = 0;
     private _startEvent: PointerEvent | undefined;
@@ -123,7 +141,27 @@ export class PointerDragSource extends CompositeDisposable {
         this._startY = event.clientY;
         this._startEvent = event;
 
+        const isTouch =
+            event.pointerType === 'touch' || event.pointerType === 'pen';
+
+        // Touch drags wait for a long-press before arming, so quick swipes
+        // fall through to the browser's native scroll gesture (when the
+        // container has touch-action: pan-x or similar). Mouse drags arm
+        // immediately — we still produce a drag on first movement past the
+        // threshold, matching pre-phase-3 behaviour.
+        const initiationDelay =
+            this.options.touchInitiationDelay ?? DEFAULT_TOUCH_INITIATION_DELAY;
+        this._armed = !isTouch || initiationDelay <= 0;
+        if (isTouch && initiationDelay > 0) {
+            this._armTimer = setTimeout(() => {
+                this._armTimer = undefined;
+                this._armed = true;
+            }, initiationDelay);
+        }
+
         const threshold = this.options.threshold ?? DEFAULT_THRESHOLD;
+        const pressTolerance =
+            this.options.pressTolerance ?? DEFAULT_PRESS_TOLERANCE;
 
         this._pendingMoveListener = addDisposableListener(
             window,
@@ -134,8 +172,20 @@ export class PointerDragSource extends CompositeDisposable {
                 }
                 const dx = moveEvent.clientX - this._startX;
                 const dy = moveEvent.clientY - this._startY;
-                if (Math.hypot(dx, dy) >= threshold) {
-                    this._beginDrag(moveEvent);
+                const distance = Math.hypot(dx, dy);
+
+                if (this._armed) {
+                    if (distance >= threshold) {
+                        this._beginDrag(moveEvent);
+                    }
+                    return;
+                }
+
+                // Pre-arm phase: significant movement means the user is
+                // scrolling, not pressing. Cancel so the browser's native
+                // gesture handler can take over.
+                if (distance > pressTolerance) {
+                    this._cancelPending();
                 }
             }
         );
@@ -163,8 +213,22 @@ export class PointerDragSource extends CompositeDisposable {
         );
     }
 
+    /**
+     * Public escape hatch for consumers (e.g. a sibling LongPressDetector
+     * firing a context menu) to dismiss any in-flight pending drag so a
+     * subsequent finger movement doesn't start a drag on top of the menu.
+     */
+    cancelPending(): void {
+        this._cancelPending();
+    }
+
     private _cancelPending(): void {
         this._pendingPointerId = undefined;
+        if (this._armTimer !== undefined) {
+            clearTimeout(this._armTimer);
+            this._armTimer = undefined;
+        }
+        this._armed = false;
         this._pendingMoveListener?.dispose();
         this._pendingUpListener?.dispose();
         this._pendingCancelListener?.dispose();

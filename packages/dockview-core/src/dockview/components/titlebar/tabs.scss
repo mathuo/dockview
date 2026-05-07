@@ -9,11 +9,22 @@
     will-change: scroll-position;
     transform: translate3d(0, 0, 0);
 
+    /**
+     * Let the browser handle horizontal swipes as native scroll on touch.
+     * The pointer drag source uses a long-press initiation, so brief
+     * horizontal flicks land here and produce momentum scrolling instead
+     * of starting a tab drag.
+     */
+    touch-action: pan-x;
+
     &.dv-tabs-container-vertical {
         width: 100%;
         height: fit-content;
         max-height: 100%;
         writing-mode: vertical-rl;
+
+        // Vertical tab bar scrolls vertically.
+        touch-action: pan-y;
     }
 
     &.dv-horizontal,

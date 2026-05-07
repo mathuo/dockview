@@ -101,12 +101,13 @@ export class VoidContainer extends CompositeDisposable {
                 if (this.accessor.options.disableDnd) {
                     return true;
                 }
-                if (this.group.api.location.type === 'floating') {
-                    // Floating groups require a shift modifier on HTML5 to drag
-                    // out; touch has no equivalent gesture, so block the drag
-                    // entirely. A long-press affordance can be layered on later.
-                    return true;
-                }
+                // Floating groups: HTML5 requires a shift modifier to
+                // tear out a panel (without it, the click moves the
+                // floating window). Touch has no shift modifier, but the
+                // long-press initiation in PointerDragSource provides the
+                // same "deliberate gesture" semantics — only a held press
+                // arms the drag, brief taps fall through to floating
+                // window movement.
                 if (
                     this.group.api.location.type === 'edge' &&
                     this.group.size === 0

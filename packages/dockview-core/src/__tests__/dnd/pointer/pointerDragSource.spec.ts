@@ -7,6 +7,7 @@ describe('PointerDragSource', () => {
     afterEach(() => {
         // Defensive: ensure no drag leaks across tests via the singleton.
         PointerDragController.getInstance().cancel();
+        jest.useRealTimers();
     });
 
     function pointerEventInit(
@@ -23,7 +24,8 @@ describe('PointerDragSource', () => {
         };
     }
 
-    test('a touch pointerdown with movement past threshold begins a drag', () => {
+    test('a touch pointerdown promoted to drag after the long-press initiation', () => {
+        jest.useFakeTimers();
         const element = document.createElement('div');
         document.body.appendChild(element);
 
@@ -38,14 +40,68 @@ describe('PointerDragSource', () => {
         });
 
         fireEvent.pointerDown(element, pointerEventInit());
-        // Below threshold (default 5px) — must NOT start
-        fireEvent.pointerMove(window, pointerEventInit({ clientX: 3 }));
-        expect(onDragStart).not.toHaveBeenCalled();
-
-        // Cross the threshold — must start exactly once
+        // Hold past the 250ms initiation delay so the drag is armed.
+        jest.advanceTimersByTime(300);
+        // Movement past the threshold (5px) now starts the drag.
         fireEvent.pointerMove(window, pointerEventInit({ clientX: 10 }));
         expect(onDragStart).toHaveBeenCalledTimes(1);
         expect(getData).toHaveBeenCalledTimes(1);
+
+        source.dispose();
+    });
+
+    test('movement during the initiation delay cancels the press (lets the browser scroll)', () => {
+        jest.useFakeTimers();
+        const element = document.createElement('div');
+        document.body.appendChild(element);
+
+        const getData = jest.fn<IDisposable, []>(() => ({
+            dispose: jest.fn(),
+        }));
+        const onDragStart = jest.fn();
+
+        const source = new PointerDragSource(element, {
+            getData,
+            onDragStart,
+        });
+
+        fireEvent.pointerDown(element, pointerEventInit());
+        // Movement past pressTolerance (default 8px) before the timer fires
+        // means the user is scrolling, not pressing. Cancel.
+        fireEvent.pointerMove(window, pointerEventInit({ clientX: 50 }));
+        jest.advanceTimersByTime(500);
+        // Even further movement after timer would have fired — must NOT
+        // promote since the press was cancelled.
+        fireEvent.pointerMove(window, pointerEventInit({ clientX: 100 }));
+
+        expect(onDragStart).not.toHaveBeenCalled();
+        expect(getData).not.toHaveBeenCalled();
+
+        source.dispose();
+    });
+
+    test('cancelPending() dismisses an in-flight press (used by long-press context menu)', () => {
+        jest.useFakeTimers();
+        const element = document.createElement('div');
+        document.body.appendChild(element);
+
+        const getData = jest.fn<IDisposable, []>(() => ({
+            dispose: jest.fn(),
+        }));
+        const onDragStart = jest.fn();
+
+        const source = new PointerDragSource(element, {
+            getData,
+            onDragStart,
+        });
+
+        fireEvent.pointerDown(element, pointerEventInit());
+        jest.advanceTimersByTime(300);
+        source.cancelPending();
+        // After cancellation, even a qualifying move must not start a drag.
+        fireEvent.pointerMove(window, pointerEventInit({ clientX: 50 }));
+
+        expect(onDragStart).not.toHaveBeenCalled();
 
         source.dispose();
     });
@@ -79,7 +135,7 @@ describe('PointerDragSource', () => {
         source.dispose();
     });
 
-    test('touchOnly: false also handles mouse', () => {
+    test('touchOnly: false also handles mouse with no initiation delay', () => {
         const element = document.createElement('div');
         document.body.appendChild(element);
 
@@ -94,6 +150,7 @@ describe('PointerDragSource', () => {
             element,
             pointerEventInit({ pointerType: 'mouse' })
         );
+        // Mouse arms immediately — no need to advance timers.
         fireEvent.pointerMove(
             window,
             pointerEventInit({ pointerType: 'mouse', clientX: 10 })

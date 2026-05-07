@@ -248,6 +248,10 @@ export class Tab extends CompositeDisposable {
             }),
             new LongPressDetector(this._element, {
                 onLongPress: (event) => {
+                    // Dismiss any in-flight pointer-drag arming so a
+                    // subsequent finger move doesn't start a drag on top
+                    // of the menu.
+                    this.pointerDragSource.cancelPending();
                     this.accessor.contextMenuController.show(
                         this.panel,
                         this.group,

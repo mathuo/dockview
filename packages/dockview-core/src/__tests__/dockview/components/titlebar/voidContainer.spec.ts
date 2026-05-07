@@ -221,7 +221,8 @@ describe('voidContainer', () => {
             );
         });
 
-        test('a touch drag past threshold sets up a group PanelTransfer (panelId=null)', () => {
+        test('a touch press held past the initiation delay sets up a group PanelTransfer (panelId=null)', () => {
+            jest.useFakeTimers();
             const accessor = fromPartial<DockviewComponent>({
                 doSetGroupActive: jest.fn(),
                 id: 'componentId',
@@ -243,6 +244,7 @@ describe('voidContainer', () => {
                 clientX: 0,
                 clientY: 0,
             });
+            jest.advanceTimersByTime(300);
             fireEvent.pointerMove(window, {
                 pointerId: 1,
                 pointerType: 'touch',
@@ -260,9 +262,11 @@ describe('voidContainer', () => {
             expect(data[0].panelId).toBeNull();
 
             cut.dispose();
+            jest.useRealTimers();
         });
 
-        test('a floating group cannot be dragged via touch (no shift modifier on touch)', () => {
+        test('a floating group can be touch-dragged (long-press substitutes for the HTML5 shift modifier)', () => {
+            jest.useFakeTimers();
             const accessor = fromPartial<DockviewComponent>({
                 doSetGroupActive: jest.fn(),
                 id: 'componentId',
@@ -284,6 +288,8 @@ describe('voidContainer', () => {
                 clientX: 0,
                 clientY: 0,
             });
+            // Hold past the touch initiation delay before moving.
+            jest.advanceTimersByTime(300);
             fireEvent.pointerMove(window, {
                 pointerId: 1,
                 pointerType: 'touch',
@@ -291,14 +297,15 @@ describe('voidContainer', () => {
                 clientY: 0,
             });
 
-            expect(onDragStart).not.toHaveBeenCalled();
+            expect(onDragStart).toHaveBeenCalledTimes(1);
             expect(
                 LocalSelectionTransfer.getInstance().hasData(
                     PanelTransfer.prototype
                 )
-            ).toBe(false);
+            ).toBe(true);
 
             cut.dispose();
+            jest.useRealTimers();
         });
 
         test('disableDnd suppresses the touch drag', () => {

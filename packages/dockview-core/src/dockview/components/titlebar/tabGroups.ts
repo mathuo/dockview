@@ -1,5 +1,7 @@
 import { toggleClass } from '../../../dom';
 import { addDisposableListener } from '../../../events';
+import { PointerDragSource } from '../../../dnd/pointer/pointerDragSource';
+import { LongPressDetector } from '../../../dnd/pointer/longPress';
 import {
     CompositeDisposable,
     IDisposable,
@@ -323,7 +325,32 @@ export class TabGroupManager {
                 })
             );
         } else {
+            // Custom chip renderers don't expose dockview's PointerDragSource,
+            // so we attach one to the rendered element here. This gives
+            // touch users the same drag affordance the built-in TabGroupChip
+            // gets.
+            const customPointerSource = new PointerDragSource(chip.element, {
+                getData: () => ({
+                    // The transfer payload is set by the consumer's
+                    // onChipDragStart callback (in tabs.ts:
+                    // _handleChipDragStart). We just produce the event.
+                    dispose: () => {
+                        /* noop */
+                    },
+                }),
+                onDragStart: (event) => {
+                    this._callbacks.onChipDragStart(tabGroup, chip, event);
+                },
+            });
+            const customLongPress = new LongPressDetector(chip.element, {
+                onLongPress: (event) => {
+                    customPointerSource.cancelPending();
+                    this._callbacks.onChipContextMenu(tabGroup, event);
+                },
+            });
             disposables.push(
+                customPointerSource,
+                customLongPress,
                 addDisposableListener(chip.element, 'contextmenu', (event) => {
                     this._callbacks.onChipContextMenu(tabGroup, event);
                 }),

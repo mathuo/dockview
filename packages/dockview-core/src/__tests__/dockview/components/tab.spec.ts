@@ -299,7 +299,8 @@ describe('tab', () => {
             );
         });
 
-        test('a touch pointerdown that moves past threshold sets up a PanelTransfer and fires onDragStart', () => {
+        test('a touch press held past the initiation delay then moved sets up a PanelTransfer and fires onDragStart', () => {
+            jest.useFakeTimers();
             const accessor = fromPartial<DockviewComponent>({
                 onDidOptionsChange: jest
                     .fn()
@@ -326,6 +327,7 @@ describe('tab', () => {
                 clientX: 0,
                 clientY: 0,
             });
+            jest.advanceTimersByTime(300);
             fireEvent.pointerMove(window, {
                 pointerId: 1,
                 pointerType: 'touch',
@@ -342,6 +344,56 @@ describe('tab', () => {
             expect(data[0].panelId).toBe('panelId');
 
             cut.dispose();
+            jest.useRealTimers();
+        });
+
+        test('a quick swipe before the initiation delay does NOT start a drag (lets the browser scroll the tab bar)', () => {
+            jest.useFakeTimers();
+            const accessor = fromPartial<DockviewComponent>({
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+                id: 'componentId',
+                options: {},
+            });
+            const groupPanel = fromPartial<DockviewGroupPanel>({
+                id: 'groupId',
+            });
+
+            const cut = new Tab(
+                { id: 'panelId' } as IDockviewPanel,
+                accessor,
+                groupPanel
+            );
+
+            const onDragStart = jest.fn();
+            cut.onDragStart(onDragStart);
+
+            fireEvent.pointerDown(cut.element, {
+                pointerId: 1,
+                pointerType: 'touch',
+                clientX: 0,
+                clientY: 0,
+            });
+            // Move 50px immediately — well past pressTolerance, but before
+            // the initiation delay. Must cancel.
+            fireEvent.pointerMove(window, {
+                pointerId: 1,
+                pointerType: 'touch',
+                clientX: 50,
+                clientY: 0,
+            });
+            jest.advanceTimersByTime(500);
+
+            expect(onDragStart).not.toHaveBeenCalled();
+            expect(
+                LocalSelectionTransfer.getInstance().hasData(
+                    PanelTransfer.prototype
+                )
+            ).toBe(false);
+
+            cut.dispose();
+            jest.useRealTimers();
         });
 
         test('a mouse pointerdown does not engage the pointer flow (HTML5 path stays in charge)', () => {
