@@ -10,6 +10,7 @@ import {
 } from '../../../dnd/droptarget';
 import { PointerDragSource } from '../../../dnd/pointer/pointerDragSource';
 import { PointerDropTarget } from '../../../dnd/pointer/pointerDropTarget';
+import { PointerGhost } from '../../../dnd/pointer/pointerGhost';
 import { DockviewComponent } from '../../dockviewComponent';
 import { addDisposableListener, Emitter, Event } from '../../../events';
 import { CompositeDisposable } from '../../../lifecycle';
@@ -120,6 +121,38 @@ export class VoidContainer extends CompositeDisposable {
                         this.panelTransfer.clearData(PanelTransfer.prototype);
                     },
                 };
+            },
+            createGhost: (event) => {
+                // Render a small "Multiple Panels (N)" pill that follows
+                // the cursor while the user drags the group header. This
+                // mirrors the previous HTML5 setDragImage behaviour from
+                // GroupDragHandler — the pointer path has no built-in drag
+                // image so we build one explicitly.
+                const ghostEl = document.createElement('div');
+                const style = window.getComputedStyle(this._element);
+                const bgColor = style.getPropertyValue(
+                    '--dv-activegroup-visiblepanel-tab-background-color'
+                );
+                const color = style.getPropertyValue(
+                    '--dv-activegroup-visiblepanel-tab-color'
+                );
+                ghostEl.style.backgroundColor = bgColor;
+                ghostEl.style.color = color;
+                ghostEl.style.padding = '2px 8px';
+                ghostEl.style.height = '24px';
+                ghostEl.style.fontSize = '11px';
+                ghostEl.style.lineHeight = '20px';
+                ghostEl.style.borderRadius = '12px';
+                ghostEl.style.whiteSpace = 'nowrap';
+                ghostEl.style.boxSizing = 'border-box';
+                ghostEl.textContent = `Multiple Panels (${this.group.size})`;
+                return new PointerGhost({
+                    element: ghostEl,
+                    initialX: event.clientX,
+                    initialY: event.clientY,
+                    offsetX: 30,
+                    offsetY: -10,
+                });
             },
             onDragStart: (event) => {
                 this._onDragStart.fire(event);
