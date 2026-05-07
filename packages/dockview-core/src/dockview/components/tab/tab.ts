@@ -15,6 +15,8 @@ import {
     WillShowOverlayEvent,
 } from '../../../dnd/droptarget';
 import { DragHandler } from '../../../dnd/abstractDragHandler';
+import { PointerDragSource } from '../../../dnd/pointer/pointerDragSource';
+import { PointerDropTarget } from '../../../dnd/pointer/pointerDropTarget';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { addGhostImage } from '../../../dnd/ghost';
 import { DockviewHeaderDirection } from '../../options';
@@ -50,8 +52,12 @@ class TabDragHandler extends DragHandler {
 export class Tab extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private readonly dropTarget: Droptarget;
+    private readonly pointerDropTarget: PointerDropTarget;
     private content: ITabRenderer | undefined = undefined;
     private readonly dragHandler: TabDragHandler;
+    private readonly pointerDragSource: PointerDragSource;
+    private readonly panelTransfer =
+        LocalSelectionTransfer.getInstance<PanelTransfer>();
     private _direction: DockviewHeaderDirection = 'horizontal';
 
     private readonly _onPointDown = new Emitter<MouseEvent>();
@@ -63,10 +69,10 @@ export class Tab extends CompositeDisposable {
     private readonly _onDropped = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDropped.event;
 
-    private readonly _onDragStart = new Emitter<DragEvent>();
+    private readonly _onDragStart = new Emitter<DragEvent | PointerEvent>();
     readonly onDragStart = this._onDragStart.event;
 
-    private readonly _onDragEnd = new Emitter<DragEvent>();
+    private readonly _onDragEnd = new Emitter<DragEvent | PointerEvent>();
     readonly onDragEnd = this._onDragEnd.event;
 
     readonly onWillShowOverlay: Event<WillShowOverlayEvent>;
@@ -97,40 +103,87 @@ export class Tab extends CompositeDisposable {
             !!this.accessor.options.disableDnd
         );
 
+        const canDisplayOverlay = (
+            event: DragEvent | PointerEvent,
+            position: import('../../../dnd/droptarget').Position,
+            isPointerDriven: boolean
+        ): boolean => {
+            if (this.group.locked) {
+                return false;
+            }
+
+            const data = getPanelData();
+
+            if (data && this.accessor.id === data.viewId) {
+                // When smooth reorder is enabled the TabsContainer drives
+                // the overlay/animation for HTML5-driven drags. The pointer
+                // path doesn't participate in that animation, so we DO want
+                // to show the per-tab overlay for touch drags.
+                if (
+                    !isPointerDriven &&
+                    this.accessor.options.theme?.tabAnimation === 'smooth'
+                ) {
+                    return false;
+                }
+                return true;
+            }
+
+            return this.group.model.canDisplayOverlay(
+                event,
+                position,
+                'tab'
+            );
+        };
+
         this.dropTarget = new Droptarget(this._element, {
             acceptedTargetZones: ['left', 'right'],
             overlayModel: this._buildOverlayModel(),
-            canDisplayOverlay: (event, position) => {
-                if (this.group.locked) {
-                    return false;
-                }
-
-                const data = getPanelData();
-
-                if (data && this.accessor.id === data.viewId) {
-                    if (
-                        this.accessor.options.theme?.tabAnimation === 'smooth'
-                    ) {
-                        // When smooth reorder is enabled, the Tabs
-                        // container handles all intra-accessor drops
-                        // (both same-group and cross-group) via
-                        // animation.  Suppress the per-tab overlay so
-                        // the tab is dropped *beside* rather than *on*.
-                        return false;
-                    }
-                    return true;
-                }
-
-                return this.group.model.canDisplayOverlay(
-                    event,
-                    position,
-                    'tab'
-                );
-            },
+            canDisplayOverlay: (event, position) =>
+                canDisplayOverlay(event, position, false),
             getOverrideTarget: () => group.model.dropTargetContainer?.model,
         });
 
-        this.onWillShowOverlay = this.dropTarget.onWillShowOverlay;
+        this.pointerDropTarget = new PointerDropTarget(this._element, {
+            acceptedTargetZones: ['left', 'right'],
+            overlayModel: this._buildOverlayModel(),
+            canDisplayOverlay: (event, position) =>
+                canDisplayOverlay(event, position, true),
+            getOverrideTarget: () => group.model.dropTargetContainer?.model,
+        });
+
+        this.pointerDragSource = new PointerDragSource(this._element, {
+            isCancelled: () => !!this.accessor.options.disableDnd,
+            getData: () => {
+                this.panelTransfer.setData(
+                    [
+                        new PanelTransfer(
+                            this.accessor.id,
+                            this.group.id,
+                            this.panel.id
+                        ),
+                    ],
+                    PanelTransfer.prototype
+                );
+                return {
+                    dispose: () => {
+                        this.panelTransfer.clearData(PanelTransfer.prototype);
+                    },
+                };
+            },
+            onDragStart: (event) => {
+                this._onDragStart.fire(event);
+            },
+            onDragEnd: (event) => {
+                this._onDragEnd.fire(event.pointerEvent);
+            },
+        });
+
+        // Both droptargets feed the same downstream stream; consumers don't
+        // need to know which path produced the overlay.
+        this.onWillShowOverlay = Event.any(
+            this.dropTarget.onWillShowOverlay,
+            this.pointerDropTarget.onWillShowOverlay
+        );
 
         this.addDisposables(
             this._onPointDown,
@@ -139,7 +192,9 @@ export class Tab extends CompositeDisposable {
             this._onDragStart,
             this._onDragEnd,
             this.accessor.onDidOptionsChange(() => {
-                this.dropTarget.setOverlayModel(this._buildOverlayModel());
+                const model = this._buildOverlayModel();
+                this.dropTarget.setOverlayModel(model);
+                this.pointerDropTarget.setOverlayModel(model);
             }),
             this.dragHandler.onDragStart((event) => {
                 if (event.dataTransfer) {
@@ -239,7 +294,12 @@ export class Tab extends CompositeDisposable {
             this.dropTarget.onDrop((event) => {
                 this._onDropped.fire(event);
             }),
-            this.dropTarget
+            this.pointerDropTarget.onDrop((event) => {
+                this._onDropped.fire(event);
+            }),
+            this.dropTarget,
+            this.pointerDropTarget,
+            this.pointerDragSource
         );
     }
 
@@ -274,13 +334,16 @@ export class Tab extends CompositeDisposable {
 
     public setDirection(direction: DockviewHeaderDirection): void {
         this._direction = direction;
-        this.dropTarget.setTargetZones(
-            direction === 'vertical' ? ['top', 'bottom'] : ['left', 'right']
-        );
+        const zones =
+            direction === 'vertical' ? ['top', 'bottom'] : ['left', 'right'];
+        this.dropTarget.setTargetZones(zones as any);
+        this.pointerDropTarget.setTargetZones(zones as any);
     }
 
     public updateDragAndDropState(): void {
-        this._element.draggable = !this.accessor.options.disableDnd;
-        this.dragHandler.setDisabled(!!this.accessor.options.disableDnd);
+        const disabled = !!this.accessor.options.disableDnd;
+        this._element.draggable = !disabled;
+        this.dragHandler.setDisabled(disabled);
+        this.pointerDragSource.setDisabled(disabled);
     }
 }

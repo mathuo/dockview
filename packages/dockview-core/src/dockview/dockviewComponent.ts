@@ -11,6 +11,7 @@ import {
     DroptargetOverlayModel,
     Position,
 } from '../dnd/droptarget';
+import { PointerDropTarget } from '../dnd/pointer/pointerDropTarget';
 import { tail, sequenceEquals, remove } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
 import { CompositeDisposable, Disposable, IDisposable } from '../lifecycle';
@@ -443,6 +444,7 @@ export class DockviewComponent
         disposable: { dispose: () => DockviewGroupPanel | undefined };
     }[] = [];
     private readonly _rootDropTarget: Droptarget;
+    private readonly _rootPointerDropTarget: PointerDropTarget;
     private _popoutRestorationPromise: Promise<void> = Promise.resolve();
 
     private readonly _onDidRemoveGroup = new Emitter<DockviewGroupPanel>();
@@ -572,45 +574,59 @@ export class DockviewComponent
         this._floatingOverlayHost.className = 'dv-floating-overlay-host';
         this._shellManager.element.appendChild(this._floatingOverlayHost);
 
-        this._rootDropTarget = new Droptarget(this.element, {
-            className: 'dv-drop-target-edge',
-            canDisplayOverlay: (event, position) => {
-                const data = getPanelData();
+        const rootCanDisplayOverlay = (
+            event: DragEvent | PointerEvent,
+            position: Position
+        ): boolean => {
+            const data = getPanelData();
 
-                if (data) {
-                    if (data.viewId !== this.id) {
-                        return false;
-                    }
-
-                    if (position === 'center') {
-                        // center drop target is only allowed if there are no panels in the grid
-                        // floating panels are allowed
-                        return this.gridview.length === 0;
-                    }
-
-                    return true;
-                }
-
-                if (position === 'center' && this.gridview.length !== 0) {
-                    /**
-                     * for external events only show the four-corner drag overlays, disable
-                     * the center position so that external drag events can fall through to the group
-                     * and panel drop target handlers
-                     */
+            if (data) {
+                if (data.viewId !== this.id) {
                     return false;
                 }
 
-                const firedEvent = new DockviewUnhandledDragOverEvent(
-                    event,
-                    'edge',
-                    position,
-                    getPanelData
-                );
+                if (position === 'center') {
+                    // center drop target is only allowed if there are no panels in the grid
+                    // floating panels are allowed
+                    return this.gridview.length === 0;
+                }
 
-                this._onUnhandledDragOverEvent.fire(firedEvent);
+                return true;
+            }
 
-                return firedEvent.isAccepted;
-            },
+            if (position === 'center' && this.gridview.length !== 0) {
+                /**
+                 * for external events only show the four-corner drag overlays, disable
+                 * the center position so that external drag events can fall through to the group
+                 * and panel drop target handlers
+                 */
+                return false;
+            }
+
+            const firedEvent = new DockviewUnhandledDragOverEvent(
+                event,
+                'edge',
+                position,
+                getPanelData
+            );
+
+            this._onUnhandledDragOverEvent.fire(firedEvent);
+
+            return firedEvent.isAccepted;
+        };
+
+        this._rootDropTarget = new Droptarget(this.element, {
+            className: 'dv-drop-target-edge',
+            canDisplayOverlay: rootCanDisplayOverlay,
+            acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
+            overlayModel:
+                options.rootOverlayModel ?? DEFAULT_ROOT_OVERLAY_MODEL,
+            getOverrideTarget: () => this.rootDropTargetContainer?.model,
+        });
+
+        this._rootPointerDropTarget = new PointerDropTarget(this.element, {
+            className: 'dv-drop-target-edge',
+            canDisplayOverlay: rootCanDisplayOverlay,
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
             overlayModel:
                 options.rootOverlayModel ?? DEFAULT_ROOT_OVERLAY_MODEL,
@@ -733,7 +749,11 @@ export class DockviewComponent
                 this._edgeGroupDisposables.clear();
             }),
             this._rootDropTarget,
-            this._rootDropTarget.onWillShowOverlay((event) => {
+            this._rootPointerDropTarget,
+            Event.any(
+                this._rootDropTarget.onWillShowOverlay,
+                this._rootPointerDropTarget.onWillShowOverlay
+            )((event) => {
                 if (this.gridview.length > 0 && event.position === 'center') {
                     // option only available when no panels in primary grid
                     return;
@@ -749,7 +769,10 @@ export class DockviewComponent
                     })
                 );
             }),
-            this._rootDropTarget.onDrop((event) => {
+            Event.any(
+                this._rootDropTarget.onDrop,
+                this._rootPointerDropTarget.onDrop
+            )((event) => {
                 const willDropEvent = new DockviewWillDropEvent({
                     nativeEvent: event.nativeEvent,
                     position: event.position,
@@ -791,8 +814,7 @@ export class DockviewComponent
                         })
                     );
                 }
-            }),
-            this._rootDropTarget
+            })
         );
     }
 
@@ -3545,17 +3567,23 @@ export class DockviewComponent
 
     private updateDropTargetModel(options: Partial<DockviewComponentOptions>) {
         if ('dndEdges' in options) {
-            this._rootDropTarget.disabled =
+            const disabled =
                 typeof options.dndEdges === 'boolean' &&
                 options.dndEdges === false;
+            this._rootDropTarget.disabled = disabled;
+            this._rootPointerDropTarget.disabled = disabled;
 
             if (
                 typeof options.dndEdges === 'object' &&
                 options.dndEdges !== null
             ) {
                 this._rootDropTarget.setOverlayModel(options.dndEdges);
+                this._rootPointerDropTarget.setOverlayModel(options.dndEdges);
             } else {
                 this._rootDropTarget.setOverlayModel(
+                    DEFAULT_ROOT_OVERLAY_MODEL
+                );
+                this._rootPointerDropTarget.setOverlayModel(
                     DEFAULT_ROOT_OVERLAY_MODEL
                 );
             }

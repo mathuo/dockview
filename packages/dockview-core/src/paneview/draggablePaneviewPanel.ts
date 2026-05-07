@@ -6,6 +6,8 @@ import {
     PaneTransfer,
 } from '../dnd/dataTransfer';
 import { Droptarget, DroptargetEvent } from '../dnd/droptarget';
+import { PointerDragSource } from '../dnd/pointer/pointerDragSource';
+import { PointerDropTarget } from '../dnd/pointer/pointerDropTarget';
 import { Emitter, Event } from '../events';
 import { IDisposable } from '../lifecycle';
 import { Orientation } from '../splitview/splitview';
@@ -28,7 +30,9 @@ export interface PaneviewDidDropEvent extends DroptargetEvent {
 
 export abstract class DraggablePaneviewPanel extends PaneviewPanel {
     private handler: DragHandler | undefined;
+    private pointerSource: PointerDragSource | undefined;
     private target: Droptarget | undefined;
+    private pointerTarget: PointerDropTarget | undefined;
 
     private readonly _onDidDrop = new Emitter<PaneviewDidDropEvent>();
     readonly onDidDrop = this._onDidDrop.event;
@@ -99,41 +103,75 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
             }
         })(this.header);
 
+        this.pointerSource = new PointerDragSource(this.header, {
+            getData: () => {
+                LocalSelectionTransfer.getInstance().setData(
+                    [new PaneTransfer(accessorId, id)],
+                    PaneTransfer.prototype
+                );
+                return {
+                    dispose: () => {
+                        LocalSelectionTransfer.getInstance().clearData(
+                            PaneTransfer.prototype
+                        );
+                    },
+                };
+            },
+        });
+
+        const canDisplayOverlay = (
+            event: DragEvent | PointerEvent,
+            position: import('../dnd/droptarget').Position
+        ): boolean => {
+            const data = getPaneData();
+
+            if (data) {
+                if (
+                    data.paneId !== this.id &&
+                    data.viewId === this.accessor.id
+                ) {
+                    return true;
+                }
+            }
+
+            const firedEvent = new PaneviewUnhandledDragOverEvent(
+                event,
+                position,
+                getPaneData,
+                this
+            );
+
+            this._onUnhandledDragOverEvent.fire(firedEvent);
+
+            return firedEvent.isAccepted;
+        };
+
         this.target = new Droptarget(this.element, {
             acceptedTargetZones: ['top', 'bottom'],
             overlayModel: {
                 activationSize: { type: 'percentage', value: 50 },
             },
-            canDisplayOverlay: (event, position) => {
-                const data = getPaneData();
+            canDisplayOverlay,
+        });
 
-                if (data) {
-                    if (
-                        data.paneId !== this.id &&
-                        data.viewId === this.accessor.id
-                    ) {
-                        return true;
-                    }
-                }
-
-                const firedEvent = new PaneviewUnhandledDragOverEvent(
-                    event,
-                    position,
-                    getPaneData,
-                    this
-                );
-
-                this._onUnhandledDragOverEvent.fire(firedEvent);
-
-                return firedEvent.isAccepted;
+        this.pointerTarget = new PointerDropTarget(this.element, {
+            acceptedTargetZones: ['top', 'bottom'],
+            overlayModel: {
+                activationSize: { type: 'percentage', value: 50 },
             },
+            canDisplayOverlay,
         });
 
         this.addDisposables(
             this._onDidDrop,
             this.handler,
+            this.pointerSource,
             this.target,
+            this.pointerTarget,
             this.target.onDrop((event) => {
+                this.onDrop(event);
+            }),
+            this.pointerTarget.onDrop((event) => {
                 this.onDrop(event);
             })
         );

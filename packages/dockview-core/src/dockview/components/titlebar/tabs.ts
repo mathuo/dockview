@@ -983,8 +983,10 @@ export class Tabs extends CompositeDisposable {
     private _handleChipDragStart(
         tabGroup: ITabGroup,
         chip: ITabGroupChipRenderer,
-        event: DragEvent
+        event: DragEvent | PointerEvent
     ): void {
+        const isPointer =
+            typeof PointerEvent !== 'undefined' && event instanceof PointerEvent;
         const firstPanelId = tabGroup.panelIds[0];
         const firstIdx = firstPanelId
             ? this._tabs.findIndex((t) => t.value.panel.id === firstPanelId)
@@ -1001,20 +1003,26 @@ export class Tabs extends CompositeDisposable {
             }
         }
 
-        this._animState = {
-            sourceTabId: '',
-            sourceIndex: firstIdx,
-            tabPositions: this.snapshotTabPositions(),
-            chipPositions: this._tabGroupManager.snapshotChipWidths(),
-            currentInsertionIndex: null,
-            targetTabGroupId: null,
-            sourceTabGroupId: tabGroup.id,
-            sourceGroupPanelIds: new Set(tabGroup.panelIds),
-            sourceChipWidth: chipRect.width,
-            cursorOffsetFromDragLeft: event.clientX - chipRect.left,
-            sourceGapWidth: groupGapWidth,
-            containerLeft: this._tabsList.getBoundingClientRect().left,
-        };
+        // Smooth-tab animation depends on HTML5 dragend lifecycle, which the
+        // pointer path does not produce. Skip animState (and the rAF collapse
+        // below) entirely for touch drags — the user still gets per-target
+        // overlays from PointerDropTarget.
+        if (!isPointer) {
+            this._animState = {
+                sourceTabId: '',
+                sourceIndex: firstIdx,
+                tabPositions: this.snapshotTabPositions(),
+                chipPositions: this._tabGroupManager.snapshotChipWidths(),
+                currentInsertionIndex: null,
+                targetTabGroupId: null,
+                sourceTabGroupId: tabGroup.id,
+                sourceGroupPanelIds: new Set(tabGroup.panelIds),
+                sourceChipWidth: chipRect.width,
+                cursorOffsetFromDragLeft: event.clientX - chipRect.left,
+                sourceGapWidth: groupGapWidth,
+                containerLeft: this._tabsList.getBoundingClientRect().left,
+            };
+        }
 
         // Set LocalSelectionTransfer so drop targets recognise this as
         // an internal dockview drag.  panelId is null (group-level),
@@ -1042,15 +1050,18 @@ export class Tabs extends CompositeDisposable {
             },
         };
 
-        if (event.dataTransfer) {
-            event.dataTransfer.effectAllowed = 'move';
+        if (!isPointer) {
+            const dragEvent = event as DragEvent;
+            if (dragEvent.dataTransfer) {
+                dragEvent.dataTransfer.effectAllowed = 'move';
 
-            if (event.dataTransfer.items.length === 0) {
-                event.dataTransfer.setData('text/plain', '');
+                if (dragEvent.dataTransfer.items.length === 0) {
+                    dragEvent.dataTransfer.setData('text/plain', '');
+                }
             }
         }
 
-        if (this.accessor.options.theme?.tabAnimation === 'smooth') {
+        if (!isPointer && this.accessor.options.theme?.tabAnimation === 'smooth') {
             // Collapse group tabs + chip after the browser
             // captures the drag image, then open the gap at the
             // source position — all instant (no transitions).
@@ -1106,8 +1117,16 @@ export class Tabs extends CompositeDisposable {
             });
         }
 
-        // Build a composite drag image showing chip + group tabs
-        this._tabGroupManager.setGroupDragImage(event, tabGroup, chip.element);
+        // Build a composite drag image showing chip + group tabs.
+        // Only meaningful for HTML5 drags — pointer drags have no native
+        // drag image and the controller doesn't support setDragImage.
+        if (!isPointer) {
+            this._tabGroupManager.setGroupDragImage(
+                event as DragEvent,
+                tabGroup,
+                chip.element
+            );
+        }
     }
 
     /**

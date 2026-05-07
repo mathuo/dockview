@@ -35,7 +35,7 @@ export interface TabGroupManagerCallbacks {
     onChipDragStart(
         tabGroup: ITabGroup,
         chip: ITabGroupChipRenderer,
-        event: DragEvent
+        event: DragEvent | PointerEvent
     ): void;
 }
 

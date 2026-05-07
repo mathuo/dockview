@@ -194,7 +194,7 @@ export interface DockviewOptions {
 export type TabAnimation = 'smooth' | 'default';
 
 export interface DockviewDndOverlayEvent extends IAcceptableEvent {
-    nativeEvent: DragEvent;
+    nativeEvent: DragEvent | PointerEvent;
     target: DockviewGroupDropLocation;
     position: Position;
     group?: DockviewGroupPanel;
@@ -206,7 +206,7 @@ export class DockviewUnhandledDragOverEvent
     implements DockviewDndOverlayEvent
 {
     constructor(
-        readonly nativeEvent: DragEvent,
+        readonly nativeEvent: DragEvent | PointerEvent,
         readonly target: DockviewGroupDropLocation,
         readonly position: Position,
         readonly getData: () => PanelTransfer | undefined,

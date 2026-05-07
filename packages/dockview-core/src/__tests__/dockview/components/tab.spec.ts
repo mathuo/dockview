@@ -8,6 +8,7 @@ import { DockviewGroupPanel } from '../../../dockview/dockviewGroupPanel';
 import { DockviewGroupPanelModel } from '../../../dockview/dockviewGroupPanelModel';
 import { Tab } from '../../../dockview/components/tab/tab';
 import { IDockviewPanel } from '../../../dockview/dockviewPanel';
+import { PointerDragController } from '../../../dnd/pointer/pointerDragController';
 import { fromPartial } from '@total-typescript/shoehorn';
 
 describe('tab', () => {
@@ -288,6 +289,106 @@ describe('tab', () => {
         ).toBe(0);
     });
 
+    describe('pointer (touch) drag', () => {
+        afterEach(() => {
+            PointerDragController.getInstance().cancel();
+            // Clear any panel transfer data between tests so tests don't
+            // poison each other through the LocalSelectionTransfer singleton.
+            LocalSelectionTransfer.getInstance().clearData(
+                PanelTransfer.prototype
+            );
+        });
+
+        test('a touch pointerdown that moves past threshold sets up a PanelTransfer and fires onDragStart', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+                id: 'componentId',
+                options: {},
+            });
+            const groupPanel = fromPartial<DockviewGroupPanel>({
+                id: 'groupId',
+            });
+
+            const cut = new Tab(
+                { id: 'panelId' } as IDockviewPanel,
+                accessor,
+                groupPanel
+            );
+
+            const onDragStart = jest.fn();
+            cut.onDragStart(onDragStart);
+
+            fireEvent.pointerDown(cut.element, {
+                pointerId: 1,
+                pointerType: 'touch',
+                clientX: 0,
+                clientY: 0,
+            });
+            fireEvent.pointerMove(window, {
+                pointerId: 1,
+                pointerType: 'touch',
+                clientX: 50,
+                clientY: 0,
+            });
+
+            expect(onDragStart).toHaveBeenCalledTimes(1);
+            const transfer = LocalSelectionTransfer.getInstance<PanelTransfer>();
+            expect(transfer.hasData(PanelTransfer.prototype)).toBe(true);
+            const data = transfer.getData(PanelTransfer.prototype)!;
+            expect(data[0].viewId).toBe('componentId');
+            expect(data[0].groupId).toBe('groupId');
+            expect(data[0].panelId).toBe('panelId');
+
+            cut.dispose();
+        });
+
+        test('a mouse pointerdown does not engage the pointer flow (HTML5 path stays in charge)', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+                id: 'componentId',
+                options: {},
+            });
+            const groupPanel = fromPartial<DockviewGroupPanel>({
+                id: 'groupId',
+            });
+
+            const cut = new Tab(
+                { id: 'panelId' } as IDockviewPanel,
+                accessor,
+                groupPanel
+            );
+
+            const onDragStart = jest.fn();
+            cut.onDragStart(onDragStart);
+
+            fireEvent.pointerDown(cut.element, {
+                pointerId: 1,
+                pointerType: 'mouse',
+                clientX: 0,
+                clientY: 0,
+            });
+            fireEvent.pointerMove(window, {
+                pointerId: 1,
+                pointerType: 'mouse',
+                clientX: 50,
+                clientY: 0,
+            });
+
+            expect(onDragStart).not.toHaveBeenCalled();
+            expect(
+                LocalSelectionTransfer.getInstance().hasData(
+                    PanelTransfer.prototype
+                )
+            ).toBe(false);
+
+            cut.dispose();
+        });
+    });
+
     describe('contextmenu event', () => {
         test('right-clicking a tab calls contextMenuController.show with the panel and group', () => {
             const showMock = jest.fn();
@@ -480,6 +581,52 @@ describe('tab', () => {
             expect(spy).toHaveBeenCalledTimes(0);
 
             cut.dispose();
+        });
+
+        test('that touch pointerdown does NOT promote to a drag when disableDnd is true', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+                id: 'componentId',
+                options: { disableDnd: true },
+            });
+            const groupPanel = fromPartial<DockviewGroupPanel>({
+                id: 'groupId',
+            });
+
+            const cut = new Tab(
+                { id: 'panelId' } as IDockviewPanel,
+                accessor,
+                groupPanel
+            );
+
+            const onDragStart = jest.fn();
+            cut.onDragStart(onDragStart);
+
+            fireEvent.pointerDown(cut.element, {
+                pointerId: 1,
+                pointerType: 'touch',
+                clientX: 0,
+                clientY: 0,
+            });
+            fireEvent.pointerMove(window, {
+                pointerId: 1,
+                pointerType: 'touch',
+                clientX: 50,
+                clientY: 0,
+            });
+
+            expect(onDragStart).not.toHaveBeenCalled();
+            // No transfer data should have been set.
+            expect(
+                LocalSelectionTransfer.getInstance().hasData(
+                    PanelTransfer.prototype
+                )
+            ).toBe(false);
+
+            cut.dispose();
+            PointerDragController.getInstance().cancel();
         });
 
         test('that onDragStart is not fired when disableDnd is true', () => {

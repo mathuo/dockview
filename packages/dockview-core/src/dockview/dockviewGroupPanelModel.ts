@@ -99,7 +99,16 @@ export interface CreateTabGroupOptions extends TabGroupOptions {
 }
 
 export class DockviewDidDropEvent extends DockviewEvent {
-    get nativeEvent(): DragEvent {
+    /**
+     * The native event that drove the drop. Originally `DragEvent` only;
+     * widened to `DragEvent | PointerEvent` so the same event is produced
+     * regardless of whether the underlying drag came from the legacy
+     * HTML5 path or the touch-friendly pointer path.
+     *
+     * For pointer-driven drops, properties like `dataTransfer` are not
+     * available — use `getData()` for the dockview payload instead.
+     */
+    get nativeEvent(): DragEvent | PointerEvent {
         return this.options.nativeEvent;
     }
 
@@ -121,7 +130,7 @@ export class DockviewDidDropEvent extends DockviewEvent {
 
     constructor(
         private readonly options: {
-            readonly nativeEvent: DragEvent;
+            readonly nativeEvent: DragEvent | PointerEvent;
             readonly position: Position;
             readonly panel?: IDockviewPanel;
             getData(): PanelTransfer | undefined;
@@ -145,7 +154,7 @@ export class DockviewWillDropEvent extends DockviewDidDropEvent {
     }
 
     constructor(options: {
-        readonly nativeEvent: DragEvent;
+        readonly nativeEvent: DragEvent | PointerEvent;
         readonly position: Position;
         readonly panel?: IDockviewPanel;
         getData(): PanelTransfer | undefined;
@@ -209,7 +218,7 @@ export interface IDockviewGroupPanelModel extends IPanel {
         suppressRoll?: boolean;
     }): void;
     canDisplayOverlay(
-        event: DragEvent,
+        event: DragEvent | PointerEvent,
         position: Position,
         target: DockviewGroupDropLocation
     ): boolean;
@@ -598,6 +607,13 @@ export class DockviewGroupPanelModel
                     event.position
                 );
             }),
+            this.contentContainer.pointerDropTarget.onDrop((event) => {
+                this.handleDropEvent(
+                    'content',
+                    event.nativeEvent,
+                    event.position
+                );
+            }),
             this.tabsContainer.onWillShowOverlay((event) => {
                 this._onWillShowOverlay.fire(event);
             }),
@@ -612,6 +628,19 @@ export class DockviewGroupPanelModel
                     })
                 );
             }),
+            this.contentContainer.pointerDropTarget.onWillShowOverlay(
+                (event) => {
+                    this._onWillShowOverlay.fire(
+                        new DockviewWillShowOverlayLocationEvent(event, {
+                            kind: 'content',
+                            panel: this.activePanel,
+                            api: this._api,
+                            group: this.groupPanel,
+                            getData: getPanelData,
+                        })
+                    );
+                }
+            ),
             this._onMove,
             this._onDidChange,
             this._onDidDrop,
@@ -1636,7 +1665,7 @@ export class DockviewGroupPanelModel
     }
 
     canDisplayOverlay(
-        event: DragEvent,
+        event: DragEvent | PointerEvent,
         position: Position,
         target: DockviewGroupDropLocation
     ): boolean {
@@ -1655,7 +1684,7 @@ export class DockviewGroupPanelModel
 
     private handleDropEvent(
         type: 'header' | 'content',
-        event: DragEvent,
+        event: DragEvent | PointerEvent,
         position: Position,
         index?: number
     ): void {

@@ -8,6 +8,7 @@ import {
 } from '../../tabGroupAccent';
 import { ITabGroupChipRenderer } from '../../framework';
 import { DockviewApi } from '../../../api/component.api';
+import { PointerDragSource } from '../../../dnd/pointer/pointerDragSource';
 
 export class TabGroupChip
     extends CompositeDisposable
@@ -23,8 +24,9 @@ export class TabGroupChip
     private readonly _onContextMenu = new Emitter<MouseEvent>();
     readonly onContextMenu: Event<MouseEvent> = this._onContextMenu.event;
 
-    private readonly _onDragStart = new Emitter<DragEvent>();
-    readonly onDragStart: Event<DragEvent> = this._onDragStart.event;
+    private readonly _onDragStart = new Emitter<DragEvent | PointerEvent>();
+    readonly onDragStart: Event<DragEvent | PointerEvent> =
+        this._onDragStart.event;
 
     get element(): HTMLElement {
         return this._element;
@@ -42,10 +44,27 @@ export class TabGroupChip
         this._label.className = 'dv-tab-group-chip-label';
         this._element.appendChild(this._label);
 
+        const pointerSource = new PointerDragSource(this._element, {
+            getData: () => ({
+                // The actual transfer payload is set up by the consumer's
+                // onDragStart callback (in tabs.ts: _handleChipDragStart),
+                // which has access to the tab group identity. We just emit
+                // the event and let the consumer populate
+                // LocalSelectionTransfer.
+                dispose: () => {
+                    /* noop */
+                },
+            }),
+            onDragStart: (event) => {
+                this._onDragStart.fire(event);
+            },
+        });
+
         this.addDisposables(
             this._onClick,
             this._onContextMenu,
             this._onDragStart,
+            pointerSource,
             addDisposableListener(this._element, 'click', (event) => {
                 this._onClick.fire(event);
             }),
