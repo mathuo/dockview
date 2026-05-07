@@ -163,8 +163,13 @@ export class PointerDragSource extends CompositeDisposable {
         const pressTolerance =
             this.options.pressTolerance ?? DEFAULT_PRESS_TOLERANCE;
 
+        // Listen on the source's owning window so popout windows work —
+        // the main `window` only sees events from the main document.
+        const targetWindow: Window =
+            this.element.ownerDocument?.defaultView ?? window;
+
         this._pendingMoveListener = addDisposableListener(
-            window,
+            targetWindow,
             'pointermove',
             (moveEvent) => {
                 if (moveEvent.pointerId !== this._pendingPointerId) {
@@ -191,7 +196,7 @@ export class PointerDragSource extends CompositeDisposable {
         );
 
         this._pendingUpListener = addDisposableListener(
-            window,
+            targetWindow,
             'pointerup',
             (upEvent) => {
                 if (upEvent.pointerId !== this._pendingPointerId) {
@@ -202,7 +207,7 @@ export class PointerDragSource extends CompositeDisposable {
         );
 
         this._pendingCancelListener = addDisposableListener(
-            window,
+            targetWindow,
             'pointercancel',
             (cancelEvent) => {
                 if (cancelEvent.pointerId !== this._pendingPointerId) {

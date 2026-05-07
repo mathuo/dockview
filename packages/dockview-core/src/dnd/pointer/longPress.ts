@@ -83,8 +83,13 @@ export class LongPressDetector extends CompositeDisposable {
             this.options.onLongPress(event);
         }, delay);
 
+        // Listen on the source's owning window so popout windows work —
+        // the main `window` only sees events from the main document.
+        const targetWindow: Window =
+            this.element.ownerDocument?.defaultView ?? window;
+
         this._moveListener = addDisposableListener(
-            window,
+            targetWindow,
             'pointermove',
             (moveEvent) => {
                 if (moveEvent.pointerId !== this._pointerId) {
@@ -99,7 +104,7 @@ export class LongPressDetector extends CompositeDisposable {
         );
 
         this._upListener = addDisposableListener(
-            window,
+            targetWindow,
             'pointerup',
             (upEvent) => {
                 if (upEvent.pointerId !== this._pointerId) {
@@ -110,7 +115,7 @@ export class LongPressDetector extends CompositeDisposable {
         );
 
         this._cancelListener = addDisposableListener(
-            window,
+            targetWindow,
             'pointercancel',
             (cancelEvent) => {
                 if (cancelEvent.pointerId !== this._pointerId) {

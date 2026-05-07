@@ -1,3 +1,4 @@
+import { disableIframePointEvents } from '../../dom';
 import { addDisposableListener, Emitter, Event } from '../../events';
 import { CompositeDisposable, IDisposable } from '../../lifecycle';
 import { PointerGhost } from './pointerGhost';
@@ -39,6 +40,7 @@ export class PointerDragController extends CompositeDisposable {
     private _moveListener: IDisposable | undefined;
     private _upListener: IDisposable | undefined;
     private _cancelListener: IDisposable | undefined;
+    private _iframeShield: { release: () => void } | undefined;
     private _onDragMoveCallback?: (e: PointerDragEvent) => void;
     private _onDragEndCallback?: (
         e: PointerDragEvent,
@@ -113,6 +115,16 @@ export class PointerDragController extends CompositeDisposable {
         this._dataDisposable = args.getData();
         this._ghost = args.ghost;
 
+        // Pointer events are captured by iframes embedded inside dockview
+        // panels — once the cursor crosses an iframe boundary the parent
+        // window stops receiving `pointermove` and the drag freezes. Cover
+        // the iframes with `pointer-events: none` for the lifetime of the
+        // drag (mirrors what the deleted AbstractDragHandler did for the
+        // HTML5 path).
+        this._iframeShield = disableIframePointEvents(
+            source.ownerDocument ?? document
+        );
+
         const startEvent: PointerDragEvent = {
             clientX: pointerEvent.clientX,
             clientY: pointerEvent.clientY,
@@ -120,8 +132,14 @@ export class PointerDragController extends CompositeDisposable {
         };
         this._onDragStart.fire(startEvent);
 
+        // Listen on the source's owning window so popout / popout-group
+        // contexts work — `window` would only see events from the main
+        // document, leaving popout-window drags frozen after pointerdown.
+        const targetWindow: Window =
+            source.ownerDocument?.defaultView ?? window;
+
         this._moveListener = addDisposableListener(
-            window,
+            targetWindow,
             'pointermove',
             (e) => {
                 if (!this._active || e.pointerId !== this._active.pointerId) {
@@ -131,15 +149,19 @@ export class PointerDragController extends CompositeDisposable {
             }
         );
 
-        this._upListener = addDisposableListener(window, 'pointerup', (e) => {
-            if (!this._active || e.pointerId !== this._active.pointerId) {
-                return;
+        this._upListener = addDisposableListener(
+            targetWindow,
+            'pointerup',
+            (e) => {
+                if (!this._active || e.pointerId !== this._active.pointerId) {
+                    return;
+                }
+                this._handleEnd(e, true);
             }
-            this._handleEnd(e, true);
-        });
+        );
 
         this._cancelListener = addDisposableListener(
-            window,
+            targetWindow,
             'pointercancel',
             (e) => {
                 if (!this._active || e.pointerId !== this._active.pointerId) {
@@ -253,6 +275,8 @@ export class PointerDragController extends CompositeDisposable {
         this._onDragEndCallback = undefined;
         this._ghost?.dispose();
         this._ghost = undefined;
+        this._iframeShield?.release();
+        this._iframeShield = undefined;
         this._moveListener?.dispose();
         this._upListener?.dispose();
         this._cancelListener?.dispose();
