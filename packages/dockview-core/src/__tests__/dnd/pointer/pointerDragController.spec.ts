@@ -251,4 +251,48 @@ describe('PointerDragController', () => {
         spy.mockRestore();
         document.body.removeChild(targetEl);
     });
+
+    test('hit-testing prefers the inner / more-specific target when nested targets overlap', () => {
+        // Regression: previously `_findTargetUnder` accepted ANY registered
+        // target whose element contains the cursor element. Because the
+        // layout-root drop target is registered first AND contains every
+        // tab, it always won the race and per-tab targets were unreachable.
+        const controller = PointerDragController.getInstance();
+
+        const root = document.createElement('div');
+        const inner = document.createElement('div');
+        root.appendChild(inner);
+        document.body.appendChild(root);
+
+        // Order matters: register OUTER first to recreate the original bug.
+        const rootHandle = makeTarget(root);
+        const innerHandle = makeTarget(inner);
+        const r1 = controller.registerTarget(rootHandle.target);
+        const r2 = controller.registerTarget(innerHandle.target);
+
+        const spy = jest
+            .spyOn(document, 'elementsFromPoint')
+            .mockReturnValue([inner, root]);
+
+        controller.beginDrag({
+            pointerEvent: makePointerEvent('pointermove'),
+            source: document.createElement('div'),
+            getData: () => ({ dispose: jest.fn() }),
+        });
+
+        window.dispatchEvent(
+            makePointerEvent('pointermove', { clientX: 10, clientY: 10 })
+        );
+
+        // Inner target should have received the drag-over; root must NOT
+        // have received it (it'd have eclipsed inner under the old logic).
+        expect(innerHandle.handleDragOver).toHaveBeenCalled();
+        expect(rootHandle.handleDragOver).not.toHaveBeenCalled();
+
+        controller.cancel();
+        r1.dispose();
+        r2.dispose();
+        spy.mockRestore();
+        document.body.removeChild(root);
+    });
 });

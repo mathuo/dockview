@@ -164,12 +164,29 @@ export class PointerDragController extends CompositeDisposable {
         x: number,
         y: number
     ): IPointerDropTargetHandle | undefined {
+        // Build an O(1) element→target lookup so we can ask: is THIS exact
+        // element a registered target?
+        const targetByElement = new Map<Element, IPointerDropTargetHandle>();
+        for (const target of this._targets) {
+            targetByElement.set(target.element, target);
+        }
+
+        // `elementsFromPoint` returns elements in topmost-first order.
+        // Walking up from each element finds the *closest* registered
+        // ancestor — preferring the most specific drop target (e.g. a tab)
+        // over outer ancestors (e.g. the dockview root) that happen to
+        // contain the cursor too. The previous implementation used a plain
+        // `.contains()` check inside the inner loop, which always matched
+        // outer targets first and made nested drop zones unreachable.
         const elements = document.elementsFromPoint(x, y);
         for (const el of elements) {
-            for (const target of this._targets) {
-                if (target.element === el || target.element.contains(el)) {
+            let current: Element | null = el;
+            while (current) {
+                const target = targetByElement.get(current);
+                if (target) {
                     return target;
                 }
+                current = current.parentElement;
             }
         }
         return undefined;
