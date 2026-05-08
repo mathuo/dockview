@@ -7,7 +7,7 @@ import { Emitter, Event } from '../../../events';
 import { trackFocus } from '../../../dom';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
-import { Droptarget } from '../../../dnd/droptarget';
+import { Droptarget, Position } from '../../../dnd/droptarget';
 import { PointerDropTarget } from '../../../dnd/pointer/pointerDropTarget';
 import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
 import { getPanelData } from '../../../dnd/dataTransfer';
@@ -64,7 +64,7 @@ export class ContentContainer
 
         const canDisplayOverlay = (
             event: DragEvent | PointerEvent,
-            position: import('../../../dnd/droptarget').Position
+            position: Position
         ): boolean => {
             if (
                 this.group.locked === 'no-drop-target' ||

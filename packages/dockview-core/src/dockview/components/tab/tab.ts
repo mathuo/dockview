@@ -12,6 +12,7 @@ import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import {
     DroptargetEvent,
     Droptarget,
+    Position,
     WillShowOverlayEvent,
 } from '../../../dnd/droptarget';
 import { DragHandler } from '../../../dnd/abstractDragHandler';
@@ -107,7 +108,7 @@ export class Tab extends CompositeDisposable {
 
         const canDisplayOverlay = (
             event: DragEvent | PointerEvent,
-            position: import('../../../dnd/droptarget').Position,
+            position: Position,
             isPointerDriven: boolean
         ): boolean => {
             if (this.group.locked) {

@@ -5,7 +5,7 @@ import {
     LocalSelectionTransfer,
     PaneTransfer,
 } from '../dnd/dataTransfer';
-import { Droptarget, DroptargetEvent } from '../dnd/droptarget';
+import { Droptarget, DroptargetEvent, Position } from '../dnd/droptarget';
 import { PointerDragSource } from '../dnd/pointer/pointerDragSource';
 import { PointerDropTarget } from '../dnd/pointer/pointerDropTarget';
 import { Emitter, Event } from '../events';
@@ -121,7 +121,7 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
 
         const canDisplayOverlay = (
             event: DragEvent | PointerEvent,
-            position: import('../dnd/droptarget').Position
+            position: Position
         ): boolean => {
             const data = getPaneData();
 

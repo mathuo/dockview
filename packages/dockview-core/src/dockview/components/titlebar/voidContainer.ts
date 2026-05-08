@@ -6,6 +6,7 @@ import {
 import {
     Droptarget,
     DroptargetEvent,
+    Position,
     WillShowOverlayEvent,
 } from '../../../dnd/droptarget';
 import { GroupDragHandler } from '../../../dnd/groupDragHandler';
@@ -74,7 +75,7 @@ export class VoidContainer extends CompositeDisposable {
 
         const canDisplayOverlay = (
             event: DragEvent | PointerEvent,
-            position: import('../../../dnd/droptarget').Position
+            position: Position
         ): boolean => {
             const data = getPanelData();
 
