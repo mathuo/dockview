@@ -10,6 +10,7 @@ import * as dataTransfer from '../../../../dnd/dataTransfer';
 import { TabAnimation } from '../../../../dockview/options';
 import { TabGroupChip } from '../../../../dockview/components/titlebar/tabGroupChip';
 import { TabGroup } from '../../../../dockview/tabGroup';
+import { PointerDragController } from '../../../../dnd/pointer/pointerDragController';
 
 function makeDOMRect(
     x: number,
@@ -1752,6 +1753,85 @@ describe('tabs - animation', () => {
             expect(getAnimState(tabs)).toBeNull();
 
             spy.mockRestore();
+        });
+    });
+
+    describe('touch drag (pointer path) cleanup', () => {
+        // Regression for the "stuck tab" bug: when smooth-tab animation is
+        // enabled and a touch drag begins, the smooth-anim setup must NOT
+        // run for pointer-driven drags — the HTML5 dragend / drop listeners
+        // that drive its cleanup never fire for `pointerup`, so any
+        // _animState set up here would leak (source tab kept at width 0).
+        test('touch tab drag in smooth mode does not initialise _animState', () => {
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
+            tabs.openPanel(createMockPanel('a'), 0);
+            tabs.openPanel(createMockPanel('b'), 1);
+            const tabA = (tabs as any)._tabs[0].value.element as HTMLElement;
+
+            // Synthesize the per-tab `onDragStart` event fed to tabs.ts —
+            // pointer drags fire a PointerEvent through Tab._onDragStart.
+            const pointerEvent = new PointerEvent('pointerdown', {
+                pointerId: 1,
+                pointerType: 'touch',
+                clientX: 0,
+                clientY: 0,
+            });
+            // Re-fire by directly invoking the Tab's emitter as
+            // PointerDragSource.onDragStart would (the controller wires
+            // this internally; here we synthesize the same shape).
+            (tabs as any)._tabs[0].value._onDragStart.fire(pointerEvent);
+
+            // _animState must remain null — no cleanup path would clear it.
+            expect(getAnimState(tabs)).toBeNull();
+            expect(tabA.classList.contains('dv-tab--dragging')).toBe(false);
+        });
+
+        test('HTML5 tab drag in smooth mode DOES initialise _animState (sanity)', () => {
+            // Counter-test: ensures the gate doesn't accidentally suppress
+            // the HTML5 path that the cleanup listeners DO support.
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
+            tabs.openPanel(createMockPanel('a'), 0);
+            tabs.openPanel(createMockPanel('b'), 1);
+            const tabA = (tabs as any)._tabs[0].value.element as HTMLElement;
+
+            fireEvent.dragStart(tabA);
+
+            const state = getAnimState(tabs);
+            expect(state).not.toBeNull();
+            expect(state.sourceTabId).toBe('a');
+        });
+
+        test('PointerDragController.onDragEnd disposes _chipDragCleanup on cancel', async () => {
+            const { tabs } = createTabs({ tabAnimation: 'default' });
+            tabs.openPanel(createMockPanel('a'), 0);
+
+            // Manually populate _chipDragCleanup as if a touch chip drag
+            // had begun via _handleChipDragStart and then was cancelled
+            // (pointerup over empty space).
+            const disposeSpy = jest.fn();
+            (tabs as any)._chipDragCleanup = { dispose: disposeSpy };
+
+            // Fire the controller's onDragEnd — the constructor-attached
+            // subscription should pick it up.
+            const controller = PointerDragController.getInstance();
+            // The simplest way to trigger onDragEnd is to start and cancel.
+            controller.beginDrag({
+                pointerEvent: new PointerEvent('pointerdown', {
+                    pointerId: 1,
+                    pointerType: 'touch',
+                }),
+                source: document.createElement('div'),
+                getData: () => ({ dispose: jest.fn() }),
+            });
+            window.dispatchEvent(
+                new PointerEvent('pointerup', {
+                    pointerId: 1,
+                    pointerType: 'touch',
+                })
+            );
+
+            expect(disposeSpy).toHaveBeenCalled();
+            expect((tabs as any)._chipDragCleanup).toBeNull();
         });
     });
 });

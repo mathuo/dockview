@@ -295,4 +295,118 @@ describe('PointerDragController', () => {
         spy.mockRestore();
         document.body.removeChild(root);
     });
+
+    describe('iframe shielding', () => {
+        test("beginDrag shields iframes in the source's owning document; teardown releases", () => {
+            const controller = PointerDragController.getInstance();
+
+            // Build iframes in the main document — these would otherwise
+            // capture pointermove events once the cursor crosses into them
+            // and freeze the drag.
+            const iframe = document.createElement('iframe');
+            const webview = document.createElement('webview');
+            const span = document.createElement('span');
+            const source = document.createElement('div');
+
+            document.body.appendChild(iframe);
+            document.body.appendChild(webview);
+            document.body.appendChild(span);
+            document.body.appendChild(source);
+
+            // pre-condition
+            expect(iframe.style.pointerEvents).toBeFalsy();
+            expect(webview.style.pointerEvents).toBeFalsy();
+            expect(span.style.pointerEvents).toBeFalsy();
+
+            controller.beginDrag({
+                pointerEvent: makePointerEvent('pointermove'),
+                source,
+                getData: () => ({ dispose: jest.fn() }),
+            });
+
+            // Iframes / webviews shielded; non-iframe elements unaffected.
+            expect(iframe.style.pointerEvents).toBe('none');
+            expect(webview.style.pointerEvents).toBe('none');
+            expect(span.style.pointerEvents).toBeFalsy();
+
+            // Release on drag end.
+            window.dispatchEvent(makePointerEvent('pointerup'));
+            expect(iframe.style.pointerEvents).toBe('');
+            expect(webview.style.pointerEvents).toBe('');
+
+            document.body.removeChild(iframe);
+            document.body.removeChild(webview);
+            document.body.removeChild(span);
+            document.body.removeChild(source);
+        });
+
+        test('cancel() also releases the shield', () => {
+            const controller = PointerDragController.getInstance();
+            const iframe = document.createElement('iframe');
+            const source = document.createElement('div');
+            document.body.appendChild(iframe);
+            document.body.appendChild(source);
+
+            controller.beginDrag({
+                pointerEvent: makePointerEvent('pointermove'),
+                source,
+                getData: () => ({ dispose: jest.fn() }),
+            });
+            expect(iframe.style.pointerEvents).toBe('none');
+
+            controller.cancel();
+            expect(iframe.style.pointerEvents).toBe('');
+
+            document.body.removeChild(iframe);
+            document.body.removeChild(source);
+        });
+    });
+
+    describe("listener attachment honours the source's owning window", () => {
+        test("pointermove from source's owning window is routed to the controller", () => {
+            // Build an iframe — stand-in for a popout window — so we get a
+            // real `contentWindow` distinct from the main `window`. Verifies
+            // that the controller listens on the source's owning window, not
+            // on the main `window`.
+            const iframe = document.createElement('iframe');
+            document.body.appendChild(iframe);
+            const otherDoc = iframe.contentDocument!;
+            const otherWin = iframe.contentWindow!;
+            expect(otherWin).not.toBe(window);
+
+            const source = otherDoc.createElement('div');
+            otherDoc.body.appendChild(source);
+            const targetEl = otherDoc.createElement('div');
+            otherDoc.body.appendChild(targetEl);
+
+            const controller = PointerDragController.getInstance();
+            const { target, handleDragOver } = makeTarget(targetEl);
+            const reg = controller.registerTarget(target);
+
+            // Hit-test should resolve via the popout's document. Assign
+            // directly (rather than spy) since elementsFromPoint lives on
+            // Document.prototype in jsdom and `spyOn` can't intercept that.
+            (otherDoc as any).elementsFromPoint = jest
+                .fn()
+                .mockReturnValue([targetEl]);
+
+            controller.beginDrag({
+                pointerEvent: makePointerEvent('pointermove'),
+                source,
+                getData: () => ({ dispose: jest.fn() }),
+            });
+
+            // Fire the move on the popout window (NOT the main `window`).
+            // If listeners attached to main `window`, this would be a no-op.
+            otherWin.dispatchEvent(
+                makePointerEvent('pointermove', { clientX: 10, clientY: 10 })
+            );
+
+            expect(handleDragOver).toHaveBeenCalled();
+
+            controller.cancel();
+            reg.dispose();
+            document.body.removeChild(iframe);
+        });
+    });
 });

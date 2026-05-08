@@ -19,6 +19,16 @@ export interface PointerGhostOptions {
     offsetY?: number;
     /** Default 0.8. */
     opacity?: number;
+    /**
+     * The element whose owning document the ghost should be appended to.
+     * For drags inside a popout window, pass the drag source so the ghost
+     * is rendered in the popout's document — appending to the main
+     * `document.body` would render the ghost in the wrong window
+     * (invisible to the user dragging in the popout).
+     *
+     * When omitted, falls back to the main `document`.
+     */
+    owner?: Element;
 }
 
 /**
@@ -26,9 +36,9 @@ export interface PointerGhostOptions {
  * pointer-driven drag. HTML5 DnD provides this for free via
  * `setDragImage`; the pointer path has to render it manually.
  *
- * The ghost is appended to `document.body` with `position: fixed`,
- * `pointer-events: none`, and a high z-index so it sits above the layout
- * without intercepting hit-testing.
+ * The ghost is appended to the owning document's body with
+ * `position: fixed`, `pointer-events: none`, and a high z-index so it
+ * sits above the layout without intercepting hit-testing.
  */
 export class PointerGhost implements IDisposable {
     private readonly element: HTMLElement;
@@ -41,22 +51,35 @@ export class PointerGhost implements IDisposable {
         this.offsetX = opts.offsetX ?? 0;
         this.offsetY = opts.offsetY ?? 0;
 
+        // Anchor at (0, 0) and animate via `transform` — see `update()` for
+        // why. `position: fixed` keeps the ghost out of layout flow and
+        // independent of ancestor scroll.
         this.element.style.position = 'fixed';
+        this.element.style.left = '0px';
+        this.element.style.top = '0px';
         this.element.style.pointerEvents = 'none';
         this.element.style.zIndex = '99999';
         this.element.style.opacity = String(opts.opacity ?? 0.8);
-        this.element.style.left = `${opts.initialX - this.offsetX}px`;
-        this.element.style.top = `${opts.initialY - this.offsetY}px`;
+        this.element.style.willChange = 'transform';
+        this.element.style.transform = `translate3d(${
+            opts.initialX - this.offsetX
+        }px, ${opts.initialY - this.offsetY}px, 0)`;
 
-        document.body.appendChild(this.element);
+        const ownerDocument = opts.owner?.ownerDocument ?? document;
+        ownerDocument.body.appendChild(this.element);
     }
 
     update(clientX: number, clientY: number): void {
         if (this._disposed) {
             return;
         }
-        this.element.style.left = `${clientX - this.offsetX}px`;
-        this.element.style.top = `${clientY - this.offsetY}px`;
+        // Use a 3D translate so the browser can composite this on the GPU
+        // without re-running layout (which `left` / `top` mutations would
+        // trigger). Pointermove fires at 60–120 Hz during a drag; this
+        // path is hot.
+        this.element.style.transform = `translate3d(${
+            clientX - this.offsetX
+        }px, ${clientY - this.offsetY}px, 0)`;
     }
 
     dispose(): void {

@@ -20,6 +20,7 @@ import {
     MutableDisposable,
 } from '../../../lifecycle';
 import { Scrollbar } from '../../../scrollbar';
+import { PointerDragController } from '../../../dnd/pointer/pointerDragController';
 import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { DockviewWillShowOverlayLocationEvent } from '../../events';
@@ -276,6 +277,17 @@ export class Tabs extends CompositeDisposable {
                     this._flipTransitionCleanup?.();
                 },
             },
+            // Touch chip / tab drags don't fire HTML5 dragend, so the
+            // _tabsList HTML5 'dragend' listener (which calls
+            // resetDragAnimation) never runs. Without this, a touch chip
+            // drag canceled by pointerup-over-empty-space leaves
+            // _chipDragCleanup populated (LocalSelectionTransfer + iframe
+            // shield) until the next chip drop. resetDragAnimation is
+            // idempotent, so this is harmless for HTML5 drags.
+            PointerDragController.getInstance().onDragEnd(() => {
+                this._chipDragCleanup?.dispose();
+                this._chipDragCleanup = null;
+            }),
             addDisposableListener(this.element, 'pointerdown', (event) => {
                 if (event.defaultPrevented) {
                     return;
@@ -617,7 +629,24 @@ export class Tabs extends CompositeDisposable {
             tab.onDragStart((event) => {
                 this._onTabDragStart.fire({ nativeEvent: event, panel });
 
-                if (this.accessor.options.theme?.tabAnimation === 'smooth') {
+                // Smooth-tab animation depends on the HTML5 dragend / drop
+                // lifecycle for cleanup (reset transforms, clear _animState).
+                // Touch drags fire `pointerup`, not `dragend`, and the
+                // _tabsList HTML5 listeners that drive that cleanup never
+                // run — so touch-driven smooth-anim leaves the source tab
+                // collapsed (width 0) permanently. Restrict the smooth-anim
+                // setup to HTML5 drags. Detect "is this a pointer-driven
+                // drag?" by negation rather than `instanceof DragEvent`,
+                // because jsdom may not implement the DragEvent class but
+                // does fire HTML5-style drag events through fireEvent.
+                const isPointer =
+                    typeof PointerEvent !== 'undefined' &&
+                    event instanceof PointerEvent;
+
+                if (
+                    !isPointer &&
+                    this.accessor.options.theme?.tabAnimation === 'smooth'
+                ) {
                     const tabWidth = tab.element.getBoundingClientRect().width;
                     const sourceIndex = this._tabs.findIndex(
                         (x) => x.value === tab
@@ -1042,12 +1071,21 @@ export class Tabs extends CompositeDisposable {
             PanelTransfer.prototype
         );
 
-        const iframes = disableIframePointEvents();
+        // For HTML5 chip drags, shield iframes so the OS-level drag doesn't
+        // get captured by an embedded iframe's content. For touch (pointer)
+        // chip drags, `PointerDragController.beginDrag` already shielded
+        // iframes (with proper `ownerDocument` scoping) — calling it a
+        // second time here stacks shields and breaks the release-restore
+        // path. Use the chip's ownerDocument so popout-window HTML5 drags
+        // shield the popout's iframes, not the main document's.
+        const iframes = isPointer
+            ? null
+            : disableIframePointEvents(chip.element.ownerDocument ?? document);
 
         this._chipDragCleanup = {
             dispose: () => {
                 panelTransfer.clearData(PanelTransfer.prototype);
-                iframes.release();
+                iframes?.release();
             },
         };
 

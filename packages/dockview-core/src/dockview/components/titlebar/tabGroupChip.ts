@@ -64,6 +64,7 @@ export class TabGroupChip
                     initialY: event.clientY,
                     offsetX: 8,
                     offsetY: 8,
+                    owner: this._element,
                 });
             },
             onDragStart: (event) => {

@@ -356,6 +356,7 @@ export class TabGroupManager {
                         initialY: event.clientY,
                         offsetX: 8,
                         offsetY: 8,
+                        owner: chip.element,
                     });
                 },
                 onDragStart: (event) => {

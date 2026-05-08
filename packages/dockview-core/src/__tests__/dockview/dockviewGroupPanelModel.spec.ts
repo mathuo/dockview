@@ -1840,4 +1840,54 @@ describe('dockviewGroupPanelModel', () => {
             expect(restored[1].panelIds).toEqual(['panel2']);
         });
     });
+
+    describe('content drop-target zones (mouse + touch parity)', () => {
+        // Regression: when a group's location changes (grid → floating /
+        // popout / edge), the content drop target's accepted zones must be
+        // updated on BOTH the HTML5 dropTarget (mouse path) and the
+        // pointerDropTarget (touch path). Without the parallel call, touch
+        // drops on a non-grid group's content area would land in zones the
+        // HTML5 path forbids — different layout outcomes between input
+        // methods.
+        function getContentTargets(group: DockviewGroupPanel): {
+            dropTarget: { setTargetZones: jest.Mock };
+            pointerDropTarget: { setTargetZones: jest.Mock };
+        } {
+            const cc = (group.model as any).contentContainer;
+            // Spy on the bound methods so we can observe each call without
+            // breaking the underlying behaviour.
+            const dropSpy = jest.spyOn(cc.dropTarget, 'setTargetZones');
+            const pointerSpy = jest.spyOn(
+                cc.pointerDropTarget,
+                'setTargetZones'
+            );
+            return {
+                dropTarget: { setTargetZones: dropSpy as any as jest.Mock },
+                pointerDropTarget: {
+                    setTargetZones: pointerSpy as any as jest.Mock,
+                },
+            };
+        }
+
+        test.each([
+            ['grid', ['top', 'bottom', 'left', 'right', 'center']],
+            ['popout', ['center']],
+            ['edge', ['center']],
+        ] as const)(
+            'location=%s applies zones to BOTH dropTarget and pointerDropTarget',
+            (locationType, expectedZones) => {
+                const { dropTarget, pointerDropTarget } =
+                    getContentTargets(groupview);
+
+                groupview.model.location = { type: locationType } as any;
+
+                expect(dropTarget.setTargetZones).toHaveBeenCalledWith(
+                    expectedZones
+                );
+                expect(pointerDropTarget.setTargetZones).toHaveBeenCalledWith(
+                    expectedZones
+                );
+            }
+        );
+    });
 });

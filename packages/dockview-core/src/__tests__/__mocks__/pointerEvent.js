@@ -21,8 +21,18 @@ if (typeof window.PointerEvent === 'undefined') {
     window.PointerEvent = PointerEvent;
 }
 
-if (typeof document.elementsFromPoint !== 'function') {
-    // Default returns []; tests that need a specific element under the
-    // pointer should override this via jest.spyOn.
-    document.elementsFromPoint = () => [];
+// Polyfill on Document.prototype so any document (including popout
+// stand-ins created via `document.implementation.createHTMLDocument`)
+// inherits these. Tests that need a specific element under the pointer
+// override per-instance via `jest.spyOn(theDoc, 'elementsFromPoint')`.
+if (typeof Document.prototype.elementsFromPoint !== 'function') {
+    Document.prototype.elementsFromPoint = function () {
+        return [];
+    };
+}
+
+if (typeof Document.prototype.elementFromPoint !== 'function') {
+    Document.prototype.elementFromPoint = function () {
+        return null;
+    };
 }

@@ -23,6 +23,11 @@ export class WillShowOverlayEvent
     extends DockviewEvent
     implements DroptargetEvent
 {
+    /**
+     * The native event that triggered the about-to-show overlay. `DragEvent`
+     * for mouse / external HTML5 drags; `PointerEvent` for touch drags.
+     * Narrow with `instanceof DragEvent` before reading `dataTransfer`.
+     */
     get nativeEvent(): DragEvent | PointerEvent {
         return this.options.nativeEvent;
     }

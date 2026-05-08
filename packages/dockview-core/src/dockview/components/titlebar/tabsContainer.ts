@@ -34,14 +34,20 @@ export interface TabDropIndexEvent {
 
 export interface TabDragEvent {
     /**
-     * The native event that started the drag. `DragEvent` for the legacy
-     * HTML5 path; `PointerEvent` for the touch-friendly pointer path.
+     * The native event that started the drag. `DragEvent` for mouse /
+     * external HTML5 drags; `PointerEvent` for touch drags. Narrow with
+     * `instanceof DragEvent` before reading `dataTransfer`.
      */
     readonly nativeEvent: DragEvent | PointerEvent;
     readonly panel: IDockviewPanel;
 }
 
 export interface GroupDragEvent {
+    /**
+     * The native event that started the drag. `DragEvent` for mouse /
+     * external HTML5 drags; `PointerEvent` for touch drags. Narrow with
+     * `instanceof DragEvent` before reading `dataTransfer`.
+     */
     readonly nativeEvent: DragEvent | PointerEvent;
     readonly group: DockviewGroupPanel;
 }

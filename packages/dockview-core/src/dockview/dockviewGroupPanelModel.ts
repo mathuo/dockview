@@ -464,19 +464,24 @@ export class DockviewGroupPanelModel
         toggleClass(this.container, 'dv-groupview-popout', false);
         toggleClass(this.container, 'dv-groupview-edge', false);
 
+        // Apply to BOTH the HTML5 dropTarget (mouse path) and the
+        // pointerDropTarget (touch path) so touch drops on a non-grid
+        // group's content area honour the same zone restrictions as
+        // mouse drops. Without the parallel call on pointerDropTarget,
+        // touch users could land in zones the HTML5 path forbids,
+        // producing different layout outcomes between input methods.
+        const applyZones = (zones: Position[]): void => {
+            this.contentContainer.dropTarget.setTargetZones(zones);
+            this.contentContainer.pointerDropTarget.setTargetZones(zones);
+        };
+
         switch (value.type) {
             case 'grid':
-                this.contentContainer.dropTarget.setTargetZones([
-                    'top',
-                    'bottom',
-                    'left',
-                    'right',
-                    'center',
-                ]);
+                applyZones(['top', 'bottom', 'left', 'right', 'center']);
                 break;
             case 'floating':
-                this.contentContainer.dropTarget.setTargetZones(['center']);
-                this.contentContainer.dropTarget.setTargetZones(
+                applyZones(['center']);
+                applyZones(
                     value
                         ? ['center']
                         : ['top', 'bottom', 'left', 'right', 'center']
@@ -486,13 +491,13 @@ export class DockviewGroupPanelModel
 
                 break;
             case 'popout':
-                this.contentContainer.dropTarget.setTargetZones(['center']);
+                applyZones(['center']);
 
                 toggleClass(this.container, 'dv-groupview-popout', true);
 
                 break;
             case 'edge':
-                this.contentContainer.dropTarget.setTargetZones(['center']);
+                applyZones(['center']);
 
                 toggleClass(this.container, 'dv-groupview-edge', true);
 

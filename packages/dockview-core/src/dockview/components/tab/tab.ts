@@ -178,6 +178,7 @@ export class Tab extends CompositeDisposable {
                     initialY: event.clientY,
                     offsetX: 30,
                     offsetY: -10,
+                    owner: this._element,
                 });
             },
             onDragStart: (event) => {

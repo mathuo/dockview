@@ -33,6 +33,15 @@ export class PointerDragController extends CompositeDisposable {
     }
 
     private readonly _targets = new Set<IPointerDropTargetHandle>();
+    /**
+     * Element → target index, kept in sync with `_targets` on register /
+     * unregister. Used by `_findTargetUnder` to do an O(1) lookup per
+     * element-walk step instead of rebuilding a map on every pointermove.
+     */
+    private readonly _targetByElement = new Map<
+        Element,
+        IPointerDropTargetHandle
+    >();
     private _active: ActiveDrag | undefined;
     private _currentTarget: IPointerDropTargetHandle | undefined;
     private _dataDisposable: IDisposable | undefined;
@@ -69,9 +78,13 @@ export class PointerDragController extends CompositeDisposable {
      */
     registerTarget(target: IPointerDropTargetHandle): IDisposable {
         this._targets.add(target);
+        this._targetByElement.set(target.element, target);
         return {
             dispose: () => {
                 this._targets.delete(target);
+                if (this._targetByElement.get(target.element) === target) {
+                    this._targetByElement.delete(target.element);
+                }
                 if (this._currentTarget === target) {
                     this._currentTarget = undefined;
                 }
@@ -175,13 +188,6 @@ export class PointerDragController extends CompositeDisposable {
         x: number,
         y: number
     ): IPointerDropTargetHandle | undefined {
-        // Build an O(1) element→target lookup so we can ask: is THIS exact
-        // element a registered target?
-        const targetByElement = new Map<Element, IPointerDropTargetHandle>();
-        for (const target of this._targets) {
-            targetByElement.set(target.element, target);
-        }
-
         // `elementsFromPoint` returns elements in topmost-first order.
         // Walking up from each element finds the *closest* registered
         // ancestor — preferring the most specific drop target (e.g. a tab)
@@ -189,11 +195,20 @@ export class PointerDragController extends CompositeDisposable {
         // contain the cursor too. The previous implementation used a plain
         // `.contains()` check inside the inner loop, which always matched
         // outer targets first and made nested drop zones unreachable.
-        const elements = document.elementsFromPoint(x, y);
+        //
+        // The element→target index is maintained incrementally on
+        // register / dispose (`_targetByElement`) so this hot path is
+        // allocation-free per pointermove.
+        //
+        // For popout-window drags, query the SOURCE's document — the main
+        // `document` would return elements from the parent window, missing
+        // any drop targets registered on popout-window elements.
+        const sourceDoc = this._active?.source.ownerDocument ?? document;
+        const elements = sourceDoc.elementsFromPoint(x, y);
         for (const el of elements) {
             let current: Element | null = el;
             while (current) {
-                const target = targetByElement.get(current);
+                const target = this._targetByElement.get(current);
                 if (target) {
                     return target;
                 }
