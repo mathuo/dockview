@@ -1682,6 +1682,14 @@ export class Tabs extends CompositeDisposable {
             // handles panel transfer and tab group recreation.
             // Use the REAL tab group ID from transfer data, not the
             // potentially stale one from _animState.
+            //
+            // Clear any inline gap margin / shifting class applied to
+            // destination tabs during dragover. Cross-group moves don't
+            // run the FLIP path, and `moveGroupOrPanel` only inserts new
+            // panels — it doesn't recreate existing destination tabs, so
+            // their inline `margin-left` would otherwise persist as a
+            // visible gap (issue #1243).
+            this.resetTabTransforms();
             this.accessor.moveGroupOrPanel({
                 from: {
                     groupId: data.groupId,

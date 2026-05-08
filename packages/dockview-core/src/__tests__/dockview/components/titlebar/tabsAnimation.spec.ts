@@ -1601,6 +1601,185 @@ describe('tabs - animation', () => {
             expect(moveTabGroupMock).toHaveBeenCalled();
             expect(moveGroupOrPanelMock).not.toHaveBeenCalled();
         });
+
+        // Regression for #1243: when a tab group chip is dragged from one
+        // split into another and dropped next to an existing tab, the
+        // destination's dragover-applied gap margin must be cleared.
+        // Otherwise the dropped group lands with extra spacing between it
+        // and the adjacent tab.
+        test('cross-group chip drop clears destination gap margin', () => {
+            const { tabs, accessor, group, tabGroup, chip, elements } =
+                setupChipDrag('smooth', ['panel-x', 'panel-y', 'panel-z']);
+
+            // The drop target (this tabs instance) has its own tabs but NOT
+            // the dragged tab group — the group lives in another dockview
+            // group. Simulate the cross-group condition.
+            (group.model as any).getTabGroups = () => [];
+            (accessor as any).moveGroupOrPanel = jest.fn();
+            (accessor as any).getPanel = jest.fn().mockReturnValue({
+                model: {
+                    getTabGroups: () => [tabGroup],
+                },
+            });
+
+            for (let i = 0; i < elements.length; i++) {
+                mockTabRect(elements[i], { left: i * 80, width: 80 });
+            }
+
+            // Simulate the destination receiving a dragover with cross-group
+            // tab-group transfer data.
+            const transfer = dataTransfer.LocalSelectionTransfer.getInstance();
+            transfer.setData(
+                [
+                    new dataTransfer.PanelTransfer(
+                        'test-accessor',
+                        'other-group',
+                        null,
+                        'tg-1'
+                    ),
+                ],
+                dataTransfer.PanelTransfer.prototype
+            );
+
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            // dragover initializes cross-group _animState, sets insertion
+            // index, and applies a gap margin to a tab in the destination.
+            fireEvent.dragOver(tabsList, { clientX: 120 });
+
+            // Sanity: a destination tab is now shifted by the gap.
+            const gappedTab = elements.find(
+                (el) => el.style.marginLeft && el.style.marginLeft !== '0px'
+            );
+            expect(gappedTab).toBeDefined();
+
+            // Drop on the destination — cross-group path runs here.
+            fireEvent.drop(tabsList);
+
+            // After the drop, no destination tab should retain a non-zero
+            // gap margin. (jsdom can't run the CSS transition that would
+            // clear an animated `0px` marginLeft, but the bug we care about
+            // is a non-cleared positive gap.)
+            for (const el of elements) {
+                expect(
+                    el.style.marginLeft === '' || el.style.marginLeft === '0px'
+                ).toBe(true);
+                expect(el.classList.contains('dv-tab--shifting')).toBe(false);
+            }
+
+            transfer.clearData(dataTransfer.PanelTransfer.prototype);
+        });
+
+        // Regression for #1243: dropping a tab group next to an existing tab
+        // must not leave residual inline margin on any tab/chip that would
+        // visually appear as extra spacing between the dropped group and the
+        // adjacent tab.
+        test('local chip drop leaves no residual gap margin (smooth)', () => {
+            const { tabs, group, tabGroup, chip } = setupChipDrag('smooth', [
+                'panel-a',
+                'panel-b',
+                'panel-c',
+                'panel-d',
+            ]);
+
+            // Re-mock with 4 panels in a horizontal row.
+            const elements = getTabElements(tabs);
+            for (let i = 0; i < elements.length; i++) {
+                mockTabRect(elements[i], { left: i * 80, width: 80 });
+            }
+
+            // Wire up a realistic moveTabGroup that mirrors what
+            // dockviewGroupPanelModel does: rebuild the tab list to match the
+            // new panel order. This is the path that actually runs on drop.
+            const panelOrder = ['panel-a', 'panel-b', 'panel-c', 'panel-d'];
+            (group.model as any).getTabGroups = () => [tabGroup];
+            (group.model as any).moveTabGroup = (
+                tabGroupId: string,
+                targetIndex: number
+            ) => {
+                const groupPanelIds = new Set(tabGroup.panelIds);
+                const groupPanels = tabGroup.panelIds.filter((p) =>
+                    panelOrder.includes(p)
+                );
+
+                let groupPanelsBefore = 0;
+                for (
+                    let i = 0;
+                    i < Math.min(targetIndex, panelOrder.length);
+                    i++
+                ) {
+                    if (groupPanelIds.has(panelOrder[i])) {
+                        groupPanelsBefore++;
+                    }
+                }
+                for (const id of groupPanels) {
+                    const idx = panelOrder.indexOf(id);
+                    if (idx !== -1) {
+                        panelOrder.splice(idx, 1);
+                    }
+                }
+                const insertAt = Math.max(
+                    0,
+                    Math.min(targetIndex - groupPanelsBefore, panelOrder.length)
+                );
+                panelOrder.splice(insertAt, 0, ...groupPanels);
+
+                // Rebuild tabs container in the new order — same dance the
+                // real model performs.
+                for (const id of [...panelOrder]) {
+                    tabs.delete(id);
+                }
+                for (let i = 0; i < panelOrder.length; i++) {
+                    tabs.openPanel(createMockPanel(panelOrder[i]), i);
+                }
+                // Re-mock rects on the new elements at their new positions.
+                const newEls = getTabElements(tabs);
+                for (let i = 0; i < newEls.length; i++) {
+                    mockTabRect(newEls[i], { left: i * 80, width: 80 });
+                }
+                // Skip the actual updateTabGroups DOM dance (chip
+                // repositioning) — not needed for the residual-margin
+                // assertion.
+            };
+
+            triggerChipDragStart(tabs, tabGroup, chip);
+            flushRAF();
+
+            // Hover past panel-c midpoint → insertion lands after panel-c (3).
+            (tabs as any).handleDragOver({ clientX: 280 } as DragEvent);
+
+            // Sanity: the drag has applied a gap to a non-source tab.
+            const beforeDrop = getTabElements(tabs);
+            const someTabHasGap = beforeDrop.some(
+                (el) => el.style.marginLeft && el.style.marginLeft !== ''
+            );
+            expect(someTabHasGap).toBe(true);
+
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            fireEvent.drop(tabsList);
+            flushRAF();
+
+            // Simulate transitionend that the browser would fire after the
+            // FLIP transition resolves. jsdom doesn't run transitions.
+            const evt = new Event('transitionend', { bubbles: true });
+            (evt as any).propertyName = 'transform';
+            tabsList.dispatchEvent(evt);
+
+            // After the drop completes, no tab should carry inline margin
+            // left/right or a dv-tab--shifting class — anything else would
+            // be visible as residual spacing.
+            const afterEls = getTabElements(tabs);
+            for (const el of afterEls) {
+                expect(el.style.marginLeft).toBe('');
+                expect(el.style.marginRight).toBe('');
+                expect(el.classList.contains('dv-tab--shifting')).toBe(false);
+            }
+
+            // The chip must also be free of leftover shift state.
+            expect(chip.element.style.marginLeft).toBe('');
+            expect(
+                chip.element.classList.contains('dv-tab-group-chip--shifting')
+            ).toBe(false);
+        });
     });
 
     describe('stale animation state', () => {
