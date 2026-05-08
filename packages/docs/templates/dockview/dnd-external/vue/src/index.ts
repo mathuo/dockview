@@ -71,7 +71,12 @@ const App = defineComponent({
             disposables.forEach(d => d?.dispose?.());
             disposables.length = 0;
 
+            // `nativeEvent` is `DragEvent | PointerEvent` since dockview
+            // added touch DnD support — narrow before reading dataTransfer.
             const panelDragDisposable = api.value.onWillDragPanel((event: any) => {
+                if (!(event.nativeEvent instanceof DragEvent)) {
+                    return;
+                }
                 const dataTransfer = event.nativeEvent.dataTransfer;
                 if (dataTransfer) {
                     dataTransfer.setData('text/plain', 'Some custom panel data transfer data');
@@ -80,6 +85,9 @@ const App = defineComponent({
             });
 
             const groupDragDisposable = api.value.onWillDragGroup((event: any) => {
+                if (!(event.nativeEvent instanceof DragEvent)) {
+                    return;
+                }
                 const dataTransfer = event.nativeEvent.dataTransfer;
                 if (dataTransfer) {
                     dataTransfer.setData('text/plain', 'Some custom group data transfer data');
