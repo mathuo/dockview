@@ -33,21 +33,13 @@ export interface TabDropIndexEvent {
 }
 
 export interface TabDragEvent {
-    /**
-     * The native event that started the drag. `DragEvent` for mouse /
-     * external HTML5 drags; `PointerEvent` for touch drags. Narrow with
-     * `instanceof DragEvent` before reading `dataTransfer`.
-     */
+    /** Narrow with `instanceof DragEvent` before reading `dataTransfer`. */
     readonly nativeEvent: DragEvent | PointerEvent;
     readonly panel: IDockviewPanel;
 }
 
 export interface GroupDragEvent {
-    /**
-     * The native event that started the drag. `DragEvent` for mouse /
-     * external HTML5 drags; `PointerEvent` for touch drags. Narrow with
-     * `instanceof DragEvent` before reading `dataTransfer`.
-     */
+    /** Narrow with `instanceof DragEvent` before reading `dataTransfer`. */
     readonly nativeEvent: DragEvent | PointerEvent;
     readonly group: DockviewGroupPanel;
 }

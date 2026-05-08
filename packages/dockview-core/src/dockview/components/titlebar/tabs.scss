@@ -81,12 +81,7 @@
 }
 
 .dv-tab {
-    /**
-     * Suppress text selection while the user mousedowns + drags a tab.
-     * Previously the HTML5 `draggable` attribute did this implicitly;
-     * since the pointer-event path no longer relies on `draggable`, the
-     * browser would otherwise treat mousedown+move as a text selection.
-     */
+    // Tabs aren't `draggable`; suppress text selection on mousedown+move.
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;

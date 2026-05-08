@@ -47,16 +47,9 @@ export class TabGroupChip
         this._element.appendChild(this._label);
 
         const pointerSource = new PointerDragSource(this._element, {
-            getData: () => ({
-                // The actual transfer payload is set up by the consumer's
-                // onDragStart callback (in tabs.ts: _handleChipDragStart),
-                // which has access to the tab group identity. We just emit
-                // the event and let the consumer populate
-                // LocalSelectionTransfer.
-                dispose: () => {
-                    /* noop */
-                },
-            }),
+            // Transfer payload is populated by the chip drag-start consumer,
+            // which has access to the tab group identity.
+            getData: () => ({ dispose: () => undefined }),
             createGhost: (event) => {
                 return new PointerGhost({
                     element: this._buildGhostElement(),
@@ -79,9 +72,8 @@ export class TabGroupChip
             pointerSource,
             new LongPressDetector(this._element, {
                 onLongPress: (event) => {
-                    // Dismiss any in-flight pointer-drag arming so a
-                    // subsequent finger move doesn't start a drag on top
-                    // of the menu.
+                    // Don't let a subsequent finger move arm a drag on top
+                    // of the just-opened menu.
                     pointerSource.cancelPending();
                     this._onContextMenu.fire(event);
                 },
@@ -145,11 +137,6 @@ export class TabGroupChip
         toggleClass(this._element, 'dv-tab-group-chip--collapsed', collapsed);
     }
 
-    /**
-     * Clone the chip with computed styles for use as a follow-finger ghost
-     * during a pointer drag. Append-to-body + position:absolute are applied
-     * by `PointerGhost`; we just need the visual fidelity of the live chip.
-     */
     private _buildGhostElement(): HTMLElement {
         const style = getComputedStyle(this._element);
         const clone = this._element.cloneNode(true) as HTMLElement;

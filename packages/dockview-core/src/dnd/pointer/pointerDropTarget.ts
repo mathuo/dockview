@@ -28,27 +28,14 @@ export interface PointerDropTargetOptions {
     canDisplayOverlay: CanDisplayOverlay;
     acceptedTargetZones: Position[];
     overlayModel?: DroptargetOverlayModel;
-    /**
-     * If provided, the overlay is rendered into the returned anchor container
-     * instead of being appended to the drop target itself. Used for floating
-     * groups and the layout root, which need overlays to escape their parent.
-     */
+    /** Render into an external anchor container (floating groups, layout root). */
     getOverrideTarget?: () => DropTargetTargetModel | undefined;
-    /**
-     * Returns the element used as the visual outline for hit-testing /
-     * positioning. Falls back to the drop target element. Used when the
-     * outline should follow a parent (e.g. theme `dndPanelOverlay: 'group'`).
-     */
+    /** Outline element for positioning; falls back to the drop element. */
     getOverlayOutline?: () => HTMLElement | null;
     className?: string;
 }
 
-/**
- * Pointer-event-based drop target. Mirrors the visual output of `Droptarget`
- * (same DOM nodes, same CSS classes, same anchor-container path) but driven
- * by the singleton `PointerDragController` rather than HTML5 dragenter /
- * dragover / drop events.
- */
+/** Pointer-driven counterpart to `Droptarget` with identical visual output. */
 export class PointerDropTarget extends CompositeDisposable {
     private _targetElement: HTMLElement | undefined;
     private _overlayElement: HTMLElement | undefined;
@@ -168,7 +155,6 @@ export class PointerDropTarget extends CompositeDisposable {
         }
 
         if (overrideTarget) {
-            // Anchored path — render into the override target's overlay.
             renderAnchoredOverlay({
                 outlineElement: outlineEl,
                 targetModel: overrideTarget,
@@ -205,10 +191,8 @@ export class PointerDropTarget extends CompositeDisposable {
 
     private _onDragLeave(): void {
         const overrideTarget = this.options.getOverrideTarget?.();
-        // For anchored overlays the controlling target manages its own
-        // lifecycle; we shouldn't tear down the in-place dropzone (which
-        // doesn't exist) but we should still clear our latched state so a
-        // subsequent pointerup doesn't fire a stale drop.
+        // Anchor target owns its own lifecycle; just clear our latched
+        // state so a subsequent pointerup doesn't fire a stale drop.
         if (overrideTarget) {
             this._state = undefined;
             overrideTarget.clear();

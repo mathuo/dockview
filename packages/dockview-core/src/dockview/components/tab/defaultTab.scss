@@ -72,12 +72,7 @@
         }
     }
 
-    /**
-     * On touch / coarse-pointer devices :hover never fires, so the close
-     * button on inactive tabs would be permanently invisible. Force it
-     * visible there. Equivalent to "always show close button when
-     * hovering is unavailable".
-     */
+    // Without this the inactive-tab close button is unreachable on touch.
     @media (hover: none) {
         &.dv-inactive-tab .dv-default-tab .dv-default-tab-action {
             visibility: visible;
@@ -110,11 +105,8 @@
                 background-color: var(--dv-icon-hover-background-color);
             }
 
-            /**
-             * On coarse pointers (touch / pen) the default 24×24 close
-             * button is below the ~36px comfortable finger-tap size.
-             * Expand the hit area without growing the icon visually.
-             */
+            // Default 24×24 hit area is below the ~36px comfortable
+            // finger-tap size; expand without growing the icon visually.
             @media (pointer: coarse) {
                 padding: 8px;
             }

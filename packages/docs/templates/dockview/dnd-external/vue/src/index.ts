@@ -71,8 +71,8 @@ const App = defineComponent({
             disposables.forEach(d => d?.dispose?.());
             disposables.length = 0;
 
-            // `nativeEvent` is `DragEvent | PointerEvent` since dockview
-            // added touch DnD support — narrow before reading dataTransfer.
+            // Pointer (touch) drags can't bridge to external HTML5 drop
+            // zones outside dockview; narrow before reading dataTransfer.
             const panelDragDisposable = api.value.onWillDragPanel((event: any) => {
                 if (!(event.nativeEvent instanceof DragEvent)) {
                     return;

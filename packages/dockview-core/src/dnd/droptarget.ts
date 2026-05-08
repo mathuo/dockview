@@ -10,12 +10,7 @@ import {
 
 export interface DroptargetEvent {
     readonly position: Position;
-    /**
-     * The native event that drove the drop. Originally `DragEvent` only;
-     * widened to `DragEvent | PointerEvent` so the same event shape can be
-     * produced by both the legacy HTML5 path and the touch-friendly pointer
-     * path.
-     */
+    /** Narrow with `instanceof DragEvent` before reading `dataTransfer`. */
     readonly nativeEvent: DragEvent | PointerEvent;
 }
 
@@ -23,11 +18,6 @@ export class WillShowOverlayEvent
     extends DockviewEvent
     implements DroptargetEvent
 {
-    /**
-     * The native event that triggered the about-to-show overlay. `DragEvent`
-     * for mouse / external HTML5 drags; `PointerEvent` for touch drags.
-     * Narrow with `instanceof DragEvent` before reading `dataTransfer`.
-     */
     get nativeEvent(): DragEvent | PointerEvent {
         return this.options.nativeEvent;
     }

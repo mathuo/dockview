@@ -5,61 +5,22 @@ import { PointerGhost } from './pointerGhost';
 import { PointerDragEvent } from './types';
 
 export interface PointerDragSourceOptions {
-    /**
-     * Called when the drag is established. Should populate transfer data
-     * (e.g. via LocalSelectionTransfer) and return a disposable that clears
-     * the data when the drag ends.
-     */
+    /** Populate transfer data; returned disposer clears it on drag end. */
     getData: (event: PointerEvent) => IDisposable;
-    /**
-     * Optional hook fired once the threshold is exceeded and the drag begins.
-     * Use for ghost setup, class toggles, etc.
-     */
     onDragStart?: (event: PointerEvent) => void;
-    /**
-     * Optional hook fired on every pointermove during the drag.
-     */
     onDragMove?: (event: PointerDragEvent) => void;
-    /**
-     * Optional hook fired when the drag ends (drop or cancel).
-     */
     onDragEnd?: (event: PointerDragEvent, dropped: boolean) => void;
-    /**
-     * Returning true cancels the drag at pointerdown time.
-     */
+    /** Cancels the drag at pointerdown time. */
     isCancelled?: (event: PointerEvent) => boolean;
-    /**
-     * Pixel distance the pointer must travel before a drag is recognised.
-     * Default 5. Mouse pointers use this threshold immediately. Touch /
-     * pen pointers must first satisfy `touchInitiationDelay` before this
-     * threshold is checked.
-     */
+    /** Default 5px. Touch pointers also need `touchInitiationDelay` to elapse. */
     threshold?: number;
-    /**
-     * Touch-only: how long (ms) the pointer must be held before the drag
-     * is "armed". Before this delay elapses, any movement past
-     * `pressTolerance` cancels the press, allowing the browser's native
-     * scroll gesture to claim the touch. Default 250ms.
-     */
+    /** Touch-only long-press; movement past `pressTolerance` cancels and lets the browser claim the gesture. Default 250ms. */
     touchInitiationDelay?: number;
-    /**
-     * Touch-only: pixel jitter allowed during the initiation delay before
-     * the press is cancelled. Default 8.
-     */
+    /** Default 8px. */
     pressTolerance?: number;
-    /**
-     * If true (default), only touch/pen pointers initiate a drag — mouse
-     * defers to the existing HTML5 drag path. Set to false to also handle
-     * mouse pointers.
-     */
+    /** Default true: mouse defers to HTML5; pointer path handles touch / pen only. */
     touchOnly?: boolean;
-    /**
-     * Optional factory for a follow-finger ghost. Called once at drag start
-     * (after the threshold is crossed). Return a `PointerGhost` and the
-     * controller will keep it positioned under the pointer for the lifetime
-     * of the drag. If omitted, no ghost is shown — the user only sees drop
-     * overlays.
-     */
+    /** Follow-finger ghost factory; if omitted the user only sees drop overlays. */
     createGhost?: (event: PointerEvent) => PointerGhost | undefined;
 }
 
@@ -68,11 +29,9 @@ const DEFAULT_TOUCH_INITIATION_DELAY = 250;
 const DEFAULT_PRESS_TOLERANCE = 8;
 
 /**
- * Pointer-event-based drag source. Replaces AbstractDragHandler for any
- * element that needs to participate in pointer-driven (touch-friendly) drags.
- *
- * On pointerdown we wait for movement past `threshold` before promoting the
- * gesture to a drag, which allows taps to pass through unaffected.
+ * Pointer-event drag source. Waits for movement past `threshold` (and
+ * touch-only `touchInitiationDelay`) before promoting to a drag so taps
+ * pass through unaffected.
  */
 export class PointerDragSource extends CompositeDisposable {
     private _disabled = false;
@@ -110,9 +69,8 @@ export class PointerDragSource extends CompositeDisposable {
         if (this._disabled) {
             return false;
         }
-        // Filter on pointer type FIRST. The isCancelled callback is allowed
-        // to read consumer-side state that may not be populated for events
-        // we'll never act on (e.g. desktop mouse drags handled by HTML5).
+        // Pointer-type filter runs before isCancelled — consumer state read
+        // by isCancelled may not be populated for events we'll never handle.
         const touchOnly = this.options.touchOnly ?? true;
         if (
             touchOnly &&
@@ -132,8 +90,7 @@ export class PointerDragSource extends CompositeDisposable {
             return;
         }
 
-        // Cancel any existing pending drag (defensive — a fresh pointerdown
-        // supersedes any in-flight tracking).
+        // Defensive: a fresh pointerdown supersedes any in-flight tracking.
         this._cancelPending();
 
         this._pendingPointerId = event.pointerId;
@@ -144,11 +101,8 @@ export class PointerDragSource extends CompositeDisposable {
         const isTouch =
             event.pointerType === 'touch' || event.pointerType === 'pen';
 
-        // Touch drags wait for a long-press before arming, so quick swipes
-        // fall through to the browser's native scroll gesture (when the
-        // container has touch-action: pan-x or similar). Mouse drags arm
-        // immediately — we still produce a drag on first movement past the
-        // threshold, matching pre-phase-3 behaviour.
+        // Touch waits for a long-press so quick swipes fall through to the
+        // browser's native scroll (with `touch-action: pan-x` etc).
         const initiationDelay =
             this.options.touchInitiationDelay ?? DEFAULT_TOUCH_INITIATION_DELAY;
         this._armed = !isTouch || initiationDelay <= 0;
@@ -163,8 +117,7 @@ export class PointerDragSource extends CompositeDisposable {
         const pressTolerance =
             this.options.pressTolerance ?? DEFAULT_PRESS_TOLERANCE;
 
-        // Listen on the source's owning window so popout windows work —
-        // the main `window` only sees events from the main document.
+        // Source's owning window — popout drags fire on their own window.
         const targetWindow: Window =
             this.element.ownerDocument?.defaultView ?? window;
 
@@ -218,11 +171,7 @@ export class PointerDragSource extends CompositeDisposable {
         );
     }
 
-    /**
-     * Public escape hatch for consumers (e.g. a sibling LongPressDetector
-     * firing a context menu) to dismiss any in-flight pending drag so a
-     * subsequent finger movement doesn't start a drag on top of the menu.
-     */
+    /** For sibling gesture detectors (e.g. LongPressDetector) to dismiss a pending drag. */
     cancelPending(): void {
         this._cancelPending();
     }

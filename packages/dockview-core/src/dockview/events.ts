@@ -36,11 +36,7 @@ export class DockviewWillShowOverlayLocationEvent implements IDockviewEvent {
         return this.options.kind;
     }
 
-    /**
-     * The native event that drove the would-be overlay display. `DragEvent`
-     * for mouse / external HTML5 drags; `PointerEvent` for touch drags.
-     * Narrow with `instanceof DragEvent` before reading `dataTransfer`.
-     */
+    /** Narrow with `instanceof DragEvent` before reading `dataTransfer`. */
     get nativeEvent(): DragEvent | PointerEvent {
         return this.event.nativeEvent;
     }

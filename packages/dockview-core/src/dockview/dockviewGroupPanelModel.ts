@@ -100,13 +100,8 @@ export interface CreateTabGroupOptions extends TabGroupOptions {
 
 export class DockviewDidDropEvent extends DockviewEvent {
     /**
-     * The native event that drove the drop. Originally `DragEvent` only;
-     * widened to `DragEvent | PointerEvent` so the same event is produced
-     * regardless of whether the underlying drag came from the legacy
-     * HTML5 path or the touch-friendly pointer path.
-     *
-     * For pointer-driven drops, properties like `dataTransfer` are not
-     * available — use `getData()` for the dockview payload instead.
+     * `PointerEvent` for touch drags has no `dataTransfer`; use
+     * `getData()` for the dockview payload regardless of input method.
      */
     get nativeEvent(): DragEvent | PointerEvent {
         return this.options.nativeEvent;
@@ -464,12 +459,7 @@ export class DockviewGroupPanelModel
         toggleClass(this.container, 'dv-groupview-popout', false);
         toggleClass(this.container, 'dv-groupview-edge', false);
 
-        // Apply to BOTH the HTML5 dropTarget (mouse path) and the
-        // pointerDropTarget (touch path) so touch drops on a non-grid
-        // group's content area honour the same zone restrictions as
-        // mouse drops. Without the parallel call on pointerDropTarget,
-        // touch users could land in zones the HTML5 path forbids,
-        // producing different layout outcomes between input methods.
+        // Mouse and touch drop targets must agree on accepted zones.
         const applyZones = (zones: Position[]): void => {
             this.contentContainer.dropTarget.setTargetZones(zones);
             this.contentContainer.pointerDropTarget.setTargetZones(zones);

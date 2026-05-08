@@ -194,11 +194,7 @@ export interface DockviewOptions {
 export type TabAnimation = 'smooth' | 'default';
 
 export interface DockviewDndOverlayEvent extends IAcceptableEvent {
-    /**
-     * The native event that drove the drag-over hit-test. `DragEvent` for
-     * mouse / external HTML5 drags; `PointerEvent` for touch drags. Narrow
-     * with `instanceof DragEvent` before reading `dataTransfer`.
-     */
+    /** Narrow with `instanceof DragEvent` before reading `dataTransfer`. */
     nativeEvent: DragEvent | PointerEvent;
     target: DockviewGroupDropLocation;
     position: Position;

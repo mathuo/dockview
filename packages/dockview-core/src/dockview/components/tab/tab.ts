@@ -117,10 +117,8 @@ export class Tab extends CompositeDisposable {
             const data = getPanelData();
 
             if (data && this.accessor.id === data.viewId) {
-                // When smooth reorder is enabled the TabsContainer drives
-                // the overlay/animation for HTML5-driven drags. The pointer
-                // path doesn't participate in that animation, so we DO want
-                // to show the per-tab overlay for touch drags.
+                // Smooth-reorder runs only for HTML5 drags; touch / pointer
+                // drags fall back to per-tab overlays.
                 if (
                     !isPointerDriven &&
                     this.accessor.options.theme?.tabAnimation === 'smooth'
@@ -169,9 +167,7 @@ export class Tab extends CompositeDisposable {
                 };
             },
             createGhost: (event) => {
-                // Position the pointer 30px in from the left edge and 10px
-                // up from the top — same offset as the HTML5 ghost so the
-                // drag image looks consistent across input methods.
+                // 30/-10 matches the HTML5 setDragImage offset for visual parity.
                 return new PointerGhost({
                     element: this._buildGhostElement(),
                     initialX: event.clientX,
@@ -249,9 +245,8 @@ export class Tab extends CompositeDisposable {
             }),
             new LongPressDetector(this._element, {
                 onLongPress: (event) => {
-                    // Dismiss any in-flight pointer-drag arming so a
-                    // subsequent finger move doesn't start a drag on top
-                    // of the menu.
+                    // Don't let a subsequent finger move arm a drag on top
+                    // of the just-opened menu.
                     this.pointerDragSource.cancelPending();
                     this.accessor.contextMenuController.show(
                         this.panel,
@@ -317,13 +312,8 @@ export class Tab extends CompositeDisposable {
     }
 
     /**
-     * Build a styled clone of this tab for use as a drag ghost. Used by
-     * both the HTML5 path (via `setDragImage`) and the pointer path (via
-     * `PointerGhost`).
-     *
-     * Vertical tabs are flipped to horizontal so the ghost looks the same
-     * as it would in a docked horizontal header — the alternative is a
-     * sideways-rotated ghost that's hard to read mid-drag.
+     * Vertical tabs are flipped to horizontal so the ghost stays readable
+     * during the drag rather than appearing sideways-rotated.
      */
     private _buildGhostElement(): HTMLElement {
         const style = getComputedStyle(this.element);

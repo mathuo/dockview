@@ -326,19 +326,11 @@ export class TabGroupManager {
                 })
             );
         } else {
-            // Custom chip renderers don't expose dockview's PointerDragSource,
-            // so we attach one to the rendered element here. This gives
-            // touch users the same drag affordance the built-in TabGroupChip
-            // gets.
+            // Custom chip renderers don't ship their own PointerDragSource;
+            // attach one so they get touch parity with the built-in chip.
             const customPointerSource = new PointerDragSource(chip.element, {
-                getData: () => ({
-                    // The transfer payload is set by the consumer's
-                    // onChipDragStart callback (in tabs.ts:
-                    // _handleChipDragStart). We just produce the event.
-                    dispose: () => {
-                        /* noop */
-                    },
-                }),
+                // Transfer payload is populated by the chip drag-start consumer.
+                getData: () => ({ dispose: () => undefined }),
                 createGhost: (event) => {
                     const style = getComputedStyle(chip.element);
                     const clone = chip.element.cloneNode(true) as HTMLElement;

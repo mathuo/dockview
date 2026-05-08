@@ -2,23 +2,13 @@ import { addDisposableListener } from '../../events';
 import { CompositeDisposable, IDisposable } from '../../lifecycle';
 
 export interface LongPressOptions {
-    /** Delay in ms before long-press fires. Default 500ms. */
+    /** Default 500ms. */
     delay?: number;
-    /**
-     * Movement tolerance in px. Pointer movement beyond this distance
-     * cancels the in-flight long-press. Default 8px.
-     */
+    /** Default 8px. */
     tolerance?: number;
-    /**
-     * If true (default), only `touch`/`pen` pointers trigger long-press.
-     * Mouse users have right-click and don't need a long-press affordance.
-     */
+    /** Default true: mouse users have right-click and don't need this. */
     touchOnly?: boolean;
-    /**
-     * Called when the press completes. Receives the originating
-     * `pointerdown` event so consumers can read `clientX/Y` for menu
-     * positioning.
-     */
+    /** Receives the `pointerdown` event so consumers can read `clientX/Y`. */
     onLongPress: (event: PointerEvent) => void;
 }
 
@@ -26,15 +16,8 @@ const DEFAULT_DELAY = 500;
 const DEFAULT_TOLERANCE = 8;
 
 /**
- * Touch-friendly long-press gesture detector. A pointerdown that is held
- * for `delay` ms without moving more than `tolerance` px in any direction
- * fires `onLongPress`. Used to surface right-click context menus to touch
- * users.
- *
- * The detector is fully passive — it does not consume the pointer or
- * interfere with `PointerDragSource` or HTML5 drag events. If movement
- * exceeds the tolerance the press is cancelled silently, allowing the drag
- * source to take over.
+ * Passive — does not consume the pointer; movement past `tolerance`
+ * cancels silently so a sibling `PointerDragSource` can take over.
  */
 export class LongPressDetector extends CompositeDisposable {
     private _pointerId: number | undefined;
@@ -83,8 +66,7 @@ export class LongPressDetector extends CompositeDisposable {
             this.options.onLongPress(event);
         }, delay);
 
-        // Listen on the source's owning window so popout windows work —
-        // the main `window` only sees events from the main document.
+        // Source's owning window — popout drags fire on their own window.
         const targetWindow: Window =
             this.element.ownerDocument?.defaultView ?? window;
 

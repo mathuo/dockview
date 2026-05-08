@@ -11,17 +11,7 @@ export interface ActiveDrag {
     readonly source: HTMLElement;
 }
 
-/**
- * Page-wide singleton that orchestrates an active pointer-driven drag.
- *
- * Responsibilities:
- *  - Track the currently active drag (only one at a time, just like HTML5 DnD).
- *  - Listen to window-level pointermove/pointerup once a drag begins.
- *  - On each move, hit-test registered drop targets via elementsFromPoint and
- *    forward drag-over / drag-leave / drop callbacks to the relevant target.
- *  - Defer disposal of the drag payload until after drop handlers run, mirroring
- *    the existing AbstractDragHandler behaviour.
- */
+/** Singleton — only one pointer-driven drag active at a time. */
 export class PointerDragController extends CompositeDisposable {
     private static _instance: PointerDragController | undefined;
 
@@ -33,11 +23,7 @@ export class PointerDragController extends CompositeDisposable {
     }
 
     private readonly _targets = new Set<IPointerDropTargetHandle>();
-    /**
-     * Element → target index, kept in sync with `_targets` on register /
-     * unregister. Used by `_findTargetUnder` to do an O(1) lookup per
-     * element-walk step instead of rebuilding a map on every pointermove.
-     */
+    /** Kept in sync with `_targets` so hit-testing is allocation-free. */
     private readonly _targetByElement = new Map<
         Element,
         IPointerDropTargetHandle
@@ -71,11 +57,6 @@ export class PointerDragController extends CompositeDisposable {
         return this._active;
     }
 
-    /**
-     * Drop targets register themselves so the controller can hit-test against
-     * them on each pointermove. Returns a disposer; PointerDropTarget calls this
-     * in its constructor.
-     */
     registerTarget(target: IPointerDropTargetHandle): IDisposable {
         this._targets.add(target);
         this._targetByElement.set(target.element, target);
@@ -117,12 +98,8 @@ export class PointerDragController extends CompositeDisposable {
         this._dataDisposable = args.getData();
         this._ghost = args.ghost;
 
-        // Pointer events are captured by iframes embedded inside dockview
-        // panels — once the cursor crosses an iframe boundary the parent
-        // window stops receiving `pointermove` and the drag freezes. Cover
-        // the iframes with `pointer-events: none` for the lifetime of the
-        // drag (mirrors what the deleted AbstractDragHandler did for the
-        // HTML5 path).
+        // Iframes capture pointermove once the cursor crosses into them,
+        // which would freeze the drag from the parent window's POV.
         this._iframeShield = disableIframePointEvents(
             source.ownerDocument ?? document
         );
@@ -134,9 +111,8 @@ export class PointerDragController extends CompositeDisposable {
         };
         this._onDragStart.fire(startEvent);
 
-        // Listen on the source's owning window so popout / popout-group
-        // contexts work — `window` would only see events from the main
-        // document, leaving popout-window drags frozen after pointerdown.
+        // Source's owning window — popout drags fire on their own window,
+        // not the main one.
         const targetWindow: Window =
             source.ownerDocument?.defaultView ?? window;
 
@@ -188,21 +164,9 @@ export class PointerDragController extends CompositeDisposable {
         x: number,
         y: number
     ): IPointerDropTargetHandle | undefined {
-        // `elementsFromPoint` returns elements in topmost-first order.
-        // Walking up from each element finds the *closest* registered
-        // ancestor — preferring the most specific drop target (e.g. a tab)
-        // over outer ancestors (e.g. the dockview root) that happen to
-        // contain the cursor too. The previous implementation used a plain
-        // `.contains()` check inside the inner loop, which always matched
-        // outer targets first and made nested drop zones unreachable.
-        //
-        // The element→target index is maintained incrementally on
-        // register / dispose (`_targetByElement`) so this hot path is
-        // allocation-free per pointermove.
-        //
-        // For popout-window drags, query the SOURCE's document — the main
-        // `document` would return elements from the parent window, missing
-        // any drop targets registered on popout-window elements.
+        // `elementsFromPoint` is topmost-first; walk up to find the closest
+        // registered ancestor (so a tab beats the layout-root that contains it).
+        // Use the source's owning document so popout drags hit their own targets.
         const sourceDoc = this._active?.source.ownerDocument ?? document;
         const elements = sourceDoc.elementsFromPoint(x, y);
         for (const el of elements) {
@@ -260,8 +224,7 @@ export class PointerDragController extends CompositeDisposable {
         this._teardown();
         this._dataDisposable = undefined;
 
-        // Defer payload disposal so consumers reading via getPanelData() during
-        // drop handlers still see the data, mirroring AbstractDragHandler.
+        // Defer disposal so drop handlers can still read the transfer data.
         setTimeout(() => dataDisposable?.dispose(), 0);
 
         onEnd?.(dragEvent, dropped);

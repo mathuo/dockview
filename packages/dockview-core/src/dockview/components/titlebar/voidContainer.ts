@@ -106,13 +106,9 @@ export class VoidContainer extends CompositeDisposable {
                 if (this.accessor.options.disableDnd) {
                     return true;
                 }
-                // Floating groups: HTML5 requires a shift modifier to
-                // tear out a panel (without it, the click moves the
-                // floating window). Touch has no shift modifier, but the
-                // long-press initiation in PointerDragSource provides the
-                // same "deliberate gesture" semantics — only a held press
-                // arms the drag, brief taps fall through to floating
-                // window movement.
+                // Floating groups are touch-draggable: the long-press
+                // initiation acts as the deliberate gesture that
+                // shift+drag provides for the HTML5 path.
                 if (
                     this.group.api.location.type === 'edge' &&
                     this.group.size === 0
@@ -133,11 +129,6 @@ export class VoidContainer extends CompositeDisposable {
                 };
             },
             createGhost: (event) => {
-                // Render a small "Multiple Panels (N)" pill that follows
-                // the cursor while the user drags the group header. This
-                // mirrors the previous HTML5 setDragImage behaviour from
-                // GroupDragHandler — the pointer path has no built-in drag
-                // image so we build one explicitly.
                 const ghostEl = document.createElement('div');
                 const style = window.getComputedStyle(this._element);
                 const bgColor = style.getPropertyValue(

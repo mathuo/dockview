@@ -1,19 +1,5 @@
-/**
- * Shared rendering helpers for drop-target overlays.
- *
- * Both the legacy HTML5 `Droptarget` and the touch-friendly `PointerDropTarget`
- * use these helpers so the visual output is identical regardless of which input
- * channel produced the drag.
- *
- * Two render paths are supported:
- *
- *  - **In-place**: a `.dv-drop-target-dropzone` containing a
- *    `.dv-drop-target-selection` element is appended to the drop target. The
- *    selection element is sized as a percentage of the drop target.
- *  - **Anchored**: an external "anchor container" (e.g. for floating groups)
- *    provides root + overlay elements, and the overlay is positioned in
- *    pixel-precise coordinates relative to the anchor container's root.
- */
+// Two render paths: in-place (dropzone appended to drop element) and
+// anchored (overlay rendered into an external anchor container).
 
 import { toggleClass } from '../dom';
 import { clamp } from '../math';
@@ -33,7 +19,6 @@ export interface OverlayElements {
     selection: HTMLElement;
 }
 
-/** Creates the dropzone+selection DOM nodes used by the in-place render path. */
 export function createOverlayElements(): OverlayElements {
     const dropzone = document.createElement('div');
     dropzone.className = 'dv-drop-target-dropzone';
@@ -108,8 +93,6 @@ function computeOverlayShape(
     };
 }
 
-/** Renders the in-place overlay (no anchor container) by sizing the selection
- *  element as a percentage of the drop target. */
 export function renderInPlaceOverlay(
     overlay: HTMLElement,
     quadrant: Position,
@@ -209,9 +192,7 @@ function applyAnchoredBounds(
     }
 }
 
-/** Renders an anchored overlay via an external anchor container.
- *  Returns true if the overlay's bounds actually changed; the caller may
- *  use this to skip redundant work on tight drag loops. */
+/** `boundsChanged: false` lets callers skip redundant work on tight drag loops. */
 export function renderAnchoredOverlay(args: {
     outlineElement: HTMLElement;
     targetModel: DropTargetTargetModel;

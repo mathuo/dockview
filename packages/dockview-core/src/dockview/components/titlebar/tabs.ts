@@ -277,13 +277,9 @@ export class Tabs extends CompositeDisposable {
                     this._flipTransitionCleanup?.();
                 },
             },
-            // Touch chip / tab drags don't fire HTML5 dragend, so the
-            // _tabsList HTML5 'dragend' listener (which calls
-            // resetDragAnimation) never runs. Without this, a touch chip
-            // drag canceled by pointerup-over-empty-space leaves
-            // _chipDragCleanup populated (LocalSelectionTransfer + iframe
-            // shield) until the next chip drop. resetDragAnimation is
-            // idempotent, so this is harmless for HTML5 drags.
+            // Touch chip drags have no HTML5 dragend; clean up here so a
+            // pointerup-over-empty-space cancel doesn't leak the transfer
+            // payload + iframe shield until the next drop.
             PointerDragController.getInstance().onDragEnd(() => {
                 this._chipDragCleanup?.dispose();
                 this._chipDragCleanup = null;
@@ -629,16 +625,11 @@ export class Tabs extends CompositeDisposable {
             tab.onDragStart((event) => {
                 this._onTabDragStart.fire({ nativeEvent: event, panel });
 
-                // Smooth-tab animation depends on the HTML5 dragend / drop
-                // lifecycle for cleanup (reset transforms, clear _animState).
-                // Touch drags fire `pointerup`, not `dragend`, and the
-                // _tabsList HTML5 listeners that drive that cleanup never
-                // run — so touch-driven smooth-anim leaves the source tab
-                // collapsed (width 0) permanently. Restrict the smooth-anim
-                // setup to HTML5 drags. Detect "is this a pointer-driven
-                // drag?" by negation rather than `instanceof DragEvent`,
-                // because jsdom may not implement the DragEvent class but
-                // does fire HTML5-style drag events through fireEvent.
+                // Smooth-anim cleanup runs from the HTML5 dragend / drop
+                // listeners on _tabsList; pointer drags would leak
+                // _animState (source tab stuck at width 0).
+                // Detect by negating PointerEvent — jsdom doesn't always
+                // expose DragEvent as a class.
                 const isPointer =
                     typeof PointerEvent !== 'undefined' &&
                     event instanceof PointerEvent;
@@ -1033,10 +1024,8 @@ export class Tabs extends CompositeDisposable {
             }
         }
 
-        // Smooth-tab animation depends on HTML5 dragend lifecycle, which the
-        // pointer path does not produce. Skip animState (and the rAF collapse
-        // below) entirely for touch drags — the user still gets per-target
-        // overlays from PointerDropTarget.
+        // Smooth-anim cleanup runs from HTML5 dragend; touch drags fall
+        // back to per-target overlays.
         if (!isPointer) {
             this._animState = {
                 sourceTabId: '',
@@ -1071,13 +1060,9 @@ export class Tabs extends CompositeDisposable {
             PanelTransfer.prototype
         );
 
-        // For HTML5 chip drags, shield iframes so the OS-level drag doesn't
-        // get captured by an embedded iframe's content. For touch (pointer)
-        // chip drags, `PointerDragController.beginDrag` already shielded
-        // iframes (with proper `ownerDocument` scoping) — calling it a
-        // second time here stacks shields and breaks the release-restore
-        // path. Use the chip's ownerDocument so popout-window HTML5 drags
-        // shield the popout's iframes, not the main document's.
+        // The pointer path's controller already shields iframes; double-
+        // shielding here would break the release-restore order. Use the
+        // chip's ownerDocument so popout HTML5 drags shield the right doc.
         const iframes = isPointer
             ? null
             : disableIframePointEvents(chip.element.ownerDocument ?? document);
@@ -1159,9 +1144,8 @@ export class Tabs extends CompositeDisposable {
             });
         }
 
-        // Build a composite drag image showing chip + group tabs.
-        // Only meaningful for HTML5 drags — pointer drags have no native
-        // drag image and the controller doesn't support setDragImage.
+        // setGroupDragImage uses HTML5 setDragImage; pointer drags get a
+        // follow-finger ghost from the PointerDragSource instead.
         if (!isPointer) {
             this._tabGroupManager.setGroupDragImage(
                 event as DragEvent,

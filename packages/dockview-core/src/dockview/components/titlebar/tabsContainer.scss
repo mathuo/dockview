@@ -28,9 +28,8 @@
     .dv-void-container {
         display: flex;
         flex-grow: 1;
-        // Suppress text selection when the user mousedowns + drags this
-        // empty header space — HTML5 `draggable=true` did this implicitly
-        // before phase 4 unified internal drags on pointer events.
+        // Pointer-event drags don't get the implicit text-selection
+        // suppression that `draggable=true` provides for HTML5 drags.
         user-select: none;
         -webkit-user-select: none;
         -moz-user-select: none;
