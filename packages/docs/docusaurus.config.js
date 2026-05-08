@@ -347,7 +347,7 @@ const config = {
             algolia: {
                 appId: 'BA8M6MXEG4',
                 apiKey: 'faaf190a8d1ac5d3a4e2c984eb457ea8',
-                indexName: 'dockview',
+                indexName: 'Documentation Website',
                 contextualSearch: true,
                 searchPagePath: 'search',
             },
