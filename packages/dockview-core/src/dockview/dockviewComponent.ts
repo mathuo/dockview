@@ -3011,6 +3011,7 @@ export class DockviewComponent
         const label = tabGroup.label;
         const color = tabGroup.color;
         const collapsed = tabGroup.collapsed;
+        const componentParams = tabGroup.componentParams;
         const panelIds = [...tabGroup.panelIds];
 
         // Capture the destination's grid location BEFORE potentially
@@ -3053,6 +3054,7 @@ export class DockviewComponent
                 label,
                 color,
                 collapsed,
+                componentParams,
             });
             for (const panel of removedPanels) {
                 targetGroup.model.addPanelToTabGroup(newTabGroup.id, panel.id);
@@ -3115,6 +3117,17 @@ export class DockviewComponent
         if (target === 'center') {
             const activePanel = from.activePanel;
 
+            // Snapshot tab group metadata before removing panels so we
+            // can recreate the tab groups in the destination after the
+            // panels are merged in.
+            const tabGroupSnapshots = from.model.getTabGroups().map((tg) => ({
+                label: tg.label,
+                color: tg.color,
+                collapsed: tg.collapsed,
+                componentParams: tg.componentParams,
+                panelIds: [...tg.panelIds],
+            }));
+
             const panels = this.movingLock(() =>
                 [...from.panels].map((p) =>
                     from.model.removePanel(p.id, {
@@ -3135,6 +3148,18 @@ export class DockviewComponent
                     });
                 }
             });
+
+            for (const snapshot of tabGroupSnapshots) {
+                const newTabGroup = to.model.createTabGroup({
+                    label: snapshot.label,
+                    color: snapshot.color,
+                    collapsed: snapshot.collapsed,
+                    componentParams: snapshot.componentParams,
+                });
+                for (const panelId of snapshot.panelIds) {
+                    to.model.addPanelToTabGroup(newTabGroup.id, panelId);
+                }
+            }
 
             // Ensure group becomes active after move
             if (options.skipSetActive !== true) {
@@ -3157,6 +3182,19 @@ export class DockviewComponent
                  * positions `source` like any other moved group.
                  */
                 const activePanel = from.activePanel;
+
+                // Snapshot tab group metadata so the new group inherits
+                // the tab grouping from the edge slot.
+                const tabGroupSnapshots = from.model
+                    .getTabGroups()
+                    .map((tg) => ({
+                        label: tg.label,
+                        color: tg.color,
+                        collapsed: tg.collapsed,
+                        componentParams: tg.componentParams,
+                        panelIds: [...tg.panelIds],
+                    }));
+
                 const movedPanels = this.movingLock(() =>
                     [...from.panels].map((p) =>
                         from.model.removePanel(p.id, { skipSetActive: true })
@@ -3171,6 +3209,21 @@ export class DockviewComponent
                         });
                     }
                 });
+
+                for (const snapshot of tabGroupSnapshots) {
+                    const newTabGroup = source.model.createTabGroup({
+                        label: snapshot.label,
+                        color: snapshot.color,
+                        collapsed: snapshot.collapsed,
+                        componentParams: snapshot.componentParams,
+                    });
+                    for (const panelId of snapshot.panelIds) {
+                        source.model.addPanelToTabGroup(
+                            newTabGroup.id,
+                            panelId
+                        );
+                    }
+                }
             } else {
                 switch (from.api.location.type) {
                     case 'grid':
