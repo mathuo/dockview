@@ -1281,6 +1281,60 @@ describe('dockviewComponent', () => {
         dockview.dispose();
     });
 
+    // Regression test for #1242: dropping a tab group at the edge of its
+    // own (and only) source group when the tab group contains all of the
+    // source group's panels must split the layout and leave no orphan
+    // empty group behind.
+    test('moveGroupOrPanel with tabGroupId to extremity of own group when tabgroup contains all panels removes empty source', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                return new PanelContentPartTest(options.id, options.name);
+            },
+        });
+
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({ id: 'panel1', component: 'default' });
+        dockview.addPanel({ id: 'panel2', component: 'default' });
+
+        const panel1 = dockview.getGroupPanel('panel1')!;
+        const panel2 = dockview.getGroupPanel('panel2')!;
+        const sourceGroup = panel1.group;
+
+        // Tab group spans every panel in the source group.
+        const tabGroup = sourceGroup.model.createTabGroup({
+            label: 'All',
+            color: 'red',
+        });
+        sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel1');
+        sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel2');
+
+        dockview.moveGroupOrPanel({
+            from: {
+                groupId: sourceGroup.id,
+                tabGroupId: tabGroup.id,
+            },
+            to: { group: sourceGroup, position: 'right' },
+        });
+
+        // Source group should be removed (it became empty); only the new
+        // group at the right contains the panels.
+        expect(dockview.groups.length).toBe(1);
+        const newGroup = panel1.group;
+        expect(newGroup).not.toBe(sourceGroup);
+        expect(panel2.group).toBe(newGroup);
+        expect(newGroup.model.size).toBe(2);
+
+        const newTabGroups = newGroup.model.getTabGroups();
+        expect(newTabGroups.length).toBe(1);
+        expect(newTabGroups[0].label).toBe('All');
+        expect(newTabGroups[0].color).toBe('red');
+
+        dockview.dispose();
+    });
+
     test('remove group', () => {
         dockview.layout(500, 1000);
 
