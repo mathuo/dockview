@@ -1602,7 +1602,7 @@ export class DockviewComponent
         // Collapse when the group becomes empty
         const autoCollapseDisposable = group.model.onDidRemovePanel(() => {
             if (group.model.isEmpty) {
-                this._shellManager!.setEdgeGroupCollapsed(position, true);
+                this.setEdgeGroupCollapsed(group, true);
             }
         });
         this._edgeGroupDisposables.set(position, autoCollapseDisposable);
@@ -1663,6 +1663,15 @@ export class DockviewComponent
     setEdgeGroupCollapsed(group: DockviewGroupPanel, collapsed: boolean): void {
         for (const [position, edgeGroup] of this._edgeGroups) {
             if (edgeGroup === group) {
+                if (
+                    this._shellManager!.isEdgeGroupCollapsed(position) ===
+                    collapsed
+                ) {
+                    // Skip the splitview resize on a no-op: with non-zero
+                    // theme gap, redundant resizeView calls accumulate
+                    // rounding drift that gradually shrinks the group.
+                    return;
+                }
                 this._shellManager!.setEdgeGroupCollapsed(position, collapsed);
                 edgeGroup.api._onDidCollapsedChange.fire({
                     isCollapsed: collapsed,
