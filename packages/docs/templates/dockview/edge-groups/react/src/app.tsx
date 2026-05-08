@@ -26,8 +26,8 @@ const RightActions = (props: IDockviewHeaderActionsProps) => {
     const [collapsed, setCollapsed] = React.useState(props.api.isCollapsed());
 
     React.useEffect(() => {
-        const disposable = props.api.onDidCollapsedChange((isCollapsed) => {
-            setCollapsed(isCollapsed);
+        const disposable = props.api.onDidCollapsedChange((event) => {
+            setCollapsed(event.isCollapsed);
         });
         return () => disposable.dispose();
     }, [props.api]);

@@ -9845,6 +9845,76 @@ describe('dockviewComponent', () => {
             dv.dispose();
         });
 
+        test('onDidCollapsedChange fires once per actual state change, not on redundant calls (#1241)', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['right']);
+            dv.layout(1000, 800);
+
+            const rightApi = dv.getEdgeGroup('right')!;
+            const events: boolean[] = [];
+            rightApi.onDidCollapsedChange((e) => events.push(e.isCollapsed));
+
+            rightApi.collapse();
+            rightApi.collapse(); // redundant
+            rightApi.expand();
+            rightApi.expand(); // redundant
+
+            expect(events).toEqual([true, false]);
+
+            dv.dispose();
+        });
+
+        test('repeated expand() does not drift the expanded size (#1241)', () => {
+            const c = document.createElement('div');
+            const dv = new DockviewComponent(c, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                // Non-zero gap is what surfaces splitview rounding drift
+                theme: { name: 'test', className: 'test', gap: 10 },
+            });
+            dv.addEdgeGroup('right', {
+                id: 'right-group',
+                initialSize: 220,
+                minimumSize: 100,
+            });
+            dv.layout(1000, 800);
+            dv.addPanel({
+                id: 'right-p1',
+                component: 'default',
+                position: { referenceGroup: 'right-group' },
+            });
+
+            const initialSize = (
+                dv as any
+            )._shellManager._outerSplitview.getViewSize(
+                (dv as any)._shellManager._rightIndex
+            );
+
+            const rightApi = dv.getEdgeGroup('right')!;
+            for (let i = 0; i < 10; i++) {
+                rightApi.expand();
+            }
+
+            const finalSize = (
+                dv as any
+            )._shellManager._outerSplitview.getViewSize(
+                (dv as any)._shellManager._rightIndex
+            );
+
+            expect(finalSize).toBe(initialSize);
+
+            dv.dispose();
+        });
+
         test('toJSON includes edgeGroups field for configured positions', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left', 'top']);
