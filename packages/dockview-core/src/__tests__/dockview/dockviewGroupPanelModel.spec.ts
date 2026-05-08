@@ -1140,6 +1140,207 @@ describe('dockviewGroupPanelModel', () => {
         ).toBe(1);
     });
 
+    // Regression test for #1242: dropping a tab-group chip on the edge of
+    // its own group must fire onMove (so the layout splits). Previously
+    // the handler short-circuited any panelId === null drop on self,
+    // which silently swallowed tab-group chip drops on the same group.
+    test('that tab group chip drop on self at edge fires onMove with tabGroupId', () => {
+        const accessor = fromPartial<DockviewComponent>({
+            id: 'testcomponentid',
+            options: {},
+            getPanel: jest.fn(),
+            doSetGroupActive: jest.fn(),
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
+            overlayRenderContainer: new OverlayRenderContainer(
+                document.createElement('div'),
+                fromPartial<DockviewComponent>({})
+            ),
+            onDidOptionsChange: jest.fn(),
+        });
+
+        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    canDisplayOverlay: jest.fn(),
+                };
+            }
+        );
+
+        const groupView = new groupviewMock() as DockviewGroupPanelModel;
+
+        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
+            return {
+                id: 'testgroupid',
+                model: groupView,
+            };
+        });
+
+        const container = document.createElement('div');
+        const cut = new DockviewGroupPanelModel(
+            container,
+            accessor,
+            'groupviewid',
+            {},
+            new groupPanelMock() as DockviewGroupPanel
+        );
+
+        cut.openPanel(new TestPanel('panel1', panelApi));
+
+        const element = container
+            .getElementsByClassName('dv-content-container')
+            .item(0) as HTMLElement;
+
+        jest.spyOn(element, 'offsetHeight', 'get').mockImplementation(
+            () => 100
+        );
+        jest.spyOn(element, 'offsetWidth', 'get').mockImplementation(() => 100);
+
+        // Tab-group chip drag: panelId is null, tabGroupId identifies the
+        // moving subset, groupId matches the group we are dropping on.
+        LocalSelectionTransfer.getInstance().setData(
+            [new PanelTransfer('testcomponentid', 'groupviewid', null, 'tg-1')],
+            PanelTransfer.prototype
+        );
+
+        const moveEvents: Array<{
+            target: string;
+            tabGroupId?: string;
+            itemId?: string;
+        }> = [];
+        cut.onMove((e) => {
+            moveEvents.push({
+                target: e.target,
+                tabGroupId: e.tabGroupId,
+                itemId: e.itemId,
+            });
+        });
+
+        fireEvent.dragEnter(element);
+        // Position cursor near the right edge so the drop position
+        // resolves to 'right' (split).
+        fireEvent(
+            element,
+            createOffsetDragOverEvent({ clientX: 95, clientY: 50 })
+        );
+
+        const target = element.querySelector(
+            '.dv-drop-target-dropzone'
+        ) as HTMLElement;
+        expect(target).not.toBeNull();
+
+        jest.spyOn(target, 'clientHeight', 'get').mockImplementation(() => 100);
+        jest.spyOn(target, 'clientWidth', 'get').mockImplementation(() => 100);
+
+        // Re-fire with the dropzone target so the directional zone is
+        // computed against the dropzone's geometry.
+        fireEvent(
+            target,
+            createOffsetDragOverEvent({ clientX: 95, clientY: 50 })
+        );
+        fireEvent.drop(target);
+
+        expect(moveEvents.length).toBe(1);
+        expect(moveEvents[0].target).toBe('right');
+        expect(moveEvents[0].tabGroupId).toBe('tg-1');
+        expect(moveEvents[0].itemId).toBeUndefined();
+
+        LocalSelectionTransfer.getInstance().clearData(PanelTransfer.prototype);
+    });
+
+    // Companion regression test: full-group drag on self (no tabGroupId)
+    // must still be a no-op so we don't regress the original behavior.
+    test('that full group drop on self at edge does not fire onMove', () => {
+        const accessor = fromPartial<DockviewComponent>({
+            id: 'testcomponentid',
+            options: {},
+            getPanel: jest.fn(),
+            doSetGroupActive: jest.fn(),
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
+            overlayRenderContainer: new OverlayRenderContainer(
+                document.createElement('div'),
+                fromPartial<DockviewComponent>({})
+            ),
+            onDidOptionsChange: jest.fn(),
+        });
+
+        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    canDisplayOverlay: jest.fn(),
+                };
+            }
+        );
+
+        const groupView = new groupviewMock() as DockviewGroupPanelModel;
+
+        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
+            return {
+                id: 'testgroupid',
+                model: groupView,
+            };
+        });
+
+        const container = document.createElement('div');
+        const cut = new DockviewGroupPanelModel(
+            container,
+            accessor,
+            'groupviewid',
+            {},
+            new groupPanelMock() as DockviewGroupPanel
+        );
+
+        cut.openPanel(new TestPanel('panel1', panelApi));
+
+        const element = container
+            .getElementsByClassName('dv-content-container')
+            .item(0) as HTMLElement;
+
+        jest.spyOn(element, 'offsetHeight', 'get').mockImplementation(
+            () => 100
+        );
+        jest.spyOn(element, 'offsetWidth', 'get').mockImplementation(() => 100);
+
+        // Full-group drag: panelId null AND tabGroupId undefined.
+        LocalSelectionTransfer.getInstance().setData(
+            [new PanelTransfer('testcomponentid', 'groupviewid', null)],
+            PanelTransfer.prototype
+        );
+
+        const moveEvents: unknown[] = [];
+        cut.onMove((e) => {
+            moveEvents.push(e);
+        });
+
+        fireEvent.dragEnter(element);
+        fireEvent(
+            element,
+            createOffsetDragOverEvent({ clientX: 95, clientY: 50 })
+        );
+
+        const target = element.querySelector(
+            '.dv-drop-target-dropzone'
+        ) as HTMLElement;
+        if (target) {
+            jest.spyOn(target, 'clientHeight', 'get').mockImplementation(
+                () => 100
+            );
+            jest.spyOn(target, 'clientWidth', 'get').mockImplementation(
+                () => 100
+            );
+            fireEvent(
+                target,
+                createOffsetDragOverEvent({ clientX: 95, clientY: 50 })
+            );
+            fireEvent.drop(target);
+        }
+
+        expect(moveEvents.length).toBe(0);
+
+        LocalSelectionTransfer.getInstance().clearData(PanelTransfer.prototype);
+    });
+
     test('that should not allow drop when not dropping for different component id', () => {
         const accessor = fromPartial<DockviewComponent>({
             id: 'testcomponentid',

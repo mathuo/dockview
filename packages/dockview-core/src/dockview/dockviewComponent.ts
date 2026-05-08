@@ -3013,6 +3013,14 @@ export class DockviewComponent
         const collapsed = tabGroup.collapsed;
         const panelIds = [...tabGroup.panelIds];
 
+        // Capture the destination's grid location BEFORE potentially
+        // removing the source group, in case source === destination and
+        // the source becomes empty after panel removal.
+        const referenceLocation =
+            destinationTarget && destinationTarget !== 'center'
+                ? getGridLocation(destinationGroup.element)
+                : undefined;
+
         // Remove panels from the source group
         const removedPanels = this.movingLock(() =>
             panelIds
@@ -3027,14 +3035,6 @@ export class DockviewComponent
 
         if (removedPanels.length === 0) {
             return;
-        }
-
-        if (
-            !options.keepEmptyGroups &&
-            sourceGroup.model.size === 0 &&
-            sourceGroup !== destinationGroup
-        ) {
-            this.doRemoveGroup(sourceGroup, { skipActive: true });
         }
 
         const addPanelsToGroup = (targetGroup: DockviewGroupPanel) => {
@@ -3070,18 +3070,36 @@ export class DockviewComponent
             }
         };
 
-        if (!destinationTarget || destinationTarget === 'center') {
-            addPanelsToGroup(destinationGroup);
+        let targetGroup: DockviewGroupPanel;
+        if (
+            !destinationTarget ||
+            destinationTarget === 'center' ||
+            !referenceLocation
+        ) {
+            targetGroup = destinationGroup;
         } else {
-            const referenceLocation = getGridLocation(destinationGroup.element);
             const dropLocation = getRelativeLocation(
                 this.gridview.orientation,
                 referenceLocation,
                 destinationTarget
             );
-            const newGroup = this.createGroupAtLocation(dropLocation);
-            addPanelsToGroup(newGroup);
+            targetGroup = this.createGroupAtLocation(dropLocation);
         }
+
+        // Remove the source group if it became empty. We compare against
+        // the actual targetGroup (which is a freshly-created group for
+        // edge drops) rather than the originally-passed destinationGroup,
+        // so a tab-group drag onto its own group's edge still cleans up
+        // the now-empty source.
+        if (
+            !options.keepEmptyGroups &&
+            sourceGroup.model.size === 0 &&
+            sourceGroup !== targetGroup
+        ) {
+            this.doRemoveGroup(sourceGroup, { skipActive: true });
+        }
+
+        addPanelsToGroup(targetGroup);
     }
 
     moveGroup(options: MoveGroupOptions): void {
