@@ -135,6 +135,12 @@ export interface DockviewOptions {
      */
     scrollbars?: 'native' | 'custom';
     /**
+     * Scroll the tab header to the active tab when selection changes.
+     * When enabled, a clipped active tab is aligned to the start of the
+     * tab strip. Defaults to `true`.
+     */
+    revealActiveTab?: boolean;
+    /**
      * Return the items to display in the tab context menu on right-click.
      *
      * Use built-in string shortcuts (`'close'`, `'closeOthers'`, `'closeAll'`, `'separator'`)
@@ -240,6 +246,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         theme: undefined,
         disableTabsOverflowList: undefined,
         scrollbars: undefined,
+        revealActiveTab: undefined,
         getTabContextMenuItems: undefined,
         getTabGroupChipContextMenuItems: undefined,
         createTabGroupChipComponent: undefined,

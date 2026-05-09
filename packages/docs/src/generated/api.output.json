@@ -28812,6 +28812,34 @@
                 }
             },
             {
+                "name": "revealActiveTab",
+                "code": "boolean",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "boolean"
+                },
+                "flags": {
+                    "isOptional": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Scroll the tab header to the active tab when selection changes.\nWhen enabled, a clipped active tab is aligned to the start of the\ntab strip. Defaults to "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`true`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": "."
+                        }
+                    ]
+                }
+            },
+            {
                 "name": "singleTabMode",
                 "code": "'fullwidth' | 'default'",
                 "kind": "property",
