@@ -170,7 +170,9 @@ export default () => {
         <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 8px' }}>
                 <span style={{ fontSize: '12px', color: 'var(--dv-paneview-header-border-color, #888)' }}>Tab position:</span>
-                {(['top', 'bottom'] as DockviewHeaderPosition[]).map((pos) => (
+                {(
+                    ['top', 'bottom', 'left', 'right'] as DockviewHeaderPosition[]
+                ).map((pos) => (
                     <button
                         key={pos}
                         onClick={() => onHeaderPositionChange(pos)}
