@@ -21,15 +21,23 @@ concurrency:
 jobs:
     release:
         runs-on: ubuntu-latest
+        environment: release
         permissions:
-            contents: write
+            contents: read
         steps:
+            - name: Generate App token
+              id: app-token
+              uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
+              with:
+                  app-id: ${{ secrets.RELEASE_APP_ID }}
+                  private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
             - uses: actions/checkout@v4
               with:
                   ref: master
                   fetch-depth: 0
                   fetch-tags: true
-                  token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+                  token: ${{ steps.app-token.outputs.token }}
 
             - uses: actions/setup-node@v4
               with:
