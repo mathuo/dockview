@@ -1336,4 +1336,34 @@ describe('gridview', () => {
 
         subscription.dispose();
     });
+
+    test('that calling serialize from within an onDidMaximizedNodeChange listener does not stack overflow when a view is maximized', () => {
+        // regression for #1074: serialize() previously fired
+        // onDidMaximizedNodeChange while toggling maximize state internally,
+        // which caused infinite recursion if a listener re-entered serialize().
+        const gridview = new Gridview(
+            true,
+            { separatorBorder: '' },
+            Orientation.HORIZONTAL
+        );
+        gridview.layout(1000, 1000);
+
+        const view1 = new MockGridview('1');
+        const view2 = new MockGridview('2');
+        gridview.addView(view1, Sizing.Distribute, [0]);
+        gridview.addView(view2, Sizing.Distribute, [1]);
+
+        gridview.maximizeView(view1);
+
+        let invocations = 0;
+        const subscription = gridview.onDidMaximizedNodeChange(() => {
+            invocations++;
+            gridview.serialize();
+        });
+
+        expect(() => gridview.serialize()).not.toThrow();
+        expect(invocations).toBe(0);
+
+        subscription.dispose();
+    });
 });

@@ -163,6 +163,8 @@ export class Emitter<T> implements IDisposable {
 
     public fire(e: T): void {
         if (this._pauseTokens.size > 0) {
+            // while paused, the event is dropped entirely — `_last` is not
+            // updated, so replay subscribers won't see values fired during a pause
             return;
         }
         if (this.options?.replay) {
@@ -173,10 +175,10 @@ export class Emitter<T> implements IDisposable {
         }
     }
 
-    public pauseEvents(): IDisposable {
-        const lock = {};
-        this._pauseTokens.add(lock);
-        return Disposable.from(() => this._pauseTokens.delete(lock));
+    public pause(): IDisposable {
+        const token = {};
+        this._pauseTokens.add(token);
+        return Disposable.from(() => this._pauseTokens.delete(token));
     }
 
     public dispose(): void {

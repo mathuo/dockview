@@ -516,7 +516,7 @@ export class Gridview implements IDisposable {
          * call `this.exitMaximizedView()`. We don't want this to invoke any listeners
          * since we undo it before leaving this method
          */
-        const pauseToken = this._onDidMaximizedNodeChange.pauseEvents();
+        const pauseToken = this._onDidMaximizedNodeChange.pause();
 
         try {
             if (this.hasMaximizedView()) {

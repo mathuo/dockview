@@ -276,7 +276,7 @@ describe('events', () => {
                 value = x;
             });
 
-            const pauseDisposable = emitter.pauseEvents();
+            const pauseDisposable = emitter.pause();
 
             emitter.fire(0);
             expect(value).toBeUndefined();
@@ -296,7 +296,7 @@ describe('events', () => {
                 value = x;
             });
 
-            const pauseDisposable = emitter.pauseEvents();
+            const pauseDisposable = emitter.pause();
 
             emitter.fire(0);
             expect(value).toBeUndefined();
@@ -313,7 +313,7 @@ describe('events', () => {
             const emitter = new Emitter<number>({ replay: true });
             let value: number | undefined = undefined;
 
-            const pauseDisposable = emitter.pauseEvents();
+            const pauseDisposable = emitter.pause();
 
             emitter.fire(1);
 
@@ -334,8 +334,8 @@ describe('events', () => {
                 value = x;
             });
 
-            const pauseDisposable1 = emitter.pauseEvents();
-            const pauseDisposable2 = emitter.pauseEvents();
+            const pauseDisposable1 = emitter.pause();
+            const pauseDisposable2 = emitter.pause();
 
             emitter.fire(0);
             expect(value).toBeUndefined();
