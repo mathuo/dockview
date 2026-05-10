@@ -1464,6 +1464,81 @@ describe('dockviewComponent', () => {
         dockview.dispose();
     });
 
+    // Regression test for #1254. After a cross-group tab-group chip
+    // drag, the chip element is detached from the DOM (the source tab
+    // group becomes empty, so `_positionChipForGroup` removes it).
+    // `dragend` therefore can't bubble to `_tabsList`, which historically
+    // left the `panelTransfer` singleton populated with the chip drag's
+    // payload (including `tabGroupId`). Fix wires a `dragend` listener
+    // directly on the chip element so cleanup runs regardless of
+    // attachment.
+    test('cross-group chip drag clears panelTransfer when the chip detaches (#1254)', async () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                return new PanelContentPartTest(options.id, options.name);
+            },
+        });
+        dockview.layout(1000, 1000);
+
+        for (let i = 1; i <= 4; i++) {
+            dockview.addPanel({ id: `panel${i}`, component: 'default' });
+        }
+
+        const sourceGroup = dockview.getGroupPanel('panel1')!.group;
+        // panel4 ungrouped so source survives the move; panels 1-3 are
+        // the tab group that will move out cross-group.
+        const monitoring = sourceGroup.model.createTabGroup({
+            label: 'Monitoring',
+            color: 'purple',
+        });
+        sourceGroup.model.addPanelToTabGroup(monitoring.id, 'panel1');
+        sourceGroup.model.addPanelToTabGroup(monitoring.id, 'panel2');
+        sourceGroup.model.addPanelToTabGroup(monitoring.id, 'panel3');
+
+        dockview.addPanel({
+            id: 'sibling',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+        const siblingGroup = dockview.getGroupPanel('sibling')!.group;
+
+        // Chip is rendered on a microtask via _scheduleTabGroupUpdate.
+        await Promise.resolve();
+
+        const chip = sourceGroup.element.querySelector(
+            '.dv-tab-group-chip'
+        ) as HTMLElement;
+        expect(chip).toBeTruthy();
+
+        // Real chip drag: dragstart populates panelTransfer with the
+        // chip payload (tabGroupId set).
+        fireEvent.dragStart(chip);
+        expect(getPanelData()?.tabGroupId).toBe(monitoring.id);
+
+        // The drop resolves via moveGroupOrPanel — the same path the
+        // real drag flow ends up calling. This detaches the chip from
+        // the DOM (source tab group becomes empty).
+        dockview.moveGroupOrPanel({
+            from: { groupId: sourceGroup.id, tabGroupId: monitoring.id },
+            to: { group: siblingGroup, position: 'right' },
+        });
+        expect(chip.isConnected).toBe(false);
+
+        // dragend fires on the (now-detached) chip element.
+        fireEvent.dragEnd(chip);
+
+        // Without the fix, panelTransfer keeps the chip-drag payload
+        // (with tabGroupId) and any subsequent dragover/canDisplayOverlay
+        // call that reads it before the next dragstart's setData runs
+        // would see stale data — including a stale tabGroupId pointing
+        // at a tab group that has just been recreated under a new id.
+        expect(getPanelData()).toBeUndefined();
+
+        dockview.dispose();
+    });
+
     test('remove group', () => {
         dockview.layout(500, 1000);
 

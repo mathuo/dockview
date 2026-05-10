@@ -1035,8 +1035,24 @@ export class Tabs extends CompositeDisposable {
 
         const iframes = disableIframePointEvents();
 
+        // The dragend listener on `_tabsList` is unreachable for chip
+        // drags because cross-group drops detach the chip from the DOM
+        // before dragend fires (the source tab group becomes empty, so
+        // `_positionChipForGroup` removes the chip element). Without
+        // bubbling, the tabsList listener never runs and `_animState`,
+        // `_chipDragCleanup`, and the dragging CSS classes leak. Listen
+        // directly on the chip element so cleanup happens regardless of
+        // whether it's still attached.  (Issue #1254.)
+        const chipElement = chip.element;
+        const onChipDragEnd = () => {
+            chipElement.removeEventListener('dragend', onChipDragEnd);
+            this.resetDragAnimation();
+        };
+        chipElement.addEventListener('dragend', onChipDragEnd);
+
         this._chipDragCleanup = {
             dispose: () => {
+                chipElement.removeEventListener('dragend', onChipDragEnd);
                 panelTransfer.clearData(PanelTransfer.prototype);
                 iframes.release();
             },
