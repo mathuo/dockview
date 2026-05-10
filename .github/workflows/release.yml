@@ -1,0 +1,62 @@
+name: Release
+
+on:
+    workflow_dispatch:
+        inputs:
+            specifier:
+                description: 'patch | minor | major | prerelease | explicit version (e.g. 6.1.0)'
+                required: true
+                type: string
+                default: patch
+            dry-run:
+                description: 'Dry run (compute version and commit locally, do not push)'
+                required: false
+                type: boolean
+                default: false
+
+concurrency:
+    group: release
+    cancel-in-progress: false
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: master
+                  fetch-depth: 0
+                  fetch-tags: true
+                  token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '20.x'
+
+            - uses: actions/cache@v4
+              with:
+                  path: |
+                      node_modules
+                      ~/.npm
+                  key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-modules-
+
+            - run: yarn
+
+            - name: Configure git
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+            - name: Version
+              run: npx nx release version ${{ inputs.specifier }}
+
+            - name: Show release commit
+              run: git --no-pager log -1 --stat
+
+            - name: Push commit and tag
+              if: ${{ !inputs.dry-run }}
+              run: git push --follow-tags origin master
