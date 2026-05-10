@@ -169,7 +169,8 @@ describe('overlayRenderContainer', () => {
         expect(panelContentEl.parentElement).toBe(container);
         expect(container.parentElement).toBe(parentContainer);
 
-        expect(container.style.display).toBe('');
+        expect(container.style.visibility).toBe('');
+        expect(container.style.pointerEvents).toBe('');
 
         expect(container.style.left).toBe('50px');
         expect(container.style.top).toBe('100px');
@@ -181,7 +182,8 @@ describe('overlayRenderContainer', () => {
 
         onDidDimensionsChange.fire({});
         await exhaustAnimationFrame();
-        expect(container.style.display).toBe('');
+        expect(container.style.visibility).toBe('');
+        expect(container.style.pointerEvents).toBe('');
 
         expect(container.style.left).toBe('49px');
         expect(container.style.top).toBe('99px');
@@ -193,22 +195,25 @@ describe('overlayRenderContainer', () => {
 
         (panel as Writable<IDockviewPanel>).api.isVisible = false;
         onDidVisibilityChange.fire({});
-        expect(container.style.display).toBe('none');
+        expect(container.style.visibility).toBe('hidden');
+        expect(container.style.pointerEvents).toBe('none');
         expect(
             referenceContainer.element.getBoundingClientRect
         ).toHaveBeenCalledTimes(2);
 
         (panel as Writable<IDockviewPanel>).api.isVisible = true;
         onDidVisibilityChange.fire({});
-        expect(container.style.display).toBe('');
+        expect(container.style.pointerEvents).toBe('');
+        await exhaustAnimationFrame();
+        expect(container.style.visibility).toBe('');
 
-        expect(container.style.left).toBe('49px');
-        expect(container.style.top).toBe('99px');
-        expect(container.style.width).toBe('101px');
-        expect(container.style.height).toBe('201px');
+        expect(container.style.left).toBe('50px');
+        expect(container.style.top).toBe('100px');
+        expect(container.style.width).toBe('100px');
+        expect(container.style.height).toBe('200px');
         expect(
             referenceContainer.element.getBoundingClientRect
-        ).toHaveBeenCalledTimes(2);
+        ).toHaveBeenCalledTimes(3);
     });
 
     test('related z-index from `aria-level` set on floating panels', async () => {
