@@ -1,4 +1,4 @@
-import { IDisposable } from './lifecycle';
+import { Disposable, IDisposable } from './lifecycle';
 
 export interface Event<T> {
     (listener: (e: T) => any): IDisposable;
@@ -105,6 +105,8 @@ export class Emitter<T> implements IDisposable {
     private _listeners: Listener<any>[] = [];
     private _disposed = false;
 
+    private readonly _pauseTokens = new Set<object>();
+
     static ENABLE_TRACKING = false;
     static readonly MEMORY_LEAK_WATCHER = new LeakageMonitor();
 
@@ -160,12 +162,23 @@ export class Emitter<T> implements IDisposable {
     }
 
     public fire(e: T): void {
+        if (this._pauseTokens.size > 0) {
+            // while paused, the event is dropped entirely — `_last` is not
+            // updated, so replay subscribers won't see values fired during a pause
+            return;
+        }
         if (this.options?.replay) {
             this._last = e;
         }
         for (const listener of this._listeners) {
             listener.callback(e);
         }
+    }
+
+    public pause(): IDisposable {
+        const token = {};
+        this._pauseTokens.add(token);
+        return Disposable.from(() => this._pauseTokens.delete(token));
     }
 
     public dispose(): void {
