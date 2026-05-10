@@ -84,7 +84,7 @@ const themes = [
     'dockview-theme-light',
     'dockview-theme-vs',
     'dockview-theme-dracula',
-    'dockview-theme-replit',
+
     'dockview-theme-kraken',
 ];
 

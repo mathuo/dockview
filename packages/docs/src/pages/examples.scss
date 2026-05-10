@@ -1,0 +1,132 @@
+.examples-page {
+    padding: 48px 0 80px;
+    background: var(--ifm-background-color);
+}
+
+.examples-hero {
+    text-align: center;
+    margin-bottom: 48px;
+
+    h1 {
+        font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+        font-weight: 700;
+        margin: 0 0 12px;
+    }
+
+    p {
+        font-size: 1.05rem;
+        color: var(--ifm-color-content-secondary);
+        max-width: 560px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+}
+
+// ─── Component sections ──────────────────────────────────────────────────────
+
+.examples-component-section {
+    margin-bottom: 48px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.examples-component-header {
+    margin-bottom: 20px;
+}
+
+.examples-component-title {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin: 0 0 4px;
+}
+
+.examples-component-description {
+    font-size: 0.9rem;
+    color: var(--ifm-color-content-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+// ─── Cards grid ──────────────────────────────────────────────────────────────
+
+.examples-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+
+    @media (min-width: 640px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: 996px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.example-card {
+    background: var(--ifm-background-surface-color);
+    border: 1px solid var(--ifm-toc-border-color);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.example-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.example-card-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+// ─── Framework links ─────────────────────────────────────────────────────────
+
+.example-card-frameworks {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.example-fw-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border: 1px solid var(--ifm-toc-border-color);
+    border-radius: 5px;
+    background: var(--ifm-background-color);
+    color: var(--ifm-color-content);
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: border-color 0.15s, background 0.15s;
+
+    &:hover {
+        border-color: var(--ifm-color-primary);
+        background: color-mix(
+            in srgb,
+            var(--ifm-color-primary) 12%,
+            transparent
+        );
+        color: var(--ifm-color-content);
+        text-decoration: none;
+    }
+
+    img {
+        flex-shrink: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .example-fw-link {
+        transition: none;
+    }
+}

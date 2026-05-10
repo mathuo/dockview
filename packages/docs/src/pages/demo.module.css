@@ -1,0 +1,122 @@
+.header {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    background: var(--ifm-navbar-background-color);
+    border-bottom: 1px solid var(--ifm-toc-border-color);
+    flex-shrink: 0;
+}
+
+.spacer {
+    flex: 1;
+}
+
+.backLink {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--ifm-navbar-link-color);
+    text-decoration: none;
+    font-size: 0.8em;
+    transition: color 0.15s;
+}
+
+.backLink:hover {
+    color: var(--ifm-navbar-link-hover-color);
+    text-decoration: none;
+}
+
+.divider {
+    width: 1px;
+    height: 16px;
+    background: var(--ifm-toc-border-color);
+}
+
+.iconButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--ifm-navbar-link-color);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+    text-decoration: none;
+}
+
+.iconButton:hover {
+    color: var(--ifm-navbar-link-hover-color);
+    background: var(--ifm-hover-overlay);
+    text-decoration: none;
+}
+
+.iconButton:focus-visible {
+    outline: 2px solid var(--ifm-color-primary);
+    outline-offset: 2px;
+}
+
+.toggleButton {
+    display: flex;
+    align-items: center;
+    background: var(--ifm-hover-overlay);
+    border: 1px solid var(--ifm-toc-border-color);
+    color: var(--ifm-navbar-link-color);
+    cursor: pointer;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    line-height: 1.4;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.toggleButton:hover {
+    color: var(--ifm-navbar-link-hover-color);
+    border-color: var(--ifm-color-emphasis-400);
+}
+
+.toggleButton:focus-visible {
+    outline: 2px solid var(--ifm-color-primary);
+    outline-offset: 2px;
+}
+
+.toggleButtonActive {
+    background: var(--ifm-color-primary);
+    border-color: var(--ifm-color-primary);
+    color: var(--ifm-color-white, #fff);
+}
+
+.toggleButtonActive:hover {
+    background: var(--ifm-color-primary-dark, var(--ifm-color-primary));
+    border-color: var(--ifm-color-primary-dark, var(--ifm-color-primary));
+    color: var(--ifm-color-white, #fff);
+}
+
+.tip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75em;
+    color: var(--ifm-navbar-link-color);
+    white-space: nowrap;
+    user-select: none;
+    background: var(--ifm-hover-overlay);
+    border: 1px solid var(--ifm-toc-border-color);
+    border-radius: 6px;
+    padding: 3px 10px 3px 8px;
+}
+
+.kbd {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--ifm-toc-border-color);
+    background: var(--ifm-hover-overlay);
+    font-family: monospace;
+    font-size: 1em;
+    line-height: 1.7;
+}

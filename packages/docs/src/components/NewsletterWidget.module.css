@@ -1,0 +1,62 @@
+/* ── Wrapper ─────────────────────────────────────────────────────────────────── */
+
+.wrapper {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9998;
+    display: flex;
+    align-items: stretch;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 999px;
+}
+
+/* ── Sticky trigger ─────────────────────────────────────────────────────────── */
+
+.trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--ifm-color-primary);
+    color: #fff;
+    border: none;
+    border-radius: 999px 0 0 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.15s;
+    text-decoration: none;
+}
+
+.trigger:hover {
+    filter: brightness(1.1);
+    color: #fff;
+    text-decoration: none;
+}
+
+.trigger:active {
+    transform: translateY(0);
+}
+
+/* ── Dismiss button ──────────────────────────────────────────────────────────── */
+
+.dismiss {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    padding: 0;
+    background: color-mix(in srgb, var(--ifm-color-primary) 80%, black);
+    color: #fff;
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 0 999px 999px 0;
+    cursor: pointer;
+    transition: filter 0.15s;
+}
+
+.dismiss:hover {
+    filter: brightness(1.15);
+}
+

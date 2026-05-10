@@ -1,13 +1,28 @@
 ---
-title: Overview
+title: Core Concepts
 sidebar_position: 0
+description: Core concepts of Dockview — panels, groups, the API pattern, and how they fit together.
 ---
 
-This section provided a core overview.
+Dockview organizes content into **panels** and **groups** arranged in a resizable grid. Understanding these primitives and the API pattern is all you need to get started.
 
-The component takes a collection of [Options](/docs/api/dockview/options) as inputs and
-once you have created a dock you can store a reference to the [API](/docs/api/dockview/overview) that is created.
+## Panels
 
+A panel is the unit of content in Dockview. Each panel renders a component you register by name. Panels are never created directly. They are instantiated through the API using `api.addPanel()`, which requires an `id` (unique identifier) and a `component` (the registered component name).
+
+See [Adding Panels](/docs/core/panels/add) for positioning, sizing, and floating options.
+
+## Groups
+
+A group is a container that holds one or more panels and renders a tab bar at the top. When a group contains multiple panels, each panel appears as a tab. Groups are created automatically when panels are added, and can be manipulated through the [Group API](/docs/api/dockview/groupApi).
+
+Users can drag panels between groups, split groups to create new ones, and float or pop out groups as separate windows.
+
+## The API Pattern
+
+All mutations to the layout go through the `DockviewApi`. You receive the API instance via the `onReady` callback (or `ready` event in Vue/Angular), which fires once the component has mounted.
+
+Store the API reference in a ref or class property, as you will use it throughout the lifetime of your application.
 
 <FrameworkSpecific framework='JavaScript'>
 ```tsx
@@ -66,3 +81,28 @@ export class AppComponent {
 ```
 </FrameworkSpecific>
 
+See the full [API Reference](/docs/api/dockview/overview) for all available methods.
+
+## Drag & Drop
+
+Drag and drop is built in. Users can drag panel tabs to rearrange them within a group, move them to a different group, split the layout to create a new group, or float a group. No configuration is required to enable this.
+
+See [Drag & Drop](/docs/core/dnd/overview) for customization and third-party drag source integration.
+
+## Serialization
+
+Layouts can be saved and restored using `api.toJSON()` and `api.fromJSON()`. This allows you to persist the layout to local storage or a backend and restore it on the next load.
+
+```ts
+// Save
+const layout = api.toJSON();
+localStorage.setItem('my_layout', JSON.stringify(layout));
+
+// Restore
+const saved = localStorage.getItem('my_layout');
+if (saved) {
+    api.fromJSON(JSON.parse(saved));
+}
+```
+
+See [Saving State](/docs/core/state/save) and [Loading State](/docs/core/state/load) for full examples.

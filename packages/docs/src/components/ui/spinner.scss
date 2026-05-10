@@ -10,7 +10,7 @@
     width: 13px;
     height: 13px;
     border-radius: 50%;
-    background: #fff;
+    background: var(--ifm-color-primary);
     animation-timing-function: cubic-bezier(0, 1, 1, 0);
 }
 .lds-ellipsis div:nth-child(1) {
@@ -51,5 +51,11 @@
     }
     100% {
         transform: translate(24px, 0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lds-ellipsis div {
+        animation-duration: 0.01ms !important;
     }
 }

@@ -1,9 +1,10 @@
-import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { Component, Injector, EnvironmentInjector } from '@angular/core';
 import { AngularFrameworkComponentFactory } from '../lib/utils/component-factory';
 import { CreateComponentOptions } from 'dockview-core';
 
 @Component({
+    standalone: false,
     selector: 'test-dockview-component',
     template: '<div class="test-dockview">{{ data?.title || "Default" }}</div>',
 })
@@ -12,24 +13,28 @@ class TestDockviewComponent {
 }
 
 @Component({
+    standalone: false,
     selector: 'test-gridview-component',
     template: '<div class="test-gridview">Gridview Panel</div>',
 })
 class TestGridviewComponent {}
 
 @Component({
+    standalone: false,
     selector: 'test-splitview-component',
     template: '<div class="test-splitview">Splitview Panel</div>',
 })
 class TestSplitviewComponent {}
 
 @Component({
+    standalone: false,
     selector: 'test-paneview-component',
     template: '<div class="test-paneview">Paneview Part</div>',
 })
 class TestPaneviewComponent {}
 
 @Component({
+    standalone: false,
     selector: 'test-tab-component',
     template: '<div class="test-tab">{{ title || "Tab" }}</div>',
 })
@@ -38,12 +43,14 @@ class TestTabComponent {
 }
 
 @Component({
+    standalone: false,
     selector: 'test-watermark-component',
     template: '<div class="test-watermark">Watermark</div>',
 })
 class TestWatermarkComponent {}
 
 @Component({
+    standalone: false,
     selector: 'test-header-actions-component',
     template: '<div class="test-header-actions">Actions</div>',
 })
@@ -218,8 +225,8 @@ describe('AngularFrameworkComponentFactory', () => {
             const renderer = factory.createTabComponent(options);
 
             expect(renderer).toBeDefined();
-            expect(renderer!.element).toBeTruthy();
-            expect(renderer!.element.tagName).toBe('TEST-TAB-COMPONENT');
+            expect(renderer.element).toBeTruthy();
+            expect(renderer.element.tagName).toBe('TEST-TAB-COMPONENT');
         });
 
         it('should use default tab component when specific component not found', () => {
@@ -231,8 +238,8 @@ describe('AngularFrameworkComponentFactory', () => {
             const renderer = factory.createTabComponent(options);
 
             expect(renderer).toBeDefined();
-            expect(renderer!.element).toBeTruthy();
-            expect(renderer!.element.tagName).toBe('TEST-TAB-COMPONENT');
+            expect(renderer.element).toBeTruthy();
+            expect(renderer.element.tagName).toBe('TEST-TAB-COMPONENT');
         });
 
         it('should return undefined when no component and no default', () => {
@@ -283,8 +290,8 @@ describe('AngularFrameworkComponentFactory', () => {
                 factory.createHeaderActionsComponent('header-test');
 
             expect(renderer).toBeDefined();
-            expect(renderer!.element).toBeTruthy();
-            expect(renderer!.element.tagName).toBe(
+            expect(renderer.element).toBeTruthy();
+            expect(renderer.element.tagName).toBe(
                 'TEST-HEADER-ACTIONS-COMPONENT'
             );
         });
@@ -350,7 +357,7 @@ describe('AngularFrameworkComponentFactory', () => {
             const renderer = factory.createTabComponent(options);
 
             expect(renderer).toBeDefined();
-            expect(renderer!.element).toBeTruthy();
+            expect(renderer.element).toBeTruthy();
         });
     });
 

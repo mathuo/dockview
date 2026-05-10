@@ -1,0 +1,89 @@
+---
+title: Managing Groups
+sidebar_position: 0
+description: How to create, remove, and clear groups programmatically using the Dockview API.
+---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+This page covers creating, removing, and clearing groups programmatically.
+
+## Adding a Group
+
+`api.addGroup()` creates an empty group and returns it. You can position it relative to an existing panel or group, or at an absolute edge of the layout.
+
+<DocRef declaration="DockviewApi" methods={['addGroup']} />
+
+```ts
+// Add a group to the right edge of the layout
+const group = api.addGroup({ direction: 'right' });
+
+// Add a group relative to an existing panel
+const group = api.addGroup({
+    referencePanel: 'panel_1',
+    direction: 'below',
+});
+
+// Add a group relative to another group
+const group = api.addGroup({
+    referenceGroup: existingGroup,
+    direction: 'left',
+});
+```
+
+Once you have a group reference you can add panels into it:
+
+```ts
+const group = api.addGroup({ direction: 'right' });
+
+api.addPanel({
+    id: 'panel_1',
+    component: 'default',
+    position: { referenceGroup: group },
+});
+```
+
+## Removing a Group
+
+`api.removeGroup()` removes a group and all panels it contains.
+
+<DocRef declaration="DockviewApi" methods={['removeGroup']} />
+
+```ts
+const group = api.activeGroup;
+if (group) {
+    api.removeGroup(group);
+}
+```
+
+You can also close a group through the group API itself:
+
+```ts
+panel.group.api.close();
+```
+
+## Closing All Groups
+
+`api.closeAllGroups()` removes every group and panel from the layout, leaving it empty.
+
+<DocRef declaration="DockviewApi" methods={['closeAllGroups']} />
+
+```ts
+api.closeAllGroups();
+```
+
+## Clearing the Layout
+
+`api.clear()` resets the component back to a completely empty, default state. It is equivalent to `closeAllGroups()` but also resets any internal state.
+
+```ts
+api.clear();
+```
+
+:::tip
+Use `api.clear()` before calling `api.fromJSON()` to guarantee a clean starting point. Alternatively, `fromJSON` accepts a `reuseExistingPanels` option:
+
+```ts
+api.fromJSON(layout, { reuseExistingPanels: true });
+```
+:::

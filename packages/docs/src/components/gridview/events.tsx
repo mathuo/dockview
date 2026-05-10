@@ -4,7 +4,7 @@ import {
     GridviewReact,
     GridviewReadyEvent,
     GridviewApi,
-} from 'dockview';
+} from 'dockview-react';
 import * as React from 'react';
 import { Console, Line } from '../ui/console/console';
 

@@ -16,7 +16,7 @@
 
 ##
 
-![](https://github.com/mathuo/dockview/blob/HEAD/packages/docs/static/img/splashscreen.gif?raw=true)
+![](https://github.com/mathuo/dockview/blob/HEAD/packages/docs/static/img/splashscreenv2.png?raw=true)
 
 Please see the website: https://dockview.dev
 
@@ -28,6 +28,8 @@ Please see the website: https://dockview.dev
 -   Tab and Group docking / Drag n' Drop
 -   Popout Windows
 -   Floating Groups
+-   Edge Groups
+-   Tab Groups
 -   Extensive API
 -   Supports Shadow DOMs
 -   High test coverage

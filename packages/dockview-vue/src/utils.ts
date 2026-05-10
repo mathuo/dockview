@@ -1,5 +1,6 @@
 import type {
     DockviewApi,
+    DockviewGroupLocation,
     DockviewGroupPanel,
     DockviewPanelApi,
     IContentRenderer,
@@ -7,9 +8,13 @@ import type {
     IDockviewPanelHeaderProps,
     IGroupHeaderProps,
     IHeaderActionsRenderer,
+    ITabGroupChipRenderer,
+    ITabGroup,
     ITabRenderer,
     IWatermarkPanelProps,
     IWatermarkRenderer,
+    IContextMenuItemRenderer,
+    IContextMenuItemComponentProps,
     PanelUpdateEvent,
     Parameters,
     TabPartInitParameters,
@@ -239,6 +244,9 @@ export class VueHeaderActionsRenderer
             }),
             props.api.onDidActiveChange(() => {
                 this.updateProps();
+            }),
+            props.api.onDidLocationChange((event) => {
+                this.updateLocation(event.location);
             })
         );
 
@@ -264,11 +272,84 @@ export class VueHeaderActionsRenderer
             isGroupActive: this.group.api.isActive,
             group: this.group,
             headerPosition: this.group.model.headerPosition,
+            location: this.group.api.location,
         };
     }
 
     private updateProps(): void {
         this._renderDisposable?.update({ params: this.buildEnrichedProps() });
+    }
+
+    private updateLocation(location: DockviewGroupLocation): void {
+        this._renderDisposable?.update({ params: { location } });
+    }
+}
+
+export class VueContextMenuItemRenderer
+    extends AbstractVueRenderer
+    implements IContextMenuItemRenderer
+{
+    private _renderDisposable:
+        | { update: (props: any) => void; dispose: () => void }
+        | undefined;
+
+    init(props: IContextMenuItemComponentProps): void {
+        this._renderDisposable?.dispose();
+        this._renderDisposable = mountVueComponent(
+            this.component,
+            this.parent,
+            { params: props },
+            this.element
+        );
+    }
+
+    dispose(): void {
+        this._renderDisposable?.dispose();
+    }
+}
+
+export class VueTabGroupChipRenderer
+    extends AbstractVueRenderer
+    implements ITabGroupChipRenderer
+{
+    private _renderDisposable:
+        | { update: (props: any) => void; dispose: () => void }
+        | undefined;
+
+    get element(): HTMLElement {
+        return this._element;
+    }
+
+    constructor(component: VueComponent, parent: ComponentInternalInstance) {
+        super(component, parent);
+        this.element.style.height = '';
+        this.element.style.width = '';
+        this.element.style.display = 'inline-flex';
+    }
+
+    init(params: { tabGroup: ITabGroup; api: DockviewApi }): void {
+        this._renderDisposable?.dispose();
+        this._renderDisposable = mountVueComponent(
+            this.component,
+            this.parent,
+            {
+                params: {
+                    tabGroup: params.tabGroup,
+                    api: params.api,
+                },
+            },
+            this.element
+        );
+    }
+
+    update(params: { tabGroup: ITabGroup }): void {
+        this._renderDisposable?.update({
+            params: { tabGroup: params.tabGroup },
+        });
+    }
+
+    dispose(): void {
+        this._renderDisposable?.dispose();
     }
 }
 

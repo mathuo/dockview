@@ -1,111 +1,280 @@
-import { createDockview, PROPERTY_KEYS_DOCKVIEW } from 'dockview-core';
-import * as dockviewTypes from '../dockview/types';
+import { describe, test, expect, vi, afterEach } from 'vitest';
+import { mount, flushPromises } from '@vue/test-utils';
+import { defineComponent, nextTick } from 'vue';
+import DockviewVue from '../dockview/dockview.vue';
+import { DockviewApi } from 'dockview-core';
+
+const MockPanel = defineComponent({
+    name: 'MockPanel',
+    props: ['params'],
+    template: '<div class="mock-panel">Panel</div>',
+});
+
+const MockTab = defineComponent({
+    name: 'MockTab',
+    props: ['params'],
+    template: '<div class="mock-tab">Tab</div>',
+});
+
+const MockTab2 = defineComponent({
+    name: 'MockTab2',
+    props: ['params'],
+    template: '<div class="mock-tab-2">Tab2</div>',
+});
+
+const MockWatermark = defineComponent({
+    name: 'MockWatermark',
+    props: ['params'],
+    template: '<div class="mock-watermark">Watermark</div>',
+});
+
+const MockHeaderAction = defineComponent({
+    name: 'MockHeaderAction',
+    props: ['params'],
+    template: '<div class="mock-header-action">Action</div>',
+});
+
+function mountDockview(props: Record<string, any> = {}) {
+    return mount(DockviewVue, {
+        props,
+        attachTo: document.body,
+        global: {
+            components: {
+                MockPanel,
+                MockTab,
+                MockTab2,
+                MockWatermark,
+                MockHeaderAction,
+            },
+        },
+    });
+}
 
 describe('DockviewVue Component', () => {
-    test('should export component types', () => {
-        expect(dockviewTypes).toBeDefined();
-        expect(typeof dockviewTypes).toBe('object');
+    let wrapper: ReturnType<typeof mountDockview>;
+
+    afterEach(() => {
+        wrapper?.unmount();
     });
 
-    test('should export dockview-core functionality', () => {
-        expect(createDockview).toBeDefined();
-        expect(PROPERTY_KEYS_DOCKVIEW).toBeDefined();
-        expect(Array.isArray(PROPERTY_KEYS_DOCKVIEW)).toBe(true);
+    test('should mount and emit ready event with api', async () => {
+        wrapper = mountDockview();
+        await flushPromises();
+
+        expect(wrapper.emitted('ready')).toBeTruthy();
+        const readyEvent = wrapper.emitted('ready')![0][0] as any;
+        expect(readyEvent.api).toBeInstanceOf(DockviewApi);
     });
 
-    test('should have correct dockview properties', () => {
-        expect(PROPERTY_KEYS_DOCKVIEW).toContain('disableAutoResizing');
-        expect(PROPERTY_KEYS_DOCKVIEW).toContain('hideBorders');
-        expect(PROPERTY_KEYS_DOCKVIEW).toContain('theme');
-        expect(PROPERTY_KEYS_DOCKVIEW).toContain('singleTabMode');
-    });
-
-    test('should create dockview instance with DOM element', () => {
-        const element = document.createElement('div');
-        document.body.appendChild(element);
-
-        const mockRenderer = {
-            element: document.createElement('div'),
-            dispose: () => {},
-            update: () => {},
-            init: () => {},
-        };
-
-        const api = createDockview(element, {
-            disableAutoResizing: true,
-            hideBorders: false,
-            createComponent: () => mockRenderer,
+    test('should pass defaultTabComponent to core options on mount', async () => {
+        wrapper = mountDockview({
+            defaultTabComponent: 'MockTab',
         });
+        await flushPromises();
 
-        expect(api).toBeDefined();
-        expect(typeof api.layout).toBe('function');
-        expect(typeof api.dispose).toBe('function');
-        expect(typeof api.addPanel).toBe('function');
-        expect(typeof api.updateOptions).toBe('function');
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
 
-        api.dispose();
-        document.body.removeChild(element);
-    });
-
-    test('should handle framework component creation', () => {
-        const element = document.createElement('div');
-        document.body.appendChild(element);
-
-        let createdComponent: any;
-
-        const api = createDockview(element, {
-            createComponent: (options) => {
-                createdComponent = {
-                    element: document.createElement('div'),
-                    dispose: jest.fn(),
-                    update: jest.fn(),
-                    init: jest.fn(),
-                };
-                return createdComponent;
-            },
-        });
-
-        // Add a panel to trigger component creation
         api.addPanel({
-            id: 'test-panel',
-            component: 'test-component',
-            title: 'Test Panel',
+            id: 'panel-1',
+            component: 'MockPanel',
+            title: 'Panel 1',
         });
 
-        expect(createdComponent).toBeDefined();
-        expect(createdComponent.element).toBeInstanceOf(HTMLElement);
-
-        api.dispose();
-        document.body.removeChild(element);
+        const panel = api.getPanel('panel-1');
+        expect(panel).toBeDefined();
     });
 
-    test('should handle option updates', () => {
-        const element = document.createElement('div');
-        document.body.appendChild(element);
-
-        const mockRenderer = {
-            element: document.createElement('div'),
-            dispose: () => {},
-            update: () => {},
-            init: () => {},
-        };
-
-        const api = createDockview(element, {
-            disableAutoResizing: false,
-            hideBorders: false,
-            createComponent: () => mockRenderer,
+    test('should update defaultTabComponent when prop changes', async () => {
+        wrapper = mountDockview({
+            defaultTabComponent: 'MockTab',
         });
+        await flushPromises();
 
-        // Update options
-        api.updateOptions({
-            disableAutoResizing: true,
-            hideBorders: true,
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const updateSpy = vi.spyOn(api, 'updateOptions');
+
+        await wrapper.setProps({ defaultTabComponent: 'MockTab2' });
+        await nextTick();
+
+        expect(updateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                defaultTabComponent: 'MockTab2',
+                createTabComponent: expect.any(Function),
+            })
+        );
+    });
+
+    test('should update watermarkComponent when prop changes', async () => {
+        wrapper = mountDockview();
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const updateSpy = vi.spyOn(api, 'updateOptions');
+
+        await wrapper.setProps({ watermarkComponent: 'MockWatermark' });
+        await nextTick();
+
+        expect(updateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                createWatermarkComponent: expect.any(Function),
+            })
+        );
+    });
+
+    test('should clear watermarkComponent when prop is unset', async () => {
+        wrapper = mountDockview({
+            watermarkComponent: 'MockWatermark',
         });
+        await flushPromises();
 
-        // Test passes if no errors are thrown
-        expect(true).toBe(true);
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const updateSpy = vi.spyOn(api, 'updateOptions');
 
-        api.dispose();
-        document.body.removeChild(element);
+        await wrapper.setProps({ watermarkComponent: undefined });
+        await nextTick();
+
+        expect(updateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                createWatermarkComponent: undefined,
+            })
+        );
+    });
+
+    test('should update rightHeaderActionsComponent when prop changes', async () => {
+        wrapper = mountDockview();
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const updateSpy = vi.spyOn(api, 'updateOptions');
+
+        await wrapper.setProps({
+            rightHeaderActionsComponent: 'MockHeaderAction',
+        });
+        await nextTick();
+
+        expect(updateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                createRightHeaderActionComponent: expect.any(Function),
+            })
+        );
+    });
+
+    test('should update leftHeaderActionsComponent when prop changes', async () => {
+        wrapper = mountDockview();
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const updateSpy = vi.spyOn(api, 'updateOptions');
+
+        await wrapper.setProps({
+            leftHeaderActionsComponent: 'MockHeaderAction',
+        });
+        await nextTick();
+
+        expect(updateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                createLeftHeaderActionComponent: expect.any(Function),
+            })
+        );
+    });
+
+    test('should update prefixHeaderActionsComponent when prop changes', async () => {
+        wrapper = mountDockview();
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const updateSpy = vi.spyOn(api, 'updateOptions');
+
+        await wrapper.setProps({
+            prefixHeaderActionsComponent: 'MockHeaderAction',
+        });
+        await nextTick();
+
+        expect(updateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                createPrefixHeaderActionComponent: expect.any(Function),
+            })
+        );
+    });
+
+    test('should update tabGroupChipComponent when prop changes', async () => {
+        wrapper = mountDockview();
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const updateSpy = vi.spyOn(api, 'updateOptions');
+
+        await wrapper.setProps({
+            tabGroupChipComponent: 'MockHeaderAction',
+        });
+        await nextTick();
+
+        expect(updateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                createTabGroupChipComponent: expect.any(Function),
+            })
+        );
+    });
+
+    test('should update tabGroupColors and tabGroupAccent when props change', async () => {
+        wrapper = mountDockview();
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const updateSpy = vi.spyOn(api, 'updateOptions');
+
+        const tabGroupColors = [{ name: 'cyan', value: '#00ffff' }];
+        await wrapper.setProps({
+            tabGroupColors,
+            tabGroupAccent: 'off',
+        });
+        await nextTick();
+
+        expect(updateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({ tabGroupColors })
+        );
+        expect(updateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({ tabGroupAccent: 'off' })
+        );
+    });
+
+    test('should dispose api on unmount', async () => {
+        wrapper = mountDockview();
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const disposeSpy = vi.spyOn(api, 'dispose');
+
+        wrapper.unmount();
+
+        expect(disposeSpy).toHaveBeenCalled();
+    });
+
+    test('should forward didDrop events from the api', async () => {
+        wrapper = mountDockview();
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const fakeEvent = { id: 'fake-did-drop' } as any;
+
+        (api as any).component._onDidDrop.fire(fakeEvent);
+
+        const emitted = wrapper.emitted('didDrop');
+        expect(emitted).toBeTruthy();
+        expect(emitted![0][0]).toBe(fakeEvent);
+    });
+
+    test('should forward willDrop events from the api', async () => {
+        wrapper = mountDockview();
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const fakeEvent = { id: 'fake-will-drop' } as any;
+
+        (api as any).component._onWillDrop.fire(fakeEvent);
+
+        const emitted = wrapper.emitted('willDrop');
+        expect(emitted).toBeTruthy();
+        expect(emitted![0][0]).toBe(fakeEvent);
     });
 });

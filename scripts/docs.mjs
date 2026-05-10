@@ -106,6 +106,8 @@ function parseType(obj) {
             return `[${obj.elements.map(parseType)}]`;
         case 'namedTupleMember':
             return `[${obj.name}: ${parseType(obj.element)}]`;
+        case 'typeOperator':
+            return `${obj.operator} ${parseType(obj.target)}`;
         default:
             throw new Error(`unhandled type ${obj.type}`);
     }
@@ -180,6 +182,12 @@ function parseComplexType(obj) {
             type: obj.type,
             values: parseComplexType(obj.element),
           };
+        case 'typeOperator':
+            return {
+                type: obj.type,
+                operator: obj.operator,
+                value: parseComplexType(obj.target),
+            };
         default:
             throw new Error(`unhandled type ${obj.type}`);
     }

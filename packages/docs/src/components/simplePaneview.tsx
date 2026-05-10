@@ -2,7 +2,7 @@ import {
     IPaneviewPanelProps,
     PaneviewReact,
     PaneviewReadyEvent,
-} from 'dockview';
+} from 'dockview-react';
 import * as React from 'react';
 
 const components = {

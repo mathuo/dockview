@@ -6,16 +6,43 @@ import {
     IDockviewPanelProps,
     DockviewApi,
     DockviewTheme,
-} from 'dockview';
+    themeAbyss,
+    IContextMenuItemComponentProps,
+    GetTabContextMenuItemsParams,
+    GetTabGroupChipContextMenuItemsParams,
+    DEFAULT_TAB_GROUP_COLORS,
+} from 'dockview-react';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import './app.scss';
-import { defaultConfig } from './defaultLayout';
-import { GridActions } from './gridActions';
-import { PanelActions } from './panelActions';
-import { GroupActions } from './groupActions';
+import {
+    defaultConfig,
+    populateEdgeGroups,
+    setupEdgeGroups,
+} from './defaultLayout';
 import { LeftControls, PrefixHeaderControls, RightControls } from './controls';
 import { Table, usePanelApiMetadata } from './debugPanel';
+import { OrdersPanel } from './ordersPanel';
+import { OrderBookPanel } from './orderBookPanel';
+import { EventLogPanel } from './eventLogPanel';
+import { LayoutInspectorPanel } from './layoutInspectorPanel';
+import { PanelDebugPanel } from './panelDebugPanel';
+import { MarketProvider } from './marketContext';
+import { WatchlistPanel } from './watchlistPanel';
+import { PriceAlertPanel } from './priceAlertPanel';
+import { PositionSummaryPanel } from './positionSummaryPanel';
+import { PanelColorsContext, DARK_COLORS, LIGHT_COLORS } from './panelTheme';
+import {
+    ThemeBuilderState,
+    ThemeCssOverrides,
+    buildEffectiveTheme,
+    getInitialStateFromTheme,
+} from './themeBuilder';
+import { Sidebar } from './themeBuilderModal';
+
+export const ApiContext = React.createContext<DockviewApi | undefined>(
+    undefined
+);
 
 const DebugContext = React.createContext<boolean>(false);
 
@@ -124,6 +151,24 @@ const components = {
             />
         );
     },
+    fixedPlaceholder: (props: IDockviewPanelProps) => {
+        return (
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '100%',
+                    color: 'rgba(255,255,255,0.6)',
+                    fontFamily: 'monospace',
+                    fontSize:
+                        props.params?.position === 'top' ? '13px' : '14px',
+                }}
+            >
+                <span>{props.params?.label as string}</span>
+            </div>
+        );
+    },
     iframe: (props: IDockviewPanelProps) => {
         return (
             <iframe
@@ -140,6 +185,45 @@ const components = {
                 src="https://dockview.dev"
             />
         );
+    },
+    vesselfinder: (props: IDockviewPanelProps) => {
+        const srcdoc = `<!DOCTYPE html>
+<html><head><style>html,body{margin:0;padding:0;height:100%;overflow:hidden;}</style></head>
+<body>
+<script>var width="100%";var height="100%";var latitude="51.5";var longitude="-0.12";var zoom="8";var names=false;</script>
+<script src="https://www.vesselfinder.com/aismap.js"></script>
+</body></html>`;
+        return (
+            <iframe
+                onMouseDown={() => {
+                    if (!props.api.isActive) {
+                        props.api.setActive();
+                    }
+                }}
+                srcDoc={srcdoc}
+                style={{
+                    border: 'none',
+                    width: '100%',
+                    height: '100%',
+                }}
+            />
+        );
+    },
+    debuginfo: (props: IDockviewPanelProps) => <PanelDebugPanel {...props} />,
+    orders: () => <OrdersPanel />,
+    orderbook: () => <OrderBookPanel />,
+    watchlist: () => <WatchlistPanel />,
+    pricealert: () => <PriceAlertPanel />,
+    positionsummary: () => <PositionSummaryPanel />,
+    eventlog: () => {
+        const api = React.useContext(ApiContext);
+        if (!api) return null;
+        return <EventLogPanel api={api} />;
+    },
+    layoutinspector: () => {
+        const api = React.useContext(ApiContext);
+        if (!api) return null;
+        return <LayoutInspectorPanel api={api} />;
     },
     shadowDom: (props: IDockviewPanelProps) => {
         const ref = React.useRef<HTMLDivElement>(null);
@@ -172,12 +256,58 @@ const components = {
 
 const headerComponents = {
     default: (props: IDockviewPanelHeaderProps) => {
-        const onContextMenu = (event: React.MouseEvent) => {
-            event.preventDefault();
-            alert('context menu');
-        };
-        return <DockviewDefaultTab onContextMenu={onContextMenu} {...props} />;
+        return <DockviewDefaultTab {...props} />;
     },
+};
+
+const FloatMenuItem = ({
+    panel,
+    api,
+    close,
+}: IContextMenuItemComponentProps) => {
+    return (
+        <div
+            className="dv-context-menu-item"
+            onClick={() => {
+                api.addFloatingGroup(panel);
+                close();
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+        >
+            <span
+                className="material-symbols-outlined"
+                style={{ fontSize: '14px' }}
+            >
+                ad_group
+            </span>
+            Float tab
+        </div>
+    );
+};
+
+const PopoutMenuItem = ({
+    panel,
+    api,
+    close,
+}: IContextMenuItemComponentProps) => {
+    return (
+        <div
+            className="dv-context-menu-item"
+            onClick={() => {
+                api.addPopoutGroup(panel);
+                close();
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+        >
+            <span
+                className="material-symbols-outlined"
+                style={{ fontSize: '14px' }}
+            >
+                open_in_new
+            </span>
+            Popout tab
+        </div>
+    );
 };
 
 const colors = [
@@ -196,7 +326,12 @@ const WatermarkComponent = () => {
 
 const ThemeContext = React.createContext<DockviewTheme | undefined>(undefined);
 
-const DockviewDemo = (props: { theme?: DockviewTheme }) => {
+const DockviewDemo = (props: {
+    theme?: DockviewTheme;
+    showSidebar?: boolean;
+    onCloseSidebar?: () => void;
+    onChangeTheme?: (theme: DockviewTheme) => void;
+}) => {
     const [logLines, setLogLines] = React.useState<
         { text: string; timestamp?: Date; backgroundColor?: string }[]
     >([]);
@@ -204,6 +339,7 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
     const [panels, setPanels] = React.useState<string[]>([]);
     const [groups, setGroups] = React.useState<string[]>([]);
     const [api, setApi] = React.useState<DockviewApi>();
+    const [layoutReady, setLayoutReady] = React.useState(false);
 
     const [activePanel, setActivePanel] = React.useState<string>();
     const [activeGroup, setActiveGroup] = React.useState<string>();
@@ -235,6 +371,13 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
         if (!api) {
             return;
         }
+
+        // Reset tracked state for the new api instance to prevent stale IDs
+        // accumulating across remounts (e.g. when toggling shell mode).
+        setPanels([]);
+        setGroups([]);
+        setActivePanel(undefined);
+        setActiveGroup(undefined);
 
         const disposables = [
             api.onDidAddPanel((event) => {
@@ -293,19 +436,24 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
         ];
 
         const loadLayout = () => {
-            const state = localStorage.getItem('dv-demo-state');
+            const state = localStorage.getItem('dv-demo-state-v6');
 
             if (state) {
                 try {
                     api.fromJSON(JSON.parse(state));
+                    populateEdgeGroups(api);
+                    setLayoutReady(true);
                     return;
                 } catch {
-                    localStorage.removeItem('dv-demo-state');
+                    localStorage.removeItem('dv-demo-state-v6');
                 }
                 return;
             }
 
             defaultConfig(api);
+            populateEdgeGroups(api);
+
+            setLayoutReady(true);
         };
 
         loadLayout();
@@ -316,8 +464,180 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
     }, [api]);
 
     const onReady = (event: DockviewReadyEvent) => {
+        setupEdgeGroups(event.api);
         setApi(event.api);
     };
+
+    const [builderState, setBuilderState] = React.useState<ThemeBuilderState>(
+        () => getInitialStateFromTheme(props.theme ?? themeAbyss)
+    );
+
+    const prevTheme = React.useRef(props.theme);
+    React.useEffect(() => {
+        if (prevTheme.current !== props.theme) {
+            prevTheme.current = props.theme;
+            setBuilderState(
+                getInitialStateFromTheme(props.theme ?? themeAbyss)
+            );
+        }
+    }, [props.theme]);
+
+    const updateBuilder = (patch: Partial<ThemeBuilderState>) =>
+        setBuilderState((s) => ({ ...s, ...patch }));
+
+    const updateCss = (patch: Partial<ThemeCssOverrides>) =>
+        setBuilderState((s) => {
+            const next = { ...s.cssOverrides };
+            for (const [k, v] of Object.entries(patch)) {
+                if (v === undefined || v === '') {
+                    delete (next as Record<string, unknown>)[k];
+                } else {
+                    (next as Record<string, unknown>)[k] = v;
+                }
+            }
+            return { ...s, cssOverrides: next };
+        });
+
+    const effectiveTheme = React.useMemo(
+        () => buildEffectiveTheme(props.theme ?? themeAbyss, builderState),
+        [props.theme, builderState]
+    );
+
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const prevCssOverrideKeys = React.useRef<string[]>([]);
+
+    React.useEffect(() => {
+        const dvRoot = containerRef.current?.querySelector(
+            '[class*="dockview-theme"]'
+        ) as HTMLElement | null;
+        if (!dvRoot) return;
+
+        for (const k of prevCssOverrideKeys.current) {
+            if (!(k in builderState.cssOverrides)) {
+                dvRoot.style.removeProperty(k);
+            }
+        }
+        for (const [k, v] of Object.entries(builderState.cssOverrides)) {
+            dvRoot.style.setProperty(k, v as string);
+        }
+        prevCssOverrideKeys.current = Object.keys(builderState.cssOverrides);
+    }, [builderState.cssOverrides]);
+
+    const panelColors = React.useMemo(
+        () =>
+            effectiveTheme.colorScheme === 'light' ? LIGHT_COLORS : DARK_COLORS,
+        [effectiveTheme]
+    );
+
+    const getTabContextMenuItems = React.useCallback(
+        ({ panel, group }: GetTabContextMenuItemsParams) => {
+            const items: (
+                | 'close'
+                | 'closeOthers'
+                | 'closeAll'
+                | 'separator'
+                | { component: React.FC<IContextMenuItemComponentProps> }
+                | { label: string; action: () => void }
+            )[] = [
+                'close',
+                'closeOthers',
+                'closeAll',
+                'separator',
+                { component: FloatMenuItem },
+                { component: PopoutMenuItem },
+            ];
+
+            if (api) {
+                const groupId = group.id;
+                const panelId = panel.id;
+                const tabGroup = api.getTabGroupForPanel({ groupId, panelId });
+                const allTabGroups = api.getTabGroups({ groupId });
+                const otherTabGroups = allTabGroups.filter(
+                    (tg) => tg.id !== tabGroup?.id
+                );
+
+                items.push('separator');
+
+                if (tabGroup) {
+                    items.push({
+                        label: `Remove from "${tabGroup.label || tabGroup.id}"`,
+                        action: () =>
+                            api.removePanelFromTabGroup({ groupId, panelId }),
+                    });
+                }
+
+                for (const tg of otherTabGroups) {
+                    items.push({
+                        label: `Add to "${tg.label || tg.id}"`,
+                        action: () =>
+                            api.addPanelToTabGroup({
+                                groupId,
+                                tabGroupId: tg.id,
+                                panelId,
+                            }),
+                    });
+                }
+
+                items.push({
+                    label: 'Add to new group',
+                    action: () => {
+                        const label = window.prompt('Group name:') || '';
+                        const colors = DEFAULT_TAB_GROUP_COLORS;
+                        const color =
+                            colors[Math.floor(Math.random() * colors.length)]
+                                .id;
+                        const newGroup = api.createTabGroup({
+                            groupId,
+                            label,
+                            color,
+                        });
+                        api.addPanelToTabGroup({
+                            groupId,
+                            tabGroupId: newGroup.id,
+                            panelId,
+                        });
+                    },
+                });
+            }
+
+            return items;
+        },
+        [api]
+    );
+
+    const getTabGroupChipContextMenuItems = React.useCallback(
+        ({ group, tabGroup }: GetTabGroupChipContextMenuItemsParams) => {
+            const items: (
+                | 'colorPicker'
+                | 'rename'
+                | 'separator'
+                | { label: string; action: () => void }
+            )[] = ['rename', 'colorPicker'];
+
+            if (api) {
+                items.push(
+                    'separator',
+                    {
+                        label: tabGroup.collapsed
+                            ? 'Expand group'
+                            : 'Collapse group',
+                        action: () => tabGroup.toggle(),
+                    },
+                    {
+                        label: 'Dissolve group',
+                        action: () =>
+                            api.dissolveTabGroup({
+                                groupId: group.id,
+                                tabGroupId: tabGroup.id,
+                            }),
+                    }
+                );
+            }
+
+            return items;
+        },
+        [api]
+    );
 
     const [watermark, setWatermark] = React.useState<boolean>(false);
 
@@ -336,7 +656,6 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
 
     const [showLogs, setShowLogs] = React.useState<boolean>(false);
     const [debug, setDebug] = React.useState<boolean>(false);
-
     return (
         <div
             className="dockview-demo"
@@ -345,81 +664,12 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                 display: 'flex',
                 flexDirection: 'column',
                 flexGrow: 1,
-                padding: '8px',
                 backgroundColor: 'rgba(0,0,50,0.25)',
                 borderRadius: '8px',
                 position: 'relative',
                 ...css,
             }}
         >
-            <div>
-                <GridActions
-                    api={api}
-                    toggleCustomWatermark={() => setWatermark(!watermark)}
-                    hasCustomWatermark={watermark}
-                />
-                {api && (
-                    <PanelActions
-                        api={api}
-                        panels={panels}
-                        activePanel={activePanel}
-                    />
-                )}
-                {api && (
-                    <GroupActions
-                        api={api}
-                        groups={groups}
-                        activeGroup={activeGroup}
-                    />
-                )}
-                {/* <div>
-                    <button
-                        onClick={() => {
-                            setGapCheck(!gapCheck);
-                        }}
-                    >
-                        {gapCheck ? 'Disable Gap Check' : 'Enable Gap Check'}
-                    </button>
-                </div> */}
-            </div>
-            <div
-                className="action-container"
-                style={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    alignItems: 'center',
-                    padding: '4px',
-                }}
-            >
-                <button
-                    onClick={() => {
-                        setDebug(!debug);
-                    }}
-                >
-                    <span className="material-symbols-outlined">
-                        engineering
-                    </span>
-                </button>
-                {showLogs && (
-                    <button
-                        onClick={() => {
-                            setLogLines([]);
-                        }}
-                    >
-                        <span className="material-symbols-outlined">undo</span>
-                    </button>
-                )}
-                <button
-                    onClick={() => {
-                        setShowLogs(!showLogs);
-                    }}
-                >
-                    <span style={{ paddingRight: '4px' }}>
-                        {`${showLogs ? 'Hide' : 'Show'} Events Log`}
-                    </span>
-                    <span className="material-symbols-outlined">terminal</span>
-                </button>
-            </div>
             <div
                 style={{
                     flexGrow: 1,
@@ -428,30 +678,54 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                 }}
             >
                 <div
+                    ref={containerRef}
                     style={{
                         flexGrow: 1,
                         overflow: 'hidden',
                         display: 'flex',
+                        visibility: layoutReady ? 'visible' : 'hidden',
                     }}
                 >
-                    <DebugContext.Provider value={debug}>
-                        <ThemeContext.Provider value={props.theme}>
-                            <DockviewReact
-                                components={components}
-                                defaultTabComponent={headerComponents.default}
-                                rightHeaderActionsComponent={RightControls}
-                                leftHeaderActionsComponent={LeftControls}
-                                prefixHeaderActionsComponent={
-                                    PrefixHeaderControls
-                                }
-                                watermarkComponent={
-                                    watermark ? WatermarkComponent : undefined
-                                }
-                                onReady={onReady}
-                                theme={props.theme}
-                            />
-                        </ThemeContext.Provider>
-                    </DebugContext.Provider>
+                    <PanelColorsContext.Provider value={panelColors}>
+                        <MarketProvider>
+                            <ApiContext.Provider value={api}>
+                                <DebugContext.Provider value={debug}>
+                                    <ThemeContext.Provider
+                                        value={effectiveTheme}
+                                    >
+                                        <DockviewReact
+                                            components={components}
+                                            defaultTabComponent={
+                                                headerComponents.default
+                                            }
+                                            rightHeaderActionsComponent={
+                                                RightControls
+                                            }
+                                            leftHeaderActionsComponent={
+                                                LeftControls
+                                            }
+                                            prefixHeaderActionsComponent={
+                                                PrefixHeaderControls
+                                            }
+                                            watermarkComponent={
+                                                watermark
+                                                    ? WatermarkComponent
+                                                    : undefined
+                                            }
+                                            onReady={onReady}
+                                            theme={effectiveTheme}
+                                            getTabContextMenuItems={
+                                                getTabContextMenuItems
+                                            }
+                                            getTabGroupChipContextMenuItems={
+                                                getTabGroupChipContextMenuItems
+                                            }
+                                        />
+                                    </ThemeContext.Provider>
+                                </DebugContext.Provider>
+                            </ApiContext.Provider>
+                        </MarketProvider>
+                    </PanelColorsContext.Provider>
                 </div>
 
                 {showLogs && (
@@ -480,7 +754,6 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                                             fontSize: '13px',
                                             display: 'flex',
                                             alignItems: 'center',
-
                                             backgroundColor:
                                                 line.backgroundColor,
                                         }}
@@ -533,6 +806,32 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                         </div>
                     </div>
                 )}
+                <Sidebar
+                    open={props.showSidebar ?? false}
+                    onClose={props.onCloseSidebar ?? (() => {})}
+                    state={builderState}
+                    onChange={updateBuilder}
+                    onCssChange={updateCss}
+                    onReset={() =>
+                        setBuilderState(
+                            getInitialStateFromTheme(props.theme ?? themeAbyss)
+                        )
+                    }
+                    baseTheme={props.theme ?? themeAbyss}
+                    containerEl={containerRef.current}
+                    api={api}
+                    panels={panels}
+                    groups={groups}
+                    activePanel={activePanel}
+                    activeGroup={activeGroup}
+                    hasCustomWatermark={watermark}
+                    toggleCustomWatermark={() => setWatermark(!watermark)}
+                    debug={debug}
+                    onToggleDebug={() => setDebug(!debug)}
+                    showLogs={showLogs}
+                    onToggleShowLogs={() => setShowLogs(!showLogs)}
+                    onClearLogs={() => setLogLines([])}
+                />
             </div>
         </div>
     );

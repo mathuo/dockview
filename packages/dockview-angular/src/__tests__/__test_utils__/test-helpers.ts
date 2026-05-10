@@ -4,6 +4,7 @@ import { DockviewAngularModule } from '../../lib/dockview-angular.module';
 
 // Simple test component for testing
 @Component({
+    standalone: false,
     selector: 'test-panel',
     template: '<div class="test-panel">Test Panel Content</div>',
 })
@@ -12,6 +13,7 @@ export class TestPanelComponent {
 }
 
 @Component({
+    standalone: false,
     selector: 'test-tab',
     template: '<div class="test-tab">Test Tab</div>',
 })
@@ -20,6 +22,7 @@ export class TestTabComponent {
 }
 
 @Component({
+    standalone: false,
     selector: 'test-watermark',
     template: '<div class="test-watermark">Test Watermark</div>',
 })

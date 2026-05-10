@@ -1,5 +1,4 @@
 import BrowserOnly from '@docusaurus/BrowserOnly';
-import { DockviewEmitter } from 'dockview';
 import * as React from 'react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import useBaseUrl from '@docusaurus/useBaseUrl';
@@ -18,86 +17,113 @@ const frameworks: FrameworkDescriptor[] = [
     { value: 'Angular', label: 'Angular', icon: 'img/angular-icon.svg' },
 ];
 
-const activeFrameworkGlobal = new DockviewEmitter<string>({ replay: true });
+const STORAGE_KEY = 'dv-docs-framework';
+const FRAMEWORK_EVENT = 'dv-framework-change';
+
+function readFramework(): string {
+    return localStorage.getItem(STORAGE_KEY) ?? frameworks[0].value;
+}
+
+function subscribe(callback: () => void): () => void {
+    window.addEventListener(FRAMEWORK_EVENT, callback);
+    window.addEventListener('storage', callback);
+    return () => {
+        window.removeEventListener(FRAMEWORK_EVENT, callback);
+        window.removeEventListener('storage', callback);
+    };
+}
 
 export function useActiveFramework(): [
     FrameworkDescriptor,
     (value: string) => void
 ] {
-    const [value, setValue] = React.useState<string>(
-        localStorage.getItem('dv-docs-framework') ?? frameworks[0].value
+    const value = React.useSyncExternalStore(
+        subscribe,
+        readFramework,
+        () => frameworks[0].value
     );
 
+    const setter = React.useCallback((newValue: string) => {
+        localStorage.setItem(STORAGE_KEY, newValue);
+        window.dispatchEvent(new CustomEvent(FRAMEWORK_EVENT));
+
+        const url = new URL(window.location.href);
+        url.searchParams.set('framework', newValue.toLowerCase());
+        window.history.replaceState(null, '', url.toString());
+    }, []);
+
     React.useEffect(() => {
-        const disposable = activeFrameworkGlobal.event((value) => [
-            setValue(value),
-        ]);
-
-        activeFrameworkGlobal.fire(
-            localStorage.getItem('dv-docs-framework') ?? frameworks[0].value
-        );
-
-        return () => {
-            disposable.dispose();
-        };
+        const urlParam = new URLSearchParams(window.location.search).get('framework');
+        const fromUrl = urlParam
+            ? frameworks.find((f) => f.value.toLowerCase() === urlParam.toLowerCase())
+            : null;
+        if (fromUrl) {
+            setter(fromUrl.value);
+        }
     }, []);
 
-    const setter = React.useCallback((value: string) => {
-        localStorage.setItem('dv-docs-framework', value);
-        setValue(value);
-        activeFrameworkGlobal.fire(value);
-    }, []);
-
-    const option = frameworks.find((_) => _.value === value);
+    const option = frameworks.find((f) => f.value === value) ?? frameworks[0];
 
     return [option, setter];
 }
 
 
 
+const ChevronDown = () => (
+    <svg
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        style={{ opacity: 0.7, flexShrink: 0 }}
+    >
+        <polyline points="6 9 12 15 18 9" />
+    </svg>
+);
+
 const FrameworkSelector1 = () => {
     const [activeFramework, setActiveFramework] = useActiveFramework();
 
-    const onChange = (event: React.ChangeEvent<HTMLSelectElement>) => [
-        setActiveFramework(event.target.value),
-    ];
-
     return (
         <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild={true}>
-                <div className="framework-menu-item-select">
-                    <span style={{ padding: '0px 8px' }}>
-                        {activeFramework.label}
-                    </span>
-                    <img
-                        width={20}
-                        height={20}
-                        src={useBaseUrl(activeFramework.icon)}
-                        style={{ marginRight: '8px' }}
-                    />
-                </div>
-            </DropdownMenu.Trigger>
+            <div className="framework-selector-wrapper">
+                <span className="framework-selector-label">Framework</span>
+                <DropdownMenu.Trigger asChild={true}>
+                    <div className="framework-menu-item-select">
+                        <img
+                            width={16}
+                            height={16}
+                            src={useBaseUrl(activeFramework.icon)}
+                        />
+                        <span>{activeFramework.label}</span>
+                        <ChevronDown />
+                    </div>
+                </DropdownMenu.Trigger>
+            </div>
             <DropdownMenu.Content
                 side="bottom"
                 align="end"
-                sideOffset={10}
+                sideOffset={8}
                 className="DropdownMenuContent"
             >
                 {frameworks.map((framework) => {
                     return (
                         <DropdownMenu.Item
-                            onClick={() => setActiveFramework(framework.label)}
+                            key={framework.value}
+                            onClick={() => setActiveFramework(framework.value)}
                             className="DropdownMenuItem"
                         >
                             <div className="framework-menu-item">
-                                <span style={{ paddingRight: '8px' }}>
-                                    {framework.label}
-                                </span>
                                 <img
-                                    width={20}
-                                    height={20}
+                                    width={16}
+                                    height={16}
                                     src={useBaseUrl(framework.icon)}
                                 />
+                                <span>{framework.label}</span>
                             </div>
                         </DropdownMenu.Item>
                     );

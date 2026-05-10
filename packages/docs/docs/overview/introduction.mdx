@@ -1,0 +1,43 @@
+---
+title: Introduction
+sidebar_position: 0
+description: An introduction to Dockview — a zero-dependency layout manager for building IDE-like interfaces with tabs, groups, drag & drop, and floating panels.
+---
+
+Dockview is a zero-dependency layout manager for building IDE-like interfaces in the browser. It provides tabs, groups, drag & drop, floating panels, popout windows, and serialization with no external runtime dependencies.
+
+## Key Features
+
+- **Tabs & Groups**: panels are organized into groups with a shared tab bar; multiple panels in one group appear as tabs
+- **Drag & Drop**: built-in drag and drop for rearranging panels and groups within the layout
+- **Floating Panels**: groups can be detached and positioned freely over the layout
+- **Popout Windows**: groups can be moved to a separate browser window
+- **Serialization**: save and restore layouts with `api.toJSON()` / `api.fromJSON()`
+- **Zero Dependencies**: the core library has no runtime dependencies
+- **Multi-Framework**: first-class support for React, Vue, Angular, and vanilla TypeScript
+
+## Component Types
+
+| Component | Description |
+|---|---|
+| **Dockview** | Full docking layout with tabs, groups, drag & drop, floating panels, and popout windows. The main component for IDE-like interfaces. [Docs →](/docs/core/overview) |
+| **Gridview** | Resizable grid of panels without tabs. Use when you want a fixed grid layout. [Docs →](/docs/other/gridview/overview) |
+| **Splitview** | Single axis (horizontal or vertical) resizable split. [Docs →](/docs/other/splitview/overview) |
+| **Paneview** | Collapsible pane sections, like VS Code's sidebar. [Docs →](/docs/other/paneview/overview) |
+
+## Framework Support
+
+Dockview provides packages for all major frameworks:
+
+| Framework | Package |
+|---|---|
+| React | `dockview-react` |
+| Vue 3 | `dockview-vue` |
+| Angular | `dockview-angular` |
+| Vanilla TypeScript | `dockview-core` |
+
+## Quick Links
+
+- [Quickstart →](/docs/overview/quickstart)
+- [Core Concepts →](/docs/core/overview)
+- [API Reference →](/docs/api/dockview/overview)

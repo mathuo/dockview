@@ -51,8 +51,14 @@ export {
     DockviewDidDropEvent,
     DockviewWillDropEvent,
     DockviewGroupChangeEvent,
+    DockviewGroupLocation,
 } from './dockview/dockviewGroupPanelModel';
-export { DockviewWillShowOverlayLocationEvent } from './dockview/events';
+export {
+    DockviewWillShowOverlayLocationEvent,
+    DockviewTabGroupChangeEvent,
+    DockviewTabGroupCollapsedChangeEvent,
+    DockviewTabGroupPanelChangeEvent,
+} from './dockview/events';
 export {
     TabDragEvent,
     GroupDragEvent,
@@ -67,11 +73,25 @@ export {
     IGroupHeaderProps,
     IWatermarkPanelProps,
     DockviewReadyEvent,
+    ITabGroupChipRenderer,
 } from './dockview/framework';
 
 export * from './dockview/options';
 export * from './dockview/theme';
 export * from './dockview/dockviewPanel';
+export {
+    DockviewTabGroupColor,
+    ITabGroup,
+    SerializedTabGroup,
+    TabGroupOptions,
+} from './dockview/tabGroup';
+export {
+    DEFAULT_TAB_GROUP_COLORS,
+    DockviewTabGroupColorEntry,
+    TabGroupColorPalette,
+    applyTabGroupAccent,
+    resolveTabGroupAccent,
+} from './dockview/tabGroupAccent';
 export { DefaultTab } from './dockview/components/tab/defaultTab';
 export {
     DefaultDockviewDeserialzier,
@@ -79,6 +99,11 @@ export {
 } from './dockview/deserializer';
 
 export * from './dockview/dockviewComponent';
+export {
+    EdgeGroupOptions,
+    EdgeGroupPosition,
+    SerializedEdgeGroups,
+} from './dockview/dockviewShell';
 export * from './gridview/gridviewComponent';
 export * from './splitview/splitviewComponent';
 export * from './paneview/paneviewComponent';
@@ -133,6 +158,7 @@ export { ExpansionEvent, PaneviewPanelApi } from './api/paneviewPanelApi';
 export {
     DockviewGroupPanelApi,
     DockviewGroupPanelFloatingChangeEvent,
+    DockviewGroupPanelCollapsedChangeEvent,
     DockviewGroupMoveParams,
 } from './api/dockviewGroupPanelApi';
 export {
@@ -141,6 +167,7 @@ export {
     PaneviewApi,
     GridviewApi,
     DockviewApi,
+    DockviewGetTabGroupsOptions,
 } from './api/component.api';
 export {
     createDockview,

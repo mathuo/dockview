@@ -167,6 +167,7 @@ const App = defineComponent({
                 <draggable-element />
                 <div
                     style="padding: 0px 4px; background-color: black; border-radius: 2px; color: white;"
+                    @dragover.prevent
                     @drop="onDrop">
                     Drop a tab or group here to inspect the attached metadata
                 </div>

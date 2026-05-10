@@ -221,7 +221,7 @@ export const DocRef = (props: DocRefProps) => {
     );
 
     const filteredDocs = React.useMemo(
-        () => filter(docs, props.methods),
+        () => (docs ? filter(docs, props.methods) : []),
         [docs]
     );
 

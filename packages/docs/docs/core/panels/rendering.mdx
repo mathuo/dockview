@@ -1,6 +1,7 @@
 ---
 title: Rendering Panels
-sidebar_postiion: 5
+sidebar_position: 5
+description: How Dockview renders panels — lazy rendering, deferred mounting, and visibility behaviour.
 ---
 
 import { MultiFrameworkContainer } from '@site/src/components/ui/container';
@@ -77,7 +78,7 @@ You can listen to `onDidVisibilityChange` to gate expensive work, or conditional
 
 <FrameworkSpecific framework='React'>
 ```tsx title="Only rendering the React Component when the panel is visible, otherwise rendering a null React Component"
-import { IDockviewPanelProps } from 'dockview';
+import { IDockviewPanelProps } from 'dockview-react';
 import * as React from 'react';
 
 function RenderWhenVisible(
@@ -208,4 +209,41 @@ Toggling the checkbox in the live example shows the panel component being destro
     sandboxId="rendering-dockview"
     react={RenderingDockview}
 />
+
+## Visibility Lifecycle Hooks
+
+When you implement a custom `IContentRenderer` (typically only relevant for vanilla TypeScript consumers), you can opt into two optional lifecycle hooks that fire when a panel transitions between hidden and visible. These hooks complement `api.onDidVisibilityChange` and run regardless of which `renderer` mode is in use:
+
+- `onShow()` — fires when the panel becomes visible (active in its group, or when its group is unhidden).
+- `onHide()` — fires when the panel becomes hidden (another tab in the group is selected, or the group is hidden).
+
+```ts
+import { IContentRenderer, GroupPanelPartInitParameters } from 'dockview-core';
+
+class MyPanel implements IContentRenderer {
+    private readonly _element: HTMLElement;
+
+    get element() {
+        return this._element;
+    }
+
+    constructor() {
+        this._element = document.createElement('div');
+    }
+
+    init(parameters: GroupPanelPartInitParameters): void {}
+
+    onShow(): void {
+        // attach listeners, resume work, restart animations
+    }
+
+    onHide(): void {
+        // detach listeners, pause work, suspend timers
+    }
+
+    dispose(): void {}
+}
+```
+
+Both hooks are optional. The framework wrappers (React, Vue, Angular) handle visibility internally — these hooks are primarily intended for vanilla `IContentRenderer` implementations and for framework adapters that need to detach/reattach DOM (for example, the Angular adapter uses them to detach and reattach `TemplateRef` views).
 

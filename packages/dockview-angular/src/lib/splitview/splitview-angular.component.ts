@@ -14,6 +14,7 @@ import {
     SimpleChanges,
     EnvironmentInjector,
     inject,
+    TemplateRef,
 } from '@angular/core';
 import {
     SplitviewApi,
@@ -28,7 +29,7 @@ import { AngularLifecycleManager } from '../utils/lifecycle-utils';
 import { SplitviewAngularReadyEvent } from './types';
 
 export interface SplitviewAngularOptions extends SplitviewOptions {
-    components: Record<string, Type<any>>;
+    components: Record<string, Type<any> | TemplateRef<any>>;
 }
 
 @Component({
@@ -55,7 +56,7 @@ export class SplitviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @ViewChild('splitviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
-    @Input() components!: Record<string, Type<any>>;
+    @Input() components!: Record<string, Type<any> | TemplateRef<any>>;
 
     // Core splitview options as inputs
     @Input() className?: string;

@@ -18,7 +18,9 @@ describe('tabsContainer', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
-            onDidOptionsChange: jest.fn(),
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -72,7 +74,9 @@ describe('tabsContainer', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
-            onDidOptionsChange: jest.fn(),
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
         });
 
         const dropTargetContainer = document.createElement('div');
@@ -142,7 +146,9 @@ describe('tabsContainer', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
-            onDidOptionsChange: jest.fn(),
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -206,7 +212,9 @@ describe('tabsContainer', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
-            onDidOptionsChange: jest.fn(),
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -270,7 +278,9 @@ describe('tabsContainer', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
-            onDidOptionsChange: jest.fn(),
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -339,7 +349,9 @@ describe('tabsContainer', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
-            onDidOptionsChange: jest.fn(),
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -404,7 +416,9 @@ describe('tabsContainer', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
-            onDidOptionsChange: jest.fn(),
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -471,7 +485,9 @@ describe('tabsContainer', () => {
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             doSetGroupActive: jest.fn(),
-            onDidOptionsChange: jest.fn(),
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -520,6 +536,55 @@ describe('tabsContainer', () => {
         expect(eventPreventDefaultSpy2).toHaveBeenCalledTimes(0);
     });
 
+    test('that an edge group cannot be floated via shift+click', () => {
+        const accessor = fromPartial<DockviewComponent>({
+            options: {},
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
+            element: document.createElement('div'),
+            addFloatingGroup: jest.fn(),
+            doSetGroupActive: jest.fn(),
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
+        });
+
+        const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+            return (<Partial<DockviewGroupPanel>>{
+                api: {
+                    location: { type: 'edge', position: 'left' },
+                } as any,
+            }) as DockviewGroupPanel;
+        });
+
+        const groupPanel = new groupPanelMock();
+
+        const cut = new TabsContainer(accessor, groupPanel);
+
+        const container = cut.element.querySelector('.dv-void-container')!;
+        expect(container).toBeTruthy();
+
+        jest.spyOn(cut.element, 'getBoundingClientRect').mockImplementation(
+            () => {
+                return { top: 50, left: 100, width: 0, height: 0 } as any;
+            }
+        );
+        jest.spyOn(
+            accessor.element,
+            'getBoundingClientRect'
+        ).mockImplementation(() => {
+            return { top: 10, left: 20, width: 0, height: 0 } as any;
+        });
+
+        const event = new KeyboardEvent('pointerdown', { shiftKey: true });
+        const eventPreventDefaultSpy = jest.spyOn(event, 'preventDefault');
+        fireEvent(container, event);
+
+        expect(accessor.doSetGroupActive).toHaveBeenCalledWith(groupPanel);
+        expect(accessor.addFloatingGroup).toHaveBeenCalledTimes(0);
+        expect(eventPreventDefaultSpy).toHaveBeenCalledTimes(0);
+    });
+
     test('that a tab that is already floating cannot be floated again', () => {
         const accessor = fromPartial<DockviewComponent>({
             options: {},
@@ -528,7 +593,9 @@ describe('tabsContainer', () => {
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             doSetGroupActive: jest.fn(),
-            onDidOptionsChange: jest.fn(),
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -580,7 +647,9 @@ describe('tabsContainer', () => {
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             getGroupPanel: jest.fn(),
-            onDidOptionsChange: jest.fn(),
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -637,7 +706,9 @@ describe('tabsContainer', () => {
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             getGroupPanel: jest.fn(),
-            onDidOptionsChange: jest.fn(),
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -705,7 +776,9 @@ describe('tabsContainer', () => {
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             getGroupPanel: jest.fn(),
-            onDidOptionsChange: jest.fn(),
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -773,7 +846,9 @@ describe('tabsContainer', () => {
             element: document.createElement('div'),
             addFloatingGroup: jest.fn(),
             getGroupPanel: jest.fn(),
-            onDidOptionsChange: jest.fn(),
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
         });
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -837,7 +912,9 @@ describe('tabsContainer', () => {
         const cut = new TabsContainer(
             fromPartial<DockviewComponent>({
                 options: {},
-                onDidOptionsChange: jest.fn(),
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
             }),
             fromPartial<DockviewGroupPanel>({})
         );
@@ -871,12 +948,16 @@ describe('tabsContainer', () => {
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
                 options: {},
-                onDidOptionsChange: jest.fn(),
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
             });
 
             const groupPanel = fromPartial<DockviewGroupPanel>({
                 id: 'testgroupid',
-                model: fromPartial<DockviewGroupPanelModel>({}),
+                model: fromPartial<DockviewGroupPanelModel>({
+                    getTabGroups: () => [],
+                }),
             });
 
             const cut = new TabsContainer(accessor, groupPanel);
@@ -908,8 +989,11 @@ describe('tabsContainer', () => {
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
                 options: {},
-                onDidOptionsChange: jest.fn(),
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
                 popupService: mockPopupService,
+                getPopupServiceForGroup: () => mockPopupService,
             });
 
             const mockClose = jest.fn();
@@ -982,14 +1066,20 @@ describe('tabsContainer', () => {
             const groupPanel = fromPartial<DockviewGroupPanel>({
                 id: 'testgroupid',
                 panels: [mockPanel],
-                model: fromPartial<DockviewGroupPanelModel>({}),
+                model: fromPartial<DockviewGroupPanelModel>({
+                    getTabGroups: () => [],
+                }),
             });
 
             const cut = new TabsContainer(accessor, groupPanel);
             (cut as any).tabs = mockTabs;
 
             // Simulate overflow tabs
-            (cut as any).toggleDropdown({ tabs: ['test-panel'], reset: false });
+            (cut as any).toggleDropdown({
+                tabs: ['test-panel'],
+                tabGroups: [],
+                reset: false,
+            });
 
             // Find the dropdown trigger and click it
             const dropdownTrigger = cut.element.querySelector(
@@ -1040,8 +1130,11 @@ describe('tabsContainer', () => {
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
                 options: {},
-                onDidOptionsChange: jest.fn(),
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
                 popupService: mockPopupService,
+                getPopupServiceForGroup: () => mockPopupService,
             });
 
             const mockClose = jest.fn();
@@ -1114,14 +1207,20 @@ describe('tabsContainer', () => {
             const groupPanel = fromPartial<DockviewGroupPanel>({
                 id: 'testgroupid',
                 panels: [mockPanel],
-                model: fromPartial<DockviewGroupPanelModel>({}),
+                model: fromPartial<DockviewGroupPanelModel>({
+                    getTabGroups: () => [],
+                }),
             });
 
             const cut = new TabsContainer(accessor, groupPanel);
             (cut as any).tabs = mockTabs;
 
             // Simulate overflow tabs
-            (cut as any).toggleDropdown({ tabs: ['test-panel'], reset: false });
+            (cut as any).toggleDropdown({
+                tabs: ['test-panel'],
+                tabGroups: [],
+                reset: false,
+            });
 
             // Find the dropdown trigger and click it
             const dropdownTrigger = cut.element.querySelector(
@@ -1162,8 +1261,11 @@ describe('tabsContainer', () => {
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
                 options: {},
-                onDidOptionsChange: jest.fn(),
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
                 popupService: mockPopupService,
+                getPopupServiceForGroup: () => mockPopupService,
             });
 
             const mockClose = jest.fn();
@@ -1236,14 +1338,20 @@ describe('tabsContainer', () => {
             const groupPanel = fromPartial<DockviewGroupPanel>({
                 id: 'testgroupid',
                 panels: [mockPanel],
-                model: fromPartial<DockviewGroupPanelModel>({}),
+                model: fromPartial<DockviewGroupPanelModel>({
+                    getTabGroups: () => [],
+                }),
             });
 
             const cut = new TabsContainer(accessor, groupPanel);
             (cut as any).tabs = mockTabs;
 
             // Simulate overflow tabs
-            (cut as any).toggleDropdown({ tabs: ['test-panel'], reset: false });
+            (cut as any).toggleDropdown({
+                tabs: ['test-panel'],
+                tabGroups: [],
+                reset: false,
+            });
 
             // Find the dropdown trigger and click it
             const dropdownTrigger = cut.element.querySelector(
@@ -1276,7 +1384,9 @@ describe('tabsContainer', () => {
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
-            onDidOptionsChange: jest.fn(),
+            onDidOptionsChange: jest
+                .fn()
+                .mockReturnValue({ dispose: jest.fn() }),
         });
 
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(

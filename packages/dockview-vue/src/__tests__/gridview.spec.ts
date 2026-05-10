@@ -1,3 +1,4 @@
+import { vi, describe, test, expect, beforeEach } from 'vitest';
 import {
     createGridview,
     PROPERTY_KEYS_GRIDVIEW,
@@ -78,7 +79,7 @@ describe('GridviewVue Component', () => {
     });
 
     test('should add and manage grid panels', () => {
-        const initSpy = jest
+        const initSpy = vi
             .spyOn(VuePart.prototype, 'init')
             .mockImplementation(() => {});
 
@@ -157,7 +158,7 @@ describe('VueGridviewPanelView', () => {
     });
 
     test('should create framework part and call init when getComponent is called', () => {
-        const initSpy = jest
+        const initSpy = vi
             .spyOn(VuePart.prototype, 'init')
             .mockImplementation(() => {});
 
@@ -176,7 +177,7 @@ describe('VueGridviewPanelView', () => {
     });
 
     test('should handle empty params', () => {
-        const initSpy = jest
+        const initSpy = vi
             .spyOn(VuePart.prototype, 'init')
             .mockImplementation(() => {});
 

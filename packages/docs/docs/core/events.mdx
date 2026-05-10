@@ -1,0 +1,191 @@
+---
+title: Events
+sidebar_position: 2
+description: Reference for Dockview events — subscribe to layout changes, panel lifecycle, focus changes, and more.
+---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+`DockviewApi` exposes a comprehensive set of events so your application can react to layout changes. All events follow the same subscription pattern and return a disposable that you should call when you no longer need the listener.
+
+```ts
+const disposable = api.onDidAddPanel((panel) => {
+    console.log('panel added:', panel.id);
+});
+
+// later, when cleaning up:
+disposable.dispose();
+```
+
+## Panel Lifecycle
+
+These events fire when panels are added, removed, moved, or change active state.
+
+```ts
+// Fires when a panel is added (including when panels move between groups)
+api.onDidAddPanel((panel: IDockviewPanel) => { });
+
+// Fires when a panel is removed (including when panels move between groups)
+api.onDidRemovePanel((panel: IDockviewPanel) => { });
+
+// Fires when the active panel changes. May be undefined if no panel is active.
+api.onDidActivePanelChange((panel: IDockviewPanel | undefined) => { });
+
+// Fires when a panel moves from one group to another
+api.onDidMovePanel((event: MovePanelEvent) => { });
+```
+
+:::info
+`onDidAddPanel` and `onDidRemovePanel` fire during panel moves. A panel being moved from group A to group B will trigger a remove followed by an add. Use `onDidMovePanel` if you only want to react to explicit moves.
+:::
+
+## Group Lifecycle
+
+These events fire when groups are added, removed, or change active state.
+
+```ts
+// Fires when a group is added (including during moves)
+api.onDidAddGroup((group: DockviewGroupPanel) => { });
+
+// Fires when a group is removed (including during moves)
+api.onDidRemoveGroup((group: DockviewGroupPanel) => { });
+
+// Fires when the active group changes. May be undefined if no group is active.
+api.onDidActiveGroupChange((group: DockviewGroupPanel | undefined) => { });
+```
+
+## Layout
+
+These events fire when the overall layout structure changes.
+
+```ts
+// Fires on any layout change (aggregation of many events).
+// Consider debouncing if using for persistence.
+api.onDidLayoutChange(() => { });
+
+// Fires after a layout is loaded via api.fromJSON()
+api.onDidLayoutFromJSON(() => { });
+
+// Fires when a group is maximized or un-maximized
+api.onDidMaximizedGroupChange((event: DockviewMaximizedGroupChanged) => { });
+```
+
+## Drag & Drop
+
+These events let you intercept and customize drag and drop behaviour.
+
+```ts
+// Fires before dockview handles a drop. Call event.preventDefault() to cancel it.
+api.onWillDrop((event: DockviewWillDropEvent) => {
+    // event.preventDefault() to cancel the drop
+});
+
+// Fires when a drop completes that dockview handled
+api.onDidDrop((event: DockviewDidDropEvent) => { });
+
+// Fires before a drop overlay is shown. Call event.preventDefault() to prevent it.
+api.onWillShowOverlay((event: DockviewWillShowOverlayLocationEvent) => {
+    // event.preventDefault() to hide the overlay for this position
+});
+
+// Fires before a panel tab drag begins. Call event.nativeEvent.preventDefault() to cancel.
+api.onWillDragPanel((event: TabDragEvent) => { });
+
+// Fires before a group header drag begins. Call event.nativeEvent.preventDefault() to cancel.
+api.onWillDragGroup((event: GroupDragEvent) => { });
+
+// Fires for drag-over events that dockview did not originate.
+// Call event.accept() to let dockview show a drop overlay for external drags.
+api.onUnhandledDragOverEvent((event: DockviewDndOverlayEvent) => {
+    event.accept();
+});
+```
+
+> See [Drag & Drop](/docs/core/dnd/dragAndDrop) and [External Dnd Events](/docs/core/dnd/external) for full examples.
+
+## Popout Window
+
+These events fire in response to popout window activity.
+
+```ts
+// Fires when a popout window is resized
+api.onDidPopoutGroupSizeChange((event: PopoutGroupChangeSizeEvent) => { });
+
+// Fires when a popout window is repositioned
+api.onDidPopoutGroupPositionChange((event: PopoutGroupChangePositionEvent) => { });
+
+// Fires when the browser blocked opening a popout window (e.g. popup blocker)
+api.onDidOpenPopoutWindowFail(() => {
+    console.warn('popup was blocked by the browser');
+});
+```
+
+> See [Popout Windows](/docs/core/groups/popoutGroups) for more.
+
+## Tab Groups
+
+These events fire when tab groups are created, destroyed, or modified across any group.
+
+```ts
+// Fires when a tab group is created
+api.onDidCreateTabGroup((event: DockviewTabGroupChangeEvent) => {
+    console.log('tab group created:', event.tabGroup.id);
+});
+
+// Fires when a tab group is destroyed (including auto-destroy when emptied)
+api.onDidDestroyTabGroup((event: DockviewTabGroupChangeEvent) => { });
+
+// Fires when a panel is added to a tab group
+api.onDidAddPanelToTabGroup((event: DockviewTabGroupPanelChangeEvent) => {
+    console.log(`panel ${event.panelId} added to group ${event.tabGroup.id}`);
+});
+
+// Fires when a panel is removed from a tab group
+api.onDidRemovePanelFromTabGroup((event: DockviewTabGroupPanelChangeEvent) => { });
+
+// Fires when a tab group's properties change (label, color)
+api.onDidTabGroupChange((event: DockviewTabGroupChangeEvent) => { });
+
+// Fires when a tab group is collapsed or expanded
+api.onDidTabGroupCollapsedChange((event: DockviewTabGroupCollapsedChangeEvent) => {
+    console.log(event.tabGroup.id, event.tabGroup.collapsed ? 'collapsed' : 'expanded');
+});
+```
+
+> See [Tab Groups](/docs/core/panels/tabs#tab-groups) for the full API.
+
+## Panel API Events
+
+Individual panels also expose events via `panel.api`:
+
+```ts
+// Fires when the panel's title changes
+panel.api.onDidTitleChange(({ title }) => { });
+
+// Fires when the panel becomes visible or hidden
+panel.api.onDidVisibilityChange(({ isVisible }) => { });
+
+// Fires when the panel moves to a different group
+panel.api.onDidGroupChange(() => { });
+
+// Fires when the panel's group active state changes
+panel.api.onDidActiveGroupChange(({ isActive }) => { });
+
+// Fires when the panel's location changes (grid → floating → popout)
+panel.api.onDidLocationChange(({ location }) => { });
+
+// Fires when the panel's renderer mode changes
+panel.api.onDidRendererChange(({ renderer }) => { });
+```
+
+## Group API Events
+
+Groups expose events via `group.api`:
+
+```ts
+// Fires when the active panel within this group changes
+group.api.onDidActivePanelChange((event) => { });
+
+// Fires when the group location changes (grid → floating → popout)
+group.api.onDidLocationChange(({ location }) => { });
+```

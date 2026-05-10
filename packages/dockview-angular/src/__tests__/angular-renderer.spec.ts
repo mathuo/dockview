@@ -7,10 +7,13 @@ import {
     EnvironmentInjector,
     inject,
     Injector,
+    TemplateRef,
+    ViewChild,
 } from '@angular/core';
 import { AngularRenderer } from '../lib/utils/angular-renderer';
 
 @Component({
+    standalone: false,
     selector: 'test-component',
     template:
         '<div class="test-component">{{ params?.title }} - {{ params?.value }}</div>',
@@ -22,6 +25,7 @@ class TestComponent {
 }
 
 @Component({
+    standalone: false,
     selector: 'test-update-component',
     template: '<div class="test-update-component">Counter: {{ counter }}</div>',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,6 +41,20 @@ class TestUpdateComponent {
     }
 }
 
+@Component({
+    standalone: false,
+    selector: 'test-template-holder-component',
+    template: `
+        <ng-template #template>
+            <test-update-component />
+        </ng-template>
+    `,
+})
+class TemplateHolderComponent {
+    @ViewChild('template', { static: true })
+    public template?: TemplateRef<any>;
+}
+
 describe('AngularRenderer', () => {
     let injector: Injector;
     let environmentInjector: EnvironmentInjector;
@@ -44,7 +62,11 @@ describe('AngularRenderer', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [TestComponent],
+            declarations: [
+                TestComponent,
+                TestUpdateComponent,
+                TemplateHolderComponent,
+            ],
         }).compileComponents();
 
         injector = TestBed.inject(Injector);
@@ -118,6 +140,40 @@ describe('AngularRenderer', () => {
 
         renderer.dispose();
 
+        // Element reference is intentionally retained after dispose so that
+        // dockview's overlay teardown can still detach the node from its
+        // parent without the getter throwing mid-cascade. See issue #1220.
+        expect(renderer.element).toBe(element);
+        expect(renderer.component).toBeNull();
+        expect(renderer.view).toBeNull();
+    });
+
+    it('should still expose its element after dispose (regression #1220)', () => {
+        // Reproduces the disposal-order bug from issue #1220: dockview-core's
+        // OverlayRenderContainer reads `panel.view.content.element` while
+        // tearing down its own disposables — by which point the renderer has
+        // already been disposed. Previously the getter threw "Angular
+        // renderer not initialized" here.
+        const renderer = new AngularRenderer<TestComponent>({
+            component: TestComponent,
+            injector,
+            environmentInjector,
+        });
+
+        renderer.init({ params: { title: 'Test Title' } });
+        renderer.dispose();
+
+        expect(() => renderer.element).not.toThrow();
+        expect(renderer.element).toBeInstanceOf(HTMLElement);
+    });
+
+    it('still throws from the element getter when accessed before init', () => {
+        const renderer = new AngularRenderer<TestComponent>({
+            component: TestComponent,
+            injector,
+            environmentInjector,
+        });
+
         expect(() => renderer.element).toThrow(
             'Angular renderer not initialized'
         );
@@ -127,7 +183,7 @@ describe('AngularRenderer', () => {
         jest.spyOn(console, 'error').mockImplementation();
 
         const renderer = new AngularRenderer({
-            component: null as any,
+            component: null as never,
             injector,
             environmentInjector,
         });
@@ -168,6 +224,31 @@ describe('AngularRenderer', () => {
         }).not.toThrow();
     });
 
+    it('should render view from template', () => {
+        // Create component with template
+        const templateRenderer = new AngularRenderer({
+            component: TemplateHolderComponent,
+            injector,
+            environmentInjector,
+        });
+        templateRenderer.init({});
+        const template = (
+            templateRenderer.component.instance as TemplateHolderComponent
+        ).template;
+
+        expect(template).toBeDefined();
+
+        // Create view from template
+        const renderer = new AngularRenderer({
+            component: template,
+            injector: templateRenderer.component.injector, // use container injector to ensure we have a view
+        });
+        renderer.init({});
+        application.tick();
+
+        expect(renderer.element.innerHTML).toContain('Counter: 0');
+    });
+
     it('should render when component is marked for change detection', () => {
         const renderer = new AngularRenderer<TestUpdateComponent>({
             component: TestUpdateComponent,
@@ -179,7 +260,7 @@ describe('AngularRenderer', () => {
         application.tick(); // trigger change detection
 
         expect(renderer.element.innerHTML).toContain('Counter: 0');
-        renderer.component!.instance.updateCounter();
+        renderer.component.instance.updateCounter();
         application.tick();
         expect(renderer.element.innerHTML).toContain('Counter: 1');
     });
@@ -199,7 +280,7 @@ describe('AngularRenderer', () => {
         });
         application.tick();
 
-        const instance = renderer.component!.instance;
+        const instance = renderer.component.instance;
         expect(instance.params).toEqual({ title: 'Hello' });
         expect(instance.api).toEqual({ mockApi: true });
         expect(instance.containerApi).toEqual({ mockContainerApi: true });

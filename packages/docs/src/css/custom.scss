@@ -4,6 +4,9 @@
  * work well for content-centric websites.
  */
 
+@import 'ag-grid-community/styles/ag-grid.css';
+@import 'ag-grid-community/styles/ag-theme-alpine.css';
+
 .main-wrapper {
     --ifm-spacing-horizontal: 2rem;
     --ifm-menu-link-padding-vertical: 0.5rem;
@@ -11,65 +14,89 @@
 
 /* You can override the default Infima variables here. */
 :root {
-    --ifm-font-family-base: 'IBM Plex Sans', ui-sans-serif, system-ui,
-        -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue,
-        Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji,
-        Segoe UI Symbol, Noto Color Emoji;
+    --ifm-font-family-base: 'Inter', ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+        'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
 
     --ifm-font-weight-bold: 600;
 
     --ifm-alert-padding-vertical: 8px;
     --ifm-alert-padding-horizontal: 8px;
 
-    --ifm-background-surface-color: #141d2c;
-    --ifm-background-color: white;
+    --ifm-background-color: #ffffff;
+    --ifm-background-surface-color: #f8fafc;
 
-    --ifm-color-primary: #21222c;
-    --ifm-color-primary-dark: #1e1f28;
-    --ifm-color-primary-darker: #1c1d25;
-    --ifm-color-primary-darkest: #17181f;
-    --ifm-color-primary-light: #242530;
-    --ifm-color-primary-lighter: #262733;
-    --ifm-color-primary-lightest: #2b2c39;
+    --ifm-color-primary: #1d4ed8;
+    --ifm-color-primary-dark: #1e40af;
+    --ifm-color-primary-darker: #1e3a8a;
+    --ifm-color-primary-darkest: #1e3270;
+    --ifm-color-primary-light: #2563eb;
+    --ifm-color-primary-lighter: #3b82f6;
+    --ifm-color-primary-lightest: #60a5fa;
+
     --ifm-code-font-size: 95%;
-    --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+    --ifm-code-background: #f1f5f9;
 
-    --ifm-color-primary: black;
+    --docusaurus-highlighted-code-line-bg: rgba(37, 99, 235, 0.08);
 
-    --ifm-dropdown-background-color: white;
-    --ifm-dropdown-border: 1px solid var(--ifm-color-primary-darkest);
+    --ifm-navbar-background-color: #ffffff;
+    --ifm-navbar-link-color: #374151;
+    --ifm-navbar-link-hover-color: #1d4ed8;
 
-    --ifm-navbar-link-color: white;
-    --ifm-navbar-link-hover-color: white;
+    --ifm-dropdown-background-color: #ffffff;
+    --ifm-dropdown-border: 1px solid #e2e8f0;
+
+    --ifm-toc-border-color: #e2e8f0;
+    --ifm-hr-border-color: #e2e8f0;
+    --ifm-table-border-color: #e2e8f0;
+
+    --dv-docs-markdown-text-color: #374151;
+
+    --ifm-hover-overlay: rgba(0, 0, 0, 0.05);
 
     .navbar {
-        color: white;
+        border-bottom: 1px solid #e2e8f0;
+        box-shadow: none;
     }
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 :root[data-theme='dark'] {
-    --ifm-background-surface-color: #141d2c;
-    --ifm-background-color: #141d2c;
+    --ifm-background-color: #0c0c0e;
+    --ifm-background-surface-color: #18181b;
+
+    --ifm-color-primary: #38bdf8;
+    --ifm-color-primary-dark: #0ea5e9;
+    --ifm-color-primary-darker: #0284c7;
+    --ifm-color-primary-darkest: #0369a1;
+    --ifm-color-primary-light: #7dd3fc;
+    --ifm-color-primary-lighter: #bae6fd;
+    --ifm-color-primary-lightest: #e0f2fe;
+
+    --ifm-code-background: #18181b;
+
+    --docusaurus-highlighted-code-line-bg: rgba(96, 165, 250, 0.1);
+
+    --ifm-navbar-background-color: #0c0c0e;
+    --ifm-navbar-link-color: #e4e4e7;
+    --ifm-navbar-link-hover-color: #38bdf8;
+
+    --ifm-dropdown-background-color: #18181b;
+    --ifm-dropdown-border: 1px solid #27272a;
+
+    --ifm-toc-border-color: #27272a;
+    --ifm-hr-border-color: #27272a;
+    --ifm-table-border-color: #27272a;
+
+    --dv-docs-markdown-text-color: #a1a1aa;
+
+    --ifm-hover-overlay: rgba(255, 255, 255, 0.06);
 
     .navbar {
-        border-bottom: 1px solid var(--ifm-toc-border-color);
+        border-bottom: 1px solid #27272a;
+        box-shadow: none;
     }
-
-    /* --ifm-color-primary: #0c111d; */
-    --ifm-color-primary: #98a2b3;
-    --ifm-color-primary-dark: #828a99;
-    --ifm-color-primary-darker: #6a707c;
-    --ifm-color-primary-darkest: #474b53;
-    --ifm-color-primary-light: #acb7ca;
-    --ifm-color-primary-lighter: #bcc9df;
-    --ifm-color-primary-lightest: #d2e1fa;
-    --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
-
-    --ifm-dropdown-background-color: #373d4b;
-    --ifm-dropdown-border: 1px solid var(--ifm-color-primary-darkest);
-
-    --dv-docs-markdown-text-color: #cdced8;
 }
 
 .navbar__brand {
@@ -99,6 +126,66 @@
 .header-github-link:hover::before {
     background-color: var(--ifm-navbar-link-hover-color);
 }
+
+.header-github-link:focus-visible {
+    outline: 2px solid var(--ifm-color-primary);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+// ─── Buttons ──────────────────────────────────────────────────────────────────
+
+:root {
+    --ifm-button-border-radius: 6px;
+    --ifm-button-font-weight: 600;
+}
+
+.button {
+    letter-spacing: 0.01em;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        text-decoration: none;
+    }
+
+    &:active {
+        transform: translateY(0);
+        box-shadow: none;
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--ifm-color-primary);
+        outline-offset: 2px;
+    }
+}
+
+.button.button--secondary {
+    --ifm-button-background-color: var(--ifm-background-surface-color);
+    --ifm-button-border-color: var(--ifm-toc-border-color);
+    --ifm-button-color: var(--ifm-navbar-link-color);
+    color: var(--ifm-navbar-link-color);
+
+    &:hover {
+        --ifm-button-background-color: var(--ifm-toc-border-color);
+        --ifm-button-border-color: var(--ifm-toc-border-color);
+        --ifm-button-color: var(--ifm-navbar-link-color);
+        color: var(--ifm-navbar-link-color);
+    }
+}
+
+:root[data-theme='dark'] .button.button--secondary {
+    --ifm-button-color: #e4e4e7;
+    color: #e4e4e7;
+
+    &:hover {
+        --ifm-button-color: #e4e4e7;
+        color: #e4e4e7;
+    }
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
 
 .pagination-nav {
     display: none;
@@ -145,7 +232,6 @@
         th,
         td {
             border: none;
-            padding: none;
             text-align: left;
         }
 
@@ -163,12 +249,21 @@
         // white-space: pre-wrap;
         .token {
             &.maybe-class-name {
-                color: #cf8cff;
+                color: #7c3aed;
             }
             &.keyword {
-                color: rgb(130, 170, 255);
+                color: #1d4ed8;
             }
         }
+    }
+}
+
+:root[data-theme='dark'] .markdown code .token {
+    &.maybe-class-name {
+        color: #c084fc;
+    }
+    &.keyword {
+        color: #93c5fd;
     }
 }
 
@@ -189,14 +284,9 @@
 }
 
 .sidebar-section2 {
-    &:not(:first-child) {
-        // border-top: 1px solid var(--ifm-toc-border-color);
-    }
-
     > .menu__list-item-collapsible {
         padding-top: 10px;
         padding-bottom: 10px;
-        // text-transform: uppercase;
 
         &:hover {
             background-color: inherit;
@@ -204,13 +294,9 @@
     }
 }
 
-.menu {
-    // padding-top: 40px;
-}
-
 .menu__list {
     .menu__list .menu__link:not(.menu__link--sublist) {
-        border-left: 1px solid #3c3c42;
+        border-left: 1px solid var(--ifm-toc-border-color);
     }
 
     .menu__list {
@@ -222,23 +308,7 @@
     }
 
     .menu__list .menu__link--active:not(.menu__link--sublist) {
-        border-left: 1px solid rgb(112, 145, 227);
-    }
-
-    .menu__list-item-collapsible {
-        // .menu__link {
-        //     display: flex;
-        //     flex-direction: row-reverse;
-        //     justify-content: flex-end;
-
-        //     &::after {
-        //         margin-left: 0px;
-        //     }
-        // }
-
-        .menu__link {
-            // color: white;
-        }
+        border-left: 1px solid var(--ifm-color-primary);
     }
 
     .menu__list-item-collapsible .menu__link:hover,
@@ -282,4 +352,30 @@
     border: none;
     display: flex;
     padding: 8px 16px;
+}
+
+.blog-list-page .hero {
+    display: none;
+}
+
+:root:not([data-theme='dark']) {
+    .theme-code-block {
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .button {
+        transition: none;
+
+        &:hover {
+            transform: none;
+            box-shadow: none;
+        }
+    }
+
+    .header-github-link::before {
+        transition: none;
+    }
 }

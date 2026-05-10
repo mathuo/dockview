@@ -16,4 +16,9 @@
     > svg {
         transform: rotate(90deg);
     }
+
+    &:hover {
+        border-radius: 2px;
+        background-color: var(--dv-icon-hover-background-color);
+    }
 }

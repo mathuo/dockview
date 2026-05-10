@@ -52,13 +52,22 @@ import {
     DockviewDidDropEvent,
     DockviewWillDropEvent,
 } from '../dockview/dockviewGroupPanelModel';
-import { DockviewWillShowOverlayLocationEvent } from '../dockview/events';
+import {
+    DockviewWillShowOverlayLocationEvent,
+    DockviewTabGroupChangeEvent,
+    DockviewTabGroupCollapsedChangeEvent,
+    DockviewTabGroupPanelChangeEvent,
+} from '../dockview/events';
+import { ITabGroup } from '../dockview/tabGroup';
+import { DockviewTabGroupColorEntry } from '../dockview/tabGroupAccent';
 import {
     PaneviewComponentOptions,
     PaneviewDndOverlayEvent,
 } from '../paneview/options';
 import { SplitviewComponentOptions } from '../splitview/options';
 import { GridviewComponentOptions } from '../gridview/options';
+import { EdgeGroupPosition, EdgeGroupOptions } from '../dockview/dockviewShell';
+import { DockviewGroupPanelApi } from './dockviewGroupPanelApi';
 
 export interface CommonApi<T = any> {
     readonly height: number;
@@ -567,6 +576,10 @@ export class GridviewApi implements CommonApi<SerializedGridviewComponent> {
     }
 }
 
+export interface DockviewGetTabGroupsOptions {
+    groupId: string;
+}
+
 export class DockviewApi implements CommonApi<SerializedDockview> {
     /**
      * The unique identifier for this instance. Used to manage scope of Drag'n'Drop events.
@@ -622,6 +635,16 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     get size(): number {
         return this.component.size;
+    }
+
+    /**
+     * The active tab-group color palette. Reflects the configured
+     * `tabGroupColors` option, or the built-in defaults when unset.
+     * Useful for custom chip renderers that want to roll their own
+     * picker UI.
+     */
+    get tabGroupColors(): readonly DockviewTabGroupColorEntry[] {
+        return this.component.tabGroupColorPalette.entries();
     }
 
     /**
@@ -751,6 +774,48 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     get onDidOpenPopoutWindowFail(): Event<void> {
         return this.component.onDidOpenPopoutWindowFail;
+    }
+
+    /**
+     * Invoked when a tab group is created in any group.
+     */
+    get onDidCreateTabGroup(): Event<DockviewTabGroupChangeEvent> {
+        return this.component.onDidCreateTabGroup;
+    }
+
+    /**
+     * Invoked when a tab group is destroyed in any group.
+     */
+    get onDidDestroyTabGroup(): Event<DockviewTabGroupChangeEvent> {
+        return this.component.onDidDestroyTabGroup;
+    }
+
+    /**
+     * Invoked when a panel is added to a tab group.
+     */
+    get onDidAddPanelToTabGroup(): Event<DockviewTabGroupPanelChangeEvent> {
+        return this.component.onDidAddPanelToTabGroup;
+    }
+
+    /**
+     * Invoked when a panel is removed from a tab group.
+     */
+    get onDidRemovePanelFromTabGroup(): Event<DockviewTabGroupPanelChangeEvent> {
+        return this.component.onDidRemovePanelFromTabGroup;
+    }
+
+    /**
+     * Invoked when a tab group's properties (label, color) change.
+     */
+    get onDidTabGroupChange(): Event<DockviewTabGroupChangeEvent> {
+        return this.component.onDidTabGroupChange;
+    }
+
+    /**
+     * Invoked when a tab group is collapsed or expanded.
+     */
+    get onDidTabGroupCollapsedChange(): Event<DockviewTabGroupCollapsedChangeEvent> {
+        return this.component.onDidTabGroupCollapsedChange;
     }
 
     /**
@@ -927,8 +992,124 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.addPopoutGroup(item, options);
     }
 
+    /**
+     * Add an edge group at the given position. Returns the group panel API
+     * for the newly created group. Throws if a group already exists there.
+     */
+    addEdgeGroup(
+        position: EdgeGroupPosition,
+        options: EdgeGroupOptions
+    ): DockviewGroupPanelApi {
+        return this.component.addEdgeGroup(position, options);
+    }
+
+    /**
+     * Get the group panel API for an edge group at the given position.
+     * Returns `undefined` if no edge group is configured at that position.
+     */
+    getEdgeGroup(
+        position: EdgeGroupPosition
+    ): DockviewGroupPanelApi | undefined {
+        return this.component.getEdgeGroup(position);
+    }
+
+    /**
+     * Set the visibility of an edge group.
+     */
+    setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void {
+        this.component.setEdgeGroupVisible(position, visible);
+    }
+
+    /**
+     * Check whether an edge group is currently visible.
+     */
+    isEdgeGroupVisible(position: EdgeGroupPosition): boolean {
+        return this.component.isEdgeGroupVisible(position);
+    }
+
+    /**
+     * Remove an edge group and reclaim its slot in the layout.
+     * All panels inside the group are disposed. Throws if no group exists at position.
+     */
+    removeEdgeGroup(position: EdgeGroupPosition): void {
+        this.component.removeEdgeGroup(position);
+    }
+
     updateOptions(options: Partial<DockviewComponentOptions>) {
         this.component.updateOptions(options);
+    }
+
+    // === Tab Group API ===
+
+    private _getGroupModel(groupId: string) {
+        const group = this.component.getPanel(groupId);
+        if (!group) {
+            throw new Error(`dockview: group '${groupId}' not found`);
+        }
+        return group.model;
+    }
+
+    createTabGroup(options: {
+        groupId: string;
+        label?: string;
+        color?: string;
+        componentParams?: Record<string, unknown>;
+    }): ITabGroup {
+        const model = this._getGroupModel(options.groupId);
+        return model.createTabGroup({
+            label: options.label,
+            color: options.color,
+            componentParams: options.componentParams,
+        });
+    }
+
+    dissolveTabGroup(options: { groupId: string; tabGroupId: string }): void {
+        const model = this._getGroupModel(options.groupId);
+        model.dissolveTabGroup(options.tabGroupId);
+    }
+
+    addPanelToTabGroup(options: {
+        groupId: string;
+        tabGroupId: string;
+        panelId: string;
+        index?: number;
+    }): void {
+        const model = this._getGroupModel(options.groupId);
+        model.addPanelToTabGroup(
+            options.tabGroupId,
+            options.panelId,
+            options.index
+        );
+    }
+
+    removePanelFromTabGroup(options: {
+        groupId: string;
+        panelId: string;
+    }): void {
+        const model = this._getGroupModel(options.groupId);
+        model.removePanelFromTabGroup(options.panelId);
+    }
+
+    getTabGroups(options: DockviewGetTabGroupsOptions): readonly ITabGroup[] {
+        const model = this._getGroupModel(options.groupId);
+        return model.getTabGroups();
+    }
+
+    getTabGroupForPanel(options: {
+        groupId: string;
+        panelId: string;
+    }): ITabGroup | undefined {
+        const model = this._getGroupModel(options.groupId);
+        return model.getTabGroupForPanel(options.panelId);
+    }
+
+    moveTabGroup(options: {
+        groupId: string;
+        tabGroupId: string;
+        index: number;
+    }): void {
+        const model = this._getGroupModel(options.groupId);
+        model.moveTabGroup(options.tabGroupId, options.index);
     }
 
     /**

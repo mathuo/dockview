@@ -1,4 +1,4 @@
-import { IDockviewPanelProps } from 'dockview';
+import { IDockviewPanelProps } from 'dockview-react';
 import * as React from 'react';
 import Map from 'react-map-gl';
 
@@ -14,7 +14,7 @@ export const MapboxPanel = (props: IDockviewPanelProps) => {
     return (
         <div style={{ overflow: 'auto', height: '100%' }}>
             <Map
-                mapboxAccessToken="pk.eyJ1IjoibWF0aHVvIiwiYSI6ImNrMXo4bnJ1ajA5OXUzaXA5ODg3Nnc1M3YifQ.Il7zfYd-sZ113W6Fmmagjg"
+                mapboxAccessToken={process.env.REACT_APP_MAPBOX_TOKEN ?? ''}
                 initialViewState={{
                     longitude: -122.4,
                     latitude: 37.8,

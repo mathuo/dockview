@@ -230,7 +230,10 @@ export function addStyles(document: Document, styleSheetList: StyleSheetList) {
                 );
             }
         } catch (err) {
-            // security errors (lack of permissions), ignore
+            console.warn(
+                'dockview: failed to access stylesheet rules due to security restrictions',
+                err
+            );
         }
 
         for (const rule of cssTexts) {

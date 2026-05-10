@@ -1,0 +1,80 @@
+---
+title: Tab Header Position
+sidebar_position: 6
+description: How to configure the position of the tab header bar on a Dockview group (top or bottom).
+---
+
+import { CodeRunner } from '@site/src/components/ui/codeRunner';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+By default the tab bar sits at the top of each group. You can change this to `bottom`, `left`, or `right`, either as a global default for all groups or per group at runtime.
+
+## Global Default
+
+Set `defaultHeaderPosition` in the component options to apply a position to all groups:
+
+<FrameworkSpecific framework='JavaScript'>
+```ts
+import { createDockview, themeAbyss } from 'dockview-core';
+
+const api = createDockview(element, {
+    theme: themeAbyss,
+    defaultHeaderPosition: 'bottom', // 'top' | 'bottom' | 'left' | 'right'
+    createComponent: (options) => new MyPanel(),
+});
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='React'>
+```tsx
+<DockviewReact
+    defaultHeaderPosition="bottom"
+    onReady={onReady}
+    components={components}
+/>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Vue'>
+```ts
+template: `
+  <dockview-vue
+    defaultHeaderPosition="bottom"
+    @ready="onReady"
+  />`
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Angular'>
+```ts
+// In template:
+<dv-dockview
+    defaultHeaderPosition="bottom"
+    (ready)="onReady($event)">
+</dv-dockview>
+```
+</FrameworkSpecific>
+
+## Per-Group at Runtime
+
+Each group's API exposes `setHeaderPosition` and `getHeaderPosition`, allowing you to change the tab bar position on individual groups independently:
+
+```ts
+const onReady = (event: DockviewReadyEvent) => {
+    const panel = event.api.addPanel({
+        id: 'panel_1',
+        component: 'default',
+        title: 'Panel 1',
+    });
+
+    // Move the tab bar to the left for this specific group
+    panel.group.api.setHeaderPosition('left');
+
+    // Read it back
+    const position = panel.group.api.getHeaderPosition(); // 'left'
+};
+```
+
+## Live Example
+
+<CodeRunner id="dockview/header-position" height={400}/>

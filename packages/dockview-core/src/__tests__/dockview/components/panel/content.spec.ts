@@ -43,6 +43,9 @@ class TestContentRenderer
     focus(): void {
         //
     }
+
+    onShow?(): void;
+    onHide?(): void;
 }
 
 describe('contentContainer', () => {
@@ -130,6 +133,84 @@ describe('contentContainer', () => {
         expect(blur).toBe(2);
 
         disposable.dispose();
+    });
+
+    test('that onShow and onHide are called when switching panels with onlyWhenVisible renderer', () => {
+        const overlayRenderContainer = fromPartial<OverlayRenderContainer>({
+            detatch: jest.fn(),
+        });
+
+        const cut = new ContentContainer(
+            fromPartial<DockviewComponent>({
+                overlayRenderContainer,
+            }),
+            fromPartial<DockviewGroupPanelModel>({
+                renderContainer: overlayRenderContainer,
+            })
+        );
+
+        const renderer1 = new TestContentRenderer('panel_1');
+        renderer1.onShow = jest.fn();
+        renderer1.onHide = jest.fn();
+
+        const renderer2 = new TestContentRenderer('panel_2');
+        renderer2.onShow = jest.fn();
+        renderer2.onHide = jest.fn();
+
+        const panel1 = fromPartial<IDockviewPanel>({
+            api: { renderer: 'onlyWhenVisible' },
+            view: { content: renderer1 },
+        });
+
+        const panel2 = fromPartial<IDockviewPanel>({
+            api: { renderer: 'onlyWhenVisible' },
+            view: { content: renderer2 },
+        });
+
+        cut.openPanel(panel1);
+
+        expect(renderer1.onShow).toHaveBeenCalledTimes(1);
+        expect(renderer1.onHide).toHaveBeenCalledTimes(0);
+
+        cut.openPanel(panel2);
+
+        expect(renderer1.onHide).toHaveBeenCalledTimes(1);
+        expect(renderer2.onShow).toHaveBeenCalledTimes(1);
+
+        cut.closePanel();
+
+        expect(renderer2.onHide).toHaveBeenCalledTimes(1);
+    });
+
+    test('that onShow and onHide are not called for panels without the hooks', () => {
+        const overlayRenderContainer = fromPartial<OverlayRenderContainer>({
+            detatch: jest.fn(),
+        });
+
+        const cut = new ContentContainer(
+            fromPartial<DockviewComponent>({
+                overlayRenderContainer,
+            }),
+            fromPartial<DockviewGroupPanelModel>({
+                renderContainer: overlayRenderContainer,
+            })
+        );
+
+        const panel1 = fromPartial<IDockviewPanel>({
+            api: { renderer: 'onlyWhenVisible' },
+            view: { content: new TestContentRenderer('panel_1') },
+        });
+
+        const panel2 = fromPartial<IDockviewPanel>({
+            api: { renderer: 'onlyWhenVisible' },
+            view: { content: new TestContentRenderer('panel_2') },
+        });
+
+        expect(() => {
+            cut.openPanel(panel1);
+            cut.openPanel(panel2);
+            cut.closePanel();
+        }).not.toThrow();
     });
 
     test("that panels renderered as 'onlyWhenVisible' are removed when closed", () => {

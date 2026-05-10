@@ -59,8 +59,17 @@
 
     .action-container {
         display: flex;
+        flex-wrap: wrap;
         padding: 4px;
         overflow: auto;
+
+        .action-row {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
 
         .text-button {
             margin: 0px 4px;

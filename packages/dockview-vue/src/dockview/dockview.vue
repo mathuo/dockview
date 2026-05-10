@@ -4,6 +4,7 @@ import {
     type DockviewOptions,
     PROPERTY_KEYS_DOCKVIEW,
     type DockviewFrameworkOptions,
+    type DockviewIDisposable,
     createDockview,
 } from 'dockview-core';
 import {
@@ -18,6 +19,8 @@ import {
 } from 'vue';
 import {
     VueHeaderActionsRenderer,
+    VueContextMenuItemRenderer,
+    VueTabGroupChipRenderer,
     VueRenderer,
     VueWatermarkRenderer,
     findComponent,
@@ -41,6 +44,7 @@ const props = defineProps<IDockviewVueProps>();
 
 const el = ref<HTMLElement | null>(null);
 const instance = ref<DockviewApi | null>(null);
+const eventDisposables: DockviewIDisposable[] = [];
 
 PROPERTY_KEYS_DOCKVIEW.forEach((coreOptionKey) => {
     watch(
@@ -53,12 +57,127 @@ PROPERTY_KEYS_DOCKVIEW.forEach((coreOptionKey) => {
     );
 });
 
+const inst = getCurrentInstance()!;
+
+watch(
+    () => props.tabGroupChipComponent,
+    (newValue) => {
+        if (instance.value) {
+            instance.value.updateOptions({
+                createTabGroupChipComponent: newValue
+                    ? () => {
+                          const component = findComponent(inst, newValue);
+                          return new VueTabGroupChipRenderer(component!, inst);
+                      }
+                    : undefined,
+            });
+        }
+    }
+);
+
+watch(
+    () => props.defaultTabComponent,
+    (newValue) => {
+        if (instance.value) {
+            instance.value.updateOptions({
+                defaultTabComponent: newValue,
+                createTabComponent(options) {
+                    let component = findComponent(inst, options.name);
+
+                    if (!component && newValue) {
+                        component = findComponent(inst, newValue);
+                    }
+
+                    if (component) {
+                        return new VueRenderer(component, inst);
+                    }
+                    return undefined;
+                },
+            });
+        }
+    }
+);
+
+watch(
+    () => props.watermarkComponent,
+    (newValue) => {
+        if (instance.value) {
+            instance.value.updateOptions({
+                createWatermarkComponent: newValue
+                    ? () => {
+                          const component = findComponent(inst, newValue);
+                          return new VueWatermarkRenderer(component!, inst);
+                      }
+                    : undefined,
+            });
+        }
+    }
+);
+
+watch(
+    () => props.rightHeaderActionsComponent,
+    (newValue) => {
+        if (instance.value) {
+            instance.value.updateOptions({
+                createRightHeaderActionComponent: newValue
+                    ? (group) => {
+                          const component = findComponent(inst, newValue);
+                          return new VueHeaderActionsRenderer(
+                              component!,
+                              inst,
+                              group
+                          );
+                      }
+                    : undefined,
+            });
+        }
+    }
+);
+
+watch(
+    () => props.leftHeaderActionsComponent,
+    (newValue) => {
+        if (instance.value) {
+            instance.value.updateOptions({
+                createLeftHeaderActionComponent: newValue
+                    ? (group) => {
+                          const component = findComponent(inst, newValue);
+                          return new VueHeaderActionsRenderer(
+                              component!,
+                              inst,
+                              group
+                          );
+                      }
+                    : undefined,
+            });
+        }
+    }
+);
+
+watch(
+    () => props.prefixHeaderActionsComponent,
+    (newValue) => {
+        if (instance.value) {
+            instance.value.updateOptions({
+                createPrefixHeaderActionComponent: newValue
+                    ? (group) => {
+                          const component = findComponent(inst, newValue);
+                          return new VueHeaderActionsRenderer(
+                              component!,
+                              inst,
+                              group
+                          );
+                      }
+                    : undefined,
+            });
+        }
+    }
+);
+
 onMounted(() => {
     if (!el.value) {
         throw new Error('dockview-vue: element is not mounted');
     }
-
-    const inst = getCurrentInstance();
 
     if (!inst) {
         throw new Error('dockview-vue: getCurrentInstance() returned null');
@@ -118,10 +237,31 @@ onMounted(() => {
                   return new VueHeaderActionsRenderer(component!, inst, group);
               }
             : undefined,
+        createContextMenuItemComponent: (options) => {
+            if (!options.component) {
+                return undefined;
+            }
+            const component = findComponent(inst, options.component as string);
+            return new VueContextMenuItemRenderer(component!, inst);
+        },
     };
 
+    const coreOptions = extractCoreOptions(props);
+
+    if (props.defaultTabComponent) {
+        frameworkOptions.defaultTabComponent = props.defaultTabComponent;
+    }
+
+    if (props.tabGroupChipComponent) {
+        const chipComponentName = props.tabGroupChipComponent;
+        coreOptions.createTabGroupChipComponent = () => {
+            const component = findComponent(inst, chipComponentName);
+            return new VueTabGroupChipRenderer(component!, inst);
+        };
+    }
+
     const api = createDockview(el.value, {
-        ...extractCoreOptions(props),
+        ...coreOptions,
         ...frameworkOptions,
     });
 
@@ -143,10 +283,17 @@ onMounted(() => {
      */
     instance.value = markRaw(api);
 
+    eventDisposables.push(
+        api.onDidDrop((event) => emit('didDrop', event)),
+        api.onWillDrop((event) => emit('willDrop', event))
+    );
+
     emit('ready', { api });
 });
 
 onBeforeUnmount(() => {
+    eventDisposables.forEach((d) => d.dispose());
+    eventDisposables.length = 0;
     if (instance.value) {
         instance.value.dispose();
     }

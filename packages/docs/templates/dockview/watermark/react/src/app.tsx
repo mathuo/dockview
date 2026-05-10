@@ -5,7 +5,7 @@ import {
     IDockviewPanelProps,
     IWatermarkPanelProps,
     Orientation,
-} from 'dockview';
+} from 'dockview-react';
 import React from 'react';
 
 const components = {

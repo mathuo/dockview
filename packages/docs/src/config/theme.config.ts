@@ -5,50 +5,127 @@ import {
     themeAbyssSpaced,
     themeLightSpaced,
     themeLight,
-    themeReplit,
     themeVisualStudio,
-} from 'dockview';
+    themeNord,
+    themeNordSpaced,
+    themeCatppuccinMocha,
+    themeCatppuccinMochaSpaced,
+    themeMonokai,
+    themeSolarizedLight,
+    themeSolarizedLightSpaced,
+    themeGithubDark,
+    themeGithubDarkSpaced,
+    themeGithubLight,
+    themeGithubLightSpaced,
+} from 'dockview-react';
 
 export const themeConfig = [
     {
         id: themeDark,
+        label: 'Dark',
         key: '**[Dark](/demo?theme=dark)**',
         text: '',
     },
     {
         id: themeLight,
+        label: 'Light',
         key: '**[Light](/demo?theme=light)**',
         text: '',
     },
     {
         id: themeVisualStudio,
+        label: 'Visual Studio',
         key: '**[Visual Studio](/demo?theme=visualStudio)**',
-
         text: 'Based on [Visual Studio](https://visualstudio.microsoft.com)',
     },
     {
         id: themeAbyss,
+        label: 'Abyss',
         key: '**[Abyss](/demo?theme=abyss)**',
         text: 'Based on [Visual Studio Code](https://code.visualstudio.com/docs/getstarted/themes) abyss theme',
     },
     {
         id: themeDracula,
+        label: 'Dracula',
         key: '**[Dracula](/demo?theme=dracula)**',
         text: 'Based on [Visual Studio Code](https://code.visualstudio.com/docs/getstarted/themes) dracula theme',
     },
     {
-        id: themeReplit,
-        key: '**[Replit](/demo?theme=replit)**',
-        text: 'Based on  [Replit](https://replit.com)',
-    },
-    {
         id: themeLightSpaced,
+        label: 'Light Spaced',
         key: '**[Light Spaced](/demo?theme=lightSpaced)**',
         text: '',
     },
     {
         id: themeAbyssSpaced,
+        label: 'Abyss Spaced',
         key: '**[Abyss Spaced](/demo?theme=abyssSpaced)**',
         text: '',
     },
-];
+    {
+        id: themeNord,
+        label: 'Nord',
+        key: '**[Nord](/demo?theme=nord)**',
+        text: 'Based on the [Nord](https://www.nordtheme.com) color palette',
+    },
+    {
+        id: themeNordSpaced,
+        label: 'Nord Spaced',
+        key: '**[Nord Spaced](/demo?theme=nordSpaced)**',
+        text: '',
+    },
+    {
+        id: themeCatppuccinMocha,
+        label: 'Catppuccin Mocha',
+        key: '**[Catppuccin Mocha](/demo?theme=catppuccinMocha)**',
+        text: 'Based on the [Catppuccin](https://github.com/catppuccin/catppuccin) Mocha flavour',
+    },
+    {
+        id: themeCatppuccinMochaSpaced,
+        label: 'Catppuccin Mocha Spaced',
+        key: '**[Catppuccin Mocha Spaced](/demo?theme=catppuccinMochaSpaced)**',
+        text: '',
+    },
+    {
+        id: themeMonokai,
+        label: 'Monokai',
+        key: '**[Monokai](/demo?theme=monokai)**',
+        text: 'Based on the [Monokai](https://monokai.pro) color scheme',
+    },
+    {
+        id: themeSolarizedLight,
+        label: 'Solarized Light',
+        key: '**[Solarized Light](/demo?theme=solarizedLight)**',
+        text: 'Based on the [Solarized](https://ethanschoonover.com/solarized) light palette',
+    },
+    {
+        id: themeSolarizedLightSpaced,
+        label: 'Solarized Light Spaced',
+        key: '**[Solarized Light Spaced](/demo?theme=solarizedLightSpaced)**',
+        text: '',
+    },
+    {
+        id: themeGithubDark,
+        label: 'GitHub Dark',
+        key: '**[GitHub Dark](/demo?theme=githubDark)**',
+        text: 'Based on the [GitHub](https://github.com) dark color scheme',
+    },
+    {
+        id: themeGithubDarkSpaced,
+        label: 'GitHub Dark Spaced',
+        key: '**[GitHub Dark Spaced](/demo?theme=githubDarkSpaced)**',
+        text: '',
+    },
+    {
+        id: themeGithubLight,
+        label: 'GitHub Light',
+        key: '**[GitHub Light](/demo?theme=githubLight)**',
+        text: 'Based on the [GitHub](https://github.com) light color scheme',
+    },
+    {
+        id: themeGithubLightSpaced,
+        label: 'GitHub Light Spaced',
+        key: '**[GitHub Light Spaced](/demo?theme=githubLightSpaced)**',
+        text: '',
+    },
+].filter((entry) => entry.id != null);

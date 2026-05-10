@@ -34,7 +34,7 @@ describe('DockviewAngularComponent', () => {
     });
 
     it('should throw error if components input is not provided', () => {
-        component.components = undefined as any;
+        component.components = undefined as never;
 
         expect(() => {
             component.ngOnInit();
@@ -71,7 +71,7 @@ describe('DockviewAngularComponent', () => {
     it('should dispose api on ngOnDestroy', () => {
         component.ngOnInit();
         const api = component.getDockviewApi();
-        const disposeSpy = jest.spyOn(api!, 'dispose');
+        const disposeSpy = jest.spyOn(api, 'dispose');
 
         component.ngOnDestroy();
 
@@ -81,7 +81,7 @@ describe('DockviewAngularComponent', () => {
     it('should handle input changes', () => {
         component.ngOnInit();
         const api = component.getDockviewApi();
-        const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
+        const updateOptionsSpy = jest.spyOn(api, 'updateOptions');
 
         component.className = 'test-class';
         component.ngOnChanges({
@@ -108,6 +108,7 @@ describe('DockviewAngularComponent', () => {
 });
 
 @Component({
+    standalone: false,
     template: `
         <dv-dockview
             [components]="components"

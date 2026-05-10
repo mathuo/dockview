@@ -44,6 +44,8 @@ describe('headerActionsRenderer', () => {
             containerApi: <any>jest.fn(),
             api: <any>{
                 onDidActiveChange: jest.fn(),
+                onDidLocationChange: jest.fn(),
+                location: { type: 'grid' },
             },
         });
 
@@ -53,6 +55,6 @@ describe('headerActionsRenderer', () => {
 
         cut.update({ params: { valueA: 'A' } });
 
-        expect(update).toBeCalledWith({ valueA: 'A' });
+        expect(update).toHaveBeenCalledWith({ valueA: 'A' });
     });
 });

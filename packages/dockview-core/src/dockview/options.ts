@@ -11,21 +11,77 @@ import { GroupOptions } from './dockviewGroupPanelModel';
 import { DockviewGroupDropLocation } from './events';
 import { IDockviewPanel } from './dockviewPanel';
 import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
-import { IGroupHeaderProps } from './framework';
+import { IGroupHeaderProps, ITabGroupChipRenderer } from './framework';
 import { FloatingGroupOptions } from './dockviewComponent';
 import { Contraints } from '../gridview/gridviewPanel';
 import { AcceptableEvent, IAcceptableEvent } from '../events';
 import { DockviewTheme } from './theme';
+import { ITabGroup } from './tabGroup';
+import { DockviewTabGroupColorEntry } from './tabGroupAccent';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
     init(params: IGroupHeaderProps): void;
 }
 
-export interface TabContextMenuEvent {
-    event: MouseEvent;
-    api: DockviewApi;
+export type BuiltInContextMenuItem =
+    | 'close'
+    | 'closeOthers'
+    | 'closeAll'
+    | 'separator';
+
+export type BuiltInChipContextMenuItem = 'separator' | 'colorPicker' | 'rename';
+
+export interface ContextMenuItemConfig {
+    label?: string;
+    /**
+     * A framework component to render as the menu item.
+     * The component type is opaque to core; the framework adapter renders it.
+     */
+    component?: unknown;
+    componentProps?: object;
+    /**
+     * A raw DOM element to embed as-is in the context menu.
+     * Use this when you want to render custom content without a framework component.
+     */
+    element?: HTMLElement;
+    action?: () => void;
+    disabled?: boolean;
+}
+
+export type ContextMenuItem = BuiltInContextMenuItem | ContextMenuItemConfig;
+
+export interface GetTabContextMenuItemsParams {
     panel: IDockviewPanel;
+    group: DockviewGroupPanel;
+    api: DockviewApi;
+    event: MouseEvent;
+}
+
+export interface GetTabGroupChipContextMenuItemsParams {
+    tabGroup: ITabGroup;
+    group: DockviewGroupPanel;
+    api: DockviewApi;
+    event: MouseEvent;
+}
+
+export interface IContextMenuItemComponentProps {
+    panel: IDockviewPanel;
+    group: DockviewGroupPanel;
+    api: DockviewApi;
+    /** Call to close the context menu */
+    close: () => void;
+    componentProps?: object;
+}
+
+export interface IContextMenuItemRenderer extends IDisposable {
+    readonly element: HTMLElement;
+    init(props: IContextMenuItemComponentProps): void;
+}
+
+export interface CreateContextMenuItemComponentOptions {
+    id: string;
+    component: unknown;
 }
 
 export interface ViewFactoryData {
@@ -78,7 +134,64 @@ export interface DockviewOptions {
      * This is only applied to the tab header section. Defaults to `custom`.
      */
     scrollbars?: 'native' | 'custom';
+    /**
+     * Return the items to display in the tab context menu on right-click.
+     *
+     * Use built-in string shortcuts (`'close'`, `'closeOthers'`, `'closeAll'`, `'separator'`)
+     * or provide a `ContextMenuItemConfig` object for custom items.
+     *
+     * If omitted, no context menu is shown.
+     * Return an empty array to suppress the menu for specific cases.
+     */
+    getTabContextMenuItems?: (
+        params: GetTabContextMenuItemsParams
+    ) => ContextMenuItem[];
+    /**
+     * Return the items to display in the tab group chip context menu on right-click.
+     *
+     * Use built-in string shortcuts (`'separator'`, `'colorPicker'`, `'rename'`) or provide a
+     * `ContextMenuItemConfig` object for custom items.
+     * `'colorPicker'` renders a native grid of color swatches for the tab group.
+     * `'rename'` renders an inline text input to rename the tab group.
+     *
+     * If omitted, no context menu is shown on chip right-click.
+     * Return an empty array to suppress the menu for specific cases.
+     */
+    getTabGroupChipContextMenuItems?: (
+        params: GetTabGroupChipContextMenuItemsParams
+    ) => (BuiltInChipContextMenuItem | ContextMenuItemConfig)[];
+    /**
+     * Factory to create custom tab group chip renderers.
+     * If not provided, the default chip renderer is used.
+     */
+    createTabGroupChipComponent?: (
+        tabGroup: ITabGroup
+    ) => ITabGroupChipRenderer;
+    /**
+     * Replace the built-in tab group color palette with a user-defined list.
+     *
+     * Each entry has an `id` (stored on `tabGroup.color` and serialized),
+     * a `value` (any CSS color expression — hex, rgb(), `var(...)`, etc.),
+     * and an optional `label` shown in the context menu picker.
+     *
+     * If omitted, the default 9-color palette is used. The list fully
+     * replaces the defaults — there is no merge.
+     */
+    tabGroupColors?: DockviewTabGroupColorEntry[];
+    /**
+     * Controls how dockview applies tab group color accents.
+     *
+     * - `'palette'` (default): write `--dv-tab-group-color`, render the
+     *   color picker, and apply built-in accent styling.
+     * - `'off'`: opt out entirely. No `--dv-tab-group-color` is written,
+     *   the color picker is suppressed, and chips/indicators render
+     *   without the accent. The `tg.color` data field is preserved so
+     *   custom chip renderers can still read it and roll their own visual.
+     */
+    tabGroupAccent?: 'palette' | 'off';
 }
+
+export type TabAnimation = 'smooth' | 'default';
 
 export interface DockviewDndOverlayEvent extends IAcceptableEvent {
     nativeEvent: DragEvent;
@@ -127,6 +240,11 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         theme: undefined,
         disableTabsOverflowList: undefined,
         scrollbars: undefined,
+        getTabContextMenuItems: undefined,
+        getTabGroupChipContextMenuItems: undefined,
+        createTabGroupChipComponent: undefined,
+        tabGroupColors: undefined,
+        tabGroupAccent: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];
@@ -159,6 +277,9 @@ export interface DockviewFrameworkOptions {
     ) => ITabRenderer | undefined;
     createComponent: (options: CreateComponentOptions) => IContentRenderer;
     createWatermarkComponent?: () => IWatermarkRenderer;
+    createContextMenuItemComponent?: (
+        options: CreateContextMenuItemComponentOptions
+    ) => IContextMenuItemRenderer | undefined;
 }
 
 export type DockviewComponentOptions = DockviewOptions &

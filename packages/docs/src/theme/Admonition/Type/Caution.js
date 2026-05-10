@@ -14,8 +14,6 @@ const defaultProps = {
     </Translate>
   ),
 };
-// TODO remove before v4: Caution replaced by Warning
-// see https://github.com/facebook/docusaurus/issues/7558
 export default function AdmonitionTypeCaution(props) {
   return (
     <AdmonitionLayout

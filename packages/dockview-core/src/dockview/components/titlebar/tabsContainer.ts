@@ -24,10 +24,12 @@ import {
     DropdownElement,
 } from './tabOverflowControl';
 import { DockviewHeaderDirection } from '../../options';
+import { applyTabGroupAccent } from '../../tabGroupAccent';
 
 export interface TabDropIndexEvent {
     readonly event: DragEvent;
     readonly index: number;
+    readonly targetTabGroupId?: string | null;
 }
 
 export interface TabDragEvent {
@@ -63,6 +65,8 @@ export interface ITabsContainer extends IDisposable {
     show(): void;
     hide(): void;
     updateDragAndDropState(): void;
+    updateTabGroups(): void;
+    refreshTabGroupAccent(): void;
 }
 
 export class TabsContainer
@@ -85,6 +89,7 @@ export class TabsContainer
 
     private dropdownPart: DropdownElement | null = null;
     private _overflowTabs: string[] = [];
+    private _overflowTabGroups: string[] = [];
     private readonly _dropdownDisposable = new MutableDisposable();
 
     private readonly _onDrop = new Emitter<TabDropIndexEvent>();
@@ -176,12 +181,15 @@ export class TabsContainer
         });
 
         this.voidContainer = new VoidContainer(this.accessor, this.group);
+        this.tabs.voidContainer = this.voidContainer.element;
 
         this._element.appendChild(this.preActionsContainer);
         this._element.appendChild(this.tabs.element);
         this._element.appendChild(this.leftActionsContainer);
         this._element.appendChild(this.voidContainer.element);
         this._element.appendChild(this.rightActionsContainer);
+
+        this.tabs.setExtendedDropZone(this._element);
 
         this.addDisposables(
             this.tabs.onDrop((e) => this._onDrop.fire(e)),
@@ -205,6 +213,10 @@ export class TabsContainer
                 });
             }),
             this.voidContainer.onDrop((event) => {
+                // If an active group drag is in progress, let Tabs handle it
+                if (this.tabs.handleVoidDrop()) {
+                    return;
+                }
                 this._onDrop.fire({
                     event: event.nativeEvent,
                     index: this.tabs.size,
@@ -222,6 +234,36 @@ export class TabsContainer
                 );
             }),
             addDisposableListener(
+                this.leftActionsContainer,
+                'dragleave',
+                (event) => {
+                    const related = event.relatedTarget as HTMLElement | null;
+                    if (
+                        !this.leftActionsContainer.contains(related) &&
+                        !this._element.contains(related)
+                    ) {
+                        // Left the header entirely
+                        this.tabs.clearExternalAnimState();
+                    }
+                }
+            ),
+            addDisposableListener(
+                this.voidContainer.element,
+                'dragleave',
+                (event) => {
+                    const related = event.relatedTarget as HTMLElement | null;
+                    if (!this.voidContainer.element.contains(related)) {
+                        if (this._element.contains(related)) {
+                            // Moved to another part of the header — keep state
+                            this.tabs.setExternalInsertionIndex(null);
+                        } else {
+                            // Left the header entirely
+                            this.tabs.clearExternalAnimState();
+                        }
+                    }
+                }
+            ),
+            addDisposableListener(
                 this.voidContainer.element,
                 'pointerdown',
                 (event) => {
@@ -235,7 +277,8 @@ export class TabsContainer
                     if (
                         isFloatingGroupsEnabled &&
                         event.shiftKey &&
-                        this.group.api.location.type !== 'floating'
+                        this.group.api.location.type !== 'floating' &&
+                        this.group.api.location.type !== 'edge'
                     ) {
                         event.preventDefault();
 
@@ -341,16 +384,24 @@ export class TabsContainer
         toggleClass(this._element, 'dv-single-tab', this.size === 1);
     }
 
-    private toggleDropdown(options: { tabs: string[]; reset: boolean }): void {
+    private toggleDropdown(options: {
+        tabs: string[];
+        tabGroups: string[];
+        reset: boolean;
+    }): void {
         const tabs = options.reset ? [] : options.tabs;
+        const tabGroups = options.reset ? [] : options.tabGroups;
         this._overflowTabs = tabs;
+        this._overflowTabGroups = tabGroups;
 
-        if (this._overflowTabs.length > 0 && this.dropdownPart) {
-            this.dropdownPart.update({ tabs: tabs.length });
+        const totalCount = this._overflowTabs.length;
+
+        if (totalCount > 0 && this.dropdownPart) {
+            this.dropdownPart.update({ tabs: totalCount });
             return;
         }
 
-        if (this._overflowTabs.length === 0) {
+        if (totalCount === 0) {
             this._dropdownDisposable.dispose();
             return;
         }
@@ -359,7 +410,7 @@ export class TabsContainer
         root.className = 'dv-tabs-overflow-dropdown-root';
 
         const part = createDropdownElementHandle();
-        part.update({ tabs: tabs.length });
+        part.update({ tabs: totalCount });
 
         this.dropdownPart = part;
 
@@ -385,9 +436,79 @@ export class TabsContainer
                 el.style.overflow = 'auto';
                 el.className = 'dv-tabs-overflow-container';
 
+                // Build lookup: panelId → tabGroup for overflow groups
+                const overflowGroupSet = new Set(this._overflowTabGroups);
+                const allTabGroups = this.group.model.getTabGroups();
+                const panelToGroup = new Map<
+                    string,
+                    (typeof allTabGroups)[0]
+                >();
+                for (const tg of allTabGroups) {
+                    if (overflowGroupSet.has(tg.id)) {
+                        for (const pid of tg.panelIds) {
+                            panelToGroup.set(pid, tg);
+                        }
+                    }
+                }
+
+                // Track which groups have already been rendered
+                const renderedGroups = new Set<string>();
+
                 for (const tab of this.tabs.tabs.filter((tab) =>
                     this._overflowTabs.includes(tab.panel.id)
                 )) {
+                    const tg = panelToGroup.get(tab.panel.id);
+
+                    // If this tab belongs to an overflow group, render the
+                    // group header before its first member tab.
+                    if (tg && !renderedGroups.has(tg.id)) {
+                        renderedGroups.add(tg.id);
+
+                        const groupHeader = document.createElement('div');
+                        groupHeader.className = 'dv-tabs-overflow-group-header';
+
+                        const colorDot = document.createElement('span');
+                        colorDot.className = 'dv-tabs-overflow-group-color';
+                        applyTabGroupAccent(
+                            colorDot,
+                            tg.color,
+                            this.accessor.tabGroupColorPalette
+                        );
+                        groupHeader.appendChild(colorDot);
+
+                        const labelSpan = document.createElement('span');
+                        labelSpan.className = 'dv-tabs-overflow-group-label';
+                        labelSpan.textContent = tg.label || tg.id;
+                        groupHeader.appendChild(labelSpan);
+
+                        if (tg.collapsed) {
+                            const badge = document.createElement('span');
+                            badge.className =
+                                'dv-tabs-overflow-group-collapsed-badge';
+                            badge.textContent = `${tg.panelIds.length}`;
+                            groupHeader.appendChild(badge);
+                        }
+
+                        groupHeader.addEventListener('click', () => {
+                            this.accessor
+                                .getPopupServiceForGroup(this.group)
+                                .close();
+                            if (tg.collapsed) {
+                                tg.expand();
+                            }
+                            // Activate the first panel in the group
+                            const firstPanelId = tg.panelIds[0];
+                            if (firstPanelId) {
+                                const panel = this.group.panels.find(
+                                    (p) => p.id === firstPanelId
+                                );
+                                panel?.api.setActive();
+                            }
+                        });
+
+                        el.appendChild(groupHeader);
+                    }
+
                     const panelObject = this.group.panels.find(
                         (panel) => panel === tab.panel
                     )!;
@@ -409,14 +530,22 @@ export class TabsContainer
                         'dv-inactive-tab',
                         !panelObject.api.isActive
                     );
+                    if (tg) {
+                        toggleClass(wrapper, 'dv-tab--grouped', true);
+                    }
 
                     wrapper.addEventListener('click', (event) => {
-                        this.accessor.popupService.close();
+                        this.accessor
+                            .getPopupServiceForGroup(this.group)
+                            .close();
 
                         if (event.defaultPrevented) {
                             return;
                         }
 
+                        if (tg?.collapsed) {
+                            tg.expand();
+                        }
                         tab.element.scrollIntoView();
                         tab.panel.api.setActive();
                     });
@@ -427,13 +556,15 @@ export class TabsContainer
 
                 const relativeParent = findRelativeZIndexParent(root);
 
-                this.accessor.popupService.openPopover(el, {
-                    x: event.clientX,
-                    y: event.clientY,
-                    zIndex: relativeParent?.style.zIndex
-                        ? `calc(${relativeParent.style.zIndex} * 2)`
-                        : undefined,
-                });
+                this.accessor
+                    .getPopupServiceForGroup(this.group)
+                    .openPopover(el, {
+                        x: event.clientX,
+                        y: event.clientY,
+                        zIndex: relativeParent?.style.zIndex
+                            ? `calc(${relativeParent.style.zIndex} * 2)`
+                            : undefined,
+                    });
             })
         );
     }
@@ -441,5 +572,13 @@ export class TabsContainer
     updateDragAndDropState(): void {
         this.tabs.updateDragAndDropState();
         this.voidContainer.updateDragAndDropState();
+    }
+
+    updateTabGroups(): void {
+        this.tabs.updateTabGroups();
+    }
+
+    refreshTabGroupAccent(): void {
+        this.tabs.refreshTabGroupAccent();
     }
 }

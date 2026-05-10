@@ -1,6 +1,31 @@
-import { createPaneview, PROPERTY_KEYS_PANEVIEW } from 'dockview-core';
+import { describe, test, expect, afterEach } from 'vitest';
+import { mount, flushPromises } from '@vue/test-utils';
+import { defineComponent } from 'vue';
+import {
+    createPaneview,
+    PaneviewApi,
+    PROPERTY_KEYS_PANEVIEW,
+} from 'dockview-core';
+import PaneviewVue from '../paneview/paneview.vue';
 import { VuePaneviewPanelView } from '../paneview/view';
 import * as paneviewTypes from '../paneview/types';
+
+const MockPaneComponent = defineComponent({
+    name: 'MockPaneComponent',
+    props: ['params', 'api', 'containerApi', 'title'],
+    template: '<div class="mock-pane">Pane</div>',
+});
+
+function mountPaneview(props: Record<string, any> = {}) {
+    return mount(PaneviewVue, {
+        props: {
+            components: { MockPaneComponent: 'MockPaneComponent' },
+            ...props,
+        },
+        attachTo: document.body,
+        global: { components: { MockPaneComponent } },
+    });
+}
 
 describe('PaneviewVue Component', () => {
     test('should export component types', () => {
@@ -127,5 +152,36 @@ describe('VuePaneviewPanelView', () => {
             panelView.update({ params: { data: 'test' } })
         ).not.toThrow();
         expect(() => panelView.dispose()).not.toThrow();
+    });
+});
+
+describe('PaneviewVue events', () => {
+    let wrapper: ReturnType<typeof mountPaneview>;
+
+    afterEach(() => {
+        wrapper?.unmount();
+    });
+
+    test('should emit ready with api', async () => {
+        wrapper = mountPaneview();
+        await flushPromises();
+
+        expect(wrapper.emitted('ready')).toBeTruthy();
+        const readyEvent = wrapper.emitted('ready')![0][0] as any;
+        expect(readyEvent.api).toBeInstanceOf(PaneviewApi);
+    });
+
+    test('should forward didDrop events from the api', async () => {
+        wrapper = mountPaneview();
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as PaneviewApi;
+        const fakeEvent = { id: 'fake-paneview-drop' } as any;
+
+        (api as any).component._onDidDrop.fire(fakeEvent);
+
+        const emitted = wrapper.emitted('didDrop');
+        expect(emitted).toBeTruthy();
+        expect(emitted![0][0]).toBe(fakeEvent);
     });
 });

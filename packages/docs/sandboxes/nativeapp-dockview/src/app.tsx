@@ -3,7 +3,7 @@ import {
     DockviewReadyEvent,
     IDockviewPanelProps,
     IDockviewPanelHeaderProps,
-} from 'dockview';
+} from 'dockview-react';
 import * as React from 'react';
 import './app.scss';
 

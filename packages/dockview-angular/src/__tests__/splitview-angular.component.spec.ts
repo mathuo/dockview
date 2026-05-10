@@ -34,7 +34,7 @@ describe('SplitviewAngularComponent', () => {
     });
 
     it('should throw error if components input is not provided', () => {
-        component.components = undefined as any;
+        component.components = undefined as never;
 
         expect(() => {
             component.ngOnInit();
@@ -71,7 +71,7 @@ describe('SplitviewAngularComponent', () => {
     it('should dispose api on ngOnDestroy', () => {
         component.ngOnInit();
         const api = component.getSplitviewApi();
-        const disposeSpy = jest.spyOn(api!, 'dispose');
+        const disposeSpy = jest.spyOn(api, 'dispose');
 
         component.ngOnDestroy();
 
@@ -81,7 +81,7 @@ describe('SplitviewAngularComponent', () => {
     it('should handle input changes', () => {
         component.ngOnInit();
         const api = component.getSplitviewApi();
-        const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
+        const updateOptionsSpy = jest.spyOn(api, 'updateOptions');
 
         component.className = 'test-class';
         component.ngOnChanges({
@@ -101,7 +101,7 @@ describe('SplitviewAngularComponent', () => {
     it('should handle orientation changes', () => {
         component.ngOnInit();
         const api = component.getSplitviewApi();
-        const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
+        const updateOptionsSpy = jest.spyOn(api, 'updateOptions');
 
         component.orientation = 'vertical';
         component.ngOnChanges({
@@ -121,7 +121,7 @@ describe('SplitviewAngularComponent', () => {
     it('should handle proportional layout changes', () => {
         component.ngOnInit();
         const api = component.getSplitviewApi();
-        const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
+        const updateOptionsSpy = jest.spyOn(api, 'updateOptions');
 
         component.proportionalLayout = true;
         component.ngOnChanges({
@@ -141,7 +141,7 @@ describe('SplitviewAngularComponent', () => {
     it('should handle disableAutoResizing changes', () => {
         component.ngOnInit();
         const api = component.getSplitviewApi();
-        const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
+        const updateOptionsSpy = jest.spyOn(api, 'updateOptions');
 
         component.disableAutoResizing = true;
         component.ngOnChanges({
@@ -161,7 +161,7 @@ describe('SplitviewAngularComponent', () => {
     it('should not call updateOptions on first change', () => {
         component.ngOnInit();
         const api = component.getSplitviewApi();
-        const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
+        const updateOptionsSpy = jest.spyOn(api, 'updateOptions');
 
         component.ngOnChanges({
             className: {
@@ -186,7 +186,7 @@ describe('SplitviewAngularComponent', () => {
     it('should handle multiple property changes at once', () => {
         component.ngOnInit();
         const api = component.getSplitviewApi();
-        const updateOptionsSpy = jest.spyOn(api!, 'updateOptions');
+        const updateOptionsSpy = jest.spyOn(api, 'updateOptions');
 
         component.className = 'test-class';
         component.proportionalLayout = true;
@@ -213,6 +213,7 @@ describe('SplitviewAngularComponent', () => {
 });
 
 @Component({
+    standalone: false,
     template: `
         <dv-splitview
             [components]="components"

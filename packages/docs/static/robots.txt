@@ -1,6 +1,8 @@
 # Dockview - https://dockview.dev
 # Allow all crawlers including AI/LLM bots
 
+# Algolia-Crawler-Verif: 0348675069E5CF6C
+
 User-agent: *
 Allow: /
 

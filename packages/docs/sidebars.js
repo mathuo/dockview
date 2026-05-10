@@ -32,7 +32,7 @@ const sidebars = {
         },
         {
             type: 'category',
-            label: 'Auxilliary Components',
+            label: 'Auxiliary Components',
             collapsible: false,
             collapsed: false,
             className: 'sidebar-section-header',

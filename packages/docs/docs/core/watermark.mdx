@@ -1,5 +1,6 @@
 ---
 title: Watermark
+description: How to customize the empty-state watermark shown when there are no panels in Dockview.
 ---
 
 import useBaseUrl from '@docusaurus/useBaseUrl';
@@ -11,9 +12,31 @@ When there is nothing else to display.
 When the dock is empty or a group has no panels (an empty group) you can render some fallback
 content which is refered to as a `watermark`. Both are controlled through the same provided component.
 
+## Empty State Behaviour
+
+By default, when the dock has no panels it renders a watermark. You can change this with `noPanelsOverlay`:
+
+- `'watermark'` (default): renders your `watermarkComponent` when empty
+- `'emptyGroup'`: keeps an empty group visible instead
+
+<FrameworkSpecific framework='React'>
+```tsx
+<DockviewReact noPanelsOverlay="emptyGroup" onReady={onReady} components={components} />
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+```ts
+const api = createDockview(element, {
+    noPanelsOverlay: 'emptyGroup',
+    createComponent: (options) => new MyPanel(),
+});
+```
+</FrameworkSpecific>
+
 ## Options
 
-The following properties can be set to configure the behaviours of floating groups.
+The following properties can be set to configure the watermark component.
 
 <FrameworkSpecific framework='React'>
   <DocRef declaration="IDockviewReactProps" methods={['watermarkComponent']} />

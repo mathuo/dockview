@@ -2,7 +2,7 @@ import {
     DockviewGroupLocation,
     DockviewPanelApi,
     DockviewPanelRenderer,
-} from 'dockview';
+} from 'dockview-react';
 import React from 'react';
 
 export interface PanelApiMetadata {

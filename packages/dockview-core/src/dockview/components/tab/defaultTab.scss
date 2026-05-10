@@ -6,6 +6,24 @@
     ); /* forces tab to be drawn on a separate layer (see https://github.com/microsoft/vscode/issues/18733) */
 }
 
+/* Applied to the ghost tab clone during drag so it shows the same border as a focused tab */
+.dv-tab-ghost-drag {
+    position: relative;
+
+    &::after {
+        position: absolute;
+        content: '';
+        height: 100%;
+        width: 100%;
+        top: 0px;
+        left: 0px;
+        pointer-events: none;
+        outline: 1px solid var(--dv-tab-divider-color) !important;
+        outline-offset: -1px;
+        z-index: 5;
+    }
+}
+
 .dv-tab {
     flex-shrink: 0;
 

@@ -347,6 +347,93 @@ describe('droptarget', () => {
         });
     });
 
+    describe('smallWidthBoundary', () => {
+        test('element narrower than default threshold renders 4px line strip without smallWidthBoundary', () => {
+            // 80px < SMALL_WIDTH_BOUNDARY (100) → isSmallX = true → 4px strip at edge
+            const smallEl = document.createElement('div');
+            jest.spyOn(smallEl, 'offsetHeight', 'get').mockReturnValue(30);
+            jest.spyOn(smallEl, 'offsetWidth', 'get').mockReturnValue(80);
+
+            const dt = new Droptarget(smallEl, {
+                canDisplayOverlay: () => true,
+                acceptedTargetZones: ['left', 'right'],
+                overlayModel: {
+                    activationSize: { value: 50, type: 'percentage' },
+                },
+            });
+
+            fireEvent.dragEnter(smallEl);
+            // left half: clientX=20, x=20, xp=25 < 50 → 'left'
+            fireEvent(
+                smallEl,
+                createOffsetDragOverEvent({ clientX: 20, clientY: 0 })
+            );
+
+            const selection = smallEl.querySelector(
+                '.dv-drop-target-selection'
+            ) as HTMLElement;
+            expect(selection).not.toBeNull();
+            // 4px strip at left edge
+            expect(selection.style.width).toBe('4px');
+            expect(
+                selection.classList.contains('dv-drop-target-small-horizontal')
+            ).toBeTruthy();
+            expect(
+                selection.classList.contains('dv-drop-target-selection-line')
+            ).toBeTruthy();
+
+            dt.dispose();
+        });
+
+        test('smallWidthBoundary: 0 renders half-width overlay regardless of element width', () => {
+            // Same 80px element, but smallWidthBoundary: 0 → isSmallX = false → half-width overlay
+            const smallEl = document.createElement('div');
+            jest.spyOn(smallEl, 'offsetHeight', 'get').mockReturnValue(30);
+            jest.spyOn(smallEl, 'offsetWidth', 'get').mockReturnValue(80);
+
+            const dt = new Droptarget(smallEl, {
+                canDisplayOverlay: () => true,
+                acceptedTargetZones: ['left', 'right'],
+                overlayModel: {
+                    activationSize: { value: 50, type: 'percentage' },
+                    smallWidthBoundary: 0,
+                },
+            });
+
+            fireEvent.dragEnter(smallEl);
+            // left half
+            fireEvent(
+                smallEl,
+                createOffsetDragOverEvent({ clientX: 20, clientY: 0 })
+            );
+
+            const selection = smallEl.querySelector(
+                '.dv-drop-target-selection'
+            ) as HTMLElement;
+            expect(selection).not.toBeNull();
+            expect(dt.state).toBe('left');
+            expect(selection.style.width).toBe('50%');
+            expect(selection.style.left).toBe('0px');
+            expect(
+                selection.classList.contains('dv-drop-target-small-horizontal')
+            ).toBeFalsy();
+
+            // right half
+            fireEvent(
+                smallEl,
+                createOffsetDragOverEvent({ clientX: 60, clientY: 0 })
+            );
+            expect(dt.state).toBe('right');
+            expect(selection.style.width).toBe('50%');
+            expect(selection.style.left).toBe('50%');
+            expect(
+                selection.classList.contains('dv-drop-target-small-horizontal')
+            ).toBeFalsy();
+
+            dt.dispose();
+        });
+    });
+
     describe('calculateQuadrantAsPixels', () => {
         test('variety of cases', () => {
             const inputs: Array<{

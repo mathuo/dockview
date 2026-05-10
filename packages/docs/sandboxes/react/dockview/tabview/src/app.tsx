@@ -2,8 +2,11 @@ import {
     DockviewApi,
     DockviewReact,
     DockviewReadyEvent,
+    DockviewTheme,
     IDockviewPanelProps,
-} from 'dockview';
+    themeAbyss,
+    TabAnimation,
+} from 'dockview-react';
 import * as React from 'react';
 
 const Default = (props: IDockviewPanelProps) => {
@@ -20,6 +23,16 @@ const components = {
 
 const Component = (props: { theme?: string }) => {
     const [api, setApi] = React.useState<DockviewApi>();
+    const [tabAnimation, setTabAnimation] = React.useState<TabAnimation>('default');
+
+    const theme: DockviewTheme = React.useMemo(
+        () => ({ ...themeAbyss, tabAnimation }),
+        [tabAnimation]
+    );
+
+    const toggleMode = () => {
+        setTabAnimation((prev) => (prev === 'smooth' ? 'default' : 'smooth'));
+    };
 
     React.useEffect(() => {
         if (!api) {
@@ -70,12 +83,35 @@ const Component = (props: { theme?: string }) => {
     };
 
     return (
-        <DockviewReact
-            className={`${props.theme || 'dockview-theme-abyss'}`}
-            onReady={onReady}
-            components={components}
-            disableFloatingGroups={true}
-        />
+        <div
+            style={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+            }}
+        >
+            <div
+                style={{
+                    padding: '4px 8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                }}
+            >
+                <button onClick={toggleMode}>
+                    {`tabAnimation: ${tabAnimation}`}
+                </button>
+            </div>
+            <div style={{ flexGrow: 1 }}>
+                <DockviewReact
+                    className={`${props.theme || 'dockview-theme-abyss'}`}
+                    onReady={onReady}
+                    components={components}
+                    theme={theme}
+                    disableFloatingGroups={true}
+                />
+            </div>
+        </div>
     );
 };
 

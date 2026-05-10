@@ -1,5 +1,6 @@
 ---
 title: Keyboard
+description: How to add keyboard shortcut support to Dockview panels and groups.
 ---
 
 import { MultiFrameworkContainer } from '@site/src/components/ui/container';
@@ -7,7 +8,34 @@ import DockviewKeyboard from '@site/sandboxes/keyboard-dockview/src/app';
 
 # Keyboard Navigation
 
-Keyboard shortcuts
+## Programmatic Focus Navigation
+
+`DockviewApi` provides two methods for moving focus between panels and groups programmatically, useful for building keyboard shortcut handlers:
+
+```ts
+// Move focus to the next panel or group
+api.moveToNext({ includePanel: true });
+
+// Move focus to the previous panel or group
+api.moveToPrevious({ includePanel: true });
+```
+
+Both accept an optional `options` object:
+
+| Option | Type | Description |
+|---|---|---|
+| `includePanel` | `boolean` | If `true`, cycles through individual panels within groups. If `false` (default), cycles through groups only. |
+| `group` | `DockviewGroupPanel` | Scope navigation to start from a specific group. |
+
+```ts
+// Cycle only through groups (not individual panels within them)
+api.moveToNext();
+
+// Cycle through all panels across all groups
+api.moveToNext({ includePanel: true });
+```
+
+## Live Example
 
 <MultiFrameworkContainer
     height={600}

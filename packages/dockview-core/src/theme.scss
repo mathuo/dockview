@@ -1,4 +1,3 @@
-@import 'theme/_sash-handle-mixin';
 @import 'theme/_drop-target-static-mixin';
 @import 'theme/_space-mixin';
 
@@ -10,7 +9,9 @@
     --dv-drag-over-border-color: transparent;
     --dv-tabs-container-scrollbar-color: #888;
     --dv-icon-hover-background-color: rgba(90, 93, 94, 0.31);
-    --dv-floating-box-shadow: 8px 8px 8px 0px rgba(83, 89, 93, 0.5);
+    --dv-floating-box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.25);
+    --dv-floating-border: 1px solid rgba(255, 255, 255, 0.1);
     --dv-overlay-z-index: 999;
     //
 
@@ -21,6 +22,36 @@
     --dv-active-sash-color: transparent;
     --dv-active-sash-transition-duration: 0.1s;
     --dv-active-sash-transition-delay: 0.5s;
+
+    // spacing variables — overridden by dockview-design-space-mixin / .dockview-spaced
+    --dv-spacing-padding: 0px;
+    --dv-tab-border-radius: 0px;
+    --dv-sash-border-radius: 0px;
+    --dv-dropdown-border-radius: 0px;
+    --dv-tab-close-icon-size: inherit;
+    --dv-floating-group-border: none;
+    --dv-drag-over-border: none;
+    --dv-floating-group-dragging-opacity: 0.5;
+
+    // Tab group color palette
+    --dv-tab-group-color-grey: #5f6368;
+    --dv-tab-group-color-blue: #1a73e8;
+    --dv-tab-group-color-red: #d93025;
+    --dv-tab-group-color-yellow: #f9ab00;
+    --dv-tab-group-color-green: #188038;
+    --dv-tab-group-color-pink: #d01884;
+    --dv-tab-group-color-purple: #a142f4;
+    --dv-tab-group-color-cyan: #007b83;
+    --dv-tab-group-color-orange: #e8710a;
+
+    // Tab group chip dimensions
+    --dv-tab-group-chip-padding: 4px 8px;
+    --dv-tab-group-chip-border-radius: 6px;
+    --dv-tab-group-chip-font-size: 11px;
+
+    // Tab group underline/overline
+    --dv-tab-group-line-height: 2px;
+    --dv-tab-group-line-opacity: 0.6;
 }
 
 @mixin dockview-theme-dark-mixin {
@@ -71,6 +102,9 @@
     --dv-paneview-header-border-color: rgb(51, 51, 51);
 
     --dv-scrollbar-background-color: rgba(0, 0, 0, 0.25);
+    --dv-floating-box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    --dv-floating-border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .dockview-theme-dark {
@@ -186,6 +220,7 @@
     --dv-paneview-header-border-color: var(--dv-color-abyss-lighter);
 
     --dv-paneview-active-outline-color: #596f99;
+
 }
 
 @mixin dockview-theme-dracula-mixin {
@@ -265,85 +300,610 @@
     @include dockview-theme-dracula-mixin();
 }
 
-@mixin dockview-design-replit-mixin {
+// ─── Nord ────────────────────────────────────────────────────────────────────
+
+@mixin dockview-theme-nord-mixin {
+    @include dockview-theme-core-mixin();
     @include dockview-drop-target-no-travel();
 
-    box-sizing: border-box;
+    --dv-color-nord-polar-0: #2e3440;
+    --dv-color-nord-polar-1: #3b4252;
+    --dv-color-nord-polar-2: #434c5e;
+    --dv-color-nord-polar-3: #4c566a;
+    --dv-color-nord-frost: #88c0d0;
+    --dv-color-nord-frost-2: #81a1c1;
+    --dv-color-nord-snow-0: #eceff4;
+    --dv-color-nord-snow-1: #d8dee9;
 
-    .dv-resize-container:has(> .dv-groupview) {
-        border-radius: 8px;
-    }
-
-    .dv-resize-container {
-        border-radius: 10px !important;
-        border: none;
-    }
+    --dv-group-view-background-color: var(--dv-color-nord-polar-0);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-nord-polar-1
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-nord-polar-0
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-nord-polar-2
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-nord-polar-1
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-nord-polar-2
+    );
+    --dv-activegroup-visiblepanel-tab-color: var(--dv-color-nord-snow-0);
+    --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-nord-snow-1);
+    --dv-inactivegroup-visiblepanel-tab-color: #8a9bbf;
+    --dv-inactivegroup-hiddenpanel-tab-color: #5e6f8e;
+    --dv-separator-border: var(--dv-color-nord-polar-3);
+    --dv-paneview-active-outline-color: var(--dv-color-nord-frost);
+    --dv-active-sash-color: var(--dv-color-nord-frost);
+    --dv-scrollbar-background-color: rgba(76, 86, 106, 0.5);
 
     .dv-groupview {
-        overflow: hidden;
-        border-radius: 10px;
-
-        .dv-tabs-and-actions-container {
-            .dv-tab {
-                margin: 4px;
-                border-radius: 8px;
-
-                .dv-svg {
-                    height: 8px;
-                    width: 8px;
-                }
-
-                &:hover {
-                    background-color: #e4e5e6 !important;
+        &.dv-active-group {
+            > .dv-tabs-and-actions-container {
+                .dv-tabs-container {
+                    > .dv-tab.dv-active-tab {
+                        position: relative;
+                        &::after {
+                            position: absolute;
+                            left: 0px;
+                            bottom: 0px;
+                            content: '';
+                            width: 100%;
+                            height: 2px;
+                            background-color: var(--dv-color-nord-frost);
+                            z-index: 999;
+                        }
+                    }
                 }
             }
-            border-bottom: 1px solid rgba(128, 128, 128, 0.35);
         }
-
-        .dv-content-container {
-            background-color: #fcfcfc;
-        }
-
-        &.dv-active-group {
-            border: 1px solid rgba(128, 128, 128, 0.35);
-        }
-
         &.dv-inactive-group {
-            border: 1px solid transparent;
+            > .dv-tabs-and-actions-container {
+                .dv-tabs-container {
+                    > .dv-tab.dv-active-tab {
+                        position: relative;
+                        &::after {
+                            position: absolute;
+                            left: 0px;
+                            bottom: 0px;
+                            content: '';
+                            width: 100%;
+                            height: 2px;
+                            background-color: var(--dv-color-nord-frost-2);
+                            z-index: 999;
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
-.dockview-theme-replit {
+.dockview-theme-nord {
+    @include dockview-theme-nord-mixin();
+}
+
+.dockview-theme-nord-spaced {
     @include dockview-theme-core-mixin();
-    @include dockview-design-replit-mixin();
-    @include dockview-design-handle-mixin();
+    @include dockview-design-space-mixin();
 
-    padding: 10px;
-    background-color: #ebeced;
+    --dv-color-nord-polar-0: #2e3440;
+    --dv-color-nord-polar-1: #3b4252;
+    --dv-color-nord-polar-2: #434c5e;
+    --dv-color-nord-polar-3: #4c566a;
+    --dv-color-nord-frost: #88c0d0;
+    --dv-color-nord-frost-2: #81a1c1;
+    --dv-color-nord-snow-0: #eceff4;
+    --dv-color-nord-snow-1: #d8dee9;
 
-    //
-    --dv-group-view-background-color: #ebeced;
-    //
-    --dv-tabs-and-actions-container-background-color: #fcfcfc;
-    //
-    --dv-activegroup-visiblepanel-tab-background-color: #f0f1f2;
-    --dv-activegroup-hiddenpanel-tab-background-color: #fcfcfc;
-    --dv-inactivegroup-visiblepanel-tab-background-color: #f0f1f2;
-    --dv-inactivegroup-hiddenpanel-tab-background-color: #fcfcfc;
-    --dv-tab-divider-color: transparent;
-    //
-    --dv-activegroup-visiblepanel-tab-color: rgb(51, 51, 51);
-    --dv-activegroup-hiddenpanel-tab-color: rgb(51, 51, 51);
-    --dv-inactivegroup-visiblepanel-tab-color: rgb(51, 51, 51);
-    --dv-inactivegroup-hiddenpanel-tab-color: rgb(51, 51, 51);
-    //
+    --dv-group-view-background-color: var(--dv-color-nord-polar-0);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-nord-polar-1
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-nord-polar-2
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-nord-polar-1
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-nord-polar-2
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-nord-polar-1
+    );
+    --dv-activegroup-visiblepanel-tab-color: var(--dv-color-nord-snow-0);
+    --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-nord-snow-1);
+    --dv-inactivegroup-visiblepanel-tab-color: #8a9bbf;
+    --dv-inactivegroup-hiddenpanel-tab-color: #5e6f8e;
     --dv-separator-border: transparent;
-    --dv-paneview-header-border-color: rgb(51, 51, 51);
+    --dv-paneview-active-outline-color: var(--dv-color-nord-frost);
+    --dv-active-sash-color: var(--dv-color-nord-frost);
+    --dv-scrollbar-background-color: rgba(76, 86, 106, 0.5);
 
-    /////
-    --dv-sash-color: #cfd1d3;
-    --dv-active-sash-color: #babbbb;
+    --dv-floating-group-border: 2px solid var(--dv-color-nord-polar-0);
+}
+
+// ─── Catppuccin Mocha ────────────────────────────────────────────────────────
+
+@mixin dockview-theme-catppuccin-mocha-mixin {
+    @include dockview-theme-core-mixin();
+    @include dockview-drop-target-no-travel();
+
+    --dv-color-mocha-crust: #11111b;
+    --dv-color-mocha-mantle: #181825;
+    --dv-color-mocha-base: #1e1e2e;
+    --dv-color-mocha-surface0: #313244;
+    --dv-color-mocha-surface1: #45475a;
+    --dv-color-mocha-text: #cdd6f4;
+    --dv-color-mocha-subtext1: #bac2de;
+    --dv-color-mocha-subtext0: #a6adc8;
+    --dv-color-mocha-mauve: #cba6f7;
+    --dv-color-mocha-lavender: #b4befe;
+
+    --dv-group-view-background-color: var(--dv-color-mocha-base);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-mocha-mantle
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-mocha-base
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-mocha-surface0
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-mocha-mantle
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-mocha-crust
+    );
+    --dv-activegroup-visiblepanel-tab-color: var(--dv-color-mocha-text);
+    --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-mocha-subtext1);
+    --dv-inactivegroup-visiblepanel-tab-color: var(--dv-color-mocha-subtext0);
+    --dv-inactivegroup-hiddenpanel-tab-color: rgba(166, 173, 200, 0.5);
+    --dv-separator-border: var(--dv-color-mocha-surface1);
+    --dv-paneview-active-outline-color: var(--dv-color-mocha-mauve);
+    --dv-active-sash-color: var(--dv-color-mocha-mauve);
+    --dv-scrollbar-background-color: rgba(49, 50, 68, 0.8);
+
+    .dv-groupview {
+        &.dv-active-group {
+            > .dv-tabs-and-actions-container {
+                .dv-tabs-container {
+                    > .dv-tab.dv-active-tab {
+                        position: relative;
+                        &::after {
+                            position: absolute;
+                            left: 0px;
+                            top: 0px;
+                            content: '';
+                            width: 100%;
+                            height: 2px;
+                            background-color: var(--dv-color-mocha-mauve);
+                            z-index: 999;
+                        }
+                    }
+                }
+            }
+        }
+        &.dv-inactive-group {
+            > .dv-tabs-and-actions-container {
+                .dv-tabs-container {
+                    > .dv-tab.dv-active-tab {
+                        position: relative;
+                        &::after {
+                            position: absolute;
+                            left: 0px;
+                            top: 0px;
+                            content: '';
+                            width: 100%;
+                            height: 2px;
+                            background-color: rgba(180, 190, 254, 0.4);
+                            z-index: 999;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.dockview-theme-catppuccin-mocha {
+    @include dockview-theme-catppuccin-mocha-mixin();
+}
+
+.dockview-theme-catppuccin-mocha-spaced {
+    @include dockview-theme-core-mixin();
+    @include dockview-design-space-mixin();
+
+    --dv-color-mocha-crust: #11111b;
+    --dv-color-mocha-mantle: #181825;
+    --dv-color-mocha-base: #1e1e2e;
+    --dv-color-mocha-surface0: #313244;
+    --dv-color-mocha-surface1: #45475a;
+    --dv-color-mocha-text: #cdd6f4;
+    --dv-color-mocha-subtext1: #bac2de;
+    --dv-color-mocha-subtext0: #a6adc8;
+    --dv-color-mocha-mauve: #cba6f7;
+    --dv-color-mocha-lavender: #b4befe;
+
+    --dv-group-view-background-color: var(--dv-color-mocha-crust);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-mocha-mantle
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-mocha-surface0
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-mocha-mantle
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-mocha-surface0
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-mocha-mantle
+    );
+    --dv-activegroup-visiblepanel-tab-color: var(--dv-color-mocha-text);
+    --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-mocha-subtext1);
+    --dv-inactivegroup-visiblepanel-tab-color: var(--dv-color-mocha-subtext0);
+    --dv-inactivegroup-hiddenpanel-tab-color: rgba(166, 173, 200, 0.5);
+    --dv-separator-border: transparent;
+    --dv-paneview-active-outline-color: var(--dv-color-mocha-mauve);
+    --dv-active-sash-color: var(--dv-color-mocha-mauve);
+    --dv-scrollbar-background-color: rgba(49, 50, 68, 0.8);
+
+    --dv-floating-group-border: 2px solid var(--dv-color-mocha-crust);
+}
+
+// ─── Monokai ─────────────────────────────────────────────────────────────────
+
+@mixin dockview-theme-monokai-mixin {
+    @include dockview-theme-core-mixin();
+    @include dockview-drop-target-no-travel();
+
+    --dv-color-monokai-bg: #272822;
+    --dv-color-monokai-bg-light: #3e3d32;
+    --dv-color-monokai-comment: #75715e;
+    --dv-color-monokai-fg: #f8f8f2;
+    --dv-color-monokai-green: #a6e22e;
+
+    --dv-group-view-background-color: var(--dv-color-monokai-bg);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-monokai-bg-light
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-monokai-bg
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: #2d2c25;
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-monokai-bg
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2c25;
+    --dv-activegroup-visiblepanel-tab-color: var(--dv-color-monokai-fg);
+    --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-monokai-comment);
+    --dv-inactivegroup-visiblepanel-tab-color: rgba(248, 248, 242, 0.5);
+    --dv-inactivegroup-hiddenpanel-tab-color: rgba(117, 113, 94, 0.5);
+    --dv-separator-border: var(--dv-color-monokai-bg-light);
+    --dv-paneview-active-outline-color: var(--dv-color-monokai-green);
+    --dv-active-sash-color: var(--dv-color-monokai-green);
+    --dv-scrollbar-background-color: rgba(117, 113, 94, 0.5);
+
+    .dv-groupview {
+        &.dv-active-group {
+            > .dv-tabs-and-actions-container {
+                .dv-tabs-container {
+                    > .dv-tab.dv-active-tab {
+                        position: relative;
+                        &::after {
+                            position: absolute;
+                            left: 0px;
+                            bottom: 0px;
+                            content: '';
+                            width: 100%;
+                            height: 2px;
+                            background-color: var(--dv-color-monokai-green);
+                            z-index: 999;
+                        }
+                    }
+                }
+            }
+        }
+        &.dv-inactive-group {
+            > .dv-tabs-and-actions-container {
+                .dv-tabs-container {
+                    > .dv-tab.dv-active-tab {
+                        position: relative;
+                        &::after {
+                            position: absolute;
+                            left: 0px;
+                            bottom: 0px;
+                            content: '';
+                            width: 100%;
+                            height: 2px;
+                            background-color: rgba(166, 226, 46, 0.35);
+                            z-index: 999;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.dockview-theme-monokai {
+    @include dockview-theme-monokai-mixin();
+}
+
+// ─── Solarized Light ─────────────────────────────────────────────────────────
+
+@mixin dockview-theme-solarized-light-mixin {
+    @include dockview-theme-core-mixin();
+    @include dockview-drop-target-no-travel();
+
+    --dv-color-sol-base3: #fdf6e3;
+    --dv-color-sol-base2: #eee8d5;
+    --dv-color-sol-base1: #93a1a1;
+    --dv-color-sol-base00: #657b83;
+    --dv-color-sol-base01: #586e75;
+    --dv-color-sol-blue: #268bd2;
+
+    --dv-group-view-background-color: var(--dv-color-sol-base3);
+    --dv-tabs-and-actions-container-background-color: var(--dv-color-sol-base2);
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-sol-base3
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: #e8e2d0;
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-sol-base3
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: #e8e2d0;
+    --dv-activegroup-visiblepanel-tab-color: var(--dv-color-sol-base01);
+    --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-sol-base00);
+    --dv-inactivegroup-visiblepanel-tab-color: var(--dv-color-sol-base1);
+    --dv-inactivegroup-hiddenpanel-tab-color: rgba(147, 161, 161, 0.6);
+    --dv-separator-border: var(--dv-color-sol-base2);
+    --dv-paneview-active-outline-color: var(--dv-color-sol-blue);
+    --dv-active-sash-color: var(--dv-color-sol-blue);
+    --dv-scrollbar-background-color: rgba(101, 123, 131, 0.25);
+    --dv-drag-over-background-color: rgba(38, 139, 210, 0.15);
+    --dv-floating-box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    --dv-floating-border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dockview-theme-solarized-light {
+    @include dockview-theme-solarized-light-mixin();
+}
+
+.dockview-theme-solarized-light-spaced {
+    @include dockview-theme-core-mixin();
+    @include dockview-design-space-mixin();
+
+    --dv-color-sol-base3: #fdf6e3;
+    --dv-color-sol-base2: #eee8d5;
+    --dv-color-sol-base1: #93a1a1;
+    --dv-color-sol-base00: #657b83;
+    --dv-color-sol-base01: #586e75;
+    --dv-color-sol-blue: #268bd2;
+
+    --dv-drag-over-background-color: rgba(38, 139, 210, 0.1);
+    --dv-group-view-background-color: var(--dv-color-sol-base2);
+    --dv-tabs-and-actions-container-background-color: var(--dv-color-sol-base3);
+    --dv-activegroup-visiblepanel-tab-background-color: #e8e2d0;
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-sol-base3
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: #e8e2d0;
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-sol-base3
+    );
+    --dv-activegroup-visiblepanel-tab-color: var(--dv-color-sol-base01);
+    --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-sol-base00);
+    --dv-inactivegroup-visiblepanel-tab-color: var(--dv-color-sol-base1);
+    --dv-inactivegroup-hiddenpanel-tab-color: rgba(147, 161, 161, 0.6);
+    --dv-separator-border: transparent;
+    --dv-paneview-active-outline-color: var(--dv-color-sol-blue);
+    --dv-active-sash-color: var(--dv-color-sol-blue);
+    --dv-floating-box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    --dv-floating-border: 1px solid rgba(0, 0, 0, 0.1);
+    --dv-scrollbar-background-color: rgba(101, 123, 131, 0.25);
+
+    --dv-floating-group-border: 2px solid rgba(238, 232, 213, 0.5);
+}
+
+// ─── GitHub Dark ─────────────────────────────────────────────────────────────
+
+@mixin dockview-theme-github-dark-mixin {
+    @include dockview-theme-core-mixin();
+    @include dockview-drop-target-no-travel();
+
+    --dv-color-gh-canvas-default: #0d1117;
+    --dv-color-gh-canvas-subtle: #161b22;
+    --dv-color-gh-canvas-inset: #010409;
+    --dv-color-gh-border: #30363d;
+    --dv-color-gh-border-muted: #21262d;
+    --dv-color-gh-fg-default: #e6edf3;
+    --dv-color-gh-fg-muted: #8b949e;
+    --dv-color-gh-fg-subtle: #6e7681;
+    --dv-color-gh-accent: #58a6ff;
+
+    --dv-group-view-background-color: var(--dv-color-gh-canvas-default);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-gh-canvas-subtle
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-gh-canvas-default
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-gh-canvas-subtle
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-gh-canvas-default
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-gh-canvas-subtle
+    );
+    --dv-activegroup-visiblepanel-tab-color: var(--dv-color-gh-fg-default);
+    --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-gh-fg-muted);
+    --dv-inactivegroup-visiblepanel-tab-color: var(--dv-color-gh-fg-subtle);
+    --dv-inactivegroup-hiddenpanel-tab-color: rgba(110, 118, 129, 0.5);
+    --dv-separator-border: var(--dv-color-gh-border);
+    --dv-paneview-active-outline-color: var(--dv-color-gh-accent);
+    --dv-active-sash-color: var(--dv-color-gh-accent);
+    --dv-scrollbar-background-color: rgba(48, 54, 61, 0.7);
+    --dv-drag-over-background-color: rgba(88, 166, 255, 0.15);
+}
+
+.dockview-theme-github-dark {
+    @include dockview-theme-github-dark-mixin();
+}
+
+.dockview-theme-github-dark-spaced {
+    @include dockview-theme-core-mixin();
+    @include dockview-design-space-mixin();
+
+    --dv-color-gh-canvas-default: #0d1117;
+    --dv-color-gh-canvas-subtle: #161b22;
+    --dv-color-gh-canvas-inset: #010409;
+    --dv-color-gh-border: #30363d;
+    --dv-color-gh-border-muted: #21262d;
+    --dv-color-gh-fg-default: #e6edf3;
+    --dv-color-gh-fg-muted: #8b949e;
+    --dv-color-gh-fg-subtle: #6e7681;
+    --dv-color-gh-accent: #58a6ff;
+
+    --dv-drag-over-background-color: rgba(88, 166, 255, 0.1);
+    --dv-group-view-background-color: var(--dv-color-gh-canvas-inset);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-gh-canvas-subtle
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-gh-border
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-gh-canvas-subtle
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-gh-border
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-gh-canvas-subtle
+    );
+    --dv-activegroup-visiblepanel-tab-color: var(--dv-color-gh-fg-default);
+    --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-gh-fg-muted);
+    --dv-inactivegroup-visiblepanel-tab-color: var(--dv-color-gh-fg-subtle);
+    --dv-inactivegroup-hiddenpanel-tab-color: rgba(110, 118, 129, 0.5);
+    --dv-separator-border: transparent;
+    --dv-paneview-active-outline-color: var(--dv-color-gh-accent);
+    --dv-active-sash-color: var(--dv-color-gh-accent);
+    --dv-scrollbar-background-color: rgba(48, 54, 61, 0.7);
+
+    --dv-floating-group-border: 2px solid var(--dv-color-gh-canvas-inset);
+}
+
+// ─── GitHub Light ─────────────────────────────────────────────────────────────
+
+@mixin dockview-theme-github-light-mixin {
+    @include dockview-theme-core-mixin();
+    @include dockview-drop-target-no-travel();
+
+    --dv-color-gh-light-canvas-default: #ffffff;
+    --dv-color-gh-light-canvas-subtle: #f6f8fa;
+    --dv-color-gh-light-canvas-inset: #f0f6ff;
+    --dv-color-gh-light-border: #d0d7de;
+    --dv-color-gh-light-fg-default: #1f2328;
+    --dv-color-gh-light-fg-muted: #656d76;
+    --dv-color-gh-light-fg-subtle: #6e7781;
+    --dv-color-gh-light-accent: #0969da;
+
+    --dv-group-view-background-color: var(--dv-color-gh-light-canvas-default);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-gh-light-canvas-subtle
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-gh-light-canvas-default
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-gh-light-canvas-subtle
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-gh-light-canvas-default
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-gh-light-canvas-subtle
+    );
+    --dv-activegroup-visiblepanel-tab-color: var(
+        --dv-color-gh-light-fg-default
+    );
+    --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-gh-light-fg-muted);
+    --dv-inactivegroup-visiblepanel-tab-color: var(
+        --dv-color-gh-light-fg-subtle
+    );
+    --dv-inactivegroup-hiddenpanel-tab-color: rgba(110, 118, 129, 0.4);
+    --dv-separator-border: var(--dv-color-gh-light-border);
+    --dv-paneview-active-outline-color: var(--dv-color-gh-light-accent);
+    --dv-active-sash-color: var(--dv-color-gh-light-accent);
+    --dv-scrollbar-background-color: rgba(208, 215, 222, 0.5);
+    --dv-drag-over-background-color: rgba(9, 105, 218, 0.1);
+    --dv-floating-box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    --dv-floating-border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dockview-theme-github-light {
+    @include dockview-theme-github-light-mixin();
+}
+
+.dockview-theme-github-light-spaced {
+    @include dockview-theme-core-mixin();
+    @include dockview-design-space-mixin();
+
+    --dv-color-gh-light-canvas-default: #ffffff;
+    --dv-color-gh-light-canvas-subtle: #f6f8fa;
+    --dv-color-gh-light-border: #d0d7de;
+    --dv-color-gh-light-fg-default: #1f2328;
+    --dv-color-gh-light-fg-muted: #656d76;
+    --dv-color-gh-light-fg-subtle: #6e7781;
+    --dv-color-gh-light-accent: #0969da;
+
+    --dv-drag-over-background-color: rgba(9, 105, 218, 0.08);
+    --dv-group-view-background-color: var(--dv-color-gh-light-canvas-subtle);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-gh-light-canvas-default
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-gh-light-border
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-gh-light-canvas-default
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-gh-light-border
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-gh-light-canvas-default
+    );
+    --dv-activegroup-visiblepanel-tab-color: var(
+        --dv-color-gh-light-fg-default
+    );
+    --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-gh-light-fg-muted);
+    --dv-inactivegroup-visiblepanel-tab-color: var(
+        --dv-color-gh-light-fg-subtle
+    );
+    --dv-inactivegroup-hiddenpanel-tab-color: rgba(110, 118, 129, 0.4);
+    --dv-separator-border: transparent;
+    --dv-paneview-active-outline-color: var(--dv-color-gh-light-accent);
+    --dv-active-sash-color: var(--dv-color-gh-light-accent);
+    --dv-floating-box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    --dv-floating-border: 1px solid rgba(0, 0, 0, 0.1);
+    --dv-scrollbar-background-color: rgba(208, 215, 222, 0.5);
+
+    --dv-floating-group-border: 2px solid rgba(208, 215, 222, 0.5);
 }
 
 .dockview-theme-abyss-spaced {
@@ -360,7 +920,7 @@
     --dv-color-abyss-secondary-text: rgb(148, 151, 169);
 
     //
-    --dv-drag-over-border: 2px solid var(--dv-color-abyss-accent);
+
     --dv-drag-over-background-color: '';
     //
 
@@ -400,16 +960,8 @@
     /////
     --dv-active-sash-color: var(--dv-color-abyss-accent);
     //
-    --dv-floating-box-shadow: 8px 8px 8px 0px rgba(0, 0, 0, 0.5);
 
-    padding: 10px;
-    background-color: var(--dv-color-abyss-dark);
-
-    .dv-resize-container {
-        .dv-groupview {
-            border: 2px solid var(--dv-color-abyss-dark);
-        }
-    }
+    --dv-floating-group-border: 2px solid var(--dv-color-abyss-dark);
 }
 
 .dockview-theme-light-spaced {
@@ -417,7 +969,7 @@
     @include dockview-design-space-mixin();
 
     //
-    --dv-drag-over-border: 2px solid rgb(91, 30, 207);
+
     --dv-drag-over-background-color: '';
     //
 
@@ -443,16 +995,133 @@
     /////
     --dv-active-sash-color: rgb(91, 30, 207);
     //
-    --dv-floating-box-shadow: 8px 8px 8px 0px rgba(0, 0, 0, 0.1);
-
-    padding: 10px;
-    background-color: #f6f5f9;
+    --dv-floating-box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    --dv-floating-border: 1px solid rgba(0, 0, 0, 0.1);
 
     --dv-scrollbar-background-color: rgba(0, 0, 0, 0.25);
+    --dv-floating-group-border: 2px solid rgba(255, 255, 255, 0.1);
+}
 
-    .dv-resize-container {
-        .dv-groupview {
-            border: 2px solid rgb(255, 255, 255, 0.1);
-        }
+// ─── Utility class ───────────────────────────────────────────────────────────
+// Apply to any dockview root to enable the spaced layout (rounded corners,
+// inter-group gaps, padded edges). Can be combined with any theme class.
+// Individual spacing variables (--dv-spacing-padding, etc.) can be
+// overridden on the element after this class is applied.
+
+.dockview-spaced {
+    @include dockview-design-space-mixin();
+}
+
+// ─── Context menu ─────────────────────────────────────────────────────────────
+
+.dv-context-menu {
+    min-width: 160px;
+    overflow: hidden;
+    background: var(
+        --dv-context-menu-background-color,
+        var(--dv-activegroup-hiddenpanel-tab-background-color)
+    );
+    color: var(
+        --dv-context-menu-color,
+        var(--dv-activegroup-hiddenpanel-tab-color)
+    );
+    border: 1px solid var(--dv-tab-divider-color);
+    border-radius: var(--dv-border-radius);
+    box-shadow: var(--dv-floating-box-shadow);
+    padding: 4px 0;
+}
+
+.dv-context-menu-item {
+    height: 25px;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: var(--dv-tabs-and-actions-container-font-size);
+    white-space: nowrap;
+    user-select: none;
+
+    &:hover {
+        background: var(--dv-icon-hover-background-color);
+    }
+
+    &.dv-context-menu-item--disabled {
+        opacity: 0.4;
+        cursor: default;
+        pointer-events: none;
+    }
+}
+
+.dv-context-menu-separator {
+    height: 1px;
+    background: var(--dv-tab-divider-color);
+    margin: 4px 0;
+}
+
+.dv-context-menu-rename {
+    padding: 8px 12px 4px;
+}
+
+.dv-context-menu-rename-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border: 1px solid var(--dv-tab-divider-color);
+    border-radius: var(--dv-border-radius);
+    background: inherit;
+    color: var(--dv-activegroup-visiblepanel-tab-color);
+    font-size: var(--dv-tabs-and-actions-container-font-size);
+    outline: none;
+
+    &:focus {
+        border-color: var(--dv-activegroup-visiblepanel-tab-color);
+    }
+
+    &::placeholder {
+        color: var(--dv-activegroup-hiddenpanel-tab-color);
+    }
+}
+
+.dv-context-menu-color-picker {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    padding: 8px 12px;
+    align-items: center;
+}
+
+.dv-context-menu-color-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    flex-shrink: 0;
+    // Each swatch sets `--dv-tab-group-color` inline; this rule reads it
+    // here so `var(...)` references resolve in the CSS engine at use time
+    // instead of at JS-IDL parse time.
+    background-color: var(--dv-tab-group-color);
+
+    &:hover {
+        opacity: 0.85;
+    }
+
+    &.dv-context-menu-color-swatch--selected {
+        outline: 2px solid var(--dv-tab-divider-color);
+        outline-offset: 2px;
+    }
+}
+
+// Tab group indicator 'none' mode — uses a JS-positioned continuous bar
+// (NoneTabGroupIndicator) instead of per-tab box-shadows, so the indicator
+// spans the full tab group width without gaps in spaced themes.
+// The flat bar always sits at the bottom (or left for vertical) edge of
+// the tab bar, so we undo the header-bottom override that moves the
+// wrap indicator's full-height SVG to top: 0.
+.dv-tab-group-indicator-none {
+    .dv-groupview-header-bottom .dv-tab-group-underline {
+        top: auto;
+        bottom: 0;
     }
 }

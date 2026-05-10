@@ -9,6 +9,8 @@ Dockview is an open-source docking layout library that lets you build IDE-like a
 - Zero runtime dependencies
 - Drag and drop with customizable drop zones
 - Floating/overlay groups
+- Edge groups (panels pinned to layout edges with collapse/expand)
+- Tab groups (visual tab organization with colored chips)
 - Popout windows (extracting panels to separate browser windows)
 - Full serialization and deserialization for state persistence
 - Theming system with CSS custom properties
@@ -224,6 +226,8 @@ The `DockviewApi` (available via the `onReady` event) provides:
 - `getGroup(id)` — Get group by ID
 - `moveToNext()` / `moveToPrevious()` — Navigate between panels
 - `addFloatingGroup(panel, options)` — Create a floating group
+- `addEdgeGroup(options)` — Pin a group to a layout edge
+- `createTabGroup(options)` — Create a tab group for visual organization
 - `addPopoutGroup(panel, options)` — Popout a panel to a new window
 - `toJSON()` — Serialize the layout
 - `fromJSON(data)` — Deserialize/restore a layout

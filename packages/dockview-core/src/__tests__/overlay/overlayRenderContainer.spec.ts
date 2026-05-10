@@ -584,4 +584,109 @@ describe('overlayRenderContainer', () => {
         ).toHaveBeenCalled();
         expect(parentContainer.getBoundingClientRect).toHaveBeenCalled();
     });
+
+    test('disposes cleanly when the renderer element getter throws (#1220)', () => {
+        // Reproduces the disposal-order failure from #1220: framework
+        // adapters such as dockview-angular may tear down their renderer
+        // before OverlayRenderContainer's destroy disposable runs, after
+        // which their `element` getter throws. The container should hold
+        // a direct reference captured at attach time and not re-query.
+        const cut = new OverlayRenderContainer(
+            parentContainer,
+            fromPartial<DockviewComponent>({})
+        );
+
+        const panelContentEl = document.createElement('div');
+        let rendererDisposed = false;
+
+        const onDidVisibilityChange = new Emitter<any>();
+        const onDidDimensionsChange = new Emitter<any>();
+        const onDidLocationChange = new Emitter<any>();
+
+        const content = {
+            get element(): HTMLElement {
+                if (rendererDisposed) {
+                    throw new Error('Angular renderer not initialized');
+                }
+                return panelContentEl;
+            },
+        };
+
+        const panel = fromPartial<IDockviewPanel>({
+            api: {
+                id: 'test_panel_id',
+                onDidVisibilityChange: onDidVisibilityChange.event,
+                onDidDimensionsChange: onDidDimensionsChange.event,
+                onDidLocationChange: onDidLocationChange.event,
+                isVisible: true,
+                location: { type: 'grid' },
+            },
+            view: { content },
+            group: {
+                api: {
+                    location: { type: 'grid' },
+                },
+            },
+        });
+
+        cut.attach({ panel, referenceContainer });
+        expect(panelContentEl.parentElement?.parentElement).toBe(
+            parentContainer
+        );
+
+        // Simulate the framework adapter tearing down its renderer first.
+        rendererDisposed = true;
+
+        expect(() => cut.detatch(panel)).not.toThrow();
+        expect(panelContentEl.parentElement?.parentElement).toBeUndefined();
+    });
+
+    test('disposing the container while a renderer throws does not propagate (#1220)', () => {
+        // Same root cause as the test above, but exercised through the
+        // container's own dispose() — the failure path in the original bug
+        // report's stack trace.
+        const cut = new OverlayRenderContainer(
+            parentContainer,
+            fromPartial<DockviewComponent>({})
+        );
+
+        const panelContentEl = document.createElement('div');
+        let rendererDisposed = false;
+
+        const onDidVisibilityChange = new Emitter<any>();
+        const onDidDimensionsChange = new Emitter<any>();
+        const onDidLocationChange = new Emitter<any>();
+
+        const content = {
+            get element(): HTMLElement {
+                if (rendererDisposed) {
+                    throw new Error('Angular renderer not initialized');
+                }
+                return panelContentEl;
+            },
+        };
+
+        const panel = fromPartial<IDockviewPanel>({
+            api: {
+                id: 'test_panel_id',
+                onDidVisibilityChange: onDidVisibilityChange.event,
+                onDidDimensionsChange: onDidDimensionsChange.event,
+                onDidLocationChange: onDidLocationChange.event,
+                isVisible: true,
+                location: { type: 'grid' },
+            },
+            view: { content },
+            group: {
+                api: {
+                    location: { type: 'grid' },
+                },
+            },
+        });
+
+        cut.attach({ panel, referenceContainer });
+
+        rendererDisposed = true;
+
+        expect(() => cut.dispose()).not.toThrow();
+    });
 });

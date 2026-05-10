@@ -14,6 +14,7 @@ import {
     SimpleChanges,
     EnvironmentInjector,
     inject,
+    TemplateRef,
 } from '@angular/core';
 import {
     DockviewApi,
@@ -25,9 +26,17 @@ import {
     PROPERTY_KEYS_DOCKVIEW,
     DockviewFrameworkOptions,
     DockviewComponentOptions,
+    GetTabContextMenuItemsParams,
+    GetTabGroupChipContextMenuItemsParams,
+    BuiltInChipContextMenuItem,
+    ContextMenuItemConfig,
+    ContextMenuItem,
+    DockviewTabGroupColorEntry,
 } from 'dockview-core';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
+import { AngularRenderer } from '../utils/angular-renderer';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
+import { AngularTabGroupChipRenderer } from './angular-tab-group-chip-renderer';
 
 export interface DockviewAngularOptions extends DockviewOptions {
     components: Record<string, Type<any>>;
@@ -37,6 +46,9 @@ export interface DockviewAngularOptions extends DockviewOptions {
     leftHeaderActionsComponent?: Type<any>;
     rightHeaderActionsComponent?: Type<any>;
     prefixHeaderActionsComponent?: Type<any>;
+    getTabContextMenuItems?: (
+        params: GetTabContextMenuItemsParams
+    ) => (ContextMenuItem | { component: Type<any> })[];
 }
 
 @Component({
@@ -63,13 +75,14 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @ViewChild('dockviewContainer', { static: true })
     private containerRef!: ElementRef<HTMLDivElement>;
 
-    @Input() components!: Record<string, Type<any>>;
-    @Input() tabComponents?: Record<string, Type<any>>;
-    @Input() watermarkComponent?: Type<any>;
-    @Input() defaultTabComponent?: Type<any>;
-    @Input() leftHeaderActionsComponent?: Type<any>;
-    @Input() rightHeaderActionsComponent?: Type<any>;
-    @Input() prefixHeaderActionsComponent?: Type<any>;
+    @Input() components!: Record<string, Type<any> | TemplateRef<any>>;
+    @Input() tabComponents?: Record<string, Type<any> | TemplateRef<any>>;
+    @Input() watermarkComponent?: Type<any> | TemplateRef<any>;
+    @Input() defaultTabComponent?: Type<any> | TemplateRef<any>;
+    @Input() leftHeaderActionsComponent?: Type<any> | TemplateRef<any>;
+    @Input() rightHeaderActionsComponent?: Type<any> | TemplateRef<any>;
+    @Input() prefixHeaderActionsComponent?: Type<any> | TemplateRef<any>;
+    @Input() tabGroupChipComponent?: Type<any>;
 
     // Core dockview options as inputs
     @Input() className?: string;
@@ -85,6 +98,18 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() locked?: boolean;
     @Input() disableAutoResizing?: boolean;
     @Input() singleTabMode?: 'fullwidth' | 'default';
+    @Input() getTabContextMenuItems?: (
+        params: GetTabContextMenuItemsParams
+    ) => (ContextMenuItem | { component: Type<any> | TemplateRef<any> })[];
+    @Input() getTabGroupChipContextMenuItems?: (
+        params: GetTabGroupChipContextMenuItemsParams
+    ) => (
+        | BuiltInChipContextMenuItem
+        | ContextMenuItemConfig
+        | { component: Type<any> | TemplateRef<any> }
+    )[];
+    @Input() tabGroupColors?: DockviewTabGroupColorEntry[];
+    @Input() tabGroupAccent?: 'palette' | 'off';
 
     @Output() ready = new EventEmitter<DockviewReadyEvent>();
     @Output() didDrop = new EventEmitter<DockviewDidDropEvent>();
@@ -118,6 +143,24 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
                     hasChanges = true;
                 }
             });
+
+            // Handle tabGroupChipComponent → createTabGroupChipComponent mapping
+            if (
+                changes['tabGroupChipComponent'] &&
+                !changes['tabGroupChipComponent'].isFirstChange()
+            ) {
+                const chipComponent =
+                    changes['tabGroupChipComponent'].currentValue;
+                coreChanges.createTabGroupChipComponent = chipComponent
+                    ? () =>
+                          new AngularTabGroupChipRenderer(
+                              chipComponent,
+                              this.injector,
+                              this.environmentInjector
+                          )
+                    : undefined;
+                hasChanges = true;
+            }
 
             if (hasChanges) {
                 this.dockviewApi.updateOptions(coreChanges);
@@ -161,11 +204,25 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
             }
         });
 
+        if (this.tabGroupChipComponent) {
+            const chipComponent = this.tabGroupChipComponent;
+            coreOptions.createTabGroupChipComponent = () => {
+                return new AngularTabGroupChipRenderer(
+                    chipComponent,
+                    this.injector,
+                    this.environmentInjector
+                );
+            };
+        }
+
         return coreOptions as DockviewOptions;
     }
 
     private createFrameworkOptions(): DockviewFrameworkOptions {
-        const headerActionsComponents: Record<string, Type<any>> = {};
+        const headerActionsComponents: Record<
+            string,
+            Type<any> | TemplateRef<any>
+        > = {};
         if (this.leftHeaderActionsComponent) {
             headerActionsComponents['left'] = this.leftHeaderActionsComponent;
         }
@@ -220,6 +277,19 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
                       )!;
                   }
                 : undefined,
+            createContextMenuItemComponent: (options) => {
+                if (!options.component) {
+                    return undefined;
+                }
+                const renderer = new AngularRenderer({
+                    component: options.component as
+                        | Type<any>
+                        | TemplateRef<any>,
+                    injector: this.injector,
+                    environmentInjector: this.environmentInjector,
+                });
+                return renderer;
+            },
         };
     }
 

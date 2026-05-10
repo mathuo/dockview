@@ -31,10 +31,12 @@ const DOCKVIEW_CDN = {
         remote: {
             'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}`,
             dockview: `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}`,
+            'dockview-react': `https://cdn.jsdelivr.net/npm/dockview-react@${DOCKVIEW_VERSION}`,
         },
         local: {
             'dockview-core': `${local}/dockview-core`,
             dockview: `${local}/dockview`,
+            'dockview-react': `${local}/dockview-react`,
         },
     },
     vue: {

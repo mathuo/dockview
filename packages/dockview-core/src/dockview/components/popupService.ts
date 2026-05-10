@@ -10,15 +10,23 @@ export class PopupService extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private _active: HTMLElement | null = null;
     private readonly _activeDisposable = new MutableDisposable();
+    private _root: HTMLElement;
+    // The window the popover lives in. Different from `window` for popout
+    // groups: their popovers must register pointerdown/keydown/resize on the
+    // popout window (not the main one) and create elements with the popout's
+    // document so they render and dismiss correctly.
+    private readonly _window: Window;
 
-    constructor(private readonly root: HTMLElement) {
+    constructor(root: HTMLElement, win: Window = window) {
         super();
 
-        this._element = document.createElement('div');
+        this._root = root;
+        this._window = win;
+        this._element = win.document.createElement('div');
         this._element.className = 'dv-popover-anchor';
         this._element.style.position = 'relative';
 
-        this.root.prepend(this._element);
+        this._root.prepend(this._element);
 
         this.addDisposables(
             Disposable.from(() => {
@@ -28,13 +36,23 @@ export class PopupService extends CompositeDisposable {
         );
     }
 
+    /**
+     * Move the popup anchor into a new root element. Call this when a shell
+     * wraps the dockview component so that edge-group overflow dropdowns
+     * position correctly relative to the full layout area.
+     */
+    updateRoot(newRoot: HTMLElement): void {
+        newRoot.prepend(this._element);
+        this._root = newRoot;
+    }
+
     openPopover(
         element: HTMLElement,
         position: { x: number; y: number; zIndex?: string }
     ): void {
         this.close();
 
-        const wrapper = document.createElement('div');
+        const wrapper = this._window.document.createElement('div');
         wrapper.style.position = 'absolute';
         wrapper.style.zIndex = position.zIndex ?? 'var(--dv-overlay-z-index)';
         wrapper.appendChild(element);
@@ -51,7 +69,7 @@ export class PopupService extends CompositeDisposable {
         this._active = wrapper;
 
         this._activeDisposable.value = new CompositeDisposable(
-            addDisposableListener(window, 'pointerdown', (event) => {
+            addDisposableListener(this._window, 'pointerdown', (event) => {
                 const target = event.target;
 
                 if (!(target instanceof HTMLElement)) {
@@ -70,13 +88,18 @@ export class PopupService extends CompositeDisposable {
 
                 this.close();
             }),
-            addDisposableListener(window, 'resize', () => {
+            addDisposableListener(this._window, 'keydown', (event) => {
+                if (event.key === 'Escape' || event.key === 'Enter') {
+                    this.close();
+                }
+            }),
+            addDisposableListener(this._window, 'resize', () => {
                 this.close();
             })
         );
 
-        requestAnimationFrame(() => {
-            shiftAbsoluteElementIntoView(wrapper, this.root);
+        this._window.requestAnimationFrame(() => {
+            shiftAbsoluteElementIntoView(wrapper, this._root);
         });
     }
 

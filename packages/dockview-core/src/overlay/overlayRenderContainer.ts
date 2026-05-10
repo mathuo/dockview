@@ -148,8 +148,15 @@ export class OverlayRenderContainer extends CompositeDisposable {
 
         const focusContainer = this.map[panel.api.id].element;
 
-        if (panel.view.content.element.parentElement !== focusContainer) {
-            focusContainer.appendChild(panel.view.content.element);
+        // Capture the content element now so the destroy disposable below
+        // does not re-query the renderer's `element` getter during teardown.
+        // Some framework adapters (e.g. dockview-angular) tear down their
+        // backing renderer before this disposable fires; reading through the
+        // getter at that point can throw.
+        const contentElement = panel.view.content.element;
+
+        if (contentElement.parentElement !== focusContainer) {
+            focusContainer.appendChild(contentElement);
         }
 
         if (focusContainer.parentElement !== this.element) {
@@ -304,8 +311,8 @@ export class OverlayRenderContainer extends CompositeDisposable {
         );
 
         this.map[panel.api.id].destroy = Disposable.from(() => {
-            if (panel.view.content.element.parentElement === focusContainer) {
-                focusContainer.removeChild(panel.view.content.element);
+            if (contentElement.parentElement === focusContainer) {
+                focusContainer.removeChild(contentElement);
             }
 
             focusContainer.parentElement?.removeChild(focusContainer);
