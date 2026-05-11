@@ -4943,6 +4943,116 @@ describe('dockviewComponent', () => {
         expect(dockview.element.contains(overlay)).toBe(false);
     });
 
+    test('floating overlay host writes are rounded and deduped (issue #1245)', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+
+        dockview.layout(1000, 500);
+        dockview.addPanel({ id: 'panel_1', component: 'default' });
+
+        const shellEl = (dockview as any)._shellManager.element as HTMLElement;
+        const host = container.querySelector(
+            '.dv-floating-overlay-host'
+        ) as HTMLElement;
+        expect(host).toBeTruthy();
+
+        // Frame 1: write fractional rects, observe rounded output.
+        jest.spyOn(shellEl, 'getBoundingClientRect').mockReturnValue({
+            left: 0.4,
+            top: 0.2,
+            width: 1000.6,
+            height: 500.4,
+            right: 1000.6,
+            bottom: 500.4,
+            x: 0.4,
+            y: 0.2,
+            toJSON: () => ({}),
+        } as any);
+        jest.spyOn(dockview.element, 'getBoundingClientRect').mockReturnValue({
+            left: 10.4,
+            top: 5.2,
+            width: 980.6,
+            height: 490.4,
+            right: 991.0,
+            bottom: 495.6,
+            x: 10.4,
+            y: 5.2,
+            toJSON: () => ({}),
+        } as any);
+
+        // Force a sync layout to invoke _syncFloatingOverlayHost.
+        dockview.layout(1000, 500, true);
+        expect(host.style.left).toBe('10px');
+        expect(host.style.top).toBe('5px');
+        expect(host.style.width).toBe('981px');
+        expect(host.style.height).toBe('490px');
+
+        // Frame 2: rects jitter sub-pixel-only — rounded values stay the same.
+        // Reassign style strings to detectable values; the dedup must keep them.
+        host.style.left = '7px';
+        host.style.top = '7px';
+        host.style.width = '7px';
+        host.style.height = '7px';
+
+        (shellEl.getBoundingClientRect as jest.Mock).mockReturnValue({
+            left: 0.49,
+            top: 0.11,
+            width: 1000.51,
+            height: 500.49,
+            right: 1001.0,
+            bottom: 500.6,
+            x: 0.49,
+            y: 0.11,
+            toJSON: () => ({}),
+        } as any);
+        (dockview.element.getBoundingClientRect as jest.Mock).mockReturnValue({
+            left: 10.49,
+            top: 5.11,
+            width: 980.51,
+            height: 490.49,
+            right: 991.0,
+            bottom: 495.6,
+            x: 10.49,
+            y: 5.11,
+            toJSON: () => ({}),
+        } as any);
+
+        dockview.layout(1000, 500, true);
+        expect(host.style.left).toBe('7px');
+        expect(host.style.top).toBe('7px');
+        expect(host.style.width).toBe('7px');
+        expect(host.style.height).toBe('7px');
+
+        // Frame 3: real size change — writes resume.
+        (dockview.element.getBoundingClientRect as jest.Mock).mockReturnValue({
+            left: 10.4,
+            top: 5.2,
+            width: 800.6,
+            height: 490.4,
+            right: 811.0,
+            bottom: 495.6,
+            x: 10.4,
+            y: 5.2,
+            toJSON: () => ({}),
+        } as any);
+
+        dockview.layout(1000, 500, true);
+        expect(host.style.width).toBe('801px');
+    });
+
     test('that external dnd events do not trigger the top-level center dnd target unless empty', () => {
         const container = document.createElement('div');
 

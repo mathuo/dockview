@@ -425,6 +425,12 @@ export class DockviewComponent
 
     private _shellManager: ShellManager | undefined;
     private _floatingOverlayHost: HTMLDivElement | undefined;
+    private _floatingOverlayHostBounds = {
+        left: NaN,
+        top: NaN,
+        width: NaN,
+        height: NaN,
+    };
     private _inShellLayout = false;
     private readonly _edgeGroups = new Map<
         EdgeGroupPosition,
@@ -1562,11 +1568,30 @@ export class DockviewComponent
         }
         const shellRect = this._shellManager.element.getBoundingClientRect();
         const gridRect = this.element.getBoundingClientRect();
+        // Round to integers to absorb sub-pixel jitter from fractional
+        // devicePixelRatio (e.g. multi-monitor / fullscreen transitions),
+        // matching the rounding applied at watchElementResize call sites.
+        const next = {
+            left: Math.round(gridRect.left - shellRect.left),
+            top: Math.round(gridRect.top - shellRect.top),
+            width: Math.round(gridRect.width),
+            height: Math.round(gridRect.height),
+        };
+        const prev = this._floatingOverlayHostBounds;
+        if (
+            next.left === prev.left &&
+            next.top === prev.top &&
+            next.width === prev.width &&
+            next.height === prev.height
+        ) {
+            return;
+        }
+        this._floatingOverlayHostBounds = next;
         const host = this._floatingOverlayHost;
-        host.style.left = `${gridRect.left - shellRect.left}px`;
-        host.style.top = `${gridRect.top - shellRect.top}px`;
-        host.style.width = `${gridRect.width}px`;
-        host.style.height = `${gridRect.height}px`;
+        host.style.left = `${next.left}px`;
+        host.style.top = `${next.top}px`;
+        host.style.width = `${next.width}px`;
+        host.style.height = `${next.height}px`;
     }
 
     private _layoutFromShell(width: number, height: number): void {
