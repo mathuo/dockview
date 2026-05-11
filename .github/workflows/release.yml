@@ -58,9 +58,9 @@ jobs:
               id: app-user
               env:
                   GH_TOKEN: ${{ steps.app-token.outputs.token }}
+                  SLUG: ${{ steps.app-token.outputs.app-slug }}
               run: |
-                  slug="${{ steps.app-token.outputs.app-slug }}"
-                  id=$(gh api "/users/${slug}[bot]" --jq .id)
+                  id=$(gh api "/users/${SLUG}[bot]" --jq .id)
                   echo "user-id=${id}" >> "$GITHUB_OUTPUT"
 
             - name: Configure git
@@ -72,7 +72,9 @@ jobs:
                   git config user.email "${UID}+${SLUG}[bot]@users.noreply.github.com"
 
             - name: Version
-              run: npx nx release version ${{ inputs.specifier }}
+              env:
+                  SPECIFIER: ${{ inputs.specifier }}
+              run: npx nx release version "$SPECIFIER"
 
             - name: Show release commit
               run: git --no-pager log -1 --stat
