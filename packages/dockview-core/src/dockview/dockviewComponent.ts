@@ -1520,10 +1520,15 @@ export class DockviewComponent
         this.updateDropTargetModel(options);
 
         const oldDisableDnd = this.options.disableDnd;
+        const oldDndStrategy = this.options.dndStrategy;
         this._options = { ...this.options, ...options };
         const newDisableDnd = this.options.disableDnd;
+        const newDndStrategy = this.options.dndStrategy;
 
-        if (oldDisableDnd !== newDisableDnd) {
+        if (
+            oldDisableDnd !== newDisableDnd ||
+            oldDndStrategy !== newDndStrategy
+        ) {
             this.updateDragAndDropState();
         }
 

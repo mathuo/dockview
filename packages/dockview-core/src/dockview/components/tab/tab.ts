@@ -22,7 +22,10 @@ import { LongPressDetector } from '../../../dnd/pointer/longPress';
 import { PointerGhost } from '../../../dnd/pointer/pointerGhost';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { addGhostImage } from '../../../dnd/ghost';
-import { DockviewHeaderDirection } from '../../options';
+import {
+    DockviewHeaderDirection,
+    resolveDndCapabilities,
+} from '../../options';
 
 class TabDragHandler extends DragHandler {
     private readonly panelTransfer =
@@ -91,10 +94,12 @@ export class Tab extends CompositeDisposable {
     ) {
         super();
 
+        const caps = resolveDndCapabilities(this.accessor.options);
+
         this._element = document.createElement('div');
         this._element.className = 'dv-tab';
         this._element.tabIndex = 0;
-        this._element.draggable = !this.accessor.options.disableDnd;
+        this._element.draggable = caps.html5;
 
         toggleClass(this.element, 'dv-inactive-tab', true);
 
@@ -103,13 +108,12 @@ export class Tab extends CompositeDisposable {
             this.accessor,
             this.group,
             this.panel,
-            !!this.accessor.options.disableDnd
+            !caps.html5
         );
 
         const canDisplayOverlay = (
             event: DragEvent | PointerEvent,
-            position: Position,
-            isPointerDriven: boolean
+            position: Position
         ): boolean => {
             if (this.group.locked) {
                 return false;
@@ -118,12 +122,9 @@ export class Tab extends CompositeDisposable {
             const data = getPanelData();
 
             if (data && this.accessor.id === data.viewId) {
-                // Smooth-reorder runs only for HTML5 drags; touch / pointer
-                // drags fall back to per-tab overlays.
-                if (
-                    !isPointerDriven &&
-                    this.accessor.options.theme?.tabAnimation === 'smooth'
-                ) {
+                // Smooth-reorder takes over the in-flight visual when active,
+                // so individual tab overlays are suppressed for internal drags.
+                if (this.accessor.options.theme?.tabAnimation === 'smooth') {
                     return false;
                 }
                 return true;
@@ -135,21 +136,21 @@ export class Tab extends CompositeDisposable {
         this.dropTarget = new Droptarget(this._element, {
             acceptedTargetZones: ['left', 'right'],
             overlayModel: this._buildOverlayModel(),
-            canDisplayOverlay: (event, position) =>
-                canDisplayOverlay(event, position, false),
+            canDisplayOverlay,
             getOverrideTarget: () => group.model.dropTargetContainer?.model,
         });
 
         this.pointerDropTarget = new PointerDropTarget(this._element, {
             acceptedTargetZones: ['left', 'right'],
             overlayModel: this._buildOverlayModel(),
-            canDisplayOverlay: (event, position) =>
-                canDisplayOverlay(event, position, true),
+            canDisplayOverlay,
             getOverrideTarget: () => group.model.dropTargetContainer?.model,
         });
 
         this.pointerDragSource = new PointerDragSource(this._element, {
-            isCancelled: () => !!this.accessor.options.disableDnd,
+            isCancelled: () =>
+                !resolveDndCapabilities(this.accessor.options).pointer,
+            touchOnly: !caps.pointerHandlesMouse,
             getData: () => {
                 this.panelTransfer.setData(
                     [
@@ -306,10 +307,11 @@ export class Tab extends CompositeDisposable {
     }
 
     public updateDragAndDropState(): void {
-        const disabled = !!this.accessor.options.disableDnd;
-        this._element.draggable = !disabled;
-        this.dragHandler.setDisabled(disabled);
-        this.pointerDragSource.setDisabled(disabled);
+        const caps = resolveDndCapabilities(this.accessor.options);
+        this._element.draggable = caps.html5;
+        this.dragHandler.setDisabled(!caps.html5);
+        this.pointerDragSource.setDisabled(!caps.pointer);
+        this.pointerDragSource.setTouchOnly(!caps.pointerHandlesMouse);
     }
 
     /**

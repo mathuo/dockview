@@ -19,6 +19,7 @@ import { CompositeDisposable } from '../../../lifecycle';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
 import { toggleClass } from '../../../dom';
+import { resolveDndCapabilities } from '../../options';
 
 export class VoidContainer extends CompositeDisposable {
     private readonly _element: HTMLElement;
@@ -47,16 +48,14 @@ export class VoidContainer extends CompositeDisposable {
     ) {
         super();
 
+        const caps = resolveDndCapabilities(this.accessor.options);
+
         this._element = document.createElement('div');
 
         this._element.className = 'dv-void-container';
-        this._element.draggable = !this.accessor.options.disableDnd;
+        this._element.draggable = caps.html5;
 
-        toggleClass(
-            this._element,
-            'dv-draggable',
-            !this.accessor.options.disableDnd
-        );
+        toggleClass(this._element, 'dv-draggable', caps.html5 || caps.pointer);
 
         this.addDisposables(
             this._onDrop,
@@ -70,7 +69,7 @@ export class VoidContainer extends CompositeDisposable {
             this._element,
             accessor,
             group,
-            !!this.accessor.options.disableDnd
+            !caps.html5
         );
 
         const canDisplayOverlay = (
@@ -103,8 +102,9 @@ export class VoidContainer extends CompositeDisposable {
         });
 
         this.pointerDragSource = new PointerDragSource(this._element, {
+            touchOnly: !caps.pointerHandlesMouse,
             isCancelled: () => {
-                if (this.accessor.options.disableDnd) {
+                if (!resolveDndCapabilities(this.accessor.options).pointer) {
                     return true;
                 }
                 // Floating groups are touch-draggable: the long-press
@@ -185,10 +185,11 @@ export class VoidContainer extends CompositeDisposable {
     }
 
     updateDragAndDropState(): void {
-        const disabled = !!this.accessor.options.disableDnd;
-        this._element.draggable = !disabled;
-        toggleClass(this._element, 'dv-draggable', !disabled);
-        this.handler.setDisabled(disabled);
-        this.pointerDragSource.setDisabled(disabled);
+        const caps = resolveDndCapabilities(this.accessor.options);
+        this._element.draggable = caps.html5;
+        toggleClass(this._element, 'dv-draggable', caps.html5 || caps.pointer);
+        this.handler.setDisabled(!caps.html5);
+        this.pointerDragSource.setDisabled(!caps.pointer);
+        this.pointerDragSource.setTouchOnly(!caps.pointerHandlesMouse);
     }
 }

@@ -35,6 +35,7 @@ const DEFAULT_PRESS_TOLERANCE = 8;
  */
 export class PointerDragSource extends CompositeDisposable {
     private _disabled = false;
+    private _touchOnly: boolean;
     private _pendingPointerId: number | undefined;
     private _pendingMoveListener: IDisposable | undefined;
     private _pendingUpListener: IDisposable | undefined;
@@ -51,6 +52,8 @@ export class PointerDragSource extends CompositeDisposable {
     ) {
         super();
 
+        this._touchOnly = options.touchOnly ?? true;
+
         this.addDisposables(
             addDisposableListener(this.element, 'pointerdown', (e) => {
                 this._onPointerDown(e);
@@ -65,15 +68,30 @@ export class PointerDragSource extends CompositeDisposable {
         }
     }
 
+    /**
+     * `false` lets the pointer source also handle mouse pointers; used when
+     * `dndStrategy: 'pointer'` to drive every input type through this path.
+     */
+    setTouchOnly(value: boolean): void {
+        if (this._touchOnly === value) {
+            return;
+        }
+        this._touchOnly = value;
+        // A pending mouse-tracked drag should be abandoned if we re-enable
+        // the touch-only filter mid-flight.
+        if (value) {
+            this._cancelPending();
+        }
+    }
+
     private _shouldHandle(event: PointerEvent): boolean {
         if (this._disabled) {
             return false;
         }
         // Pointer-type filter runs before isCancelled — consumer state read
         // by isCancelled may not be populated for events we'll never handle.
-        const touchOnly = this.options.touchOnly ?? true;
         if (
-            touchOnly &&
+            this._touchOnly &&
             event.pointerType !== 'touch' &&
             event.pointerType !== 'pen'
         ) {

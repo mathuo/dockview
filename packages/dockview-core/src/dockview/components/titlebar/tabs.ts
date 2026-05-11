@@ -77,6 +77,7 @@ export class Tabs extends CompositeDisposable {
     private _voidContainerListeners: IDisposable | null = null;
     private _extendedDropZone: HTMLElement | null = null;
     private _chipDragCleanup: IDisposable | null = null;
+    private _pointerInsideTabsList = false;
 
     private readonly _tabGroupManager: TabGroupManager;
 
@@ -279,10 +280,20 @@ export class Tabs extends CompositeDisposable {
             },
             // Touch chip drags have no HTML5 dragend; clean up here so a
             // pointerup-over-empty-space cancel doesn't leak the transfer
-            // payload + iframe shield until the next drop.
+            // payload + iframe shield until the next drop. Also tear down
+            // any smooth-reorder anim state that the pointer dragover bridge
+            // installed but the drop path did not consume.
             PointerDragController.getInstance().onDragEnd(() => {
                 this._chipDragCleanup?.dispose();
                 this._chipDragCleanup = null;
+                this._pointerInsideTabsList = false;
+                this.resetDragAnimation();
+            }),
+            // Pointer-event mirror of the HTML5 dragover / dragleave handlers
+            // below. Drives smooth-reorder for `dndStrategy: 'pointer'` and
+            // for touch drags in `'auto'`.
+            PointerDragController.getInstance().onDragMove((e) => {
+                this._handlePointerDragMove(e.clientX, e.clientY);
             }),
             addDisposableListener(this.element, 'pointerdown', (event) => {
                 if (event.defaultPrevented) {
@@ -625,19 +636,10 @@ export class Tabs extends CompositeDisposable {
             tab.onDragStart((event) => {
                 this._onTabDragStart.fire({ nativeEvent: event, panel });
 
-                // Smooth-anim cleanup runs from the HTML5 dragend / drop
-                // listeners on _tabsList; pointer drags would leak
-                // _animState (source tab stuck at width 0).
-                // Detect by negating PointerEvent — jsdom doesn't always
-                // expose DragEvent as a class.
-                const isPointer =
-                    typeof PointerEvent !== 'undefined' &&
-                    event instanceof PointerEvent;
-
-                if (
-                    !isPointer &&
-                    this.accessor.options.theme?.tabAnimation === 'smooth'
-                ) {
+                // Both HTML5 and pointer drags initialize _animState. Cleanup
+                // is wired in both paths: HTML5 via dragend/drop on _tabsList,
+                // pointer via PointerDragController.onDragEnd subscriptions.
+                if (this.accessor.options.theme?.tabAnimation === 'smooth') {
                     const tabWidth = tab.element.getBoundingClientRect().width;
                     const sourceIndex = this._tabs.findIndex(
                         (x) => x.value === tab
@@ -986,6 +988,7 @@ export class Tabs extends CompositeDisposable {
         for (const tab of this._tabs) {
             tab.value.updateDragAndDropState();
         }
+        this._tabGroupManager.updateDragAndDropState();
     }
 
     /**
@@ -1024,24 +1027,20 @@ export class Tabs extends CompositeDisposable {
             }
         }
 
-        // Smooth-anim cleanup runs from HTML5 dragend; touch drags fall
-        // back to per-target overlays.
-        if (!isPointer) {
-            this._animState = {
-                sourceTabId: '',
-                sourceIndex: firstIdx,
-                tabPositions: this.snapshotTabPositions(),
-                chipPositions: this._tabGroupManager.snapshotChipWidths(),
-                currentInsertionIndex: null,
-                targetTabGroupId: null,
-                sourceTabGroupId: tabGroup.id,
-                sourceGroupPanelIds: new Set(tabGroup.panelIds),
-                sourceChipWidth: chipRect.width,
-                cursorOffsetFromDragLeft: event.clientX - chipRect.left,
-                sourceGapWidth: groupGapWidth,
-                containerLeft: this._tabsList.getBoundingClientRect().left,
-            };
-        }
+        this._animState = {
+            sourceTabId: '',
+            sourceIndex: firstIdx,
+            tabPositions: this.snapshotTabPositions(),
+            chipPositions: this._tabGroupManager.snapshotChipWidths(),
+            currentInsertionIndex: null,
+            targetTabGroupId: null,
+            sourceTabGroupId: tabGroup.id,
+            sourceGroupPanelIds: new Set(tabGroup.panelIds),
+            sourceChipWidth: chipRect.width,
+            cursorOffsetFromDragLeft: event.clientX - chipRect.left,
+            sourceGapWidth: groupGapWidth,
+            containerLeft: this._tabsList.getBoundingClientRect().left,
+        };
 
         // Set LocalSelectionTransfer so drop targets recognise this as
         // an internal dockview drag.  panelId is null (group-level),
@@ -1074,13 +1073,17 @@ export class Tabs extends CompositeDisposable {
         // bubbling, the tabsList listener never runs and `_animState`,
         // `_chipDragCleanup`, and the dragging CSS classes leak. Listen
         // directly on the chip element so cleanup happens regardless of
-        // whether it's still attached.  (Issue #1254.)
+        // whether it's still attached.  (Issue #1254.) Pointer chip drags
+        // are torn down by the PointerDragController.onDragEnd subscription
+        // in the constructor.
         const chipElement = chip.element;
         const onChipDragEnd = () => {
             chipElement.removeEventListener('dragend', onChipDragEnd);
             this.resetDragAnimation();
         };
-        chipElement.addEventListener('dragend', onChipDragEnd);
+        if (!isPointer) {
+            chipElement.addEventListener('dragend', onChipDragEnd);
+        }
 
         this._chipDragCleanup = {
             dispose: () => {
@@ -1101,10 +1104,7 @@ export class Tabs extends CompositeDisposable {
             }
         }
 
-        if (
-            !isPointer &&
-            this.accessor.options.theme?.tabAnimation === 'smooth'
-        ) {
+        if (this.accessor.options.theme?.tabAnimation === 'smooth') {
             // Collapse group tabs + chip after the browser
             // captures the drag image, then open the gap at the
             // source position — all instant (no transitions).
@@ -1238,7 +1238,146 @@ export class Tabs extends CompositeDisposable {
         return total / this._tabs.length;
     }
 
-    private handleDragOver(event: DragEvent): void {
+    /**
+     * Pointer mirror of the `_tabsList` HTML5 dragover / dragleave handlers.
+     * Hit-tests the active pointer drag against this tabs list and drives
+     * smooth-reorder gap transforms — both for chip / tab drags originating
+     * here and for cross-group drags arriving from elsewhere.
+     */
+    private _handlePointerDragMove(clientX: number, clientY: number): void {
+        if (this.accessor.options.disableDnd) {
+            return;
+        }
+        const sourceDoc = this._tabsList.ownerDocument ?? document;
+        const elAtPoint = sourceDoc.elementFromPoint(clientX, clientY);
+        const inside =
+            !!elAtPoint &&
+            (this._tabsList.contains(elAtPoint) ||
+                (!!this._extendedDropZone &&
+                    this._extendedDropZone.contains(elAtPoint)));
+
+        if (!inside) {
+            if (this._pointerInsideTabsList) {
+                this._pointerInsideTabsList = false;
+                this._handlePointerDragLeave(elAtPoint);
+            }
+            return;
+        }
+
+        this._pointerInsideTabsList = true;
+
+        // Mirror HTML5 dragover: refresh stale anim state when the drag
+        // identity changes between operations.
+        if (this._animState) {
+            const data = getPanelData();
+            if (
+                data?.tabGroupId &&
+                data.groupId !== this.group.id &&
+                this._animState.sourceTabGroupId !== data.tabGroupId
+            ) {
+                this._animState = null;
+            }
+        }
+
+        if (!this._animState) {
+            const data = getPanelData();
+            if (
+                this.accessor.options.theme?.tabAnimation === 'default' &&
+                !data?.tabGroupId
+            ) {
+                return;
+            }
+            if (
+                data &&
+                (data.panelId || data.tabGroupId) &&
+                data.groupId !== this.group.id
+            ) {
+                const avgWidth = this.getAverageTabWidth();
+                if (data.tabGroupId) {
+                    const sourceGroup = this.accessor.getPanel(data.groupId);
+                    const sourceTg = sourceGroup?.model
+                        .getTabGroups()
+                        .find((tg) => tg.id === data.tabGroupId);
+                    const panelCount = sourceTg?.panelIds.length ?? 1;
+                    const groupGapWidth =
+                        avgWidth * panelCount + avgWidth;
+                    this._animState = {
+                        sourceTabId: '',
+                        sourceIndex: -1,
+                        tabPositions: this.snapshotTabPositions(),
+                        chipPositions:
+                            this._tabGroupManager.snapshotChipWidths(),
+                        currentInsertionIndex: null,
+                        targetTabGroupId: null,
+                        sourceTabGroupId: data.tabGroupId,
+                        sourceGroupPanelIds: sourceTg
+                            ? new Set(sourceTg.panelIds)
+                            : new Set<string>(),
+                        sourceChipWidth: avgWidth,
+                        cursorOffsetFromDragLeft: groupGapWidth / 2,
+                        sourceGapWidth: groupGapWidth,
+                        containerLeft:
+                            this._tabsList.getBoundingClientRect().left,
+                    };
+                } else {
+                    this._animState = {
+                        sourceTabId: data.panelId!,
+                        sourceIndex: -1,
+                        tabPositions: this.snapshotTabPositions(),
+                        chipPositions:
+                            this._tabGroupManager.snapshotChipWidths(),
+                        currentInsertionIndex: null,
+                        targetTabGroupId: null,
+                        sourceTabGroupId: null,
+                        sourceGroupPanelIds: null,
+                        sourceChipWidth: 0,
+                        cursorOffsetFromDragLeft: avgWidth / 2,
+                        sourceGapWidth: avgWidth,
+                        containerLeft:
+                            this._tabsList.getBoundingClientRect().left,
+                    };
+                }
+            } else {
+                return;
+            }
+        }
+
+        if (this._animState!.sourceIndex !== -1) {
+            this.group.model.dropTargetContainer?.model?.clear();
+        }
+        this.handleDragOver({ clientX });
+    }
+
+    private _handlePointerDragLeave(related: Element | null): void {
+        if (!this._animState) {
+            return;
+        }
+        if (related && this._tabsList.contains(related)) {
+            return;
+        }
+        if (related && this._extendedDropZone?.contains(related)) {
+            this.resetTabTransforms();
+            this._animState.currentInsertionIndex = null;
+            return;
+        }
+        const isVoid =
+            this._voidContainer &&
+            related &&
+            (related === this._voidContainer ||
+                this._voidContainer.contains(related));
+        if (isVoid) {
+            return;
+        }
+        this.resetTabTransforms();
+        if (this._animState.sourceIndex === -1) {
+            this.group.model.dropTargetContainer?.model?.clear();
+            this._animState = null;
+        } else {
+            this._animState.currentInsertionIndex = null;
+        }
+    }
+
+    private handleDragOver(event: { clientX: number }): void {
         if (!this._animState) {
             return;
         }

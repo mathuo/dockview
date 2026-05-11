@@ -1936,33 +1936,62 @@ describe('tabs - animation', () => {
     });
 
     describe('touch drag (pointer path) cleanup', () => {
-        // Regression for the "stuck tab" bug: when smooth-tab animation is
-        // enabled and a touch drag begins, the smooth-anim setup must NOT
-        // run for pointer-driven drags — the HTML5 dragend / drop listeners
-        // that drive its cleanup never fire for `pointerup`, so any
-        // _animState set up here would leak (source tab kept at width 0).
-        test('touch tab drag in smooth mode does not initialise _animState', () => {
+        // Pointer-driven smooth-reorder is wired into the same _animState
+        // pipeline as the HTML5 path. The PointerDragController.onDragEnd
+        // subscription in the Tabs constructor calls resetDragAnimation,
+        // so state set up here is cleaned up on pointerup / pointercancel.
+        test('touch tab drag in smooth mode initialises _animState', () => {
             const { tabs } = createTabs({ tabAnimation: 'smooth' });
             tabs.openPanel(createMockPanel('a'), 0);
             tabs.openPanel(createMockPanel('b'), 1);
-            const tabA = (tabs as any)._tabs[0].value.element as HTMLElement;
 
-            // Synthesize the per-tab `onDragStart` event fed to tabs.ts —
-            // pointer drags fire a PointerEvent through Tab._onDragStart.
             const pointerEvent = new PointerEvent('pointerdown', {
                 pointerId: 1,
                 pointerType: 'touch',
                 clientX: 0,
                 clientY: 0,
             });
-            // Re-fire by directly invoking the Tab's emitter as
-            // PointerDragSource.onDragStart would (the controller wires
-            // this internally; here we synthesize the same shape).
             (tabs as any)._tabs[0].value._onDragStart.fire(pointerEvent);
 
-            // _animState must remain null — no cleanup path would clear it.
+            const state = getAnimState(tabs);
+            expect(state).not.toBeNull();
+            expect(state.sourceTabId).toBe('a');
+        });
+
+        test('pointer drag end clears _animState set up by pointer drag', () => {
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
+            tabs.openPanel(createMockPanel('a'), 0);
+            tabs.openPanel(createMockPanel('b'), 1);
+
+            const tabAEl = (tabs as any)._tabs[0].value.element as HTMLElement;
+            const pointerEvent = new PointerEvent('pointerdown', {
+                pointerId: 1,
+                pointerType: 'touch',
+                clientX: 0,
+                clientY: 0,
+            });
+            (tabs as any)._tabs[0].value._onDragStart.fire(pointerEvent);
+            expect(getAnimState(tabs)).not.toBeNull();
+
+            // The Tabs constructor subscribes to onDragEnd; trigger it via a
+            // begin/cancel cycle.
+            const controller = PointerDragController.getInstance();
+            controller.beginDrag({
+                pointerEvent: new PointerEvent('pointerdown', {
+                    pointerId: 1,
+                    pointerType: 'touch',
+                }),
+                source: tabAEl,
+                getData: () => ({ dispose: jest.fn() }),
+            });
+            window.dispatchEvent(
+                new PointerEvent('pointerup', {
+                    pointerId: 1,
+                    pointerType: 'touch',
+                })
+            );
+
             expect(getAnimState(tabs)).toBeNull();
-            expect(tabA.classList.contains('dv-tab--dragging')).toBe(false);
         });
 
         test('HTML5 tab drag in smooth mode DOES initialise _animState (sanity)', () => {

@@ -92,6 +92,38 @@ export interface ViewFactoryData {
 export type DockviewHeaderPosition = 'top' | 'bottom' | 'left' | 'right';
 export type DockviewHeaderDirection = 'horizontal' | 'vertical';
 
+export type DockviewDndStrategy = 'auto' | 'pointer' | 'html5';
+
+export interface DndCapabilities {
+    /** HTML5 drag/drop wiring active (draggable attr, dragstart). */
+    readonly html5: boolean;
+    /** Pointer-event drag source active. */
+    readonly pointer: boolean;
+    /**
+     * When true, the pointer source handles mouse pointers too
+     * (`touchOnly: false`). Implies `pointer` is true.
+     */
+    readonly pointerHandlesMouse: boolean;
+}
+
+export function resolveDndCapabilities(
+    options: Pick<DockviewOptions, 'dndStrategy' | 'disableDnd'>
+): DndCapabilities {
+    if (options.disableDnd) {
+        return { html5: false, pointer: false, pointerHandlesMouse: false };
+    }
+    switch (options.dndStrategy) {
+        case 'pointer':
+            return { html5: false, pointer: true, pointerHandlesMouse: true };
+        case 'html5':
+            return { html5: true, pointer: false, pointerHandlesMouse: false };
+        case 'auto':
+        case undefined:
+        default:
+            return { html5: true, pointer: true, pointerHandlesMouse: false };
+    }
+}
+
 export interface DockviewOptions {
     /**
      * Disable the auto-resizing which is controlled through a `ResizeObserver`.
@@ -118,6 +150,19 @@ export interface DockviewOptions {
      * */
     rootOverlayModel?: DroptargetOverlayModel;
     disableDnd?: boolean;
+    /**
+     * Selects which drag-and-drop implementation is active.
+     *
+     * - `'auto'` (default): HTML5 drag-and-drop drives mouse drags; pointer
+     *   events drive touch and pen drags. Matches the historical behaviour.
+     * - `'pointer'`: pointer events drive every input type. Useful in
+     *   environments where HTML5 drag-and-drop is unreliable (some Linux
+     *   browsers, certain Safari versions, embedded webviews). Cross-window
+     *   HTML5 drag and the HTML5 native drag image are not available in this
+     *   mode.
+     * - `'html5'`: HTML5 drag-and-drop only — disables touch / pen drag.
+     */
+    dndStrategy?: DockviewDndStrategy;
     // #end dnd
     locked?: boolean;
     className?: string;
@@ -235,6 +280,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         rootOverlayModel: undefined,
         locked: undefined,
         disableDnd: undefined,
+        dndStrategy: undefined,
         className: undefined,
         noPanelsOverlay: undefined,
         dndEdges: undefined,

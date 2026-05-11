@@ -11,6 +11,12 @@ import { DockviewApi } from '../../../api/component.api';
 import { PointerDragSource } from '../../../dnd/pointer/pointerDragSource';
 import { LongPressDetector } from '../../../dnd/pointer/longPress';
 import { PointerGhost } from '../../../dnd/pointer/pointerGhost';
+import { DndCapabilities } from '../../options';
+
+export interface TabGroupChipOptions {
+    /** Called on each drag attempt so strategy changes take effect live. */
+    getDndCapabilities?: () => DndCapabilities;
+}
 
 export class TabGroupChip
     extends CompositeDisposable
@@ -18,6 +24,8 @@ export class TabGroupChip
 {
     private readonly _element: HTMLElement;
     private readonly _label: HTMLSpanElement;
+    private readonly _pointerSource: PointerDragSource;
+    private readonly _getCapabilities: () => DndCapabilities;
     private _tabGroup: ITabGroup | undefined;
 
     private readonly _onClick = new Emitter<MouseEvent>();
@@ -34,19 +42,34 @@ export class TabGroupChip
         return this._element;
     }
 
-    constructor(private readonly _palette?: TabGroupColorPalette) {
+    constructor(
+        private readonly _palette?: TabGroupColorPalette,
+        opts?: TabGroupChipOptions
+    ) {
         super();
+
+        this._getCapabilities =
+            opts?.getDndCapabilities ??
+            (() => ({
+                html5: true,
+                pointer: true,
+                pointerHandlesMouse: false,
+            }));
+
+        const initialCaps = this._getCapabilities();
 
         this._element = document.createElement('div');
         this._element.className = 'dv-tab-group-chip';
         this._element.tabIndex = 0;
-        this._element.draggable = true;
+        this._element.draggable = initialCaps.html5;
 
         this._label = document.createElement('span');
         this._label.className = 'dv-tab-group-chip-label';
         this._element.appendChild(this._label);
 
-        const pointerSource = new PointerDragSource(this._element, {
+        this._pointerSource = new PointerDragSource(this._element, {
+            touchOnly: !initialCaps.pointerHandlesMouse,
+            isCancelled: () => !this._getCapabilities().pointer,
             // Transfer payload is populated by the chip drag-start consumer,
             // which has access to the tab group identity.
             getData: () => ({ dispose: () => undefined }),
@@ -69,12 +92,12 @@ export class TabGroupChip
             this._onClick,
             this._onContextMenu,
             this._onDragStart,
-            pointerSource,
+            this._pointerSource,
             new LongPressDetector(this._element, {
                 onLongPress: (event) => {
                     // Don't let a subsequent finger move arm a drag on top
                     // of the just-opened menu.
-                    pointerSource.cancelPending();
+                    this._pointerSource.cancelPending();
                     this._onContextMenu.fire(event);
                 },
             }),
@@ -117,6 +140,13 @@ export class TabGroupChip
         this.updateColor(params.tabGroup.color);
         this.updateLabel(params.tabGroup.label);
         this.updateCollapsed(params.tabGroup.collapsed);
+    }
+
+    updateDragAndDropState(): void {
+        const caps = this._getCapabilities();
+        this._element.draggable = caps.html5;
+        this._pointerSource.setDisabled(!caps.pointer);
+        this._pointerSource.setTouchOnly(!caps.pointerHandlesMouse);
     }
 
     private updateColor(color: string | undefined): void {

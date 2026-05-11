@@ -10,7 +10,7 @@ import {
 } from '../../../lifecycle';
 import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
-import { DockviewHeaderDirection } from '../../options';
+import { DockviewHeaderDirection, resolveDndCapabilities } from '../../options';
 import { Tab } from '../tab/tab';
 import { ITabGroup } from '../../tabGroup';
 import { applyTabGroupAccent } from '../../tabGroupAccent';
@@ -244,6 +244,14 @@ export class TabGroupManager {
         this._pendingTransitionCleanups.delete(panelId);
     }
 
+    updateDragAndDropState(): void {
+        for (const { chip } of this._chipRenderers.values()) {
+            if (chip instanceof TabGroupChip) {
+                chip.updateDragAndDropState();
+            }
+        }
+    }
+
     disposeAll(): void {
         this._indicator?.dispose();
         this._indicator = null;
@@ -297,7 +305,10 @@ export class TabGroupManager {
             this._ctx.accessor.options.createTabGroupChipComponent;
         const chip: ITabGroupChipRenderer = createChip
             ? createChip(tabGroup)
-            : new TabGroupChip(this._ctx.accessor.tabGroupColorPalette);
+            : new TabGroupChip(this._ctx.accessor.tabGroupColorPalette, {
+                  getDndCapabilities: () =>
+                      resolveDndCapabilities(this._ctx.accessor.options),
+              });
 
         chip.init({ tabGroup, api: this._ctx.accessor.api });
 
