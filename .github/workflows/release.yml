@@ -9,7 +9,7 @@ on:
                 type: string
                 default: patch
             dry-run:
-                description: 'Dry run (compute version and commit locally, do not push)'
+                description: 'Dry run (compute version locally, do not commit or tag)'
                 required: false
                 type: boolean
                 default: false
@@ -23,7 +23,7 @@ jobs:
         runs-on: ubuntu-latest
         environment: release
         permissions:
-            contents: read
+            contents: write
         steps:
             - name: Generate App token
               id: app-token
@@ -54,31 +54,95 @@ jobs:
 
             - run: yarn
 
-            - name: Get App user id
-              id: app-user
-              env:
-                  GH_TOKEN: ${{ steps.app-token.outputs.token }}
-                  SLUG: ${{ steps.app-token.outputs.app-slug }}
-              run: |
-                  id=$(gh api "/users/${SLUG}[bot]" --jq .id)
-                  echo "user-id=${id}" >> "$GITHUB_OUTPUT"
+            - name: Capture baseline HEAD
+              id: head
+              run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-            - name: Configure git
-              env:
-                  SLUG: ${{ steps.app-token.outputs.app-slug }}
-                  UID: ${{ steps.app-user.outputs.user-id }}
-              run: |
-                  git config user.name  "${SLUG}[bot]"
-                  git config user.email "${UID}+${SLUG}[bot]@users.noreply.github.com"
-
-            - name: Version
+            - name: Bump version files
               env:
                   SPECIFIER: ${{ inputs.specifier }}
-              run: npx nx release version "$SPECIFIER"
+              run: npx nx release version "$SPECIFIER" --git-commit=false --git-tag=false
 
-            - name: Show release commit
-              run: git --no-pager log -1 --stat
+            - name: Compute new version
+              id: ver
+              run: |
+                  v=$(node -p "require('./packages/dockview-core/package.json').version")
+                  echo "version=${v}" >> "$GITHUB_OUTPUT"
+                  echo "tag=v${v}" >> "$GITHUB_OUTPUT"
 
-            - name: Push commit and tag
+            - name: Show pending changes
+              run: |
+                  git --no-pager diff --stat
+                  echo "---"
+                  git --no-pager diff --name-status
+
+            - name: Create signed release commit on master
               if: ${{ !inputs.dry-run }}
-              run: git push --follow-tags origin master
+              id: commit
+              env:
+                  GH_TOKEN: ${{ steps.app-token.outputs.token }}
+                  EXPECTED_OID: ${{ steps.head.outputs.sha }}
+                  VERSION: ${{ steps.ver.outputs.version }}
+              run: |
+                  set -euo pipefail
+
+                  additions='[]'
+                  while IFS= read -r -d '' path; do
+                      entry=$(jq -nc \
+                          --arg path "$path" \
+                          --arg contents "$(base64 -w0 < "$path")" \
+                          '{path: $path, contents: $contents}')
+                      additions=$(jq -c --argjson e "$entry" '. + [$e]' <<<"$additions")
+                  done < <(git diff --name-only --diff-filter=AM -z HEAD)
+
+                  deletions='[]'
+                  while IFS= read -r -d '' path; do
+                      entry=$(jq -nc --arg path "$path" '{path: $path}')
+                      deletions=$(jq -c --argjson e "$entry" '. + [$e]' <<<"$deletions")
+                  done < <(git diff --name-only --diff-filter=D -z HEAD)
+
+                  input=$(jq -nc \
+                      --arg repo "${GITHUB_REPOSITORY}" \
+                      --arg branch "master" \
+                      --arg headline "chore(release): publish v${VERSION}" \
+                      --arg oid "${EXPECTED_OID}" \
+                      --argjson additions "${additions}" \
+                      --argjson deletions "${deletions}" \
+                      '{
+                          branch: {repositoryNameWithOwner: $repo, branchName: $branch},
+                          message: {headline: $headline},
+                          expectedHeadOid: $oid,
+                          fileChanges: {additions: $additions, deletions: $deletions}
+                      }')
+
+                  resp=$(gh api graphql \
+                      -f query='mutation($input: CreateCommitOnBranchInput!) { createCommitOnBranch(input: $input) { commit { oid url } } }' \
+                      -F input="${input}")
+
+                  new_sha=$(jq -r '.data.createCommitOnBranch.commit.oid' <<<"$resp")
+                  new_url=$(jq -r '.data.createCommitOnBranch.commit.url' <<<"$resp")
+                  echo "sha=${new_sha}" >> "$GITHUB_OUTPUT"
+                  echo "Created signed commit ${new_sha}"
+                  echo "${new_url}"
+
+            - name: Create signed release tag
+              if: ${{ !inputs.dry-run }}
+              env:
+                  GH_TOKEN: ${{ steps.app-token.outputs.token }}
+                  TAG: ${{ steps.ver.outputs.tag }}
+                  COMMIT_SHA: ${{ steps.commit.outputs.sha }}
+              run: |
+                  set -euo pipefail
+
+                  tag_resp=$(gh api -X POST "repos/${GITHUB_REPOSITORY}/git/tags" \
+                      -f tag="${TAG}" \
+                      -f message="${TAG}" \
+                      -f object="${COMMIT_SHA}" \
+                      -f type=commit)
+                  tag_obj_sha=$(jq -r '.sha' <<<"$tag_resp")
+
+                  gh api -X POST "repos/${GITHUB_REPOSITORY}/git/refs" \
+                      -f ref="refs/tags/${TAG}" \
+                      -f sha="${tag_obj_sha}"
+
+                  echo "Created signed annotated tag ${TAG} at ${COMMIT_SHA}"
