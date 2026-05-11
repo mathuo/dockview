@@ -352,6 +352,96 @@ describe('tabs - animation', () => {
             expect(elements[1].style.transform).toBe('');
         });
 
+        test('FLIP transforms survive the dragend that fires immediately after drop', () => {
+            // After a drop, tab.onDrop sets _animState = null then calls
+            // runFlipAnimation (which queues a rAF that triggers the
+            // transition). The browser then fires `dragend` synchronously
+            // on the source element, which bubbles to _tabsList where the
+            // resetDragAnimation listener runs *before* the rAF — if that
+            // listener clears the transforms, FLIP never animates.
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
+            tabs.openPanel(createMockPanel('panel-a'), 0);
+            tabs.openPanel(createMockPanel('panel-b'), 1);
+
+            const elements = getTabElements(tabs);
+            const firstPositions = new Map<string, DOMRect>();
+            firstPositions.set('panel-a', makeDOMRect(0, 0, 80, 30));
+            firstPositions.set('panel-b', makeDOMRect(80, 0, 80, 30));
+            mockTabRect(elements[0], { left: 80, width: 80 });
+            mockTabRect(elements[1], { left: 0, width: 80 });
+
+            // tab.onDrop nulls _animState before invoking runFlipAnimation.
+            (tabs as any)._animState = null;
+            (tabs as any).runFlipAnimation(firstPositions, 'panel-a');
+
+            expect(elements[1].style.transform).toBe('translateX(80px)');
+            expect(
+                elements[1].classList.contains('dv-tab--shifting')
+            ).toBeTruthy();
+
+            // Fire the post-drop dragend — must NOT clobber the FLIP.
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            fireEvent.dragEnd(tabsList);
+
+            expect(elements[1].style.transform).toBe('translateX(80px)');
+            expect(
+                elements[1].classList.contains('dv-tab--shifting')
+            ).toBeTruthy();
+
+            // rAF still runs and clears the transform so the CSS
+            // transition takes over.
+            flushRAF();
+            expect(elements[1].style.transform).toBe('');
+        });
+
+        test('pointer drag end after drop does not clobber in-flight FLIP', () => {
+            // Pointer-side equivalent of the test above. The Tabs
+            // constructor subscribes to PointerDragController.onDragEnd
+            // and calls resetDragAnimation; a successful drop fires
+            // controller.onDragEnd synchronously after tab.onDrop, so
+            // the same race exists on the pointer path.
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
+            tabs.openPanel(createMockPanel('panel-a'), 0);
+            tabs.openPanel(createMockPanel('panel-b'), 1);
+
+            const elements = getTabElements(tabs);
+            const firstPositions = new Map<string, DOMRect>();
+            firstPositions.set('panel-a', makeDOMRect(0, 0, 80, 30));
+            firstPositions.set('panel-b', makeDOMRect(80, 0, 80, 30));
+            mockTabRect(elements[0], { left: 80, width: 80 });
+            mockTabRect(elements[1], { left: 0, width: 80 });
+
+            (tabs as any)._animState = null;
+            (tabs as any).runFlipAnimation(firstPositions, 'panel-a');
+
+            expect(elements[1].style.transform).toBe('translateX(80px)');
+
+            // Trigger PointerDragController.onDragEnd via a begin/cancel.
+            const controller = PointerDragController.getInstance();
+            controller.beginDrag({
+                pointerEvent: new PointerEvent('pointerdown', {
+                    pointerId: 1,
+                    pointerType: 'touch',
+                }),
+                source: elements[0],
+                getData: () => ({ dispose: jest.fn() }),
+            });
+            window.dispatchEvent(
+                new PointerEvent('pointerup', {
+                    pointerId: 1,
+                    pointerType: 'touch',
+                })
+            );
+
+            expect(elements[1].style.transform).toBe('translateX(80px)');
+            expect(
+                elements[1].classList.contains('dv-tab--shifting')
+            ).toBeTruthy();
+
+            flushRAF();
+            expect(elements[1].style.transform).toBe('');
+        });
+
         test('no animation when no tabs moved (drop at original position)', () => {
             const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');

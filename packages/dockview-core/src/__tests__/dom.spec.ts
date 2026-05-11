@@ -80,4 +80,27 @@ describe('dom', () => {
         expect(el3.style.pointerEvents).toBe('inherit');
         expect(el4.style.pointerEvents).toBe('');
     });
+
+    test('disableIframePointEvents respects the rootNode parameter', () => {
+        // Iframes in a popout document must be shieldable independently
+        // of the main document. The rootNode parameter previously was
+        // ignored — the function always walked the main document.
+        const main = document.createElement('iframe');
+        document.body.appendChild(main);
+
+        // Simulate a popout window via a detached document.
+        const popoutDoc = document.implementation.createHTMLDocument('popout');
+        const popoutIframe = popoutDoc.createElement('iframe');
+        popoutDoc.body.appendChild(popoutIframe);
+
+        const f = disableIframePointEvents(popoutDoc);
+
+        expect(popoutIframe.style.pointerEvents).toBe('none');
+        // Main document's iframe must NOT have been shielded — the caller
+        // asked to shield only the popout.
+        expect(main.style.pointerEvents).toBe('');
+
+        f.release();
+        expect(popoutIframe.style.pointerEvents).toBe('');
+    });
 });

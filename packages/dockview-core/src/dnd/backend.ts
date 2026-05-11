@@ -109,8 +109,12 @@ class Html5DragSource extends CompositeDisposable implements IDragSource {
                 }
 
                 // Iframes capture pointermove once the cursor enters them,
-                // which freezes drag tracking from the parent window's POV.
-                const iframes = disableIframePointEvents();
+                // which freezes drag tracking from the parent window's
+                // POV. Shield the source's owning document so popout-window
+                // drags shield the popout, not the main window.
+                const iframes = disableIframePointEvents(
+                    this.el.ownerDocument ?? document
+                );
                 this._pointerEventsDisposable.value = {
                     dispose: () => iframes.release(),
                 };

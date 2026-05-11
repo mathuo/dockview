@@ -217,6 +217,112 @@ describe('dockviewComponent', () => {
             });
         });
 
+        test('dndStrategy switches `draggable` on existing tabs / void containers', () => {
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                // Implicit default: dndStrategy = 'auto'
+            });
+
+            dockview.addPanel({ id: 'panel1', component: 'default' });
+            dockview.addPanel({ id: 'panel2', component: 'default' });
+
+            const tabs = () =>
+                Array.from(
+                    dockview.element.querySelectorAll('.dv-tab')
+                ) as HTMLElement[];
+            const voids = () =>
+                Array.from(
+                    dockview.element.querySelectorAll('.dv-void-container')
+                ) as HTMLElement[];
+
+            // auto: HTML5 active → draggable=true everywhere
+            tabs().forEach((t) => expect(t.draggable).toBe(true));
+            voids().forEach((v) => expect(v.draggable).toBe(true));
+
+            // 'pointer': HTML5 off → draggable=false
+            dockview.updateOptions({ dndStrategy: 'pointer' });
+            tabs().forEach((t) => expect(t.draggable).toBe(false));
+            voids().forEach((v) => expect(v.draggable).toBe(false));
+
+            // 'html5': HTML5 back on
+            dockview.updateOptions({ dndStrategy: 'html5' });
+            tabs().forEach((t) => expect(t.draggable).toBe(true));
+            voids().forEach((v) => expect(v.draggable).toBe(true));
+
+            // back to 'auto' for completeness
+            dockview.updateOptions({ dndStrategy: 'auto' });
+            tabs().forEach((t) => expect(t.draggable).toBe(true));
+            voids().forEach((v) => expect(v.draggable).toBe(true));
+        });
+
+        test('dndStrategy applies to tabs added after the option change', () => {
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.updateOptions({ dndStrategy: 'pointer' });
+
+            dockview.addPanel({ id: 'panel1', component: 'default' });
+
+            const tab = dockview.element.querySelector(
+                '.dv-tab'
+            ) as HTMLElement;
+            const voidContainer = dockview.element.querySelector(
+                '.dv-void-container'
+            ) as HTMLElement;
+
+            // 'pointer' strategy disables HTML5 path: draggable should be false
+            // even though disableDnd is not set.
+            expect(tab.draggable).toBe(false);
+            expect(voidContainer.draggable).toBe(false);
+        });
+
+        test('disableDnd overrides dndStrategy', () => {
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                dndStrategy: 'html5',
+                disableDnd: true,
+            });
+
+            dockview.addPanel({ id: 'panel1', component: 'default' });
+
+            const tab = dockview.element.querySelector(
+                '.dv-tab'
+            ) as HTMLElement;
+            // disableDnd: true wins regardless of strategy.
+            expect(tab.draggable).toBe(false);
+        });
+
         test('that new tabs respect current disableDnd option when added after option change', () => {
             dockview = new DockviewComponent(container, {
                 createComponent(options) {

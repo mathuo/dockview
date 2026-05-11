@@ -1832,27 +1832,33 @@ export class Tabs extends CompositeDisposable {
 
     private resetDragAnimation(): void {
         this._pendingCollapse = false;
-        this.resetTabTransforms();
 
-        // Clear drag-collapse classes instantly (no transition)
-        if (this._animState?.sourceTabGroupId) {
-            this._clearGroupDragClasses(this._animState.sourceTabGroupId);
-        } else {
-            this._removeClassInstantlyBatch(
-                this._tabs.map((t) => t.value.element),
-                'dv-tab--dragging'
-            );
+        // After a drop, `tab.onDrop` consumes _animState (sets it to null)
+        // and immediately calls `runFlipAnimation`, which sets transforms
+        // and queues an rAF to trigger the CSS transition. dragend fires
+        // synchronously on the source element BEFORE that rAF runs — if
+        // we cleared transforms here we'd clobber the in-flight FLIP, so
+        // gate the cleanup on _animState still being set (i.e. drag was
+        // cancelled rather than dropped).
+        if (this._animState) {
+            this.resetTabTransforms();
+            if (this._animState.sourceTabGroupId) {
+                this._clearGroupDragClasses(this._animState.sourceTabGroupId);
+            } else {
+                this._removeClassInstantlyBatch(
+                    this._tabs.map((t) => t.value.element),
+                    'dv-tab--dragging'
+                );
+            }
+            this._animState = null;
+            // Restore any hidden underlines from group drags.
+            for (const [, el] of this._tabGroupManager.groupUnderlines) {
+                el.style.removeProperty('display');
+            }
         }
-
-        this._animState = null;
 
         this._chipDragCleanup?.dispose();
         this._chipDragCleanup = null;
-
-        // Restore any hidden underlines from group drags
-        for (const [, el] of this._tabGroupManager.groupUnderlines) {
-            el.style.removeProperty('display');
-        }
     }
 
     private runFlipAnimation(
