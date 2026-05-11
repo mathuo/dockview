@@ -54,10 +54,22 @@ jobs:
 
             - run: yarn
 
-            - name: Configure git
+            - name: Get App user id
+              id: app-user
+              env:
+                  GH_TOKEN: ${{ steps.app-token.outputs.token }}
               run: |
-                  git config user.name "github-actions[bot]"
-                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  slug="${{ steps.app-token.outputs.app-slug }}"
+                  id=$(gh api "/users/${slug}[bot]" --jq .id)
+                  echo "user-id=${id}" >> "$GITHUB_OUTPUT"
+
+            - name: Configure git
+              env:
+                  SLUG: ${{ steps.app-token.outputs.app-slug }}
+                  UID: ${{ steps.app-user.outputs.user-id }}
+              run: |
+                  git config user.name  "${SLUG}[bot]"
+                  git config user.email "${UID}+${SLUG}[bot]@users.noreply.github.com"
 
             - name: Version
               run: npx nx release version ${{ inputs.specifier }}
