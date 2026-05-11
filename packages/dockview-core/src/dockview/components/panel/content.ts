@@ -12,7 +12,7 @@ import {
     IDropTarget,
     Position,
 } from '../../../dnd/droptarget';
-import { PointerDropTarget } from '../../../dnd/pointer/pointerDropTarget';
+import { pointerBackend } from '../../../dnd/backend';
 import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
 import { getPanelData } from '../../../dnd/dataTransfer';
 
@@ -97,6 +97,9 @@ export class ContentContainer
             return this.group.canDisplayOverlay(event, position, 'content');
         };
 
+        // `dropTarget` stays the concrete `Droptarget` (not via the backend
+        // factory) because overlayRenderContainer forwards HTML5 drag events
+        // through `dropTarget.dnd` — that field is not part of `IDropTarget`.
         this.dropTarget = new Droptarget(this.element, {
             getOverlayOutline: () => {
                 return accessor.options.theme?.dndPanelOverlay === 'group'
@@ -109,7 +112,7 @@ export class ContentContainer
             getOverrideTarget: target ? () => target.model : undefined,
         });
 
-        this.pointerDropTarget = new PointerDropTarget(this.element, {
+        this.pointerDropTarget = pointerBackend.createDropTarget(this.element, {
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
             canDisplayOverlay,
             getOverlayOutline: () => {

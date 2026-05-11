@@ -11,14 +11,13 @@ import { ITabRenderer } from '../../types';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import {
     DroptargetEvent,
-    Droptarget,
     IDropTarget,
     Position,
     WillShowOverlayEvent,
 } from '../../../dnd/droptarget';
+import { html5Backend, pointerBackend } from '../../../dnd/backend';
 import { DragHandler } from '../../../dnd/abstractDragHandler';
 import { PointerDragSource } from '../../../dnd/pointer/pointerDragSource';
-import { PointerDropTarget } from '../../../dnd/pointer/pointerDropTarget';
 import { LongPressDetector } from '../../../dnd/pointer/longPress';
 import { PointerGhost } from '../../../dnd/pointer/pointerGhost';
 import { IDockviewPanel } from '../../dockviewPanel';
@@ -134,19 +133,23 @@ export class Tab extends CompositeDisposable {
             return this.group.model.canDisplayOverlay(event, position, 'tab');
         };
 
-        this.dropTarget = new Droptarget(this._element, {
+        this.dropTarget = html5Backend.createDropTarget(this._element, {
             acceptedTargetZones: ['left', 'right'],
             overlayModel: this._buildOverlayModel(),
             canDisplayOverlay,
             getOverrideTarget: () => group.model.dropTargetContainer?.model,
         });
 
-        this.pointerDropTarget = new PointerDropTarget(this._element, {
-            acceptedTargetZones: ['left', 'right'],
-            overlayModel: this._buildOverlayModel(),
-            canDisplayOverlay,
-            getOverrideTarget: () => group.model.dropTargetContainer?.model,
-        });
+        this.pointerDropTarget = pointerBackend.createDropTarget(
+            this._element,
+            {
+                acceptedTargetZones: ['left', 'right'],
+                overlayModel: this._buildOverlayModel(),
+                canDisplayOverlay,
+                getOverrideTarget: () =>
+                    group.model.dropTargetContainer?.model,
+            }
+        );
 
         this.pointerDragSource = new PointerDragSource(this._element, {
             isCancelled: () =>

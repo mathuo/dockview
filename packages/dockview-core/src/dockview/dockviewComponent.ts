@@ -7,12 +7,11 @@ import {
 } from '../gridview/gridview';
 import {
     directionToPosition,
-    Droptarget,
     DroptargetOverlayModel,
     IDropTarget,
     Position,
 } from '../dnd/droptarget';
-import { PointerDropTarget } from '../dnd/pointer/pointerDropTarget';
+import { html5Backend, pointerBackend } from '../dnd/backend';
 import { tail, sequenceEquals, remove } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
 import { CompositeDisposable, Disposable, IDisposable } from '../lifecycle';
@@ -616,7 +615,7 @@ export class DockviewComponent
             return firedEvent.isAccepted;
         };
 
-        this._rootDropTarget = new Droptarget(this.element, {
+        this._rootDropTarget = html5Backend.createDropTarget(this.element, {
             className: 'dv-drop-target-edge',
             canDisplayOverlay: rootCanDisplayOverlay,
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
@@ -625,7 +624,7 @@ export class DockviewComponent
             getOverrideTarget: () => this.rootDropTargetContainer?.model,
         });
 
-        this._rootPointerDropTarget = new PointerDropTarget(this.element, {
+        this._rootPointerDropTarget = pointerBackend.createDropTarget(this.element, {
             className: 'dv-drop-target-edge',
             canDisplayOverlay: rootCanDisplayOverlay,
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],

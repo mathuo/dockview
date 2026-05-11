@@ -4,15 +4,14 @@ import {
     PanelTransfer,
 } from '../../../dnd/dataTransfer';
 import {
-    Droptarget,
     DroptargetEvent,
     IDropTarget,
     Position,
     WillShowOverlayEvent,
 } from '../../../dnd/droptarget';
+import { html5Backend, pointerBackend } from '../../../dnd/backend';
 import { GroupDragHandler } from '../../../dnd/groupDragHandler';
 import { PointerDragSource } from '../../../dnd/pointer/pointerDragSource';
-import { PointerDropTarget } from '../../../dnd/pointer/pointerDropTarget';
 import { PointerGhost } from '../../../dnd/pointer/pointerGhost';
 import { DockviewComponent } from '../../dockviewComponent';
 import { addDisposableListener, Emitter, Event } from '../../../events';
@@ -90,17 +89,21 @@ export class VoidContainer extends CompositeDisposable {
             );
         };
 
-        this.dropTarget = new Droptarget(this._element, {
+        this.dropTarget = html5Backend.createDropTarget(this._element, {
             acceptedTargetZones: ['center'],
             canDisplayOverlay,
             getOverrideTarget: () => group.model.dropTargetContainer?.model,
         });
 
-        this.pointerDropTarget = new PointerDropTarget(this._element, {
-            acceptedTargetZones: ['center'],
-            canDisplayOverlay,
-            getOverrideTarget: () => group.model.dropTargetContainer?.model,
-        });
+        this.pointerDropTarget = pointerBackend.createDropTarget(
+            this._element,
+            {
+                acceptedTargetZones: ['center'],
+                canDisplayOverlay,
+                getOverrideTarget: () =>
+                    group.model.dropTargetContainer?.model,
+            }
+        );
 
         this.pointerDragSource = new PointerDragSource(this._element, {
             touchOnly: !caps.pointerHandlesMouse,
