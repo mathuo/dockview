@@ -6,6 +6,7 @@ import {
 import {
     Droptarget,
     DroptargetEvent,
+    IDropTarget,
     Position,
     WillShowOverlayEvent,
 } from '../../../dnd/droptarget';
@@ -23,8 +24,8 @@ import { resolveDndCapabilities } from '../../options';
 
 export class VoidContainer extends CompositeDisposable {
     private readonly _element: HTMLElement;
-    private readonly dropTarget: Droptarget;
-    private readonly pointerDropTarget: PointerDropTarget;
+    private readonly dropTarget: IDropTarget;
+    private readonly pointerDropTarget: IDropTarget;
     private readonly handler: GroupDragHandler;
     private readonly pointerDragSource: PointerDragSource;
     private readonly panelTransfer =

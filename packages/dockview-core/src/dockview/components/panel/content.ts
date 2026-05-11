@@ -7,14 +7,21 @@ import { Emitter, Event } from '../../../events';
 import { trackFocus } from '../../../dom';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
-import { Droptarget, Position } from '../../../dnd/droptarget';
+import {
+    Droptarget,
+    IDropTarget,
+    Position,
+} from '../../../dnd/droptarget';
 import { PointerDropTarget } from '../../../dnd/pointer/pointerDropTarget';
 import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
 import { getPanelData } from '../../../dnd/dataTransfer';
 
 export interface IContentContainer extends IDisposable {
+    // `Droptarget` here (not `IDropTarget`) because overlayRenderContainer
+    // forwards HTML5 drag events through `dropTarget.dnd` (the inner
+    // DragAndDropObserver), which has no pointer-backend equivalent.
     readonly dropTarget: Droptarget;
-    readonly pointerDropTarget: PointerDropTarget;
+    readonly pointerDropTarget: IDropTarget;
     onDidFocus: Event<void>;
     onDidBlur: Event<void>;
     element: HTMLElement;
@@ -47,7 +54,7 @@ export class ContentContainer
     }
 
     readonly dropTarget: Droptarget;
-    readonly pointerDropTarget: PointerDropTarget;
+    readonly pointerDropTarget: IDropTarget;
 
     constructor(
         private readonly accessor: DockviewComponent,

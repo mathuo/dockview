@@ -12,6 +12,7 @@ import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import {
     DroptargetEvent,
     Droptarget,
+    IDropTarget,
     Position,
     WillShowOverlayEvent,
 } from '../../../dnd/droptarget';
@@ -57,8 +58,8 @@ class TabDragHandler extends DragHandler {
 
 export class Tab extends CompositeDisposable {
     private readonly _element: HTMLElement;
-    private readonly dropTarget: Droptarget;
-    private readonly pointerDropTarget: PointerDropTarget;
+    private readonly dropTarget: IDropTarget;
+    private readonly pointerDropTarget: IDropTarget;
     private content: ITabRenderer | undefined = undefined;
     private readonly dragHandler: TabDragHandler;
     private readonly pointerDragSource: PointerDragSource;

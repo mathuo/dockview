@@ -12,6 +12,7 @@ import {
     DropTargetTargetModel,
     DroptargetEvent,
     DroptargetOverlayModel,
+    IDropTarget,
     MeasuredValue,
     Position,
     WillShowOverlayEvent,
@@ -36,7 +37,10 @@ export interface PointerDropTargetOptions {
 }
 
 /** Pointer-driven counterpart to `Droptarget` with identical visual output. */
-export class PointerDropTarget extends CompositeDisposable {
+export class PointerDropTarget
+    extends CompositeDisposable
+    implements IDropTarget
+{
     private _targetElement: HTMLElement | undefined;
     private _overlayElement: HTMLElement | undefined;
     private _state: Position | undefined;

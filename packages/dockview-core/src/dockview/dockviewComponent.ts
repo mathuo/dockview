@@ -9,6 +9,7 @@ import {
     directionToPosition,
     Droptarget,
     DroptargetOverlayModel,
+    IDropTarget,
     Position,
 } from '../dnd/droptarget';
 import { PointerDropTarget } from '../dnd/pointer/pointerDropTarget';
@@ -443,8 +444,8 @@ export class DockviewComponent
         referenceGroup?: string;
         disposable: { dispose: () => DockviewGroupPanel | undefined };
     }[] = [];
-    private readonly _rootDropTarget: Droptarget;
-    private readonly _rootPointerDropTarget: PointerDropTarget;
+    private readonly _rootDropTarget: IDropTarget;
+    private readonly _rootPointerDropTarget: IDropTarget;
     private _popoutRestorationPromise: Promise<void> = Promise.resolve();
 
     private readonly _onDidRemoveGroup = new Emitter<DockviewGroupPanel>();

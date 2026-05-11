@@ -1,5 +1,5 @@
 import { DockviewEvent, Emitter, Event } from '../events';
-import { CompositeDisposable } from '../lifecycle';
+import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { DragAndDropObserver } from './dnd';
 import { Direction } from '../gridview/baseComponentGridview';
 import {
@@ -123,7 +123,21 @@ export interface DroptargetOptions {
     getOverlayOutline?: () => HTMLElement | null;
 }
 
-export class Droptarget extends CompositeDisposable {
+/**
+ * Backend-agnostic drop target. Both the HTML5 `Droptarget` and the pointer
+ * `PointerDropTarget` implement this shape so consumers can hold one field
+ * regardless of which DnD backend produced it.
+ */
+export interface IDropTarget extends IDisposable {
+    readonly onDrop: Event<DroptargetEvent>;
+    readonly onWillShowOverlay: Event<WillShowOverlayEvent>;
+    readonly state: Position | undefined;
+    disabled: boolean;
+    setTargetZones(zones: Position[]): void;
+    setOverlayModel(model: DroptargetOverlayModel): void;
+}
+
+export class Droptarget extends CompositeDisposable implements IDropTarget {
     private targetElement: HTMLElement | undefined;
     private overlayElement: HTMLElement | undefined;
     private _state: Position | undefined;
