@@ -109,8 +109,7 @@ export class VoidContainer extends CompositeDisposable {
             {
                 acceptedTargetZones: ['center'],
                 canDisplayOverlay,
-                getOverrideTarget: () =>
-                    group.model.dropTargetContainer?.model,
+                getOverrideTarget: () => group.model.dropTargetContainer?.model,
             }
         );
 

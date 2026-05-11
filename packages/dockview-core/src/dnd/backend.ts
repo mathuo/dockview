@@ -51,7 +51,9 @@ export interface DragSourceOptions {
     getData: (event: DragEvent | PointerEvent) => IDisposable;
     /** Veto a drag at start time. */
     isCancelled?: (event: DragEvent | PointerEvent) => boolean;
-    createGhost?: (event: DragEvent | PointerEvent) => IDragGhostSpec | undefined;
+    createGhost?: (
+        event: DragEvent | PointerEvent
+    ) => IDragGhostSpec | undefined;
     onDragStart?: (event: DragEvent | PointerEvent) => void;
     onDragEnd?: (event: DragEvent | PointerEvent) => void;
     /** Initial disabled state; toggle later via `setDisabled`. */

@@ -53,7 +53,11 @@ export class PointerDragController extends CompositeDisposable {
 
     private constructor() {
         super();
-        this.addDisposables(this._onDragStart, this._onDragMove, this._onDragEnd);
+        this.addDisposables(
+            this._onDragStart,
+            this._onDragMove,
+            this._onDragEnd
+        );
     }
 
     get active(): ActiveDrag | undefined {

@@ -7,11 +7,7 @@ import { Emitter, Event } from '../../../events';
 import { trackFocus } from '../../../dom';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
-import {
-    Droptarget,
-    IDropTarget,
-    Position,
-} from '../../../dnd/droptarget';
+import { Droptarget, IDropTarget, Position } from '../../../dnd/droptarget';
 import { pointerBackend } from '../../../dnd/backend';
 import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
 import { getPanelData } from '../../../dnd/dataTransfer';

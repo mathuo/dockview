@@ -624,14 +624,23 @@ export class DockviewComponent
             getOverrideTarget: () => this.rootDropTargetContainer?.model,
         });
 
-        this._rootPointerDropTarget = pointerBackend.createDropTarget(this.element, {
-            className: 'dv-drop-target-edge',
-            canDisplayOverlay: rootCanDisplayOverlay,
-            acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
-            overlayModel:
-                options.rootOverlayModel ?? DEFAULT_ROOT_OVERLAY_MODEL,
-            getOverrideTarget: () => this.rootDropTargetContainer?.model,
-        });
+        this._rootPointerDropTarget = pointerBackend.createDropTarget(
+            this.element,
+            {
+                className: 'dv-drop-target-edge',
+                canDisplayOverlay: rootCanDisplayOverlay,
+                acceptedTargetZones: [
+                    'top',
+                    'bottom',
+                    'left',
+                    'right',
+                    'center',
+                ],
+                overlayModel:
+                    options.rootOverlayModel ?? DEFAULT_ROOT_OVERLAY_MODEL,
+                getOverrideTarget: () => this.rootDropTargetContainer?.model,
+            }
+        );
 
         this.updateDropTargetModel(options);
 

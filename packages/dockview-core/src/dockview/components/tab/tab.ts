@@ -23,10 +23,7 @@ import {
 } from '../../../dnd/backend';
 import { LongPressDetector } from '../../../dnd/pointer/longPress';
 import { IDockviewPanel } from '../../dockviewPanel';
-import {
-    DockviewHeaderDirection,
-    resolveDndCapabilities,
-} from '../../options';
+import { DockviewHeaderDirection, resolveDndCapabilities } from '../../options';
 
 export class Tab extends CompositeDisposable {
     private readonly _element: HTMLElement;
@@ -111,8 +108,7 @@ export class Tab extends CompositeDisposable {
                 acceptedTargetZones: ['left', 'right'],
                 overlayModel: this._buildOverlayModel(),
                 canDisplayOverlay,
-                getOverrideTarget: () =>
-                    group.model.dropTargetContainer?.model,
+                getOverrideTarget: () => group.model.dropTargetContainer?.model,
             }
         );
 

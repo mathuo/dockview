@@ -441,8 +441,7 @@ export class TabGroupManager {
                 disabled: !caps.pointer,
                 touchOnly: !caps.pointerHandlesMouse,
                 isCancelled: () =>
-                    !resolveDndCapabilities(this._ctx.accessor.options)
-                        .pointer,
+                    !resolveDndCapabilities(this._ctx.accessor.options).pointer,
                 createGhost: () => ({
                     element: this._buildChipGhostElement(chip.element),
                     offsetX: 8,
@@ -487,7 +486,11 @@ export class TabGroupManager {
                 new LongPressDetector(chip.element, {
                     onLongPress: onContextMenu,
                 }),
-                addDisposableListener(chip.element, 'contextmenu', onContextMenu)
+                addDisposableListener(
+                    chip.element,
+                    'contextmenu',
+                    onContextMenu
+                )
             );
         }
 

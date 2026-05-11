@@ -1119,8 +1119,7 @@ export class Tabs extends CompositeDisposable {
                         .getTabGroups()
                         .find((tg) => tg.id === data.tabGroupId);
                     const panelCount = sourceTg?.panelIds.length ?? 1;
-                    const groupGapWidth =
-                        avgWidth * panelCount + avgWidth;
+                    const groupGapWidth = avgWidth * panelCount + avgWidth;
                     this._animState = {
                         sourceTabId: '',
                         sourceIndex: -1,

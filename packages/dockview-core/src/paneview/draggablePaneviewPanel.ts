@@ -10,11 +10,7 @@ import {
     LocalSelectionTransfer,
     PaneTransfer,
 } from '../dnd/dataTransfer';
-import {
-    DroptargetEvent,
-    IDropTarget,
-    Position,
-} from '../dnd/droptarget';
+import { DroptargetEvent, IDropTarget, Position } from '../dnd/droptarget';
 import { Emitter, Event } from '../events';
 import { Orientation } from '../splitview/splitview';
 import {
