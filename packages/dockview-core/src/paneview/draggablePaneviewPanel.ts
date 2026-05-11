@@ -1,15 +1,21 @@
 import { PaneviewApi } from '../api/component.api';
-import { DragHandler } from '../dnd/abstractDragHandler';
+import {
+    DragSourceOptions,
+    html5Backend,
+    IDragSource,
+    pointerBackend,
+} from '../dnd/backend';
 import {
     getPaneData,
     LocalSelectionTransfer,
     PaneTransfer,
 } from '../dnd/dataTransfer';
-import { Droptarget, DroptargetEvent, Position } from '../dnd/droptarget';
-import { PointerDragSource } from '../dnd/pointer/pointerDragSource';
-import { PointerDropTarget } from '../dnd/pointer/pointerDropTarget';
+import {
+    DroptargetEvent,
+    IDropTarget,
+    Position,
+} from '../dnd/droptarget';
 import { Emitter, Event } from '../events';
-import { IDisposable } from '../lifecycle';
 import { Orientation } from '../splitview/splitview';
 import {
     PaneviewDndOverlayEvent,
@@ -29,10 +35,10 @@ export interface PaneviewDidDropEvent extends DroptargetEvent {
 }
 
 export abstract class DraggablePaneviewPanel extends PaneviewPanel {
-    private handler: DragHandler | undefined;
-    private pointerSource: PointerDragSource | undefined;
-    private target: Droptarget | undefined;
-    private pointerTarget: PointerDropTarget | undefined;
+    private html5DragSource: IDragSource | undefined;
+    private pointerDragSource: IDragSource | undefined;
+    private target: IDropTarget | undefined;
+    private pointerTarget: IDropTarget | undefined;
 
     private readonly _onDidDrop = new Emitter<PaneviewDidDropEvent>();
     readonly onDidDrop = this._onDidDrop.event;
@@ -86,24 +92,7 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
         const accessorId = this.accessor.id;
         this.header.draggable = true;
 
-        this.handler = new (class PaneDragHandler extends DragHandler {
-            getData(): IDisposable {
-                LocalSelectionTransfer.getInstance().setData(
-                    [new PaneTransfer(accessorId, id)],
-                    PaneTransfer.prototype
-                );
-
-                return {
-                    dispose: () => {
-                        LocalSelectionTransfer.getInstance().clearData(
-                            PaneTransfer.prototype
-                        );
-                    },
-                };
-            }
-        })(this.header);
-
-        this.pointerSource = new PointerDragSource(this.header, {
+        const sharedDragOptions: DragSourceOptions = {
             getData: () => {
                 LocalSelectionTransfer.getInstance().setData(
                     [new PaneTransfer(accessorId, id)],
@@ -117,7 +106,16 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
                     },
                 };
             },
-        });
+        };
+
+        this.html5DragSource = html5Backend.createDragSource(
+            this.header,
+            sharedDragOptions
+        );
+        this.pointerDragSource = pointerBackend.createDragSource(
+            this.header,
+            sharedDragOptions
+        );
 
         const canDisplayOverlay = (
             event: DragEvent | PointerEvent,
@@ -146,26 +144,27 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
             return firedEvent.isAccepted;
         };
 
-        this.target = new Droptarget(this.element, {
-            acceptedTargetZones: ['top', 'bottom'],
+        const dropTargetOptions = {
+            acceptedTargetZones: ['top', 'bottom'] as Position[],
             overlayModel: {
-                activationSize: { type: 'percentage', value: 50 },
+                activationSize: { type: 'percentage' as const, value: 50 },
             },
             canDisplayOverlay,
-        });
+        };
 
-        this.pointerTarget = new PointerDropTarget(this.element, {
-            acceptedTargetZones: ['top', 'bottom'],
-            overlayModel: {
-                activationSize: { type: 'percentage', value: 50 },
-            },
-            canDisplayOverlay,
-        });
+        this.target = html5Backend.createDropTarget(
+            this.element,
+            dropTargetOptions
+        );
+        this.pointerTarget = pointerBackend.createDropTarget(
+            this.element,
+            dropTargetOptions
+        );
 
         this.addDisposables(
             this._onDidDrop,
-            this.handler,
-            this.pointerSource,
+            this.html5DragSource,
+            this.pointerDragSource,
             this.target,
             this.pointerTarget,
             this.target.onDrop((event) => {
