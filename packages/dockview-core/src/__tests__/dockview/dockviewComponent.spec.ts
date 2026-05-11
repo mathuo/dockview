@@ -1575,9 +1575,15 @@ describe('dockviewComponent', () => {
     // group becomes empty, so `_positionChipForGroup` removes it).
     // `dragend` therefore can't bubble to `_tabsList`, which historically
     // left the `panelTransfer` singleton populated with the chip drag's
-    // payload (including `tabGroupId`). Fix wires a `dragend` listener
-    // directly on the chip element so cleanup runs regardless of
-    // attachment.
+    // payload (including `tabGroupId`).
+    //
+    // In the current architecture this is also our smoke test for the
+    // manager-owned chip-drag wiring: the `TabGroupManager`'s
+    // `html5Backend.createDragSource(chip.element, ...)` `getData`
+    // callback is what sets `panelTransfer` on chip dragstart, and the
+    // synchronous-clear `dragend` listener attached directly to the chip
+    // element (`tabGroups.ts:syncClearOnDragEnd`) is what clears it for
+    // the detach-then-dragend path exercised below.
     test('cross-group chip drag clears panelTransfer when the chip detaches (#1254)', async () => {
         const container = document.createElement('div');
 

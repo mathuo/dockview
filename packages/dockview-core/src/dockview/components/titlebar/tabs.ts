@@ -76,7 +76,6 @@ export class Tabs extends CompositeDisposable {
     private _voidContainer: HTMLElement | null = null;
     private _voidContainerListeners: IDisposable | null = null;
     private _extendedDropZone: HTMLElement | null = null;
-    private _chipDragCleanup: IDisposable | null = null;
     private _pointerInsideTabsList = false;
 
     private readonly _tabGroupManager: TabGroupManager;
@@ -264,6 +263,16 @@ export class Tabs extends CompositeDisposable {
                 onChipDragStart: (tabGroup, chip, event) => {
                     this._handleChipDragStart(tabGroup, chip, event);
                 },
+                onChipDragEnd: () => {
+                    // HTML5 chip dragend (incl. cancels). The Html5DragSource
+                    // owns the listener on the chip element, so this fires
+                    // even if the chip was detached cross-group — the
+                    // element keeps its listeners until the source is
+                    // disposed. resetDragAnimation is a no-op after a
+                    // successful drop (anim state already null) thanks to
+                    // the gating inside it.
+                    this.resetDragAnimation();
+                },
             }
         );
 
@@ -278,14 +287,11 @@ export class Tabs extends CompositeDisposable {
                     this._flipTransitionCleanup?.();
                 },
             },
-            // Touch chip drags have no HTML5 dragend; clean up here so a
-            // pointerup-over-empty-space cancel doesn't leak the transfer
-            // payload + iframe shield until the next drop. Also tear down
-            // any smooth-reorder anim state that the pointer dragover bridge
-            // installed but the drop path did not consume.
+            // Pointer-side cleanup: when any pointer drag ends, tear
+            // down smooth-reorder anim state the dragover bridge may
+            // have installed. The chip's pointer drag source handles
+            // its own transfer payload + iframe-shield cleanup.
             PointerDragController.getInstance().onDragEnd(() => {
-                this._chipDragCleanup?.dispose();
-                this._chipDragCleanup = null;
                 this._pointerInsideTabsList = false;
                 this.resetDragAnimation();
             }),
@@ -867,14 +873,18 @@ export class Tabs extends CompositeDisposable {
         this._tabGroupManager.refreshAccents();
     }
 
+    /**
+     * Tabs-list-specific side effects of a chip drag start. The chip's
+     * drag sources (constructed by `TabGroupManager`) own the transfer
+     * payload, iframe shielding, dataTransfer setup, and the HTML5 drag
+     * image. This method just sets up the smooth-reorder anim state and
+     * collapses the source-group tabs in the tabs list.
+     */
     private _handleChipDragStart(
         tabGroup: ITabGroup,
         chip: ITabGroupChipRenderer,
         event: DragEvent | PointerEvent
     ): void {
-        const isPointer =
-            typeof PointerEvent !== 'undefined' &&
-            event instanceof PointerEvent;
         const firstPanelId = tabGroup.panelIds[0];
         const firstIdx = firstPanelId
             ? this._tabs.findIndex((t) => t.value.panel.id === firstPanelId)
@@ -906,133 +916,61 @@ export class Tabs extends CompositeDisposable {
             containerLeft: this._tabsList.getBoundingClientRect().left,
         };
 
-        // Set LocalSelectionTransfer so drop targets recognise this as
-        // an internal dockview drag.  panelId is null (group-level),
-        // tabGroupId identifies which tab group is being dragged.
-        const panelTransfer =
-            LocalSelectionTransfer.getInstance<PanelTransfer>();
-        panelTransfer.setData(
-            [
-                new PanelTransfer(
-                    this.accessor.id,
-                    this.group.id,
-                    null,
-                    tabGroup.id
-                ),
-            ],
-            PanelTransfer.prototype
-        );
-
-        // The pointer path's controller already shields iframes; double-
-        // shielding here would break the release-restore order. Use the
-        // chip's ownerDocument so popout HTML5 drags shield the right doc.
-        const iframes = isPointer
-            ? null
-            : disableIframePointEvents(chip.element.ownerDocument ?? document);
-
-        // The dragend listener on `_tabsList` is unreachable for chip
-        // drags because cross-group drops detach the chip from the DOM
-        // before dragend fires (the source tab group becomes empty, so
-        // `_positionChipForGroup` removes the chip element). Without
-        // bubbling, the tabsList listener never runs and `_animState`,
-        // `_chipDragCleanup`, and the dragging CSS classes leak. Listen
-        // directly on the chip element so cleanup happens regardless of
-        // whether it's still attached.  (Issue #1254.) Pointer chip drags
-        // are torn down by the PointerDragController.onDragEnd subscription
-        // in the constructor.
-        const chipElement = chip.element;
-        const onChipDragEnd = () => {
-            chipElement.removeEventListener('dragend', onChipDragEnd);
-            this.resetDragAnimation();
-        };
-        if (!isPointer) {
-            chipElement.addEventListener('dragend', onChipDragEnd);
+        if (this.accessor.options.theme?.tabAnimation !== 'smooth') {
+            return;
         }
 
-        this._chipDragCleanup = {
-            dispose: () => {
-                chipElement.removeEventListener('dragend', onChipDragEnd);
-                panelTransfer.clearData(PanelTransfer.prototype);
-                iframes?.release();
-            },
-        };
-
-        if (!isPointer) {
-            const dragEvent = event as DragEvent;
-            if (dragEvent.dataTransfer) {
-                dragEvent.dataTransfer.effectAllowed = 'move';
-
-                if (dragEvent.dataTransfer.items.length === 0) {
-                    dragEvent.dataTransfer.setData('text/plain', '');
+        // Collapse group tabs + chip after the browser captures the drag
+        // image, then open the gap at the source position — all instant
+        // (no transitions).
+        const groupPanelIds = new Set(tabGroup.panelIds);
+        this._pendingCollapse = true;
+        requestAnimationFrame(() => {
+            this._pendingCollapse = false;
+            if (!this._animState) {
+                return;
+            }
+            // Collapse all group tabs instantly
+            for (const t of this._tabs) {
+                if (groupPanelIds.has(t.value.panel.id)) {
+                    t.value.element.style.transition = 'none';
+                    toggleClass(t.value.element, 'dv-tab--dragging', true);
                 }
             }
-        }
-
-        if (this.accessor.options.theme?.tabAnimation === 'smooth') {
-            // Collapse group tabs + chip after the browser
-            // captures the drag image, then open the gap at the
-            // source position — all instant (no transitions).
-            const groupPanelIds = new Set(tabGroup.panelIds);
-            this._pendingCollapse = true;
-            requestAnimationFrame(() => {
-                this._pendingCollapse = false;
-                if (!this._animState) {
-                    return;
-                }
-                // Collapse all group tabs instantly
-                for (const t of this._tabs) {
-                    if (groupPanelIds.has(t.value.panel.id)) {
-                        t.value.element.style.transition = 'none';
-                        toggleClass(t.value.element, 'dv-tab--dragging', true);
-                    }
-                }
-                // Collapse the group chip instantly
-                const chipEntry = this._tabGroupManager.chipRenderers.get(
-                    tabGroup.id
-                );
-                if (chipEntry) {
-                    chipEntry.chip.element.style.transition = 'none';
-                    toggleClass(
-                        chipEntry.chip.element,
-                        'dv-tab-group-chip--dragging',
-                        true
-                    );
-                }
-                // Single reflow for the entire batch
-                void this._tabsList.offsetHeight;
-
-                const underline = this._tabGroupManager.groupUnderlines.get(
-                    tabGroup.id
-                );
-                if (underline) {
-                    underline.style.display = 'none';
-                }
-
-                this._animState.currentInsertionIndex ??= firstIdx;
-                // Apply gap with transitions disabled
-                this.applyDragOverTransforms(true);
-
-                // Re-enable transitions for subsequent moves
-                for (const t of this._tabs) {
-                    if (groupPanelIds.has(t.value.panel.id)) {
-                        t.value.element.style.removeProperty('transition');
-                    }
-                }
-                if (chipEntry) {
-                    chipEntry.chip.element.style.removeProperty('transition');
-                }
-            });
-        }
-
-        // setGroupDragImage uses HTML5 setDragImage; pointer drags get a
-        // follow-finger ghost from the PointerDragSource instead.
-        if (!isPointer) {
-            this._tabGroupManager.setGroupDragImage(
-                event as DragEvent,
-                tabGroup,
-                chip.element
+            // Collapse the group chip instantly
+            const chipEntry = this._tabGroupManager.chipRenderers.get(
+                tabGroup.id
             );
-        }
+            if (chipEntry) {
+                chipEntry.chip.element.style.transition = 'none';
+                toggleClass(
+                    chipEntry.chip.element,
+                    'dv-tab-group-chip--dragging',
+                    true
+                );
+            }
+            // Single reflow for the entire batch
+            void this._tabsList.offsetHeight;
+
+            const underline = this._tabGroupManager.groupUnderlines.get(
+                tabGroup.id
+            );
+            if (underline) {
+                underline.style.display = 'none';
+            }
+
+            this._animState.currentInsertionIndex ??= firstIdx;
+            this.applyDragOverTransforms(true);
+
+            for (const t of this._tabs) {
+                if (groupPanelIds.has(t.value.panel.id)) {
+                    t.value.element.style.removeProperty('transition');
+                }
+            }
+            if (chipEntry) {
+                chipEntry.chip.element.style.removeProperty('transition');
+            }
+        });
     }
 
     /**
@@ -1752,13 +1690,16 @@ export class Tabs extends CompositeDisposable {
         sourceTabGroupId: string,
         insertionIndex: number
     ): void {
-        // Read transfer data BEFORE disposing cleanup — disposing
-        // _chipDragCleanup clears the global LocalSelectionTransfer
-        // singleton which getPanelData() reads from.
+        // Read transfer data first.
         const data = getPanelData();
 
-        this._chipDragCleanup?.dispose();
-        this._chipDragCleanup = null;
+        // Synchronously dispose the source chip's drag sources, which
+        // clears the panelTransfer payload + iframe shield. Cross-group
+        // moves dissolve the source chip on a microtask, which is too
+        // late: a synchronous `getPanelData()` after this method (or any
+        // sibling dragover handler firing in the same tick) would
+        // otherwise see stale data still referencing the old tabGroupId.
+        this._tabGroupManager.disposeChipDrag(sourceTabGroupId);
 
         // Check if the tab group exists in this group (within-group reorder)
         // or in another group (cross-group move).
@@ -1856,9 +1797,6 @@ export class Tabs extends CompositeDisposable {
                 el.style.removeProperty('display');
             }
         }
-
-        this._chipDragCleanup?.dispose();
-        this._chipDragCleanup = null;
     }
 
     private runFlipAnimation(

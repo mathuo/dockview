@@ -1424,37 +1424,12 @@ describe('tabs - animation', () => {
             expect(state.sourceTabGroupId).toBe('tg-1');
         });
 
-        test('chip dragstart sets LocalSelectionTransfer with tabGroupId', () => {
-            const { tabs, accessor, group, tabGroup, chip } =
-                setupChipDrag('smooth');
-
-            triggerChipDragStart(tabs, tabGroup, chip);
-
-            const panelData = dataTransfer.getPanelData();
-            expect(panelData).toBeDefined();
-            expect(panelData!.viewId).toBe(accessor.id);
-            expect(panelData!.groupId).toBe(group.id);
-            expect(panelData!.panelId).toBeNull();
-            expect(panelData!.tabGroupId).toBe('tg-1');
-
-            // cleanup
-            dataTransfer.LocalSelectionTransfer.getInstance().clearData(
-                dataTransfer.PanelTransfer.prototype
-            );
-        });
-
-        test('chip dragstart sets dataTransfer properties', () => {
-            const { tabs, tabGroup, chip } = setupChipDrag('smooth');
-
-            const event = triggerChipDragStart(tabs, tabGroup, chip);
-
-            expect(event.dataTransfer!.effectAllowed).toBe('move');
-
-            // cleanup
-            dataTransfer.LocalSelectionTransfer.getInstance().clearData(
-                dataTransfer.PanelTransfer.prototype
-            );
-        });
+        // `LocalSelectionTransfer.setData` and `dataTransfer.effectAllowed`
+        // are now owned by the chip's drag source in `TabGroupManager`,
+        // not by `_handleChipDragStart`. These responsibilities are
+        // covered by the #1254 regression test in `dockviewComponent.spec.ts`
+        // (which fires a real `dragstart` on the chip element so the
+        // backend factory's `getData` callback runs).
 
         test('chip dragstart does not collapse tabs in default mode', () => {
             const { tabs, tabGroup, chip, elements } = setupChipDrag('default');
@@ -1546,20 +1521,11 @@ describe('tabs - animation', () => {
             );
         });
 
-        test('resetDragAnimation clears LocalSelectionTransfer', () => {
-            const { tabs, tabGroup, chip } = setupChipDrag('default');
-
-            triggerChipDragStart(tabs, tabGroup, chip);
-
-            // PanelTransfer should be set
-            expect(dataTransfer.getPanelData()).toBeDefined();
-
-            // Simulate drag cancel
-            (tabs as any).resetDragAnimation();
-
-            // PanelTransfer should be cleared
-            expect(dataTransfer.getPanelData()).toBeUndefined();
-        });
+        // `resetDragAnimation` no longer touches the panel-transfer
+        // singleton; the chip's drag source owns that lifecycle (dragend
+        // listener for HTML5, controller for pointer, plus a direct
+        // synchronous-clear listener on the chip element for the detach-
+        // then-dragend path tested by #1254).
 
         test('drop handler processes group drop in default mode', () => {
             const { tabs, tabGroup, chip } = setupChipDrag('default', [
@@ -2100,37 +2066,11 @@ describe('tabs - animation', () => {
             expect(state.sourceTabId).toBe('a');
         });
 
-        test('PointerDragController.onDragEnd disposes _chipDragCleanup on cancel', async () => {
-            const { tabs } = createTabs({ tabAnimation: 'default' });
-            tabs.openPanel(createMockPanel('a'), 0);
-
-            // Manually populate _chipDragCleanup as if a touch chip drag
-            // had begun via _handleChipDragStart and then was cancelled
-            // (pointerup over empty space).
-            const disposeSpy = jest.fn();
-            (tabs as any)._chipDragCleanup = { dispose: disposeSpy };
-
-            // Fire the controller's onDragEnd — the constructor-attached
-            // subscription should pick it up.
-            const controller = PointerDragController.getInstance();
-            // The simplest way to trigger onDragEnd is to start and cancel.
-            controller.beginDrag({
-                pointerEvent: new PointerEvent('pointerdown', {
-                    pointerId: 1,
-                    pointerType: 'touch',
-                }),
-                source: document.createElement('div'),
-                getData: () => ({ dispose: jest.fn() }),
-            });
-            window.dispatchEvent(
-                new PointerEvent('pointerup', {
-                    pointerId: 1,
-                    pointerType: 'touch',
-                })
-            );
-
-            expect(disposeSpy).toHaveBeenCalled();
-            expect((tabs as any)._chipDragCleanup).toBeNull();
-        });
+        // Pointer chip drag cleanup used to live in a Tabs-level
+        // `_chipDragCleanup` field disposed from this controller
+        // subscription. That state is gone — the manager's pointer drag
+        // source now owns the iframe shield + panelTransfer cleanup via
+        // its internal MutableDisposables, fired by the controller's own
+        // teardown when the drag ends.
     });
 });
