@@ -26,7 +26,7 @@ this is also true for any active ResizeObservers.
 api.addPanel({
     id: 'my_unique_panel_id',
     component: 'my_component',
-    renderer: 'always'
+    renderer: 'onlyWhenVisible'
 });
 ```
 
@@ -38,7 +38,7 @@ This approach will maintain any DOM-sepcific state you had and is essential if y
 api.addPanel({
     id: 'my_unique_panel_id',
     component: 'my_component',
-    renderer: 'onlyWhenVisible'
+    renderer: 'always'
 });
 ```
 
@@ -74,7 +74,7 @@ api.addPanel({
 
 When a panel uses `always` render mode, the panel component instance is kept alive even when the panel is not visible. This means reactive state, subscriptions, and lifecycle hooks continue to run in the background.
 
-You can listen to `onDidVisibilityChange` to gate expensive work, or conditionally render inner content only when the panel is visible.
+Hidden panels are hidden via `visibility: hidden` rather than being removed from layout, so browser-driven work — CSS animations, `requestAnimationFrame` loops, autoplay `<video>` elements, and embedded `<iframe>` documents — also continues while the panel is hidden. If you need to pause that work, listen to `onDidVisibilityChange` and stop it explicitly; you can also conditionally render inner content only when the panel is visible.
 
 <FrameworkSpecific framework='React'>
 ```tsx title="Only rendering the React Component when the panel is visible, otherwise rendering a null React Component"

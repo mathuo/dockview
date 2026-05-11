@@ -1726,8 +1726,10 @@ export class DockviewGroupPanelModel
                         return;
                     }
 
-                    if (data.panelId === null) {
-                        // don't allow group move to drop anywhere on self
+                    if (data.panelId === null && !data.tabGroupId) {
+                        // Full-group drops on self are a no-op.
+                        // Tab-group drags are partial moves: an edge drop
+                        // splits the layout and creates a new group.
                         return;
                     }
                 }
@@ -1735,7 +1737,7 @@ export class DockviewGroupPanelModel
 
             if (type === 'header') {
                 if (data.groupId === this.id) {
-                    if (data.panelId === null) {
+                    if (data.panelId === null && !data.tabGroupId) {
                         return;
                     }
                 }

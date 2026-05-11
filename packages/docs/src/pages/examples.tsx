@@ -102,10 +102,13 @@ function formatName(name: string): string {
 }
 
 function ExampleCard({ component, example }: { component: string; example: Example }) {
+    const anchorId = `${component}-${example.name}`;
     return (
-        <div className="example-card">
+        <div className="example-card" id={anchorId}>
             <div className="example-card-header">
-                <h3 className="example-card-title">{formatName(example.name)}</h3>
+                <h3 className="example-card-title" id={`${anchorId}-title`}>
+                    {formatName(example.name)}
+                </h3>
             </div>
             <div className="example-card-frameworks">
                 {example.frameworks.map((fw) => {
@@ -136,9 +139,11 @@ function ExampleCard({ component, example }: { component: string; example: Examp
 
 function ComponentSection({ group }: { group: ComponentGroup }) {
     return (
-        <section className="examples-component-section">
+        <section className="examples-component-section" id={group.component}>
             <div className="examples-component-header">
-                <h2 className="examples-component-title">{group.label}</h2>
+                <h2 className="examples-component-title" id={`${group.component}-heading`}>
+                    {group.label}
+                </h2>
                 <p className="examples-component-description">
                     {group.description}
                 </p>

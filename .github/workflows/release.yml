@@ -1,0 +1,156 @@
+name: Release
+
+on:
+    workflow_dispatch:
+        inputs:
+            specifier:
+                description: 'patch | minor | major | prerelease | explicit version (e.g. 6.1.0)'
+                required: true
+                type: string
+                default: patch
+            dry-run:
+                description: 'Dry run (compute version locally, do not commit or tag)'
+                required: false
+                type: boolean
+                default: false
+
+concurrency:
+    group: release
+    cancel-in-progress: false
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+        environment: release
+        permissions:
+            contents: write
+        steps:
+            - name: Generate App token
+              id: app-token
+              uses: actions/create-github-app-token@v3.1.1
+              with:
+                  app-id: ${{ secrets.RELEASE_APP_ID }}
+                  private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+            - uses: actions/checkout@v4
+              with:
+                  ref: master
+                  fetch-depth: 0
+                  fetch-tags: true
+                  token: ${{ steps.app-token.outputs.token }}
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '24.x'
+
+            - uses: actions/cache@v4
+              with:
+                  path: |
+                      node_modules
+                      ~/.npm
+                  key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-modules-
+
+            - run: yarn
+
+            - name: Capture baseline HEAD
+              id: head
+              run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+            - name: Bump version files
+              env:
+                  SPECIFIER: ${{ inputs.specifier }}
+              run: npx nx release version "$SPECIFIER" --git-commit=false --git-tag=false
+
+            - name: Compute new version
+              id: ver
+              run: |
+                  v=$(node -p "require('./packages/dockview-core/package.json').version")
+                  echo "version=${v}" >> "$GITHUB_OUTPUT"
+                  echo "tag=v${v}" >> "$GITHUB_OUTPUT"
+
+            - name: Show pending changes
+              run: |
+                  git --no-pager diff --stat
+                  echo "---"
+                  git --no-pager diff --name-status
+
+            - name: Create signed release commit on master
+              if: ${{ !inputs.dry-run }}
+              id: commit
+              env:
+                  GH_TOKEN: ${{ steps.app-token.outputs.token }}
+                  EXPECTED_OID: ${{ steps.head.outputs.sha }}
+                  VERSION: ${{ steps.ver.outputs.version }}
+              run: |
+                  set -euo pipefail
+
+                  additions='[]'
+                  while IFS= read -r -d '' path; do
+                      entry=$(jq -nc \
+                          --arg path "$path" \
+                          --arg contents "$(base64 -w0 < "$path")" \
+                          '{path: $path, contents: $contents}')
+                      additions=$(jq -c --argjson e "$entry" '. + [$e]' <<<"$additions")
+                  done < <(git diff --name-only --diff-filter=AM -z HEAD)
+
+                  deletions='[]'
+                  while IFS= read -r -d '' path; do
+                      entry=$(jq -nc --arg path "$path" '{path: $path}')
+                      deletions=$(jq -c --argjson e "$entry" '. + [$e]' <<<"$deletions")
+                  done < <(git diff --name-only --diff-filter=D -z HEAD)
+
+                  body=$(jq -nc \
+                      --arg repo "${GITHUB_REPOSITORY}" \
+                      --arg branch "master" \
+                      --arg headline "chore(release): publish v${VERSION}" \
+                      --arg oid "${EXPECTED_OID}" \
+                      --argjson additions "${additions}" \
+                      --argjson deletions "${deletions}" \
+                      '{
+                          query: "mutation($input: CreateCommitOnBranchInput!) { createCommitOnBranch(input: $input) { commit { oid url } } }",
+                          variables: {
+                              input: {
+                                  branch: {repositoryNameWithOwner: $repo, branchName: $branch},
+                                  message: {headline: $headline},
+                                  expectedHeadOid: $oid,
+                                  fileChanges: {additions: $additions, deletions: $deletions}
+                              }
+                          }
+                      }')
+
+                  resp=$(printf '%s' "$body" | gh api graphql --input -)
+                  if [ "$(jq 'has("errors")' <<<"$resp")" = "true" ]; then
+                      echo "GraphQL errors:" >&2
+                      jq '.errors' <<<"$resp" >&2
+                      exit 1
+                  fi
+
+                  new_sha=$(jq -r '.data.createCommitOnBranch.commit.oid' <<<"$resp")
+                  new_url=$(jq -r '.data.createCommitOnBranch.commit.url' <<<"$resp")
+                  echo "sha=${new_sha}" >> "$GITHUB_OUTPUT"
+                  echo "Created signed commit ${new_sha}"
+                  echo "${new_url}"
+
+            - name: Create signed release tag
+              if: ${{ !inputs.dry-run }}
+              env:
+                  GH_TOKEN: ${{ steps.app-token.outputs.token }}
+                  TAG: ${{ steps.ver.outputs.tag }}
+                  COMMIT_SHA: ${{ steps.commit.outputs.sha }}
+              run: |
+                  set -euo pipefail
+
+                  tag_resp=$(gh api -X POST "repos/${GITHUB_REPOSITORY}/git/tags" \
+                      -f tag="${TAG}" \
+                      -f message="${TAG}" \
+                      -f object="${COMMIT_SHA}" \
+                      -f type=commit)
+                  tag_obj_sha=$(jq -r '.sha' <<<"$tag_resp")
+
+                  gh api -X POST "repos/${GITHUB_REPOSITORY}/git/refs" \
+                      -f ref="refs/tags/${TAG}" \
+                      -f sha="${tag_obj_sha}"
+
+                  echo "Created signed annotated tag ${TAG} at ${COMMIT_SHA}"

@@ -242,6 +242,10 @@ const config = {
                 },
                 items: [
                     {
+                        type: 'search',
+                        position: 'right',
+                    },
+                    {
                         to: '/newsletter',
                         label: 'Newsletter',
                         position: 'right',
@@ -339,6 +343,13 @@ const config = {
             },
             tableOfContents: {
                 maxHeadingLevel: 5,
+            },
+            algolia: {
+                appId: 'BA8M6MXEG4',
+                apiKey: 'faaf190a8d1ac5d3a4e2c984eb457ea8',
+                indexName: 'Documentation Website',
+                contextualSearch: true,
+                searchPagePath: 'search',
             },
         }),
 };
