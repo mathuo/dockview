@@ -20,7 +20,7 @@ import { addDisposableListener, Emitter, Event } from '../../../events';
 import { CompositeDisposable } from '../../../lifecycle';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { quasiPreventDefault, toggleClass } from '../../../dom';
-import { resolveDndCapabilities } from '../../options';
+import { resolveDndCapabilities } from '../../dndCapabilities';
 
 export class VoidContainer extends CompositeDisposable {
     private readonly _element: HTMLElement;

@@ -23,7 +23,8 @@ import {
 } from '../../../dnd/backend';
 import { LongPressDetector } from '../../../dnd/pointer/longPress';
 import { IDockviewPanel } from '../../dockviewPanel';
-import { DockviewHeaderDirection, resolveDndCapabilities } from '../../options';
+import { DockviewHeaderDirection } from '../../options';
+import { resolveDndCapabilities } from '../../dndCapabilities';
 
 export class Tab extends CompositeDisposable {
     private readonly _element: HTMLElement;

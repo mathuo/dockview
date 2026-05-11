@@ -17,7 +17,8 @@ import {
 } from '../../../lifecycle';
 import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
-import { DockviewHeaderDirection, resolveDndCapabilities } from '../../options';
+import { DockviewHeaderDirection } from '../../options';
+import { resolveDndCapabilities } from '../../dndCapabilities';
 import { Tab } from '../tab/tab';
 import { ITabGroup } from '../../tabGroup';
 import { applyTabGroupAccent } from '../../tabGroupAccent';

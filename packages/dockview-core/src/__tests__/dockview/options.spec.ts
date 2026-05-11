@@ -1,4 +1,4 @@
-import { resolveDndCapabilities } from '../../dockview/options';
+import { resolveDndCapabilities } from '../../dockview/dndCapabilities';
 
 describe('resolveDndCapabilities', () => {
     test("'auto' (default): both backends active, pointer is touch-only", () => {
