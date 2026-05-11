@@ -169,8 +169,9 @@ describe('tabs - animation', () => {
             const elements = getTabElements(tabs);
             fireEvent.dragStart(elements[0]);
 
-            // disableDnd prevents DragHandler from processing the event
-            // so Tab's onDragStart never fires, and _animState stays null
+            // disableDnd prevents the HTML5 drag source from processing
+            // the event, so Tab's onDragStart never fires and _animState
+            // stays null.
             expect(getAnimState(tabs)).toBeNull();
         });
     });

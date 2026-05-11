@@ -19,7 +19,6 @@ import { DockviewComponent } from '../../dockviewComponent';
 import { addDisposableListener, Emitter, Event } from '../../../events';
 import { CompositeDisposable } from '../../../lifecycle';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
-import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
 import { quasiPreventDefault, toggleClass } from '../../../dom';
 import { resolveDndCapabilities } from '../../options';
 
@@ -65,11 +64,11 @@ export class VoidContainer extends CompositeDisposable {
             addDisposableListener(this._element, 'pointerdown', () => {
                 this.accessor.doSetGroupActive(this.group);
             }),
-            // Shift+pointerdown on the void container was previously
-            // suppressed inside GroupDragHandler so that the group's overlay
-            // drag (move-by-floating) wouldn't fire alongside the HTML5
-            // drag. quasiPreventDefault marks the event without calling
-            // preventDefault (which would also block dragstart).
+            // Shift+pointerdown marks the event so the group's overlay
+            // drag (move-by-floating) sees it was consumed and doesn't
+            // fire alongside the HTML5 drag. quasiPreventDefault sets the
+            // marker without calling preventDefault — that would also
+            // block dragstart, which we need to fire.
             addDisposableListener(
                 this._element,
                 'pointerdown',
