@@ -950,4 +950,44 @@ describe('splitview', () => {
             { left: '464px', top: '0px' },
         ]);
     });
+
+    test('layoutViews writes integer pixels even when margin division is fractional (issue #1245)', () => {
+        // 3 views with margin 10: marginReducedSize = 10*2/3 = 6.666... and
+        // every (visiblePanelsBeforeThisView / sashCount) * marginReducedSize
+        // computes a fractional offset. Without rounding these become
+        // sub-pixel inline styles that re-trigger downstream layout work.
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: false,
+            margin: 10,
+        });
+        splitview.layout(1000, 500);
+
+        splitview.addView(new Testview(0, 1000));
+        splitview.addView(new Testview(0, 1000));
+        splitview.addView(new Testview(0, 1000));
+
+        const integerPx = /^-?\d+px$/;
+
+        const viewEls = Array.from(
+            container.querySelectorAll(
+                '.dv-split-view-container > .dv-view-container > .dv-view'
+            )
+        ) as HTMLElement[];
+
+        for (const el of viewEls) {
+            expect(el.style.width).toMatch(integerPx);
+            expect(el.style.left).toMatch(integerPx);
+        }
+
+        const sashEls = Array.from(
+            container.querySelectorAll(
+                '.dv-split-view-container > .dv-sash-container > .dv-sash'
+            )
+        ) as HTMLElement[];
+
+        for (const el of sashEls) {
+            expect(el.style.left).toMatch(integerPx);
+        }
+    });
 });

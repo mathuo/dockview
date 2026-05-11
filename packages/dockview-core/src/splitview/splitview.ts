@@ -850,34 +850,44 @@ export class Splitview {
                       (visiblePanelsBeforeThisView / sashCount) *
                           marginReducedSize;
 
+            // Round pixel writes to integers so fractional `marginReducedSize`
+            // / `offset` (which appear as soon as `n` views can't divide `margin`
+            // evenly) don't produce sub-pixel inline-style writes that re-trigger
+            // layout work via downstream observers. The recursive
+            // `view.view.layout(...)` call below keeps full precision so child
+            // splitviews compute against the unrounded values.
+            const sizePx = Math.round(size);
+            const offsetPx = Math.round(offset);
+
             if (i < this.viewItems.length - 1) {
                 // calculate sash position
                 const newSize = view.visible
                     ? offset + size - sashWidth / 2 + this.margin / 2
                     : offset;
+                const newSizePx = Math.round(newSize);
 
                 if (this._orientation === Orientation.HORIZONTAL) {
-                    this.sashes[i].container.style.left = `${newSize}px`;
+                    this.sashes[i].container.style.left = `${newSizePx}px`;
                     this.sashes[i].container.style.top = `0px`;
                 }
                 if (this._orientation === Orientation.VERTICAL) {
                     this.sashes[i].container.style.left = `0px`;
-                    this.sashes[i].container.style.top = `${newSize}px`;
+                    this.sashes[i].container.style.top = `${newSizePx}px`;
                 }
             }
 
             // calculate view position
 
             if (this._orientation === Orientation.HORIZONTAL) {
-                view.container.style.width = `${size}px`;
-                view.container.style.left = `${offset}px`;
+                view.container.style.width = `${sizePx}px`;
+                view.container.style.left = `${offsetPx}px`;
                 view.container.style.top = '';
 
                 view.container.style.height = '';
             }
             if (this._orientation === Orientation.VERTICAL) {
-                view.container.style.height = `${size}px`;
-                view.container.style.top = `${offset}px`;
+                view.container.style.height = `${sizePx}px`;
+                view.container.style.top = `${offsetPx}px`;
                 view.container.style.width = '';
                 view.container.style.left = '';
             }
