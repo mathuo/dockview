@@ -1,5 +1,5 @@
 import { addDisposableListener, Emitter, Event } from '../../../events';
-import { CompositeDisposable, IDisposable } from '../../../lifecycle';
+import { CompositeDisposable } from '../../../lifecycle';
 import {
     getPanelData,
     LocalSelectionTransfer,
@@ -15,53 +15,26 @@ import {
     Position,
     WillShowOverlayEvent,
 } from '../../../dnd/droptarget';
-import { html5Backend, pointerBackend } from '../../../dnd/backend';
-import { DragHandler } from '../../../dnd/abstractDragHandler';
-import { PointerDragSource } from '../../../dnd/pointer/pointerDragSource';
+import {
+    DragSourceOptions,
+    html5Backend,
+    IDragSource,
+    pointerBackend,
+} from '../../../dnd/backend';
 import { LongPressDetector } from '../../../dnd/pointer/longPress';
-import { PointerGhost } from '../../../dnd/pointer/pointerGhost';
 import { IDockviewPanel } from '../../dockviewPanel';
-import { addGhostImage } from '../../../dnd/ghost';
 import {
     DockviewHeaderDirection,
     resolveDndCapabilities,
 } from '../../options';
-
-class TabDragHandler extends DragHandler {
-    private readonly panelTransfer =
-        LocalSelectionTransfer.getInstance<PanelTransfer>();
-
-    constructor(
-        element: HTMLElement,
-        private readonly accessor: DockviewComponent,
-        private readonly group: DockviewGroupPanel,
-        private readonly panel: IDockviewPanel,
-        disabled?: boolean
-    ) {
-        super(element, disabled);
-    }
-
-    getData(event: DragEvent): IDisposable {
-        this.panelTransfer.setData(
-            [new PanelTransfer(this.accessor.id, this.group.id, this.panel.id)],
-            PanelTransfer.prototype
-        );
-
-        return {
-            dispose: () => {
-                this.panelTransfer.clearData(PanelTransfer.prototype);
-            },
-        };
-    }
-}
 
 export class Tab extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private readonly dropTarget: IDropTarget;
     private readonly pointerDropTarget: IDropTarget;
     private content: ITabRenderer | undefined = undefined;
-    private readonly dragHandler: TabDragHandler;
-    private readonly pointerDragSource: PointerDragSource;
+    private readonly html5DragSource: IDragSource;
+    private readonly pointerDragSource: IDragSource;
     private readonly panelTransfer =
         LocalSelectionTransfer.getInstance<PanelTransfer>();
     private _direction: DockviewHeaderDirection = 'horizontal';
@@ -103,14 +76,6 @@ export class Tab extends CompositeDisposable {
 
         toggleClass(this.element, 'dv-inactive-tab', true);
 
-        this.dragHandler = new TabDragHandler(
-            this._element,
-            this.accessor,
-            this.group,
-            this.panel,
-            !caps.html5
-        );
-
         const canDisplayOverlay = (
             event: DragEvent | PointerEvent,
             position: Position
@@ -151,10 +116,7 @@ export class Tab extends CompositeDisposable {
             }
         );
 
-        this.pointerDragSource = new PointerDragSource(this._element, {
-            isCancelled: () =>
-                !resolveDndCapabilities(this.accessor.options).pointer,
-            touchOnly: !caps.pointerHandlesMouse,
+        const sharedDragOptions: DragSourceOptions = {
             getData: () => {
                 this.panelTransfer.setData(
                     [
@@ -172,24 +134,47 @@ export class Tab extends CompositeDisposable {
                     },
                 };
             },
-            createGhost: (event) => {
-                // 30/-10 matches the HTML5 setDragImage offset for visual parity.
-                return new PointerGhost({
-                    element: this._buildGhostElement(),
-                    initialX: event.clientX,
-                    initialY: event.clientY,
-                    offsetX: 30,
-                    offsetY: -10,
-                    owner: this._element,
-                });
-            },
+            // 30/-10 matches the HTML5 setDragImage offset that has been
+            // shipped for years; pointer backend wraps in PointerGhost,
+            // HTML5 backend feeds into setDragImage.
+            createGhost: () => ({
+                element: this._buildGhostElement(),
+                offsetX: 30,
+                offsetY: -10,
+            }),
             onDragStart: (event) => {
                 this._onDragStart.fire(event);
+                if (
+                    !(event instanceof PointerEvent) &&
+                    this.accessor.options.theme?.tabAnimation === 'smooth'
+                ) {
+                    // Delay collapse to next frame so the browser
+                    // captures the full drag image first.
+                    requestAnimationFrame(() => {
+                        toggleClass(this.element, 'dv-tab--dragging', true);
+                    });
+                }
             },
             onDragEnd: (event) => {
-                this._onDragEnd.fire(event.pointerEvent);
+                this._onDragEnd.fire(event);
             },
+        };
+
+        this.html5DragSource = html5Backend.createDragSource(this._element, {
+            ...sharedDragOptions,
+            disabled: !caps.html5,
         });
+
+        this.pointerDragSource = pointerBackend.createDragSource(
+            this._element,
+            {
+                ...sharedDragOptions,
+                disabled: !caps.pointer,
+                touchOnly: !caps.pointerHandlesMouse,
+                isCancelled: () =>
+                    !resolveDndCapabilities(this.accessor.options).pointer,
+            }
+        );
 
         // Both droptargets feed the same downstream stream; consumers don't
         // need to know which path produced the overlay.
@@ -209,33 +194,12 @@ export class Tab extends CompositeDisposable {
                 this.dropTarget.setOverlayModel(model);
                 this.pointerDropTarget.setOverlayModel(model);
             }),
-            this.dragHandler.onDragStart((event) => {
-                if (event.dataTransfer) {
-                    addGhostImage(
-                        event.dataTransfer,
-                        this._buildGhostElement(),
-                        {
-                            y: -10,
-                            x: 30,
-                        }
-                    );
-                }
-
-                this._onDragStart.fire(event);
-
-                if (this.accessor.options.theme?.tabAnimation === 'smooth') {
-                    // Delay collapse to next frame so the browser
-                    // captures the full drag image first
-                    requestAnimationFrame(() => {
-                        toggleClass(this.element, 'dv-tab--dragging', true);
-                    });
-                }
-            }),
-            addDisposableListener(this._element, 'dragend', (event) => {
+            addDisposableListener(this._element, 'dragend', () => {
+                // The shared onDragEnd handler already fires _onDragEnd via
+                // the HTML5 backend; just strip the dragging class here.
                 toggleClass(this.element, 'dv-tab--dragging', false);
-                this._onDragEnd.fire(event);
             }),
-            this.dragHandler,
+            this.html5DragSource,
             addDisposableListener(this._element, 'pointerdown', (event) => {
                 this._onPointDown.fire(event);
             }),
@@ -313,7 +277,7 @@ export class Tab extends CompositeDisposable {
     public updateDragAndDropState(): void {
         const caps = resolveDndCapabilities(this.accessor.options);
         this._element.draggable = caps.html5;
-        this.dragHandler.setDisabled(!caps.html5);
+        this.html5DragSource.setDisabled(!caps.html5);
         this.pointerDragSource.setDisabled(!caps.pointer);
         this.pointerDragSource.setTouchOnly(!caps.pointerHandlesMouse);
     }

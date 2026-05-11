@@ -213,6 +213,84 @@ describe('voidContainer', () => {
         });
     });
 
+    describe('HTML5 drag cancellation predicate', () => {
+        // These predicates used to live in `GroupDragHandler.isCancelled`;
+        // they're now inlined into `voidContainer.ts` as the html5 backend
+        // drag source's `isCancelled` callback. Behavior is preserved.
+
+        test('floating group: dragstart is prevented when shiftKey is not held', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                options: {},
+            });
+            const group = fromPartial<DockviewGroupPanel>({
+                api: { location: { type: 'floating' } },
+            });
+            const cut = new VoidContainer(accessor, group);
+
+            const event = new Event('dragstart') as DragEvent;
+            // jsdom's DragEvent constructor doesn't preserve shiftKey,
+            // so the default-false matches the unshifted case.
+            const spy = jest.spyOn(event, 'preventDefault');
+            fireEvent(cut.element, event);
+            expect(spy).toHaveBeenCalledTimes(1);
+
+            cut.dispose();
+        });
+
+        test('edge group with zero panels: dragstart is prevented', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                options: {},
+            });
+            const group = fromPartial<DockviewGroupPanel>({
+                api: { location: { type: 'edge', position: 'left' } },
+                size: 0,
+            });
+            const cut = new VoidContainer(accessor, group);
+
+            const event = new Event('dragstart');
+            const spy = jest.spyOn(event, 'preventDefault');
+            fireEvent(cut.element, event);
+            expect(spy).toHaveBeenCalledTimes(1);
+
+            cut.dispose();
+        });
+
+        test('edge group with panels: dragstart is allowed', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                options: {},
+            });
+            const group = fromPartial<DockviewGroupPanel>({
+                api: { location: { type: 'edge', position: 'left' } },
+                size: 1,
+            });
+            const cut = new VoidContainer(accessor, group);
+
+            const event = new Event('dragstart');
+            const spy = jest.spyOn(event, 'preventDefault');
+            fireEvent(cut.element, event);
+            expect(spy).toHaveBeenCalledTimes(0);
+
+            cut.dispose();
+        });
+
+        test('grid group: dragstart is allowed regardless of shiftKey', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                options: {},
+            });
+            const group = fromPartial<DockviewGroupPanel>({
+                api: { location: { type: 'grid' } },
+            });
+            const cut = new VoidContainer(accessor, group);
+
+            const event = new Event('dragstart');
+            const spy = jest.spyOn(event, 'preventDefault');
+            fireEvent(cut.element, event);
+            expect(spy).toHaveBeenCalledTimes(0);
+
+            cut.dispose();
+        });
+    });
+
     describe('pointer (touch) drag', () => {
         afterEach(() => {
             PointerDragController.getInstance().cancel();

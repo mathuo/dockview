@@ -9,24 +9,26 @@ import {
     Position,
     WillShowOverlayEvent,
 } from '../../../dnd/droptarget';
-import { html5Backend, pointerBackend } from '../../../dnd/backend';
-import { GroupDragHandler } from '../../../dnd/groupDragHandler';
-import { PointerDragSource } from '../../../dnd/pointer/pointerDragSource';
-import { PointerGhost } from '../../../dnd/pointer/pointerGhost';
+import {
+    DragSourceOptions,
+    html5Backend,
+    IDragSource,
+    pointerBackend,
+} from '../../../dnd/backend';
 import { DockviewComponent } from '../../dockviewComponent';
 import { addDisposableListener, Emitter, Event } from '../../../events';
 import { CompositeDisposable } from '../../../lifecycle';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
-import { toggleClass } from '../../../dom';
+import { quasiPreventDefault, toggleClass } from '../../../dom';
 import { resolveDndCapabilities } from '../../options';
 
 export class VoidContainer extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private readonly dropTarget: IDropTarget;
     private readonly pointerDropTarget: IDropTarget;
-    private readonly handler: GroupDragHandler;
-    private readonly pointerDragSource: PointerDragSource;
+    private readonly html5DragSource: IDragSource;
+    private readonly pointerDragSource: IDragSource;
     private readonly panelTransfer =
         LocalSelectionTransfer.getInstance<PanelTransfer>();
 
@@ -62,14 +64,22 @@ export class VoidContainer extends CompositeDisposable {
             this._onDragStart,
             addDisposableListener(this._element, 'pointerdown', () => {
                 this.accessor.doSetGroupActive(this.group);
-            })
-        );
-
-        this.handler = new GroupDragHandler(
-            this._element,
-            accessor,
-            group,
-            !caps.html5
+            }),
+            // Shift+pointerdown on the void container was previously
+            // suppressed inside GroupDragHandler so that the group's overlay
+            // drag (move-by-floating) wouldn't fire alongside the HTML5
+            // drag. quasiPreventDefault marks the event without calling
+            // preventDefault (which would also block dragstart).
+            addDisposableListener(
+                this._element,
+                'pointerdown',
+                (e) => {
+                    if (e.shiftKey) {
+                        quasiPreventDefault(e);
+                    }
+                },
+                true
+            )
         );
 
         const canDisplayOverlay = (
@@ -105,23 +115,29 @@ export class VoidContainer extends CompositeDisposable {
             }
         );
 
-        this.pointerDragSource = new PointerDragSource(this._element, {
-            touchOnly: !caps.pointerHandlesMouse,
-            isCancelled: () => {
-                if (!resolveDndCapabilities(this.accessor.options).pointer) {
-                    return true;
-                }
-                // Floating groups are touch-draggable: the long-press
-                // initiation acts as the deliberate gesture that
-                // shift+drag provides for the HTML5 path.
-                if (
-                    this.group.api.location.type === 'edge' &&
-                    this.group.size === 0
-                ) {
-                    return true;
-                }
-                return false;
-            },
+        const buildMultiPanelsGhost = (): HTMLElement => {
+            const ghostEl = document.createElement('div');
+            const style = window.getComputedStyle(this._element);
+            const bgColor = style.getPropertyValue(
+                '--dv-activegroup-visiblepanel-tab-background-color'
+            );
+            const color = style.getPropertyValue(
+                '--dv-activegroup-visiblepanel-tab-color'
+            );
+            ghostEl.style.backgroundColor = bgColor;
+            ghostEl.style.color = color;
+            ghostEl.style.padding = '2px 8px';
+            ghostEl.style.height = '24px';
+            ghostEl.style.fontSize = '11px';
+            ghostEl.style.lineHeight = '20px';
+            ghostEl.style.borderRadius = '12px';
+            ghostEl.style.whiteSpace = 'nowrap';
+            ghostEl.style.boxSizing = 'border-box';
+            ghostEl.textContent = `Multiple Panels (${this.group.size})`;
+            return ghostEl;
+        };
+
+        const sharedDragOptions: DragSourceOptions = {
             getData: () => {
                 this.panelTransfer.setData(
                     [new PanelTransfer(this.accessor.id, this.group.id, null)],
@@ -133,38 +149,63 @@ export class VoidContainer extends CompositeDisposable {
                     },
                 };
             },
-            createGhost: (event) => {
-                const ghostEl = document.createElement('div');
-                const style = window.getComputedStyle(this._element);
-                const bgColor = style.getPropertyValue(
-                    '--dv-activegroup-visiblepanel-tab-background-color'
-                );
-                const color = style.getPropertyValue(
-                    '--dv-activegroup-visiblepanel-tab-color'
-                );
-                ghostEl.style.backgroundColor = bgColor;
-                ghostEl.style.color = color;
-                ghostEl.style.padding = '2px 8px';
-                ghostEl.style.height = '24px';
-                ghostEl.style.fontSize = '11px';
-                ghostEl.style.lineHeight = '20px';
-                ghostEl.style.borderRadius = '12px';
-                ghostEl.style.whiteSpace = 'nowrap';
-                ghostEl.style.boxSizing = 'border-box';
-                ghostEl.textContent = `Multiple Panels (${this.group.size})`;
-                return new PointerGhost({
-                    element: ghostEl,
-                    initialX: event.clientX,
-                    initialY: event.clientY,
-                    offsetX: 30,
-                    offsetY: -10,
-                    owner: this._element,
-                });
-            },
+            createGhost: () => ({
+                element: buildMultiPanelsGhost(),
+                offsetX: 30,
+                offsetY: -10,
+            }),
             onDragStart: (event) => {
                 this._onDragStart.fire(event);
             },
+        };
+
+        this.html5DragSource = html5Backend.createDragSource(this._element, {
+            ...sharedDragOptions,
+            disabled: !caps.html5,
+            isCancelled: (event) => {
+                // HTML5: floating groups need shift+drag as the explicit
+                // detach gesture (otherwise click-and-drag conflicts with
+                // moving the floating group itself).
+                if (
+                    this.group.api.location.type === 'floating' &&
+                    !(event as DragEvent).shiftKey
+                ) {
+                    return true;
+                }
+                if (
+                    this.group.api.location.type === 'edge' &&
+                    this.group.size === 0
+                ) {
+                    return true;
+                }
+                return false;
+            },
         });
+
+        this.pointerDragSource = pointerBackend.createDragSource(
+            this._element,
+            {
+                ...sharedDragOptions,
+                disabled: !caps.pointer,
+                touchOnly: !caps.pointerHandlesMouse,
+                isCancelled: () => {
+                    if (
+                        !resolveDndCapabilities(this.accessor.options).pointer
+                    ) {
+                        return true;
+                    }
+                    // Pointer: long-press IS the deliberate gesture, so
+                    // floating groups don't need the shift gate.
+                    if (
+                        this.group.api.location.type === 'edge' &&
+                        this.group.size === 0
+                    ) {
+                        return true;
+                    }
+                    return false;
+                },
+            }
+        );
 
         this.onWillShowOverlay = Event.any(
             this.dropTarget.onWillShowOverlay,
@@ -172,10 +213,7 @@ export class VoidContainer extends CompositeDisposable {
         );
 
         this.addDisposables(
-            this.handler,
-            this.handler.onDragStart((event) => {
-                this._onDragStart.fire(event);
-            }),
+            this.html5DragSource,
             this.dropTarget.onDrop((event) => {
                 this._onDrop.fire(event);
             }),
@@ -192,7 +230,7 @@ export class VoidContainer extends CompositeDisposable {
         const caps = resolveDndCapabilities(this.accessor.options);
         this._element.draggable = caps.html5;
         toggleClass(this._element, 'dv-draggable', caps.html5 || caps.pointer);
-        this.handler.setDisabled(!caps.html5);
+        this.html5DragSource.setDisabled(!caps.html5);
         this.pointerDragSource.setDisabled(!caps.pointer);
         this.pointerDragSource.setTouchOnly(!caps.pointerHandlesMouse);
     }
