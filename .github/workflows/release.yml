@@ -1,0 +1,84 @@
+name: Release
+
+on:
+    workflow_dispatch:
+        inputs:
+            specifier:
+                description: 'patch | minor | major | prerelease | explicit version (e.g. 6.1.0)'
+                required: true
+                type: string
+                default: patch
+            dry-run:
+                description: 'Dry run (compute version and commit locally, do not push)'
+                required: false
+                type: boolean
+                default: false
+
+concurrency:
+    group: release
+    cancel-in-progress: false
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+        environment: release
+        permissions:
+            contents: read
+        steps:
+            - name: Generate App token
+              id: app-token
+              uses: actions/create-github-app-token@v3.1.1
+              with:
+                  app-id: ${{ secrets.RELEASE_APP_ID }}
+                  private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+            - uses: actions/checkout@v4
+              with:
+                  ref: master
+                  fetch-depth: 0
+                  fetch-tags: true
+                  token: ${{ steps.app-token.outputs.token }}
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '20.x'
+
+            - uses: actions/cache@v4
+              with:
+                  path: |
+                      node_modules
+                      ~/.npm
+                  key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-modules-
+
+            - run: yarn
+
+            - name: Get App user id
+              id: app-user
+              env:
+                  GH_TOKEN: ${{ steps.app-token.outputs.token }}
+                  SLUG: ${{ steps.app-token.outputs.app-slug }}
+              run: |
+                  id=$(gh api "/users/${SLUG}[bot]" --jq .id)
+                  echo "user-id=${id}" >> "$GITHUB_OUTPUT"
+
+            - name: Configure git
+              env:
+                  SLUG: ${{ steps.app-token.outputs.app-slug }}
+                  UID: ${{ steps.app-user.outputs.user-id }}
+              run: |
+                  git config user.name  "${SLUG}[bot]"
+                  git config user.email "${UID}+${SLUG}[bot]@users.noreply.github.com"
+
+            - name: Version
+              env:
+                  SPECIFIER: ${{ inputs.specifier }}
+              run: npx nx release version "$SPECIFIER"
+
+            - name: Show release commit
+              run: git --no-pager log -1 --stat
+
+            - name: Push commit and tag
+              if: ${{ !inputs.dry-run }}
+              run: git push --follow-tags origin master
