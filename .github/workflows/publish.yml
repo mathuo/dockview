@@ -14,6 +14,7 @@ jobs:
     publish:
         if: github.event_name == 'release'
         runs-on: ubuntu-latest
+        environment: publish
         permissions:
             contents: read
             id-token: write
@@ -25,13 +26,6 @@ jobs:
               with:
                   node-version: '24.x'
             - run: npm install -g npm@latest
-
-            - uses: actions/cache@v4
-              with:
-                  path: ~/.npm
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-node-
 
             - run: yarn
             - run: npx nx run-many -t build --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
@@ -44,6 +38,7 @@ jobs:
     publish-experimental:
         if: github.event_name == 'workflow_dispatch'
         runs-on: ubuntu-latest
+        environment: publish
         permissions:
             contents: read
             id-token: write
@@ -55,13 +50,6 @@ jobs:
               with:
                   node-version: '24.x'
             - run: npm install -g npm@latest
-
-            - uses: actions/cache@v4
-              with:
-                  path: ~/.npm
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-node-
 
             - run: yarn
             - run: npx nx run-many -t build --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
