@@ -5493,17 +5493,24 @@ address@^1.0.1:
   resolved "https://registry.yarnpkg.com/address/-/address-1.2.2.tgz#2b5248dac5485a6390532c6a517fda2e3faac89e"
   integrity sha512-4B/qKCfeE/ODUaAUpSwfzazo5x29WD4r3vXiWsB7I2mSDAihwEqKO+g8GELZUQSSAo5e1XTYh3ZVfLyxBc12nA==
 
-ag-grid-community@31.3.4, ag-grid-community@^31.3.4:
-  version "31.3.4"
-  resolved "https://registry.yarnpkg.com/ag-grid-community/-/ag-grid-community-31.3.4.tgz#d9397672d6941aebc633a37b2b32e3637aa05642"
-  integrity sha512-jOxQO86C6eLnk1GdP24HB6aqaouFzMWizgfUwNY5MnetiWzz9ZaAmOGSnW/XBvdjXvC5Fpk3gSbvVKKQ7h9kBw==
+ag-charts-types@13.3.0:
+  version "13.3.0"
+  resolved "https://registry.yarnpkg.com/ag-charts-types/-/ag-charts-types-13.3.0.tgz#544d9b76d7db86837ffdffffb14f6b0ee1159c14"
+  integrity sha512-UMoAn908LC4ZIJSNfUckSBEFa79Mi1vFRA8qIRx+NusEuuFgXDioCZx4MxM7O3rDXlxTWH9DvQmcDjh7vyd89w==
 
-ag-grid-react@^31.3.4:
-  version "31.3.4"
-  resolved "https://registry.yarnpkg.com/ag-grid-react/-/ag-grid-react-31.3.4.tgz#3e0659c455cbf0facb5af457f260fccb8eb87bea"
-  integrity sha512-WmPASHRFGSTxCMRStWG5bRtln0Ugsdqbb3+Y8sEyGHeLw4hXqfpqie3lT9kqCOl7wPWUjCpwmFdXzRnWPmyyeg==
+ag-grid-community@35.3.0, ag-grid-community@^35.3.0:
+  version "35.3.0"
+  resolved "https://registry.yarnpkg.com/ag-grid-community/-/ag-grid-community-35.3.0.tgz#b0c6b5180c25a1c763978531db7e86e8acd839fe"
+  integrity sha512-c9WQWB88J965IjBC/GPUX30aAZix10o6oYT86DWipcxgLZTIQlLSilJJEr1bno/245rPEAIMjhoU1gp9VIfURg==
   dependencies:
-    ag-grid-community "31.3.4"
+    ag-charts-types "13.3.0"
+
+ag-grid-react@^35.3.0:
+  version "35.3.0"
+  resolved "https://registry.yarnpkg.com/ag-grid-react/-/ag-grid-react-35.3.0.tgz#e4a652107140c2f348f8c75dcc5ceddff717f0d0"
+  integrity sha512-3c6YEFGQGNZxEi1PdK0b+WhKkKRJ7KxuYzsG4UmISyax5/J7N93f8B1TZK1pq+AgzPhdk/++vjZe3KhFdF3tog==
+  dependencies:
+    ag-grid-community "35.3.0"
     prop-types "^15.8.1"
 
 agent-base@^7.1.0, agent-base@^7.1.2:
