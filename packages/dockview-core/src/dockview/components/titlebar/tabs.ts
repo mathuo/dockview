@@ -312,6 +312,59 @@ export class Tabs extends CompositeDisposable {
                     this.accessor.doSetGroupActive(this.group);
                 }
             }),
+            // Trackpad / wheel forwarding. The strip scrolls along its own
+            // axis (x for horizontal headers, y for vertical), so deltaY
+            // from a plain mouse wheel maps onto the strip's axis too —
+            // this gives the VS Code-style "scroll over tab bar to page
+            // through tabs" feel. We only consume the event when the strip
+            // is actually overflowing in the direction the user wheeled in,
+            // so a wheel at the edge of a non-overflowing strip still
+            // bubbles up and scrolls the page. `{ passive: false }` is
+            // required because we call preventDefault().
+            addDisposableListener(
+                this._tabsList,
+                'wheel',
+                (event) => {
+                    const isVertical = this._direction === 'vertical';
+                    const primary = isVertical
+                        ? event.deltaY || event.deltaX
+                        : event.deltaX || event.deltaY;
+                    if (primary === 0) {
+                        return;
+                    }
+                    const max = isVertical
+                        ? this._tabsList.scrollHeight -
+                          this._tabsList.clientHeight
+                        : this._tabsList.scrollWidth -
+                          this._tabsList.clientWidth;
+                    if (max <= 0) {
+                        return;
+                    }
+                    const current = isVertical
+                        ? this._tabsList.scrollTop
+                        : this._tabsList.scrollLeft;
+                    // At the edge in the wheel direction: let the page
+                    // scroll instead of trapping the gesture.
+                    if (
+                        (primary < 0 && current <= 0) ||
+                        (primary > 0 && current >= max)
+                    ) {
+                        return;
+                    }
+                    event.preventDefault();
+                    // Custom-scrollbar mode wraps the tabs list and installs
+                    // its own wheel listener that rewrites scrollLeft from a
+                    // deltaY-only tracker. Without stopPropagation that
+                    // handler would clobber our deltaX-aware update.
+                    event.stopPropagation();
+                    if (isVertical) {
+                        this._tabsList.scrollTop = current + primary;
+                    } else {
+                        this._tabsList.scrollLeft = current + primary;
+                    }
+                },
+                { passive: false }
+            ),
             addDisposableListener(
                 this._tabsList,
                 'dragover',

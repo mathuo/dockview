@@ -22,6 +22,20 @@ export interface PointerDragSourceOptions {
     touchOnly?: boolean;
     /** Follow-finger ghost factory; if omitted the user only sees drop overlays. */
     createGhost?: (event: PointerEvent) => PointerGhost | undefined;
+    /**
+     * Called with the per-move pointer delta during the pre-arm window when
+     * the user moves past `pressTolerance` before the long-press has armed.
+     * When provided, the source enters a "scroll-forwarding" mode instead of
+     * cancelling the gesture, so quick flicks on a `touch-action: none` source
+     * (which would otherwise do nothing) can still scroll a container. The
+     * callback is invoked on every subsequent pointermove until pointerup or
+     * pointercancel; the drag itself never arms once scroll mode begins.
+     */
+    onPreArmScroll?: (
+        dx: number,
+        dy: number,
+        event: PointerEvent
+    ) => void;
 }
 
 const DEFAULT_THRESHOLD = 5;
@@ -45,6 +59,13 @@ export class PointerDragSource extends CompositeDisposable {
     private _startX = 0;
     private _startY = 0;
     private _startEvent: PointerEvent | undefined;
+    // Scroll-forwarding mode: once entered, pointermoves on this pointer are
+    // diffed against the previous position and forwarded via `onPreArmScroll`
+    // instead of being evaluated for drag arming. Stays active until
+    // pointerup/pointercancel.
+    private _scrollMode = false;
+    private _lastScrollX = 0;
+    private _lastScrollY = 0;
 
     constructor(
         private readonly element: HTMLElement,
@@ -146,6 +167,16 @@ export class PointerDragSource extends CompositeDisposable {
                 if (moveEvent.pointerId !== this._pendingPointerId) {
                     return;
                 }
+
+                if (this._scrollMode) {
+                    const stepDx = moveEvent.clientX - this._lastScrollX;
+                    const stepDy = moveEvent.clientY - this._lastScrollY;
+                    this._lastScrollX = moveEvent.clientX;
+                    this._lastScrollY = moveEvent.clientY;
+                    this.options.onPreArmScroll?.(stepDx, stepDy, moveEvent);
+                    return;
+                }
+
                 const dx = moveEvent.clientX - this._startX;
                 const dy = moveEvent.clientY - this._startY;
                 const distance = Math.hypot(dx, dy);
@@ -158,10 +189,17 @@ export class PointerDragSource extends CompositeDisposable {
                 }
 
                 // Pre-arm phase: significant movement means the user is
-                // scrolling, not pressing. Cancel so the browser's native
-                // gesture handler can take over.
+                // scrolling, not pressing. If a scroll forwarder is wired
+                // up, hand the gesture off to it (covers the
+                // `touch-action: none` source case where the browser won't
+                // produce its own pan). Otherwise cancel so the browser's
+                // native gesture handler can take over.
                 if (distance > pressTolerance) {
-                    this._cancelPending();
+                    if (this.options.onPreArmScroll) {
+                        this._enterScrollMode(moveEvent);
+                    } else {
+                        this._cancelPending();
+                    }
                 }
             }
         );
@@ -201,6 +239,7 @@ export class PointerDragSource extends CompositeDisposable {
             this._armTimer = undefined;
         }
         this._armed = false;
+        this._scrollMode = false;
         this._pendingMoveListener?.dispose();
         this._pendingUpListener?.dispose();
         this._pendingCancelListener?.dispose();
@@ -208,6 +247,24 @@ export class PointerDragSource extends CompositeDisposable {
         this._pendingUpListener = undefined;
         this._pendingCancelListener = undefined;
         this._startEvent = undefined;
+    }
+
+    /**
+     * Promote the in-flight gesture from "deciding whether to drag" to
+     * "definitely a scroll." We clear the long-press timer so the drag can
+     * no longer arm, keep the existing pointermove / up / cancel listeners
+     * (so we keep receiving deltas until the pointer is released), and
+     * seed the running scroll origin from this first qualifying move.
+     */
+    private _enterScrollMode(event: PointerEvent): void {
+        this._scrollMode = true;
+        this._lastScrollX = event.clientX;
+        this._lastScrollY = event.clientY;
+        if (this._armTimer !== undefined) {
+            clearTimeout(this._armTimer);
+            this._armTimer = undefined;
+        }
+        this._armed = false;
     }
 
     private _beginDrag(triggerEvent: PointerEvent): void {

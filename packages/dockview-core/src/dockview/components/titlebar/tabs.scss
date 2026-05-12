@@ -10,10 +10,24 @@
     transform: translate3d(0, 0, 0);
 
     /**
-     * Let the browser handle horizontal swipes as native scroll on touch.
-     * The pointer drag source uses a long-press initiation, so brief
-     * horizontal flicks land here and produce momentum scrolling instead
-     * of starting a tab drag.
+     * Stop scroll-chaining at the tab strip so that wheel / trackpad
+     * overscroll past the strip's edges doesn't trigger the browser's
+     * swipe-to-go-back-or-forward gesture (and doesn't scroll the page
+     * either). `contain` keeps the native bounce visuals; `none` would
+     * also disable them.
+     */
+    overscroll-behavior: contain;
+
+    /**
+     * Empty space between tabs (and the scrollbar lane) keeps pan-x so a
+     * flick on those areas produces native momentum scroll. The tab and
+     * chip elements themselves opt out (`touch-action: none`) so the
+     * pointer drag source owns the gesture from pointerdown — without
+     * that, the browser claims horizontal motion as a pan and fires
+     * pointercancel before our long-press timer can begin the drag.
+     * `onPreArmScroll` on the pointer drag source forwards pre-arm
+     * motion back into this container's scrollLeft so brief swipes on
+     * a tab still scroll the strip.
      */
     touch-action: pan-x;
 
@@ -93,6 +107,10 @@
     box-sizing: border-box;
     font-size: var(--dv-tab-font-size);
     margin: var(--dv-tab-margin);
+    // Block the browser's native pan so the pointer drag source can run
+    // its long-press arming without Chrome firing pointercancel mid-gesture.
+    // See the container comment above; pre-arm scroll is forwarded in JS.
+    touch-action: none;
 
     &.dv-tab--shifting {
         will-change:
@@ -167,6 +185,10 @@
     white-space: nowrap;
     box-sizing: border-box;
     line-height: 1;
+    // Same reasoning as `.dv-tab`: opt out of native pan so the chip's
+    // long-press drag arms reliably; pre-arm motion is forwarded back as
+    // strip-scroll via the pointer drag source's `onPreArmScroll`.
+    touch-action: none;
 
     // The accent value is set inline by `applyTabGroupAccent` at render time.
     // When the palette is disabled or the group has no color, the var is

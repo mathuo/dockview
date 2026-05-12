@@ -451,6 +451,19 @@ export class TabGroupManager {
                 onDragStart: (event) => {
                     this._callbacks.onChipDragStart(tabGroup, chip, event);
                 },
+                // Chips share the tab strip with `.dv-tab`; both opt out of
+                // native pan via `touch-action: none`, so route pre-arm
+                // motion back into the parent strip's scroll. See
+                // `tabs.scss` for the rationale.
+                onPreArmScroll: (dx, dy) => {
+                    const container = chip.element.parentElement;
+                    if (!container) return;
+                    if (this._ctx.getDirection() === 'vertical') {
+                        container.scrollTop -= dy;
+                    } else {
+                        container.scrollLeft -= dx;
+                    }
+                },
             }
         );
 

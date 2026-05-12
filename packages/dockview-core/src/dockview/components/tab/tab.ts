@@ -170,6 +170,19 @@ export class Tab extends CompositeDisposable {
                 touchOnly: !caps.pointerHandlesMouse,
                 isCancelled: () =>
                     !resolveDndCapabilities(this.accessor.options).pointer,
+                // Tabs themselves are `touch-action: none` so the browser
+                // can't claim a horizontal flick as a native pan and cancel
+                // the gesture before our long-press arms. Forward pre-arm
+                // motion to the tab strip's scroll so flicks still scroll.
+                onPreArmScroll: (dx, dy) => {
+                    const container = this._element.parentElement;
+                    if (!container) return;
+                    if (this._direction === 'vertical') {
+                        container.scrollTop -= dy;
+                    } else {
+                        container.scrollLeft -= dx;
+                    }
+                },
             }
         );
 
