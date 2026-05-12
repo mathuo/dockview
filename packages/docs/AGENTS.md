@@ -22,10 +22,11 @@ Documentation website built with Docusaurus v3.
 - Release notes are stored in `blog/` with the naming format `YYYY-MM-DD-dockview-X.Y.Z.md`
 - See root AGENTS.md for release note format details
 
-### Legacy Content
+### Sandboxes
 
-- `sandboxes/` - Legacy directory that we would rather delete than update
-- Always ask before making changes to sandbox content as deletion is preferred
+- `sandboxes/` - Legacy code-sandbox sources. Most are stale, but several are still load-bearing: MDX pages and `src/` components import directly from `@site/sandboxes/<name>/src/app` (e.g. `rendering-dockview`, `externaldnd-dockview`, `demo-dockview`, `dockview-app`, `nativeapp-dockview`, `iframe-dockview`, `keyboard-dockview`, `fullwidthtab-dockview`). Removing or renaming files inside these sandboxes will break the docs build.
+- Their dependencies (`recoil`, `ag-grid-community`, `ag-grid-react`, `react-dnd`, `@minoru/react-dnd-treeview`, etc.) are pulled in via `packages/docs/package.json` — don't delete them without first removing the corresponding sandbox import.
+- Long-term preference is still to migrate these examples out of `sandboxes/` and delete the directory. Until then, ask before changing sandbox content.
 
 ### Framework Examples
 
