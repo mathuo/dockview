@@ -31,11 +31,7 @@ export interface PointerDragSourceOptions {
      * callback is invoked on every subsequent pointermove until pointerup or
      * pointercancel; the drag itself never arms once scroll mode begins.
      */
-    onPreArmScroll?: (
-        dx: number,
-        dy: number,
-        event: PointerEvent
-    ) => void;
+    onPreArmScroll?: (dx: number, dy: number, event: PointerEvent) => void;
 }
 
 const DEFAULT_THRESHOLD = 5;

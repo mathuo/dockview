@@ -76,11 +76,7 @@ export interface DragSourceOptions {
      * pointerup / pointercancel and is the recommended way to keep native
      * pan behaviour on a source whose own element uses `touch-action: none`.
      */
-    onPreArmScroll?: (
-        dx: number,
-        dy: number,
-        event: PointerEvent
-    ) => void;
+    onPreArmScroll?: (dx: number, dy: number, event: PointerEvent) => void;
 }
 
 export interface IDragSource extends IDisposable {
