@@ -1,3 +1,8 @@
 {
+  "extends": "@vue/tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "types": []
+  },
   "include": ["src/dockview/types.ts"]
 }
