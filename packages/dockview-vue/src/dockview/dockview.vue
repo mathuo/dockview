@@ -10,8 +10,6 @@ import {
 import {
     ref,
     onMounted,
-    defineProps,
-    defineEmits,
     watch,
     onBeforeUnmount,
     markRaw,
