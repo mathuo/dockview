@@ -48,9 +48,9 @@ jobs:
                   path: |
                       node_modules
                       ~/.npm
-                  key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+                  key: release-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
                   restore-keys: |
-                      ${{ runner.os }}-modules-
+                      release-${{ runner.os }}-modules-
 
             - run: yarn
 
