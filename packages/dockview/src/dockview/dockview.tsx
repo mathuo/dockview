@@ -95,7 +95,7 @@ function extractCoreOptions(props: IDockviewReactProps): DockviewOptions {
 export const DockviewReact = React.forwardRef(
     (props: IDockviewReactProps, ref: React.ForwardedRef<HTMLDivElement>) => {
         const domRef = React.useRef<HTMLDivElement>(null);
-        const dockviewRef = React.useRef<DockviewApi>();
+        const dockviewRef = React.useRef<DockviewApi | undefined>(undefined);
         const [portals, addPortal] = usePortalsLifecycle();
 
         React.useImperativeHandle(ref, () => domRef.current!, []);

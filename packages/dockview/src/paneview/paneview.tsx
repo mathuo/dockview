@@ -49,7 +49,7 @@ function extractCoreOptions(props: IPaneviewReactProps): PaneviewOptions {
 export const PaneviewReact = React.forwardRef(
     (props: IPaneviewReactProps, ref: React.ForwardedRef<HTMLDivElement>) => {
         const domRef = React.useRef<HTMLDivElement>(null);
-        const paneviewRef = React.useRef<PaneviewApi>();
+        const paneviewRef = React.useRef<PaneviewApi | undefined>(undefined);
         const [portals, addPortal] = usePortalsLifecycle();
 
         React.useImperativeHandle(ref, () => domRef.current!, []);

@@ -9,6 +9,29 @@ export type PopoutWindowOptions = {
     onWillClose?: (event: { id: string; window: Window }) => void;
 } & Box;
 
+/**
+ * Reject popout URLs that aren't same-origin http(s). Blocks `javascript:`,
+ * `data:`, `blob:`, `vbscript:`, and cross-origin URLs that would otherwise
+ * execute in a context the browser still associates with the opener via
+ * `window.opener`.
+ */
+export function assertSameOriginPopoutUrl(url: string): void {
+    let resolved: URL;
+    try {
+        resolved = new URL(url, window.location.href);
+    } catch {
+        throw new Error(`dockview: invalid popout URL: ${url}`);
+    }
+
+    const protocolOk =
+        resolved.protocol === 'http:' || resolved.protocol === 'https:';
+    if (!protocolOk || resolved.origin !== window.location.origin) {
+        throw new Error(
+            `dockview: popout URL must be same-origin http(s); got: ${url}`
+        );
+    }
+}
+
 export class PopoutWindow extends CompositeDisposable {
     private readonly _onWillClose = new Emitter<void>();
     readonly onWillClose = this._onWillClose.event;
@@ -71,6 +94,7 @@ export class PopoutWindow extends CompositeDisposable {
         }
 
         const url = `${this.options.url}`;
+        assertSameOriginPopoutUrl(url);
 
         const features = Object.entries({
             top: this.options.top,

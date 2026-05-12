@@ -1,10 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { DockviewDefaultTab } from '../../dockview/defaultTab';
-import React from 'react';
+import React, { act } from 'react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewApi, DockviewPanelApi, TitleEvent } from 'dockview-core';
 import { Emitter } from 'dockview-core/dist/cjs/events';
-import { act } from 'react-dom/test-utils';
 import { Disposable } from 'dockview-core/dist/cjs/lifecycle';
 
 describe('defaultTab', () => {

@@ -1,17 +1,22 @@
 import * as React from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import {
+    AllCommunityModule,
     ModuleRegistry,
-    ClientSideRowModelModule,
     ColDef,
     ValueFormatterParams,
     CellClassParams,
     RowClickedEvent,
+    themeAlpine,
+    colorSchemeDark,
 } from 'ag-grid-community';
 import { useMarket, useMarketDispatch, WATCHLIST_TICKERS } from './marketContext';
 import { usePanelColors } from './panelTheme';
 
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
+ModuleRegistry.registerModules([AllCommunityModule]);
+
+const lightTheme = themeAlpine;
+const darkTheme = themeAlpine.withPart(colorSchemeDark);
 
 const TICKERS = [
     'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'META',
@@ -144,11 +149,9 @@ export const OrdersPanel: React.FC = () => {
     );
 
     return (
-        <div
-            className={isDark ? 'ag-theme-alpine-dark' : 'ag-theme-alpine'}
-            style={{ height: '100%', width: '100%' }}
-        >
+        <div style={{ height: '100%', width: '100%' }}>
             <AgGridReact
+                theme={isDark ? darkTheme : lightTheme}
                 rowData={rowData}
                 columnDefs={columnDefs}
                 defaultColDef={defaultColDef}

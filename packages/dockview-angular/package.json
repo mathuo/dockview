@@ -1,6 +1,6 @@
 {
     "name": "dockview-angular",
-    "version": "6.1.1",
+    "version": "6.2.0",
     "description": "Angular docking layout manager — tabs, groups, grids, splitviews, drag and drop, floating panels",
     "keywords": [
         "splitview",
@@ -61,16 +61,11 @@
         "format:check": "prettier --check 'src/**/*.{ts,tsx,js,jsx}'"
     },
     "dependencies": {
-        "dockview-core": "^6.1.1"
+        "dockview-core": "^6.2.0"
     },
     "peerDependencies": {
         "@angular/common": ">=21.0.6",
         "@angular/core": ">=21.0.6",
         "rxjs": ">=7.0.0"
-    },
-    "devDependencies": {
-        "jest-preset-angular": "^16.0.0",
-        "ng-packagr": "^21.0.0",
-        "zone.js": "^0.15.1"
     }
 }
