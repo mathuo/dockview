@@ -42,7 +42,6 @@
         "dockview-core": "^6.0.1",
         "prism-react-renderer": "^2.3.1",
         "react-dnd": "^16.0.1",
-        "recoil": "^0.7.7",
         "source-map-loader": "^5.0.0"
     },
     "devDependencies": {
