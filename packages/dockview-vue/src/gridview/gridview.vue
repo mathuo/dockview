@@ -6,7 +6,6 @@ import {
     type GridviewFrameworkOptions,
     createGridview,
 } from 'dockview-core';
-import { defineProps, defineEmits } from 'vue';
 import { useViewComponent } from '../composables/useViewComponent';
 import { VueGridviewPanelView } from './view';
 import type { IGridviewVueProps, GridviewVueEvents } from './types';
