@@ -29,7 +29,7 @@ export class ReactWatermarkPart implements IWatermarkRenderer {
     }
 
     init(parameters: WatermarkRendererInitParameters): void {
-        this.part = new ReactPart(
+        this.part = new ReactPart<IWatermarkPanelProps>(
             this.element,
             this.reactPortalStore,
             this.component,
