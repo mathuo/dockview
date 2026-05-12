@@ -5,12 +5,10 @@ import {
 } from 'dockview-react';
 import * as React from 'react';
 
-import { atom, useRecoilState, useRecoilValue } from 'recoil';
-
-const renderVisibleComponentsOnlyAtom = atom<boolean>({
-    key: 'renderVisibleComponentsOnlyAtom',
-    default: false,
-});
+const RenderVisibleOnlyContext = React.createContext<{
+    render: boolean;
+    setRender: (value: boolean) => void;
+}>({ render: false, setRender: () => undefined });
 
 function RenderWhenVisible(
     component: React.FunctionComponent<IDockviewPanelProps>
@@ -20,7 +18,7 @@ function RenderWhenVisible(
             props.api.isVisible
         );
 
-        const render = useRecoilValue(renderVisibleComponentsOnlyAtom);
+        const { render } = React.useContext(RenderVisibleOnlyContext);
 
         React.useEffect(() => {
             const disposable = props.api.onDidVisibilityChange((event) =>
@@ -90,7 +88,7 @@ const components = {
 };
 
 const Checkbox = () => {
-    const [render, setRender] = useRecoilState(renderVisibleComponentsOnlyAtom);
+    const { render, setRender } = React.useContext(RenderVisibleOnlyContext);
 
     return (
         <label>
@@ -105,7 +103,7 @@ const Checkbox = () => {
 };
 
 const RenderingDockview = (props: { theme?: string }) => {
-    const [render, setRender] = useRecoilState(renderVisibleComponentsOnlyAtom);
+    const [render, setRender] = React.useState<boolean>(false);
 
     const onReady = (event: DockviewReadyEvent) => {
         event.api.addPanel({
@@ -143,22 +141,24 @@ const RenderingDockview = (props: { theme?: string }) => {
     };
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%',
-            }}
-        >
-            <Checkbox />
-            <div style={{ flexGrow: 1, color: 'white' }}>
-                <DockviewReact
-                    components={components}
-                    onReady={onReady}
-                    className={`${props.theme || 'dockview-theme-abyss'}`}
-                />
+        <RenderVisibleOnlyContext.Provider value={{ render, setRender }}>
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                }}
+            >
+                <Checkbox />
+                <div style={{ flexGrow: 1, color: 'white' }}>
+                    <DockviewReact
+                        components={components}
+                        onReady={onReady}
+                        className={`${props.theme || 'dockview-theme-abyss'}`}
+                    />
+                </div>
             </div>
-        </div>
+        </RenderVisibleOnlyContext.Provider>
     );
 };
 

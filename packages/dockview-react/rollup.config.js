@@ -71,6 +71,9 @@ function createBundle(format, options) {
         }),
         typescript({
             tsconfig: 'tsconfig.esm.json',
+            outDir: outputDir,
+            declaration: false,
+            declarationMap: false,
         }),
     ];
 
