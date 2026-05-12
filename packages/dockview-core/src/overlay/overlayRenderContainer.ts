@@ -194,10 +194,19 @@ export class OverlayRenderContainer extends CompositeDisposable {
                 focusContainer.style.top = `${top}px`;
                 focusContainer.style.width = `${width}px`;
                 focusContainer.style.height = `${height}px`;
-                // Reveal after the first position is applied (was hidden to
-                // prevent a flash at 0,0 before the initial layout fires).
-                if (focusContainer.style.visibility === 'hidden') {
+                // Sync visibility/pointer-events with the panel's current
+                // visibility at paint time. visibilityChanged() may have
+                // flipped to hidden between scheduling this rAF and now;
+                // unconditionally clearing `visibility:hidden` here would
+                // leave a hidden panel visually visible at a stale position,
+                // because onDidDimensionsChange skips non-visible panels and
+                // never recomputes their box on subsequent resizes.
+                if (panel.api.isVisible) {
                     focusContainer.style.visibility = '';
+                    focusContainer.style.pointerEvents = '';
+                } else {
+                    focusContainer.style.visibility = 'hidden';
+                    focusContainer.style.pointerEvents = 'none';
                 }
 
                 toggleClass(

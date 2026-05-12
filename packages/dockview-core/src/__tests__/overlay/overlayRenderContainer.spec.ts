@@ -474,6 +474,81 @@ describe('overlayRenderContainer', () => {
         expect(container2.style.visibility).toBe('');
     });
 
+    test('resize rAF that fires after a panel was hidden mid-flight keeps visibility hidden', async () => {
+        // Regression test for a race where:
+        //   1. visibilityChanged(visible=true) schedules a resize rAF and clears pointerEvents
+        //   2. before the rAF fires, the panel becomes non-visible:
+        //      visibilityChanged(visible=false) sets visibility:hidden + pointerEvents:none
+        //   3. the rAF then ran `if (style.visibility === 'hidden') style.visibility = ''`,
+        //      leaving the overlay computed-visible with pointer-events:none at a stale
+        //      position. onDidDimensionsChange skips non-visible panels, so subsequent
+        //      sash drags never repositioned the overlay — its stale content leaked into
+        //      neighbouring panel areas.
+        const cut = new OverlayRenderContainer(
+            parentContainer,
+            fromPartial<DockviewComponent>({})
+        );
+
+        const panelContentEl = document.createElement('div');
+        const onDidVisibilityChange = new Emitter<any>();
+        const onDidDimensionsChange = new Emitter<any>();
+        const onDidLocationChange = new Emitter<any>();
+
+        const panel = fromPartial<IDockviewPanel>({
+            api: {
+                id: 'test_panel_id',
+                onDidVisibilityChange: onDidVisibilityChange.event,
+                onDidDimensionsChange: onDidDimensionsChange.event,
+                onDidLocationChange: onDidLocationChange.event,
+                isVisible: true,
+                location: { type: 'grid' },
+            },
+            view: { content: { element: panelContentEl } },
+            group: { api: { location: { type: 'grid' } } },
+        });
+
+        jest.spyOn(
+            referenceContainer.element,
+            'getBoundingClientRect'
+        ).mockReturnValue(
+            fromPartial<DOMRect>({
+                left: 100,
+                top: 200,
+                width: 100,
+                height: 200,
+            })
+        );
+        jest.spyOn(parentContainer, 'getBoundingClientRect').mockReturnValue(
+            fromPartial<DOMRect>({ left: 0, top: 0, width: 1000, height: 1000 })
+        );
+
+        const container = cut.attach({ panel, referenceContainer });
+        await exhaustMicrotaskQueue();
+        await exhaustAnimationFrame();
+
+        // Baseline: panel is visible and positioned.
+        expect(container.style.visibility).toBe('');
+        expect(container.style.pointerEvents).toBe('');
+
+        // Flip the panel to non-visible so the queued post-resize rAF sees
+        // `panel.api.isVisible === false`.
+        (panel as Writable<IDockviewPanel>).api.isVisible = false;
+        onDidVisibilityChange.fire({});
+        expect(container.style.visibility).toBe('hidden');
+        expect(container.style.pointerEvents).toBe('none');
+
+        // Now simulate an in-flight resize completing AFTER the visibility flip.
+        // The rAF runs and must NOT clobber `visibility:hidden`.
+        (panel as Writable<IDockviewPanel>).api.isVisible = true;
+        onDidVisibilityChange.fire({}); // schedules a resize rAF
+        (panel as Writable<IDockviewPanel>).api.isVisible = false;
+        onDidVisibilityChange.fire({}); // hides again before rAF
+        await exhaustAnimationFrame();
+
+        expect(container.style.visibility).toBe('hidden');
+        expect(container.style.pointerEvents).toBe('none');
+    });
+
     test('updateAllPositions forces position recalculation for visible panels', async () => {
         const cut = new OverlayRenderContainer(
             parentContainer,
