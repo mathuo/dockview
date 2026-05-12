@@ -42,7 +42,7 @@ function extractCoreOptions(props: IGridviewReactProps): GridviewOptions {
 export const GridviewReact = React.forwardRef(
     (props: IGridviewReactProps, ref: React.ForwardedRef<HTMLDivElement>) => {
         const domRef = React.useRef<HTMLDivElement>(null);
-        const gridviewRef = React.useRef<GridviewApi>();
+        const gridviewRef = React.useRef<GridviewApi | undefined>(undefined);
         const [portals, addPortal] = usePortalsLifecycle();
 
         React.useImperativeHandle(ref, () => domRef.current!, []);

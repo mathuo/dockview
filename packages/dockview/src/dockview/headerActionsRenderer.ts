@@ -58,7 +58,7 @@ export class ReactHeaderActionsRendererPart implements IHeaderActionsRenderer {
             })
         );
 
-        this._part = new ReactPart(
+        this._part = new ReactPart<IDockviewHeaderActionsProps>(
             this.element,
             this.reactPortalStore,
             this.component,
