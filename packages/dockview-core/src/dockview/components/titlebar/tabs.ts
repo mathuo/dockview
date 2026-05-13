@@ -1340,11 +1340,15 @@ export class Tabs extends CompositeDisposable {
                     continue;
                 }
 
-                if (isGroupDrag) {
+                if (isGroupDrag && isInsideRange) {
                     // A group cannot be dropped inside another group.
                     // Snap the insertion index to just before or just
                     // after this group based on cursor position relative
-                    // to the group's midpoint.
+                    // to the group's midpoint. Only applies when the
+                    // insertion would land *inside* the group — for
+                    // `isJustBeforeGroup`, the index is already outside
+                    // (immediately left of the group) and is a valid
+                    // drop position, so leave it untouched (issue #1264).
                     const groupMid = (firstIdx + lastIdx + 1) / 2;
                     if (insertionIndex < groupMid) {
                         insertionIndex = firstIdx;
@@ -1352,6 +1356,13 @@ export class Tabs extends CompositeDisposable {
                         insertionIndex = lastIdx + 1;
                     }
                     // targetTabGroupId stays null
+                    break;
+                }
+
+                if (isGroupDrag && isJustBeforeGroup) {
+                    // Cursor is just before the group — accept this
+                    // index as-is. Groups can be dropped at the slot
+                    // immediately left of another group's first tab.
                     break;
                 }
 
