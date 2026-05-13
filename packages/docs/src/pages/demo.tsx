@@ -17,9 +17,23 @@ const updateTheme = (theme: DockviewTheme) => {
     window.history.pushState({ path: newUrl }, '', newUrl);
 };
 
+// `variant` is locked at mount so rotating mid-session doesn't yank the
+// layout out from under the visitor. `?variant=mobile|desktop` forces.
+const resolveVariant = (): 'mobile' | 'desktop' => {
+    const params = new URLSearchParams(window.location.search);
+    const override = params.get('variant');
+    if (override === 'mobile' || override === 'desktop') {
+        return override;
+    }
+    return window.matchMedia('(max-width: 600px)').matches
+        ? 'mobile'
+        : 'desktop';
+};
+
 const DemoPage: React.FC = () => {
     const [theme, setTheme] = React.useState<DockviewTheme>(themeAbyss);
     const [showSidebar, setShowSidebar] = React.useState(false);
+    const variant = React.useMemo(resolveVariant, []);
 
     React.useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -29,6 +43,18 @@ const DemoPage: React.FC = () => {
         setTheme(newTheme);
         updateTheme(newTheme);
     }, []);
+
+    if (variant === 'mobile') {
+        return (
+            <MobileDemo
+                theme={theme}
+                onChangeTheme={(t) => {
+                    setTheme(t);
+                    updateTheme(t);
+                }}
+            />
+        );
+    }
 
     return (
         <>
@@ -111,6 +137,117 @@ const DemoPage: React.FC = () => {
                     },
                 }}
             />
+        </>
+    );
+};
+
+const MobileDemo: React.FC<{
+    theme: DockviewTheme;
+    onChangeTheme: (theme: DockviewTheme) => void;
+}> = ({ theme, onChangeTheme }) => {
+    const [sheetOpen, setSheetOpen] = React.useState(false);
+
+    return (
+        <>
+            <div className={styles.mobileHeader}>
+                <a
+                    href="/"
+                    className={styles.mobileButton}
+                    aria-label="Back to dockview.dev"
+                >
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path d="M19 12H5M12 5l-7 7 7 7" />
+                    </svg>
+                </a>
+                <div className={styles.mobileTip}>
+                    Long-press a tab, then drag
+                </div>
+                <button
+                    type="button"
+                    className={styles.mobileButton}
+                    onClick={() => setSheetOpen(true)}
+                    aria-label="Change theme"
+                >
+                    Theme
+                </button>
+            </div>
+            <ExampleFrame
+                theme={theme}
+                framework="react"
+                height="100%"
+                id="dockview/demo-dockview-mobile"
+            />
+            {sheetOpen && (
+                <ThemeBottomSheet
+                    activeTheme={theme}
+                    onSelect={(t) => {
+                        onChangeTheme(t);
+                        setSheetOpen(false);
+                    }}
+                    onClose={() => setSheetOpen(false)}
+                />
+            )}
+        </>
+    );
+};
+
+const ThemeBottomSheet: React.FC<{
+    activeTheme: DockviewTheme;
+    onSelect: (theme: DockviewTheme) => void;
+    onClose: () => void;
+}> = ({ activeTheme, onSelect, onClose }) => {
+    // Close on escape so non-touch testers can dismiss without tapping
+    // the backdrop.
+    React.useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+        document.addEventListener('keydown', onKey);
+        return () => document.removeEventListener('keydown', onKey);
+    }, [onClose]);
+
+    return (
+        <>
+            <div
+                className={styles.sheetBackdrop}
+                onClick={onClose}
+                aria-hidden="true"
+            />
+            <div
+                className={styles.sheet}
+                role="dialog"
+                aria-label="Choose theme"
+            >
+                <div className={styles.sheetGrabber} />
+                <div className={styles.sheetTitle}>Theme</div>
+                {themeConfig.map((t) => {
+                    const active = t.id.name === activeTheme.name;
+                    return (
+                        <button
+                            key={t.id.name}
+                            type="button"
+                            className={`${styles.sheetItem} ${
+                                active ? styles.sheetItemActive : ''
+                            }`}
+                            onClick={() => onSelect(t.id)}
+                        >
+                            <span>{t.label}</span>
+                            {active && <span>✓</span>}
+                        </button>
+                    );
+                })}
+            </div>
         </>
     );
 };
