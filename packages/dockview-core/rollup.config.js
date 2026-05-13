@@ -67,6 +67,9 @@ function createBundle(format, options) {
     const plugins = [
         typescript({
             tsconfig: 'tsconfig.esm.json',
+            outDir: outputDir,
+            declaration: false,
+            declarationMap: false,
         }),
     ];
 

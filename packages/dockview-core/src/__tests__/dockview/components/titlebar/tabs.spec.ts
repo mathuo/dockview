@@ -547,6 +547,45 @@ describe('tabs', () => {
         });
     });
 
+    describe('delete', () => {
+        test('does not throw when id is not present on an empty tabs list', () => {
+            const cut = new Tabs(
+                fromPartial<DockviewGroupPanel>({}),
+                fromPartial<DockviewComponent>({
+                    options: {},
+                }),
+                {
+                    showTabsOverflowControl: false,
+                }
+            );
+
+            expect(() => cut.delete('does-not-exist')).not.toThrow();
+        });
+
+        test('does not throw when deleting an id after the tabs list has been emptied', () => {
+            const panel1 = createMockPanel('panel1');
+
+            const cut = new Tabs(
+                fromPartial<DockviewGroupPanel>({}),
+                fromPartial<DockviewComponent>({
+                    options: {},
+                    onDidOptionsChange: jest
+                        .fn()
+                        .mockReturnValue({ dispose: jest.fn() }),
+                }),
+                {
+                    showTabsOverflowControl: false,
+                }
+            );
+
+            cut.openPanel(panel1);
+            cut.delete('panel1');
+            expect(cut.tabs.length).toBe(0);
+
+            expect(() => cut.delete('panel1')).not.toThrow();
+        });
+    });
+
     describe('direction', () => {
         test('direction setter toggles CSS classes', () => {
             const cut = new Tabs(

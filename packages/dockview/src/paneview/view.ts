@@ -26,7 +26,7 @@ export class PanePanelSection implements IPanePart {
     }
 
     public init(parameters: PanePanelComponentInitParameter): void {
-        this.part = new ReactPart(
+        this.part = new ReactPart<IPaneviewPanelProps>(
             this.element,
             this.reactPortalStore,
             this.component,

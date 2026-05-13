@@ -1,0 +1,11 @@
+# CODEOWNERS — required reviewers for security-sensitive paths.
+# Syntax: https://docs.github.com/en/repositories/managing-your-repositories-settings-and-security/customizing-your-repository/about-code-owners
+#
+# Enforcement is opt-in: enable "Require review from Code Owners" in the
+# branch ruleset protecting master for these rules to actually gate merges.
+
+# Anything under .github/ — workflows, Dependabot, actions config, this file.
+/.github/                @mathuo
+
+# Release plumbing.
+/nx.json                 @mathuo

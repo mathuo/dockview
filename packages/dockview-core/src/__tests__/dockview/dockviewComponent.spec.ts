@@ -1281,6 +1281,264 @@ describe('dockviewComponent', () => {
         dockview.dispose();
     });
 
+    // Regression test for #1244: dragging a group via its header onto
+    // another group's center must preserve the source's tab groups
+    // (label, color, collapsed, componentParams, panelIds).
+    test('moveGroup to center preserves tab groups from the source', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                return new PanelContentPartTest(options.id, options.name);
+            },
+        });
+
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({ id: 'panel1', component: 'default' });
+        dockview.addPanel({ id: 'panel2', component: 'default' });
+
+        const panel1 = dockview.getGroupPanel('panel1')!;
+        const panel2 = dockview.getGroupPanel('panel2')!;
+        const sourceGroup = panel1.group;
+
+        // Create a tab group on the source spanning both panels.
+        const tabGroup = sourceGroup.model.createTabGroup({
+            label: 'Feature',
+            color: 'blue',
+            collapsed: true,
+            componentParams: { foo: 'bar' },
+        });
+        sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel1');
+        sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel2');
+
+        // Spin off a destination group so the merge has somewhere to go.
+        dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+        const panel3 = dockview.getGroupPanel('panel3')!;
+        const destGroup = panel3.group;
+        expect(destGroup).not.toBe(sourceGroup);
+
+        // Drag the source group onto destGroup's center (this is what
+        // the void-container header drag fires).
+        dockview.moveGroupOrPanel({
+            from: { groupId: sourceGroup.id },
+            to: { group: destGroup, position: 'center' },
+        });
+
+        // All three panels should now live in destGroup.
+        expect(destGroup.model.size).toBe(3);
+        expect(panel1.group).toBe(destGroup);
+        expect(panel2.group).toBe(destGroup);
+
+        // Tab group should have come along with its panels and metadata.
+        const movedTabGroups = destGroup.model.getTabGroups();
+        expect(movedTabGroups.length).toBe(1);
+        const moved = movedTabGroups[0];
+        expect(moved.label).toBe('Feature');
+        expect(moved.color).toBe('blue');
+        expect(moved.collapsed).toBe(true);
+        expect(moved.componentParams).toEqual({ foo: 'bar' });
+        expect([...moved.panelIds]).toEqual(['panel1', 'panel2']);
+
+        dockview.dispose();
+    });
+
+    // Companion to the above: confirm the active panel stays correct
+    // when the source contains a collapsed tab group + an ungrouped
+    // panel that is the active one.
+    test('moveGroup to center preserves active panel across collapsed tab group merge', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                return new PanelContentPartTest(options.id, options.name);
+            },
+        });
+
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({ id: 'panel1', component: 'default' });
+        dockview.addPanel({ id: 'panel2', component: 'default' });
+        dockview.addPanel({ id: 'panel3', component: 'default' });
+
+        const panel3 = dockview.getGroupPanel('panel3')!;
+        const sourceGroup = panel3.group;
+
+        // Collapsed tab group on panel1 + panel2; panel3 is ungrouped
+        // and is the active panel (since the only other panels are
+        // inside a collapsed group).
+        const tabGroup = sourceGroup.model.createTabGroup({
+            label: 'Hidden',
+            color: 'red',
+        });
+        sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel1');
+        sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel2');
+        tabGroup.collapse();
+
+        // panel3 is the active panel; collapsing the group above
+        // redirects active away from the collapsed-group panels.
+        expect(sourceGroup.model.activePanel?.id).toBe('panel3');
+
+        // Spin off destination group.
+        dockview.addPanel({
+            id: 'panel4',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+        const panel4 = dockview.getGroupPanel('panel4')!;
+        const destGroup = panel4.group;
+
+        // Drag entire source onto destGroup's center.
+        dockview.moveGroupOrPanel({
+            from: { groupId: sourceGroup.id },
+            to: { group: destGroup, position: 'center' },
+        });
+
+        // Active panel should still be panel3.
+        expect(destGroup.model.activePanel?.id).toBe('panel3');
+
+        // Tab group recreated and still collapsed.
+        const tgs = destGroup.model.getTabGroups();
+        expect(tgs.length).toBe(1);
+        expect(tgs[0].collapsed).toBe(true);
+        expect([...tgs[0].panelIds]).toEqual(['panel1', 'panel2']);
+
+        dockview.dispose();
+    });
+
+    // Regression test for #1242: dropping a tab group at the edge of its
+    // own (and only) source group when the tab group contains all of the
+    // source group's panels must split the layout and leave no orphan
+    // empty group behind.
+    test('moveGroupOrPanel with tabGroupId to extremity of own group when tabgroup contains all panels removes empty source', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                return new PanelContentPartTest(options.id, options.name);
+            },
+        });
+
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({ id: 'panel1', component: 'default' });
+        dockview.addPanel({ id: 'panel2', component: 'default' });
+
+        const panel1 = dockview.getGroupPanel('panel1')!;
+        const panel2 = dockview.getGroupPanel('panel2')!;
+        const sourceGroup = panel1.group;
+
+        // Tab group spans every panel in the source group.
+        const tabGroup = sourceGroup.model.createTabGroup({
+            label: 'All',
+            color: 'red',
+        });
+        sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel1');
+        sourceGroup.model.addPanelToTabGroup(tabGroup.id, 'panel2');
+
+        dockview.moveGroupOrPanel({
+            from: {
+                groupId: sourceGroup.id,
+                tabGroupId: tabGroup.id,
+            },
+            to: { group: sourceGroup, position: 'right' },
+        });
+
+        // Source group should be removed (it became empty); only the new
+        // group at the right contains the panels.
+        expect(dockview.groups.length).toBe(1);
+        const newGroup = panel1.group;
+        expect(newGroup).not.toBe(sourceGroup);
+        expect(panel2.group).toBe(newGroup);
+        expect(newGroup.model.size).toBe(2);
+
+        const newTabGroups = newGroup.model.getTabGroups();
+        expect(newTabGroups.length).toBe(1);
+        expect(newTabGroups[0].label).toBe('All');
+        expect(newTabGroups[0].color).toBe('red');
+
+        dockview.dispose();
+    });
+
+    // Regression test for #1254. After a cross-group tab-group chip
+    // drag, the chip element is detached from the DOM (the source tab
+    // group becomes empty, so `_positionChipForGroup` removes it).
+    // `dragend` therefore can't bubble to `_tabsList`, which historically
+    // left the `panelTransfer` singleton populated with the chip drag's
+    // payload (including `tabGroupId`). Fix wires a `dragend` listener
+    // directly on the chip element so cleanup runs regardless of
+    // attachment.
+    test('cross-group chip drag clears panelTransfer when the chip detaches (#1254)', async () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                return new PanelContentPartTest(options.id, options.name);
+            },
+        });
+        dockview.layout(1000, 1000);
+
+        for (let i = 1; i <= 4; i++) {
+            dockview.addPanel({ id: `panel${i}`, component: 'default' });
+        }
+
+        const sourceGroup = dockview.getGroupPanel('panel1')!.group;
+        // panel4 ungrouped so source survives the move; panels 1-3 are
+        // the tab group that will move out cross-group.
+        const monitoring = sourceGroup.model.createTabGroup({
+            label: 'Monitoring',
+            color: 'purple',
+        });
+        sourceGroup.model.addPanelToTabGroup(monitoring.id, 'panel1');
+        sourceGroup.model.addPanelToTabGroup(monitoring.id, 'panel2');
+        sourceGroup.model.addPanelToTabGroup(monitoring.id, 'panel3');
+
+        dockview.addPanel({
+            id: 'sibling',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+        const siblingGroup = dockview.getGroupPanel('sibling')!.group;
+
+        // Chip is rendered on a microtask via _scheduleTabGroupUpdate.
+        await Promise.resolve();
+
+        const chip = sourceGroup.element.querySelector(
+            '.dv-tab-group-chip'
+        ) as HTMLElement;
+        expect(chip).toBeTruthy();
+
+        // Real chip drag: dragstart populates panelTransfer with the
+        // chip payload (tabGroupId set).
+        fireEvent.dragStart(chip);
+        expect(getPanelData()?.tabGroupId).toBe(monitoring.id);
+
+        // The drop resolves via moveGroupOrPanel — the same path the
+        // real drag flow ends up calling. This detaches the chip from
+        // the DOM (source tab group becomes empty).
+        dockview.moveGroupOrPanel({
+            from: { groupId: sourceGroup.id, tabGroupId: monitoring.id },
+            to: { group: siblingGroup, position: 'right' },
+        });
+        expect(chip.isConnected).toBe(false);
+
+        // dragend fires on the (now-detached) chip element.
+        fireEvent.dragEnd(chip);
+
+        // Without the fix, panelTransfer keeps the chip-drag payload
+        // (with tabGroupId) and any subsequent dragover/canDisplayOverlay
+        // call that reads it before the next dragstart's setData runs
+        // would see stale data — including a stale tabGroupId pointing
+        // at a tab group that has just been recreated under a new id.
+        expect(getPanelData()).toBeUndefined();
+
+        dockview.dispose();
+    });
+
     test('remove group', () => {
         dockview.layout(500, 1000);
 
@@ -9841,6 +10099,76 @@ describe('dockviewComponent', () => {
 
             rightApi.expand();
             expect(rightApi.isCollapsed()).toBe(false);
+
+            dv.dispose();
+        });
+
+        test('onDidCollapsedChange fires once per actual state change, not on redundant calls (#1241)', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['right']);
+            dv.layout(1000, 800);
+
+            const rightApi = dv.getEdgeGroup('right')!;
+            const events: boolean[] = [];
+            rightApi.onDidCollapsedChange((e) => events.push(e.isCollapsed));
+
+            rightApi.collapse();
+            rightApi.collapse(); // redundant
+            rightApi.expand();
+            rightApi.expand(); // redundant
+
+            expect(events).toEqual([true, false]);
+
+            dv.dispose();
+        });
+
+        test('repeated expand() does not drift the expanded size (#1241)', () => {
+            const c = document.createElement('div');
+            const dv = new DockviewComponent(c, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                // Non-zero gap is what surfaces splitview rounding drift
+                theme: { name: 'test', className: 'test', gap: 10 },
+            });
+            dv.addEdgeGroup('right', {
+                id: 'right-group',
+                initialSize: 220,
+                minimumSize: 100,
+            });
+            dv.layout(1000, 800);
+            dv.addPanel({
+                id: 'right-p1',
+                component: 'default',
+                position: { referenceGroup: 'right-group' },
+            });
+
+            const initialSize = (
+                dv as any
+            )._shellManager._outerSplitview.getViewSize(
+                (dv as any)._shellManager._rightIndex
+            );
+
+            const rightApi = dv.getEdgeGroup('right')!;
+            for (let i = 0; i < 10; i++) {
+                rightApi.expand();
+            }
+
+            const finalSize = (
+                dv as any
+            )._shellManager._outerSplitview.getViewSize(
+                (dv as any)._shellManager._rightIndex
+            );
+
+            expect(finalSize).toBe(initialSize);
 
             dv.dispose();
         });

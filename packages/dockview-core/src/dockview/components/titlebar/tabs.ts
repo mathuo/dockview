@@ -858,11 +858,13 @@ export class Tabs extends CompositeDisposable {
         const tabToRemove = this._tabs.splice(index, 1)[0];
         this._tabMap.delete(id);
 
-        const { value, disposable } = tabToRemove;
+        if (tabToRemove) {
+            const { value, disposable } = tabToRemove;
 
-        disposable.dispose();
-        value.dispose();
-        value.element.remove();
+            disposable.dispose();
+            value.dispose();
+            value.element.remove();
+        }
 
         // If a non-source tab was removed during active drag, refresh positions
         if (this._animState) {
@@ -1033,8 +1035,24 @@ export class Tabs extends CompositeDisposable {
 
         const iframes = disableIframePointEvents();
 
+        // The dragend listener on `_tabsList` is unreachable for chip
+        // drags because cross-group drops detach the chip from the DOM
+        // before dragend fires (the source tab group becomes empty, so
+        // `_positionChipForGroup` removes the chip element). Without
+        // bubbling, the tabsList listener never runs and `_animState`,
+        // `_chipDragCleanup`, and the dragging CSS classes leak. Listen
+        // directly on the chip element so cleanup happens regardless of
+        // whether it's still attached.  (Issue #1254.)
+        const chipElement = chip.element;
+        const onChipDragEnd = () => {
+            chipElement.removeEventListener('dragend', onChipDragEnd);
+            this.resetDragAnimation();
+        };
+        chipElement.addEventListener('dragend', onChipDragEnd);
+
         this._chipDragCleanup = {
             dispose: () => {
+                chipElement.removeEventListener('dragend', onChipDragEnd);
                 panelTransfer.clearData(PanelTransfer.prototype);
                 iframes.release();
             },
@@ -1680,6 +1698,14 @@ export class Tabs extends CompositeDisposable {
             // handles panel transfer and tab group recreation.
             // Use the REAL tab group ID from transfer data, not the
             // potentially stale one from _animState.
+            //
+            // Clear any inline gap margin / shifting class applied to
+            // destination tabs during dragover. Cross-group moves don't
+            // run the FLIP path, and `moveGroupOrPanel` only inserts new
+            // panels — it doesn't recreate existing destination tabs, so
+            // their inline `margin-left` would otherwise persist as a
+            // visible gap (issue #1243).
+            this.resetTabTransforms();
             this.accessor.moveGroupOrPanel({
                 from: {
                     groupId: data.groupId,

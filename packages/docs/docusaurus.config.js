@@ -242,6 +242,10 @@ const config = {
                 },
                 items: [
                     {
+                        type: 'search',
+                        position: 'right',
+                    },
+                    {
                         to: '/newsletter',
                         label: 'Newsletter',
                         position: 'right',
@@ -277,8 +281,12 @@ const config = {
                 style: 'dark',
                 links: [
                     {
-                        title: 'Learn',
+                        title: 'Documentation',
                         items: [
+                            {
+                                label: 'Get Started',
+                                to: '/docs/overview/introduction',
+                            },
                             {
                                 label: 'Demo',
                                 to: '/demo',
@@ -286,28 +294,28 @@ const config = {
                         ],
                     },
                     {
-                        title: 'Community',
+                        title: 'Dockview',
                         items: [
                             {
-                                label: 'Stack Overflow',
-                                href: 'https://stackoverflow.com/questions/tagged/dockview',
+                                label: 'Sitemap',
+                                to: '/sitemap.xml',
+                            },
+                            {
+                                label: 'Contact us',
+                                to: '/contact-us',
                             },
                         ],
                     },
                     {
-                        title: 'More',
+                        title: 'Follow',
                         items: [
-                            // {
-                            //     label: 'Blog',
-                            //     to: '/blog',
-                            // },
                             {
                                 label: 'GitHub',
                                 href: 'https://github.com/mathuo/dockview',
                             },
                             {
-                                label: 'Contributing',
-                                href: 'https://github.com/mathuo/dockview/blob/master/CONTRIBUTING.md',
+                                label: 'LinkedIn',
+                                href: 'https://www.linkedin.com/company/dockviewjs',
                             },
                         ],
                     },
@@ -339,6 +347,13 @@ const config = {
             },
             tableOfContents: {
                 maxHeadingLevel: 5,
+            },
+            algolia: {
+                appId: 'BA8M6MXEG4',
+                apiKey: 'faaf190a8d1ac5d3a4e2c984eb457ea8',
+                indexName: 'Documentation Website',
+                contextualSearch: true,
+                searchPagePath: 'search',
             },
         }),
 };
