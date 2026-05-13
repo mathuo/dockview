@@ -17,3 +17,20 @@ import { DocRef } from '@site/src/components/ui/reference/docRef';
 You can intercept drag events to attach your own metadata using the `onWillDragPanel` and `onWillDragGroup` api methods.
 
 <CodeRunner id="dockview/dnd-external" />
+
+## `nativeEvent` narrowing
+
+`event.nativeEvent` on drag-related events (`onWillDragPanel`, `onWillDragGroup`, `onWillDrop`, `onWillShowOverlay`, `onUnhandledDragOverEvent`) is typed as `DragEvent | PointerEvent` to cover both the HTML5 and pointer-event ([touch / pen](/docs/core/dnd/strategy)) backends.
+
+Narrow before reading `DragEvent`-only fields like `dataTransfer`:
+
+```ts
+api.onWillDragPanel((event) => {
+    if (!(event.nativeEvent instanceof DragEvent)) {
+        return; // touch / pen drag — no DataTransfer
+    }
+    event.nativeEvent.dataTransfer?.setData('text/plain', '...');
+});
+```
+
+Touch and pen drags cannot bridge to external HTML5 drop zones, so skipping them here is the intended behaviour — the drag still works inside dockview.

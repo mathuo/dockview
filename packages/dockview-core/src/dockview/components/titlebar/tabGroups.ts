@@ -428,12 +428,17 @@ export class TabGroupManager {
         // ends via `moveGroupOrPanel` (no actual drop event) needs the
         // singleton cleared immediately, otherwise a synchronous
         // `getPanelData()` after the move still sees the stale chip
-        // payload. Attached directly so the listener survives chip
-        // disposal in the detach-then-dragend cross-group path. (#1254)
-        const syncClearOnDragEnd = () => {
-            panelTransfer.clearData(PanelTransfer.prototype);
-        };
-        chip.element.addEventListener('dragend', syncClearOnDragEnd);
+        // payload. Attached directly (not via `addDisposableListener`) so
+        // the listener survives chip disposal in the detach-then-dragend
+        // cross-group path; `once: true` auto-removes after the single
+        // dragend that we care about. (#1254)
+        chip.element.addEventListener(
+            'dragend',
+            () => {
+                panelTransfer.clearData(PanelTransfer.prototype);
+            },
+            { once: true }
+        );
 
         const pointerDragSource = pointerBackend.createDragSource(
             chip.element,
