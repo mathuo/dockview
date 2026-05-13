@@ -601,6 +601,71 @@ describe('tabs - animation', () => {
             );
         });
 
+        test('dragging a group chip just before another group keeps insertion index outside the group (issue #1264)', () => {
+            // Regression: dragging a chip onto the LEFT of a standalone tab
+            // T, when a chip group sits immediately to T's right, must drop
+            // *before* T — not between T and the adjacent chip.
+            //
+            // Layout: [T][A1][A2] with chip "groupA" covering A1+A2.
+            // Drag external chip B; cursor on T's far left → insertionIndex
+            // accumulates to 0. The fix prevents the `isGroupDrag` snap
+            // from moving it forward to firstIdx (1) just because
+            // groupA's first tab is at index 1.
+            const { tabs, group } = createTabs({ tabAnimation: 'smooth' });
+            const panelT = createMockPanel('T');
+            const panelA1 = createMockPanel('A1');
+            const panelA2 = createMockPanel('A2');
+
+            tabs.openPanel(panelT, 0);
+            tabs.openPanel(panelA1, 1);
+            tabs.openPanel(panelA2, 2);
+
+            const elements = getTabElements(tabs);
+            mockTabRect(elements[0], { left: 0, width: 80 }); // T
+            mockTabRect(elements[1], { left: 110, width: 80 }); // A1 (chip)
+            mockTabRect(elements[2], { left: 190, width: 80 }); // A2 (chip)
+
+            const groupA = {
+                id: 'groupA',
+                panelIds: ['A1', 'A2'],
+                collapsed: false,
+            };
+            (group.model as any).getTabGroups = () => [groupA];
+
+            const chipRenderers = (tabs as any)._tabGroupManager
+                ._chipRenderers as Map<string, any>;
+            chipRenderers.set('groupA', {
+                chip: { element: document.createElement('span') },
+                disposable: { dispose: jest.fn() },
+            });
+
+            // Simulate cross-group chip drag state (source chip from another
+            // group, no overlap with destination panels).
+            (tabs as any)._animState = {
+                sourceTabId: '',
+                sourceIndex: -1,
+                tabPositions: (tabs as any).snapshotTabPositions(),
+                chipPositions: new Map([['groupA', 30]]),
+                currentInsertionIndex: null,
+                targetTabGroupId: null,
+                sourceTabGroupId: 'external-chipB',
+                sourceGroupPanelIds: new Set<string>(),
+                sourceChipWidth: 30,
+                cursorOffsetFromDragLeft: 40,
+                sourceGapWidth: 80,
+                containerLeft: 0,
+            };
+
+            // Cursor at clientX=20 → dragLeftEdge = -20, availableSpace = -20.
+            // T's midpoint check: 0 + 40 ≤ -20 → false, insertionIndex = 0.
+            // Without the fix: isJustBeforeGroup snaps to firstIdx (1),
+            // producing the buggy "between T and chip" drop.
+            (tabs as any).handleDragOver({ clientX: 20 } as DragEvent);
+
+            expect(getAnimState(tabs).currentInsertionIndex).toBe(0);
+            expect(getAnimState(tabs).targetTabGroupId).toBeNull();
+        });
+
         test('dragging a group chip never targets another group', () => {
             // Regression: dragging a group chip between two tabs of another
             // group should NOT set targetTabGroupId — groups cannot be
