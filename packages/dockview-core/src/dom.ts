@@ -209,12 +209,12 @@ export function quasiDefaultPrevented(event: Event): boolean {
     return (event as any)[QUASI_PREVENT_DEFAULT_KEY];
 }
 
-export type CspNonce =
+export type CspNonceProvider =
     | string
     | ((targetDocument: Document) => string | undefined);
 
 export interface AddStylesOptions {
-    nonce?: CspNonce;
+    nonce?: CspNonceProvider;
 }
 
 export function addStyles(

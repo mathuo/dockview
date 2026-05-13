@@ -19,7 +19,7 @@ ContextMenuItemConfig
 Contraints
 CreateComponentOptions
 CreateContextMenuItemComponentOptions
-CspNonce
+CspNonceProvider
 DEFAULT_TAB_GROUP_COLORS
 DefaultDockviewDeserialzier
 DefaultTab

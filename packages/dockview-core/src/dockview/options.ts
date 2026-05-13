@@ -17,8 +17,7 @@ import { Contraints } from '../gridview/gridviewPanel';
 import { AcceptableEvent, IAcceptableEvent } from '../events';
 import { DockviewTheme } from './theme';
 import { ITabGroup } from './tabGroup';
-import { CspNonce } from '../dom';
-export { CspNonce } from '../dom';
+export { CspNonceProvider } from '../dom';
 import { DockviewTabGroupColorEntry } from './tabGroupAccent';
 
 export interface IHeaderActionsRenderer extends IDisposable {
@@ -110,7 +109,7 @@ export interface DockviewOptions {
               minimumWidthWithinViewport?: number;
           };
     popoutUrl?: string;
-    nonce?: CspNonce;
+    nonce?: CspNonceProvider;
     defaultRenderer?: DockviewPanelRenderer;
     defaultHeaderPosition?: DockviewHeaderPosition;
     debug?: boolean;

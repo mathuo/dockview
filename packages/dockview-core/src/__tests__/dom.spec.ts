@@ -156,26 +156,13 @@ describe('dom', () => {
             expect(targetDoc.head.querySelectorAll('style').length).toBe(0);
         });
 
-        test('preserves source order across readable and unreadable sheets', () => {
-            // Simulate a CORS-restricted sheet whose cssRules throws on access.
-            const unreadable: any = {
-                href: 'https://cdn.test/blocked.css',
-                type: 'text/css',
-                get cssRules(): CSSRuleList {
-                    throw new DOMException('SecurityError', 'SecurityError');
-                },
-            };
-
+        test('preserves source order when mixing href-bearing and inline sheets', () => {
             const targetDoc = makeTargetDocument();
             const sheets = makeStyleSheetList([
                 makeStyleSheet(['.first { color: red; }']),
-                unreadable,
+                makeStyleSheet([], 'https://cdn.test/middle.css'),
                 makeStyleSheet(['.third { color: green; }']),
             ]);
-
-            const warn = jest
-                .spyOn(console, 'warn')
-                .mockImplementation(() => {});
 
             addStyles(targetDoc, sheets, { nonce: 'n1' });
 
@@ -187,10 +174,35 @@ describe('dom', () => {
             expect(appended[0].textContent).toBe('.first { color: red; }');
             expect(appended[1].tagName).toBe('LINK');
             expect((appended[1] as HTMLLinkElement).getAttribute('href')).toBe(
-                'https://cdn.test/blocked.css'
+                'https://cdn.test/middle.css'
             );
             expect(appended[2].tagName).toBe('STYLE');
             expect(appended[2].textContent).toBe('.third { color: green; }');
+        });
+
+        test('warns and continues when cssRules access throws on an href-less sheet', () => {
+            const targetDoc = makeTargetDocument();
+            const unreadable: any = {
+                type: 'text/css',
+                get cssRules(): CSSRuleList {
+                    throw new DOMException('SecurityError', 'SecurityError');
+                },
+            };
+            const sheets = makeStyleSheetList([
+                unreadable,
+                makeStyleSheet(['.after { color: green; }']),
+            ]);
+
+            const warn = jest
+                .spyOn(console, 'warn')
+                .mockImplementation(() => {});
+
+            addStyles(targetDoc, sheets);
+
+            expect(warn).toHaveBeenCalledTimes(1);
+            const styles = targetDoc.head.querySelectorAll('style');
+            expect(styles.length).toBe(1);
+            expect(styles[0].textContent).toBe('.after { color: green; }');
 
             warn.mockRestore();
         });
