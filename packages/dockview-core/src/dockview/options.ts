@@ -17,7 +17,8 @@ import { Contraints } from '../gridview/gridviewPanel';
 import { AcceptableEvent, IAcceptableEvent } from '../events';
 import { DockviewTheme } from './theme';
 import { ITabGroup } from './tabGroup';
-export { CspNonceProvider } from '../dom';
+import { CspNonceProvider } from '../dom';
+export { CspNonceProvider };
 import { DockviewTabGroupColorEntry } from './tabGroupAccent';
 
 export interface IHeaderActionsRenderer extends IDisposable {
