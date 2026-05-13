@@ -80,6 +80,27 @@ const DemoPage: React.FC = () => {
                     <span>+ click a tab to float it</span>
                 </div>
                 <div className={styles.spacer} />
+                <button
+                    type="button"
+                    className={styles.iconButton}
+                    title="View mobile demo"
+                    aria-label="View mobile demo"
+                    onClick={switchToMobileVariant}
+                >
+                    <svg
+                        height="16"
+                        width="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <rect x="7" y="2" width="10" height="20" rx="2" />
+                        <path d="M11 18h2" />
+                    </svg>
+                </button>
                 <a
                     href={CODESANDBOX_URL}
                     target="_blank"
@@ -216,6 +237,12 @@ const switchToDesktopVariant = () => {
     // locked at mount.
     const params = new URLSearchParams(window.location.search);
     params.set('variant', 'desktop');
+    window.location.search = params.toString();
+};
+
+const switchToMobileVariant = () => {
+    const params = new URLSearchParams(window.location.search);
+    params.set('variant', 'mobile');
     window.location.search = params.toString();
 };
 
