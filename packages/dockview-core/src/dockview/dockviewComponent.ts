@@ -891,6 +891,7 @@ export class DockviewComponent
                 height: box.height,
                 onDidOpen: options?.onDidOpen,
                 onWillClose: options?.onWillClose,
+                nonce: this.options?.nonce,
             }
         );
 

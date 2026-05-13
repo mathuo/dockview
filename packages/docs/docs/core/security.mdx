@@ -1,0 +1,92 @@
+---
+title: Security
+description: How Dockview behaves under strict Content Security Policy, Trusted Types, and other browser security primitives.
+---
+
+# Security
+
+Dockview is designed to work in security-hardened environments: strict [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP), [Trusted Types](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API), and same-origin popouts. This page covers what Dockview does at runtime, what you need to allow, and how to configure Dockview so that a strict policy doesn't break popout windows.
+
+## What Dockview does at runtime
+
+For the main document Dockview only writes to `element.style` properties (e.g. positioning, sizing), manipulates `classList`, and attaches event listeners via `addEventListener`. None of those are restricted by `style-src` or `script-src`. Dockview does not use `eval`, the `Function` constructor, `setTimeout`/`setInterval` with string arguments, `document.write`, inline event handlers, or any CSS-in-JS runtime.
+
+The **one** place Dockview needs dynamic styling is when opening a **popout window**: Dockview reads the parent window's stylesheets and recreates them in the popout's `<head>`, preserving the original cascade order. Stylesheets that were loaded via an `href` (i.e. external CSS files) are recreated as `<link rel="stylesheet">` elements; only stylesheet objects without an `href` (inline `<style>` or CSSOM-created sheets) are recreated as inline `<style>` elements. This is the path that interacts with `style-src`.
+
+Because external sheets are re-attached as `<link>` elements, the popout loads them asynchronously and may render unstyled for a frame before the network (or HTTP cache) resolves the request. For same-origin sheets this is generally invisible — the browser serves them from cache — but expect a brief flash if your CSS is hosted on a slow origin.
+
+## Content Security Policy
+
+### Recommended policy
+
+A policy like the following is enough to run Dockview with popouts:
+
+```
+Content-Security-Policy:
+  default-src 'self';
+  style-src   'self' 'nonce-RANDOM_NONCE';
+  script-src  'self' 'nonce-RANDOM_NONCE';
+```
+
+Note that:
+
+- You do **not** need `'unsafe-inline'` in `style-src`.
+- `RANDOM_NONCE` must be regenerated per response. It should be the same nonce that your server-rendered HTML applies to its own `<script>` / `<style>` tags.
+- The nonce only authorises the inline `<style>` elements Dockview injects. Any external CSS files Dockview re-attaches as `<link rel="stylesheet">` in the popout are still subject to your `style-src` **source expressions** — make sure those URLs are covered by `'self'` or an explicit origin in the directive.
+- If your popout is same-origin (the default for `window.open(url)` where `url` is on your origin), the popout document inherits your CSP and nonce, so the same nonce works for both windows.
+
+### Passing the nonce to Dockview
+
+Dockview forwards a `nonce` option to every `<style>` element it creates. The nonce must be valid for the document the `<style>` lands in, which — for popout windows — is **not** the opener document. Because `popout.html` is a separate HTTP response with its own freshly-generated nonce, the parent page's nonce is never valid in the popout's CSP context.
+
+For this reason `nonce` accepts either a **string** (when the same nonce is known to cover both documents, e.g. during local development with a static policy) or a **function** that is called with the target `Document` so you can read the nonce directly off the popout page.
+
+The recommended setup is to have your `popout.html` emit a `<meta name="csp-nonce">` element with its request nonce, then read it through the function form:
+
+```tsx title="React"
+<DockviewReact
+    nonce={(doc) =>
+        doc
+            .querySelector<HTMLMetaElement>('meta[name="csp-nonce"]')
+            ?.content
+    }
+    onReady={onReady}
+    components={components}
+/>
+```
+
+```vue
+<!-- Vue -->
+<dockview-vue :nonce="readCspNonce" @ready="onReady" />
+```
+
+```ts title="Angular"
+<dockview-angular [nonce]="readCspNonce" (ready)="onReady($event)"></dockview-angular>
+```
+
+```ts title="Vanilla"
+import { createDockview } from 'dockview-core';
+
+const api = createDockview(element, {
+    nonce: (doc) =>
+        doc
+            .querySelector<HTMLMetaElement>('meta[name="csp-nonce"]')
+            ?.content,
+    createComponent: (options) => { /* ... */ },
+});
+```
+
+If your popout markup uses a different convention (for example a global like `window.__CSP_NONCE__`), return that from the function instead.
+
+### CSP checklist
+
+- Add `'nonce-<value>'` to your `style-src` directive on **both** the main page and the popout page.
+- Generate a fresh nonce per response (on both pages).
+- In the popout HTML, expose the nonce in a known location (a `<meta name="csp-nonce">` tag is the most portable choice).
+- Provide the function form of `nonce` to Dockview so it reads the popout's own nonce at the moment styles are injected.
+- Serve the popout from the same origin as the host so it inherits your origin's CSP defaults.
+
+## Trusted Types
+
+Dockview is also compatible with [Trusted Types](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) (`require-trusted-types-for 'script'`). Dockview clears DOM subtrees with `Node.replaceChildren()` rather than `element.innerHTML = ''`, which Trusted Types treats as a sink.
+

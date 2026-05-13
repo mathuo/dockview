@@ -342,7 +342,7 @@ export class WrapTabGroupIndicator extends BaseTabGroupIndicator {
         let svg = underline.firstElementChild as SVGSVGElement | null;
         let path: SVGPathElement;
         if (!svg || svg.tagName !== 'svg') {
-            underline.innerHTML = '';
+            underline.replaceChildren();
             svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.style.display = 'block';
             path = document.createElementNS(
@@ -494,7 +494,7 @@ export class NoneTabGroupIndicator extends BaseTabGroupIndicator {
 
         // Clear any SVG content left over from a mode switch
         if (underline.firstElementChild) {
-            underline.innerHTML = '';
+            underline.replaceChildren();
         }
 
         underline.style.backgroundColor = color;
