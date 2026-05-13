@@ -50,32 +50,64 @@ describe('PointerDragSource', () => {
         source.dispose();
     });
 
-    test('movement during the initiation delay cancels the press (lets the browser scroll)', () => {
+    test('a pre-arm flick past pressTolerance begins the drag (any direction)', () => {
         jest.useFakeTimers();
         const element = document.createElement('div');
         document.body.appendChild(element);
 
-        const getData = jest.fn<IDisposable, []>(() => ({
-            dispose: jest.fn(),
-        }));
         const onDragStart = jest.fn();
-
         const source = new PointerDragSource(element, {
-            getData,
+            getData: () => ({ dispose: jest.fn() }),
             onDragStart,
         });
 
         fireEvent.pointerDown(element, pointerEventInit());
-        // Movement past pressTolerance (default 8px) before the timer fires
-        // means the user is scrolling, not pressing. Cancel.
-        fireEvent.pointerMove(window, pointerEventInit({ clientX: 50 }));
-        jest.advanceTimersByTime(500);
-        // Even further movement after timer would have fired — must NOT
-        // promote since the press was cancelled.
-        fireEvent.pointerMove(window, pointerEventInit({ clientX: 100 }));
+        // Flick past pressTolerance (default 8px) within the initiation
+        // delay — drag intent in any direction arms the drag now.
+        fireEvent.pointerMove(window, pointerEventInit({ clientX: 20 }));
+        expect(onDragStart).toHaveBeenCalledTimes(1);
 
+        source.dispose();
+    });
+
+    test('a pre-arm flick downward also begins the drag (no axis bias)', () => {
+        jest.useFakeTimers();
+        const element = document.createElement('div');
+        document.body.appendChild(element);
+
+        const onDragStart = jest.fn();
+        const source = new PointerDragSource(element, {
+            getData: () => ({ dispose: jest.fn() }),
+            onDragStart,
+        });
+
+        fireEvent.pointerDown(element, pointerEventInit());
+        fireEvent.pointerMove(window, pointerEventInit({ clientY: 20 }));
+        expect(onDragStart).toHaveBeenCalledTimes(1);
+
+        source.dispose();
+    });
+
+    test('jitter under pressTolerance during the initiation delay does not arm the drag', () => {
+        jest.useFakeTimers();
+        const element = document.createElement('div');
+        document.body.appendChild(element);
+
+        const onDragStart = jest.fn();
+        const source = new PointerDragSource(element, {
+            getData: () => ({ dispose: jest.fn() }),
+            onDragStart,
+        });
+
+        fireEvent.pointerDown(element, pointerEventInit());
+        // 4px finger jitter — under pressTolerance, drag does not arm yet.
+        fireEvent.pointerMove(window, pointerEventInit({ clientX: 4 }));
         expect(onDragStart).not.toHaveBeenCalled();
-        expect(getData).not.toHaveBeenCalled();
+        // After the initiation delay fires, subsequent motion past
+        // `threshold` (5px) starts the drag.
+        jest.advanceTimersByTime(300);
+        fireEvent.pointerMove(window, pointerEventInit({ clientX: 10 }));
+        expect(onDragStart).toHaveBeenCalledTimes(1);
 
         source.dispose();
     });

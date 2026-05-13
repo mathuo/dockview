@@ -69,14 +69,6 @@ export interface DragSourceOptions {
     pressTolerance?: number;
     /** Pointer-only movement threshold to promote pointerdown → drag. */
     threshold?: number;
-    /**
-     * Pointer-only. When provided, a pre-arm move past `pressTolerance`
-     * switches the source into scroll-forwarding mode rather than cancelling
-     * the gesture. The callback receives the per-move pointer delta until
-     * pointerup / pointercancel and is the recommended way to keep native
-     * pan behaviour on a source whose own element uses `touch-action: none`.
-     */
-    onPreArmScroll?: (dx: number, dy: number, event: PointerEvent) => void;
 }
 
 export interface IDragSource extends IDisposable {
@@ -231,7 +223,6 @@ class PointerDragBackend implements IDragBackend {
             touchInitiationDelay: options.touchInitiationDelay,
             pressTolerance: options.pressTolerance,
             threshold: options.threshold,
-            onPreArmScroll: options.onPreArmScroll,
         });
 
         if (options.disabled) {

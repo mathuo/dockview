@@ -22,12 +22,8 @@
      * Empty space between tabs (and the scrollbar lane) keeps pan-x so a
      * flick on those areas produces native momentum scroll. The tab and
      * chip elements themselves opt out (`touch-action: none`) so the
-     * pointer drag source owns the gesture from pointerdown — without
-     * that, the browser claims horizontal motion as a pan and fires
-     * pointercancel before our long-press timer can begin the drag.
-     * `onPreArmScroll` on the pointer drag source forwards pre-arm
-     * motion back into this container's scrollLeft so brief swipes on
-     * a tab still scroll the strip.
+     * pointer drag source owns the gesture from pointerdown — a flick on
+     * a tab or chip always becomes a drag, regardless of direction.
      */
     touch-action: pan-x;
 
@@ -186,8 +182,8 @@
     box-sizing: border-box;
     line-height: 1;
     // Same reasoning as `.dv-tab`: opt out of native pan so the chip's
-    // long-press drag arms reliably; pre-arm motion is forwarded back as
-    // strip-scroll via the pointer drag source's `onPreArmScroll`.
+    // drag arms on any flick. Strip-scrolling lives on the surrounding
+    // empty space (the container keeps `touch-action: pan-x`).
     touch-action: none;
 
     // The accent value is set inline by `applyTabGroupAccent` at render time.

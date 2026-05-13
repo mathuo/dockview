@@ -348,7 +348,7 @@ describe('tab', () => {
             jest.useRealTimers();
         });
 
-        test('a quick swipe before the initiation delay does NOT start a drag (lets the browser scroll the tab bar)', () => {
+        test('a quick swipe in any direction begins the drag (tabs always grab on flick)', () => {
             jest.useFakeTimers();
             const accessor = fromPartial<DockviewComponent>({
                 onDidOptionsChange: jest
@@ -376,22 +376,18 @@ describe('tab', () => {
                 clientX: 0,
                 clientY: 0,
             });
-            // Move 50px immediately — well past pressTolerance, but before
-            // the initiation delay. Must cancel.
+            // A downward flick past pressTolerance, before the initiation
+            // delay fires — drag intent in any direction begins the drag
+            // (strip-scrolling lives on the empty container space, not on
+            // tabs themselves).
             fireEvent.pointerMove(window, {
                 pointerId: 1,
                 pointerType: 'touch',
-                clientX: 50,
-                clientY: 0,
+                clientX: 0,
+                clientY: 50,
             });
-            jest.advanceTimersByTime(500);
 
-            expect(onDragStart).not.toHaveBeenCalled();
-            expect(
-                LocalSelectionTransfer.getInstance().hasData(
-                    PanelTransfer.prototype
-                )
-            ).toBe(false);
+            expect(onDragStart).toHaveBeenCalledTimes(1);
 
             cut.dispose();
             jest.useRealTimers();
