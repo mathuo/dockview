@@ -195,19 +195,45 @@ const MobileDemo: React.FC<{
                 <button
                     type="button"
                     className={styles.mobileButton}
-                    onClick={() => setSheetOpen(true)}
-                    aria-label="Open menu"
+                    onClick={switchToDesktopVariant}
+                    aria-label="View desktop demo"
+                    title="View desktop demo"
                 >
                     <svg
                         width="20"
                         height="20"
                         viewBox="0 0 24 24"
-                        fill="currentColor"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                         aria-hidden="true"
                     >
-                        <circle cx="5" cy="12" r="2" />
-                        <circle cx="12" cy="12" r="2" />
-                        <circle cx="19" cy="12" r="2" />
+                        <rect x="2" y="4" width="20" height="13" rx="2" />
+                        <path d="M8 21h8M12 17v4" />
+                    </svg>
+                </button>
+                <button
+                    type="button"
+                    className={styles.mobileButton}
+                    onClick={() => setSheetOpen(true)}
+                    aria-label="Change theme"
+                    title="Change theme"
+                >
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                    >
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 3a9 9 0 0 0 0 18 6 6 0 1 1 0-12 3 3 0 1 1 0-6z" />
                     </svg>
                 </button>
             </div>
@@ -218,9 +244,9 @@ const MobileDemo: React.FC<{
                 id="dockview/demo-dockview-mobile"
             />
             {sheetOpen && (
-                <MobileMenuSheet
+                <ThemeBottomSheet
                     activeTheme={theme}
-                    onSelectTheme={(t) => {
+                    onSelect={(t) => {
                         onChangeTheme(t);
                         setSheetOpen(false);
                     }}
@@ -246,11 +272,11 @@ const switchToMobileVariant = () => {
     window.location.search = params.toString();
 };
 
-const MobileMenuSheet: React.FC<{
+const ThemeBottomSheet: React.FC<{
     activeTheme: DockviewTheme;
-    onSelectTheme: (theme: DockviewTheme) => void;
+    onSelect: (theme: DockviewTheme) => void;
     onClose: () => void;
-}> = ({ activeTheme, onSelectTheme, onClose }) => {
+}> = ({ activeTheme, onSelect, onClose }) => {
     // Close on escape so non-touch testers can dismiss without tapping
     // the backdrop.
     React.useEffect(() => {
@@ -273,24 +299,9 @@ const MobileMenuSheet: React.FC<{
             <div
                 className={styles.sheet}
                 role="dialog"
-                aria-label="Demo settings"
+                aria-label="Choose theme"
             >
                 <div className={styles.sheetGrabber} />
-                <div className={styles.sheetTitle}>View</div>
-                <button
-                    type="button"
-                    className={styles.sheetItem}
-                    onClick={switchToDesktopVariant}
-                >
-                    <div>
-                        <div>Switch to desktop demo</div>
-                        <div className={styles.sheetItemSub}>
-                            Full feature set; designed for larger screens
-                        </div>
-                    </div>
-                    <span aria-hidden="true">→</span>
-                </button>
-                <div className={styles.sheetDivider} />
                 <div className={styles.sheetTitle}>Theme</div>
                 {themeConfig.map((t) => {
                     const active = t.id.name === activeTheme.name;
@@ -301,7 +312,7 @@ const MobileMenuSheet: React.FC<{
                             className={`${styles.sheetItem} ${
                                 active ? styles.sheetItemActive : ''
                             }`}
-                            onClick={() => onSelectTheme(t.id)}
+                            onClick={() => onSelect(t.id)}
                         >
                             <span>{t.label}</span>
                             {active && <span>✓</span>}

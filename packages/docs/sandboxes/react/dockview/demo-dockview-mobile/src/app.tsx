@@ -253,6 +253,105 @@ const FilesPanel: React.FC<IDockviewPanelProps> = () => {
     );
 };
 
+const POSITIONS = [
+    { symbol: 'AAPL', qty: 120, value: 23080.8, pnl: 412.5 },
+    { symbol: 'NVDA', qty: 30, value: 14434.8, pnl: 1145.2 },
+    { symbol: 'MSFT', qty: 50, value: 20613.5, pnl: -210.0 },
+];
+
+const PositionsPanel: React.FC<IDockviewPanelProps> = () => {
+    const total = POSITIONS.reduce((s, p) => s + p.value, 0);
+    return (
+        <div style={panelStyle}>
+            <div style={{ marginBottom: 8, opacity: 0.7, fontSize: 12 }}>
+                TOTAL · ${fmt(total, 0)}
+            </div>
+            {POSITIONS.map((p) => {
+                const up = p.pnl >= 0;
+                return (
+                    <div
+                        key={p.symbol}
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            padding: '8px 4px',
+                            borderBottom: '1px solid rgba(128,128,128,0.18)',
+                            fontSize: 13,
+                        }}
+                    >
+                        <div>
+                            <span style={{ fontWeight: 600 }}>{p.symbol}</span>
+                            <span style={{ marginLeft: 8, opacity: 0.6, fontSize: 11 }}>
+                                {p.qty} sh
+                            </span>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                            <div>${fmt(p.value, 0)}</div>
+                            <div
+                                style={{
+                                    fontSize: 11,
+                                    color: up ? '#3da45e' : '#d8403a',
+                                }}
+                            >
+                                {up ? '+' : ''}
+                                ${fmt(p.pnl, 0)}
+                            </div>
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
+
+const NEWS = [
+    {
+        time: '09:42',
+        source: 'Reuters',
+        headline: 'Fed minutes signal patience on rate path',
+    },
+    {
+        time: '09:15',
+        source: 'Bloomberg',
+        headline: 'Nvidia tops $480 ahead of earnings',
+    },
+    {
+        time: '08:58',
+        source: 'WSJ',
+        headline: 'Apple sets event for new accessory line',
+    },
+    {
+        time: '08:22',
+        source: 'FT',
+        headline: 'Tesla cuts vehicle prices in three markets',
+    },
+];
+
+const NewsPanel: React.FC<IDockviewPanelProps> = () => {
+    return (
+        <div style={panelStyle}>
+            {NEWS.map((n, i) => (
+                <div
+                    key={i}
+                    style={{
+                        padding: '10px 4px',
+                        borderBottom: '1px solid rgba(128,128,128,0.18)',
+                    }}
+                >
+                    <div style={{ display: 'flex', gap: 8, fontSize: 11, opacity: 0.6 }}>
+                        <span>{n.time}</span>
+                        <span>·</span>
+                        <span>{n.source}</span>
+                    </div>
+                    <div style={{ fontSize: 13, marginTop: 2 }}>
+                        {n.headline}
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+};
+
 const SEARCH_RESULTS = [
     { file: 'strategy.ts', line: 42, text: 'function rebalance(portfolio)' },
     { file: 'strategy.ts', line: 87, text: '// portfolio drift threshold' },
@@ -304,6 +403,8 @@ const components = {
     watchlist: WatchlistPanel,
     chart: ChartPanel,
     orders: OrdersPanel,
+    positions: PositionsPanel,
+    news: NewsPanel,
     files: FilesPanel,
     search: SearchPanel,
 };
@@ -341,7 +442,11 @@ const App: React.FC<AppProps> = (props) => {
             position: { referenceGroup: leftEdge.id },
         });
 
-        // Main group — three tabs the visitor can reorder, split, or merge.
+        // Main area splits vertically — top group holds the three primary
+        // tabs (watchlist / chart / orders), bottom group holds positions
+        // and news. Portrait phones have far more height than width, so a
+        // vertical split is the only one that doesn't crush each region
+        // below readability at 375px wide.
         api.addPanel({
             id: 'watchlist',
             component: 'watchlist',
@@ -360,7 +465,25 @@ const App: React.FC<AppProps> = (props) => {
             position: { referencePanel: 'watchlist', direction: 'within' },
         });
 
+        // `direction: 'below'` against the watchlist panel creates a new
+        // group sized via initialHeight so the top stays ~60% on a typical
+        // phone viewport.
+        api.addPanel({
+            id: 'positions',
+            component: 'positions',
+            title: 'Positions',
+            position: { referencePanel: 'watchlist', direction: 'below' },
+            initialHeight: 260,
+        });
+        api.addPanel({
+            id: 'news',
+            component: 'news',
+            title: 'News',
+            position: { referencePanel: 'positions', direction: 'within' },
+        });
+
         api.getPanel('watchlist')?.api.setActive();
+        api.getPanel('positions')?.api.setActive();
     };
 
     return (
