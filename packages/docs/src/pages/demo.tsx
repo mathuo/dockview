@@ -175,9 +175,19 @@ const MobileDemo: React.FC<{
                     type="button"
                     className={styles.mobileButton}
                     onClick={() => setSheetOpen(true)}
-                    aria-label="Change theme"
+                    aria-label="Open menu"
                 >
-                    Theme
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        aria-hidden="true"
+                    >
+                        <circle cx="5" cy="12" r="2" />
+                        <circle cx="12" cy="12" r="2" />
+                        <circle cx="19" cy="12" r="2" />
+                    </svg>
                 </button>
             </div>
             <ExampleFrame
@@ -187,9 +197,9 @@ const MobileDemo: React.FC<{
                 id="dockview/demo-dockview-mobile"
             />
             {sheetOpen && (
-                <ThemeBottomSheet
+                <MobileMenuSheet
                     activeTheme={theme}
-                    onSelect={(t) => {
+                    onSelectTheme={(t) => {
                         onChangeTheme(t);
                         setSheetOpen(false);
                     }}
@@ -200,11 +210,20 @@ const MobileDemo: React.FC<{
     );
 };
 
-const ThemeBottomSheet: React.FC<{
+const switchToDesktopVariant = () => {
+    // Preserve the current theme so the visitor sees the same look in the
+    // desktop variant they chose on mobile. Reload because `variant` is
+    // locked at mount.
+    const params = new URLSearchParams(window.location.search);
+    params.set('variant', 'desktop');
+    window.location.search = params.toString();
+};
+
+const MobileMenuSheet: React.FC<{
     activeTheme: DockviewTheme;
-    onSelect: (theme: DockviewTheme) => void;
+    onSelectTheme: (theme: DockviewTheme) => void;
     onClose: () => void;
-}> = ({ activeTheme, onSelect, onClose }) => {
+}> = ({ activeTheme, onSelectTheme, onClose }) => {
     // Close on escape so non-touch testers can dismiss without tapping
     // the backdrop.
     React.useEffect(() => {
@@ -227,9 +246,24 @@ const ThemeBottomSheet: React.FC<{
             <div
                 className={styles.sheet}
                 role="dialog"
-                aria-label="Choose theme"
+                aria-label="Demo settings"
             >
                 <div className={styles.sheetGrabber} />
+                <div className={styles.sheetTitle}>View</div>
+                <button
+                    type="button"
+                    className={styles.sheetItem}
+                    onClick={switchToDesktopVariant}
+                >
+                    <div>
+                        <div>Switch to desktop demo</div>
+                        <div className={styles.sheetItemSub}>
+                            Full feature set; designed for larger screens
+                        </div>
+                    </div>
+                    <span aria-hidden="true">→</span>
+                </button>
+                <div className={styles.sheetDivider} />
                 <div className={styles.sheetTitle}>Theme</div>
                 {themeConfig.map((t) => {
                     const active = t.id.name === activeTheme.name;
@@ -240,7 +274,7 @@ const ThemeBottomSheet: React.FC<{
                             className={`${styles.sheetItem} ${
                                 active ? styles.sheetItemActive : ''
                             }`}
-                            onClick={() => onSelect(t.id)}
+                            onClick={() => onSelectTheme(t.id)}
                         >
                             <span>{t.label}</span>
                             {active && <span>✓</span>}

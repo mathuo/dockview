@@ -200,9 +200,12 @@
 
 .sheetTitle {
     font-weight: 600;
-    padding: 0 20px 12px;
-    font-size: 0.95em;
+    padding: 12px 20px 8px;
+    font-size: 0.75em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     color: var(--ifm-navbar-link-color);
+    opacity: 0.6;
 }
 
 .sheetItem {
@@ -226,6 +229,18 @@
 
 .sheetItemActive {
     color: var(--ifm-color-primary);
+}
+
+.sheetItemSub {
+    font-size: 0.75em;
+    opacity: 0.65;
+    margin-top: 2px;
+}
+
+.sheetDivider {
+    height: 1px;
+    background: var(--ifm-toc-border-color);
+    margin: 4px 0;
 }
 
 @keyframes sheetFadeIn {

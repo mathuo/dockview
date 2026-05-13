@@ -207,10 +207,105 @@ const OrdersPanel: React.FC<IDockviewPanelProps> = () => {
     );
 };
 
+const FILES = [
+    { name: 'portfolio.json', kind: 'json' },
+    { name: 'strategy.ts', kind: 'ts' },
+    { name: 'README.md', kind: 'md' },
+    { name: 'screener.csv', kind: 'csv' },
+    { name: 'notes.txt', kind: 'txt' },
+];
+
+const FilesPanel: React.FC<IDockviewPanelProps> = () => {
+    return (
+        <div style={panelStyle}>
+            <div style={{ marginBottom: 8, opacity: 0.7, fontSize: 12 }}>
+                WORKSPACE
+            </div>
+            {FILES.map((f) => (
+                <div
+                    key={f.name}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '8px 4px',
+                        fontSize: 13,
+                    }}
+                >
+                    <span
+                        style={{
+                            display: 'inline-block',
+                            minWidth: 28,
+                            padding: '1px 4px',
+                            borderRadius: 3,
+                            fontSize: 9,
+                            textAlign: 'center',
+                            background: 'rgba(128,128,128,0.18)',
+                            opacity: 0.85,
+                        }}
+                    >
+                        {f.kind}
+                    </span>
+                    <span>{f.name}</span>
+                </div>
+            ))}
+        </div>
+    );
+};
+
+const SEARCH_RESULTS = [
+    { file: 'strategy.ts', line: 42, text: 'function rebalance(portfolio)' },
+    { file: 'strategy.ts', line: 87, text: '// portfolio drift threshold' },
+    { file: 'README.md', line: 12, text: 'Portfolio rebalancing policies' },
+];
+
+const SearchPanel: React.FC<IDockviewPanelProps> = () => {
+    return (
+        <div style={panelStyle}>
+            <input
+                type="text"
+                defaultValue="portfolio"
+                style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    boxSizing: 'border-box',
+                    border: '1px solid rgba(128,128,128,0.3)',
+                    borderRadius: 6,
+                    background: 'transparent',
+                    color: 'inherit',
+                    fontSize: 14,
+                    marginBottom: 12,
+                }}
+            />
+            <div style={{ fontSize: 11, opacity: 0.6, marginBottom: 6 }}>
+                {SEARCH_RESULTS.length} results
+            </div>
+            {SEARCH_RESULTS.map((r, i) => (
+                <div
+                    key={i}
+                    style={{
+                        padding: '8px 4px',
+                        borderBottom: '1px solid rgba(128,128,128,0.18)',
+                    }}
+                >
+                    <div style={{ fontSize: 12, opacity: 0.7 }}>
+                        {r.file}:{r.line}
+                    </div>
+                    <div style={{ fontSize: 13, fontFamily: 'monospace' }}>
+                        {r.text}
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+};
+
 const components = {
     watchlist: WatchlistPanel,
     chart: ChartPanel,
     orders: OrdersPanel,
+    files: FilesPanel,
+    search: SearchPanel,
 };
 
 export interface AppProps {
@@ -219,24 +314,53 @@ export interface AppProps {
 
 const App: React.FC<AppProps> = (props) => {
     const onReady = (event: DockviewReadyEvent) => {
-        event.api.addPanel({
+        const api = event.api;
+
+        // Left edge group — starts collapsed as a thin rail. Visitor taps to
+        // expand, drags into it to demonstrate cross-group drops onto an
+        // edge target. 200px expanded leaves ~175px for the main group on a
+        // 375px-wide iPhone — narrow but usable.
+        const leftEdge = api.addEdgeGroup('left', {
+            id: 'left-edge',
+            initialSize: 200,
+            minimumSize: 140,
+            collapsedSize: 32,
+            collapsed: true,
+        });
+
+        api.addPanel({
+            id: 'files',
+            component: 'files',
+            title: 'Files',
+            position: { referenceGroup: leftEdge.id },
+        });
+        api.addPanel({
+            id: 'search',
+            component: 'search',
+            title: 'Search',
+            position: { referenceGroup: leftEdge.id },
+        });
+
+        // Main group — three tabs the visitor can reorder, split, or merge.
+        api.addPanel({
             id: 'watchlist',
             component: 'watchlist',
             title: 'Watchlist',
         });
-        event.api.addPanel({
+        api.addPanel({
             id: 'chart',
             component: 'chart',
             title: 'Chart',
             position: { referencePanel: 'watchlist', direction: 'within' },
         });
-        event.api.addPanel({
+        api.addPanel({
             id: 'orders',
             component: 'orders',
             title: 'Orders',
             position: { referencePanel: 'watchlist', direction: 'within' },
         });
-        event.api.getPanel('watchlist')?.api.setActive();
+
+        api.getPanel('watchlist')?.api.setActive();
     };
 
     return (
