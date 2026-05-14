@@ -71,12 +71,7 @@ const App = defineComponent({
             disposables.forEach(d => d?.dispose?.());
             disposables.length = 0;
 
-            // Pointer (touch) drags can't bridge to external HTML5 drop
-            // zones outside dockview; narrow before reading dataTransfer.
             const panelDragDisposable = api.value.onWillDragPanel((event: any) => {
-                if (!(event.nativeEvent instanceof DragEvent)) {
-                    return;
-                }
                 const dataTransfer = event.nativeEvent.dataTransfer;
                 if (dataTransfer) {
                     dataTransfer.setData('text/plain', 'Some custom panel data transfer data');
@@ -85,9 +80,6 @@ const App = defineComponent({
             });
 
             const groupDragDisposable = api.value.onWillDragGroup((event: any) => {
-                if (!(event.nativeEvent instanceof DragEvent)) {
-                    return;
-                }
                 const dataTransfer = event.nativeEvent.dataTransfer;
                 if (dataTransfer) {
                     dataTransfer.setData('text/plain', 'Some custom group data transfer data');
