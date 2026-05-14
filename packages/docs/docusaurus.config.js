@@ -298,7 +298,7 @@ const config = {
                         items: [
                             {
                                 label: 'Sitemap',
-                                to: '/sitemap.xml',
+                                href: 'pathname:///sitemap.xml',
                             },
                             {
                                 label: 'Contact us',
