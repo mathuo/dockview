@@ -74,6 +74,7 @@ export {
     IWatermarkPanelProps,
     DockviewReadyEvent,
     ITabGroupChipRenderer,
+    IGroupDragGhostRenderer,
 } from './dockview/framework';
 
 export * from './dockview/options';

@@ -3,6 +3,7 @@ import { GroupDragHandler } from '../../dnd/groupDragHandler';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import { LocalSelectionTransfer, PanelTransfer } from '../../dnd/dataTransfer';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
+import { IGroupDragGhostRenderer } from '../../dockview/framework';
 
 describe('groupDragHandler', () => {
     test('that the dnd transfer object is setup and torndown', () => {
@@ -134,6 +135,112 @@ describe('groupDragHandler', () => {
         expect(spy).toHaveBeenCalledTimes(0);
 
         cut.dispose();
+    });
+
+    test('that a custom createGroupDragGhostComponent factory is invoked and disposed', () => {
+        jest.useFakeTimers();
+
+        const element = document.createElement('div');
+
+        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
+            const partial: Partial<DockviewGroupPanel> = {
+                id: 'g1',
+                api: { location: { type: 'grid' } } as any,
+                size: 3,
+            };
+            return partial as DockviewGroupPanel;
+        });
+        const group = new groupMock();
+
+        const ghostElement = document.createElement('div');
+        ghostElement.textContent = 'custom-ghost';
+
+        const init = jest.fn();
+        const dispose = jest.fn();
+        const renderer: IGroupDragGhostRenderer = {
+            element: ghostElement,
+            init,
+            dispose,
+        };
+        const factory = jest.fn(() => renderer);
+
+        const fakeApi = { id: 'api-id' };
+        const accessor = {
+            id: 'accessor_id',
+            api: fakeApi,
+            options: { createGroupDragGhostComponent: factory },
+        } as unknown as DockviewComponent;
+
+        const cut = new GroupDragHandler(element, accessor, group);
+
+        const dataTransfer = {
+            setDragImage: jest.fn(),
+        } as unknown as DataTransfer;
+        const dragEvent = {
+            dataTransfer,
+        } as unknown as DragEvent;
+
+        const disposable = cut.getData(dragEvent);
+
+        expect(factory).toHaveBeenCalledWith(group);
+        expect(init).toHaveBeenCalledWith({ group, api: fakeApi });
+        expect(dataTransfer.setDragImage).toHaveBeenCalledWith(
+            ghostElement,
+            30,
+            -10
+        );
+        expect(dispose).not.toHaveBeenCalled();
+
+        jest.runAllTimers();
+        expect(dispose).toHaveBeenCalledTimes(1);
+
+        disposable.dispose();
+        cut.dispose();
+        jest.useRealTimers();
+    });
+
+    test('that the default ghost is used when no factory is provided', () => {
+        jest.useFakeTimers();
+
+        const element = document.createElement('div');
+
+        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
+            const partial: Partial<DockviewGroupPanel> = {
+                id: 'g1',
+                api: { location: { type: 'grid' } } as any,
+                size: 4,
+            };
+            return partial as DockviewGroupPanel;
+        });
+        const group = new groupMock();
+
+        const accessor = {
+            id: 'accessor_id',
+            api: {},
+            options: {},
+        } as unknown as DockviewComponent;
+
+        const cut = new GroupDragHandler(element, accessor, group);
+
+        const dataTransfer = {
+            setDragImage: jest.fn(),
+        } as unknown as DataTransfer;
+        const dragEvent = {
+            dataTransfer,
+        } as unknown as DragEvent;
+
+        const disposable = cut.getData(dragEvent);
+
+        expect(dataTransfer.setDragImage).toHaveBeenCalledTimes(1);
+        const ghost = (dataTransfer.setDragImage as jest.Mock).mock
+            .calls[0][0] as HTMLElement;
+        expect(ghost.textContent).toBe('Multiple Panels (4)');
+
+        jest.runAllTimers();
+
+        disposable.dispose();
+        cut.dispose();
+        jest.useRealTimers();
     });
 
     test('that the event is never cancelled when the group is not floating', () => {
