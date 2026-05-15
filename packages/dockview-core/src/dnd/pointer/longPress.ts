@@ -60,15 +60,23 @@ export class LongPressDetector extends CompositeDisposable {
         const delay = this.options.delay ?? DEFAULT_DELAY;
         const tolerance = this.options.tolerance ?? DEFAULT_TOLERANCE;
 
-        this._timer = setTimeout(() => {
-            this._timer = undefined;
-            this._cancelPending();
-            this.options.onLongPress(event);
-        }, delay);
-
         // Source's owning window — popout drags fire on their own window.
         const targetWindow: Window =
             this.element.ownerDocument?.defaultView ?? window;
+
+        this._timer = setTimeout(() => {
+            this._timer = undefined;
+            this._cancelPending();
+            // Touch browsers synthesize a compatibility `contextmenu` event
+            // for long-press. preventDefault on the original pointerdown is
+            // too late (already dispatched), so install a one-shot
+            // capture-phase guard for the next contextmenu. Without this,
+            // consumers that don't preventDefault inside their onLongPress
+            // (or that early-return before doing so) leak the browser's
+            // native menu on top of theirs.
+            this._installContextMenuGuard(targetWindow);
+            this.options.onLongPress(event);
+        }, delay);
 
         this._moveListener = addDisposableListener(
             targetWindow,
@@ -105,6 +113,21 @@ export class LongPressDetector extends CompositeDisposable {
                 }
                 this._cancelPending();
             }
+        );
+    }
+
+    private _installContextMenuGuard(targetWindow: Window): void {
+        let guard: IDisposable | undefined;
+        const timeout = setTimeout(() => guard?.dispose(), 500);
+        guard = addDisposableListener(
+            targetWindow,
+            'contextmenu',
+            (event) => {
+                event.preventDefault();
+                clearTimeout(timeout);
+                guard?.dispose();
+            },
+            { capture: true }
         );
     }
 

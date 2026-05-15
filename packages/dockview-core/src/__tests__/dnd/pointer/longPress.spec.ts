@@ -129,4 +129,62 @@ describe('LongPressDetector', () => {
         cut.dispose();
         document.body.removeChild(element);
     });
+
+    test('suppresses the browser-synthesised contextmenu that follows long-press', () => {
+        jest.useFakeTimers();
+        const element = document.createElement('div');
+        document.body.appendChild(element);
+
+        const cut = new LongPressDetector(element, {
+            onLongPress: jest.fn(),
+            delay: 500,
+        });
+
+        fireEvent.pointerDown(element, pointerInit());
+        jest.advanceTimersByTime(500);
+
+        // Chrome's touch-emulator fires `contextmenu` immediately after the
+        // long-press window. The guard must call preventDefault on it.
+        const event = new MouseEvent('contextmenu', {
+            bubbles: true,
+            cancelable: true,
+        });
+        element.dispatchEvent(event);
+        expect(event.defaultPrevented).toBe(true);
+
+        cut.dispose();
+        document.body.removeChild(element);
+    });
+
+    test('contextmenu guard self-disposes after the first event', () => {
+        jest.useFakeTimers();
+        const element = document.createElement('div');
+        document.body.appendChild(element);
+
+        const cut = new LongPressDetector(element, {
+            onLongPress: jest.fn(),
+            delay: 500,
+        });
+
+        fireEvent.pointerDown(element, pointerInit());
+        jest.advanceTimersByTime(500);
+
+        const first = new MouseEvent('contextmenu', {
+            bubbles: true,
+            cancelable: true,
+        });
+        element.dispatchEvent(first);
+        expect(first.defaultPrevented).toBe(true);
+
+        // An unrelated, later right-click must not be suppressed.
+        const second = new MouseEvent('contextmenu', {
+            bubbles: true,
+            cancelable: true,
+        });
+        element.dispatchEvent(second);
+        expect(second.defaultPrevented).toBe(false);
+
+        cut.dispose();
+        document.body.removeChild(element);
+    });
 });

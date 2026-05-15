@@ -1,4 +1,5 @@
 import {
+    ContextMenuItem,
     DockviewReact,
     DockviewReadyEvent,
     IDockviewPanelProps,
@@ -486,10 +487,16 @@ const App: React.FC<AppProps> = (props) => {
         api.getPanel('positions')?.api.setActive();
     };
 
+    const getTabContextMenuItems = React.useCallback(
+        (): ContextMenuItem[] => ['close', 'closeOthers', 'closeAll'],
+        []
+    );
+
     return (
         <DockviewReact
             components={components}
             onReady={onReady}
+            getTabContextMenuItems={getTabContextMenuItems}
             theme={props.theme ?? themeAbyss}
         />
     );
