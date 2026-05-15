@@ -1,13 +1,66 @@
 import { resolveDndCapabilities } from '../../dockview/dndCapabilities';
 import { PROPERTY_KEYS_DOCKVIEW } from '../../dockview/options';
 
+function mockMatchMedia(byQuery: Record<string, boolean>): () => void {
+    const original = window.matchMedia;
+    (window as any).matchMedia = (query: string) =>
+        ({
+            matches: byQuery[query] ?? false,
+            media: query,
+            addEventListener: () => {},
+            removeEventListener: () => {},
+            addListener: () => {},
+            removeListener: () => {},
+            dispatchEvent: () => false,
+            onchange: null,
+        }) as MediaQueryList;
+    return () => {
+        (window as any).matchMedia = original;
+    };
+}
+
 describe('resolveDndCapabilities', () => {
-    test("'auto' (default): both backends active, pointer is touch-only", () => {
+    test("'auto' (default): both backends active, pointer is touch-only on hybrid/desktop", () => {
+        // jsdom has no matchMedia → falls back to the non-coarse branch.
         expect(resolveDndCapabilities({ dndStrategy: 'auto' })).toEqual({
             html5: true,
             pointer: true,
             pointerHandlesMouse: false,
         });
+    });
+
+    test("'auto' on a touch-primary device resolves to pointer-only", () => {
+        const restore = mockMatchMedia({
+            '(pointer: coarse)': true,
+            '(pointer: fine)': false,
+        });
+        try {
+            expect(resolveDndCapabilities({ dndStrategy: 'auto' })).toEqual({
+                html5: false,
+                pointer: true,
+                pointerHandlesMouse: true,
+            });
+        } finally {
+            restore();
+        }
+    });
+
+    test("'auto' on a hybrid device (coarse + fine) keeps both backends", () => {
+        // Touchscreen laptop / iPad with mouse: HTML5 stays available so the
+        // real mouse path keeps working.
+        const restore = mockMatchMedia({
+            '(pointer: coarse)': true,
+            '(pointer: fine)': true,
+        });
+        try {
+            expect(resolveDndCapabilities({ dndStrategy: 'auto' })).toEqual({
+                html5: true,
+                pointer: true,
+                pointerHandlesMouse: false,
+            });
+        } finally {
+            restore();
+        }
     });
 
     test('undefined strategy resolves the same as auto', () => {
