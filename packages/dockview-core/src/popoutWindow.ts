@@ -1,4 +1,4 @@
-import { addStyles } from './dom';
+import { addStyles, CspNonceProvider } from './dom';
 import { Emitter, addDisposableListener } from './events';
 import { CompositeDisposable, Disposable, IDisposable } from './lifecycle';
 import { Box } from './types';
@@ -7,6 +7,7 @@ export type PopoutWindowOptions = {
     url: string;
     onDidOpen?: (event: { id: string; window: Window }) => void;
     onWillClose?: (event: { id: string; window: Window }) => void;
+    nonce?: CspNonceProvider;
 } & Box;
 
 /**
@@ -164,7 +165,9 @@ export class PopoutWindow extends CompositeDisposable {
 
                     externalDocument.body.appendChild(container);
 
-                    addStyles(externalDocument, window.document.styleSheets);
+                    addStyles(externalDocument, window.document.styleSheets, {
+                        nonce: this.options.nonce,
+                    });
 
                     /**
                      * beforeunload must be registered after load for reasons I could not determine

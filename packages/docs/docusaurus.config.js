@@ -281,8 +281,12 @@ const config = {
                 style: 'dark',
                 links: [
                     {
-                        title: 'Learn',
+                        title: 'Documentation',
                         items: [
+                            {
+                                label: 'Get Started',
+                                to: '/docs/overview/introduction',
+                            },
                             {
                                 label: 'Demo',
                                 to: '/demo',
@@ -290,28 +294,28 @@ const config = {
                         ],
                     },
                     {
-                        title: 'Community',
+                        title: 'Dockview',
                         items: [
                             {
-                                label: 'Stack Overflow',
-                                href: 'https://stackoverflow.com/questions/tagged/dockview',
+                                label: 'Sitemap',
+                                href: 'pathname:///sitemap.xml',
+                            },
+                            {
+                                label: 'Contact us',
+                                to: '/contact-us',
                             },
                         ],
                     },
                     {
-                        title: 'More',
+                        title: 'Follow',
                         items: [
-                            // {
-                            //     label: 'Blog',
-                            //     to: '/blog',
-                            // },
                             {
                                 label: 'GitHub',
                                 href: 'https://github.com/mathuo/dockview',
                             },
                             {
-                                label: 'Contributing',
-                                href: 'https://github.com/mathuo/dockview/blob/master/CONTRIBUTING.md',
+                                label: 'LinkedIn',
+                                href: 'https://www.linkedin.com/company/dockviewjs',
                             },
                         ],
                     },

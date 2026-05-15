@@ -1,4 +1,5 @@
 import { resolveDndCapabilities } from '../../dockview/dndCapabilities';
+import { PROPERTY_KEYS_DOCKVIEW } from '../../dockview/options';
 
 describe('resolveDndCapabilities', () => {
     test("'auto' (default): both backends active, pointer is touch-only", () => {
@@ -66,5 +67,11 @@ describe('resolveDndCapabilities', () => {
                 }
             }
         }
+    });
+});
+
+describe('PROPERTY_KEYS_DOCKVIEW', () => {
+    test('includes nonce so framework wrappers (React, Vue) auto-forward it', () => {
+        expect(PROPERTY_KEYS_DOCKVIEW).toContain('nonce');
     });
 });

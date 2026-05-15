@@ -209,8 +209,22 @@ export function quasiDefaultPrevented(event: Event): boolean {
     return (event as any)[QUASI_PREVENT_DEFAULT_KEY];
 }
 
-export function addStyles(document: Document, styleSheetList: StyleSheetList) {
+export type CspNonceProvider =
+    | string
+    | ((targetDocument: Document) => string | undefined);
+
+export interface AddStylesOptions {
+    nonce?: CspNonceProvider;
+}
+
+export function addStyles(
+    document: Document,
+    styleSheetList: StyleSheetList,
+    options: AddStylesOptions = {}
+) {
     const styleSheets = Array.from(styleSheetList);
+    const { nonce } = options;
+    const resolvedNonce = typeof nonce === 'function' ? nonce(document) : nonce;
 
     for (const styleSheet of styleSheets) {
         if (styleSheet.href) {
@@ -219,6 +233,10 @@ export function addStyles(document: Document, styleSheetList: StyleSheetList) {
             link.type = styleSheet.type;
             link.rel = 'stylesheet';
             document.head.appendChild(link);
+            // The <link> will load and apply its rules in the target
+            // document. Reading cssRules here would duplicate them
+            // (and throws for cross-origin sheets).
+            continue;
         }
 
         let cssTexts: string[] = [];
@@ -236,11 +254,16 @@ export function addStyles(document: Document, styleSheetList: StyleSheetList) {
             );
         }
 
+        const fragment = document.createDocumentFragment();
         for (const rule of cssTexts) {
             const style = document.createElement('style');
+            if (resolvedNonce) {
+                style.setAttribute('nonce', resolvedNonce);
+            }
             style.appendChild(document.createTextNode(rule));
-            document.head.appendChild(style);
+            fragment.appendChild(style);
         }
+        document.head.appendChild(fragment);
     }
 }
 
