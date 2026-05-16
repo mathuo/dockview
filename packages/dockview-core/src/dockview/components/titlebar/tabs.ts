@@ -563,38 +563,38 @@ export class Tabs extends CompositeDisposable {
 
     setActivePanel(panel: IDockviewPanel): void {
         const isVertical = this._direction === 'vertical';
-        let running = 0;
 
         for (const tab of this._tabs) {
             const isActivePanel = panel.id === tab.value.panel.id;
             tab.value.setActive(isActivePanel);
 
-            if (isActivePanel) {
+            if (
+                isActivePanel &&
+                this.accessor.options.revealActiveTab !== false
+            ) {
                 const element = tab.value.element;
                 const parentElement = element.parentElement!;
 
                 if (isVertical) {
+                    const running = element.offsetTop;
                     if (
                         running < parentElement.scrollTop ||
-                        running + element.clientHeight >
+                        running + element.offsetHeight >
                             parentElement.scrollTop + parentElement.clientHeight
                     ) {
                         parentElement.scrollTop = running;
                     }
                 } else {
+                    const running = element.offsetLeft;
                     if (
                         running < parentElement.scrollLeft ||
-                        running + element.clientWidth >
+                        running + element.offsetWidth >
                             parentElement.scrollLeft + parentElement.clientWidth
                     ) {
                         parentElement.scrollLeft = running;
                     }
                 }
             }
-
-            running += isVertical
-                ? tab.value.element.clientHeight
-                : tab.value.element.clientWidth;
         }
 
         // Reposition underlines so the wrap-around follows the new active tab
