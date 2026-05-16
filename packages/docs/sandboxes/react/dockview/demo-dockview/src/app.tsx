@@ -672,6 +672,7 @@ const DockviewDemo = (props: {
     );
 
     const [watermark, setWatermark] = React.useState<boolean>(false);
+    const [customGhost, setCustomGhost] = React.useState<boolean>(false);
 
     const [gapCheck, setGapCheck] = React.useState<boolean>(false);
 
@@ -745,7 +746,9 @@ const DockviewDemo = (props: {
                                                     : undefined
                                             }
                                             groupDragGhostComponent={
-                                                GroupDragGhost
+                                                customGhost
+                                                    ? GroupDragGhost
+                                                    : undefined
                                             }
                                             onReady={onReady}
                                             theme={effectiveTheme}
@@ -861,6 +864,8 @@ const DockviewDemo = (props: {
                     activeGroup={activeGroup}
                     hasCustomWatermark={watermark}
                     toggleCustomWatermark={() => setWatermark(!watermark)}
+                    hasCustomGhost={customGhost}
+                    toggleCustomGhost={() => setCustomGhost(!customGhost)}
                     debug={debug}
                     onToggleDebug={() => setDebug(!debug)}
                     showLogs={showLogs}
