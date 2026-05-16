@@ -6668,6 +6668,102 @@ describe('dockviewComponent', () => {
             windowObject!.close();
         });
 
+        test('issue #851: fromJSON popout restoration is cancelled on dispose', async () => {
+            jest.useFakeTimers();
+            try {
+                const container = document.createElement('div');
+
+                const openSpy = jest.fn().mockImplementation(() => {
+                    return setupMockWindow();
+                });
+                window.open = openSpy;
+
+                const dockview = new DockviewComponent(container, {
+                    createComponent(options) {
+                        switch (options.name) {
+                            case 'default':
+                                return new PanelContentPartTest(
+                                    options.id,
+                                    options.name
+                                );
+                            default:
+                                throw new Error(`unsupported`);
+                        }
+                    },
+                });
+
+                dockview.layout(1000, 1000);
+
+                dockview.fromJSON({
+                    activeGroup: 'group-1',
+                    grid: {
+                        root: {
+                            type: 'branch',
+                            data: [
+                                {
+                                    type: 'leaf',
+                                    data: {
+                                        views: ['panel1'],
+                                        id: 'group-1',
+                                        activeView: 'panel1',
+                                    },
+                                    size: 1000,
+                                },
+                            ],
+                            size: 1000,
+                        },
+                        height: 1000,
+                        width: 1000,
+                        orientation: Orientation.VERTICAL,
+                    },
+                    popoutGroups: [
+                        {
+                            data: {
+                                views: ['panel2'],
+                                id: 'group-2',
+                                activeView: 'panel2',
+                            },
+                            position: null,
+                        },
+                    ],
+                    panels: {
+                        panel1: {
+                            id: 'panel1',
+                            contentComponent: 'default',
+                            title: 'panel1',
+                        },
+                        panel2: {
+                            id: 'panel2',
+                            contentComponent: 'default',
+                            title: 'panel2',
+                        },
+                    },
+                });
+
+                // Dispose BEFORE the popout-restoration timer has had a chance
+                // to fire. This simulates the React StrictMode mount -> dispose
+                // -> remount sequence that triggers issue #851.
+                expect(openSpy).not.toHaveBeenCalled();
+                dockview.dispose();
+
+                // Advance any timers and microtasks. With the fix in place the
+                // queued popout restoration is cancelled in dispose() and the
+                // guard inside the timeout body short-circuits any survivors,
+                // so window.open MUST NOT be called.
+                jest.runAllTimers();
+                await Promise.resolve();
+                jest.runAllTimers();
+
+                expect(openSpy).not.toHaveBeenCalled();
+
+                // The restoration promise should still resolve cleanly so
+                // callers awaiting it don't hang.
+                await dockview.popoutRestorationPromise;
+            } finally {
+                jest.useRealTimers();
+            }
+        });
+
         test('grid -> floating -> popout -> popout closed', async () => {
             const container = document.createElement('div');
 
