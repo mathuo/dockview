@@ -20,6 +20,7 @@ describe('dockviewPanel', () => {
             update: jest.fn(),
             init: jest.fn(),
             dispose: jest.fn(),
+            setTitle: jest.fn(),
         });
 
         const cut = new DockviewPanel(
@@ -67,6 +68,7 @@ describe('dockviewPanel', () => {
         const model = fromPartial<IDockviewPanelModel>({
             update: jest.fn(),
             init: jest.fn(),
+            setTitle: jest.fn(),
         });
 
         const cut = new DockviewPanel(
@@ -112,6 +114,7 @@ describe('dockviewPanel', () => {
             update: jest.fn(),
             init: jest.fn(),
             dispose: jest.fn(),
+            setTitle: jest.fn(),
         });
 
         const cut = new DockviewPanel(
@@ -148,6 +151,7 @@ describe('dockviewPanel', () => {
             update: jest.fn(),
             init: jest.fn(),
             dispose: jest.fn(),
+            setTitle: jest.fn(),
         });
 
         const cut = new DockviewPanel(
@@ -185,6 +189,7 @@ describe('dockviewPanel', () => {
             update: jest.fn(),
             init: jest.fn(),
             dispose: jest.fn(),
+            setTitle: jest.fn(),
         });
 
         const cut = new DockviewPanel(
@@ -223,6 +228,7 @@ describe('dockviewPanel', () => {
             update: jest.fn(),
             init: jest.fn(),
             dispose: jest.fn(),
+            setTitle: jest.fn(),
         });
 
         const cut = new DockviewPanel(

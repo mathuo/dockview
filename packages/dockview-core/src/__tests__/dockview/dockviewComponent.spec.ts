@@ -10974,4 +10974,26 @@ describe('dockviewComponent', () => {
             dv.dispose();
         });
     });
+
+    test('issue #914: api.setTitle reflected by createTabRenderer output', () => {
+        // Regression test for #914 — the header overflow dropdown lazily
+        // builds a fresh tab renderer via panel.view.createTabRenderer(...)
+        // each time it opens. Prior to the fix that renderer was initialised
+        // with a snapshot of the panel's init params, so a title updated via
+        // api.setTitle (which only updated DockviewPanel._title and fired
+        // onDidTitleChange) was not reflected in the dropdown entry.
+        const panel = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+            title: 'original',
+        });
+
+        panel.api.setTitle('renamed');
+
+        const overflowTab = panel.view.createTabRenderer('headerOverflow');
+
+        // DefaultTab renders the title into a child div with textContent.
+        expect(overflowTab.element.textContent).toContain('renamed');
+        expect(overflowTab.element.textContent).not.toContain('original');
+    });
 });
