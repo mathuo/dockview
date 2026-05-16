@@ -560,7 +560,11 @@ describe('voidContainer', () => {
             const setDragImage = jest.fn();
             const event = new Event('dragstart');
             Object.defineProperty(event, 'dataTransfer', {
-                value: { setDragImage, items: [] } as unknown as DataTransfer,
+                value: {
+                    setDragImage,
+                    setData: jest.fn(),
+                    items: [],
+                } as unknown as DataTransfer,
             });
             fireEvent(cut.element, event);
 
@@ -594,7 +598,11 @@ describe('voidContainer', () => {
             const setDragImage = jest.fn();
             const event = new Event('dragstart');
             Object.defineProperty(event, 'dataTransfer', {
-                value: { setDragImage, items: [] } as unknown as DataTransfer,
+                value: {
+                    setDragImage,
+                    setData: jest.fn(),
+                    items: [],
+                } as unknown as DataTransfer,
             });
             fireEvent(cut.element, event);
 
