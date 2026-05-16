@@ -9271,6 +9271,73 @@ describe('dockviewComponent', () => {
             // The most recent size (400px) should be preserved
             expect(panel1.group.api.width).toBe(400);
         });
+
+        test('issue 1020: addGroup + moveTo with defaultRenderer="always" repositions panel overlay', async () => {
+            // Reproduces https://github.com/mathuo/dockview/issues/1020
+            // The user split a group by creating a new adjacent group and
+            // moving the active panel into it. With defaultRenderer="always"
+            // the panel's content overlay stayed at the old grid coordinates
+            // until a resize fired. The fix wires _onDidMovePanel to
+            // debouncedUpdateAllPositions on the dockview component so every
+            // programmatic move re-runs the overlay positioning pass.
+
+            // An earlier test in this file enables fake timers without
+            // restoring them, which makes the requestAnimationFrame await
+            // below hang and time out. Force real timers here so the
+            // animation-frame callback actually fires.
+            jest.useRealTimers();
+
+            const c = document.createElement('div');
+            const dv = new DockviewComponent(c, {
+                createComponent(options) {
+                    return new PanelContentPartTest(options.id, options.name);
+                },
+                defaultRenderer: 'always',
+            });
+            dv.layout(1000, 1000);
+
+            const panel1 = dv.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            expect(panel1.api.renderer).toBe('always');
+            const sourceGroup = panel1.api.group;
+
+            const updateSpy = jest.spyOn(
+                dv.overlayRenderContainer,
+                'updateAllPositions'
+            );
+
+            // Mirror the user's exact onClick pattern.
+            const newGroup = dv.api.addGroup({
+                direction: 'right',
+                referenceGroup: sourceGroup,
+            });
+            panel1.api.moveTo({
+                group: newGroup,
+                skipSetActive: false,
+            });
+
+            // Move is wired correctly.
+            expect(panel1.group).toBe(newGroup);
+            expect(newGroup.activePanel?.id).toBe('panel1');
+            // The single-panel source group should have been cleaned up.
+            expect(dv.groups).not.toContain(sourceGroup);
+
+            // The fix schedules updateAllPositions on the next animation
+            // frame via debouncedUpdateAllPositions(). Without the
+            // _onDidMovePanel listener this assertion fails — the overlay
+            // would only reposition on the next external resize.
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            expect(updateSpy).toHaveBeenCalled();
+
+            // Content node must still be in the DOM tree.
+            expect(panel1.view.content.element.parentElement).toBeTruthy();
+
+            updateSpy.mockRestore();
+            dv.dispose();
+        });
     });
 
     describe('renderer: always with fromJSON', () => {
