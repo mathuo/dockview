@@ -964,6 +964,15 @@ export class DockviewGroupPanelModel
         this.tabsContainer.refreshTabGroupAccent();
     }
 
+    refreshWatermark(): void {
+        if (this.watermark) {
+            this.watermark.element.remove();
+            this.watermark.dispose?.();
+            this.watermark = undefined;
+        }
+        this.updateContainer();
+    }
+
     getTabGroupForPanel(panelId: string): ITabGroup | undefined {
         return this._findTabGroupForPanel(panelId);
     }

@@ -321,7 +321,32 @@ const colors = [
 let count = 0;
 
 const WatermarkComponent = () => {
-    return <div>custom watermark</div>;
+    return (
+        <div
+            style={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                color: 'rgba(255,255,255,0.55)',
+                fontFamily: 'monospace',
+                pointerEvents: 'none',
+            }}
+        >
+            <span
+                className="material-symbols-outlined"
+                style={{ fontSize: 32, opacity: 0.7 }}
+            >
+                dashboard
+            </span>
+            <div style={{ fontSize: 13 }}>Custom watermark</div>
+            <div style={{ fontSize: 11, opacity: 0.7 }}>
+                Drag a tab here or add a panel
+            </div>
+        </div>
+    );
 };
 
 const ThemeContext = React.createContext<DockviewTheme | undefined>(undefined);

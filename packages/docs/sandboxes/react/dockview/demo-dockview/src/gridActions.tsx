@@ -227,11 +227,7 @@ function usePopover() {
     };
 }
 
-export const GridActions = (props: {
-    api?: DockviewApi;
-    hasCustomWatermark: boolean;
-    toggleCustomWatermark: () => void;
-}) => {
+export const GridActions = (props: { api?: DockviewApi }) => {
     const onClear = () => {
         props.api?.clear();
     };

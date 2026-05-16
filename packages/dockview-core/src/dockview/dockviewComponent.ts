@@ -1520,6 +1520,18 @@ export class DockviewComponent
             }
         }
 
+        if ('createWatermarkComponent' in options) {
+            if (this._watermark) {
+                this._watermark.element.parentElement!.remove();
+                this._watermark.dispose?.();
+                this._watermark = null;
+            }
+            this.updateWatermark();
+            for (const group of this.groups) {
+                group.model.refreshWatermark();
+            }
+        }
+
         if ('tabGroupColors' in options || 'tabGroupAccent' in options) {
             this._tabGroupColorPalette.setEntries(
                 this._options.tabGroupColors ?? DEFAULT_TAB_GROUP_COLORS
