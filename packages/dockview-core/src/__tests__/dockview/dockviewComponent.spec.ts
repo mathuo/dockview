@@ -4497,6 +4497,74 @@ describe('dockviewComponent', () => {
         expect(dockview.groups.length).toBe(0);
     });
 
+    test('updateOptions({ createWatermarkComponent }) swaps live watermarks', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+
+        // No groups → dockview-level watermark mounted with the default renderer.
+        expect(
+            dockview.element.querySelectorAll('.dv-watermark-container').length
+        ).toBe(1);
+        expect(
+            dockview.element.querySelectorAll(
+                '.dv-watermark-container .dv-watermark-custom'
+            ).length
+        ).toBe(0);
+
+        const customRenderers: HTMLElement[] = [];
+
+        dockview.updateOptions({
+            createWatermarkComponent: () => {
+                const el = document.createElement('div');
+                el.className = 'dv-watermark-custom';
+                customRenderers.push(el);
+                return {
+                    element: el,
+                    init: () => {
+                        /* noop */
+                    },
+                };
+            },
+        });
+
+        // Same dockview-level container, but now wrapping the custom element.
+        expect(
+            dockview.element.querySelectorAll('.dv-watermark-container').length
+        ).toBe(1);
+        expect(
+            dockview.element.querySelectorAll(
+                '.dv-watermark-container .dv-watermark-custom'
+            ).length
+        ).toBe(1);
+        expect(customRenderers).toHaveLength(1);
+
+        // Toggling back to the default factory disposes the custom one and
+        // re-creates the default watermark in place.
+        dockview.updateOptions({ createWatermarkComponent: undefined });
+
+        expect(
+            dockview.element.querySelectorAll('.dv-watermark-container').length
+        ).toBe(1);
+        expect(
+            dockview.element.querySelectorAll(
+                '.dv-watermark-container .dv-watermark-custom'
+            ).length
+        ).toBe(0);
+    });
+
     test('that deserializing an empty layout has zero groups and a watermark', () => {
         const container = document.createElement('div');
 

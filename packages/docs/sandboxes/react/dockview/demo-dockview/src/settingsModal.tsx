@@ -59,11 +59,7 @@ export const ControlsContent = (props: {
     return (
         <>
             <Section title="Grid">
-                <GridActions
-                    api={props.api}
-                    hasCustomWatermark={props.hasCustomWatermark}
-                    toggleCustomWatermark={props.toggleCustomWatermark}
-                />
+                <GridActions api={props.api} />
             </Section>
 
             {props.api && props.activePanel && (
@@ -118,6 +114,19 @@ export const ControlsContent = (props: {
                             terminal
                         </span>
                         <span>Events Log</span>
+                    </button>
+                    <button
+                        onClick={props.toggleCustomWatermark}
+                        style={toggleBtn(props.hasCustomWatermark)}
+                        title="Use a custom watermark component (visible when no grid groups are present)"
+                    >
+                        <span
+                            className="material-symbols-outlined"
+                            style={{ fontSize: 14 }}
+                        >
+                            branding_watermark
+                        </span>
+                        <span>Custom watermark</span>
                     </button>
                     <button
                         onClick={props.toggleCustomGhost}
