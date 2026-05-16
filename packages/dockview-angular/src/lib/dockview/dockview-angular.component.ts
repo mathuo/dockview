@@ -38,6 +38,7 @@ import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularRenderer } from '../utils/angular-renderer';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
 import { AngularTabGroupChipRenderer } from './angular-tab-group-chip-renderer';
+import { AngularGroupDragGhostRenderer } from './angular-group-drag-ghost-renderer';
 
 export interface DockviewAngularOptions extends DockviewOptions {
     components: Record<string, Type<any>>;
@@ -84,6 +85,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() rightHeaderActionsComponent?: Type<any> | TemplateRef<any>;
     @Input() prefixHeaderActionsComponent?: Type<any> | TemplateRef<any>;
     @Input() tabGroupChipComponent?: Type<any>;
+    @Input() groupDragGhostComponent?: Type<any>;
 
     // Core dockview options as inputs
     @Input() className?: string;
@@ -164,6 +166,24 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
                 hasChanges = true;
             }
 
+            // Handle groupDragGhostComponent → createGroupDragGhostComponent mapping
+            if (
+                changes['groupDragGhostComponent'] &&
+                !changes['groupDragGhostComponent'].isFirstChange()
+            ) {
+                const ghostComponent =
+                    changes['groupDragGhostComponent'].currentValue;
+                coreChanges.createGroupDragGhostComponent = ghostComponent
+                    ? () =>
+                          new AngularGroupDragGhostRenderer(
+                              ghostComponent,
+                              this.injector,
+                              this.environmentInjector
+                          )
+                    : undefined;
+                hasChanges = true;
+            }
+
             if (hasChanges) {
                 this.dockviewApi.updateOptions(coreChanges);
             }
@@ -211,6 +231,17 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
             coreOptions.createTabGroupChipComponent = () => {
                 return new AngularTabGroupChipRenderer(
                     chipComponent,
+                    this.injector,
+                    this.environmentInjector
+                );
+            };
+        }
+
+        if (this.groupDragGhostComponent) {
+            const ghostComponent = this.groupDragGhostComponent;
+            coreOptions.createGroupDragGhostComponent = () => {
+                return new AngularGroupDragGhostRenderer(
+                    ghostComponent,
                     this.injector,
                     this.environmentInjector
                 );

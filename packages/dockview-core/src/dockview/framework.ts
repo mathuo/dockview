@@ -56,3 +56,9 @@ export interface ITabGroupChipRenderer {
     update?(params: { tabGroup: ITabGroup }): void;
     dispose(): void;
 }
+
+export interface IGroupDragGhostRenderer {
+    readonly element: HTMLElement;
+    init(params: { group: IDockviewGroupPanel; api: DockviewApi }): void;
+    dispose?(): void;
+}

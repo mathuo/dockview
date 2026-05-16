@@ -1,5 +1,6 @@
 import { DockviewComponent } from '../dockview/dockviewComponent';
 import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
+import { IGroupDragGhostRenderer } from '../dockview/framework';
 import { quasiPreventDefault } from '../dom';
 import { addDisposableListener } from '../events';
 import { IDisposable } from '../lifecycle';
@@ -66,21 +67,46 @@ export class GroupDragHandler extends DragHandler {
         );
 
         if (dataTransfer) {
-            const ghostElement = document.createElement('div');
+            const createGhost =
+                this.accessor.options.createGroupDragGhostComponent;
 
-            ghostElement.style.backgroundColor = bgColor;
-            ghostElement.style.color = color;
-            ghostElement.style.padding = '2px 8px';
-            ghostElement.style.height = '24px';
-            ghostElement.style.fontSize = '11px';
-            ghostElement.style.lineHeight = '20px';
-            ghostElement.style.borderRadius = '12px';
-            ghostElement.style.position = 'absolute';
-            ghostElement.style.pointerEvents = 'none';
-            ghostElement.style.top = '-9999px';
-            ghostElement.textContent = `Multiple Panels (${this.group.size})`;
+            let ghostElement: HTMLElement;
+            let customRenderer: IGroupDragGhostRenderer | undefined;
+
+            if (createGhost) {
+                customRenderer = createGhost(this.group);
+                customRenderer.init({
+                    group: this.group,
+                    api: this.accessor.api,
+                });
+                ghostElement = customRenderer.element;
+                ghostElement.style.position = 'absolute';
+                ghostElement.style.pointerEvents = 'none';
+                ghostElement.style.top = '-9999px';
+            } else {
+                ghostElement = document.createElement('div');
+
+                ghostElement.style.backgroundColor = bgColor;
+                ghostElement.style.color = color;
+                ghostElement.style.padding = '2px 8px';
+                ghostElement.style.height = '24px';
+                ghostElement.style.fontSize = '11px';
+                ghostElement.style.lineHeight = '20px';
+                ghostElement.style.borderRadius = '12px';
+                ghostElement.style.position = 'absolute';
+                ghostElement.style.pointerEvents = 'none';
+                ghostElement.style.top = '-9999px';
+                ghostElement.textContent = `Multiple Panels (${this.group.size})`;
+            }
 
             addGhostImage(dataTransfer, ghostElement, { y: -10, x: 30 });
+
+            if (customRenderer?.dispose) {
+                // addGhostImage removes the element from the DOM on the next
+                // tick; dispose the framework renderer on the same schedule.
+                const renderer = customRenderer;
+                setTimeout(() => renderer.dispose?.(), 0);
+            }
         }
 
         return {

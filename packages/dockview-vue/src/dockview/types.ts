@@ -12,6 +12,7 @@ export interface VueProps {
     leftHeaderActionsComponent?: string;
     prefixHeaderActionsComponent?: string;
     tabGroupChipComponent?: string;
+    groupDragGhostComponent?: string;
 }
 
 export type VueEvents = {

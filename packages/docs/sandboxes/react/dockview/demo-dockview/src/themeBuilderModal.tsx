@@ -296,6 +296,8 @@ export const Sidebar = (props: {
     activeGroup?: string;
     hasCustomWatermark: boolean;
     toggleCustomWatermark: () => void;
+    hasCustomGhost: boolean;
+    toggleCustomGhost: () => void;
     debug: boolean;
     onToggleDebug: () => void;
     showLogs: boolean;
@@ -902,6 +904,8 @@ export const Sidebar = (props: {
                         activeGroup={props.activeGroup}
                         hasCustomWatermark={props.hasCustomWatermark}
                         toggleCustomWatermark={props.toggleCustomWatermark}
+                        hasCustomGhost={props.hasCustomGhost}
+                        toggleCustomGhost={props.toggleCustomGhost}
                         debug={props.debug}
                         onToggleDebug={props.onToggleDebug}
                         showLogs={props.showLogs}
