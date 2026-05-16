@@ -18,6 +18,7 @@ export interface IDockviewPanelModel extends IDisposable {
     layout(width: number, height: number): void;
     init(params: GroupPanelPartInitParameters): void;
     createTabRenderer(tabLocation: TabLocation): ITabRenderer;
+    setTitle(title: string): void;
 }
 
 export class DockviewPanelModel implements IDockviewPanelModel {
@@ -62,6 +63,15 @@ export class DockviewPanelModel implements IDockviewPanelModel {
 
         this.content.init(params);
         this.tab.init({ ...params, tabLocation: 'header' });
+    }
+
+    setTitle(title: string): void {
+        // keep the cached init params in sync so that tab renderers created
+        // lazily after the title changes (e.g. for the header overflow
+        // dropdown) see the current title rather than the stale original.
+        if (this._params) {
+            this._params.title = title;
+        }
     }
 
     layout(width: number, height: number): void {

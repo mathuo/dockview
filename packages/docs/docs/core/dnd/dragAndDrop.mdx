@@ -141,6 +141,92 @@ parentElement.addEventListener('drop', (e) => onDidDrop(e));
 ```
 </FrameworkSpecific>
 
+## Customizing the group drag ghost
+
+When the user drags a whole group of panels by its empty header area, dockview shows a small floating ghost that follows the cursor. By default it renders the text `Multiple Panels (N)` — to localize the label or replace the visual entirely, supply a `createGroupDragGhostComponent` factory. It receives the `DockviewGroupPanel` being dragged and must return an `IGroupDragGhostRenderer`.
+
+<FrameworkSpecific framework="React">
+  <DocRef declaration="IDockviewReactProps" methods={['groupDragGhostComponent']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+  <DocRef declaration="IDockviewVueProps" methods={['groupDragGhostComponent']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+  <DocRef declaration="IDockviewAngularProps" methods={['groupDragGhostComponent']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+  <DocRef declaration="DockviewComponentOptions" methods={['createGroupDragGhostComponent']} />
+</FrameworkSpecific>
+
+The renderer must implement:
+
+```ts
+interface IGroupDragGhostRenderer {
+    readonly element: HTMLElement;   // the ghost DOM element
+    init(params: { group: IDockviewGroupPanel; api: DockviewApi }): void;
+    dispose?(): void;
+}
+```
+
+The ghost is captured by the browser at drag start and removed shortly after, so the component is short-lived — render synchronously enough to be painted before the browser snapshots the element.
+
+<FrameworkSpecific framework="React">
+```tsx
+const GroupDragGhost = (props: IDockviewGroupDragGhostProps) => (
+    <div className="my-drag-ghost">
+        {props.group.activePanel?.title} +{props.group.panels.length - 1} more
+    </div>
+);
+
+return (
+    <DockviewReact
+        components={components}
+        onReady={onReady}
+        groupDragGhostComponent={GroupDragGhost}
+    />
+);
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+```html
+<dockview-vue :components="components" group-drag-ghost-component="MyDragGhost" @ready="onReady" />
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+```html
+<dv-dockview
+    [components]="components"
+    [groupDragGhostComponent]="MyDragGhostComponent"
+    (ready)="onReady($event)">
+</dv-dockview>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+```ts
+class MyGroupDragGhost {
+    readonly element = document.createElement('div');
+
+    init({ group }) {
+        this.element.className = 'my-drag-ghost';
+        this.element.textContent = `${group.activePanel?.title} +${group.panels.length - 1} more`;
+    }
+
+    dispose() {}
+}
+
+const api = createDockview(parentElement, {
+    createComponent: (options) => new MyPanel(options),
+    createGroupDragGhostComponent: (group) => new MyGroupDragGhost(),
+});
+```
+</FrameworkSpecific>
+
 ## Third Party Dnd Libraries
 
 This shows a simple example of a third-party library used inside a panel that relies on drag

@@ -32,6 +32,10 @@ import {
     IDockviewTabGroupChipProps,
     ReactTabGroupChipPart,
 } from './reactTabGroupChipPart';
+import {
+    IDockviewGroupDragGhostProps,
+    ReactGroupDragGhostPart,
+} from './reactGroupDragGhostPart';
 
 function createGroupControlElement(
     component: React.FunctionComponent<IDockviewHeaderActionsProps> | undefined,
@@ -75,6 +79,16 @@ export interface IDockviewReactProps extends DockviewOptions {
         params: GetTabGroupChipContextMenuItemsParams
     ) => (BuiltInChipContextMenuItem | ReactContextMenuItemConfig)[];
     tabGroupChipComponent?: React.FunctionComponent<IDockviewTabGroupChipProps>;
+    /**
+     * Component rendered as the drag ghost (the small floating chip) while
+     * a group of panels is being dragged. If omitted, the default
+     * `"Multiple Panels (N)"` ghost is used.
+     *
+     * Note: the ghost is captured by the browser at drag start, so the
+     * component must render fast / synchronously enough to be visible
+     * before the browser snapshots it.
+     */
+    groupDragGhostComponent?: React.FunctionComponent<IDockviewGroupDragGhostProps>;
     //
     onReady: (event: DockviewReadyEvent) => void;
     onDidDrop?: (event: DockviewDidDropEvent) => void;
@@ -206,6 +220,15 @@ export const DockviewReact = React.forwardRef(
                 };
             }
 
+            if (props.groupDragGhostComponent) {
+                const ghostComponent = props.groupDragGhostComponent;
+                coreOptions.createGroupDragGhostComponent = () => {
+                    return new ReactGroupDragGhostPart(ghostComponent, {
+                        addPortal,
+                    });
+                };
+            }
+
             const api = createDockview(domRef.current, {
                 ...coreOptions,
                 ...frameworkOptions,
@@ -280,6 +303,25 @@ export const DockviewReact = React.forwardRef(
                     : undefined,
             });
         }, [props.tabGroupChipComponent]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+
+            dockviewRef.current.updateOptions({
+                createGroupDragGhostComponent: props.groupDragGhostComponent
+                    ? () => {
+                          return new ReactGroupDragGhostPart(
+                              props.groupDragGhostComponent!,
+                              {
+                                  addPortal,
+                              }
+                          );
+                      }
+                    : undefined,
+            });
+        }, [props.groupDragGhostComponent]);
 
         React.useEffect(() => {
             if (!dockviewRef.current) {

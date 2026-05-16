@@ -112,6 +112,7 @@ IGridPanelView
 IGridView
 IGridviewComponent
 IGridviewPanel
+IGroupDragGhostRenderer
 IGroupHeaderProps
 IGroupPanelBaseProps
 IGroupPanelInitParameters

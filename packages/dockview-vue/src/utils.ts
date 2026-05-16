@@ -4,8 +4,10 @@ import type {
     DockviewGroupPanel,
     DockviewPanelApi,
     IContentRenderer,
+    IDockviewGroupPanel,
     IDockviewHeaderActionsProps,
     IDockviewPanelHeaderProps,
+    IGroupDragGhostRenderer,
     IGroupHeaderProps,
     IHeaderActionsRenderer,
     ITabGroupChipRenderer,
@@ -346,6 +348,41 @@ export class VueTabGroupChipRenderer
         this._renderDisposable?.update({
             params: { tabGroup: params.tabGroup },
         });
+    }
+
+    dispose(): void {
+        this._renderDisposable?.dispose();
+    }
+}
+
+export class VueGroupDragGhostRenderer
+    extends AbstractVueRenderer
+    implements IGroupDragGhostRenderer
+{
+    private _renderDisposable:
+        | { update: (props: any) => void; dispose: () => void }
+        | undefined;
+
+    constructor(component: VueComponent, parent: ComponentInternalInstance) {
+        super(component, parent);
+        this.element.style.height = '';
+        this.element.style.width = '';
+        this.element.style.display = 'inline-flex';
+    }
+
+    init(params: { group: IDockviewGroupPanel; api: DockviewApi }): void {
+        this._renderDisposable?.dispose();
+        this._renderDisposable = mountVueComponent(
+            this.component,
+            this.parent,
+            {
+                params: {
+                    group: params.group,
+                    api: params.api,
+                },
+            },
+            this.element
+        );
     }
 
     dispose(): void {

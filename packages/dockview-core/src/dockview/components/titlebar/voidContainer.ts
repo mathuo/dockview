@@ -64,6 +64,13 @@ export class VoidContainer extends CompositeDisposable {
         this.dropTarget = new Droptarget(this._element, {
             acceptedTargetZones: ['center'],
             canDisplayOverlay: (event, position) => {
+                if (this.group.api.locked) {
+                    // Dropping on the void/header space adds the panel
+                    // to this group, which `locked` is meant to prevent
+                    // (both `true` and `'no-drop-target'`).
+                    return false;
+                }
+
                 const data = getPanelData();
 
                 if (data && this.accessor.id === data.viewId) {

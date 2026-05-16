@@ -4,6 +4,7 @@ import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
 import {
     DockviewGroupChangeEvent,
     DockviewGroupLocation,
+    DockviewGroupPanelLocked,
 } from '../dockview/dockviewGroupPanelModel';
 import { DockviewHeaderPosition } from '../dockview/options';
 import { Emitter, Event } from '../events';
@@ -39,6 +40,13 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
      */
     readonly onDidCollapsedChange: Event<DockviewGroupPanelCollapsedChangeEvent>;
     readonly location: DockviewGroupLocation;
+    /**
+     * Whether this group is locked against drop interactions.
+     * - `true`: panels cannot be dropped into the group (center / tabs),
+     *   but the group can still be split from its edges.
+     * - `'no-drop-target'`: all drop zones are disabled for this group.
+     */
+    locked: DockviewGroupPanelLocked;
     /**
      * If you require the Window object
      */
@@ -94,6 +102,20 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             throw new Error(NOT_INITIALIZED_MESSAGE);
         }
         return this._group.model.location;
+    }
+
+    get locked(): DockviewGroupPanelLocked {
+        if (!this._group) {
+            throw new Error(NOT_INITIALIZED_MESSAGE);
+        }
+        return this._group.locked;
+    }
+
+    set locked(value: DockviewGroupPanelLocked) {
+        if (!this._group) {
+            throw new Error(NOT_INITIALIZED_MESSAGE);
+        }
+        this._group.locked = value;
     }
 
     constructor(

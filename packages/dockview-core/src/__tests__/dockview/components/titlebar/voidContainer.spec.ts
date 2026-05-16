@@ -2,6 +2,11 @@ import { VoidContainer } from '../../../../dockview/components/titlebar/voidCont
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewComponent } from '../../../../dockview/dockviewComponent';
 import { DockviewGroupPanel } from '../../../../dockview/dockviewGroupPanel';
+import { DockviewGroupPanelModel } from '../../../../dockview/dockviewGroupPanelModel';
+import {
+    LocalSelectionTransfer,
+    PanelTransfer,
+} from '../../../../dnd/dataTransfer';
 import { fireEvent } from '@testing-library/dom';
 
 describe('voidContainer', () => {
@@ -203,6 +208,102 @@ describe('voidContainer', () => {
 
             fireEvent.dragStart(cut.element);
             expect(spy).toHaveBeenCalledTimes(0);
+
+            cut.dispose();
+        });
+    });
+
+    describe('locked group (regression #990)', () => {
+        function setup(lockedValue: boolean | 'no-drop-target') {
+            const accessor = fromPartial<DockviewComponent>({
+                id: 'testcomponentid',
+                options: {},
+                doSetGroupActive: jest.fn(),
+            });
+
+            const groupView = fromPartial<DockviewGroupPanelModel>({
+                canDisplayOverlay: jest.fn().mockReturnValue(true),
+                dropTargetContainer: undefined,
+            });
+
+            const group = fromPartial<DockviewGroupPanel>({
+                id: 'testgroupid',
+                model: groupView,
+                api: fromPartial<DockviewGroupPanel['api']>({
+                    locked: lockedValue,
+                }),
+            });
+
+            const cut = new VoidContainer(accessor, group);
+
+            jest.spyOn(cut.element, 'offsetHeight', 'get').mockImplementation(
+                () => 100
+            );
+            jest.spyOn(cut.element, 'offsetWidth', 'get').mockImplementation(
+                () => 100
+            );
+
+            return { cut, groupView };
+        }
+
+        afterEach(() => {
+            LocalSelectionTransfer.getInstance().clearData(
+                PanelTransfer.prototype
+            );
+        });
+
+        test.each([true, 'no-drop-target' as const])(
+            'does not display a drop overlay when locked=%p, even for same-accessor drags',
+            (lockedValue) => {
+                const { cut, groupView } = setup(lockedValue);
+
+                LocalSelectionTransfer.getInstance().setData(
+                    [
+                        new PanelTransfer(
+                            'testcomponentid',
+                            'anothergroupid',
+                            'panel1'
+                        ),
+                    ],
+                    PanelTransfer.prototype
+                );
+
+                fireEvent.dragEnter(cut.element);
+                fireEvent.dragOver(cut.element);
+
+                expect(
+                    cut.element.parentElement?.getElementsByClassName(
+                        'dv-drop-target-dropzone'
+                    ).length ?? 0
+                ).toBe(0);
+                // short-circuited before consulting the group model
+                expect(groupView.canDisplayOverlay).not.toHaveBeenCalled();
+
+                cut.dispose();
+            }
+        );
+
+        test('still displays a drop overlay for same-accessor drags when not locked', () => {
+            const { cut } = setup(false);
+
+            LocalSelectionTransfer.getInstance().setData(
+                [
+                    new PanelTransfer(
+                        'testcomponentid',
+                        'anothergroupid',
+                        'panel1'
+                    ),
+                ],
+                PanelTransfer.prototype
+            );
+
+            fireEvent.dragEnter(cut.element);
+            fireEvent.dragOver(cut.element);
+
+            expect(
+                cut.element.getElementsByClassName('dv-drop-target-dropzone')
+                    .length
+            ).toBe(1);
 
             cut.dispose();
         });

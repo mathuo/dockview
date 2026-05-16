@@ -48,6 +48,8 @@ export const ControlsContent = (props: {
     activeGroup?: string;
     hasCustomWatermark: boolean;
     toggleCustomWatermark: () => void;
+    hasCustomGhost: boolean;
+    toggleCustomGhost: () => void;
     debug: boolean;
     onToggleDebug: () => void;
     showLogs: boolean;
@@ -125,6 +127,19 @@ export const ControlsContent = (props: {
                             branding_watermark
                         </span>
                         <span>Custom watermark</span>
+                    </button>
+                    <button
+                        onClick={props.toggleCustomGhost}
+                        style={toggleBtn(props.hasCustomGhost)}
+                        title="Replace the default 'Multiple Panels (N)' group drag ghost with a custom component"
+                    >
+                        <span
+                            className="material-symbols-outlined"
+                            style={{ fontSize: 14 }}
+                        >
+                            drag_indicator
+                        </span>
+                        <span>Custom Drag Ghost</span>
                     </button>
                     {props.showLogs && (
                         <button
