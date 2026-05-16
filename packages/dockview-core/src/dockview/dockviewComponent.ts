@@ -2856,8 +2856,11 @@ export class DockviewComponent
                      * the source group is a popout group with a single panel
                      *
                      * 1. remove the panel from the group without triggering any events
-                     * 2. remove the popout group
-                     * 3. create a new group at the requested location and add that panel
+                     * 2. remove the popout group — this may cascade-remove the empty
+                     *    reference group it left behind in the main grid (see
+                     *    doRemoveGroup for popout groups), which can shift grid indices
+                     * 3. recompute the target location now that the grid is stable
+                     * 4. create a new group at the recomputed location and add that panel
                      */
 
                     const popoutGroup = this._popoutGroups.find(
@@ -2877,7 +2880,15 @@ export class DockviewComponent
 
                     this.doRemoveGroup(sourceGroup, { skipActive: true });
 
-                    const newGroup = this.createGroupAtLocation(targetLocation);
+                    const updatedTargetLocation = getRelativeLocation(
+                        this.gridview.orientation,
+                        getGridLocation(destinationGroup.element),
+                        destinationTarget
+                    );
+
+                    const newGroup = this.createGroupAtLocation(
+                        updatedTargetLocation
+                    );
                     this.movingLock(() =>
                         newGroup.model.openPanel(removedPanel, {
                             skipSetActive: true,
