@@ -12,6 +12,7 @@ import {
 import {
     DragSourceOptions,
     html5Backend,
+    IDragGhostSpec,
     IDragSource,
     pointerBackend,
 } from '../../../dnd/backend';
@@ -85,6 +86,13 @@ export class VoidContainer extends CompositeDisposable {
             event: DragEvent | PointerEvent,
             position: Position
         ): boolean => {
+            if (this.group.api.locked) {
+                // Dropping on the void/header space adds the panel
+                // to this group, which `locked` is meant to prevent
+                // (both `true` and `'no-drop-target'`).
+                return false;
+            }
+
             const data = getPanelData();
 
             if (data && this.accessor.id === data.viewId) {
@@ -135,6 +143,31 @@ export class VoidContainer extends CompositeDisposable {
             return ghostEl;
         };
 
+        const buildGhostSpec = (): IDragGhostSpec => {
+            const createGhost =
+                this.accessor.options.createGroupDragGhostComponent;
+            if (createGhost) {
+                const renderer = createGhost(this.group);
+                renderer.init({
+                    group: this.group,
+                    api: this.accessor.api,
+                });
+                return {
+                    element: renderer.element,
+                    offsetX: 30,
+                    offsetY: -10,
+                    dispose: renderer.dispose
+                        ? () => renderer.dispose?.()
+                        : undefined,
+                };
+            }
+            return {
+                element: buildMultiPanelsGhost(),
+                offsetX: 30,
+                offsetY: -10,
+            };
+        };
+
         const sharedDragOptions: DragSourceOptions = {
             getData: () => {
                 this.panelTransfer.setData(
@@ -147,11 +180,7 @@ export class VoidContainer extends CompositeDisposable {
                     },
                 };
             },
-            createGhost: () => ({
-                element: buildMultiPanelsGhost(),
-                offsetX: 30,
-                offsetY: -10,
-            }),
+            createGhost: buildGhostSpec,
             onDragStart: (event) => {
                 this._onDragStart.fire(event);
             },

@@ -2,11 +2,13 @@ import { VoidContainer } from '../../../../dockview/components/titlebar/voidCont
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewComponent } from '../../../../dockview/dockviewComponent';
 import { DockviewGroupPanel } from '../../../../dockview/dockviewGroupPanel';
-import { fireEvent } from '@testing-library/dom';
+import { DockviewGroupPanelModel } from '../../../../dockview/dockviewGroupPanelModel';
 import {
     LocalSelectionTransfer,
     PanelTransfer,
 } from '../../../../dnd/dataTransfer';
+import { IGroupDragGhostRenderer } from '../../../../dockview/framework';
+import { fireEvent } from '@testing-library/dom';
 import { PointerDragController } from '../../../../dnd/pointer/pointerDragController';
 
 describe('voidContainer', () => {
@@ -419,6 +421,191 @@ describe('voidContainer', () => {
             expect(onDragStart).not.toHaveBeenCalled();
 
             cut.dispose();
+        });
+    });
+
+    describe('locked group (regression #990)', () => {
+        function setup(lockedValue: boolean | 'no-drop-target') {
+            const accessor = fromPartial<DockviewComponent>({
+                id: 'testcomponentid',
+                options: {},
+                doSetGroupActive: jest.fn(),
+            });
+
+            const groupView = fromPartial<DockviewGroupPanelModel>({
+                canDisplayOverlay: jest.fn().mockReturnValue(true),
+                dropTargetContainer: undefined,
+            });
+
+            const group = fromPartial<DockviewGroupPanel>({
+                id: 'testgroupid',
+                model: groupView,
+                api: fromPartial<DockviewGroupPanel['api']>({
+                    locked: lockedValue,
+                }),
+            });
+
+            const cut = new VoidContainer(accessor, group);
+
+            jest.spyOn(cut.element, 'offsetHeight', 'get').mockImplementation(
+                () => 100
+            );
+            jest.spyOn(cut.element, 'offsetWidth', 'get').mockImplementation(
+                () => 100
+            );
+
+            return { cut, groupView };
+        }
+
+        afterEach(() => {
+            LocalSelectionTransfer.getInstance().clearData(
+                PanelTransfer.prototype
+            );
+        });
+
+        test.each([true, 'no-drop-target' as const])(
+            'does not display a drop overlay when locked=%p, even for same-accessor drags',
+            (lockedValue) => {
+                const { cut, groupView } = setup(lockedValue);
+
+                LocalSelectionTransfer.getInstance().setData(
+                    [
+                        new PanelTransfer(
+                            'testcomponentid',
+                            'anothergroupid',
+                            'panel1'
+                        ),
+                    ],
+                    PanelTransfer.prototype
+                );
+
+                fireEvent.dragEnter(cut.element);
+                fireEvent.dragOver(cut.element);
+
+                expect(
+                    cut.element.parentElement?.getElementsByClassName(
+                        'dv-drop-target-dropzone'
+                    ).length ?? 0
+                ).toBe(0);
+                // short-circuited before consulting the group model
+                expect(groupView.canDisplayOverlay).not.toHaveBeenCalled();
+
+                cut.dispose();
+            }
+        );
+
+        test('still displays a drop overlay for same-accessor drags when not locked', () => {
+            const { cut } = setup(false);
+
+            LocalSelectionTransfer.getInstance().setData(
+                [
+                    new PanelTransfer(
+                        'testcomponentid',
+                        'anothergroupid',
+                        'panel1'
+                    ),
+                ],
+                PanelTransfer.prototype
+            );
+
+            fireEvent.dragEnter(cut.element);
+            fireEvent.dragOver(cut.element);
+
+            expect(
+                cut.element.getElementsByClassName('dv-drop-target-dropzone')
+                    .length
+            ).toBe(1);
+
+            cut.dispose();
+        });
+    });
+
+    describe('custom group drag ghost (createGroupDragGhostComponent)', () => {
+        afterEach(() => {
+            LocalSelectionTransfer.getInstance().clearData(
+                PanelTransfer.prototype
+            );
+        });
+
+        test('factory is invoked, init is called, and dispose runs after drag start', () => {
+            jest.useFakeTimers();
+
+            const ghostElement = document.createElement('div');
+            ghostElement.textContent = 'custom-ghost';
+
+            const init = jest.fn();
+            const dispose = jest.fn();
+            const renderer: IGroupDragGhostRenderer = {
+                element: ghostElement,
+                init,
+                dispose,
+            };
+            const factory = jest.fn(() => renderer);
+
+            const fakeApi = { id: 'api-id' };
+            const accessor = fromPartial<DockviewComponent>({
+                id: 'accessor_id',
+                api: fakeApi as any,
+                options: { createGroupDragGhostComponent: factory },
+                doSetGroupActive: jest.fn(),
+            });
+            const group = fromPartial<DockviewGroupPanel>({
+                id: 'g1',
+                api: { location: { type: 'grid' } },
+                size: 3,
+            });
+
+            const cut = new VoidContainer(accessor, group);
+
+            const setDragImage = jest.fn();
+            const event = new Event('dragstart');
+            Object.defineProperty(event, 'dataTransfer', {
+                value: { setDragImage, items: [] } as unknown as DataTransfer,
+            });
+            fireEvent(cut.element, event);
+
+            expect(factory).toHaveBeenCalledWith(group);
+            expect(init).toHaveBeenCalledWith({ group, api: fakeApi });
+            expect(dispose).not.toHaveBeenCalled();
+
+            jest.runAllTimers();
+            expect(dispose).toHaveBeenCalledTimes(1);
+
+            cut.dispose();
+            jest.useRealTimers();
+        });
+
+        test('default "Multiple Panels" ghost is used when no factory is provided', () => {
+            jest.useFakeTimers();
+
+            const accessor = fromPartial<DockviewComponent>({
+                id: 'accessor_id',
+                options: {},
+                doSetGroupActive: jest.fn(),
+            });
+            const group = fromPartial<DockviewGroupPanel>({
+                id: 'g1',
+                api: { location: { type: 'grid' } },
+                size: 4,
+            });
+
+            const cut = new VoidContainer(accessor, group);
+
+            const setDragImage = jest.fn();
+            const event = new Event('dragstart');
+            Object.defineProperty(event, 'dataTransfer', {
+                value: { setDragImage, items: [] } as unknown as DataTransfer,
+            });
+            fireEvent(cut.element, event);
+
+            expect(setDragImage).toHaveBeenCalledTimes(1);
+            const ghost = setDragImage.mock.calls[0][0] as HTMLElement;
+            expect(ghost.textContent).toBe('Multiple Panels (4)');
+
+            jest.runAllTimers();
+
+            cut.dispose();
+            jest.useRealTimers();
         });
     });
 });

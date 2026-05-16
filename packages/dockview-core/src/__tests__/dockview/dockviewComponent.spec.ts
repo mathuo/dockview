@@ -4609,6 +4609,74 @@ describe('dockviewComponent', () => {
         expect(dockview.groups.length).toBe(0);
     });
 
+    test('updateOptions({ createWatermarkComponent }) swaps live watermarks', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+
+        // No groups → dockview-level watermark mounted with the default renderer.
+        expect(
+            dockview.element.querySelectorAll('.dv-watermark-container').length
+        ).toBe(1);
+        expect(
+            dockview.element.querySelectorAll(
+                '.dv-watermark-container .dv-watermark-custom'
+            ).length
+        ).toBe(0);
+
+        const customRenderers: HTMLElement[] = [];
+
+        dockview.updateOptions({
+            createWatermarkComponent: () => {
+                const el = document.createElement('div');
+                el.className = 'dv-watermark-custom';
+                customRenderers.push(el);
+                return {
+                    element: el,
+                    init: () => {
+                        /* noop */
+                    },
+                };
+            },
+        });
+
+        // Same dockview-level container, but now wrapping the custom element.
+        expect(
+            dockview.element.querySelectorAll('.dv-watermark-container').length
+        ).toBe(1);
+        expect(
+            dockview.element.querySelectorAll(
+                '.dv-watermark-container .dv-watermark-custom'
+            ).length
+        ).toBe(1);
+        expect(customRenderers).toHaveLength(1);
+
+        // Toggling back to the default factory disposes the custom one and
+        // re-creates the default watermark in place.
+        dockview.updateOptions({ createWatermarkComponent: undefined });
+
+        expect(
+            dockview.element.querySelectorAll('.dv-watermark-container').length
+        ).toBe(1);
+        expect(
+            dockview.element.querySelectorAll(
+                '.dv-watermark-container .dv-watermark-custom'
+            ).length
+        ).toBe(0);
+    });
+
     test('that deserializing an empty layout has zero groups and a watermark', () => {
         const container = document.createElement('div');
 
@@ -6780,6 +6848,102 @@ describe('dockviewComponent', () => {
             windowObject!.close();
         });
 
+        test('issue #851: fromJSON popout restoration is cancelled on dispose', async () => {
+            jest.useFakeTimers();
+            try {
+                const container = document.createElement('div');
+
+                const openSpy = jest.fn().mockImplementation(() => {
+                    return setupMockWindow();
+                });
+                window.open = openSpy;
+
+                const dockview = new DockviewComponent(container, {
+                    createComponent(options) {
+                        switch (options.name) {
+                            case 'default':
+                                return new PanelContentPartTest(
+                                    options.id,
+                                    options.name
+                                );
+                            default:
+                                throw new Error(`unsupported`);
+                        }
+                    },
+                });
+
+                dockview.layout(1000, 1000);
+
+                dockview.fromJSON({
+                    activeGroup: 'group-1',
+                    grid: {
+                        root: {
+                            type: 'branch',
+                            data: [
+                                {
+                                    type: 'leaf',
+                                    data: {
+                                        views: ['panel1'],
+                                        id: 'group-1',
+                                        activeView: 'panel1',
+                                    },
+                                    size: 1000,
+                                },
+                            ],
+                            size: 1000,
+                        },
+                        height: 1000,
+                        width: 1000,
+                        orientation: Orientation.VERTICAL,
+                    },
+                    popoutGroups: [
+                        {
+                            data: {
+                                views: ['panel2'],
+                                id: 'group-2',
+                                activeView: 'panel2',
+                            },
+                            position: null,
+                        },
+                    ],
+                    panels: {
+                        panel1: {
+                            id: 'panel1',
+                            contentComponent: 'default',
+                            title: 'panel1',
+                        },
+                        panel2: {
+                            id: 'panel2',
+                            contentComponent: 'default',
+                            title: 'panel2',
+                        },
+                    },
+                });
+
+                // Dispose BEFORE the popout-restoration timer has had a chance
+                // to fire. This simulates the React StrictMode mount -> dispose
+                // -> remount sequence that triggers issue #851.
+                expect(openSpy).not.toHaveBeenCalled();
+                dockview.dispose();
+
+                // Advance any timers and microtasks. With the fix in place the
+                // queued popout restoration is cancelled in dispose() and the
+                // guard inside the timeout body short-circuits any survivors,
+                // so window.open MUST NOT be called.
+                jest.runAllTimers();
+                await Promise.resolve();
+                jest.runAllTimers();
+
+                expect(openSpy).not.toHaveBeenCalled();
+
+                // The restoration promise should still resolve cleanly so
+                // callers awaiting it don't hang.
+                await dockview.popoutRestorationPromise;
+            } finally {
+                jest.useRealTimers();
+            }
+        });
+
         test('grid -> floating -> popout -> popout closed', async () => {
             const container = document.createElement('div');
 
@@ -7026,6 +7190,170 @@ describe('dockviewComponent', () => {
 
             expect(dockview.panels.length).toBe(3);
             expect(dockview.groups.length).toBe(3);
+        });
+
+        // Regression test for issue #1004: when a single-panel popout group is
+        // dragged back into the dock as a panel (not as the whole group), the
+        // empty reference group it left in the grid gets cascade-removed by
+        // doRemoveGroup. The popout branch of moveGroupOrPanel used to compute
+        // the target grid location before that cascade-removal, which left a
+        // stale index that either misplaced the panel or threw "Invalid index"
+        // at the far edge.
+        const collectGridPanelOrder = (gridRoot: any): string[] => {
+            const result: string[] = [];
+            const walk = (node: any): void => {
+                if (node.type === 'leaf') {
+                    for (const view of node.data.views) {
+                        result.push(view);
+                    }
+                } else if (node.type === 'branch') {
+                    for (const child of node.data) {
+                        walk(child);
+                    }
+                }
+            };
+            walk(gridRoot);
+            return result;
+        };
+
+        test('issue #1004: panel from single-panel popout lands at correct index past original slot', async () => {
+            const container = document.createElement('div');
+
+            window.open = () => setupMockWindow();
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            const panel3 = dockview.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            dockview.addPanel({
+                id: 'panel_4',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            // Pop out panel_2 (sole panel in its group, so the whole group is
+            // popped out and the original slot becomes an empty invisible
+            // reference group in the main grid).
+            await dockview.addPopoutGroup(panel2);
+            expect(panel2.api.location.type).toBe('popout');
+
+            // Drop the panel back onto the right edge of panel_3's group —
+            // a neighbor following the original slot. Pre-fix this placed the
+            // new group after panel_4 instead of between panel_3 and panel_4.
+            panel2.api.moveTo({
+                group: panel3.api.group,
+                position: 'right',
+            });
+
+            expect(panel2.api.location.type).toBe('grid');
+            expect(dockview.panels.length).toBe(4);
+            // The empty popout reference group should have been cleaned up.
+            expect(dockview.groups.length).toBe(4);
+
+            const gridOrder = collectGridPanelOrder(
+                JSON.parse(JSON.stringify(dockview.toJSON())).grid.root
+            );
+            expect(gridOrder).toEqual([
+                'panel_1',
+                'panel_3',
+                'panel_2',
+                'panel_4',
+            ]);
+        });
+
+        test('issue #1004: panel from single-panel popout dropped past far edge does not throw', async () => {
+            const container = document.createElement('div');
+
+            window.open = () => setupMockWindow();
+
+            const dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.layout(1000, 500);
+
+            dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            dockview.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            const panel4 = dockview.addPanel({
+                id: 'panel_4',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            await dockview.addPopoutGroup(panel2);
+            expect(panel2.api.location.type).toBe('popout');
+
+            // Drop on the far right edge — pre-fix this threw "Invalid index"
+            // because the stale target index pointed past the end of the grid
+            // after the empty reference group was cascade-removed.
+            expect(() =>
+                panel2.api.moveTo({
+                    group: panel4.api.group,
+                    position: 'right',
+                })
+            ).not.toThrow();
+
+            expect(panel2.api.location.type).toBe('grid');
+            expect(dockview.panels.length).toBe(4);
+            expect(dockview.groups.length).toBe(4);
+
+            const gridOrder = collectGridPanelOrder(
+                JSON.parse(JSON.stringify(dockview.toJSON())).grid.root
+            );
+            expect(gridOrder).toEqual([
+                'panel_1',
+                'panel_3',
+                'panel_4',
+                'panel_2',
+            ]);
         });
 
         test('add a popout group', async () => {
@@ -9383,6 +9711,73 @@ describe('dockviewComponent', () => {
             // The most recent size (400px) should be preserved
             expect(panel1.group.api.width).toBe(400);
         });
+
+        test('issue 1020: addGroup + moveTo with defaultRenderer="always" repositions panel overlay', async () => {
+            // Reproduces https://github.com/mathuo/dockview/issues/1020
+            // The user split a group by creating a new adjacent group and
+            // moving the active panel into it. With defaultRenderer="always"
+            // the panel's content overlay stayed at the old grid coordinates
+            // until a resize fired. The fix wires _onDidMovePanel to
+            // debouncedUpdateAllPositions on the dockview component so every
+            // programmatic move re-runs the overlay positioning pass.
+
+            // An earlier test in this file enables fake timers without
+            // restoring them, which makes the requestAnimationFrame await
+            // below hang and time out. Force real timers here so the
+            // animation-frame callback actually fires.
+            jest.useRealTimers();
+
+            const c = document.createElement('div');
+            const dv = new DockviewComponent(c, {
+                createComponent(options) {
+                    return new PanelContentPartTest(options.id, options.name);
+                },
+                defaultRenderer: 'always',
+            });
+            dv.layout(1000, 1000);
+
+            const panel1 = dv.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+
+            expect(panel1.api.renderer).toBe('always');
+            const sourceGroup = panel1.api.group;
+
+            const updateSpy = jest.spyOn(
+                dv.overlayRenderContainer,
+                'updateAllPositions'
+            );
+
+            // Mirror the user's exact onClick pattern.
+            const newGroup = dv.api.addGroup({
+                direction: 'right',
+                referenceGroup: sourceGroup,
+            });
+            panel1.api.moveTo({
+                group: newGroup,
+                skipSetActive: false,
+            });
+
+            // Move is wired correctly.
+            expect(panel1.group).toBe(newGroup);
+            expect(newGroup.activePanel?.id).toBe('panel1');
+            // The single-panel source group should have been cleaned up.
+            expect(dv.groups).not.toContain(sourceGroup);
+
+            // The fix schedules updateAllPositions on the next animation
+            // frame via debouncedUpdateAllPositions(). Without the
+            // _onDidMovePanel listener this assertion fails — the overlay
+            // would only reposition on the next external resize.
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            expect(updateSpy).toHaveBeenCalled();
+
+            // Content node must still be in the DOM tree.
+            expect(panel1.view.content.element.parentElement).toBeTruthy();
+
+            updateSpy.mockRestore();
+            dv.dispose();
+        });
     });
 
     describe('renderer: always with fromJSON', () => {
@@ -10758,5 +11153,27 @@ describe('dockviewComponent', () => {
             expect(dv.getEdgeGroup('left')).toBeDefined();
             dv.dispose();
         });
+    });
+
+    test('issue #914: api.setTitle reflected by createTabRenderer output', () => {
+        // Regression test for #914 — the header overflow dropdown lazily
+        // builds a fresh tab renderer via panel.view.createTabRenderer(...)
+        // each time it opens. Prior to the fix that renderer was initialised
+        // with a snapshot of the panel's init params, so a title updated via
+        // api.setTitle (which only updated DockviewPanel._title and fired
+        // onDidTitleChange) was not reflected in the dropdown entry.
+        const panel = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+            title: 'original',
+        });
+
+        panel.api.setTitle('renamed');
+
+        const overflowTab = panel.view.createTabRenderer('headerOverflow');
+
+        // DefaultTab renders the title into a child div with textContent.
+        expect(overflowTab.element.textContent).toContain('renamed');
+        expect(overflowTab.element.textContent).not.toContain('original');
     });
 });

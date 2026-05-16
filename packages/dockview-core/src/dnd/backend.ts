@@ -44,6 +44,13 @@ export interface IDragGhostSpec {
     /** Pixels from cursor to ghost's top-left. Default 0. */
     offsetX?: number;
     offsetY?: number;
+    /**
+     * Called when the backend is done with the ghost. HTML5 fires it after
+     * the drag-image snapshot is captured (next tick); pointer fires it
+     * when the follow-cursor ghost is removed at drag end. Use for custom
+     * framework renderers that need teardown.
+     */
+    dispose?: () => void;
 }
 
 export interface DragSourceOptions {
@@ -132,6 +139,13 @@ class Html5DragSource extends CompositeDisposable implements IDragSource {
                         x: ghost.offsetX ?? 0,
                         y: ghost.offsetY ?? 0,
                     });
+                    if (ghost.dispose) {
+                        // addGhostImage removes the element from the DOM on
+                        // the next tick; dispose the framework renderer on
+                        // the same schedule.
+                        const disposeGhost = ghost.dispose;
+                        setTimeout(() => disposeGhost(), 0);
+                    }
                 }
 
                 if (event.dataTransfer) {
@@ -200,7 +214,7 @@ class PointerDragBackend implements IDragBackend {
                   if (!spec) {
                       return undefined;
                   }
-                  return new PointerGhost({
+                  const ghost = new PointerGhost({
                       element: spec.element,
                       initialX: event.clientX,
                       initialY: event.clientY,
@@ -208,6 +222,15 @@ class PointerDragBackend implements IDragBackend {
                       offsetY: spec.offsetY,
                       owner: element,
                   });
+                  if (spec.dispose) {
+                      const baseDispose = ghost.dispose.bind(ghost);
+                      const disposeSpec = spec.dispose;
+                      ghost.dispose = () => {
+                          baseDispose();
+                          disposeSpec();
+                      };
+                  }
+                  return ghost;
               }
             : undefined;
 

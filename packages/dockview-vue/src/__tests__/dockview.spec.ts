@@ -216,6 +216,25 @@ describe('DockviewVue Component', () => {
         );
     });
 
+    test('should update groupDragGhostComponent when prop changes', async () => {
+        wrapper = mountDockview();
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const updateSpy = vi.spyOn(api, 'updateOptions');
+
+        await wrapper.setProps({
+            groupDragGhostComponent: 'MockHeaderAction',
+        });
+        await nextTick();
+
+        expect(updateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                createGroupDragGhostComponent: expect.any(Function),
+            })
+        );
+    });
+
     test('should update tabGroupColors and tabGroupAccent when props change', async () => {
         wrapper = mountDockview();
         await flushPromises();

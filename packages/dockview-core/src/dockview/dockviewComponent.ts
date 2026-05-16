@@ -446,6 +446,7 @@ export class DockviewComponent
     private readonly _rootDropTarget: IDropTarget;
     private readonly _rootPointerDropTarget: IDropTarget;
     private _popoutRestorationPromise: Promise<void> = Promise.resolve();
+    private readonly _popoutRestorationCleanups = new Set<() => void>();
 
     private readonly _onDidRemoveGroup = new Emitter<DockviewGroupPanel>();
     readonly onDidRemoveGroup: Event<DockviewGroupPanel> =
@@ -740,6 +741,15 @@ export class DockviewComponent
                 this._bufferOnDidLayoutChange.fire();
             }),
             Disposable.from(() => {
+                // Cancel any pending popout-restoration timers scheduled by
+                // fromJSON so they don't open new browser windows after
+                // dispose, and resolve their promises so callers awaiting
+                // popoutRestorationPromise don't hang. See issue #851.
+                for (const cleanup of [...this._popoutRestorationCleanups]) {
+                    cleanup();
+                }
+                this._popoutRestorationCleanups.clear();
+
                 // iterate over a copy of the array since .dispose() mutates the original array
                 for (const group of [...this._floatingGroups]) {
                     group.dispose();
@@ -1556,6 +1566,18 @@ export class DockviewComponent
             }
         }
 
+        if ('createWatermarkComponent' in options) {
+            if (this._watermark) {
+                this._watermark.element.parentElement!.remove();
+                this._watermark.dispose?.();
+                this._watermark = null;
+            }
+            this.updateWatermark();
+            for (const group of this.groups) {
+                group.model.refreshWatermark();
+            }
+        }
+
         if ('tabGroupColors' in options || 'tabGroupAccent' in options) {
             this._tabGroupColorPalette.setEntries(
                 this._options.tabGroupColors ?? DEFAULT_TAB_GROUP_COLORS
@@ -2132,7 +2154,23 @@ export class DockviewComponent
 
                 // Add a small delay for each popup after the first to avoid browser popup blocking
                 const popoutPromise = new Promise<void>((resolve) => {
-                    setTimeout(() => {
+                    const cleanup = () => {
+                        this._popoutRestorationCleanups.delete(cleanup);
+                        clearTimeout(handle);
+                        resolve();
+                    };
+                    const handle = setTimeout(() => {
+                        this._popoutRestorationCleanups.delete(cleanup);
+                        // Guard against the component being disposed before
+                        // this timer fires. Under React StrictMode the
+                        // component is mounted -> disposed -> remounted, and
+                        // without this guard the first instance's queued
+                        // restoration would open a second popout window.
+                        // See issue #851.
+                        if (this.isDisposed) {
+                            resolve();
+                            return;
+                        }
                         this.addPopoutGroup(group, {
                             position: position ?? undefined,
                             overridePopoutGroup: gridReferenceGroup
@@ -2145,6 +2183,7 @@ export class DockviewComponent
                         });
                         resolve();
                     }, index * DESERIALIZATION_POPOUT_DELAY_MS); // 100ms delay between each popup
+                    this._popoutRestorationCleanups.add(cleanup);
                 });
 
                 popoutPromises.push(popoutPromise);
@@ -2892,8 +2931,11 @@ export class DockviewComponent
                      * the source group is a popout group with a single panel
                      *
                      * 1. remove the panel from the group without triggering any events
-                     * 2. remove the popout group
-                     * 3. create a new group at the requested location and add that panel
+                     * 2. remove the popout group — this may cascade-remove the empty
+                     *    reference group it left behind in the main grid (see
+                     *    doRemoveGroup for popout groups), which can shift grid indices
+                     * 3. recompute the target location now that the grid is stable
+                     * 4. create a new group at the recomputed location and add that panel
                      */
 
                     const popoutGroup = this._popoutGroups.find(
@@ -2913,7 +2955,15 @@ export class DockviewComponent
 
                     this.doRemoveGroup(sourceGroup, { skipActive: true });
 
-                    const newGroup = this.createGroupAtLocation(targetLocation);
+                    const updatedTargetLocation = getRelativeLocation(
+                        this.gridview.orientation,
+                        getGridLocation(destinationGroup.element),
+                        destinationTarget
+                    );
+
+                    const newGroup = this.createGroupAtLocation(
+                        updatedTargetLocation
+                    );
                     this.movingLock(() =>
                         newGroup.model.openPanel(removedPanel, {
                             skipSetActive: true,

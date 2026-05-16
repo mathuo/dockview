@@ -11,7 +11,11 @@ import { GroupOptions } from './dockviewGroupPanelModel';
 import { DockviewGroupDropLocation } from './events';
 import { IDockviewPanel } from './dockviewPanel';
 import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
-import { IGroupHeaderProps, ITabGroupChipRenderer } from './framework';
+import {
+    IGroupDragGhostRenderer,
+    IGroupHeaderProps,
+    ITabGroupChipRenderer,
+} from './framework';
 import { FloatingGroupOptions } from './dockviewComponent';
 import { Contraints } from '../gridview/gridviewPanel';
 import { AcceptableEvent, IAcceptableEvent } from '../events';
@@ -186,6 +190,17 @@ export interface DockviewOptions {
         tabGroup: ITabGroup
     ) => ITabGroupChipRenderer;
     /**
+     * Factory to create the custom ghost element shown while dragging a
+     * group of panels (the small floating chip that follows the cursor).
+     *
+     * If not provided, a default ghost rendering `"Multiple Panels (N)"`
+     * is used. Supplying a factory replaces the entire default ghost,
+     * enabling i18n / custom visuals.
+     */
+    createGroupDragGhostComponent?: (
+        group: DockviewGroupPanel
+    ) => IGroupDragGhostRenderer;
+    /**
      * Replace the built-in tab group color palette with a user-defined list.
      *
      * Each entry has an `id` (stored on `tabGroup.color` and serialized),
@@ -264,6 +279,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         getTabContextMenuItems: undefined,
         getTabGroupChipContextMenuItems: undefined,
         createTabGroupChipComponent: undefined,
+        createGroupDragGhostComponent: undefined,
         tabGroupColors: undefined,
         tabGroupAccent: undefined,
     };

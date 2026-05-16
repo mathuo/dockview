@@ -16,6 +16,7 @@ import {
     getCurrentInstance,
 } from 'vue';
 import {
+    VueGroupDragGhostRenderer,
     VueHeaderActionsRenderer,
     VueContextMenuItemRenderer,
     VueTabGroupChipRenderer,
@@ -66,6 +67,25 @@ watch(
                     ? () => {
                           const component = findComponent(inst, newValue);
                           return new VueTabGroupChipRenderer(component!, inst);
+                      }
+                    : undefined,
+            });
+        }
+    }
+);
+
+watch(
+    () => props.groupDragGhostComponent,
+    (newValue) => {
+        if (instance.value) {
+            instance.value.updateOptions({
+                createGroupDragGhostComponent: newValue
+                    ? () => {
+                          const component = findComponent(inst, newValue);
+                          return new VueGroupDragGhostRenderer(
+                              component!,
+                              inst
+                          );
                       }
                     : undefined,
             });
@@ -255,6 +275,14 @@ onMounted(() => {
         coreOptions.createTabGroupChipComponent = () => {
             const component = findComponent(inst, chipComponentName);
             return new VueTabGroupChipRenderer(component!, inst);
+        };
+    }
+
+    if (props.groupDragGhostComponent) {
+        const ghostComponentName = props.groupDragGhostComponent;
+        coreOptions.createGroupDragGhostComponent = () => {
+            const component = findComponent(inst, ghostComponentName);
+            return new VueGroupDragGhostRenderer(component!, inst);
         };
     }
 

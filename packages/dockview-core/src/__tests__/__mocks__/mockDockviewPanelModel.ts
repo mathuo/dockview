@@ -37,6 +37,10 @@ export class DockviewPanelModelMock implements IDockviewPanelModel {
         //
     }
 
+    setTitle(title: string): void {
+        //
+    }
+
     layout(width: number, height: number): void {
         //
     }

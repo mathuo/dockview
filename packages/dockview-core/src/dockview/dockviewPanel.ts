@@ -172,6 +172,11 @@ export class DockviewPanel
 
         if (didTitleChange) {
             this._title = title;
+            // keep the view-model's cached init params in sync so that tab
+            // renderers constructed lazily (e.g. the header overflow
+            // dropdown via createTabRenderer) see the updated title
+            // (#914).
+            this.view.setTitle(title);
             this.api._onDidTitleChange.fire({ title });
         }
     }
