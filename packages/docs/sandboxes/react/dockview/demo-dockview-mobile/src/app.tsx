@@ -418,10 +418,11 @@ const App: React.FC<AppProps> = (props) => {
     const onReady = (event: DockviewReadyEvent) => {
         const api = event.api;
 
-        // Left edge group — starts collapsed as a thin rail. Visitor taps to
-        // expand, drags into it to demonstrate cross-group drops onto an
-        // edge target. 200px expanded leaves ~175px for the main group on a
-        // 375px-wide iPhone — narrow but usable.
+        // Create the left edge group empty here — panels added later, AFTER
+        // the main area is populated. Adding panels with
+        // `position: { referenceGroup }` marks the target as the active
+        // group, so populating the edge first causes subsequent
+        // position-less `addPanel` calls to land in the edge group too.
         const leftEdge = api.addEdgeGroup('left', {
             id: 'left-edge',
             initialSize: 200,
@@ -430,23 +431,11 @@ const App: React.FC<AppProps> = (props) => {
             collapsed: true,
         });
 
-        api.addPanel({
-            id: 'files',
-            component: 'files',
-            title: 'Files',
-            position: { referenceGroup: leftEdge.id },
-        });
-        api.addPanel({
-            id: 'search',
-            component: 'search',
-            title: 'Search',
-            position: { referenceGroup: leftEdge.id },
-        });
-
-        // Main area splits vertically — top group holds the three primary
-        // tabs (watchlist / chart / orders), bottom group holds positions
-        // and news. Portrait phones have far more height than width, so a
-        // vertical split is the only one that doesn't crush each region
+        // Primary dockview — top group is a 4-tab tab group with the
+        // trading panels, bottom group is a standalone News panel. The mix
+        // demonstrates both a tab group and a single-panel group in the
+        // primary area. Portrait phones have far more height than width, so
+        // a vertical split is the only one that doesn't crush each region
         // below readability at 375px wide.
         api.addPanel({
             id: 'watchlist',
@@ -465,26 +454,61 @@ const App: React.FC<AppProps> = (props) => {
             title: 'Orders',
             position: { referencePanel: 'watchlist', direction: 'within' },
         });
-
-        // `direction: 'below'` against the watchlist panel creates a new
-        // group sized via initialHeight so the top stays ~60% on a typical
-        // phone viewport.
         api.addPanel({
             id: 'positions',
             component: 'positions',
             title: 'Positions',
-            position: { referencePanel: 'watchlist', direction: 'below' },
-            initialHeight: 260,
+            position: { referencePanel: 'watchlist', direction: 'within' },
         });
+
+        // `direction: 'below'` against the watchlist panel creates a new
+        // group sized via initialHeight so the top stays ~65% on a typical
+        // phone viewport. News sits alone as a single-panel group.
         api.addPanel({
             id: 'news',
             component: 'news',
             title: 'News',
-            position: { referencePanel: 'positions', direction: 'within' },
+            position: { referencePanel: 'watchlist', direction: 'below' },
+            initialHeight: 220,
+        });
+
+        // Sub-group Orders + Positions into a "Trades" coloured tab group
+        // inside the primary top group — demonstrates the tab-group feature
+        // alongside the standalone Watchlist / Chart tabs.
+        const tradingGroupId = api.getPanel('watchlist')!.api.group.id;
+        const tradesTabGroup = api.createTabGroup({
+            groupId: tradingGroupId,
+            label: 'Trades',
+            color: 'green',
+        });
+        api.addPanelToTabGroup({
+            groupId: tradingGroupId,
+            tabGroupId: tradesTabGroup.id,
+            panelId: 'orders',
+        });
+        api.addPanelToTabGroup({
+            groupId: tradingGroupId,
+            tabGroupId: tradesTabGroup.id,
+            panelId: 'positions',
+        });
+
+        // Populate the edge group LAST (mirrors the desktop demo's order)
+        // so the active-group side-effect of `addPanel({referenceGroup})`
+        // doesn't pull the main panels into the edge.
+        api.addPanel({
+            id: 'files',
+            component: 'files',
+            title: 'Files',
+            position: { referenceGroup: leftEdge.id },
+        });
+        api.addPanel({
+            id: 'search',
+            component: 'search',
+            title: 'Search',
+            position: { referenceGroup: leftEdge.id },
         });
 
         api.getPanel('watchlist')?.api.setActive();
-        api.getPanel('positions')?.api.setActive();
     };
 
     const getTabContextMenuItems = React.useCallback(
