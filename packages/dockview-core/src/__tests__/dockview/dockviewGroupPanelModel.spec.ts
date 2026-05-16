@@ -51,6 +51,10 @@ class TestModel implements IDockviewPanelModel {
         //
     }
 
+    setTitle(title: string): void {
+        //
+    }
+
     layout(width: number, height: number): void {
         //
     }
