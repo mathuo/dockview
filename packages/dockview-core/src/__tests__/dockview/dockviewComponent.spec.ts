@@ -9280,6 +9280,13 @@ describe('dockviewComponent', () => {
             // until a resize fired. The fix wires _onDidMovePanel to
             // debouncedUpdateAllPositions on the dockview component so every
             // programmatic move re-runs the overlay positioning pass.
+
+            // An earlier test in this file enables fake timers without
+            // restoring them, which makes the requestAnimationFrame await
+            // below hang and time out. Force real timers here so the
+            // animation-frame callback actually fires.
+            jest.useRealTimers();
+
             const c = document.createElement('div');
             const dv = new DockviewComponent(c, {
                 createComponent(options) {
