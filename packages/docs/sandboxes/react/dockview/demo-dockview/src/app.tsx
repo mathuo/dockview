@@ -2,6 +2,7 @@ import {
     DockviewDefaultTab,
     DockviewReact,
     DockviewReadyEvent,
+    IDockviewGroupDragGhostProps,
     IDockviewPanelHeaderProps,
     IDockviewPanelProps,
     DockviewApi,
@@ -322,6 +323,37 @@ let count = 0;
 
 const WatermarkComponent = () => {
     return <div>custom watermark</div>;
+};
+
+const GroupDragGhost = (props: IDockviewGroupDragGhostProps) => {
+    const count = props.group.panels.length;
+    const title = props.group.activePanel?.title ?? 'Group';
+    return (
+        <div
+            style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '4px 10px',
+                borderRadius: 999,
+                background: 'rgba(33, 150, 243, 0.92)',
+                color: 'white',
+                font: '11px/1 system-ui, sans-serif',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
+            }}
+        >
+            <span style={{ fontWeight: 600 }}>{title}</span>
+            <span
+                style={{
+                    padding: '1px 6px',
+                    borderRadius: 999,
+                    background: 'rgba(255,255,255,0.25)',
+                }}
+            >
+                +{Math.max(0, count - 1)} more
+            </span>
+        </div>
+    );
 };
 
 const ThemeContext = React.createContext<DockviewTheme | undefined>(undefined);
@@ -711,6 +743,9 @@ const DockviewDemo = (props: {
                                                 watermark
                                                     ? WatermarkComponent
                                                     : undefined
+                                            }
+                                            groupDragGhostComponent={
+                                                GroupDragGhost
                                             }
                                             onReady={onReady}
                                             theme={effectiveTheme}
