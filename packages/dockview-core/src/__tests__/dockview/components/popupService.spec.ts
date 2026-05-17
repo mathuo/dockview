@@ -246,6 +246,38 @@ describe('PopupService', () => {
             const anchor = root.querySelector('.dv-popover-anchor')!;
             expect(anchor.querySelector('.my-popup')).toBeNull();
         });
+
+        test('ignores resize on coarse-primary input (mobile keyboard)', () => {
+            const originalMatchMedia = window.matchMedia;
+            // Simulate a touch-primary device (e.g. phone): only `coarse`
+            // pointer, no `fine` pointer. The on-screen keyboard fires
+            // resize when it appears; the popover must not close.
+            window.matchMedia = ((query: string) => ({
+                matches:
+                    query === '(pointer: coarse)' ? true : false,
+                media: query,
+                addListener: () => undefined,
+                removeListener: () => undefined,
+                addEventListener: () => undefined,
+                removeEventListener: () => undefined,
+                dispatchEvent: () => false,
+                onchange: null,
+            })) as typeof window.matchMedia;
+
+            try {
+                const altService = new PopupService(root);
+                const el = document.createElement('div');
+                el.className = 'mobile-popup';
+                altService.openPopover(el, { x: 0, y: 0 });
+
+                window.dispatchEvent(new Event('resize'));
+
+                expect(root.querySelector('.mobile-popup')).not.toBeNull();
+                altService.dispose();
+            } finally {
+                window.matchMedia = originalMatchMedia;
+            }
+        });
     });
 
     describe('updateRoot', () => {

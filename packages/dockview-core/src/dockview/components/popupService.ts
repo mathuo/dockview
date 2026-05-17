@@ -6,6 +6,15 @@ import {
     MutableDisposable,
 } from '../../lifecycle';
 
+function isCoarsePrimaryInput(win: Window): boolean {
+    if (!win.matchMedia) {
+        return false;
+    }
+    const coarse = win.matchMedia('(pointer: coarse)').matches;
+    const fine = win.matchMedia('(pointer: fine)').matches;
+    return coarse && !fine;
+}
+
 export class PopupService extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private _active: HTMLElement | null = null;
@@ -110,6 +119,18 @@ export class PopupService extends CompositeDisposable {
                 }
             }),
             addDisposableListener(this._window, 'resize', () => {
+                // On touch-primary devices, common interactions resize the
+                // window: on-screen keyboard pop, orientation change, browser
+                // address-bar collapse. None of these mean "the user wants
+                // the popover dismissed". Specifically, focusing the chip
+                // context menu's rename input pops the keyboard, which would
+                // otherwise close the menu the moment the user goes to edit
+                // it. Desktop / hybrid input keeps the existing behaviour —
+                // there a resize genuinely means the user has resized the
+                // window and the popover position is now stale.
+                if (isCoarsePrimaryInput(this._window)) {
+                    return;
+                }
                 this.close();
             })
         );
