@@ -126,7 +126,11 @@
         margin: 0 !important;
         overflow: hidden;
         opacity: 0;
-        pointer-events: none;
+        // No `pointer-events: none` here: on Android Chrome, mutating the
+        // currently-touched element to `pointer-events: none` releases
+        // implicit pointer capture and fires `pointercancel`, which
+        // aborts our PointerDragController. `width: 0` already removes
+        // the element from drop-overlay hit-testing.
         transition:
             width var(--dv-transition-duration, 200ms) ease-out,
             padding var(--dv-transition-duration, 200ms) ease-out,
@@ -169,7 +173,13 @@
 
 // Tab group chip
 .dv-tab-group-chip {
-    display: inline-flex;
+    // `flex` (block-level), not `inline-flex`: Android Chrome's long-press
+    // text-selection / definition-lookup gesture still fires on inline-level
+    // elements that contain text — even with `user-select: none` — and that
+    // gesture cancels the in-progress touch via `pointercancel`, killing
+    // the LongPressDetector. `.dv-tab` is block-level by default and isn't
+    // affected. Visual layout in the flex parent is unchanged.
+    display: flex;
     align-items: center;
     align-self: center;
     padding: var(--dv-tab-group-chip-padding);
@@ -223,7 +233,9 @@
         margin: 0 !important;
         overflow: hidden;
         opacity: 0;
-        pointer-events: none;
+        // See `.dv-tab--dragging` above: omitting `pointer-events: none`
+        // is deliberate, to keep implicit pointer capture alive on Android
+        // Chrome (Pixel) during the pointer drag.
         transition:
             width var(--dv-transition-duration, 200ms) ease-out,
             padding var(--dv-transition-duration, 200ms) ease-out,
