@@ -63,6 +63,15 @@ function buildSeparator(): HTMLElement {
     return el;
 }
 
+function isCoarsePrimaryInput(): boolean {
+    if (typeof window === 'undefined' || !window.matchMedia) {
+        return false;
+    }
+    const coarse = window.matchMedia('(pointer: coarse)').matches;
+    const fine = window.matchMedia('(pointer: fine)').matches;
+    return coarse && !fine;
+}
+
 function buildRenameInput(tabGroup: ITabGroup): HTMLElement {
     const wrapper = document.createElement('div');
     wrapper.className = 'dv-context-menu-rename';
@@ -86,10 +95,17 @@ function buildRenameInput(tabGroup: ITabGroup): HTMLElement {
 
     wrapper.appendChild(input);
 
-    requestAnimationFrame(() => {
-        input.focus();
-        input.select();
-    });
+    // Skip auto-focus on touch-primary devices: focusing the input pops the
+    // on-screen keyboard, which fires `window resize`, which `PopupService`
+    // listens to and uses to dismiss the popover — so the menu opens, the
+    // keyboard appears, and the menu immediately closes before the user can
+    // type. The user can still tap the input to focus it intentionally.
+    if (!isCoarsePrimaryInput()) {
+        requestAnimationFrame(() => {
+            input.focus();
+            input.select();
+        });
+    }
 
     return wrapper;
 }
