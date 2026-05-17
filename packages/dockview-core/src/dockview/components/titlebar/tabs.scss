@@ -177,7 +177,17 @@
     border-radius: var(--dv-tab-group-chip-border-radius);
     font-size: var(--dv-tab-group-chip-font-size);
     cursor: pointer;
+    // Vendor prefixes matter on Android Chrome: with only the unprefixed
+    // rule, the browser still engaged its long-press text-selection gesture
+    // on the chip's inner label, firing `pointercancel` mid-press and
+    // killing both `LongPressDetector` (context menu) and `PointerDragSource`
+    // (chip drag). `.dv-tab` already ships the prefixed set, which is why
+    // its long-press menu works on the same device.
     user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-touch-callout: none;
     white-space: nowrap;
     box-sizing: border-box;
     line-height: 1;
