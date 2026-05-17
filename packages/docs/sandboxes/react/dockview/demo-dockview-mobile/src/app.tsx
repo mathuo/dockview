@@ -516,11 +516,20 @@ const App: React.FC<AppProps> = (props) => {
         []
     );
 
+    const getTabGroupChipContextMenuItems = React.useCallback(
+        (): ('rename' | 'colorPicker' | 'separator')[] => [
+            'rename',
+            'colorPicker',
+        ],
+        []
+    );
+
     return (
         <DockviewReact
             components={components}
             onReady={onReady}
             getTabContextMenuItems={getTabContextMenuItems}
+            getTabGroupChipContextMenuItems={getTabGroupChipContextMenuItems}
             theme={props.theme ?? themeAbyss}
         />
     );

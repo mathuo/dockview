@@ -126,11 +126,7 @@
         margin: 0 !important;
         overflow: hidden;
         opacity: 0;
-        // No `pointer-events: none` here: on Android Chrome, mutating the
-        // currently-touched element to `pointer-events: none` releases
-        // implicit pointer capture and fires `pointercancel`, which
-        // aborts our PointerDragController. `width: 0` already removes
-        // the element from drop-overlay hit-testing.
+        pointer-events: none;
         transition:
             width var(--dv-transition-duration, 200ms) ease-out,
             padding var(--dv-transition-duration, 200ms) ease-out,
@@ -173,13 +169,7 @@
 
 // Tab group chip
 .dv-tab-group-chip {
-    // `flex` (block-level), not `inline-flex`: Android Chrome's long-press
-    // text-selection / definition-lookup gesture still fires on inline-level
-    // elements that contain text — even with `user-select: none` — and that
-    // gesture cancels the in-progress touch via `pointercancel`, killing
-    // the LongPressDetector. `.dv-tab` is block-level by default and isn't
-    // affected. Visual layout in the flex parent is unchanged.
-    display: flex;
+    display: inline-flex;
     align-items: center;
     align-self: center;
     padding: var(--dv-tab-group-chip-padding);
@@ -187,17 +177,7 @@
     border-radius: var(--dv-tab-group-chip-border-radius);
     font-size: var(--dv-tab-group-chip-font-size);
     cursor: pointer;
-    // Vendor prefixes matter on Android Chrome: with only the unprefixed
-    // rule, the browser still engaged its long-press text-selection gesture
-    // on the chip's inner label, firing `pointercancel` mid-press and
-    // killing both `LongPressDetector` (context menu) and `PointerDragSource`
-    // (chip drag). `.dv-tab` already ships the prefixed set, which is why
-    // its long-press menu works on the same device.
     user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -webkit-touch-callout: none;
     white-space: nowrap;
     box-sizing: border-box;
     line-height: 1;
@@ -233,9 +213,7 @@
         margin: 0 !important;
         overflow: hidden;
         opacity: 0;
-        // See `.dv-tab--dragging` above: omitting `pointer-events: none`
-        // is deliberate, to keep implicit pointer capture alive on Android
-        // Chrome (Pixel) during the pointer drag.
+        pointer-events: none;
         transition:
             width var(--dv-transition-duration, 200ms) ease-out,
             padding var(--dv-transition-duration, 200ms) ease-out,
