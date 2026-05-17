@@ -589,6 +589,17 @@ export class DockviewComponent
                         return this.gridview.length === 0;
                     }
 
+                    if (
+                        this.options.floatingTabBehavior === 'browser' &&
+                        this._isMouseOverNonSourceFloatingGroup(
+                            event,
+                            data.groupId
+                        )
+                    ) {
+                        // suppress the root overlay so the floating group's
+                        // own Droptarget can handle the event
+                        return false;
+                    }
                     return true;
                 }
 
@@ -779,6 +790,59 @@ export class DockviewComponent
                 const data = getPanelData();
 
                 if (data) {
+                    if (
+                        this.options.floatingTabBehavior === 'browser' &&
+                        data.panelId
+                    ) {
+                        const sourceGroup = data.groupId
+                            ? this._groups.get(data.groupId)?.value
+                            : undefined;
+
+                        if (
+                            sourceGroup &&
+                            sourceGroup.api.location.type === 'floating' &&
+                            sourceGroup.size > 1
+                        ) {
+                            const panel = this.getGroupPanel(data.panelId) as
+                                | DockviewPanel
+                                | undefined;
+                            if (panel) {
+                                const floatingGroupPanel =
+                                    this._floatingGroups.find(
+                                        (fg) => fg.group === sourceGroup
+                                    );
+
+                                const width =
+                                    floatingGroupPanel?.overlay.toJSON()
+                                        .width ??
+                                    DEFAULT_FLOATING_GROUP_POSITION.width;
+                                const height =
+                                    floatingGroupPanel?.overlay.toJSON()
+                                        .height ??
+                                    DEFAULT_FLOATING_GROUP_POSITION.height;
+
+                                const containerRect =
+                                    this.gridview.element.getBoundingClientRect();
+                                const x =
+                                    event.nativeEvent.clientX -
+                                    containerRect.left -
+                                    width / 2;
+                                const y =
+                                    event.nativeEvent.clientY -
+                                    containerRect.top -
+                                    20;
+
+                                this.addFloatingGroup(panel, {
+                                    x: Math.max(0, x),
+                                    y: Math.max(0, y),
+                                    width,
+                                    height,
+                                });
+                                return;
+                            }
+                        }
+                    }
+
                     this.moveGroupOrPanel({
                         from: {
                             groupId: data.groupId,
@@ -1433,6 +1497,31 @@ export class DockviewComponent
         }
 
         this.updateWatermark();
+    }
+
+    private _isMouseOverNonSourceFloatingGroup(
+        event: DragEvent,
+        sourceGroupId: string
+    ): boolean {
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+
+        for (const floatingGroup of this._floatingGroups) {
+            if (floatingGroup.group.id === sourceGroupId) {
+                continue;
+            }
+            const rect = floatingGroup.overlay.element.getBoundingClientRect();
+            if (
+                mouseX >= rect.left &&
+                mouseX <= rect.right &&
+                mouseY >= rect.top &&
+                mouseY <= rect.bottom
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private orthogonalize(
