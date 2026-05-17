@@ -258,7 +258,7 @@
                         &::after {
                             position: absolute;
                             left: 0px;
-                            top: 0px;
+                            bottom: 0px;
                             content: '';
                             width: 100%;
                             height: 1px;
@@ -478,7 +478,7 @@
                         &::after {
                             position: absolute;
                             left: 0px;
-                            top: 0px;
+                            bottom: 0px;
                             content: '';
                             width: 100%;
                             height: 2px;
@@ -497,7 +497,7 @@
                         &::after {
                             position: absolute;
                             left: 0px;
-                            top: 0px;
+                            bottom: 0px;
                             content: '';
                             width: 100%;
                             height: 2px;
@@ -1113,15 +1113,12 @@
     }
 }
 
-// Tab group indicator 'none' mode — uses a JS-positioned continuous bar
-// (NoneTabGroupIndicator) instead of per-tab box-shadows, so the indicator
-// spans the full tab group width without gaps in spaced themes.
-// The flat bar always sits at the bottom (or left for vertical) edge of
-// the tab bar, so we undo the header-bottom override that moves the
-// wrap indicator's full-height SVG to top: 0.
-.dv-tab-group-indicator-none {
-    .dv-groupview-header-bottom .dv-tab-group-underline {
-        top: auto;
-        bottom: 0;
+// Header-bottom: flip the active-tab indicator from bottom (content side when
+// tabs are on top) to top (content side when tabs are on bottom).
+.dv-groupview-header-bottom {
+    .dv-tabs-container > .dv-tab::after {
+        top: 0px;
+        bottom: auto;
     }
 }
+
