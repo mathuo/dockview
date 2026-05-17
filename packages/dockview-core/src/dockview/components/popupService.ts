@@ -68,8 +68,24 @@ export class PopupService extends CompositeDisposable {
 
         this._active = wrapper;
 
+        // Outside-pointerdown dismissal is suppressed for a short grace
+        // window after opening. Touch long-press callers (chip / tab context
+        // menus) open the popover while the user's finger is still pressing
+        // the source element — Android Chrome can dispatch a follow-up
+        // synthetic pointerdown tied to the gesture, and the release-then-
+        // retap motion can land just outside the wrapper. Either would
+        // dismiss the popover before the user can see or interact with it.
+        // The grace window is short enough that intentional outside taps
+        // still feel responsive.
+        const openedAt = Date.now();
+        const POINTERDOWN_GRACE_MS = 200;
+
         this._activeDisposable.value = new CompositeDisposable(
             addDisposableListener(this._window, 'pointerdown', (event) => {
+                if (Date.now() - openedAt < POINTERDOWN_GRACE_MS) {
+                    return;
+                }
+
                 const target = event.target;
 
                 if (!(target instanceof HTMLElement)) {
