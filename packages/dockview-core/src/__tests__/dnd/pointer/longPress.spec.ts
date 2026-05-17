@@ -156,6 +156,69 @@ describe('LongPressDetector', () => {
         document.body.removeChild(element);
     });
 
+    test('suppresses the synthesised click on the source after long-press', () => {
+        jest.useFakeTimers();
+        const element = document.createElement('div');
+        document.body.appendChild(element);
+
+        const onClick = jest.fn();
+        element.addEventListener('click', onClick);
+
+        const cut = new LongPressDetector(element, {
+            onLongPress: jest.fn(),
+            delay: 500,
+        });
+
+        fireEvent.pointerDown(element, pointerInit());
+        jest.advanceTimersByTime(500);
+
+        // Touchend → click on the source. Must be suppressed so primary-
+        // action click handlers (e.g. chip collapse-toggle, tab activate)
+        // don't fire alongside the long-press menu.
+        const click = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+        });
+        element.dispatchEvent(click);
+        expect(click.defaultPrevented).toBe(true);
+        expect(onClick).not.toHaveBeenCalled();
+
+        cut.dispose();
+        document.body.removeChild(element);
+    });
+
+    test('click guard does not suppress clicks on unrelated elements', () => {
+        jest.useFakeTimers();
+        const element = document.createElement('div');
+        const other = document.createElement('div');
+        document.body.appendChild(element);
+        document.body.appendChild(other);
+
+        const onOtherClick = jest.fn();
+        other.addEventListener('click', onOtherClick);
+
+        const cut = new LongPressDetector(element, {
+            onLongPress: jest.fn(),
+            delay: 500,
+        });
+
+        fireEvent.pointerDown(element, pointerInit());
+        jest.advanceTimersByTime(500);
+
+        // A click on a context menu item (separate subtree) must reach
+        // its listener.
+        const click = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+        });
+        other.dispatchEvent(click);
+        expect(onOtherClick).toHaveBeenCalledTimes(1);
+
+        cut.dispose();
+        document.body.removeChild(element);
+        document.body.removeChild(other);
+    });
+
     test('contextmenu guard self-disposes after the first event', () => {
         jest.useFakeTimers();
         const element = document.createElement('div');

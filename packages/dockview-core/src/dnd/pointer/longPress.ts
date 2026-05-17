@@ -75,6 +75,17 @@ export class LongPressDetector extends CompositeDisposable {
             // (or that early-return before doing so) leak the browser's
             // native menu on top of theirs.
             this._installContextMenuGuard(targetWindow);
+            // Same idea for `click`: when the user releases their finger
+            // after the long-press, touch browsers dispatch a `click` to
+            // the element the touch ended on (the source). Consumers
+            // typically wire click to a primary action (e.g. tab activate,
+            // tab-group chip collapse-toggle). Without this guard, the
+            // long-press immediately fires both the context menu AND the
+            // primary action — and the action's side effects (e.g. a chip
+            // collapse animation) read as a screen wobble while the menu
+            // is supposed to be open. Scoped to the source element so
+            // clicks on menu items elsewhere remain effective.
+            this._installClickGuard(targetWindow);
             this.options.onLongPress(event);
         }, delay);
 
@@ -124,6 +135,28 @@ export class LongPressDetector extends CompositeDisposable {
             'contextmenu',
             (event) => {
                 event.preventDefault();
+                clearTimeout(timeout);
+                guard?.dispose();
+            },
+            { capture: true }
+        );
+    }
+
+    private _installClickGuard(targetWindow: Window): void {
+        let guard: IDisposable | undefined;
+        const timeout = setTimeout(() => guard?.dispose(), 500);
+        guard = addDisposableListener(
+            targetWindow,
+            'click',
+            (event) => {
+                // Only suppress clicks targeted at the long-pressed element
+                // or its descendants. A user tap on a context menu item (or
+                // anywhere else) still gets through unchanged.
+                const target = event.target as Node | null;
+                if (target && this.element.contains(target)) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
                 clearTimeout(timeout);
                 guard?.dispose();
             },
