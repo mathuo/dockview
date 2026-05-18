@@ -578,11 +578,7 @@ export class DockviewComponent
             canDisplayOverlay: (event, position) => {
                 const data = getPanelData();
 
-                if (data) {
-                    if (data.viewId !== this.id) {
-                        return false;
-                    }
-
+                if (data?.viewId === this.id) {
                     if (position === 'center') {
                         // center drop target is only allowed if there are no panels in the grid
                         // floating panels are allowed
@@ -778,7 +774,7 @@ export class DockviewComponent
 
                 const data = getPanelData();
 
-                if (data) {
+                if (data?.viewId === this.id) {
                     this.moveGroupOrPanel({
                         from: {
                             groupId: data.groupId,

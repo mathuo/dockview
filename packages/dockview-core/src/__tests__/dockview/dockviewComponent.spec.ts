@@ -11,7 +11,11 @@ import { Emitter } from '../../events';
 import { DockviewPanel, IDockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import { fireEvent, queryByTestId } from '@testing-library/dom';
-import { getPanelData } from '../../dnd/dataTransfer';
+import {
+    getPanelData,
+    LocalSelectionTransfer,
+    PanelTransfer,
+} from '../../dnd/dataTransfer';
 import {
     GroupDragEvent,
     TabDragEvent,
@@ -5162,6 +5166,175 @@ describe('dockviewComponent', () => {
         expect(events[4].target).toBe('edge');
         expect(events[4].getData).toBe(getPanelData);
         expect(events.length).toBe(5);
+    });
+
+    test('that external dockview drags trigger the top-level edge dnd target', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+
+        let events: DockviewDndOverlayEvent[] = [];
+
+        dockview.onUnhandledDragOverEvent((e) => {
+            events.push(e);
+            e.accept();
+        });
+
+        dockview.layout(1000, 500);
+
+        dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+        dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+
+        Object.defineProperty(dockview.element, 'offsetWidth', {
+            get: () => 100,
+        });
+        Object.defineProperty(dockview.element, 'offsetHeight', {
+            get: () => 100,
+        });
+
+        jest.spyOn(dockview.element, 'getBoundingClientRect').mockReturnValue({
+            left: 0,
+            top: 0,
+            width: 100,
+            height: 100,
+        } as any);
+
+        LocalSelectionTransfer.getInstance<PanelTransfer>().setData(
+            [new PanelTransfer('external-view', 'external-group', 'panel_99')],
+            PanelTransfer.prototype
+        );
+
+        try {
+            const eventLeft = new KeyboardEvent('dragover');
+            Object.defineProperty(eventLeft, 'clientX', {
+                get: () => 0,
+            });
+            Object.defineProperty(eventLeft, 'clientY', {
+                get: () => 0,
+            });
+
+            fireEvent.dragEnter(dockview.element);
+            fireEvent(dockview.element, eventLeft);
+
+            expect(events).toHaveLength(1);
+            expect(events[0].nativeEvent).toBe(eventLeft);
+            expect(events[0].position).toBe('left');
+            expect(events[0].target).toBe('edge');
+            expect(events[0].getData).toBe(getPanelData);
+            expect(
+                dockview.element.getElementsByClassName(
+                    'dv-drop-target-anchor'
+                ).length
+            ).toBe(1);
+        } finally {
+            LocalSelectionTransfer.getInstance<PanelTransfer>().clearData(
+                PanelTransfer.prototype
+            );
+        }
+    });
+
+    test('that external dockview drops emit root-level onDidDrop events', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+
+        let didDropEvent: any = undefined;
+
+        dockview.onUnhandledDragOverEvent((e) => {
+            e.accept();
+        });
+        dockview.onDidDrop((event) => {
+            didDropEvent = event;
+        });
+
+        dockview.layout(1000, 500);
+
+        dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+        dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+
+        Object.defineProperty(dockview.element, 'offsetWidth', {
+            get: () => 100,
+        });
+        Object.defineProperty(dockview.element, 'offsetHeight', {
+            get: () => 100,
+        });
+
+        jest.spyOn(dockview.element, 'getBoundingClientRect').mockReturnValue({
+            left: 0,
+            top: 0,
+            width: 100,
+            height: 100,
+        } as any);
+
+        const moveSpy = jest.spyOn(dockview, 'moveGroupOrPanel');
+
+        LocalSelectionTransfer.getInstance<PanelTransfer>().setData(
+            [new PanelTransfer('external-view', 'external-group', 'panel_99')],
+            PanelTransfer.prototype
+        );
+
+        try {
+            const eventLeft = new KeyboardEvent('dragover');
+            Object.defineProperty(eventLeft, 'clientX', {
+                get: () => 0,
+            });
+            Object.defineProperty(eventLeft, 'clientY', {
+                get: () => 0,
+            });
+
+            fireEvent.dragEnter(dockview.element);
+            fireEvent(dockview.element, eventLeft);
+            fireEvent.drop(dockview.element);
+
+            expect(moveSpy).not.toHaveBeenCalled();
+            expect(didDropEvent).toBeDefined();
+            expect(didDropEvent.position).toBe('left');
+            expect(didDropEvent.group).toBeUndefined();
+            expect(didDropEvent.panel).toBeUndefined();
+            expect(didDropEvent.getData).toBe(getPanelData);
+        } finally {
+            LocalSelectionTransfer.getInstance<PanelTransfer>().clearData(
+                PanelTransfer.prototype
+            );
+        }
     });
 
     test('that dragging a tab triggers onWillDragPanel', () => {
