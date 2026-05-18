@@ -1,5 +1,5 @@
 import { IValueDisposable } from '../../../lifecycle';
-import { DockviewHeaderDirection } from '../../options';
+import { DockviewHeaderDirection, DockviewHeaderPosition } from '../../options';
 import { Tab } from '../tab/tab';
 import { ITabGroup } from '../../tabGroup';
 import {
@@ -14,6 +14,7 @@ export interface TabGroupIndicatorContext {
     getTabMap(): Map<string, IValueDisposable<Tab>>;
     getChipElement(groupId: string): HTMLElement | undefined;
     getDirection(): DockviewHeaderDirection;
+    getHeaderPosition(): DockviewHeaderPosition;
     getColorPalette(): TabGroupColorPalette | undefined;
 }
 
@@ -410,6 +411,7 @@ export class WrapTabGroupIndicator extends BaseTabGroupIndicator {
 
         const r = 6; // corner radius
         const half = t / 2;
+        const headerPosition = this._ctx.getHeaderPosition();
 
         if (isVertical) {
             const svgW = crossSize;
@@ -419,20 +421,23 @@ export class WrapTabGroupIndicator extends BaseTabGroupIndicator {
             underline.style.width = `${svgW}px`;
             underline.style.height = `${svgH}px`;
 
-            const xLeft = half;
-            const xRight = svgW - half;
+            // right header: indicator on the left edge (invert x sides)
+            const isRightHeader = headerPosition === 'right';
+            const xNear = isRightHeader ? svgW - half : half;
+            const xFar = isRightHeader ? half : svgW - half;
+            const cd = isRightHeader ? -1 : 1; // curve direction
 
             const d = [
-                `M ${xLeft},0`,
-                `L ${xLeft},${aStart - r}`,
-                `Q ${xLeft},${aStart} ${xLeft + r},${aStart}`,
-                `L ${xRight - r},${aStart}`,
-                `Q ${xRight},${aStart} ${xRight},${aStart + r}`,
-                `L ${xRight},${aEnd - r}`,
-                `Q ${xRight},${aEnd} ${xRight - r},${aEnd}`,
-                `L ${xLeft + r},${aEnd}`,
-                `Q ${xLeft},${aEnd} ${xLeft},${aEnd + r}`,
-                `L ${xLeft},${svgH}`,
+                `M ${xNear},0`,
+                `L ${xNear},${aStart - r}`,
+                `Q ${xNear},${aStart} ${xNear + cd * r},${aStart}`,
+                `L ${xFar - cd * r},${aStart}`,
+                `Q ${xFar},${aStart} ${xFar},${aStart + r}`,
+                `L ${xFar},${aEnd - r}`,
+                `Q ${xFar},${aEnd} ${xFar - cd * r},${aEnd}`,
+                `L ${xNear + cd * r},${aEnd}`,
+                `Q ${xNear},${aEnd} ${xNear},${aEnd + r}`,
+                `L ${xNear},${svgH}`,
             ].join(' ');
 
             path.setAttribute('d', d);
@@ -444,20 +449,23 @@ export class WrapTabGroupIndicator extends BaseTabGroupIndicator {
             underline.style.width = `${svgW}px`;
             underline.style.height = `${svgH}px`;
 
-            const yBot = svgH - half;
-            const yTop = half;
+            // bottom header: indicator on the top edge (invert y sides)
+            const isBottomHeader = headerPosition === 'bottom';
+            const yNear = isBottomHeader ? half : svgH - half;
+            const yFar = isBottomHeader ? svgH - half : half;
+            const cd = isBottomHeader ? 1 : -1; // curve direction
 
             const d = [
-                `M 0,${yBot}`,
-                `L ${aStart - r},${yBot}`,
-                `Q ${aStart},${yBot} ${aStart},${yBot - r}`,
-                `L ${aStart},${yTop + r}`,
-                `Q ${aStart},${yTop} ${aStart + r},${yTop}`,
-                `L ${aEnd - r},${yTop}`,
-                `Q ${aEnd},${yTop} ${aEnd},${yTop + r}`,
-                `L ${aEnd},${yBot - r}`,
-                `Q ${aEnd},${yBot} ${aEnd + r},${yBot}`,
-                `L ${svgW},${yBot}`,
+                `M 0,${yNear}`,
+                `L ${aStart - r},${yNear}`,
+                `Q ${aStart},${yNear} ${aStart},${yNear + cd * r}`,
+                `L ${aStart},${yFar - cd * r}`,
+                `Q ${aStart},${yFar} ${aStart + r},${yFar}`,
+                `L ${aEnd - r},${yFar}`,
+                `Q ${aEnd},${yFar} ${aEnd},${yFar - cd * r}`,
+                `L ${aEnd},${yNear + cd * r}`,
+                `Q ${aEnd},${yNear} ${aEnd + r},${yNear}`,
+                `L ${svgW},${yNear}`,
             ].join(' ');
 
             path.setAttribute('d', d);
