@@ -253,8 +253,7 @@ describe('PopupService', () => {
             // pointer, no `fine` pointer. The on-screen keyboard fires
             // resize when it appears; the popover must not close.
             window.matchMedia = ((query: string) => ({
-                matches:
-                    query === '(pointer: coarse)' ? true : false,
+                matches: query === '(pointer: coarse)' ? true : false,
                 media: query,
                 addListener: () => undefined,
                 removeListener: () => undefined,
