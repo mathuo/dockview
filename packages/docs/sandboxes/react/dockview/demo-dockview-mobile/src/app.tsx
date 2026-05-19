@@ -1,12 +1,35 @@
 import {
-    ContextMenuItem,
+    DockviewApi,
     DockviewReact,
     DockviewReadyEvent,
     IDockviewPanelProps,
     DockviewTheme,
     themeAbyss,
+    IContextMenuItemComponentProps,
+    GetTabContextMenuItemsParams,
+    GetTabGroupChipContextMenuItemsParams,
+    DEFAULT_TAB_GROUP_COLORS,
 } from 'dockview-react';
 import * as React from 'react';
+
+const FloatMenuItem = ({
+    panel,
+    api,
+    close,
+}: IContextMenuItemComponentProps) => {
+    return (
+        <div
+            className="dv-context-menu-item"
+            onClick={() => {
+                api.addFloatingGroup(panel);
+                close();
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+        >
+            Float tab
+        </div>
+    );
+};
 
 // Touch-tuned demo: 3 panels in 1 group at launch. Visitor creates
 // multi-group state by long-pressing and dragging a tab.
@@ -415,8 +438,11 @@ export interface AppProps {
 }
 
 const App: React.FC<AppProps> = (props) => {
+    const [api, setApi] = React.useState<DockviewApi>();
+
     const onReady = (event: DockviewReadyEvent) => {
         const api = event.api;
+        setApi(api);
 
         // Create the left edge group empty here — panels added later, AFTER
         // the main area is populated. Adding panels with
@@ -512,16 +538,117 @@ const App: React.FC<AppProps> = (props) => {
     };
 
     const getTabContextMenuItems = React.useCallback(
-        (): ContextMenuItem[] => ['close', 'closeOthers', 'closeAll'],
-        []
+        ({ panel, group }: GetTabContextMenuItemsParams) => {
+            const items: (
+                | 'close'
+                | 'closeOthers'
+                | 'closeAll'
+                | 'separator'
+                | { component: React.FC<IContextMenuItemComponentProps> }
+                | { label: string; action: () => void }
+            )[] = [
+                'close',
+                'closeOthers',
+                'closeAll',
+                'separator',
+                { component: FloatMenuItem },
+            ];
+
+            if (api) {
+                const groupId = group.id;
+                const panelId = panel.id;
+                const tabGroup = api.getTabGroupForPanel({ groupId, panelId });
+                const allTabGroups = api.getTabGroups({ groupId });
+                const otherTabGroups = allTabGroups.filter(
+                    (tg) => tg.id !== tabGroup?.id
+                );
+
+                items.push('separator');
+
+                if (tabGroup) {
+                    items.push({
+                        label: `Remove from "${tabGroup.label || tabGroup.id}"`,
+                        action: () =>
+                            api.removePanelFromTabGroup({ groupId, panelId }),
+                    });
+                }
+
+                for (const tg of otherTabGroups) {
+                    items.push({
+                        label: `Add to "${tg.label || tg.id}"`,
+                        action: () =>
+                            api.addPanelToTabGroup({
+                                groupId,
+                                tabGroupId: tg.id,
+                                panelId,
+                            }),
+                    });
+                }
+
+                items.push({
+                    label: 'Add to new group',
+                    action: () => {
+                        const label = window.prompt('Group name:') || '';
+                        const colors = DEFAULT_TAB_GROUP_COLORS;
+                        const color =
+                            colors[Math.floor(Math.random() * colors.length)]
+                                .id;
+                        const newGroup = api.createTabGroup({
+                            groupId,
+                            label,
+                            color,
+                        });
+                        api.addPanelToTabGroup({
+                            groupId,
+                            tabGroupId: newGroup.id,
+                            panelId,
+                        });
+                    },
+                });
+            }
+
+            return items;
+        },
+        [api]
     );
 
     const getTabGroupChipContextMenuItems = React.useCallback(
-        (): ('rename' | 'colorPicker' | 'separator')[] => [
-            'rename',
-            'colorPicker',
-        ],
-        []
+        ({ group, tabGroup }: GetTabGroupChipContextMenuItemsParams) => {
+            const items: (
+                | 'colorPicker'
+                | 'rename'
+                | 'separator'
+                | { label: string; action: () => void }
+            )[] = ['rename', 'colorPicker'];
+
+            if (api) {
+                items.push(
+                    'separator',
+                    {
+                        label: 'Float group',
+                        action: () => api.addFloatingGroup(group),
+                    },
+                    'separator',
+                    {
+                        label: tabGroup.collapsed
+                            ? 'Expand group'
+                            : 'Collapse group',
+                        action: () => tabGroup.toggle(),
+                    },
+                    {
+                        label: 'Dissolve group',
+                        action: () =>
+                            api.dissolveTabGroup({
+                                groupId: group.id,
+                                tabGroupId: tabGroup.id,
+                            }),
+                    }
+                );
+            }
+
+            return items;
+        },
+        [api]
     );
 
     return (
