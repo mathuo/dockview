@@ -1138,10 +1138,7 @@ export class Tabs extends CompositeDisposable {
      * removal shifts the insertion index down by one). Always clears
      * `targetTabGroupId` so the dropped tab lands outside the group.
      */
-    private _handleChipDrop(
-        tabGroup: ITabGroup,
-        event: DroptargetEvent
-    ): void {
+    private _handleChipDrop(tabGroup: ITabGroup, event: DroptargetEvent): void {
         const firstPanelId = tabGroup.panelIds[0];
         if (!firstPanelId) {
             return;
@@ -1155,9 +1152,7 @@ export class Tabs extends CompositeDisposable {
         const data = getPanelData();
         const sourceIndex =
             data && data.groupId === this.group.id && data.panelId
-                ? this._tabs.findIndex(
-                      (x) => x.value.panel.id === data.panelId
-                  )
+                ? this._tabs.findIndex((x) => x.value.panel.id === data.panelId)
                 : -1;
         const adjustedIndex =
             insertionIndex -
