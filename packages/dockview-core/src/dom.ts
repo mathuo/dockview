@@ -311,7 +311,10 @@ export function addTestId(element: HTMLElement, id: string): void {
  * Should be more efficient than element.querySelectorAll("*") since there
  * is no need to store every element in-memory using this approach
  */
-function allTagsNamesInclusiveOfShadowDoms(tagNames: string[]) {
+function allTagsNamesInclusiveOfShadowDoms(
+    tagNames: string[],
+    rootNode: ParentNode
+) {
     const iframes: HTMLElement[] = [];
 
     function findIframesInNode(node: Element) {
@@ -330,13 +333,21 @@ function allTagsNamesInclusiveOfShadowDoms(tagNames: string[]) {
         }
     }
 
-    findIframesInNode(document.documentElement);
+    // Document → walk from its root element. Element → walk from itself.
+    const startEl =
+        rootNode instanceof Document
+            ? rootNode.documentElement
+            : (rootNode as Element);
+    findIframesInNode(startEl);
 
     return iframes;
 }
 
 export function disableIframePointEvents(rootNode: ParentNode = document) {
-    const iframes = allTagsNamesInclusiveOfShadowDoms(['IFRAME', 'WEBVIEW']);
+    const iframes = allTagsNamesInclusiveOfShadowDoms(
+        ['IFRAME', 'WEBVIEW'],
+        rootNode
+    );
 
     const original = new WeakMap<HTMLElement, string>(); // don't hold onto HTMLElement references longer than required
 

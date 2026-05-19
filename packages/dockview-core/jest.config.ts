@@ -11,6 +11,7 @@ const config: JestConfigWithTsJest = {
     ],
     setupFiles: [
         '<rootDir>/packages/dockview-core/src/__tests__/__mocks__/resizeObserver.js',
+        '<rootDir>/packages/dockview-core/src/__tests__/__mocks__/pointerEvent.js',
     ],
     setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
     coveragePathIgnorePatterns: ['/node_modules/'],

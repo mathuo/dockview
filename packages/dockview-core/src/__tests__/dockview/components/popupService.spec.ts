@@ -125,10 +125,18 @@ describe('PopupService', () => {
     });
 
     describe('pointerdown outside popover', () => {
-        test('closes the popover', () => {
+        test('closes the popover (after the open grace window)', () => {
+            // Touch long-press callers fire pointerdown events tied to the
+            // gesture that opened the popover. PopupService suppresses
+            // outside-dismissal for a short grace window — advance past it.
+            const nowSpy = jest.spyOn(Date, 'now');
+            nowSpy.mockReturnValue(0);
+
             const el = document.createElement('div');
             el.className = 'my-popup';
             service.openPopover(el, { x: 0, y: 0 });
+
+            nowSpy.mockReturnValue(300);
 
             const outside = document.createElement('div');
             document.body.appendChild(outside);
@@ -139,17 +147,50 @@ describe('PopupService', () => {
 
             const anchor = root.querySelector('.dv-popover-anchor')!;
             expect(anchor.querySelector('.my-popup')).toBeNull();
+
+            nowSpy.mockRestore();
         });
 
-        test('does not close when clicking inside the popover', () => {
+        test('ignores outside pointerdown within the open grace window', () => {
+            const nowSpy = jest.spyOn(Date, 'now');
+            nowSpy.mockReturnValue(0);
+
             const el = document.createElement('div');
             el.className = 'my-popup';
             service.openPopover(el, { x: 0, y: 0 });
+
+            // Within grace window — must not dismiss.
+            nowSpy.mockReturnValue(50);
+
+            const outside = document.createElement('div');
+            document.body.appendChild(outside);
+            outside.dispatchEvent(
+                new MouseEvent('pointerdown', { bubbles: true })
+            );
+            outside.remove();
+
+            const anchor = root.querySelector('.dv-popover-anchor')!;
+            expect(anchor.querySelector('.my-popup')).not.toBeNull();
+
+            nowSpy.mockRestore();
+        });
+
+        test('does not close when clicking inside the popover', () => {
+            const nowSpy = jest.spyOn(Date, 'now');
+            nowSpy.mockReturnValue(0);
+
+            const el = document.createElement('div');
+            el.className = 'my-popup';
+            service.openPopover(el, { x: 0, y: 0 });
+
+            nowSpy.mockReturnValue(300);
 
             el.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
 
             const anchor = root.querySelector('.dv-popover-anchor')!;
             expect(anchor.querySelector('.my-popup')).not.toBeNull();
+
+            nowSpy.mockRestore();
         });
     });
 
@@ -204,6 +245,37 @@ describe('PopupService', () => {
 
             const anchor = root.querySelector('.dv-popover-anchor')!;
             expect(anchor.querySelector('.my-popup')).toBeNull();
+        });
+
+        test('ignores resize on coarse-primary input (mobile keyboard)', () => {
+            const originalMatchMedia = window.matchMedia;
+            // Simulate a touch-primary device (e.g. phone): only `coarse`
+            // pointer, no `fine` pointer. The on-screen keyboard fires
+            // resize when it appears; the popover must not close.
+            window.matchMedia = ((query: string) => ({
+                matches: query === '(pointer: coarse)' ? true : false,
+                media: query,
+                addListener: () => undefined,
+                removeListener: () => undefined,
+                addEventListener: () => undefined,
+                removeEventListener: () => undefined,
+                dispatchEvent: () => false,
+                onchange: null,
+            })) as typeof window.matchMedia;
+
+            try {
+                const altService = new PopupService(root);
+                const el = document.createElement('div');
+                el.className = 'mobile-popup';
+                altService.openPopover(el, { x: 0, y: 0 });
+
+                window.dispatchEvent(new Event('resize'));
+
+                expect(root.querySelector('.mobile-popup')).not.toBeNull();
+                altService.dispose();
+            } finally {
+                window.matchMedia = originalMatchMedia;
+            }
         });
     });
 
@@ -304,6 +376,8 @@ describe('PopupService', () => {
             } as unknown as Window;
 
             const altService = new PopupService(altRoot, altWindow);
+            const nowSpy = jest.spyOn(Date, 'now');
+            nowSpy.mockReturnValue(0);
             try {
                 const el = document.createElement('div');
                 el.className = 'alt-popup';
@@ -314,6 +388,10 @@ describe('PopupService', () => {
                 expect(altListeners['keydown']?.length).toBe(1);
                 expect(altListeners['resize']?.length).toBe(1);
 
+                // Advance past the open grace window so outside-pointerdown
+                // actually dismisses the popover.
+                nowSpy.mockReturnValue(300);
+
                 // pointerdown outside on the alternate window should close
                 const outside = document.createElement('div');
                 document.body.appendChild(outside);
@@ -321,6 +399,7 @@ describe('PopupService', () => {
                 expect(altRoot.querySelector('.alt-popup')).toBeNull();
                 outside.remove();
             } finally {
+                nowSpy.mockRestore();
                 altService.dispose();
                 altRoot.remove();
             }

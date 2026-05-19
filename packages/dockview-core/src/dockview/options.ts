@@ -98,6 +98,8 @@ export interface ViewFactoryData {
 export type DockviewHeaderPosition = 'top' | 'bottom' | 'left' | 'right';
 export type DockviewHeaderDirection = 'horizontal' | 'vertical';
 
+export type DockviewDndStrategy = 'auto' | 'pointer' | 'html5';
+
 export interface DockviewOptions {
     /**
      * Disable the auto-resizing which is controlled through a `ResizeObserver`.
@@ -125,6 +127,19 @@ export interface DockviewOptions {
      * */
     rootOverlayModel?: DroptargetOverlayModel;
     disableDnd?: boolean;
+    /**
+     * Selects which drag-and-drop implementation is active.
+     *
+     * - `'auto'` (default): HTML5 drag-and-drop drives mouse drags; pointer
+     *   events drive touch and pen drags. Matches the historical behaviour.
+     * - `'pointer'`: pointer events drive every input type. Useful in
+     *   environments where HTML5 drag-and-drop is unreliable (some Linux
+     *   browsers, certain Safari versions, embedded webviews). Cross-window
+     *   HTML5 drag and the HTML5 native drag image are not available in this
+     *   mode.
+     * - `'html5'`: HTML5 drag-and-drop only — disables touch / pen drag.
+     */
+    dndStrategy?: DockviewDndStrategy;
     // #end dnd
     locked?: boolean;
     className?: string;
@@ -212,7 +227,8 @@ export interface DockviewOptions {
 export type TabAnimation = 'smooth' | 'default';
 
 export interface DockviewDndOverlayEvent extends IAcceptableEvent {
-    nativeEvent: DragEvent;
+    /** Narrow with `instanceof DragEvent` before reading `dataTransfer`. */
+    nativeEvent: DragEvent | PointerEvent;
     target: DockviewGroupDropLocation;
     position: Position;
     group?: DockviewGroupPanel;
@@ -224,7 +240,7 @@ export class DockviewUnhandledDragOverEvent
     implements DockviewDndOverlayEvent
 {
     constructor(
-        readonly nativeEvent: DragEvent,
+        readonly nativeEvent: DragEvent | PointerEvent,
         readonly target: DockviewGroupDropLocation,
         readonly position: Position,
         readonly getData: () => PanelTransfer | undefined,
@@ -253,6 +269,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         rootOverlayModel: undefined,
         locked: undefined,
         disableDnd: undefined,
+        dndStrategy: undefined,
         className: undefined,
         noPanelsOverlay: undefined,
         dndEdges: undefined,

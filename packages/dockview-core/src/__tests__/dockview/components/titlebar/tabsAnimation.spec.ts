@@ -10,6 +10,7 @@ import * as dataTransfer from '../../../../dnd/dataTransfer';
 import { TabAnimation } from '../../../../dockview/options';
 import { TabGroupChip } from '../../../../dockview/components/titlebar/tabGroupChip';
 import { TabGroup } from '../../../../dockview/tabGroup';
+import { PointerDragController } from '../../../../dnd/pointer/pointerDragController';
 
 function makeDOMRect(
     x: number,
@@ -168,8 +169,9 @@ describe('tabs - animation', () => {
             const elements = getTabElements(tabs);
             fireEvent.dragStart(elements[0]);
 
-            // disableDnd prevents DragHandler from processing the event
-            // so Tab's onDragStart never fires, and _animState stays null
+            // disableDnd prevents the HTML5 drag source from processing
+            // the event, so Tab's onDragStart never fires and _animState
+            // stays null.
             expect(getAnimState(tabs)).toBeNull();
         });
     });
@@ -347,6 +349,96 @@ describe('tabs - animation', () => {
             flushRAF();
 
             // After rAF: transform should be removed (CSS transition takes over)
+            expect(elements[1].style.transform).toBe('');
+        });
+
+        test('FLIP transforms survive the dragend that fires immediately after drop', () => {
+            // After a drop, tab.onDrop sets _animState = null then calls
+            // runFlipAnimation (which queues a rAF that triggers the
+            // transition). The browser then fires `dragend` synchronously
+            // on the source element, which bubbles to _tabsList where the
+            // resetDragAnimation listener runs *before* the rAF — if that
+            // listener clears the transforms, FLIP never animates.
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
+            tabs.openPanel(createMockPanel('panel-a'), 0);
+            tabs.openPanel(createMockPanel('panel-b'), 1);
+
+            const elements = getTabElements(tabs);
+            const firstPositions = new Map<string, DOMRect>();
+            firstPositions.set('panel-a', makeDOMRect(0, 0, 80, 30));
+            firstPositions.set('panel-b', makeDOMRect(80, 0, 80, 30));
+            mockTabRect(elements[0], { left: 80, width: 80 });
+            mockTabRect(elements[1], { left: 0, width: 80 });
+
+            // tab.onDrop nulls _animState before invoking runFlipAnimation.
+            (tabs as any)._animState = null;
+            (tabs as any).runFlipAnimation(firstPositions, 'panel-a');
+
+            expect(elements[1].style.transform).toBe('translateX(80px)');
+            expect(
+                elements[1].classList.contains('dv-tab--shifting')
+            ).toBeTruthy();
+
+            // Fire the post-drop dragend — must NOT clobber the FLIP.
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            fireEvent.dragEnd(tabsList);
+
+            expect(elements[1].style.transform).toBe('translateX(80px)');
+            expect(
+                elements[1].classList.contains('dv-tab--shifting')
+            ).toBeTruthy();
+
+            // rAF still runs and clears the transform so the CSS
+            // transition takes over.
+            flushRAF();
+            expect(elements[1].style.transform).toBe('');
+        });
+
+        test('pointer drag end after drop does not clobber in-flight FLIP', () => {
+            // Pointer-side equivalent of the test above. The Tabs
+            // constructor subscribes to PointerDragController.onDragEnd
+            // and calls resetDragAnimation; a successful drop fires
+            // controller.onDragEnd synchronously after tab.onDrop, so
+            // the same race exists on the pointer path.
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
+            tabs.openPanel(createMockPanel('panel-a'), 0);
+            tabs.openPanel(createMockPanel('panel-b'), 1);
+
+            const elements = getTabElements(tabs);
+            const firstPositions = new Map<string, DOMRect>();
+            firstPositions.set('panel-a', makeDOMRect(0, 0, 80, 30));
+            firstPositions.set('panel-b', makeDOMRect(80, 0, 80, 30));
+            mockTabRect(elements[0], { left: 80, width: 80 });
+            mockTabRect(elements[1], { left: 0, width: 80 });
+
+            (tabs as any)._animState = null;
+            (tabs as any).runFlipAnimation(firstPositions, 'panel-a');
+
+            expect(elements[1].style.transform).toBe('translateX(80px)');
+
+            // Trigger PointerDragController.onDragEnd via a begin/cancel.
+            const controller = PointerDragController.getInstance();
+            controller.beginDrag({
+                pointerEvent: new PointerEvent('pointerdown', {
+                    pointerId: 1,
+                    pointerType: 'touch',
+                }),
+                source: elements[0],
+                getData: () => ({ dispose: jest.fn() }),
+            });
+            window.dispatchEvent(
+                new PointerEvent('pointerup', {
+                    pointerId: 1,
+                    pointerType: 'touch',
+                })
+            );
+
+            expect(elements[1].style.transform).toBe('translateX(80px)');
+            expect(
+                elements[1].classList.contains('dv-tab--shifting')
+            ).toBeTruthy();
+
+            flushRAF();
             expect(elements[1].style.transform).toBe('');
         });
 
@@ -1397,37 +1489,12 @@ describe('tabs - animation', () => {
             expect(state.sourceTabGroupId).toBe('tg-1');
         });
 
-        test('chip dragstart sets LocalSelectionTransfer with tabGroupId', () => {
-            const { tabs, accessor, group, tabGroup, chip } =
-                setupChipDrag('smooth');
-
-            triggerChipDragStart(tabs, tabGroup, chip);
-
-            const panelData = dataTransfer.getPanelData();
-            expect(panelData).toBeDefined();
-            expect(panelData!.viewId).toBe(accessor.id);
-            expect(panelData!.groupId).toBe(group.id);
-            expect(panelData!.panelId).toBeNull();
-            expect(panelData!.tabGroupId).toBe('tg-1');
-
-            // cleanup
-            dataTransfer.LocalSelectionTransfer.getInstance().clearData(
-                dataTransfer.PanelTransfer.prototype
-            );
-        });
-
-        test('chip dragstart sets dataTransfer properties', () => {
-            const { tabs, tabGroup, chip } = setupChipDrag('smooth');
-
-            const event = triggerChipDragStart(tabs, tabGroup, chip);
-
-            expect(event.dataTransfer!.effectAllowed).toBe('move');
-
-            // cleanup
-            dataTransfer.LocalSelectionTransfer.getInstance().clearData(
-                dataTransfer.PanelTransfer.prototype
-            );
-        });
+        // `LocalSelectionTransfer.setData` and `dataTransfer.effectAllowed`
+        // are now owned by the chip's drag source in `TabGroupManager`,
+        // not by `_handleChipDragStart`. These responsibilities are
+        // covered by the #1254 regression test in `dockviewComponent.spec.ts`
+        // (which fires a real `dragstart` on the chip element so the
+        // backend factory's `getData` callback runs).
 
         test('chip dragstart does not collapse tabs in default mode', () => {
             const { tabs, tabGroup, chip, elements } = setupChipDrag('default');
@@ -1519,20 +1586,11 @@ describe('tabs - animation', () => {
             );
         });
 
-        test('resetDragAnimation clears LocalSelectionTransfer', () => {
-            const { tabs, tabGroup, chip } = setupChipDrag('default');
-
-            triggerChipDragStart(tabs, tabGroup, chip);
-
-            // PanelTransfer should be set
-            expect(dataTransfer.getPanelData()).toBeDefined();
-
-            // Simulate drag cancel
-            (tabs as any).resetDragAnimation();
-
-            // PanelTransfer should be cleared
-            expect(dataTransfer.getPanelData()).toBeUndefined();
-        });
+        // `resetDragAnimation` no longer touches the panel-transfer
+        // singleton; the chip's drag source owns that lifecycle (dragend
+        // listener for HTML5, controller for pointer, plus a direct
+        // synchronous-clear listener on the chip element for the detach-
+        // then-dragend path tested by #1254).
 
         test('drop handler processes group drop in default mode', () => {
             const { tabs, tabGroup, chip } = setupChipDrag('default', [
@@ -1997,5 +2055,87 @@ describe('tabs - animation', () => {
 
             spy.mockRestore();
         });
+    });
+
+    describe('touch drag (pointer path) cleanup', () => {
+        // Pointer-driven smooth-reorder is wired into the same _animState
+        // pipeline as the HTML5 path. The PointerDragController.onDragEnd
+        // subscription in the Tabs constructor calls resetDragAnimation,
+        // so state set up here is cleaned up on pointerup / pointercancel.
+        test('touch tab drag in smooth mode initialises _animState', () => {
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
+            tabs.openPanel(createMockPanel('a'), 0);
+            tabs.openPanel(createMockPanel('b'), 1);
+
+            const pointerEvent = new PointerEvent('pointerdown', {
+                pointerId: 1,
+                pointerType: 'touch',
+                clientX: 0,
+                clientY: 0,
+            });
+            (tabs as any)._tabs[0].value._onDragStart.fire(pointerEvent);
+
+            const state = getAnimState(tabs);
+            expect(state).not.toBeNull();
+            expect(state.sourceTabId).toBe('a');
+        });
+
+        test('pointer drag end clears _animState set up by pointer drag', () => {
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
+            tabs.openPanel(createMockPanel('a'), 0);
+            tabs.openPanel(createMockPanel('b'), 1);
+
+            const tabAEl = (tabs as any)._tabs[0].value.element as HTMLElement;
+            const pointerEvent = new PointerEvent('pointerdown', {
+                pointerId: 1,
+                pointerType: 'touch',
+                clientX: 0,
+                clientY: 0,
+            });
+            (tabs as any)._tabs[0].value._onDragStart.fire(pointerEvent);
+            expect(getAnimState(tabs)).not.toBeNull();
+
+            // The Tabs constructor subscribes to onDragEnd; trigger it via a
+            // begin/cancel cycle.
+            const controller = PointerDragController.getInstance();
+            controller.beginDrag({
+                pointerEvent: new PointerEvent('pointerdown', {
+                    pointerId: 1,
+                    pointerType: 'touch',
+                }),
+                source: tabAEl,
+                getData: () => ({ dispose: jest.fn() }),
+            });
+            window.dispatchEvent(
+                new PointerEvent('pointerup', {
+                    pointerId: 1,
+                    pointerType: 'touch',
+                })
+            );
+
+            expect(getAnimState(tabs)).toBeNull();
+        });
+
+        test('HTML5 tab drag in smooth mode DOES initialise _animState (sanity)', () => {
+            // Counter-test: ensures the gate doesn't accidentally suppress
+            // the HTML5 path that the cleanup listeners DO support.
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
+            tabs.openPanel(createMockPanel('a'), 0);
+            tabs.openPanel(createMockPanel('b'), 1);
+            const tabA = (tabs as any)._tabs[0].value.element as HTMLElement;
+
+            fireEvent.dragStart(tabA);
+
+            const state = getAnimState(tabs);
+            expect(state).not.toBeNull();
+            expect(state.sourceTabId).toBe('a');
+        });
+
+        // Pointer chip drag cleanup used to live in a Tabs-level
+        // `_chipDragCleanup` field disposed from this controller
+        // subscription. That state is gone — the manager's pointer drag
+        // source now owns the iframe shield + panelTransfer cleanup via
+        // its internal MutableDisposables, fired by the controller's own
+        // teardown when the drag ends.
     });
 });

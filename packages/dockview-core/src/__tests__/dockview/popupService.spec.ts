@@ -76,15 +76,24 @@ describe('PopupService', () => {
         expect(root.contains(el)).toBe(false);
     });
 
-    test('pointerdown outside the popup closes it', () => {
+    test('pointerdown outside the popup closes it (after grace window)', () => {
+        const nowSpy = jest.spyOn(Date, 'now');
+        nowSpy.mockReturnValue(0);
+
         const { service, root } = makeService();
         const el = openMenu(service);
         const outside = document.createElement('div');
         document.body.appendChild(outside);
 
+        // PopupService swallows outside-pointerdown for a brief grace window
+        // after opening (touch long-press protection) — advance past it.
+        nowSpy.mockReturnValue(300);
+
         fireEvent.pointerDown(outside);
 
         expect(root.contains(el)).toBe(false);
+
+        nowSpy.mockRestore();
     });
 
     test('pointerdown inside the popup does not close it', () => {

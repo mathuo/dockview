@@ -1,0 +1,45 @@
+---
+title: 'Dnd Strategy'
+sidebar_position: 4
+description: Choose which drag-and-drop backend powers dockview (HTML5, pointer events, or both) and how touch gestures behave.
+---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+`dndStrategy` selects which drag-and-drop implementation drives the dock. The default (`'auto'`) covers desktop and touch with no further configuration.
+
+| Value | Behaviour |
+|---|---|
+| `'auto'` (default) | HTML5 drives mouse drags; pointer events drive touch and pen drags. |
+| `'pointer'` | Pointer events drive every input type. Useful where HTML5 drag-and-drop is unreliable (some Linux browsers, certain Safari versions, embedded webviews). Cross-window HTML5 drag and the native browser drag image are not available in this mode. |
+| `'html5'` | HTML5 drag-and-drop only — touch and pen drags are disabled. |
+
+`disableDnd: true` overrides every strategy. The strategy can also be changed at runtime via `api.updateOptions({ dndStrategy: ... })`; the change propagates to every existing drag source.
+
+## Touch gestures
+
+Under `'auto'` and `'pointer'`, touch drags use a long-press-then-drag gesture so taps and native scroll still work.
+
+| Gesture | Result |
+|---|---|
+| Tap | `click` fires normally; no drag |
+| Quick horizontal swipe across the tab strip | Browser scrolls natively |
+| Hold ~250 ms, then move | Drag arms; ghost follows the finger |
+| Hold ~500 ms still | Context menu opens; any in-flight drag arm is cancelled |
+| Release without movement | Nothing |
+
+<FrameworkSpecific framework="JavaScript">
+  <DocRef declaration="DockviewComponentOptions" methods={["dndStrategy"]} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="React">
+  <DocRef declaration="IDockviewReactProps" methods={["dndStrategy"]}  />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+  <DocRef declaration="IDockviewVueProps" methods={["dndStrategy"]}  />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+  <DocRef declaration="IDockviewAngularProps" methods={["dndStrategy"]}  />
+</FrameworkSpecific>

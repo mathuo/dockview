@@ -35,7 +35,8 @@ export const PROPERTY_KEYS_PANEVIEW: (keyof PaneviewOptions)[] = (() => {
 })();
 
 export interface PaneviewDndOverlayEvent extends IAcceptableEvent {
-    nativeEvent: DragEvent;
+    /** Narrow with `instanceof DragEvent` before reading `dataTransfer`. */
+    nativeEvent: DragEvent | PointerEvent;
     position: Position;
     panel: IPaneviewPanel;
     getData: () => PaneTransfer | undefined;
@@ -46,7 +47,7 @@ export class PaneviewUnhandledDragOverEvent
     implements PaneviewDndOverlayEvent
 {
     constructor(
-        readonly nativeEvent: DragEvent,
+        readonly nativeEvent: DragEvent | PointerEvent,
         readonly position: Position,
         readonly getData: () => PaneTransfer | undefined,
         readonly panel: IPaneviewPanel

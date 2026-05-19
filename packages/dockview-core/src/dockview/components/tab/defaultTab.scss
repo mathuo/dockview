@@ -72,6 +72,13 @@
         }
     }
 
+    // Without this the inactive-tab close button is unreachable on touch.
+    @media (hover: none) {
+        &.dv-inactive-tab .dv-default-tab .dv-default-tab-action {
+            visibility: visible;
+        }
+    }
+
     .dv-default-tab {
         position: relative;
         height: 100%;
@@ -96,6 +103,12 @@
             &:hover {
                 border-radius: 2px;
                 background-color: var(--dv-icon-hover-background-color);
+            }
+
+            // Default 24×24 hit area is below the ~36px comfortable
+            // finger-tap size; expand without growing the icon visually.
+            @media (pointer: coarse) {
+                padding: 8px;
             }
         }
     }

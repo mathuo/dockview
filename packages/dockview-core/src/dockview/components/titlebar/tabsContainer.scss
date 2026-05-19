@@ -28,7 +28,20 @@
     .dv-void-container {
         display: flex;
         flex-grow: 1;
-        
+        // Pointer-event drags don't get the implicit text-selection
+        // suppression that `draggable=true` provides for HTML5 drags.
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        // Same reasoning as `.dv-tab` / `.dv-tab-group-chip`: block the
+        // browser's native pan so the pointer drag source can arm without
+        // Chrome firing `pointercancel` mid-gesture. Without this, an
+        // Android Chrome touch drag from the void container shows the
+        // ghost briefly, then aborts as soon as the browser claims the
+        // motion as a native pan.
+        touch-action: none;
+
         &.dv-draggable {
             cursor: grab;
         }

@@ -18,7 +18,10 @@ describe('TabGroupChip', () => {
 
         expect(chip.element.className).toBe('dv-tab-group-chip');
         expect(chip.element.tabIndex).toBe(0);
-        expect(chip.element.draggable).toBe(true);
+        // The chip is presentation-only; `draggable` is set by the
+        // `TabGroupManager` when wiring DnD sources, so by default a
+        // bare chip element is not draggable.
+        expect(chip.element.draggable).toBe(false);
     });
 
     test('element contains a label span', () => {
@@ -214,15 +217,8 @@ describe('TabGroupChip', () => {
         expect(handler).toHaveBeenCalledTimes(1);
     });
 
-    test('fires onDragStart event', () => {
-        const chip = new TabGroupChip(createPalette());
-        const handler = jest.fn();
-        chip.onDragStart(handler);
-
-        fireEvent.dragStart(chip.element);
-
-        expect(handler).toHaveBeenCalledTimes(1);
-    });
+    // Chip drag-start wiring moved to TabGroupManager; integration tests
+    // in tabsAnimation.spec.ts cover the chip → manager → tabs.ts flow.
 
     test('dragstart does not add dv-tab-group-chip--dragging class', () => {
         const chip = new TabGroupChip(createPalette());

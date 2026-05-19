@@ -675,6 +675,17 @@ const DockviewDemo = (props: {
                 items.push(
                     'separator',
                     {
+                        label: 'Float group',
+                        action: () => api.addFloatingGroup(group),
+                    },
+                    {
+                        label: 'Popout group',
+                        action: () => {
+                            void api.addPopoutGroup(group);
+                        },
+                    },
+                    'separator',
+                    {
                         label: tabGroup.collapsed
                             ? 'Expand group'
                             : 'Collapse group',
