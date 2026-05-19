@@ -137,4 +137,68 @@
         position: absolute;
         cursor: se-resize;
     }
+
+    // Default 4px hit area is unusable with a fingertip (~36–44px target).
+    // Grow the invisible handles on coarse pointers and bias them outward
+    // so they don't steal taps from panel content. Corners take precedence
+    // over edges by reserving a 24px gap at each end.
+    @media (pointer: coarse) {
+        .dv-resize-handle-top,
+        .dv-resize-handle-bottom {
+            height: 16px;
+            width: calc(100% - 48px);
+            left: 24px;
+        }
+
+        .dv-resize-handle-top {
+            top: -10px;
+        }
+
+        .dv-resize-handle-bottom {
+            bottom: -10px;
+        }
+
+        .dv-resize-handle-left,
+        .dv-resize-handle-right {
+            width: 16px;
+            height: calc(100% - 48px);
+            top: 24px;
+        }
+
+        .dv-resize-handle-left {
+            left: -10px;
+        }
+
+        .dv-resize-handle-right {
+            right: -10px;
+        }
+
+        .dv-resize-handle-topleft,
+        .dv-resize-handle-topright,
+        .dv-resize-handle-bottomleft,
+        .dv-resize-handle-bottomright {
+            height: 24px;
+            width: 24px;
+        }
+
+        .dv-resize-handle-topleft {
+            top: -12px;
+            left: -12px;
+        }
+
+        .dv-resize-handle-topright {
+            top: -12px;
+            right: -12px;
+        }
+
+        .dv-resize-handle-bottomleft {
+            bottom: -12px;
+            left: -12px;
+        }
+
+        .dv-resize-handle-bottomright {
+            bottom: -12px;
+            right: -12px;
+        }
+    }
 }
