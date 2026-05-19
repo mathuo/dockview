@@ -70,10 +70,13 @@ export interface DragSourceOptions {
      * pointers and lets the HTML5 path handle them. HTML5 backend ignores.
      */
     touchOnly?: boolean;
-    /** Pointer-only long-press delay in ms. */
-    touchInitiationDelay?: number;
-    /** Pointer-only pre-arm movement tolerance in px. */
-    pressTolerance?: number;
+    /**
+     * Pointer-only long-press delay in ms. May be a function so the value
+     * can vary per gesture (e.g. floating-group redock vs docked rearrange).
+     */
+    touchInitiationDelay?: number | (() => number);
+    /** Pointer-only pre-arm movement tolerance in px. May also be a function. */
+    pressTolerance?: number | (() => number);
     /** Pointer-only movement threshold to promote pointerdown → drag. */
     threshold?: number;
 }

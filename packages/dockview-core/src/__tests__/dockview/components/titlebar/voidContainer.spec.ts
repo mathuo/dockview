@@ -369,8 +369,10 @@ describe('voidContainer', () => {
                 clientX: 0,
                 clientY: 0,
             });
-            // Hold past the touch initiation delay before moving.
-            jest.advanceTimersByTime(300);
+            // Floating groups require a longer hold (500ms) than the
+            // default 250ms so the move-the-float gesture and the redock
+            // gesture don't both fire on a short drag.
+            jest.advanceTimersByTime(550);
             fireEvent.pointerMove(window, {
                 pointerId: 1,
                 pointerType: 'touch',
@@ -384,6 +386,46 @@ describe('voidContainer', () => {
                     PanelTransfer.prototype
                 )
             ).toBe(true);
+
+            cut.dispose();
+            jest.useRealTimers();
+        });
+
+        test('a short drag on a floating group does NOT trigger redock (pressTolerance: Infinity)', () => {
+            jest.useFakeTimers();
+            const accessor = fromPartial<DockviewComponent>({
+                doSetGroupActive: jest.fn(),
+                id: 'componentId',
+                options: {},
+            });
+            const group = fromPartial<DockviewGroupPanel>({
+                id: 'groupId',
+                api: { location: { type: 'floating' } },
+                size: 1,
+            });
+            const cut = new VoidContainer(accessor, group);
+
+            const onDragStart = jest.fn();
+            cut.onDragStart(onDragStart);
+
+            fireEvent.pointerDown(cut.element, {
+                pointerId: 1,
+                pointerType: 'touch',
+                clientX: 0,
+                clientY: 0,
+            });
+            // Move within the pre-arm window — for a floating group this
+            // must NOT promote to a redock (the overlay's move-the-float
+            // drag owns this gesture).
+            jest.advanceTimersByTime(100);
+            fireEvent.pointerMove(window, {
+                pointerId: 1,
+                pointerType: 'touch',
+                clientX: 200,
+                clientY: 0,
+            });
+
+            expect(onDragStart).not.toHaveBeenCalled();
 
             cut.dispose();
             jest.useRealTimers();

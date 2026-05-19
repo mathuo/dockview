@@ -14,10 +14,15 @@ export interface PointerDragSourceOptions {
     isCancelled?: (event: PointerEvent) => boolean;
     /** Default 5px. Touch pointers also need `touchInitiationDelay` to elapse. */
     threshold?: number;
-    /** Touch-only long-press; movement past `pressTolerance` during the delay still arms the drag (any flick is drag intent). Default 250ms. */
-    touchInitiationDelay?: number;
-    /** Default 8px. */
-    pressTolerance?: number;
+    /**
+     * Touch-only long-press; movement past `pressTolerance` during the delay
+     * still arms the drag (any flick is drag intent). Default 250ms. May be
+     * a function so callers can vary it per gesture (e.g. require a longer
+     * hold for floating-group redock vs docked-group rearrange).
+     */
+    touchInitiationDelay?: number | (() => number);
+    /** Default 8px. May be a function — see `touchInitiationDelay`. */
+    pressTolerance?: number | (() => number);
     /** Default true: mouse defers to HTML5; pointer path handles touch / pen only. */
     touchOnly?: boolean;
     /** Follow-finger ghost factory; if omitted the user only sees drop overlays. */
@@ -122,10 +127,13 @@ export class PointerDragSource extends CompositeDisposable {
         // Touch waits a short window so a still finger can press-and-hold
         // before drifting; once the timer fires, any motion past `threshold`
         // begins the drag.
+        const initiationDelayOpt = this.options.touchInitiationDelay;
         const initiationDelay =
-            this.options.touchInitiationDelay ?? DEFAULT_TOUCH_INITIATION_DELAY;
+            (typeof initiationDelayOpt === 'function'
+                ? initiationDelayOpt()
+                : initiationDelayOpt) ?? DEFAULT_TOUCH_INITIATION_DELAY;
         this._armed = !isTouch || initiationDelay <= 0;
-        if (isTouch && initiationDelay > 0) {
+        if (isTouch && initiationDelay > 0 && isFinite(initiationDelay)) {
             this._armTimer = setTimeout(() => {
                 this._armTimer = undefined;
                 this._armed = true;
@@ -133,8 +141,11 @@ export class PointerDragSource extends CompositeDisposable {
         }
 
         const threshold = this.options.threshold ?? DEFAULT_THRESHOLD;
+        const pressToleranceOpt = this.options.pressTolerance;
         const pressTolerance =
-            this.options.pressTolerance ?? DEFAULT_PRESS_TOLERANCE;
+            (typeof pressToleranceOpt === 'function'
+                ? pressToleranceOpt()
+                : pressToleranceOpt) ?? DEFAULT_PRESS_TOLERANCE;
 
         // Source's owning window — popout drags fire on their own window.
         const targetWindow: Window =

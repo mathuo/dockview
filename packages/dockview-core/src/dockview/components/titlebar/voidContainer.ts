@@ -18,10 +18,20 @@ import {
 } from '../../../dnd/backend';
 import { DockviewComponent } from '../../dockviewComponent';
 import { addDisposableListener, Emitter, Event } from '../../../events';
-import { CompositeDisposable } from '../../../lifecycle';
+import {
+    CompositeDisposable,
+    Disposable,
+    MutableDisposable,
+} from '../../../lifecycle';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { quasiPreventDefault, toggleClass } from '../../../dom';
 import { resolveDndCapabilities } from '../../dndCapabilities';
+
+// Floating-group redock via touch: require a deliberate long press so the
+// "move the float around" gesture doesn't double-trigger the redock ghost.
+// Infinity pressTolerance disables the pre-arm flick override; any motion
+// during the wait is treated as drag-the-float, not redock intent.
+const FLOATING_REDOCK_INITIATION_DELAY_MS = 500;
 
 export class VoidContainer extends CompositeDisposable {
     private readonly _element: HTMLElement;
@@ -213,12 +223,21 @@ export class VoidContainer extends CompositeDisposable {
             },
         });
 
+        const isFloating = () => this.group?.api?.location?.type === 'floating';
+
         this.pointerDragSource = pointerBackend.createDragSource(
             this._element,
             {
                 ...sharedDragOptions,
                 disabled: !caps.pointer,
                 touchOnly: !caps.pointerHandlesMouse,
+                // Floating groups share this element with the overlay's
+                // move-the-float drag. Without a longer hold + tolerance
+                // override, both gestures commit simultaneously and the
+                // user sees the float follow their finger *and* a ghost.
+                touchInitiationDelay: () =>
+                    isFloating() ? FLOATING_REDOCK_INITIATION_DELAY_MS : 250,
+                pressTolerance: () => (isFloating() ? Infinity : 8),
                 isCancelled: () => {
                     if (
                         !resolveDndCapabilities(this.accessor.options).pointer
@@ -235,8 +254,34 @@ export class VoidContainer extends CompositeDisposable {
                     }
                     return false;
                 },
+                onDragStart: (event) => {
+                    // Redock just committed — abort any in-flight overlay
+                    // move so the float stops following the finger while
+                    // the ghost takes over.
+                    this.getFloatingOverlay()?.cancelPendingDrag();
+                    this._onDragStart.fire(event);
+                },
             }
         );
+
+        // Mirror direction: once the overlay's move-the-float gesture has
+        // actually moved something, cancel the pending redock arm so the
+        // ghost doesn't appear mid-drag if the user holds past 500ms.
+        const overlayMoveSub = new MutableDisposable();
+        const refreshOverlayMoveSub = () => {
+            const overlay = this.getFloatingOverlay();
+            overlayMoveSub.value = overlay
+                ? overlay.onDidStartMoving(() => {
+                      this.pointerDragSource.cancelPending();
+                  })
+                : Disposable.NONE;
+        };
+        refreshOverlayMoveSub();
+        this.addDisposables(overlayMoveSub);
+        const locationChange = this.group?.api?.onDidLocationChange;
+        if (locationChange) {
+            this.addDisposables(locationChange(refreshOverlayMoveSub));
+        }
 
         this.onWillShowOverlay = Event.any(
             this.dropTarget.onWillShowOverlay,
@@ -264,5 +309,14 @@ export class VoidContainer extends CompositeDisposable {
         this.html5DragSource.setDisabled(!caps.html5);
         this.pointerDragSource.setDisabled(!caps.pointer);
         this.pointerDragSource.setTouchOnly(!caps.pointerHandlesMouse);
+    }
+
+    private getFloatingOverlay() {
+        if (!this.group) {
+            return undefined;
+        }
+        return this.accessor.floatingGroups?.find(
+            (fg) => fg.group === this.group
+        )?.overlay;
     }
 }

@@ -4,7 +4,11 @@ import {
     toggleClass,
 } from '../dom';
 import { Emitter, Event, addDisposableListener } from '../events';
-import { CompositeDisposable, MutableDisposable } from '../lifecycle';
+import {
+    CompositeDisposable,
+    Disposable,
+    MutableDisposable,
+} from '../lifecycle';
 import { clamp } from '../math';
 import { AnchoredBox } from '../types';
 
@@ -47,6 +51,13 @@ export class Overlay extends CompositeDisposable {
     private readonly _onDidChangeEnd = new Emitter<void>();
     readonly onDidChangeEnd: Event<void> = this._onDidChangeEnd.event;
 
+    private readonly _onDidStartMoving = new Emitter<void>();
+    /** Fires once per drag, the first time the float actually moves. */
+    readonly onDidStartMoving: Event<void> = this._onDidStartMoving.event;
+
+    private readonly _dragMove = new MutableDisposable();
+    private _dragCancelled = false;
+
     private static readonly MINIMUM_HEIGHT = 20;
     private static readonly MINIMUM_WIDTH = 20;
 
@@ -81,7 +92,12 @@ export class Overlay extends CompositeDisposable {
     ) {
         super();
 
-        this.addDisposables(this._onDidChange, this._onDidChangeEnd);
+        this.addDisposables(
+            this._onDidChange,
+            this._onDidChangeEnd,
+            this._onDidStartMoving,
+            this._dragMove
+        );
 
         this._element.className = 'dv-resize-container';
         this._isVisible = true;
@@ -235,14 +251,29 @@ export class Overlay extends CompositeDisposable {
         return result;
     }
 
+    /**
+     * Abort an in-flight move-the-float drag. Used by the void container
+     * when a redock long-press fires after the move started, so the ghost
+     * gesture wins without the float continuing to follow the finger.
+     * Does not emit `onDidChangeEnd` because no change is being committed.
+     */
+    cancelPendingDrag(): void {
+        if (!this._dragMove.value) {
+            return;
+        }
+        this._dragCancelled = true;
+        toggleClass(this._element, 'dv-resize-container-dragging', false);
+        this._dragMove.value = Disposable.NONE;
+    }
+
     setupDrag(
         dragTarget: HTMLElement,
         options: { inDragMode: boolean } = { inDragMode: false }
     ): void {
-        const move = new MutableDisposable();
-
         const track = (captureTarget?: HTMLElement, pointerId?: number) => {
             let offset: { x: number; y: number } | null = null;
+            let hasMoved = false;
+            this._dragCancelled = false;
 
             const iframes = disableIframePointEvents();
 
@@ -265,11 +296,11 @@ export class Overlay extends CompositeDisposable {
                     false
                 );
 
-                move.dispose();
+                this._dragMove.value = Disposable.NONE;
                 this._onDidChangeEnd.fire();
             };
 
-            move.value = new CompositeDisposable(
+            this._dragMove.value = new CompositeDisposable(
                 {
                     dispose: () => {
                         iframes.release();
@@ -288,6 +319,9 @@ export class Overlay extends CompositeDisposable {
                     },
                 },
                 addDisposableListener(window, 'pointermove', (e) => {
+                    if (this._dragCancelled) {
+                        return;
+                    }
                     const containerRect =
                         this.options.container.getBoundingClientRect();
                     const x = e.clientX - containerRect.left;
@@ -372,6 +406,10 @@ export class Overlay extends CompositeDisposable {
                     }
 
                     this.setBounds(bounds);
+                    if (!hasMoved) {
+                        hasMoved = true;
+                        this._onDidStartMoving.fire();
+                    }
                 }),
                 addDisposableListener(window, 'pointerup', end),
                 addDisposableListener(window, 'pointercancel', end)
@@ -379,7 +417,6 @@ export class Overlay extends CompositeDisposable {
         };
 
         this.addDisposables(
-            move,
             addDisposableListener(dragTarget, 'pointerdown', (event) => {
                 if (event.defaultPrevented) {
                     event.preventDefault();
