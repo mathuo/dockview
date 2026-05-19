@@ -32,6 +32,7 @@ import { ITabGroup } from '../../tabGroup';
 import { TabGroupChip } from './tabGroupChip';
 import { TabGroupManager } from './tabGroups';
 import { ITabGroupChipRenderer } from '../../framework';
+import { DroptargetEvent } from '../../../dnd/droptarget';
 
 interface TabAnimationState {
     sourceTabId: string;
@@ -218,6 +219,7 @@ export class Tabs extends CompositeDisposable {
         for (const tab of this._tabs) {
             tab.value.setDirection(value);
         }
+        this._tabGroupManager.updateDirection();
     }
 
     constructor(
@@ -272,6 +274,9 @@ export class Tabs extends CompositeDisposable {
                     // successful drop (anim state already null) thanks to
                     // the gating inside it.
                     this.resetDragAnimation();
+                },
+                onChipDrop: (tabGroup, event) => {
+                    this._handleChipDrop(tabGroup, event);
                 },
             }
         );
@@ -1023,6 +1028,39 @@ export class Tabs extends CompositeDisposable {
             if (chipEntry) {
                 chipEntry.chip.element.style.removeProperty('transition');
             }
+        });
+    }
+
+    /**
+     * A drop on a tab group chip means "insert before this group". Resolve to
+     * the index of the group's first tab, adjusting for same-group removal
+     * (when the source tab is currently to the left of the target slot, its
+     * removal shifts the insertion index down by one). Always clears
+     * `targetTabGroupId` so the dropped tab lands outside the group.
+     */
+    private _handleChipDrop(tabGroup: ITabGroup, event: DroptargetEvent): void {
+        const firstPanelId = tabGroup.panelIds[0];
+        if (!firstPanelId) {
+            return;
+        }
+        const insertionIndex = this._tabs.findIndex(
+            (x) => x.value.panel.id === firstPanelId
+        );
+        if (insertionIndex === -1) {
+            return;
+        }
+        const data = getPanelData();
+        const sourceIndex =
+            data && data.groupId === this.group.id && data.panelId
+                ? this._tabs.findIndex((x) => x.value.panel.id === data.panelId)
+                : -1;
+        const adjustedIndex =
+            insertionIndex -
+            (sourceIndex !== -1 && sourceIndex < insertionIndex ? 1 : 0);
+        this._onDrop.fire({
+            event: event.nativeEvent,
+            index: adjustedIndex,
+            targetTabGroupId: null,
         });
     }
 

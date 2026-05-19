@@ -24,6 +24,8 @@ import { ITabGroup } from '../../tabGroup';
 import { applyTabGroupAccent } from '../../tabGroupAccent';
 import { TabGroupChip } from './tabGroupChip';
 import { ITabGroupChipRenderer } from '../../framework';
+import { Droptarget, DroptargetEvent } from '../../../dnd/droptarget';
+import { getPanelData } from '../../../dnd/dataTransfer';
 import {
     ITabGroupIndicator,
     NoneTabGroupIndicator,
@@ -57,6 +59,7 @@ export interface TabGroupManagerCallbacks {
         chip: ITabGroupChipRenderer,
         event: DragEvent | PointerEvent
     ): void;
+    onChipDrop(tabGroup: ITabGroup, event: DroptargetEvent): void;
 }
 
 interface ChipRendererEntry {
@@ -65,6 +68,7 @@ interface ChipRendererEntry {
     html5DragSource: IDragSource;
     pointerDragSource: IDragSource;
     disposable: IDisposable;
+    dropTarget: Droptarget;
 }
 
 export class TabGroupManager {
@@ -144,6 +148,13 @@ export class TabGroupManager {
         }
         for (const tabGroup of this._ctx.group.model.getTabGroups()) {
             this._positionChipForGroup(tabGroup);
+        }
+    }
+
+    updateDirection(): void {
+        const isVertical = this._ctx.getDirection() === 'vertical';
+        for (const [, entry] of this._chipRenderers) {
+            entry.dropTarget.setTargetZones(isVertical ? ['top'] : ['left']);
         }
     }
 
@@ -500,12 +511,57 @@ export class TabGroupManager {
             );
         }
 
+        // The chip sits before its group's first tab in the DOM, so it
+        // covers the "drop before the group" position. Without a drop
+        // target here, dropping a tab over the chip is a dead zone —
+        // particularly visible when the group is first in the tabs list
+        // and there's no preceding tab whose right zone covers position 0.
+        // The smooth animation path already shifts the chip's margin to
+        // open a gap, so suppress the overlay in that mode.
+        const isVertical = this._ctx.getDirection() === 'vertical';
+        const dropTarget = new Droptarget(chip.element, {
+            acceptedTargetZones: isVertical ? ['top'] : ['left'],
+            overlayModel: {
+                activationSize: { value: 100, type: 'percentage' },
+            },
+            canDisplayOverlay: (event, position) => {
+                if (this._ctx.group.locked) {
+                    return false;
+                }
+                if (this._ctx.accessor.options.disableDnd) {
+                    return false;
+                }
+                const data = getPanelData();
+                if (data && this._ctx.accessor.id === data.viewId) {
+                    if (
+                        this._ctx.accessor.options.theme?.tabAnimation ===
+                        'smooth'
+                    ) {
+                        return false;
+                    }
+                    return true;
+                }
+                return this._ctx.group.model.canDisplayOverlay(
+                    event,
+                    position,
+                    'tab'
+                );
+            },
+        });
+        disposables.push(
+            dropTarget,
+            dropTarget.onDrop((event) => {
+                this._callbacks.onChipDrop(tabGroup, event);
+            })
+        );
+
         const disposable = new CompositeDisposable(...disposables);
         this._chipRenderers.set(tabGroup.id, {
             chip,
             html5DragSource,
             pointerDragSource,
             disposable,
+            dropTarget,
         });
 
         // Group is born collapsed (cross-group drop, layout restore, etc.):

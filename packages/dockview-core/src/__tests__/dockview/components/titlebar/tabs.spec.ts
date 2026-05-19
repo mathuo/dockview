@@ -545,6 +545,124 @@ describe('tabs', () => {
             const index = simulateDropOnTab(tabs, 1, 'right');
             expect(index).toBe(2);
         });
+
+        test('dropping on a group chip inserts before the group (group is first in tabs)', () => {
+            // [chip, A(0,in groupX), B(1,in groupX), C(2)]
+            // Drag C over the chip → insert before groupX at index 0.
+            // sourceIndex=2, insertionIndex=0, 2 < 0 is false → adjustedIndex=0.
+            const { tabs, group } = createTabsForDropTest();
+            tabs.openPanel(createMockPanel('panel-a'), 0);
+            tabs.openPanel(createMockPanel('panel-b'), 1);
+            tabs.openPanel(createMockPanel('panel-c'), 2);
+
+            const noopEvent = () => ({ dispose: jest.fn() });
+            const groupX = {
+                id: 'group-x',
+                panelIds: ['panel-a', 'panel-b'],
+                collapsed: false,
+                label: '',
+                color: undefined,
+                onDidChange: noopEvent,
+                onDidPanelChange: noopEvent,
+                onDidCollapseChange: noopEvent,
+            };
+            (group.model as any).getTabGroups = () => [groupX];
+            tabs.updateTabGroups();
+
+            LocalSelectionTransfer.getInstance<PanelTransfer>().setData(
+                [
+                    new PanelTransfer(
+                        'test-accessor-id',
+                        'test-group-id',
+                        'panel-c'
+                    ),
+                ],
+                PanelTransfer.prototype
+            );
+
+            const chipEl = (tabs as any)._tabGroupManager._chipRenderers.get(
+                'group-x'
+            ).chip.element as HTMLElement;
+            jest.spyOn(chipEl, 'offsetWidth', 'get').mockReturnValue(40);
+            jest.spyOn(chipEl, 'offsetHeight', 'get').mockReturnValue(30);
+
+            const drops: TabDropIndexEvent[] = [];
+            tabs.onDrop((e) => drops.push(e));
+
+            fireEvent.dragEnter(chipEl);
+            fireEvent(
+                chipEl,
+                createOffsetDragOverEvent({ clientX: 10, clientY: 0 })
+            );
+
+            const dropzone = chipEl.querySelector('.dv-drop-target-dropzone');
+            expect(dropzone).not.toBeNull();
+
+            fireEvent.drop(dropzone!);
+
+            expect(drops.length).toBe(1);
+            expect(drops[0].index).toBe(0);
+            expect(drops[0].targetTabGroupId).toBeNull();
+        });
+
+        test('dropping a cross-group panel on a chip inserts before the group at firstTabIdx', () => {
+            // [X(0), chip, A(1,in groupY), B(2,in groupY)]
+            // External drag (different group) onto chip → insert at index 1
+            // (firstTabIdx of groupY). sourceIndex=-1 → no adjustment.
+            const { tabs, group } = createTabsForDropTest();
+            tabs.openPanel(createMockPanel('panel-x'), 0);
+            tabs.openPanel(createMockPanel('panel-a'), 1);
+            tabs.openPanel(createMockPanel('panel-b'), 2);
+
+            const noopEvent = () => ({ dispose: jest.fn() });
+            const groupY = {
+                id: 'group-y',
+                panelIds: ['panel-a', 'panel-b'],
+                collapsed: false,
+                label: '',
+                color: undefined,
+                onDidChange: noopEvent,
+                onDidPanelChange: noopEvent,
+                onDidCollapseChange: noopEvent,
+            };
+            (group.model as any).getTabGroups = () => [groupY];
+            tabs.updateTabGroups();
+
+            LocalSelectionTransfer.getInstance<PanelTransfer>().setData(
+                [
+                    new PanelTransfer(
+                        'test-accessor-id',
+                        'other-group-id',
+                        'panel-z'
+                    ),
+                ],
+                PanelTransfer.prototype
+            );
+
+            const chipEl = (tabs as any)._tabGroupManager._chipRenderers.get(
+                'group-y'
+            ).chip.element as HTMLElement;
+            jest.spyOn(chipEl, 'offsetWidth', 'get').mockReturnValue(40);
+            jest.spyOn(chipEl, 'offsetHeight', 'get').mockReturnValue(30);
+
+            const drops: TabDropIndexEvent[] = [];
+            tabs.onDrop((e) => drops.push(e));
+
+            fireEvent.dragEnter(chipEl);
+            fireEvent(
+                chipEl,
+                createOffsetDragOverEvent({ clientX: 10, clientY: 0 })
+            );
+
+            const dropzone = chipEl.querySelector('.dv-drop-target-dropzone');
+            expect(dropzone).not.toBeNull();
+
+            fireEvent.drop(dropzone!);
+
+            expect(drops.length).toBe(1);
+            expect(drops[0].index).toBe(1);
+            expect(drops[0].targetTabGroupId).toBeNull();
+        });
     });
 
     describe('delete', () => {
