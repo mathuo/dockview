@@ -58,6 +58,20 @@
         will-change: transform, opacity;
     }
 
+    // Without touch-action: none, mobile browsers interpret a drag on the
+    // handle as a scroll/zoom and fire pointercancel, causing the resize
+    // gesture to lose the finger mid-drag.
+    .dv-resize-handle-top,
+    .dv-resize-handle-bottom,
+    .dv-resize-handle-left,
+    .dv-resize-handle-right,
+    .dv-resize-handle-topleft,
+    .dv-resize-handle-topright,
+    .dv-resize-handle-bottomleft,
+    .dv-resize-handle-bottomright {
+        touch-action: none;
+    }
+
     .dv-resize-handle-top {
         height: 4px;
         width: calc(100% - 8px);

@@ -241,15 +241,50 @@ export class Overlay extends CompositeDisposable {
     ): void {
         const move = new MutableDisposable();
 
-        const track = () => {
+        const track = (captureTarget?: HTMLElement, pointerId?: number) => {
             let offset: { x: number; y: number } | null = null;
 
             const iframes = disableIframePointEvents();
+
+            if (
+                captureTarget &&
+                typeof pointerId === 'number' &&
+                typeof captureTarget.setPointerCapture === 'function'
+            ) {
+                try {
+                    captureTarget.setPointerCapture(pointerId);
+                } catch {
+                    // ignore – non-fatal if the browser refuses capture
+                }
+            }
+
+            const end = () => {
+                toggleClass(
+                    this._element,
+                    'dv-resize-container-dragging',
+                    false
+                );
+
+                move.dispose();
+                this._onDidChangeEnd.fire();
+            };
 
             move.value = new CompositeDisposable(
                 {
                     dispose: () => {
                         iframes.release();
+                        if (
+                            captureTarget &&
+                            typeof pointerId === 'number' &&
+                            typeof captureTarget.releasePointerCapture ===
+                                'function'
+                        ) {
+                            try {
+                                captureTarget.releasePointerCapture(pointerId);
+                            } catch {
+                                // ignore – pointer may already be released
+                            }
+                        }
                     },
                 },
                 addDisposableListener(window, 'pointermove', (e) => {
@@ -338,16 +373,8 @@ export class Overlay extends CompositeDisposable {
 
                     this.setBounds(bounds);
                 }),
-                addDisposableListener(window, 'pointerup', () => {
-                    toggleClass(
-                        this._element,
-                        'dv-resize-container-dragging',
-                        false
-                    );
-
-                    move.dispose();
-                    this._onDidChangeEnd.fire();
-                })
+                addDisposableListener(window, 'pointerup', end),
+                addDisposableListener(window, 'pointercancel', end)
             );
         };
 
@@ -365,7 +392,7 @@ export class Overlay extends CompositeDisposable {
                     return;
                 }
 
-                track();
+                track(dragTarget, event.pointerId);
             }),
             addDisposableListener(
                 this.options.content,
@@ -382,7 +409,7 @@ export class Overlay extends CompositeDisposable {
                     }
 
                     if (event.shiftKey) {
-                        track();
+                        track(this.options.content, event.pointerId);
                     }
                 }
             ),
@@ -431,6 +458,22 @@ export class Overlay extends CompositeDisposable {
                 } | null = null;
 
                 const iframes = disableIframePointEvents();
+
+                const pointerId = e.pointerId;
+                if (
+                    typeof resizeHandleElement.setPointerCapture === 'function'
+                ) {
+                    try {
+                        resizeHandleElement.setPointerCapture(pointerId);
+                    } catch {
+                        // ignore – non-fatal if the browser refuses capture
+                    }
+                }
+
+                const end = () => {
+                    move.dispose();
+                    this._onDidChangeEnd.fire();
+                };
 
                 move.value = new CompositeDisposable(
                     addDisposableListener(window, 'pointermove', (e) => {
@@ -612,12 +655,22 @@ export class Overlay extends CompositeDisposable {
                     {
                         dispose: () => {
                             iframes.release();
+                            if (
+                                typeof resizeHandleElement.releasePointerCapture ===
+                                'function'
+                            ) {
+                                try {
+                                    resizeHandleElement.releasePointerCapture(
+                                        pointerId
+                                    );
+                                } catch {
+                                    // ignore – pointer may already be released
+                                }
+                            }
                         },
                     },
-                    addDisposableListener(window, 'pointerup', () => {
-                        move.dispose();
-                        this._onDidChangeEnd.fire();
-                    })
+                    addDisposableListener(window, 'pointerup', end),
+                    addDisposableListener(window, 'pointercancel', end)
                 );
             })
         );
