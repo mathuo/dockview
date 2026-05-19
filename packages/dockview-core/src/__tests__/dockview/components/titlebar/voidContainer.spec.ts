@@ -609,6 +609,9 @@ describe('voidContainer', () => {
             expect(setDragImage).toHaveBeenCalledTimes(1);
             const ghost = setDragImage.mock.calls[0][0] as HTMLElement;
             expect(ghost.textContent).toBe('Multiple Panels (4)');
+            // Regression: a plain block-level div appended to body stretches
+            // to viewport width and renders as a horizontal bar.
+            expect(ghost.style.display).toBe('inline-block');
 
             jest.runAllTimers();
 

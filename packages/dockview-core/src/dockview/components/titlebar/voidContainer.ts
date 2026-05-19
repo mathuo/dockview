@@ -139,6 +139,10 @@ export class VoidContainer extends CompositeDisposable {
             ghostEl.style.borderRadius = '12px';
             ghostEl.style.whiteSpace = 'nowrap';
             ghostEl.style.boxSizing = 'border-box';
+            // HTML5 setDragImage snapshots the element as appended to the
+            // document; a default block-level div would stretch to the
+            // body's width and render as a viewport-wide bar.
+            ghostEl.style.display = 'inline-block';
             ghostEl.textContent = `Multiple Panels (${this.group.size})`;
             return ghostEl;
         };
