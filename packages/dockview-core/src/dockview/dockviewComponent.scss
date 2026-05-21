@@ -1,3 +1,15 @@
+// Floating overlay container for unpinned edge groups
+.dv-edge-overlay {
+    position: absolute;
+    overflow: hidden;
+    z-index: var(--dv-overlay-z-index, 999);
+
+    > .dv-groupview {
+        width: 100%;
+        height: 100%;
+    }
+}
+
 .dv-dockview {
     position: relative;
     background-color: var(--dv-group-view-background-color);

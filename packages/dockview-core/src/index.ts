@@ -160,6 +160,7 @@ export {
     DockviewGroupPanelApi,
     DockviewGroupPanelFloatingChangeEvent,
     DockviewGroupPanelCollapsedChangeEvent,
+    DockviewGroupPanelPinnedChangeEvent,
     DockviewGroupMoveParams,
 } from './api/dockviewGroupPanelApi';
 export {

@@ -1713,6 +1713,25 @@ export class DockviewComponent
         return false;
     }
 
+    setEdgeGroupPinned(group: DockviewGroupPanel, pinned: boolean): void {
+        for (const [position, edgeGroup] of this._edgeGroups) {
+            if (edgeGroup === group) {
+                this._shellManager!.setEdgeGroupPinned(position, pinned);
+                edgeGroup.api._onDidPinnedChange.fire({ isPinned: pinned });
+                return;
+            }
+        }
+    }
+
+    isEdgeGroupPinned(group: DockviewGroupPanel): boolean {
+        for (const [position, edgeGroup] of this._edgeGroups) {
+            if (edgeGroup === group) {
+                return this._shellManager!.isEdgeGroupPinned(position);
+            }
+        }
+        return true;
+    }
+
     private updateDragAndDropState(): void {
         // Update draggable state for all tabs and void containers
         for (const group of this.groups) {
