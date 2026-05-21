@@ -102,6 +102,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() locked?: boolean;
     @Input() disableAutoResizing?: boolean;
     @Input() singleTabMode?: 'fullwidth' | 'default';
+    @Input() revealActiveTab?: boolean;
     @Input() getTabContextMenuItems?: (
         params: GetTabContextMenuItemsParams
     ) => (ContextMenuItem | { component: Type<any> | TemplateRef<any> })[];
