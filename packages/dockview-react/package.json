@@ -20,6 +20,8 @@
         "drag-and-drop",
         "drag",
         "drop",
+        "touch",
+        "mobile",
         "typescript",
         "zero-dependency",
         "ide-layout",

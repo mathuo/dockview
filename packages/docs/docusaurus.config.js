@@ -156,7 +156,7 @@ const config = {
                 '@type': 'SoftwareSourceCode',
                 name: 'Dockview',
                 description:
-                    'A zero dependency docking layout manager for building IDE-like interfaces with tabs, groups, grids, splitviews, drag and drop, floating panels, and popout windows. Supports React, Vue, Angular, and vanilla TypeScript.',
+                    'A zero dependency docking layout manager for building IDE-like interfaces with tabs, groups, grids, splitviews, drag and drop, floating panels, and popout windows. Touch and mobile ready. Supports React, Vue, Angular, and vanilla TypeScript.',
                 url: 'https://dockview.dev',
                 codeRepository: 'https://github.com/mathuo/dockview',
                 programmingLanguage: ['TypeScript', 'JavaScript'],
@@ -177,6 +177,8 @@ const config = {
                     'gridview',
                     'floating panels',
                     'popout windows',
+                    'touch',
+                    'mobile',
                     'zero dependency',
                 ],
             }),
@@ -213,12 +215,14 @@ const config = {
                         'ide-layout',
                         'floating-panels',
                         'popout-windows',
+                        'touch',
+                        'mobile',
                     ].join(' ,'),
                 },
                 {
                     name: 'description',
                     content:
-                        'Dockview is a zero dependency docking layout manager for building IDE-like interfaces with tabs, groups, grids, splitviews, drag and drop, floating panels, and popout windows. Supports React, Vue, Angular, and vanilla TypeScript.',
+                        'Dockview is a zero dependency docking layout manager for building IDE-like interfaces with tabs, groups, grids, splitviews, drag and drop, floating panels, and popout windows. Touch and mobile ready. Supports React, Vue, Angular, and vanilla TypeScript.',
                 },
                 {
                     property: 'og:type',

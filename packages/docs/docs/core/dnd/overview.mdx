@@ -38,3 +38,7 @@ Dockview supports a wide variety of built-in Drag and Drop possibilities.
 <div style={{display: 'flex', justifyContent: 'center'}}>
   <img style={{ height: '300px' }} src={useBaseUrl('/img/magnet_drop_positions.svg')} alt="Diagram showing the available drop positions when moving a tab or group relative to the container edges" />
 </div>
+
+## Touch and pen input
+
+Mouse drags use the browser's HTML5 drag-and-drop. Touch and pen drags are driven by a pointer-events backend with a long-press-to-drag gesture, so taps and native scroll still work on mobile. The backend is selected automatically and can be overridden — see [Dnd Strategy](./strategy) for the `dndStrategy` option and the full gesture table.
