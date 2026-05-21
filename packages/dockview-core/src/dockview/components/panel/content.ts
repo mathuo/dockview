@@ -7,12 +7,17 @@ import { Emitter, Event } from '../../../events';
 import { trackFocus } from '../../../dom';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
-import { Droptarget } from '../../../dnd/droptarget';
+import { Droptarget, IDropTarget, Position } from '../../../dnd/droptarget';
+import { pointerBackend } from '../../../dnd/backend';
 import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
 import { getPanelData } from '../../../dnd/dataTransfer';
 
 export interface IContentContainer extends IDisposable {
+    // `Droptarget` here (not `IDropTarget`) because overlayRenderContainer
+    // forwards HTML5 drag events through `dropTarget.dnd` (the inner
+    // DragAndDropObserver), which has no pointer-backend equivalent.
     readonly dropTarget: Droptarget;
+    readonly pointerDropTarget: IDropTarget;
     onDidFocus: Event<void>;
     onDidBlur: Event<void>;
     element: HTMLElement;
@@ -45,6 +50,7 @@ export class ContentContainer
     }
 
     readonly dropTarget: Droptarget;
+    readonly pointerDropTarget: IDropTarget;
 
     constructor(
         private readonly accessor: DockviewComponent,
@@ -59,6 +65,37 @@ export class ContentContainer
 
         const target = group.dropTargetContainer;
 
+        const canDisplayOverlay = (
+            event: DragEvent | PointerEvent,
+            position: Position
+        ): boolean => {
+            if (
+                this.group.locked === 'no-drop-target' ||
+                (this.group.locked && position === 'center')
+            ) {
+                return false;
+            }
+
+            const data = getPanelData();
+
+            if (
+                !data &&
+                event.shiftKey &&
+                this.group.location.type !== 'floating'
+            ) {
+                return false;
+            }
+
+            if (data && data.viewId === this.accessor.id) {
+                return true;
+            }
+
+            return this.group.canDisplayOverlay(event, position, 'content');
+        };
+
+        // `dropTarget` stays the concrete `Droptarget` (not via the backend
+        // factory) because overlayRenderContainer forwards HTML5 drag events
+        // through `dropTarget.dnd` — that field is not part of `IDropTarget`.
         this.dropTarget = new Droptarget(this.element, {
             getOverlayOutline: () => {
                 return accessor.options.theme?.dndPanelOverlay === 'group'
@@ -67,34 +104,23 @@ export class ContentContainer
             },
             className: 'dv-drop-target-content',
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
-            canDisplayOverlay: (event, position) => {
-                if (
-                    this.group.locked === 'no-drop-target' ||
-                    (this.group.locked && position === 'center')
-                ) {
-                    return false;
-                }
-
-                const data = getPanelData();
-
-                if (
-                    !data &&
-                    event.shiftKey &&
-                    this.group.location.type !== 'floating'
-                ) {
-                    return false;
-                }
-
-                if (data && data.viewId === this.accessor.id) {
-                    return true;
-                }
-
-                return this.group.canDisplayOverlay(event, position, 'content');
-            },
+            canDisplayOverlay,
             getOverrideTarget: target ? () => target.model : undefined,
         });
 
-        this.addDisposables(this.dropTarget);
+        this.pointerDropTarget = pointerBackend.createDropTarget(this.element, {
+            acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
+            canDisplayOverlay,
+            getOverlayOutline: () => {
+                return accessor.options.theme?.dndPanelOverlay === 'group'
+                    ? this.element.parentElement
+                    : null;
+            },
+            className: 'dv-drop-target-content',
+            getOverrideTarget: target ? () => target.model : undefined,
+        });
+
+        this.addDisposables(this.dropTarget, this.pointerDropTarget);
     }
 
     show(): void {

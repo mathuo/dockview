@@ -120,3 +120,135 @@
     font-size: 1em;
     line-height: 1.7;
 }
+
+.mobileHeader {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+    background: var(--ifm-navbar-background-color);
+    border-bottom: 1px solid var(--ifm-toc-border-color);
+    flex-shrink: 0;
+}
+
+.mobileButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+    background: none;
+    border: none;
+    color: var(--ifm-navbar-link-color);
+    cursor: pointer;
+    border-radius: 6px;
+    text-decoration: none;
+    padding: 0 12px;
+    font-size: 0.9em;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mobileButton:hover,
+.mobileButton:active {
+    background: var(--ifm-hover-overlay);
+    color: var(--ifm-navbar-link-hover-color);
+    text-decoration: none;
+}
+
+.mobileTip {
+    flex: 1;
+    text-align: center;
+    font-size: 0.75em;
+    color: var(--ifm-navbar-link-color);
+    opacity: 0.75;
+    user-select: none;
+    padding: 0 8px;
+}
+
+.sheetBackdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    animation: sheetFadeIn 0.15s ease-out;
+}
+
+.sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--ifm-navbar-background-color);
+    border-top: 1px solid var(--ifm-toc-border-color);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    padding: 8px 0 max(16px, env(safe-area-inset-bottom));
+    z-index: 1001;
+    max-height: 70vh;
+    overflow-y: auto;
+    animation: sheetSlideUp 0.2s ease-out;
+}
+
+.sheetGrabber {
+    width: 36px;
+    height: 4px;
+    background: var(--ifm-color-emphasis-400);
+    border-radius: 2px;
+    margin: 4px auto 12px;
+}
+
+.sheetTitle {
+    font-weight: 600;
+    padding: 12px 20px 8px;
+    font-size: 0.75em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ifm-navbar-link-color);
+    opacity: 0.6;
+}
+
+.sheetItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-size: 0.95em;
+    color: var(--ifm-navbar-link-color);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sheetItem:active {
+    background: var(--ifm-hover-overlay);
+}
+
+.sheetItemActive {
+    color: var(--ifm-color-primary);
+}
+
+.sheetItemSub {
+    font-size: 0.75em;
+    opacity: 0.65;
+    margin-top: 2px;
+}
+
+.sheetDivider {
+    height: 1px;
+    background: var(--ifm-toc-border-color);
+    margin: 4px 0;
+}
+
+@keyframes sheetFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes sheetSlideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}

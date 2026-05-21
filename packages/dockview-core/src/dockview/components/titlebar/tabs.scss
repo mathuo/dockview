@@ -9,11 +9,32 @@
     will-change: scroll-position;
     transform: translate3d(0, 0, 0);
 
+    /**
+     * Stop scroll-chaining at the tab strip so that wheel / trackpad
+     * overscroll past the strip's edges doesn't trigger the browser's
+     * swipe-to-go-back-or-forward gesture (and doesn't scroll the page
+     * either). `contain` keeps the native bounce visuals; `none` would
+     * also disable them.
+     */
+    overscroll-behavior: contain;
+
+    /**
+     * Empty space between tabs (and the scrollbar lane) keeps pan-x so a
+     * flick on those areas produces native momentum scroll. The tab and
+     * chip elements themselves opt out (`touch-action: none`) so the
+     * pointer drag source owns the gesture from pointerdown — a flick on
+     * a tab or chip always becomes a drag, regardless of direction.
+     */
+    touch-action: pan-x;
+
     &.dv-tabs-container-vertical {
         width: 100%;
         height: fit-content;
         max-height: 100%;
         writing-mode: vertical-rl;
+
+        // Vertical tab bar scrolls vertically.
+        touch-action: pan-y;
     }
 
     &.dv-horizontal,
@@ -70,7 +91,11 @@
 }
 
 .dv-tab {
-    -webkit-user-drag: element;
+    // Tabs aren't `draggable`; suppress text selection on mousedown+move.
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     outline: none;
     padding: 0.25rem 0.5rem;
     cursor: pointer;
@@ -78,6 +103,10 @@
     box-sizing: border-box;
     font-size: var(--dv-tab-font-size);
     margin: var(--dv-tab-margin);
+    // Block the browser's native pan so the pointer drag source can run
+    // its long-press arming without Chrome firing pointercancel mid-gesture.
+    // See the container comment above; pre-arm scroll is forwarded in JS.
+    touch-action: none;
 
     &.dv-tab--shifting {
         will-change:
@@ -152,6 +181,10 @@
     white-space: nowrap;
     box-sizing: border-box;
     line-height: 1;
+    // Same reasoning as `.dv-tab`: opt out of native pan so the chip's
+    // drag arms on any flick. Strip-scrolling lives on the surrounding
+    // empty space (the container keeps `touch-action: pan-x`).
+    touch-action: none;
 
     // The accent value is set inline by `applyTabGroupAccent` at render time.
     // When the palette is disabled or the group has no color, the var is

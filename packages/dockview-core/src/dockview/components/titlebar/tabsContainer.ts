@@ -27,18 +27,20 @@ import { DockviewHeaderDirection } from '../../options';
 import { applyTabGroupAccent } from '../../tabGroupAccent';
 
 export interface TabDropIndexEvent {
-    readonly event: DragEvent;
+    readonly event: DragEvent | PointerEvent;
     readonly index: number;
     readonly targetTabGroupId?: string | null;
 }
 
 export interface TabDragEvent {
-    readonly nativeEvent: DragEvent;
+    /** Narrow with `instanceof DragEvent` before reading `dataTransfer`. */
+    readonly nativeEvent: DragEvent | PointerEvent;
     readonly panel: IDockviewPanel;
 }
 
 export interface GroupDragEvent {
-    readonly nativeEvent: DragEvent;
+    /** Narrow with `instanceof DragEvent` before reading `dataTransfer`. */
+    readonly nativeEvent: DragEvent | PointerEvent;
     readonly group: DockviewGroupPanel;
 }
 

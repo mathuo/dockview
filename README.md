@@ -26,6 +26,7 @@ Please see the website: https://dockview.dev
 -   Support for split-views, grid-views and 'dockable' views
 -   Themeable and customizable
 -   Tab and Group docking / Drag n' Drop
+-   Touch & mobile support
 -   Popout Windows
 -   Floating Groups
 -   Extensive API

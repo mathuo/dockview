@@ -36,7 +36,8 @@ export class DockviewWillShowOverlayLocationEvent implements IDockviewEvent {
         return this.options.kind;
     }
 
-    get nativeEvent(): DragEvent {
+    /** Narrow with `instanceof DragEvent` before reading `dataTransfer`. */
+    get nativeEvent(): DragEvent | PointerEvent {
         return this.event.nativeEvent;
     }
 

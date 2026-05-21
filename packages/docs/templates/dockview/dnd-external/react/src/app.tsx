@@ -83,7 +83,12 @@ const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
             position: { referencePanel: 'panel_1', direction: 'right' },
         });
 
+        // Pointer (touch) drags can't bridge to external HTML5 drop
+        // zones outside dockview; narrow before reading `dataTransfer`.
         const panelDragDisposable = api.onWillDragPanel((event) => {
+            if (!(event.nativeEvent instanceof DragEvent)) {
+                return;
+            }
             const dataTransfer = event.nativeEvent.dataTransfer;
 
             if (dataTransfer) {
@@ -99,6 +104,9 @@ const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
         });
 
         const groupDragDisposable = api.onWillDragGroup((event) => {
+            if (!(event.nativeEvent instanceof DragEvent)) {
+                return;
+            }
             const dataTransfer = event.nativeEvent.dataTransfer;
 
             if (dataTransfer) {

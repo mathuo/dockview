@@ -112,6 +112,14 @@ const IconEdgeGroups = () => (
     </svg>
 );
 
+const IconTouch = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9 11V6a2 2 0 014 0v5" />
+        <path d="M9 11V8a2 2 0 00-4 0v6a7 7 0 0014 0v-3a2 2 0 00-4 0" />
+        <path d="M13 11V7a2 2 0 014 0v4" />
+    </svg>
+);
+
 // ─── Feature cards ────────────────────────────────────────────────────────────
 
 const FEATURES = [
@@ -162,6 +170,12 @@ const FEATURES = [
         title: 'Edge Groups',
         description:
             'IDE-style collapsible side panels docked to any edge of the layout. Toggle via the API, persist their state, and host any panel content.',
+    },
+    {
+        icon: <IconTouch />,
+        title: 'Touch & Mobile',
+        description:
+            'First-class touch and pen support. A pointer-events backend powers drag and drop on mobile with a long-press gesture that preserves native taps and scroll.',
     },
 ];
 
@@ -232,8 +246,8 @@ function Hero() {
                     </h1>
                     <p className="hero-subtitle">
                         Build IDE-like interfaces with tabs, groups, drag &
-                        drop, floating panels, and popout windows. Zero
-                        dependencies.
+                        drop, floating panels, and popout windows. Touch and
+                        mobile ready. Zero dependencies.
                     </p>
                     <div className="hero-actions">
                         <div className="hero-fw-btns">
@@ -294,7 +308,7 @@ export default function Home(): JSX.Element {
     return (
         <Layout
             title="Docking Layout Manager"
-            description="Dockview is a zero dependency docking layout manager for building IDE-like interfaces with tabs, groups, grids, splitviews, drag and drop, floating panels, and popout windows. Supports React, Vue, Angular, and vanilla TypeScript."
+            description="Dockview is a zero dependency docking layout manager for building IDE-like interfaces with tabs, groups, grids, splitviews, drag and drop, floating panels, and popout windows. Touch and mobile ready. Supports React, Vue, Angular, and vanilla TypeScript."
         >
             <main>
                 <Hero />

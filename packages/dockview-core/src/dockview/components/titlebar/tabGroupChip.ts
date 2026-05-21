@@ -8,7 +8,16 @@ import {
 } from '../../tabGroupAccent';
 import { ITabGroupChipRenderer } from '../../framework';
 import { DockviewApi } from '../../../api/component.api';
+import { LongPressDetector } from '../../../dnd/pointer/longPress';
 
+/**
+ * Visual chip for a tab group. Owns the DOM element, label, click /
+ * context-menu interactions, and exposes a long-press gesture as a
+ * second `onContextMenu` source. Drag-and-drop wiring lives in
+ * `TabGroupManager` — the manager constructs the drag sources on this
+ * chip's element so it can include tabs-list context (custom group
+ * drag image, tab-group transfer payload).
+ */
 export class TabGroupChip
     extends CompositeDisposable
     implements ITabGroupChipRenderer
@@ -21,10 +30,8 @@ export class TabGroupChip
     readonly onClick: Event<MouseEvent> = this._onClick.event;
 
     private readonly _onContextMenu = new Emitter<MouseEvent>();
+    /** Fires on right-click and on touch long-press. */
     readonly onContextMenu: Event<MouseEvent> = this._onContextMenu.event;
-
-    private readonly _onDragStart = new Emitter<DragEvent>();
-    readonly onDragStart: Event<DragEvent> = this._onDragStart.event;
 
     get element(): HTMLElement {
         return this._element;
@@ -36,7 +43,6 @@ export class TabGroupChip
         this._element = document.createElement('div');
         this._element.className = 'dv-tab-group-chip';
         this._element.tabIndex = 0;
-        this._element.draggable = true;
 
         this._label = document.createElement('span');
         this._label.className = 'dv-tab-group-chip-label';
@@ -45,15 +51,16 @@ export class TabGroupChip
         this.addDisposables(
             this._onClick,
             this._onContextMenu,
-            this._onDragStart,
+            new LongPressDetector(this._element, {
+                onLongPress: (event) => {
+                    this._onContextMenu.fire(event);
+                },
+            }),
             addDisposableListener(this._element, 'click', (event) => {
                 this._onClick.fire(event);
             }),
             addDisposableListener(this._element, 'contextmenu', (event) => {
                 this._onContextMenu.fire(event);
-            }),
-            addDisposableListener(this._element, 'dragstart', (event) => {
-                this._onDragStart.fire(event);
             })
         );
     }

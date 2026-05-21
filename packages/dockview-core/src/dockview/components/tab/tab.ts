@@ -1,5 +1,5 @@
 import { addDisposableListener, Emitter, Event } from '../../../events';
-import { CompositeDisposable, IDisposable } from '../../../lifecycle';
+import { CompositeDisposable } from '../../../lifecycle';
 import {
     getPanelData,
     LocalSelectionTransfer,
@@ -11,47 +11,30 @@ import { ITabRenderer } from '../../types';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import {
     DroptargetEvent,
-    Droptarget,
+    IDropTarget,
+    Position,
     WillShowOverlayEvent,
 } from '../../../dnd/droptarget';
-import { DragHandler } from '../../../dnd/abstractDragHandler';
+import {
+    DragSourceOptions,
+    html5Backend,
+    IDragSource,
+    pointerBackend,
+} from '../../../dnd/backend';
+import { LongPressDetector } from '../../../dnd/pointer/longPress';
 import { IDockviewPanel } from '../../dockviewPanel';
-import { addGhostImage } from '../../../dnd/ghost';
 import { DockviewHeaderDirection } from '../../options';
-
-class TabDragHandler extends DragHandler {
-    private readonly panelTransfer =
-        LocalSelectionTransfer.getInstance<PanelTransfer>();
-
-    constructor(
-        element: HTMLElement,
-        private readonly accessor: DockviewComponent,
-        private readonly group: DockviewGroupPanel,
-        private readonly panel: IDockviewPanel,
-        disabled?: boolean
-    ) {
-        super(element, disabled);
-    }
-
-    getData(event: DragEvent): IDisposable {
-        this.panelTransfer.setData(
-            [new PanelTransfer(this.accessor.id, this.group.id, this.panel.id)],
-            PanelTransfer.prototype
-        );
-
-        return {
-            dispose: () => {
-                this.panelTransfer.clearData(PanelTransfer.prototype);
-            },
-        };
-    }
-}
+import { resolveDndCapabilities } from '../../dndCapabilities';
 
 export class Tab extends CompositeDisposable {
     private readonly _element: HTMLElement;
-    private readonly dropTarget: Droptarget;
+    private readonly dropTarget: IDropTarget;
+    private readonly pointerDropTarget: IDropTarget;
     private content: ITabRenderer | undefined = undefined;
-    private readonly dragHandler: TabDragHandler;
+    private readonly html5DragSource: IDragSource;
+    private readonly pointerDragSource: IDragSource;
+    private readonly panelTransfer =
+        LocalSelectionTransfer.getInstance<PanelTransfer>();
     private _direction: DockviewHeaderDirection = 'horizontal';
 
     private readonly _onPointDown = new Emitter<MouseEvent>();
@@ -63,10 +46,10 @@ export class Tab extends CompositeDisposable {
     private readonly _onDropped = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDropped.event;
 
-    private readonly _onDragStart = new Emitter<DragEvent>();
+    private readonly _onDragStart = new Emitter<DragEvent | PointerEvent>();
     readonly onDragStart = this._onDragStart.event;
 
-    private readonly _onDragEnd = new Emitter<DragEvent>();
+    private readonly _onDragEnd = new Emitter<DragEvent | PointerEvent>();
     readonly onDragEnd = this._onDragEnd.event;
 
     readonly onWillShowOverlay: Event<WillShowOverlayEvent>;
@@ -82,55 +65,120 @@ export class Tab extends CompositeDisposable {
     ) {
         super();
 
+        const caps = resolveDndCapabilities(this.accessor.options);
+
         this._element = document.createElement('div');
         this._element.className = 'dv-tab';
         this._element.tabIndex = 0;
-        this._element.draggable = !this.accessor.options.disableDnd;
+        this._element.draggable = caps.html5;
 
         toggleClass(this.element, 'dv-inactive-tab', true);
 
-        this.dragHandler = new TabDragHandler(
-            this._element,
-            this.accessor,
-            this.group,
-            this.panel,
-            !!this.accessor.options.disableDnd
-        );
+        const canDisplayOverlay = (
+            event: DragEvent | PointerEvent,
+            position: Position
+        ): boolean => {
+            if (this.group.locked) {
+                return false;
+            }
 
-        this.dropTarget = new Droptarget(this._element, {
-            acceptedTargetZones: ['left', 'right'],
-            overlayModel: this._buildOverlayModel(),
-            canDisplayOverlay: (event, position) => {
-                if (this.group.locked) {
+            const data = getPanelData();
+
+            if (data && this.accessor.id === data.viewId) {
+                // Smooth-reorder takes over the in-flight visual when active,
+                // so individual tab overlays are suppressed for internal drags.
+                if (this.accessor.options.theme?.tabAnimation === 'smooth') {
                     return false;
                 }
+                return true;
+            }
 
-                const data = getPanelData();
+            return this.group.model.canDisplayOverlay(event, position, 'tab');
+        };
 
-                if (data && this.accessor.id === data.viewId) {
-                    if (
-                        this.accessor.options.theme?.tabAnimation === 'smooth'
-                    ) {
-                        // When smooth reorder is enabled, the Tabs
-                        // container handles all intra-accessor drops
-                        // (both same-group and cross-group) via
-                        // animation.  Suppress the per-tab overlay so
-                        // the tab is dropped *beside* rather than *on*.
-                        return false;
-                    }
-                    return true;
-                }
-
-                return this.group.model.canDisplayOverlay(
-                    event,
-                    position,
-                    'tab'
-                );
-            },
+        this.dropTarget = html5Backend.createDropTarget(this._element, {
+            acceptedTargetZones: ['left', 'right'],
+            overlayModel: this._buildOverlayModel(),
+            canDisplayOverlay,
             getOverrideTarget: () => group.model.dropTargetContainer?.model,
         });
 
-        this.onWillShowOverlay = this.dropTarget.onWillShowOverlay;
+        this.pointerDropTarget = pointerBackend.createDropTarget(
+            this._element,
+            {
+                acceptedTargetZones: ['left', 'right'],
+                overlayModel: this._buildOverlayModel(),
+                canDisplayOverlay,
+                getOverrideTarget: () => group.model.dropTargetContainer?.model,
+            }
+        );
+
+        const sharedDragOptions: DragSourceOptions = {
+            getData: () => {
+                this.panelTransfer.setData(
+                    [
+                        new PanelTransfer(
+                            this.accessor.id,
+                            this.group.id,
+                            this.panel.id
+                        ),
+                    ],
+                    PanelTransfer.prototype
+                );
+                return {
+                    dispose: () => {
+                        this.panelTransfer.clearData(PanelTransfer.prototype);
+                    },
+                };
+            },
+            // 30/-10 matches the HTML5 setDragImage offset that has been
+            // shipped for years; pointer backend wraps in PointerGhost,
+            // HTML5 backend feeds into setDragImage.
+            createGhost: () => ({
+                element: this._buildGhostElement(),
+                offsetX: 30,
+                offsetY: -10,
+            }),
+            onDragStart: (event) => {
+                this._onDragStart.fire(event);
+                if (
+                    !(event instanceof PointerEvent) &&
+                    this.accessor.options.theme?.tabAnimation === 'smooth'
+                ) {
+                    // Delay collapse to next frame so the browser
+                    // captures the full drag image first.
+                    requestAnimationFrame(() => {
+                        toggleClass(this.element, 'dv-tab--dragging', true);
+                    });
+                }
+            },
+            onDragEnd: (event) => {
+                this._onDragEnd.fire(event);
+            },
+        };
+
+        this.html5DragSource = html5Backend.createDragSource(this._element, {
+            ...sharedDragOptions,
+            disabled: !caps.html5,
+        });
+
+        this.pointerDragSource = pointerBackend.createDragSource(
+            this._element,
+            {
+                ...sharedDragOptions,
+                disabled: !caps.pointer,
+                touchOnly: !caps.pointerHandlesMouse,
+                isCancelled: () =>
+                    !resolveDndCapabilities(this.accessor.options).pointer,
+            }
+        );
+
+        // Both droptargets feed the same downstream stream; consumers don't
+        // need to know which path produced the overlay.
+        this.onWillShowOverlay = Event.any(
+            this.dropTarget.onWillShowOverlay,
+            this.pointerDropTarget.onWillShowOverlay
+        );
 
         this.addDisposables(
             this._onPointDown,
@@ -139,90 +187,16 @@ export class Tab extends CompositeDisposable {
             this._onDragStart,
             this._onDragEnd,
             this.accessor.onDidOptionsChange(() => {
-                this.dropTarget.setOverlayModel(this._buildOverlayModel());
+                const model = this._buildOverlayModel();
+                this.dropTarget.setOverlayModel(model);
+                this.pointerDropTarget.setOverlayModel(model);
             }),
-            this.dragHandler.onDragStart((event) => {
-                if (event.dataTransfer) {
-                    const style = getComputedStyle(this.element);
-                    const newNode = this.element.cloneNode(true) as HTMLElement;
-                    const isVertical = this._direction === 'vertical';
-
-                    /**
-                     * Properties to skip when copying computed styles for a
-                     * vertical tab ghost.  `writing-mode` is excluded so we
-                     * can force `horizontal-tb`.  Size and margin logical
-                     * properties are excluded because their physical meaning
-                     * flips when writing-mode changes, which would produce
-                     * incorrect dimensions.
-                     */
-                    const verticalSkip = new Set([
-                        'writing-mode',
-                        'inline-size',
-                        'block-size',
-                        'min-inline-size',
-                        'min-block-size',
-                        'max-inline-size',
-                        'max-block-size',
-                        'margin-inline',
-                        'margin-inline-start',
-                        'margin-inline-end',
-                        'margin-block',
-                        'margin-block-start',
-                        'margin-block-end',
-                        'padding-inline',
-                        'padding-inline-start',
-                        'padding-inline-end',
-                        'padding-block',
-                        'padding-block-start',
-                        'padding-block-end',
-                    ]);
-
-                    Array.from(style).forEach((key) => {
-                        if (isVertical && verticalSkip.has(key)) {
-                            return;
-                        }
-                        newNode.style.setProperty(
-                            key,
-                            style.getPropertyValue(key),
-                            style.getPropertyPriority(key)
-                        );
-                    });
-
-                    if (isVertical) {
-                        // Force horizontal text flow and swap the physical
-                        // dimensions so the ghost appears as a horizontal tab.
-                        newNode.style.setProperty(
-                            'writing-mode',
-                            'horizontal-tb'
-                        );
-                        newNode.style.setProperty('width', style.height);
-                        newNode.style.setProperty('height', style.width);
-                    }
-
-                    newNode.style.position = 'absolute';
-                    newNode.classList.add('dv-tab-ghost-drag');
-
-                    addGhostImage(event.dataTransfer, newNode, {
-                        y: -10,
-                        x: 30,
-                    });
-                }
-
-                this._onDragStart.fire(event);
-
-                if (this.accessor.options.theme?.tabAnimation === 'smooth') {
-                    // Delay collapse to next frame so the browser
-                    // captures the full drag image first
-                    requestAnimationFrame(() => {
-                        toggleClass(this.element, 'dv-tab--dragging', true);
-                    });
-                }
-            }),
-            addDisposableListener(this._element, 'dragend', (event) => {
+            addDisposableListener(this._element, 'dragend', () => {
+                // The shared onDragEnd handler already fires _onDragEnd via
+                // the HTML5 backend; just strip the dragging class here.
                 toggleClass(this.element, 'dv-tab--dragging', false);
-                this._onDragEnd.fire(event);
             }),
-            this.dragHandler,
+            this.html5DragSource,
             addDisposableListener(this._element, 'pointerdown', (event) => {
                 this._onPointDown.fire(event);
             }),
@@ -236,10 +210,27 @@ export class Tab extends CompositeDisposable {
                     event
                 );
             }),
+            new LongPressDetector(this._element, {
+                onLongPress: (event) => {
+                    // Don't let a subsequent finger move arm a drag on top
+                    // of the just-opened menu.
+                    this.pointerDragSource.cancelPending();
+                    this.accessor.contextMenuController.show(
+                        this.panel,
+                        this.group,
+                        event
+                    );
+                },
+            }),
             this.dropTarget.onDrop((event) => {
                 this._onDropped.fire(event);
             }),
-            this.dropTarget
+            this.pointerDropTarget.onDrop((event) => {
+                this._onDropped.fire(event);
+            }),
+            this.dropTarget,
+            this.pointerDropTarget,
+            this.pointerDragSource
         );
     }
 
@@ -274,13 +265,71 @@ export class Tab extends CompositeDisposable {
 
     public setDirection(direction: DockviewHeaderDirection): void {
         this._direction = direction;
-        this.dropTarget.setTargetZones(
-            direction === 'vertical' ? ['top', 'bottom'] : ['left', 'right']
-        );
+        const zones =
+            direction === 'vertical' ? ['top', 'bottom'] : ['left', 'right'];
+        this.dropTarget.setTargetZones(zones as any);
+        this.pointerDropTarget.setTargetZones(zones as any);
     }
 
     public updateDragAndDropState(): void {
-        this._element.draggable = !this.accessor.options.disableDnd;
-        this.dragHandler.setDisabled(!!this.accessor.options.disableDnd);
+        const caps = resolveDndCapabilities(this.accessor.options);
+        this._element.draggable = caps.html5;
+        this.html5DragSource.setDisabled(!caps.html5);
+        this.pointerDragSource.setDisabled(!caps.pointer);
+        this.pointerDragSource.setTouchOnly(!caps.pointerHandlesMouse);
+    }
+
+    /**
+     * Vertical tabs are flipped to horizontal so the ghost stays readable
+     * during the drag rather than appearing sideways-rotated.
+     */
+    private _buildGhostElement(): HTMLElement {
+        const style = getComputedStyle(this.element);
+        const newNode = this.element.cloneNode(true) as HTMLElement;
+        const isVertical = this._direction === 'vertical';
+
+        const verticalSkip = new Set([
+            'writing-mode',
+            'inline-size',
+            'block-size',
+            'min-inline-size',
+            'min-block-size',
+            'max-inline-size',
+            'max-block-size',
+            'margin-inline',
+            'margin-inline-start',
+            'margin-inline-end',
+            'margin-block',
+            'margin-block-start',
+            'margin-block-end',
+            'padding-inline',
+            'padding-inline-start',
+            'padding-inline-end',
+            'padding-block',
+            'padding-block-start',
+            'padding-block-end',
+        ]);
+
+        Array.from(style).forEach((key) => {
+            if (isVertical && verticalSkip.has(key)) {
+                return;
+            }
+            newNode.style.setProperty(
+                key,
+                style.getPropertyValue(key),
+                style.getPropertyPriority(key)
+            );
+        });
+
+        if (isVertical) {
+            newNode.style.setProperty('writing-mode', 'horizontal-tb');
+            newNode.style.setProperty('width', style.height);
+            newNode.style.setProperty('height', style.width);
+        }
+
+        newNode.style.position = 'absolute';
+        newNode.classList.add('dv-tab-ghost-drag');
+
+        return newNode;
     }
 }

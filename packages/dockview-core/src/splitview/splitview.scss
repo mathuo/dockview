@@ -136,6 +136,32 @@
         }
     }
 
+    // Default 4px sash is unusable with a fingertip. Extend the hit area
+    // via a transparent ::before that overhangs each side; pointer events
+    // bubble to the sash so the existing drag wiring still fires. The
+    // visible 4px band (and its active-color highlight) is unchanged.
+    @media (pointer: coarse) {
+        .dv-sash-container > .dv-sash:not(.dv-disabled)::before {
+            content: '';
+            position: absolute;
+            background: transparent;
+        }
+
+        &.dv-horizontal > .dv-sash-container > .dv-sash:not(.dv-disabled)::before {
+            top: 0;
+            bottom: 0;
+            left: -10px;
+            right: -10px;
+        }
+
+        &.dv-vertical > .dv-sash-container > .dv-sash:not(.dv-disabled)::before {
+            left: 0;
+            right: 0;
+            top: -10px;
+            bottom: -10px;
+        }
+    }
+
     .dv-view-container {
         position: relative;
         height: 100%;

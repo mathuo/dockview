@@ -1,13 +1,17 @@
 import { PaneviewApi } from '../api/component.api';
-import { DragHandler } from '../dnd/abstractDragHandler';
+import {
+    DragSourceOptions,
+    html5Backend,
+    IDragSource,
+    pointerBackend,
+} from '../dnd/backend';
 import {
     getPaneData,
     LocalSelectionTransfer,
     PaneTransfer,
 } from '../dnd/dataTransfer';
-import { Droptarget, DroptargetEvent } from '../dnd/droptarget';
+import { DroptargetEvent, IDropTarget, Position } from '../dnd/droptarget';
 import { Emitter, Event } from '../events';
-import { IDisposable } from '../lifecycle';
 import { Orientation } from '../splitview/splitview';
 import {
     PaneviewDndOverlayEvent,
@@ -27,8 +31,10 @@ export interface PaneviewDidDropEvent extends DroptargetEvent {
 }
 
 export abstract class DraggablePaneviewPanel extends PaneviewPanel {
-    private handler: DragHandler | undefined;
-    private target: Droptarget | undefined;
+    private html5DragSource: IDragSource | undefined;
+    private pointerDragSource: IDragSource | undefined;
+    private target: IDropTarget | undefined;
+    private pointerTarget: IDropTarget | undefined;
 
     private readonly _onDidDrop = new Emitter<PaneviewDidDropEvent>();
     readonly onDidDrop = this._onDidDrop.event;
@@ -82,13 +88,12 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
         const accessorId = this.accessor.id;
         this.header.draggable = true;
 
-        this.handler = new (class PaneDragHandler extends DragHandler {
-            getData(): IDisposable {
+        const sharedDragOptions: DragSourceOptions = {
+            getData: () => {
                 LocalSelectionTransfer.getInstance().setData(
                     [new PaneTransfer(accessorId, id)],
                     PaneTransfer.prototype
                 );
-
                 return {
                     dispose: () => {
                         LocalSelectionTransfer.getInstance().clearData(
@@ -96,44 +101,72 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
                         );
                     },
                 };
-            }
-        })(this.header);
-
-        this.target = new Droptarget(this.element, {
-            acceptedTargetZones: ['top', 'bottom'],
-            overlayModel: {
-                activationSize: { type: 'percentage', value: 50 },
             },
-            canDisplayOverlay: (event, position) => {
-                const data = getPaneData();
+        };
 
-                if (data) {
-                    if (
-                        data.paneId !== this.id &&
-                        data.viewId === this.accessor.id
-                    ) {
-                        return true;
-                    }
+        this.html5DragSource = html5Backend.createDragSource(
+            this.header,
+            sharedDragOptions
+        );
+        this.pointerDragSource = pointerBackend.createDragSource(
+            this.header,
+            sharedDragOptions
+        );
+
+        const canDisplayOverlay = (
+            event: DragEvent | PointerEvent,
+            position: Position
+        ): boolean => {
+            const data = getPaneData();
+
+            if (data) {
+                if (
+                    data.paneId !== this.id &&
+                    data.viewId === this.accessor.id
+                ) {
+                    return true;
                 }
+            }
 
-                const firedEvent = new PaneviewUnhandledDragOverEvent(
-                    event,
-                    position,
-                    getPaneData,
-                    this
-                );
+            const firedEvent = new PaneviewUnhandledDragOverEvent(
+                event,
+                position,
+                getPaneData,
+                this
+            );
 
-                this._onUnhandledDragOverEvent.fire(firedEvent);
+            this._onUnhandledDragOverEvent.fire(firedEvent);
 
-                return firedEvent.isAccepted;
+            return firedEvent.isAccepted;
+        };
+
+        const dropTargetOptions = {
+            acceptedTargetZones: ['top', 'bottom'] as Position[],
+            overlayModel: {
+                activationSize: { type: 'percentage' as const, value: 50 },
             },
-        });
+            canDisplayOverlay,
+        };
+
+        this.target = html5Backend.createDropTarget(
+            this.element,
+            dropTargetOptions
+        );
+        this.pointerTarget = pointerBackend.createDropTarget(
+            this.element,
+            dropTargetOptions
+        );
 
         this.addDisposables(
             this._onDidDrop,
-            this.handler,
+            this.html5DragSource,
+            this.pointerDragSource,
             this.target,
+            this.pointerTarget,
             this.target.onDrop((event) => {
+                this.onDrop(event);
+            }),
+            this.pointerTarget.onDrop((event) => {
                 this.onDrop(event);
             })
         );

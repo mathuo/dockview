@@ -99,7 +99,11 @@ export interface CreateTabGroupOptions extends TabGroupOptions {
 }
 
 export class DockviewDidDropEvent extends DockviewEvent {
-    get nativeEvent(): DragEvent {
+    /**
+     * `PointerEvent` for touch drags has no `dataTransfer`; use
+     * `getData()` for the dockview payload regardless of input method.
+     */
+    get nativeEvent(): DragEvent | PointerEvent {
         return this.options.nativeEvent;
     }
 
@@ -121,7 +125,7 @@ export class DockviewDidDropEvent extends DockviewEvent {
 
     constructor(
         private readonly options: {
-            readonly nativeEvent: DragEvent;
+            readonly nativeEvent: DragEvent | PointerEvent;
             readonly position: Position;
             readonly panel?: IDockviewPanel;
             getData(): PanelTransfer | undefined;
@@ -145,7 +149,7 @@ export class DockviewWillDropEvent extends DockviewDidDropEvent {
     }
 
     constructor(options: {
-        readonly nativeEvent: DragEvent;
+        readonly nativeEvent: DragEvent | PointerEvent;
         readonly position: Position;
         readonly panel?: IDockviewPanel;
         getData(): PanelTransfer | undefined;
@@ -209,7 +213,7 @@ export interface IDockviewGroupPanelModel extends IPanel {
         suppressRoll?: boolean;
     }): void;
     canDisplayOverlay(
-        event: DragEvent,
+        event: DragEvent | PointerEvent,
         position: Position,
         target: DockviewGroupDropLocation
     ): boolean;
@@ -455,19 +459,19 @@ export class DockviewGroupPanelModel
         toggleClass(this.container, 'dv-groupview-popout', false);
         toggleClass(this.container, 'dv-groupview-edge', false);
 
+        // Mouse and touch drop targets must agree on accepted zones.
+        const applyZones = (zones: Position[]): void => {
+            this.contentContainer.dropTarget.setTargetZones(zones);
+            this.contentContainer.pointerDropTarget.setTargetZones(zones);
+        };
+
         switch (value.type) {
             case 'grid':
-                this.contentContainer.dropTarget.setTargetZones([
-                    'top',
-                    'bottom',
-                    'left',
-                    'right',
-                    'center',
-                ]);
+                applyZones(['top', 'bottom', 'left', 'right', 'center']);
                 break;
             case 'floating':
-                this.contentContainer.dropTarget.setTargetZones(['center']);
-                this.contentContainer.dropTarget.setTargetZones(
+                applyZones(['center']);
+                applyZones(
                     value
                         ? ['center']
                         : ['top', 'bottom', 'left', 'right', 'center']
@@ -477,13 +481,13 @@ export class DockviewGroupPanelModel
 
                 break;
             case 'popout':
-                this.contentContainer.dropTarget.setTargetZones(['center']);
+                applyZones(['center']);
 
                 toggleClass(this.container, 'dv-groupview-popout', true);
 
                 break;
             case 'edge':
-                this.contentContainer.dropTarget.setTargetZones(['center']);
+                applyZones(['center']);
 
                 toggleClass(this.container, 'dv-groupview-edge', true);
 
@@ -598,6 +602,13 @@ export class DockviewGroupPanelModel
                     event.position
                 );
             }),
+            this.contentContainer.pointerDropTarget.onDrop((event) => {
+                this.handleDropEvent(
+                    'content',
+                    event.nativeEvent,
+                    event.position
+                );
+            }),
             this.tabsContainer.onWillShowOverlay((event) => {
                 this._onWillShowOverlay.fire(event);
             }),
@@ -612,6 +623,19 @@ export class DockviewGroupPanelModel
                     })
                 );
             }),
+            this.contentContainer.pointerDropTarget.onWillShowOverlay(
+                (event) => {
+                    this._onWillShowOverlay.fire(
+                        new DockviewWillShowOverlayLocationEvent(event, {
+                            kind: 'content',
+                            panel: this.activePanel,
+                            api: this._api,
+                            group: this.groupPanel,
+                            getData: getPanelData,
+                        })
+                    );
+                }
+            ),
             this._onMove,
             this._onDidChange,
             this._onDidDrop,
@@ -1645,7 +1669,7 @@ export class DockviewGroupPanelModel
     }
 
     canDisplayOverlay(
-        event: DragEvent,
+        event: DragEvent | PointerEvent,
         position: Position,
         target: DockviewGroupDropLocation
     ): boolean {
@@ -1664,7 +1688,7 @@ export class DockviewGroupPanelModel
 
     private handleDropEvent(
         type: 'header' | 'content',
-        event: DragEvent,
+        event: DragEvent | PointerEvent,
         position: Position,
         index?: number
     ): void {

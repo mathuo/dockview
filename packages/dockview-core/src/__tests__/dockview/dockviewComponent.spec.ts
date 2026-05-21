@@ -217,6 +217,112 @@ describe('dockviewComponent', () => {
             });
         });
 
+        test('dndStrategy switches `draggable` on existing tabs / void containers', () => {
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                // Implicit default: dndStrategy = 'auto'
+            });
+
+            dockview.addPanel({ id: 'panel1', component: 'default' });
+            dockview.addPanel({ id: 'panel2', component: 'default' });
+
+            const tabs = () =>
+                Array.from(
+                    dockview.element.querySelectorAll('.dv-tab')
+                ) as HTMLElement[];
+            const voids = () =>
+                Array.from(
+                    dockview.element.querySelectorAll('.dv-void-container')
+                ) as HTMLElement[];
+
+            // auto: HTML5 active → draggable=true everywhere
+            tabs().forEach((t) => expect(t.draggable).toBe(true));
+            voids().forEach((v) => expect(v.draggable).toBe(true));
+
+            // 'pointer': HTML5 off → draggable=false
+            dockview.updateOptions({ dndStrategy: 'pointer' });
+            tabs().forEach((t) => expect(t.draggable).toBe(false));
+            voids().forEach((v) => expect(v.draggable).toBe(false));
+
+            // 'html5': HTML5 back on
+            dockview.updateOptions({ dndStrategy: 'html5' });
+            tabs().forEach((t) => expect(t.draggable).toBe(true));
+            voids().forEach((v) => expect(v.draggable).toBe(true));
+
+            // back to 'auto' for completeness
+            dockview.updateOptions({ dndStrategy: 'auto' });
+            tabs().forEach((t) => expect(t.draggable).toBe(true));
+            voids().forEach((v) => expect(v.draggable).toBe(true));
+        });
+
+        test('dndStrategy applies to tabs added after the option change', () => {
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+            dockview.updateOptions({ dndStrategy: 'pointer' });
+
+            dockview.addPanel({ id: 'panel1', component: 'default' });
+
+            const tab = dockview.element.querySelector(
+                '.dv-tab'
+            ) as HTMLElement;
+            const voidContainer = dockview.element.querySelector(
+                '.dv-void-container'
+            ) as HTMLElement;
+
+            // 'pointer' strategy disables HTML5 path: draggable should be false
+            // even though disableDnd is not set.
+            expect(tab.draggable).toBe(false);
+            expect(voidContainer.draggable).toBe(false);
+        });
+
+        test('disableDnd overrides dndStrategy', () => {
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+                dndStrategy: 'html5',
+                disableDnd: true,
+            });
+
+            dockview.addPanel({ id: 'panel1', component: 'default' });
+
+            const tab = dockview.element.querySelector(
+                '.dv-tab'
+            ) as HTMLElement;
+            // disableDnd: true wins regardless of strategy.
+            expect(tab.draggable).toBe(false);
+        });
+
         test('that new tabs respect current disableDnd option when added after option change', () => {
             dockview = new DockviewComponent(container, {
                 createComponent(options) {
@@ -1469,9 +1575,15 @@ describe('dockviewComponent', () => {
     // group becomes empty, so `_positionChipForGroup` removes it).
     // `dragend` therefore can't bubble to `_tabsList`, which historically
     // left the `panelTransfer` singleton populated with the chip drag's
-    // payload (including `tabGroupId`). Fix wires a `dragend` listener
-    // directly on the chip element so cleanup runs regardless of
-    // attachment.
+    // payload (including `tabGroupId`).
+    //
+    // In the current architecture this is also our smoke test for the
+    // manager-owned chip-drag wiring: the `TabGroupManager`'s
+    // `html5Backend.createDragSource(chip.element, ...)` `getData`
+    // callback is what sets `panelTransfer` on chip dragstart, and the
+    // synchronous-clear `dragend` listener attached directly to the chip
+    // element (`tabGroups.ts:syncClearOnDragEnd`) is what clears it for
+    // the detach-then-dragend path exercised below.
     test('cross-group chip drag clears panelTransfer when the chip detaches (#1254)', async () => {
         const container = document.createElement('div');
 
