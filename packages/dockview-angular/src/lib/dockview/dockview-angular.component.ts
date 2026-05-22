@@ -33,6 +33,11 @@ import {
     ContextMenuItemConfig,
     ContextMenuItem,
     DockviewTabGroupColorEntry,
+    DockviewHeaderPosition,
+    DockviewDndStrategy,
+    DockviewPanelRenderer,
+    DockviewTheme,
+    DroptargetOverlayModel,
 } from 'dockview-core';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularRenderer } from '../utils/angular-renderer';
@@ -102,6 +107,15 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() locked?: boolean;
     @Input() disableAutoResizing?: boolean;
     @Input() singleTabMode?: 'fullwidth' | 'default';
+    @Input() theme?: DockviewTheme;
+    @Input() scrollbars?: 'native' | 'custom';
+    @Input() disableTabsOverflowList?: boolean;
+    @Input() defaultRenderer?: DockviewPanelRenderer;
+    @Input() defaultHeaderPosition?: DockviewHeaderPosition;
+    @Input() disableDnd?: boolean;
+    @Input() dndStrategy?: DockviewDndStrategy;
+    @Input() dndEdges?: false | DroptargetOverlayModel;
+    @Input() noPanelsOverlay?: 'emptyGroup' | 'watermark';
     @Input() getTabContextMenuItems?: (
         params: GetTabContextMenuItemsParams
     ) => (ContextMenuItem | { component: Type<any> | TemplateRef<any> })[];
@@ -292,21 +306,24 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
             createLeftHeaderActionComponent: this.leftHeaderActionsComponent
                 ? (group) => {
                       return componentFactory.createHeaderActionsComponent(
-                          'left'
+                          'left',
+                          group
                       )!;
                   }
                 : undefined,
             createRightHeaderActionComponent: this.rightHeaderActionsComponent
                 ? (group) => {
                       return componentFactory.createHeaderActionsComponent(
-                          'right'
+                          'right',
+                          group
                       )!;
                   }
                 : undefined,
             createPrefixHeaderActionComponent: this.prefixHeaderActionsComponent
                 ? (group) => {
                       return componentFactory.createHeaderActionsComponent(
-                          'prefix'
+                          'prefix',
+                          group
                       )!;
                   }
                 : undefined,

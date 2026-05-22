@@ -105,6 +105,42 @@ describe('DockviewAngularComponent', () => {
 
         expect(component.getDockviewApi()).toBeDefined();
     });
+
+    it('forwards every PROPERTY_KEYS_DOCKVIEW input to dockview-core on update', () => {
+        // Regression for the missing-input gap: scrollbars, disableTabsOverflowList,
+        // theme, defaultRenderer, defaultHeaderPosition, disableDnd, dndStrategy,
+        // dndEdges, and noPanelsOverlay used to have no @Input() declared, so
+        // PROPERTY_KEYS_DOCKVIEW.forEach found `undefined` for them and they
+        // were silently unsettable from Angular templates.
+        component.ngOnInit();
+        const api = component.getDockviewApi()!;
+        const updateOptionsSpy = jest.spyOn(api, 'updateOptions');
+
+        const cases: Array<[string, unknown]> = [
+            ['scrollbars', 'native'],
+            ['disableTabsOverflowList', true],
+            ['defaultRenderer', 'always'],
+            ['defaultHeaderPosition', 'bottom'],
+            ['disableDnd', true],
+            ['dndStrategy', 'pointer'],
+            ['noPanelsOverlay', 'emptyGroup'],
+            ['theme', { name: 't', className: 'dv-t' }],
+        ];
+
+        for (const [key, value] of cases) {
+            updateOptionsSpy.mockClear();
+            (component as any)[key] = value;
+            component.ngOnChanges({
+                [key]: {
+                    currentValue: value,
+                    previousValue: undefined,
+                    firstChange: false,
+                    isFirstChange: () => false,
+                },
+            });
+            expect(updateOptionsSpy).toHaveBeenCalledWith({ [key]: value });
+        }
+    });
 });
 
 @Component({
