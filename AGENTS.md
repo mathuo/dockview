@@ -56,10 +56,10 @@ NX handles build ordering automatically via `dependsOn: ["^build"]`. The depende
 ### Monorepo Structure
 
 -   **packages/dockview-core** - Core layout engine (TypeScript, framework-agnostic, zero dependencies)
--   **packages/dockview** - React bindings and components
+-   **packages/dockview-react** - Canonical React bindings package — what docs, READMEs, and examples point users at (`npm install dockview-react`). Re-exports the implementation from `packages/dockview`.
+-   **packages/dockview** - Legacy alias kept for backwards compatibility. Still holds the actual React source; `dockview-react` re-exports from it.
 -   **packages/dockview-vue** - Vue 3 bindings and components
 -   **packages/dockview-angular** - Angular bindings and components
--   **packages/dockview-react** - Re-export wrapper (`export * from 'dockview'`)
 -   **packages/docs** - Documentation website (Docusaurus v3)
 
 ### Key Components

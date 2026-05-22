@@ -1,6 +1,8 @@
 # AGENTS.md - dockview
 
-Primary React bindings package. This is what most React users install (`npm install dockview`).
+Legacy React bindings package, kept as an alias for backwards compatibility. New projects should install [`dockview-react`](../dockview-react/AGENTS.md) instead — see the repo-root README and docs site for the canonical install instructions.
+
+Note: this package still contains the actual React source. `dockview-react` is the thin re-export wrapper that has become the canonical public name. Don't move source between packages without coordinating a publish plan.
 
 ## Overview
 

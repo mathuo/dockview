@@ -41,15 +41,14 @@ Please see the website: https://dockview.dev
 | Package | Description | Version |
 | --- | --- | --- |
 | [`dockview-core`](https://www.npmjs.com/package/dockview-core) | Core layout engine — zero dependencies, vanilla TypeScript | [![npm version](https://badge.fury.io/js/dockview-core.svg)](https://www.npmjs.com/package/dockview-core) |
-| [`dockview`](https://www.npmjs.com/package/dockview) | React bindings (peer: `react` ≥16.8) | [![npm version](https://badge.fury.io/js/dockview.svg)](https://www.npmjs.com/package/dockview) |
+| [`dockview-react`](https://www.npmjs.com/package/dockview-react) | React bindings (peer: `react` ≥16.8) | [![npm version](https://badge.fury.io/js/dockview-react.svg)](https://www.npmjs.com/package/dockview-react) |
 | [`dockview-vue`](https://www.npmjs.com/package/dockview-vue) | Vue 3 bindings (peer: `vue` ≥3.4) | [![npm version](https://badge.fury.io/js/dockview-vue.svg)](https://www.npmjs.com/package/dockview-vue) |
 | [`dockview-angular`](https://www.npmjs.com/package/dockview-angular) | Angular bindings (peer: `@angular/core` ≥21) | [![npm version](https://badge.fury.io/js/dockview-angular.svg)](https://www.npmjs.com/package/dockview-angular) |
-| [`dockview-react`](https://www.npmjs.com/package/dockview-react) | Re-export of `dockview` for migration convenience | [![npm version](https://badge.fury.io/js/dockview-react.svg)](https://www.npmjs.com/package/dockview-react) |
 
 ## Installation
 
 ```bash
-npm install dockview          # React
+npm install dockview-react    # React
 npm install dockview-vue      # Vue
 npm install dockview-angular  # Angular
 npm install dockview-core     # Vanilla TypeScript
@@ -58,8 +57,8 @@ npm install dockview-core     # Vanilla TypeScript
 ## Quick Start (React)
 
 ```tsx
-import { DockviewReact } from 'dockview';
-import 'dockview/dist/styles/dockview.css';
+import { DockviewReact } from 'dockview-react';
+import 'dockview-react/dist/styles/dockview.css';
 
 const components = {
     default: (props) => <div>Hello {props.params.title}</div>,
@@ -101,7 +100,7 @@ yarn format     # Run Prettier
 Build order is managed automatically by NX:
 
 ```
-dockview-core → dockview → dockview-react
+dockview-core → dockview-react
 dockview-core → dockview-vue
 dockview-core → dockview-angular
 ```
@@ -116,4 +115,4 @@ MIT — see [LICENSE](./LICENSE) for details.
 
 ---
 
-Want to verify our builds? Go [here](https://www.npmjs.com/package/dockview#user-content-provenance).
+Want to verify our builds? Go [here](https://www.npmjs.com/package/dockview-react#user-content-provenance).
