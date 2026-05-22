@@ -99,8 +99,9 @@ export class AngularHeaderActionsRenderer implements IHeaderActionsRenderer {
             }),
             this.group.model.onDidActivePanelChange(() => {
                 this.assign({
-                    activePanel: this.group.model
-                        .activePanel as IDockviewPanel | undefined,
+                    activePanel: this.group.model.activePanel as
+                        | IDockviewPanel
+                        | undefined,
                 });
             }),
             parameters.api.onDidActiveChange(() => {
