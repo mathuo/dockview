@@ -16,6 +16,16 @@ When there are more tabs than can fit in the header, Dockview shows a scrollable
 ```
 </FrameworkSpecific>
 
+<FrameworkSpecific framework='Angular'>
+```html
+<dv-dockview
+    scrollbars="native"
+    [components]="components"
+    (ready)="onReady($event)">
+</dv-dockview>
+```
+</FrameworkSpecific>
+
 <FrameworkSpecific framework='JavaScript'>
 ```ts
 const api = createDockview(element, {
@@ -30,6 +40,16 @@ You can also disable the overflow tab list entirely with `disableTabsOverflowLis
 <FrameworkSpecific framework='React'>
 ```tsx
 <DockviewReact disableTabsOverflowList={true} onReady={onReady} components={components} />
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Angular'>
+```html
+<dv-dockview
+    [disableTabsOverflowList]="true"
+    [components]="components"
+    (ready)="onReady($event)">
+</dv-dockview>
 ```
 </FrameworkSpecific>
 

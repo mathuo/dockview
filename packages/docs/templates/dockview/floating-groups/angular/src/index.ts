@@ -99,12 +99,9 @@ export class RightHeaderActionsComponent {
             this.group.api.moveTo({ group });
         } else {
             this.containerApi.addFloatingGroup(this.group, {
-                position: {
-                    width: 400,
-                    height: 300,
-                    bottom: 50,
-                    right: 50,
-                }
+                width: 400,
+                height: 300,
+                position: { bottom: 50, right: 50 },
             });
         }
     }

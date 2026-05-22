@@ -285,20 +285,27 @@ describe('AngularFrameworkComponentFactory', () => {
     });
 
     describe('createHeaderActionsComponent', () => {
+        const stubGroup = {} as any;
+
         it('should create header actions component successfully', () => {
-            const renderer =
-                factory.createHeaderActionsComponent('header-test');
+            const renderer = factory.createHeaderActionsComponent(
+                'header-test',
+                stubGroup
+            );
 
             expect(renderer).toBeDefined();
-            expect(renderer.element).toBeTruthy();
-            expect(renderer.element.tagName).toBe(
-                'TEST-HEADER-ACTIONS-COMPONENT'
-            );
+            expect(renderer!.element).toBeTruthy();
+            // The renderer wraps the user component in a host div; the inner
+            // component is mounted on init() by dockview-core.
+            expect(renderer!.element.tagName).toBe('DIV');
+            expect(renderer!.element.className).toContain('dv-angular-part');
         });
 
         it('should return undefined for unknown component', () => {
-            const renderer =
-                factory.createHeaderActionsComponent('unknown-header');
+            const renderer = factory.createHeaderActionsComponent(
+                'unknown-header',
+                stubGroup
+            );
 
             expect(renderer).toBeUndefined();
         });
@@ -313,7 +320,8 @@ describe('AngularFrameworkComponentFactory', () => {
 
             const renderer =
                 factoryWithoutHeaderActions.createHeaderActionsComponent(
-                    'test'
+                    'test',
+                    stubGroup
                 );
 
             expect(renderer).toBeUndefined();

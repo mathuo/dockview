@@ -10,11 +10,13 @@ import {
     IWatermarkRenderer,
     IHeaderActionsRenderer,
     CreateComponentOptions,
+    DockviewGroupPanel,
     GridviewPanel,
     SplitviewPanel,
     IPanePart,
 } from 'dockview-core';
 import { AngularRenderer } from './angular-renderer';
+import { AngularHeaderActionsRenderer } from '../dockview/angular-header-actions-renderer';
 import { AngularGridviewPanel } from '../gridview/angular-gridview-panel';
 import { AngularSplitviewPanel } from '../splitview/angular-splitview-panel';
 import { AngularPanePart } from '../paneview/angular-pane-part';
@@ -148,21 +150,22 @@ export class AngularFrameworkComponentFactory {
     }
 
     createHeaderActionsComponent(
-        name: string
+        name: string,
+        group: DockviewGroupPanel
     ): IHeaderActionsRenderer | undefined {
         const component = this.headerActionsComponents?.[name];
         if (!component) {
             return undefined;
         }
 
-        const renderer = new AngularRenderer({
+        // Dedicated renderer (not AngularRenderer) so the component instance
+        // receives the full IDockviewHeaderActionsProps surface and stays in
+        // sync with group/panel state via event subscriptions.
+        return new AngularHeaderActionsRenderer(
             component,
-            injector: this.injector,
-            environmentInjector: this.environmentInjector,
-        });
-
-        // Initialize with empty props - dockview-core will call init() again with actual IGroupHeaderProps
-        renderer.init({});
-        return renderer;
+            group,
+            this.injector,
+            this.environmentInjector
+        );
     }
 }

@@ -22,6 +22,27 @@ The `hideBorders` option removes the borders rendered between groups in the grid
 ```
 </FrameworkSpecific>
 
+<FrameworkSpecific framework='Angular'>
+```ts
+import { themeAbyss } from 'dockview-core';
+
+@Component({
+    template: `
+        <dv-dockview
+            [hideBorders]="true"
+            [theme]="theme"
+            [components]="components"
+            (ready)="onReady($event)">
+        </dv-dockview>
+    `,
+})
+export class AppComponent {
+    theme = themeAbyss;
+    // ...
+}
+```
+</FrameworkSpecific>
+
 <FrameworkSpecific framework='JavaScript'>
 ```ts
 const api = createDockview(element, {
