@@ -111,12 +111,18 @@ const App = {
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
+Declare an `@Input()` for each field you want to receive. The `params` input
+receives the entire object passed to `api.addPanel({ params: ... })`, and is
+updated in place when you call `panel.api.updateParameters(...)`. `api`,
+`group`, and `containerApi` are always provided.
+
 ```tsx
 @Component({
     selector: 'panel-component-1',
-    template: `<div>Panel Content 1</div>`
+    template: `<div>Panel Content 1 — {{ params?.myCustomKey }}</div>`
 })
 export class PanelComponent1 {
+    @Input() params: { myCustomKey?: string };
     @Input() api: DockviewPanelApi;
     @Input() group: any;
     @Input() containerApi: DockviewApi;
@@ -127,6 +133,7 @@ export class PanelComponent1 {
     template: `<div>Panel Content 2</div>`
 })
 export class PanelComponent2 {
+    @Input() params: Record<string, unknown>;
     @Input() api: DockviewPanelApi;
 }
 

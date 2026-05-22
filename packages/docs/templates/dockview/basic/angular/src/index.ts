@@ -9,11 +9,13 @@ import 'dockview-core/dist/styles/dockview.css';
 // Default panel component
 @Component({
     selector: 'default-panel',
-    template: `<div>{{ title || 'Default Panel' }}</div>`
+    template: `<div>{{ title }}{{ params?.subtitle ? ' — ' + params.subtitle : '' }}</div>`
 })
 export class DefaultPanelComponent {
+    // `params` receives the object passed to `api.addPanel({ params: ... })`.
+    @Input() params: { subtitle?: string };
     @Input() api: any;
-    
+
     get title() {
         return this.api?.title || this.api?.id || 'Panel';
     }
@@ -49,6 +51,7 @@ export class AppComponent {
         api.addPanel({
             id: 'panel_1',
             component: 'default',
+            params: { subtitle: 'with params' },
         });
 
         api.addPanel({

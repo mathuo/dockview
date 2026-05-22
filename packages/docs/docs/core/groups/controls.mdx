@@ -68,11 +68,37 @@ import PrefixComponent from './PrefixComponent.vue';
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
+Each header-action component receives the full `IDockviewHeaderActionsProps`
+surface as `@Input()`s. `panels`, `activePanel`, `isGroupActive`, and
+`location` are kept in sync as the group changes.
+
 ```ts
-import { Component } from '@angular/core';
-import { LeftComponent } from './left.component';
-import { RightComponent } from './right.component';
-import { PrefixComponent } from './prefix.component';
+import { Component, Input } from '@angular/core';
+import {
+    DockviewApi,
+    DockviewGroupLocation,
+    DockviewGroupPanel,
+    DockviewGroupPanelApi,
+    DockviewHeaderPosition,
+    IDockviewPanel,
+} from 'dockview-core';
+
+@Component({
+    selector: 'left-component',
+    template: `<div><!-- content --></div>`,
+})
+export class LeftComponent {
+    @Input() api!: DockviewGroupPanelApi;
+    @Input() containerApi!: DockviewApi;
+    @Input() group!: DockviewGroupPanel;
+    @Input() panels!: IDockviewPanel[];
+    @Input() activePanel?: IDockviewPanel;
+    @Input() isGroupActive!: boolean;
+    @Input() headerPosition!: DockviewHeaderPosition;
+    @Input() location?: DockviewGroupLocation;
+}
+
+// `RightComponent` and `PrefixComponent` declare the same set of inputs.
 
 @Component({
     selector: 'app-root',
