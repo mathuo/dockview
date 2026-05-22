@@ -1,12 +1,12 @@
 # AGENTS.md - dockview-react
 
-Thin re-export wrapper providing an alternative package name.
+Canonical React bindings package — the public install name users should reach for (`npm install dockview-react`). All documentation, READMEs, and examples point at this package.
 
 ## Overview
 
 - Entire source is one line: `export * from 'dockview'`
-- Exists so users can `npm install dockview-react` as an alternative to `npm install dockview`
-- No unique source code; all functionality comes from the `dockview` package
+- Re-exports the implementation from the `dockview` package, which is kept as a legacy alias for backwards compatibility
+- No unique source code in this package; functionality lives in the `dockview` package
 
 ## Build
 

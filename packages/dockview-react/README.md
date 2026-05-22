@@ -1,7 +1,7 @@
 <div align="center">
 <h1>dockview-react</h1>
 
-<p>Re-export wrapper for the <code>dockview</code> package — use <code>dockview</code> directly for new projects</p>
+<p>React bindings for dockview — zero dependency layout manager supporting tabs, groups, grids and splitviews</p>
 
 </div>
 
@@ -40,18 +40,44 @@ Please see the website: https://dockview.dev
 
 ## Quick Start
 
-This package re-exports everything from [`dockview`](https://www.npmjs.com/package/dockview). For new projects, we recommend installing `dockview` directly:
-
-```
-npm install dockview
-```
-
-If you're already using `dockview-react`, it continues to work — all exports are identical to `dockview`:
+Dockview has a peer dependency on `react >= 16.8.0` and `react-dom >= 16.8.0`. Install from [npm](https://www.npmjs.com/package/dockview-react):
 
 ```
 npm install dockview-react
 ```
 
-See the [`dockview` package](https://www.npmjs.com/package/dockview) and the [documentation](https://dockview.dev) for usage examples.
+Import the stylesheet:
+
+```css
+@import 'dockview-react/dist/styles/dockview.css';
+```
+
+Apply a theme and render the component:
+
+```tsx
+import { DockviewReact } from 'dockview-react';
+
+const components = {
+    myComponent: (props) => <div>Hello World</div>,
+};
+
+function App() {
+    return (
+        <div className="dockview-theme-dark" style={{ height: '400px' }}>
+            <DockviewReact
+                components={components}
+                onReady={(event) => {
+                    event.api.addPanel({
+                        id: 'panel_1',
+                        component: 'myComponent',
+                    });
+                }}
+            />
+        </div>
+    );
+}
+```
+
+See the [documentation](https://dockview.dev) for full examples.
 
 Want to verify our builds? Go [here](https://www.npmjs.com/package/dockview-react#Provenance).

@@ -24,8 +24,8 @@ Dockview is an open-source docking layout library that lets you build IDE-like a
 | Package | Framework | Install |
 |---|---|---|
 | dockview-core | Vanilla TypeScript | `npm install dockview-core` |
-| dockview | React | `npm install dockview` |
-| dockview-react | React (alias) | `npm install dockview-react` |
+| dockview-react | React | `npm install dockview-react` |
+| dockview | React (legacy alias) | `npm install dockview` |
 | dockview-vue | Vue 3 | `npm install dockview-vue` |
 | dockview-angular | Angular | `npm install dockview-angular` |
 
@@ -80,19 +80,19 @@ Apply a theme to a parent element:
 Install:
 
 ```
-npm install dockview
+npm install dockview-react
 ```
 
 Import the stylesheet:
 
 ```css
-@import 'dockview/dist/styles/dockview.css';
+@import 'dockview-react/dist/styles/dockview.css';
 ```
 
 Render the component:
 
 ```tsx
-import { DockviewReact } from 'dockview';
+import { DockviewReact } from 'dockview-react';
 
 const components = {
     myComponent: (props) => <div>Hello World</div>,
@@ -251,6 +251,6 @@ Custom themes can be created using CSS custom properties (CSS variables).
 - API Reference: https://dockview.dev/docs/api/dockview/overview
 - Live Demo: https://dockview.dev/demo
 - GitHub: https://github.com/mathuo/dockview
-- npm: https://www.npmjs.com/package/dockview
+- npm: https://www.npmjs.com/package/dockview-react
 - Blog / Release Notes: https://dockview.dev/blog
 - License: MIT
