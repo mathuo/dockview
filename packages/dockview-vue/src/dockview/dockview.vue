@@ -230,11 +230,7 @@ onMounted(() => {
             let component =
                 options.name === DEFAULT_VUE_TAB
                     ? null
-                    : findComponent(
-                          inst,
-                          options.name,
-                          props.tabComponents
-                      );
+                    : findComponent(inst, options.name, props.tabComponents);
 
             if (!component && props.defaultTabComponent) {
                 component =

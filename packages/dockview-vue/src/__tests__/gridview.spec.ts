@@ -222,8 +222,7 @@ describe('GridviewVue components prop resolves without registration', () => {
         });
         await flushPromises();
 
-        const api = (wrapper.emitted('ready')![0][0] as any)
-            .api as GridviewApi;
+        const api = (wrapper.emitted('ready')![0][0] as any).api as GridviewApi;
 
         expect(() =>
             api.addPanel({ id: 'cell-1', component: 'Cell' })
@@ -242,8 +241,7 @@ describe('GridviewVue components prop resolves without registration', () => {
         });
         await flushPromises();
 
-        const api = (wrapper.emitted('ready')![0][0] as any)
-            .api as GridviewApi;
+        const api = (wrapper.emitted('ready')![0][0] as any).api as GridviewApi;
 
         expect(() =>
             api.addPanel({ id: 'bad', component: 'NotRegistered' })

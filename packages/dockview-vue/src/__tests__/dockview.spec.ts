@@ -465,9 +465,10 @@ describe('DockviewVue components prop (issue #1301)', () => {
         const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
 
         expect(() =>
-            (api as any).component.options.createRightHeaderActionComponent?.(
-                { api: {}, model: {} } as any
-            )
+            (api as any).component.options.createRightHeaderActionComponent?.({
+                api: {},
+                model: {},
+            } as any)
         ).not.toThrow();
     });
 
@@ -480,9 +481,10 @@ describe('DockviewVue components prop (issue #1301)', () => {
         const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
 
         expect(() =>
-            (api as any).component.options.createLeftHeaderActionComponent?.(
-                { api: {}, model: {} } as any
-            )
+            (api as any).component.options.createLeftHeaderActionComponent?.({
+                api: {},
+                model: {},
+            } as any)
         ).not.toThrow();
     });
 
@@ -495,9 +497,10 @@ describe('DockviewVue components prop (issue #1301)', () => {
         const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
 
         expect(() =>
-            (api as any).component.options.createPrefixHeaderActionComponent?.(
-                { api: {}, model: {} } as any
-            )
+            (api as any).component.options.createPrefixHeaderActionComponent?.({
+                api: {},
+                model: {},
+            } as any)
         ).not.toThrow();
     });
 
