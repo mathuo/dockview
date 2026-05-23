@@ -3,6 +3,7 @@ import type {
     SplitviewOptions,
     SplitviewPanelApi,
 } from 'dockview-core';
+import type { VueComponent } from '../utils';
 
 export interface SplitviewReadyEvent {
     api: SplitviewApi;
@@ -15,7 +16,7 @@ export interface ISplitviewVuePanelProps<T extends Record<string, any> = any> {
 }
 
 export interface ISplitviewVueProps extends SplitviewOptions {
-    components: Record<string, string>;
+    components?: Record<string, VueComponent>;
 }
 
 export type SplitviewVueEvents = {

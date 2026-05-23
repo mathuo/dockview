@@ -124,29 +124,42 @@ export default function App() {
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
-```ts
-import { DockviewVue, DockviewReadyEvent, IDockviewPanelProps } from 'dockview-vue';
-import { defineComponent, PropType } from 'vue';
+```vue
+<script setup lang="ts">
+import {
+    DockviewVue,
+    type DockviewReadyEvent,
+    type IDockviewPanelProps,
+} from 'dockview-vue';
+import { defineComponent, type PropType } from 'vue';
 
 const MyPanel = defineComponent({
     name: 'MyPanel',
-    props: { params: { type: Object as PropType<IDockviewPanelProps>, required: true } },
+    props: {
+        params: { type: Object as PropType<IDockviewPanelProps>, required: true },
+    },
     template: `<div style="padding: 16px">{{ params.api.title }}</div>`,
 });
 
-const App = defineComponent({
-    name: 'App',
-    components: { 'dockview-vue': DockviewVue, 'my-panel': MyPanel },
-    methods: {
-        onReady(event: DockviewReadyEvent) {
-            event.api.addPanel({ id: 'panel_1', component: 'my-panel', title: 'Panel 1' });
-            event.api.addPanel({ id: 'panel_2', component: 'my-panel', title: 'Panel 2',
-                position: { referencePanel: 'panel_1', direction: 'right' }
-            });
-        },
-    },
-    template: `<dockview-vue style="width:100%;height:100%" class="dockview-theme-abyss" @ready="onReady" />`,
-});
+function onReady(event: DockviewReadyEvent) {
+    event.api.addPanel({ id: 'panel_1', component: 'my-panel', title: 'Panel 1' });
+    event.api.addPanel({
+        id: 'panel_2',
+        component: 'my-panel',
+        title: 'Panel 2',
+        position: { referencePanel: 'panel_1', direction: 'right' },
+    });
+}
+</script>
+
+<template>
+    <DockviewVue
+        style="width:100%;height:100%"
+        class="dockview-theme-abyss"
+        :components="{ 'my-panel': MyPanel }"
+        @ready="onReady"
+    />
+</template>
 ```
 </FrameworkSpecific>
 

@@ -21,6 +21,7 @@ import {
     VuePart,
     findComponent,
     mountVueComponent,
+    resolveComponent,
 } from '../utils';
 
 const mockUpdate = vi.fn();
@@ -95,6 +96,155 @@ describe('findComponent', () => {
 
         expect(() => findComponent(mockInstance, 'non-existent')).toThrow(
             "Failed to find Vue Component 'non-existent'"
+        );
+    });
+
+    test('should find component in explicit components map without instance/app registration', () => {
+        const testComponent = { template: '<div>Explicit</div>' };
+        const mockInstance = {
+            components: {},
+            appContext: { components: {} },
+            parent: null,
+        } as any;
+
+        const found = findComponent(mockInstance, 'explicit', {
+            explicit: testComponent as any,
+        });
+        expect(found).toBe(testComponent);
+    });
+
+    test('explicit components map takes priority over instance components', () => {
+        const instanceComponent = { template: '<div>Instance</div>' };
+        const explicitComponent = { template: '<div>Explicit</div>' };
+        const mockInstance = {
+            components: { 'shared-name': instanceComponent },
+            appContext: { components: {} },
+            parent: null,
+        } as any;
+
+        const found = findComponent(mockInstance, 'shared-name', {
+            'shared-name': explicitComponent as any,
+        });
+        expect(found).toBe(explicitComponent);
+    });
+
+    test('explicit components map takes priority over app context', () => {
+        const globalComponent = { template: '<div>Global</div>' };
+        const explicitComponent = { template: '<div>Explicit</div>' };
+        const mockInstance = {
+            components: {},
+            appContext: { components: { 'shared-name': globalComponent } },
+            parent: null,
+        } as any;
+
+        const found = findComponent(mockInstance, 'shared-name', {
+            'shared-name': explicitComponent as any,
+        });
+        expect(found).toBe(explicitComponent);
+    });
+
+    test('falls through to instance walk when name not in components map', () => {
+        const instanceComponent = { template: '<div>Instance</div>' };
+        const mockInstance = {
+            components: { 'only-in-instance': instanceComponent },
+            appContext: { components: {} },
+            parent: null,
+        } as any;
+
+        const found = findComponent(mockInstance, 'only-in-instance', {
+            other: { template: '<div>Other</div>' } as any,
+        });
+        expect(found).toBe(instanceComponent);
+    });
+
+    test('falls through to app context when name not in components map or instance', () => {
+        const globalComponent = { template: '<div>Global</div>' };
+        const mockInstance = {
+            components: {},
+            appContext: { components: { 'only-global': globalComponent } },
+            parent: null,
+        } as any;
+
+        const found = findComponent(mockInstance, 'only-global', {
+            other: { template: '<div>Other</div>' } as any,
+        });
+        expect(found).toBe(globalComponent);
+    });
+
+    test('still throws when name not in components map and not registered anywhere', () => {
+        const mockInstance = {
+            components: {},
+            appContext: { components: {} },
+            parent: null,
+        } as any;
+
+        expect(() =>
+            findComponent(mockInstance, 'missing', {
+                other: { template: '<div>Other</div>' } as any,
+            })
+        ).toThrow("Failed to find Vue Component 'missing'");
+    });
+
+    test('treats empty components map identically to no map', () => {
+        const globalComponent = { template: '<div>Global</div>' };
+        const mockInstance = {
+            components: {},
+            appContext: { components: { foo: globalComponent } },
+            parent: null,
+        } as any;
+
+        const found = findComponent(mockInstance, 'foo', {});
+        expect(found).toBe(globalComponent);
+    });
+});
+
+describe('resolveComponent', () => {
+    const mockInstance = {
+        components: {},
+        appContext: { components: {} },
+        parent: null,
+    } as any;
+
+    test('returns undefined when value is undefined', () => {
+        expect(resolveComponent(undefined, mockInstance)).toBeUndefined();
+    });
+
+    test('returns the component directly when value is a component object', () => {
+        const component = { template: '<div>Direct</div>' } as any;
+        expect(resolveComponent(component, mockInstance)).toBe(component);
+    });
+
+    test('looks up string names via findComponent', () => {
+        const component = { template: '<div>Named</div>' };
+        const inst = {
+            components: { 'my-name': component },
+            appContext: { components: {} },
+            parent: null,
+        } as any;
+
+        expect(resolveComponent('my-name', inst)).toBe(component);
+    });
+
+    test('looks up string names in the components map when provided', () => {
+        const component = { template: '<div>Mapped</div>' };
+        expect(
+            resolveComponent('mapped', mockInstance, {
+                mapped: component as any,
+            })
+        ).toBe(component);
+    });
+
+    test('returns the component object even when components map does not contain it', () => {
+        // Direct component refs bypass the map entirely.
+        const component = { template: '<div>Direct</div>' } as any;
+        expect(
+            resolveComponent(component, mockInstance, { other: {} as any })
+        ).toBe(component);
+    });
+
+    test('throws when string name is not resolvable', () => {
+        expect(() => resolveComponent('missing', mockInstance)).toThrow(
+            "Failed to find Vue Component 'missing'"
         );
     });
 });

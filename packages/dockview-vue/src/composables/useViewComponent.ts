@@ -90,7 +90,11 @@ export function useViewComponent<
                         id: string;
                         name?: string;
                     }) => {
-                        const component = findComponent(inst, options.name!);
+                        const component = findComponent(
+                            inst,
+                            options.name!,
+                            (props as any).components
+                        );
                         return config.createView(
                             options.id,
                             options.name,
@@ -118,7 +122,11 @@ export function useViewComponent<
 
         const frameworkOptions = {
             createComponent(options: { id: string; name?: string }) {
-                const component = findComponent(inst, options.name!);
+                const component = findComponent(
+                    inst,
+                    options.name!,
+                    (props as any).components
+                );
                 return config.createView(
                     options.id,
                     options.name,

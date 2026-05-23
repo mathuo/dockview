@@ -50,8 +50,13 @@ export type VueComponent<T = any> = DefineComponent<T>;
 
 export function findComponent(
     parent: ComponentInternalInstance,
-    name: string
+    name: string,
+    components?: Record<string, VueComponent | undefined>
 ): VueComponent | null {
+    if (components && components[name]) {
+        return components[name] as VueComponent;
+    }
+
     let instance = parent as any;
     let component: any = null;
 
@@ -69,6 +74,20 @@ export function findComponent(
     }
 
     return component as VueComponent;
+}
+
+export function resolveComponent(
+    value: string | VueComponent | undefined,
+    parent: ComponentInternalInstance,
+    components?: Record<string, VueComponent | undefined>
+): VueComponent | undefined {
+    if (value === undefined) {
+        return undefined;
+    }
+    if (typeof value !== 'string') {
+        return value;
+    }
+    return findComponent(parent, value, components) ?? undefined;
 }
 
 /**

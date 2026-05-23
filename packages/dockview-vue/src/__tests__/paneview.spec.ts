@@ -185,3 +185,52 @@ describe('PaneviewVue events', () => {
         expect(emitted![0][0]).toBe(fakeEvent);
     });
 });
+
+// Regression coverage for https://github.com/mathuo/dockview/issues/1301
+describe('PaneviewVue components prop resolves without registration', () => {
+    let wrapper: ReturnType<typeof mount>;
+
+    afterEach(() => {
+        wrapper?.unmount();
+    });
+
+    test('addPanel resolves component from props.components alone', async () => {
+        // No `global.components` and no `app.component()` — the user's
+        // `<script setup>` scenario.
+        wrapper = mount(PaneviewVue, {
+            props: { components: { MyPane: MockPaneComponent } },
+            attachTo: document.body,
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as PaneviewApi;
+
+        expect(() =>
+            api.addPanel({
+                id: 'pane-1',
+                component: 'MyPane',
+                title: 'Pane',
+            })
+        ).not.toThrow();
+
+        expect(api.getPanel('pane-1')).toBeDefined();
+    });
+
+    test('throws when component name is not in the map and not registered', async () => {
+        wrapper = mount(PaneviewVue, {
+            props: { components: { MyPane: MockPaneComponent } },
+            attachTo: document.body,
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as PaneviewApi;
+
+        expect(() =>
+            api.addPanel({
+                id: 'pane-bad',
+                component: 'NotRegistered',
+                title: 'Bad',
+            })
+        ).toThrow("Failed to find Vue Component 'NotRegistered'");
+    });
+});

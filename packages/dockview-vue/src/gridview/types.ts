@@ -3,6 +3,7 @@ import type {
     GridviewOptions,
     GridviewPanelApi,
 } from 'dockview-core';
+import type { VueComponent } from '../utils';
 
 export interface GridviewReadyEvent {
     api: GridviewApi;
@@ -15,7 +16,7 @@ export interface IGridviewVuePanelProps<T extends Record<string, any> = any> {
 }
 
 export interface IGridviewVueProps extends GridviewOptions {
-    components: Record<string, string>;
+    components?: Record<string, VueComponent>;
 }
 
 export type GridviewVueEvents = {

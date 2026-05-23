@@ -23,8 +23,11 @@ import {
     VueRenderer,
     VueWatermarkRenderer,
     findComponent,
+    resolveComponent,
 } from '../utils';
 import type { IDockviewVueProps, VueEvents } from './types';
+
+const DEFAULT_VUE_TAB = 'props.defaultTabComponent';
 
 function extractCoreOptions(props: IDockviewVueProps): DockviewOptions {
     const coreOptions = (
@@ -65,7 +68,7 @@ watch(
             instance.value.updateOptions({
                 createTabGroupChipComponent: newValue
                     ? () => {
-                          const component = findComponent(inst, newValue);
+                          const component = resolveComponent(newValue, inst);
                           return new VueTabGroupChipRenderer(component!, inst);
                       }
                     : undefined,
@@ -81,7 +84,7 @@ watch(
             instance.value.updateOptions({
                 createGroupDragGhostComponent: newValue
                     ? () => {
-                          const component = findComponent(inst, newValue);
+                          const component = resolveComponent(newValue, inst);
                           return new VueGroupDragGhostRenderer(
                               component!,
                               inst
@@ -97,13 +100,26 @@ watch(
     () => props.defaultTabComponent,
     (newValue) => {
         if (instance.value) {
+            const coreDefault =
+                typeof newValue === 'string'
+                    ? newValue
+                    : newValue
+                      ? DEFAULT_VUE_TAB
+                      : undefined;
             instance.value.updateOptions({
-                defaultTabComponent: newValue,
+                defaultTabComponent: coreDefault,
                 createTabComponent(options) {
-                    let component = findComponent(inst, options.name);
+                    let component =
+                        options.name === DEFAULT_VUE_TAB
+                            ? null
+                            : findComponent(
+                                  inst,
+                                  options.name,
+                                  props.tabComponents
+                              );
 
                     if (!component && newValue) {
-                        component = findComponent(inst, newValue);
+                        component = resolveComponent(newValue, inst) ?? null;
                     }
 
                     if (component) {
@@ -123,7 +139,7 @@ watch(
             instance.value.updateOptions({
                 createWatermarkComponent: newValue
                     ? () => {
-                          const component = findComponent(inst, newValue);
+                          const component = resolveComponent(newValue, inst);
                           return new VueWatermarkRenderer(component!, inst);
                       }
                     : undefined,
@@ -139,7 +155,7 @@ watch(
             instance.value.updateOptions({
                 createRightHeaderActionComponent: newValue
                     ? (group) => {
-                          const component = findComponent(inst, newValue);
+                          const component = resolveComponent(newValue, inst);
                           return new VueHeaderActionsRenderer(
                               component!,
                               inst,
@@ -159,7 +175,7 @@ watch(
             instance.value.updateOptions({
                 createLeftHeaderActionComponent: newValue
                     ? (group) => {
-                          const component = findComponent(inst, newValue);
+                          const component = resolveComponent(newValue, inst);
                           return new VueHeaderActionsRenderer(
                               component!,
                               inst,
@@ -179,7 +195,7 @@ watch(
             instance.value.updateOptions({
                 createPrefixHeaderActionComponent: newValue
                     ? (group) => {
-                          const component = findComponent(inst, newValue);
+                          const component = resolveComponent(newValue, inst);
                           return new VueHeaderActionsRenderer(
                               component!,
                               inst,
@@ -203,14 +219,26 @@ onMounted(() => {
 
     const frameworkOptions: DockviewFrameworkOptions = {
         createComponent(options) {
-            const component = findComponent(inst, options.name);
+            const component = findComponent(
+                inst,
+                options.name,
+                props.components
+            );
             return new VueRenderer(component!, inst);
         },
         createTabComponent(options) {
-            let component = findComponent(inst, options.name);
+            let component =
+                options.name === DEFAULT_VUE_TAB
+                    ? null
+                    : findComponent(
+                          inst,
+                          options.name,
+                          props.tabComponents
+                      );
 
             if (!component && props.defaultTabComponent) {
-                component = findComponent(inst, props.defaultTabComponent);
+                component =
+                    resolveComponent(props.defaultTabComponent, inst) ?? null;
             }
 
             if (component) {
@@ -220,9 +248,9 @@ onMounted(() => {
         },
         createWatermarkComponent: props.watermarkComponent
             ? () => {
-                  const component = findComponent(
-                      inst,
-                      props.watermarkComponent!
+                  const component = resolveComponent(
+                      props.watermarkComponent,
+                      inst
                   );
 
                   return new VueWatermarkRenderer(component!, inst);
@@ -230,27 +258,27 @@ onMounted(() => {
             : undefined,
         createLeftHeaderActionComponent: props.leftHeaderActionsComponent
             ? (group) => {
-                  const component = findComponent(
-                      inst,
-                      props.leftHeaderActionsComponent!
+                  const component = resolveComponent(
+                      props.leftHeaderActionsComponent,
+                      inst
                   );
                   return new VueHeaderActionsRenderer(component!, inst, group);
               }
             : undefined,
         createPrefixHeaderActionComponent: props.prefixHeaderActionsComponent
             ? (group) => {
-                  const component = findComponent(
-                      inst,
-                      props.prefixHeaderActionsComponent!
+                  const component = resolveComponent(
+                      props.prefixHeaderActionsComponent,
+                      inst
                   );
                   return new VueHeaderActionsRenderer(component!, inst, group);
               }
             : undefined,
         createRightHeaderActionComponent: props.rightHeaderActionsComponent
             ? (group) => {
-                  const component = findComponent(
-                      inst,
-                      props.rightHeaderActionsComponent!
+                  const component = resolveComponent(
+                      props.rightHeaderActionsComponent,
+                      inst
                   );
                   return new VueHeaderActionsRenderer(component!, inst, group);
               }
@@ -259,29 +287,35 @@ onMounted(() => {
             if (!options.component) {
                 return undefined;
             }
-            const component = findComponent(inst, options.component as string);
+            const component = findComponent(
+                inst,
+                options.component as string,
+                props.components
+            );
             return new VueContextMenuItemRenderer(component!, inst);
         },
     };
 
     const coreOptions = extractCoreOptions(props);
 
-    if (props.defaultTabComponent) {
+    if (typeof props.defaultTabComponent === 'string') {
         frameworkOptions.defaultTabComponent = props.defaultTabComponent;
+    } else if (props.defaultTabComponent) {
+        frameworkOptions.defaultTabComponent = DEFAULT_VUE_TAB;
     }
 
     if (props.tabGroupChipComponent) {
-        const chipComponentName = props.tabGroupChipComponent;
+        const chipValue = props.tabGroupChipComponent;
         coreOptions.createTabGroupChipComponent = () => {
-            const component = findComponent(inst, chipComponentName);
+            const component = resolveComponent(chipValue, inst);
             return new VueTabGroupChipRenderer(component!, inst);
         };
     }
 
     if (props.groupDragGhostComponent) {
-        const ghostComponentName = props.groupDragGhostComponent;
+        const ghostValue = props.groupDragGhostComponent;
         coreOptions.createGroupDragGhostComponent = () => {
-            const component = findComponent(inst, ghostComponentName);
+            const component = resolveComponent(ghostValue, inst);
             return new VueGroupDragGhostRenderer(component!, inst);
         };
     }
