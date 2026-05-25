@@ -60,7 +60,6 @@ import { getPanelData } from '../dnd/dataTransfer';
 import { Parameters } from '../panel/types';
 import { Overlay } from '../overlay/overlay';
 import {
-    addTestId,
     Classnames,
     getDockviewTheme,
     onDidWindowResizeEnd,
@@ -76,6 +75,7 @@ import { ModuleRegistry } from './modules';
 import { AllModules } from './allModules';
 import { IFloatingGroupHost } from './floatingGroupService';
 import { IPopoutWindowHost } from './popoutWindowService';
+import { IWatermarkHost } from './watermarkService';
 import { AnchoredBox, AnchorPosition, Box } from '../types';
 import {
     DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
@@ -325,7 +325,11 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
 
 export class DockviewComponent
     extends BaseGrid<DockviewGroupPanel>
-    implements IDockviewComponent, IFloatingGroupHost, IPopoutWindowHost
+    implements
+        IDockviewComponent,
+        IFloatingGroupHost,
+        IPopoutWindowHost,
+        IWatermarkHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
@@ -333,7 +337,6 @@ export class DockviewComponent
     private readonly _moduleRegistry = new ModuleRegistry<DockviewComponent>();
     private _options: Exclude<DockviewComponentOptions, 'orientation'>;
     private _tabGroupColorPalette: TabGroupColorPalette;
-    private _watermark: IWatermarkRenderer | null = null;
     private _shellThemeClassnames: Classnames | undefined;
 
     readonly overlayRenderContainer: OverlayRenderContainer;
@@ -514,6 +517,21 @@ export class DockviewComponent
 
     private get _popoutWindowService() {
         return this._moduleRegistry.services.popoutWindowService!;
+    }
+
+    private get _watermarkService() {
+        return this._moduleRegistry.services.watermarkService!;
+    }
+
+    get mountElement(): HTMLElement {
+        return this.gridview.element;
+    }
+
+    hasVisibleGridGroup(): boolean {
+        return this.groups.some(
+            (group) =>
+                group.api.location.type === 'grid' && group.api.isVisible
+        );
     }
 
     fireLayoutChange(): void {
@@ -764,6 +782,8 @@ export class DockviewComponent
                 this._floatingGroupService.disposeAll();
 
                 this._popoutWindowService.disposeAll();
+
+                this._watermarkService.dispose();
 
                 this._shellManager?.dispose();
 
@@ -1502,12 +1522,7 @@ export class DockviewComponent
         }
 
         if ('createWatermarkComponent' in options) {
-            if (this._watermark) {
-                this._watermark.element.parentElement!.remove();
-                this._watermark.dispose?.();
-                this._watermark = null;
-            }
-            this.updateWatermark();
+            this._watermarkService.refresh();
             for (const group of this.groups) {
                 group.model.refreshWatermark();
             }
@@ -2415,30 +2430,7 @@ export class DockviewComponent
     }
 
     updateWatermark(): void {
-        if (
-            this.groups.filter(
-                (x) => x.api.location.type === 'grid' && x.api.isVisible
-            ).length === 0
-        ) {
-            if (!this._watermark) {
-                this._watermark = this.createWatermarkComponent();
-
-                this._watermark.init({
-                    containerApi: new DockviewApi(this),
-                });
-
-                const watermarkContainer = document.createElement('div');
-                watermarkContainer.className = 'dv-watermark-container';
-                addTestId(watermarkContainer, 'watermark-component');
-                watermarkContainer.appendChild(this._watermark.element);
-
-                this.gridview.element.appendChild(watermarkContainer);
-            }
-        } else if (this._watermark) {
-            this._watermark.element.parentElement!.remove();
-            this._watermark.dispose?.();
-            this._watermark = null;
-        }
+        this._watermarkService?.update();
     }
 
     addGroup(options?: AddGroupOptions): DockviewGroupPanel {
