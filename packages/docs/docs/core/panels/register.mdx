@@ -81,33 +81,34 @@ const api = createDockview(parentElement, {
 
 
 <FrameworkSpecific framework='Vue'>
-```tsx
-const App = {
-    name: 'App',
-    components: {
-        'component_1': VueComponent1,
-        'component_2': VueComponent2,
-    },
-    methods: {
-        onReady(event: DockviewReadyEvent) {
-            event.api.addPanel({
-                id: 'panel_1',
-                component: 'component_1'
-            });
 
-               event.api.addPanel({
-                id: 'panel_2',
-                component: 'component_2'
-            });
-        },
-    },
-    template: `
-      <dockview-vue
+Pass your panel components directly to `<DockviewVue>` via the `components`
+prop. This is the recommended pattern and works with `<script setup>` — no
+global `app.component(...)` registration is required.
+
+```vue
+<script setup lang="ts">
+import { DockviewVue, type DockviewReadyEvent } from 'dockview-vue';
+import VueComponent1 from './VueComponent1.vue';
+import VueComponent2 from './VueComponent2.vue';
+
+function onReady(event: DockviewReadyEvent) {
+    event.api.addPanel({ id: 'panel_1', component: 'component_1' });
+    event.api.addPanel({ id: 'panel_2', component: 'component_2' });
+}
+</script>
+
+<template>
+    <DockviewVue
+        :components="{ component_1: VueComponent1, component_2: VueComponent2 }"
         @ready="onReady"
-      >
-      </dockview-vue>`,
-};
+    />
+</template>
 ```
+
+Legacy Options-API style is still supported — components registered on any
+ancestor via `components: { ... }` (or globally via `app.component(...)`) are
+resolved by name as before.
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>

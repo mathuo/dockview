@@ -1,12 +1,22 @@
-import { vi, describe, test, expect, beforeEach } from 'vitest';
+import { vi, describe, test, expect, beforeEach, afterEach } from 'vitest';
+import { mount, flushPromises } from '@vue/test-utils';
+import { defineComponent } from 'vue';
 import {
     createGridview,
+    GridviewApi,
     PROPERTY_KEYS_GRIDVIEW,
     Orientation,
 } from 'dockview-core';
+import GridviewVue from '../gridview/gridview.vue';
 import { VueGridviewPanelView } from '../gridview/view';
 import { VuePart } from '../utils';
 import * as gridviewTypes from '../gridview/types';
+
+const MockGridComponent = defineComponent({
+    name: 'MockGridComponent',
+    props: ['params', 'api', 'containerApi'],
+    template: '<div class="mock-grid">Grid</div>',
+});
 
 describe('GridviewVue Component', () => {
     test('should export component types', () => {
@@ -191,5 +201,50 @@ describe('VueGridviewPanelView', () => {
         expect(component).toBeDefined();
 
         initSpy.mockRestore();
+    });
+});
+
+// Regression coverage for https://github.com/mathuo/dockview/issues/1301
+describe('GridviewVue components prop resolves without registration', () => {
+    let wrapper: ReturnType<typeof mount>;
+
+    afterEach(() => {
+        wrapper?.unmount();
+    });
+
+    test('addPanel resolves component from props.components alone', async () => {
+        wrapper = mount(GridviewVue, {
+            props: {
+                orientation: Orientation.HORIZONTAL,
+                components: { Cell: MockGridComponent },
+            },
+            attachTo: document.body,
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as GridviewApi;
+
+        expect(() =>
+            api.addPanel({ id: 'cell-1', component: 'Cell' })
+        ).not.toThrow();
+
+        expect(api.getPanel('cell-1')).toBeDefined();
+    });
+
+    test('throws when component name is not in the map and not registered', async () => {
+        wrapper = mount(GridviewVue, {
+            props: {
+                orientation: Orientation.HORIZONTAL,
+                components: { Cell: MockGridComponent },
+            },
+            attachTo: document.body,
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as GridviewApi;
+
+        expect(() =>
+            api.addPanel({ id: 'bad', component: 'NotRegistered' })
+        ).toThrow("Failed to find Vue Component 'NotRegistered'");
     });
 });

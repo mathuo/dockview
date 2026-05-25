@@ -4,15 +4,18 @@ import {
     type DockviewReadyEvent,
     type DockviewWillDropEvent,
 } from 'dockview-core';
+import type { VueComponent } from '../utils';
 
 export interface VueProps {
-    watermarkComponent?: string;
-    defaultTabComponent?: string;
-    rightHeaderActionsComponent?: string;
-    leftHeaderActionsComponent?: string;
-    prefixHeaderActionsComponent?: string;
-    tabGroupChipComponent?: string;
-    groupDragGhostComponent?: string;
+    components?: Record<string, VueComponent>;
+    tabComponents?: Record<string, VueComponent>;
+    watermarkComponent?: string | VueComponent;
+    defaultTabComponent?: string | VueComponent;
+    rightHeaderActionsComponent?: string | VueComponent;
+    leftHeaderActionsComponent?: string | VueComponent;
+    prefixHeaderActionsComponent?: string | VueComponent;
+    tabGroupChipComponent?: string | VueComponent;
+    groupDragGhostComponent?: string | VueComponent;
 }
 
 export type VueEvents = {

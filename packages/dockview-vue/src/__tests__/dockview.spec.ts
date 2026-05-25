@@ -297,3 +297,263 @@ describe('DockviewVue Component', () => {
         expect(emitted![0][0]).toBe(fakeEvent);
     });
 });
+
+// Regression coverage for https://github.com/mathuo/dockview/issues/1301
+// `<script setup>` users (and anyone not using the Options API) need to be
+// able to supply panel components without registering globally in main.ts.
+describe('DockviewVue components prop (issue #1301)', () => {
+    let wrapper: ReturnType<typeof mount>;
+
+    afterEach(() => {
+        wrapper?.unmount();
+    });
+
+    function mountBare(props: Record<string, any> = {}) {
+        // NOTE: no `global.components` here — this is the scenario that used
+        // to require `app.component(...)` in main.ts.
+        return mount(DockviewVue, { props, attachTo: document.body });
+    }
+
+    test('addPanel resolves component from props.components without any registration', async () => {
+        wrapper = mountBare({
+            components: { Panel: MockPanel },
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+
+        expect(() =>
+            api.addPanel({
+                id: 'panel-1',
+                component: 'Panel',
+                title: 'Panel 1',
+            })
+        ).not.toThrow();
+
+        expect(api.getPanel('panel-1')).toBeDefined();
+    });
+
+    test('addPanel still throws a helpful error when component is not in the map', async () => {
+        wrapper = mountBare({
+            components: { Panel: MockPanel },
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+
+        expect(() =>
+            api.addPanel({
+                id: 'panel-bad',
+                component: 'DoesNotExist',
+                title: 'Bad',
+            })
+        ).toThrow("Failed to find Vue Component 'DoesNotExist'");
+    });
+
+    test('tabComponents map resolves tab components without registration', async () => {
+        wrapper = mountBare({
+            components: { Panel: MockPanel },
+            tabComponents: { CustomTab: MockTab },
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+
+        expect(() =>
+            api.addPanel({
+                id: 'panel-1',
+                component: 'Panel',
+                tabComponent: 'CustomTab',
+                title: 'Panel 1',
+            })
+        ).not.toThrow();
+
+        expect(api.getPanel('panel-1')).toBeDefined();
+    });
+
+    test('defaultTabComponent accepts a component object directly', async () => {
+        wrapper = mountBare({
+            components: { Panel: MockPanel },
+            defaultTabComponent: MockTab,
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+
+        expect(() =>
+            api.addPanel({
+                id: 'panel-1',
+                component: 'Panel',
+                title: 'Panel 1',
+            })
+        ).not.toThrow();
+
+        expect(api.getPanel('panel-1')).toBeDefined();
+    });
+
+    test('defaultTabComponent still works as a string (backward compat)', async () => {
+        wrapper = mount(DockviewVue, {
+            props: {
+                defaultTabComponent: 'MockTab',
+                components: { Panel: MockPanel },
+            },
+            attachTo: document.body,
+            // String form must continue to work with the legacy global
+            // registration path too — that's the contract we promised.
+            global: { components: { MockTab } },
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const updateSpy = vi.spyOn(api, 'updateOptions');
+
+        await wrapper.setProps({ defaultTabComponent: 'MockTab2' });
+        await nextTick();
+
+        expect(updateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({ defaultTabComponent: 'MockTab2' })
+        );
+    });
+
+    test('switching defaultTabComponent from string to component uses sentinel', async () => {
+        wrapper = mount(DockviewVue, {
+            props: {
+                defaultTabComponent: 'MockTab',
+                components: { Panel: MockPanel },
+            },
+            attachTo: document.body,
+            global: { components: { MockTab } },
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+        const updateSpy = vi.spyOn(api, 'updateOptions');
+
+        await wrapper.setProps({ defaultTabComponent: MockTab2 });
+        await nextTick();
+
+        // Sentinel name routes core back into createTabComponent, which then
+        // returns our component object via resolveComponent.
+        expect(updateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                defaultTabComponent: 'props.defaultTabComponent',
+            })
+        );
+    });
+
+    test('watermarkComponent accepts a component object directly', async () => {
+        wrapper = mountBare({
+            watermarkComponent: MockWatermark,
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+
+        // Should not throw on createWatermarkComponent invocation — we proxy
+        // any call to verify resolveComponent doesn't reject the object.
+        expect(() =>
+            (api as any).component.options.createWatermarkComponent?.()
+        ).not.toThrow();
+    });
+
+    test('rightHeaderActionsComponent accepts a component object directly', async () => {
+        wrapper = mountBare({
+            rightHeaderActionsComponent: MockHeaderAction,
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+
+        expect(() =>
+            (api as any).component.options.createRightHeaderActionComponent?.({
+                api: {},
+                model: {},
+            } as any)
+        ).not.toThrow();
+    });
+
+    test('leftHeaderActionsComponent accepts a component object directly', async () => {
+        wrapper = mountBare({
+            leftHeaderActionsComponent: MockHeaderAction,
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+
+        expect(() =>
+            (api as any).component.options.createLeftHeaderActionComponent?.({
+                api: {},
+                model: {},
+            } as any)
+        ).not.toThrow();
+    });
+
+    test('prefixHeaderActionsComponent accepts a component object directly', async () => {
+        wrapper = mountBare({
+            prefixHeaderActionsComponent: MockHeaderAction,
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+
+        expect(() =>
+            (api as any).component.options.createPrefixHeaderActionComponent?.({
+                api: {},
+                model: {},
+            } as any)
+        ).not.toThrow();
+    });
+
+    test('tabGroupChipComponent accepts a component object directly', async () => {
+        wrapper = mountBare({
+            tabGroupChipComponent: MockHeaderAction,
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+
+        expect(() =>
+            (api as any).component.options.createTabGroupChipComponent?.()
+        ).not.toThrow();
+    });
+
+    test('groupDragGhostComponent accepts a component object directly', async () => {
+        wrapper = mountBare({
+            groupDragGhostComponent: MockHeaderAction,
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+
+        expect(() =>
+            (api as any).component.options.createGroupDragGhostComponent?.()
+        ).not.toThrow();
+    });
+
+    test('switching components map at runtime is picked up on next addPanel', async () => {
+        wrapper = mountBare({
+            components: { Panel: MockPanel },
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any).api as DockviewApi;
+
+        api.addPanel({ id: 'panel-1', component: 'Panel', title: 'P1' });
+        expect(api.getPanel('panel-1')).toBeDefined();
+
+        const NewPanel = {
+            name: 'NewPanel',
+            props: ['params'],
+            template: '<div class="new-panel">New</div>',
+        };
+
+        await wrapper.setProps({ components: { Panel: NewPanel } });
+        await nextTick();
+
+        // The next addPanel should resolve against the updated map — no
+        // rerender of existing panels (we explicitly chose read-at-create).
+        expect(() =>
+            api.addPanel({ id: 'panel-2', component: 'Panel', title: 'P2' })
+        ).not.toThrow();
+    });
+});

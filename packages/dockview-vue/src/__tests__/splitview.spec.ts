@@ -1,12 +1,22 @@
-import { vi, describe, test, expect } from 'vitest';
+import { vi, describe, test, expect, afterEach } from 'vitest';
+import { mount, flushPromises } from '@vue/test-utils';
+import { defineComponent } from 'vue';
 import {
     createSplitview,
     Orientation,
     PROPERTY_KEYS_SPLITVIEW,
+    SplitviewApi,
 } from 'dockview-core';
+import SplitviewVue from '../splitview/splitview.vue';
 import { VueSplitviewPanelView } from '../splitview/view';
 import { VuePart } from '../utils';
 import * as splitviewTypes from '../splitview/types';
+
+const MockSplitComponent = defineComponent({
+    name: 'MockSplitComponent',
+    props: ['params', 'api', 'containerApi'],
+    template: '<div class="mock-split">Split</div>',
+});
 
 describe('SplitviewVue Component', () => {
     test('should export component types', () => {
@@ -131,5 +141,52 @@ describe('VueSplitviewPanelView', () => {
         expect(initSpy).toHaveBeenCalled();
 
         initSpy.mockRestore();
+    });
+});
+
+// Regression coverage for https://github.com/mathuo/dockview/issues/1301
+describe('SplitviewVue components prop resolves without registration', () => {
+    let wrapper: ReturnType<typeof mount>;
+
+    afterEach(() => {
+        wrapper?.unmount();
+    });
+
+    test('addPanel resolves component from props.components alone', async () => {
+        wrapper = mount(SplitviewVue, {
+            props: {
+                orientation: Orientation.HORIZONTAL,
+                components: { Pane: MockSplitComponent },
+            },
+            attachTo: document.body,
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any)
+            .api as SplitviewApi;
+
+        expect(() =>
+            api.addPanel({ id: 'pane-1', component: 'Pane' })
+        ).not.toThrow();
+
+        expect(api.getPanel('pane-1')).toBeDefined();
+    });
+
+    test('throws when component name is not in the map and not registered', async () => {
+        wrapper = mount(SplitviewVue, {
+            props: {
+                orientation: Orientation.HORIZONTAL,
+                components: { Pane: MockSplitComponent },
+            },
+            attachTo: document.body,
+        });
+        await flushPromises();
+
+        const api = (wrapper.emitted('ready')![0][0] as any)
+            .api as SplitviewApi;
+
+        expect(() =>
+            api.addPanel({ id: 'bad', component: 'NotRegistered' })
+        ).toThrow("Failed to find Vue Component 'NotRegistered'");
     });
 });
