@@ -66,7 +66,6 @@ import {
     onDidWindowResizeEnd,
     onDidWindowMoveEnd,
     toggleClass,
-    watchElementResize,
 } from '../dom';
 import { DockviewFloatingGroupPanel } from './dockviewFloatingGroupPanel';
 import {
@@ -74,6 +73,7 @@ import {
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
 import { AllModules, ModuleRegistry } from './modules';
+import { IFloatingGroupHost } from './floatingGroupService';
 import { AnchoredBox, AnchorPosition, Box } from '../types';
 import {
     DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
@@ -323,7 +323,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
 
 export class DockviewComponent
     extends BaseGrid<DockviewGroupPanel>
-    implements IDockviewComponent
+    implements IDockviewComponent, IFloatingGroupHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
@@ -438,7 +438,6 @@ export class DockviewComponent
         IDisposable
     >();
 
-    private readonly _floatingGroups: DockviewFloatingGroupPanel[] = [];
     private readonly _popoutGroups: {
         window: PopoutWindow;
         popoutGroup: DockviewGroupPanel;
@@ -509,8 +508,19 @@ export class DockviewComponent
         return this._api;
     }
 
-    get floatingGroups(): DockviewFloatingGroupPanel[] {
-        return this._floatingGroups;
+    get floatingGroups(): readonly DockviewFloatingGroupPanel[] {
+        return (
+            this._moduleRegistry?.services.floatingGroupService
+                ?.floatingGroups ?? []
+        );
+    }
+
+    private get _floatingGroupService() {
+        return this._moduleRegistry.services.floatingGroupService!;
+    }
+
+    fireLayoutChange(): void {
+        this._bufferOnDidLayoutChange.fire();
     }
 
     /**
@@ -757,10 +767,7 @@ export class DockviewComponent
                 }
                 this._popoutRestorationCleanups.clear();
 
-                // iterate over a copy of the array since .dispose() mutates the original array
-                for (const group of [...this._floatingGroups]) {
-                    group.dispose();
-                }
+                this._floatingGroupService.disposeAll();
 
                 // iterate over a copy of the array since .dispose() mutates the original array
                 for (const group of [...this._popoutGroups]) {
@@ -1047,7 +1054,7 @@ export class DockviewComponent
                                 break;
                             case 'floating':
                             case 'popout':
-                                floatingBox = this._floatingGroups
+                                floatingBox = this.floatingGroups
                                     .find(
                                         (value) =>
                                             value.group.api.id ===
@@ -1408,61 +1415,7 @@ export class DockviewComponent
                     : false,
         });
 
-        const floatingGroupPanel = new DockviewFloatingGroupPanel(
-            group,
-            overlay
-        );
-
-        const disposable = new CompositeDisposable(
-            group.api.onDidActiveChange((event) => {
-                if (event.isActive) {
-                    overlay.bringToFront();
-                }
-            }),
-            (() => {
-                let lastWidth = -1;
-                let lastHeight = -1;
-                return watchElementResize(group.element, (entry) => {
-                    const width = Math.round(entry.contentRect.width);
-                    const height = Math.round(entry.contentRect.height);
-                    if (width === lastWidth && height === lastHeight) {
-                        return;
-                    }
-                    lastWidth = width;
-                    lastHeight = height;
-                    group.layout(width, height); // let the group know it's size is changing so it can fire events to the panel
-                });
-            })()
-        );
-
-        floatingGroupPanel.addDisposables(
-            overlay.onDidChange(() => {
-                // this is either a resize or a move
-                // to inform the panels .layout(...) the group with it's current size
-                // don't care about resize since the above watcher handles that
-                group.layout(group.width, group.height);
-            }),
-            overlay.onDidChangeEnd(() => {
-                this._bufferOnDidLayoutChange.fire();
-            }),
-            group.onDidChange((event) => {
-                overlay.setBounds({
-                    height: event?.height,
-                    width: event?.width,
-                });
-            }),
-            {
-                dispose: () => {
-                    disposable.dispose();
-
-                    remove(this._floatingGroups, floatingGroupPanel);
-                    group.model.location = { type: 'grid' };
-                    this.updateWatermark();
-                },
-            }
-        );
-
-        this._floatingGroups.push(floatingGroupPanel);
+        this._floatingGroupService.addFloatingGroup(group, overlay);
 
         group.model.location = { type: 'floating' };
 
@@ -1520,29 +1473,7 @@ export class DockviewComponent
     override updateOptions(options: Partial<DockviewComponentOptions>): void {
         super.updateOptions(options);
 
-        if ('floatingGroupBounds' in options) {
-            for (const group of this._floatingGroups) {
-                switch (options.floatingGroupBounds) {
-                    case 'boundedWithinViewport':
-                        group.overlay.minimumInViewportHeight = undefined;
-                        group.overlay.minimumInViewportWidth = undefined;
-                        break;
-                    case undefined:
-                        group.overlay.minimumInViewportHeight =
-                            DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE;
-                        group.overlay.minimumInViewportWidth =
-                            DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE;
-                        break;
-                    default:
-                        group.overlay.minimumInViewportHeight =
-                            options.floatingGroupBounds?.minimumHeightWithinViewport;
-                        group.overlay.minimumInViewportWidth =
-                            options.floatingGroupBounds?.minimumWidthWithinViewport;
-                }
-
-                group.overlay.setBounds();
-            }
-        }
+        this._floatingGroupService.updateBounds(options);
 
         this.updateDropTargetModel(options);
 
@@ -1614,12 +1545,9 @@ export class DockviewComponent
 
         this._syncFloatingOverlayHost();
 
-        if (this._floatingGroups) {
-            for (const floating of this._floatingGroups) {
-                // ensure floting groups stay within visible boundaries
-                floating.overlay.setBounds();
-            }
-        }
+        // floatingGroupService may be undefined during super() (BaseGrid calls
+        // layout(0, 0) before subclass field initialisers run).
+        this._moduleRegistry?.services.floatingGroupService?.constrainBounds();
     }
 
     private _syncFloatingOverlayHost(): void {
@@ -1837,14 +1765,8 @@ export class DockviewComponent
             {} as { [key: string]: GroupviewPanelState }
         );
 
-        const floats: SerializedFloatingGroup[] = this._floatingGroups.map(
-            (group) => {
-                return {
-                    data: group.group.toJSON() as GroupPanelViewState,
-                    position: group.overlay.toJSON(),
-                };
-            }
-        );
+        const floats: SerializedFloatingGroup[] =
+            this._floatingGroupService.serialize();
 
         const popoutGroups: SerializedPopoutGroup[] = this._popoutGroups.map(
             (group) => {
@@ -2201,9 +2123,7 @@ export class DockviewComponent
                 () => void 0
             );
 
-            for (const floatingGroup of this._floatingGroups) {
-                floatingGroup.overlay.setBounds();
-            }
+            this._floatingGroupService.constrainBounds();
 
             if (typeof activeGroup === 'string') {
                 const panel = this.getPanel(activeGroup);
@@ -2239,10 +2159,7 @@ export class DockviewComponent
                 this._onDidRemoveGroup.fire(group);
             }
 
-            // iterate over a reassigned array since original array will be modified
-            for (const floatingGroup of [...this._floatingGroups]) {
-                floatingGroup.dispose();
-            }
+            this._floatingGroupService.disposeAll();
 
             // fires clean-up events and clears the underlying HTML gridview.
             this.clear();
@@ -2535,7 +2452,7 @@ export class DockviewComponent
         return new Watermark();
     }
 
-    private updateWatermark(): void {
+    updateWatermark(): void {
         if (
             this.groups.filter(
                 (x) => x.api.location.type === 'grid' && x.api.isVisible
@@ -2689,8 +2606,8 @@ export class DockviewComponent
         const activePanel = this.activePanel;
 
         if (group.api.location.type === 'floating') {
-            const floatingGroup = this._floatingGroups.find(
-                (_) => _.group === group
+            const floatingGroup = this._floatingGroupService.findFloatingGroup(
+                group
             );
 
             if (floatingGroup) {
@@ -2700,7 +2617,7 @@ export class DockviewComponent
                     this._onDidRemoveGroup.fire(group);
                 }
 
-                remove(this._floatingGroups, floatingGroup);
+                // floatingGroup.dispose() removes itself from the service array
                 floatingGroup.dispose();
 
                 if (!options?.skipActive && this._activeGroup === group) {
@@ -3333,8 +3250,8 @@ export class DockviewComponent
                         this.gridview.removeView(getGridLocation(from.element));
                         break;
                     case 'floating': {
-                        const selectedFloatingGroup = this._floatingGroups.find(
-                            (x) => x.group === from
+                        const selectedFloatingGroup = this._floatingGroupService.findFloatingGroup(
+                            from
                         );
                         if (!selectedFloatingGroup) {
                             throw new Error(
@@ -3431,8 +3348,8 @@ export class DockviewComponent
             } else if (to.api.location.type === 'floating') {
                 // For moves to floating locations, add as floating group
                 // Get the position/size from the target floating group
-                const targetFloatingGroup = this._floatingGroups.find(
-                    (x) => x.group === to
+                const targetFloatingGroup = this._floatingGroupService.findFloatingGroup(
+                    to
                 );
                 if (targetFloatingGroup) {
                     const box = targetFloatingGroup.overlay.toJSON();

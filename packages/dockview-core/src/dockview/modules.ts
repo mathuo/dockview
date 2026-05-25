@@ -8,6 +8,8 @@
  * is reserved for a future major version.
  */
 
+import { IFloatingGroupService } from './floatingGroupService';
+
 export interface DockviewModule<THost = unknown> {
     moduleName: string;
     services?: Record<string, (host: THost) => unknown>;
@@ -15,8 +17,7 @@ export interface DockviewModule<THost = unknown> {
 }
 
 export interface ServiceCollection {
-    // Service slots are added here as modules are extracted.
-    // Each slot is optional so unregistered modules read as undefined.
+    floatingGroupService?: IFloatingGroupService;
 }
 
 export class ModuleMissingError extends Error {
@@ -81,10 +82,11 @@ export class ModuleRegistry<THost> {
 }
 
 /**
- * Internal registry of all built-in modules. Currently empty — modules
- * are added here as features are extracted from DockviewComponent.
- *
- * Not exported from the package. The DockviewComponent registers this
- * list at construction time.
+ * Internal registry of all built-in modules. Not exported from the package.
+ * The DockviewComponent registers this list at construction time.
  */
-export const AllModules: DockviewModule<unknown>[] = [];
+import { FloatingGroupModule } from './floatingGroupModule';
+
+export const AllModules: DockviewModule<unknown>[] = [
+    FloatingGroupModule as DockviewModule<unknown>,
+];
