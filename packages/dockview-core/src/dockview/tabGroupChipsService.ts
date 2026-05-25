@@ -10,6 +10,8 @@ import { defineModule } from './modules';
 
 export interface ITabGroupChipsHost {
     fireLayoutChange(): void;
+    readonly onDidAddGroup: Event<DockviewGroupPanel>;
+    readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
 }
 
 export interface ITabGroupChipsService extends IDisposable {
@@ -116,4 +118,26 @@ export const TabGroupChipsModule = defineModule<
     name: 'TabGroupChips',
     serviceKey: 'tabGroupChipsService',
     create: (host) => new TabGroupChipsService(host),
+    init: (host, service) => {
+        // Self-attach to existing and future groups; tear down when groups
+        // are removed. Component doesn't need to know about this wiring.
+        const perGroupDisposables = new Map<DockviewGroupPanel, IDisposable>();
+        return new CompositeDisposable(
+            host.onDidAddGroup((group) => {
+                perGroupDisposables.set(group, service.attachToGroup(group));
+            }),
+            host.onDidRemoveGroup((group) => {
+                perGroupDisposables.get(group)?.dispose();
+                perGroupDisposables.delete(group);
+            }),
+            {
+                dispose: () => {
+                    for (const d of perGroupDisposables.values()) {
+                        d.dispose();
+                    }
+                    perGroupDisposables.clear();
+                },
+            }
+        );
+    },
 });

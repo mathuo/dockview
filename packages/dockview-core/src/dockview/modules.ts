@@ -8,6 +8,7 @@
  * is reserved for a future major version.
  */
 
+import { IDisposable } from '../lifecycle';
 import { IFloatingGroupService } from './floatingGroupService';
 import { IPopoutWindowService } from './popoutWindowService';
 import { IWatermarkService } from './watermarkService';
@@ -25,6 +26,14 @@ export interface ServiceCollection {
 export interface DockviewModule<THost = unknown> {
     moduleName: string;
     services?: Record<string, (host: THost) => unknown>;
+    /**
+     * Optional post-construct hook called once after the host is fully
+     * constructed and all module services are instantiated. Use this to
+     * subscribe to host events — the returned disposable runs at host
+     * teardown. Components don't need to call into the service from event
+     * handlers; the module owns its own reactivity.
+     */
+    init?: (host: THost, services: ServiceCollection) => IDisposable;
     dependsOn?: DockviewModule<any>[];
 }
 
@@ -37,6 +46,10 @@ export function defineModule<K extends keyof ServiceCollection, THost>(config: {
     name: string;
     serviceKey: K;
     create: (host: THost) => NonNullable<ServiceCollection[K]>;
+    init?: (
+        host: THost,
+        service: NonNullable<ServiceCollection[K]>
+    ) => IDisposable;
     dependsOn?: DockviewModule<any>[];
 }): DockviewModule<THost> {
     return {
@@ -44,6 +57,15 @@ export function defineModule<K extends keyof ServiceCollection, THost>(config: {
         services: {
             [config.serviceKey]: config.create as (host: THost) => unknown,
         },
+        init: config.init
+            ? (host, services) =>
+                  config.init!(
+                      host,
+                      services[config.serviceKey] as NonNullable<
+                          ServiceCollection[K]
+                      >
+                  )
+            : undefined,
         dependsOn: config.dependsOn,
     };
 }
@@ -68,9 +90,10 @@ export function requireService<T>(
     return service;
 }
 
-export class ModuleRegistry<THost> {
+export class ModuleRegistry<THost> implements IDisposable {
     private readonly _modules = new Map<string, DockviewModule<any>>();
     private readonly _services: ServiceCollection = {};
+    private readonly _initDisposables: IDisposable[] = [];
 
     get services(): ServiceCollection {
         return this._services;
@@ -101,7 +124,29 @@ export class ModuleRegistry<THost> {
         }
     }
 
+    postConstruct(host: THost): void {
+        for (const module of this._modules.values()) {
+            if (module.init) {
+                this._initDisposables.push(
+                    (
+                        module.init as (
+                            h: THost,
+                            s: ServiceCollection
+                        ) => IDisposable
+                    )(host, this._services)
+                );
+            }
+        }
+    }
+
     has(moduleName: string): boolean {
         return this._modules.has(moduleName);
+    }
+
+    dispose(): void {
+        for (const disposable of this._initDisposables) {
+            disposable.dispose();
+        }
+        this._initDisposables.length = 0;
     }
 }

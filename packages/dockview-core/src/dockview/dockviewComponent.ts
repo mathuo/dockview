@@ -680,7 +680,6 @@ export class DockviewComponent
         toggleClass(this.element, 'dv-debug', !!options.debug);
 
         this.updateTheme();
-        this.updateWatermark();
 
         if (options.debug) {
             this.addDisposables(new StrictEventsSequencing(this));
@@ -713,9 +712,6 @@ export class DockviewComponent
             this._onUnhandledDragOverEvent,
             this._onDidMaximizedGroupChange,
             this._onDidOptionsChange,
-            this.onDidViewVisibilityChangeMicroTaskQueue(() => {
-                this.updateWatermark();
-            }),
             this.onDidAdd((event) => {
                 if (!this._moving) {
                     this._onDidAddGroup.fire(event);
@@ -737,12 +733,6 @@ export class DockviewComponent
                     isMaximized: event.isMaximized,
                 });
             }),
-            Event.any(
-                this.onDidAdd,
-                this.onDidRemove
-            )(() => {
-                this.updateWatermark();
-            }),
             Event.any<unknown>(
                 this.onDidAddPanel,
                 this.onDidRemovePanel,
@@ -759,6 +749,10 @@ export class DockviewComponent
                 // including the popout-restoration timer cancellation that
                 // resolves promises so callers awaiting popoutRestorationPromise
                 // don't hang. See issue #851.
+                // Tear down module init() subscriptions first so they stop
+                // firing into services that are about to be disposed.
+                this._moduleRegistry.dispose();
+
                 this._floatingGroupService.dispose();
                 this._popoutWindowService.dispose();
                 this._watermarkService.dispose();
@@ -834,6 +828,11 @@ export class DockviewComponent
                 }
             })
         );
+
+        // Final module wiring: runs after the host is fully constructed.
+        // Modules subscribe to host events here so the component doesn't
+        // need to manually invoke them at scattered call sites.
+        this._moduleRegistry.postConstruct(this);
     }
 
     override setVisible(panel: DockviewGroupPanel, visible: boolean): void {
@@ -3441,7 +3440,6 @@ export class DockviewComponent
                         this._onDidActivePanelChange.fire(event.panel);
                     }
                 }),
-                this._tabGroupChipsService.attachToGroup(view),
                 Event.any(
                     view.model.onDidPanelTitleChange,
                     view.model.onDidPanelParametersChange

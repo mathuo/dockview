@@ -1,7 +1,9 @@
-import { IDisposable } from '../lifecycle';
+import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { addTestId } from '../dom';
+import { Event } from '../events';
 import { IWatermarkRenderer } from './types';
 import { DockviewApi } from '../api/component.api';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { defineModule } from './modules';
 
 export interface IWatermarkHost {
@@ -9,6 +11,10 @@ export interface IWatermarkHost {
     readonly mountElement: HTMLElement;
     createWatermarkComponent(): IWatermarkRenderer;
     hasVisibleGridGroup(): boolean;
+    // Events used by the module's init() to drive its own update cadence.
+    readonly onDidAdd: Event<DockviewGroupPanel>;
+    readonly onDidRemove: Event<DockviewGroupPanel>;
+    readonly onDidViewVisibilityChangeMicroTaskQueue: Event<unknown>;
 }
 
 export interface IWatermarkService extends IDisposable {
@@ -69,5 +75,20 @@ export const WatermarkModule = defineModule<'watermarkService', IWatermarkHost>(
         name: 'Watermark',
         serviceKey: 'watermarkService',
         create: (host) => new WatermarkService(host),
+        init: (host, service) => {
+            // Initial evaluation reflects the watermark state at construction time.
+            service.update();
+            return new CompositeDisposable(
+                Event.any(
+                    host.onDidAdd,
+                    host.onDidRemove
+                )(() => {
+                    service.update();
+                }),
+                host.onDidViewVisibilityChangeMicroTaskQueue(() => {
+                    service.update();
+                })
+            );
+        },
     }
 );
