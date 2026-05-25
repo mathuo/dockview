@@ -12,6 +12,11 @@ export interface IWatermarkHost {
     createWatermarkComponent(): IWatermarkRenderer;
     hasVisibleGridGroup(): boolean;
     // Events used by the module's init() to drive its own update cadence.
+    // Subscribe to BaseGrid-level add/remove (not the dockview-level
+    // onDidAddGroup/onDidRemoveGroup) because BaseGrid fires even when
+    // doRemoveGroup is called with skipDispose=true during floating/popout
+    // conversions — that's when a grid group disappears and the watermark
+    // needs to re-evaluate. The dockview-level events skip these.
     readonly onDidAdd: Event<DockviewGroupPanel>;
     readonly onDidRemove: Event<DockviewGroupPanel>;
     readonly onDidViewVisibilityChangeMicroTaskQueue: Event<unknown>;

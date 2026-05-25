@@ -1241,7 +1241,6 @@ export class DockviewComponent
                 );
 
                 this._popoutWindowService.add(value);
-                this.updateWatermark();
 
                 return true;
             })
@@ -1410,8 +1409,6 @@ export class DockviewComponent
         if (!options?.skipActiveGroup) {
             this.doSetGroupAndPanelActive(group);
         }
-
-        this.updateWatermark();
     }
 
     private orthogonalize(
@@ -2111,8 +2108,6 @@ export class DockviewComponent
             throw err;
         }
 
-        this.updateWatermark();
-
         // Force position updates for always visible panels after DOM layout is complete
         this.debouncedUpdateAllPositions();
 
@@ -2585,7 +2580,6 @@ export class DockviewComponent
                     );
                 }
 
-                this.updateWatermark();
                 return selectedGroup.popoutGroup;
             }
 

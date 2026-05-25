@@ -16,7 +16,6 @@ import { defineModule } from './modules';
  */
 export interface IFloatingGroupHost {
     fireLayoutChange(): void;
-    updateWatermark(): void;
 }
 
 export interface IFloatingGroupService extends IDisposable {
@@ -101,7 +100,6 @@ export class FloatingGroupService implements IFloatingGroupService {
                     disposable.dispose();
                     remove(this._floatingGroups, floatingGroupPanel);
                     group.model.location = { type: 'grid' };
-                    this._host.updateWatermark();
                 },
             }
         );
