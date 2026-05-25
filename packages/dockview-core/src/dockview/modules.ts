@@ -12,12 +12,14 @@ import { IFloatingGroupService } from './floatingGroupService';
 import { IPopoutWindowService } from './popoutWindowService';
 import { IWatermarkService } from './watermarkService';
 import { IEdgeGroupService } from './edgeGroupService';
+import { ITabGroupChipsService } from './tabGroupChipsService';
 
 export interface ServiceCollection {
     floatingGroupService?: IFloatingGroupService;
     popoutWindowService?: IPopoutWindowService;
     watermarkService?: IWatermarkService;
     edgeGroupService?: IEdgeGroupService;
+    tabGroupChipsService?: ITabGroupChipsService;
 }
 
 export interface DockviewModule<THost = unknown> {

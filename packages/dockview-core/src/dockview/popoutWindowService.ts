@@ -1,9 +1,14 @@
 import { IDisposable } from '../lifecycle';
 import { remove } from '../array';
+import { Emitter, Event } from '../events';
 import { PopupService } from './components/popupService';
 import { PopoutWindow } from '../popoutWindow';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
-import { SerializedPopoutGroup } from './dockviewComponent';
+import {
+    PopoutGroupChangeSizeEvent,
+    PopoutGroupChangePositionEvent,
+    SerializedPopoutGroup,
+} from './dockviewComponent';
 import { GroupPanelViewState } from './dockviewGroupPanelModel';
 import { defineModule } from './modules';
 
@@ -19,6 +24,7 @@ export interface PopoutGroupEntry {
  */
 export interface IPopoutWindowHost {
     readonly isDisposed: boolean;
+    fireLayoutChange(): void;
 }
 
 export interface IPopoutWindowService extends IDisposable {
@@ -39,6 +45,13 @@ export interface IPopoutWindowService extends IDisposable {
     finishRestoration(promises: Promise<void>[]): void;
     cancelPendingRestorations(): void;
 
+    readonly onDidPopoutGroupSizeChange: Event<PopoutGroupChangeSizeEvent>;
+    readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent>;
+    readonly onDidOpenPopoutWindowFail: Event<void>;
+    fireDidSizeChange(event: PopoutGroupChangeSizeEvent): void;
+    fireDidPositionChange(event: PopoutGroupChangePositionEvent): void;
+    fireOpenWindowFail(): void;
+
     serialize(): SerializedPopoutGroup[];
     disposeAll(): void;
 }
@@ -50,8 +63,43 @@ export class PopoutWindowService implements IPopoutWindowService {
     private readonly _restorationCleanups = new Set<() => void>();
     private _restorationPromise: Promise<void> = Promise.resolve();
 
+    private readonly _onDidPopoutGroupSizeChange =
+        new Emitter<PopoutGroupChangeSizeEvent>();
+    readonly onDidPopoutGroupSizeChange =
+        this._onDidPopoutGroupSizeChange.event;
+
+    private readonly _onDidPopoutGroupPositionChange =
+        new Emitter<PopoutGroupChangePositionEvent>();
+    readonly onDidPopoutGroupPositionChange =
+        this._onDidPopoutGroupPositionChange.event;
+
+    private readonly _onDidOpenPopoutWindowFail = new Emitter<void>();
+    readonly onDidOpenPopoutWindowFail = this._onDidOpenPopoutWindowFail.event;
+
+    private readonly _layoutChangeWiring: IDisposable;
+
     constructor(host: IPopoutWindowHost) {
         this._host = host;
+        // Popout size/position changes persist as layout changes. Owning
+        // this wiring inside the module keeps the component agnostic.
+        this._layoutChangeWiring = Event.any<unknown>(
+            this.onDidPopoutGroupSizeChange,
+            this.onDidPopoutGroupPositionChange
+        )(() => {
+            host.fireLayoutChange();
+        });
+    }
+
+    fireDidSizeChange(event: PopoutGroupChangeSizeEvent): void {
+        this._onDidPopoutGroupSizeChange.fire(event);
+    }
+
+    fireDidPositionChange(event: PopoutGroupChangePositionEvent): void {
+        this._onDidPopoutGroupPositionChange.fire(event);
+    }
+
+    fireOpenWindowFail(): void {
+        this._onDidOpenPopoutWindowFail.fire();
     }
 
     get entries(): readonly PopoutGroupEntry[] {
@@ -148,6 +196,10 @@ export class PopoutWindowService implements IPopoutWindowService {
     dispose(): void {
         this.cancelPendingRestorations();
         this.disposeAll();
+        this._layoutChangeWiring.dispose();
+        this._onDidPopoutGroupSizeChange.dispose();
+        this._onDidPopoutGroupPositionChange.dispose();
+        this._onDidOpenPopoutWindowFail.dispose();
     }
 }
 
