@@ -72,7 +72,8 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
-import { AllModules, ModuleRegistry } from './modules';
+import { ModuleRegistry } from './modules';
+import { AllModules } from './allModules';
 import { IFloatingGroupHost } from './floatingGroupService';
 import { IPopoutWindowHost } from './popoutWindowService';
 import { AnchoredBox, AnchorPosition, Box } from '../types';
@@ -1209,7 +1210,7 @@ export class DockviewComponent
                             returnedGroup = group;
 
                             const alreadyRemoved =
-                                !this._popoutWindowService.findByPopoutGroup(
+                                !this._popoutWindowService.findByGroup(
                                     group
                                 );
 
@@ -1411,7 +1412,7 @@ export class DockviewComponent
                     : false,
         });
 
-        this._floatingGroupService.addFloatingGroup(group, overlay);
+        this._floatingGroupService.add(group, overlay);
 
         group.model.location = { type: 'floating' };
 
@@ -2567,9 +2568,7 @@ export class DockviewComponent
         const activePanel = this.activePanel;
 
         if (group.api.location.type === 'floating') {
-            const floatingGroup = this._floatingGroupService.findFloatingGroup(
-                group
-            );
+            const floatingGroup = this._floatingGroupService.findByGroup(group);
 
             if (floatingGroup) {
                 if (!options?.skipDispose) {
@@ -2597,7 +2596,7 @@ export class DockviewComponent
 
         if (group.api.location.type === 'popout') {
             const selectedGroup =
-                this._popoutWindowService.findByPopoutGroup(group);
+                this._popoutWindowService.findByGroup(group);
 
             if (selectedGroup) {
                 if (!options?.skipDispose) {
@@ -2823,7 +2822,7 @@ export class DockviewComponent
                      */
 
                     const popoutGroup =
-                        this._popoutWindowService.findByPopoutGroup(
+                        this._popoutWindowService.findByGroup(
                             sourceGroup
                         )!;
 
@@ -3211,9 +3210,8 @@ export class DockviewComponent
                         this.gridview.removeView(getGridLocation(from.element));
                         break;
                     case 'floating': {
-                        const selectedFloatingGroup = this._floatingGroupService.findFloatingGroup(
-                            from
-                        );
+                        const selectedFloatingGroup =
+                            this._floatingGroupService.findByGroup(from);
                         if (!selectedFloatingGroup) {
                             throw new Error(
                                 'dockview: failed to find floating group'
@@ -3224,7 +3222,7 @@ export class DockviewComponent
                     }
                     case 'popout': {
                         const selectedPopoutGroup =
-                            this._popoutWindowService.findByPopoutGroup(from);
+                            this._popoutWindowService.findByGroup(from);
                         if (!selectedPopoutGroup) {
                             throw new Error(
                                 'dockview: failed to find popout group'
@@ -3304,9 +3302,8 @@ export class DockviewComponent
             } else if (to.api.location.type === 'floating') {
                 // For moves to floating locations, add as floating group
                 // Get the position/size from the target floating group
-                const targetFloatingGroup = this._floatingGroupService.findFloatingGroup(
-                    to
-                );
+                const targetFloatingGroup =
+                    this._floatingGroupService.findByGroup(to);
                 if (targetFloatingGroup) {
                     const box = targetFloatingGroup.overlay.toJSON();
 

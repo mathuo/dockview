@@ -5,6 +5,7 @@ import { PopoutWindow } from '../popoutWindow';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { SerializedPopoutGroup } from './dockviewComponent';
 import { GroupPanelViewState } from './dockviewGroupPanelModel';
+import { defineModule } from './modules';
 
 export interface PopoutGroupEntry {
     window: PopoutWindow;
@@ -26,9 +27,7 @@ export interface IPopoutWindowService extends IDisposable {
     add(entry: PopoutGroupEntry): void;
     remove(entry: PopoutGroupEntry): void;
 
-    findByPopoutGroup(
-        group: DockviewGroupPanel
-    ): PopoutGroupEntry | undefined;
+    findByGroup(group: DockviewGroupPanel): PopoutGroupEntry | undefined;
     findReferenceGroupId(group: DockviewGroupPanel): string | undefined;
 
     getPopupService(groupId: string): PopupService | undefined;
@@ -71,9 +70,7 @@ export class PopoutWindowService implements IPopoutWindowService {
         remove(this._entries, entry);
     }
 
-    findByPopoutGroup(
-        group: DockviewGroupPanel
-    ): PopoutGroupEntry | undefined {
+    findByGroup(group: DockviewGroupPanel): PopoutGroupEntry | undefined {
         return this._entries.find((entry) => entry.popoutGroup === group);
     }
 
@@ -156,3 +153,12 @@ export class PopoutWindowService implements IPopoutWindowService {
         this.disposeAll();
     }
 }
+
+export const PopoutWindowModule = defineModule<
+    'popoutWindowService',
+    IPopoutWindowHost
+>({
+    name: 'PopoutWindow',
+    serviceKey: 'popoutWindowService',
+    create: (host) => new PopoutWindowService(host),
+});

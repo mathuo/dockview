@@ -11,15 +11,38 @@
 import { IFloatingGroupService } from './floatingGroupService';
 import { IPopoutWindowService } from './popoutWindowService';
 
-export interface DockviewModule<THost = unknown> {
-    moduleName: string;
-    services?: Record<string, (host: THost) => unknown>;
-    dependsOn?: DockviewModule<THost>[];
-}
-
 export interface ServiceCollection {
     floatingGroupService?: IFloatingGroupService;
     popoutWindowService?: IPopoutWindowService;
+}
+
+export interface DockviewModule<THost = unknown> {
+    moduleName: string;
+    services?: Record<string, (host: THost) => unknown>;
+    dependsOn?: DockviewModule<any>[];
+}
+
+/**
+ * Typed helper for defining a module. Enforces that the factory's return
+ * type matches the slot in ServiceCollection at compile time, replacing
+ * the manual cast each module file would otherwise need.
+ */
+export function defineModule<
+    K extends keyof ServiceCollection,
+    THost,
+>(config: {
+    name: string;
+    serviceKey: K;
+    create: (host: THost) => NonNullable<ServiceCollection[K]>;
+    dependsOn?: DockviewModule<any>[];
+}): DockviewModule<THost> {
+    return {
+        moduleName: config.name,
+        services: {
+            [config.serviceKey]: config.create as (host: THost) => unknown,
+        },
+        dependsOn: config.dependsOn,
+    };
 }
 
 export class ModuleMissingError extends Error {
@@ -43,17 +66,14 @@ export function requireService<T>(
 }
 
 export class ModuleRegistry<THost> {
-    // Stored loosely; the THost generic is enforced at initialize() time only,
-    // because AllModules is declared in this file and cannot statically reference
-    // the DockviewComponent host type without creating a circular import.
-    private readonly _modules = new Map<string, DockviewModule<unknown>>();
+    private readonly _modules = new Map<string, DockviewModule<any>>();
     private readonly _services: ServiceCollection = {};
 
     get services(): ServiceCollection {
         return this._services;
     }
 
-    register(module: DockviewModule<unknown>): void {
+    register<H>(module: DockviewModule<H>): void {
         if (this._modules.has(module.moduleName)) {
             return;
         }
@@ -82,15 +102,3 @@ export class ModuleRegistry<THost> {
         return this._modules.has(moduleName);
     }
 }
-
-/**
- * Internal registry of all built-in modules. Not exported from the package.
- * The DockviewComponent registers this list at construction time.
- */
-import { FloatingGroupModule } from './floatingGroupModule';
-import { PopoutWindowModule } from './popoutWindowModule';
-
-export const AllModules: DockviewModule<unknown>[] = [
-    FloatingGroupModule as DockviewModule<unknown>,
-    PopoutWindowModule as DockviewModule<unknown>,
-];

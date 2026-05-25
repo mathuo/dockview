@@ -8,6 +8,7 @@ import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewOptions } from './options';
 import { SerializedFloatingGroup } from './dockviewComponent';
 import { GroupPanelViewState } from './dockviewGroupPanelModel';
+import { defineModule } from './modules';
 
 /**
  * Narrow callback surface the FloatingGroupService needs from its host
@@ -21,12 +22,12 @@ export interface IFloatingGroupHost {
 export interface IFloatingGroupService extends IDisposable {
     readonly floatingGroups: readonly DockviewFloatingGroupPanel[];
 
-    addFloatingGroup(
+    add(
         group: DockviewGroupPanel,
         overlay: Overlay
     ): DockviewFloatingGroupPanel;
 
-    findFloatingGroup(
+    findByGroup(
         group: DockviewGroupPanel
     ): DockviewFloatingGroupPanel | undefined;
 
@@ -51,7 +52,7 @@ export class FloatingGroupService implements IFloatingGroupService {
         this._host = host;
     }
 
-    addFloatingGroup(
+    add(
         group: DockviewGroupPanel,
         overlay: Overlay
     ): DockviewFloatingGroupPanel {
@@ -109,7 +110,7 @@ export class FloatingGroupService implements IFloatingGroupService {
         return floatingGroupPanel;
     }
 
-    findFloatingGroup(
+    findByGroup(
         group: DockviewGroupPanel
     ): DockviewFloatingGroupPanel | undefined {
         return this._floatingGroups.find((floating) => floating.group === group);
@@ -164,3 +165,12 @@ export class FloatingGroupService implements IFloatingGroupService {
         this.disposeAll();
     }
 }
+
+export const FloatingGroupModule = defineModule<
+    'floatingGroupService',
+    IFloatingGroupHost
+>({
+    name: 'FloatingGroup',
+    serviceKey: 'floatingGroupService',
+    create: (host) => new FloatingGroupService(host),
+});
