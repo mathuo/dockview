@@ -73,6 +73,7 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
+import { AllModules, ModuleRegistry } from './modules';
 import { AnchoredBox, AnchorPosition, Box } from '../types';
 import {
     DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
@@ -327,6 +328,7 @@ export class DockviewComponent
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
     private readonly _api: DockviewApi;
+    private readonly _moduleRegistry = new ModuleRegistry<DockviewComponent>();
     private _options: Exclude<DockviewComponentOptions, 'orientation'>;
     private _tabGroupColorPalette: TabGroupColorPalette;
     private _watermark: IWatermarkRenderer | null = null;
@@ -534,6 +536,11 @@ export class DockviewComponent
 
         this._options = options;
         this._tabGroupColorPalette = buildTabGroupColorPalette(options);
+
+        for (const module of AllModules) {
+            this._moduleRegistry.register(module);
+        }
+        this._moduleRegistry.initialize(this);
 
         this.popupService = new PopupService(this.element);
         this.contextMenuController = new ContextMenuController(this);
