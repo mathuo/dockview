@@ -113,7 +113,9 @@ export class FloatingGroupService implements IFloatingGroupService {
     findByGroup(
         group: DockviewGroupPanel
     ): DockviewFloatingGroupPanel | undefined {
-        return this._floatingGroups.find((floating) => floating.group === group);
+        return this._floatingGroups.find(
+            (floating) => floating.group === group
+        );
     }
 
     serialize(): SerializedFloatingGroup[] {

@@ -527,8 +527,7 @@ export class DockviewComponent
 
     hasVisibleGridGroup(): boolean {
         return this.groups.some(
-            (group) =>
-                group.api.location.type === 'grid' && group.api.isVisible
+            (group) => group.api.location.type === 'grid' && group.api.isVisible
         );
     }
 
@@ -1225,9 +1224,7 @@ export class DockviewComponent
                             returnedGroup = group;
 
                             const alreadyRemoved =
-                                !this._popoutWindowService.findByGroup(
-                                    group
-                                );
+                                !this._popoutWindowService.findByGroup(group);
 
                             if (alreadyRemoved) {
                                 /**
@@ -1974,10 +1971,7 @@ export class DockviewComponent
                     'right',
                 ] as EdgeGroupPosition[]) {
                     const fixedData = data.edgeGroups[_position];
-                    if (
-                        fixedData &&
-                        !this._edgeGroupService.has(_position)
-                    ) {
+                    if (fixedData && !this._edgeGroupService.has(_position)) {
                         const groupState = fixedData.group as
                             | GroupPanelViewState
                             | undefined;
@@ -2576,8 +2570,7 @@ export class DockviewComponent
         }
 
         if (group.api.location.type === 'popout') {
-            const selectedGroup =
-                this._popoutWindowService.findByGroup(group);
+            const selectedGroup = this._popoutWindowService.findByGroup(group);
 
             if (selectedGroup) {
                 if (!options?.skipDispose) {
@@ -2803,9 +2796,7 @@ export class DockviewComponent
                      */
 
                     const popoutGroup =
-                        this._popoutWindowService.findByGroup(
-                            sourceGroup
-                        )!;
+                        this._popoutWindowService.findByGroup(sourceGroup)!;
 
                     const removedPanel: IDockviewPanel | undefined =
                         this.movingLock(() =>

@@ -31,10 +31,7 @@ export interface DockviewModule<THost = unknown> {
  * type matches the slot in ServiceCollection at compile time, replacing
  * the manual cast each module file would otherwise need.
  */
-export function defineModule<
-    K extends keyof ServiceCollection,
-    THost,
->(config: {
+export function defineModule<K extends keyof ServiceCollection, THost>(config: {
     name: string;
     serviceKey: K;
     create: (host: THost) => NonNullable<ServiceCollection[K]>;

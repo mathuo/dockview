@@ -42,9 +42,9 @@ export class EdgeGroupService implements IEdgeGroupService {
         IDisposable
     >();
 
-    constructor(_host: IEdgeGroupServiceHost) {
-        // host is unused today
-    }
+    // No constructor needed — the host is currently unused. The
+    // IEdgeGroupServiceHost slot stays for symmetry with the other modules
+    // and to leave room for future host callbacks.
 
     add(
         position: EdgeGroupPosition,
@@ -86,9 +86,7 @@ export class EdgeGroupService implements IEdgeGroupService {
         return false;
     }
 
-    findPositionOf(
-        group: DockviewGroupPanel
-    ): EdgeGroupPosition | undefined {
+    findPositionOf(group: DockviewGroupPanel): EdgeGroupPosition | undefined {
         for (const [position, edgeGroup] of this._edgeGroups) {
             if (edgeGroup === group) {
                 return position;
@@ -116,5 +114,5 @@ export const EdgeGroupModule = defineModule<
 >({
     name: 'EdgeGroup',
     serviceKey: 'edgeGroupService',
-    create: (host) => new EdgeGroupService(host),
+    create: () => new EdgeGroupService(),
 });

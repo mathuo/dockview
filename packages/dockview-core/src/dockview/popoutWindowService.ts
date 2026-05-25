@@ -91,10 +91,7 @@ export class PopoutWindowService implements IPopoutWindowService {
         this._popupServices.delete(groupId);
     }
 
-    scheduleRestoration(
-        delayMs: number,
-        work: () => void
-    ): Promise<void> {
+    scheduleRestoration(delayMs: number, work: () => void): Promise<void> {
         return new Promise<void>((resolve) => {
             const cleanup = () => {
                 this._restorationCleanups.delete(cleanup);

@@ -64,11 +64,10 @@ export class WatermarkService implements IWatermarkService {
     }
 }
 
-export const WatermarkModule = defineModule<
-    'watermarkService',
-    IWatermarkHost
->({
-    name: 'Watermark',
-    serviceKey: 'watermarkService',
-    create: (host) => new WatermarkService(host),
-});
+export const WatermarkModule = defineModule<'watermarkService', IWatermarkHost>(
+    {
+        name: 'Watermark',
+        serviceKey: 'watermarkService',
+        create: (host) => new WatermarkService(host),
+    }
+);

@@ -77,7 +77,8 @@ describe('requireService', () => {
         expect(() => requireService(undefined, 'M')).toThrow(
             ModuleMissingError
         );
-        expect(() => requireService(undefined, 'M', 'install dockview-pro'))
-            .toThrow(/dockview-pro/);
+        expect(() =>
+            requireService(undefined, 'M', 'install dockview-pro')
+        ).toThrow(/dockview-pro/);
     });
 });
