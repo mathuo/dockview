@@ -9,6 +9,7 @@
  */
 
 import { IFloatingGroupService } from './floatingGroupService';
+import { IPopoutWindowService } from './popoutWindowService';
 
 export interface DockviewModule<THost = unknown> {
     moduleName: string;
@@ -18,6 +19,7 @@ export interface DockviewModule<THost = unknown> {
 
 export interface ServiceCollection {
     floatingGroupService?: IFloatingGroupService;
+    popoutWindowService?: IPopoutWindowService;
 }
 
 export class ModuleMissingError extends Error {
@@ -86,7 +88,9 @@ export class ModuleRegistry<THost> {
  * The DockviewComponent registers this list at construction time.
  */
 import { FloatingGroupModule } from './floatingGroupModule';
+import { PopoutWindowModule } from './popoutWindowModule';
 
 export const AllModules: DockviewModule<unknown>[] = [
     FloatingGroupModule as DockviewModule<unknown>,
+    PopoutWindowModule as DockviewModule<unknown>,
 ];

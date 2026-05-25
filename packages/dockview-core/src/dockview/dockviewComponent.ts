@@ -74,6 +74,7 @@ import {
 } from './components/titlebar/tabsContainer';
 import { AllModules, ModuleRegistry } from './modules';
 import { IFloatingGroupHost } from './floatingGroupService';
+import { IPopoutWindowHost } from './popoutWindowService';
 import { AnchoredBox, AnchorPosition, Box } from '../types';
 import {
     DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
@@ -323,7 +324,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
 
 export class DockviewComponent
     extends BaseGrid<DockviewGroupPanel>
-    implements IDockviewComponent, IFloatingGroupHost
+    implements IDockviewComponent, IFloatingGroupHost, IPopoutWindowHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
@@ -336,7 +337,6 @@ export class DockviewComponent
 
     readonly overlayRenderContainer: OverlayRenderContainer;
     readonly popupService: PopupService;
-    private readonly _popoutPopupServices = new Map<string, PopupService>();
     readonly contextMenuController: ContextMenuController;
     readonly rootDropTargetContainer: DropTargetAnchorContainer;
 
@@ -438,16 +438,8 @@ export class DockviewComponent
         IDisposable
     >();
 
-    private readonly _popoutGroups: {
-        window: PopoutWindow;
-        popoutGroup: DockviewGroupPanel;
-        referenceGroup?: string;
-        disposable: { dispose: () => DockviewGroupPanel | undefined };
-    }[] = [];
     private readonly _rootDropTarget: IDropTarget;
     private readonly _rootPointerDropTarget: IDropTarget;
-    private _popoutRestorationPromise: Promise<void> = Promise.resolve();
-    private readonly _popoutRestorationCleanups = new Set<() => void>();
 
     private readonly _onDidRemoveGroup = new Emitter<DockviewGroupPanel>();
     readonly onDidRemoveGroup: Event<DockviewGroupPanel> =
@@ -519,6 +511,10 @@ export class DockviewComponent
         return this._moduleRegistry.services.floatingGroupService!;
     }
 
+    private get _popoutWindowService() {
+        return this._moduleRegistry.services.popoutWindowService!;
+    }
+
     fireLayoutChange(): void {
         this._bufferOnDidLayoutChange.fire();
     }
@@ -528,7 +524,7 @@ export class DockviewComponent
      * Useful for tests that need to wait for delayed popout creation.
      */
     get popoutRestorationPromise(): Promise<void> {
-        return this._popoutRestorationPromise;
+        return this._popoutWindowService.restorationPromise;
     }
 
     constructor(container: HTMLElement, options: DockviewComponentOptions) {
@@ -762,17 +758,11 @@ export class DockviewComponent
                 // fromJSON so they don't open new browser windows after
                 // dispose, and resolve their promises so callers awaiting
                 // popoutRestorationPromise don't hang. See issue #851.
-                for (const cleanup of [...this._popoutRestorationCleanups]) {
-                    cleanup();
-                }
-                this._popoutRestorationCleanups.clear();
+                this._popoutWindowService.cancelPendingRestorations();
 
                 this._floatingGroupService.disposeAll();
 
-                // iterate over a copy of the array since .dispose() mutates the original array
-                for (const group of [...this._popoutGroups]) {
-                    group.disposable.dispose();
-                }
+                this._popoutWindowService.disposeAll();
 
                 this._shellManager?.dispose();
 
@@ -887,7 +877,10 @@ export class DockviewComponent
      * and dismisses on events from that window.
      */
     getPopupServiceForGroup(group: DockviewGroupPanel): PopupService {
-        return this._popoutPopupServices.get(group.id) ?? this.popupService;
+        return (
+            this._popoutWindowService.getPopupService(group.id) ??
+            this.popupService
+        );
     }
 
     addPopoutGroup(
@@ -1093,11 +1086,14 @@ export class DockviewComponent
                     popoutContainer,
                     _window.window!
                 );
-                this._popoutPopupServices.set(group.id, popoutPopupService);
+                this._popoutWindowService.setPopupService(
+                    group.id,
+                    popoutPopupService
+                );
                 popoutWindowDisposable.addDisposables(
                     popoutPopupService,
                     Disposable.from(() => {
-                        this._popoutPopupServices.delete(group.id);
+                        this._popoutWindowService.deletePopupService(group.id);
                     })
                 );
 
@@ -1212,16 +1208,17 @@ export class DockviewComponent
                                 this.rootDropTargetContainer;
                             returnedGroup = group;
 
-                            const alreadyRemoved = !this._popoutGroups.find(
-                                (p) => p.popoutGroup === group
-                            );
+                            const alreadyRemoved =
+                                !this._popoutWindowService.findByPopoutGroup(
+                                    group
+                                );
 
                             if (alreadyRemoved) {
                                 /**
                                  * If this popout group was explicitly removed then we shouldn't run the additional
                                  * steps. To tell if the running of this disposable is the result of this popout group
-                                 * being explicitly removed we can check if this popout group is still referenced in
-                                 * the `this._popoutGroups` list.
+                                 * being explicitly removed we can check if this popout group is still tracked by
+                                 * the popout window service.
                                  */
                                 return;
                             }
@@ -1251,7 +1248,7 @@ export class DockviewComponent
                     })
                 );
 
-                this._popoutGroups.push(value);
+                this._popoutWindowService.add(value);
                 this.updateWatermark();
 
                 return true;
@@ -1294,9 +1291,8 @@ export class DockviewComponent
         } else {
             group = item;
 
-            const popoutReferenceGroupId = this._popoutGroups.find(
-                (_) => _.popoutGroup === group
-            )?.referenceGroup;
+            const popoutReferenceGroupId =
+                this._popoutWindowService.findReferenceGroupId(group);
             const popoutReferenceGroup = popoutReferenceGroupId
                 ? this.getPanel(popoutReferenceGroupId)
                 : undefined;
@@ -1768,19 +1764,8 @@ export class DockviewComponent
         const floats: SerializedFloatingGroup[] =
             this._floatingGroupService.serialize();
 
-        const popoutGroups: SerializedPopoutGroup[] = this._popoutGroups.map(
-            (group) => {
-                return {
-                    data: group.popoutGroup.toJSON() as GroupPanelViewState,
-                    gridReferenceGroup: group.referenceGroup,
-                    position: group.window.dimensions(),
-                    url:
-                        group.popoutGroup.api.location.type === 'popout'
-                            ? group.popoutGroup.api.location.popoutUrl
-                            : undefined,
-                };
-            }
-        );
+        const popoutGroups: SerializedPopoutGroup[] =
+            this._popoutWindowService.serialize();
 
         const result: SerializedDockview = {
             grid: data,
@@ -2071,57 +2056,33 @@ export class DockviewComponent
 
             const serializedPopoutGroups = data.popoutGroups ?? [];
 
-            // Create a promise that resolves when all popout groups are created
-            const popoutPromises: Promise<void>[] = [];
-
             // Queue popup group creation with delays to avoid browser blocking
-            serializedPopoutGroups.forEach((serializedPopoutGroup, index) => {
-                const { data, position, gridReferenceGroup, url } =
-                    serializedPopoutGroup;
+            const popoutPromises = serializedPopoutGroups.map(
+                (serializedPopoutGroup, index) => {
+                    const { data, position, gridReferenceGroup, url } =
+                        serializedPopoutGroup;
 
-                const group = createGroupFromSerializedState(data);
+                    const group = createGroupFromSerializedState(data);
 
-                // Add a small delay for each popup after the first to avoid browser popup blocking
-                const popoutPromise = new Promise<void>((resolve) => {
-                    const cleanup = () => {
-                        this._popoutRestorationCleanups.delete(cleanup);
-                        clearTimeout(handle);
-                        resolve();
-                    };
-                    const handle = setTimeout(() => {
-                        this._popoutRestorationCleanups.delete(cleanup);
-                        // Guard against the component being disposed before
-                        // this timer fires. Under React StrictMode the
-                        // component is mounted -> disposed -> remounted, and
-                        // without this guard the first instance's queued
-                        // restoration would open a second popout window.
-                        // See issue #851.
-                        if (this.isDisposed) {
-                            resolve();
-                            return;
+                    return this._popoutWindowService.scheduleRestoration(
+                        index * DESERIALIZATION_POPOUT_DELAY_MS,
+                        () => {
+                            this.addPopoutGroup(group, {
+                                position: position ?? undefined,
+                                overridePopoutGroup: gridReferenceGroup
+                                    ? group
+                                    : undefined,
+                                referenceGroup: gridReferenceGroup
+                                    ? this.getPanel(gridReferenceGroup)
+                                    : undefined,
+                                popoutUrl: url,
+                            });
                         }
-                        this.addPopoutGroup(group, {
-                            position: position ?? undefined,
-                            overridePopoutGroup: gridReferenceGroup
-                                ? group
-                                : undefined,
-                            referenceGroup: gridReferenceGroup
-                                ? this.getPanel(gridReferenceGroup)
-                                : undefined,
-                            popoutUrl: url,
-                        });
-                        resolve();
-                    }, index * DESERIALIZATION_POPOUT_DELAY_MS); // 100ms delay between each popup
-                    this._popoutRestorationCleanups.add(cleanup);
-                });
-
-                popoutPromises.push(popoutPromise);
-            });
-
-            // Store the promise for tests to wait on
-            this._popoutRestorationPromise = Promise.all(popoutPromises).then(
-                () => void 0
+                    );
+                }
             );
+
+            this._popoutWindowService.finishRestoration(popoutPromises);
 
             this._floatingGroupService.constrainBounds();
 
@@ -2635,9 +2596,8 @@ export class DockviewComponent
         }
 
         if (group.api.location.type === 'popout') {
-            const selectedGroup = this._popoutGroups.find(
-                (_) => _.popoutGroup === group
-            );
+            const selectedGroup =
+                this._popoutWindowService.findByPopoutGroup(group);
 
             if (selectedGroup) {
                 if (!options?.skipDispose) {
@@ -2656,7 +2616,7 @@ export class DockviewComponent
                     this._onDidRemoveGroup.fire(group);
                 }
 
-                remove(this._popoutGroups, selectedGroup);
+                this._popoutWindowService.remove(selectedGroup);
 
                 const removedGroup = selectedGroup.disposable.dispose();
 
@@ -2862,9 +2822,10 @@ export class DockviewComponent
                      * 4. create a new group at the recomputed location and add that panel
                      */
 
-                    const popoutGroup = this._popoutGroups.find(
-                        (group) => group.popoutGroup === sourceGroup
-                    )!;
+                    const popoutGroup =
+                        this._popoutWindowService.findByPopoutGroup(
+                            sourceGroup
+                        )!;
 
                     const removedPanel: IDockviewPanel | undefined =
                         this.movingLock(() =>
@@ -3262,9 +3223,8 @@ export class DockviewComponent
                         break;
                     }
                     case 'popout': {
-                        const selectedPopoutGroup = this._popoutGroups.find(
-                            (x) => x.popoutGroup === from
-                        );
+                        const selectedPopoutGroup =
+                            this._popoutWindowService.findByPopoutGroup(from);
                         if (!selectedPopoutGroup) {
                             throw new Error(
                                 'dockview: failed to find popout group'
@@ -3272,11 +3232,7 @@ export class DockviewComponent
                         }
 
                         // Remove from popout groups list to prevent automatic restoration
-                        const index =
-                            this._popoutGroups.indexOf(selectedPopoutGroup);
-                        if (index >= 0) {
-                            this._popoutGroups.splice(index, 1);
-                        }
+                        this._popoutWindowService.remove(selectedPopoutGroup);
 
                         // Clean up the reference group (ghost) if it exists and is hidden
                         if (selectedPopoutGroup.referenceGroup) {
