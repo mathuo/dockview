@@ -4,6 +4,7 @@ import { PopoutWindowModule } from './popoutWindowService';
 import { WatermarkModule } from './watermarkService';
 import { EdgeGroupModule } from './edgeGroupService';
 import { TabGroupChipsModule } from './tabGroupChipsService';
+import { ContextMenuModule } from './contextMenu';
 
 /**
  * Internal list of all built-in modules. Registered automatically by
@@ -15,4 +16,5 @@ export const AllModules: DockviewModule<any>[] = [
     WatermarkModule,
     EdgeGroupModule,
     TabGroupChipsModule,
+    ContextMenuModule,
 ];

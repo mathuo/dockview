@@ -14,6 +14,7 @@ import { IPopoutWindowService } from './popoutWindowService';
 import { IWatermarkService } from './watermarkService';
 import { IEdgeGroupService } from './edgeGroupService';
 import { ITabGroupChipsService } from './tabGroupChipsService';
+import { IContextMenuService } from './contextMenu';
 
 export interface ServiceCollection {
     floatingGroupService?: IFloatingGroupService;
@@ -21,6 +22,7 @@ export interface ServiceCollection {
     watermarkService?: IWatermarkService;
     edgeGroupService?: IEdgeGroupService;
     tabGroupChipsService?: ITabGroupChipsService;
+    contextMenuService?: IContextMenuService;
 }
 
 export interface DockviewModule<THost = unknown> {

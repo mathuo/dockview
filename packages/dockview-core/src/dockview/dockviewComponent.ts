@@ -91,7 +91,7 @@ import {
 import { PopoutWindow } from '../popoutWindow';
 import { StrictEventsSequencing } from './strictEventsSequencing';
 import { PopupService } from './components/popupService';
-import { ContextMenuController } from './contextMenu';
+import { IContextMenuHost, IContextMenuService } from './contextMenu';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import { themeAbyss } from './theme';
 import {
@@ -333,7 +333,8 @@ export class DockviewComponent
         IPopoutWindowHost,
         IWatermarkHost,
         IEdgeGroupServiceHost,
-        ITabGroupChipsHost
+        ITabGroupChipsHost,
+        IContextMenuHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
@@ -345,7 +346,6 @@ export class DockviewComponent
 
     readonly overlayRenderContainer: OverlayRenderContainer;
     readonly popupService: PopupService;
-    readonly contextMenuController: ContextMenuController;
     readonly rootDropTargetContainer: DropTargetAnchorContainer;
 
     private readonly _onWillDragPanel = new Emitter<TabDragEvent>();
@@ -523,6 +523,18 @@ export class DockviewComponent
         return this._moduleRegistry.services.tabGroupChipsService!;
     }
 
+    private get _contextMenuService() {
+        return this._moduleRegistry.services.contextMenuService!;
+    }
+
+    /**
+     * @deprecated Public access retained for backward compatibility. The
+     * underlying service is now owned by ContextMenuModule.
+     */
+    get contextMenuController(): IContextMenuService {
+        return this._contextMenuService;
+    }
+
     get mountElement(): HTMLElement {
         return this.gridview.element;
     }
@@ -567,7 +579,6 @@ export class DockviewComponent
         this._moduleRegistry.initialize(this);
 
         this.popupService = new PopupService(this.element);
-        this.contextMenuController = new ContextMenuController(this);
         this._api = new DockviewApi(this);
 
         // The shell always wraps the dockview element so edge groups can be
