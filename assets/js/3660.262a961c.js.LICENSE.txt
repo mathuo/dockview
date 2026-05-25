@@ -1,13 +1,13 @@
 /**
  * dockview
- * @version 6.4.0
+ * @version 6.5.0
  * @link https://github.com/mathuo/dockview
  * @license MIT
  */
 
 /**
  * dockview-core
- * @version 6.4.0
+ * @version 6.5.0
  * @link https://github.com/mathuo/dockview
  * @license MIT
  */
