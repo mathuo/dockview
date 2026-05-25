@@ -1,9 +1,12 @@
 import { IDisposable } from '../lifecycle';
+import { Event } from '../events';
 import {
+    DroptargetEvent,
     DroptargetOverlayModel,
     DropTargetTargetModel,
     IDropTarget,
     Position,
+    WillShowOverlayEvent,
 } from '../dnd/droptarget';
 import { html5Backend, pointerBackend } from '../dnd/backend';
 import { getPanelData } from '../dnd/dataTransfer';
@@ -33,15 +36,20 @@ export interface IRootDropTargetHost {
 }
 
 export interface IRootDropTargetService extends IDisposable {
-    readonly html5Target: IDropTarget;
-    readonly pointerTarget: IDropTarget;
+    /** Merged stream from both DnD backends. */
+    readonly onWillShowOverlay: Event<WillShowOverlayEvent>;
+    /** Merged stream from both DnD backends. */
+    readonly onDrop: Event<DroptargetEvent>;
     /** Apply changed options (dndEdges, rootOverlayModel). */
     setOptions(options: Partial<DockviewComponentOptions>): void;
 }
 
 export class RootDropTargetService implements IRootDropTargetService {
-    readonly html5Target: IDropTarget;
-    readonly pointerTarget: IDropTarget;
+    private readonly _html5Target: IDropTarget;
+    private readonly _pointerTarget: IDropTarget;
+
+    readonly onWillShowOverlay: Event<WillShowOverlayEvent>;
+    readonly onDrop: Event<DroptargetEvent>;
 
     constructor(host: IRootDropTargetHost) {
         const canDisplayOverlay = (
@@ -75,7 +83,7 @@ export class RootDropTargetService implements IRootDropTargetService {
         const overlayModel =
             host.options.rootOverlayModel ?? DEFAULT_ROOT_OVERLAY_MODEL;
 
-        this.html5Target = html5Backend.createDropTarget(host.element, {
+        this._html5Target = html5Backend.createDropTarget(host.element, {
             className: 'dv-drop-target-edge',
             canDisplayOverlay,
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
@@ -83,13 +91,27 @@ export class RootDropTargetService implements IRootDropTargetService {
             getOverrideTarget: () => host.rootDropTargetOverrideTarget(),
         });
 
-        this.pointerTarget = pointerBackend.createDropTarget(host.element, {
+        this._pointerTarget = pointerBackend.createDropTarget(host.element, {
             className: 'dv-drop-target-edge',
             canDisplayOverlay,
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
             overlayModel,
             getOverrideTarget: () => host.rootDropTargetOverrideTarget(),
         });
+
+        this.onWillShowOverlay = Event.any(
+            this._html5Target.onWillShowOverlay,
+            this._pointerTarget.onWillShowOverlay
+        );
+        this.onDrop = Event.any(
+            this._html5Target.onDrop,
+            this._pointerTarget.onDrop
+        );
+
+        // Apply remaining initial-state options (dndEdges) now that the
+        // targets exist. rootOverlayModel was already baked into the ctor
+        // args above; setOptions handles dndEdges + late changes.
+        this.setOptions(host.options);
     }
 
     setOptions(options: Partial<DockviewComponentOptions>): void {
@@ -97,18 +119,18 @@ export class RootDropTargetService implements IRootDropTargetService {
             const disabled =
                 typeof options.dndEdges === 'boolean' &&
                 options.dndEdges === false;
-            this.html5Target.disabled = disabled;
-            this.pointerTarget.disabled = disabled;
+            this._html5Target.disabled = disabled;
+            this._pointerTarget.disabled = disabled;
 
             if (
                 typeof options.dndEdges === 'object' &&
                 options.dndEdges !== null
             ) {
-                this.html5Target.setOverlayModel(options.dndEdges);
-                this.pointerTarget.setOverlayModel(options.dndEdges);
+                this._html5Target.setOverlayModel(options.dndEdges);
+                this._pointerTarget.setOverlayModel(options.dndEdges);
             } else {
-                this.html5Target.setOverlayModel(DEFAULT_ROOT_OVERLAY_MODEL);
-                this.pointerTarget.setOverlayModel(DEFAULT_ROOT_OVERLAY_MODEL);
+                this._html5Target.setOverlayModel(DEFAULT_ROOT_OVERLAY_MODEL);
+                this._pointerTarget.setOverlayModel(DEFAULT_ROOT_OVERLAY_MODEL);
             }
         }
 
@@ -118,8 +140,8 @@ export class RootDropTargetService implements IRootDropTargetService {
     }
 
     dispose(): void {
-        this.html5Target.dispose();
-        this.pointerTarget.dispose();
+        this._html5Target.dispose();
+        this._pointerTarget.dispose();
     }
 }
 

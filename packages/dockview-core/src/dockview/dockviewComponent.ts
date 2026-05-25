@@ -631,12 +631,6 @@ export class DockviewComponent
         this._floatingOverlayHost.className = 'dv-floating-overlay-host';
         this._shellManager.element.appendChild(this._floatingOverlayHost);
 
-        // Root drop targets (the far-edge "split the whole layout" drop zones)
-        // live in RootDropTargetService; constructed by the module registry.
-        // Apply initial options so dndEdges/rootOverlayModel from this
-        // constructor's options arg take effect.
-        this._rootDropTargetService.setOptions(options);
-
         toggleClass(this.gridview.element, 'dv-dockview', true);
         toggleClass(this.element, 'dv-debug', !!options.debug);
 
@@ -722,10 +716,7 @@ export class DockviewComponent
                 this._shellManager?.dispose();
                 this._edgeGroupService.dispose();
             }),
-            Event.any(
-                this._rootDropTargetService.html5Target.onWillShowOverlay,
-                this._rootDropTargetService.pointerTarget.onWillShowOverlay
-            )((event) => {
+            this._rootDropTargetService.onWillShowOverlay((event) => {
                 if (this.gridview.length > 0 && event.position === 'center') {
                     // option only available when no panels in primary grid
                     return;
@@ -741,10 +732,7 @@ export class DockviewComponent
                     })
                 );
             }),
-            Event.any(
-                this._rootDropTargetService.html5Target.onDrop,
-                this._rootDropTargetService.pointerTarget.onDrop
-            )((event) => {
+            this._rootDropTargetService.onDrop((event) => {
                 const willDropEvent = new DockviewWillDropEvent({
                     nativeEvent: event.nativeEvent,
                     position: event.position,
@@ -1420,7 +1408,7 @@ export class DockviewComponent
 
         this._floatingGroupService.updateBounds(options);
 
-        this.updateDropTargetModel(options);
+        this._rootDropTargetService.setOptions(options);
 
         const oldDisableDnd = this.options.disableDnd;
         const oldDndStrategy = this.options.dndStrategy;
@@ -3472,12 +3460,6 @@ export class DockviewComponent
         return location.length % 2 == 1
             ? rootOrientation
             : orthogonal(rootOrientation);
-    }
-
-    private updateDropTargetModel(
-        options: Partial<DockviewComponentOptions>
-    ): void {
-        this._rootDropTargetService.setOptions(options);
     }
 
     private updateTheme(): void {
