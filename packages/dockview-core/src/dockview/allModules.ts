@@ -5,6 +5,7 @@ import { WatermarkModule } from './watermarkService';
 import { EdgeGroupModule } from './edgeGroupService';
 import { TabGroupChipsModule } from './tabGroupChipsService';
 import { ContextMenuModule } from './contextMenu';
+import { RootDropTargetModule } from './rootDropTargetService';
 
 /**
  * Internal list of all built-in modules. Registered automatically by
@@ -17,4 +18,5 @@ export const AllModules: DockviewModule<any>[] = [
     EdgeGroupModule,
     TabGroupChipsModule,
     ContextMenuModule,
+    RootDropTargetModule,
 ];

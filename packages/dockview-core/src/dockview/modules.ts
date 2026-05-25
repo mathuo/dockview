@@ -15,6 +15,7 @@ import { IWatermarkService } from './watermarkService';
 import { IEdgeGroupService } from './edgeGroupService';
 import { ITabGroupChipsService } from './tabGroupChipsService';
 import { IContextMenuService } from './contextMenu';
+import { IRootDropTargetService } from './rootDropTargetService';
 
 export interface ServiceCollection {
     floatingGroupService?: IFloatingGroupService;
@@ -23,6 +24,7 @@ export interface ServiceCollection {
     edgeGroupService?: IEdgeGroupService;
     tabGroupChipsService?: ITabGroupChipsService;
     contextMenuService?: IContextMenuService;
+    rootDropTargetService?: IRootDropTargetService;
 }
 
 export interface DockviewModule<THost = unknown> {
