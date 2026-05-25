@@ -38,6 +38,10 @@
     "main": "dist/dockview-vue.umd.js",
     "module": "dist/dockview-vue.es.js",
     "types": "dist/types/index.d.ts",
+    "sideEffects": [
+        "**/*.css",
+        "**/*.scss"
+    ],
     "homepage": "https://github.com/mathuo/dockview",
     "bugs": {
         "url": "https://github.com/mathuo/dockview/issues"
