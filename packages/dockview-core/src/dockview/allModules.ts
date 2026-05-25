@@ -2,6 +2,7 @@ import { DockviewModule } from './modules';
 import { FloatingGroupModule } from './floatingGroupService';
 import { PopoutWindowModule } from './popoutWindowService';
 import { WatermarkModule } from './watermarkService';
+import { EdgeGroupModule } from './edgeGroupService';
 
 /**
  * Internal list of all built-in modules. Registered automatically by
@@ -11,4 +12,5 @@ export const AllModules: DockviewModule<any>[] = [
     FloatingGroupModule,
     PopoutWindowModule,
     WatermarkModule,
+    EdgeGroupModule,
 ];

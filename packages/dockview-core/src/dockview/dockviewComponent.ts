@@ -76,6 +76,7 @@ import { AllModules } from './allModules';
 import { IFloatingGroupHost } from './floatingGroupService';
 import { IPopoutWindowHost } from './popoutWindowService';
 import { IWatermarkHost } from './watermarkService';
+import { IEdgeGroupServiceHost } from './edgeGroupService';
 import { AnchoredBox, AnchorPosition, Box } from '../types';
 import {
     DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
@@ -329,7 +330,8 @@ export class DockviewComponent
         IDockviewComponent,
         IFloatingGroupHost,
         IPopoutWindowHost,
-        IWatermarkHost
+        IWatermarkHost,
+        IEdgeGroupServiceHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
@@ -433,14 +435,6 @@ export class DockviewComponent
     private _shellManager: ShellManager | undefined;
     private _floatingOverlayHost: HTMLDivElement | undefined;
     private _inShellLayout = false;
-    private readonly _edgeGroups = new Map<
-        EdgeGroupPosition,
-        DockviewGroupPanel
-    >();
-    private readonly _edgeGroupDisposables = new Map<
-        EdgeGroupPosition,
-        IDisposable
-    >();
 
     private readonly _rootDropTarget: IDropTarget;
     private readonly _rootPointerDropTarget: IDropTarget;
@@ -521,6 +515,10 @@ export class DockviewComponent
 
     private get _watermarkService() {
         return this._moduleRegistry.services.watermarkService!;
+    }
+
+    private get _edgeGroupService() {
+        return this._moduleRegistry.services.edgeGroupService!;
     }
 
     get mountElement(): HTMLElement {
@@ -787,10 +785,7 @@ export class DockviewComponent
 
                 this._shellManager?.dispose();
 
-                for (const d of this._edgeGroupDisposables.values()) {
-                    d.dispose();
-                }
-                this._edgeGroupDisposables.clear();
+                this._edgeGroupService.disposeAll();
             }),
             this._rootDropTarget,
             this._rootPointerDropTarget,
@@ -1593,7 +1588,7 @@ export class DockviewComponent
         position: EdgeGroupPosition,
         options: EdgeGroupOptions
     ): DockviewGroupPanelApi {
-        if (this._edgeGroups.has(position)) {
+        if (this._edgeGroupService.has(position)) {
             throw new Error(
                 `dockview: edge group already exists at position '${position}'`
             );
@@ -1602,8 +1597,6 @@ export class DockviewComponent
         const group = this.createGroup({ id: options.id });
         group.model.location = { type: 'edge', position };
         group.model.headerPosition = position;
-        this._edgeGroups.set(position, group);
-        this._onDidAddGroup.fire(group);
 
         // Collapse when the group becomes empty
         const autoCollapseDisposable = group.model.onDidRemovePanel(() => {
@@ -1611,7 +1604,9 @@ export class DockviewComponent
                 this.setEdgeGroupCollapsed(group, true);
             }
         });
-        this._edgeGroupDisposables.set(position, autoCollapseDisposable);
+
+        this._edgeGroupService.add(position, group, autoCollapseDisposable);
+        this._onDidAddGroup.fire(group);
 
         this._shellManager!.addEdgeView(
             position,
@@ -1625,7 +1620,7 @@ export class DockviewComponent
     getEdgeGroup(
         position: EdgeGroupPosition
     ): DockviewGroupPanelApi | undefined {
-        return this._edgeGroups.get(position)?.api;
+        return this._edgeGroupService.get(position)?.api;
     }
 
     setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void {
@@ -1637,7 +1632,7 @@ export class DockviewComponent
     }
 
     removeEdgeGroup(position: EdgeGroupPosition): void {
-        const group = this._edgeGroups.get(position);
+        const group = this._edgeGroupService.get(position);
         if (!group) {
             throw new Error(
                 `dockview: no edge group exists at position '${position}'`
@@ -1652,48 +1647,36 @@ export class DockviewComponent
             });
         }
 
-        // Dispose the auto-collapse listener
-        this._edgeGroupDisposables.get(position)?.dispose();
-        this._edgeGroupDisposables.delete(position);
-
         // Remove from the shell splitview
         this._shellManager!.removeEdgeView(position);
 
-        // Clean up group state
-        this._edgeGroups.delete(position);
+        // Clean up service-tracked state + group itself
+        this._edgeGroupService.remove(position);
         group.dispose();
         this._groups.delete(group.id);
         this._onDidRemoveGroup.fire(group);
     }
 
     setEdgeGroupCollapsed(group: DockviewGroupPanel, collapsed: boolean): void {
-        for (const [position, edgeGroup] of this._edgeGroups) {
-            if (edgeGroup === group) {
-                if (
-                    this._shellManager!.isEdgeGroupCollapsed(position) ===
-                    collapsed
-                ) {
-                    // Skip the splitview resize on a no-op: with non-zero
-                    // theme gap, redundant resizeView calls accumulate
-                    // rounding drift that gradually shrinks the group.
-                    return;
-                }
-                this._shellManager!.setEdgeGroupCollapsed(position, collapsed);
-                edgeGroup.api._onDidCollapsedChange.fire({
-                    isCollapsed: collapsed,
-                });
-                return;
-            }
+        const position = this._edgeGroupService.findPositionOf(group);
+        if (!position) {
+            return;
         }
+        if (this._shellManager!.isEdgeGroupCollapsed(position) === collapsed) {
+            // Skip the splitview resize on a no-op: with non-zero theme gap,
+            // redundant resizeView calls accumulate rounding drift that
+            // gradually shrinks the group.
+            return;
+        }
+        this._shellManager!.setEdgeGroupCollapsed(position, collapsed);
+        group.api._onDidCollapsedChange.fire({ isCollapsed: collapsed });
     }
 
     isEdgeGroupCollapsed(group: DockviewGroupPanel): boolean {
-        for (const [position, edgeGroup] of this._edgeGroups) {
-            if (edgeGroup === group) {
-                return this._shellManager!.isEdgeGroupCollapsed(position);
-            }
-        }
-        return false;
+        const position = this._edgeGroupService.findPositionOf(group);
+        return position
+            ? this._shellManager!.isEdgeGroupCollapsed(position)
+            : false;
     }
 
     private updateDragAndDropState(): void {
@@ -1797,11 +1780,11 @@ export class DockviewComponent
             result.popoutGroups = popoutGroups;
         }
 
-        if (this._edgeGroups.size > 0) {
+        if (this._edgeGroupService.hasAny()) {
             const shellSerialized = this._shellManager!.toJSON();
 
             // Augment each entry with the serialized group state
-            for (const [position, group] of this._edgeGroups) {
+            for (const [position, group] of this._edgeGroupService.entries()) {
                 const entry = shellSerialized[position];
                 if (entry) {
                     entry.group = group.toJSON();
@@ -1991,7 +1974,10 @@ export class DockviewComponent
                     'right',
                 ] as EdgeGroupPosition[]) {
                     const fixedData = data.edgeGroups[_position];
-                    if (fixedData && !this._edgeGroups.has(_position)) {
+                    if (
+                        fixedData &&
+                        !this._edgeGroupService.has(_position)
+                    ) {
                         const groupState = fixedData.group as
                             | GroupPanelViewState
                             | undefined;
@@ -2001,7 +1987,10 @@ export class DockviewComponent
                 }
 
                 // Restore panel contents of edge groups
-                for (const [position, edgeGroup] of this._edgeGroups) {
+                for (const [
+                    position,
+                    edgeGroup,
+                ] of this._edgeGroupService.entries()) {
                     const edgeData = data.edgeGroups[position];
                     const groupState = edgeData?.group as
                         | GroupPanelViewState
@@ -2163,7 +2152,7 @@ export class DockviewComponent
         const hasActiveGroup = !!this.activeGroup;
 
         for (const group of groups) {
-            if ([...this._edgeGroups.values()].includes(group)) {
+            if (this._edgeGroupService.includes(group)) {
                 // Edge groups are structural - only clear their panels, not the group itself
                 const panels = [...group.panels];
                 for (const panel of panels) {
@@ -2542,7 +2531,7 @@ export class DockviewComponent
             | undefined
     ): DockviewGroupPanel {
         // Edge groups are permanent structural elements - never remove them from the layout
-        if ([...this._edgeGroups.values()].includes(group)) {
+        if (this._edgeGroupService.includes(group)) {
             return group;
         }
 

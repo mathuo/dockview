@@ -11,11 +11,13 @@
 import { IFloatingGroupService } from './floatingGroupService';
 import { IPopoutWindowService } from './popoutWindowService';
 import { IWatermarkService } from './watermarkService';
+import { IEdgeGroupService } from './edgeGroupService';
 
 export interface ServiceCollection {
     floatingGroupService?: IFloatingGroupService;
     popoutWindowService?: IPopoutWindowService;
     watermarkService?: IWatermarkService;
+    edgeGroupService?: IEdgeGroupService;
 }
 
 export interface DockviewModule<THost = unknown> {
