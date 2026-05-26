@@ -1,5 +1,5 @@
 import { CompositeDisposable, IDisposable } from '../lifecycle';
-import { Emitter, Event } from '../events';
+import { Event } from '../events';
 import {
     DockviewTabGroupChangeEvent,
     DockviewTabGroupPanelChangeEvent,
@@ -9,22 +9,25 @@ import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { defineModule } from './modules';
 
 export interface ITabGroupChipsHost {
-    fireLayoutChange(): void;
     readonly onDidAddGroup: Event<DockviewGroupPanel>;
     readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
+
+    fireDidCreateTabGroup(event: DockviewTabGroupChangeEvent): void;
+    fireDidDestroyTabGroup(event: DockviewTabGroupChangeEvent): void;
+    fireDidAddPanelToTabGroup(event: DockviewTabGroupPanelChangeEvent): void;
+    fireDidRemovePanelFromTabGroup(
+        event: DockviewTabGroupPanelChangeEvent
+    ): void;
+    fireDidTabGroupChange(event: DockviewTabGroupChangeEvent): void;
+    fireDidTabGroupCollapsedChange(
+        event: DockviewTabGroupCollapsedChangeEvent
+    ): void;
 }
 
 export interface ITabGroupChipsService extends IDisposable {
-    readonly onDidCreateTabGroup: Event<DockviewTabGroupChangeEvent>;
-    readonly onDidDestroyTabGroup: Event<DockviewTabGroupChangeEvent>;
-    readonly onDidAddPanelToTabGroup: Event<DockviewTabGroupPanelChangeEvent>;
-    readonly onDidRemovePanelFromTabGroup: Event<DockviewTabGroupPanelChangeEvent>;
-    readonly onDidTabGroupChange: Event<DockviewTabGroupChangeEvent>;
-    readonly onDidTabGroupCollapsedChange: Event<DockviewTabGroupCollapsedChangeEvent>;
-
     /**
      * Subscribe to the per-group tab-group events on the given group and
-     * re-fire them on the service's component-level emitters. Returns a
+     * re-fire them on the host's component-level emitters. Returns a
      * disposable that detaches the subscriptions; intended to be bundled
      * into the per-group CompositeDisposable so cleanup happens when the
      * group is removed.
@@ -33,81 +36,37 @@ export interface ITabGroupChipsService extends IDisposable {
 }
 
 export class TabGroupChipsService implements ITabGroupChipsService {
-    private readonly _layoutChangeWiring: IDisposable;
-
-    private readonly _onDidCreateTabGroup =
-        new Emitter<DockviewTabGroupChangeEvent>();
-    readonly onDidCreateTabGroup = this._onDidCreateTabGroup.event;
-
-    private readonly _onDidDestroyTabGroup =
-        new Emitter<DockviewTabGroupChangeEvent>();
-    readonly onDidDestroyTabGroup = this._onDidDestroyTabGroup.event;
-
-    private readonly _onDidAddPanelToTabGroup =
-        new Emitter<DockviewTabGroupPanelChangeEvent>();
-    readonly onDidAddPanelToTabGroup = this._onDidAddPanelToTabGroup.event;
-
-    private readonly _onDidRemovePanelFromTabGroup =
-        new Emitter<DockviewTabGroupPanelChangeEvent>();
-    readonly onDidRemovePanelFromTabGroup =
-        this._onDidRemovePanelFromTabGroup.event;
-
-    private readonly _onDidTabGroupChange =
-        new Emitter<DockviewTabGroupChangeEvent>();
-    readonly onDidTabGroupChange = this._onDidTabGroupChange.event;
-
-    private readonly _onDidTabGroupCollapsedChange =
-        new Emitter<DockviewTabGroupCollapsedChangeEvent>();
-    readonly onDidTabGroupCollapsedChange =
-        this._onDidTabGroupCollapsedChange.event;
+    private readonly _host: ITabGroupChipsHost;
 
     constructor(host: ITabGroupChipsHost) {
-        // Any tab-group mutation persists as a layout change. Owning this
-        // wiring inside the module keeps the component agnostic about which
-        // module's events should trigger layout-change.
-        this._layoutChangeWiring = Event.any<unknown>(
-            this.onDidCreateTabGroup,
-            this.onDidDestroyTabGroup,
-            this.onDidAddPanelToTabGroup,
-            this.onDidRemovePanelFromTabGroup,
-            this.onDidTabGroupChange,
-            this.onDidTabGroupCollapsedChange
-        )(() => {
-            host.fireLayoutChange();
-        });
+        this._host = host;
     }
 
     attachToGroup(group: DockviewGroupPanel): IDisposable {
         return new CompositeDisposable(
             group.model.onDidCreateTabGroup((e) => {
-                this._onDidCreateTabGroup.fire(e);
+                this._host.fireDidCreateTabGroup(e);
             }),
             group.model.onDidDestroyTabGroup((e) => {
-                this._onDidDestroyTabGroup.fire(e);
+                this._host.fireDidDestroyTabGroup(e);
             }),
             group.model.onDidAddPanelToTabGroup((e) => {
-                this._onDidAddPanelToTabGroup.fire(e);
+                this._host.fireDidAddPanelToTabGroup(e);
             }),
             group.model.onDidRemovePanelFromTabGroup((e) => {
-                this._onDidRemovePanelFromTabGroup.fire(e);
+                this._host.fireDidRemovePanelFromTabGroup(e);
             }),
             group.model.onDidTabGroupChange((e) => {
-                this._onDidTabGroupChange.fire(e);
+                this._host.fireDidTabGroupChange(e);
             }),
             group.model.onDidTabGroupCollapsedChange((e) => {
-                this._onDidTabGroupCollapsedChange.fire(e);
+                this._host.fireDidTabGroupCollapsedChange(e);
             })
         );
     }
 
     dispose(): void {
-        this._layoutChangeWiring.dispose();
-        this._onDidCreateTabGroup.dispose();
-        this._onDidDestroyTabGroup.dispose();
-        this._onDidAddPanelToTabGroup.dispose();
-        this._onDidRemovePanelFromTabGroup.dispose();
-        this._onDidTabGroupChange.dispose();
-        this._onDidTabGroupCollapsedChange.dispose();
+        // No internal state to tear down — emitters live on the host.
     }
 }
 

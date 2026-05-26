@@ -369,17 +369,19 @@ export class DockviewComponent
     private readonly _onDidAddPanel = new Emitter<IDockviewPanel>();
     readonly onDidAddPanel: Event<IDockviewPanel> = this._onDidAddPanel.event;
 
-    get onDidPopoutGroupSizeChange(): Event<PopoutGroupChangeSizeEvent> {
-        return this._popoutWindowService.onDidPopoutGroupSizeChange;
-    }
+    private readonly _onDidPopoutGroupSizeChange =
+        new Emitter<PopoutGroupChangeSizeEvent>();
+    readonly onDidPopoutGroupSizeChange: Event<PopoutGroupChangeSizeEvent> =
+        this._onDidPopoutGroupSizeChange.event;
 
-    get onDidPopoutGroupPositionChange(): Event<PopoutGroupChangePositionEvent> {
-        return this._popoutWindowService.onDidPopoutGroupPositionChange;
-    }
+    private readonly _onDidPopoutGroupPositionChange =
+        new Emitter<PopoutGroupChangePositionEvent>();
+    readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent> =
+        this._onDidPopoutGroupPositionChange.event;
 
-    get onDidOpenPopoutWindowFail(): Event<void> {
-        return this._popoutWindowService.onDidOpenPopoutWindowFail;
-    }
+    private readonly _onDidOpenPopoutWindowFail = new Emitter<void>();
+    readonly onDidOpenPopoutWindowFail: Event<void> =
+        this._onDidOpenPopoutWindowFail.event;
 
     private readonly _onDidLayoutFromJSON = new Emitter<void>();
     readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutFromJSON.event;
@@ -393,28 +395,62 @@ export class DockviewComponent
     private readonly _onDidMovePanel = new Emitter<MovePanelEvent>();
     readonly onDidMovePanel = this._onDidMovePanel.event;
 
-    get onDidCreateTabGroup(): Event<DockviewTabGroupChangeEvent> {
-        return this._tabGroupChipsService.onDidCreateTabGroup;
+    private readonly _onDidCreateTabGroup =
+        new Emitter<DockviewTabGroupChangeEvent>();
+    readonly onDidCreateTabGroup: Event<DockviewTabGroupChangeEvent> =
+        this._onDidCreateTabGroup.event;
+
+    private readonly _onDidDestroyTabGroup =
+        new Emitter<DockviewTabGroupChangeEvent>();
+    readonly onDidDestroyTabGroup: Event<DockviewTabGroupChangeEvent> =
+        this._onDidDestroyTabGroup.event;
+
+    private readonly _onDidAddPanelToTabGroup =
+        new Emitter<DockviewTabGroupPanelChangeEvent>();
+    readonly onDidAddPanelToTabGroup: Event<DockviewTabGroupPanelChangeEvent> =
+        this._onDidAddPanelToTabGroup.event;
+
+    private readonly _onDidRemovePanelFromTabGroup =
+        new Emitter<DockviewTabGroupPanelChangeEvent>();
+    readonly onDidRemovePanelFromTabGroup: Event<DockviewTabGroupPanelChangeEvent> =
+        this._onDidRemovePanelFromTabGroup.event;
+
+    private readonly _onDidTabGroupChange =
+        new Emitter<DockviewTabGroupChangeEvent>();
+    readonly onDidTabGroupChange: Event<DockviewTabGroupChangeEvent> =
+        this._onDidTabGroupChange.event;
+
+    private readonly _onDidTabGroupCollapsedChange =
+        new Emitter<DockviewTabGroupCollapsedChangeEvent>();
+    readonly onDidTabGroupCollapsedChange: Event<DockviewTabGroupCollapsedChangeEvent> =
+        this._onDidTabGroupCollapsedChange.event;
+
+    fireDidCreateTabGroup(event: DockviewTabGroupChangeEvent): void {
+        this._onDidCreateTabGroup.fire(event);
     }
 
-    get onDidDestroyTabGroup(): Event<DockviewTabGroupChangeEvent> {
-        return this._tabGroupChipsService.onDidDestroyTabGroup;
+    fireDidDestroyTabGroup(event: DockviewTabGroupChangeEvent): void {
+        this._onDidDestroyTabGroup.fire(event);
     }
 
-    get onDidAddPanelToTabGroup(): Event<DockviewTabGroupPanelChangeEvent> {
-        return this._tabGroupChipsService.onDidAddPanelToTabGroup;
+    fireDidAddPanelToTabGroup(event: DockviewTabGroupPanelChangeEvent): void {
+        this._onDidAddPanelToTabGroup.fire(event);
     }
 
-    get onDidRemovePanelFromTabGroup(): Event<DockviewTabGroupPanelChangeEvent> {
-        return this._tabGroupChipsService.onDidRemovePanelFromTabGroup;
+    fireDidRemovePanelFromTabGroup(
+        event: DockviewTabGroupPanelChangeEvent
+    ): void {
+        this._onDidRemovePanelFromTabGroup.fire(event);
     }
 
-    get onDidTabGroupChange(): Event<DockviewTabGroupChangeEvent> {
-        return this._tabGroupChipsService.onDidTabGroupChange;
+    fireDidTabGroupChange(event: DockviewTabGroupChangeEvent): void {
+        this._onDidTabGroupChange.fire(event);
     }
 
-    get onDidTabGroupCollapsedChange(): Event<DockviewTabGroupCollapsedChangeEvent> {
-        return this._tabGroupChipsService.onDidTabGroupCollapsedChange;
+    fireDidTabGroupCollapsedChange(
+        event: DockviewTabGroupCollapsedChangeEvent
+    ): void {
+        this._onDidTabGroupCollapsedChange.fire(event);
     }
 
     private readonly _onDidMaximizedGroupChange =
@@ -666,6 +702,28 @@ export class DockviewComponent
             this._onDidActiveGroupChange,
             this._onUnhandledDragOverEvent,
             this._onDidMaximizedGroupChange,
+            this._onDidPopoutGroupSizeChange,
+            this._onDidPopoutGroupPositionChange,
+            this._onDidOpenPopoutWindowFail,
+            this._onDidCreateTabGroup,
+            this._onDidDestroyTabGroup,
+            this._onDidAddPanelToTabGroup,
+            this._onDidRemovePanelFromTabGroup,
+            this._onDidTabGroupChange,
+            this._onDidTabGroupCollapsedChange,
+            Event.any<unknown>(
+                this.onDidPopoutGroupSizeChange,
+                this.onDidPopoutGroupPositionChange,
+                this.onDidCreateTabGroup,
+                this.onDidDestroyTabGroup,
+                this.onDidAddPanelToTabGroup,
+                this.onDidRemovePanelFromTabGroup,
+                this.onDidTabGroupChange,
+                this.onDidTabGroupCollapsedChange
+            )(() => {
+                // Popout size/position and tab-group mutations persist as layout changes.
+                this.fireLayoutChange();
+            }),
             this._onDidOptionsChange,
             this.onDidAdd((event) => {
                 if (!this._moving) {
@@ -934,7 +992,7 @@ export class DockviewComponent
                     );
 
                     popoutWindowDisposable.dispose();
-                    this._popoutWindowService.fireOpenWindowFail();
+                    this._onDidOpenPopoutWindowFail.fire();
 
                     // if the popout window was blocked, we need to move the group back to the reference group
                     // and set it to visible
@@ -1093,14 +1151,14 @@ export class DockviewComponent
                 popoutWindowDisposable.addDisposables(
                     _onDidWindowPositionChange,
                     onDidWindowResizeEnd(_window.window!, () => {
-                        this._popoutWindowService.fireDidSizeChange({
+                        this._onDidPopoutGroupSizeChange.fire({
                             width: _window.window!.innerWidth,
                             height: _window.window!.innerHeight,
                             group,
                         });
                     }),
                     _onDidWindowPositionChange.event(() => {
-                        this._popoutWindowService.fireDidPositionChange({
+                        this._onDidPopoutGroupPositionChange.fire({
                             screenX: _window.window!.screenX,
                             screenY: _window.window!.screenX,
                             group,
