@@ -76,24 +76,45 @@ export function defineModule<K extends keyof ServiceCollection, THost>(config: {
     };
 }
 
-export class ModuleMissingError extends Error {
-    constructor(moduleName: string, hint?: string) {
-        const tail = hint ? ` ${hint}` : '';
-        super(`Dockview module "${moduleName}" is not registered.${tail}`);
-        this.name = 'ModuleMissingError';
-        Object.setPrototypeOf(this, ModuleMissingError.prototype);
-    }
+const _warnedMissingModule = new Set<string>();
+
+/**
+ * For tests — clears the once-per-key dedup cache used by `assertModule`.
+ */
+export function _resetMissingModuleWarnings(): void {
+    _warnedMissingModule.clear();
 }
 
-export function requireService<T>(
+/**
+ * Returns the service if its module is registered, otherwise logs a
+ * deduplicated console error and returns `undefined`. Modelled on AG Grid's
+ * `assertModuleRegistered`: missing modules never throw — they degrade the
+ * affected feature to a no-op so consuming applications don't crash in
+ * production.
+ *
+ * Use at public-API entry points where the caller wants to surface which
+ * module is missing. For internal/lifecycle paths, plain `?.` chaining on
+ * the service slot is preferred — no log, just a silent no-op.
+ */
+export function assertModule<T>(
     service: T | undefined,
     moduleName: string,
-    hint?: string
-): T {
-    if (service === undefined) {
-        throw new ModuleMissingError(moduleName, hint);
+    context?: string
+): T | undefined {
+    if (service !== undefined) {
+        return service;
     }
-    return service;
+    const key = `${moduleName}|${context ?? ''}`;
+    if (_warnedMissingModule.has(key)) {
+        return undefined;
+    }
+    _warnedMissingModule.add(key);
+    const where = context ? ` for ${context}` : '';
+    // eslint-disable-next-line no-console
+    console.error(
+        `dockview: module "${moduleName}" is not registered${where}.`
+    );
+    return undefined;
 }
 
 export class ModuleRegistry<THost> implements IDisposable {

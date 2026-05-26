@@ -1,8 +1,8 @@
 import {
     DockviewModule,
-    ModuleMissingError,
     ModuleRegistry,
-    requireService,
+    _resetMissingModuleWarnings,
+    assertModule,
 } from '../../dockview/modules';
 
 describe('ModuleRegistry', () => {
@@ -103,17 +103,43 @@ describe('ModuleRegistry', () => {
     });
 });
 
-describe('requireService', () => {
-    test('returns the service when present', () => {
-        expect(requireService({ x: 1 }, 'M')).toEqual({ x: 1 });
+describe('assertModule', () => {
+    let consoleError: jest.SpyInstance;
+
+    beforeEach(() => {
+        _resetMissingModuleWarnings();
+        consoleError = jest
+            .spyOn(console, 'error')
+            .mockImplementation(() => undefined);
     });
 
-    test('throws ModuleMissingError when undefined', () => {
-        expect(() => requireService(undefined, 'M')).toThrow(
-            ModuleMissingError
+    afterEach(() => {
+        consoleError.mockRestore();
+    });
+
+    test('returns the service when present and does not log', () => {
+        expect(assertModule({ x: 1 }, 'M')).toEqual({ x: 1 });
+        expect(consoleError).not.toHaveBeenCalled();
+    });
+
+    test('returns undefined and logs once when module missing', () => {
+        expect(assertModule(undefined, 'PopoutWindow')).toBeUndefined();
+        expect(assertModule(undefined, 'PopoutWindow')).toBeUndefined();
+        expect(consoleError).toHaveBeenCalledTimes(1);
+        expect(consoleError.mock.calls[0][0]).toMatch(/PopoutWindow/);
+        expect(consoleError.mock.calls[0][0]).toMatch(/not registered/);
+    });
+
+    test('dedup key includes context so different call sites each warn once', () => {
+        assertModule(undefined, 'PopoutWindow', 'api.addPopoutGroup');
+        assertModule(undefined, 'PopoutWindow', 'api.addPopoutGroup');
+        assertModule(undefined, 'PopoutWindow', 'api.popoutRestorationPromise');
+        expect(consoleError).toHaveBeenCalledTimes(2);
+        expect(consoleError.mock.calls[0][0]).toMatch(
+            /for api\.addPopoutGroup/
         );
-        expect(() =>
-            requireService(undefined, 'M', 'install dockview-pro')
-        ).toThrow(/dockview-pro/);
+        expect(consoleError.mock.calls[1][0]).toMatch(
+            /for api\.popoutRestorationPromise/
+        );
     });
 });
