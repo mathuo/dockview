@@ -4,10 +4,7 @@ import {
     MutableDisposable,
 } from '../lifecycle';
 import { Event } from '../events';
-import {
-    DockviewComponentOptions,
-    IHeaderActionsRenderer,
-} from './options';
+import { DockviewComponentOptions, IHeaderActionsRenderer } from './options';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewApi } from '../api/component.api';
 import { defineModule } from './modules';

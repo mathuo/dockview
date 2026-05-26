@@ -3137,6 +3137,13 @@ export class DockviewComponent
                     )
                 );
                 source = this.createGroup();
+                // The new source group enters the layout via gridview.addView
+                // below, which bypasses doAddGroup and so doesn't fire
+                // BaseGrid._onDidAdd. Modules (TabGroupChips, etc.) drive
+                // per-group attachment off _onDidAddGroup, so we fire it
+                // explicitly here — matches the pattern in addFloatingGroup
+                // and addEdgeGroup.
+                this._onDidAddGroup.fire(source);
                 this.movingLock(() => {
                     for (const panel of movedPanels) {
                         source.model.openPanel(panel, {
