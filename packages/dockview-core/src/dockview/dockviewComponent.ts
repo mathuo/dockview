@@ -65,7 +65,7 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
-import { ModuleRegistry } from './modules';
+import { assertModule, ModuleRegistry } from './modules';
 import { AllModules } from './allModules';
 import { IFloatingGroupHost } from './floatingGroupService';
 import { IPopoutWindowHost } from './popoutWindowService';
@@ -530,7 +530,7 @@ export class DockviewComponent
     }
 
     private get _floatingGroupService() {
-        return this._moduleRegistry.services.floatingGroupService!;
+        return this._moduleRegistry.services.floatingGroupService;
     }
 
     private get _popoutWindowService() {
@@ -1254,6 +1254,15 @@ export class DockviewComponent
         item: DockviewPanel | DockviewGroupPanel,
         options?: FloatingGroupOptionsInternal
     ): void {
+        const service = assertModule(
+            this._floatingGroupService,
+            'FloatingGroup',
+            'api.addFloatingGroup'
+        );
+        if (!service) {
+            return;
+        }
+
         if (
             item instanceof DockviewGroupPanel &&
             item.model.location.type === 'edge'
@@ -1402,7 +1411,7 @@ export class DockviewComponent
                     : false,
         });
 
-        this._floatingGroupService.add(group, overlay);
+        service.add(group, overlay);
 
         group.model.location = { type: 'floating' };
 
@@ -1458,7 +1467,7 @@ export class DockviewComponent
     override updateOptions(options: Partial<DockviewComponentOptions>): void {
         super.updateOptions(options);
 
-        this._floatingGroupService.updateBounds(options);
+        this._floatingGroupService?.updateBounds(options);
 
         this._rootDropTargetService.setOptions(options);
 
@@ -1732,7 +1741,7 @@ export class DockviewComponent
         );
 
         const floats: SerializedFloatingGroup[] =
-            this._floatingGroupService.serialize();
+            this._floatingGroupService?.serialize() ?? [];
 
         const popoutGroups: SerializedPopoutGroup[] =
             this._popoutWindowService.serialize();
@@ -2086,7 +2095,7 @@ export class DockviewComponent
 
             this._popoutWindowService.finishRestoration(popoutPromises);
 
-            this._floatingGroupService.constrainBounds();
+            this._floatingGroupService?.constrainBounds();
 
             if (typeof activeGroup === 'string') {
                 const panel = this.getPanel(activeGroup);
@@ -2122,7 +2131,7 @@ export class DockviewComponent
                 this._onDidRemoveGroup.fire(group);
             }
 
-            this._floatingGroupService.disposeAll();
+            this._floatingGroupService?.disposeAll();
 
             // fires clean-up events and clears the underlying HTML gridview.
             this.clear();
@@ -2540,7 +2549,7 @@ export class DockviewComponent
         const activePanel = this.activePanel;
 
         if (group.api.location.type === 'floating') {
-            const floatingGroup = this._floatingGroupService.findByGroup(group);
+            const floatingGroup = this._floatingGroupService?.findByGroup(group);
 
             if (floatingGroup) {
                 if (!options?.skipDispose) {
@@ -3186,7 +3195,7 @@ export class DockviewComponent
                         break;
                     case 'floating': {
                         const selectedFloatingGroup =
-                            this._floatingGroupService.findByGroup(from);
+                            this._floatingGroupService?.findByGroup(from);
                         if (!selectedFloatingGroup) {
                             throw new Error(
                                 'dockview: failed to find floating group'
@@ -3278,7 +3287,7 @@ export class DockviewComponent
                 // For moves to floating locations, add as floating group
                 // Get the position/size from the target floating group
                 const targetFloatingGroup =
-                    this._floatingGroupService.findByGroup(to);
+                    this._floatingGroupService?.findByGroup(to);
                 if (targetFloatingGroup) {
                     const box = targetFloatingGroup.overlay.toJSON();
 
