@@ -6,6 +6,7 @@ import { EdgeGroupModule } from './edgeGroupService';
 import { TabGroupChipsModule } from './tabGroupChipsService';
 import { ContextMenuModule } from './contextMenu';
 import { RootDropTargetModule } from './rootDropTargetService';
+import { HeaderActionsModule } from './headerActionsService';
 
 /**
  * Internal list of all built-in modules. Registered automatically by
@@ -19,4 +20,5 @@ export const AllModules: DockviewModule<any>[] = [
     TabGroupChipsModule,
     ContextMenuModule,
     RootDropTargetModule,
+    HeaderActionsModule,
 ];

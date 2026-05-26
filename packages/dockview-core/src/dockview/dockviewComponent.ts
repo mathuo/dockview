@@ -72,6 +72,7 @@ import { IPopoutWindowHost } from './popoutWindowService';
 import { IWatermarkHost } from './watermarkService';
 import { IEdgeGroupServiceHost } from './edgeGroupService';
 import { ITabGroupChipsHost } from './tabGroupChipsService';
+import { IHeaderActionsHost } from './headerActionsService';
 import { AnchoredBox, AnchorPosition, Box } from '../types';
 import {
     DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
@@ -325,7 +326,8 @@ export class DockviewComponent
         IEdgeGroupServiceHost,
         ITabGroupChipsHost,
         IContextMenuHost,
-        IRootDropTargetHost
+        IRootDropTargetHost,
+        IHeaderActionsHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
@@ -555,6 +557,10 @@ export class DockviewComponent
         return this._moduleRegistry.services.rootDropTargetService!;
     }
 
+    get headerActionsService() {
+        return this._moduleRegistry.services.headerActionsService;
+    }
+
     isGridEmpty(): boolean {
         return this.gridview.length === 0;
     }
@@ -771,6 +777,7 @@ export class DockviewComponent
                 this._watermarkService.dispose();
                 this._tabGroupChipsService.dispose();
                 this._rootDropTargetService.dispose();
+                this.headerActionsService?.dispose();
                 this._shellManager?.dispose();
                 this._edgeGroupService.dispose();
             }),
@@ -1490,9 +1497,7 @@ export class DockviewComponent
             'createLeftHeaderActionComponent' in options ||
             'createPrefixHeaderActionComponent' in options
         ) {
-            for (const group of this.groups) {
-                group.model.updateHeaderActions();
-            }
+            this.headerActionsService?.refreshAll();
         }
 
         if ('createWatermarkComponent' in options) {
