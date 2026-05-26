@@ -59,7 +59,7 @@ export function defineModule<K extends keyof ServiceCollection, THost>(config: {
     return {
         moduleName: config.name,
         services: {
-            [config.serviceKey]: config.create as (host: THost) => unknown,
+            [config.serviceKey]: config.create,
         },
         init: config.init
             ? (host, services) =>
