@@ -547,10 +547,6 @@ export class DockviewComponent
         return this._moduleRegistry.services.edgeGroupService!;
     }
 
-    private get _contextMenuService() {
-        return this._moduleRegistry.services.contextMenuService!;
-    }
-
     private get _rootDropTargetService() {
         return this._moduleRegistry.services.rootDropTargetService!;
     }
@@ -583,10 +579,11 @@ export class DockviewComponent
 
     /**
      * @deprecated Public access retained for backward compatibility. The
-     * underlying service is now owned by ContextMenuModule.
+     * underlying service is now owned by ContextMenuModule and may be
+     * undefined if the module is not registered.
      */
-    get contextMenuController(): IContextMenuService {
-        return this._contextMenuService;
+    get contextMenuController(): IContextMenuService | undefined {
+        return this._moduleRegistry.services.contextMenuService;
     }
 
     get mountElement(): HTMLElement {

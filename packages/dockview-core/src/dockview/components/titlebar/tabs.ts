@@ -256,7 +256,7 @@ export class Tabs extends CompositeDisposable {
             },
             {
                 onChipContextMenu: (tabGroup, event) => {
-                    this.accessor.contextMenuController.showForChip(
+                    this.accessor.contextMenuController?.showForChip(
                         tabGroup,
                         this.group,
                         event
