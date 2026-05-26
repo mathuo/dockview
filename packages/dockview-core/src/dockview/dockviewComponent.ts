@@ -1581,9 +1581,7 @@ export class DockviewComponent
             'api.addEdgeGroup'
         );
         if (!service) {
-            throw new Error(
-                `dockview: EdgeGroup module is not registered`
-            );
+            throw new Error(`dockview: EdgeGroup module is not registered`);
         }
         if (service.has(position)) {
             throw new Error(
@@ -2006,10 +2004,7 @@ export class DockviewComponent
                 }
 
                 // Restore panel contents of edge groups
-                for (const [
-                    position,
-                    edgeGroup,
-                ] of edgeService.entries()) {
+                for (const [position, edgeGroup] of edgeService.entries()) {
                     const edgeData = data.edgeGroups[position];
                     const groupState = edgeData?.group as
                         | GroupPanelViewState
@@ -2091,51 +2086,49 @@ export class DockviewComponent
 
             // Queue popup group creation with delays to avoid browser blocking
             const popoutPromises = popoutService
-                ? serializedPopoutGroups.map(
-                      (serializedPopoutGroup, index) => {
-                          const { data, position, gridReferenceGroup, url } =
-                              serializedPopoutGroup;
+                ? serializedPopoutGroups.map((serializedPopoutGroup, index) => {
+                      const { data, position, gridReferenceGroup, url } =
+                          serializedPopoutGroup;
 
-                          const group = createGroupFromSerializedState(data);
+                      const group = createGroupFromSerializedState(data);
 
-                          return popoutService.scheduleRestoration(
-                              index * DESERIALIZATION_POPOUT_DELAY_MS,
-                              () => {
-                                  this.addPopoutGroup(group, {
-                                      position: position ?? undefined,
-                                      overridePopoutGroup: gridReferenceGroup
-                                          ? group
-                                          : undefined,
-                                      referenceGroup: gridReferenceGroup
-                                          ? this.getPanel(gridReferenceGroup)
-                                          : undefined,
-                                      popoutUrl: url,
-                                  });
-                              },
-                              () => {
-                                  // The group was registered in _groups synchronously
-                                  // but the timer that would parent it into the popout
-                                  // window never ran. Dispose the orphan here so the
-                                  // next clear() doesn't trip over an unparented
-                                  // element. See issue #1304.
-                                  if (
-                                      !this.isDisposed &&
-                                      this._groups.has(group.id) &&
-                                      group.element.parentElement === null
-                                  ) {
-                                      for (const panel of [...group.panels]) {
-                                          this.removePanel(panel, {
-                                              removeEmptyGroup: false,
-                                          });
-                                      }
-                                      group.dispose();
-                                      this._groups.delete(group.id);
-                                      this._onDidRemoveGroup.fire(group);
+                      return popoutService.scheduleRestoration(
+                          index * DESERIALIZATION_POPOUT_DELAY_MS,
+                          () => {
+                              this.addPopoutGroup(group, {
+                                  position: position ?? undefined,
+                                  overridePopoutGroup: gridReferenceGroup
+                                      ? group
+                                      : undefined,
+                                  referenceGroup: gridReferenceGroup
+                                      ? this.getPanel(gridReferenceGroup)
+                                      : undefined,
+                                  popoutUrl: url,
+                              });
+                          },
+                          () => {
+                              // The group was registered in _groups synchronously
+                              // but the timer that would parent it into the popout
+                              // window never ran. Dispose the orphan here so the
+                              // next clear() doesn't trip over an unparented
+                              // element. See issue #1304.
+                              if (
+                                  !this.isDisposed &&
+                                  this._groups.has(group.id) &&
+                                  group.element.parentElement === null
+                              ) {
+                                  for (const panel of [...group.panels]) {
+                                      this.removePanel(panel, {
+                                          removeEmptyGroup: false,
+                                      });
                                   }
+                                  group.dispose();
+                                  this._groups.delete(group.id);
+                                  this._onDidRemoveGroup.fire(group);
                               }
-                          );
-                      }
-                  )
+                          }
+                      );
+                  })
                 : [];
 
             popoutService?.finishRestoration(popoutPromises);
@@ -2594,7 +2587,8 @@ export class DockviewComponent
         const activePanel = this.activePanel;
 
         if (group.api.location.type === 'floating') {
-            const floatingGroup = this._floatingGroupService?.findByGroup(group);
+            const floatingGroup =
+                this._floatingGroupService?.findByGroup(group);
 
             if (floatingGroup) {
                 if (!options?.skipDispose) {
