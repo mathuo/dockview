@@ -8018,6 +8018,116 @@ describe('dockviewComponent', () => {
             });
         });
 
+        test('issue #1304: re-entrant fromJSON cancels pending popout restorations', async () => {
+            jest.useFakeTimers();
+            try {
+                const container = document.createElement('div');
+
+                const openSpy = jest.fn().mockImplementation(setupMockWindow);
+                window.open = openSpy;
+
+                const dockview = new DockviewComponent(container, {
+                    createComponent(options) {
+                        switch (options.name) {
+                            case 'default':
+                                return new PanelContentPartTest(
+                                    options.id,
+                                    options.name
+                                );
+                            default:
+                                throw new Error(`unsupported`);
+                        }
+                    },
+                });
+
+                dockview.layout(1000, 1000);
+
+                const popoutLayout = {
+                    grid: {
+                        root: {
+                            type: 'branch' as const,
+                            data: [
+                                {
+                                    type: 'leaf' as const,
+                                    data: {
+                                        views: [],
+                                        id: '1',
+                                        activeView: undefined as any,
+                                    },
+                                    visible: false,
+                                },
+                            ],
+                        },
+                        orientation: Orientation.VERTICAL,
+                        width: 1000,
+                        height: 1000,
+                    },
+                    panels: {
+                        id_0: {
+                            id: 'id_0',
+                            contentComponent: 'default',
+                        },
+                    },
+                    activeGroup: '2',
+                    popoutGroups: [
+                        {
+                            data: {
+                                views: ['id_0'],
+                                activeView: 'id_0',
+                                id: '2',
+                            },
+                            gridReferenceGroup: '1',
+                            position: {
+                                top: 500,
+                                left: 500,
+                                width: 100,
+                                height: 100,
+                            },
+                        },
+                    ],
+                };
+
+                const emptyLayout = {
+                    grid: {
+                        root: { type: 'branch' as const, data: [] },
+                        orientation: Orientation.VERTICAL,
+                        width: 1000,
+                        height: 1000,
+                    },
+                    panels: {},
+                };
+
+                expect(() => {
+                    dockview.fromJSON(popoutLayout as any);
+                    dockview.fromJSON(popoutLayout as any);
+                    dockview.fromJSON(emptyLayout as any);
+                }).not.toThrow();
+
+                // Drain any timers — none should still be in flight, but if
+                // any survive they must not call window.open or throw.
+                jest.runAllTimers();
+                await dockview.popoutRestorationPromise;
+
+                // Final layout is empty, no popouts should have opened.
+                expect(openSpy).not.toHaveBeenCalled();
+                expect(dockview.groups).toHaveLength(0);
+                expect(dockview.panels).toHaveLength(0);
+
+                // The component should still be usable — loading a fresh
+                // layout after the sequence must succeed.
+                expect(() => {
+                    dockview.fromJSON(popoutLayout as any);
+                }).not.toThrow();
+
+                jest.runAllTimers();
+                await dockview.popoutRestorationPromise;
+
+                dockview.dispose();
+            } finally {
+                jest.useRealTimers();
+            }
+        });
+
         test('dispose of dockview instance when popup is open', async () => {
             const container = document.createElement('div');
 
