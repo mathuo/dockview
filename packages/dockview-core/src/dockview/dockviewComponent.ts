@@ -538,15 +538,13 @@ export class DockviewComponent
     }
 
     private get _watermarkService() {
-        return this._moduleRegistry.services.watermarkService!;
+        // Tier 1 module — optional. Callers must `?.`-guard so the module
+        // can be removed from AllModules without crashing the component.
+        return this._moduleRegistry.services.watermarkService;
     }
 
     private get _edgeGroupService() {
         return this._moduleRegistry.services.edgeGroupService!;
-    }
-
-    private get _tabGroupChipsService() {
-        return this._moduleRegistry.services.tabGroupChipsService!;
     }
 
     private get _contextMenuService() {
@@ -764,22 +762,14 @@ export class DockviewComponent
                 this._bufferOnDidLayoutChange.fire();
             }),
             Disposable.from(() => {
-                // Service dispose() handles each module's full teardown,
-                // including the popout-restoration timer cancellation that
-                // resolves promises so callers awaiting popoutRestorationPromise
+                // Registry disposes init() subscriptions then every module
+                // service that implements IDisposable. The order matters so
+                // init handlers stop firing into services about to be torn
+                // down. Includes popout-restoration timer cancellation that
+                // resolves promises so awaiters of popoutRestorationPromise
                 // don't hang. See issue #851.
-                // Tear down module init() subscriptions first so they stop
-                // firing into services that are about to be disposed.
                 this._moduleRegistry.dispose();
-
-                this._floatingGroupService.dispose();
-                this._popoutWindowService.dispose();
-                this._watermarkService.dispose();
-                this._tabGroupChipsService.dispose();
-                this._rootDropTargetService.dispose();
-                this.headerActionsService?.dispose();
                 this._shellManager?.dispose();
-                this._edgeGroupService.dispose();
             }),
             this._rootDropTargetService.onWillShowOverlay((event) => {
                 if (this.gridview.length > 0 && event.position === 'center') {
@@ -1501,7 +1491,7 @@ export class DockviewComponent
         }
 
         if ('createWatermarkComponent' in options) {
-            this._watermarkService.refresh();
+            this._watermarkService?.refresh();
             for (const group of this.groups) {
                 group.model.refreshWatermark();
             }
@@ -2424,10 +2414,6 @@ export class DockviewComponent
             return this.options.createWatermarkComponent();
         }
         return new Watermark();
-    }
-
-    updateWatermark(): void {
-        this._watermarkService?.update();
     }
 
     addGroup(options?: AddGroupOptions): DockviewGroupPanel {

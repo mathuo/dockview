@@ -45,6 +45,41 @@ describe('ModuleRegistry', () => {
         expect(calls).toEqual(['first']);
     });
 
+    test('dispose tears down init() subscriptions before disposing services', () => {
+        const order: string[] = [];
+        const registry = new ModuleRegistry<unknown>();
+
+        registry.register({
+            moduleName: 'M',
+            services: {
+                m: () => ({
+                    dispose: () => order.push('service.dispose'),
+                }),
+            },
+            init: () => ({
+                dispose: () => order.push('init.dispose'),
+            }),
+        });
+
+        registry.initialize({});
+        registry.postConstruct({});
+        registry.dispose();
+
+        expect(order).toEqual(['init.dispose', 'service.dispose']);
+    });
+
+    test('dispose tolerates services without a dispose method', () => {
+        const registry = new ModuleRegistry<unknown>();
+
+        registry.register({
+            moduleName: 'PlainValue',
+            services: { v: () => ({ value: 42 }) },
+        });
+
+        registry.initialize({});
+        expect(() => registry.dispose()).not.toThrow();
+    });
+
     test('dependsOn is registered depth-first before the dependent', () => {
         const order: string[] = [];
         const registry = new ModuleRegistry<unknown>();

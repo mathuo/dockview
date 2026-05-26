@@ -150,9 +150,20 @@ export class ModuleRegistry<THost> implements IDisposable {
     }
 
     dispose(): void {
+        // Tear down init() subscriptions first so they stop firing into
+        // services that are about to be disposed.
         for (const disposable of this._initDisposables) {
             disposable.dispose();
         }
         this._initDisposables.length = 0;
+
+        for (const service of Object.values(this._services)) {
+            if (
+                service !== undefined &&
+                typeof (service as Partial<IDisposable>).dispose === 'function'
+            ) {
+                (service as IDisposable).dispose();
+            }
+        }
     }
 }
