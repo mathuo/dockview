@@ -1785,6 +1785,14 @@ export class DockviewComponent
         data: SerializedDockview,
         options?: { reuseExistingPanels: boolean }
     ): void {
+        // Cancel any popout-restoration timers queued by a previous fromJSON
+        // that haven't fired yet. The cancel path also disposes orphan groups
+        // registered in _groups synchronously but never parented into a popout
+        // window — otherwise the upcoming clear() would call gridview.remove()
+        // on an unparented element and throw "Invalid grid element". See
+        // issue #1304.
+        this._popoutWindowService.cancelPendingRestorations();
+
         const existingPanels = new Map<string, IDockviewPanel>();
 
         let tempGroup: DockviewGroupPanel | undefined;
@@ -2063,6 +2071,27 @@ export class DockviewComponent
                                     : undefined,
                                 popoutUrl: url,
                             });
+                        },
+                        () => {
+                            // The group was registered in _groups synchronously
+                            // but the timer that would parent it into the popout
+                            // window never ran. Dispose the orphan here so the
+                            // next clear() doesn't trip over an unparented
+                            // element. See issue #1304.
+                            if (
+                                !this.isDisposed &&
+                                this._groups.has(group.id) &&
+                                group.element.parentElement === null
+                            ) {
+                                for (const panel of [...group.panels]) {
+                                    this.removePanel(panel, {
+                                        removeEmptyGroup: false,
+                                    });
+                                }
+                                group.dispose();
+                                this._groups.delete(group.id);
+                                this._onDidRemoveGroup.fire(group);
+                            }
                         }
                     );
                 }

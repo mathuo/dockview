@@ -35,7 +35,11 @@ export interface IPopoutWindowService extends IDisposable {
     deletePopupService(groupId: string): void;
 
     readonly restorationPromise: Promise<void>;
-    scheduleRestoration(delayMs: number, work: () => void): Promise<void>;
+    scheduleRestoration(
+        delayMs: number,
+        work: () => void,
+        onCancel?: () => void
+    ): Promise<void>;
     finishRestoration(promises: Promise<void>[]): void;
     cancelPendingRestorations(): void;
 
@@ -91,11 +95,16 @@ export class PopoutWindowService implements IPopoutWindowService {
         this._popupServices.delete(groupId);
     }
 
-    scheduleRestoration(delayMs: number, work: () => void): Promise<void> {
+    scheduleRestoration(
+        delayMs: number,
+        work: () => void,
+        onCancel?: () => void
+    ): Promise<void> {
         return new Promise<void>((resolve) => {
             const cleanup = () => {
                 this._restorationCleanups.delete(cleanup);
                 clearTimeout(handle);
+                onCancel?.();
                 resolve();
             };
             const handle = setTimeout(() => {
