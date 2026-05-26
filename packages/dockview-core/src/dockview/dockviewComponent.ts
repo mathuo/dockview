@@ -544,7 +544,7 @@ export class DockviewComponent
     }
 
     private get _edgeGroupService() {
-        return this._moduleRegistry.services.edgeGroupService!;
+        return this._moduleRegistry.services.edgeGroupService;
     }
 
     private get _rootDropTargetService() {
@@ -1575,7 +1575,17 @@ export class DockviewComponent
         position: EdgeGroupPosition,
         options: EdgeGroupOptions
     ): DockviewGroupPanelApi {
-        if (this._edgeGroupService.has(position)) {
+        const service = assertModule(
+            this._edgeGroupService,
+            'EdgeGroup',
+            'api.addEdgeGroup'
+        );
+        if (!service) {
+            throw new Error(
+                `dockview: EdgeGroup module is not registered`
+            );
+        }
+        if (service.has(position)) {
             throw new Error(
                 `dockview: edge group already exists at position '${position}'`
             );
@@ -1592,7 +1602,7 @@ export class DockviewComponent
             }
         });
 
-        this._edgeGroupService.add(position, group, autoCollapseDisposable);
+        service.add(position, group, autoCollapseDisposable);
         this._onDidAddGroup.fire(group);
 
         this._shellManager!.addEdgeView(
@@ -1607,7 +1617,7 @@ export class DockviewComponent
     getEdgeGroup(
         position: EdgeGroupPosition
     ): DockviewGroupPanelApi | undefined {
-        return this._edgeGroupService.get(position)?.api;
+        return this._edgeGroupService?.get(position)?.api;
     }
 
     setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void {
@@ -1619,7 +1629,15 @@ export class DockviewComponent
     }
 
     removeEdgeGroup(position: EdgeGroupPosition): void {
-        const group = this._edgeGroupService.get(position);
+        const service = assertModule(
+            this._edgeGroupService,
+            'EdgeGroup',
+            'api.removeEdgeGroup'
+        );
+        if (!service) {
+            return;
+        }
+        const group = service.get(position);
         if (!group) {
             throw new Error(
                 `dockview: no edge group exists at position '${position}'`
@@ -1638,14 +1656,14 @@ export class DockviewComponent
         this._shellManager!.removeEdgeView(position);
 
         // Clean up service-tracked state + group itself
-        this._edgeGroupService.remove(position);
+        service.remove(position);
         group.dispose();
         this._groups.delete(group.id);
         this._onDidRemoveGroup.fire(group);
     }
 
     setEdgeGroupCollapsed(group: DockviewGroupPanel, collapsed: boolean): void {
-        const position = this._edgeGroupService.findPositionOf(group);
+        const position = this._edgeGroupService?.findPositionOf(group);
         if (!position) {
             return;
         }
@@ -1660,7 +1678,7 @@ export class DockviewComponent
     }
 
     isEdgeGroupCollapsed(group: DockviewGroupPanel): boolean {
-        const position = this._edgeGroupService.findPositionOf(group);
+        const position = this._edgeGroupService?.findPositionOf(group);
         return position
             ? this._shellManager!.isEdgeGroupCollapsed(position)
             : false;
@@ -1767,11 +1785,12 @@ export class DockviewComponent
             result.popoutGroups = popoutGroups;
         }
 
-        if (this._edgeGroupService.hasAny()) {
+        const edgeEntries = this._edgeGroupService?.entries() ?? [];
+        if (this._edgeGroupService?.hasAny()) {
             const shellSerialized = this._shellManager!.toJSON();
 
             // Augment each entry with the serialized group state
-            for (const [position, group] of this._edgeGroupService.entries()) {
+            for (const [position, group] of edgeEntries) {
                 const entry = shellSerialized[position];
                 if (entry) {
                     entry.group = group.toJSON();
@@ -1958,7 +1977,15 @@ export class DockviewComponent
 
             this._layoutFromShell(width, height);
 
-            if (data.edgeGroups) {
+            const edgeService = data.edgeGroups
+                ? assertModule(
+                      this._edgeGroupService,
+                      'EdgeGroup',
+                      'fromJSON edge restoration'
+                  )
+                : this._edgeGroupService;
+
+            if (data.edgeGroups && edgeService) {
                 // Auto-create edge groups for positions in the serialized state
                 // that don't already have a group registered (e.g. when fromJSON
                 // is called before the user has called addEdgeGroup).
@@ -1969,7 +1996,7 @@ export class DockviewComponent
                     'right',
                 ] as EdgeGroupPosition[]) {
                     const fixedData = data.edgeGroups[_position];
-                    if (fixedData && !this._edgeGroupService.has(_position)) {
+                    if (fixedData && !edgeService.has(_position)) {
                         const groupState = fixedData.group as
                             | GroupPanelViewState
                             | undefined;
@@ -1982,7 +2009,7 @@ export class DockviewComponent
                 for (const [
                     position,
                     edgeGroup,
-                ] of this._edgeGroupService.entries()) {
+                ] of edgeService.entries()) {
                     const edgeData = data.edgeGroups[position];
                     const groupState = edgeData?.group as
                         | GroupPanelViewState
@@ -2174,7 +2201,7 @@ export class DockviewComponent
         const hasActiveGroup = !!this.activeGroup;
 
         for (const group of groups) {
-            if (this._edgeGroupService.includes(group)) {
+            if (this._edgeGroupService?.includes(group)) {
                 // Edge groups are structural - only clear their panels, not the group itself
                 const panels = [...group.panels];
                 for (const panel of panels) {
@@ -2549,7 +2576,7 @@ export class DockviewComponent
             | undefined
     ): DockviewGroupPanel {
         // Edge groups are permanent structural elements - never remove them from the layout
-        if (this._edgeGroupService.includes(group)) {
+        if (this._edgeGroupService?.includes(group)) {
             return group;
         }
 
