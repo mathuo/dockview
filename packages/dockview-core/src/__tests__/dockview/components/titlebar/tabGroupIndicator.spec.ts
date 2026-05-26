@@ -21,6 +21,7 @@ function createContext(
         getTabMap: () => new Map(),
         getChipElement: () => undefined,
         getDirection: () => 'horizontal',
+        getHeaderPosition: () => 'top',
         getColorPalette: () => palette,
         ...overrides,
     };

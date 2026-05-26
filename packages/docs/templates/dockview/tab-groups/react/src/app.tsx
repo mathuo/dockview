@@ -6,6 +6,7 @@ import {
     GetTabContextMenuItemsParams,
     GetTabGroupChipContextMenuItemsParams,
     themeAbyss,
+    DockviewHeaderPosition,
 } from 'dockview-react';
 import React from 'react';
 import {
@@ -27,6 +28,18 @@ const components = {
 
 export default () => {
     const [api, setApi] = React.useState<DockviewApi>();
+    const [headerPosition, setHeaderPosition] =
+        React.useState<DockviewHeaderPosition>('top');
+
+    const onHeaderPositionChange = (
+        position: DockviewHeaderPosition
+    ) => {
+        setHeaderPosition(position);
+        if (!api) return;
+        for (const group of api.groups) {
+            group.api.setHeaderPosition(position);
+        }
+    };
 
     const onReady = (event: DockviewReadyEvent) => {
         setApi(event.api);
@@ -154,18 +167,35 @@ export default () => {
     );
 
     return (
-        <div style={{ width: '100%', height: '100%' }}>
-            <DockviewReact
-                className={'dockview-theme-abyss'}
-                onReady={onReady}
-                components={components}
-                theme={{ ...themeAbyss, tabAnimation: 'smooth' }}
-                disableFloatingGroups={true}
-                getTabContextMenuItems={getTabContextMenuItems}
-                getTabGroupChipContextMenuItems={
-                    getTabGroupChipContextMenuItems
-                }
-            />
+        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 8px' }}>
+                <span style={{ fontSize: '12px', color: 'var(--dv-paneview-header-border-color, #888)' }}>Tab position:</span>
+                {(
+                    ['top', 'bottom', 'left', 'right'] as DockviewHeaderPosition[]
+                ).map((pos) => (
+                    <button
+                        key={pos}
+                        onClick={() => onHeaderPositionChange(pos)}
+                        disabled={headerPosition === pos}
+                    >
+                        {pos}
+                    </button>
+                ))}
+            </div>
+            <div style={{ flex: 1, minHeight: 0 }}>
+                <DockviewReact
+                    className={'dockview-theme-abyss'}
+                    onReady={onReady}
+                    components={components}
+                    theme={{ ...themeAbyss, tabAnimation: 'smooth', tabGroupIndicator: 'wrap' }}
+                    disableFloatingGroups={true}
+                    getTabContextMenuItems={getTabContextMenuItems}
+                    getTabGroupChipContextMenuItems={
+                        getTabGroupChipContextMenuItems
+                    }
+                />
+            </div>
         </div>
     );
 };
+
