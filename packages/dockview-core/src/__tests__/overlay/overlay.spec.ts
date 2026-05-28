@@ -713,4 +713,152 @@ describe('overlay', () => {
             overlay.dispose();
         });
     });
+
+    describe('header', () => {
+        test('inserts the header above the content and flags the container', () => {
+            const container = document.createElement('div');
+            const content = document.createElement('div');
+            const header = document.createElement('div');
+            header.className = 'dv-floating-titlebar';
+
+            document.body.appendChild(container);
+
+            const overlay = new Overlay({
+                height: 200,
+                width: 100,
+                left: 10,
+                top: 20,
+                minimumInViewportWidth: 0,
+                minimumInViewportHeight: 0,
+                container,
+                content,
+                header,
+            });
+
+            expect(
+                overlay.element.classList.contains(
+                    'dv-resize-container-with-titlebar'
+                )
+            ).toBeTruthy();
+
+            // header is rendered before the content
+            const children = Array.from(overlay.element.children);
+            expect(children.indexOf(header)).toBeLessThan(
+                children.indexOf(content)
+            );
+
+            overlay.dispose();
+        });
+
+        test('headerHeight reflects the header element, 0 when absent', () => {
+            const container = document.createElement('div');
+            const content = document.createElement('div');
+            const header = document.createElement('div');
+
+            Object.defineProperty(header, 'offsetHeight', {
+                configurable: true,
+                value: 22,
+            });
+
+            document.body.appendChild(container);
+
+            const withHeader = new Overlay({
+                height: 200,
+                width: 100,
+                left: 10,
+                top: 20,
+                minimumInViewportWidth: 0,
+                minimumInViewportHeight: 0,
+                container,
+                content,
+                header,
+            });
+            expect(withHeader.headerHeight).toBe(22);
+            withHeader.dispose();
+
+            const withoutHeader = new Overlay({
+                height: 200,
+                width: 100,
+                left: 10,
+                top: 20,
+                minimumInViewportWidth: 0,
+                minimumInViewportHeight: 0,
+                container,
+                content: document.createElement('div'),
+            });
+            expect(withoutHeader.headerHeight).toBe(0);
+            withoutHeader.dispose();
+        });
+
+        test('setupDrag on the header moves the overlay', () => {
+            const container = document.createElement('div');
+            const content = document.createElement('div');
+            const header = document.createElement('div');
+
+            document.body.appendChild(container);
+
+            const overlay = new Overlay({
+                height: 50,
+                width: 50,
+                left: 10,
+                top: 10,
+                minimumInViewportWidth: 0,
+                minimumInViewportHeight: 0,
+                container,
+                content,
+                header,
+            });
+
+            jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
+                () =>
+                    mockGetBoundingClientRect({
+                        left: 0,
+                        top: 0,
+                        width: 100,
+                        height: 100,
+                    })
+            );
+            jest.spyOn(
+                overlay.element,
+                'getBoundingClientRect'
+            ).mockImplementation(() =>
+                mockGetBoundingClientRect({
+                    left: 10,
+                    top: 10,
+                    width: 50,
+                    height: 50,
+                })
+            );
+
+            overlay.setupDrag(header);
+
+            const down = new MouseEvent('pointerdown', {
+                clientX: 20,
+                clientY: 20,
+                bubbles: true,
+            }) as any;
+            down.pointerId = 1;
+            header.dispatchEvent(down);
+
+            const move = new MouseEvent('pointermove', {
+                clientX: 40,
+                clientY: 40,
+                bubbles: true,
+            }) as any;
+            move.pointerId = 1;
+            window.dispatchEvent(move);
+
+            expect(
+                overlay.element.classList.contains(
+                    'dv-resize-container-dragging'
+                )
+            ).toBeTruthy();
+
+            const up = new MouseEvent('pointerup', { bubbles: true }) as any;
+            up.pointerId = 1;
+            window.dispatchEvent(up);
+
+            overlay.dispose();
+        });
+    });
 });

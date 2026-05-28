@@ -82,10 +82,26 @@ export class Overlay extends CompositeDisposable {
         return this._isVisible;
     }
 
+    /**
+     * Height of the optional drag-handle header, or 0 when none is present.
+     * Used to translate between the overlay's outer box and the content area
+     * available to the group beneath the header.
+     */
+    get headerHeight(): number {
+        return this.options.header?.offsetHeight ?? 0;
+    }
+
     constructor(
         private readonly options: AnchoredBox & {
             container: HTMLElement;
             content: HTMLElement;
+            /**
+             * Optional dedicated drag handle rendered above the content (a
+             * floating window title bar). When provided the resize container
+             * lays its children out as a flex column so the content shrinks
+             * to fit beneath the handle.
+             */
+            header?: HTMLElement;
             minimumInViewportWidth?: number;
             minimumInViewportHeight?: number;
         }
@@ -110,6 +126,15 @@ export class Overlay extends CompositeDisposable {
         this.setupResize('topright');
         this.setupResize('bottomleft');
         this.setupResize('bottomright');
+
+        if (this.options.header) {
+            toggleClass(
+                this._element,
+                'dv-resize-container-with-titlebar',
+                true
+            );
+            this._element.appendChild(this.options.header);
+        }
 
         this._element.appendChild(this.options.content);
         this.options.container.appendChild(this._element);

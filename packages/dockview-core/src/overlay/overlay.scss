@@ -34,6 +34,40 @@
     }
 }
 
+// When a dedicated drag-handle title bar is present the overlay stacks the
+// handle above the group as a flex column so the group shrinks to fit beneath
+// it. Resize handles are position:absolute and stay out of the flex flow.
+.dv-resize-container-with-titlebar {
+    display: flex;
+    flex-direction: column;
+
+    > .dv-floating-titlebar {
+        flex: 0 0 auto;
+    }
+
+    > .dv-groupview {
+        height: auto;
+        flex: 1 1 0;
+        min-height: 0;
+    }
+}
+
+.dv-floating-titlebar {
+    box-sizing: border-box;
+    flex-shrink: 0;
+    height: var(--dv-floating-titlebar-height, 22px);
+    background-color: var(--dv-floating-titlebar-background-color);
+    border-bottom: var(--dv-floating-titlebar-border-bottom, none);
+    user-select: none;
+    // Without touch-action: none, mobile browsers interpret a drag on the bar
+    // as a scroll/zoom and fire pointercancel, losing the move gesture.
+    touch-action: none;
+
+    &.dv-draggable {
+        cursor: grab;
+    }
+}
+
 .dv-resize-container {
     --dv-overlay-z-index: var(--dv-overlay-z-index, 999);
 

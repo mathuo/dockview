@@ -33,6 +33,14 @@
     --dv-drag-over-border: none;
     --dv-floating-group-dragging-opacity: 0.5;
 
+    // Dedicated floating-group drag handle ("title bar"). The bar itself is
+    // contentless; these variables control its appearance.
+    --dv-floating-titlebar-height: 22px;
+    --dv-floating-titlebar-background-color: var(
+        --dv-tabs-and-actions-container-background-color
+    );
+    --dv-floating-titlebar-border-bottom: var(--dv-floating-border);
+
     // Tab group color palette
     --dv-tab-group-color-grey: #5f6368;
     --dv-tab-group-color-blue: #1a73e8;
@@ -220,7 +228,6 @@
     --dv-paneview-header-border-color: var(--dv-color-abyss-lighter);
 
     --dv-paneview-active-outline-color: #596f99;
-
 }
 
 @mixin dockview-theme-dracula-mixin {
