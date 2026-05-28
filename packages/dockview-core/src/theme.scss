@@ -23,7 +23,7 @@
     --dv-active-sash-transition-duration: 0.1s;
     --dv-active-sash-transition-delay: 0.5s;
 
-    // spacing variables — overridden by dockview-design-space-mixin / .dockview-spaced
+    // spacing variables - overridden by dockview-design-space-mixin / .dockview-spaced
     --dv-spacing-padding: 0px;
     --dv-tab-border-radius: 0px;
     --dv-sash-border-radius: 0px;
@@ -1113,7 +1113,7 @@
     }
 }
 
-// Tab group indicator 'none' mode — uses a JS-positioned continuous bar
+// Tab group indicator 'none' mode - uses a JS-positioned continuous bar
 // (NoneTabGroupIndicator) instead of per-tab box-shadows, so the indicator
 // spans the full tab group width without gaps in spaced themes.
 // The flat bar always sits at the bottom (or left for vertical) edge of
