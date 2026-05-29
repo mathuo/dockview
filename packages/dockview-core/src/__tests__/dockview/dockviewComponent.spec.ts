@@ -6075,6 +6075,69 @@ describe('dockviewComponent', () => {
                 expect(json.floatingGroups![0].grid).toBeUndefined();
             });
 
+            test('a group can be split into a popout window', async () => {
+                window.open = () => setupMockWindow();
+                const dockview = make();
+                dockview.layout(1000, 500);
+
+                const panel1 = dockview.addPanel({
+                    id: 'panel_1',
+                    component: 'default',
+                });
+                const panel2 = dockview.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    position: { referencePanel: 'panel_1', direction: 'right' },
+                });
+
+                await dockview.addPopoutGroup(panel1.api.group);
+                expect(panel1.api.location.type).toBe('popout');
+
+                // drag panel2's group onto the right edge of the popout group
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel2.group.id },
+                    to: { group: panel1.group, position: 'right' },
+                });
+
+                expect(panel2.api.location.type).toBe('popout');
+                expect(dockview.getGridviewForGroup(panel1.group)).toBe(
+                    dockview.getGridviewForGroup(panel2.group)
+                );
+                expect(dockview.getGridviewForGroup(panel1.group)).not.toBe(
+                    (dockview as any).gridview
+                );
+
+                dockview.dispose();
+            });
+
+            test('a multi-group popout window serializes with a nested grid', async () => {
+                window.open = () => setupMockWindow();
+                const dockview = make();
+                dockview.layout(1000, 500);
+
+                const panel1 = dockview.addPanel({
+                    id: 'panel_1',
+                    component: 'default',
+                });
+                const panel2 = dockview.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    position: { referencePanel: 'panel_1', direction: 'right' },
+                });
+
+                await dockview.addPopoutGroup(panel1.api.group);
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel2.group.id },
+                    to: { group: panel1.group, position: 'right' },
+                });
+
+                const json = dockview.toJSON();
+                expect(json.popoutGroups![0].grid).toBeDefined();
+                expect(json.popoutGroups![0].data).toBeUndefined();
+
+                dockview.dispose();
+            });
+
             test('multi-group floating window round-trips through toJSON/fromJSON', () => {
                 const dockview = make();
                 dockview.layout(1000, 500);

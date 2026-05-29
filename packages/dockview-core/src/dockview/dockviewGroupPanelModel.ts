@@ -466,7 +466,9 @@ export class DockviewGroupPanelModel
 
                 break;
             case 'popout':
-                applyZones(['center']);
+                // Popout windows host their own nested gridview, so an edge
+                // drop splits the window's layout just like the main grid.
+                applyZones(['top', 'bottom', 'left', 'right', 'center']);
 
                 toggleClass(this.container, 'dv-groupview-popout', true);
 

@@ -5,12 +5,28 @@ import { PopoutWindow } from '../popoutWindow';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { SerializedPopoutGroup } from './dockviewComponent';
 import { GroupPanelViewState } from './dockviewGroupPanelModel';
+import { Gridview, ISerializedLeafNode } from '../gridview/gridview';
+import { OverlayRenderContainer } from '../overlay/overlayRenderContainer';
+import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import { defineModule } from './modules';
 
 export interface PopoutGroupEntry {
     window: PopoutWindow;
     popoutGroup: DockviewGroupPanel;
     referenceGroup?: string;
+    /**
+     * The popout window hosts its own gridview so it can hold a nested
+     * splitview layout of groups. `popoutGroup` is the window's anchor group.
+     */
+    gridview: Gridview;
+    /**
+     * Render / drop-target containers and window accessor for this popout, so
+     * groups relocated into the window can be wired to its own document.
+     */
+    overlayRenderContainer: OverlayRenderContainer;
+    dropTargetContainer: DropTargetAnchorContainer;
+    getWindow: () => Window;
+    popoutUrl?: string;
     disposable: { dispose: () => DockviewGroupPanel | undefined };
 }
 
@@ -75,7 +91,13 @@ export class PopoutWindowService implements IPopoutWindowService {
     }
 
     findByGroup(group: DockviewGroupPanel): PopoutGroupEntry | undefined {
-        return this._entries.find((entry) => entry.popoutGroup === group);
+        // A popout window may host several groups in a nested gridview, so
+        // match by membership (DOM containment) rather than only the anchor.
+        return this._entries.find(
+            (entry) =>
+                entry.popoutGroup === group ||
+                entry.gridview.element.contains(group.element)
+        );
     }
 
     findReferenceGroupId(group: DockviewGroupPanel): string | undefined {
@@ -137,15 +159,37 @@ export class PopoutWindowService implements IPopoutWindowService {
     }
 
     serialize(): SerializedPopoutGroup[] {
-        return this._entries.map((entry) => ({
-            data: entry.popoutGroup.toJSON() as GroupPanelViewState,
-            gridReferenceGroup: entry.referenceGroup,
-            position: entry.window.dimensions(),
-            url:
+        return this._entries.map((entry) => {
+            const grid = entry.gridview.serialize();
+            const root = grid.root;
+            const url =
                 entry.popoutGroup.api.location.type === 'popout'
                     ? entry.popoutGroup.api.location.popoutUrl
-                    : undefined,
-        }));
+                    : undefined;
+
+            const base = {
+                gridReferenceGroup: entry.referenceGroup,
+                position: entry.window.dimensions(),
+                url,
+            };
+
+            // Single-group window keeps the legacy `data` shape so layouts
+            // round-trip byte-stably and older readers keep working.
+            if (
+                root.type === 'branch' &&
+                root.data.length === 1 &&
+                root.data[0].type === 'leaf'
+            ) {
+                return {
+                    ...base,
+                    data: (
+                        root.data[0] as ISerializedLeafNode<GroupPanelViewState>
+                    ).data,
+                };
+            }
+
+            return { ...base, grid };
+        });
     }
 
     disposeAll(): void {
