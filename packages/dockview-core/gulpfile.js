@@ -5,7 +5,7 @@ const concat = require('gulp-concat');
 gulp.task('sass', () => {
     return gulp
         .src('./src/**/*.scss')
-        .pipe(gulpSass().on('error', gulpSass.logError))
+        .pipe(gulpSass({ charset: false }).on('error', gulpSass.logError))
         .pipe(concat('dockview.css'))
         .pipe(gulp.dest('./dist/styles/'));
 });

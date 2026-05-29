@@ -22,7 +22,7 @@
      * Empty space between tabs (and the scrollbar lane) keeps pan-x so a
      * flick on those areas produces native momentum scroll. The tab and
      * chip elements themselves opt out (`touch-action: none`) so the
-     * pointer drag source owns the gesture from pointerdown — a flick on
+     * pointer drag source owns the gesture from pointerdown - a flick on
      * a tab or chip always becomes a drag, regardless of direction.
      */
     touch-action: pan-x;
@@ -240,7 +240,7 @@
     }
 }
 
-// Tab group underline — positioned by CSS, sized and drawn by JS via SVG
+// Tab group underline - positioned by CSS, sized and drawn by JS via SVG
 .dv-tab-group-underline {
     position: absolute;
     bottom: 0;
@@ -294,7 +294,7 @@
             // height (not width) must be zeroed to remove the tab from flow.
             height: 0 !important;
             min-height: 0 !important;
-            // Cancel the base rule's width: 0 — collapsing width in vertical
+            // Cancel the base rule's width: 0 - collapsing width in vertical
             // mode causes the dragging tab to animate on the x-axis, which is
             // wrong. Width should stay at its natural (auto) value.
             width: auto !important;
