@@ -458,12 +458,9 @@ export class DockviewGroupPanelModel
                 applyZones(['top', 'bottom', 'left', 'right', 'center']);
                 break;
             case 'floating':
-                applyZones(['center']);
-                applyZones(
-                    value
-                        ? ['center']
-                        : ['top', 'bottom', 'left', 'right', 'center']
-                );
+                // Floating windows host their own nested gridview, so an edge
+                // drop splits the window's layout just like the main grid.
+                applyZones(['top', 'bottom', 'left', 'right', 'center']);
 
                 toggleClass(this.container, 'dv-groupview-floating', true);
 

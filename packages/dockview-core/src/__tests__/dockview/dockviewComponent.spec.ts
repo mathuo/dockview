@@ -5896,6 +5896,232 @@ describe('dockviewComponent', () => {
             expect(dockview.panels.length).toBe(3);
         });
 
+        describe('nested floating layout (multi-root)', () => {
+            const make = () =>
+                new DockviewComponent(document.createElement('div'), {
+                    createComponent(options) {
+                        switch (options.name) {
+                            case 'default':
+                                return new PanelContentPartTest(
+                                    options.id,
+                                    options.name
+                                );
+                            default:
+                                throw new Error(`unsupported`);
+                        }
+                    },
+                });
+
+            test('whole-group move splits a floating window rather than spawning a new one', () => {
+                const dockview = make();
+                dockview.layout(1000, 500);
+
+                const panel1 = dockview.addPanel({
+                    id: 'panel_1',
+                    component: 'default',
+                });
+                const panel2 = dockview.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    floating: true,
+                });
+
+                expect(dockview.floatingGroups.length).toBe(1);
+
+                // drag the whole grid group to the right of the floating group
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel1.group.id },
+                    to: { group: panel2.group, position: 'right' },
+                });
+
+                // still a single floating window, now hosting both groups
+                expect(dockview.floatingGroups.length).toBe(1);
+                expect(panel1.group.api.location.type).toBe('floating');
+                expect(panel2.group.api.location.type).toBe('floating');
+                expect(dockview.getGridviewForGroup(panel1.group)).toBe(
+                    dockview.getGridviewForGroup(panel2.group)
+                );
+                expect(dockview.getGridviewForGroup(panel1.group)).not.toBe(
+                    (dockview as any).gridview
+                );
+            });
+
+            test('panel split into a floating window creates a new group inside it', () => {
+                const dockview = make();
+                dockview.layout(1000, 500);
+
+                const panel1a = dockview.addPanel({
+                    id: 'panel_1a',
+                    component: 'default',
+                });
+                dockview.addPanel({
+                    id: 'panel_1b',
+                    component: 'default',
+                    position: { referencePanel: 'panel_1a' },
+                });
+                const panel2 = dockview.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    floating: true,
+                });
+
+                // split one panel out of the 2-panel grid group into the float
+                dockview.moveGroupOrPanel({
+                    from: {
+                        groupId: panel1a.group.id,
+                        panelId: 'panel_1b',
+                    },
+                    to: { group: panel2.group, position: 'bottom' },
+                });
+
+                const movedPanel = dockview.panels.find(
+                    (p) => p.id === 'panel_1b'
+                )!;
+                expect(movedPanel.group.api.location.type).toBe('floating');
+                expect(dockview.getGridviewForGroup(movedPanel.group)).toBe(
+                    dockview.getGridviewForGroup(panel2.group)
+                );
+                expect(dockview.floatingGroups.length).toBe(1);
+            });
+
+            test('moving a group out of a multi-group window keeps the window alive', () => {
+                const dockview = make();
+                dockview.layout(1000, 500);
+
+                const panel1 = dockview.addPanel({
+                    id: 'panel_1',
+                    component: 'default',
+                });
+                const panel2 = dockview.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    floating: true,
+                });
+                const panel3 = dockview.addPanel({
+                    id: 'panel_3',
+                    component: 'default',
+                    position: { referencePanel: 'panel_1', direction: 'right' },
+                });
+
+                // build a 2-group floating window: split panel3's group in
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel3.group.id },
+                    to: { group: panel2.group, position: 'right' },
+                });
+                expect(dockview.floatingGroups.length).toBe(1);
+                expect(dockview.getGridviewForGroup(panel3.group)).toBe(
+                    dockview.getGridviewForGroup(panel2.group)
+                );
+
+                // now move panel3's group back to the main grid (beside panel1)
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel3.group.id },
+                    to: { group: panel1.group, position: 'right' },
+                });
+
+                expect(panel3.group.api.location.type).toBe('grid');
+                expect(panel2.group.api.location.type).toBe('floating');
+                // the window survived because panel2's group still lives in it
+                expect(dockview.floatingGroups.length).toBe(1);
+            });
+
+            test('floating-to-floating move merges windows (source window closes)', () => {
+                const dockview = make();
+                dockview.layout(1000, 500);
+
+                dockview.addPanel({ id: 'panel_1', component: 'default' });
+                const panel2 = dockview.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    floating: true,
+                });
+                const panel3 = dockview.addPanel({
+                    id: 'panel_3',
+                    component: 'default',
+                    floating: true,
+                });
+
+                expect(dockview.floatingGroups.length).toBe(2);
+
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel3.group.id },
+                    to: { group: panel2.group, position: 'bottom' },
+                });
+
+                // panel3's single-group window closed; both groups now share
+                // panel2's window
+                expect(dockview.floatingGroups.length).toBe(1);
+                expect(panel2.group.api.location.type).toBe('floating');
+                expect(panel3.group.api.location.type).toBe('floating');
+                expect(dockview.getGridviewForGroup(panel3.group)).toBe(
+                    dockview.getGridviewForGroup(panel2.group)
+                );
+            });
+
+            test('single-group floating window serializes in the legacy shape', () => {
+                const dockview = make();
+                dockview.layout(1000, 500);
+
+                dockview.addPanel({ id: 'panel_1', component: 'default' });
+                dockview.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    floating: true,
+                });
+
+                const json = dockview.toJSON();
+                expect(json.floatingGroups?.length).toBe(1);
+                expect(json.floatingGroups![0].data).toBeDefined();
+                expect(json.floatingGroups![0].grid).toBeUndefined();
+            });
+
+            test('multi-group floating window round-trips through toJSON/fromJSON', () => {
+                const dockview = make();
+                dockview.layout(1000, 500);
+
+                dockview.addPanel({ id: 'panel_1', component: 'default' });
+                const panel2 = dockview.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    floating: true,
+                });
+                const panel3 = dockview.addPanel({
+                    id: 'panel_3',
+                    component: 'default',
+                    position: { referencePanel: 'panel_1', direction: 'right' },
+                });
+
+                // split panel3's group into the floating window
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel3.group.id },
+                    to: { group: panel2.group, position: 'right' },
+                });
+                expect(dockview.floatingGroups.length).toBe(1);
+
+                const json = dockview.toJSON();
+                // a multi-group window serializes as a nested grid
+                expect(json.floatingGroups![0].grid).toBeDefined();
+                expect(json.floatingGroups![0].data).toBeUndefined();
+
+                const restored = make();
+                restored.layout(1000, 500);
+                restored.fromJSON(json);
+
+                expect(restored.panels.length).toBe(3);
+                expect(restored.floatingGroups.length).toBe(1);
+                const floatingGroups = restored.groups.filter(
+                    (g) => g.api.location.type === 'floating'
+                );
+                expect(floatingGroups.length).toBe(2);
+                expect(restored.getGridviewForGroup(floatingGroups[0])).toBe(
+                    restored.getGridviewForGroup(floatingGroups[1])
+                );
+                expect(
+                    restored.getGridviewForGroup(floatingGroups[0])
+                ).not.toBe((restored as any).gridview);
+            });
+        });
+
         test('move a floating group of many tabs to a new fixed group', () => {
             const container = document.createElement('div');
 

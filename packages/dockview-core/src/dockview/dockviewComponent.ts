@@ -4,6 +4,8 @@ import {
     getGridLocation,
     ISerializedLeafNode,
     orthogonal,
+    Gridview,
+    SerializedGridview,
 } from '../gridview/gridview';
 import { directionToPosition, Position } from '../dnd/droptarget';
 import { tail, sequenceEquals } from '../array';
@@ -35,7 +37,7 @@ import {
     toTarget,
 } from '../gridview/baseComponentGridview';
 import { DockviewApi } from '../api/component.api';
-import { Orientation } from '../splitview/splitview';
+import { Orientation, Sizing } from '../splitview/splitview';
 import {
     GroupOptions,
     GroupPanelViewState,
@@ -156,7 +158,16 @@ export interface PanelReference {
 }
 
 export interface SerializedFloatingGroup {
-    data: GroupPanelViewState;
+    /**
+     * Legacy single-group form. Still written when a floating window hosts a
+     * single group (for stable round-trips) and always accepted on read.
+     */
+    data?: GroupPanelViewState;
+    /**
+     * Nested layout of the floating window. Written when the window hosts more
+     * than one group; mutually exclusive with `data`.
+     */
+    grid?: SerializedGridview<GroupPanelViewState>;
     position: AnchoredBox;
 }
 
@@ -1393,22 +1404,81 @@ export class DockviewComponent
 
         const anchoredBox = getAnchoredBox();
 
+        // The floating window hosts its own gridview so it can grow into a
+        // nested splitview layout. The window starts with the single anchor
+        // group; further groups are added via drag-and-drop.
+        const floatingGridview = this.createFloatingGridview();
+        floatingGridview.addView(group, Sizing.Distribute, [0]);
+
+        this.mountFloatingWindow(
+            floatingGridview,
+            group,
+            [group],
+            anchoredBox,
+            {
+                dragHandle: options?.dragHandle,
+                inDragMode: options?.inDragMode,
+                skipActiveGroup: options?.skipActiveGroup,
+            }
+        );
+    }
+
+    /** Build an empty gridview configured to match the main grid's styling. */
+    private createFloatingGridview(
+        orientation: Orientation = Orientation.HORIZONTAL
+    ): Gridview {
+        return new Gridview(
+            true,
+            this.options.hideBorders
+                ? { separatorBorder: 'transparent' }
+                : undefined,
+            orientation,
+            false,
+            this.options.theme?.gap ?? 0
+        );
+    }
+
+    /**
+     * Wrap a (populated) floating gridview in an overlay window: title bar /
+     * move handle, drag wiring, the floating-group service entry and the
+     * `floating` location tag for every member group.
+     */
+    private mountFloatingWindow(
+        floatingGridview: Gridview,
+        anchorGroup: DockviewGroupPanel,
+        members: DockviewGroupPanel[],
+        anchoredBox: AnchoredBox,
+        options?: {
+            dragHandle?: 'titlebar' | 'tabbar';
+            inDragMode?: boolean;
+            skipActiveGroup?: boolean;
+        }
+    ): void {
+        const service = assertModule(
+            this._floatingGroupService,
+            'FloatingGroup',
+            'api.addFloatingGroup'
+        );
+        if (!service) {
+            return;
+        }
+
         const dragHandleMode =
             options?.dragHandle ??
             this.options.floatingGroupDragHandle ??
             'titlebar';
 
-        // `'titlebar'` renders a dedicated grab bar above the group's tab bar
-        // and uses it as the move handle; `'tabbar'` falls back to the legacy
-        // behaviour of moving via the tab-bar void container.
+        // `'titlebar'` renders a dedicated grab bar above the tab bar and uses
+        // it as the move handle; `'tabbar'` falls back to moving via the
+        // tab-bar void container.
         const titleBar =
             dragHandleMode === 'titlebar'
-                ? new FloatingTitleBar(this, group)
+                ? new FloatingTitleBar(this, anchorGroup)
                 : undefined;
 
         const overlay = new Overlay({
             container: this._floatingOverlayHost ?? this.gridview.element,
-            content: group.element,
+            content: floatingGridview.element,
             header: titleBar?.element,
             ...anchoredBox,
             minimumInViewportWidth:
@@ -1427,7 +1497,7 @@ export class DockviewComponent
 
         const dragHandle =
             titleBar?.element ??
-            group.element.querySelector('.dv-void-container');
+            anchorGroup.element.querySelector('.dv-void-container');
 
         if (!dragHandle) {
             throw new Error('dockview: failed to find drag handle');
@@ -1440,10 +1510,14 @@ export class DockviewComponent
                     : false,
         });
 
-        const floatingGroupPanel = service.add(group, overlay);
+        const floatingGroupPanel = service.add(
+            anchorGroup,
+            overlay,
+            floatingGridview
+        );
 
         if (titleBar) {
-            // Tie the title bar's lifetime to the floating group and surface
+            // Tie the title bar's lifetime to the floating window and surface
             // its redock drag through the same public `onWillDragGroup` event
             // the tab-bar handle uses.
             floatingGroupPanel.addDisposables(
@@ -1451,16 +1525,18 @@ export class DockviewComponent
                 titleBar.onDragStart((event) => {
                     this._onWillDragGroup.fire({
                         nativeEvent: event,
-                        group,
+                        group: anchorGroup,
                     });
                 })
             );
         }
 
-        group.model.location = { type: 'floating' };
+        for (const member of members) {
+            member.model.location = { type: 'floating' };
+        }
 
         if (!options?.skipActiveGroup) {
-            this.doSetGroupAndPanelActive(group);
+            this.doSetGroupAndPanelActive(anchorGroup);
         }
     }
 
@@ -2097,17 +2173,49 @@ export class DockviewComponent
             const serializedFloatingGroups = data.floatingGroups ?? [];
 
             for (const serializedFloatingGroup of serializedFloatingGroups) {
-                const { data, position } = serializedFloatingGroup;
+                const { data, grid, position } = serializedFloatingGroup;
 
-                const group = createGroupFromSerializedState(data);
+                if (grid) {
+                    // Multi-group window: rebuild the window's nested gridview
+                    // from its serialized tree.
+                    const floatingGridview = this.createFloatingGridview(
+                        grid.orientation
+                    );
+                    const members: DockviewGroupPanel[] = [];
+                    floatingGridview.deserialize(grid, {
+                        fromJSON: (
+                            node: ISerializedLeafNode<GroupPanelViewState>
+                        ) => {
+                            const group = createGroupFromSerializedState(
+                                node.data
+                            );
+                            members.push(group);
+                            return group;
+                        },
+                    });
 
-                this.addFloatingGroup(group, {
-                    position: position,
-                    width: position.width,
-                    height: position.height,
-                    skipRemoveGroup: true,
-                    inDragMode: false,
-                });
+                    if (members.length === 0) {
+                        continue;
+                    }
+
+                    this.mountFloatingWindow(
+                        floatingGridview,
+                        members[0],
+                        members,
+                        position,
+                        { inDragMode: false }
+                    );
+                } else if (data) {
+                    const group = createGroupFromSerializedState(data);
+
+                    this.addFloatingGroup(group, {
+                        position: position,
+                        width: position.width,
+                        height: position.height,
+                        skipRemoveGroup: true,
+                        inDragMode: false,
+                    });
+                }
             }
 
             const serializedPopoutGroups = data.popoutGroups ?? [];
@@ -2628,8 +2736,43 @@ export class DockviewComponent
                 this._floatingGroupService?.findByGroup(group);
 
             if (floatingGroup) {
+                const members = this.floatingWindowMembers(group);
+
+                if (members.length > 1) {
+                    // The floating window hosts other groups — remove just this
+                    // group's view from the window's nested gridview and keep
+                    // the window alive.
+                    floatingGroup.gridview.remove(group);
+
+                    if (floatingGroup.group === group) {
+                        // The anchor left; promote a remaining member.
+                        floatingGroup.setAnchorGroup(
+                            members.find((m) => m !== group)!
+                        );
+                    }
+
+                    if (!options?.skipDispose) {
+                        group.dispose();
+                        this._groups.delete(group.id);
+                        this._onDidRemoveGroup.fire(group);
+                    } else {
+                        // Relocation: reset location so the destination root
+                        // can re-tag it.
+                        group.model.location = { type: 'grid' };
+                    }
+
+                    if (!options?.skipActive && this._activeGroup === group) {
+                        const groups = Array.from(this._groups.values());
+                        this.doSetGroupAndPanelActive(
+                            groups.length > 0 ? groups[0].value : undefined
+                        );
+                    }
+
+                    return group;
+                }
+
                 if (!options?.skipDispose) {
-                    floatingGroup.group.dispose();
+                    group.dispose();
                     this._groups.delete(group.id);
                     this._onDidRemoveGroup.fire(group);
                 }
@@ -2645,7 +2788,7 @@ export class DockviewComponent
                     );
                 }
 
-                return floatingGroup.group;
+                return group;
             }
 
             throw new Error('dockview: failed to find floating group');
@@ -2825,9 +2968,15 @@ export class DockviewComponent
              * into an adjacent group
              */
 
+            // The destination group may live in the main grid or in a floating
+            // window's nested gridview — resolve which root we are dropping
+            // into so locations/orientation are computed against it.
+            const destinationGridview =
+                this.getGridviewForGroup(destinationGroup);
+
             const referenceLocation = getGridLocation(destinationGroup.element);
             const targetLocation = getRelativeLocation(
-                this.gridview.orientation,
+                destinationGridview.orientation,
                 referenceLocation,
                 destinationTarget
             );
@@ -2840,7 +2989,10 @@ export class DockviewComponent
 
                 const [targetParentLocation, to] = tail(targetLocation);
 
-                if (sourceGroup.api.location.type === 'grid') {
+                if (
+                    sourceGroup.api.location.type === 'grid' &&
+                    destinationGridview === this.gridview
+                ) {
                     const sourceLocation = getGridLocation(sourceGroup.element);
                     const [sourceParentLocation, from] = tail(sourceLocation);
 
@@ -2896,13 +3048,16 @@ export class DockviewComponent
                     this.doRemoveGroup(sourceGroup, { skipActive: true });
 
                     const updatedTargetLocation = getRelativeLocation(
-                        this.gridview.orientation,
+                        destinationGridview.orientation,
                         getGridLocation(destinationGroup.element),
                         destinationTarget
                     );
 
                     const newGroup = this.createGroupAtLocation(
-                        updatedTargetLocation
+                        updatedTargetLocation,
+                        undefined,
+                        undefined,
+                        destinationGridview
                     );
                     this.movingLock(() =>
                         newGroup.model.openPanel(removedPanel, {
@@ -2938,7 +3093,12 @@ export class DockviewComponent
                         );
                     }
 
-                    const newGroup = this.createGroupAtLocation(targetLocation);
+                    const newGroup = this.createGroupAtLocation(
+                        targetLocation,
+                        undefined,
+                        undefined,
+                        destinationGridview
+                    );
                     this.movingLock(() =>
                         newGroup.model.openPanel(removedPanel, {
                             skipSetGroupActive: true,
@@ -2967,11 +3127,19 @@ export class DockviewComponent
                 );
 
                 const location = getRelativeLocation(
-                    this.gridview.orientation,
+                    destinationGridview.orientation,
                     updatedReferenceLocation,
                     destinationTarget
                 );
-                this.movingLock(() => this.doAddGroup(targetGroup, location));
+                this.movingLock(() =>
+                    this.doAddGroup(
+                        targetGroup,
+                        location,
+                        undefined,
+                        destinationGridview
+                    )
+                );
+                this.setGroupLocationForRoot(targetGroup, destinationGridview);
                 this.doSetGroupAndPanelActive(targetGroup);
 
                 this._onDidMovePanel.fire({
@@ -2998,12 +3166,17 @@ export class DockviewComponent
                 }
 
                 const dropLocation = getRelativeLocation(
-                    this.gridview.orientation,
+                    destinationGridview.orientation,
                     referenceLocation,
                     destinationTarget
                 );
 
-                const group = this.createGroupAtLocation(dropLocation);
+                const group = this.createGroupAtLocation(
+                    dropLocation,
+                    undefined,
+                    undefined,
+                    destinationGridview
+                );
                 this.movingLock(() =>
                     group.model.openPanel(removedPanel, {
                         skipSetGroupActive: true,
@@ -3280,7 +3453,21 @@ export class DockviewComponent
                                 'dockview: failed to find floating group'
                             );
                         }
-                        selectedFloatingGroup.dispose();
+
+                        const members = this.floatingWindowMembers(from);
+                        if (members.length > 1) {
+                            // Detach just this group from the floating window's
+                            // nested gridview; keep the window (and its other
+                            // groups) alive.
+                            selectedFloatingGroup.gridview.remove(from);
+                            if (selectedFloatingGroup.group === from) {
+                                selectedFloatingGroup.setAnchorGroup(
+                                    members.find((m) => m !== from)!
+                                );
+                            }
+                        } else {
+                            selectedFloatingGroup.dispose();
+                        }
                         break;
                     }
                     case 'popout': {
@@ -3333,20 +3520,24 @@ export class DockviewComponent
                 }
             }
 
-            // For moves to grid locations
-            if (to.api.location.type === 'grid') {
+            // Place `source` next to `to`, in whichever gridview root `to`
+            // lives in. When `to` is inside a floating window this splits the
+            // window's nested layout rather than spawning a new window.
+            if (
+                to.api.location.type === 'grid' ||
+                to.api.location.type === 'floating'
+            ) {
+                const destGridview = this.getGridviewForGroup(to);
                 const referenceLocation = getGridLocation(to.element);
                 const dropLocation = getRelativeLocation(
-                    this.gridview.orientation,
+                    destGridview.orientation,
                     referenceLocation,
                     target
                 );
 
-                // Add to grid for all moves targeting grid location
-
                 let size: number;
 
-                switch (this.gridview.orientation) {
+                switch (destGridview.orientation) {
                     case Orientation.VERTICAL:
                         size =
                             referenceLocation.length % 2 == 0
@@ -3361,42 +3552,8 @@ export class DockviewComponent
                         break;
                 }
 
-                this.gridview.addView(source, size, dropLocation);
-            } else if (to.api.location.type === 'floating') {
-                // For moves to floating locations, add as floating group
-                // Get the position/size from the target floating group
-                const targetFloatingGroup =
-                    this._floatingGroupService?.findByGroup(to);
-                if (targetFloatingGroup) {
-                    const box = targetFloatingGroup.overlay.toJSON();
-
-                    // Calculate position based on available properties
-                    let left: number, top: number;
-                    if ('left' in box) {
-                        left = box.left + 50;
-                    } else if ('right' in box) {
-                        left = Math.max(0, box.right - box.width - 50);
-                    } else {
-                        left = 50; // Default fallback
-                    }
-
-                    if ('top' in box) {
-                        top = box.top + 50;
-                    } else if ('bottom' in box) {
-                        top = Math.max(0, box.bottom - box.height - 50);
-                    } else {
-                        top = 50; // Default fallback
-                    }
-
-                    this.addFloatingGroup(source, {
-                        height: box.height,
-                        width: box.width,
-                        position: {
-                            left,
-                            top,
-                        },
-                    });
-                }
+                destGridview.addView(source, size, dropLocation);
+                this.setGroupLocationForRoot(source, destGridview);
             }
         }
 
@@ -3612,11 +3769,55 @@ export class DockviewComponent
     private createGroupAtLocation(
         location: number[],
         size?: number,
-        options?: GroupOptions
+        options?: GroupOptions,
+        gridview: Gridview = this.gridview
     ): DockviewGroupPanel {
         const group = this.createGroup(options);
-        this.doAddGroup(group, location, size);
+        this.doAddGroup(group, location, size, gridview);
+        this.setGroupLocationForRoot(group, gridview);
         return group;
+    }
+
+    /**
+     * Tag a group with the location type matching the gridview root it now
+     * lives in (main grid vs a floating window). Floating and grid groups
+     * share the main render/drop-target containers, so only `location` differs.
+     */
+    private setGroupLocationForRoot(
+        group: DockviewGroupPanel,
+        gridview: Gridview
+    ): void {
+        group.model.location =
+            gridview === this.gridview
+                ? { type: 'grid' }
+                : { type: 'floating' };
+    }
+
+    /**
+     * Resolve which gridview root currently owns a group: the main grid, or
+     * the nested gridview of the floating window it lives in.
+     */
+    getGridviewForGroup(group: DockviewGroupPanel): Gridview {
+        return (
+            this._floatingGroupService?.findByGroup(group)?.gridview ??
+            this.gridview
+        );
+    }
+
+    /**
+     * The groups that live within the same floating window as `group`
+     * (including `group` itself). Empty when `group` is not floating.
+     */
+    private floatingWindowMembers(
+        group: DockviewGroupPanel
+    ): DockviewGroupPanel[] {
+        const floating = this._floatingGroupService?.findByGroup(group);
+        if (!floating) {
+            return [];
+        }
+        return this.groups.filter((candidate) =>
+            floating.gridview.element.contains(candidate.element)
+        );
     }
 
     private findGroup(panel: IDockviewPanel): DockviewGroupPanel | undefined {

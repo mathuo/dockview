@@ -274,9 +274,10 @@ export abstract class BaseGrid<T extends IGridPanelView>
     protected doAddGroup(
         group: T,
         location: number[] = [0],
-        size?: number
+        size?: number,
+        gridview: Gridview = this.gridview
     ): void {
-        this.gridview.addView(group, size ?? Sizing.Distribute, location);
+        gridview.addView(group, size ?? Sizing.Distribute, location);
 
         this._onDidAdd.fire(group);
     }

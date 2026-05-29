@@ -34,9 +34,17 @@
     }
 }
 
+// A floating window hosts its own gridview as the overlay content; it must
+// fill the resize container so its size tracks the overlay box.
+.dv-resize-container > .dv-grid-view {
+    width: 100%;
+    height: 100%;
+}
+
 // When a dedicated drag-handle title bar is present the overlay stacks the
-// handle above the group as a flex column so the group shrinks to fit beneath
-// it. Resize handles are position:absolute and stay out of the flex flow.
+// handle above the nested gridview as a flex column so the layout shrinks to
+// fit beneath it. Resize handles are position:absolute and stay out of the
+// flex flow.
 .dv-resize-container-with-titlebar {
     display: flex;
     flex-direction: column;
@@ -45,7 +53,7 @@
         flex: 0 0 auto;
     }
 
-    > .dv-groupview {
+    > .dv-grid-view {
         height: auto;
         flex: 1 1 0;
         min-height: 0;
