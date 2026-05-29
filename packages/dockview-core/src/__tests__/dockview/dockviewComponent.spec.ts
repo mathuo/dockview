@@ -8353,6 +8353,57 @@ describe('dockviewComponent', () => {
             jest.useRealTimers();
         });
 
+        test('restoring popouts while the browser blocks popups falls back to the grid and clears cleanly', async () => {
+            jest.useFakeTimers();
+            window.open = () => setupMockWindow();
+            const container = document.createElement('div');
+            const dockview = new DockviewComponent(container, {
+                createComponent(o) {
+                    return new PanelContentPartTest(o.id, o.name);
+                },
+            });
+            dockview.layout(1000, 500);
+            dockview.addPanel({ id: 'p1', component: 'default' });
+            const p2 = dockview.addPanel({
+                id: 'p2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            const p3 = dockview.addPanel({
+                id: 'p3',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            await dockview.addPopoutGroup(p2.group);
+            await dockview.addPopoutGroup(p3.group);
+            const state = dockview.toJSON();
+
+            // the browser blocks the popouts when the layout is restored
+            (window as any).open = () => null;
+
+            dockview.clear();
+            dockview.fromJSON(state);
+            jest.advanceTimersByTime(500);
+            await dockview.popoutRestorationPromise;
+
+            // blocked popout content is not lost — it falls back into the grid
+            expect(dockview.panels.map((p) => p.id).sort()).toEqual([
+                'p1',
+                'p2',
+                'p3',
+            ]);
+            expect(
+                dockview.groups.filter((g) => g.api.location.type === 'popout')
+                    .length
+            ).toBe(0);
+
+            // and clearing the restored layout doesn't throw on orphaned groups
+            expect(() => dockview.clear()).not.toThrow();
+            expect(dockview.groups.length).toBe(0);
+
+            jest.useRealTimers();
+        });
+
         describe('when browsers block popups', () => {
             let container: HTMLDivElement;
             let dockview: DockviewComponent;
@@ -8509,6 +8560,37 @@ describe('dockviewComponent', () => {
             } finally {
                 jest.useRealTimers();
             }
+        });
+
+        test('rapid repeated fromJSON with popouts does not throw on orphaned groups', async () => {
+            jest.useFakeTimers();
+            window.open = () => setupMockWindow();
+            const container = document.createElement('div');
+            const dockview = new DockviewComponent(container, {
+                createComponent: (o) => new PanelContentPartTest(o.id, o.name),
+            });
+            dockview.layout(1000, 500);
+            dockview.addPanel({ id: 'p1', component: 'default' });
+            const p2 = dockview.addPanel({
+                id: 'p2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            const p3 = dockview.addPanel({
+                id: 'p3',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            await dockview.addPopoutGroup(p2.group);
+            await dockview.addPopoutGroup(p3.group);
+            const state = JSON.parse(JSON.stringify(dockview.toJSON()));
+
+            for (let i = 0; i < 6; i++) {
+                expect(() => dockview.fromJSON(state)).not.toThrow();
+                jest.advanceTimersByTime(60); // let some popout timers fire
+            }
+            dockview.dispose();
+            jest.useRealTimers();
         });
 
         test('dispose of dockview instance when popup is open', async () => {

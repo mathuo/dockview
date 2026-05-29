@@ -1037,14 +1037,38 @@ export class DockviewComponent
                     popoutWindowDisposable.dispose();
                     this._onDidOpenPopoutWindowFail.fire();
 
-                    // if the popout window was blocked, we need to move the group back to the reference group
-                    // and set it to visible
-                    this.movingLock(() =>
-                        moveGroupWithoutDestroying({
-                            from: group,
-                            to: referenceGroup,
-                        })
-                    );
+                    // The popout window was blocked (e.g. by the browser's
+                    // popup blocker — common when restoring popouts on load).
+                    // Fall back gracefully so the group is valid and visible
+                    // rather than an orphan that later crashes clear()/remove().
+                    if (group === referenceGroup) {
+                        // No separate grid group to return to (e.g. restoring a
+                        // popout straight from JSON) — dock this group into the
+                        // main grid.
+                        if (!this.gridview.element.contains(group.element)) {
+                            this.movingLock(() => this.doAddGroup(group, [0]));
+                            group.model.location = { type: 'grid' };
+                        }
+                    } else {
+                        // A fresh group was created for the popout — return its
+                        // panels to the reference group and discard the now-empty
+                        // popout group so it doesn't linger as an orphan.
+                        this.movingLock(() =>
+                            moveGroupWithoutDestroying({
+                                from: group,
+                                to: referenceGroup,
+                            })
+                        );
+
+                        if (
+                            group.model.size === 0 &&
+                            this._groups.has(group.id)
+                        ) {
+                            group.dispose();
+                            this._groups.delete(group.id);
+                            this._onDidRemoveGroup.fire(group);
+                        }
+                    }
 
                     if (!referenceGroup.api.isVisible) {
                         referenceGroup.api.setVisible(true);
@@ -3071,6 +3095,30 @@ export class DockviewComponent
             }
 
             throw new Error('dockview: failed to find popout group');
+        }
+
+        // A `grid`-location group whose element isn't actually in the gridview
+        // is an orphan — e.g. a popout-destined group created during fromJSON
+        // whose window hasn't opened yet, swept up by clear()/a re-entrant
+        // fromJSON. `gridview.remove()` would throw "Invalid grid element", so
+        // dispose it directly.
+        if (!this.gridview.element.contains(group.element)) {
+            if (!options?.skipDispose) {
+                const item = this._groups.get(group.id);
+                item?.disposable.dispose();
+                group.dispose();
+                this._groups.delete(group.id);
+                this._onDidRemoveGroup.fire(group);
+            }
+
+            if (!options?.skipActive && this._activeGroup === group) {
+                const groups = Array.from(this._groups.values());
+                this.doSetGroupAndPanelActive(
+                    groups.length > 0 ? groups[0].value : undefined
+                );
+            }
+
+            return group;
         }
 
         const re = super.doRemoveGroup(group, options);
