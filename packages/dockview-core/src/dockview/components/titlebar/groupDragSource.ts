@@ -30,6 +30,16 @@ export interface GroupDragSourceOptions {
     readonly element: HTMLElement;
     readonly accessor: DockviewComponent;
     readonly group: DockviewGroupPanel;
+    /**
+     * Whether this element is the floating window's move handle. Only the move
+     * handle needs the floating disambiguation (shift for mouse / long-press
+     * for touch) that keeps the redock gesture from firing alongside the
+     * move-the-float gesture. Other handles on a floating group (e.g. the tab
+     * bar's void container when a dedicated title bar is the move handle) drag
+     * to redock with a plain drag, exactly like a group in the main grid.
+     * Defaults to `() => true`.
+     */
+    readonly isFloatingMoveHandle?: () => boolean;
 }
 
 /**
@@ -53,12 +63,16 @@ export class GroupDragSource extends CompositeDisposable {
     private readonly _onDragStart = new Emitter<DragEvent | PointerEvent>();
     readonly onDragStart = this._onDragStart.event;
 
+    private readonly isFloatingMoveHandle: () => boolean;
+
     constructor(options: GroupDragSourceOptions) {
         super();
 
         this._element = options.element;
         this.accessor = options.accessor;
         this.group = options.group;
+        this.isFloatingMoveHandle =
+            options.isFloatingMoveHandle ?? (() => true);
 
         const caps = resolveDndCapabilities(this.accessor.options);
 
@@ -140,11 +154,14 @@ export class GroupDragSource extends CompositeDisposable {
             ...sharedDragOptions,
             disabled: !caps.html5,
             isCancelled: (event) => {
-                // HTML5: floating groups need shift+drag as the explicit
-                // detach gesture (otherwise click-and-drag conflicts with
-                // moving the floating group itself).
+                // HTML5: when this element is the floating window's move
+                // handle, redock needs shift+drag (otherwise click-and-drag
+                // conflicts with moving the float). A non-move-handle (e.g. the
+                // void container when a title bar moves the float) redocks with
+                // a plain drag, like a group in the main grid.
                 if (
                     this.group.api.location.type === 'floating' &&
+                    this.isFloatingMoveHandle() &&
                     !(event as DragEvent).shiftKey
                 ) {
                     return true;
@@ -159,7 +176,11 @@ export class GroupDragSource extends CompositeDisposable {
             },
         });
 
-        const isFloating = () => this.group?.api?.location?.type === 'floating';
+        // Only the move handle needs the touch disambiguation; other handles
+        // redock with the normal grid press behaviour.
+        const isFloating = () =>
+            this.group?.api?.location?.type === 'floating' &&
+            this.isFloatingMoveHandle();
 
         this.pointerDragSource = pointerBackend.createDragSource(
             this._element,

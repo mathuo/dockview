@@ -239,6 +239,31 @@ describe('voidContainer', () => {
             cut.dispose();
         });
 
+        test('floating group with a title bar: void dragstart is NOT prevented (drags like a grid group)', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                options: {},
+            });
+            const group = fromPartial<DockviewGroupPanel>({
+                api: { location: { type: 'floating' } },
+            });
+            const cut = new VoidContainer(accessor, group);
+
+            // a title-bar floating window's overlay carries this class; the
+            // void container is then no longer the move handle, so a plain
+            // drag should redock rather than being gated behind shift.
+            const overlay = document.createElement('div');
+            overlay.className =
+                'dv-resize-container dv-resize-container-with-titlebar';
+            overlay.appendChild(cut.element);
+
+            const event = new Event('dragstart') as DragEvent;
+            const spy = jest.spyOn(event, 'preventDefault');
+            fireEvent(cut.element, event);
+            expect(spy).toHaveBeenCalledTimes(0);
+
+            cut.dispose();
+        });
+
         test('edge group with zero panels: dragstart is prevented', () => {
             const accessor = fromPartial<DockviewComponent>({
                 options: {},

@@ -69,6 +69,12 @@ export class VoidContainer extends CompositeDisposable {
             element: this._element,
             accessor: this.accessor,
             group: this.group,
+            // The void container is the float's move handle only when there is
+            // no dedicated title bar. When a title bar moves the float (the
+            // overlay is `.dv-resize-container-with-titlebar`), the void
+            // container redocks with a plain drag, like a group in the grid.
+            isFloatingMoveHandle: () =>
+                !this._element.closest('.dv-resize-container-with-titlebar'),
         });
 
         const canDisplayOverlay = (
