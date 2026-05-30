@@ -84,8 +84,7 @@ export class GroupDragSource extends CompositeDisposable {
         this._element = options.element;
         this.accessor = options.accessor;
         const group = options.group;
-        this.groupAccessor =
-            typeof group === 'function' ? group : () => group;
+        this.groupAccessor = typeof group === 'function' ? group : () => group;
         this.isFloatingMoveHandle =
             options.isFloatingMoveHandle ?? (() => true);
 

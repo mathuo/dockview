@@ -1749,7 +1749,9 @@ export class DockviewComponent
             floatingGroupPanel.setTitleBar(titleBar);
             floatingGroupPanel.addDisposables(
                 titleBar,
-                Disposable.from(() => floatingGroupPanel.setTitleBar(undefined)),
+                Disposable.from(() =>
+                    floatingGroupPanel.setTitleBar(undefined)
+                ),
                 titleBar.onDragStart((event) => {
                     this._onWillDragGroup.fire({
                         nativeEvent: event,
