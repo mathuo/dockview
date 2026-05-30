@@ -1041,6 +1041,35 @@ export class DockviewComponent
                     // popup blocker — common when restoring popouts on load).
                     // Fall back gracefully so the group is valid and visible
                     // rather than an orphan that later crashes clear()/remove().
+                    if (options?.overridePopoutGridview) {
+                        // Restoring a multi-group popout window: its nested
+                        // gridview was built up-front but never attached to a
+                        // window. Dock every member into the main grid so no
+                        // group is lost, then discard the detached gridview.
+                        const blockedGridview = options.overridePopoutGridview;
+                        const members = this.groups.filter((candidate) =>
+                            blockedGridview.element.contains(candidate.element)
+                        );
+                        for (const member of members) {
+                            this.movingLock(() => {
+                                blockedGridview.remove(member);
+                                member.model.renderContainer =
+                                    this.overlayRenderContainer;
+                                member.model.dropTargetContainer =
+                                    this.rootDropTargetContainer;
+                                this.doAddGroup(member, [0]);
+                                member.model.location = { type: 'grid' };
+                            });
+                        }
+                        blockedGridview.dispose();
+
+                        if (referenceGroup && !referenceGroup.api.isVisible) {
+                            referenceGroup.api.setVisible(true);
+                        }
+
+                        return false;
+                    }
+
                     if (group === referenceGroup) {
                         // No separate grid group to return to (e.g. restoring a
                         // popout straight from JSON) — dock this group into the
@@ -1714,13 +1743,17 @@ export class DockviewComponent
         if (titleBar) {
             // Tie the title bar's lifetime to the floating window and surface
             // its redock drag through the same public `onWillDragGroup` event
-            // the tab-bar handle uses.
+            // the tab-bar handle uses. Register it so anchor reassignment (when
+            // the original anchor leaves a multi-group window) retargets the
+            // bar at a group that still lives here.
+            floatingGroupPanel.setTitleBar(titleBar);
             floatingGroupPanel.addDisposables(
                 titleBar,
+                Disposable.from(() => floatingGroupPanel.setTitleBar(undefined)),
                 titleBar.onDragStart((event) => {
                     this._onWillDragGroup.fire({
                         nativeEvent: event,
-                        group: anchorGroup,
+                        group: floatingGroupPanel.group,
                     });
                 })
             );
@@ -4173,9 +4206,18 @@ export class DockviewComponent
         // set on the shell from reaching the dockview subtree.
         this._shellThemeClassnames?.setClassNames(theme.className);
 
-        this.gridview.margin = theme.gap ?? 0;
+        const gap = theme.gap ?? 0;
+        this.gridview.margin = gap;
+        // Floating / popout windows host their own nested gridviews; keep their
+        // gap in sync with the main grid when the theme changes at runtime.
+        for (const floating of this.floatingGroups) {
+            floating.gridview.margin = gap;
+        }
+        for (const entry of this._popoutWindowService?.entries ?? []) {
+            entry.gridview.margin = gap;
+        }
         this._shellManager?.updateTheme(
-            theme.gap ?? 0,
+            gap,
             theme.edgeGroupCollapsedSize ?? 35
         );
 

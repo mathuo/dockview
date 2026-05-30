@@ -9,11 +9,20 @@ export interface IDockviewFloatingGroupPanel {
     position(bounds: Partial<AnchoredBox>): void;
 }
 
+/**
+ * The subset of the dedicated floating title bar this panel needs to keep in
+ * sync. Declared structurally to avoid a circular import on `FloatingTitleBar`.
+ */
+export interface IAnchorTrackingTitleBar {
+    setGroup(group: DockviewGroupPanel): void;
+}
+
 export class DockviewFloatingGroupPanel
     extends CompositeDisposable
     implements IDockviewFloatingGroupPanel
 {
     private _group: DockviewGroupPanel;
+    private _titleBar: IAnchorTrackingTitleBar | undefined;
 
     /**
      * The window's representative/anchor group. A floating window can host a
@@ -24,8 +33,17 @@ export class DockviewFloatingGroupPanel
         return this._group;
     }
 
+    /**
+     * Register the dedicated title bar (if any) so anchor reassignment keeps
+     * its drag handle pointed at a group that still lives in this window.
+     */
+    setTitleBar(titleBar: IAnchorTrackingTitleBar | undefined): void {
+        this._titleBar = titleBar;
+    }
+
     setAnchorGroup(group: DockviewGroupPanel): void {
         this._group = group;
+        this._titleBar?.setGroup(group);
     }
 
     constructor(

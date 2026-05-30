@@ -29,7 +29,14 @@ const FLOATING_REDOCK_INITIATION_DELAY_MS = 500;
 export interface GroupDragSourceOptions {
     readonly element: HTMLElement;
     readonly accessor: DockviewComponent;
-    readonly group: DockviewGroupPanel;
+    /**
+     * The group this handle drags. Pass a function when the handle outlives the
+     * group it represents and can be retargeted — e.g. a floating window's
+     * dedicated title bar, whose anchor group is reassigned when the original
+     * anchor leaves a multi-group window. A fixed reference (the tab-bar void
+     * container, which lives inside its own group's DOM) is also accepted.
+     */
+    readonly group: DockviewGroupPanel | (() => DockviewGroupPanel);
     /**
      * Whether this element is the floating window's move handle. Only the move
      * handle needs the floating disambiguation (shift for mouse / long-press
@@ -54,7 +61,7 @@ export interface GroupDragSourceOptions {
 export class GroupDragSource extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private readonly accessor: DockviewComponent;
-    private readonly group: DockviewGroupPanel;
+    private readonly groupAccessor: () => DockviewGroupPanel;
     private readonly html5DragSource: IDragSource;
     private readonly pointerDragSource: IDragSource;
     private readonly panelTransfer =
@@ -65,12 +72,20 @@ export class GroupDragSource extends CompositeDisposable {
 
     private readonly isFloatingMoveHandle: () => boolean;
 
+    // Resolved lazily so a retargetable handle (the floating title bar) always
+    // drags the window's *current* anchor group, not the one captured here.
+    private get group(): DockviewGroupPanel {
+        return this.groupAccessor();
+    }
+
     constructor(options: GroupDragSourceOptions) {
         super();
 
         this._element = options.element;
         this.accessor = options.accessor;
-        this.group = options.group;
+        const group = options.group;
+        this.groupAccessor =
+            typeof group === 'function' ? group : () => group;
         this.isFloatingMoveHandle =
             options.isFloatingMoveHandle ?? (() => true);
 

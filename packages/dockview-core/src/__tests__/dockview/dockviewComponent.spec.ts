@@ -6183,6 +6183,126 @@ describe('dockviewComponent', () => {
                     restored.getGridviewForGroup(floatingGroups[0])
                 ).not.toBe((restored as any).gridview);
             });
+
+            test('the floating title bar retargets when its anchor group leaves the window', () => {
+                const dockview = make(); // default dragHandle is 'titlebar'
+                dockview.layout(1000, 500);
+
+                const panel1 = dockview.addPanel({
+                    id: 'panel_1',
+                    component: 'default',
+                });
+                const panel2 = dockview.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    floating: true,
+                });
+                const panel3 = dockview.addPanel({
+                    id: 'panel_3',
+                    component: 'default',
+                    position: { referencePanel: 'panel_1', direction: 'right' },
+                });
+
+                // build a 2-group floating window; panel2's group is the anchor
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel3.group.id },
+                    to: { group: panel2.group, position: 'right' },
+                });
+
+                const fg = dockview.floatingGroups[0];
+                expect(fg.group).toBe(panel2.group);
+
+                const titlebar = fg.overlay.element.querySelector(
+                    '.dv-floating-titlebar'
+                ) as HTMLElement;
+                expect(titlebar).toBeTruthy();
+
+                // move the original anchor back to the grid; the window survives
+                // and promotes panel3's group as the new anchor
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel2.group.id },
+                    to: { group: panel1.group, position: 'right' },
+                });
+                expect(dockview.floatingGroups.length).toBe(1);
+                expect(fg.group).toBe(panel3.group);
+
+                // dragging the title bar now targets the promoted anchor, not
+                // the departed original group
+                const groupDragEvents: GroupDragEvent[] = [];
+                dockview.onWillDragGroup((event) =>
+                    groupDragEvents.push(event)
+                );
+
+                // shift+drag is the title bar's redock gesture; jsdom's
+                // DragEvent ctor drops shiftKey, so set it explicitly
+                const event = new Event('dragstart') as DragEvent;
+                Object.defineProperty(event, 'shiftKey', { value: true });
+                fireEvent(titlebar, event);
+
+                expect(groupDragEvents.length).toBe(1);
+                expect(groupDragEvents[0].group).toBe(panel3.group);
+
+                dockview.dispose();
+            });
+
+            test('restoring a blocked multi-group popout docks every member into the grid', async () => {
+                jest.useFakeTimers();
+                window.open = () => setupMockWindow();
+                const dockview = make();
+                dockview.layout(1000, 500);
+
+                const panel1 = dockview.addPanel({
+                    id: 'panel_1',
+                    component: 'default',
+                });
+                const panel2 = dockview.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    position: { referencePanel: 'panel_1', direction: 'right' },
+                });
+
+                await dockview.addPopoutGroup(panel1.api.group);
+                // split panel2's group into the popout -> 2-group popout window
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel2.group.id },
+                    to: { group: panel1.group, position: 'right' },
+                });
+
+                const state = dockview.toJSON();
+                expect(state.popoutGroups![0].grid).toBeDefined();
+
+                // the browser blocks the popout when the layout is restored
+                (window as any).open = () => null;
+
+                dockview.clear();
+                dockview.fromJSON(state);
+                jest.advanceTimersByTime(500);
+                await dockview.popoutRestorationPromise;
+
+                // both groups fell back into the grid; nothing is lost or
+                // orphaned
+                expect(dockview.panels.map((p) => p.id).sort()).toEqual([
+                    'panel_1',
+                    'panel_2',
+                ]);
+                expect(
+                    dockview.groups.filter(
+                        (g) => g.api.location.type === 'popout'
+                    ).length
+                ).toBe(0);
+                // both members landed in the main grid (a hidden reference
+                // ghost group may also linger, as with single-group restore)
+                expect(
+                    dockview.groups.filter(
+                        (g) => g.api.location.type === 'grid'
+                    ).length
+                ).toBeGreaterThanOrEqual(2);
+
+                expect(() => dockview.clear()).not.toThrow();
+                expect(dockview.groups.length).toBe(0);
+
+                jest.useRealTimers();
+            });
         });
 
         test('move a floating group of many tabs to a new fixed group', () => {
