@@ -49,6 +49,10 @@
     ],
     "module": "./dist/fesm2022/dockview-angular.mjs",
     "typings": "./dist/types/dockview-angular.d.ts",
+    "sideEffects": [
+        "**/*.css",
+        "**/*.scss"
+    ],
     "scripts": {
         "build:angular": "ng-packagr -c tsconfig.lib.json -p ng-package.json",
         "build:css": "node scripts/copy-css.js",

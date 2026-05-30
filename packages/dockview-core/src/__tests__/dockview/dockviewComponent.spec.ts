@@ -18,7 +18,10 @@ import {
 } from '../../dockview/components/titlebar/tabsContainer';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewApi } from '../../api/component.api';
-import { DockviewDndOverlayEvent } from '../../dockview/options';
+import {
+    DockviewDndOverlayEvent,
+    IHeaderActionsRenderer,
+} from '../../dockview/options';
 import { SizeEvent } from '../../api/gridviewPanelApi';
 import { setupMockWindow } from '../__mocks__/mockWindow';
 import { EdgeGroupOptions } from '../../dockview/dockviewShell';
@@ -11263,6 +11266,148 @@ describe('dockviewComponent', () => {
             expect(dv.getEdgeGroup('left')).toBeDefined();
             dv.dispose();
         });
+    });
+
+    test('regression: tab-group events fire on a source group born during moveGroup-from-edge', () => {
+        // moveGroup from an edge group to the grid creates a fresh `source`
+        // group via this.createGroup() and adds it via gridview.addView(...) —
+        // bypassing doAddGroup, so BaseGrid._onDidAdd never fires for source.
+        // TabGroupChipsModule attaches per-group event forwarding via
+        // host.onDidAddGroup (driven by BaseGrid._onDidAdd through the
+        // gated callback in DockviewComponent); since neither path fires,
+        // attachToGroup never runs and subsequent api.createTabGroup on
+        // the moved-source group doesn't propagate to dockview.api.onDidCreateTabGroup.
+        function createFixedDockview(
+            c: HTMLElement,
+            positions: ('top' | 'bottom' | 'left' | 'right')[]
+        ): DockviewComponent {
+            const dv = new DockviewComponent(c, {
+                createComponent(options) {
+                    return new PanelContentPartTest(options.id, options.name);
+                },
+            });
+            for (const position of positions) {
+                dv.addEdgeGroup(position, { id: `${position}-group` });
+            }
+            return dv;
+        }
+
+        const c = document.createElement('div');
+        const dv = createFixedDockview(c, ['left']);
+        dv.layout(1000, 800);
+
+        const edgeGroup = dv.groups.find(
+            (g) => g.api.location.type === 'edge'
+        )!;
+
+        const target = dv.addPanel({ id: 'center', component: 'default' });
+        dv.addPanel({
+            id: 'edge-p1',
+            component: 'default',
+            position: { referenceGroup: edgeGroup.id },
+        });
+
+        // Move the edge group to the grid — internally creates a fresh
+        // `source` group via createGroup + gridview.addView (the path that
+        // bypasses doAddGroup / _onDidAddGroup).
+        dv.moveGroup({
+            from: { group: edgeGroup },
+            to: { group: target.api.group, position: 'right' },
+        });
+
+        const movedPanel = dv.getGroupPanel('edge-p1')!;
+        const movedGroup = movedPanel.group;
+
+        // Subscribe AFTER the move so we can prove the event propagates.
+        const events: string[] = [];
+        dv.api.onDidCreateTabGroup((e) => events.push(e.tabGroup.id));
+
+        // Trigger a tab-group operation on the moved-source group.
+        const tg = dv.api.createTabGroup({
+            groupId: movedGroup.id,
+            label: 'test',
+        });
+
+        // Should fire — but doesn't because attachToGroup never ran.
+        expect(events).toEqual([tg.id]);
+
+        dv.dispose();
+    });
+
+    test('regression: HeaderActions renderer disposed when group removed during a move (movingLock leak)', () => {
+        // After the module extraction, HeaderActionsModule cleans up
+        // per-group renderer state via host.onDidRemoveGroup. But that
+        // event is gated by `!this._moving` in DockviewComponent, so a
+        // group emptied inside movingLock (e.g. moveGroupOrPanel emptying
+        // a source group via removePanel(removeEmptyGroup:true)) never
+        // fires onDidRemoveGroup, and the user-supplied IHeaderActionsRenderer
+        // instances leak. Master held the disposables directly in the
+        // group model's addDisposables() chain, which fired regardless.
+        type Key = string;
+        const disposed: Key[] = [];
+
+        const factory =
+            (slot: 'left' | 'right' | 'prefix') =>
+            (group: DockviewGroupPanel): IHeaderActionsRenderer => {
+                const key: Key = `${group.id}:${slot}`;
+                return {
+                    element: document.createElement('div'),
+                    init() {},
+                    dispose() {
+                        disposed.push(key);
+                    },
+                };
+            };
+
+        const container = document.createElement('div');
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+            createLeftHeaderActionComponent: factory('left'),
+            createRightHeaderActionComponent: factory('right'),
+            createPrefixHeaderActionComponent: factory('prefix'),
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        const panel2 = dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            position: { referencePanel: 'panel1', direction: 'right' },
+        });
+
+        const group1Id = panel1.api.group.id;
+
+        // Move panel1 into panel2's group; group1 becomes empty and is
+        // removed via removePanel(removeEmptyGroup:true) inside movingLock.
+        dockview.moveGroupOrPanel({
+            from: { groupId: group1Id, panelId: 'panel1' },
+            to: { group: panel2.api.group, position: 'center' },
+        });
+
+        // The 3 renderers attached to the removed group1 should have been
+        // disposed. They are not, because HeaderActionsModule's cleanup
+        // never fired.
+        expect(disposed).toEqual(
+            expect.arrayContaining([
+                `${group1Id}:left`,
+                `${group1Id}:right`,
+                `${group1Id}:prefix`,
+            ])
+        );
     });
 
     test('issue #914: api.setTitle reflected by createTabRenderer output', () => {
