@@ -48,6 +48,25 @@
         }
     }
 
+    // When a floating window has a dedicated drag-handle bar, the bar — not the
+    // group below it — is the top of the rounded card. Move the top border and
+    // rounded top corners onto the handle and flatten the group's top so the
+    // two read as a single card.
+    .dv-resize-container-with-titlebar {
+        > .dv-floating-titlebar {
+            border: var(--dv-floating-group-border);
+            border-bottom: none;
+            border-top-left-radius: var(--dv-border-radius);
+            border-top-right-radius: var(--dv-border-radius);
+        }
+
+        .dv-groupview {
+            border-top: none;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+    }
+
     .dv-tabs-overflow-container,
     .dv-tabs-overflow-dropdown-default {
         border-radius: var(--dv-dropdown-border-radius);

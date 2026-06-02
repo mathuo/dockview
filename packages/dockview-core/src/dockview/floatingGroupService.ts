@@ -90,8 +90,15 @@ export class FloatingGroupService implements IFloatingGroupService {
                 this._host.fireLayoutChange();
             }),
             group.onDidChange((event) => {
+                // `event.height` is the group's requested *content* height.
+                // When a dedicated title bar is present the overlay's outer
+                // box is taller by the header, so add it back to preserve the
+                // requested content size.
                 overlay.setBounds({
-                    height: event?.height,
+                    height:
+                        typeof event?.height === 'number'
+                            ? event.height + overlay.headerHeight
+                            : event?.height,
                     width: event?.width,
                 });
             }),

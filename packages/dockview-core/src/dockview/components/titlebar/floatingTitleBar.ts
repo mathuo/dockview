@@ -1,0 +1,77 @@
+import { DockviewComponent } from '../../dockviewComponent';
+import { addDisposableListener, Emitter, Event } from '../../../events';
+import { CompositeDisposable } from '../../../lifecycle';
+import { DockviewGroupPanel } from '../../dockviewGroupPanel';
+import { quasiPreventDefault } from '../../../dom';
+import { GroupDragSource } from './groupDragSource';
+
+/**
+ * A dedicated, blank drag handle rendered above a floating group's tab bar.
+ *
+ * It plays the same dual role the tab-bar void container plays today: a plain
+ * pointer-drag moves the floating window (wired by the overlay via
+ * `setupDrag`), while a shift+drag (mouse) or long-press (touch) detaches the
+ * group to redock it into the grid. The redock half is provided by the shared
+ * {@link GroupDragSource}; the move half is owned by the overlay.
+ *
+ * The bar is intentionally contentless — styling is driven entirely through
+ * the `--dv-floating-titlebar-*` theme variables.
+ */
+export class FloatingTitleBar extends CompositeDisposable {
+    private readonly _element: HTMLElement;
+    private readonly dragSource: GroupDragSource;
+
+    private readonly _onDragStart = new Emitter<DragEvent | PointerEvent>();
+    readonly onDragStart = this._onDragStart.event;
+
+    get element(): HTMLElement {
+        return this._element;
+    }
+
+    constructor(
+        private readonly accessor: DockviewComponent,
+        private readonly group: DockviewGroupPanel
+    ) {
+        super();
+
+        this._element = document.createElement('div');
+        this._element.className = 'dv-floating-titlebar';
+
+        this.addDisposables(
+            this._onDragStart,
+            addDisposableListener(this._element, 'pointerdown', () => {
+                this.accessor.doSetGroupActive(this.group);
+            }),
+            // Shift+pointerdown marks the event so the overlay's
+            // move-the-float drag doesn't fire alongside the HTML5 redock
+            // drag. See VoidContainer for the same disambiguation.
+            addDisposableListener(
+                this._element,
+                'pointerdown',
+                (e) => {
+                    if (e.shiftKey) {
+                        quasiPreventDefault(e);
+                    }
+                },
+                true
+            )
+        );
+
+        this.dragSource = new GroupDragSource({
+            element: this._element,
+            accessor: this.accessor,
+            group: this.group,
+        });
+
+        this.addDisposables(
+            this.dragSource,
+            this.dragSource.onDragStart((event) => {
+                this._onDragStart.fire(event);
+            })
+        );
+    }
+
+    updateDragAndDropState(): void {
+        this.dragSource.updateDragAndDropState();
+    }
+}

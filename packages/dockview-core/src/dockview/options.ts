@@ -115,6 +115,18 @@ export interface DockviewOptions {
               minimumHeightWithinViewport?: number;
               minimumWidthWithinViewport?: number;
           };
+    /**
+     * Selects which element moves a floating group when dragged.
+     *
+     * - `'titlebar'` (default): a dedicated, blank drag-handle bar is rendered
+     *   above the group's tab bar. Dragging it moves the floating window;
+     *   shift+drag (mouse) / long-press (touch) redocks into the grid. Style
+     *   it with the `--dv-floating-titlebar-*` theme variables.
+     * - `'tabbar'`: the legacy behaviour — the empty space in the tab bar
+     *   (the "void container") doubles as the move handle. No dedicated bar
+     *   is rendered.
+     */
+    floatingGroupDragHandle?: 'titlebar' | 'tabbar';
     popoutUrl?: string;
     nonce?: CspNonceProvider;
     defaultRenderer?: DockviewPanelRenderer;
@@ -261,6 +273,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         singleTabMode: undefined,
         disableFloatingGroups: undefined,
         floatingGroupBounds: undefined,
+        floatingGroupDragHandle: undefined,
         popoutUrl: undefined,
         nonce: undefined,
         defaultRenderer: undefined,

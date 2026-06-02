@@ -65,6 +65,7 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
+import { FloatingTitleBar } from './components/titlebar/floatingTitleBar';
 import { assertModule, ModuleRegistry } from './modules';
 import { AllModules } from './allModules';
 import { IFloatingGroupHost } from './floatingGroupService';
@@ -212,6 +213,11 @@ export interface FloatingGroupOptions {
     height?: number;
     width?: number;
     position?: AnchorPosition;
+    /**
+     * Override the component-level `floatingGroupDragHandle` option for this
+     * group only. See {@link DockviewOptions.floatingGroupDragHandle}.
+     */
+    dragHandle?: 'titlebar' | 'tabbar';
 }
 
 interface FloatingGroupOptionsInternal extends FloatingGroupOptions {
@@ -1387,9 +1393,23 @@ export class DockviewComponent
 
         const anchoredBox = getAnchoredBox();
 
+        const dragHandleMode =
+            options?.dragHandle ??
+            this.options.floatingGroupDragHandle ??
+            'titlebar';
+
+        // `'titlebar'` renders a dedicated grab bar above the group's tab bar
+        // and uses it as the move handle; `'tabbar'` falls back to the legacy
+        // behaviour of moving via the tab-bar void container.
+        const titleBar =
+            dragHandleMode === 'titlebar'
+                ? new FloatingTitleBar(this, group)
+                : undefined;
+
         const overlay = new Overlay({
             container: this._floatingOverlayHost ?? this.gridview.element,
             content: group.element,
+            header: titleBar?.element,
             ...anchoredBox,
             minimumInViewportWidth:
                 this.options.floatingGroupBounds === 'boundedWithinViewport'
@@ -1405,20 +1425,37 @@ export class DockviewComponent
                       DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE),
         });
 
-        const el = group.element.querySelector('.dv-void-container');
+        const dragHandle =
+            titleBar?.element ??
+            group.element.querySelector('.dv-void-container');
 
-        if (!el) {
+        if (!dragHandle) {
             throw new Error('dockview: failed to find drag handle');
         }
 
-        overlay.setupDrag(<HTMLElement>el, {
+        overlay.setupDrag(<HTMLElement>dragHandle, {
             inDragMode:
                 typeof options?.inDragMode === 'boolean'
                     ? options.inDragMode
                     : false,
         });
 
-        service.add(group, overlay);
+        const floatingGroupPanel = service.add(group, overlay);
+
+        if (titleBar) {
+            // Tie the title bar's lifetime to the floating group and surface
+            // its redock drag through the same public `onWillDragGroup` event
+            // the tab-bar handle uses.
+            floatingGroupPanel.addDisposables(
+                titleBar,
+                titleBar.onDragStart((event) => {
+                    this._onWillDragGroup.fire({
+                        nativeEvent: event,
+                        group,
+                    });
+                })
+            );
+        }
 
         group.model.location = { type: 'floating' };
 

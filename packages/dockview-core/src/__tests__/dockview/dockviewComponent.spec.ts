@@ -5659,6 +5659,97 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(0);
         });
 
+        const createDockview = () =>
+            new DockviewComponent(document.createElement('div'), {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+        test('renders a dedicated title bar by default', () => {
+            const dockview = createDockview();
+            dockview.layout(1000, 500);
+
+            dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+                floating: true,
+            });
+
+            const overlay = dockview.floatingGroups[0].overlay.element;
+            expect(overlay.querySelector('.dv-floating-titlebar')).toBeTruthy();
+
+            // the overlay stacks the handle above the group via flex column
+            expect(
+                overlay.classList.contains('dv-resize-container-with-titlebar')
+            ).toBeTruthy();
+
+            dockview.dispose();
+        });
+
+        test('floatingGroupDragHandle: "tabbar" omits the title bar', () => {
+            const dockview = new DockviewComponent(
+                document.createElement('div'),
+                {
+                    createComponent(options) {
+                        switch (options.name) {
+                            case 'default':
+                                return new PanelContentPartTest(
+                                    options.id,
+                                    options.name
+                                );
+                            default:
+                                throw new Error(`unsupported`);
+                        }
+                    },
+                    floatingGroupDragHandle: 'tabbar',
+                }
+            );
+            dockview.layout(1000, 500);
+
+            dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+                floating: true,
+            });
+
+            const overlay = dockview.floatingGroups[0].overlay.element;
+            expect(overlay.querySelector('.dv-floating-titlebar')).toBeNull();
+            expect(
+                overlay.classList.contains('dv-resize-container-with-titlebar')
+            ).toBeFalsy();
+
+            dockview.dispose();
+        });
+
+        test('per-group dragHandle override beats the component option', () => {
+            const dockview = createDockview();
+            dockview.layout(1000, 500);
+
+            const panel = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            // component default is 'titlebar'; override to 'tabbar' for this group
+            dockview.addFloatingGroup(panel.api.group, {
+                dragHandle: 'tabbar',
+            });
+
+            const overlay = dockview.floatingGroups[0].overlay.element;
+            expect(overlay.querySelector('.dv-floating-titlebar')).toBeNull();
+
+            dockview.dispose();
+        });
+
         test('move a floating group of one tab to a new fixed group', () => {
             const container = document.createElement('div');
 
