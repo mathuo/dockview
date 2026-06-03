@@ -6284,6 +6284,112 @@ describe('dockviewComponent', () => {
                 dockview.dispose();
             });
 
+            test('backward compatibility: a legacy single-group floating + popout layout (data shape, no grid) restores', async () => {
+                jest.useFakeTimers();
+                window.open = () => setupMockWindow();
+
+                const dockview = make();
+                dockview.layout(1000, 500);
+
+                // A frozen layout in the shape dockview emitted BEFORE nested
+                // multi-group windows existed: floating/popout groups use the
+                // legacy `data` field and no `grid`. Hand-authored (not produced
+                // by the current serializer) so it guards old -> new read
+                // compatibility against future format changes.
+                const legacyLayout = {
+                    activeGroup: 'grid-group',
+                    grid: {
+                        root: {
+                            type: 'branch',
+                            data: [
+                                {
+                                    type: 'leaf',
+                                    data: {
+                                        views: ['p1'],
+                                        id: 'grid-group',
+                                        activeView: 'p1',
+                                    },
+                                    size: 1000,
+                                },
+                            ],
+                            size: 500,
+                        },
+                        height: 500,
+                        width: 1000,
+                        orientation: Orientation.HORIZONTAL,
+                    },
+                    panels: {
+                        p1: {
+                            id: 'p1',
+                            contentComponent: 'default',
+                            title: 'p1',
+                        },
+                        p2: {
+                            id: 'p2',
+                            contentComponent: 'default',
+                            title: 'p2',
+                        },
+                        p3: {
+                            id: 'p3',
+                            contentComponent: 'default',
+                            title: 'p3',
+                        },
+                    },
+                    floatingGroups: [
+                        {
+                            data: {
+                                views: ['p2'],
+                                id: 'float-group',
+                                activeView: 'p2',
+                            },
+                            position: {
+                                top: 10,
+                                left: 10,
+                                width: 300,
+                                height: 200,
+                            },
+                        },
+                    ],
+                    popoutGroups: [
+                        {
+                            data: {
+                                views: ['p3'],
+                                id: 'popout-group',
+                                activeView: 'p3',
+                            },
+                            position: {
+                                left: 0,
+                                top: 0,
+                                width: 400,
+                                height: 300,
+                            },
+                        },
+                    ],
+                } as Parameters<typeof dockview.fromJSON>[0];
+
+                dockview.fromJSON(legacyLayout);
+
+                // popout restoration is queued on a timer
+                jest.advanceTimersByTime(200);
+                await dockview.popoutRestorationPromise;
+
+                expect(dockview.panels.map((p) => p.id).sort()).toEqual([
+                    'p1',
+                    'p2',
+                    'p3',
+                ]);
+
+                const loc = (id: string) =>
+                    dockview.panels.find((p) => p.id === id)!.api.location.type;
+                expect(loc('p1')).toBe('grid');
+                expect(loc('p2')).toBe('floating');
+                expect(loc('p3')).toBe('popout');
+                expect(dockview.floatingGroups.length).toBe(1);
+
+                jest.useRealTimers();
+                dockview.dispose();
+            });
+
             test('multi-group floating window round-trips through toJSON/fromJSON', () => {
                 const dockview = make();
                 dockview.layout(1000, 500);
