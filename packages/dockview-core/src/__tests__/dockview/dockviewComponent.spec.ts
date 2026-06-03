@@ -6138,6 +6138,103 @@ describe('dockviewComponent', () => {
                 dockview.dispose();
             });
 
+            test('closing a popout window after its anchor was moved out relocates the remaining members (no orphan)', async () => {
+                const mockWindow = setupMockWindow();
+                window.open = () => mockWindow;
+
+                const dockview = make();
+                dockview.layout(1000, 500);
+
+                const panel1 = dockview.addPanel({
+                    id: 'panel_1',
+                    component: 'default',
+                });
+                const panel2 = dockview.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    position: { referencePanel: 'panel_1', direction: 'right' },
+                });
+                const panel3 = dockview.addPanel({
+                    id: 'panel_3',
+                    component: 'default',
+                    position: { referencePanel: 'panel_1', direction: 'right' },
+                });
+
+                // pop out panel1's group, then drag panel2's group into the
+                // popout window -> 2-group popout, anchor = panel1's group
+                await dockview.addPopoutGroup(panel1.api.group);
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel2.group.id },
+                    to: { group: panel1.group, position: 'right' },
+                });
+                expect(panel1.api.location.type).toBe('popout');
+                expect(panel2.api.location.type).toBe('popout');
+
+                // move the ORIGINAL anchor (panel1's group) back to the grid;
+                // the window survives and promotes panel2's group as anchor
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel1.group.id },
+                    to: { group: panel3.group, position: 'right' },
+                });
+                expect(panel1.api.location.type).toBe('grid');
+                expect(panel2.api.location.type).toBe('popout');
+
+                // close the OS window. Before the fix, the teardown keyed off the
+                // (departed) original anchor and left panel2's group orphaned in
+                // the disposed nested gridview.
+                mockWindow.close();
+
+                expect(panel2.api.location.type).toBe('grid');
+                expect(dockview.panels.length).toBe(3);
+
+                // an orphaned group would trip clear() with 'Invalid grid element'
+                expect(() => dockview.clear()).not.toThrow();
+                expect(dockview.groups.length).toBe(0);
+
+                dockview.dispose();
+            });
+
+            test('a globally-configured popoutUrl is recorded on the group and survives serialization', async () => {
+                const mockWindow = setupMockWindow();
+                window.open = () => mockWindow;
+
+                const dockview = new DockviewComponent(
+                    document.createElement('div'),
+                    {
+                        popoutUrl: '/custom-popout.html',
+                        createComponent(options) {
+                            switch (options.name) {
+                                case 'default':
+                                    return new PanelContentPartTest(
+                                        options.id,
+                                        options.name
+                                    );
+                                default:
+                                    throw new Error(`unsupported`);
+                            }
+                        },
+                    }
+                );
+                dockview.layout(1000, 500);
+
+                const panel1 = dockview.addPanel({
+                    id: 'panel_1',
+                    component: 'default',
+                });
+
+                // no per-call popoutUrl -> falls back to the global option
+                await dockview.addPopoutGroup(panel1.api.group);
+
+                expect(
+                    (panel1.api.location as { popoutUrl?: string }).popoutUrl
+                ).toBe('/custom-popout.html');
+
+                const json = dockview.toJSON();
+                expect(json.popoutGroups![0].url).toBe('/custom-popout.html');
+
+                dockview.dispose();
+            });
+
             test('multi-group floating window round-trips through toJSON/fromJSON', () => {
                 const dockview = make();
                 dockview.layout(1000, 500);

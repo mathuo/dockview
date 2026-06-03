@@ -964,14 +964,17 @@ export class DockviewComponent
         const groupId =
             options?.overridePopoutGroup?.id ?? this.getNextGroupId();
 
+        // Resolve the configured popout URL once (per-call override → global
+        // option). Recorded on the entry / group locations so it survives
+        // serialization; the '/popout.html' default is applied only when
+        // actually opening the window, not baked into saved layouts.
+        const resolvedPopoutUrl = options?.popoutUrl ?? this.options?.popoutUrl;
+
         const _window = new PopoutWindow(
             `${this.id}-${groupId}`, // unique id
             theme ?? '',
             {
-                url:
-                    options?.popoutUrl ??
-                    this.options?.popoutUrl ??
-                    '/popout.html',
+                url: resolvedPopoutUrl ?? '/popout.html',
                 left: window.screenX + box.left,
                 top: window.screenY + box.top,
                 width: box.width,
@@ -1157,7 +1160,7 @@ export class DockviewComponent
                 group.model.location = {
                     type: 'popout',
                     getWindow: () => _window.window!,
-                    popoutUrl: options?.popoutUrl,
+                    popoutUrl: resolvedPopoutUrl,
                 };
 
                 if (options?.overridePopoutGridview) {
@@ -1176,7 +1179,7 @@ export class DockviewComponent
                         member.model.location = {
                             type: 'popout',
                             getWindow: () => _window.window!,
-                            popoutUrl: options?.popoutUrl,
+                            popoutUrl: resolvedPopoutUrl,
                         };
                     }
                 }
@@ -1229,7 +1232,7 @@ export class DockviewComponent
                     overlayRenderContainer,
                     dropTargetContainer,
                     getWindow: () => _window.window!,
-                    popoutUrl: options?.popoutUrl,
+                    popoutUrl: resolvedPopoutUrl,
                     referenceGroup: isValidReferenceGroup
                         ? referenceGroup.id
                         : undefined,
@@ -1414,19 +1417,32 @@ export class DockviewComponent
             return;
         }
 
-        // A popout window may host several groups. On a genuine window close
-        // (the entry is still tracked), relocate every non-anchor member back
-        // to the main grid before the anchor logic below handles `group`.
-        // Explicit removal paths remove the entry first, so this is skipped for
-        // them.
-        if (this._popoutWindowService?.findByGroup(group)) {
-            const extraMembers = this.groups.filter(
-                (candidate) =>
-                    candidate !== group &&
-                    popoutGridview.element.contains(candidate.element)
-            );
+        // Distinguish a genuine window close from an explicit `removeGroup`:
+        // the explicit-removal paths remove the service entry *before* this
+        // disposable runs. Key off the stable `popoutGridview` rather than the
+        // captured `group`, which may no longer be the window's anchor (it can
+        // have been dragged out, promoting another member to anchor).
+        const genuineClose = !!this._popoutWindowService?.entries.find(
+            (entry) => entry.gridview === popoutGridview
+        );
 
-            for (const member of extraMembers) {
+        // The groups still living in this window, resolved from the gridview so
+        // a reassigned anchor doesn't hide surviving members.
+        const members = this.groups.filter((candidate) =>
+            popoutGridview.element.contains(candidate.element)
+        );
+        const anchorPresent = members.includes(group);
+        const anchorIsSoleMember = anchorPresent && members.length === 1;
+
+        // On a genuine close, relocate every member that ISN'T the captured
+        // anchor back to the main grid. The captured anchor (if still here) gets
+        // the reference-return / re-float treatment below. Explicit removal
+        // relocates via its own path, so the loop is skipped for it.
+        if (genuineClose) {
+            for (const member of members) {
+                if (member === group) {
+                    continue;
+                }
                 this.movingLock(() => {
                     this.doRemoveGroup(member, {
                         skipDispose: true,
@@ -1438,7 +1454,11 @@ export class DockviewComponent
             }
         }
 
-        if (isGroupAddedToDom && this.getPanel(referenceGroup.id)) {
+        if (
+            anchorPresent &&
+            isGroupAddedToDom &&
+            this.getPanel(referenceGroup.id)
+        ) {
             this.movingLock(() =>
                 moveGroupWithoutDestroying({
                     from: group,
@@ -1455,26 +1475,26 @@ export class DockviewComponent
                     skipPopoutAssociated: true,
                 });
             }
-        } else if (this.getPanel(group.id)) {
+        } else if (anchorPresent && this.getPanel(group.id)) {
             group.model.renderContainer = this.overlayRenderContainer;
             group.model.dropTargetContainer = this.rootDropTargetContainer;
             closeResult.returnedGroup = group;
 
-            const alreadyRemoved =
-                !this._popoutWindowService?.findByGroup(group);
-
-            if (alreadyRemoved) {
+            if (!genuineClose) {
                 /**
                  * If this popout group was explicitly removed then we shouldn't run the additional
-                 * steps. To tell if the running of this disposable is the result of this popout group
-                 * being explicitly removed we can check if this popout group is still tracked by
-                 * the popout window service.
+                 * steps. The explicit remover re-docks the returned group itself; here we only hand
+                 * it back (above) and tear down the nested gridview.
                  */
                 disposePopoutGridview();
                 return;
             }
 
-            if (floatingBox) {
+            // Re-float only restores the pre-popout state of a SINGLE popped-out
+            // group. A multi-group window must not be split (anchor re-floats
+            // while the rest dock to the grid), so dock the anchor to the grid
+            // alongside the other members once they're no longer alone.
+            if (floatingBox && anchorIsSoleMember) {
                 this.addFloatingGroup(group, {
                     height: floatingBox.height,
                     width: floatingBox.width,
@@ -2551,7 +2571,7 @@ export class DockviewComponent
         }
 
         // Queue popup group creation with delays to avoid browser blocking
-        return serialized.map((serializedPopoutGroup, index) => {
+        return serialized.flatMap((serializedPopoutGroup, index) => {
             const { data, grid, position, gridReferenceGroup, url } =
                 serializedPopoutGroup;
 
@@ -2565,6 +2585,15 @@ export class DockviewComponent
                 const built = this.deserializeNestedGridview(grid, createGroup);
                 overridePopoutGridview = built.gridview;
                 members = built.members;
+
+                if (members.length === 0) {
+                    // A serialized window with no groups: nothing to restore.
+                    // Mirror the floating path's guard and discard the empty
+                    // gridview rather than passing an undefined anchor to
+                    // addPopoutGroup.
+                    overridePopoutGridview.dispose();
+                    return [];
+                }
             }
 
             const group = grid ? members[0] : createGroup(data!);
@@ -4174,9 +4203,10 @@ export class DockviewComponent
         if (floating) {
             return floating.gridview;
         }
-        const popout = this._popoutWindowService?.entries.find((entry) =>
-            entry.gridview.element.contains(group.element)
-        );
+        // Use findByGroup (anchor-identity OR containment) for symmetry with
+        // the floating branch — it also resolves an anchor whose element is
+        // briefly detached from the gridview during a move/restore.
+        const popout = this._popoutWindowService?.findByGroup(group);
         if (popout) {
             return popout.gridview;
         }
