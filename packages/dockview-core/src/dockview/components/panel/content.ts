@@ -63,7 +63,11 @@ export class ContentContainer
 
         this.addDisposables(this._onDidFocus, this._onDidBlur);
 
-        const target = group.dropTargetContainer;
+        // Resolve the override anchor dynamically: a group can be relocated
+        // between roots (grid / floating / popout) after construction, and the
+        // popout anchor in particular lives in another window — a value
+        // captured here would mount overlays in the wrong window.
+        const getOverrideTarget = () => group.dropTargetContainer?.model;
 
         const canDisplayOverlay = (
             event: DragEvent | PointerEvent,
@@ -105,7 +109,7 @@ export class ContentContainer
             className: 'dv-drop-target-content',
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
             canDisplayOverlay,
-            getOverrideTarget: target ? () => target.model : undefined,
+            getOverrideTarget,
         });
 
         this.pointerDropTarget = pointerBackend.createDropTarget(this.element, {
@@ -117,7 +121,7 @@ export class ContentContainer
                     : null;
             },
             className: 'dv-drop-target-content',
-            getOverrideTarget: target ? () => target.model : undefined,
+            getOverrideTarget,
         });
 
         this.addDisposables(this.dropTarget, this.pointerDropTarget);

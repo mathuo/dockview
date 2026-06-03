@@ -2076,7 +2076,11 @@ describe('dockviewGroupPanelModel', () => {
 
         test.each([
             ['grid', ['top', 'bottom', 'left', 'right', 'center']],
-            ['popout', ['center']],
+            // floating + popout host their own nested gridview, so they accept
+            // all zones (edge drops split the window). Edge groups are
+            // structural and stay center-only.
+            ['floating', ['top', 'bottom', 'left', 'right', 'center']],
+            ['popout', ['top', 'bottom', 'left', 'right', 'center']],
             ['edge', ['center']],
         ] as const)(
             'location=%s applies zones to BOTH dropTarget and pointerDropTarget',

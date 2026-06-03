@@ -20,6 +20,7 @@ import { GroupDragSource } from './groupDragSource';
 export class FloatingTitleBar extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private readonly dragSource: GroupDragSource;
+    private _group: DockviewGroupPanel;
 
     private readonly _onDragStart = new Emitter<DragEvent | PointerEvent>();
     readonly onDragStart = this._onDragStart.event;
@@ -28,11 +29,27 @@ export class FloatingTitleBar extends CompositeDisposable {
         return this._element;
     }
 
+    /** The window's current anchor group — the one this bar drags/activates. */
+    get group(): DockviewGroupPanel {
+        return this._group;
+    }
+
+    /**
+     * Retarget the bar at a new anchor group. Called when the original anchor
+     * leaves a multi-group floating window and another member is promoted, so
+     * the bar keeps activating/redocking a group that actually lives here.
+     */
+    setGroup(group: DockviewGroupPanel): void {
+        this._group = group;
+    }
+
     constructor(
         private readonly accessor: DockviewComponent,
-        private readonly group: DockviewGroupPanel
+        group: DockviewGroupPanel
     ) {
         super();
+
+        this._group = group;
 
         this._element = document.createElement('div');
         this._element.className = 'dv-floating-titlebar';
@@ -40,7 +57,7 @@ export class FloatingTitleBar extends CompositeDisposable {
         this.addDisposables(
             this._onDragStart,
             addDisposableListener(this._element, 'pointerdown', () => {
-                this.accessor.doSetGroupActive(this.group);
+                this.accessor.doSetGroupActive(this._group);
             }),
             // Shift+pointerdown marks the event so the overlay's
             // move-the-float drag doesn't fire alongside the HTML5 redock
@@ -60,7 +77,8 @@ export class FloatingTitleBar extends CompositeDisposable {
         this.dragSource = new GroupDragSource({
             element: this._element,
             accessor: this.accessor,
-            group: this.group,
+            // resolve lazily so the drag source follows anchor reassignment
+            group: () => this._group,
         });
 
         this.addDisposables(

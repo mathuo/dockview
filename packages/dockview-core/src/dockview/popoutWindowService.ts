@@ -5,12 +5,28 @@ import { PopoutWindow } from '../popoutWindow';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { SerializedPopoutGroup } from './dockviewComponent';
 import { GroupPanelViewState } from './dockviewGroupPanelModel';
+import { Gridview, ISerializedLeafNode } from '../gridview/gridview';
+import { OverlayRenderContainer } from '../overlay/overlayRenderContainer';
+import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import { defineModule } from './modules';
 
 export interface PopoutGroupEntry {
     window: PopoutWindow;
     popoutGroup: DockviewGroupPanel;
     referenceGroup?: string;
+    /**
+     * The popout window hosts its own gridview so it can hold a nested
+     * splitview layout of groups. `popoutGroup` is the window's anchor group.
+     */
+    gridview: Gridview;
+    /**
+     * Render / drop-target containers and window accessor for this popout, so
+     * groups relocated into the window can be wired to its own document.
+     */
+    overlayRenderContainer: OverlayRenderContainer;
+    dropTargetContainer: DropTargetAnchorContainer;
+    getWindow: () => Window;
+    popoutUrl?: string;
     disposable: { dispose: () => DockviewGroupPanel | undefined };
 }
 
@@ -29,6 +45,12 @@ export interface IPopoutWindowService extends IDisposable {
 
     findByGroup(group: DockviewGroupPanel): PopoutGroupEntry | undefined;
     findReferenceGroupId(group: DockviewGroupPanel): string | undefined;
+
+    observeGridviewSize(
+        popoutWindow: PopoutWindow,
+        gridview: Gridview,
+        overlayRenderContainer: OverlayRenderContainer
+    ): IDisposable | undefined;
 
     getPopupService(groupId: string): PopupService | undefined;
     setPopupService(groupId: string, service: PopupService): void;
@@ -75,12 +97,77 @@ export class PopoutWindowService implements IPopoutWindowService {
     }
 
     findByGroup(group: DockviewGroupPanel): PopoutGroupEntry | undefined {
-        return this._entries.find((entry) => entry.popoutGroup === group);
+        // A popout window may host several groups in a nested gridview, so
+        // match by membership (DOM containment) rather than only the anchor.
+        return this._entries.find(
+            (entry) =>
+                entry.popoutGroup === group ||
+                entry.gridview.element.contains(group.element)
+        );
     }
 
     findReferenceGroupId(group: DockviewGroupPanel): string | undefined {
         return this._entries.find((entry) => entry.popoutGroup === group)
             ?.referenceGroup;
+    }
+
+    /**
+     * The popout window's innerWidth/innerHeight are often 0/stale until it has
+     * painted, and the nested gridview lays its children out to the size passed
+     * to layout() (a plain group fills via CSS instead). To stop content
+     * rendering into a zero box until a manual resize — and to avoid the race a
+     * fixed number of animation frames had — observe the gridview element with
+     * a ResizeObserver created in the POPOUT window's OWN realm. A parent-realm
+     * observer fires unreliably across the window boundary; a same-realm one
+     * fires reliably, including the initial observation once the window is
+     * sized.
+     *
+     * @returns a disposable that disconnects the observer, or `undefined` when
+     * the popout realm has no ResizeObserver (e.g. jsdom).
+     */
+    observeGridviewSize(
+        popoutWindow: PopoutWindow,
+        gridview: Gridview,
+        overlayRenderContainer: OverlayRenderContainer
+    ): IDisposable | undefined {
+        const PopoutResizeObserver = (
+            popoutWindow.window as (Window & typeof globalThis) | undefined
+        )?.ResizeObserver;
+        if (!PopoutResizeObserver) {
+            return undefined;
+        }
+
+        let lastWidth = -1;
+        let lastHeight = -1;
+        const relayout = () => {
+            const win = popoutWindow.window;
+            if (this._host.isDisposed || !win || win.closed) {
+                return;
+            }
+            const width = Math.round(gridview.element.clientWidth);
+            const height = Math.round(gridview.element.clientHeight);
+            if (width === lastWidth && height === lastHeight) {
+                return;
+            }
+            lastWidth = width;
+            lastHeight = height;
+            if (width > 0 && height > 0) {
+                gridview.layout(width, height);
+            }
+            overlayRenderContainer.updateAllPositions();
+        };
+        const observer = new PopoutResizeObserver(() => {
+            // Defer out of the observer callback into the popout's own frame to
+            // size against the settled layout and to avoid resize-loop warnings.
+            const raf = popoutWindow.window?.requestAnimationFrame;
+            if (raf) {
+                raf.call(popoutWindow.window, relayout);
+            } else {
+                relayout();
+            }
+        });
+        observer.observe(gridview.element);
+        return { dispose: () => observer.disconnect() };
     }
 
     getPopupService(groupId: string): PopupService | undefined {
@@ -137,15 +224,37 @@ export class PopoutWindowService implements IPopoutWindowService {
     }
 
     serialize(): SerializedPopoutGroup[] {
-        return this._entries.map((entry) => ({
-            data: entry.popoutGroup.toJSON() as GroupPanelViewState,
-            gridReferenceGroup: entry.referenceGroup,
-            position: entry.window.dimensions(),
-            url:
+        return this._entries.map((entry) => {
+            const grid = entry.gridview.serialize();
+            const root = grid.root;
+            const url =
                 entry.popoutGroup.api.location.type === 'popout'
                     ? entry.popoutGroup.api.location.popoutUrl
-                    : undefined,
-        }));
+                    : undefined;
+
+            const base = {
+                gridReferenceGroup: entry.referenceGroup,
+                position: entry.window.dimensions(),
+                url,
+            };
+
+            // Single-group window keeps the legacy `data` shape so layouts
+            // round-trip byte-stably and older readers keep working.
+            if (
+                root.type === 'branch' &&
+                root.data.length === 1 &&
+                root.data[0].type === 'leaf'
+            ) {
+                return {
+                    ...base,
+                    data: (
+                        root.data[0] as ISerializedLeafNode<GroupPanelViewState>
+                    ).data,
+                };
+            }
+
+            return { ...base, grid };
+        });
     }
 
     disposeAll(): void {

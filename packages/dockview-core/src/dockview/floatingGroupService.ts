@@ -1,6 +1,7 @@
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { remove } from '../array';
 import { watchElementResize } from '../dom';
+import { Gridview, ISerializedLeafNode } from '../gridview/gridview';
 import { Overlay } from '../overlay/overlay';
 import { DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE } from '../constants';
 import { DockviewFloatingGroupPanel } from './dockviewFloatingGroupPanel';
@@ -23,7 +24,8 @@ export interface IFloatingGroupService extends IDisposable {
 
     add(
         group: DockviewGroupPanel,
-        overlay: Overlay
+        overlay: Overlay,
+        gridview: Gridview
     ): DockviewFloatingGroupPanel;
 
     findByGroup(
@@ -53,11 +55,13 @@ export class FloatingGroupService implements IFloatingGroupService {
 
     add(
         group: DockviewGroupPanel,
-        overlay: Overlay
+        overlay: Overlay,
+        gridview: Gridview
     ): DockviewFloatingGroupPanel {
         const floatingGroupPanel = new DockviewFloatingGroupPanel(
             group,
-            overlay
+            overlay,
+            gridview
         );
 
         const disposable = new CompositeDisposable(
@@ -67,9 +71,13 @@ export class FloatingGroupService implements IFloatingGroupService {
                 }
             }),
             (() => {
+                // The floating window's nested gridview fills the overlay
+                // beneath the (optional) title bar; size it from its own
+                // measured box so it follows the overlay as the user drags
+                // / resizes the window.
                 let lastWidth = -1;
                 let lastHeight = -1;
-                return watchElementResize(group.element, (entry) => {
+                return watchElementResize(gridview.element, (entry) => {
                     const width = Math.round(entry.contentRect.width);
                     const height = Math.round(entry.contentRect.height);
                     if (width === lastWidth && height === lastHeight) {
@@ -77,14 +85,14 @@ export class FloatingGroupService implements IFloatingGroupService {
                     }
                     lastWidth = width;
                     lastHeight = height;
-                    group.layout(width, height);
+                    gridview.layout(width, height);
                 });
             })()
         );
 
         floatingGroupPanel.addDisposables(
             overlay.onDidChange(() => {
-                group.layout(group.width, group.height);
+                gridview.layout(gridview.width, gridview.height);
             }),
             overlay.onDidChangeEnd(() => {
                 this._host.fireLayoutChange();
@@ -118,16 +126,41 @@ export class FloatingGroupService implements IFloatingGroupService {
     findByGroup(
         group: DockviewGroupPanel
     ): DockviewFloatingGroupPanel | undefined {
+        // A floating window may host several groups in a nested gridview, so
+        // match by membership (DOM containment) rather than only the anchor
+        // group. `floating.group === group` covers the brief window before the
+        // anchor's element is attached to the gridview.
         return this._floatingGroups.find(
-            (floating) => floating.group === group
+            (floating) =>
+                floating.group === group ||
+                floating.gridview.element.contains(group.element)
         );
     }
 
     serialize(): SerializedFloatingGroup[] {
-        return this._floatingGroups.map((group) => ({
-            data: group.group.toJSON() as GroupPanelViewState,
-            position: group.overlay.toJSON(),
-        }));
+        return this._floatingGroups.map((floating) => {
+            const grid = floating.gridview.serialize();
+            const position = floating.overlay.toJSON();
+            const root = grid.root;
+
+            // A single-group window keeps the legacy `data` shape so layouts
+            // round-trip byte-stably and older readers keep working; only
+            // genuine multi-group windows emit the nested `grid` form.
+            if (
+                root.type === 'branch' &&
+                root.data.length === 1 &&
+                root.data[0].type === 'leaf'
+            ) {
+                return {
+                    data: (
+                        root.data[0] as ISerializedLeafNode<GroupPanelViewState>
+                    ).data,
+                    position,
+                };
+            }
+
+            return { grid, position };
+        });
     }
 
     constrainBounds(): void {

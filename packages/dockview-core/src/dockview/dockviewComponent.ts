@@ -4,6 +4,8 @@ import {
     getGridLocation,
     ISerializedLeafNode,
     orthogonal,
+    Gridview,
+    SerializedGridview,
 } from '../gridview/gridview';
 import { directionToPosition, Position } from '../dnd/droptarget';
 import { tail, sequenceEquals } from '../array';
@@ -35,7 +37,7 @@ import {
     toTarget,
 } from '../gridview/baseComponentGridview';
 import { DockviewApi } from '../api/component.api';
-import { Orientation } from '../splitview/splitview';
+import { Orientation, Sizing } from '../splitview/splitview';
 import {
     GroupOptions,
     GroupPanelViewState,
@@ -150,18 +152,44 @@ export interface DockviewPopoutGroupOptions {
     overridePopoutGroup?: DockviewGroupPanel;
 }
 
+interface DockviewPopoutGroupOptionsInternal extends DockviewPopoutGroupOptions {
+    /**
+     * Restore into a pre-built nested gridview (multi-group popout window)
+     * rather than creating one around a single group.
+     */
+    overridePopoutGridview?: Gridview;
+}
+
 export interface PanelReference {
     update: (event: { params: { [key: string]: any } }) => void;
     remove: () => void;
 }
 
 export interface SerializedFloatingGroup {
-    data: GroupPanelViewState;
+    /**
+     * Legacy single-group form. Still written when a floating window hosts a
+     * single group (for stable round-trips) and always accepted on read.
+     */
+    data?: GroupPanelViewState;
+    /**
+     * Nested layout of the floating window. Written when the window hosts more
+     * than one group; mutually exclusive with `data`.
+     */
+    grid?: SerializedGridview<GroupPanelViewState>;
     position: AnchoredBox;
 }
 
 export interface SerializedPopoutGroup {
-    data: GroupPanelViewState;
+    /**
+     * Legacy single-group form. Still written when a popout window hosts a
+     * single group (for stable round-trips) and always accepted on read.
+     */
+    data?: GroupPanelViewState;
+    /**
+     * Nested layout of the popout window. Written when the window hosts more
+     * than one group; mutually exclusive with `data`.
+     */
+    grid?: SerializedGridview<GroupPanelViewState>;
     url?: string;
     gridReferenceGroup?: string;
     position: Box | null;
@@ -887,7 +915,7 @@ export class DockviewComponent
 
     addPopoutGroup(
         itemToPopout: DockviewPanel | DockviewGroupPanel,
-        options?: DockviewPopoutGroupOptions
+        options?: DockviewPopoutGroupOptionsInternal
     ): Promise<boolean> {
         const service = assertModule(
             this._popoutWindowService,
@@ -936,14 +964,17 @@ export class DockviewComponent
         const groupId =
             options?.overridePopoutGroup?.id ?? this.getNextGroupId();
 
+        // Resolve the configured popout URL once (per-call override → global
+        // option). Recorded on the entry / group locations so it survives
+        // serialization; the '/popout.html' default is applied only when
+        // actually opening the window, not baked into saved layouts.
+        const resolvedPopoutUrl = options?.popoutUrl ?? this.options?.popoutUrl;
+
         const _window = new PopoutWindow(
             `${this.id}-${groupId}`, // unique id
             theme ?? '',
             {
-                url:
-                    options?.popoutUrl ??
-                    this.options?.popoutUrl ??
-                    '/popout.html',
+                url: resolvedPopoutUrl ?? '/popout.html',
                 left: window.screenX + box.left,
                 top: window.screenY + box.top,
                 width: box.width,
@@ -985,7 +1016,11 @@ export class DockviewComponent
 
                 let group: DockviewGroupPanel;
 
-                if (!isGroupAddedToDom) {
+                if (options?.overridePopoutGridview) {
+                    // Restoring a multi-group window: the anchor group is
+                    // already built inside the supplied gridview.
+                    group = options.overridePopoutGroup ?? referenceGroup;
+                } else if (!isGroupAddedToDom) {
                     group = referenceGroup;
                 } else if (options?.overridePopoutGroup) {
                     group = options.overridePopoutGroup;
@@ -998,26 +1033,12 @@ export class DockviewComponent
                 }
 
                 if (popoutContainer === null) {
-                    console.error(
-                        'dockview: failed to create popout. perhaps you need to allow pop-ups for this website'
-                    );
-
-                    popoutWindowDisposable.dispose();
-                    this._onDidOpenPopoutWindowFail.fire();
-
-                    // if the popout window was blocked, we need to move the group back to the reference group
-                    // and set it to visible
-                    this.movingLock(() =>
-                        moveGroupWithoutDestroying({
-                            from: group,
-                            to: referenceGroup,
-                        })
-                    );
-
-                    if (!referenceGroup.api.isVisible) {
-                        referenceGroup.api.setVisible(true);
-                    }
-
+                    this.handleBlockedPopout({
+                        group,
+                        referenceGroup,
+                        options,
+                        popoutWindowDisposable,
+                    });
                     return false;
                 }
 
@@ -1030,14 +1051,45 @@ export class DockviewComponent
                 );
 
                 group.model.renderContainer = overlayRenderContainer;
-                group.layout(
+
+                // The popout window hosts its own gridview so it can grow into
+                // a nested splitview layout. The window starts with the single
+                // anchor group; further groups arrive via drag-and-drop. On
+                // restore a pre-populated gridview is supplied instead.
+                const popoutGridview =
+                    options?.overridePopoutGridview ??
+                    this.createNestedGridview();
+                if (!options?.overridePopoutGridview) {
+                    popoutGridview.addView(group, Sizing.Distribute, [0]);
+                }
+                // Fill the popout window. Unlike the main grid (explicit px) and
+                // floating windows (CSS inside .dv-resize-container), the popout
+                // gridview has no sizing context, so without this it collapses
+                // to 0 height and nothing renders.
+                popoutGridview.element.style.width = '100%';
+                popoutGridview.element.style.height = '100%';
+                popoutGridview.layout(
                     _window.window!.innerWidth,
                     _window.window!.innerHeight
                 );
 
+                // Guarded so the teardown's re-entrant paths (window close
+                // re-enters via the anchor's doRemoveGroup) never double-dispose.
+                let popoutGridviewDisposed = false;
+                const disposePopoutGridview = () => {
+                    if (!popoutGridviewDisposed) {
+                        popoutGridviewDisposed = true;
+                        popoutGridview.dispose();
+                    }
+                };
+
                 let floatingBox: AnchoredBox | undefined;
 
-                if (!options?.overridePopoutGroup && isGroupAddedToDom) {
+                if (
+                    !options?.overridePopoutGroup &&
+                    !options?.overridePopoutGridview &&
+                    isGroupAddedToDom
+                ) {
                     if (itemToPopout instanceof DockviewPanel) {
                         this.movingLock(() => {
                             const panel =
@@ -1077,7 +1129,7 @@ export class DockviewComponent
                 popoutContainer.style.overflow = 'hidden';
                 popoutContainer.appendChild(gready);
 
-                popoutContainer.appendChild(group.element);
+                popoutContainer.appendChild(popoutGridview.element);
 
                 const anchor = document.createElement('div');
                 const dropTargetContainer = new DropTargetAnchorContainer(
@@ -1108,8 +1160,29 @@ export class DockviewComponent
                 group.model.location = {
                     type: 'popout',
                     getWindow: () => _window.window!,
-                    popoutUrl: options?.popoutUrl,
+                    popoutUrl: resolvedPopoutUrl,
                 };
+
+                if (options?.overridePopoutGridview) {
+                    // Restored multi-group window. Wire every member (including
+                    // the anchor) to this window's containers and popout
+                    // location now that the gridview is attached and laid out —
+                    // re-setting renderContainer forces a re-render at the right
+                    // time so 'always'-rendered content positions in this
+                    // window rather than where it was first created.
+                    const members = this.groups.filter((candidate) =>
+                        popoutGridview.element.contains(candidate.element)
+                    );
+                    for (const member of members) {
+                        member.model.renderContainer = overlayRenderContainer;
+                        member.model.dropTargetContainer = dropTargetContainer;
+                        member.model.location = {
+                            type: 'popout',
+                            getWindow: () => _window.window!,
+                            popoutUrl: resolvedPopoutUrl,
+                        };
+                    }
+                }
 
                 if (
                     isGroupAddedToDom &&
@@ -1119,6 +1192,17 @@ export class DockviewComponent
                 }
 
                 this.doSetGroupAndPanelActive(group);
+
+                const resizeObserverDisposable = service.observeGridviewSize(
+                    _window,
+                    popoutGridview,
+                    overlayRenderContainer
+                );
+                if (resizeObserverDisposable) {
+                    popoutWindowDisposable.addDisposables(
+                        resizeObserverDisposable
+                    );
+                }
 
                 popoutWindowDisposable.addDisposables(
                     group.api.onDidActiveChange((event) => {
@@ -1131,7 +1215,10 @@ export class DockviewComponent
                     })
                 );
 
-                let returnedGroup: DockviewGroupPanel | undefined;
+                // Holder so the close teardown (extracted below) can publish
+                // the group that was returned to the main grid back to the
+                // entry's `dispose()` contract.
+                const closeResult: { returnedGroup?: DockviewGroupPanel } = {};
 
                 const isValidReferenceGroup =
                     isGroupAddedToDom &&
@@ -1141,13 +1228,18 @@ export class DockviewComponent
                 const value = {
                     window: _window,
                     popoutGroup: group,
+                    gridview: popoutGridview,
+                    overlayRenderContainer,
+                    dropTargetContainer,
+                    getWindow: () => _window.window!,
+                    popoutUrl: resolvedPopoutUrl,
                     referenceGroup: isValidReferenceGroup
                         ? referenceGroup.id
                         : undefined,
                     disposable: {
                         dispose: () => {
                             popoutWindowDisposable.dispose();
-                            return returnedGroup;
+                            return closeResult.returnedGroup;
                         },
                     },
                 };
@@ -1172,85 +1264,24 @@ export class DockviewComponent
                             group,
                         });
                     }),
-                    /**
-                     * ResizeObserver seems slow here, I do not know why but we don't need it
-                     * since we can reply on the window resize event as we will occupy the full
-                     * window dimensions
-                     */
                     addDisposableListener(_window.window!, 'resize', () => {
-                        group.layout(
+                        popoutGridview.layout(
                             _window.window!.innerWidth,
                             _window.window!.innerHeight
                         );
                     }),
                     overlayRenderContainer,
-                    Disposable.from(() => {
-                        if (this.isDisposed) {
-                            return; // cleanup may run after instance is disposed
-                        }
-
-                        if (
-                            isGroupAddedToDom &&
-                            this.getPanel(referenceGroup.id)
-                        ) {
-                            this.movingLock(() =>
-                                moveGroupWithoutDestroying({
-                                    from: group,
-                                    to: referenceGroup,
-                                })
-                            );
-
-                            if (!referenceGroup.api.isVisible) {
-                                referenceGroup.api.setVisible(true);
-                            }
-
-                            if (this.getPanel(group.id)) {
-                                this.doRemoveGroup(group, {
-                                    skipPopoutAssociated: true,
-                                });
-                            }
-                        } else if (this.getPanel(group.id)) {
-                            group.model.renderContainer =
-                                this.overlayRenderContainer;
-                            group.model.dropTargetContainer =
-                                this.rootDropTargetContainer;
-                            returnedGroup = group;
-
-                            const alreadyRemoved = !service.findByGroup(group);
-
-                            if (alreadyRemoved) {
-                                /**
-                                 * If this popout group was explicitly removed then we shouldn't run the additional
-                                 * steps. To tell if the running of this disposable is the result of this popout group
-                                 * being explicitly removed we can check if this popout group is still tracked by
-                                 * the popout window service.
-                                 */
-                                return;
-                            }
-
-                            if (floatingBox) {
-                                this.addFloatingGroup(group, {
-                                    height: floatingBox.height,
-                                    width: floatingBox.width,
-                                    position: floatingBox,
-                                });
-                            } else {
-                                this.doRemoveGroup(group, {
-                                    skipDispose: true,
-                                    skipActive: true,
-                                    skipPopoutReturn: true,
-                                });
-
-                                group.model.location = { type: 'grid' };
-
-                                this.movingLock(() => {
-                                    // suppress group add events since the group already exists
-                                    this.doAddGroup(group, [0]);
-                                });
-                            }
-                            this.doSetGroupAndPanelActive(group);
-                        }
-                    })
+                    Disposable.from(() =>
+                        this.disposePopoutWindow({
+                            group,
+                            referenceGroup,
+                            popoutGridview,
+                            isGroupAddedToDom,
+                            floatingBox,
+                            disposePopoutGridview,
+                            closeResult,
+                        })
+                    )
                 );
 
                 service.add(value);
@@ -1261,6 +1292,235 @@ export class DockviewComponent
                 console.error('dockview: failed to create popout.', err);
                 return false;
             });
+    }
+
+    /**
+     * The popout window was blocked (e.g. by the browser's popup blocker —
+     * common when restoring popouts on load). Fall back gracefully so the
+     * group(s) end up valid and visible in the main grid rather than as
+     * orphans that later crash clear()/remove().
+     */
+    private handleBlockedPopout(params: {
+        group: DockviewGroupPanel;
+        referenceGroup: DockviewGroupPanel;
+        options?: DockviewPopoutGroupOptionsInternal;
+        popoutWindowDisposable: CompositeDisposable;
+    }): void {
+        const { group, referenceGroup, options, popoutWindowDisposable } =
+            params;
+
+        console.error(
+            'dockview: failed to create popout. perhaps you need to allow pop-ups for this website'
+        );
+
+        popoutWindowDisposable.dispose();
+        this._onDidOpenPopoutWindowFail.fire();
+
+        if (options?.overridePopoutGridview) {
+            // Restoring a multi-group popout window: its nested gridview was
+            // built up-front but never attached to a window. Dock every member
+            // into the main grid so no group is lost, then discard the
+            // detached gridview.
+            const blockedGridview = options.overridePopoutGridview;
+            const members = this.groups.filter((candidate) =>
+                blockedGridview.element.contains(candidate.element)
+            );
+            for (const member of members) {
+                this.movingLock(() => {
+                    blockedGridview.remove(member);
+                    this.redockGroupToMainGrid(member);
+                });
+            }
+            blockedGridview.dispose();
+
+            if (referenceGroup && !referenceGroup.api.isVisible) {
+                referenceGroup.api.setVisible(true);
+            }
+
+            return;
+        }
+
+        if (group === referenceGroup) {
+            // No separate grid group to return to (e.g. restoring a popout
+            // straight from JSON) — dock this group into the main grid.
+            if (!this.gridview.element.contains(group.element)) {
+                this.movingLock(() => this.doAddGroup(group, [0]));
+                group.model.location = { type: 'grid' };
+            }
+        } else {
+            // A fresh group was created for the popout — return its panels to
+            // the reference group and discard the now-empty popout group so it
+            // doesn't linger as an orphan.
+            this.movingLock(() =>
+                moveGroupWithoutDestroying({
+                    from: group,
+                    to: referenceGroup,
+                })
+            );
+
+            if (group.model.size === 0 && this._groups.has(group.id)) {
+                group.dispose();
+                this._groups.delete(group.id);
+                this._onDidRemoveGroup.fire(group);
+            }
+        }
+
+        if (!referenceGroup.api.isVisible) {
+            referenceGroup.api.setVisible(true);
+        }
+    }
+
+    /**
+     * Wire a group that has been displaced from a floating / popout window back
+     * to the main grid's render & drop-target containers and dock it at the
+     * root. The caller is responsible for first detaching it from its old
+     * gridview — the detach strategy differs between the window-teardown path
+     * (`doRemoveGroup`) and the blocked-window path (`gridview.remove`).
+     */
+    private redockGroupToMainGrid(group: DockviewGroupPanel): void {
+        group.model.renderContainer = this.overlayRenderContainer;
+        group.model.dropTargetContainer = this.rootDropTargetContainer;
+        group.model.location = { type: 'grid' };
+        this.doAddGroup(group, [0]);
+    }
+
+    /**
+     * Teardown for a popout window's `popoutWindowDisposable`. Runs when the
+     * window closes (by user, by `removeGroup`, or by component disposal):
+     * relocates every member group back to the main grid (or to a floating
+     * window when the anchor came from one), then disposes the nested gridview.
+     * `closeResult.returnedGroup` is read by the entry's `dispose()` contract.
+     */
+    private disposePopoutWindow(params: {
+        group: DockviewGroupPanel;
+        referenceGroup: DockviewGroupPanel;
+        popoutGridview: Gridview;
+        isGroupAddedToDom: boolean;
+        floatingBox: AnchoredBox | undefined;
+        disposePopoutGridview: () => void;
+        closeResult: { returnedGroup?: DockviewGroupPanel };
+    }): void {
+        const {
+            group,
+            referenceGroup,
+            popoutGridview,
+            isGroupAddedToDom,
+            floatingBox,
+            disposePopoutGridview,
+            closeResult,
+        } = params;
+
+        if (this.isDisposed) {
+            // cleanup may run after instance is disposed; just tear down the
+            // nested gridview.
+            disposePopoutGridview();
+            return;
+        }
+
+        // Distinguish a genuine window close from an explicit `removeGroup`:
+        // the explicit-removal paths remove the service entry *before* this
+        // disposable runs. Key off the stable `popoutGridview` rather than the
+        // captured `group`, which may no longer be the window's anchor (it can
+        // have been dragged out, promoting another member to anchor).
+        const genuineClose = !!this._popoutWindowService?.entries.find(
+            (entry) => entry.gridview === popoutGridview
+        );
+
+        // The groups still living in this window, resolved from the gridview so
+        // a reassigned anchor doesn't hide surviving members.
+        const members = this.groups.filter((candidate) =>
+            popoutGridview.element.contains(candidate.element)
+        );
+        const anchorPresent = members.includes(group);
+        const anchorIsSoleMember = anchorPresent && members.length === 1;
+
+        // On a genuine close, relocate every member that ISN'T the captured
+        // anchor back to the main grid. The captured anchor (if still here) gets
+        // the reference-return / re-float treatment below. Explicit removal
+        // relocates via its own path, so the loop is skipped for it.
+        if (genuineClose) {
+            for (const member of members) {
+                if (member === group) {
+                    continue;
+                }
+                this.movingLock(() => {
+                    this.doRemoveGroup(member, {
+                        skipDispose: true,
+                        skipActive: true,
+                        skipPopoutReturn: true,
+                    });
+                    this.redockGroupToMainGrid(member);
+                });
+            }
+        }
+
+        if (
+            anchorPresent &&
+            isGroupAddedToDom &&
+            this.getPanel(referenceGroup.id)
+        ) {
+            this.movingLock(() =>
+                moveGroupWithoutDestroying({
+                    from: group,
+                    to: referenceGroup,
+                })
+            );
+
+            if (!referenceGroup.api.isVisible) {
+                referenceGroup.api.setVisible(true);
+            }
+
+            if (this.getPanel(group.id)) {
+                this.doRemoveGroup(group, {
+                    skipPopoutAssociated: true,
+                });
+            }
+        } else if (anchorPresent && this.getPanel(group.id)) {
+            group.model.renderContainer = this.overlayRenderContainer;
+            group.model.dropTargetContainer = this.rootDropTargetContainer;
+            closeResult.returnedGroup = group;
+
+            if (!genuineClose) {
+                /**
+                 * If this popout group was explicitly removed then we shouldn't run the additional
+                 * steps. The explicit remover re-docks the returned group itself; here we only hand
+                 * it back (above) and tear down the nested gridview.
+                 */
+                disposePopoutGridview();
+                return;
+            }
+
+            // Re-float only restores the pre-popout state of a SINGLE popped-out
+            // group. A multi-group window must not be split (anchor re-floats
+            // while the rest dock to the grid), so dock the anchor to the grid
+            // alongside the other members once they're no longer alone.
+            if (floatingBox && anchorIsSoleMember) {
+                this.addFloatingGroup(group, {
+                    height: floatingBox.height,
+                    width: floatingBox.width,
+                    position: floatingBox,
+                });
+            } else {
+                this.doRemoveGroup(group, {
+                    skipDispose: true,
+                    skipActive: true,
+                    skipPopoutReturn: true,
+                });
+
+                group.model.location = { type: 'grid' };
+
+                this.movingLock(() => {
+                    // suppress group add events since the group already exists
+                    this.doAddGroup(group, [0]);
+                });
+            }
+            this.doSetGroupAndPanelActive(group);
+        }
+
+        // All members have been relocated out; tear down the window's nested
+        // gridview (does not dispose the leaf views — their lifecycle stays
+        // with `_groups`).
+        disposePopoutGridview();
     }
 
     addFloatingGroup(
@@ -1393,22 +1653,84 @@ export class DockviewComponent
 
         const anchoredBox = getAnchoredBox();
 
+        // The floating window hosts its own gridview so it can grow into a
+        // nested splitview layout. The window starts with the single anchor
+        // group; further groups are added via drag-and-drop.
+        const floatingGridview = this.createNestedGridview();
+        floatingGridview.addView(group, Sizing.Distribute, [0]);
+
+        this.mountFloatingWindow(
+            floatingGridview,
+            group,
+            [group],
+            anchoredBox,
+            {
+                dragHandle: options?.dragHandle,
+                inDragMode: options?.inDragMode,
+                skipActiveGroup: options?.skipActiveGroup,
+            }
+        );
+    }
+
+    /**
+     * Build an empty gridview configured to match the main grid's styling, for
+     * hosting a nested layout inside a floating or popout window.
+     */
+    private createNestedGridview(
+        orientation: Orientation = Orientation.HORIZONTAL
+    ): Gridview {
+        return new Gridview(
+            true,
+            this.options.hideBorders
+                ? { separatorBorder: 'transparent' }
+                : undefined,
+            orientation,
+            false,
+            this.options.theme?.gap ?? 0
+        );
+    }
+
+    /**
+     * Wrap a (populated) floating gridview in an overlay window: title bar /
+     * move handle, drag wiring, the floating-group service entry and the
+     * `floating` location tag for every member group.
+     */
+    private mountFloatingWindow(
+        floatingGridview: Gridview,
+        anchorGroup: DockviewGroupPanel,
+        members: DockviewGroupPanel[],
+        anchoredBox: AnchoredBox,
+        options?: {
+            dragHandle?: 'titlebar' | 'tabbar';
+            inDragMode?: boolean;
+            skipActiveGroup?: boolean;
+        }
+    ): void {
+        const service = assertModule(
+            this._floatingGroupService,
+            'FloatingGroup',
+            'api.addFloatingGroup'
+        );
+        if (!service) {
+            return;
+        }
+
         const dragHandleMode =
             options?.dragHandle ??
             this.options.floatingGroupDragHandle ??
             'titlebar';
 
-        // `'titlebar'` renders a dedicated grab bar above the group's tab bar
-        // and uses it as the move handle; `'tabbar'` falls back to the legacy
-        // behaviour of moving via the tab-bar void container.
+        // `'titlebar'` renders a dedicated grab bar above the tab bar and uses
+        // it as the move handle; `'tabbar'` falls back to moving via the
+        // tab-bar void container.
         const titleBar =
             dragHandleMode === 'titlebar'
-                ? new FloatingTitleBar(this, group)
+                ? new FloatingTitleBar(this, anchorGroup)
                 : undefined;
 
         const overlay = new Overlay({
             container: this._floatingOverlayHost ?? this.gridview.element,
-            content: group.element,
+            content: floatingGridview.element,
             header: titleBar?.element,
             ...anchoredBox,
             minimumInViewportWidth:
@@ -1427,7 +1749,7 @@ export class DockviewComponent
 
         const dragHandle =
             titleBar?.element ??
-            group.element.querySelector('.dv-void-container');
+            anchorGroup.element.querySelector('.dv-void-container');
 
         if (!dragHandle) {
             throw new Error('dockview: failed to find drag handle');
@@ -1440,27 +1762,39 @@ export class DockviewComponent
                     : false,
         });
 
-        const floatingGroupPanel = service.add(group, overlay);
+        const floatingGroupPanel = service.add(
+            anchorGroup,
+            overlay,
+            floatingGridview
+        );
 
         if (titleBar) {
-            // Tie the title bar's lifetime to the floating group and surface
+            // Tie the title bar's lifetime to the floating window and surface
             // its redock drag through the same public `onWillDragGroup` event
-            // the tab-bar handle uses.
+            // the tab-bar handle uses. Register it so anchor reassignment (when
+            // the original anchor leaves a multi-group window) retargets the
+            // bar at a group that still lives here.
+            floatingGroupPanel.setTitleBar(titleBar);
             floatingGroupPanel.addDisposables(
                 titleBar,
+                Disposable.from(() =>
+                    floatingGroupPanel.setTitleBar(undefined)
+                ),
                 titleBar.onDragStart((event) => {
                     this._onWillDragGroup.fire({
                         nativeEvent: event,
-                        group,
+                        group: floatingGroupPanel.group,
                     });
                 })
             );
         }
 
-        group.model.location = { type: 'floating' };
+        for (const member of members) {
+            member.model.location = { type: 'floating' };
+        }
 
         if (!options?.skipActiveGroup) {
-            this.doSetGroupAndPanelActive(group);
+            this.doSetGroupAndPanelActive(anchorGroup);
         }
     }
 
@@ -2012,163 +2346,20 @@ export class DockviewComponent
 
             this._layoutFromShell(width, height);
 
-            const edgeService = data.edgeGroups
-                ? assertModule(
-                      this._edgeGroupService,
-                      'EdgeGroup',
-                      'fromJSON edge restoration'
-                  )
-                : this._edgeGroupService;
-
-            if (data.edgeGroups && edgeService) {
-                // Auto-create edge groups for positions in the serialized state
-                // that don't already have a group registered (e.g. when fromJSON
-                // is called before the user has called addEdgeGroup).
-                for (const _position of [
-                    'top',
-                    'bottom',
-                    'left',
-                    'right',
-                ] as EdgeGroupPosition[]) {
-                    const fixedData = data.edgeGroups[_position];
-                    if (fixedData && !edgeService.has(_position)) {
-                        const groupState = fixedData.group as
-                            | GroupPanelViewState
-                            | undefined;
-                        const id = groupState?.id ?? `${_position}-group`;
-                        this.addEdgeGroup(_position, { id });
-                    }
-                }
-
-                // Restore panel contents of edge groups
-                for (const [position, edgeGroup] of edgeService.entries()) {
-                    const edgeData = data.edgeGroups[position];
-                    const groupState = edgeData?.group as
-                        | GroupPanelViewState
-                        | undefined;
-                    if (groupState) {
-                        const { views, activeView } = groupState;
-                        const createdPanels: IDockviewPanel[] = [];
-
-                        for (const panelId of views) {
-                            if (panels[panelId]) {
-                                const panel = this._deserializer.fromJSON(
-                                    panels[panelId],
-                                    edgeGroup
-                                );
-                                createdPanels.push(panel);
-                            }
-                        }
-
-                        for (let i = 0; i < createdPanels.length; i++) {
-                            const panel = createdPanels[i];
-                            const isActive = activeView === panel.id;
-                            edgeGroup.model.openPanel(panel, {
-                                skipSetActive: !isActive,
-                                skipSetGroupActive: true,
-                            });
-                        }
-
-                        // Restore tab groups before activating a fallback panel
-                        if (
-                            groupState.tabGroups &&
-                            groupState.tabGroups.length > 0
-                        ) {
-                            edgeGroup.model.restoreTabGroups(
-                                groupState.tabGroups
-                            );
-                        }
-
-                        if (
-                            !edgeGroup.activePanel &&
-                            edgeGroup.panels.length > 0
-                        ) {
-                            edgeGroup.model.openPanel(
-                                edgeGroup.panels[edgeGroup.panels.length - 1],
-                                { skipSetGroupActive: true }
-                            );
-                        }
-                    }
-                }
-
-                this._shellManager!.fromJSON(data.edgeGroups);
+            if (data.edgeGroups) {
+                this.deserializeEdgeGroups(data.edgeGroups, panels);
             }
 
-            const serializedFloatingGroups = data.floatingGroups ?? [];
+            this.deserializeFloatingWindows(
+                data.floatingGroups ?? [],
+                createGroupFromSerializedState
+            );
 
-            for (const serializedFloatingGroup of serializedFloatingGroups) {
-                const { data, position } = serializedFloatingGroup;
-
-                const group = createGroupFromSerializedState(data);
-
-                this.addFloatingGroup(group, {
-                    position: position,
-                    width: position.width,
-                    height: position.height,
-                    skipRemoveGroup: true,
-                    inDragMode: false,
-                });
-            }
-
-            const serializedPopoutGroups = data.popoutGroups ?? [];
-
-            const popoutService =
-                serializedPopoutGroups.length > 0
-                    ? assertModule(
-                          this._popoutWindowService,
-                          'PopoutWindow',
-                          'fromJSON popout restoration'
-                      )
-                    : this._popoutWindowService;
-
-            // Queue popup group creation with delays to avoid browser blocking
-            const popoutPromises = popoutService
-                ? serializedPopoutGroups.map((serializedPopoutGroup, index) => {
-                      const { data, position, gridReferenceGroup, url } =
-                          serializedPopoutGroup;
-
-                      const group = createGroupFromSerializedState(data);
-
-                      return popoutService.scheduleRestoration(
-                          index * DESERIALIZATION_POPOUT_DELAY_MS,
-                          () => {
-                              this.addPopoutGroup(group, {
-                                  position: position ?? undefined,
-                                  overridePopoutGroup: gridReferenceGroup
-                                      ? group
-                                      : undefined,
-                                  referenceGroup: gridReferenceGroup
-                                      ? this.getPanel(gridReferenceGroup)
-                                      : undefined,
-                                  popoutUrl: url,
-                              });
-                          },
-                          () => {
-                              // The group was registered in _groups synchronously
-                              // but the timer that would parent it into the popout
-                              // window never ran. Dispose the orphan here so the
-                              // next clear() doesn't trip over an unparented
-                              // element. See issue #1304.
-                              if (
-                                  !this.isDisposed &&
-                                  this._groups.has(group.id) &&
-                                  group.element.parentElement === null
-                              ) {
-                                  for (const panel of [...group.panels]) {
-                                      this.removePanel(panel, {
-                                          removeEmptyGroup: false,
-                                      });
-                                  }
-                                  group.dispose();
-                                  this._groups.delete(group.id);
-                                  this._onDidRemoveGroup.fire(group);
-                              }
-                          }
-                      );
-                  })
-                : [];
-
-            popoutService?.finishRestoration(popoutPromises);
+            const popoutPromises = this.deserializePopoutWindows(
+                data.popoutGroups ?? [],
+                createGroupFromSerializedState
+            );
+            this._popoutWindowService?.finishRestoration(popoutPromises);
 
             this._floatingGroupService?.constrainBounds();
 
@@ -2223,6 +2414,231 @@ export class DockviewComponent
         this.debouncedUpdateAllPositions();
 
         this._onDidLayoutFromJSON.fire();
+    }
+
+    /**
+     * Rebuild a floating / popout window's nested gridview from its serialized
+     * tree, collecting the member groups (in deserialization order) so the
+     * caller can mount or restore the window.
+     */
+    private deserializeNestedGridview(
+        grid: SerializedGridview<GroupPanelViewState>,
+        createGroup: (state: GroupPanelViewState) => DockviewGroupPanel
+    ): { gridview: Gridview; members: DockviewGroupPanel[] } {
+        const gridview = this.createNestedGridview(grid.orientation);
+        const members: DockviewGroupPanel[] = [];
+        gridview.deserialize(grid, {
+            fromJSON: (node: ISerializedLeafNode<GroupPanelViewState>) => {
+                const group = createGroup(node.data);
+                members.push(group);
+                return group;
+            },
+        });
+        return { gridview, members };
+    }
+
+    private deserializeEdgeGroups(
+        edgeGroups: SerializedEdgeGroups,
+        panels: Record<string, GroupviewPanelState>
+    ): void {
+        const edgeService = assertModule(
+            this._edgeGroupService,
+            'EdgeGroup',
+            'fromJSON edge restoration'
+        );
+        if (!edgeService) {
+            return;
+        }
+
+        // Auto-create edge groups for positions in the serialized state that
+        // don't already have a group registered (e.g. when fromJSON is called
+        // before the user has called addEdgeGroup).
+        for (const _position of [
+            'top',
+            'bottom',
+            'left',
+            'right',
+        ] as EdgeGroupPosition[]) {
+            const fixedData = edgeGroups[_position];
+            if (fixedData && !edgeService.has(_position)) {
+                const groupState = fixedData.group as
+                    | GroupPanelViewState
+                    | undefined;
+                const id = groupState?.id ?? `${_position}-group`;
+                this.addEdgeGroup(_position, { id });
+            }
+        }
+
+        // Restore panel contents of edge groups
+        for (const [position, edgeGroup] of edgeService.entries()) {
+            const edgeData = edgeGroups[position];
+            const groupState = edgeData?.group as
+                | GroupPanelViewState
+                | undefined;
+            if (groupState) {
+                const { views, activeView } = groupState;
+                const createdPanels: IDockviewPanel[] = [];
+
+                for (const panelId of views) {
+                    if (panels[panelId]) {
+                        const panel = this._deserializer.fromJSON(
+                            panels[panelId],
+                            edgeGroup
+                        );
+                        createdPanels.push(panel);
+                    }
+                }
+
+                for (let i = 0; i < createdPanels.length; i++) {
+                    const panel = createdPanels[i];
+                    const isActive = activeView === panel.id;
+                    edgeGroup.model.openPanel(panel, {
+                        skipSetActive: !isActive,
+                        skipSetGroupActive: true,
+                    });
+                }
+
+                // Restore tab groups before activating a fallback panel
+                if (groupState.tabGroups && groupState.tabGroups.length > 0) {
+                    edgeGroup.model.restoreTabGroups(groupState.tabGroups);
+                }
+
+                if (!edgeGroup.activePanel && edgeGroup.panels.length > 0) {
+                    edgeGroup.model.openPanel(
+                        edgeGroup.panels[edgeGroup.panels.length - 1],
+                        { skipSetGroupActive: true }
+                    );
+                }
+            }
+        }
+
+        this._shellManager!.fromJSON(edgeGroups);
+    }
+
+    private deserializeFloatingWindows(
+        serialized: SerializedFloatingGroup[],
+        createGroup: (state: GroupPanelViewState) => DockviewGroupPanel
+    ): void {
+        for (const serializedFloatingGroup of serialized) {
+            const { data, grid, position } = serializedFloatingGroup;
+
+            if (grid) {
+                // Multi-group window: rebuild the window's nested gridview from
+                // its serialized tree.
+                const { gridview: floatingGridview, members } =
+                    this.deserializeNestedGridview(grid, createGroup);
+
+                if (members.length === 0) {
+                    continue;
+                }
+
+                this.mountFloatingWindow(
+                    floatingGridview,
+                    members[0],
+                    members,
+                    position,
+                    { inDragMode: false }
+                );
+            } else if (data) {
+                const group = createGroup(data);
+
+                this.addFloatingGroup(group, {
+                    position: position,
+                    width: position.width,
+                    height: position.height,
+                    skipRemoveGroup: true,
+                    inDragMode: false,
+                });
+            }
+        }
+    }
+
+    private deserializePopoutWindows(
+        serialized: SerializedPopoutGroup[],
+        createGroup: (state: GroupPanelViewState) => DockviewGroupPanel
+    ): Promise<void>[] {
+        const popoutService =
+            serialized.length > 0
+                ? assertModule(
+                      this._popoutWindowService,
+                      'PopoutWindow',
+                      'fromJSON popout restoration'
+                  )
+                : this._popoutWindowService;
+
+        if (!popoutService) {
+            return [];
+        }
+
+        // Queue popup group creation with delays to avoid browser blocking
+        return serialized.flatMap((serializedPopoutGroup, index) => {
+            const { data, grid, position, gridReferenceGroup, url } =
+                serializedPopoutGroup;
+
+            // Multi-group popout windows rebuild their nested gridview from the
+            // serialized tree; single-group windows use the legacy single-group
+            // path.
+            let overridePopoutGridview: Gridview | undefined;
+            let members: DockviewGroupPanel[] = [];
+
+            if (grid) {
+                const built = this.deserializeNestedGridview(grid, createGroup);
+                overridePopoutGridview = built.gridview;
+                members = built.members;
+
+                if (members.length === 0) {
+                    // A serialized window with no groups: nothing to restore.
+                    // Mirror the floating path's guard and discard the empty
+                    // gridview rather than passing an undefined anchor to
+                    // addPopoutGroup.
+                    overridePopoutGridview.dispose();
+                    return [];
+                }
+            }
+
+            const group = grid ? members[0] : createGroup(data!);
+
+            return popoutService.scheduleRestoration(
+                index * DESERIALIZATION_POPOUT_DELAY_MS,
+                () => {
+                    this.addPopoutGroup(group, {
+                        position: position ?? undefined,
+                        overridePopoutGroup: gridReferenceGroup
+                            ? group
+                            : undefined,
+                        overridePopoutGridview,
+                        referenceGroup: gridReferenceGroup
+                            ? this.getPanel(gridReferenceGroup)
+                            : undefined,
+                        popoutUrl: url,
+                    });
+                },
+                () => {
+                    // The group was registered in _groups synchronously but the
+                    // timer that would parent it into the popout window never
+                    // ran. Dispose the orphan here so the next clear() doesn't
+                    // trip over an unparented element. See issue #1304.
+                    for (const orphan of members.length > 0
+                        ? members
+                        : [group]) {
+                        if (
+                            !this.isDisposed &&
+                            this._groups.has(orphan.id) &&
+                            orphan.element.parentElement === null
+                        ) {
+                            for (const panel of [...orphan.panels]) {
+                                this.removePanel(panel, {
+                                    removeEmptyGroup: false,
+                                });
+                            }
+                            orphan.dispose();
+                            this._groups.delete(orphan.id);
+                            this._onDidRemoveGroup.fire(orphan);
+                        }
+                    }
+                }
+            );
+        });
     }
 
     clear(): void {
@@ -2594,6 +3010,74 @@ export class DockviewComponent
         this.doRemoveGroup(group, options);
     }
 
+    /**
+     * Detach a single group from the nested gridview of its floating / popout
+     * window, keeping the window and its remaining members alive, and reassign
+     * the window's anchor if the detached group was it.
+     *
+     * @returns `true` if the group was detached from a multi-member window;
+     * `false` if `group` is not in a nested window, or is the window's only
+     * member — in which case the caller is responsible for disposing the whole
+     * window.
+     */
+    private detachFromNestedWindow(group: DockviewGroupPanel): boolean {
+        const floating = this._floatingGroupService?.findByGroup(group);
+        if (floating) {
+            const members = this.nestedWindowMembers(group);
+            if (members.length <= 1) {
+                return false;
+            }
+            floating.gridview.remove(group);
+            if (floating.group === group) {
+                // The anchor left; promote a remaining member.
+                floating.setAnchorGroup(members.find((m) => m !== group)!);
+            }
+            return true;
+        }
+
+        const popout = this._popoutWindowService?.findByGroup(group);
+        if (popout) {
+            const members = this.nestedWindowMembers(group);
+            if (members.length <= 1) {
+                return false;
+            }
+            popout.gridview.remove(group);
+            if (popout.popoutGroup === group) {
+                // The anchor left; promote a remaining member.
+                popout.popoutGroup = members.find((m) => m !== group)!;
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Dispose a group and forget it: remove it from `_groups` and fire the
+     * removed event.
+     */
+    private disposeGroupRecord(group: DockviewGroupPanel): void {
+        group.dispose();
+        this._groups.delete(group.id);
+        this._onDidRemoveGroup.fire(group);
+    }
+
+    /**
+     * When `removed` was the active group, fall the active selection back to
+     * the first remaining group (or clear it when none remain).
+     */
+    private activateFallbackGroupIfRemoved(
+        removed: DockviewGroupPanel,
+        skipActive?: boolean
+    ): void {
+        if (!skipActive && this._activeGroup === removed) {
+            const groups = Array.from(this._groups.values());
+            this.doSetGroupAndPanelActive(
+                groups.length > 0 ? groups[0].value : undefined
+            );
+        }
+    }
+
     protected override doRemoveGroup(
         group: DockviewGroupPanel,
         options?:
@@ -2627,71 +3111,104 @@ export class DockviewComponent
             const floatingGroup =
                 this._floatingGroupService?.findByGroup(group);
 
-            if (floatingGroup) {
-                if (!options?.skipDispose) {
-                    floatingGroup.group.dispose();
-                    this._groups.delete(group.id);
-                    this._onDidRemoveGroup.fire(group);
-                }
-
-                // floatingGroup.dispose() removes itself from the service array
-                floatingGroup.dispose();
-
-                if (!options?.skipActive && this._activeGroup === group) {
-                    const groups = Array.from(this._groups.values());
-
-                    this.doSetGroupAndPanelActive(
-                        groups.length > 0 ? groups[0].value : undefined
-                    );
-                }
-
-                return floatingGroup.group;
+            if (!floatingGroup) {
+                throw new Error('dockview: failed to find floating group');
             }
 
-            throw new Error('dockview: failed to find floating group');
+            if (this.detachFromNestedWindow(group)) {
+                // The floating window hosts other groups and stays alive —
+                // finalize just this group.
+                if (!options?.skipDispose) {
+                    this.disposeGroupRecord(group);
+                } else {
+                    // Relocation: reset location so the destination root can
+                    // re-tag it.
+                    group.model.location = { type: 'grid' };
+                }
+
+                this.activateFallbackGroupIfRemoved(group, options?.skipActive);
+                return group;
+            }
+
+            // Last group leaving — dispose the whole floating window.
+            if (!options?.skipDispose) {
+                this.disposeGroupRecord(group);
+            }
+
+            // floatingGroup.dispose() removes itself from the service array
+            floatingGroup.dispose();
+
+            this.activateFallbackGroupIfRemoved(group, options?.skipActive);
+            return group;
         }
 
         if (group.api.location.type === 'popout') {
             const selectedGroup = this._popoutWindowService?.findByGroup(group);
 
-            if (selectedGroup) {
-                if (!options?.skipDispose) {
-                    if (!options?.skipPopoutAssociated) {
-                        const refGroup = selectedGroup.referenceGroup
-                            ? this.getPanel(selectedGroup.referenceGroup)
-                            : undefined;
-                        if (refGroup && refGroup.panels.length === 0) {
-                            this.removeGroup(refGroup);
-                        }
-                    }
-
-                    selectedGroup.popoutGroup.dispose();
-
-                    this._groups.delete(group.id);
-                    this._onDidRemoveGroup.fire(group);
-                }
-
-                this._popoutWindowService?.remove(selectedGroup);
-
-                const removedGroup = selectedGroup.disposable.dispose();
-
-                if (!options?.skipPopoutReturn && removedGroup) {
-                    this.doAddGroup(removedGroup, [0]);
-                    this.doSetGroupAndPanelActive(removedGroup);
-                }
-
-                if (!options?.skipActive && this._activeGroup === group) {
-                    const groups = Array.from(this._groups.values());
-
-                    this.doSetGroupAndPanelActive(
-                        groups.length > 0 ? groups[0].value : undefined
-                    );
-                }
-
-                return selectedGroup.popoutGroup;
+            if (!selectedGroup) {
+                throw new Error('dockview: failed to find popout group');
             }
 
-            throw new Error('dockview: failed to find popout group');
+            if (this.detachFromNestedWindow(group)) {
+                // The popout window hosts other groups and stays alive —
+                // finalize just this group.
+                if (!options?.skipDispose) {
+                    this.disposeGroupRecord(group);
+                } else {
+                    // Relocation: reset location so the destination root can
+                    // re-tag it.
+                    group.model.location = { type: 'grid' };
+                }
+
+                this.activateFallbackGroupIfRemoved(group, options?.skipActive);
+                return group;
+            }
+
+            // Last group leaving — tear the whole popout window down.
+            if (!options?.skipDispose) {
+                if (!options?.skipPopoutAssociated) {
+                    const refGroup = selectedGroup.referenceGroup
+                        ? this.getPanel(selectedGroup.referenceGroup)
+                        : undefined;
+                    if (refGroup && refGroup.panels.length === 0) {
+                        this.removeGroup(refGroup);
+                    }
+                }
+
+                selectedGroup.popoutGroup.dispose();
+
+                this._groups.delete(group.id);
+                this._onDidRemoveGroup.fire(group);
+            }
+
+            this._popoutWindowService?.remove(selectedGroup);
+
+            const removedGroup = selectedGroup.disposable.dispose();
+
+            if (!options?.skipPopoutReturn && removedGroup) {
+                this.doAddGroup(removedGroup, [0]);
+                this.doSetGroupAndPanelActive(removedGroup);
+            }
+
+            this.activateFallbackGroupIfRemoved(group, options?.skipActive);
+            return selectedGroup.popoutGroup;
+        }
+
+        // A `grid`-location group whose element isn't actually in the gridview
+        // is an orphan — e.g. a popout-destined group created during fromJSON
+        // whose window hasn't opened yet, swept up by clear()/a re-entrant
+        // fromJSON. `gridview.remove()` would throw "Invalid grid element", so
+        // dispose it directly.
+        if (!this.gridview.element.contains(group.element)) {
+            if (!options?.skipDispose) {
+                const item = this._groups.get(group.id);
+                item?.disposable.dispose();
+                this.disposeGroupRecord(group);
+            }
+
+            this.activateFallbackGroupIfRemoved(group, options?.skipActive);
+
+            return group;
         }
 
         const re = super.doRemoveGroup(group, options);
@@ -2716,6 +3233,13 @@ export class DockviewComponent
             this._updatePositionsFrameId = undefined;
 
             this.overlayRenderContainer.updateAllPositions();
+
+            // Popout windows have their own render containers; reposition those
+            // too so panels moved/split within a popout are laid out (the main
+            // container only covers grid + floating, which share it).
+            for (const entry of this._popoutWindowService?.entries ?? []) {
+                entry.overlayRenderContainer.updateAllPositions();
+            }
         });
     }
 
@@ -2825,9 +3349,15 @@ export class DockviewComponent
              * into an adjacent group
              */
 
+            // The destination group may live in the main grid or in a floating
+            // window's nested gridview — resolve which root we are dropping
+            // into so locations/orientation are computed against it.
+            const destinationGridview =
+                this.getGridviewForGroup(destinationGroup);
+
             const referenceLocation = getGridLocation(destinationGroup.element);
             const targetLocation = getRelativeLocation(
-                this.gridview.orientation,
+                destinationGridview.orientation,
                 referenceLocation,
                 destinationTarget
             );
@@ -2840,7 +3370,10 @@ export class DockviewComponent
 
                 const [targetParentLocation, to] = tail(targetLocation);
 
-                if (sourceGroup.api.location.type === 'grid') {
+                if (
+                    sourceGroup.api.location.type === 'grid' &&
+                    destinationGridview === this.gridview
+                ) {
                     const sourceLocation = getGridLocation(sourceGroup.element);
                     const [sourceParentLocation, from] = tail(sourceLocation);
 
@@ -2864,9 +3397,13 @@ export class DockviewComponent
                     }
                 }
 
-                if (sourceGroup.api.location.type === 'popout') {
+                if (
+                    sourceGroup.api.location.type === 'popout' &&
+                    this.nestedWindowMembers(sourceGroup).length <= 1
+                ) {
                     /**
-                     * the source group is a popout group with a single panel
+                     * the source group is the only group in a popout window and
+                     * has a single panel
                      *
                      * 1. remove the panel from the group without triggering any events
                      * 2. remove the popout group — this may cascade-remove the empty
@@ -2874,6 +3411,9 @@ export class DockviewComponent
                      *    doRemoveGroup for popout groups), which can shift grid indices
                      * 3. recompute the target location now that the grid is stable
                      * 4. create a new group at the recomputed location and add that panel
+                     *
+                     * Multi-group popout windows fall through to the generic
+                     * detach-and-re-add path so the window stays alive.
                      */
 
                     const popoutGroup =
@@ -2896,13 +3436,16 @@ export class DockviewComponent
                     this.doRemoveGroup(sourceGroup, { skipActive: true });
 
                     const updatedTargetLocation = getRelativeLocation(
-                        this.gridview.orientation,
+                        destinationGridview.orientation,
                         getGridLocation(destinationGroup.element),
                         destinationTarget
                     );
 
                     const newGroup = this.createGroupAtLocation(
-                        updatedTargetLocation
+                        updatedTargetLocation,
+                        undefined,
+                        undefined,
+                        destinationGridview
                     );
                     this.movingLock(() =>
                         newGroup.model.openPanel(removedPanel, {
@@ -2938,7 +3481,12 @@ export class DockviewComponent
                         );
                     }
 
-                    const newGroup = this.createGroupAtLocation(targetLocation);
+                    const newGroup = this.createGroupAtLocation(
+                        targetLocation,
+                        undefined,
+                        undefined,
+                        destinationGridview
+                    );
                     this.movingLock(() =>
                         newGroup.model.openPanel(removedPanel, {
                             skipSetGroupActive: true,
@@ -2967,11 +3515,19 @@ export class DockviewComponent
                 );
 
                 const location = getRelativeLocation(
-                    this.gridview.orientation,
+                    destinationGridview.orientation,
                     updatedReferenceLocation,
                     destinationTarget
                 );
-                this.movingLock(() => this.doAddGroup(targetGroup, location));
+                this.movingLock(() =>
+                    this.doAddGroup(
+                        targetGroup,
+                        location,
+                        undefined,
+                        destinationGridview
+                    )
+                );
+                this.setGroupLocationForRoot(targetGroup, destinationGridview);
                 this.doSetGroupAndPanelActive(targetGroup);
 
                 this._onDidMovePanel.fire({
@@ -2998,12 +3554,17 @@ export class DockviewComponent
                 }
 
                 const dropLocation = getRelativeLocation(
-                    this.gridview.orientation,
+                    destinationGridview.orientation,
                     referenceLocation,
                     destinationTarget
                 );
 
-                const group = this.createGroupAtLocation(dropLocation);
+                const group = this.createGroupAtLocation(
+                    dropLocation,
+                    undefined,
+                    undefined,
+                    destinationGridview
+                );
                 this.movingLock(() =>
                     group.model.openPanel(removedPanel, {
                         skipSetGroupActive: true,
@@ -3280,7 +3841,14 @@ export class DockviewComponent
                                 'dockview: failed to find floating group'
                             );
                         }
-                        selectedFloatingGroup.dispose();
+
+                        // Detach just this group from the floating window's
+                        // nested gridview, keeping the window (and its other
+                        // groups) alive. If it was the only member, dispose the
+                        // whole window.
+                        if (!this.detachFromNestedWindow(from)) {
+                            selectedFloatingGroup.dispose();
+                        }
                         break;
                     }
                     case 'popout': {
@@ -3292,7 +3860,16 @@ export class DockviewComponent
                             );
                         }
 
-                        // Remove from popout groups list to prevent automatic restoration
+                        // Detach just this group from the popout window's
+                        // nested gridview, keeping the window + its other groups
+                        // alive. Destination containers/location are applied by
+                        // the placement block below.
+                        if (this.detachFromNestedWindow(from)) {
+                            break;
+                        }
+
+                        // Last group leaving — tear the window down. Remove from
+                        // the service first to prevent automatic restoration.
                         this._popoutWindowService?.remove(selectedPopoutGroup);
 
                         // Clean up the reference group (ghost) if it exists and is hidden
@@ -3310,43 +3887,35 @@ export class DockviewComponent
                             }
                         }
 
-                        // Manually dispose the window without triggering restoration
+                        // Dispose the window without triggering restoration. The
+                        // placement block below applies the destination
+                        // location and containers to `from`.
                         selectedPopoutGroup.window.dispose();
-
-                        // Update group's location and containers for target
-                        if (to.api.location.type === 'grid') {
-                            from.model.renderContainer =
-                                this.overlayRenderContainer;
-                            from.model.dropTargetContainer =
-                                this.rootDropTargetContainer;
-                            from.model.location = { type: 'grid' };
-                        } else if (to.api.location.type === 'floating') {
-                            from.model.renderContainer =
-                                this.overlayRenderContainer;
-                            from.model.dropTargetContainer =
-                                this.rootDropTargetContainer;
-                            from.model.location = { type: 'floating' };
-                        }
 
                         break;
                     }
                 }
             }
 
-            // For moves to grid locations
-            if (to.api.location.type === 'grid') {
+            // Place `source` next to `to`, in whichever gridview root `to`
+            // lives in. When `to` is inside a floating / popout window this
+            // splits that window's nested layout rather than spawning a new one.
+            if (
+                to.api.location.type === 'grid' ||
+                to.api.location.type === 'floating' ||
+                to.api.location.type === 'popout'
+            ) {
+                const destGridview = this.getGridviewForGroup(to);
                 const referenceLocation = getGridLocation(to.element);
                 const dropLocation = getRelativeLocation(
-                    this.gridview.orientation,
+                    destGridview.orientation,
                     referenceLocation,
                     target
                 );
 
-                // Add to grid for all moves targeting grid location
-
                 let size: number;
 
-                switch (this.gridview.orientation) {
+                switch (destGridview.orientation) {
                     case Orientation.VERTICAL:
                         size =
                             referenceLocation.length % 2 == 0
@@ -3361,42 +3930,8 @@ export class DockviewComponent
                         break;
                 }
 
-                this.gridview.addView(source, size, dropLocation);
-            } else if (to.api.location.type === 'floating') {
-                // For moves to floating locations, add as floating group
-                // Get the position/size from the target floating group
-                const targetFloatingGroup =
-                    this._floatingGroupService?.findByGroup(to);
-                if (targetFloatingGroup) {
-                    const box = targetFloatingGroup.overlay.toJSON();
-
-                    // Calculate position based on available properties
-                    let left: number, top: number;
-                    if ('left' in box) {
-                        left = box.left + 50;
-                    } else if ('right' in box) {
-                        left = Math.max(0, box.right - box.width - 50);
-                    } else {
-                        left = 50; // Default fallback
-                    }
-
-                    if ('top' in box) {
-                        top = box.top + 50;
-                    } else if ('bottom' in box) {
-                        top = Math.max(0, box.bottom - box.height - 50);
-                    } else {
-                        top = 50; // Default fallback
-                    }
-
-                    this.addFloatingGroup(source, {
-                        height: box.height,
-                        width: box.width,
-                        position: {
-                            left,
-                            top,
-                        },
-                    });
-                }
+                destGridview.addView(source, size, dropLocation);
+                this.setGroupLocationForRoot(source, destGridview);
             }
         }
 
@@ -3612,11 +4147,86 @@ export class DockviewComponent
     private createGroupAtLocation(
         location: number[],
         size?: number,
-        options?: GroupOptions
+        options?: GroupOptions,
+        gridview: Gridview = this.gridview
     ): DockviewGroupPanel {
         const group = this.createGroup(options);
-        this.doAddGroup(group, location, size);
+        this.doAddGroup(group, location, size, gridview);
+        this.setGroupLocationForRoot(group, gridview);
         return group;
+    }
+
+    /**
+     * Tag a group with the location and render / drop-target containers
+     * matching the gridview root it now lives in: the main grid, a floating
+     * window (shares the main containers), or a popout window (uses its own
+     * window-local containers).
+     */
+    private setGroupLocationForRoot(
+        group: DockviewGroupPanel,
+        gridview: Gridview
+    ): void {
+        const popout = this._popoutWindowService?.entries.find(
+            (entry) => entry.gridview === gridview
+        );
+
+        if (popout) {
+            if (group.model.renderContainer !== popout.overlayRenderContainer) {
+                group.model.renderContainer = popout.overlayRenderContainer;
+            }
+            group.model.dropTargetContainer = popout.dropTargetContainer;
+            group.model.location = {
+                type: 'popout',
+                getWindow: popout.getWindow,
+                popoutUrl: popout.popoutUrl,
+            };
+            return;
+        }
+
+        // grid / floating both render through the main containers
+        if (group.model.renderContainer !== this.overlayRenderContainer) {
+            group.model.renderContainer = this.overlayRenderContainer;
+        }
+        group.model.dropTargetContainer = this.rootDropTargetContainer;
+        group.model.location =
+            gridview === this.gridview
+                ? { type: 'grid' }
+                : { type: 'floating' };
+    }
+
+    /**
+     * Resolve which gridview root currently owns a group: the main grid, or
+     * the nested gridview of the floating / popout window it lives in.
+     */
+    getGridviewForGroup(group: DockviewGroupPanel): Gridview {
+        const floating = this._floatingGroupService?.findByGroup(group);
+        if (floating) {
+            return floating.gridview;
+        }
+        // Use findByGroup (anchor-identity OR containment) for symmetry with
+        // the floating branch — it also resolves an anchor whose element is
+        // briefly detached from the gridview during a move/restore.
+        const popout = this._popoutWindowService?.findByGroup(group);
+        if (popout) {
+            return popout.gridview;
+        }
+        return this.gridview;
+    }
+
+    /**
+     * The groups that live within the same floating / popout window as `group`
+     * (including `group` itself). Empty when `group` is in the main grid.
+     */
+    private nestedWindowMembers(
+        group: DockviewGroupPanel
+    ): DockviewGroupPanel[] {
+        const gridview = this.getGridviewForGroup(group);
+        if (gridview === this.gridview) {
+            return [];
+        }
+        return this.groups.filter((candidate) =>
+            gridview.element.contains(candidate.element)
+        );
     }
 
     private findGroup(panel: IDockviewPanel): DockviewGroupPanel | undefined {
@@ -3640,9 +4250,18 @@ export class DockviewComponent
         // set on the shell from reaching the dockview subtree.
         this._shellThemeClassnames?.setClassNames(theme.className);
 
-        this.gridview.margin = theme.gap ?? 0;
+        const gap = theme.gap ?? 0;
+        this.gridview.margin = gap;
+        // Floating / popout windows host their own nested gridviews; keep their
+        // gap in sync with the main grid when the theme changes at runtime.
+        for (const floating of this.floatingGroups) {
+            floating.gridview.margin = gap;
+        }
+        for (const entry of this._popoutWindowService?.entries ?? []) {
+            entry.gridview.margin = gap;
+        }
         this._shellManager?.updateTheme(
-            theme.gap ?? 0,
+            gap,
             theme.edgeGroupCollapsedSize ?? 35
         );
 
