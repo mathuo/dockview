@@ -6194,6 +6194,55 @@ describe('dockviewComponent', () => {
                 dockview.dispose();
             });
 
+            test('closing a multi-group popout whose anchor came from a floating group docks all members to the grid (no split)', async () => {
+                const mockWindow = setupMockWindow();
+                window.open = () => mockWindow;
+
+                const dockview = make();
+                dockview.layout(1000, 500);
+
+                const panel1 = dockview.addPanel({
+                    id: 'panel_1',
+                    component: 'default',
+                });
+                const panel2 = dockview.addPanel({
+                    id: 'panel_2',
+                    component: 'default',
+                    floating: true,
+                });
+                // panel3 must be placed explicitly in the grid — a position-less
+                // add would land in the active (floating) group.
+                const panel3 = dockview.addPanel({
+                    id: 'panel_3',
+                    component: 'default',
+                    position: { referencePanel: 'panel_1', direction: 'right' },
+                });
+
+                // pop the floating group out (captures a floatingBox), then drag
+                // panel3's grid group into the popout window -> 2-group popout
+                await dockview.addPopoutGroup(panel2.api.group);
+                const popoutGroup = dockview.groups.find(
+                    (g) => g.api.location.type === 'popout'
+                )!;
+                dockview.moveGroupOrPanel({
+                    from: { groupId: panel3.group.id },
+                    to: { group: popoutGroup, position: 'right' },
+                });
+                expect(panel2.api.location.type).toBe('popout');
+                expect(panel3.api.location.type).toBe('popout');
+
+                mockWindow.close();
+
+                // Before the fix the anchor re-floated while the other member
+                // docked to the grid, splitting the window across two roots.
+                expect(panel2.api.location.type).toBe('grid');
+                expect(panel3.api.location.type).toBe('grid');
+                expect(dockview.floatingGroups.length).toBe(0);
+                expect(panel1.api.location.type).toBe('grid');
+
+                dockview.dispose();
+            });
+
             test('a globally-configured popoutUrl is recorded on the group and survives serialization', async () => {
                 const mockWindow = setupMockWindow();
                 window.open = () => mockWindow;
