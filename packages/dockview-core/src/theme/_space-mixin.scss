@@ -1,7 +1,7 @@
 @mixin dockview-design-space-mixin {
     --dv-spacing-padding: 10px;
     --dv-tab-font-size: 12px;
-    --dv-border-radius: 20px;
+    --dv-border-radius: 12px;
     --dv-tab-margin: 0.5rem 0.25rem;
     --dv-tabs-and-actions-container-height: 44px;
     --dv-tab-border-radius: 8px;
@@ -9,6 +9,14 @@
     --dv-dropdown-border-radius: 8px;
     --dv-tab-close-icon-size: 8px;
     --dv-floating-group-border: 2px solid var(--dv-group-view-background-color);
+    // Blend the drag-handle bar into the spaced backdrop: match the gap/frame
+    // color between groups (--dv-group-view-background-color) rather than the
+    // tab-bar color, so the handle reads as part of the card frame.
+    --dv-floating-titlebar-background-color: var(
+        --dv-group-view-background-color
+    );
+    // Keep the handle seamless with the gap — no divider line below it.
+    --dv-floating-titlebar-border-bottom: none;
 
     box-sizing: border-box;
     padding: var(--dv-spacing-padding);
@@ -48,23 +56,34 @@
         }
     }
 
-    // When a floating window has a dedicated drag-handle bar, the bar — not the
-    // group below it — is the top of the rounded card. Move the top border and
-    // rounded top corners onto the handle and flatten the group's top so the
-    // two read as a single card.
-    .dv-resize-container-with-titlebar {
-        > .dv-floating-titlebar {
-            border: var(--dv-floating-group-border);
-            border-bottom: none;
-            border-top-left-radius: var(--dv-border-radius);
-            border-top-right-radius: var(--dv-border-radius);
-        }
+    // Apply the spaced grid inset to floating groups, mirroring the dockview
+    // root's --dv-spacing-padding edge in the docked layout. The nested
+    // gridview is sized from its own content box (a ResizeObserver feeds
+    // gridview.layout), so box-sizing:border-box + padding insets the nested
+    // layout while the padding band reveals the resize container's background.
+    // Resize handles live on .dv-resize-container, not the gridview, so they
+    // are unaffected.
+    .dv-resize-container > .dv-grid-view {
+        box-sizing: border-box;
+        padding: var(--dv-spacing-padding);
+    }
 
-        .dv-groupview {
-            border-top: none;
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-        }
+    // With a dedicated title bar the bar already frames the top of the card and
+    // shares the inset/gap color, so the grid's top inset would double up into a
+    // tall empty band above the panels — drop it (keep left/right/bottom).
+    .dv-resize-container-with-titlebar > .dv-grid-view {
+        padding-top: 0;
+    }
+
+    // The drag-handle bar is the top strip of the floating window's frame (same
+    // color as the inset gap). Round its top corners so it follows the
+    // container's rounded top. The nested groups below are complete,
+    // independently-rounded cards — do NOT flatten their tops (an unscoped
+    // descendant rule here previously stripped the top border/rounding from
+    // every nested group, not just a single merged one).
+    .dv-resize-container-with-titlebar > .dv-floating-titlebar {
+        border-top-left-radius: var(--dv-border-radius);
+        border-top-right-radius: var(--dv-border-radius);
     }
 
     .dv-tabs-overflow-container,
@@ -103,6 +122,13 @@
 
         .dv-tabs-and-actions-container {
             padding: 0px calc(var(--dv-border-radius) / 2);
+
+            // Round the top of the tab bar to match the rounded groupview
+            // outline (the content container rounds the bottom). Without this
+            // the tab strip's square top corners poke past the card's rounded
+            // top-left / top-right corners.
+            border-top-left-radius: var(--dv-border-radius);
+            border-top-right-radius: var(--dv-border-radius);
 
             // Vertical tab bars (left/right edge groups): swap the padding
             // axes. Horizontal padding would squeeze the tab into a fraction

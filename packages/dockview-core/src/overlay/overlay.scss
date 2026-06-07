@@ -82,6 +82,12 @@
     position: absolute;
     z-index: calc(var(--dv-overlay-z-index) - 2);
 
+    // The container is the backdrop behind its content. A single floating group
+    // hides it entirely, but a nested floating layout exposes the gaps/sashes
+    // between groups — without a fill those gaps would be transparent. Mirror
+    // the docked backdrop (the dockview root uses --dv-group-view-background-color).
+    background-color: var(--dv-group-view-background-color);
+
     border: var(--dv-floating-border);
     box-shadow: var(--dv-floating-box-shadow);
 
