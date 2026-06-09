@@ -26,6 +26,10 @@ import { IDockviewPanel } from '../../dockviewPanel';
 import { DockviewHeaderDirection } from '../../options';
 import { resolveDndCapabilities } from '../../dndCapabilities';
 
+let _tabId = 0;
+/** Stable DOM id referenced by the tabpanel's `aria-labelledby`. */
+const nextTabId = (): string => `dv-tab-${_tabId++}`;
+
 export class Tab extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private readonly dropTarget: IDropTarget;
@@ -71,6 +75,15 @@ export class Tab extends CompositeDisposable {
         this._element.className = 'dv-tab';
         this._element.tabIndex = 0;
         this._element.draggable = caps.html5;
+        // WAI-ARIA Tabs pattern. `aria-controls` points at the group's single
+        // tabpanel (the content container); `aria-selected` tracks activation.
+        this._element.id = nextTabId();
+        this._element.setAttribute('role', 'tab');
+        this._element.setAttribute('aria-selected', 'false');
+        const contentContainerId = this.group?.model?.contentContainerId;
+        if (contentContainerId) {
+            this._element.setAttribute('aria-controls', contentContainerId);
+        }
 
         toggleClass(this.element, 'dv-inactive-tab', true);
 
@@ -237,6 +250,10 @@ export class Tab extends CompositeDisposable {
     public setActive(isActive: boolean): void {
         toggleClass(this.element, 'dv-active-tab', isActive);
         toggleClass(this.element, 'dv-inactive-tab', !isActive);
+        this._element.setAttribute(
+            'aria-selected',
+            isActive ? 'true' : 'false'
+        );
     }
 
     public setContent(part: ITabRenderer): void {

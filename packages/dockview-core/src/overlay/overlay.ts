@@ -116,6 +116,11 @@ export class Overlay extends CompositeDisposable {
         );
 
         this._element.className = 'dv-resize-container';
+        // Floating groups are non-modal dialogs over the layout. The contained
+        // group(s) carry their own `role="region"` + label, so the dialog
+        // itself only needs role + modality here.
+        this._element.setAttribute('role', 'dialog');
+        this._element.setAttribute('aria-modal', 'false');
         this._isVisible = true;
 
         this.setupResize('top');

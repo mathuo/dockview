@@ -12,6 +12,10 @@ import { pointerBackend } from '../../../dnd/backend';
 import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
 import { getPanelData } from '../../../dnd/dataTransfer';
 
+let _contentId = 0;
+/** Stable DOM id so each tab's `aria-controls` can reference its tabpanel. */
+const nextContentId = (): string => `dv-tabpanel-${_contentId++}`;
+
 export interface IContentContainer extends IDisposable {
     // `Droptarget` here (not `IDropTarget`) because overlayRenderContainer
     // forwards HTML5 drag events through `dropTarget.dnd` (the inner
@@ -28,6 +32,7 @@ export interface IContentContainer extends IDisposable {
     hide(): void;
     renderPanel(panel: IDockviewPanel, options: { asActive: boolean }): void;
     refreshFocusState(): void;
+    setLabelledBy(tabElementId: string | undefined): void;
 }
 
 export class ContentContainer
@@ -60,6 +65,11 @@ export class ContentContainer
         this._element = document.createElement('div');
         this._element.className = 'dv-content-container';
         this._element.tabIndex = -1;
+        // WAI-ARIA Tabs pattern: the single content area per group is the
+        // tabpanel; `aria-labelledby` is pointed at the active tab in
+        // `setLabelledBy` (driven from the group model on activation).
+        this._element.id = nextContentId();
+        this._element.setAttribute('role', 'tabpanel');
 
         this.addDisposables(this._onDidFocus, this._onDidBlur);
 
@@ -133,6 +143,14 @@ export class ContentContainer
 
     hide(): void {
         this.element.style.display = 'none';
+    }
+
+    setLabelledBy(tabElementId: string | undefined): void {
+        if (tabElementId) {
+            this._element.setAttribute('aria-labelledby', tabElementId);
+        } else {
+            this._element.removeAttribute('aria-labelledby');
+        }
     }
 
     renderPanel(

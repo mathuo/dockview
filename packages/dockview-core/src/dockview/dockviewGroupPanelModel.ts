@@ -357,6 +357,11 @@ export class DockviewGroupPanelModel
         return this._activePanel;
     }
 
+    /** DOM id of the content container (the group's tabpanel), referenced by each tab's `aria-controls`. */
+    get contentContainerId(): string {
+        return this.contentContainer.element.id;
+    }
+
     get locked(): DockviewGroupPanelLocked {
         return this._locked;
     }
@@ -496,6 +501,9 @@ export class DockviewGroupPanelModel
         super();
 
         toggleClass(this.container, 'dv-groupview', true);
+        // Each group is a navigable region, labelled by its active panel
+        // (see `updateAccessibleLabel`, driven on activation / title change).
+        this.container.setAttribute('role', 'region');
 
         this._api = new DockviewApi(this.accessor);
 
@@ -514,6 +522,11 @@ export class DockviewGroupPanelModel
             options.headerPosition ?? accessor.defaultHeaderPosition;
 
         this.addDisposables(
+            // Keep the region's accessible name in sync when the active
+            // panel's title changes (no-op when a non-active title changes).
+            this._onDidPanelTitleChange.event(() =>
+                this.updateAccessibleLabel()
+            ),
             this._onTabDragStart,
             this._onGroupDragStart,
             this._onWillShowOverlay,
@@ -1557,6 +1570,11 @@ export class DockviewGroupPanelModel
         if (panel) {
             this.tabsContainer.setActivePanel(panel);
 
+            // Point the tabpanel's `aria-labelledby` at the now-active tab.
+            this.contentContainer.setLabelledBy(
+                this.tabsContainer.getTabId(panel.id)
+            );
+
             this.contentContainer.openPanel(panel);
 
             panel.layout(this._width, this._height);
@@ -1569,6 +1587,18 @@ export class DockviewGroupPanelModel
             this._onDidActivePanelChange.fire({
                 panel,
             });
+        }
+
+        this.updateAccessibleLabel();
+    }
+
+    /** Label the group region with its active panel's title (the WAI-ARIA region name). */
+    private updateAccessibleLabel(): void {
+        const title = this._activePanel?.title;
+        if (title) {
+            this.container.setAttribute('aria-label', title);
+        } else {
+            this.container.removeAttribute('aria-label');
         }
     }
 
