@@ -266,6 +266,21 @@ export interface DockviewMaximizedGroupChanged {
     isMaximized: boolean;
 }
 
+/** The coarse kind of a structural layout mutation (see `onWillMutateLayout`). */
+export type DockviewLayoutMutationKind =
+    | 'add'
+    | 'remove'
+    | 'move'
+    | 'float'
+    | 'popout'
+    | 'maximize'
+    | 'load'
+    | 'clear';
+
+export interface DockviewLayoutMutationEvent {
+    readonly kind: DockviewLayoutMutationKind;
+}
+
 export interface PopoutGroupChangeSizeEvent {
     width: number;
     height: number;
@@ -285,6 +300,8 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly orientation: Orientation;
     readonly onDidDrop: Event<DockviewDidDropEvent>;
     readonly onWillDrop: Event<DockviewWillDropEvent>;
+    readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;
+    readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent>;
     readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent>;
     readonly onDidRemovePanel: Event<IDockviewPanel>;
     readonly onDidAddPanel: Event<IDockviewPanel>;
@@ -395,6 +412,19 @@ export class DockviewComponent
 
     private readonly _onWillDrop = new Emitter<DockviewWillDropEvent>();
     readonly onWillDrop: Event<DockviewWillDropEvent> = this._onWillDrop.event;
+
+    // Transaction boundary bracketing each top-level structural mutation.
+    // Compound operations (e.g. a drag that relocates a panel) nest via the
+    // depth counter and bracket as a single transaction. See `mutation()`.
+    private _mutationDepth = 0;
+    private readonly _onWillMutateLayout =
+        new Emitter<DockviewLayoutMutationEvent>();
+    readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent> =
+        this._onWillMutateLayout.event;
+    private readonly _onDidMutateLayout =
+        new Emitter<DockviewLayoutMutationEvent>();
+    readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent> =
+        this._onDidMutateLayout.event;
 
     private readonly _onWillShowOverlay =
         new Emitter<DockviewWillShowOverlayLocationEvent>();
@@ -780,6 +810,8 @@ export class DockviewComponent
             this._onDidLayoutFromJSON,
             this._onDidDrop,
             this._onWillDrop,
+            this._onWillMutateLayout,
+            this._onDidMutateLayout,
             this._onDidMovePanel,
             this._onDidMovePanel.event(() => {
                 /**
@@ -2732,6 +2764,12 @@ export class DockviewComponent
     addPanel<T extends object = Parameters>(
         options: AddPanelOptions<T>
     ): DockviewPanel {
+        return this.mutation('add', () => this._doAddPanel(options));
+    }
+
+    private _doAddPanel<T extends object = Parameters>(
+        options: AddPanelOptions<T>
+    ): DockviewPanel {
         if (this.panels.find((_) => _.id === options.id)) {
             throw new Error(
                 `dockview: panel with id ${options.id} already exists`
@@ -2930,6 +2968,19 @@ export class DockviewComponent
     }
 
     removePanel(
+        panel: IDockviewPanel,
+        options: {
+            removeEmptyGroup: boolean;
+            skipDispose?: boolean;
+            skipSetActiveGroup?: boolean;
+        } = {
+            removeEmptyGroup: true,
+        }
+    ): void {
+        this.mutation('remove', () => this._doRemovePanel(panel, options));
+    }
+
+    private _doRemovePanel(
         panel: IDockviewPanel,
         options: {
             removeEmptyGroup: boolean;
@@ -3309,7 +3360,34 @@ export class DockviewComponent
         }
     }
 
+    /**
+     * Bracket a structural mutation with `onWillMutateLayout` /
+     * `onDidMutateLayout`. Re-entrant: nested calls (a compound operation such
+     * as a drag that relocates a panel) join the outermost transaction, so the
+     * events fire exactly once around the whole operation. `kind` reflects the
+     * outermost mutation.
+     */
+    mutation<T>(kind: DockviewLayoutMutationKind, func: () => T): T {
+        const outer = this._mutationDepth === 0;
+        if (outer) {
+            this._onWillMutateLayout.fire({ kind });
+        }
+        this._mutationDepth++;
+        try {
+            return func();
+        } finally {
+            this._mutationDepth--;
+            if (outer) {
+                this._onDidMutateLayout.fire({ kind });
+            }
+        }
+    }
+
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void {
+        this.mutation('move', () => this._doMoveGroupOrPanel(options));
+    }
+
+    private _doMoveGroupOrPanel(options: MoveGroupOrPanelOptions): void {
         const destinationGroup = options.to.group;
         const sourceGroupId = options.from.groupId;
         const sourceItemId = options.from.panelId;

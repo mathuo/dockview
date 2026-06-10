@@ -1,4 +1,5 @@
 import {
+    DockviewLayoutMutationEvent,
     DockviewMaximizedGroupChanged,
     FloatingGroupOptions,
     IDockviewComponent,
@@ -729,6 +730,21 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     get onWillDrop(): Event<DockviewWillDropEvent> {
         return this.component.onWillDrop;
+    }
+
+    /**
+     * Fires before each top-level structural layout mutation (add / remove /
+     * move / float / popout / maximize / load / clear). Compound operations
+     * (e.g. a drag) fire once. Pair with `onDidMutateLayout` to bracket a
+     * change — useful for undo/redo, autosave and dirty-tracking.
+     */
+    get onWillMutateLayout(): Event<DockviewLayoutMutationEvent> {
+        return this.component.onWillMutateLayout;
+    }
+
+    /** Fires after each top-level structural layout mutation. See `onWillMutateLayout`. */
+    get onDidMutateLayout(): Event<DockviewLayoutMutationEvent> {
+        return this.component.onDidMutateLayout;
     }
 
     /**

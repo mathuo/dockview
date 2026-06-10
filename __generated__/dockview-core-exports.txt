@@ -48,6 +48,8 @@ DockviewGroupPanelModel
 DockviewHeaderDirection
 DockviewHeaderPosition
 DockviewIDisposable
+DockviewLayoutMutationEvent
+DockviewLayoutMutationKind
 DockviewMaximizedGroupChanged
 DockviewMutableDisposable
 DockviewOptions
