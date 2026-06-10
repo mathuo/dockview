@@ -90,7 +90,22 @@ export class FloatingGroupService implements IFloatingGroupService {
             })()
         );
 
+        // Floating windows are non-modal dialogs (role set in Overlay). Give
+        // the dialog an accessible name from the representative group's active
+        // panel, refreshed as the active panel changes. An untitled panel
+        // leaves the dialog unnamed rather than hard-coding a label string.
+        const updateDialogLabel = (): void => {
+            const title = group.activePanel?.title;
+            if (title) {
+                overlay.element.setAttribute('aria-label', title);
+            } else {
+                overlay.element.removeAttribute('aria-label');
+            }
+        };
+        updateDialogLabel();
+
         floatingGroupPanel.addDisposables(
+            group.api.onDidActivePanelChange(() => updateDialogLabel()),
             overlay.onDidChange(() => {
                 gridview.layout(gridview.width, gridview.height);
             }),

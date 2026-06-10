@@ -1,3 +1,4 @@
+import { fireEvent } from '@testing-library/dom';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { IContentRenderer } from '../../dockview/types';
 import { GroupPanelPartInitParameters } from '../../dockview/types';
@@ -204,5 +205,144 @@ describe('accessibility: WAI-ARIA tabs baseline', () => {
         const dialog = container.querySelector('.dv-resize-container')!;
         expect(dialog.getAttribute('role')).toBe('dialog');
         expect(dialog.getAttribute('aria-modal')).toBe('false');
+    });
+
+    test('floating dialog is named by its active panel title', () => {
+        dockview.addPanel({ id: 'panel1', component: 'default' });
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            title: 'Floater',
+            floating: true,
+        });
+
+        const dialog = container.querySelector('.dv-resize-container')!;
+        expect(dialog.getAttribute('aria-label')).toBe('Floater');
+    });
+});
+
+/**
+ * Layer 2 — the free WAI-ARIA Tabs keyboard pattern within a strip
+ * (roving tabindex + arrow / Home / End navigation + manual activation).
+ */
+describe('accessibility: tab keyboard navigation', () => {
+    let container: HTMLElement;
+    let dockview: DockviewComponent;
+
+    beforeEach(() => {
+        container = document.createElement('div');
+        // Attach to the document so `.focus()` updates `document.activeElement`
+        // (jsdom only focuses connected elements).
+        document.body.appendChild(container);
+        dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                return new PanelContentPartTest(options.id, options.name);
+            },
+        });
+        dockview.layout(1000, 1000);
+    });
+
+    afterEach(() => {
+        dockview.dispose();
+        container.remove();
+    });
+
+    const realTabs = (): HTMLElement[] =>
+        Array.from(container.querySelectorAll('.dv-tab')) as HTMLElement[];
+
+    test('roving tabindex — only the active tab is in the tab order', () => {
+        dockview.addPanel({ id: 'p1', component: 'default' });
+        dockview.addPanel({ id: 'p2', component: 'default' }); // p2 active
+
+        const tabs = realTabs();
+        const active = tabs.filter(
+            (t) => t.getAttribute('aria-selected') === 'true'
+        );
+        expect(active).toHaveLength(1);
+        expect(active[0].tabIndex).toBe(0);
+        tabs.filter((t) => t !== active[0]).forEach((t) =>
+            expect(t.tabIndex).toBe(-1)
+        );
+    });
+
+    test('arrow keys move the roving focus along the strip', () => {
+        const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+        dockview.addPanel({ id: 'p2', component: 'default' });
+        dockview.addPanel({ id: 'p3', component: 'default' });
+        p1.api.setActive();
+
+        const [t1, t2, t3] = realTabs();
+        expect(t1.tabIndex).toBe(0);
+
+        fireEvent.keyDown(t1, { key: 'ArrowRight' });
+        expect(document.activeElement).toBe(t2);
+        expect(t2.tabIndex).toBe(0);
+        expect(t1.tabIndex).toBe(-1);
+
+        fireEvent.keyDown(t2, { key: 'ArrowRight' });
+        expect(document.activeElement).toBe(t3);
+
+        fireEvent.keyDown(t3, { key: 'ArrowLeft' });
+        expect(document.activeElement).toBe(t2);
+    });
+
+    test('arrow navigation clamps at the ends', () => {
+        const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+        dockview.addPanel({ id: 'p2', component: 'default' });
+        p1.api.setActive();
+        const [t1, t2] = realTabs();
+
+        // ArrowLeft at the first tab is a no-op.
+        t1.focus();
+        fireEvent.keyDown(t1, { key: 'ArrowLeft' });
+        expect(document.activeElement).toBe(t1);
+
+        // ArrowRight at the last tab is a no-op.
+        fireEvent.keyDown(t1, { key: 'ArrowRight' });
+        expect(document.activeElement).toBe(t2);
+        fireEvent.keyDown(t2, { key: 'ArrowRight' });
+        expect(document.activeElement).toBe(t2);
+    });
+
+    test('Home and End jump to the first and last tab', () => {
+        const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+        dockview.addPanel({ id: 'p2', component: 'default' });
+        dockview.addPanel({ id: 'p3', component: 'default' });
+        p1.api.setActive();
+        const tabs = realTabs();
+
+        fireEvent.keyDown(tabs[0], { key: 'End' });
+        expect(document.activeElement).toBe(tabs[2]);
+
+        fireEvent.keyDown(tabs[2], { key: 'Home' });
+        expect(document.activeElement).toBe(tabs[0]);
+    });
+
+    test('arrowing moves focus but does not activate (manual activation)', () => {
+        const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+        const p2 = dockview.addPanel({ id: 'p2', component: 'default' });
+        p1.api.setActive();
+
+        const [t1] = realTabs();
+        fireEvent.keyDown(t1, { key: 'ArrowRight' });
+
+        expect(p1.api.isActive).toBe(true);
+        expect(p2.api.isActive).toBe(false);
+    });
+
+    test('Enter and Space activate the focused tab', () => {
+        const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+        const p2 = dockview.addPanel({ id: 'p2', component: 'default' });
+        const p3 = dockview.addPanel({ id: 'p3', component: 'default' });
+        p1.api.setActive();
+        const [t1, t2, t3] = realTabs();
+
+        fireEvent.keyDown(t1, { key: 'ArrowRight' });
+        fireEvent.keyDown(t2, { key: 'Enter' });
+        expect(p2.api.isActive).toBe(true);
+
+        fireEvent.keyDown(t2, { key: 'ArrowRight' });
+        fireEvent.keyDown(t3, { key: ' ' });
+        expect(p3.api.isActive).toBe(true);
     });
 });
