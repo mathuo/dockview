@@ -206,6 +206,19 @@ describe('accessibility: WAI-ARIA tabs baseline', () => {
         expect(dialog.getAttribute('role')).toBe('dialog');
         expect(dialog.getAttribute('aria-modal')).toBe('false');
     });
+
+    test('floating dialog is named by its active panel title', () => {
+        dockview.addPanel({ id: 'panel1', component: 'default' });
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            title: 'Floater',
+            floating: true,
+        });
+
+        const dialog = container.querySelector('.dv-resize-container')!;
+        expect(dialog.getAttribute('aria-label')).toBe('Floater');
+    });
 });
 
 /**
