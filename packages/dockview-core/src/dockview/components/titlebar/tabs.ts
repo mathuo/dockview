@@ -380,6 +380,13 @@ export class Tabs extends CompositeDisposable {
                 },
                 { passive: false }
             ),
+            // WAI-ARIA Tabs keyboard pattern: arrow keys move the roving
+            // focus along the strip, Home/End jump to the ends, and
+            // Enter/Space activate the focused tab (manual activation, so
+            // arrowing through tabs doesn't switch panels until committed).
+            addDisposableListener(this._tabsList, 'keydown', (event) => {
+                this._onKeyDown(event);
+            }),
             addDisposableListener(
                 this._tabsList,
                 'dragover',
@@ -521,6 +528,55 @@ export class Tabs extends CompositeDisposable {
             this.selectedIndex > -1 &&
             this._tabs[this.selectedIndex].value === tab
         );
+    }
+
+    private _onKeyDown(event: KeyboardEvent): void {
+        // Only handle when a tab element itself is focused — never hijack keys
+        // typed inside a custom tab renderer's own controls (inputs etc.).
+        const index = this._tabs.findIndex(
+            (tab) => tab.value.element === event.target
+        );
+        if (index === -1) {
+            return;
+        }
+
+        const isVertical = this._direction === 'vertical';
+        const nextKey = isVertical ? 'ArrowDown' : 'ArrowRight';
+        const prevKey = isVertical ? 'ArrowUp' : 'ArrowLeft';
+        const last = this._tabs.length - 1;
+
+        switch (event.key) {
+            case nextKey:
+                event.preventDefault();
+                this._focusTab(Math.min(index + 1, last));
+                break;
+            case prevKey:
+                event.preventDefault();
+                this._focusTab(Math.max(index - 1, 0));
+                break;
+            case 'Home':
+                event.preventDefault();
+                this._focusTab(0);
+                break;
+            case 'End':
+                event.preventDefault();
+                this._focusTab(last);
+                break;
+            case 'Enter':
+            case ' ':
+                // Manual activation of the focused tab.
+                event.preventDefault();
+                this._tabs[index].value.panel.api.setActive();
+                break;
+        }
+    }
+
+    /** Move the roving focus to the tab at `index` (updates tabindex + DOM focus). */
+    private _focusTab(index: number): void {
+        for (let i = 0; i < this._tabs.length; i++) {
+            this._tabs[i].value.element.tabIndex = i === index ? 0 : -1;
+        }
+        this._tabs[index].value.element.focus();
     }
 
     setActivePanel(panel: IDockviewPanel): void {

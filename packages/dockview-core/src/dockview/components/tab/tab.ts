@@ -74,7 +74,10 @@ export class Tab extends CompositeDisposable {
 
         this._element = document.createElement('div');
         this._element.className = 'dv-tab';
-        this._element.tabIndex = 0;
+        // Roving tabindex (WAI-ARIA Tabs pattern): only the active tab is in
+        // the tab order; `setActive` flips this. Inactive tabs are reachable
+        // via arrow keys, handled by the tab strip.
+        this._element.tabIndex = -1;
         this._element.draggable = caps.html5;
         // WAI-ARIA Tabs pattern. `aria-controls` points at the group's single
         // tabpanel (the content container); `aria-selected` tracks activation.
@@ -255,6 +258,9 @@ export class Tab extends CompositeDisposable {
             'aria-selected',
             isActive ? 'true' : 'false'
         );
+        // Roving tabindex anchors to the active tab; arrow-key navigation in
+        // the tab strip moves the rover from there.
+        this._element.tabIndex = isActive ? 0 : -1;
     }
 
     public setContent(part: ITabRenderer): void {
