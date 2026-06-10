@@ -101,7 +101,10 @@ describe('accessibility: WAI-ARIA tabs baseline', () => {
     });
 
     test('aria-selected and aria-labelledby follow the active panel', () => {
-        const panel1 = dockview.addPanel({ id: 'panel1', component: 'default' });
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
         dockview.addPanel({ id: 'panel2', component: 'default' });
 
         const tabpanel = container.querySelector('.dv-content-container')!;
