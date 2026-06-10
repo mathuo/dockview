@@ -1,6 +1,6 @@
 import { DockviewApi } from '../api/component.api';
 import { getPanelData, PanelTransfer } from '../dnd/dataTransfer';
-import { Position } from '../dnd/droptarget';
+import { Droptarget, Position } from '../dnd/droptarget';
 import { DockviewComponent } from './dockviewComponent';
 import { addClasses, isAncestor, removeClasses, toggleClass } from '../dom';
 import {
@@ -360,6 +360,11 @@ export class DockviewGroupPanelModel
     /** DOM id of the content container (the group's tabpanel), referenced by each tab's `aria-controls`. */
     get contentContainerId(): string {
         return this.contentContainer.element.id;
+    }
+
+    /** The group's content drop target — lets keyboard docking preview a drop here. */
+    get contentDropTarget(): Droptarget {
+        return this.contentContainer.dropTarget;
     }
 
     get locked(): DockviewGroupPanelLocked {
