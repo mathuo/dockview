@@ -8,6 +8,7 @@ import { ContextMenuModule } from './contextMenu';
 import { RootDropTargetModule } from './rootDropTargetService';
 import { HeaderActionsModule } from './headerActionsService';
 import { AdvancedDnDModule } from './advancedDnDService';
+import { LiveRegionModule } from './liveRegionService';
 
 /**
  * Internal list of all built-in modules. Registered automatically by
@@ -23,4 +24,5 @@ export const AllModules: DockviewModule<any>[] = [
     RootDropTargetModule,
     HeaderActionsModule,
     AdvancedDnDModule,
+    LiveRegionModule,
 ];

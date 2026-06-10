@@ -97,6 +97,7 @@ import { PopupService } from './components/popupService';
 import { IContextMenuHost, IContextMenuService } from './contextMenu';
 import { IRootDropTargetHost } from './rootDropTargetService';
 import { IAdvancedDnDHost } from './advancedDnDService';
+import { ILiveRegionHost } from './liveRegionService';
 import { IDragGhostSpec } from '../dnd/backend';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import { themeAbyss } from './theme';
@@ -385,7 +386,8 @@ export class DockviewComponent
         IContextMenuHost,
         IRootDropTargetHost,
         IHeaderActionsHost,
-        IAdvancedDnDHost
+        IAdvancedDnDHost,
+        ILiveRegionHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
