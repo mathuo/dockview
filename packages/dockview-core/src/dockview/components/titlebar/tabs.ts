@@ -201,6 +201,10 @@ export class Tabs extends CompositeDisposable {
         }
 
         this._direction = value;
+        this._tabsList.setAttribute(
+            'aria-orientation',
+            value === 'vertical' ? 'vertical' : 'horizontal'
+        );
         if (this._scrollbar) {
             this._scrollbar.orientation = value;
         }
@@ -233,6 +237,12 @@ export class Tabs extends CompositeDisposable {
 
         this._tabsList = document.createElement('div');
         this._tabsList.className = 'dv-tabs-container';
+        // WAI-ARIA Tabs pattern: the strip of tabs is the tablist.
+        this._tabsList.setAttribute('role', 'tablist');
+        this._tabsList.setAttribute(
+            'aria-orientation',
+            this._direction === 'vertical' ? 'vertical' : 'horizontal'
+        );
 
         this.showTabsOverflowControl = options.showTabsOverflowControl;
 
@@ -499,6 +509,11 @@ export class Tabs extends CompositeDisposable {
 
     indexOf(id: string): number {
         return this._tabs.findIndex((tab) => tab.value.panel.id === id);
+    }
+
+    /** DOM id of the tab element for a panel — for the tabpanel's `aria-labelledby`. */
+    getTabId(panelId: string): string | undefined {
+        return this._tabMap.get(panelId)?.value.element.id;
     }
 
     isActive(tab: Tab): boolean {
