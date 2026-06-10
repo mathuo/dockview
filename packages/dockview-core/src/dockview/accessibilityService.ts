@@ -30,21 +30,35 @@ export interface IAccessibilityHost {
 
 export interface IAccessibilityService extends IDisposable {}
 
+type DockPhase = 'target' | 'edge';
+
 interface MoveState {
     readonly source: IDockviewPanel;
-    readonly targets: DockviewGroupPanel[];
-    index: number;
+    readonly groups: DockviewGroupPanel[];
+    groupIndex: number;
+    phase: DockPhase;
+    position: Position;
 }
 
+const EDGE_FROM_KEY: Record<string, Position> = {
+    ArrowLeft: 'left',
+    ArrowRight: 'right',
+    ArrowUp: 'top',
+    ArrowDown: 'bottom',
+};
+
 /**
- * Pro accessibility module — operate the dock without a mouse. This first
- * vertical: keyboard docking by tab-into. `Ctrl+M` on the active panel
- * enters move mode; arrows cycle the target group (live preview + narration);
- * `Enter` docks it into the target; `Escape` cancels. Opt-in via the
- * `keyboardDocking` option.
+ * Pro accessibility module — operate the dock without a mouse. Keyboard
+ * docking: `Ctrl+M` on the active panel arms a two-phase move with a live drop
+ * preview + screen-reader narration:
+ *   1. PICK TARGET — arrows cycle the groups (incl. the panel's own, so a tab
+ *      can be split out); `Enter` selects one.
+ *   2. PICK EDGE — arrows choose a split edge (left/right/top/bottom) or the
+ *      centre (tab-into); `Enter` commits, `Escape` steps back.
+ * `Escape` from the target phase cancels. Opt-in via `keyboardDocking`.
  *
- * Splits (edge targets), float / popout terminals, spatial F6 navigation and
- * cross-window focus management are later phases.
+ * Float / popout terminals, spatial F6 navigation and cross-window focus
+ * management are later phases.
  */
 export class AccessibilityService
     extends CompositeDisposable
@@ -86,64 +100,119 @@ export class AccessibilityService
 
     private _enterMoveMode(e: KeyboardEvent): void {
         const source = this.host.activePanel;
-        if (!source) {
-            return;
-        }
-        const targets = this.host.groups.filter((g) => g !== source.group);
-        if (targets.length === 0) {
+        const groups = this.host.groups;
+        if (!source || groups.length === 0) {
             return;
         }
         e.preventDefault();
         e.stopPropagation();
-        this._move = { source, targets, index: 0 };
-        this._showTarget();
+        // Start on the panel's own group so a single group of tabs can still
+        // split a tab out via the edge phase.
+        const groupIndex = Math.max(0, groups.indexOf(source.group));
+        this._move = {
+            source,
+            groups,
+            groupIndex,
+            phase: 'target',
+            position: 'center',
+        };
+        this._render();
     }
 
     private _onMoveKey(e: KeyboardEvent): void {
         const move = this._move!;
-        const count = move.targets.length;
 
-        switch (e.key) {
-            case 'ArrowRight':
-            case 'ArrowDown':
-                this._consume(e);
-                move.index = (move.index + 1) % count;
-                this._showTarget();
-                break;
-            case 'ArrowLeft':
-            case 'ArrowUp':
-                this._consume(e);
-                move.index = (move.index - 1 + count) % count;
-                this._showTarget();
-                break;
-            case 'Enter': {
-                this._consume(e);
-                const target = move.targets[move.index];
-                const source = move.source;
-                this._exit();
-                this.host.dockPanel(source, target, 'center');
-                this.host.announce(`${this._label(source)} docked.`);
-                break;
-            }
-            case 'Escape':
-                this._consume(e);
+        if (e.key === 'Escape') {
+            this._consume(e);
+            if (move.phase === 'edge') {
+                move.phase = 'target';
+                move.position = 'center';
+                this._render();
+            } else {
                 this._exit();
                 this.host.announce('Move cancelled.');
-                break;
+            }
+            return;
+        }
+
+        if (e.key === 'Enter') {
+            this._consume(e);
+            if (move.phase === 'target') {
+                move.phase = 'edge';
+                move.position = 'center';
+                this._render();
+            } else {
+                this._commit();
+            }
+            return;
+        }
+
+        if (move.phase === 'target') {
+            const n = move.groups.length;
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                this._consume(e);
+                move.groupIndex = (move.groupIndex + 1) % n;
+                this._render();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                this._consume(e);
+                move.groupIndex = (move.groupIndex - 1 + n) % n;
+                this._render();
+            }
+            return;
+        }
+
+        // edge phase
+        const edge = EDGE_FROM_KEY[e.key];
+        if (edge) {
+            this._consume(e);
+            move.position = edge;
+            this._render();
+        } else if (e.key === ' ' || e.key === 'c' || e.key === 'C') {
+            this._consume(e);
+            move.position = 'center';
+            this._render();
         }
     }
 
-    private _showTarget(): void {
+    private _render(): void {
         const move = this._move!;
-        const target = move.targets[move.index];
+        const group = move.groups[move.groupIndex];
         this._clearPreview();
-        this._preview = this.host.showDropPreview(target, 'center');
-        const name = target.activePanel?.title ?? target.id;
+        this._preview = this.host.showDropPreview(group, move.position);
+
+        const name = group.activePanel?.title ?? group.id;
+        if (move.phase === 'target') {
+            this.host.announce(
+                `Moving ${this._label(move.source)}. Target ${name}, ${
+                    move.groupIndex + 1
+                } of ${move.groups.length}. Enter to choose where, Escape to cancel.`
+            );
+        } else {
+            this.host.announce(
+                `${this._describe(move.position)} ${name}. Arrows to change, Enter to confirm, Escape to go back.`
+            );
+        }
+    }
+
+    private _commit(): void {
+        const move = this._move!;
+        const group = move.groups[move.groupIndex];
+        const position = move.position;
+        const source = move.source;
+        const name = group.activePanel?.title ?? group.id;
+        this._exit();
+        this.host.dockPanel(source, group, position);
         this.host.announce(
-            `Moving ${this._label(move.source)}. Target ${name}, ${
-                move.index + 1
-            } of ${move.targets.length}. Enter to dock, Escape to cancel.`
+            `${this._label(source)} ${
+                position === 'center'
+                    ? `docked into ${name}`
+                    : `split ${position} of ${name}`
+            }.`
         );
+    }
+
+    private _describe(position: Position): string {
+        return position === 'center' ? 'Tab into' : `Split ${position} of`;
     }
 
     private _exit(): void {

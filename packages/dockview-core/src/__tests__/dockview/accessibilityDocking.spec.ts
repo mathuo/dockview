@@ -51,18 +51,37 @@ describe('accessibility: keyboard docking', () => {
         container.remove();
     });
 
-    test('Ctrl+M then Enter docks the active panel into the target group', () => {
+    test('target another group, centre, Enter → tab-into (groups merge)', () => {
         make(true);
-        twoGroups(); // p2 is active, in its own group
+        twoGroups(); // p1, p2 in separate groups; p2 active, targeting its own group
         expect(dockview.groups.length).toBe(2);
 
         fireEvent.keyDown(dockview.element, { key: 'm', ctrlKey: true });
         expect(region().textContent).toContain('Moving P2');
-        expect(region().textContent).toContain('Target P1');
+
+        // move the target to p1's group, then pick the group (edge phase)
+        fireEvent.keyDown(dockview.element, { key: 'ArrowRight' });
+        fireEvent.keyDown(dockview.element, { key: 'Enter' });
+        expect(region().textContent).toContain('Tab into');
+
+        // commit centre (tab-into)
+        fireEvent.keyDown(dockview.element, { key: 'Enter' });
+        expect(dockview.groups.length).toBe(1);
+    });
+
+    test('split a tab out of a single group to an edge (creates a group)', () => {
+        make(true);
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        dockview.addPanel({ id: 'p2', component: 'default', title: 'P2' });
+        expect(dockview.groups.length).toBe(1); // p1, p2 are tabs in one group
+
+        fireEvent.keyDown(dockview.element, { key: 'm', ctrlKey: true });
+        fireEvent.keyDown(dockview.element, { key: 'Enter' }); // pick the (only) group
+        fireEvent.keyDown(dockview.element, { key: 'ArrowLeft' }); // left edge = split
+        expect(region().textContent).toContain('Split left of');
 
         fireEvent.keyDown(dockview.element, { key: 'Enter' });
-        expect(region().textContent).toBe('P2 docked.');
-        expect(dockview.groups.length).toBe(1);
+        expect(dockview.groups.length).toBe(2);
     });
 
     test('Escape cancels without changing the layout', () => {
