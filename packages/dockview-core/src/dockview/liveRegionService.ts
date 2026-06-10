@@ -5,6 +5,7 @@ import {
     DockviewLayoutMutationEvent,
     DockviewLayoutMutationKind,
 } from './dockviewComponent';
+import { DockviewComponentOptions } from './options';
 import { defineModule } from './modules';
 
 /**
@@ -15,6 +16,7 @@ import { defineModule } from './modules';
  */
 export interface ILiveRegionHost {
     readonly element: HTMLElement;
+    readonly options: DockviewComponentOptions;
     readonly onDidAddPanel: Event<IDockviewPanel>;
     readonly onDidRemovePanel: Event<IDockviewPanel>;
     readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;
@@ -67,12 +69,14 @@ export class LiveRegionService
     extends CompositeDisposable
     implements ILiveRegionService
 {
+    private readonly _host: ILiveRegionHost;
     private readonly _region: HTMLElement;
     private _suppressDepth = 0;
 
     constructor(host: ILiveRegionHost) {
         super();
 
+        this._host = host;
         this._region = createLiveRegion();
         host.element.appendChild(this._region);
 
@@ -101,7 +105,12 @@ export class LiveRegionService
         message: string,
         _politeness: 'polite' | 'assertive' = 'polite'
     ): void {
-        if (this._suppressDepth > 0 || !message) {
+        // Opt-out (read live so `updateOptions({ announcements })` applies).
+        if (
+            this._host.options.announcements === false ||
+            this._suppressDepth > 0 ||
+            !message
+        ) {
             return;
         }
         // Clearing first forces SRs to re-announce an identical message.

@@ -234,6 +234,13 @@ export interface DockviewOptions {
         params: DropOverlayModelParams
     ) => DroptargetOverlayModel | undefined;
     /**
+     * Built-in screen-reader announcements of layout changes (a visually-hidden
+     * `aria-live` region narrating panel open/close etc.). On by default —
+     * set to `false` to disable, e.g. when the host app provides its own
+     * announcement system. Honoured live via `updateOptions`.
+     */
+    announcements?: boolean;
+    /**
      * Replace the built-in tab group color palette with a user-defined list.
      *
      * Each entry has an `id` (stored on `tabGroup.color` and serialized),
@@ -315,6 +322,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         createTabGroupChipComponent: undefined,
         createGroupDragGhostComponent: undefined,
         dropOverlayModel: undefined,
+        announcements: undefined,
         tabGroupColors: undefined,
         tabGroupAccent: undefined,
     };

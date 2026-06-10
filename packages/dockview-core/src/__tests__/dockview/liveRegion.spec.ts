@@ -94,4 +94,27 @@ describe('LiveRegion announcer', () => {
         dockview.clear();
         expect(region().textContent).toBe('');
     });
+
+    test('announcements: false disables the announcer', () => {
+        dockview.dispose();
+        container = document.createElement('div');
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            announcements: false,
+        });
+        dockview.layout(800, 600);
+
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'Orders' });
+        expect(region().textContent).toBe('');
+    });
+
+    test('updateOptions({ announcements: false }) disables it live', () => {
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'Orders' });
+        expect(region().textContent).toBe('Orders opened');
+
+        dockview.updateOptions({ announcements: false });
+        region().textContent = '';
+        dockview.addPanel({ id: 'p2', component: 'default', title: 'Chart' });
+        expect(region().textContent).toBe('');
+    });
 });
