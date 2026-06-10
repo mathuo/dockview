@@ -19,6 +19,7 @@ import { IRootDropTargetService } from './rootDropTargetService';
 import { IHeaderActionsService } from './headerActionsService';
 import { IAdvancedDnDService } from './advancedDnDService';
 import { ILiveRegionService } from './liveRegionService';
+import { IAccessibilityService } from './accessibilityService';
 
 export interface ServiceCollection {
     floatingGroupService?: IFloatingGroupService;
@@ -31,6 +32,7 @@ export interface ServiceCollection {
     headerActionsService?: IHeaderActionsService;
     advancedDnDService?: IAdvancedDnDService;
     liveRegionService?: ILiveRegionService;
+    accessibilityService?: IAccessibilityService;
 }
 
 export interface DockviewModule<THost = unknown> {

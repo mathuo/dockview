@@ -9,6 +9,7 @@ import { RootDropTargetModule } from './rootDropTargetService';
 import { HeaderActionsModule } from './headerActionsService';
 import { AdvancedDnDModule } from './advancedDnDService';
 import { LiveRegionModule } from './liveRegionService';
+import { AccessibilityModule } from './accessibilityService';
 
 /**
  * Internal list of all built-in modules. Registered automatically by
@@ -25,4 +26,5 @@ export const AllModules: DockviewModule<any>[] = [
     HeaderActionsModule,
     AdvancedDnDModule,
     LiveRegionModule,
+    AccessibilityModule,
 ];

@@ -14,7 +14,7 @@ import {
 } from '../dnd/droptarget';
 import { tail, sequenceEquals } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
-import { CompositeDisposable, Disposable } from '../lifecycle';
+import { CompositeDisposable, Disposable, IDisposable } from '../lifecycle';
 import { Event, Emitter, addDisposableListener } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import { IWatermarkRenderer, GroupviewPanelState } from './types';
@@ -98,6 +98,7 @@ import { IContextMenuHost, IContextMenuService } from './contextMenu';
 import { IRootDropTargetHost } from './rootDropTargetService';
 import { IAdvancedDnDHost } from './advancedDnDService';
 import { ILiveRegionHost } from './liveRegionService';
+import { IAccessibilityHost } from './accessibilityService';
 import { IDragGhostSpec } from '../dnd/backend';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import { themeAbyss } from './theme';
@@ -387,7 +388,8 @@ export class DockviewComponent
         IRootDropTargetHost,
         IHeaderActionsHost,
         IAdvancedDnDHost,
-        ILiveRegionHost
+        ILiveRegionHost,
+        IAccessibilityHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
@@ -695,6 +697,30 @@ export class DockviewComponent
         group?: DockviewGroupPanel
     ): DroptargetOverlayModel | undefined {
         return this._advancedDnDService?.resolveOverlayModel(location, group);
+    }
+
+    // IAccessibilityHost — keyboard docking reaches the AdvancedDnD preview +
+    // LiveRegion announcer through these so the service stays decoupled.
+    showDropPreview(group: DockviewGroupPanel, position: Position): IDisposable {
+        return (
+            this._advancedDnDService?.showPreviewOverlay(group, position) ??
+            Disposable.NONE
+        );
+    }
+
+    announce(message: string): void {
+        this._moduleRegistry.services.liveRegionService?.announce(message);
+    }
+
+    dockPanel(
+        panel: IDockviewPanel,
+        group: DockviewGroupPanel,
+        position: Position
+    ): void {
+        this.moveGroupOrPanel({
+            from: { groupId: panel.group.id, panelId: panel.id },
+            to: { group, position },
+        });
     }
 
     /**

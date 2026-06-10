@@ -256,6 +256,13 @@ export interface DockviewOptions {
      */
     getAnnouncement?: (event: LiveRegionEvent) => string | null | undefined;
     /**
+     * Enable keyboard docking — move the active panel without a mouse:
+     * `Ctrl`/`Cmd`+`M` enters move mode, arrows cycle the target group (with a
+     * live drop preview + screen-reader narration), `Enter` docks it, `Escape`
+     * cancels. Off by default (opt-in while the feature matures).
+     */
+    keyboardDocking?: boolean;
+    /**
      * Replace the built-in tab group color palette with a user-defined list.
      *
      * Each entry has an `id` (stored on `tabGroup.color` and serialized),
@@ -339,6 +346,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         dropOverlayModel: undefined,
         announcements: undefined,
         getAnnouncement: undefined,
+        keyboardDocking: undefined,
         tabGroupColors: undefined,
         tabGroupAccent: undefined,
     };
