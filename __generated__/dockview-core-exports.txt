@@ -145,6 +145,7 @@ IWatermarkPanelProps
 IWatermarkRenderer
 InvisibleSizing
 LayoutPriority
+LiveRegionEvent
 MaximizedChanged
 MaximizedViewChanged
 MeasuredValue

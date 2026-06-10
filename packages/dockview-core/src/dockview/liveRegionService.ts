@@ -82,9 +82,9 @@ export class LiveRegionService
 
         this.addDisposables(
             { dispose: () => this._region.remove() },
-            host.onDidAddPanel((panel) => this._announcePanel(panel, 'opened')),
+            host.onDidAddPanel((panel) => this._announcePanel(panel, 'open')),
             host.onDidRemovePanel((panel) =>
-                this._announcePanel(panel, 'closed')
+                this._announcePanel(panel, 'close')
             ),
             // Bracket bulk transactions so a fromJSON / clear doesn't announce
             // every nested add/remove.
@@ -118,8 +118,24 @@ export class LiveRegionService
         this._region.textContent = message;
     }
 
-    private _announcePanel(panel: IDockviewPanel, verb: string): void {
-        this.announce(`${panel.title ?? panel.id} ${verb}`);
+    private _announcePanel(
+        panel: IDockviewPanel,
+        kind: 'open' | 'close'
+    ): void {
+        // The app may localise/override the message, suppress it (null / ''),
+        // or fall through to the default (undefined).
+        const custom = this._host.options.getAnnouncement?.({ kind, panel });
+        if (custom === null || custom === '') {
+            return;
+        }
+        this.announce(custom ?? this._defaultMessage(panel, kind));
+    }
+
+    private _defaultMessage(
+        panel: IDockviewPanel,
+        kind: 'open' | 'close'
+    ): string {
+        return `${panel.title ?? panel.id} ${kind === 'open' ? 'opened' : 'closed'}`;
     }
 }
 

@@ -117,4 +117,48 @@ describe('LiveRegion announcer', () => {
         dockview.addPanel({ id: 'p2', component: 'default', title: 'Chart' });
         expect(region().textContent).toBe('');
     });
+
+    test('getAnnouncement localises / overrides the default message', () => {
+        dockview.dispose();
+        container = document.createElement('div');
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            getAnnouncement: ({ kind, panel }) =>
+                kind === 'open'
+                    ? `${panel.title} ouvert`
+                    : `${panel.title} fermé`,
+        });
+        dockview.layout(800, 600);
+
+        const p1 = dockview.addPanel({
+            id: 'p1',
+            component: 'default',
+            title: 'Commandes',
+        });
+        expect(region().textContent).toBe('Commandes ouvert');
+
+        dockview.removePanel(p1);
+        expect(region().textContent).toBe('Commandes fermé');
+    });
+
+    test('getAnnouncement returning null suppresses that announcement', () => {
+        dockview.dispose();
+        container = document.createElement('div');
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            // suppress opens, keep the default for closes
+            getAnnouncement: ({ kind }) => (kind === 'open' ? null : undefined),
+        });
+        dockview.layout(800, 600);
+
+        const p1 = dockview.addPanel({
+            id: 'p1',
+            component: 'default',
+            title: 'Orders',
+        });
+        expect(region().textContent).toBe(''); // open suppressed
+
+        dockview.removePanel(p1);
+        expect(region().textContent).toBe('Orders closed'); // default kept
+    });
 });

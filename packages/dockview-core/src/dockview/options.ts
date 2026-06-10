@@ -64,6 +64,13 @@ export interface DropOverlayModelParams {
     group?: DockviewGroupPanel;
 }
 
+/** A layout change to be announced — see the `getAnnouncement` option. */
+export interface LiveRegionEvent {
+    /** `'open'` when a panel was added, `'close'` when it was removed. */
+    kind: 'open' | 'close';
+    panel: IDockviewPanel;
+}
+
 export interface GetTabContextMenuItemsParams {
     panel: IDockviewPanel;
     group: DockviewGroupPanel;
@@ -241,6 +248,14 @@ export interface DockviewOptions {
      */
     announcements?: boolean;
     /**
+     * Localise or override the built-in announcement strings (the default
+     * messages are English). Return a string to use it, `null` / `''` to
+     * suppress that announcement, or `undefined` to keep the default. This is
+     * how non-English apps translate announcements — core ships no message
+     * catalog, only the default strings + this hook.
+     */
+    getAnnouncement?: (event: LiveRegionEvent) => string | null | undefined;
+    /**
      * Replace the built-in tab group color palette with a user-defined list.
      *
      * Each entry has an `id` (stored on `tabGroup.color` and serialized),
@@ -323,6 +338,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         createGroupDragGhostComponent: undefined,
         dropOverlayModel: undefined,
         announcements: undefined,
+        getAnnouncement: undefined,
         tabGroupColors: undefined,
         tabGroupAccent: undefined,
     };
