@@ -94,9 +94,7 @@ export class AdvancedDnDService implements IAdvancedDnDService {
         this.host.fireWillShowOverlay(event);
     }
 
-    buildGroupDragGhost(
-        group: DockviewGroupPanel
-    ): IDragGhostSpec | undefined {
+    buildGroupDragGhost(group: DockviewGroupPanel): IDragGhostSpec | undefined {
         const createGhost = this.host.options.createGroupDragGhostComponent;
         if (!createGhost) {
             return undefined;
@@ -107,9 +105,7 @@ export class AdvancedDnDService implements IAdvancedDnDService {
             element: renderer.element,
             offsetX: GROUP_DRAG_GHOST_OFFSET_X,
             offsetY: GROUP_DRAG_GHOST_OFFSET_Y,
-            dispose: renderer.dispose
-                ? () => renderer.dispose?.()
-                : undefined,
+            dispose: renderer.dispose ? () => renderer.dispose?.() : undefined,
         };
     }
 
