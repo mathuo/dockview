@@ -68,6 +68,7 @@ DockviewUnhandledDragOverEvent
 DockviewWillDropEvent
 DockviewWillShowOverlayLocationEvent
 DraggablePaneviewPanel
+DropOverlayModelParams
 DroptargetOverlayModel
 EdgeGroupOptions
 EdgeGroupPosition
