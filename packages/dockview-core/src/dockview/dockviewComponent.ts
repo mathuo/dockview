@@ -91,6 +91,7 @@ import { StrictEventsSequencing } from './strictEventsSequencing';
 import { PopupService } from './components/popupService';
 import { IContextMenuHost, IContextMenuService } from './contextMenu';
 import { IRootDropTargetHost } from './rootDropTargetService';
+import { IAdvancedDnDHost } from './advancedDnDService';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import { themeAbyss } from './theme';
 import {
@@ -361,7 +362,8 @@ export class DockviewComponent
         ITabGroupChipsHost,
         IContextMenuHost,
         IRootDropTargetHost,
-        IHeaderActionsHost
+        IHeaderActionsHost,
+        IAdvancedDnDHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
@@ -585,6 +587,13 @@ export class DockviewComponent
         return this._moduleRegistry.services.rootDropTargetService!;
     }
 
+    private get _advancedDnDService() {
+        // Optional — callers `?.`-guard so the module can be removed from
+        // AllModules. Absent ⇒ the onWill* hooks simply don't fire (≡ no
+        // subscriber), which is invisible to apps not customising DnD.
+        return this._moduleRegistry.services.advancedDnDService;
+    }
+
     get headerActionsService() {
         return this._moduleRegistry.services.headerActionsService;
     }
@@ -609,6 +618,26 @@ export class DockviewComponent
         );
         this._onUnhandledDragOverEvent.fire(event);
         return event.isAccepted;
+    }
+
+    // IAdvancedDnDHost — the emitters stay here so the public onWill* event
+    // shape is unchanged; AdvancedDnDService routes the per-group fires
+    // through these. Engine guards (e.g. disableDnd) run on the component
+    // ahead of the dispatch.
+    fireWillDragPanel(event: TabDragEvent): void {
+        this._onWillDragPanel.fire(event);
+    }
+
+    fireWillDragGroup(event: GroupDragEvent): void {
+        this._onWillDragGroup.fire(event);
+    }
+
+    fireWillDrop(event: DockviewWillDropEvent): void {
+        this._onWillDrop.fire(event);
+    }
+
+    fireWillShowOverlay(event: DockviewWillShowOverlayLocationEvent): void {
+        this._onWillShowOverlay.fire(event);
     }
 
     /**
@@ -4024,10 +4053,10 @@ export class DockviewComponent
         if (!this._groups.has(view.id)) {
             const disposable = new CompositeDisposable(
                 view.model.onTabDragStart((event) => {
-                    this._onWillDragPanel.fire(event);
+                    this._advancedDnDService?.dispatchWillDragPanel(event);
                 }),
                 view.model.onGroupDragStart((event) => {
-                    this._onWillDragGroup.fire(event);
+                    this._advancedDnDService?.dispatchWillDragGroup(event);
                 }),
                 view.model.onMove((event) => {
                     const { groupId, itemId, target, index, tabGroupId } =
@@ -4049,15 +4078,17 @@ export class DockviewComponent
                     this._onDidDrop.fire(event);
                 }),
                 view.model.onWillDrop((event) => {
-                    this._onWillDrop.fire(event);
+                    this._advancedDnDService?.dispatchWillDrop(event);
                 }),
                 view.model.onWillShowOverlay((event) => {
                     if (this.options.disableDnd) {
+                        // Engine policy — stays in core, ahead of any
+                        // customisation dispatch.
                         event.preventDefault();
                         return;
                     }
 
-                    this._onWillShowOverlay.fire(event);
+                    this._advancedDnDService?.dispatchWillShowOverlay(event);
                 }),
                 view.model.onUnhandledDragOverEvent((event) => {
                     this._onUnhandledDragOverEvent.fire(event);
