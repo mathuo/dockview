@@ -79,6 +79,51 @@ describe('layout mutation events', () => {
         expect(did).toEqual(['move']);
     });
 
+    test('removeGroup brackets one "remove" transaction', () => {
+        const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+        will.length = 0;
+        did.length = 0;
+
+        dockview.removeGroup(p1.group);
+        expect(will).toEqual(['remove']);
+        expect(did).toEqual(['remove']);
+    });
+
+    test('addFloatingGroup brackets one "float" transaction', () => {
+        const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+        dockview.addPanel({ id: 'p2', component: 'default' });
+        will.length = 0;
+        did.length = 0;
+
+        dockview.addFloatingGroup(p1);
+        expect(will).toEqual(['float']);
+        expect(did).toEqual(['float']);
+    });
+
+    test('clear brackets one "clear" transaction', () => {
+        dockview.addPanel({ id: 'p1', component: 'default' });
+        dockview.addPanel({ id: 'p2', component: 'default' });
+        will.length = 0;
+        did.length = 0;
+
+        dockview.clear();
+        expect(will).toEqual(['clear']);
+        expect(did).toEqual(['clear']);
+    });
+
+    test('fromJSON fires a single "load" transaction, not N nested adds', () => {
+        dockview.addPanel({ id: 'p1', component: 'default' });
+        dockview.addPanel({ id: 'p2', component: 'default' });
+        dockview.addPanel({ id: 'p3', component: 'default' });
+        const json = dockview.toJSON();
+        will.length = 0;
+        did.length = 0;
+
+        dockview.fromJSON(json);
+        expect(will).toEqual(['load']);
+        expect(did).toEqual(['load']);
+    });
+
     test('onWillMutateLayout fires before onDidMutateLayout', () => {
         const order: string[] = [];
         dockview.onWillMutateLayout(() => order.push('will'));

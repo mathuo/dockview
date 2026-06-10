@@ -273,7 +273,6 @@ export type DockviewLayoutMutationKind =
     | 'move'
     | 'float'
     | 'popout'
-    | 'maximize'
     | 'load'
     | 'clear';
 
@@ -1004,6 +1003,17 @@ export class DockviewComponent
         itemToPopout: DockviewPanel | DockviewGroupPanel,
         options?: DockviewPopoutGroupOptionsInternal
     ): Promise<boolean> {
+        // The transaction brackets the synchronous structural change; the
+        // popout window opens asynchronously after it resolves.
+        return this.mutation('popout', () =>
+            this._doAddPopoutGroup(itemToPopout, options)
+        );
+    }
+
+    private _doAddPopoutGroup(
+        itemToPopout: DockviewPanel | DockviewGroupPanel,
+        options?: DockviewPopoutGroupOptionsInternal
+    ): Promise<boolean> {
         const service = assertModule(
             this._popoutWindowService,
             'PopoutWindow',
@@ -1611,6 +1621,13 @@ export class DockviewComponent
     }
 
     addFloatingGroup(
+        item: DockviewPanel | DockviewGroupPanel,
+        options?: FloatingGroupOptionsInternal
+    ): void {
+        this.mutation('float', () => this._doAddFloatingGroup(item, options));
+    }
+
+    private _doAddFloatingGroup(
         item: DockviewPanel | DockviewGroupPanel,
         options?: FloatingGroupOptionsInternal
     ): void {
@@ -2263,6 +2280,15 @@ export class DockviewComponent
         data: SerializedDockview,
         options?: { reuseExistingPanels: boolean }
     ): void {
+        // One 'load' transaction for the whole deserialization — the many
+        // nested add/remove mutations join it via the depth counter.
+        this.mutation('load', () => this._doFromJSON(data, options));
+    }
+
+    private _doFromJSON(
+        data: SerializedDockview,
+        options?: { reuseExistingPanels: boolean }
+    ): void {
         // Cancel any popout-restoration timers queued by a previous fromJSON
         // that haven't fired yet. The cancel path also disposes orphan groups
         // registered in _groups synchronously but never parented into a popout
@@ -2729,6 +2755,10 @@ export class DockviewComponent
     }
 
     clear(): void {
+        this.mutation('clear', () => this._doClear());
+    }
+
+    private _doClear(): void {
         const groups = Array.from(this._groups.values()).map((_) => _.value);
 
         const hasActiveGroup = !!this.activeGroup;
@@ -3113,7 +3143,7 @@ export class DockviewComponent
               }
             | undefined
     ): void {
-        this.doRemoveGroup(group, options);
+        this.mutation('remove', () => this.doRemoveGroup(group, options));
     }
 
     /**
@@ -3835,6 +3865,10 @@ export class DockviewComponent
     }
 
     moveGroup(options: MoveGroupOptions): void {
+        this.mutation('move', () => this._doMoveGroup(options));
+    }
+
+    private _doMoveGroup(options: MoveGroupOptions): void {
         const from = options.from.group;
         const to = options.to.group;
         const target = options.to.position;
