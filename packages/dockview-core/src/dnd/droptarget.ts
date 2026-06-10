@@ -434,6 +434,36 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
             this.overlayElement = undefined;
         }
     }
+
+    /**
+     * Render the drop overlay at `position` without a live drag, so keyboard
+     * docking shows the exact same preview as a mouse drag. Mirrors the
+     * `onDragOver` render path (in-place or anchored). Pair with `clearOverlay`.
+     */
+    showOverlay(position: Position): void {
+        const overrideTarget = this.options.getOverrideTarget?.();
+        const target = this.options.getOverlayOutline?.() ?? this.element;
+        const width = target.offsetWidth;
+        const height = target.offsetHeight;
+
+        if (!overrideTarget && !this.targetElement) {
+            const els = createOverlayElements();
+            this.targetElement = els.dropzone;
+            this.overlayElement = els.selection;
+            target.classList.add('dv-drop-target');
+            target.append(this.targetElement);
+        }
+
+        this.toggleClasses(position, width, height);
+        this._state = position;
+    }
+
+    /** Clear an overlay shown via {@link showOverlay} (in-place or anchored). */
+    clearOverlay(): void {
+        this.removeDropTarget();
+        this.options.getOverrideTarget?.()?.clear();
+        this._state = undefined;
+    }
 }
 
 export function calculateQuadrantAsPercentage(

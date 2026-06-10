@@ -1,6 +1,6 @@
-import { IDisposable } from '../lifecycle';
+import { Disposable, IDisposable } from '../lifecycle';
 import { IDragGhostSpec } from '../dnd/backend';
-import { DroptargetOverlayModel } from '../dnd/droptarget';
+import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
 import { DockviewApi } from '../api/component.api';
 import {
     GroupDragEvent,
@@ -57,6 +57,17 @@ export interface IAdvancedDnDService extends IDisposable {
         location: DockviewGroupDropLocation,
         group?: DockviewGroupPanel
     ): DroptargetOverlayModel | undefined;
+    /**
+     * Render the drop-preview overlay on a group at `position` — the same
+     * overlay a mouse drag shows — without a live drag. Returns a disposable
+     * that clears it. Used by keyboard docking so keyboard and mouse previews
+     * are identical (single source of truth). Commit the move via the public
+     * `api.moveGroupOrPanel({ to: { group, position } })`.
+     */
+    showPreviewOverlay(
+        group: DockviewGroupPanel,
+        position: Position
+    ): IDisposable;
 }
 
 /**
@@ -114,6 +125,15 @@ export class AdvancedDnDService implements IAdvancedDnDService {
         group?: DockviewGroupPanel
     ): DroptargetOverlayModel | undefined {
         return this.host.options.dropOverlayModel?.({ location, group });
+    }
+
+    showPreviewOverlay(
+        group: DockviewGroupPanel,
+        position: Position
+    ): IDisposable {
+        const target = group.model.contentDropTarget;
+        target.showOverlay(position);
+        return Disposable.from(() => target.clearOverlay());
     }
 
     dispose(): void {
