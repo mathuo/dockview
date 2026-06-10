@@ -1,6 +1,7 @@
 import { VoidContainer } from '../../../../dockview/components/titlebar/voidContainer';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewComponent } from '../../../../dockview/dockviewComponent';
+import { AdvancedDnDService } from '../../../../dockview/advancedDnDService';
 import { DockviewGroupPanel } from '../../../../dockview/dockviewGroupPanel';
 import { DockviewGroupPanelModel } from '../../../../dockview/dockviewGroupPanelModel';
 import {
@@ -615,6 +616,10 @@ describe('voidContainer', () => {
                 api: fakeApi as any,
                 options: { createGroupDragGhostComponent: factory },
                 doSetGroupActive: jest.fn(),
+                // The custom-ghost resolution now lives in AdvancedDnDService;
+                // delegate to the real service so this still exercises it.
+                buildGroupDragGhost: (g: any) =>
+                    new AdvancedDnDService(accessor).buildGroupDragGhost(g),
             });
             const group = fromPartial<DockviewGroupPanel>({
                 id: 'g1',

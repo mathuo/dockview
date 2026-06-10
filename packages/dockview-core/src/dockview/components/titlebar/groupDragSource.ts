@@ -122,22 +122,13 @@ export class GroupDragSource extends CompositeDisposable {
         };
 
         const buildGhostSpec = (): IDragGhostSpec => {
-            const createGhost =
-                this.accessor.options.createGroupDragGhostComponent;
-            if (createGhost) {
-                const renderer = createGhost(this.group);
-                renderer.init({
-                    group: this.group,
-                    api: this.accessor.api,
-                });
-                return {
-                    element: renderer.element,
-                    offsetX: 30,
-                    offsetY: -10,
-                    dispose: renderer.dispose
-                        ? () => renderer.dispose?.()
-                        : undefined,
-                };
+            // The custom-ghost resolution (createGroupDragGhostComponent) is
+            // owned by the AdvancedDnD module; core keeps the default chip and
+            // falls back to it when no custom ghost is produced (incl. when
+            // the module is absent).
+            const customGhost = this.accessor.buildGroupDragGhost?.(this.group);
+            if (customGhost) {
+                return customGhost;
             }
             return {
                 element: buildMultiPanelsGhost(),

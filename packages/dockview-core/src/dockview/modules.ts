@@ -17,6 +17,7 @@ import { ITabGroupChipsService } from './tabGroupChipsService';
 import { IContextMenuService } from './contextMenu';
 import { IRootDropTargetService } from './rootDropTargetService';
 import { IHeaderActionsService } from './headerActionsService';
+import { IAdvancedDnDService } from './advancedDnDService';
 
 export interface ServiceCollection {
     floatingGroupService?: IFloatingGroupService;
@@ -27,6 +28,7 @@ export interface ServiceCollection {
     contextMenuService?: IContextMenuService;
     rootDropTargetService?: IRootDropTargetService;
     headerActionsService?: IHeaderActionsService;
+    advancedDnDService?: IAdvancedDnDService;
 }
 
 export interface DockviewModule<THost = unknown> {

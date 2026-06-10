@@ -8,7 +8,7 @@ import {
 import { html5Backend, pointerBackend } from '../../../dnd/backend';
 import { DockviewComponent } from '../../dockviewComponent';
 import { addDisposableListener, Emitter, Event } from '../../../events';
-import { CompositeDisposable } from '../../../lifecycle';
+import { CompositeDisposable, Disposable } from '../../../lifecycle';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { quasiPreventDefault } from '../../../dom';
 import { GroupDragSource } from './groupDragSource';
@@ -105,6 +105,10 @@ export class VoidContainer extends CompositeDisposable {
             acceptedTargetZones: ['center'],
             canDisplayOverlay,
             getOverrideTarget: () => group.model.dropTargetContainer?.model,
+            overlayModel: this.accessor.resolveDropOverlayModel?.(
+                'header_space',
+                this.group
+            ),
         });
 
         this.pointerDropTarget = pointerBackend.createDropTarget(
@@ -113,6 +117,10 @@ export class VoidContainer extends CompositeDisposable {
                 acceptedTargetZones: ['center'],
                 canDisplayOverlay,
                 getOverrideTarget: () => group.model.dropTargetContainer?.model,
+                overlayModel: this.accessor.resolveDropOverlayModel?.(
+                    'header_space',
+                    this.group
+                ),
             }
         );
 
@@ -133,7 +141,18 @@ export class VoidContainer extends CompositeDisposable {
                 this._onDrop.fire(event);
             }),
             this.dropTarget,
-            this.pointerDropTarget
+            this.pointerDropTarget,
+            // Re-apply the app-supplied overlay model when options change.
+            // `{}` resets to the built-in default (all fields optional).
+            this.accessor.onDidOptionsChange?.(() => {
+                const model =
+                    this.accessor.resolveDropOverlayModel?.(
+                        'header_space',
+                        this.group
+                    ) ?? {};
+                this.dropTarget.setOverlayModel(model);
+                this.pointerDropTarget.setOverlayModel(model);
+            }) ?? Disposable.NONE
         );
     }
 

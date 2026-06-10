@@ -1,5 +1,6 @@
 import {
     CompositeDisposable,
+    Disposable,
     IDisposable,
     MutableDisposable,
 } from '../../../lifecycle';
@@ -120,6 +121,7 @@ export class ContentContainer
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
             canDisplayOverlay,
             getOverrideTarget,
+            overlayModel: this.accessor.resolveDropOverlayModel?.('content'),
         });
 
         this.pointerDropTarget = pointerBackend.createDropTarget(this.element, {
@@ -132,9 +134,21 @@ export class ContentContainer
             },
             className: 'dv-drop-target-content',
             getOverrideTarget,
+            overlayModel: this.accessor.resolveDropOverlayModel?.('content'),
         });
 
-        this.addDisposables(this.dropTarget, this.pointerDropTarget);
+        this.addDisposables(
+            this.dropTarget,
+            this.pointerDropTarget,
+            // Re-apply the app-supplied overlay model when options change.
+            // `{}` resets to the built-in default (all fields optional).
+            this.accessor.onDidOptionsChange?.(() => {
+                const model =
+                    this.accessor.resolveDropOverlayModel?.('content') ?? {};
+                this.dropTarget.setOverlayModel(model);
+                this.pointerDropTarget.setOverlayModel(model);
+            }) ?? Disposable.NONE
+        );
     }
 
     show(): void {
