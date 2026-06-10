@@ -57,6 +57,13 @@ export interface ContextMenuItemConfig {
 
 export type ContextMenuItem = BuiltInContextMenuItem | ContextMenuItemConfig;
 
+export interface DropOverlayModelParams {
+    /** Which of a group's drop targets the overlay is for. `'edge'` is shaped by `dndEdges`, not this option. */
+    location: DockviewGroupDropLocation;
+    /** The group the target belongs to, where known (tab / header_space / content). */
+    group?: DockviewGroupPanel;
+}
+
 export interface GetTabContextMenuItemsParams {
     panel: IDockviewPanel;
     group: DockviewGroupPanel;
@@ -213,6 +220,20 @@ export interface DockviewOptions {
         group: DockviewGroupPanel
     ) => IGroupDragGhostRenderer;
     /**
+     * Shape the drop overlay shown over a group's drop targets — the tab
+     * strip (`'tab'`), the header void space (`'header_space'`) and the
+     * panel content area (`'content'`). Return a {@link DroptargetOverlayModel}
+     * to override that target's default overlay (size, activation threshold,
+     * small-element boundaries), or `undefined` to keep the default.
+     *
+     * `group` is provided where known (tab / header_space). The outer-layout
+     * edge overlay is shaped by `dndEdges`, not this option, so `'edge'` is
+     * not dispatched here.
+     */
+    dropOverlayModel?: (
+        params: DropOverlayModelParams
+    ) => DroptargetOverlayModel | undefined;
+    /**
      * Replace the built-in tab group color palette with a user-defined list.
      *
      * Each entry has an `id` (stored on `tabGroup.color` and serialized),
@@ -293,6 +314,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         getTabGroupChipContextMenuItems: undefined,
         createTabGroupChipComponent: undefined,
         createGroupDragGhostComponent: undefined,
+        dropOverlayModel: undefined,
         tabGroupColors: undefined,
         tabGroupAccent: undefined,
     };

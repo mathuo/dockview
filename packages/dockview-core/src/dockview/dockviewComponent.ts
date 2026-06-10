@@ -7,7 +7,11 @@ import {
     Gridview,
     SerializedGridview,
 } from '../gridview/gridview';
-import { directionToPosition, Position } from '../dnd/droptarget';
+import {
+    directionToPosition,
+    DroptargetOverlayModel,
+    Position,
+} from '../dnd/droptarget';
 import { tail, sequenceEquals } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
 import { CompositeDisposable, Disposable } from '../lifecycle';
@@ -49,6 +53,7 @@ import {
     DockviewTabGroupChangeEvent,
     DockviewTabGroupCollapsedChangeEvent,
     DockviewTabGroupPanelChangeEvent,
+    DockviewGroupDropLocation,
 } from './events';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
@@ -648,6 +653,17 @@ export class DockviewComponent
      */
     buildGroupDragGhost(group: DockviewGroupPanel): IDragGhostSpec | undefined {
         return this._advancedDnDService?.buildGroupDragGhost(group);
+    }
+
+    /**
+     * Resolve the app-supplied drop overlay model (via the AdvancedDnD module)
+     * for a group drop target, or `undefined` to keep the target's default.
+     */
+    resolveDropOverlayModel(
+        location: DockviewGroupDropLocation,
+        group?: DockviewGroupPanel
+    ): DroptargetOverlayModel | undefined {
+        return this._advancedDnDService?.resolveOverlayModel(location, group);
     }
 
     /**

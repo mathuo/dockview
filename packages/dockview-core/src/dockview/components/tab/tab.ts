@@ -11,6 +11,7 @@ import { ITabRenderer } from '../../types';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import {
     DroptargetEvent,
+    DroptargetOverlayModel,
     IDropTarget,
     Position,
     WillShowOverlayEvent,
@@ -247,7 +248,16 @@ export class Tab extends CompositeDisposable {
         this._element.appendChild(this.content.element);
     }
 
-    private _buildOverlayModel() {
+    private _buildOverlayModel(): DroptargetOverlayModel {
+        // An app-supplied model (the dropOverlayModel option) takes precedence
+        // over the theme-derived default for this tab.
+        const custom = this.accessor.resolveDropOverlayModel?.(
+            'tab',
+            this.group
+        );
+        if (custom) {
+            return custom;
+        }
         // 'line' themes render a 4px insertion strip at the tab edge via the
         // anchor container's small-boundary path.  'fill' themes render a
         // half-width highlighted area, so we disable the small-boundary path

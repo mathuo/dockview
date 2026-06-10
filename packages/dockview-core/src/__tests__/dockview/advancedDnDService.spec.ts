@@ -5,6 +5,8 @@ import {
 import { DockviewComponentOptions } from '../../dockview/options';
 import { DockviewApi } from '../../api/component.api';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
+import { DockviewComponent } from '../../dockview/dockviewComponent';
+import { IContentRenderer } from '../../dockview/types';
 
 describe('AdvancedDnDService', () => {
     function createHost(
@@ -106,8 +108,70 @@ describe('AdvancedDnDService', () => {
         });
     });
 
+    describe('overlay model resolution', () => {
+        test('forwards location + group to the option and returns its result', () => {
+            const model = { size: { value: 30, type: 'percentage' as const } };
+            const dropOverlayModel = jest.fn(() => model);
+            const service = new AdvancedDnDService(
+                createHost({ dropOverlayModel })
+            );
+            const group = {} as DockviewGroupPanel;
+
+            const result = service.resolveOverlayModel('content', group);
+
+            expect(dropOverlayModel).toHaveBeenCalledWith({
+                location: 'content',
+                group,
+            });
+            expect(result).toBe(model);
+        });
+
+        test('returns undefined when no option is configured', () => {
+            const service = new AdvancedDnDService(createHost());
+            expect(service.resolveOverlayModel('tab')).toBeUndefined();
+        });
+    });
+
     test('dispose is a no-op and does not throw', () => {
         const service = new AdvancedDnDService(createHost());
         expect(() => service.dispose()).not.toThrow();
+    });
+});
+
+class TestContentPart implements IContentRenderer {
+    element = document.createElement('div');
+    init(): void {
+        // noop
+    }
+    layout(): void {
+        // noop
+    }
+    dispose(): void {
+        // noop
+    }
+}
+
+describe('dropOverlayModel integration', () => {
+    test('is consulted for tab, content and header_space targets (not edge)', () => {
+        const container = document.createElement('div');
+        const dropOverlayModel = jest.fn(() => undefined);
+
+        const dockview = new DockviewComponent(container, {
+            createComponent: () => new TestContentPart(),
+            dropOverlayModel,
+        });
+        dockview.layout(800, 600);
+        dockview.addPanel({ id: 'p1', component: 'default' });
+
+        const locations = dropOverlayModel.mock.calls.map(
+            (call) => (call[0] as { location: string }).location
+        );
+
+        expect(locations).toContain('tab');
+        expect(locations).toContain('content');
+        expect(locations).toContain('header_space');
+        expect(locations).not.toContain('edge');
+
+        dockview.dispose();
     });
 });

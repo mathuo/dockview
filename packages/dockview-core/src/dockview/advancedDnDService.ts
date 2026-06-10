@@ -1,5 +1,6 @@
 import { IDisposable } from '../lifecycle';
 import { IDragGhostSpec } from '../dnd/backend';
+import { DroptargetOverlayModel } from '../dnd/droptarget';
 import { DockviewApi } from '../api/component.api';
 import {
     GroupDragEvent,
@@ -7,7 +8,10 @@ import {
 } from './components/titlebar/tabsContainer';
 import { DockviewWillDropEvent } from './dockviewGroupPanelModel';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
-import { DockviewWillShowOverlayLocationEvent } from './events';
+import {
+    DockviewGroupDropLocation,
+    DockviewWillShowOverlayLocationEvent,
+} from './events';
 import { DockviewComponentOptions } from './options';
 import { defineModule } from './modules';
 
@@ -45,6 +49,14 @@ export interface IAdvancedDnDService extends IDisposable {
      * `undefined` is also what happens when this module is absent.
      */
     buildGroupDragGhost(group: DockviewGroupPanel): IDragGhostSpec | undefined;
+    /**
+     * Resolve the app-supplied overlay model for a group drop target via the
+     * `dropOverlayModel` option, or `undefined` to keep the target's default.
+     */
+    resolveOverlayModel(
+        location: DockviewGroupDropLocation,
+        group?: DockviewGroupPanel
+    ): DroptargetOverlayModel | undefined;
 }
 
 /**
@@ -99,6 +111,13 @@ export class AdvancedDnDService implements IAdvancedDnDService {
                 ? () => renderer.dispose?.()
                 : undefined,
         };
+    }
+
+    resolveOverlayModel(
+        location: DockviewGroupDropLocation,
+        group?: DockviewGroupPanel
+    ): DroptargetOverlayModel | undefined {
+        return this.host.options.dropOverlayModel?.({ location, group });
     }
 
     dispose(): void {
