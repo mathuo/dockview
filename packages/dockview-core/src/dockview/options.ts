@@ -257,9 +257,12 @@ export interface DockviewOptions {
     getAnnouncement?: (event: LiveRegionEvent) => string | null | undefined;
     /**
      * Enable keyboard docking — move the active panel without a mouse:
-     * `Ctrl`/`Cmd`+`M` enters move mode, arrows cycle the target group (with a
-     * live drop preview + screen-reader narration), `Enter` docks it, `Escape`
+     * `Ctrl`+`M` enters move mode, arrows cycle the target group (with a live
+     * drop preview + screen-reader narration), `Enter` docks it, `Escape`
      * cancels. Off by default (opt-in while the feature matures).
+     *
+     * (`Cmd`+`M` is intentionally not used — it's the macOS minimise-window
+     * shortcut. A rebindable keymap is a planned follow-up.)
      */
     keyboardDocking?: boolean;
     /**

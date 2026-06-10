@@ -38,7 +38,7 @@ interface MoveState {
 
 /**
  * Pro accessibility module — operate the dock without a mouse. This first
- * vertical: keyboard docking by tab-into. `Ctrl/Cmd+M` on the active panel
+ * vertical: keyboard docking by tab-into. `Ctrl+M` on the active panel
  * enters move mode; arrows cycle the target group (live preview + narration);
  * `Enter` docks it into the target; `Escape` cancels. Opt-in via the
  * `keyboardDocking` option.
@@ -77,7 +77,9 @@ export class AccessibilityService
             this._onMoveKey(e);
             return;
         }
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'm' || e.key === 'M')) {
+        // Ctrl+M only — NOT Cmd+M, which is the macOS "minimise window"
+        // shortcut and is handled by the OS before the page can intercept it.
+        if (e.ctrlKey && !e.metaKey && (e.key === 'm' || e.key === 'M')) {
             this._enterMoveMode(e);
         }
     }
