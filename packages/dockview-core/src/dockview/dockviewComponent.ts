@@ -92,6 +92,7 @@ import { PopupService } from './components/popupService';
 import { IContextMenuHost, IContextMenuService } from './contextMenu';
 import { IRootDropTargetHost } from './rootDropTargetService';
 import { IAdvancedDnDHost } from './advancedDnDService';
+import { IDragGhostSpec } from '../dnd/backend';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import { themeAbyss } from './theme';
 import {
@@ -638,6 +639,15 @@ export class DockviewComponent
 
     fireWillShowOverlay(event: DockviewWillShowOverlayLocationEvent): void {
         this._onWillShowOverlay.fire(event);
+    }
+
+    /**
+     * Resolve the custom group drag ghost (via the AdvancedDnD module), or
+     * `undefined` to fall back to the default chip. Returns `undefined` when
+     * the module is absent — the default ghost then renders.
+     */
+    buildGroupDragGhost(group: DockviewGroupPanel): IDragGhostSpec | undefined {
+        return this._advancedDnDService?.buildGroupDragGhost(group);
     }
 
     /**

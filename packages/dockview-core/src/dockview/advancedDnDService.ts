@@ -1,11 +1,19 @@
 import { IDisposable } from '../lifecycle';
+import { IDragGhostSpec } from '../dnd/backend';
+import { DockviewApi } from '../api/component.api';
 import {
     GroupDragEvent,
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
 import { DockviewWillDropEvent } from './dockviewGroupPanelModel';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewWillShowOverlayLocationEvent } from './events';
+import { DockviewComponentOptions } from './options';
 import { defineModule } from './modules';
+
+/** Cursor offset of the group drag ghost, matched to the long-shipped default. */
+const GROUP_DRAG_GHOST_OFFSET_X = 30;
+const GROUP_DRAG_GHOST_OFFSET_Y = -10;
 
 /**
  * The narrow surface the {@link AdvancedDnDService} needs from the host
@@ -17,6 +25,8 @@ import { defineModule } from './modules';
  * `disableDnd` guard) stays on the component, ahead of the dispatch.
  */
 export interface IAdvancedDnDHost {
+    readonly options: DockviewComponentOptions;
+    readonly api: DockviewApi;
     fireWillDragPanel(event: TabDragEvent): void;
     fireWillDragGroup(event: GroupDragEvent): void;
     fireWillDrop(event: DockviewWillDropEvent): void;
@@ -28,6 +38,13 @@ export interface IAdvancedDnDService extends IDisposable {
     dispatchWillDragGroup(event: GroupDragEvent): void;
     dispatchWillDrop(event: DockviewWillDropEvent): void;
     dispatchWillShowOverlay(event: DockviewWillShowOverlayLocationEvent): void;
+    /**
+     * Resolve the custom group drag ghost from
+     * `createGroupDragGhostComponent`, or `undefined` when no factory is
+     * configured (the caller then renders the default chip). Returning
+     * `undefined` is also what happens when this module is absent.
+     */
+    buildGroupDragGhost(group: DockviewGroupPanel): IDragGhostSpec | undefined;
 }
 
 /**
@@ -63,6 +80,25 @@ export class AdvancedDnDService implements IAdvancedDnDService {
 
     dispatchWillShowOverlay(event: DockviewWillShowOverlayLocationEvent): void {
         this.host.fireWillShowOverlay(event);
+    }
+
+    buildGroupDragGhost(
+        group: DockviewGroupPanel
+    ): IDragGhostSpec | undefined {
+        const createGhost = this.host.options.createGroupDragGhostComponent;
+        if (!createGhost) {
+            return undefined;
+        }
+        const renderer = createGhost(group);
+        renderer.init({ group, api: this.host.api });
+        return {
+            element: renderer.element,
+            offsetX: GROUP_DRAG_GHOST_OFFSET_X,
+            offsetY: GROUP_DRAG_GHOST_OFFSET_Y,
+            dispose: renderer.dispose
+                ? () => renderer.dispose?.()
+                : undefined,
+        };
     }
 
     dispose(): void {
