@@ -1,57 +1,12 @@
 import { CompositeDisposable, IDisposable } from '../lifecycle';
-import { Event } from '../events';
 import { Position } from '../dnd/droptarget';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
-import { DockviewLayoutMutationEvent } from './dockviewComponent';
-import {
-    DockviewComponentOptions,
-    DockviewKeybindings,
-    KeyboardNavigationOptions,
-} from './options';
+import { DockviewKeybindings, KeyboardNavigationOptions } from './options';
 import { defineModule } from './modules';
 import { AdvancedDnDModule } from './advancedDnDService';
 import { LiveRegionModule } from './liveRegionService';
-
-/**
- * The narrow surface the {@link AccessibilityService} needs from the host
- * (the `DockviewComponent`). It reads the group tree, previews a drop (via the
- * AdvancedDnD module — same overlay as a mouse drag), narrates (via the
- * LiveRegion module), and commits the dock.
- */
-export interface IAccessibilityHost {
-    /**
-     * The outermost dockview element (the shell, which also contains edge
-     * groups). A getter — it must resolve to the shell once that exists, not
-     * the inner gridview, or keydowns from edge groups are missed.
-     */
-    readonly rootElement: HTMLElement;
-    readonly options: DockviewComponentOptions;
-    readonly groups: DockviewGroupPanel[];
-    readonly activeGroup: DockviewGroupPanel | undefined;
-    readonly activePanel: IDockviewPanel | undefined;
-    /**
-     * The next / previous group in gridview (spatial) order, wrapping round —
-     * the one piece of navigation that needs the grid internals. All other
-     * focus logic lives in the service, using the public group API.
-     */
-    adjacentGroup(
-        group: DockviewGroupPanel,
-        reverse: boolean
-    ): DockviewGroupPanel | undefined;
-    /** Fires before / after a structural layout change — used to restore focus on close. */
-    readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;
-    readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent>;
-    showDropPreview(group: DockviewGroupPanel, position: Position): IDisposable;
-    announce(message: string): void;
-    dockPanel(
-        panel: IDockviewPanel,
-        group: DockviewGroupPanel,
-        position: Position
-    ): void;
-}
-
-export interface IAccessibilityService extends IDisposable {}
+import { IAccessibilityHost, IAccessibilityService } from './moduleContracts';
 
 type DockPhase = 'target' | 'edge';
 

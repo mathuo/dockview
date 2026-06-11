@@ -13,13 +13,15 @@ import { IFloatingGroupService } from './floatingGroupService';
 import { IPopoutWindowService } from './popoutWindowService';
 import { IWatermarkService } from './watermarkService';
 import { IEdgeGroupService } from './edgeGroupService';
-import { ITabGroupChipsService } from './tabGroupChipsService';
-import { IContextMenuService } from './contextMenu';
 import { IRootDropTargetService } from './rootDropTargetService';
 import { IHeaderActionsService } from './headerActionsService';
 import { IAdvancedDnDService } from './advancedDnDService';
 import { ILiveRegionService } from './liveRegionService';
-import { IAccessibilityService } from './accessibilityService';
+import {
+    IAccessibilityService,
+    IContextMenuService,
+    ITabGroupChipsService,
+} from './moduleContracts';
 
 export interface ServiceCollection {
     floatingGroupService?: IFloatingGroupService;

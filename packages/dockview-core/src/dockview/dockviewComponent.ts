@@ -79,7 +79,12 @@ import { IFloatingGroupHost } from './floatingGroupService';
 import { IPopoutWindowHost } from './popoutWindowService';
 import { IWatermarkHost } from './watermarkService';
 import { IEdgeGroupServiceHost } from './edgeGroupService';
-import { ITabGroupChipsHost } from './tabGroupChipsService';
+import {
+    IAccessibilityHost,
+    IContextMenuHost,
+    IContextMenuService,
+    ITabGroupChipsHost,
+} from './moduleContracts';
 import { IHeaderActionsHost } from './headerActionsService';
 import { AnchoredBox, AnchorPosition, Box } from '../types';
 import {
@@ -94,11 +99,9 @@ import {
 import { PopoutWindow } from '../popoutWindow';
 import { StrictEventsSequencing } from './strictEventsSequencing';
 import { PopupService } from './components/popupService';
-import { IContextMenuHost, IContextMenuService } from './contextMenu';
 import { IRootDropTargetHost } from './rootDropTargetService';
 import { IAdvancedDnDHost } from './advancedDnDService';
 import { ILiveRegionHost } from './liveRegionService';
-import { IAccessibilityHost } from './accessibilityService';
 import { IDragGhostSpec } from '../dnd/backend';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import { themeAbyss } from './theme';
