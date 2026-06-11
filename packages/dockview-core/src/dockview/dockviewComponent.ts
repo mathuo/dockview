@@ -14,7 +14,7 @@ import {
 } from '../dnd/droptarget';
 import { tail, sequenceEquals } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
-import { CompositeDisposable, Disposable } from '../lifecycle';
+import { CompositeDisposable, Disposable, IDisposable } from '../lifecycle';
 import { Event, Emitter, addDisposableListener } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import { IWatermarkRenderer, GroupviewPanelState } from './types';
@@ -97,6 +97,8 @@ import { PopupService } from './components/popupService';
 import { IContextMenuHost, IContextMenuService } from './contextMenu';
 import { IRootDropTargetHost } from './rootDropTargetService';
 import { IAdvancedDnDHost } from './advancedDnDService';
+import { ILiveRegionHost } from './liveRegionService';
+import { IAccessibilityHost } from './accessibilityService';
 import { IDragGhostSpec } from '../dnd/backend';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import { themeAbyss } from './theme';
@@ -385,7 +387,9 @@ export class DockviewComponent
         IContextMenuHost,
         IRootDropTargetHost,
         IHeaderActionsHost,
-        IAdvancedDnDHost
+        IAdvancedDnDHost,
+        ILiveRegionHost,
+        IAccessibilityHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
@@ -693,6 +697,94 @@ export class DockviewComponent
         group?: DockviewGroupPanel
     ): DroptargetOverlayModel | undefined {
         return this._advancedDnDService?.resolveOverlayModel(location, group);
+    }
+
+    // IAccessibilityHost — keyboard docking reaches the AdvancedDnD preview +
+    // LiveRegion announcer through these so the service stays decoupled.
+    /** Outermost element — the shell (incl. edge groups) once built, else the gridview. */
+    get rootElement(): HTMLElement {
+        return this._shellManager?.element ?? this.element;
+    }
+
+    focusNextPanel(): void {
+        const group = this.activeGroup;
+        if (!group) {
+            return;
+        }
+        group.model.moveToNext();
+        // Keep DOM focus inside the dock: switching hides the previously
+        // focused content, which would otherwise drop focus to <body> and
+        // leave the keymap unable to see the next key.
+        group.model.focusContent();
+    }
+
+    focusPreviousPanel(): void {
+        const group = this.activeGroup;
+        if (!group) {
+            return;
+        }
+        group.model.moveToPrevious();
+        group.model.focusContent();
+    }
+
+    focusNextGroup(): void {
+        this._focusAdjacentGroup(false);
+    }
+
+    focusPreviousGroup(): void {
+        this._focusAdjacentGroup(true);
+    }
+
+    /** Land DOM focus on the active group's content, keeping it inside the dock. */
+    focusActiveContent(): void {
+        this.activeGroup?.model.focusContent();
+    }
+
+    private _focusAdjacentGroup(reverse: boolean): void {
+        const current = this.activeGroup;
+        // gridview traversal only covers grid groups; a floating/popout group
+        // isn't in the grid, so there's no adjacent grid group to step to.
+        if (current && current.api.location.type !== 'grid') {
+            return;
+        }
+        const location = current ? getGridLocation(current.element) : undefined;
+        const target = current
+            ? <DockviewGroupPanel | undefined>(
+                  (reverse
+                      ? this.gridview.previous(location!)
+                      : this.gridview.next(location!)
+                  )?.view
+              )
+            : this.groups[0];
+        if (target) {
+            this.doSetGroupAndPanelActive(target);
+            target.model.focusContent();
+        }
+    }
+
+    showDropPreview(
+        group: DockviewGroupPanel,
+        position: Position
+    ): IDisposable {
+        return (
+            this._advancedDnDService?.showPreviewOverlay(group, position) ??
+            Disposable.NONE
+        );
+    }
+
+    announce(message: string): void {
+        this._moduleRegistry.services.liveRegionService?.announce(message);
+    }
+
+    dockPanel(
+        panel: IDockviewPanel,
+        group: DockviewGroupPanel,
+        position: Position
+    ): void {
+        this.moveGroupOrPanel({
+            from: { groupId: panel.group.id, panelId: panel.id },
+            to: { group, position },
+        });
     }
 
     /**

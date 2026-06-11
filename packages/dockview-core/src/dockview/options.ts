@@ -64,6 +64,38 @@ export interface DropOverlayModelParams {
     group?: DockviewGroupPanel;
 }
 
+/** A layout change to be announced — see the `getAnnouncement` option. */
+export interface LiveRegionEvent {
+    /** `'open'` when a panel was added, `'close'` when it was removed. */
+    kind: 'open' | 'close';
+    panel: IDockviewPanel;
+}
+
+/**
+ * Key bindings for {@link DockviewComponentOptions.keyboardNavigation}. Each
+ * value is a string of `+`-separated parts, modifiers first, e.g. `'ctrl+]'`,
+ * `'shift+f6'`, `'ctrl+m'`. Recognised modifiers: `ctrl`, `shift`, `alt`,
+ * `meta` (alias `cmd`). The final part is the `KeyboardEvent.key` to match,
+ * case-insensitively (`'m'`, `']'`, `'f6'`, `'arrowleft'`).
+ */
+export interface DockviewKeybindings {
+    /** Switch to the next tab in the focused group. Default `ctrl+]`. */
+    nextTab: string;
+    /** Switch to the previous tab in the focused group. Default `ctrl+[`. */
+    prevTab: string;
+    /** Move focus to the next group. Default `f6`. */
+    focusNextGroup: string;
+    /** Move focus to the previous group. Default `shift+f6`. */
+    focusPrevGroup: string;
+    /** Arm keyboard docking of the active panel. Default `ctrl+m`. */
+    dock: string;
+}
+
+export interface KeyboardNavigationOptions {
+    /** Override individual {@link DockviewKeybindings}; unset keys keep their defaults. */
+    keymap?: Partial<DockviewKeybindings>;
+}
+
 export interface GetTabContextMenuItemsParams {
     panel: IDockviewPanel;
     group: DockviewGroupPanel;
@@ -234,6 +266,37 @@ export interface DockviewOptions {
         params: DropOverlayModelParams
     ) => DroptargetOverlayModel | undefined;
     /**
+     * Built-in screen-reader announcements of layout changes (a visually-hidden
+     * `aria-live` region narrating panel open/close etc.). On by default —
+     * set to `false` to disable, e.g. when the host app provides its own
+     * announcement system. Honoured live via `updateOptions`.
+     */
+    announcements?: boolean;
+    /**
+     * Localise or override the built-in announcement strings (the default
+     * messages are English). Return a string to use it, `null` / `''` to
+     * suppress that announcement, or `undefined` to keep the default. This is
+     * how non-English apps translate announcements — core ships no message
+     * catalog, only the default strings + this hook.
+     */
+    getAnnouncement?: (event: LiveRegionEvent) => string | null | undefined;
+    /**
+     * Operate the dock with the keyboard. `true` enables the default bindings;
+     * pass an object to override individual ones via `keymap`. Off by default
+     * (opt-in while the feature matures). Enables:
+     *
+     * - **Switch tab** within the focused group — `Ctrl`+`]` / `Ctrl`+`[`.
+     * - **Move focus between groups** — `F6` / `Shift`+`F6`.
+     * - **Dock the active panel** without a mouse — `Ctrl`+`M` arms a two-phase
+     *   move (arrows cycle the target group with a live drop preview +
+     *   screen-reader narration, `Enter` docks, `Escape` cancels).
+     *
+     * Defaults avoid `Cmd`-based and browser-reserved combinations (e.g.
+     * `Cmd`+`M` is the macOS minimise-window shortcut); use {@link keymap} to
+     * rebind for your platform.
+     */
+    keyboardNavigation?: boolean | KeyboardNavigationOptions;
+    /**
      * Replace the built-in tab group color palette with a user-defined list.
      *
      * Each entry has an `id` (stored on `tabGroup.color` and serialized),
@@ -315,6 +378,9 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         createTabGroupChipComponent: undefined,
         createGroupDragGhostComponent: undefined,
         dropOverlayModel: undefined,
+        announcements: undefined,
+        getAnnouncement: undefined,
+        keyboardNavigation: undefined,
         tabGroupColors: undefined,
         tabGroupAccent: undefined,
     };
