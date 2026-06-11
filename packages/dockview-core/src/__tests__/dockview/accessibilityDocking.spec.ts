@@ -458,3 +458,52 @@ describe('accessibility: focus restore on close', () => {
         expect(spy).not.toHaveBeenCalled();
     });
 });
+
+/**
+ * L4 — focus across maximize/restore. Maximizing hides sibling groups via
+ * visibility toggling and leaves the maximized group's DOM in place, so the
+ * active panel keeps focus across the transition. This guards against a future
+ * change that re-renders on maximize (which would silently drop focus).
+ */
+describe('accessibility: focus across maximize', () => {
+    let container: HTMLElement;
+    let dockview: DockviewComponent;
+
+    const make = (): void => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            keyboardNavigation: true,
+        });
+        dockview.layout(1000, 1000);
+    };
+
+    afterEach(() => {
+        dockview.dispose();
+        container.remove();
+    });
+
+    test('maximize and restore keep focus on the active group', () => {
+        make();
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            title: 'P2',
+            position: { direction: 'right' },
+        });
+        const group = dockview.activeGroup!;
+        const tab = group.element.querySelector('.dv-tab') as HTMLElement;
+        tab.focus();
+        expect(container.contains(document.activeElement)).toBe(true);
+
+        group.api.maximize();
+        expect(group.api.isMaximized()).toBe(true);
+        expect(container.contains(document.activeElement)).toBe(true);
+
+        group.api.exitMaximized();
+        expect(group.api.isMaximized()).toBe(false);
+        expect(container.contains(document.activeElement)).toBe(true);
+    });
+});
