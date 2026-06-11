@@ -26,19 +26,17 @@ export interface IAccessibilityHost {
     readonly rootElement: HTMLElement;
     readonly options: DockviewComponentOptions;
     readonly groups: DockviewGroupPanel[];
+    readonly activeGroup: DockviewGroupPanel | undefined;
     readonly activePanel: IDockviewPanel | undefined;
-    /** Activate the next tab in the focused group (wraps round). */
-    focusNextPanel(): void;
-    /** Activate the previous tab in the focused group (wraps round). */
-    focusPreviousPanel(): void;
-    /** Move focus to the next group (wraps round). */
-    focusNextGroup(): void;
-    /** Move focus to the previous group (wraps round). */
-    focusPreviousGroup(): void;
-    /** Move focus to the group spatially in the given direction, if any. */
-    focusGroupInDirection(direction: 'left' | 'right' | 'up' | 'down'): void;
-    /** Return DOM focus to the active group's content (keeps it inside the dock). */
-    focusActiveContent(): void;
+    /**
+     * The next / previous group in gridview (spatial) order, wrapping round —
+     * the one piece of navigation that needs the grid internals. All other
+     * focus logic lives in the service, using the public group API.
+     */
+    adjacentGroup(
+        group: DockviewGroupPanel,
+        reverse: boolean
+    ): DockviewGroupPanel | undefined;
     showDropPreview(group: DockviewGroupPanel, position: Position): IDisposable;
     announce(message: string): void;
     dockPanel(
@@ -173,29 +171,112 @@ export class AccessibilityService
             this._enterMoveMode(e);
         } else if (matchesBinding(e, keymap.nextTab)) {
             this._consume(e);
-            this.host.focusNextPanel();
+            this._switchTab(false);
         } else if (matchesBinding(e, keymap.prevTab)) {
             this._consume(e);
-            this.host.focusPreviousPanel();
+            this._switchTab(true);
         } else if (matchesBinding(e, keymap.focusNextGroup)) {
             this._consume(e);
-            this.host.focusNextGroup();
+            this._cycleGroup(false);
         } else if (matchesBinding(e, keymap.focusPrevGroup)) {
             this._consume(e);
-            this.host.focusPreviousGroup();
+            this._cycleGroup(true);
         } else if (matchesBinding(e, keymap.focusGroupLeft)) {
             this._consume(e);
-            this.host.focusGroupInDirection('left');
+            this._focusGroupInDirection('left');
         } else if (matchesBinding(e, keymap.focusGroupRight)) {
             this._consume(e);
-            this.host.focusGroupInDirection('right');
+            this._focusGroupInDirection('right');
         } else if (matchesBinding(e, keymap.focusGroupUp)) {
             this._consume(e);
-            this.host.focusGroupInDirection('up');
+            this._focusGroupInDirection('up');
         } else if (matchesBinding(e, keymap.focusGroupDown)) {
             this._consume(e);
-            this.host.focusGroupInDirection('down');
+            this._focusGroupInDirection('down');
         }
+    }
+
+    // --- navigation (uses the public group API + the adjacentGroup primitive) ---
+
+    private _switchTab(reverse: boolean): void {
+        const group = this.host.activeGroup;
+        if (!group) {
+            return;
+        }
+        if (reverse) {
+            group.model.moveToPrevious();
+        } else {
+            group.model.moveToNext();
+        }
+        // Keep DOM focus inside the dock: switching hides the previously
+        // focused content, which would otherwise drop focus to <body> and
+        // leave the keymap unable to see the next key.
+        group.model.focusContent();
+    }
+
+    private _cycleGroup(reverse: boolean): void {
+        const current = this.host.activeGroup;
+        const target = current
+            ? this.host.adjacentGroup(current, reverse)
+            : this.host.groups[0];
+        this._focusGroup(target);
+    }
+
+    private _focusGroupInDirection(
+        direction: 'left' | 'right' | 'up' | 'down'
+    ): void {
+        const current = this.host.activeGroup;
+        if (!current || current.api.location.type !== 'grid') {
+            return;
+        }
+        const from = current.element.getBoundingClientRect();
+        const fromX = from.left + from.width / 2;
+        const fromY = from.top + from.height / 2;
+
+        let best: DockviewGroupPanel | undefined;
+        let bestDistance = Number.POSITIVE_INFINITY;
+        for (const group of this.host.groups) {
+            if (group === current || group.api.location.type !== 'grid') {
+                continue;
+            }
+            const rect = group.element.getBoundingClientRect();
+            const dx = rect.left + rect.width / 2 - fromX;
+            const dy = rect.top + rect.height / 2 - fromY;
+            // require the candidate to sit predominantly in the asked-for
+            // direction (dominant axis), so 'left' ignores a group that's
+            // mostly above/below.
+            const inDirection =
+                direction === 'left'
+                    ? dx < 0 && Math.abs(dx) >= Math.abs(dy)
+                    : direction === 'right'
+                      ? dx > 0 && Math.abs(dx) >= Math.abs(dy)
+                      : direction === 'up'
+                        ? dy < 0 && Math.abs(dy) >= Math.abs(dx)
+                        : dy > 0 && Math.abs(dy) >= Math.abs(dx);
+            if (!inDirection) {
+                continue;
+            }
+            const distance = dx * dx + dy * dy;
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                best = group;
+            }
+        }
+
+        this._focusGroup(best);
+    }
+
+    private _focusGroup(target: DockviewGroupPanel | undefined): void {
+        if (!target) {
+            return;
+        }
+        target.api.setActive();
+        target.model.focusContent();
+    }
+
+    /** Return DOM focus to the active group's content, keeping it in the dock. */
+    private _restoreFocus(): void {
+        this.host.activeGroup?.model.focusContent();
     }
 
     private _enterMoveMode(e: KeyboardEvent): void {
@@ -231,7 +312,7 @@ export class AccessibilityService
             } else {
                 this._exit();
                 this.host.announce('Move cancelled.');
-                this.host.focusActiveContent();
+                this._restoreFocus();
             }
             return;
         }
@@ -316,7 +397,7 @@ export class AccessibilityService
         }
         // The move re-renders the grid; pull focus back into the dock so the
         // keymap keeps working without a click.
-        this.host.focusActiveContent();
+        this._restoreFocus();
     }
 
     private _describe(position: Position): string {
