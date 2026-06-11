@@ -714,6 +714,33 @@ export class DockviewComponent
         this.activeGroup?.model.moveToPrevious();
     }
 
+    focusNextGroup(): void {
+        this._focusAdjacentGroup(false);
+    }
+
+    focusPreviousGroup(): void {
+        this._focusAdjacentGroup(true);
+    }
+
+    private _focusAdjacentGroup(reverse: boolean): void {
+        const current = this.activeGroup;
+        // gridview traversal only covers grid groups; a floating/popout group
+        // isn't in the grid, so there's no adjacent grid group to step to.
+        if (current && current.api.location.type !== 'grid') {
+            return;
+        }
+        const location = current ? getGridLocation(current.element) : undefined;
+        const target = current
+            ? <DockviewGroupPanel | undefined>(
+                  (reverse
+                      ? this.gridview.previous(location!)
+                      : this.gridview.next(location!)
+                  )?.view
+              )
+            : this.groups[0];
+        target?.focus();
+    }
+
     showDropPreview(
         group: DockviewGroupPanel,
         position: Position

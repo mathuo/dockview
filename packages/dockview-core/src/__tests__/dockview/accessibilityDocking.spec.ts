@@ -183,3 +183,76 @@ describe('accessibility: tab switching', () => {
         expect(dockview.activePanel?.id).toBe('p3');
     });
 });
+
+/**
+ * Move focus between groups by keyboard — F6 / Shift+F6 step to the next /
+ * previous group in gridview order (wrapping round).
+ */
+describe('accessibility: group focus navigation', () => {
+    let container: HTMLElement;
+    let dockview: DockviewComponent;
+
+    const make = (keyboardNavigation: boolean): void => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            keyboardNavigation,
+        });
+        dockview.layout(1000, 1000);
+    };
+
+    const threeGroups = (): void => {
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            title: 'P2',
+            position: { direction: 'right' },
+        });
+        dockview.addPanel({
+            id: 'p3',
+            component: 'default',
+            title: 'P3',
+            position: { direction: 'right' },
+        });
+    };
+
+    afterEach(() => {
+        dockview.dispose();
+        container.remove();
+    });
+
+    test('F6 moves focus to the next group and wraps round', () => {
+        make(true);
+        threeGroups(); // three groups; p3's group active
+        expect(dockview.activeGroup?.id).toBe(dockview.groups[2].id);
+
+        fireEvent.keyDown(dockview.element, { key: 'F6' });
+        expect(dockview.activeGroup?.id).toBe(dockview.groups[0].id); // wrapped
+
+        fireEvent.keyDown(dockview.element, { key: 'F6' });
+        expect(dockview.activeGroup?.id).toBe(dockview.groups[1].id);
+    });
+
+    test('Shift+F6 moves focus to the previous group and wraps round', () => {
+        make(true);
+        threeGroups(); // p3's group active (index 2)
+
+        fireEvent.keyDown(dockview.element, { key: 'F6', shiftKey: true });
+        expect(dockview.activeGroup?.id).toBe(dockview.groups[1].id);
+
+        fireEvent.keyDown(dockview.element, { key: 'F6', shiftKey: true });
+        fireEvent.keyDown(dockview.element, { key: 'F6', shiftKey: true });
+        expect(dockview.activeGroup?.id).toBe(dockview.groups[2].id); // wrapped
+    });
+
+    test('does nothing when keyboardNavigation is off', () => {
+        make(false);
+        threeGroups();
+        const before = dockview.activeGroup?.id;
+
+        fireEvent.keyDown(dockview.element, { key: 'F6' });
+        expect(dockview.activeGroup?.id).toBe(before);
+    });
+});

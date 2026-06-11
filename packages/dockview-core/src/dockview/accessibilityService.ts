@@ -31,6 +31,10 @@ export interface IAccessibilityHost {
     focusNextPanel(): void;
     /** Activate the previous tab in the focused group (wraps round). */
     focusPreviousPanel(): void;
+    /** Move focus to the next group (wraps round). */
+    focusNextGroup(): void;
+    /** Move focus to the previous group (wraps round). */
+    focusPreviousGroup(): void;
     showDropPreview(group: DockviewGroupPanel, position: Position): IDisposable;
     announce(message: string): void;
     dockPanel(
@@ -62,6 +66,8 @@ const EDGE_FROM_KEY: Record<string, Position> = {
 const DEFAULT_KEYMAP: DockviewKeybindings = {
     nextTab: 'ctrl+]',
     prevTab: 'ctrl+[',
+    focusNextGroup: 'f6',
+    focusPrevGroup: 'shift+f6',
     dock: 'ctrl+m',
 };
 
@@ -88,6 +94,7 @@ function matchesBinding(e: KeyboardEvent, binding: string): boolean {
  * `keyboardNavigation`, with a rebindable {@link DockviewKeybindings} keymap.
  *
  * - **Switch tab** (`Ctrl+]` / `Ctrl+[`) — cycle the focused group's tabs.
+ * - **Focus group** (`F6` / `Shift+F6`) — move focus between groups.
  * - **Keyboard docking** (`Ctrl+M`) — arms a two-phase move of the active
  *   panel with a live drop preview + screen-reader narration:
  *     1. PICK TARGET — arrows cycle the groups (incl. the panel's own, so a tab
@@ -96,8 +103,8 @@ function matchesBinding(e: KeyboardEvent, binding: string): boolean {
  *        centre (tab-into); `Enter` commits, `Escape` steps back.
  *   `Escape` from the target phase cancels.
  *
- * Inter-group focus navigation (F6 / spatial), float / popout terminals and
- * cross-window focus management are later phases.
+ * Spatial (directional) group focus, float / popout terminals and cross-window
+ * focus management are later phases.
  */
 export class AccessibilityService
     extends CompositeDisposable
@@ -162,6 +169,12 @@ export class AccessibilityService
         } else if (matchesBinding(e, keymap.prevTab)) {
             this._consume(e);
             this.host.focusPreviousPanel();
+        } else if (matchesBinding(e, keymap.focusNextGroup)) {
+            this._consume(e);
+            this.host.focusNextGroup();
+        } else if (matchesBinding(e, keymap.focusPrevGroup)) {
+            this._consume(e);
+            this.host.focusPreviousGroup();
         }
     }
 
