@@ -1,6 +1,7 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { IContentRenderer } from '../../dockview/types';
 import { ILiveRegionService } from '../../dockview/liveRegionService';
+import { AnnouncementEvent } from '../../dockview/options';
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');
@@ -160,5 +161,51 @@ describe('LiveRegion announcer', () => {
 
         dockview.removePanel(p1);
         expect(region().textContent).toBe('Orders closed'); // default kept
+    });
+
+    const assertiveRegion = (): HTMLElement =>
+        container.querySelector('.dv-live-region-assertive') as HTMLElement;
+
+    test('creates a separate assertive (alert) region', () => {
+        const r = assertiveRegion();
+        expect(r).toBeTruthy();
+        expect(r.getAttribute('role')).toBe('alert');
+        expect(r.getAttribute('aria-live')).toBe('assertive');
+    });
+
+    test('routes by politeness — assertive vs polite region', () => {
+        service().announce('routine');
+        expect(region().textContent).toBe('routine');
+        expect(assertiveRegion().textContent).toBe('');
+
+        service().announce('not allowed', 'assertive');
+        expect(assertiveRegion().textContent).toBe('not allowed');
+        expect(region().textContent).toBe('routine'); // polite untouched
+    });
+
+    test('a custom announcer receives events; the DOM regions stay empty', () => {
+        const events: AnnouncementEvent[] = [];
+        const c2 = document.createElement('div');
+        const dv2 = new DockviewComponent(c2, {
+            createComponent: () => new TestPanel(),
+            announcer: (e) => events.push(e),
+        });
+        dv2.layout(800, 600);
+        const svc = (
+            dv2 as unknown as {
+                _moduleRegistry: {
+                    services: { liveRegionService: ILiveRegionService };
+                };
+            }
+        )._moduleRegistry.services.liveRegionService;
+
+        svc.announce('hi', 'assertive');
+
+        expect(events).toEqual([{ message: 'hi', politeness: 'assertive' }]);
+        expect(c2.querySelector('.dv-live-region')?.textContent).toBe('');
+        expect(c2.querySelector('.dv-live-region-assertive')?.textContent).toBe(
+            ''
+        );
+        dv2.dispose();
     });
 });

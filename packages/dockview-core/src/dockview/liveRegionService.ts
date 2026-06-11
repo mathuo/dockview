@@ -36,11 +36,16 @@ export interface ILiveRegionService extends IDisposable {
 const isBulk = (kind: DockviewLayoutMutationKind): boolean =>
     kind === 'load' || kind === 'clear';
 
-function createLiveRegion(): HTMLElement {
+function createLiveRegion(politeness: 'polite' | 'assertive'): HTMLElement {
     const el = document.createElement('div');
-    el.className = 'dv-live-region';
-    el.setAttribute('role', 'status');
-    el.setAttribute('aria-live', 'polite');
+    el.className =
+        politeness === 'assertive'
+            ? 'dv-live-region-assertive'
+            : 'dv-live-region';
+    // assertive interrupts the SR (errors / cancellations); polite waits for a
+    // pause (routine status). `alert` implies assertive, `status` implies polite.
+    el.setAttribute('role', politeness === 'assertive' ? 'alert' : 'status');
+    el.setAttribute('aria-live', politeness);
     el.setAttribute('aria-atomic', 'true');
     // Visually hidden but kept in the accessibility tree (never display:none /
     // visibility:hidden, which would drop it from AT). Standard clip pattern.
@@ -60,28 +65,35 @@ function createLiveRegion(): HTMLElement {
 }
 
 /**
- * Narrates layout state changes to screen readers via a visually-hidden
- * `aria-live` region. Free / core (WCAG 4.1.3). Phase 1: open / close
- * announcements + the `announce()` sink; the bulk load/clear burst is
- * suppressed via the mutation-transaction events.
+ * Narrates layout state changes to screen readers via visually-hidden
+ * `aria-live` regions. Free / core (WCAG 4.1.3). Announces panel open/close +
+ * the shared `announce()` sink (the pro module narrates docking here too).
+ * Two regions: a **polite** one for routine status and an **assertive** one
+ * for errors/cancellations. The bulk load/clear burst is suppressed via the
+ * mutation-transaction events, and an app can take over delivery entirely with
+ * the `announcer` option.
  */
 export class LiveRegionService
     extends CompositeDisposable
     implements ILiveRegionService
 {
     private readonly _host: ILiveRegionHost;
-    private readonly _region: HTMLElement;
+    private readonly _polite: HTMLElement;
+    private readonly _assertive: HTMLElement;
     private _suppressDepth = 0;
 
     constructor(host: ILiveRegionHost) {
         super();
 
         this._host = host;
-        this._region = createLiveRegion();
-        host.element.appendChild(this._region);
+        this._polite = createLiveRegion('polite');
+        this._assertive = createLiveRegion('assertive');
+        host.element.appendChild(this._polite);
+        host.element.appendChild(this._assertive);
 
         this.addDisposables(
-            { dispose: () => this._region.remove() },
+            { dispose: () => this._polite.remove() },
+            { dispose: () => this._assertive.remove() },
             host.onDidAddPanel((panel) => this._announcePanel(panel, 'open')),
             host.onDidRemovePanel((panel) =>
                 this._announcePanel(panel, 'close')
@@ -103,7 +115,7 @@ export class LiveRegionService
 
     announce(
         message: string,
-        _politeness: 'polite' | 'assertive' = 'polite'
+        politeness: 'polite' | 'assertive' = 'polite'
     ): void {
         // Opt-out (read live so `updateOptions({ announcements })` applies).
         if (
@@ -113,9 +125,18 @@ export class LiveRegionService
         ) {
             return;
         }
+        // Apps can route announcements into their own SR system instead of the
+        // built-in regions (e.g. a shared app-wide live region).
+        const announcer = this._host.options.announcer;
+        if (announcer) {
+            announcer({ message, politeness });
+            return;
+        }
         // Clearing first forces SRs to re-announce an identical message.
-        this._region.textContent = '';
-        this._region.textContent = message;
+        const region =
+            politeness === 'assertive' ? this._assertive : this._polite;
+        region.textContent = '';
+        region.textContent = message;
     }
 
     private _announcePanel(
