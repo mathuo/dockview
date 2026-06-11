@@ -707,11 +707,24 @@ export class DockviewComponent
     }
 
     focusNextPanel(): void {
-        this.activeGroup?.model.moveToNext();
+        const group = this.activeGroup;
+        if (!group) {
+            return;
+        }
+        group.model.moveToNext();
+        // Keep DOM focus inside the dock: switching hides the previously
+        // focused content, which would otherwise drop focus to <body> and
+        // leave the keymap unable to see the next key.
+        group.model.focusContent();
     }
 
     focusPreviousPanel(): void {
-        this.activeGroup?.model.moveToPrevious();
+        const group = this.activeGroup;
+        if (!group) {
+            return;
+        }
+        group.model.moveToPrevious();
+        group.model.focusContent();
     }
 
     focusNextGroup(): void {
@@ -720,6 +733,11 @@ export class DockviewComponent
 
     focusPreviousGroup(): void {
         this._focusAdjacentGroup(true);
+    }
+
+    /** Land DOM focus on the active group's content, keeping it inside the dock. */
+    focusActiveContent(): void {
+        this.activeGroup?.model.focusContent();
     }
 
     private _focusAdjacentGroup(reverse: boolean): void {
@@ -738,7 +756,10 @@ export class DockviewComponent
                   )?.view
               )
             : this.groups[0];
-        target?.focus();
+        if (target) {
+            this.doSetGroupAndPanelActive(target);
+            target.model.focusContent();
+        }
     }
 
     showDropPreview(

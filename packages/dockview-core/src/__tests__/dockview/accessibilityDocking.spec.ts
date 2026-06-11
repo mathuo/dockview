@@ -182,6 +182,20 @@ describe('accessibility: tab switching', () => {
         fireEvent.keyDown(dockview.element, { key: ']', ctrlKey: true });
         expect(dockview.activePanel?.id).toBe('p3');
     });
+
+    test('pulls focus back into the dock after switching (so it keeps working)', () => {
+        make(true);
+        threeTabs(); // p3 active, single group
+        const group = dockview.activeGroup!;
+        // switching hides the previously focused content; without restoring
+        // focus it would fall to <body> and gate out the next key
+        const spy = jest.spyOn(group.model, 'focusContent');
+
+        fireEvent.keyDown(dockview.element, { key: ']', ctrlKey: true });
+
+        expect(dockview.activePanel?.id).toBe('p1');
+        expect(spy).toHaveBeenCalled();
+    });
 });
 
 /**

@@ -35,6 +35,8 @@ export interface IAccessibilityHost {
     focusNextGroup(): void;
     /** Move focus to the previous group (wraps round). */
     focusPreviousGroup(): void;
+    /** Return DOM focus to the active group's content (keeps it inside the dock). */
+    focusActiveContent(): void;
     showDropPreview(group: DockviewGroupPanel, position: Position): IDisposable;
     announce(message: string): void;
     dockPanel(
@@ -211,6 +213,7 @@ export class AccessibilityService
             } else {
                 this._exit();
                 this.host.announce('Move cancelled.');
+                this.host.focusActiveContent();
             }
             return;
         }
@@ -293,6 +296,9 @@ export class AccessibilityService
         } catch {
             this.host.announce('That move is not allowed.');
         }
+        // The move re-renders the grid; pull focus back into the dock so the
+        // keymap keeps working without a click.
+        this.host.focusActiveContent();
     }
 
     private _describe(position: Position): string {
