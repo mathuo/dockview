@@ -120,8 +120,10 @@ function matchesBinding(e: KeyboardEvent, binding: string): boolean {
  * - **Floating `Esc`** (L4) — `Esc` inside a floating group returns focus to
  *   the control that had it before entering the float (polite: bubble phase,
  *   respects `defaultPrevented`, so panel content keeps `Esc`).
+ * - **Floating Tab-containment** (L4) — Tab wraps within the floating group so
+ *   focus doesn't leak to the grid behind it.
  *
- * Float Tab-containment and cross-window (popout) focus are later phases.
+ * Cross-window (popout) focus is a later phase.
  */
 export class AccessibilityService
     extends CompositeDisposable
@@ -227,6 +229,51 @@ export class AccessibilityService
         this._returnFocusFromFloat();
     }
 
+    /**
+     * Keep Tab inside the floating group that holds focus: at the last tabbable
+     * Tab wraps to the first, at the first Shift+Tab wraps to the last. Returns
+     * true if it handled the event. No-op outside a float.
+     */
+    private _trapFloatTab(e: KeyboardEvent): boolean {
+        const target = e.target;
+        if (!(target instanceof Element)) {
+            return false;
+        }
+        const float = target.closest('[role="dialog"]');
+        if (!float || !this.host.rootElement.contains(float)) {
+            return false;
+        }
+        const tabbables = this._tabbables(float);
+        if (tabbables.length === 0) {
+            return false;
+        }
+        const first = tabbables[0];
+        const last = tabbables[tabbables.length - 1];
+        const active = float.ownerDocument.activeElement;
+        if (!e.shiftKey && active === last) {
+            e.preventDefault();
+            first.focus();
+            return true;
+        }
+        if (e.shiftKey && active === first) {
+            e.preventDefault();
+            last.focus();
+            return true;
+        }
+        return false;
+    }
+
+    private _tabbables(root: Element): HTMLElement[] {
+        const nodes = root.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), input:not([disabled]), ' +
+                'select:not([disabled]), textarea:not([disabled]), [tabindex]'
+        );
+        // tabIndex >= 0 keeps naturally-focusable controls and roving anchors
+        // (the active tab) while dropping tabindex="-1" plumbing (content
+        // containers, inactive tabs).
+        return Array.from(nodes).filter((el) => el.tabIndex >= 0);
+    }
+
     private _returnFocusFromFloat(): void {
         const prev = this._lastNonFloatFocus;
         if (
@@ -269,6 +316,11 @@ export class AccessibilityService
             !(e.target instanceof Node) ||
             !this.host.rootElement.contains(e.target)
         ) {
+            return;
+        }
+        // Trap Tab within a floating group so focus doesn't leak to the grid
+        // behind it (the float is non-modal, but its Tab order should be).
+        if (e.key === 'Tab' && this._trapFloatTab(e)) {
             return;
         }
         const keymap = this._keymap;

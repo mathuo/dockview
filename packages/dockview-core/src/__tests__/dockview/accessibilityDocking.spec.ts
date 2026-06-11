@@ -588,3 +588,96 @@ describe('accessibility: floating group Esc returns focus', () => {
         expect(document.activeElement).toBe(ft); // not restored
     });
 });
+
+class ButtonPanel implements IContentRenderer {
+    element = document.createElement('div');
+    init(): void {
+        const b1 = document.createElement('button');
+        b1.textContent = 'b1';
+        const b2 = document.createElement('button');
+        b2.textContent = 'b2';
+        this.element.append(b1, b2);
+    }
+    layout(): void {
+        // noop
+    }
+    dispose(): void {
+        // noop
+    }
+}
+
+/**
+ * L4 — Tab is trapped within a floating group: at the last tabbable Tab wraps
+ * to the first, at the first Shift+Tab wraps to the last, so focus doesn't leak
+ * to the grid behind the (non-modal) float.
+ */
+describe('accessibility: floating group Tab containment', () => {
+    let container: HTMLElement;
+    let dockview: DockviewComponent;
+
+    const make = (keyboardNavigation: boolean): void => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new ButtonPanel(),
+            keyboardNavigation,
+        });
+        dockview.layout(1000, 1000);
+        dockview.addPanel({ id: 'main', component: 'default', title: 'Main' });
+        dockview.addPanel({
+            id: 'float',
+            component: 'default',
+            title: 'Float',
+            floating: true,
+        });
+    };
+
+    // mirror the service's tabbable query so the test is robust to float chrome
+    const tabbables = (): HTMLElement[] => {
+        const float = container.querySelector('[role="dialog"]')!;
+        return Array.from(
+            float.querySelectorAll<HTMLElement>(
+                'a[href], button:not([disabled]), input:not([disabled]), ' +
+                    'select:not([disabled]), textarea:not([disabled]), [tabindex]'
+            )
+        ).filter((el) => el.tabIndex >= 0);
+    };
+
+    afterEach(() => {
+        dockview.dispose();
+        container.remove();
+    });
+
+    test('Tab at the last tabbable wraps to the first', () => {
+        make(true);
+        const t = tabbables();
+        expect(t.length).toBeGreaterThan(1);
+        const first = t[0];
+        const last = t[t.length - 1];
+
+        last.focus();
+        fireEvent.keyDown(last, { key: 'Tab', bubbles: true });
+        expect(document.activeElement).toBe(first);
+    });
+
+    test('Shift+Tab at the first tabbable wraps to the last', () => {
+        make(true);
+        const t = tabbables();
+        const first = t[0];
+        const last = t[t.length - 1];
+
+        first.focus();
+        fireEvent.keyDown(first, { key: 'Tab', shiftKey: true, bubbles: true });
+        expect(document.activeElement).toBe(last);
+    });
+
+    test('off when keyboardNavigation is disabled', () => {
+        make(false);
+        const t = tabbables();
+        const last = t[t.length - 1];
+
+        last.focus();
+        fireEvent.keyDown(last, { key: 'Tab', bubbles: true });
+        expect(document.activeElement).toBe(last); // not wrapped
+    });
+});
