@@ -671,6 +671,20 @@ describe('accessibility: floating group Tab containment', () => {
         expect(document.activeElement).toBe(last);
     });
 
+    test('Tab from non-tabbable plumbing (content container) stays in the float', () => {
+        // the real-browser leak: focus on the tabindex="-1" content container
+        // matched no tabbable, so default Tab escaped to the grid behind
+        make(true);
+        const float = container.querySelector('[role="dialog"]')!;
+        const content = float.querySelector(
+            '.dv-content-container'
+        ) as HTMLElement;
+        content.focus();
+
+        fireEvent.keyDown(content, { key: 'Tab', bubbles: true });
+        expect(document.activeElement).toBe(tabbables()[0]); // not the grid
+    });
+
     test('off when keyboardNavigation is disabled', () => {
         make(false);
         const t = tabbables();

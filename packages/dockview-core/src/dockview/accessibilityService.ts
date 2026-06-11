@@ -243,24 +243,28 @@ export class AccessibilityService
         if (!float || !this.host.rootElement.contains(float)) {
             return false;
         }
+        // Always manage Tab inside a float, never just at the boundary: focus
+        // often sits on non-tabbable plumbing (the content container, which is
+        // tabindex="-1"), and the browser's default Tab from there escapes to
+        // the grid behind. Drive the cursor through the float's tabbables
+        // ourselves and swallow the default so it can't leak out.
+        e.preventDefault();
         const tabbables = this._tabbables(float);
         if (tabbables.length === 0) {
-            return false;
+            return true;
         }
-        const first = tabbables[0];
-        const last = tabbables[tabbables.length - 1];
         const active = float.ownerDocument.activeElement;
-        if (!e.shiftKey && active === last) {
-            e.preventDefault();
-            first.focus();
-            return true;
-        }
-        if (e.shiftKey && active === first) {
-            e.preventDefault();
-            last.focus();
-            return true;
-        }
-        return false;
+        const index =
+            active instanceof HTMLElement ? tabbables.indexOf(active) : -1;
+        const n = tabbables.length;
+        const next =
+            index === -1
+                ? e.shiftKey
+                    ? n - 1
+                    : 0
+                : (index + (e.shiftKey ? -1 : 1) + n) % n;
+        tabbables[next].focus();
+        return true;
     }
 
     private _tabbables(root: Element): HTMLElement[] {
