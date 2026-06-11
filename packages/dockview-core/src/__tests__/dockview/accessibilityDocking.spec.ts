@@ -507,3 +507,84 @@ describe('accessibility: focus across maximize', () => {
         expect(container.contains(document.activeElement)).toBe(true);
     });
 });
+
+/**
+ * L4 — Esc inside a floating group returns focus to the invoking control (the
+ * last thing focused in the main dock). Runs in the bubble phase and respects
+ * defaultPrevented so panel content that uses Esc keeps priority.
+ */
+describe('accessibility: floating group Esc returns focus', () => {
+    let container: HTMLElement;
+    let dockview: DockviewComponent;
+
+    const make = (keyboardNavigation: boolean): void => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            keyboardNavigation,
+        });
+        dockview.layout(1000, 1000);
+    };
+
+    const setup = (): void => {
+        dockview.addPanel({ id: 'main', component: 'default', title: 'Main' });
+        dockview.addPanel({
+            id: 'float',
+            component: 'default',
+            title: 'Float',
+            floating: true,
+        });
+    };
+
+    const mainTab = (): HTMLElement =>
+        Array.from(container.querySelectorAll('.dv-tab')).find(
+            (t) => !(t as HTMLElement).closest('[role="dialog"]')
+        ) as HTMLElement;
+    const floatTab = (): HTMLElement =>
+        container.querySelector('[role="dialog"] .dv-tab') as HTMLElement;
+
+    afterEach(() => {
+        dockview.dispose();
+        container.remove();
+    });
+
+    test('Esc inside a float returns focus to the invoking control', () => {
+        make(true);
+        setup();
+        const invoker = mainTab();
+        invoker.focus(); // tracked as the invoking control
+        floatTab().focus(); // now focused inside the float
+        expect(floatTab().closest('[role="dialog"]')).toBeTruthy();
+
+        fireEvent.keyDown(floatTab(), { key: 'Escape', bubbles: true });
+        expect(document.activeElement).toBe(invoker);
+    });
+
+    test('does not hijack Esc that panel content handles (defaultPrevented)', () => {
+        make(true);
+        setup();
+        mainTab().focus();
+        const ft = floatTab();
+        ft.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+            }
+        });
+        ft.focus();
+
+        fireEvent.keyDown(ft, { key: 'Escape', bubbles: true });
+        expect(document.activeElement).toBe(ft); // stayed in the float
+    });
+
+    test('off when keyboardNavigation is disabled', () => {
+        make(false);
+        setup();
+        mainTab().focus();
+        const ft = floatTab();
+        ft.focus();
+
+        fireEvent.keyDown(ft, { key: 'Escape', bubbles: true });
+        expect(document.activeElement).toBe(ft); // not restored
+    });
+});

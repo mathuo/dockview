@@ -117,8 +117,11 @@ function matchesBinding(e: KeyboardEvent, binding: string): boolean {
  * - **Focus restore on close** (L4) — when removing a panel/group pulls focus
  *   out of the dock, focus returns to the neighbour the layout just activated
  *   instead of being stranded on `<body>`.
+ * - **Floating `Esc`** (L4) — `Esc` inside a floating group returns focus to
+ *   the control that had it before entering the float (polite: bubble phase,
+ *   respects `defaultPrevented`, so panel content keeps `Esc`).
  *
- * Float / popout `Esc`-restore and cross-window (popout) focus are later phases.
+ * Float Tab-containment and cross-window (popout) focus are later phases.
  */
 export class AccessibilityService
     extends CompositeDisposable
@@ -127,6 +130,7 @@ export class AccessibilityService
     private _move: MoveState | null = null;
     private _preview: IDisposable | undefined;
     private _focusWasInside = false;
+    private _lastNonFloatFocus: HTMLElement | undefined;
 
     constructor(private readonly host: IAccessibilityHost) {
         super();
@@ -139,11 +143,39 @@ export class AccessibilityService
         const onKeyDown = (e: KeyboardEvent): void => this._onKeyDown(e);
         doc.addEventListener('keydown', onKeyDown, true);
 
+        // Remember the last control focused in the main dock (outside any
+        // float) so Esc inside a floating group can return focus to its
+        // invoking control. Observe-only — never consumes.
+        const onFocusIn = (e: FocusEvent): void => {
+            const t = e.target;
+            if (
+                t instanceof HTMLElement &&
+                this.host.rootElement.contains(t) &&
+                !t.closest('[role="dialog"]')
+            ) {
+                this._lastNonFloatFocus = t;
+            }
+        };
+        doc.addEventListener('focusin', onFocusIn, true);
+
+        // Esc-from-float restore runs in the BUBBLE phase and respects
+        // defaultPrevented, so panel content that uses Esc keeps priority.
+        const onEscape = (e: KeyboardEvent): void => this._onFloatingEscape(e);
+        doc.addEventListener('keydown', onEscape, false);
+
         this.addDisposables(
             { dispose: () => this._clearPreview() },
             {
                 dispose: () =>
                     doc.removeEventListener('keydown', onKeyDown, true),
+            },
+            {
+                dispose: () =>
+                    doc.removeEventListener('focusin', onFocusIn, true),
+            },
+            {
+                dispose: () =>
+                    doc.removeEventListener('keydown', onEscape, false),
             },
             // L4 focus management — when a close pulls focus out of the dock,
             // return it to the neighbour the component just activated rather
@@ -170,6 +202,46 @@ export class AccessibilityService
     private _isFocusInside(): boolean {
         const active = this.host.rootElement.ownerDocument.activeElement;
         return active instanceof Node && this.host.rootElement.contains(active);
+    }
+
+    private _onFloatingEscape(e: KeyboardEvent): void {
+        if (
+            !this._nav ||
+            this._move ||
+            e.defaultPrevented ||
+            e.key !== 'Escape'
+        ) {
+            return;
+        }
+        const target = e.target;
+        if (!(target instanceof Element)) {
+            return;
+        }
+        // Only when focus is inside one of *this* dock's floating groups.
+        const float = target.closest('[role="dialog"]');
+        if (!float || !this.host.rootElement.contains(float)) {
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        this._returnFocusFromFloat();
+    }
+
+    private _returnFocusFromFloat(): void {
+        const prev = this._lastNonFloatFocus;
+        if (
+            prev &&
+            prev.isConnected &&
+            this.host.rootElement.contains(prev) &&
+            !prev.closest('[role="dialog"]')
+        ) {
+            prev.focus();
+            return;
+        }
+        // Invoking control is gone — fall back to a grid group's content.
+        this.host.groups
+            .find((g) => g.api.location.type === 'grid')
+            ?.model.focusContent();
     }
 
     private get _nav(): KeyboardNavigationOptions | undefined {
