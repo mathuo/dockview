@@ -53,6 +53,7 @@ DockviewKeybindings
 DockviewLayoutMutationEvent
 DockviewLayoutMutationKind
 DockviewMaximizedGroupChanged
+DockviewMessages
 DockviewMutableDisposable
 DockviewOptions
 DockviewPanel

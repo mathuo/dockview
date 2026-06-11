@@ -8,6 +8,7 @@ import {
     DockviewMaximizedGroupChanged,
 } from './dockviewComponent';
 import { DockviewComponentOptions, LiveRegionEvent } from './options';
+import { resolveMessages } from './accessibilityMessages';
 import { defineModule } from './modules';
 
 /**
@@ -206,22 +207,23 @@ export class LiveRegionService
         panel: IDockviewPanel,
         kind: LiveRegionEvent['kind']
     ): string {
+        const m = resolveMessages(this._host.options.messages);
         const name = panel.title ?? panel.id;
         switch (kind) {
             case 'open':
-                return `${name} opened`;
+                return m.panelOpened(name);
             case 'close':
-                return `${name} closed`;
+                return m.panelClosed(name);
             case 'maximize':
-                return `${name} maximized`;
+                return m.groupMaximized(name);
             case 'restore':
-                return `${name} restored`;
+                return m.groupRestored(name);
             case 'float':
-                return `${name} floated`;
+                return m.groupFloated(name);
             case 'dock':
-                return `${name} docked`;
+                return m.groupDocked(name);
             case 'popout':
-                return `${name} opened in a new window`;
+                return m.groupPoppedOut(name);
         }
     }
 }
