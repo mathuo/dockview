@@ -2,6 +2,7 @@ import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { IContentRenderer } from '../../dockview/types';
 import { ILiveRegionService } from '../../dockview/liveRegionService';
 import { AnnouncementEvent } from '../../dockview/options';
+import { setupMockWindow } from '../__mocks__/mockWindow';
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');
@@ -216,6 +217,42 @@ describe('LiveRegion announcer', () => {
 
         p.api.group.api.maximize();
         expect(region().textContent).toBe('Vue agrandi');
+    });
+
+    test('announces a panel floating', () => {
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        const p2 = dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            title: 'P2',
+        });
+        dockview.addFloatingGroup(p2);
+        expect(region().textContent).toBe('P2 floated');
+    });
+
+    test('a normal grid split does not spuriously announce float/dock', () => {
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            title: 'P2',
+            position: { direction: 'right' },
+        });
+        // the only announcement is the open — group creation's initial
+        // `-> grid` transition must not read as a dock
+        expect(region().textContent).toBe('P2 opened');
+    });
+
+    test('announces a panel popping out to a new window', async () => {
+        window.open = () => setupMockWindow();
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        const p2 = dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            title: 'P2',
+        });
+        await dockview.addPopoutGroup(p2);
+        expect(region().textContent).toBe('P2 opened in a new window');
     });
 
     test('a custom announcer receives events; the DOM regions stay empty', () => {

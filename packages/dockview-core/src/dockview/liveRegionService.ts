@@ -1,6 +1,7 @@
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { Event } from '../events';
 import { IDockviewPanel } from './dockviewPanel';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
 import {
     DockviewLayoutMutationEvent,
     DockviewLayoutMutationKind,
@@ -23,6 +24,8 @@ export interface ILiveRegionHost {
     readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;
     readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent>;
     readonly onDidMaximizedGroupChange: Event<DockviewMaximizedGroupChanged>;
+    readonly onDidAddGroup: Event<DockviewGroupPanel>;
+    readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
 }
 
 export interface ILiveRegionService extends IDisposable {
@@ -83,6 +86,7 @@ export class LiveRegionService
     private readonly _polite: HTMLElement;
     private readonly _assertive: HTMLElement;
     private _suppressDepth = 0;
+    private readonly _locationSubs = new Map<string, IDisposable>();
 
     constructor(host: ILiveRegionHost) {
         super();
@@ -118,8 +122,45 @@ export class LiveRegionService
                         e.isMaximized ? 'maximize' : 'restore'
                     );
                 }
-            })
+            }),
+            // Narrate a group floating / docking back / popping out. A group is
+            // born in the grid then transitions, so track each group's previous
+            // location and ignore the no-op initial `-> grid`.
+            host.onDidAddGroup((group) => this._trackLocation(group)),
+            host.onDidRemoveGroup((group) => {
+                this._locationSubs.get(group.id)?.dispose();
+                this._locationSubs.delete(group.id);
+            }),
+            {
+                dispose: () => {
+                    this._locationSubs.forEach((sub) => sub.dispose());
+                    this._locationSubs.clear();
+                },
+            }
         );
+    }
+
+    private _trackLocation(group: DockviewGroupPanel): void {
+        let prev = group.api.location.type;
+        const sub = group.api.onDidLocationChange((e) => {
+            const next = e.location.type;
+            if (next === prev) {
+                return;
+            }
+            prev = next;
+            const panel = group.activePanel;
+            if (!panel) {
+                return;
+            }
+            const kind =
+                next === 'floating'
+                    ? 'float'
+                    : next === 'popout'
+                      ? 'popout'
+                      : 'dock';
+            this._announce(panel, kind);
+        });
+        this._locationSubs.set(group.id, sub);
     }
 
     announce(
@@ -165,13 +206,23 @@ export class LiveRegionService
         panel: IDockviewPanel,
         kind: LiveRegionEvent['kind']
     ): string {
-        const verb = {
-            open: 'opened',
-            close: 'closed',
-            maximize: 'maximized',
-            restore: 'restored',
-        }[kind];
-        return `${panel.title ?? panel.id} ${verb}`;
+        const name = panel.title ?? panel.id;
+        switch (kind) {
+            case 'open':
+                return `${name} opened`;
+            case 'close':
+                return `${name} closed`;
+            case 'maximize':
+                return `${name} maximized`;
+            case 'restore':
+                return `${name} restored`;
+            case 'float':
+                return `${name} floated`;
+            case 'dock':
+                return `${name} docked`;
+            case 'popout':
+                return `${name} opened in a new window`;
+        }
     }
 }
 

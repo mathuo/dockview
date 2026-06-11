@@ -67,11 +67,20 @@ export interface DropOverlayModelParams {
 /** A layout change to be announced — see the `getAnnouncement` option. */
 export interface LiveRegionEvent {
     /**
-     * What changed: a panel was added (`'open'`) or removed (`'close'`), or a
-     * group was maximized (`'maximize'`) / restored (`'restore'`). `panel` is
-     * the affected panel — for group events, the group's active panel.
+     * What changed: a panel was added (`'open'`) or removed (`'close'`); a
+     * group was maximized (`'maximize'`) / restored (`'restore'`); or a group
+     * moved to a floating window (`'float'`), back into the grid (`'dock'`), or
+     * out to a popout window (`'popout'`). `panel` is the affected panel — for
+     * group events, the group's active panel.
      */
-    kind: 'open' | 'close' | 'maximize' | 'restore';
+    kind:
+        | 'open'
+        | 'close'
+        | 'maximize'
+        | 'restore'
+        | 'float'
+        | 'dock'
+        | 'popout';
     panel: IDockviewPanel;
 }
 
