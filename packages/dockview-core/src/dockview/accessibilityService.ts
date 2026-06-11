@@ -1,5 +1,4 @@
 import { CompositeDisposable, IDisposable } from '../lifecycle';
-import { addDisposableListener } from '../events';
 import { Position } from '../dnd/droptarget';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
@@ -15,7 +14,12 @@ import { LiveRegionModule } from './liveRegionService';
  * LiveRegion module), and commits the dock.
  */
 export interface IAccessibilityHost {
-    readonly element: HTMLElement;
+    /**
+     * The outermost dockview element (the shell, which also contains edge
+     * groups). A getter — it must resolve to the shell once that exists, not
+     * the inner gridview, or keydowns from edge groups are missed.
+     */
+    readonly rootElement: HTMLElement;
     readonly options: DockviewComponentOptions;
     readonly groups: DockviewGroupPanel[];
     readonly activePanel: IDockviewPanel | undefined;
@@ -70,16 +74,20 @@ export class AccessibilityService
     constructor(private readonly host: IAccessibilityHost) {
         super();
 
+        // Listen on the document (capture) rather than the dockview element:
+        // edge groups live in the shell *outside* the gridview, and the shell
+        // is created after this service, so a fixed element would miss them.
+        // Capture also lets move-mode keys beat the free tab-strip navigation.
+        const doc = host.rootElement.ownerDocument;
+        const onKeyDown = (e: KeyboardEvent): void => this._onKeyDown(e);
+        doc.addEventListener('keydown', onKeyDown, true);
+
         this.addDisposables(
             { dispose: () => this._clearPreview() },
-            // Capture phase so move-mode arrows take precedence over the
-            // free tab-strip keyboard navigation (which lives on the tablist).
-            addDisposableListener(
-                host.element,
-                'keydown',
-                (e) => this._onKeyDown(e),
-                true
-            )
+            {
+                dispose: () =>
+                    doc.removeEventListener('keydown', onKeyDown, true),
+            }
         );
     }
 
@@ -91,9 +99,15 @@ export class AccessibilityService
             this._onMoveKey(e);
             return;
         }
-        // Ctrl+M only — NOT Cmd+M, which is the macOS "minimise window"
-        // shortcut and is handled by the OS before the page can intercept it.
-        if (e.ctrlKey && !e.metaKey && (e.key === 'm' || e.key === 'M')) {
+        // Ctrl+M only — NOT Cmd+M (macOS minimise-window, OS-intercepted).
+        // Scope to events originating inside *this* dockview.
+        if (
+            e.ctrlKey &&
+            !e.metaKey &&
+            (e.key === 'm' || e.key === 'M') &&
+            e.target instanceof Node &&
+            this.host.rootElement.contains(e.target)
+        ) {
             this._enterMoveMode(e);
         }
     }
@@ -201,14 +215,18 @@ export class AccessibilityService
         const source = move.source;
         const name = group.activePanel?.title ?? group.id;
         this._exit();
-        this.host.dockPanel(source, group, position);
-        this.host.announce(
-            `${this._label(source)} ${
-                position === 'center'
-                    ? `docked into ${name}`
-                    : `split ${position} of ${name}`
-            }.`
-        );
+        try {
+            this.host.dockPanel(source, group, position);
+            this.host.announce(
+                `${this._label(source)} ${
+                    position === 'center'
+                        ? `docked into ${name}`
+                        : `split ${position} of ${name}`
+                }.`
+            );
+        } catch {
+            this.host.announce('That move is not allowed.');
+        }
     }
 
     private _describe(position: Position): string {

@@ -701,7 +701,15 @@ export class DockviewComponent
 
     // IAccessibilityHost — keyboard docking reaches the AdvancedDnD preview +
     // LiveRegion announcer through these so the service stays decoupled.
-    showDropPreview(group: DockviewGroupPanel, position: Position): IDisposable {
+    /** Outermost element — the shell (incl. edge groups) once built, else the gridview. */
+    get rootElement(): HTMLElement {
+        return this._shellManager?.element ?? this.element;
+    }
+
+    showDropPreview(
+        group: DockviewGroupPanel,
+        position: Position
+    ): IDisposable {
         return (
             this._advancedDnDService?.showPreviewOverlay(group, position) ??
             Disposable.NONE
