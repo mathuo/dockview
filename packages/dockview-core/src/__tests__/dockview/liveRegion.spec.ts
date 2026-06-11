@@ -183,6 +183,41 @@ describe('LiveRegion announcer', () => {
         expect(region().textContent).toBe('routine'); // polite untouched
     });
 
+    test('announces maximize and restore (via the active panel)', () => {
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'Orders' });
+        const p2 = dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            title: 'Chart',
+            position: { direction: 'right' },
+        });
+
+        p2.api.group.api.maximize();
+        expect(region().textContent).toBe('Chart maximized');
+
+        p2.api.group.api.exitMaximized();
+        expect(region().textContent).toBe('Chart restored');
+    });
+
+    test('maximize announcement is localisable via getAnnouncement', () => {
+        dockview.dispose();
+        container = document.createElement('div');
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            getAnnouncement: ({ kind, panel }) =>
+                kind === 'maximize' ? `${panel.title} agrandi` : undefined,
+        });
+        dockview.layout(800, 600);
+        const p = dockview.addPanel({
+            id: 'p1',
+            component: 'default',
+            title: 'Vue',
+        });
+
+        p.api.group.api.maximize();
+        expect(region().textContent).toBe('Vue agrandi');
+    });
+
     test('a custom announcer receives events; the DOM regions stay empty', () => {
         const events: AnnouncementEvent[] = [];
         const c2 = document.createElement('div');

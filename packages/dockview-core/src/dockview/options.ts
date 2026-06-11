@@ -66,8 +66,12 @@ export interface DropOverlayModelParams {
 
 /** A layout change to be announced — see the `getAnnouncement` option. */
 export interface LiveRegionEvent {
-    /** `'open'` when a panel was added, `'close'` when it was removed. */
-    kind: 'open' | 'close';
+    /**
+     * What changed: a panel was added (`'open'`) or removed (`'close'`), or a
+     * group was maximized (`'maximize'`) / restored (`'restore'`). `panel` is
+     * the affected panel — for group events, the group's active panel.
+     */
+    kind: 'open' | 'close' | 'maximize' | 'restore';
     panel: IDockviewPanel;
 }
 

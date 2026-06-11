@@ -4,8 +4,9 @@ import { IDockviewPanel } from './dockviewPanel';
 import {
     DockviewLayoutMutationEvent,
     DockviewLayoutMutationKind,
+    DockviewMaximizedGroupChanged,
 } from './dockviewComponent';
-import { DockviewComponentOptions } from './options';
+import { DockviewComponentOptions, LiveRegionEvent } from './options';
 import { defineModule } from './modules';
 
 /**
@@ -21,6 +22,7 @@ export interface ILiveRegionHost {
     readonly onDidRemovePanel: Event<IDockviewPanel>;
     readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;
     readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent>;
+    readonly onDidMaximizedGroupChange: Event<DockviewMaximizedGroupChanged>;
 }
 
 export interface ILiveRegionService extends IDisposable {
@@ -94,10 +96,8 @@ export class LiveRegionService
         this.addDisposables(
             { dispose: () => this._polite.remove() },
             { dispose: () => this._assertive.remove() },
-            host.onDidAddPanel((panel) => this._announcePanel(panel, 'open')),
-            host.onDidRemovePanel((panel) =>
-                this._announcePanel(panel, 'close')
-            ),
+            host.onDidAddPanel((panel) => this._announce(panel, 'open')),
+            host.onDidRemovePanel((panel) => this._announce(panel, 'close')),
             // Bracket bulk transactions so a fromJSON / clear doesn't announce
             // every nested add/remove.
             host.onWillMutateLayout((e) => {
@@ -108,6 +108,15 @@ export class LiveRegionService
             host.onDidMutateLayout((e) => {
                 if (isBulk(e.kind)) {
                     this._suppressDepth = Math.max(0, this._suppressDepth - 1);
+                }
+            }),
+            host.onDidMaximizedGroupChange((e) => {
+                const panel = e.group.activePanel;
+                if (panel) {
+                    this._announce(
+                        panel,
+                        e.isMaximized ? 'maximize' : 'restore'
+                    );
                 }
             })
         );
@@ -139,9 +148,9 @@ export class LiveRegionService
         region.textContent = message;
     }
 
-    private _announcePanel(
+    private _announce(
         panel: IDockviewPanel,
-        kind: 'open' | 'close'
+        kind: LiveRegionEvent['kind']
     ): void {
         // The app may localise/override the message, suppress it (null / ''),
         // or fall through to the default (undefined).
@@ -154,9 +163,15 @@ export class LiveRegionService
 
     private _defaultMessage(
         panel: IDockviewPanel,
-        kind: 'open' | 'close'
+        kind: LiveRegionEvent['kind']
     ): string {
-        return `${panel.title ?? panel.id} ${kind === 'open' ? 'opened' : 'closed'}`;
+        const verb = {
+            open: 'opened',
+            close: 'closed',
+            maximize: 'maximized',
+            restore: 'restored',
+        }[kind];
+        return `${panel.title ?? panel.id} ${verb}`;
     }
 }
 
