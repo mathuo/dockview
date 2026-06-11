@@ -2,7 +2,11 @@ import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { Position } from '../dnd/droptarget';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
-import { DockviewComponentOptions } from './options';
+import {
+    DockviewComponentOptions,
+    DockviewKeybindings,
+    KeyboardNavigationOptions,
+} from './options';
 import { defineModule } from './modules';
 import { AdvancedDnDModule } from './advancedDnDService';
 import { LiveRegionModule } from './liveRegionService';
@@ -23,6 +27,10 @@ export interface IAccessibilityHost {
     readonly options: DockviewComponentOptions;
     readonly groups: DockviewGroupPanel[];
     readonly activePanel: IDockviewPanel | undefined;
+    /** Activate the next tab in the focused group (wraps round). */
+    focusNextPanel(): void;
+    /** Activate the previous tab in the focused group (wraps round). */
+    focusPreviousPanel(): void;
     showDropPreview(group: DockviewGroupPanel, position: Position): IDisposable;
     announce(message: string): void;
     dockPanel(
@@ -51,18 +59,45 @@ const EDGE_FROM_KEY: Record<string, Position> = {
     ArrowDown: 'bottom',
 };
 
+const DEFAULT_KEYMAP: DockviewKeybindings = {
+    nextTab: 'ctrl+]',
+    prevTab: 'ctrl+[',
+    dock: 'ctrl+m',
+};
+
 /**
- * Pro accessibility module — operate the dock without a mouse. Keyboard
- * docking: `Ctrl+M` on the active panel arms a two-phase move with a live drop
- * preview + screen-reader narration:
- *   1. PICK TARGET — arrows cycle the groups (incl. the panel's own, so a tab
- *      can be split out); `Enter` selects one.
- *   2. PICK EDGE — arrows choose a split edge (left/right/top/bottom) or the
- *      centre (tab-into); `Enter` commits, `Escape` steps back.
- * `Escape` from the target phase cancels. Opt-in via `keyboardDocking`.
+ * Does `e` match a binding string like `'ctrl+]'` / `'shift+f6'`? Modifiers
+ * are matched exactly (a binding without `shift` will not fire while Shift is
+ * held), and the final part is compared to `KeyboardEvent.key`, lower-cased.
+ */
+function matchesBinding(e: KeyboardEvent, binding: string): boolean {
+    const parts = binding.toLowerCase().split('+');
+    const key = parts[parts.length - 1];
+    const mods = parts.slice(0, -1);
+    return (
+        e.ctrlKey === mods.includes('ctrl') &&
+        e.shiftKey === mods.includes('shift') &&
+        e.altKey === mods.includes('alt') &&
+        e.metaKey === (mods.includes('meta') || mods.includes('cmd')) &&
+        e.key.toLowerCase() === key
+    );
+}
+
+/**
+ * Pro accessibility module — operate the dock without a mouse. Opt-in via
+ * `keyboardNavigation`, with a rebindable {@link DockviewKeybindings} keymap.
  *
- * Float / popout terminals, spatial F6 navigation and cross-window focus
- * management are later phases.
+ * - **Switch tab** (`Ctrl+]` / `Ctrl+[`) — cycle the focused group's tabs.
+ * - **Keyboard docking** (`Ctrl+M`) — arms a two-phase move of the active
+ *   panel with a live drop preview + screen-reader narration:
+ *     1. PICK TARGET — arrows cycle the groups (incl. the panel's own, so a tab
+ *        can be split out); `Enter` selects one.
+ *     2. PICK EDGE — arrows choose a split edge (left/right/top/bottom) or the
+ *        centre (tab-into); `Enter` commits, `Escape` steps back.
+ *   `Escape` from the target phase cancels.
+ *
+ * Inter-group focus navigation (F6 / spatial), float / popout terminals and
+ * cross-window focus management are later phases.
  */
 export class AccessibilityService
     extends CompositeDisposable
@@ -91,24 +126,42 @@ export class AccessibilityService
         );
     }
 
+    private get _nav(): KeyboardNavigationOptions | undefined {
+        const opt = this.host.options.keyboardNavigation;
+        if (!opt) {
+            return undefined;
+        }
+        return opt === true ? {} : opt;
+    }
+
+    private get _keymap(): DockviewKeybindings {
+        return { ...DEFAULT_KEYMAP, ...this._nav?.keymap };
+    }
+
     private _onKeyDown(e: KeyboardEvent): void {
-        if (!this.host.options.keyboardDocking) {
+        if (!this._nav) {
             return;
         }
         if (this._move) {
             this._onMoveKey(e);
             return;
         }
-        // Ctrl+M only — NOT Cmd+M (macOS minimise-window, OS-intercepted).
-        // Scope to events originating inside *this* dockview.
+        // Only act on events originating inside *this* dockview.
         if (
-            e.ctrlKey &&
-            !e.metaKey &&
-            (e.key === 'm' || e.key === 'M') &&
-            e.target instanceof Node &&
-            this.host.rootElement.contains(e.target)
+            !(e.target instanceof Node) ||
+            !this.host.rootElement.contains(e.target)
         ) {
+            return;
+        }
+        const keymap = this._keymap;
+        if (matchesBinding(e, keymap.dock)) {
             this._enterMoveMode(e);
+        } else if (matchesBinding(e, keymap.nextTab)) {
+            this._consume(e);
+            this.host.focusNextPanel();
+        } else if (matchesBinding(e, keymap.prevTab)) {
+            this._consume(e);
+            this.host.focusPreviousPanel();
         }
     }
 

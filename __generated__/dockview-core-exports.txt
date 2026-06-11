@@ -48,6 +48,7 @@ DockviewGroupPanelModel
 DockviewHeaderDirection
 DockviewHeaderPosition
 DockviewIDisposable
+DockviewKeybindings
 DockviewLayoutMutationEvent
 DockviewLayoutMutationKind
 DockviewMaximizedGroupChanged
@@ -144,6 +145,7 @@ IViewSize
 IWatermarkPanelProps
 IWatermarkRenderer
 InvisibleSizing
+KeyboardNavigationOptions
 LayoutPriority
 LiveRegionEvent
 MaximizedChanged

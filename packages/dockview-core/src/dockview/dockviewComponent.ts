@@ -706,6 +706,14 @@ export class DockviewComponent
         return this._shellManager?.element ?? this.element;
     }
 
+    focusNextPanel(): void {
+        this.activeGroup?.model.moveToNext();
+    }
+
+    focusPreviousPanel(): void {
+        this.activeGroup?.model.moveToPrevious();
+    }
+
     showDropPreview(
         group: DockviewGroupPanel,
         position: Position

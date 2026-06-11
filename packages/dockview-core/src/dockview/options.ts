@@ -71,6 +71,27 @@ export interface LiveRegionEvent {
     panel: IDockviewPanel;
 }
 
+/**
+ * Key bindings for {@link DockviewComponentOptions.keyboardNavigation}. Each
+ * value is a string of `+`-separated parts, modifiers first, e.g. `'ctrl+]'`,
+ * `'shift+f6'`, `'ctrl+m'`. Recognised modifiers: `ctrl`, `shift`, `alt`,
+ * `meta` (alias `cmd`). The final part is the `KeyboardEvent.key` to match,
+ * case-insensitively (`'m'`, `']'`, `'f6'`, `'arrowleft'`).
+ */
+export interface DockviewKeybindings {
+    /** Switch to the next tab in the focused group. Default `ctrl+]`. */
+    nextTab: string;
+    /** Switch to the previous tab in the focused group. Default `ctrl+[`. */
+    prevTab: string;
+    /** Arm keyboard docking of the active panel. Default `ctrl+m`. */
+    dock: string;
+}
+
+export interface KeyboardNavigationOptions {
+    /** Override individual {@link DockviewKeybindings}; unset keys keep their defaults. */
+    keymap?: Partial<DockviewKeybindings>;
+}
+
 export interface GetTabContextMenuItemsParams {
     panel: IDockviewPanel;
     group: DockviewGroupPanel;
@@ -256,15 +277,20 @@ export interface DockviewOptions {
      */
     getAnnouncement?: (event: LiveRegionEvent) => string | null | undefined;
     /**
-     * Enable keyboard docking — move the active panel without a mouse:
-     * `Ctrl`+`M` enters move mode, arrows cycle the target group (with a live
-     * drop preview + screen-reader narration), `Enter` docks it, `Escape`
-     * cancels. Off by default (opt-in while the feature matures).
+     * Operate the dock with the keyboard. `true` enables the default bindings;
+     * pass an object to override individual ones via `keymap`. Off by default
+     * (opt-in while the feature matures). Enables:
      *
-     * (`Cmd`+`M` is intentionally not used — it's the macOS minimise-window
-     * shortcut. A rebindable keymap is a planned follow-up.)
+     * - **Switch tab** within the focused group — `Ctrl`+`]` / `Ctrl`+`[`.
+     * - **Dock the active panel** without a mouse — `Ctrl`+`M` arms a two-phase
+     *   move (arrows cycle the target group with a live drop preview +
+     *   screen-reader narration, `Enter` docks, `Escape` cancels).
+     *
+     * Defaults avoid `Cmd`-based and browser-reserved combinations (e.g.
+     * `Cmd`+`M` is the macOS minimise-window shortcut); use {@link keymap} to
+     * rebind for your platform.
      */
-    keyboardDocking?: boolean;
+    keyboardNavigation?: boolean | KeyboardNavigationOptions;
     /**
      * Replace the built-in tab group color palette with a user-defined list.
      *
@@ -349,7 +375,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         dropOverlayModel: undefined,
         announcements: undefined,
         getAnnouncement: undefined,
-        keyboardDocking: undefined,
+        keyboardNavigation: undefined,
         tabGroupColors: undefined,
         tabGroupAccent: undefined,
     };

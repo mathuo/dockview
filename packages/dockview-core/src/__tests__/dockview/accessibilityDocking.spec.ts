@@ -23,12 +23,14 @@ describe('accessibility: keyboard docking', () => {
     let container: HTMLElement;
     let dockview: DockviewComponent;
 
-    const make = (keyboardDocking: boolean): void => {
+    const make = (
+        keyboardNavigation: boolean | { keymap?: Record<string, string> }
+    ): void => {
         container = document.createElement('div');
         document.body.appendChild(container);
         dockview = new DockviewComponent(container, {
             createComponent: () => new TestPanel(),
-            keyboardDocking,
+            keyboardNavigation,
         });
         dockview.layout(1000, 1000);
     };
@@ -96,12 +98,88 @@ describe('accessibility: keyboard docking', () => {
         expect(dockview.groups.length).toBe(2);
     });
 
-    test('does nothing when keyboardDocking is off (default)', () => {
+    test('does nothing when keyboardNavigation is off (default)', () => {
         make(false);
         twoGroups();
 
         fireEvent.keyDown(dockview.element, { key: 'm', ctrlKey: true });
         expect(region().textContent).not.toContain('Moving');
         expect(dockview.groups.length).toBe(2);
+    });
+});
+
+/**
+ * Switch tabs within the focused group by keyboard — Ctrl+] / Ctrl+[ cycle
+ * the active group's panels (wrapping round), driven by the rebindable keymap.
+ */
+describe('accessibility: tab switching', () => {
+    let container: HTMLElement;
+    let dockview: DockviewComponent;
+
+    const make = (
+        keyboardNavigation: boolean | { keymap?: Record<string, string> }
+    ): void => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            keyboardNavigation,
+        });
+        dockview.layout(1000, 1000);
+    };
+
+    const threeTabs = (): void => {
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        dockview.addPanel({ id: 'p2', component: 'default', title: 'P2' });
+        dockview.addPanel({ id: 'p3', component: 'default', title: 'P3' });
+    };
+
+    afterEach(() => {
+        dockview.dispose();
+        container.remove();
+    });
+
+    test('Ctrl+] advances to the next tab and wraps round', () => {
+        make(true);
+        threeTabs(); // one group, p3 active
+        expect(dockview.activePanel?.id).toBe('p3');
+
+        fireEvent.keyDown(dockview.element, { key: ']', ctrlKey: true });
+        expect(dockview.activePanel?.id).toBe('p1'); // wrapped past the end
+
+        fireEvent.keyDown(dockview.element, { key: ']', ctrlKey: true });
+        expect(dockview.activePanel?.id).toBe('p2');
+    });
+
+    test('Ctrl+[ steps back to the previous tab and wraps round', () => {
+        make(true);
+        threeTabs(); // p3 active
+
+        fireEvent.keyDown(dockview.element, { key: '[', ctrlKey: true });
+        expect(dockview.activePanel?.id).toBe('p2');
+
+        fireEvent.keyDown(dockview.element, { key: '[', ctrlKey: true });
+        fireEvent.keyDown(dockview.element, { key: '[', ctrlKey: true });
+        expect(dockview.activePanel?.id).toBe('p3'); // wrapped past the start
+    });
+
+    test('a rebound keymap is honoured (and the default no longer fires)', () => {
+        make({ keymap: { nextTab: 'alt+n' } });
+        threeTabs(); // p3 active
+
+        // default binding is overridden, so Ctrl+] does nothing now
+        fireEvent.keyDown(dockview.element, { key: ']', ctrlKey: true });
+        expect(dockview.activePanel?.id).toBe('p3');
+
+        fireEvent.keyDown(dockview.element, { key: 'n', altKey: true });
+        expect(dockview.activePanel?.id).toBe('p1');
+    });
+
+    test('does nothing when keyboardNavigation is off', () => {
+        make(false);
+        threeTabs(); // p3 active
+
+        fireEvent.keyDown(dockview.element, { key: ']', ctrlKey: true });
+        expect(dockview.activePanel?.id).toBe('p3');
     });
 });
