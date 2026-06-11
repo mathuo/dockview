@@ -1,7 +1,9 @@
 import { CompositeDisposable, IDisposable } from '../lifecycle';
+import { Event } from '../events';
 import { Position } from '../dnd/droptarget';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
+import { DockviewLayoutMutationEvent } from './dockviewComponent';
 import {
     DockviewComponentOptions,
     DockviewKeybindings,
@@ -37,6 +39,9 @@ export interface IAccessibilityHost {
         group: DockviewGroupPanel,
         reverse: boolean
     ): DockviewGroupPanel | undefined;
+    /** Fires before / after a structural layout change — used to restore focus on close. */
+    readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;
+    readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent>;
     showDropPreview(group: DockviewGroupPanel, position: Position): IDisposable;
     announce(message: string): void;
     dockPanel(
@@ -109,8 +114,11 @@ function matchesBinding(e: KeyboardEvent, binding: string): boolean {
  *     2. PICK EDGE — arrows choose a split edge (left/right/top/bottom) or the
  *        centre (tab-into); `Enter` commits, `Escape` steps back.
  *   `Escape` from the target phase cancels.
+ * - **Focus restore on close** (L4) — when removing a panel/group pulls focus
+ *   out of the dock, focus returns to the neighbour the layout just activated
+ *   instead of being stranded on `<body>`.
  *
- * Float / popout terminals and cross-window focus management are later phases.
+ * Float / popout `Esc`-restore and cross-window (popout) focus are later phases.
  */
 export class AccessibilityService
     extends CompositeDisposable
@@ -118,6 +126,7 @@ export class AccessibilityService
 {
     private _move: MoveState | null = null;
     private _preview: IDisposable | undefined;
+    private _focusWasInside = false;
 
     constructor(private readonly host: IAccessibilityHost) {
         super();
@@ -135,8 +144,32 @@ export class AccessibilityService
             {
                 dispose: () =>
                     doc.removeEventListener('keydown', onKeyDown, true),
-            }
+            },
+            // L4 focus management — when a close pulls focus out of the dock,
+            // return it to the neighbour the component just activated rather
+            // than leaving it stranded on <body>. Snapshot before the teardown
+            // (focus still on the closing panel), restore after.
+            host.onWillMutateLayout((e) => {
+                if (e.kind === 'remove' && this._nav) {
+                    this._focusWasInside = this._isFocusInside();
+                }
+            }),
+            host.onDidMutateLayout((e) => {
+                if (
+                    e.kind === 'remove' &&
+                    this._nav &&
+                    this._focusWasInside &&
+                    !this._isFocusInside()
+                ) {
+                    this._restoreFocus();
+                }
+            })
         );
+    }
+
+    private _isFocusInside(): boolean {
+        const active = this.host.rootElement.ownerDocument.activeElement;
+        return active instanceof Node && this.host.rootElement.contains(active);
     }
 
     private get _nav(): KeyboardNavigationOptions | undefined {

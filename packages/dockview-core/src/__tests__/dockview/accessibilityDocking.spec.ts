@@ -380,3 +380,81 @@ describe('accessibility: spatial group focus', () => {
         expect(dockview.activeGroup).toBe(groupOf('tl'));
     });
 });
+
+/**
+ * L4 focus management — closing a panel/group that holds focus must hand it to
+ * a deterministic neighbour, never drop it on <body>. The service snapshots
+ * focus before the remove and restores after if it was pulled out of the dock.
+ */
+describe('accessibility: focus restore on close', () => {
+    let container: HTMLElement;
+    let dockview: DockviewComponent;
+
+    const make = (keyboardNavigation: boolean): void => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            keyboardNavigation,
+        });
+        dockview.layout(1000, 1000);
+    };
+
+    // one group, two tabs — only the active tab carries aria-selected="true"
+    const twoTabs = (): void => {
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        dockview.addPanel({ id: 'p2', component: 'default', title: 'P2' });
+    };
+
+    const activeTab = (): HTMLElement =>
+        container.querySelector('.dv-tab[aria-selected="true"]') as HTMLElement;
+
+    const remove = (id: string): void =>
+        dockview.removePanel(dockview.panels.find((p) => p.id === id)!);
+
+    afterEach(() => {
+        dockview.dispose();
+        container.remove();
+    });
+
+    test('returns focus to a neighbour when the close pulls it out of the dock', () => {
+        make(true);
+        twoTabs(); // p2 active
+        activeTab().focus(); // focus p2's tab — a real in-dock focusable element
+        expect(container.contains(document.activeElement)).toBe(true);
+
+        const group = dockview.activeGroup!;
+        const spy = jest.spyOn(group.model, 'focusContent');
+
+        remove('p2'); // p2's tab removed → focus falls to <body>
+
+        expect(dockview.activePanel?.id).toBe('p1'); // neighbour activated
+        expect(spy).toHaveBeenCalled(); // and focus restored to it
+    });
+
+    test('does not steal focus when focus was outside the dock', () => {
+        make(true);
+        twoTabs();
+        const outside = document.createElement('button');
+        document.body.appendChild(outside);
+        outside.focus();
+        expect(container.contains(document.activeElement)).toBe(false);
+
+        const spy = jest.spyOn(dockview.activeGroup!.model, 'focusContent');
+        remove('p1'); // closing a background tab while focused elsewhere
+
+        expect(spy).not.toHaveBeenCalled();
+        outside.remove();
+    });
+
+    test('off when keyboardNavigation is disabled', () => {
+        make(false);
+        twoTabs();
+        activeTab().focus();
+
+        const spy = jest.spyOn(dockview.activeGroup!.model, 'focusContent');
+        remove('p2');
+
+        expect(spy).not.toHaveBeenCalled();
+    });
+});
