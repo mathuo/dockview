@@ -762,6 +762,51 @@ export class DockviewComponent
         }
     }
 
+    focusGroupInDirection(direction: 'left' | 'right' | 'up' | 'down'): void {
+        const current = this.activeGroup;
+        if (!current || current.api.location.type !== 'grid') {
+            return;
+        }
+        const from = current.element.getBoundingClientRect();
+        const fromX = from.left + from.width / 2;
+        const fromY = from.top + from.height / 2;
+
+        let best: DockviewGroupPanel | undefined;
+        let bestDistance = Number.POSITIVE_INFINITY;
+        for (const group of this.groups) {
+            if (group === current || group.api.location.type !== 'grid') {
+                continue;
+            }
+            const rect = group.element.getBoundingClientRect();
+            const dx = rect.left + rect.width / 2 - fromX;
+            const dy = rect.top + rect.height / 2 - fromY;
+            // require the candidate to sit predominantly in the asked-for
+            // direction (dominant axis), so 'left' ignores a group that's
+            // mostly above/below.
+            const inDirection =
+                direction === 'left'
+                    ? dx < 0 && Math.abs(dx) >= Math.abs(dy)
+                    : direction === 'right'
+                      ? dx > 0 && Math.abs(dx) >= Math.abs(dy)
+                      : direction === 'up'
+                        ? dy < 0 && Math.abs(dy) >= Math.abs(dx)
+                        : dy > 0 && Math.abs(dy) >= Math.abs(dx);
+            if (!inDirection) {
+                continue;
+            }
+            const distance = dx * dx + dy * dy;
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                best = group;
+            }
+        }
+
+        if (best) {
+            this.doSetGroupAndPanelActive(best);
+            best.model.focusContent();
+        }
+    }
+
     showDropPreview(
         group: DockviewGroupPanel,
         position: Position

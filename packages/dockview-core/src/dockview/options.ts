@@ -87,6 +87,14 @@ export interface DockviewKeybindings {
     focusNextGroup: string;
     /** Move focus to the previous group. Default `shift+f6`. */
     focusPrevGroup: string;
+    /** Move focus to the group spatially to the left. Default `ctrl+shift+arrowleft`. */
+    focusGroupLeft: string;
+    /** Move focus to the group spatially to the right. Default `ctrl+shift+arrowright`. */
+    focusGroupRight: string;
+    /** Move focus to the group spatially above. Default `ctrl+shift+arrowup`. */
+    focusGroupUp: string;
+    /** Move focus to the group spatially below. Default `ctrl+shift+arrowdown`. */
+    focusGroupDown: string;
     /** Arm keyboard docking of the active panel. Default `ctrl+m`. */
     dock: string;
 }
@@ -286,7 +294,8 @@ export interface DockviewOptions {
      * (opt-in while the feature matures). Enables:
      *
      * - **Switch tab** within the focused group — `Ctrl`+`]` / `Ctrl`+`[`.
-     * - **Move focus between groups** — `F6` / `Shift`+`F6`.
+     * - **Move focus between groups** — `F6` / `Shift`+`F6` (sequential) or
+     *   `Ctrl`+`Shift`+arrow keys (spatial: focus the group in that direction).
      * - **Dock the active panel** without a mouse — `Ctrl`+`M` arms a two-phase
      *   move (arrows cycle the target group with a live drop preview +
      *   screen-reader narration, `Enter` docks, `Escape` cancels).

@@ -35,6 +35,8 @@ export interface IAccessibilityHost {
     focusNextGroup(): void;
     /** Move focus to the previous group (wraps round). */
     focusPreviousGroup(): void;
+    /** Move focus to the group spatially in the given direction, if any. */
+    focusGroupInDirection(direction: 'left' | 'right' | 'up' | 'down'): void;
     /** Return DOM focus to the active group's content (keeps it inside the dock). */
     focusActiveContent(): void;
     showDropPreview(group: DockviewGroupPanel, position: Position): IDisposable;
@@ -70,6 +72,10 @@ const DEFAULT_KEYMAP: DockviewKeybindings = {
     prevTab: 'ctrl+[',
     focusNextGroup: 'f6',
     focusPrevGroup: 'shift+f6',
+    focusGroupLeft: 'ctrl+shift+arrowleft',
+    focusGroupRight: 'ctrl+shift+arrowright',
+    focusGroupUp: 'ctrl+shift+arrowup',
+    focusGroupDown: 'ctrl+shift+arrowdown',
     dock: 'ctrl+m',
 };
 
@@ -96,7 +102,8 @@ function matchesBinding(e: KeyboardEvent, binding: string): boolean {
  * `keyboardNavigation`, with a rebindable {@link DockviewKeybindings} keymap.
  *
  * - **Switch tab** (`Ctrl+]` / `Ctrl+[`) — cycle the focused group's tabs.
- * - **Focus group** (`F6` / `Shift+F6`) — move focus between groups.
+ * - **Focus group** (`F6` / `Shift+F6` sequential, `Ctrl+Shift+Arrows`
+ *   spatial) — move focus between groups.
  * - **Keyboard docking** (`Ctrl+M`) — arms a two-phase move of the active
  *   panel with a live drop preview + screen-reader narration:
  *     1. PICK TARGET — arrows cycle the groups (incl. the panel's own, so a tab
@@ -105,8 +112,7 @@ function matchesBinding(e: KeyboardEvent, binding: string): boolean {
  *        centre (tab-into); `Enter` commits, `Escape` steps back.
  *   `Escape` from the target phase cancels.
  *
- * Spatial (directional) group focus, float / popout terminals and cross-window
- * focus management are later phases.
+ * Float / popout terminals and cross-window focus management are later phases.
  */
 export class AccessibilityService
     extends CompositeDisposable
@@ -177,6 +183,18 @@ export class AccessibilityService
         } else if (matchesBinding(e, keymap.focusPrevGroup)) {
             this._consume(e);
             this.host.focusPreviousGroup();
+        } else if (matchesBinding(e, keymap.focusGroupLeft)) {
+            this._consume(e);
+            this.host.focusGroupInDirection('left');
+        } else if (matchesBinding(e, keymap.focusGroupRight)) {
+            this._consume(e);
+            this.host.focusGroupInDirection('right');
+        } else if (matchesBinding(e, keymap.focusGroupUp)) {
+            this._consume(e);
+            this.host.focusGroupInDirection('up');
+        } else if (matchesBinding(e, keymap.focusGroupDown)) {
+            this._consume(e);
+            this.host.focusGroupInDirection('down');
         }
     }
 
