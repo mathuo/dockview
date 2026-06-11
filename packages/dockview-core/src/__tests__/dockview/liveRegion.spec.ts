@@ -1,6 +1,8 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { IContentRenderer } from '../../dockview/types';
 import { ILiveRegionService } from '../../dockview/liveRegionService';
+import { AnnouncementEvent } from '../../dockview/options';
+import { setupMockWindow } from '../__mocks__/mockWindow';
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');
@@ -160,5 +162,122 @@ describe('LiveRegion announcer', () => {
 
         dockview.removePanel(p1);
         expect(region().textContent).toBe('Orders closed'); // default kept
+    });
+
+    const assertiveRegion = (): HTMLElement =>
+        container.querySelector('.dv-live-region-assertive') as HTMLElement;
+
+    test('creates a separate assertive (alert) region', () => {
+        const r = assertiveRegion();
+        expect(r).toBeTruthy();
+        expect(r.getAttribute('role')).toBe('alert');
+        expect(r.getAttribute('aria-live')).toBe('assertive');
+    });
+
+    test('routes by politeness — assertive vs polite region', () => {
+        service().announce('routine');
+        expect(region().textContent).toBe('routine');
+        expect(assertiveRegion().textContent).toBe('');
+
+        service().announce('not allowed', 'assertive');
+        expect(assertiveRegion().textContent).toBe('not allowed');
+        expect(region().textContent).toBe('routine'); // polite untouched
+    });
+
+    test('announces maximize and restore (via the active panel)', () => {
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'Orders' });
+        const p2 = dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            title: 'Chart',
+            position: { direction: 'right' },
+        });
+
+        p2.api.group.api.maximize();
+        expect(region().textContent).toBe('Chart maximized');
+
+        p2.api.group.api.exitMaximized();
+        expect(region().textContent).toBe('Chart restored');
+    });
+
+    test('maximize announcement is localisable via getAnnouncement', () => {
+        dockview.dispose();
+        container = document.createElement('div');
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            getAnnouncement: ({ kind, panel }) =>
+                kind === 'maximize' ? `${panel.title} agrandi` : undefined,
+        });
+        dockview.layout(800, 600);
+        const p = dockview.addPanel({
+            id: 'p1',
+            component: 'default',
+            title: 'Vue',
+        });
+
+        p.api.group.api.maximize();
+        expect(region().textContent).toBe('Vue agrandi');
+    });
+
+    test('announces a panel floating', () => {
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        const p2 = dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            title: 'P2',
+        });
+        dockview.addFloatingGroup(p2);
+        expect(region().textContent).toBe('P2 floated');
+    });
+
+    test('a normal grid split does not spuriously announce float/dock', () => {
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            title: 'P2',
+            position: { direction: 'right' },
+        });
+        // the only announcement is the open — group creation's initial
+        // `-> grid` transition must not read as a dock
+        expect(region().textContent).toBe('P2 opened');
+    });
+
+    test('announces a panel popping out to a new window', async () => {
+        window.open = () => setupMockWindow();
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        const p2 = dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            title: 'P2',
+        });
+        await dockview.addPopoutGroup(p2);
+        expect(region().textContent).toBe('P2 opened in a new window');
+    });
+
+    test('a custom announcer receives events; the DOM regions stay empty', () => {
+        const events: AnnouncementEvent[] = [];
+        const c2 = document.createElement('div');
+        const dv2 = new DockviewComponent(c2, {
+            createComponent: () => new TestPanel(),
+            announcer: (e) => events.push(e),
+        });
+        dv2.layout(800, 600);
+        const svc = (
+            dv2 as unknown as {
+                _moduleRegistry: {
+                    services: { liveRegionService: ILiveRegionService };
+                };
+            }
+        )._moduleRegistry.services.liveRegionService;
+
+        svc.announce('hi', 'assertive');
+
+        expect(events).toEqual([{ message: 'hi', politeness: 'assertive' }]);
+        expect(c2.querySelector('.dv-live-region')?.textContent).toBe('');
+        expect(c2.querySelector('.dv-live-region-assertive')?.textContent).toBe(
+            ''
+        );
+        dv2.dispose();
     });
 });

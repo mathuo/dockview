@@ -66,9 +66,30 @@ export interface DropOverlayModelParams {
 
 /** A layout change to be announced — see the `getAnnouncement` option. */
 export interface LiveRegionEvent {
-    /** `'open'` when a panel was added, `'close'` when it was removed. */
-    kind: 'open' | 'close';
+    /**
+     * What changed: a panel was added (`'open'`) or removed (`'close'`); a
+     * group was maximized (`'maximize'`) / restored (`'restore'`); or a group
+     * moved to a floating window (`'float'`), back into the grid (`'dock'`), or
+     * out to a popout window (`'popout'`). `panel` is the affected panel — for
+     * group events, the group's active panel.
+     */
+    kind:
+        | 'open'
+        | 'close'
+        | 'maximize'
+        | 'restore'
+        | 'float'
+        | 'dock'
+        | 'popout';
     panel: IDockviewPanel;
+}
+
+/** A resolved announcement handed to a custom `announcer`. */
+export interface AnnouncementEvent {
+    /** The (already localised) text to announce. */
+    message: string;
+    /** `'assertive'` interrupts the screen reader; `'polite'` waits for a pause. */
+    politeness: 'polite' | 'assertive';
 }
 
 /**
@@ -289,6 +310,13 @@ export interface DockviewOptions {
      */
     getAnnouncement?: (event: LiveRegionEvent) => string | null | undefined;
     /**
+     * Route announcements to your own screen-reader infrastructure instead of
+     * the built-in `aria-live` regions (e.g. an app-wide live region). When
+     * set, dockview hands you each {@link AnnouncementEvent} and writes nothing
+     * to its own regions. `getAnnouncement` (localisation) still applies first.
+     */
+    announcer?: (event: AnnouncementEvent) => void;
+    /**
      * Operate the dock with the keyboard. `true` enables the default bindings;
      * pass an object to override individual ones via `keymap`. Off by default
      * (opt-in while the feature matures). Enables:
@@ -389,6 +417,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         dropOverlayModel: undefined,
         announcements: undefined,
         getAnnouncement: undefined,
+        announcer: undefined,
         keyboardNavigation: undefined,
         tabGroupColors: undefined,
         tabGroupAccent: undefined,

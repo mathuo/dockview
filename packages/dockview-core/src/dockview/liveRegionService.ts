@@ -1,11 +1,13 @@
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { Event } from '../events';
 import { IDockviewPanel } from './dockviewPanel';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
 import {
     DockviewLayoutMutationEvent,
     DockviewLayoutMutationKind,
+    DockviewMaximizedGroupChanged,
 } from './dockviewComponent';
-import { DockviewComponentOptions } from './options';
+import { DockviewComponentOptions, LiveRegionEvent } from './options';
 import { defineModule } from './modules';
 
 /**
@@ -21,6 +23,9 @@ export interface ILiveRegionHost {
     readonly onDidRemovePanel: Event<IDockviewPanel>;
     readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;
     readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent>;
+    readonly onDidMaximizedGroupChange: Event<DockviewMaximizedGroupChanged>;
+    readonly onDidAddGroup: Event<DockviewGroupPanel>;
+    readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
 }
 
 export interface ILiveRegionService extends IDisposable {
@@ -36,11 +41,16 @@ export interface ILiveRegionService extends IDisposable {
 const isBulk = (kind: DockviewLayoutMutationKind): boolean =>
     kind === 'load' || kind === 'clear';
 
-function createLiveRegion(): HTMLElement {
+function createLiveRegion(politeness: 'polite' | 'assertive'): HTMLElement {
     const el = document.createElement('div');
-    el.className = 'dv-live-region';
-    el.setAttribute('role', 'status');
-    el.setAttribute('aria-live', 'polite');
+    el.className =
+        politeness === 'assertive'
+            ? 'dv-live-region-assertive'
+            : 'dv-live-region';
+    // assertive interrupts the SR (errors / cancellations); polite waits for a
+    // pause (routine status). `alert` implies assertive, `status` implies polite.
+    el.setAttribute('role', politeness === 'assertive' ? 'alert' : 'status');
+    el.setAttribute('aria-live', politeness);
     el.setAttribute('aria-atomic', 'true');
     // Visually hidden but kept in the accessibility tree (never display:none /
     // visibility:hidden, which would drop it from AT). Standard clip pattern.
@@ -60,32 +70,38 @@ function createLiveRegion(): HTMLElement {
 }
 
 /**
- * Narrates layout state changes to screen readers via a visually-hidden
- * `aria-live` region. Free / core (WCAG 4.1.3). Phase 1: open / close
- * announcements + the `announce()` sink; the bulk load/clear burst is
- * suppressed via the mutation-transaction events.
+ * Narrates layout state changes to screen readers via visually-hidden
+ * `aria-live` regions. Free / core (WCAG 4.1.3). Announces panel open/close +
+ * the shared `announce()` sink (the pro module narrates docking here too).
+ * Two regions: a **polite** one for routine status and an **assertive** one
+ * for errors/cancellations. The bulk load/clear burst is suppressed via the
+ * mutation-transaction events, and an app can take over delivery entirely with
+ * the `announcer` option.
  */
 export class LiveRegionService
     extends CompositeDisposable
     implements ILiveRegionService
 {
     private readonly _host: ILiveRegionHost;
-    private readonly _region: HTMLElement;
+    private readonly _polite: HTMLElement;
+    private readonly _assertive: HTMLElement;
     private _suppressDepth = 0;
+    private readonly _locationSubs = new Map<string, IDisposable>();
 
     constructor(host: ILiveRegionHost) {
         super();
 
         this._host = host;
-        this._region = createLiveRegion();
-        host.element.appendChild(this._region);
+        this._polite = createLiveRegion('polite');
+        this._assertive = createLiveRegion('assertive');
+        host.element.appendChild(this._polite);
+        host.element.appendChild(this._assertive);
 
         this.addDisposables(
-            { dispose: () => this._region.remove() },
-            host.onDidAddPanel((panel) => this._announcePanel(panel, 'open')),
-            host.onDidRemovePanel((panel) =>
-                this._announcePanel(panel, 'close')
-            ),
+            { dispose: () => this._polite.remove() },
+            { dispose: () => this._assertive.remove() },
+            host.onDidAddPanel((panel) => this._announce(panel, 'open')),
+            host.onDidRemovePanel((panel) => this._announce(panel, 'close')),
             // Bracket bulk transactions so a fromJSON / clear doesn't announce
             // every nested add/remove.
             host.onWillMutateLayout((e) => {
@@ -97,13 +113,59 @@ export class LiveRegionService
                 if (isBulk(e.kind)) {
                     this._suppressDepth = Math.max(0, this._suppressDepth - 1);
                 }
-            })
+            }),
+            host.onDidMaximizedGroupChange((e) => {
+                const panel = e.group.activePanel;
+                if (panel) {
+                    this._announce(
+                        panel,
+                        e.isMaximized ? 'maximize' : 'restore'
+                    );
+                }
+            }),
+            // Narrate a group floating / docking back / popping out. A group is
+            // born in the grid then transitions, so track each group's previous
+            // location and ignore the no-op initial `-> grid`.
+            host.onDidAddGroup((group) => this._trackLocation(group)),
+            host.onDidRemoveGroup((group) => {
+                this._locationSubs.get(group.id)?.dispose();
+                this._locationSubs.delete(group.id);
+            }),
+            {
+                dispose: () => {
+                    this._locationSubs.forEach((sub) => sub.dispose());
+                    this._locationSubs.clear();
+                },
+            }
         );
+    }
+
+    private _trackLocation(group: DockviewGroupPanel): void {
+        let prev = group.api.location.type;
+        const sub = group.api.onDidLocationChange((e) => {
+            const next = e.location.type;
+            if (next === prev) {
+                return;
+            }
+            prev = next;
+            const panel = group.activePanel;
+            if (!panel) {
+                return;
+            }
+            const kind =
+                next === 'floating'
+                    ? 'float'
+                    : next === 'popout'
+                      ? 'popout'
+                      : 'dock';
+            this._announce(panel, kind);
+        });
+        this._locationSubs.set(group.id, sub);
     }
 
     announce(
         message: string,
-        _politeness: 'polite' | 'assertive' = 'polite'
+        politeness: 'polite' | 'assertive' = 'polite'
     ): void {
         // Opt-out (read live so `updateOptions({ announcements })` applies).
         if (
@@ -113,14 +175,23 @@ export class LiveRegionService
         ) {
             return;
         }
+        // Apps can route announcements into their own SR system instead of the
+        // built-in regions (e.g. a shared app-wide live region).
+        const announcer = this._host.options.announcer;
+        if (announcer) {
+            announcer({ message, politeness });
+            return;
+        }
         // Clearing first forces SRs to re-announce an identical message.
-        this._region.textContent = '';
-        this._region.textContent = message;
+        const region =
+            politeness === 'assertive' ? this._assertive : this._polite;
+        region.textContent = '';
+        region.textContent = message;
     }
 
-    private _announcePanel(
+    private _announce(
         panel: IDockviewPanel,
-        kind: 'open' | 'close'
+        kind: LiveRegionEvent['kind']
     ): void {
         // The app may localise/override the message, suppress it (null / ''),
         // or fall through to the default (undefined).
@@ -133,9 +204,25 @@ export class LiveRegionService
 
     private _defaultMessage(
         panel: IDockviewPanel,
-        kind: 'open' | 'close'
+        kind: LiveRegionEvent['kind']
     ): string {
-        return `${panel.title ?? panel.id} ${kind === 'open' ? 'opened' : 'closed'}`;
+        const name = panel.title ?? panel.id;
+        switch (kind) {
+            case 'open':
+                return `${name} opened`;
+            case 'close':
+                return `${name} closed`;
+            case 'maximize':
+                return `${name} maximized`;
+            case 'restore':
+                return `${name} restored`;
+            case 'float':
+                return `${name} floated`;
+            case 'dock':
+                return `${name} docked`;
+            case 'popout':
+                return `${name} opened in a new window`;
+        }
     }
 }
 
