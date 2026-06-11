@@ -706,60 +706,28 @@ export class DockviewComponent
         return this._shellManager?.element ?? this.element;
     }
 
-    focusNextPanel(): void {
-        const group = this.activeGroup;
-        if (!group) {
-            return;
-        }
-        group.model.moveToNext();
-        // Keep DOM focus inside the dock: switching hides the previously
-        // focused content, which would otherwise drop focus to <body> and
-        // leave the keymap unable to see the next key.
-        group.model.focusContent();
-    }
-
-    focusPreviousPanel(): void {
-        const group = this.activeGroup;
-        if (!group) {
-            return;
-        }
-        group.model.moveToPrevious();
-        group.model.focusContent();
-    }
-
-    focusNextGroup(): void {
-        this._focusAdjacentGroup(false);
-    }
-
-    focusPreviousGroup(): void {
-        this._focusAdjacentGroup(true);
-    }
-
-    /** Land DOM focus on the active group's content, keeping it inside the dock. */
-    focusActiveContent(): void {
-        this.activeGroup?.model.focusContent();
-    }
-
-    private _focusAdjacentGroup(reverse: boolean): void {
-        const current = this.activeGroup;
+    /**
+     * The next / previous group in gridview (spatial) order, wrapping round.
+     * The keyboard accessibility module's focus navigation is built on this
+     * primitive — the only piece that needs the grid internals; the rest of
+     * the navigation logic lives in the AccessibilityService.
+     */
+    adjacentGroup(
+        group: DockviewGroupPanel,
+        reverse: boolean
+    ): DockviewGroupPanel | undefined {
         // gridview traversal only covers grid groups; a floating/popout group
         // isn't in the grid, so there's no adjacent grid group to step to.
-        if (current && current.api.location.type !== 'grid') {
-            return;
+        if (group.api.location.type !== 'grid') {
+            return undefined;
         }
-        const location = current ? getGridLocation(current.element) : undefined;
-        const target = current
-            ? <DockviewGroupPanel | undefined>(
-                  (reverse
-                      ? this.gridview.previous(location!)
-                      : this.gridview.next(location!)
-                  )?.view
-              )
-            : this.groups[0];
-        if (target) {
-            this.doSetGroupAndPanelActive(target);
-            target.model.focusContent();
-        }
+        const location = getGridLocation(group.element);
+        return <DockviewGroupPanel | undefined>(
+            (reverse
+                ? this.gridview.previous(location)
+                : this.gridview.next(location)
+            )?.view
+        );
     }
 
     showDropPreview(

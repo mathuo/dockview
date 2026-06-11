@@ -270,3 +270,113 @@ describe('accessibility: group focus navigation', () => {
         expect(dockview.activeGroup?.id).toBe(before);
     });
 });
+
+/**
+ * Spatial group focus — Ctrl+Shift+Arrow focuses the group geometrically in
+ * that direction. jsdom has no layout, so a clean 2x2 grid is mocked via
+ * getBoundingClientRect.
+ */
+describe('accessibility: spatial group focus', () => {
+    let container: HTMLElement;
+    let dockview: DockviewComponent;
+
+    const make = (): void => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            keyboardNavigation: true,
+        });
+        dockview.layout(200, 200);
+    };
+
+    const groupOf = (panelId: string) =>
+        dockview.groups.find((g) => g.panels.some((p) => p.id === panelId))!;
+
+    const setRect = (panelId: string, left: number, top: number): void => {
+        groupOf(panelId).element.getBoundingClientRect = () =>
+            ({
+                left,
+                top,
+                width: 100,
+                height: 100,
+                right: left + 100,
+                bottom: top + 100,
+                x: left,
+                y: top,
+                toJSON: () => ({}),
+            }) as DOMRect;
+    };
+
+    const grid2x2 = (): void => {
+        dockview.addPanel({ id: 'tl', component: 'default' });
+        dockview.addPanel({
+            id: 'tr',
+            component: 'default',
+            position: { referencePanel: 'tl', direction: 'right' },
+        });
+        dockview.addPanel({
+            id: 'bl',
+            component: 'default',
+            position: { referencePanel: 'tl', direction: 'below' },
+        });
+        dockview.addPanel({
+            id: 'br',
+            component: 'default',
+            position: { referencePanel: 'tr', direction: 'below' },
+        });
+        // pin a clean 2x2 geometry regardless of jsdom's (absent) layout
+        setRect('tl', 0, 0);
+        setRect('tr', 100, 0);
+        setRect('bl', 0, 100);
+        setRect('br', 100, 100);
+    };
+
+    const dir = (key: string): void => {
+        fireEvent.keyDown(dockview.element, {
+            key,
+            ctrlKey: true,
+            shiftKey: true,
+        });
+    };
+
+    afterEach(() => {
+        dockview.dispose();
+        container.remove();
+    });
+
+    test('Ctrl+Shift+Right / Down focus the neighbouring group', () => {
+        make();
+        grid2x2();
+        expect(dockview.groups.length).toBe(4);
+        groupOf('tl').api.setActive();
+        expect(dockview.activeGroup).toBe(groupOf('tl'));
+
+        dir('ArrowRight');
+        expect(dockview.activeGroup).toBe(groupOf('tr'));
+
+        groupOf('tl').api.setActive();
+        dir('ArrowDown');
+        expect(dockview.activeGroup).toBe(groupOf('bl'));
+    });
+
+    test('picks the dominant-axis neighbour, not a diagonal one', () => {
+        make();
+        grid2x2();
+        groupOf('tl').api.setActive();
+
+        // 'right' from top-left must land on top-right, never bottom-right
+        dir('ArrowRight');
+        expect(dockview.activeGroup).toBe(groupOf('tr'));
+        expect(dockview.activeGroup).not.toBe(groupOf('br'));
+    });
+
+    test('does nothing when there is no group in that direction', () => {
+        make();
+        grid2x2();
+        groupOf('tl').api.setActive();
+
+        dir('ArrowLeft'); // nothing to the left of top-left
+        expect(dockview.activeGroup).toBe(groupOf('tl'));
+    });
+});
