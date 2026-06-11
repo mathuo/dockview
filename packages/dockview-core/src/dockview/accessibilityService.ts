@@ -1,7 +1,9 @@
 import { CompositeDisposable, IDisposable } from '../lifecycle';
+import { Event } from '../events';
 import { Position } from '../dnd/droptarget';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
+import { DockviewLayoutMutationEvent } from './dockviewComponent';
 import {
     DockviewComponentOptions,
     DockviewKeybindings,
@@ -37,6 +39,9 @@ export interface IAccessibilityHost {
         group: DockviewGroupPanel,
         reverse: boolean
     ): DockviewGroupPanel | undefined;
+    /** Fires before / after a structural layout change — used to restore focus on close. */
+    readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;
+    readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent>;
     showDropPreview(group: DockviewGroupPanel, position: Position): IDisposable;
     announce(message: string): void;
     dockPanel(
@@ -109,8 +114,16 @@ function matchesBinding(e: KeyboardEvent, binding: string): boolean {
  *     2. PICK EDGE — arrows choose a split edge (left/right/top/bottom) or the
  *        centre (tab-into); `Enter` commits, `Escape` steps back.
  *   `Escape` from the target phase cancels.
+ * - **Focus restore on close** (L4) — when removing a panel/group pulls focus
+ *   out of the dock, focus returns to the neighbour the layout just activated
+ *   instead of being stranded on `<body>`.
+ * - **Floating `Esc`** (L4) — `Esc` inside a floating group returns focus to
+ *   the control that had it before entering the float (polite: bubble phase,
+ *   respects `defaultPrevented`, so panel content keeps `Esc`).
+ * - **Floating Tab-containment** (L4) — Tab wraps within the floating group so
+ *   focus doesn't leak to the grid behind it.
  *
- * Float / popout terminals and cross-window focus management are later phases.
+ * Cross-window (popout) focus is a later phase.
  */
 export class AccessibilityService
     extends CompositeDisposable
@@ -118,6 +131,8 @@ export class AccessibilityService
 {
     private _move: MoveState | null = null;
     private _preview: IDisposable | undefined;
+    private _focusWasInside = false;
+    private _lastNonFloatFocus: HTMLElement | undefined;
 
     constructor(private readonly host: IAccessibilityHost) {
         super();
@@ -130,13 +145,154 @@ export class AccessibilityService
         const onKeyDown = (e: KeyboardEvent): void => this._onKeyDown(e);
         doc.addEventListener('keydown', onKeyDown, true);
 
+        // Remember the last control focused in the main dock (outside any
+        // float) so Esc inside a floating group can return focus to its
+        // invoking control. Observe-only — never consumes.
+        const onFocusIn = (e: FocusEvent): void => {
+            const t = e.target;
+            if (
+                t instanceof HTMLElement &&
+                this.host.rootElement.contains(t) &&
+                !t.closest('[role="dialog"]')
+            ) {
+                this._lastNonFloatFocus = t;
+            }
+        };
+        doc.addEventListener('focusin', onFocusIn, true);
+
+        // Esc-from-float restore runs in the BUBBLE phase and respects
+        // defaultPrevented, so panel content that uses Esc keeps priority.
+        const onEscape = (e: KeyboardEvent): void => this._onFloatingEscape(e);
+        doc.addEventListener('keydown', onEscape, false);
+
         this.addDisposables(
             { dispose: () => this._clearPreview() },
             {
                 dispose: () =>
                     doc.removeEventListener('keydown', onKeyDown, true),
-            }
+            },
+            {
+                dispose: () =>
+                    doc.removeEventListener('focusin', onFocusIn, true),
+            },
+            {
+                dispose: () =>
+                    doc.removeEventListener('keydown', onEscape, false),
+            },
+            // L4 focus management — when a close pulls focus out of the dock,
+            // return it to the neighbour the component just activated rather
+            // than leaving it stranded on <body>. Snapshot before the teardown
+            // (focus still on the closing panel), restore after.
+            host.onWillMutateLayout((e) => {
+                if (e.kind === 'remove' && this._nav) {
+                    this._focusWasInside = this._isFocusInside();
+                }
+            }),
+            host.onDidMutateLayout((e) => {
+                if (
+                    e.kind === 'remove' &&
+                    this._nav &&
+                    this._focusWasInside &&
+                    !this._isFocusInside()
+                ) {
+                    this._restoreFocus();
+                }
+            })
         );
+    }
+
+    private _isFocusInside(): boolean {
+        const active = this.host.rootElement.ownerDocument.activeElement;
+        return active instanceof Node && this.host.rootElement.contains(active);
+    }
+
+    private _onFloatingEscape(e: KeyboardEvent): void {
+        if (
+            !this._nav ||
+            this._move ||
+            e.defaultPrevented ||
+            e.key !== 'Escape'
+        ) {
+            return;
+        }
+        const target = e.target;
+        if (!(target instanceof Element)) {
+            return;
+        }
+        // Only when focus is inside one of *this* dock's floating groups.
+        const float = target.closest('[role="dialog"]');
+        if (!float || !this.host.rootElement.contains(float)) {
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        this._returnFocusFromFloat();
+    }
+
+    /**
+     * Keep Tab inside the floating group that holds focus: at the last tabbable
+     * Tab wraps to the first, at the first Shift+Tab wraps to the last. Returns
+     * true if it handled the event. No-op outside a float.
+     */
+    private _trapFloatTab(e: KeyboardEvent): boolean {
+        const target = e.target;
+        if (!(target instanceof Element)) {
+            return false;
+        }
+        const float = target.closest('[role="dialog"]');
+        if (!float || !this.host.rootElement.contains(float)) {
+            return false;
+        }
+        // Always manage Tab inside a float, never just at the boundary: focus
+        // often sits on non-tabbable plumbing (the content container, which is
+        // tabindex="-1"), and the browser's default Tab from there escapes to
+        // the grid behind. Drive the cursor through the float's tabbables
+        // ourselves and swallow the default so it can't leak out.
+        e.preventDefault();
+        const tabbables = this._tabbables(float);
+        if (tabbables.length === 0) {
+            return true;
+        }
+        const active = float.ownerDocument.activeElement;
+        const index =
+            active instanceof HTMLElement ? tabbables.indexOf(active) : -1;
+        const n = tabbables.length;
+        const next =
+            index === -1
+                ? e.shiftKey
+                    ? n - 1
+                    : 0
+                : (index + (e.shiftKey ? -1 : 1) + n) % n;
+        tabbables[next].focus();
+        return true;
+    }
+
+    private _tabbables(root: Element): HTMLElement[] {
+        const nodes = root.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), input:not([disabled]), ' +
+                'select:not([disabled]), textarea:not([disabled]), [tabindex]'
+        );
+        // tabIndex >= 0 keeps naturally-focusable controls and roving anchors
+        // (the active tab) while dropping tabindex="-1" plumbing (content
+        // containers, inactive tabs).
+        return Array.from(nodes).filter((el) => el.tabIndex >= 0);
+    }
+
+    private _returnFocusFromFloat(): void {
+        const prev = this._lastNonFloatFocus;
+        if (
+            prev &&
+            prev.isConnected &&
+            this.host.rootElement.contains(prev) &&
+            !prev.closest('[role="dialog"]')
+        ) {
+            prev.focus();
+            return;
+        }
+        // Invoking control is gone — fall back to a grid group's content.
+        this.host.groups
+            .find((g) => g.api.location.type === 'grid')
+            ?.model.focusContent();
     }
 
     private get _nav(): KeyboardNavigationOptions | undefined {
@@ -164,6 +320,11 @@ export class AccessibilityService
             !(e.target instanceof Node) ||
             !this.host.rootElement.contains(e.target)
         ) {
+            return;
+        }
+        // Trap Tab within a floating group so focus doesn't leak to the grid
+        // behind it (the float is non-modal, but its Tab order should be).
+        if (e.key === 'Tab' && this._trapFloatTab(e)) {
             return;
         }
         const keymap = this._keymap;

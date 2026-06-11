@@ -380,3 +380,318 @@ describe('accessibility: spatial group focus', () => {
         expect(dockview.activeGroup).toBe(groupOf('tl'));
     });
 });
+
+/**
+ * L4 focus management — closing a panel/group that holds focus must hand it to
+ * a deterministic neighbour, never drop it on <body>. The service snapshots
+ * focus before the remove and restores after if it was pulled out of the dock.
+ */
+describe('accessibility: focus restore on close', () => {
+    let container: HTMLElement;
+    let dockview: DockviewComponent;
+
+    const make = (keyboardNavigation: boolean): void => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            keyboardNavigation,
+        });
+        dockview.layout(1000, 1000);
+    };
+
+    // one group, two tabs — only the active tab carries aria-selected="true"
+    const twoTabs = (): void => {
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        dockview.addPanel({ id: 'p2', component: 'default', title: 'P2' });
+    };
+
+    const activeTab = (): HTMLElement =>
+        container.querySelector('.dv-tab[aria-selected="true"]') as HTMLElement;
+
+    const remove = (id: string): void =>
+        dockview.removePanel(dockview.panels.find((p) => p.id === id)!);
+
+    afterEach(() => {
+        dockview.dispose();
+        container.remove();
+    });
+
+    test('returns focus to a neighbour when the close pulls it out of the dock', () => {
+        make(true);
+        twoTabs(); // p2 active
+        activeTab().focus(); // focus p2's tab — a real in-dock focusable element
+        expect(container.contains(document.activeElement)).toBe(true);
+
+        const group = dockview.activeGroup!;
+        const spy = jest.spyOn(group.model, 'focusContent');
+
+        remove('p2'); // p2's tab removed → focus falls to <body>
+
+        expect(dockview.activePanel?.id).toBe('p1'); // neighbour activated
+        expect(spy).toHaveBeenCalled(); // and focus restored to it
+    });
+
+    test('does not steal focus when focus was outside the dock', () => {
+        make(true);
+        twoTabs();
+        const outside = document.createElement('button');
+        document.body.appendChild(outside);
+        outside.focus();
+        expect(container.contains(document.activeElement)).toBe(false);
+
+        const spy = jest.spyOn(dockview.activeGroup!.model, 'focusContent');
+        remove('p1'); // closing a background tab while focused elsewhere
+
+        expect(spy).not.toHaveBeenCalled();
+        outside.remove();
+    });
+
+    test('off when keyboardNavigation is disabled', () => {
+        make(false);
+        twoTabs();
+        activeTab().focus();
+
+        const spy = jest.spyOn(dockview.activeGroup!.model, 'focusContent');
+        remove('p2');
+
+        expect(spy).not.toHaveBeenCalled();
+    });
+});
+
+/**
+ * L4 — focus across maximize/restore. Maximizing hides sibling groups via
+ * visibility toggling and leaves the maximized group's DOM in place, so the
+ * active panel keeps focus across the transition. This guards against a future
+ * change that re-renders on maximize (which would silently drop focus).
+ */
+describe('accessibility: focus across maximize', () => {
+    let container: HTMLElement;
+    let dockview: DockviewComponent;
+
+    const make = (): void => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            keyboardNavigation: true,
+        });
+        dockview.layout(1000, 1000);
+    };
+
+    afterEach(() => {
+        dockview.dispose();
+        container.remove();
+    });
+
+    test('maximize and restore keep focus on the active group', () => {
+        make();
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            title: 'P2',
+            position: { direction: 'right' },
+        });
+        const group = dockview.activeGroup!;
+        const tab = group.element.querySelector('.dv-tab') as HTMLElement;
+        tab.focus();
+        expect(container.contains(document.activeElement)).toBe(true);
+
+        group.api.maximize();
+        expect(group.api.isMaximized()).toBe(true);
+        expect(container.contains(document.activeElement)).toBe(true);
+
+        group.api.exitMaximized();
+        expect(group.api.isMaximized()).toBe(false);
+        expect(container.contains(document.activeElement)).toBe(true);
+    });
+});
+
+/**
+ * L4 — Esc inside a floating group returns focus to the invoking control (the
+ * last thing focused in the main dock). Runs in the bubble phase and respects
+ * defaultPrevented so panel content that uses Esc keeps priority.
+ */
+describe('accessibility: floating group Esc returns focus', () => {
+    let container: HTMLElement;
+    let dockview: DockviewComponent;
+
+    const make = (keyboardNavigation: boolean): void => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            keyboardNavigation,
+        });
+        dockview.layout(1000, 1000);
+    };
+
+    const setup = (): void => {
+        dockview.addPanel({ id: 'main', component: 'default', title: 'Main' });
+        dockview.addPanel({
+            id: 'float',
+            component: 'default',
+            title: 'Float',
+            floating: true,
+        });
+    };
+
+    const mainTab = (): HTMLElement =>
+        Array.from(container.querySelectorAll('.dv-tab')).find(
+            (t) => !(t as HTMLElement).closest('[role="dialog"]')
+        ) as HTMLElement;
+    const floatTab = (): HTMLElement =>
+        container.querySelector('[role="dialog"] .dv-tab') as HTMLElement;
+
+    afterEach(() => {
+        dockview.dispose();
+        container.remove();
+    });
+
+    test('Esc inside a float returns focus to the invoking control', () => {
+        make(true);
+        setup();
+        const invoker = mainTab();
+        invoker.focus(); // tracked as the invoking control
+        floatTab().focus(); // now focused inside the float
+        expect(floatTab().closest('[role="dialog"]')).toBeTruthy();
+
+        fireEvent.keyDown(floatTab(), { key: 'Escape', bubbles: true });
+        expect(document.activeElement).toBe(invoker);
+    });
+
+    test('does not hijack Esc that panel content handles (defaultPrevented)', () => {
+        make(true);
+        setup();
+        mainTab().focus();
+        const ft = floatTab();
+        ft.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+            }
+        });
+        ft.focus();
+
+        fireEvent.keyDown(ft, { key: 'Escape', bubbles: true });
+        expect(document.activeElement).toBe(ft); // stayed in the float
+    });
+
+    test('off when keyboardNavigation is disabled', () => {
+        make(false);
+        setup();
+        mainTab().focus();
+        const ft = floatTab();
+        ft.focus();
+
+        fireEvent.keyDown(ft, { key: 'Escape', bubbles: true });
+        expect(document.activeElement).toBe(ft); // not restored
+    });
+});
+
+class ButtonPanel implements IContentRenderer {
+    element = document.createElement('div');
+    init(): void {
+        const b1 = document.createElement('button');
+        b1.textContent = 'b1';
+        const b2 = document.createElement('button');
+        b2.textContent = 'b2';
+        this.element.append(b1, b2);
+    }
+    layout(): void {
+        // noop
+    }
+    dispose(): void {
+        // noop
+    }
+}
+
+/**
+ * L4 — Tab is trapped within a floating group: at the last tabbable Tab wraps
+ * to the first, at the first Shift+Tab wraps to the last, so focus doesn't leak
+ * to the grid behind the (non-modal) float.
+ */
+describe('accessibility: floating group Tab containment', () => {
+    let container: HTMLElement;
+    let dockview: DockviewComponent;
+
+    const make = (keyboardNavigation: boolean): void => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new ButtonPanel(),
+            keyboardNavigation,
+        });
+        dockview.layout(1000, 1000);
+        dockview.addPanel({ id: 'main', component: 'default', title: 'Main' });
+        dockview.addPanel({
+            id: 'float',
+            component: 'default',
+            title: 'Float',
+            floating: true,
+        });
+    };
+
+    // mirror the service's tabbable query so the test is robust to float chrome
+    const tabbables = (): HTMLElement[] => {
+        const float = container.querySelector('[role="dialog"]')!;
+        return Array.from(
+            float.querySelectorAll<HTMLElement>(
+                'a[href], button:not([disabled]), input:not([disabled]), ' +
+                    'select:not([disabled]), textarea:not([disabled]), [tabindex]'
+            )
+        ).filter((el) => el.tabIndex >= 0);
+    };
+
+    afterEach(() => {
+        dockview.dispose();
+        container.remove();
+    });
+
+    test('Tab at the last tabbable wraps to the first', () => {
+        make(true);
+        const t = tabbables();
+        expect(t.length).toBeGreaterThan(1);
+        const first = t[0];
+        const last = t[t.length - 1];
+
+        last.focus();
+        fireEvent.keyDown(last, { key: 'Tab', bubbles: true });
+        expect(document.activeElement).toBe(first);
+    });
+
+    test('Shift+Tab at the first tabbable wraps to the last', () => {
+        make(true);
+        const t = tabbables();
+        const first = t[0];
+        const last = t[t.length - 1];
+
+        first.focus();
+        fireEvent.keyDown(first, { key: 'Tab', shiftKey: true, bubbles: true });
+        expect(document.activeElement).toBe(last);
+    });
+
+    test('Tab from non-tabbable plumbing (content container) stays in the float', () => {
+        // the real-browser leak: focus on the tabindex="-1" content container
+        // matched no tabbable, so default Tab escaped to the grid behind
+        make(true);
+        const float = container.querySelector('[role="dialog"]')!;
+        const content = float.querySelector(
+            '.dv-content-container'
+        ) as HTMLElement;
+        content.focus();
+
+        fireEvent.keyDown(content, { key: 'Tab', bubbles: true });
+        expect(document.activeElement).toBe(tabbables()[0]); // not the grid
+    });
+
+    test('off when keyboardNavigation is disabled', () => {
+        make(false);
+        const t = tabbables();
+        const last = t[t.length - 1];
+
+        last.focus();
+        fireEvent.keyDown(last, { key: 'Tab', bubbles: true });
+        expect(document.activeElement).toBe(last); // not wrapped
+    });
+});
