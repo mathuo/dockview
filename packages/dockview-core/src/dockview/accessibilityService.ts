@@ -9,6 +9,7 @@ import {
     DockviewKeybindings,
     KeyboardNavigationOptions,
 } from './options';
+import { resolveMessages } from './accessibilityMessages';
 import { defineModule } from './modules';
 import { AdvancedDnDModule } from './advancedDnDService';
 import { LiveRegionModule } from './liveRegionService';
@@ -472,7 +473,7 @@ export class AccessibilityService
                 this._render();
             } else {
                 this._exit();
-                this.host.announce('Move cancelled.');
+                this.host.announce(this._messages.moveCancelled());
                 this._restoreFocus();
             }
             return;
@@ -517,6 +518,10 @@ export class AccessibilityService
         }
     }
 
+    private get _messages() {
+        return resolveMessages(this.host.options.messages);
+    }
+
     private _render(): void {
         const move = this._move!;
         const group = move.groups[move.groupIndex];
@@ -524,16 +529,18 @@ export class AccessibilityService
         this._preview = this.host.showDropPreview(group, move.position);
 
         const name = group.activePanel?.title ?? group.id;
+        const m = this._messages;
         if (move.phase === 'target') {
             this.host.announce(
-                `Moving ${this._label(move.source)}. Target ${name}, ${
-                    move.groupIndex + 1
-                } of ${move.groups.length}. Enter to choose where, Escape to cancel.`
+                m.movePickTarget(
+                    this._label(move.source),
+                    name,
+                    move.groupIndex + 1,
+                    move.groups.length
+                )
             );
         } else {
-            this.host.announce(
-                `${this._describe(move.position)} ${name}. Arrows to change, Enter to confirm, Escape to go back.`
-            );
+            this.host.announce(m.movePickEdge(move.position, name));
         }
     }
 
@@ -543,26 +550,19 @@ export class AccessibilityService
         const position = move.position;
         const source = move.source;
         const name = group.activePanel?.title ?? group.id;
+        const m = this._messages;
         this._exit();
         try {
             this.host.dockPanel(source, group, position);
             this.host.announce(
-                `${this._label(source)} ${
-                    position === 'center'
-                        ? `docked into ${name}`
-                        : `split ${position} of ${name}`
-                }.`
+                m.moveCommitted(this._label(source), name, position)
             );
         } catch {
-            this.host.announce('That move is not allowed.');
+            this.host.announce(m.moveNotAllowed());
         }
         // The move re-renders the grid; pull focus back into the dock so the
         // keymap keeps working without a click.
         this._restoreFocus();
-    }
-
-    private _describe(position: Position): string {
-        return position === 'center' ? 'Tab into' : `Split ${position} of`;
     }
 
     private _exit(): void {

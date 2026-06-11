@@ -4,6 +4,8 @@ import { IGridView } from '../gridview/gridview';
 import { IContentRenderer, ITabRenderer, IWatermarkRenderer } from './types';
 import { Parameters } from '../panel/types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
+import { DockviewMessages } from './accessibilityMessages';
+export type { DockviewMessages } from './accessibilityMessages';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
 import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
@@ -317,6 +319,14 @@ export interface DockviewOptions {
      */
     announcer?: (event: AnnouncementEvent) => void;
     /**
+     * Translate / override the strings dockview speaks to assistive technology
+     * — both the LiveRegion announcements and the keyboard-docking narration.
+     * Provide any subset of {@link DockviewMessages}; unset entries keep the
+     * English defaults. (`getAnnouncement` still applies first, per-event, for
+     * announcements.)
+     */
+    messages?: Partial<DockviewMessages>;
+    /**
      * Operate the dock with the keyboard. `true` enables the default bindings;
      * pass an object to override individual ones via `keymap`. Off by default
      * (opt-in while the feature matures). Enables:
@@ -418,6 +428,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         announcements: undefined,
         getAnnouncement: undefined,
         announcer: undefined,
+        messages: undefined,
         keyboardNavigation: undefined,
         tabGroupColors: undefined,
         tabGroupAccent: undefined,
