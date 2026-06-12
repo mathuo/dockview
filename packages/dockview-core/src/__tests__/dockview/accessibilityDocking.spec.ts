@@ -695,3 +695,47 @@ describe('accessibility: floating group Tab containment', () => {
         expect(document.activeElement).toBe(last); // not wrapped
     });
 });
+
+/**
+ * L5 i18n — the keyboard-docking narration flows through the same `messages`
+ * catalog as the announcements, so a translator owns every string.
+ */
+describe('accessibility: docking narration i18n', () => {
+    let container: HTMLElement;
+    let dockview: DockviewComponent;
+
+    afterEach(() => {
+        dockview.dispose();
+        container.remove();
+    });
+
+    test('the messages catalog localises docking narration', () => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            keyboardNavigation: true,
+            messages: {
+                movePickTarget: (source) => `Deplacement ${source}.`,
+                moveCancelled: () => 'Annule.',
+            },
+        });
+        dockview.layout(1000, 1000);
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            title: 'P2',
+            position: { direction: 'right' },
+        });
+        const region = container.querySelector(
+            '.dv-live-region'
+        ) as HTMLElement;
+
+        fireEvent.keyDown(dockview.element, { key: 'm', ctrlKey: true });
+        expect(region.textContent).toBe('Deplacement P2.');
+
+        fireEvent.keyDown(dockview.element, { key: 'Escape' });
+        expect(region.textContent).toBe('Annule.');
+    });
+});

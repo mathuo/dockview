@@ -255,6 +255,29 @@ describe('LiveRegion announcer', () => {
         expect(region().textContent).toBe('P2 opened in a new window');
     });
 
+    test('the messages catalog localises announcement strings', () => {
+        dockview.dispose();
+        container = document.createElement('div');
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            messages: {
+                panelOpened: (t) => `${t} ouvert`,
+                groupFloated: (t) => `${t} flottant`,
+            },
+        });
+        dockview.layout(800, 600);
+
+        const p = dockview.addPanel({
+            id: 'p1',
+            component: 'default',
+            title: 'Vue',
+        });
+        expect(region().textContent).toBe('Vue ouvert');
+
+        dockview.addFloatingGroup(p);
+        expect(region().textContent).toBe('Vue flottant');
+    });
+
     test('a custom announcer receives events; the DOM regions stay empty', () => {
         const events: AnnouncementEvent[] = [];
         const c2 = document.createElement('div');
