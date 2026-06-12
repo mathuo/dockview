@@ -1,39 +1,7 @@
 import { CompositeDisposable, IDisposable } from '../lifecycle';
-import { Event } from '../events';
-import {
-    DockviewTabGroupChangeEvent,
-    DockviewTabGroupPanelChangeEvent,
-    DockviewTabGroupCollapsedChangeEvent,
-} from './events';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { defineModule } from './modules';
-
-export interface ITabGroupChipsHost {
-    readonly onDidAddGroup: Event<DockviewGroupPanel>;
-    readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
-
-    fireDidCreateTabGroup(event: DockviewTabGroupChangeEvent): void;
-    fireDidDestroyTabGroup(event: DockviewTabGroupChangeEvent): void;
-    fireDidAddPanelToTabGroup(event: DockviewTabGroupPanelChangeEvent): void;
-    fireDidRemovePanelFromTabGroup(
-        event: DockviewTabGroupPanelChangeEvent
-    ): void;
-    fireDidTabGroupChange(event: DockviewTabGroupChangeEvent): void;
-    fireDidTabGroupCollapsedChange(
-        event: DockviewTabGroupCollapsedChangeEvent
-    ): void;
-}
-
-export interface ITabGroupChipsService extends IDisposable {
-    /**
-     * Subscribe to the per-group tab-group events on the given group and
-     * re-fire them on the host's component-level emitters. Returns a
-     * disposable that detaches the subscriptions; intended to be bundled
-     * into the per-group CompositeDisposable so cleanup happens when the
-     * group is removed.
-     */
-    attachToGroup(group: DockviewGroupPanel): IDisposable;
-}
+import { ITabGroupChipsHost, ITabGroupChipsService } from './moduleContracts';
 
 export class TabGroupChipsService implements ITabGroupChipsService {
     private readonly _host: ITabGroupChipsHost;

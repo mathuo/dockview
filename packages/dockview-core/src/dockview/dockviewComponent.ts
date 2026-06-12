@@ -73,13 +73,19 @@ import {
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
 import { FloatingTitleBar } from './components/titlebar/floatingTitleBar';
-import { assertModule, ModuleRegistry } from './modules';
+import { assertModule, DockviewModule, ModuleRegistry } from './modules';
 import { AllModules } from './allModules';
 import { IFloatingGroupHost } from './floatingGroupService';
 import { IPopoutWindowHost } from './popoutWindowService';
 import { IWatermarkHost } from './watermarkService';
 import { IEdgeGroupServiceHost } from './edgeGroupService';
-import { ITabGroupChipsHost } from './tabGroupChipsService';
+import {
+    IAccessibilityHost,
+    IAdvancedDnDHost,
+    IContextMenuHost,
+    IContextMenuService,
+    ITabGroupChipsHost,
+} from './moduleContracts';
 import { IHeaderActionsHost } from './headerActionsService';
 import { AnchoredBox, AnchorPosition, Box } from '../types';
 import {
@@ -94,11 +100,8 @@ import {
 import { PopoutWindow } from '../popoutWindow';
 import { StrictEventsSequencing } from './strictEventsSequencing';
 import { PopupService } from './components/popupService';
-import { IContextMenuHost, IContextMenuService } from './contextMenu';
 import { IRootDropTargetHost } from './rootDropTargetService';
-import { IAdvancedDnDHost } from './advancedDnDService';
 import { ILiveRegionHost } from './liveRegionService';
-import { IAccessibilityHost } from './accessibilityService';
 import { IDragGhostSpec } from '../dnd/backend';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import { themeAbyss } from './theme';
@@ -623,7 +626,9 @@ export class DockviewComponent
     }
 
     private get _rootDropTargetService() {
-        return this._moduleRegistry.services.rootDropTargetService!;
+        // Optional like every other module service — RootDropTargetModule can be
+        // removed from the registered set without crashing the component.
+        return this._moduleRegistry.services.rootDropTargetService;
     }
 
     private get _advancedDnDService() {
@@ -804,7 +809,14 @@ export class DockviewComponent
         this._options = options;
         this._tabGroupColorPalette = buildTabGroupColorPalette(options);
 
-        for (const module of AllModules) {
+        // Internal seam: defaults to the full set, but tests can supply a
+        // subset to assert every module is independently removable (and the
+        // opt-in module API will build on this later). Not part of the public
+        // options surface.
+        const modules =
+            (options as { modules?: DockviewModule<any>[] }).modules ??
+            AllModules;
+        for (const module of modules) {
             this._moduleRegistry.register(module);
         }
         this._moduleRegistry.initialize(this);
@@ -949,67 +961,78 @@ export class DockviewComponent
                 // don't hang. See issue #851.
                 this._moduleRegistry.dispose();
                 this._shellManager?.dispose();
-            }),
-            this._rootDropTargetService.onWillShowOverlay((event) => {
-                if (this.gridview.length > 0 && event.position === 'center') {
-                    // option only available when no panels in primary grid
-                    return;
-                }
+            })
+        );
 
-                this._onWillShowOverlay.fire(
-                    new DockviewWillShowOverlayLocationEvent(event, {
-                        kind: 'edge',
-                        panel: undefined,
-                        api: this._api,
-                        group: undefined,
-                        getData: getPanelData,
-                    })
-                );
-            }),
-            this._rootDropTargetService.onDrop((event) => {
-                const willDropEvent = new DockviewWillDropEvent({
-                    nativeEvent: event.nativeEvent,
-                    position: event.position,
-                    panel: undefined,
-                    api: this._api,
-                    group: undefined,
-                    getData: getPanelData,
-                    kind: 'edge',
-                });
+        // Root edge-drop wiring lives with its (optional) module — guard it so
+        // the module is independently removable.
+        const rootDropTarget = this._rootDropTargetService;
+        if (rootDropTarget) {
+            this.addDisposables(
+                rootDropTarget.onWillShowOverlay((event) => {
+                    if (
+                        this.gridview.length > 0 &&
+                        event.position === 'center'
+                    ) {
+                        // option only available when no panels in primary grid
+                        return;
+                    }
 
-                this._onWillDrop.fire(willDropEvent);
-
-                if (willDropEvent.defaultPrevented) {
-                    return;
-                }
-
-                const data = getPanelData();
-
-                if (data) {
-                    this.moveGroupOrPanel({
-                        from: {
-                            groupId: data.groupId,
-                            panelId: data.panelId ?? undefined,
-                        },
-                        to: {
-                            group: this.orthogonalize(event.position),
-                            position: 'center',
-                        },
-                    });
-                } else {
-                    this._onDidDrop.fire(
-                        new DockviewDidDropEvent({
-                            nativeEvent: event.nativeEvent,
-                            position: event.position,
+                    this._onWillShowOverlay.fire(
+                        new DockviewWillShowOverlayLocationEvent(event, {
+                            kind: 'edge',
                             panel: undefined,
                             api: this._api,
                             group: undefined,
                             getData: getPanelData,
                         })
                     );
-                }
-            })
-        );
+                }),
+                rootDropTarget.onDrop((event) => {
+                    const willDropEvent = new DockviewWillDropEvent({
+                        nativeEvent: event.nativeEvent,
+                        position: event.position,
+                        panel: undefined,
+                        api: this._api,
+                        group: undefined,
+                        getData: getPanelData,
+                        kind: 'edge',
+                    });
+
+                    this._onWillDrop.fire(willDropEvent);
+
+                    if (willDropEvent.defaultPrevented) {
+                        return;
+                    }
+
+                    const data = getPanelData();
+
+                    if (data) {
+                        this.moveGroupOrPanel({
+                            from: {
+                                groupId: data.groupId,
+                                panelId: data.panelId ?? undefined,
+                            },
+                            to: {
+                                group: this.orthogonalize(event.position),
+                                position: 'center',
+                            },
+                        });
+                    } else {
+                        this._onDidDrop.fire(
+                            new DockviewDidDropEvent({
+                                nativeEvent: event.nativeEvent,
+                                position: event.position,
+                                panel: undefined,
+                                api: this._api,
+                                group: undefined,
+                                getData: getPanelData,
+                            })
+                        );
+                    }
+                })
+            );
+        }
 
         // Final module wiring: runs after the host is fully constructed.
         // Modules subscribe to host events here so the component doesn't
@@ -2011,7 +2034,7 @@ export class DockviewComponent
 
         this._floatingGroupService?.updateBounds(options);
 
-        this._rootDropTargetService.setOptions(options);
+        this._rootDropTargetService?.setOptions(options);
 
         const oldDisableDnd = this.options.disableDnd;
         const oldDndStrategy = this.options.dndStrategy;

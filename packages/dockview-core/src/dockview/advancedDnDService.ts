@@ -1,7 +1,6 @@
 import { Disposable, IDisposable } from '../lifecycle';
 import { IDragGhostSpec } from '../dnd/backend';
 import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
-import { DockviewApi } from '../api/component.api';
 import {
     GroupDragEvent,
     TabDragEvent,
@@ -12,8 +11,8 @@ import {
     DockviewGroupDropLocation,
     DockviewWillShowOverlayLocationEvent,
 } from './events';
-import { DockviewComponentOptions } from './options';
 import { defineModule } from './modules';
+import { IAdvancedDnDHost, IAdvancedDnDService } from './moduleContracts';
 
 /** Cursor offset of the group drag ghost, matched to the long-shipped default. */
 const GROUP_DRAG_GHOST_OFFSET_X = 30;
@@ -28,48 +27,6 @@ const GROUP_DRAG_GHOST_OFFSET_Y = -10;
  * dispatch point those fires are routed through. Engine policy (e.g. the
  * `disableDnd` guard) stays on the component, ahead of the dispatch.
  */
-export interface IAdvancedDnDHost {
-    readonly options: DockviewComponentOptions;
-    readonly api: DockviewApi;
-    fireWillDragPanel(event: TabDragEvent): void;
-    fireWillDragGroup(event: GroupDragEvent): void;
-    fireWillDrop(event: DockviewWillDropEvent): void;
-    fireWillShowOverlay(event: DockviewWillShowOverlayLocationEvent): void;
-}
-
-export interface IAdvancedDnDService extends IDisposable {
-    dispatchWillDragPanel(event: TabDragEvent): void;
-    dispatchWillDragGroup(event: GroupDragEvent): void;
-    dispatchWillDrop(event: DockviewWillDropEvent): void;
-    dispatchWillShowOverlay(event: DockviewWillShowOverlayLocationEvent): void;
-    /**
-     * Resolve the custom group drag ghost from
-     * `createGroupDragGhostComponent`, or `undefined` when no factory is
-     * configured (the caller then renders the default chip). Returning
-     * `undefined` is also what happens when this module is absent.
-     */
-    buildGroupDragGhost(group: DockviewGroupPanel): IDragGhostSpec | undefined;
-    /**
-     * Resolve the app-supplied overlay model for a group drop target via the
-     * `dropOverlayModel` option, or `undefined` to keep the target's default.
-     */
-    resolveOverlayModel(
-        location: DockviewGroupDropLocation,
-        group?: DockviewGroupPanel
-    ): DroptargetOverlayModel | undefined;
-    /**
-     * Render the drop-preview overlay on a group at `position` — the same
-     * overlay a mouse drag shows — without a live drag. Returns a disposable
-     * that clears it. Used by keyboard docking so keyboard and mouse previews
-     * are identical (single source of truth). Commit the move via the public
-     * `api.moveGroupOrPanel({ to: { group, position } })`.
-     */
-    showPreviewOverlay(
-        group: DockviewGroupPanel,
-        position: Position
-    ): IDisposable;
-}
-
 /**
  * Owns the dispatch of the advanced drag-and-drop hooks — `onWillDragPanel`,
  * `onWillDragGroup`, `onWillDrop` and `onWillShowOverlay`.

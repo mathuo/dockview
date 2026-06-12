@@ -32,7 +32,7 @@ export interface ILiveRegionHost {
 export interface ILiveRegionService extends IDisposable {
     /**
      * Announce a message to assistive technology via the live region. The
-     * shared sink — the pro accessibility module writes keyboard-docking
+     * shared sink — the accessibility module writes keyboard-docking
      * narration here too, so all announcements use one region.
      */
     announce(message: string, politeness?: 'polite' | 'assertive'): void;
@@ -73,7 +73,7 @@ function createLiveRegion(politeness: 'polite' | 'assertive'): HTMLElement {
 /**
  * Narrates layout state changes to screen readers via visually-hidden
  * `aria-live` regions. Free / core (WCAG 4.1.3). Announces panel open/close +
- * the shared `announce()` sink (the pro module narrates docking here too).
+ * the shared `announce()` sink (the accessibility module narrates docking here too).
  * Two regions: a **polite** one for routine status and an **assertive** one
  * for errors/cancellations. The bulk load/clear burst is suppressed via the
  * mutation-transaction events, and an app can take over delivery entirely with
