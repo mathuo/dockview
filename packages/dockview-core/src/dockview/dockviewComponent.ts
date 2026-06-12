@@ -81,6 +81,7 @@ import { IWatermarkHost } from './watermarkService';
 import { IEdgeGroupServiceHost } from './edgeGroupService';
 import {
     IAccessibilityHost,
+    IAdvancedDnDHost,
     IContextMenuHost,
     IContextMenuService,
     ITabGroupChipsHost,
@@ -100,7 +101,6 @@ import { PopoutWindow } from '../popoutWindow';
 import { StrictEventsSequencing } from './strictEventsSequencing';
 import { PopupService } from './components/popupService';
 import { IRootDropTargetHost } from './rootDropTargetService';
-import { IAdvancedDnDHost } from './advancedDnDService';
 import { ILiveRegionHost } from './liveRegionService';
 import { IDragGhostSpec } from '../dnd/backend';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';

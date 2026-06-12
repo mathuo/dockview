@@ -15,10 +15,10 @@ import { IWatermarkService } from './watermarkService';
 import { IEdgeGroupService } from './edgeGroupService';
 import { IRootDropTargetService } from './rootDropTargetService';
 import { IHeaderActionsService } from './headerActionsService';
-import { IAdvancedDnDService } from './advancedDnDService';
 import { ILiveRegionService } from './liveRegionService';
 import {
     IAccessibilityService,
+    IAdvancedDnDService,
     IContextMenuService,
     ITabGroupChipsService,
 } from './moduleContracts';
