@@ -1,5 +1,9 @@
-import { Emitter, Event } from '../events';
-import { CompositeDisposable, IDisposable } from '../lifecycle';
+import { Emitter, Event, addDisposableListener } from '../events';
+import {
+    CompositeDisposable,
+    IDisposable,
+    MutableDisposable,
+} from '../lifecycle';
 import {
     IView,
     LayoutPriority,
@@ -17,6 +21,12 @@ export interface EdgeGroupOptions {
     maximumSize?: number;
     collapsedSize?: number;
     collapsed?: boolean;
+    /**
+     * When true (default) the group pushes the layout when expanded.
+     * When false the group is always collapsed in the layout and expands
+     * as a floating overlay on demand.
+     */
+    pinned?: boolean;
 }
 
 export interface SerializedEdgeGroups {
@@ -24,24 +34,28 @@ export interface SerializedEdgeGroups {
         size: number;
         visible: boolean;
         collapsed?: boolean;
+        pinned?: boolean;
         group?: unknown;
     };
     bottom?: {
         size: number;
         visible: boolean;
         collapsed?: boolean;
+        pinned?: boolean;
         group?: unknown;
     };
     left?: {
         size: number;
         visible: boolean;
         collapsed?: boolean;
+        pinned?: boolean;
         group?: unknown;
     };
     right?: {
         size: number;
         visible: boolean;
         collapsed?: boolean;
+        pinned?: boolean;
         group?: unknown;
     };
 }
@@ -70,6 +84,7 @@ export class EdgeGroupView implements IView {
     readonly priority = LayoutPriority.Low;
 
     private _isCollapsed = false;
+    private _isPinned = true;
     private _lastExpandedSize: number;
     private _collapsedSize: number;
     private _expandedMinimumSize: number;
@@ -95,6 +110,10 @@ export class EdgeGroupView implements IView {
 
     get isCollapsed(): boolean {
         return this._isCollapsed;
+    }
+
+    get isPinned(): boolean {
+        return this._isPinned;
     }
 
     get lastExpandedSize(): number {
@@ -129,10 +148,22 @@ export class EdgeGroupView implements IView {
 
         this._lastExpandedSize = options.initialSize ?? 200;
 
+        // pinned defaults to true — unpinned groups float over content
+        this._isPinned = options.pinned !== false;
+        group.element.classList.toggle('dv-edge-unpinned', !this._isPinned);
+
         if (options.collapsed) {
             this._isCollapsed = true;
             group.element.classList.add('dv-edge-collapsed');
         }
+    }
+
+    setPinned(pinned: boolean): void {
+        if (this._isPinned === pinned) {
+            return;
+        }
+        this._isPinned = pinned;
+        this._group.element.classList.toggle('dv-edge-unpinned', !pinned);
     }
 
     layout(size: number, orthogonalSize: number): void {
@@ -391,6 +422,7 @@ export class ShellManager implements IDisposable {
     private _rightIndex: number | undefined;
 
     private readonly _disposables = new CompositeDisposable();
+    private readonly _overlayDismissDisposable = new MutableDisposable();
 
     // Retained for updateTheme() recalculations.
     private readonly _viewConfigs = new Map<
@@ -401,6 +433,11 @@ export class ShellManager implements IDisposable {
     private _currentHeight = 0;
     private _gap: number;
     private _defaultCollapsedSize: number;
+
+    // Overlay state for unpinned groups
+    private _overlayElement: HTMLElement | null = null;
+    private _overlayPosition: EdgeGroupPosition | null = null;
+    private _overlayPlaceholder: HTMLElement | null = null;
 
     constructor(
         container: HTMLElement,
@@ -417,6 +454,8 @@ export class ShellManager implements IDisposable {
         this._shellElement.style.height = '100%';
         this._shellElement.style.width = '100%';
         this._shellElement.style.position = 'relative';
+        this._shellElement.style.overflow = 'clip';
+        this._shellElement.style.isolation = 'isolate';
         container.appendChild(this._shellElement);
 
         const centerView = new CenterView(dockviewElement, layoutGrid);
@@ -745,6 +784,17 @@ export class ShellManager implements IDisposable {
         if (!view) {
             return;
         }
+
+        // Unpinned groups: expand/collapse as floating overlay, not splitview resize
+        if (!view.isPinned) {
+            if (collapsed) {
+                this._hideOverlay();
+            } else {
+                this._showOverlay(position, view);
+            }
+            return;
+        }
+
         view.setCollapsed(collapsed);
         const targetSize = collapsed
             ? view.collapsedSize
@@ -773,8 +823,227 @@ export class ShellManager implements IDisposable {
         }
     }
 
+    private _showOverlay(
+        position: EdgeGroupPosition,
+        view: EdgeGroupView
+    ): void {
+        // Dismiss any existing overlay first
+        this._hideOverlay();
+
+        const groupEl = view.element;
+        const collapsedSize = view.collapsedSize;
+        const expandedSize = view.lastExpandedSize;
+
+        // The group element lives inside dv-view (overflow:auto) inside the
+        // splitview (overflow:hidden). We must move it out of those clipping
+        // ancestors and into an absolutely-positioned overlay div on the shell.
+        // To avoid the empty dv-view slot showing a white background, we insert
+        // a transparent placeholder that keeps the splitview slot "filled".
+        const placeholder = document.createElement('div');
+        placeholder.style.width = '100%';
+        placeholder.style.height = '100%';
+        placeholder.style.background = 'transparent';
+        groupEl.parentElement?.insertBefore(placeholder, groupEl);
+        this._overlayPlaceholder = placeholder;
+
+        const overlay = document.createElement('div');
+        overlay.className = 'dv-edge-overlay';
+        overlay.style.position = 'absolute';
+        overlay.style.zIndex = 'var(--dv-overlay-z-index, 999)';
+
+        // Position the overlay to cover tab strip + expanded content area.
+        // Left/right groups span the full shell height; top/bottom groups live
+        // inside the middle column so their overlay must be horizontally
+        // constrained to the middle column (not the full shell width).
+        switch (position) {
+            case 'left':
+                overlay.style.left = '0';
+                overlay.style.top = '0';
+                overlay.style.bottom = '0';
+                overlay.style.width = `${collapsedSize + expandedSize}px`;
+                break;
+            case 'right':
+                overlay.style.right = '0';
+                overlay.style.top = '0';
+                overlay.style.bottom = '0';
+                overlay.style.width = `${collapsedSize + expandedSize}px`;
+                break;
+            case 'top': {
+                const midEl = this._middleColumn.element;
+                const shellRect = this._shellElement.getBoundingClientRect();
+                const midRect = midEl.getBoundingClientRect();
+                const midLeft = midRect.left - shellRect.left;
+                overlay.style.top = '0';
+                overlay.style.left = `${midLeft}px`;
+                overlay.style.width = `${midRect.width}px`;
+                overlay.style.height = `${collapsedSize + expandedSize}px`;
+                break;
+            }
+            case 'bottom': {
+                const midEl = this._middleColumn.element;
+                const shellRect = this._shellElement.getBoundingClientRect();
+                const midRect = midEl.getBoundingClientRect();
+                const midLeft = midRect.left - shellRect.left;
+                overlay.style.bottom = '0';
+                overlay.style.left = `${midLeft}px`;
+                overlay.style.width = `${midRect.width}px`;
+                overlay.style.height = `${collapsedSize + expandedSize}px`;
+                break;
+            }
+        }
+
+        overlay.appendChild(groupEl);
+        this._shellElement.appendChild(overlay);
+
+        // Remove dv-edge-collapsed so the group lays out with full content in
+        // the overlay (restored when the overlay closes in _hideOverlay).
+        groupEl.classList.remove('dv-edge-collapsed');
+
+        // Trigger a layout so the group renders at its new expanded size
+        if (position === 'left' || position === 'right') {
+            view.layout(collapsedSize + expandedSize, this._currentHeight);
+        } else {
+            const midWidth =
+                this._middleColumn.element.getBoundingClientRect().width;
+            view.layout(collapsedSize + expandedSize, midWidth);
+        }
+
+        groupEl.classList.add('dv-edge-overlay-visible');
+        this._overlayElement = overlay;
+        this._overlayPosition = position;
+
+        // Dismiss when the user clicks outside the overlay
+        this._overlayDismissDisposable.value = addDisposableListener(
+            window,
+            'pointerdown',
+            (e) => {
+                if (!overlay.contains(e.target as Node)) {
+                    this._hideOverlay();
+                }
+            },
+            true
+        );
+    }
+
+    private _hideOverlay(): void {
+        if (!this._overlayElement || !this._overlayPosition) {
+            return;
+        }
+
+        const position = this._overlayPosition;
+        const view = this._getView(position);
+        const overlay = this._overlayElement;
+        const placeholder = this._overlayPlaceholder;
+
+        this._overlayDismissDisposable.dispose();
+        this._overlayElement = null;
+        this._overlayPosition = null;
+        this._overlayPlaceholder = null;
+
+        if (view) {
+            view.element.classList.remove('dv-edge-overlay-visible');
+            if (view.isCollapsed) {
+                view.element.classList.add('dv-edge-collapsed');
+            }
+            overlay.removeChild(view.element);
+            // Restore into the splitview slot, replacing the placeholder
+            if (placeholder?.parentElement) {
+                placeholder.parentElement.insertBefore(
+                    view.element,
+                    placeholder
+                );
+                placeholder.remove();
+            }
+            // Re-layout at collapsed size so the tab strip renders correctly.
+            // For left/right the orthogonalSize is height; for top/bottom it's
+            // the middle column width.
+            if (view.isCollapsed) {
+                const isHorizontal =
+                    position === 'left' || position === 'right';
+                const ortho = isHorizontal
+                    ? this._currentHeight
+                    : this._middleColumn.element.getBoundingClientRect().width;
+                view.layout(view.collapsedSize, ortho);
+            }
+        }
+
+        overlay.remove();
+    }
+
     isEdgeGroupCollapsed(position: EdgeGroupPosition): boolean {
         return this._getView(position)?.isCollapsed ?? false;
+    }
+
+    setEdgeGroupPinned(position: EdgeGroupPosition, pinned: boolean): void {
+        const view = this._getView(position);
+        if (!view) {
+            return;
+        }
+        view.setPinned(pinned);
+
+        if (!pinned) {
+            // Switching to unpinned: collapse in layout (tab strip only)
+            if (!view.isCollapsed) {
+                view.setCollapsed(true);
+                const targetSize = view.collapsedSize;
+                switch (position) {
+                    case 'left':
+                        if (this._leftIndex !== undefined) {
+                            this._outerSplitview.resizeView(
+                                this._leftIndex,
+                                targetSize
+                            );
+                        }
+                        break;
+                    case 'right':
+                        if (this._rightIndex !== undefined) {
+                            this._outerSplitview.resizeView(
+                                this._rightIndex,
+                                targetSize
+                            );
+                        }
+                        break;
+                    case 'top':
+                    case 'bottom':
+                        this._middleColumn.resizeView(position, targetSize);
+                        break;
+                }
+            }
+        } else {
+            // Switching to pinned: close any open overlay, then expand in layout.
+            // The overlay may have already been auto-dismissed (e.g. by the
+            // pointerdown capture listener firing before the click handler), so
+            // always expand regardless of whether _overlayPosition matches.
+            this._hideOverlay();
+            view.setCollapsed(false);
+            const targetSize = view.lastExpandedSize;
+            switch (position) {
+                case 'left':
+                    if (this._leftIndex !== undefined) {
+                        this._outerSplitview.resizeView(
+                            this._leftIndex,
+                            targetSize
+                        );
+                    }
+                    break;
+                case 'right':
+                    if (this._rightIndex !== undefined) {
+                        this._outerSplitview.resizeView(
+                            this._rightIndex,
+                            targetSize
+                        );
+                    }
+                    break;
+                case 'top':
+                case 'bottom':
+                    this._middleColumn.resizeView(position, targetSize);
+                    break;
+            }
+        }
+    }
+
+    isEdgeGroupPinned(position: EdgeGroupPosition): boolean {
+        return this._getView(position)?.isPinned ?? true;
     }
 
     private _getView(position: EdgeGroupPosition): EdgeGroupView | undefined {
@@ -800,6 +1069,7 @@ export class ShellManager implements IDisposable {
                     : this._outerSplitview.getViewSize(this._leftIndex),
                 visible: this._outerSplitview.isViewVisible(this._leftIndex),
                 collapsed: this._leftView.isCollapsed || undefined,
+                pinned: this._leftView.isPinned ? undefined : false,
             };
         }
         if (this._rightView && this._rightIndex !== undefined) {
@@ -809,6 +1079,7 @@ export class ShellManager implements IDisposable {
                     : this._outerSplitview.getViewSize(this._rightIndex),
                 visible: this._outerSplitview.isViewVisible(this._rightIndex),
                 collapsed: this._rightView.isCollapsed || undefined,
+                pinned: this._rightView.isPinned ? undefined : false,
             };
         }
         if (this._topView) {
@@ -818,6 +1089,7 @@ export class ShellManager implements IDisposable {
                     : this._middleColumn.getViewSize('top'),
                 visible: this._middleColumn.isViewVisible('top'),
                 collapsed: this._topView.isCollapsed || undefined,
+                pinned: this._topView.isPinned ? undefined : false,
             };
         }
         if (this._bottomView) {
@@ -827,6 +1099,7 @@ export class ShellManager implements IDisposable {
                     : this._middleColumn.getViewSize('bottom'),
                 visible: this._middleColumn.isViewVisible('bottom'),
                 collapsed: this._bottomView.isCollapsed || undefined,
+                pinned: this._bottomView.isPinned ? undefined : false,
             };
         }
 
@@ -840,6 +1113,9 @@ export class ShellManager implements IDisposable {
             // be applied before setCollapsed locks min/max to collapsedSize.
             this._leftView?.restoreExpandedSize(data.left.size);
             this._leftView?.setCollapsed(data.left.collapsed ?? false);
+            if (data.left.pinned === false) {
+                this._leftView?.setPinned(false);
+            }
             this._outerSplitview.resizeView(
                 this._leftIndex,
                 data.left.collapsed
@@ -853,6 +1129,9 @@ export class ShellManager implements IDisposable {
         if (data.right && this._rightIndex !== undefined) {
             this._rightView?.restoreExpandedSize(data.right.size);
             this._rightView?.setCollapsed(data.right.collapsed ?? false);
+            if (data.right.pinned === false) {
+                this._rightView?.setPinned(false);
+            }
             this._outerSplitview.resizeView(
                 this._rightIndex,
                 data.right.collapsed
@@ -866,6 +1145,9 @@ export class ShellManager implements IDisposable {
         if (data.top) {
             this._topView?.restoreExpandedSize(data.top.size);
             this._topView?.setCollapsed(data.top.collapsed ?? false);
+            if (data.top.pinned === false) {
+                this._topView?.setPinned(false);
+            }
             this._middleColumn.resizeView(
                 'top',
                 data.top.collapsed
@@ -879,6 +1161,9 @@ export class ShellManager implements IDisposable {
         if (data.bottom) {
             this._bottomView?.restoreExpandedSize(data.bottom.size);
             this._bottomView?.setCollapsed(data.bottom.collapsed ?? false);
+            if (data.bottom.pinned === false) {
+                this._bottomView?.setPinned(false);
+            }
             this._middleColumn.resizeView(
                 'bottom',
                 data.bottom.collapsed
@@ -892,6 +1177,7 @@ export class ShellManager implements IDisposable {
     }
 
     dispose(): void {
+        this._hideOverlay();
         this._disposables.dispose();
         this._shellElement.parentElement?.removeChild(this._shellElement);
     }
