@@ -56,7 +56,7 @@ function matchesBinding(e: KeyboardEvent, binding: string): boolean {
 }
 
 /**
- * Pro accessibility module — operate the dock without a mouse. Opt-in via
+ * Accessibility module — operate the dock without a mouse. Opt-in via
  * `keyboardNavigation`, with a rebindable {@link DockviewKeybindings} keymap.
  *
  * - **Switch tab** (`Ctrl+]` / `Ctrl+[`) — cycle the focused group's tabs.
