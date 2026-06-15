@@ -278,6 +278,7 @@ export type DockviewLayoutMutationKind =
     | 'move'
     | 'float'
     | 'popout'
+    | 'maximize'
     | 'tab-group'
     | 'load'
     | 'clear';
@@ -4018,6 +4019,19 @@ export class DockviewComponent
 
     moveGroup(options: MoveGroupOptions): void {
         this.mutation('move', () => this._doMoveGroup(options));
+    }
+
+    // Bracket maximize/restore as a 'maximize' transaction. The maximized node
+    // is serialized by the gridview (`SerializedGridview.maximizedNode`), so
+    // the state round-trips through toJSON/fromJSON and is restorable on undo.
+    // When the exit is a side-effect of another bracketed operation (e.g. a
+    // move that activates a different group) the depth counter folds it in.
+    override maximizeGroup(panel: DockviewGroupPanel): void {
+        this.mutation('maximize', () => super.maximizeGroup(panel));
+    }
+
+    override exitMaximizedGroup(): void {
+        this.mutation('maximize', () => super.exitMaximizedGroup());
     }
 
     private _doMoveGroup(options: MoveGroupOptions): void {

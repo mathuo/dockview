@@ -173,6 +173,55 @@ describe('layout mutation events', () => {
         expect(did).toEqual(['remove']);
     });
 
+    test('maximizeGroup brackets one "maximize" transaction', () => {
+        const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+        dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+        will.length = 0;
+        did.length = 0;
+
+        dockview.maximizeGroup(p1.group);
+        expect(will).toEqual(['maximize']);
+        expect(did).toEqual(['maximize']);
+    });
+
+    test('exitMaximizedGroup brackets one "maximize" transaction', () => {
+        const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+        dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+        dockview.maximizeGroup(p1.group);
+        will.length = 0;
+        did.length = 0;
+
+        dockview.exitMaximizedGroup();
+        expect(will).toEqual(['maximize']);
+        expect(did).toEqual(['maximize']);
+    });
+
+    test('maximize state survives a toJSON/fromJSON round-trip', () => {
+        const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+        dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+        dockview.maximizeGroup(p1.group);
+        expect(dockview.hasMaximizedGroup()).toBe(true);
+
+        const json = dockview.toJSON();
+        dockview.fromJSON(json);
+
+        // Confirms the seam fires on a restorable state — undo/redo via
+        // fromJSON can put the maximize back.
+        expect(dockview.hasMaximizedGroup()).toBe(true);
+    });
+
     describe('tab group mutations', () => {
         test('createTabGroup brackets one "tab-group" transaction', () => {
             const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
