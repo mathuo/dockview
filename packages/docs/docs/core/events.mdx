@@ -70,6 +70,27 @@ api.onDidLayoutFromJSON(() => { });
 api.onDidMaximizedGroupChange((event: DockviewMaximizedGroupChanged) => { });
 ```
 
+### Mutation boundary
+
+`onWillMutateLayout` and `onDidMutateLayout` bracket each top-level structural change to the layout. Unlike `onDidLayoutChange` — which is coalesced and only fires _after_ a change — these provide an explicit before/after pair, so you can capture a snapshot of the layout _before_ the mutation runs. This makes them the right hook for autosave, dirty-tracking and undo/redo.
+
+```ts
+// Fires immediately before a structural mutation
+api.onWillMutateLayout((event: DockviewLayoutMutationEvent) => {
+    // event.kind: 'add' | 'remove' | 'move' | 'float' | 'popout'
+    //           | 'tab-group' | 'load' | 'clear'
+    // event.origin: 'user' | 'api'
+    const snapshot = api.toJSON(); // pre-image, before the change applies
+});
+
+// Fires immediately after the same mutation settles
+api.onDidMutateLayout((event: DockviewLayoutMutationEvent) => { });
+```
+
+A compound operation brackets as a **single** transaction: dragging a panel to a new group, or restoring a whole layout via `fromJSON`, fires exactly one before/after pair rather than one per internal step.
+
+`event.origin` distinguishes _who_ caused the change — `'user'` for direct interaction (drag-and-drop, tab UI), `'api'` for a programmatic `DockviewApi` call made by your own code — so consumers such as an undo stack can choose to ignore the app's own programmatic mutations.
+
 ## Drag & Drop
 
 These events let you intercept and customize drag and drop behaviour.
