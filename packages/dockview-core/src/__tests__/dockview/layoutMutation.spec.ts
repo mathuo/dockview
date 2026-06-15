@@ -281,7 +281,10 @@ describe('layout mutation events', () => {
         });
 
         test('a compound api mutation stays "api" through nested teardown', () => {
-            const p1 = dockview.api.addPanel({ id: 'p1', component: 'default' });
+            const p1 = dockview.api.addPanel({
+                id: 'p1',
+                component: 'default',
+            });
             dockview.api.addPanel({
                 id: 'p2',
                 component: 'default',
