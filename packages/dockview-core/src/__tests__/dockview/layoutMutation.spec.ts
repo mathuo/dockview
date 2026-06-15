@@ -124,6 +124,125 @@ describe('layout mutation events', () => {
         expect(did).toEqual(['load']);
     });
 
+    test('addGroup brackets one "add" transaction', () => {
+        dockview.addGroup();
+        expect(will).toEqual(['add']);
+        expect(did).toEqual(['add']);
+    });
+
+    test('closeAllGroups brackets a single "remove" transaction', () => {
+        dockview.addPanel({ id: 'p1', component: 'default' });
+        dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+        will.length = 0;
+        did.length = 0;
+
+        // Multiple panels across multiple groups must collapse into one
+        // transaction, not one-per-panel.
+        dockview.closeAllGroups();
+        expect(will).toEqual(['remove']);
+        expect(did).toEqual(['remove']);
+    });
+
+    test('addEdgeGroup brackets one "add" transaction', () => {
+        dockview.addEdgeGroup('left', { id: 'edge-left' });
+        expect(will).toEqual(['add']);
+        expect(did).toEqual(['add']);
+    });
+
+    test('removeEdgeGroup brackets a single "remove" transaction', () => {
+        dockview.addEdgeGroup('left', { id: 'edge-left' });
+        dockview.addPanel({
+            id: 'p1',
+            component: 'default',
+            position: { referenceGroup: 'edge-left' },
+        });
+        dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            position: { referenceGroup: 'edge-left' },
+        });
+        will.length = 0;
+        did.length = 0;
+
+        dockview.removeEdgeGroup('left');
+        expect(will).toEqual(['remove']);
+        expect(did).toEqual(['remove']);
+    });
+
+    describe('tab group mutations', () => {
+        test('createTabGroup brackets one "tab-group" transaction', () => {
+            const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+            will.length = 0;
+            did.length = 0;
+
+            dockview.api.createTabGroup({ groupId: p1.group.id });
+            expect(will).toEqual(['tab-group']);
+            expect(did).toEqual(['tab-group']);
+        });
+
+        test('addPanelToTabGroup brackets one "tab-group" transaction', () => {
+            const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+            const tg = dockview.api.createTabGroup({ groupId: p1.group.id });
+            will.length = 0;
+            did.length = 0;
+
+            dockview.api.addPanelToTabGroup({
+                groupId: p1.group.id,
+                tabGroupId: tg.id,
+                panelId: 'p1',
+            });
+            expect(will).toEqual(['tab-group']);
+            expect(did).toEqual(['tab-group']);
+        });
+
+        test('moving a panel between tab groups fires one "tab-group", not two', () => {
+            const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+            const tg1 = dockview.api.createTabGroup({ groupId: p1.group.id });
+            const tg2 = dockview.api.createTabGroup({ groupId: p1.group.id });
+            dockview.api.addPanelToTabGroup({
+                groupId: p1.group.id,
+                tabGroupId: tg1.id,
+                panelId: 'p1',
+            });
+            will.length = 0;
+            did.length = 0;
+
+            // The destination add internally removes p1 from tg1 first; that
+            // nested removePanelFromTabGroup must not open its own transaction.
+            dockview.api.addPanelToTabGroup({
+                groupId: p1.group.id,
+                tabGroupId: tg2.id,
+                panelId: 'p1',
+            });
+            expect(will).toEqual(['tab-group']);
+            expect(did).toEqual(['tab-group']);
+        });
+
+        test('an "already in this group" no-op fires nothing', () => {
+            const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+            const tg = dockview.api.createTabGroup({ groupId: p1.group.id });
+            dockview.api.addPanelToTabGroup({
+                groupId: p1.group.id,
+                tabGroupId: tg.id,
+                panelId: 'p1',
+            });
+            will.length = 0;
+            did.length = 0;
+
+            dockview.api.addPanelToTabGroup({
+                groupId: p1.group.id,
+                tabGroupId: tg.id,
+                panelId: 'p1',
+            });
+            expect(will).toEqual([]);
+            expect(did).toEqual([]);
+        });
+    });
+
     test('onWillMutateLayout fires before onDidMutateLayout', () => {
         const order: string[] = [];
         dockview.onWillMutateLayout(() => order.push('will'));
@@ -131,5 +250,57 @@ describe('layout mutation events', () => {
 
         dockview.addPanel({ id: 'p1', component: 'default' });
         expect(order).toEqual(['will', 'did']);
+    });
+
+    describe('mutation origin', () => {
+        let origins: string[];
+
+        beforeEach(() => {
+            origins = [];
+            dockview.onDidMutateLayout((e) => origins.push(e.origin));
+        });
+
+        test('a direct (component) mutation is tagged "user"', () => {
+            // Driving the component directly models the DnD / tab-UI /
+            // keyboard paths that never pass through the DockviewApi.
+            dockview.addPanel({ id: 'p1', component: 'default' });
+            expect(origins).toEqual(['user']);
+        });
+
+        test('a programmatic DockviewApi mutation is tagged "api"', () => {
+            dockview.api.addPanel({ id: 'p1', component: 'default' });
+            expect(origins).toEqual(['api']);
+        });
+
+        test('a programmatic tab-group mutation is tagged "api"', () => {
+            const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+            origins.length = 0;
+
+            dockview.api.createTabGroup({ groupId: p1.group.id });
+            expect(origins).toEqual(['api']);
+        });
+
+        test('a compound api mutation stays "api" through nested teardown', () => {
+            const p1 = dockview.api.addPanel({ id: 'p1', component: 'default' });
+            dockview.api.addPanel({
+                id: 'p2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            origins.length = 0;
+
+            // Floating p1 brackets one 'float' transaction whose body removes
+            // the source group (a nested mutation). The outer api origin must
+            // survive — a nested call must not reset it to 'user'.
+            dockview.api.addFloatingGroup(p1);
+            expect(origins).toEqual(['api']);
+        });
+
+        test('origin restores to "user" after an api call completes', () => {
+            dockview.api.addPanel({ id: 'p1', component: 'default' });
+            dockview.addPanel({ id: 'p2', component: 'default' });
+            expect(origins).toEqual(['api', 'user']);
+            expect(dockview.mutationOrigin()).toBe('user');
+        });
     });
 });

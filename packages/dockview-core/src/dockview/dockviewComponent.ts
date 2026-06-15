@@ -278,11 +278,22 @@ export type DockviewLayoutMutationKind =
     | 'move'
     | 'float'
     | 'popout'
+    | 'tab-group'
     | 'load'
     | 'clear';
 
+/**
+ * Who caused a layout mutation: `'user'` for mutations driven by direct
+ * interaction (drag-and-drop, tab UI, keyboard docking) and `'api'` for those
+ * entered through a {@link DockviewApi} method called by application code.
+ * Lets consumers (e.g. an undo stack) treat the app's own programmatic changes
+ * differently from end-user gestures.
+ */
+export type DockviewLayoutMutationOrigin = 'user' | 'api';
+
 export interface DockviewLayoutMutationEvent {
     readonly kind: DockviewLayoutMutationKind;
+    readonly origin: DockviewLayoutMutationOrigin;
 }
 
 export interface PopoutGroupChangeSizeEvent {
@@ -306,6 +317,11 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onWillDrop: Event<DockviewWillDropEvent>;
     readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;
     readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent>;
+    mutationOrigin(): DockviewLayoutMutationOrigin;
+    withMutationOrigin<T>(
+        origin: DockviewLayoutMutationOrigin,
+        func: () => T
+    ): T;
     readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent>;
     readonly onDidRemovePanel: Event<IDockviewPanel>;
     readonly onDidAddPanel: Event<IDockviewPanel>;
@@ -423,6 +439,10 @@ export class DockviewComponent
     // Compound operations (e.g. a drag that relocates a panel) nest via the
     // depth counter and bracket as a single transaction. See `mutation()`.
     private _mutationDepth = 0;
+    // Current mutation origin. Defaults to `'user'`; the DockviewApi boundary
+    // flips it to `'api'` for the duration of a programmatic call via
+    // `withMutationOrigin`. Nested mutations inherit the outer origin.
+    private _mutationOrigin: DockviewLayoutMutationOrigin = 'user';
     private readonly _onWillMutateLayout =
         new Emitter<DockviewLayoutMutationEvent>();
     readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent> =
@@ -2147,27 +2167,29 @@ export class DockviewComponent
             );
         }
 
-        const group = this.createGroup({ id: options.id });
-        group.model.location = { type: 'edge', position };
-        group.model.headerPosition = position;
+        return this.mutation('add', () => {
+            const group = this.createGroup({ id: options.id });
+            group.model.location = { type: 'edge', position };
+            group.model.headerPosition = position;
 
-        // Collapse when the group becomes empty
-        const autoCollapseDisposable = group.model.onDidRemovePanel(() => {
-            if (group.model.isEmpty) {
-                this.setEdgeGroupCollapsed(group, true);
-            }
+            // Collapse when the group becomes empty
+            const autoCollapseDisposable = group.model.onDidRemovePanel(() => {
+                if (group.model.isEmpty) {
+                    this.setEdgeGroupCollapsed(group, true);
+                }
+            });
+
+            service.add(position, group, autoCollapseDisposable);
+            this._onDidAddGroup.fire(group);
+
+            this._shellManager!.addEdgeView(
+                position,
+                options,
+                group as IEdgeGroupHost
+            );
+
+            return group.api;
         });
-
-        service.add(position, group, autoCollapseDisposable);
-        this._onDidAddGroup.fire(group);
-
-        this._shellManager!.addEdgeView(
-            position,
-            options,
-            group as IEdgeGroupHost
-        );
-
-        return group.api;
     }
 
     getEdgeGroup(
@@ -2200,22 +2222,26 @@ export class DockviewComponent
             );
         }
 
-        // Remove panels inside the group first
-        for (const panel of [...group.panels]) {
-            this.removePanel(panel, {
-                removeEmptyGroup: false,
-                skipDispose: false,
-            });
-        }
+        // One transaction — the per-panel removals below nest via the depth
+        // counter, so consumers see a single edge-group removal.
+        this.mutation('remove', () => {
+            // Remove panels inside the group first
+            for (const panel of [...group.panels]) {
+                this.removePanel(panel, {
+                    removeEmptyGroup: false,
+                    skipDispose: false,
+                });
+            }
 
-        // Remove from the shell splitview
-        this._shellManager!.removeEdgeView(position);
+            // Remove from the shell splitview
+            this._shellManager!.removeEdgeView(position);
 
-        // Clean up service-tracked state + group itself
-        service.remove(position);
-        group.dispose();
-        this._groups.delete(group.id);
-        this._onDidRemoveGroup.fire(group);
+            // Clean up service-tracked state + group itself
+            service.remove(position);
+            group.dispose();
+            this._groups.delete(group.id);
+            this._onDidRemoveGroup.fire(group);
+        });
     }
 
     setEdgeGroupCollapsed(group: DockviewGroupPanel, collapsed: boolean): void {
@@ -2867,11 +2893,15 @@ export class DockviewComponent
     }
 
     closeAllGroups(): void {
-        for (const entry of this._groups.entries()) {
-            const [_, group] = entry;
+        // One transaction — the per-panel removals inside nest via the depth
+        // counter, so consumers (undo, announcements) see a single mutation.
+        this.mutation('remove', () => {
+            for (const entry of this._groups.entries()) {
+                const [_, group] = entry;
 
-            group.value.model.closeAllPanels();
-        }
+                group.value.model.closeAllPanels();
+            }
+        });
     }
 
     addPanel<T extends object = Parameters>(
@@ -3133,6 +3163,10 @@ export class DockviewComponent
     }
 
     addGroup(options?: AddGroupOptions): DockviewGroupPanel {
+        return this.mutation('add', () => this._doAddGroup(options));
+    }
+
+    private _doAddGroup(options?: AddGroupOptions): DockviewGroupPanel {
         if (options) {
             let referenceGroup: DockviewGroupPanel | undefined;
 
@@ -3482,8 +3516,9 @@ export class DockviewComponent
      */
     mutation<T>(kind: DockviewLayoutMutationKind, func: () => T): T {
         const outer = this._mutationDepth === 0;
+        const origin = this._mutationOrigin;
         if (outer) {
-            this._onWillMutateLayout.fire({ kind });
+            this._onWillMutateLayout.fire({ kind, origin });
         }
         this._mutationDepth++;
         try {
@@ -3491,8 +3526,42 @@ export class DockviewComponent
         } finally {
             this._mutationDepth--;
             if (outer) {
-                this._onDidMutateLayout.fire({ kind });
+                this._onDidMutateLayout.fire({ kind, origin });
             }
+        }
+    }
+
+    /**
+     * The origin of the mutation currently in progress (`'user'` by default).
+     * Read inside a `mutation()`'s lifetime to learn whether the change was
+     * driven by application code (via the {@link DockviewApi}) or a user
+     * gesture.
+     */
+    mutationOrigin(): DockviewLayoutMutationOrigin {
+        return this._mutationOrigin;
+    }
+
+    /**
+     * Run `func` with the mutation origin set to `origin`, restoring the
+     * previous value afterwards. Used by the DockviewApi boundary to tag
+     * programmatic mutations as `'api'`; nested mutations inherit the
+     * outermost origin (a re-entrant call does not overwrite it).
+     */
+    withMutationOrigin<T>(
+        origin: DockviewLayoutMutationOrigin,
+        func: () => T
+    ): T {
+        // Only the outermost caller sets the origin — a nested mutation keeps
+        // whatever the enclosing operation established.
+        if (this._mutationDepth > 0) {
+            return func();
+        }
+        const previous = this._mutationOrigin;
+        this._mutationOrigin = origin;
+        try {
+            return func();
+        } finally {
+            this._mutationOrigin = previous;
         }
     }
 
