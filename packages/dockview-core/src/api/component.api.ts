@@ -4,6 +4,7 @@ import {
     FloatingGroupOptions,
     IDockviewComponent,
     MovePanelEvent,
+    PopoutGroup,
     PopoutGroupChangePositionEvent,
     PopoutGroupChangeSizeEvent,
     SerializedDockview,
@@ -788,8 +789,22 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.onDidPopoutGroupPositionChange;
     }
 
+    /**
+     * Fires when a popout group successfully opens in its own window, carrying
+     * the live `Window` handle. Use it to route focus or attach per-document
+     * listeners. Enumerate the current popouts at any time with `getPopouts()`.
+     */
+    get onDidAddPopoutGroup(): Event<PopoutGroup> {
+        return this.component.onDidAddPopoutGroup;
+    }
+
     get onDidOpenPopoutWindowFail(): Event<void> {
         return this.component.onDidOpenPopoutWindowFail;
+    }
+
+    /** Enumerate the popout groups currently open in their own windows. */
+    getPopouts(): PopoutGroup[] {
+        return this.component.getPopouts();
     }
 
     /**

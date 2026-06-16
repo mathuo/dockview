@@ -188,6 +188,7 @@ PaneviewPanel
 PaneviewPanelApi
 PaneviewUnhandledDragOverEvent
 Parameters
+PopoutGroup
 PopoutGroupChangePositionEvent
 PopoutGroupChangeSizeEvent
 Position
