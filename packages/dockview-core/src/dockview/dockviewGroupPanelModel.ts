@@ -688,7 +688,26 @@ export class DockviewGroupPanelModel
         });
     }
 
+    /**
+     * Bracket a tab-group mutation as a layout transaction. `accessor` is
+     * always a full {@link DockviewComponent} in production; the optional-call
+     * fallback keeps partial test doubles (which omit `mutation`) working.
+     * When nested inside a larger operation (a drag-driven move, fromJSON
+     * restore) the component's depth counter folds it into the outer one.
+     */
+    private _bracketTabGroupMutation<T>(func: () => T): T {
+        return this.accessor.mutation
+            ? this.accessor.mutation('tab-group', func)
+            : func();
+    }
+
     createTabGroup(options?: CreateTabGroupOptions): ITabGroup {
+        return this._bracketTabGroupMutation(() =>
+            this._doCreateTabGroup(options)
+        );
+    }
+
+    private _doCreateTabGroup(options?: CreateTabGroupOptions): ITabGroup {
         const id = options?.id ?? `tg-${this.id}-${this._tabGroupIdCounter++}`;
         const tabGroup = new TabGroup(id, {
             label: options?.label,
@@ -731,15 +750,17 @@ export class DockviewGroupPanelModel
             return;
         }
 
-        // Remove all panels from the group (they stay in the flat panel list)
-        const panelIds = [...tabGroup.panelIds];
-        for (const panelId of panelIds) {
-            tabGroup.removePanel(panelId);
-            this._panelToTabGroup.delete(panelId);
-            this._onDidRemovePanelFromTabGroup.fire({ tabGroup, panelId });
-        }
+        this._bracketTabGroupMutation(() => {
+            // Remove all panels from the group (they stay in the flat panel list)
+            const panelIds = [...tabGroup.panelIds];
+            for (const panelId of panelIds) {
+                tabGroup.removePanel(panelId);
+                this._panelToTabGroup.delete(panelId);
+                this._onDidRemovePanelFromTabGroup.fire({ tabGroup, panelId });
+            }
 
-        tabGroup.dispose();
+            tabGroup.dispose();
+        });
     }
 
     addPanelToTabGroup(
@@ -759,21 +780,24 @@ export class DockviewGroupPanelModel
 
         // Remove from any existing group first
         const existingGroup = this.getTabGroupForPanel(panelId);
-        if (existingGroup) {
-            if (existingGroup.id === tabGroupId) {
-                return; // already in this group
-            }
-            this.removePanelFromTabGroup(panelId);
+        if (existingGroup && existingGroup.id === tabGroupId) {
+            return; // already in this group — no mutation
         }
 
-        tabGroup.addPanel(panelId, index);
-        this._panelToTabGroup.set(panelId, tabGroup);
+        this._bracketTabGroupMutation(() => {
+            if (existingGroup) {
+                this.removePanelFromTabGroup(panelId);
+            }
 
-        // Enforce contiguity: move the panel in the flat _panels array
-        // to the correct global position matching its group-local index
-        this._enforceContiguity(tabGroup, panelId);
+            tabGroup.addPanel(panelId, index);
+            this._panelToTabGroup.set(panelId, tabGroup);
 
-        this._onDidAddPanelToTabGroup.fire({ tabGroup, panelId });
+            // Enforce contiguity: move the panel in the flat _panels array
+            // to the correct global position matching its group-local index
+            this._enforceContiguity(tabGroup, panelId);
+
+            this._onDidAddPanelToTabGroup.fire({ tabGroup, panelId });
+        });
     }
 
     /**
@@ -968,14 +992,16 @@ export class DockviewGroupPanelModel
             return;
         }
 
-        tabGroup.removePanel(panelId);
-        this._panelToTabGroup.delete(panelId);
-        this._onDidRemovePanelFromTabGroup.fire({ tabGroup, panelId });
+        this._bracketTabGroupMutation(() => {
+            tabGroup.removePanel(panelId);
+            this._panelToTabGroup.delete(panelId);
+            this._onDidRemovePanelFromTabGroup.fire({ tabGroup, panelId });
 
-        // Auto-destroy empty groups
-        if (tabGroup.isEmpty) {
-            tabGroup.dispose();
-        }
+            // Auto-destroy empty groups
+            if (tabGroup.isEmpty) {
+                tabGroup.dispose();
+            }
+        });
     }
 
     getTabGroups(): readonly ITabGroup[] {
