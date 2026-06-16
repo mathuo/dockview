@@ -1135,10 +1135,23 @@
 
 // Header-bottom: flip the active-tab indicator from bottom (content side when
 // tabs are on top) to top (content side when tabs are on bottom).
-.dv-groupview-header-bottom {
-    .dv-tabs-container > .dv-tab::after {
-        top: 0px;
-        bottom: auto;
+//
+// The per-theme active-marker rules compile with the theme-class prefix
+// (`.dockview-theme-x .dv-groupview.dv-active-group … .dv-active-tab::after`,
+// specificity 0,7,1). This override therefore mirrors that selector chain —
+// adding the header-bottom class on the (same) group element — to reach equal
+// specificity, then wins on source order because it is declared after every
+// theme mixin. A shorter selector loses the cascade and the flip silently
+// does nothing.
+.dv-groupview.dv-groupview-header-bottom {
+    &.dv-active-group,
+    &.dv-inactive-group {
+        > .dv-tabs-and-actions-container
+            .dv-tabs-container
+            > .dv-tab.dv-active-tab::after {
+            top: 0px;
+            bottom: auto;
+        }
     }
 }
 
