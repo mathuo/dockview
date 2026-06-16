@@ -278,11 +278,23 @@ export type DockviewLayoutMutationKind =
     | 'move'
     | 'float'
     | 'popout'
+    | 'maximize'
+    | 'tab-group'
     | 'load'
     | 'clear';
 
+/**
+ * Who caused a layout mutation: `'user'` for mutations driven by direct
+ * interaction (drag-and-drop, tab UI, keyboard docking) and `'api'` for those
+ * entered through a {@link DockviewApi} method called by application code.
+ * Lets consumers (e.g. an undo stack) treat the app's own programmatic changes
+ * differently from end-user gestures.
+ */
+export type DockviewLayoutMutationOrigin = 'user' | 'api';
+
 export interface DockviewLayoutMutationEvent {
     readonly kind: DockviewLayoutMutationKind;
+    readonly origin: DockviewLayoutMutationOrigin;
 }
 
 export interface PopoutGroupChangeSizeEvent {
@@ -300,6 +312,17 @@ export interface PopoutGroupChangePositionEvent {
 /** A spatial (visual) direction for group-to-group navigation. */
 export type GroupNavigationDirection = 'left' | 'right' | 'up' | 'down';
 
+/**
+ * A popout group currently open in its own window. `window` is the live
+ * `Window` handle of the popout, so consumers can route focus, attach
+ * per-document listeners, or place the window.
+ */
+export interface PopoutGroup {
+    readonly id: string;
+    readonly group: DockviewGroupPanel;
+    readonly window: Window;
+}
+
 export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly activePanel: IDockviewPanel | undefined;
     readonly totalPanels: number;
@@ -309,6 +332,11 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onWillDrop: Event<DockviewWillDropEvent>;
     readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;
     readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent>;
+    mutationOrigin(): DockviewLayoutMutationOrigin;
+    withMutationOrigin<T>(
+        origin: DockviewLayoutMutationOrigin,
+        func: () => T
+    ): T;
     readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent>;
     readonly onDidRemovePanel: Event<IDockviewPanel>;
     readonly onDidAddPanel: Event<IDockviewPanel>;
@@ -324,7 +352,9 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidMaximizedGroupChange: Event<DockviewMaximizedGroupChanged>;
     readonly onDidPopoutGroupSizeChange: Event<PopoutGroupChangeSizeEvent>;
     readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent>;
+    readonly onDidAddPopoutGroup: Event<PopoutGroup>;
     readonly onDidOpenPopoutWindowFail: Event<void>;
+    getPopouts(): PopoutGroup[];
     readonly onDidCreateTabGroup: Event<DockviewTabGroupChangeEvent>;
     readonly onDidDestroyTabGroup: Event<DockviewTabGroupChangeEvent>;
     readonly onDidAddPanelToTabGroup: Event<DockviewTabGroupPanelChangeEvent>;
@@ -430,6 +460,10 @@ export class DockviewComponent
     // Compound operations (e.g. a drag that relocates a panel) nest via the
     // depth counter and bracket as a single transaction. See `mutation()`.
     private _mutationDepth = 0;
+    // Current mutation origin. Defaults to `'user'`; the DockviewApi boundary
+    // flips it to `'api'` for the duration of a programmatic call via
+    // `withMutationOrigin`. Nested mutations inherit the outer origin.
+    private _mutationOrigin: DockviewLayoutMutationOrigin = 'user';
     private readonly _onWillMutateLayout =
         new Emitter<DockviewLayoutMutationEvent>();
     readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent> =
@@ -465,6 +499,10 @@ export class DockviewComponent
         new Emitter<PopoutGroupChangePositionEvent>();
     readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent> =
         this._onDidPopoutGroupPositionChange.event;
+
+    private readonly _onDidAddPopoutGroup = new Emitter<PopoutGroup>();
+    readonly onDidAddPopoutGroup: Event<PopoutGroup> =
+        this._onDidAddPopoutGroup.event;
 
     private readonly _onDidOpenPopoutWindowFail = new Emitter<void>();
     readonly onDidOpenPopoutWindowFail: Event<void> =
@@ -612,6 +650,30 @@ export class DockviewComponent
             this._moduleRegistry?.services.floatingGroupService
                 ?.floatingGroups ?? []
         );
+    }
+
+    /**
+     * Boxes of the floating groups other than `exclude`, in coordinates
+     * relative to the floating overlay container. Supplied to a
+     * `transformFloatingGroupDrag` callback as `context.others` so it can
+     * align the dragged float against its siblings.
+     */
+    private _gatherFloatingGroupBoxes(
+        exclude: DockviewGroupPanel
+    ): readonly Box[] {
+        const container = this._floatingOverlayHost ?? this.gridview.element;
+        const containerRect = container.getBoundingClientRect();
+        return this.floatingGroups
+            .filter((floating) => floating.group !== exclude)
+            .map((floating) => {
+                const rect = floating.overlay.element.getBoundingClientRect();
+                return {
+                    left: rect.left - containerRect.left,
+                    top: rect.top - containerRect.top,
+                    width: rect.width,
+                    height: rect.height,
+                };
+            });
     }
 
     private get _floatingGroupService() {
@@ -955,6 +1017,7 @@ export class DockviewComponent
             this._onDidMaximizedGroupChange,
             this._onDidPopoutGroupSizeChange,
             this._onDidPopoutGroupPositionChange,
+            this._onDidAddPopoutGroup,
             this._onDidOpenPopoutWindowFail,
             this._onDidCreateTabGroup,
             this._onDidDestroyTabGroup,
@@ -1146,6 +1209,17 @@ export class DockviewComponent
         // popout window opens asynchronously after it resolves.
         return this.mutation('popout', () =>
             this._doAddPopoutGroup(itemToPopout, options)
+        );
+    }
+
+    /** Enumerate the popout groups currently open in their own windows. */
+    getPopouts(): PopoutGroup[] {
+        return (
+            this._popoutWindowService?.entries.map((entry) => ({
+                id: entry.popoutGroup.id,
+                group: entry.popoutGroup,
+                window: entry.getWindow(),
+            })) ?? []
         );
     }
 
@@ -1521,6 +1595,12 @@ export class DockviewComponent
                 );
 
                 service.add(value);
+
+                this._onDidAddPopoutGroup.fire({
+                    id: value.popoutGroup.id,
+                    group: value.popoutGroup,
+                    window: value.getWindow(),
+                });
 
                 return true;
             })
@@ -1988,6 +2068,16 @@ export class DockviewComponent
                     : (this.options.floatingGroupBounds
                           ?.minimumHeightWithinViewport ??
                       DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE),
+            transformDragPosition: this.options.transformFloatingGroupDrag
+                ? (context) =>
+                      this.options.transformFloatingGroupDrag!({
+                          group: anchorGroup,
+                          proposed: context.proposed,
+                          container: context.container,
+                          others: context.others,
+                      })
+                : undefined,
+            getSiblingBoxes: () => this._gatherFloatingGroupBoxes(anchorGroup),
         });
 
         const dragHandle =
@@ -2203,27 +2293,29 @@ export class DockviewComponent
             );
         }
 
-        const group = this.createGroup({ id: options.id });
-        group.model.location = { type: 'edge', position };
-        group.model.headerPosition = position;
+        return this.mutation('add', () => {
+            const group = this.createGroup({ id: options.id });
+            group.model.location = { type: 'edge', position };
+            group.model.headerPosition = position;
 
-        // Collapse when the group becomes empty
-        const autoCollapseDisposable = group.model.onDidRemovePanel(() => {
-            if (group.model.isEmpty) {
-                this.setEdgeGroupCollapsed(group, true);
-            }
+            // Collapse when the group becomes empty
+            const autoCollapseDisposable = group.model.onDidRemovePanel(() => {
+                if (group.model.isEmpty) {
+                    this.setEdgeGroupCollapsed(group, true);
+                }
+            });
+
+            service.add(position, group, autoCollapseDisposable);
+            this._onDidAddGroup.fire(group);
+
+            this._shellManager!.addEdgeView(
+                position,
+                options,
+                group as IEdgeGroupHost
+            );
+
+            return group.api;
         });
-
-        service.add(position, group, autoCollapseDisposable);
-        this._onDidAddGroup.fire(group);
-
-        this._shellManager!.addEdgeView(
-            position,
-            options,
-            group as IEdgeGroupHost
-        );
-
-        return group.api;
     }
 
     getEdgeGroup(
@@ -2256,22 +2348,26 @@ export class DockviewComponent
             );
         }
 
-        // Remove panels inside the group first
-        for (const panel of [...group.panels]) {
-            this.removePanel(panel, {
-                removeEmptyGroup: false,
-                skipDispose: false,
-            });
-        }
+        // One transaction — the per-panel removals below nest via the depth
+        // counter, so consumers see a single edge-group removal.
+        this.mutation('remove', () => {
+            // Remove panels inside the group first
+            for (const panel of [...group.panels]) {
+                this.removePanel(panel, {
+                    removeEmptyGroup: false,
+                    skipDispose: false,
+                });
+            }
 
-        // Remove from the shell splitview
-        this._shellManager!.removeEdgeView(position);
+            // Remove from the shell splitview
+            this._shellManager!.removeEdgeView(position);
 
-        // Clean up service-tracked state + group itself
-        service.remove(position);
-        group.dispose();
-        this._groups.delete(group.id);
-        this._onDidRemoveGroup.fire(group);
+            // Clean up service-tracked state + group itself
+            service.remove(position);
+            group.dispose();
+            this._groups.delete(group.id);
+            this._onDidRemoveGroup.fire(group);
+        });
     }
 
     setEdgeGroupCollapsed(group: DockviewGroupPanel, collapsed: boolean): void {
@@ -2923,11 +3019,15 @@ export class DockviewComponent
     }
 
     closeAllGroups(): void {
-        for (const entry of this._groups.entries()) {
-            const [_, group] = entry;
+        // One transaction — the per-panel removals inside nest via the depth
+        // counter, so consumers (undo, announcements) see a single mutation.
+        this.mutation('remove', () => {
+            for (const entry of this._groups.entries()) {
+                const [_, group] = entry;
 
-            group.value.model.closeAllPanels();
-        }
+                group.value.model.closeAllPanels();
+            }
+        });
     }
 
     addPanel<T extends object = Parameters>(
@@ -3189,6 +3289,10 @@ export class DockviewComponent
     }
 
     addGroup(options?: AddGroupOptions): DockviewGroupPanel {
+        return this.mutation('add', () => this._doAddGroup(options));
+    }
+
+    private _doAddGroup(options?: AddGroupOptions): DockviewGroupPanel {
         if (options) {
             let referenceGroup: DockviewGroupPanel | undefined;
 
@@ -3538,8 +3642,9 @@ export class DockviewComponent
      */
     mutation<T>(kind: DockviewLayoutMutationKind, func: () => T): T {
         const outer = this._mutationDepth === 0;
+        const origin = this._mutationOrigin;
         if (outer) {
-            this._onWillMutateLayout.fire({ kind });
+            this._onWillMutateLayout.fire({ kind, origin });
         }
         this._mutationDepth++;
         try {
@@ -3547,8 +3652,42 @@ export class DockviewComponent
         } finally {
             this._mutationDepth--;
             if (outer) {
-                this._onDidMutateLayout.fire({ kind });
+                this._onDidMutateLayout.fire({ kind, origin });
             }
+        }
+    }
+
+    /**
+     * The origin of the mutation currently in progress (`'user'` by default).
+     * Read inside a `mutation()`'s lifetime to learn whether the change was
+     * driven by application code (via the {@link DockviewApi}) or a user
+     * gesture.
+     */
+    mutationOrigin(): DockviewLayoutMutationOrigin {
+        return this._mutationOrigin;
+    }
+
+    /**
+     * Run `func` with the mutation origin set to `origin`, restoring the
+     * previous value afterwards. Used by the DockviewApi boundary to tag
+     * programmatic mutations as `'api'`; nested mutations inherit the
+     * outermost origin (a re-entrant call does not overwrite it).
+     */
+    withMutationOrigin<T>(
+        origin: DockviewLayoutMutationOrigin,
+        func: () => T
+    ): T {
+        // Only the outermost caller sets the origin — a nested mutation keeps
+        // whatever the enclosing operation established.
+        if (this._mutationDepth > 0) {
+            return func();
+        }
+        const previous = this._mutationOrigin;
+        this._mutationOrigin = origin;
+        try {
+            return func();
+        } finally {
+            this._mutationOrigin = previous;
         }
     }
 
@@ -4005,6 +4144,19 @@ export class DockviewComponent
 
     moveGroup(options: MoveGroupOptions): void {
         this.mutation('move', () => this._doMoveGroup(options));
+    }
+
+    // Bracket maximize/restore as a 'maximize' transaction. The maximized node
+    // is serialized by the gridview (`SerializedGridview.maximizedNode`), so
+    // the state round-trips through toJSON/fromJSON and is restorable on undo.
+    // When the exit is a side-effect of another bracketed operation (e.g. a
+    // move that activates a different group) the depth counter folds it in.
+    override maximizeGroup(panel: DockviewGroupPanel): void {
+        this.mutation('maximize', () => super.maximizeGroup(panel));
+    }
+
+    override exitMaximizedGroup(): void {
+        this.mutation('maximize', () => super.exitMaximizedGroup());
     }
 
     private _doMoveGroup(options: MoveGroupOptions): void {

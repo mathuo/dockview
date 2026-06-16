@@ -52,6 +52,7 @@ DockviewIDisposable
 DockviewKeybindings
 DockviewLayoutMutationEvent
 DockviewLayoutMutationKind
+DockviewLayoutMutationOrigin
 DockviewMaximizedGroupChanged
 DockviewMessages
 DockviewMutableDisposable
@@ -78,6 +79,7 @@ DroptargetOverlayModel
 EdgeGroupOptions
 EdgeGroupPosition
 ExpansionEvent
+FloatingGroupDragContext
 FloatingGroupOptions
 FocusEvent
 GetTabContextMenuItemsParams
@@ -189,6 +191,7 @@ PaneviewPanel
 PaneviewPanelApi
 PaneviewUnhandledDragOverEvent
 Parameters
+PopoutGroup
 PopoutGroupChangePositionEvent
 PopoutGroupChangeSizeEvent
 Position
