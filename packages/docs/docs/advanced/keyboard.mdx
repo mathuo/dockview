@@ -35,6 +35,26 @@ api.moveToNext();
 api.moveToNext({ includePanel: true });
 ```
 
+## Spatial Navigation
+
+`moveToNext` / `moveToPrevious` cycle through groups in list order. To navigate by *visual* direction instead, `adjacentGroupInDirection` returns the nearest grid group to the left, right, above, or below a given group (by comparing their centre points). Floating and popout groups are ignored, and it returns `undefined` when there is no group in that direction.
+
+```ts
+const left = api.adjacentGroupInDirection(api.activeGroup, 'left');
+if (left) {
+    left.focus();
+}
+```
+
+Each group also exposes its rendered geometry, relative to the top-left of the dockview root, via `group.api.boundingBox` (`undefined` for popout groups). Combined with `api.groups`, this lets you build a custom spatial map or overview:
+
+```ts
+const layout = api.groups.map((group) => ({
+    group,
+    box: group.api.boundingBox,
+}));
+```
+
 ## Live Example
 
 <MultiFrameworkContainer

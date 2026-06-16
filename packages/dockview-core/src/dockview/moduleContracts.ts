@@ -15,7 +15,10 @@ import { ITabGroup } from './tabGroup';
 import { TabGroupColorPalette } from './tabGroupAccent';
 import { PopupService } from './components/popupService';
 import { DockviewComponentOptions } from './options';
-import { DockviewLayoutMutationEvent } from './dockviewComponent';
+import {
+    DockviewLayoutMutationEvent,
+    GroupNavigationDirection,
+} from './dockviewComponent';
 import { DockviewWillDropEvent } from './dockviewGroupPanelModel';
 import {
     GroupDragEvent,
@@ -101,6 +104,11 @@ export interface IAccessibilityHost {
     adjacentGroup(
         group: DockviewGroupPanel,
         reverse: boolean
+    ): DockviewGroupPanel | undefined;
+    /** The nearest grid group in a spatial direction — drives Alt+Arrow nav. */
+    adjacentGroupInDirection(
+        group: DockviewGroupPanel,
+        direction: GroupNavigationDirection
     ): DockviewGroupPanel | undefined;
     /** Fires before / after a structural layout change — used to restore focus on close. */
     readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;

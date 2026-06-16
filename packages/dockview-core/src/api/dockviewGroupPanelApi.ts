@@ -1,5 +1,6 @@
 import { Position, positionToDirection } from '../dnd/droptarget';
 import { DockviewComponent } from '../dockview/dockviewComponent';
+import { Box } from '../types';
 import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
 import {
     DockviewGroupChangeEvent,
@@ -102,6 +103,26 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             throw new Error(NOT_INITIALIZED_MESSAGE);
         }
         return this._group.model.location;
+    }
+
+    /**
+     * The group's bounding box relative to the top-left of the dockview root,
+     * in pixels. Covers grid and floating groups; returns `undefined` for a
+     * popout group (it lives in a separate window). Reflects the live rendered
+     * geometry, so it is only meaningful once the layout has been sized.
+     */
+    get boundingBox(): Box | undefined {
+        if (!this._group || this._group.model.location.type === 'popout') {
+            return undefined;
+        }
+        const root = this.accessor.element.getBoundingClientRect();
+        const rect = this._group.element.getBoundingClientRect();
+        return {
+            left: rect.left - root.left,
+            top: rect.top - root.top,
+            width: rect.width,
+            height: rect.height,
+        };
     }
 
     get locked(): DockviewGroupPanelLocked {

@@ -309,6 +309,9 @@ export interface PopoutGroupChangePositionEvent {
     group: DockviewGroupPanel;
 }
 
+/** A spatial (visual) direction for group-to-group navigation. */
+export type GroupNavigationDirection = 'left' | 'right' | 'up' | 'down';
+
 /**
  * A popout group currently open in its own window. `window` is the live
  * `Window` handle of the popout, so consumers can route focus, attach
@@ -374,6 +377,10 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     // lifecycle
     addGroup(options?: AddGroupOptions): DockviewGroupPanel;
     closeAllGroups(): void;
+    adjacentGroupInDirection(
+        group: DockviewGroupPanel,
+        direction: GroupNavigationDirection
+    ): DockviewGroupPanel | undefined;
     // events
     moveToNext(options?: MovementOptions): void;
     moveToPrevious(options?: MovementOptions): void;
@@ -795,6 +802,55 @@ export class DockviewComponent
                 : this.gridview.next(location)
             )?.view
         );
+    }
+
+    /**
+     * The nearest grid group in a spatial direction from `group`, by
+     * comparing group centre points. Floating and popout groups sit outside
+     * the grid's geometry and are ignored. Returns `undefined` when there is
+     * no group in that direction.
+     */
+    adjacentGroupInDirection(
+        group: DockviewGroupPanel,
+        direction: GroupNavigationDirection
+    ): DockviewGroupPanel | undefined {
+        if (group.api.location.type !== 'grid') {
+            return undefined;
+        }
+        const from = group.element.getBoundingClientRect();
+        const fromX = from.left + from.width / 2;
+        const fromY = from.top + from.height / 2;
+
+        let best: DockviewGroupPanel | undefined;
+        let bestDistance = Number.POSITIVE_INFINITY;
+        for (const candidate of this.groups) {
+            if (candidate === group || candidate.api.location.type !== 'grid') {
+                continue;
+            }
+            const rect = candidate.element.getBoundingClientRect();
+            const dx = rect.left + rect.width / 2 - fromX;
+            const dy = rect.top + rect.height / 2 - fromY;
+            // Require the candidate to sit predominantly in the asked-for
+            // direction (dominant axis), so 'left' ignores a group that's
+            // mostly above/below.
+            const inDirection =
+                direction === 'left'
+                    ? dx < 0 && Math.abs(dx) >= Math.abs(dy)
+                    : direction === 'right'
+                      ? dx > 0 && Math.abs(dx) >= Math.abs(dy)
+                      : direction === 'up'
+                        ? dy < 0 && Math.abs(dy) >= Math.abs(dx)
+                        : dy > 0 && Math.abs(dy) >= Math.abs(dx);
+            if (!inDirection) {
+                continue;
+            }
+            const distance = dx * dx + dy * dy;
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                best = candidate;
+            }
+        }
+        return best;
     }
 
     showDropPreview(

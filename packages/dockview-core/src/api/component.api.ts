@@ -2,6 +2,7 @@ import {
     DockviewLayoutMutationEvent,
     DockviewMaximizedGroupChanged,
     FloatingGroupOptions,
+    GroupNavigationDirection,
     IDockviewComponent,
     MovePanelEvent,
     PopoutGroup,
@@ -861,6 +862,23 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     get groups(): DockviewGroupPanel[] {
         return this.component.groups;
+    }
+
+    /**
+     * The nearest grid group in a spatial direction from `group`, comparing
+     * group centre points — e.g. the group visually to the left. Floating and
+     * popout groups are ignored. Returns `undefined` when there is no group in
+     * that direction. Pair with `group.api.boundingBox` to build your own
+     * spatial navigation.
+     */
+    adjacentGroupInDirection(
+        group: IDockviewGroupPanel,
+        direction: GroupNavigationDirection
+    ): IDockviewGroupPanel | undefined {
+        return this.component.adjacentGroupInDirection(
+            <DockviewGroupPanel>group,
+            direction
+        );
     }
 
     /**
