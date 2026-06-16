@@ -309,6 +309,17 @@ export interface PopoutGroupChangePositionEvent {
     group: DockviewGroupPanel;
 }
 
+/**
+ * A popout group currently open in its own window. `window` is the live
+ * `Window` handle of the popout, so consumers can route focus, attach
+ * per-document listeners, or place the window.
+ */
+export interface PopoutGroup {
+    readonly id: string;
+    readonly group: DockviewGroupPanel;
+    readonly window: Window;
+}
+
 export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly activePanel: IDockviewPanel | undefined;
     readonly totalPanels: number;
@@ -338,7 +349,9 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidMaximizedGroupChange: Event<DockviewMaximizedGroupChanged>;
     readonly onDidPopoutGroupSizeChange: Event<PopoutGroupChangeSizeEvent>;
     readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent>;
+    readonly onDidAddPopoutGroup: Event<PopoutGroup>;
     readonly onDidOpenPopoutWindowFail: Event<void>;
+    getPopouts(): PopoutGroup[];
     readonly onDidCreateTabGroup: Event<DockviewTabGroupChangeEvent>;
     readonly onDidDestroyTabGroup: Event<DockviewTabGroupChangeEvent>;
     readonly onDidAddPanelToTabGroup: Event<DockviewTabGroupPanelChangeEvent>;
@@ -479,6 +492,10 @@ export class DockviewComponent
         new Emitter<PopoutGroupChangePositionEvent>();
     readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent> =
         this._onDidPopoutGroupPositionChange.event;
+
+    private readonly _onDidAddPopoutGroup = new Emitter<PopoutGroup>();
+    readonly onDidAddPopoutGroup: Event<PopoutGroup> =
+        this._onDidAddPopoutGroup.event;
 
     private readonly _onDidOpenPopoutWindowFail = new Emitter<void>();
     readonly onDidOpenPopoutWindowFail: Event<void> =
@@ -920,6 +937,7 @@ export class DockviewComponent
             this._onDidMaximizedGroupChange,
             this._onDidPopoutGroupSizeChange,
             this._onDidPopoutGroupPositionChange,
+            this._onDidAddPopoutGroup,
             this._onDidOpenPopoutWindowFail,
             this._onDidCreateTabGroup,
             this._onDidDestroyTabGroup,
@@ -1111,6 +1129,17 @@ export class DockviewComponent
         // popout window opens asynchronously after it resolves.
         return this.mutation('popout', () =>
             this._doAddPopoutGroup(itemToPopout, options)
+        );
+    }
+
+    /** Enumerate the popout groups currently open in their own windows. */
+    getPopouts(): PopoutGroup[] {
+        return (
+            this._popoutWindowService?.entries.map((entry) => ({
+                id: entry.popoutGroup.id,
+                group: entry.popoutGroup,
+                window: entry.getWindow(),
+            })) ?? []
         );
     }
 
@@ -1486,6 +1515,12 @@ export class DockviewComponent
                 );
 
                 service.add(value);
+
+                this._onDidAddPopoutGroup.fire({
+                    id: value.popoutGroup.id,
+                    group: value.popoutGroup,
+                    window: value.getWindow(),
+                });
 
                 return true;
             })

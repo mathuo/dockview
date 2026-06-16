@@ -129,6 +129,13 @@ api.onUnhandledDragOverEvent((event: DockviewDndOverlayEvent) => {
 These events fire in response to popout window activity.
 
 ```ts
+// Fires when a popout group opens in its own window, carrying the live Window
+// handle. Use it to route focus or attach listeners to the popout's document.
+api.onDidAddPopoutGroup((event: PopoutGroup) => {
+    // event.id, event.group, event.window
+    event.window.focus();
+});
+
 // Fires when a popout window is resized
 api.onDidPopoutGroupSizeChange((event: PopoutGroupChangeSizeEvent) => { });
 
@@ -139,6 +146,14 @@ api.onDidPopoutGroupPositionChange((event: PopoutGroupChangePositionEvent) => { 
 api.onDidOpenPopoutWindowFail(() => {
     console.warn('popup was blocked by the browser');
 });
+```
+
+Enumerate the popout groups currently open at any time:
+
+```ts
+for (const popout of api.getPopouts()) {
+    // popout.id, popout.group, popout.window
+}
 ```
 
 > See [Popout Windows](/docs/core/groups/popoutGroups) for more.
