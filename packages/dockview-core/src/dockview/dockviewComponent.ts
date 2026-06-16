@@ -607,6 +607,30 @@ export class DockviewComponent
         );
     }
 
+    /**
+     * Boxes of the floating groups other than `exclude`, in coordinates
+     * relative to the floating overlay container. Supplied to a
+     * `transformFloatingGroupDrag` callback as `context.others` so it can
+     * align the dragged float against its siblings.
+     */
+    private _gatherFloatingGroupBoxes(
+        exclude: DockviewGroupPanel
+    ): readonly Box[] {
+        const container = this._floatingOverlayHost ?? this.gridview.element;
+        const containerRect = container.getBoundingClientRect();
+        return this.floatingGroups
+            .filter((floating) => floating.group !== exclude)
+            .map((floating) => {
+                const rect = floating.overlay.element.getBoundingClientRect();
+                return {
+                    left: rect.left - containerRect.left,
+                    top: rect.top - containerRect.top,
+                    width: rect.width,
+                    height: rect.height,
+                };
+            });
+    }
+
     private get _floatingGroupService() {
         return this._moduleRegistry.services.floatingGroupService;
     }
@@ -1932,6 +1956,16 @@ export class DockviewComponent
                     : (this.options.floatingGroupBounds
                           ?.minimumHeightWithinViewport ??
                       DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE),
+            transformDragPosition: this.options.transformFloatingGroupDrag
+                ? (context) =>
+                      this.options.transformFloatingGroupDrag!({
+                          group: anchorGroup,
+                          proposed: context.proposed,
+                          container: context.container,
+                          others: context.others,
+                      })
+                : undefined,
+            getSiblingBoxes: () => this._gatherFloatingGroupBoxes(anchorGroup),
         });
 
         const dragHandle =

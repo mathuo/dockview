@@ -78,6 +78,7 @@ DroptargetOverlayModel
 EdgeGroupOptions
 EdgeGroupPosition
 ExpansionEvent
+FloatingGroupDragContext
 FloatingGroupOptions
 FocusEvent
 GetTabContextMenuItemsParams
