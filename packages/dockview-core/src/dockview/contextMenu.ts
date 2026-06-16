@@ -1,17 +1,15 @@
 import { findRelativeZIndexParent } from '../dom';
-import { DockviewApi } from '../api/component.api';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
 import {
     BuiltInChipContextMenuItem,
     ContextMenuItemConfig,
     ContextMenuItem,
-    DockviewComponentOptions,
 } from './options';
 import { ITabGroup } from './tabGroup';
 import { TabGroupColorPalette } from './tabGroupAccent';
-import { PopupService } from './components/popupService';
 import { defineModule } from './modules';
+import { IContextMenuHost, IContextMenuService } from './moduleContracts';
 
 function popoverZIndexFor(target: EventTarget | null): string | undefined {
     if (!(target instanceof HTMLElement)) {
@@ -148,26 +146,6 @@ function buildColorPicker(
     }
 
     return wrapper;
-}
-
-export interface IContextMenuHost {
-    readonly options: DockviewComponentOptions;
-    readonly api: DockviewApi;
-    readonly tabGroupColorPalette: TabGroupColorPalette;
-    getPopupServiceForGroup(group: DockviewGroupPanel): PopupService;
-}
-
-export interface IContextMenuService {
-    show(
-        panel: IDockviewPanel,
-        group: DockviewGroupPanel,
-        event: MouseEvent
-    ): void;
-    showForChip(
-        tabGroup: ITabGroup,
-        group: DockviewGroupPanel,
-        event: MouseEvent
-    ): void;
 }
 
 export class ContextMenuController implements IContextMenuService {

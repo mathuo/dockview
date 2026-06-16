@@ -13,10 +13,15 @@ import { IFloatingGroupService } from './floatingGroupService';
 import { IPopoutWindowService } from './popoutWindowService';
 import { IWatermarkService } from './watermarkService';
 import { IEdgeGroupService } from './edgeGroupService';
-import { ITabGroupChipsService } from './tabGroupChipsService';
-import { IContextMenuService } from './contextMenu';
 import { IRootDropTargetService } from './rootDropTargetService';
 import { IHeaderActionsService } from './headerActionsService';
+import { ILiveRegionService } from './liveRegionService';
+import {
+    IAccessibilityService,
+    IAdvancedDnDService,
+    IContextMenuService,
+    ITabGroupChipsService,
+} from './moduleContracts';
 
 export interface ServiceCollection {
     floatingGroupService?: IFloatingGroupService;
@@ -27,6 +32,9 @@ export interface ServiceCollection {
     contextMenuService?: IContextMenuService;
     rootDropTargetService?: IRootDropTargetService;
     headerActionsService?: IHeaderActionsService;
+    advancedDnDService?: IAdvancedDnDService;
+    liveRegionService?: ILiveRegionService;
+    accessibilityService?: IAccessibilityService;
 }
 
 export interface DockviewModule<THost = unknown> {

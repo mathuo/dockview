@@ -11,6 +11,7 @@ import { ITabRenderer } from '../../types';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import {
     DroptargetEvent,
+    DroptargetOverlayModel,
     IDropTarget,
     Position,
     WillShowOverlayEvent,
@@ -25,6 +26,10 @@ import { LongPressDetector } from '../../../dnd/pointer/longPress';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { DockviewHeaderDirection } from '../../options';
 import { resolveDndCapabilities } from '../../dndCapabilities';
+
+let _tabId = 0;
+/** Stable DOM id referenced by the tabpanel's `aria-labelledby`. */
+const nextTabId = (): string => `dv-tab-${_tabId++}`;
 
 export class Tab extends CompositeDisposable {
     private readonly _element: HTMLElement;
@@ -69,8 +74,20 @@ export class Tab extends CompositeDisposable {
 
         this._element = document.createElement('div');
         this._element.className = 'dv-tab';
-        this._element.tabIndex = 0;
+        // Roving tabindex (WAI-ARIA Tabs pattern): only the active tab is in
+        // the tab order; `setActive` flips this. Inactive tabs are reachable
+        // via arrow keys, handled by the tab strip.
+        this._element.tabIndex = -1;
         this._element.draggable = caps.html5;
+        // WAI-ARIA Tabs pattern. `aria-controls` points at the group's single
+        // tabpanel (the content container); `aria-selected` tracks activation.
+        this._element.id = nextTabId();
+        this._element.setAttribute('role', 'tab');
+        this._element.setAttribute('aria-selected', 'false');
+        const contentContainerId = this.group?.model?.contentContainerId;
+        if (contentContainerId) {
+            this._element.setAttribute('aria-controls', contentContainerId);
+        }
 
         toggleClass(this.element, 'dv-inactive-tab', true);
 
@@ -237,6 +254,13 @@ export class Tab extends CompositeDisposable {
     public setActive(isActive: boolean): void {
         toggleClass(this.element, 'dv-active-tab', isActive);
         toggleClass(this.element, 'dv-inactive-tab', !isActive);
+        this._element.setAttribute(
+            'aria-selected',
+            isActive ? 'true' : 'false'
+        );
+        // Roving tabindex anchors to the active tab; arrow-key navigation in
+        // the tab strip moves the rover from there.
+        this._element.tabIndex = isActive ? 0 : -1;
     }
 
     public setContent(part: ITabRenderer): void {
@@ -247,7 +271,16 @@ export class Tab extends CompositeDisposable {
         this._element.appendChild(this.content.element);
     }
 
-    private _buildOverlayModel() {
+    private _buildOverlayModel(): DroptargetOverlayModel {
+        // An app-supplied model (the dropOverlayModel option) takes precedence
+        // over the theme-derived default for this tab.
+        const custom = this.accessor.resolveDropOverlayModel?.(
+            'tab',
+            this.group
+        );
+        if (custom) {
+            return custom;
+        }
         // 'line' themes render a 4px insertion strip at the tab edge via the
         // anchor container's small-boundary path.  'fill' themes render a
         // half-width highlighted area, so we disable the small-boundary path

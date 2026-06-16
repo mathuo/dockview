@@ -4,8 +4,11 @@ import { IGridView } from '../gridview/gridview';
 import { IContentRenderer, ITabRenderer, IWatermarkRenderer } from './types';
 import { Parameters } from '../panel/types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
+import { DockviewMessages } from './accessibilityMessages';
+export type { DockviewMessages } from './accessibilityMessages';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
+import { Box } from '../types';
 import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
 import { GroupOptions } from './dockviewGroupPanelModel';
 import { DockviewGroupDropLocation } from './events';
@@ -57,6 +60,74 @@ export interface ContextMenuItemConfig {
 
 export type ContextMenuItem = BuiltInContextMenuItem | ContextMenuItemConfig;
 
+export interface DropOverlayModelParams {
+    /** Which of a group's drop targets the overlay is for. `'edge'` is shaped by `dndEdges`, not this option. */
+    location: DockviewGroupDropLocation;
+    /** The group the target belongs to, where known (tab / header_space / content). */
+    group?: DockviewGroupPanel;
+}
+
+/** A layout change to be announced — see the `getAnnouncement` option. */
+export interface LiveRegionEvent {
+    /**
+     * What changed: a panel was added (`'open'`) or removed (`'close'`); a
+     * group was maximized (`'maximize'`) / restored (`'restore'`); or a group
+     * moved to a floating window (`'float'`), back into the grid (`'dock'`), or
+     * out to a popout window (`'popout'`). `panel` is the affected panel — for
+     * group events, the group's active panel.
+     */
+    kind:
+        | 'open'
+        | 'close'
+        | 'maximize'
+        | 'restore'
+        | 'float'
+        | 'dock'
+        | 'popout';
+    panel: IDockviewPanel;
+}
+
+/** A resolved announcement handed to a custom `announcer`. */
+export interface AnnouncementEvent {
+    /** The (already localised) text to announce. */
+    message: string;
+    /** `'assertive'` interrupts the screen reader; `'polite'` waits for a pause. */
+    politeness: 'polite' | 'assertive';
+}
+
+/**
+ * Key bindings for {@link DockviewComponentOptions.keyboardNavigation}. Each
+ * value is a string of `+`-separated parts, modifiers first, e.g. `'ctrl+]'`,
+ * `'shift+f6'`, `'ctrl+m'`. Recognised modifiers: `ctrl`, `shift`, `alt`,
+ * `meta` (alias `cmd`). The final part is the `KeyboardEvent.key` to match,
+ * case-insensitively (`'m'`, `']'`, `'f6'`, `'arrowleft'`).
+ */
+export interface DockviewKeybindings {
+    /** Switch to the next tab in the focused group. Default `ctrl+]`. */
+    nextTab: string;
+    /** Switch to the previous tab in the focused group. Default `ctrl+[`. */
+    prevTab: string;
+    /** Move focus to the next group. Default `f6`. */
+    focusNextGroup: string;
+    /** Move focus to the previous group. Default `shift+f6`. */
+    focusPrevGroup: string;
+    /** Move focus to the group spatially to the left. Default `ctrl+shift+arrowleft`. */
+    focusGroupLeft: string;
+    /** Move focus to the group spatially to the right. Default `ctrl+shift+arrowright`. */
+    focusGroupRight: string;
+    /** Move focus to the group spatially above. Default `ctrl+shift+arrowup`. */
+    focusGroupUp: string;
+    /** Move focus to the group spatially below. Default `ctrl+shift+arrowdown`. */
+    focusGroupDown: string;
+    /** Arm keyboard docking of the active panel. Default `ctrl+m`. */
+    dock: string;
+}
+
+export interface KeyboardNavigationOptions {
+    /** Override individual {@link DockviewKeybindings}; unset keys keep their defaults. */
+    keymap?: Partial<DockviewKeybindings>;
+}
+
 export interface GetTabContextMenuItemsParams {
     panel: IDockviewPanel;
     group: DockviewGroupPanel;
@@ -100,6 +171,24 @@ export type DockviewHeaderDirection = 'horizontal' | 'vertical';
 
 export type DockviewDndStrategy = 'auto' | 'pointer' | 'html5';
 
+/**
+ * Context handed to {@link DockviewOptions.transformFloatingGroupDrag} on each
+ * pointer-move frame while a floating group is being dragged.
+ */
+export interface FloatingGroupDragContext {
+    /** The floating group being dragged. */
+    readonly group: DockviewGroupPanel;
+    /** Proposed top-left + size this frame, in container pixels (pre-clamp). */
+    readonly proposed: Box;
+    /** Size of the container the floating group is dragged within. */
+    readonly container: { width: number; height: number };
+    /**
+     * Bounds of the other floating groups (relative to the same container),
+     * snapshotted at drag start.
+     */
+    readonly others: readonly Box[];
+}
+
 export interface DockviewOptions {
     /**
      * Disable the auto-resizing which is controlled through a `ResizeObserver`.
@@ -115,6 +204,20 @@ export interface DockviewOptions {
               minimumHeightWithinViewport?: number;
               minimumWidthWithinViewport?: number;
           };
+    /**
+     * Adjust a floating group's position while it is being dragged. Runs on
+     * each pointer-move frame with the proposed top-left (before the container
+     * clamp) and returns an adjusted top-left, or nothing to leave it
+     * unchanged. Use it for snapping, alignment, or custom bounds. Move only —
+     * resizing a floating group is unaffected.
+     *
+     * `context.others` holds the bounds of the other floating groups (relative
+     * to the same container), snapshotted at drag start, so the callback can
+     * align the dragged group against its siblings.
+     */
+    transformFloatingGroupDrag?: (
+        context: FloatingGroupDragContext
+    ) => { top: number; left: number } | void;
     /**
      * Selects which element moves a floating group when dragged.
      *
@@ -213,6 +316,67 @@ export interface DockviewOptions {
         group: DockviewGroupPanel
     ) => IGroupDragGhostRenderer;
     /**
+     * Shape the drop overlay shown over a group's drop targets — the tab
+     * strip (`'tab'`), the header void space (`'header_space'`) and the
+     * panel content area (`'content'`). Return a {@link DroptargetOverlayModel}
+     * to override that target's default overlay (size, activation threshold,
+     * small-element boundaries), or `undefined` to keep the default.
+     *
+     * `group` is provided where known (tab / header_space). The outer-layout
+     * edge overlay is shaped by `dndEdges`, not this option, so `'edge'` is
+     * not dispatched here.
+     */
+    dropOverlayModel?: (
+        params: DropOverlayModelParams
+    ) => DroptargetOverlayModel | undefined;
+    /**
+     * Built-in screen-reader announcements of layout changes (a visually-hidden
+     * `aria-live` region narrating panel open/close etc.). On by default —
+     * set to `false` to disable, e.g. when the host app provides its own
+     * announcement system. Honoured live via `updateOptions`.
+     */
+    announcements?: boolean;
+    /**
+     * Localise or override the built-in announcement strings (the default
+     * messages are English). Return a string to use it, `null` / `''` to
+     * suppress that announcement, or `undefined` to keep the default. This is
+     * how non-English apps translate announcements — core ships no message
+     * catalog, only the default strings + this hook.
+     */
+    getAnnouncement?: (event: LiveRegionEvent) => string | null | undefined;
+    /**
+     * Route announcements to your own screen-reader infrastructure instead of
+     * the built-in `aria-live` regions (e.g. an app-wide live region). When
+     * set, dockview hands you each {@link AnnouncementEvent} and writes nothing
+     * to its own regions. `getAnnouncement` (localisation) still applies first.
+     */
+    announcer?: (event: AnnouncementEvent) => void;
+    /**
+     * Translate / override the strings dockview speaks to assistive technology
+     * — both the LiveRegion announcements and the keyboard-docking narration.
+     * Provide any subset of {@link DockviewMessages}; unset entries keep the
+     * English defaults. (`getAnnouncement` still applies first, per-event, for
+     * announcements.)
+     */
+    messages?: Partial<DockviewMessages>;
+    /**
+     * Operate the dock with the keyboard. `true` enables the default bindings;
+     * pass an object to override individual ones via `keymap`. Off by default
+     * (opt-in while the feature matures). Enables:
+     *
+     * - **Switch tab** within the focused group — `Ctrl`+`]` / `Ctrl`+`[`.
+     * - **Move focus between groups** — `F6` / `Shift`+`F6` (sequential) or
+     *   `Ctrl`+`Shift`+arrow keys (spatial: focus the group in that direction).
+     * - **Dock the active panel** without a mouse — `Ctrl`+`M` arms a two-phase
+     *   move (arrows cycle the target group with a live drop preview +
+     *   screen-reader narration, `Enter` docks, `Escape` cancels).
+     *
+     * Defaults avoid `Cmd`-based and browser-reserved combinations (e.g.
+     * `Cmd`+`M` is the macOS minimise-window shortcut); use {@link keymap} to
+     * rebind for your platform.
+     */
+    keyboardNavigation?: boolean | KeyboardNavigationOptions;
+    /**
      * Replace the built-in tab group color palette with a user-defined list.
      *
      * Each entry has an `id` (stored on `tabGroup.color` and serialized),
@@ -273,6 +437,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         singleTabMode: undefined,
         disableFloatingGroups: undefined,
         floatingGroupBounds: undefined,
+        transformFloatingGroupDrag: undefined,
         floatingGroupDragHandle: undefined,
         popoutUrl: undefined,
         nonce: undefined,
@@ -293,6 +458,12 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         getTabGroupChipContextMenuItems: undefined,
         createTabGroupChipComponent: undefined,
         createGroupDragGhostComponent: undefined,
+        dropOverlayModel: undefined,
+        announcements: undefined,
+        getAnnouncement: undefined,
+        announcer: undefined,
+        messages: undefined,
+        keyboardNavigation: undefined,
         tabGroupColors: undefined,
         tabGroupAccent: undefined,
     };

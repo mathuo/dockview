@@ -7,6 +7,7 @@ AddPanelOptions
 AddPanelPositionOptions
 AddPaneviewComponentOptions
 AddSplitviewComponentOptions
+AnnouncementEvent
 BaseComponentOptions
 BaseGrid
 BaseGridOptions
@@ -48,7 +49,12 @@ DockviewGroupPanelModel
 DockviewHeaderDirection
 DockviewHeaderPosition
 DockviewIDisposable
+DockviewKeybindings
+DockviewLayoutMutationEvent
+DockviewLayoutMutationKind
+DockviewLayoutMutationOrigin
 DockviewMaximizedGroupChanged
+DockviewMessages
 DockviewMutableDisposable
 DockviewOptions
 DockviewPanel
@@ -68,10 +74,12 @@ DockviewUnhandledDragOverEvent
 DockviewWillDropEvent
 DockviewWillShowOverlayLocationEvent
 DraggablePaneviewPanel
+DropOverlayModelParams
 DroptargetOverlayModel
 EdgeGroupOptions
 EdgeGroupPosition
 ExpansionEvent
+FloatingGroupDragContext
 FloatingGroupOptions
 FocusEvent
 GetTabContextMenuItemsParams
@@ -91,6 +99,7 @@ GridviewOptions
 GridviewPanel
 GridviewPanelApi
 GroupDragEvent
+GroupNavigationDirection
 GroupPanelPartInitParameters
 GroupviewPanelState
 HeaderPartInitParameters
@@ -141,7 +150,9 @@ IViewSize
 IWatermarkPanelProps
 IWatermarkRenderer
 InvisibleSizing
+KeyboardNavigationOptions
 LayoutPriority
+LiveRegionEvent
 MaximizedChanged
 MaximizedViewChanged
 MeasuredValue
@@ -180,6 +191,7 @@ PaneviewPanel
 PaneviewPanelApi
 PaneviewUnhandledDragOverEvent
 Parameters
+PopoutGroup
 PopoutGroupChangePositionEvent
 PopoutGroupChangeSizeEvent
 Position

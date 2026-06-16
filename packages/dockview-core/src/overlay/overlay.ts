@@ -10,7 +10,20 @@ import {
     MutableDisposable,
 } from '../lifecycle';
 import { clamp } from '../math';
-import { AnchoredBox } from '../types';
+import { AnchoredBox, Box } from '../types';
+
+/**
+ * Context handed to {@link OverlayOptions.transformDragPosition} each
+ * pointer-move frame while a floating overlay is being dragged.
+ */
+export interface OverlayDragContext {
+    /** Proposed top-left + size this frame, in container pixels (pre-clamp). */
+    readonly proposed: Box;
+    /** Size of the container the overlay is dragged within. */
+    readonly container: { width: number; height: number };
+    /** Bounds of the sibling overlays, snapshotted at drag start. */
+    readonly others: readonly Box[];
+}
 
 class AriaLevelTracker {
     private _orderedList: HTMLElement[] = [];
@@ -104,6 +117,19 @@ export class Overlay extends CompositeDisposable {
             header?: HTMLElement;
             minimumInViewportWidth?: number;
             minimumInViewportHeight?: number;
+            /**
+             * Adjust the proposed top-left each drag frame (before the
+             * container clamp). Return an adjusted position or nothing to leave
+             * it unchanged. Used to implement snapping / custom bounds.
+             */
+            transformDragPosition?: (
+                context: OverlayDragContext
+            ) => { top: number; left: number } | void;
+            /**
+             * Snapshot the sibling overlays' boxes at drag start, supplied to
+             * `transformDragPosition` as `context.others`.
+             */
+            getSiblingBoxes?: () => readonly Box[];
         }
     ) {
         super();
@@ -116,6 +142,11 @@ export class Overlay extends CompositeDisposable {
         );
 
         this._element.className = 'dv-resize-container';
+        // Floating groups are non-modal dialogs over the layout. The contained
+        // group(s) carry their own `role="region"` + label, so the dialog
+        // itself only needs role + modality here.
+        this._element.setAttribute('role', 'dialog');
+        this._element.setAttribute('aria-modal', 'false');
         this._isVisible = true;
 
         this.setupResize('top');
@@ -300,6 +331,11 @@ export class Overlay extends CompositeDisposable {
             let hasMoved = false;
             this._dragCancelled = false;
 
+            // Snapshot once per drag — siblings don't move while this one drags.
+            const siblingBoxes = this.options.transformDragPosition
+                ? (this.options.getSiblingBoxes?.() ?? [])
+                : [];
+
             const iframes = disableIframePointEvents();
 
             if (
@@ -375,43 +411,54 @@ export class Overlay extends CompositeDisposable {
                         this.getMinimumHeight(overlayRect.height)
                     );
 
-                    const top = clamp(
-                        y - offset.y,
-                        -yOffset,
-                        Math.max(
-                            0,
-                            containerRect.height - overlayRect.height + yOffset
-                        )
+                    let proposedTop = y - offset.y;
+                    let proposedLeft = x - offset.x;
+
+                    // Let a consumer nudge the proposed position (snapping,
+                    // custom bounds) before the container clamp below.
+                    if (this.options.transformDragPosition) {
+                        const adjusted = this.options.transformDragPosition({
+                            proposed: {
+                                top: proposedTop,
+                                left: proposedLeft,
+                                width: overlayRect.width,
+                                height: overlayRect.height,
+                            },
+                            container: {
+                                width: containerRect.width,
+                                height: containerRect.height,
+                            },
+                            others: siblingBoxes,
+                        });
+                        if (adjusted) {
+                            proposedTop = adjusted.top;
+                            proposedLeft = adjusted.left;
+                        }
+                    }
+
+                    const maxTop = Math.max(
+                        0,
+                        containerRect.height - overlayRect.height + yOffset
                     );
+                    const maxLeft = Math.max(
+                        0,
+                        containerRect.width - overlayRect.width + xOffset
+                    );
+
+                    const top = clamp(proposedTop, -yOffset, maxTop);
 
                     const bottom = clamp(
-                        offset.y -
-                            y +
-                            containerRect.height -
-                            overlayRect.height,
+                        containerRect.height - overlayRect.height - proposedTop,
                         -yOffset,
-                        Math.max(
-                            0,
-                            containerRect.height - overlayRect.height + yOffset
-                        )
+                        maxTop
                     );
 
-                    const left = clamp(
-                        x - offset.x,
-                        -xOffset,
-                        Math.max(
-                            0,
-                            containerRect.width - overlayRect.width + xOffset
-                        )
-                    );
+                    const left = clamp(proposedLeft, -xOffset, maxLeft);
 
                     const right = clamp(
-                        offset.x - x + containerRect.width - overlayRect.width,
+                        containerRect.width - overlayRect.width - proposedLeft,
                         -xOffset,
-                        Math.max(
-                            0,
-                            containerRect.width - overlayRect.width + xOffset
-                        )
+                        maxLeft
                     );
 
                     const bounds: any = {};

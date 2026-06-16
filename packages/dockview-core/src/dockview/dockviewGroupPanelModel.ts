@@ -1,6 +1,6 @@
 import { DockviewApi } from '../api/component.api';
 import { getPanelData, PanelTransfer } from '../dnd/dataTransfer';
-import { Position } from '../dnd/droptarget';
+import { Droptarget, Position } from '../dnd/droptarget';
 import { DockviewComponent } from './dockviewComponent';
 import { addClasses, isAncestor, removeClasses, toggleClass } from '../dom';
 import {
@@ -357,6 +357,16 @@ export class DockviewGroupPanelModel
         return this._activePanel;
     }
 
+    /** DOM id of the content container (the group's tabpanel), referenced by each tab's `aria-controls`. */
+    get contentContainerId(): string {
+        return this.contentContainer.element.id;
+    }
+
+    /** The group's content drop target — lets keyboard docking preview a drop here. */
+    get contentDropTarget(): Droptarget {
+        return this.contentContainer.dropTarget;
+    }
+
     get locked(): DockviewGroupPanelLocked {
         return this._locked;
     }
@@ -496,6 +506,9 @@ export class DockviewGroupPanelModel
         super();
 
         toggleClass(this.container, 'dv-groupview', true);
+        // Each group is a navigable region, labelled by its active panel
+        // (see `updateAccessibleLabel`, driven on activation / title change).
+        this.container.setAttribute('role', 'region');
 
         this._api = new DockviewApi(this.accessor);
 
@@ -514,6 +527,11 @@ export class DockviewGroupPanelModel
             options.headerPosition ?? accessor.defaultHeaderPosition;
 
         this.addDisposables(
+            // Keep the region's accessible name in sync when the active
+            // panel's title changes (no-op when a non-active title changes).
+            this._onDidPanelTitleChange.event(() =>
+                this.updateAccessibleLabel()
+            ),
             this._onTabDragStart,
             this._onGroupDragStart,
             this._onWillShowOverlay,
@@ -670,7 +688,26 @@ export class DockviewGroupPanelModel
         });
     }
 
+    /**
+     * Bracket a tab-group mutation as a layout transaction. `accessor` is
+     * always a full {@link DockviewComponent} in production; the optional-call
+     * fallback keeps partial test doubles (which omit `mutation`) working.
+     * When nested inside a larger operation (a drag-driven move, fromJSON
+     * restore) the component's depth counter folds it into the outer one.
+     */
+    private _bracketTabGroupMutation<T>(func: () => T): T {
+        return this.accessor.mutation
+            ? this.accessor.mutation('tab-group', func)
+            : func();
+    }
+
     createTabGroup(options?: CreateTabGroupOptions): ITabGroup {
+        return this._bracketTabGroupMutation(() =>
+            this._doCreateTabGroup(options)
+        );
+    }
+
+    private _doCreateTabGroup(options?: CreateTabGroupOptions): ITabGroup {
         const id = options?.id ?? `tg-${this.id}-${this._tabGroupIdCounter++}`;
         const tabGroup = new TabGroup(id, {
             label: options?.label,
@@ -713,15 +750,17 @@ export class DockviewGroupPanelModel
             return;
         }
 
-        // Remove all panels from the group (they stay in the flat panel list)
-        const panelIds = [...tabGroup.panelIds];
-        for (const panelId of panelIds) {
-            tabGroup.removePanel(panelId);
-            this._panelToTabGroup.delete(panelId);
-            this._onDidRemovePanelFromTabGroup.fire({ tabGroup, panelId });
-        }
+        this._bracketTabGroupMutation(() => {
+            // Remove all panels from the group (they stay in the flat panel list)
+            const panelIds = [...tabGroup.panelIds];
+            for (const panelId of panelIds) {
+                tabGroup.removePanel(panelId);
+                this._panelToTabGroup.delete(panelId);
+                this._onDidRemovePanelFromTabGroup.fire({ tabGroup, panelId });
+            }
 
-        tabGroup.dispose();
+            tabGroup.dispose();
+        });
     }
 
     addPanelToTabGroup(
@@ -741,21 +780,24 @@ export class DockviewGroupPanelModel
 
         // Remove from any existing group first
         const existingGroup = this.getTabGroupForPanel(panelId);
-        if (existingGroup) {
-            if (existingGroup.id === tabGroupId) {
-                return; // already in this group
-            }
-            this.removePanelFromTabGroup(panelId);
+        if (existingGroup && existingGroup.id === tabGroupId) {
+            return; // already in this group — no mutation
         }
 
-        tabGroup.addPanel(panelId, index);
-        this._panelToTabGroup.set(panelId, tabGroup);
+        this._bracketTabGroupMutation(() => {
+            if (existingGroup) {
+                this.removePanelFromTabGroup(panelId);
+            }
 
-        // Enforce contiguity: move the panel in the flat _panels array
-        // to the correct global position matching its group-local index
-        this._enforceContiguity(tabGroup, panelId);
+            tabGroup.addPanel(panelId, index);
+            this._panelToTabGroup.set(panelId, tabGroup);
 
-        this._onDidAddPanelToTabGroup.fire({ tabGroup, panelId });
+            // Enforce contiguity: move the panel in the flat _panels array
+            // to the correct global position matching its group-local index
+            this._enforceContiguity(tabGroup, panelId);
+
+            this._onDidAddPanelToTabGroup.fire({ tabGroup, panelId });
+        });
     }
 
     /**
@@ -950,14 +992,16 @@ export class DockviewGroupPanelModel
             return;
         }
 
-        tabGroup.removePanel(panelId);
-        this._panelToTabGroup.delete(panelId);
-        this._onDidRemovePanelFromTabGroup.fire({ tabGroup, panelId });
+        this._bracketTabGroupMutation(() => {
+            tabGroup.removePanel(panelId);
+            this._panelToTabGroup.delete(panelId);
+            this._onDidRemovePanelFromTabGroup.fire({ tabGroup, panelId });
 
-        // Auto-destroy empty groups
-        if (tabGroup.isEmpty) {
-            tabGroup.dispose();
-        }
+            // Auto-destroy empty groups
+            if (tabGroup.isEmpty) {
+                tabGroup.dispose();
+            }
+        });
     }
 
     getTabGroups(): readonly ITabGroup[] {
@@ -1557,6 +1601,11 @@ export class DockviewGroupPanelModel
         if (panel) {
             this.tabsContainer.setActivePanel(panel);
 
+            // Point the tabpanel's `aria-labelledby` at the now-active tab.
+            this.contentContainer.setLabelledBy(
+                this.tabsContainer.getTabId(panel.id)
+            );
+
             this.contentContainer.openPanel(panel);
 
             panel.layout(this._width, this._height);
@@ -1569,6 +1618,18 @@ export class DockviewGroupPanelModel
             this._onDidActivePanelChange.fire({
                 panel,
             });
+        }
+
+        this.updateAccessibleLabel();
+    }
+
+    /** Label the group region with its active panel's title (the WAI-ARIA region name). */
+    private updateAccessibleLabel(): void {
+        const title = this._activePanel?.title;
+        if (title) {
+            this.container.setAttribute('aria-label', title);
+        } else {
+            this.container.removeAttribute('aria-label');
         }
     }
 

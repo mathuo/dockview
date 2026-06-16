@@ -1,8 +1,11 @@
 import {
+    DockviewLayoutMutationEvent,
     DockviewMaximizedGroupChanged,
     FloatingGroupOptions,
+    GroupNavigationDirection,
     IDockviewComponent,
     MovePanelEvent,
+    PopoutGroup,
     PopoutGroupChangePositionEvent,
     PopoutGroupChangeSizeEvent,
     SerializedDockview,
@@ -732,6 +735,21 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     /**
+     * Fires before each top-level structural layout mutation (add / remove /
+     * move / float / popout / maximize / load / clear). Compound operations
+     * (e.g. a drag) fire once. Pair with `onDidMutateLayout` to bracket a
+     * change — useful for undo/redo, autosave and dirty-tracking.
+     */
+    get onWillMutateLayout(): Event<DockviewLayoutMutationEvent> {
+        return this.component.onWillMutateLayout;
+    }
+
+    /** Fires after each top-level structural layout mutation. See `onWillMutateLayout`. */
+    get onDidMutateLayout(): Event<DockviewLayoutMutationEvent> {
+        return this.component.onDidMutateLayout;
+    }
+
+    /**
      * Invoked before an overlay is shown indicating a drop target.
      *
      * Calling `event.preventDefault()` will prevent the overlay being shown and prevent
@@ -772,8 +790,22 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.onDidPopoutGroupPositionChange;
     }
 
+    /**
+     * Fires when a popout group successfully opens in its own window, carrying
+     * the live `Window` handle. Use it to route focus or attach per-document
+     * listeners. Enumerate the current popouts at any time with `getPopouts()`.
+     */
+    get onDidAddPopoutGroup(): Event<PopoutGroup> {
+        return this.component.onDidAddPopoutGroup;
+    }
+
     get onDidOpenPopoutWindowFail(): Event<void> {
         return this.component.onDidOpenPopoutWindowFail;
+    }
+
+    /** Enumerate the popout groups currently open in their own windows. */
+    getPopouts(): PopoutGroup[] {
+        return this.component.getPopouts();
     }
 
     /**
@@ -833,6 +865,23 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     /**
+     * The nearest grid group in a spatial direction from `group`, comparing
+     * group centre points — e.g. the group visually to the left. Floating and
+     * popout groups are ignored. Returns `undefined` when there is no group in
+     * that direction. Pair with `group.api.boundingBox` to build your own
+     * spatial navigation.
+     */
+    adjacentGroupInDirection(
+        group: IDockviewGroupPanel,
+        direction: GroupNavigationDirection
+    ): IDockviewGroupPanel | undefined {
+        return this.component.adjacentGroupInDirection(
+            <DockviewGroupPanel>group,
+            direction
+        );
+    }
+
+    /**
      *  Active panel object.
      */
     get activePanel(): IDockviewPanel | undefined {
@@ -875,14 +924,18 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     addPanel<T extends object = Parameters>(
         options: AddPanelOptions<T>
     ): IDockviewPanel {
-        return this.component.addPanel(options);
+        return this.component.withMutationOrigin('api', () =>
+            this.component.addPanel(options)
+        );
     }
 
     /**
      * Remove a panel given the panel object.
      */
     removePanel(panel: IDockviewPanel): void {
-        this.component.removePanel(panel);
+        this.component.withMutationOrigin('api', () =>
+            this.component.removePanel(panel)
+        );
     }
 
     /**
@@ -896,14 +949,18 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      * Close all groups and panels.
      */
     closeAllGroups(): void {
-        return this.component.closeAllGroups();
+        return this.component.withMutationOrigin('api', () =>
+            this.component.closeAllGroups()
+        );
     }
 
     /**
      * Remove a group and any panels within the group.
      */
     removeGroup(group: IDockviewGroupPanel): void {
-        this.component.removeGroup(<DockviewGroupPanel>group);
+        this.component.withMutationOrigin('api', () =>
+            this.component.removeGroup(<DockviewGroupPanel>group)
+        );
     }
 
     /**
@@ -920,7 +977,9 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         item: IDockviewPanel | DockviewGroupPanel,
         options?: FloatingGroupOptions
     ): void {
-        return this.component.addFloatingGroup(item, options);
+        return this.component.withMutationOrigin('api', () =>
+            this.component.addFloatingGroup(item, options)
+        );
     }
 
     /**
@@ -930,7 +989,9 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         data: SerializedDockview,
         options?: { reuseExistingPanels: boolean }
     ): void {
-        this.component.fromJSON(data, options);
+        this.component.withMutationOrigin('api', () =>
+            this.component.fromJSON(data, options)
+        );
     }
 
     /**
@@ -944,7 +1005,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      * Reset the component back to an empty and default state.
      */
     clear(): void {
-        this.component.clear();
+        this.component.withMutationOrigin('api', () => this.component.clear());
     }
 
     /**
@@ -989,7 +1050,9 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
             onWillClose?: (event: { id: string; window: Window }) => void;
         }
     ): Promise<boolean> {
-        return this.component.addPopoutGroup(item, options);
+        return this.component.withMutationOrigin('api', () =>
+            this.component.addPopoutGroup(item, options)
+        );
     }
 
     /**
@@ -1056,16 +1119,20 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         componentParams?: Record<string, unknown>;
     }): ITabGroup {
         const model = this._getGroupModel(options.groupId);
-        return model.createTabGroup({
-            label: options.label,
-            color: options.color,
-            componentParams: options.componentParams,
-        });
+        return this.component.withMutationOrigin('api', () =>
+            model.createTabGroup({
+                label: options.label,
+                color: options.color,
+                componentParams: options.componentParams,
+            })
+        );
     }
 
     dissolveTabGroup(options: { groupId: string; tabGroupId: string }): void {
         const model = this._getGroupModel(options.groupId);
-        model.dissolveTabGroup(options.tabGroupId);
+        this.component.withMutationOrigin('api', () =>
+            model.dissolveTabGroup(options.tabGroupId)
+        );
     }
 
     addPanelToTabGroup(options: {
@@ -1075,10 +1142,12 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         index?: number;
     }): void {
         const model = this._getGroupModel(options.groupId);
-        model.addPanelToTabGroup(
-            options.tabGroupId,
-            options.panelId,
-            options.index
+        this.component.withMutationOrigin('api', () =>
+            model.addPanelToTabGroup(
+                options.tabGroupId,
+                options.panelId,
+                options.index
+            )
         );
     }
 
@@ -1087,7 +1156,9 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         panelId: string;
     }): void {
         const model = this._getGroupModel(options.groupId);
-        model.removePanelFromTabGroup(options.panelId);
+        this.component.withMutationOrigin('api', () =>
+            model.removePanelFromTabGroup(options.panelId)
+        );
     }
 
     getTabGroups(options: DockviewGetTabGroupsOptions): readonly ITabGroup[] {

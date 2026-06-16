@@ -70,6 +70,27 @@ api.onDidLayoutFromJSON(() => { });
 api.onDidMaximizedGroupChange((event: DockviewMaximizedGroupChanged) => { });
 ```
 
+### Mutation boundary
+
+`onWillMutateLayout` and `onDidMutateLayout` bracket each top-level structural change to the layout. Unlike `onDidLayoutChange` — which is coalesced and only fires _after_ a change — these provide an explicit before/after pair, so you can capture a snapshot of the layout _before_ the mutation runs. This makes them the right hook for autosave, dirty-tracking and undo/redo.
+
+```ts
+// Fires immediately before a structural mutation
+api.onWillMutateLayout((event: DockviewLayoutMutationEvent) => {
+    // event.kind: 'add' | 'remove' | 'move' | 'float' | 'popout'
+    //           | 'tab-group' | 'load' | 'clear'
+    // event.origin: 'user' | 'api'
+    const snapshot = api.toJSON(); // pre-image, before the change applies
+});
+
+// Fires immediately after the same mutation settles
+api.onDidMutateLayout((event: DockviewLayoutMutationEvent) => { });
+```
+
+A compound operation brackets as a **single** transaction: dragging a panel to a new group, or restoring a whole layout via `fromJSON`, fires exactly one before/after pair rather than one per internal step.
+
+`event.origin` distinguishes _who_ caused the change — `'user'` for direct interaction (drag-and-drop, tab UI), `'api'` for a programmatic `DockviewApi` call made by your own code — so consumers such as an undo stack can choose to ignore the app's own programmatic mutations.
+
 ## Drag & Drop
 
 These events let you intercept and customize drag and drop behaviour.
@@ -108,6 +129,13 @@ api.onUnhandledDragOverEvent((event: DockviewDndOverlayEvent) => {
 These events fire in response to popout window activity.
 
 ```ts
+// Fires when a popout group opens in its own window, carrying the live Window
+// handle. Use it to route focus or attach listeners to the popout's document.
+api.onDidAddPopoutGroup((event: PopoutGroup) => {
+    // event.id, event.group, event.window
+    event.window.focus();
+});
+
 // Fires when a popout window is resized
 api.onDidPopoutGroupSizeChange((event: PopoutGroupChangeSizeEvent) => { });
 
@@ -118,6 +146,14 @@ api.onDidPopoutGroupPositionChange((event: PopoutGroupChangePositionEvent) => { 
 api.onDidOpenPopoutWindowFail(() => {
     console.warn('popup was blocked by the browser');
 });
+```
+
+Enumerate the popout groups currently open at any time:
+
+```ts
+for (const popout of api.getPopouts()) {
+    // popout.id, popout.group, popout.window
+}
 ```
 
 > See [Popout Windows](/docs/core/groups/popoutGroups) for more.

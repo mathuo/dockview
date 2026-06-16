@@ -861,4 +861,150 @@ describe('overlay', () => {
             overlay.dispose();
         });
     });
+
+    describe('drag position transform', () => {
+        function setupDraggableOverlay(options: {
+            transformDragPosition?: Parameters<
+                typeof Overlay
+            >[0]['transformDragPosition'];
+            getSiblingBoxes?: () => readonly {
+                left: number;
+                top: number;
+                width: number;
+                height: number;
+            }[];
+        }) {
+            const container = document.createElement('div');
+            const content = document.createElement('div');
+            document.body.appendChild(container);
+            container.appendChild(content);
+
+            const overlay = new Overlay({
+                height: 100,
+                width: 100,
+                left: 50,
+                top: 50,
+                minimumInViewportWidth: 0,
+                minimumInViewportHeight: 0,
+                container,
+                content,
+                ...options,
+            });
+
+            jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
+                () =>
+                    mockGetBoundingClientRect({
+                        left: 0,
+                        top: 0,
+                        width: 400,
+                        height: 400,
+                    })
+            );
+            jest.spyOn(
+                overlay.element,
+                'getBoundingClientRect'
+            ).mockImplementation(() =>
+                mockGetBoundingClientRect({
+                    left: 50,
+                    top: 50,
+                    width: 100,
+                    height: 100,
+                })
+            );
+
+            const dragTarget = document.createElement('div');
+            container.appendChild(dragTarget);
+            overlay.setupDrag(dragTarget);
+
+            const drag = (clientX: number, clientY: number) => {
+                const down = new MouseEvent('pointerdown', {
+                    clientX: 60,
+                    clientY: 60,
+                    bubbles: true,
+                }) as any;
+                down.pointerId = 1;
+                dragTarget.dispatchEvent(down);
+
+                const move = new MouseEvent('pointermove', {
+                    clientX,
+                    clientY,
+                    bubbles: true,
+                }) as any;
+                move.pointerId = 1;
+                window.dispatchEvent(move);
+            };
+
+            return { overlay, drag };
+        }
+
+        test('receives the proposed box, container and sibling boxes', () => {
+            const calls: any[] = [];
+            const siblings = [{ left: 0, top: 0, width: 10, height: 10 }];
+            const { overlay, drag } = setupDraggableOverlay({
+                getSiblingBoxes: () => siblings,
+                transformDragPosition: (ctx) => {
+                    calls.push(ctx);
+                },
+            });
+
+            drag(200, 200);
+
+            expect(calls.length).toBeGreaterThan(0);
+            expect(calls[0].proposed).toMatchObject({
+                width: 100,
+                height: 100,
+            });
+            expect(calls[0].container).toEqual({ width: 400, height: 400 });
+            expect(calls[0].others).toEqual(siblings);
+
+            overlay.dispose();
+        });
+
+        test('a returned position is applied (pin to top-left)', () => {
+            const { overlay, drag } = setupDraggableOverlay({
+                transformDragPosition: () => ({ top: 0, left: 0 }),
+            });
+            const spy = jest.spyOn(overlay, 'setBounds');
+
+            drag(300, 300);
+
+            // top <= bottom and left <= right at (0,0), so it anchors top-left.
+            expect(spy).toHaveBeenLastCalledWith({ top: 0, left: 0 });
+
+            overlay.dispose();
+        });
+
+        test('runs before the container clamp (out-of-bounds is still clamped in)', () => {
+            const { overlay, drag } = setupDraggableOverlay({
+                // Ask for a position far outside the 400x400 container.
+                transformDragPosition: () => ({ top: 100000, left: 100000 }),
+            });
+            const spy = jest.spyOn(overlay, 'setBounds');
+
+            drag(200, 200);
+
+            // The raw 100000 must never reach setBounds — it's clamped to the
+            // container range first (every applied offset stays near the
+            // 400x400 container, nowhere near the requested 100000).
+            const bounds = spy.mock.calls.at(-1)![0] as Record<string, number>;
+            for (const value of Object.values(bounds)) {
+                expect(Math.abs(value)).toBeLessThan(1000);
+            }
+
+            overlay.dispose();
+        });
+
+        test('no transform → sibling boxes are never gathered', () => {
+            const getSiblingBoxes = jest.fn(() => []);
+            const { overlay, drag } = setupDraggableOverlay({
+                getSiblingBoxes,
+            });
+
+            drag(200, 200);
+
+            expect(getSiblingBoxes).not.toHaveBeenCalled();
+
+            overlay.dispose();
+        });
+    });
 });

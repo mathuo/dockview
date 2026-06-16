@@ -7,10 +7,14 @@ import {
     Gridview,
     SerializedGridview,
 } from '../gridview/gridview';
-import { directionToPosition, Position } from '../dnd/droptarget';
+import {
+    directionToPosition,
+    DroptargetOverlayModel,
+    Position,
+} from '../dnd/droptarget';
 import { tail, sequenceEquals } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
-import { CompositeDisposable, Disposable } from '../lifecycle';
+import { CompositeDisposable, Disposable, IDisposable } from '../lifecycle';
 import { Event, Emitter, addDisposableListener } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import { IWatermarkRenderer, GroupviewPanelState } from './types';
@@ -49,6 +53,7 @@ import {
     DockviewTabGroupChangeEvent,
     DockviewTabGroupCollapsedChangeEvent,
     DockviewTabGroupPanelChangeEvent,
+    DockviewGroupDropLocation,
 } from './events';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
@@ -68,13 +73,19 @@ import {
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
 import { FloatingTitleBar } from './components/titlebar/floatingTitleBar';
-import { assertModule, ModuleRegistry } from './modules';
+import { assertModule, DockviewModule, ModuleRegistry } from './modules';
 import { AllModules } from './allModules';
 import { IFloatingGroupHost } from './floatingGroupService';
 import { IPopoutWindowHost } from './popoutWindowService';
 import { IWatermarkHost } from './watermarkService';
 import { IEdgeGroupServiceHost } from './edgeGroupService';
-import { ITabGroupChipsHost } from './tabGroupChipsService';
+import {
+    IAccessibilityHost,
+    IAdvancedDnDHost,
+    IContextMenuHost,
+    IContextMenuService,
+    ITabGroupChipsHost,
+} from './moduleContracts';
 import { IHeaderActionsHost } from './headerActionsService';
 import { AnchoredBox, AnchorPosition, Box } from '../types';
 import {
@@ -89,8 +100,9 @@ import {
 import { PopoutWindow } from '../popoutWindow';
 import { StrictEventsSequencing } from './strictEventsSequencing';
 import { PopupService } from './components/popupService';
-import { IContextMenuHost, IContextMenuService } from './contextMenu';
 import { IRootDropTargetHost } from './rootDropTargetService';
+import { ILiveRegionHost } from './liveRegionService';
+import { IDragGhostSpec } from '../dnd/backend';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import { themeAbyss } from './theme';
 import {
@@ -259,6 +271,32 @@ export interface DockviewMaximizedGroupChanged {
     isMaximized: boolean;
 }
 
+/** The coarse kind of a structural layout mutation (see `onWillMutateLayout`). */
+export type DockviewLayoutMutationKind =
+    | 'add'
+    | 'remove'
+    | 'move'
+    | 'float'
+    | 'popout'
+    | 'maximize'
+    | 'tab-group'
+    | 'load'
+    | 'clear';
+
+/**
+ * Who caused a layout mutation: `'user'` for mutations driven by direct
+ * interaction (drag-and-drop, tab UI, keyboard docking) and `'api'` for those
+ * entered through a {@link DockviewApi} method called by application code.
+ * Lets consumers (e.g. an undo stack) treat the app's own programmatic changes
+ * differently from end-user gestures.
+ */
+export type DockviewLayoutMutationOrigin = 'user' | 'api';
+
+export interface DockviewLayoutMutationEvent {
+    readonly kind: DockviewLayoutMutationKind;
+    readonly origin: DockviewLayoutMutationOrigin;
+}
+
 export interface PopoutGroupChangeSizeEvent {
     width: number;
     height: number;
@@ -271,6 +309,20 @@ export interface PopoutGroupChangePositionEvent {
     group: DockviewGroupPanel;
 }
 
+/** A spatial (visual) direction for group-to-group navigation. */
+export type GroupNavigationDirection = 'left' | 'right' | 'up' | 'down';
+
+/**
+ * A popout group currently open in its own window. `window` is the live
+ * `Window` handle of the popout, so consumers can route focus, attach
+ * per-document listeners, or place the window.
+ */
+export interface PopoutGroup {
+    readonly id: string;
+    readonly group: DockviewGroupPanel;
+    readonly window: Window;
+}
+
 export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly activePanel: IDockviewPanel | undefined;
     readonly totalPanels: number;
@@ -278,6 +330,13 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly orientation: Orientation;
     readonly onDidDrop: Event<DockviewDidDropEvent>;
     readonly onWillDrop: Event<DockviewWillDropEvent>;
+    readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;
+    readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent>;
+    mutationOrigin(): DockviewLayoutMutationOrigin;
+    withMutationOrigin<T>(
+        origin: DockviewLayoutMutationOrigin,
+        func: () => T
+    ): T;
     readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent>;
     readonly onDidRemovePanel: Event<IDockviewPanel>;
     readonly onDidAddPanel: Event<IDockviewPanel>;
@@ -293,7 +352,9 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidMaximizedGroupChange: Event<DockviewMaximizedGroupChanged>;
     readonly onDidPopoutGroupSizeChange: Event<PopoutGroupChangeSizeEvent>;
     readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent>;
+    readonly onDidAddPopoutGroup: Event<PopoutGroup>;
     readonly onDidOpenPopoutWindowFail: Event<void>;
+    getPopouts(): PopoutGroup[];
     readonly onDidCreateTabGroup: Event<DockviewTabGroupChangeEvent>;
     readonly onDidDestroyTabGroup: Event<DockviewTabGroupChangeEvent>;
     readonly onDidAddPanelToTabGroup: Event<DockviewTabGroupPanelChangeEvent>;
@@ -316,6 +377,10 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     // lifecycle
     addGroup(options?: AddGroupOptions): DockviewGroupPanel;
     closeAllGroups(): void;
+    adjacentGroupInDirection(
+        group: DockviewGroupPanel,
+        direction: GroupNavigationDirection
+    ): DockviewGroupPanel | undefined;
     // events
     moveToNext(options?: MovementOptions): void;
     moveToPrevious(options?: MovementOptions): void;
@@ -361,7 +426,10 @@ export class DockviewComponent
         ITabGroupChipsHost,
         IContextMenuHost,
         IRootDropTargetHost,
-        IHeaderActionsHost
+        IHeaderActionsHost,
+        IAdvancedDnDHost,
+        ILiveRegionHost,
+        IAccessibilityHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
@@ -387,6 +455,23 @@ export class DockviewComponent
 
     private readonly _onWillDrop = new Emitter<DockviewWillDropEvent>();
     readonly onWillDrop: Event<DockviewWillDropEvent> = this._onWillDrop.event;
+
+    // Transaction boundary bracketing each top-level structural mutation.
+    // Compound operations (e.g. a drag that relocates a panel) nest via the
+    // depth counter and bracket as a single transaction. See `mutation()`.
+    private _mutationDepth = 0;
+    // Current mutation origin. Defaults to `'user'`; the DockviewApi boundary
+    // flips it to `'api'` for the duration of a programmatic call via
+    // `withMutationOrigin`. Nested mutations inherit the outer origin.
+    private _mutationOrigin: DockviewLayoutMutationOrigin = 'user';
+    private readonly _onWillMutateLayout =
+        new Emitter<DockviewLayoutMutationEvent>();
+    readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent> =
+        this._onWillMutateLayout.event;
+    private readonly _onDidMutateLayout =
+        new Emitter<DockviewLayoutMutationEvent>();
+    readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent> =
+        this._onDidMutateLayout.event;
 
     private readonly _onWillShowOverlay =
         new Emitter<DockviewWillShowOverlayLocationEvent>();
@@ -414,6 +499,10 @@ export class DockviewComponent
         new Emitter<PopoutGroupChangePositionEvent>();
     readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent> =
         this._onDidPopoutGroupPositionChange.event;
+
+    private readonly _onDidAddPopoutGroup = new Emitter<PopoutGroup>();
+    readonly onDidAddPopoutGroup: Event<PopoutGroup> =
+        this._onDidAddPopoutGroup.event;
 
     private readonly _onDidOpenPopoutWindowFail = new Emitter<void>();
     readonly onDidOpenPopoutWindowFail: Event<void> =
@@ -563,6 +652,30 @@ export class DockviewComponent
         );
     }
 
+    /**
+     * Boxes of the floating groups other than `exclude`, in coordinates
+     * relative to the floating overlay container. Supplied to a
+     * `transformFloatingGroupDrag` callback as `context.others` so it can
+     * align the dragged float against its siblings.
+     */
+    private _gatherFloatingGroupBoxes(
+        exclude: DockviewGroupPanel
+    ): readonly Box[] {
+        const container = this._floatingOverlayHost ?? this.gridview.element;
+        const containerRect = container.getBoundingClientRect();
+        return this.floatingGroups
+            .filter((floating) => floating.group !== exclude)
+            .map((floating) => {
+                const rect = floating.overlay.element.getBoundingClientRect();
+                return {
+                    left: rect.left - containerRect.left,
+                    top: rect.top - containerRect.top,
+                    width: rect.width,
+                    height: rect.height,
+                };
+            });
+    }
+
     private get _floatingGroupService() {
         return this._moduleRegistry.services.floatingGroupService;
     }
@@ -582,7 +695,16 @@ export class DockviewComponent
     }
 
     private get _rootDropTargetService() {
-        return this._moduleRegistry.services.rootDropTargetService!;
+        // Optional like every other module service — RootDropTargetModule can be
+        // removed from the registered set without crashing the component.
+        return this._moduleRegistry.services.rootDropTargetService;
+    }
+
+    private get _advancedDnDService() {
+        // Optional — callers `?.`-guard so the module can be removed from
+        // AllModules. Absent ⇒ the onWill* hooks simply don't fire (≡ no
+        // subscriber), which is invisible to apps not customising DnD.
+        return this._moduleRegistry.services.advancedDnDService;
     }
 
     get headerActionsService() {
@@ -609,6 +731,151 @@ export class DockviewComponent
         );
         this._onUnhandledDragOverEvent.fire(event);
         return event.isAccepted;
+    }
+
+    // IAdvancedDnDHost — the emitters stay here so the public onWill* event
+    // shape is unchanged; AdvancedDnDService routes the per-group fires
+    // through these. Engine guards (e.g. disableDnd) run on the component
+    // ahead of the dispatch.
+    fireWillDragPanel(event: TabDragEvent): void {
+        this._onWillDragPanel.fire(event);
+    }
+
+    fireWillDragGroup(event: GroupDragEvent): void {
+        this._onWillDragGroup.fire(event);
+    }
+
+    fireWillDrop(event: DockviewWillDropEvent): void {
+        this._onWillDrop.fire(event);
+    }
+
+    fireWillShowOverlay(event: DockviewWillShowOverlayLocationEvent): void {
+        this._onWillShowOverlay.fire(event);
+    }
+
+    /**
+     * Resolve the custom group drag ghost (via the AdvancedDnD module), or
+     * `undefined` to fall back to the default chip. Returns `undefined` when
+     * the module is absent — the default ghost then renders.
+     */
+    buildGroupDragGhost(group: DockviewGroupPanel): IDragGhostSpec | undefined {
+        return this._advancedDnDService?.buildGroupDragGhost(group);
+    }
+
+    /**
+     * Resolve the app-supplied drop overlay model (via the AdvancedDnD module)
+     * for a group drop target, or `undefined` to keep the target's default.
+     */
+    resolveDropOverlayModel(
+        location: DockviewGroupDropLocation,
+        group?: DockviewGroupPanel
+    ): DroptargetOverlayModel | undefined {
+        return this._advancedDnDService?.resolveOverlayModel(location, group);
+    }
+
+    // IAccessibilityHost — keyboard docking reaches the AdvancedDnD preview +
+    // LiveRegion announcer through these so the service stays decoupled.
+    /** Outermost element — the shell (incl. edge groups) once built, else the gridview. */
+    get rootElement(): HTMLElement {
+        return this._shellManager?.element ?? this.element;
+    }
+
+    /**
+     * The next / previous group in gridview (spatial) order, wrapping round.
+     * The keyboard accessibility module's focus navigation is built on this
+     * primitive — the only piece that needs the grid internals; the rest of
+     * the navigation logic lives in the AccessibilityService.
+     */
+    adjacentGroup(
+        group: DockviewGroupPanel,
+        reverse: boolean
+    ): DockviewGroupPanel | undefined {
+        // gridview traversal only covers grid groups; a floating/popout group
+        // isn't in the grid, so there's no adjacent grid group to step to.
+        if (group.api.location.type !== 'grid') {
+            return undefined;
+        }
+        const location = getGridLocation(group.element);
+        return <DockviewGroupPanel | undefined>(
+            (reverse
+                ? this.gridview.previous(location)
+                : this.gridview.next(location)
+            )?.view
+        );
+    }
+
+    /**
+     * The nearest grid group in a spatial direction from `group`, by
+     * comparing group centre points. Floating and popout groups sit outside
+     * the grid's geometry and are ignored. Returns `undefined` when there is
+     * no group in that direction.
+     */
+    adjacentGroupInDirection(
+        group: DockviewGroupPanel,
+        direction: GroupNavigationDirection
+    ): DockviewGroupPanel | undefined {
+        if (group.api.location.type !== 'grid') {
+            return undefined;
+        }
+        const from = group.element.getBoundingClientRect();
+        const fromX = from.left + from.width / 2;
+        const fromY = from.top + from.height / 2;
+
+        let best: DockviewGroupPanel | undefined;
+        let bestDistance = Number.POSITIVE_INFINITY;
+        for (const candidate of this.groups) {
+            if (candidate === group || candidate.api.location.type !== 'grid') {
+                continue;
+            }
+            const rect = candidate.element.getBoundingClientRect();
+            const dx = rect.left + rect.width / 2 - fromX;
+            const dy = rect.top + rect.height / 2 - fromY;
+            // Require the candidate to sit predominantly in the asked-for
+            // direction (dominant axis), so 'left' ignores a group that's
+            // mostly above/below.
+            const inDirection =
+                direction === 'left'
+                    ? dx < 0 && Math.abs(dx) >= Math.abs(dy)
+                    : direction === 'right'
+                      ? dx > 0 && Math.abs(dx) >= Math.abs(dy)
+                      : direction === 'up'
+                        ? dy < 0 && Math.abs(dy) >= Math.abs(dx)
+                        : dy > 0 && Math.abs(dy) >= Math.abs(dx);
+            if (!inDirection) {
+                continue;
+            }
+            const distance = dx * dx + dy * dy;
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                best = candidate;
+            }
+        }
+        return best;
+    }
+
+    showDropPreview(
+        group: DockviewGroupPanel,
+        position: Position
+    ): IDisposable {
+        return (
+            this._advancedDnDService?.showPreviewOverlay(group, position) ??
+            Disposable.NONE
+        );
+    }
+
+    announce(message: string): void {
+        this._moduleRegistry.services.liveRegionService?.announce(message);
+    }
+
+    dockPanel(
+        panel: IDockviewPanel,
+        group: DockviewGroupPanel,
+        position: Position
+    ): void {
+        this.moveGroupOrPanel({
+            from: { groupId: panel.group.id, panelId: panel.id },
+            to: { group, position },
+        });
     }
 
     /**
@@ -660,7 +927,14 @@ export class DockviewComponent
         this._options = options;
         this._tabGroupColorPalette = buildTabGroupColorPalette(options);
 
-        for (const module of AllModules) {
+        // Internal seam: defaults to the full set, but tests can supply a
+        // subset to assert every module is independently removable (and the
+        // opt-in module API will build on this later). Not part of the public
+        // options surface.
+        const modules =
+            (options as { modules?: DockviewModule<any>[] }).modules ??
+            AllModules;
+        for (const module of modules) {
             this._moduleRegistry.register(module);
         }
         this._moduleRegistry.initialize(this);
@@ -725,6 +999,8 @@ export class DockviewComponent
             this._onDidLayoutFromJSON,
             this._onDidDrop,
             this._onWillDrop,
+            this._onWillMutateLayout,
+            this._onDidMutateLayout,
             this._onDidMovePanel,
             this._onDidMovePanel.event(() => {
                 /**
@@ -741,6 +1017,7 @@ export class DockviewComponent
             this._onDidMaximizedGroupChange,
             this._onDidPopoutGroupSizeChange,
             this._onDidPopoutGroupPositionChange,
+            this._onDidAddPopoutGroup,
             this._onDidOpenPopoutWindowFail,
             this._onDidCreateTabGroup,
             this._onDidDestroyTabGroup,
@@ -803,67 +1080,78 @@ export class DockviewComponent
                 // don't hang. See issue #851.
                 this._moduleRegistry.dispose();
                 this._shellManager?.dispose();
-            }),
-            this._rootDropTargetService.onWillShowOverlay((event) => {
-                if (this.gridview.length > 0 && event.position === 'center') {
-                    // option only available when no panels in primary grid
-                    return;
-                }
+            })
+        );
 
-                this._onWillShowOverlay.fire(
-                    new DockviewWillShowOverlayLocationEvent(event, {
-                        kind: 'edge',
-                        panel: undefined,
-                        api: this._api,
-                        group: undefined,
-                        getData: getPanelData,
-                    })
-                );
-            }),
-            this._rootDropTargetService.onDrop((event) => {
-                const willDropEvent = new DockviewWillDropEvent({
-                    nativeEvent: event.nativeEvent,
-                    position: event.position,
-                    panel: undefined,
-                    api: this._api,
-                    group: undefined,
-                    getData: getPanelData,
-                    kind: 'edge',
-                });
+        // Root edge-drop wiring lives with its (optional) module — guard it so
+        // the module is independently removable.
+        const rootDropTarget = this._rootDropTargetService;
+        if (rootDropTarget) {
+            this.addDisposables(
+                rootDropTarget.onWillShowOverlay((event) => {
+                    if (
+                        this.gridview.length > 0 &&
+                        event.position === 'center'
+                    ) {
+                        // option only available when no panels in primary grid
+                        return;
+                    }
 
-                this._onWillDrop.fire(willDropEvent);
-
-                if (willDropEvent.defaultPrevented) {
-                    return;
-                }
-
-                const data = getPanelData();
-
-                if (data) {
-                    this.moveGroupOrPanel({
-                        from: {
-                            groupId: data.groupId,
-                            panelId: data.panelId ?? undefined,
-                        },
-                        to: {
-                            group: this.orthogonalize(event.position),
-                            position: 'center',
-                        },
-                    });
-                } else {
-                    this._onDidDrop.fire(
-                        new DockviewDidDropEvent({
-                            nativeEvent: event.nativeEvent,
-                            position: event.position,
+                    this._onWillShowOverlay.fire(
+                        new DockviewWillShowOverlayLocationEvent(event, {
+                            kind: 'edge',
                             panel: undefined,
                             api: this._api,
                             group: undefined,
                             getData: getPanelData,
                         })
                     );
-                }
-            })
-        );
+                }),
+                rootDropTarget.onDrop((event) => {
+                    const willDropEvent = new DockviewWillDropEvent({
+                        nativeEvent: event.nativeEvent,
+                        position: event.position,
+                        panel: undefined,
+                        api: this._api,
+                        group: undefined,
+                        getData: getPanelData,
+                        kind: 'edge',
+                    });
+
+                    this._onWillDrop.fire(willDropEvent);
+
+                    if (willDropEvent.defaultPrevented) {
+                        return;
+                    }
+
+                    const data = getPanelData();
+
+                    if (data) {
+                        this.moveGroupOrPanel({
+                            from: {
+                                groupId: data.groupId,
+                                panelId: data.panelId ?? undefined,
+                            },
+                            to: {
+                                group: this.orthogonalize(event.position),
+                                position: 'center',
+                            },
+                        });
+                    } else {
+                        this._onDidDrop.fire(
+                            new DockviewDidDropEvent({
+                                nativeEvent: event.nativeEvent,
+                                position: event.position,
+                                panel: undefined,
+                                api: this._api,
+                                group: undefined,
+                                getData: getPanelData,
+                            })
+                        );
+                    }
+                })
+            );
+        }
 
         // Final module wiring: runs after the host is fully constructed.
         // Modules subscribe to host events here so the component doesn't
@@ -914,6 +1202,28 @@ export class DockviewComponent
     }
 
     addPopoutGroup(
+        itemToPopout: DockviewPanel | DockviewGroupPanel,
+        options?: DockviewPopoutGroupOptionsInternal
+    ): Promise<boolean> {
+        // The transaction brackets the synchronous structural change; the
+        // popout window opens asynchronously after it resolves.
+        return this.mutation('popout', () =>
+            this._doAddPopoutGroup(itemToPopout, options)
+        );
+    }
+
+    /** Enumerate the popout groups currently open in their own windows. */
+    getPopouts(): PopoutGroup[] {
+        return (
+            this._popoutWindowService?.entries.map((entry) => ({
+                id: entry.popoutGroup.id,
+                group: entry.popoutGroup,
+                window: entry.getWindow(),
+            })) ?? []
+        );
+    }
+
+    private _doAddPopoutGroup(
         itemToPopout: DockviewPanel | DockviewGroupPanel,
         options?: DockviewPopoutGroupOptionsInternal
     ): Promise<boolean> {
@@ -1286,6 +1596,12 @@ export class DockviewComponent
 
                 service.add(value);
 
+                this._onDidAddPopoutGroup.fire({
+                    id: value.popoutGroup.id,
+                    group: value.popoutGroup,
+                    window: value.getWindow(),
+                });
+
                 return true;
             })
             .catch((err) => {
@@ -1527,6 +1843,13 @@ export class DockviewComponent
         item: DockviewPanel | DockviewGroupPanel,
         options?: FloatingGroupOptionsInternal
     ): void {
+        this.mutation('float', () => this._doAddFloatingGroup(item, options));
+    }
+
+    private _doAddFloatingGroup(
+        item: DockviewPanel | DockviewGroupPanel,
+        options?: FloatingGroupOptionsInternal
+    ): void {
         const service = assertModule(
             this._floatingGroupService,
             'FloatingGroup',
@@ -1745,6 +2068,16 @@ export class DockviewComponent
                     : (this.options.floatingGroupBounds
                           ?.minimumHeightWithinViewport ??
                       DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE),
+            transformDragPosition: this.options.transformFloatingGroupDrag
+                ? (context) =>
+                      this.options.transformFloatingGroupDrag!({
+                          group: anchorGroup,
+                          proposed: context.proposed,
+                          container: context.container,
+                          others: context.others,
+                      })
+                : undefined,
+            getSiblingBoxes: () => this._gatherFloatingGroupBoxes(anchorGroup),
         });
 
         const dragHandle =
@@ -1847,7 +2180,7 @@ export class DockviewComponent
 
         this._floatingGroupService?.updateBounds(options);
 
-        this._rootDropTargetService.setOptions(options);
+        this._rootDropTargetService?.setOptions(options);
 
         const oldDisableDnd = this.options.disableDnd;
         const oldDndStrategy = this.options.dndStrategy;
@@ -1960,27 +2293,29 @@ export class DockviewComponent
             );
         }
 
-        const group = this.createGroup({ id: options.id });
-        group.model.location = { type: 'edge', position };
-        group.model.headerPosition = position;
+        return this.mutation('add', () => {
+            const group = this.createGroup({ id: options.id });
+            group.model.location = { type: 'edge', position };
+            group.model.headerPosition = position;
 
-        // Collapse when the group becomes empty
-        const autoCollapseDisposable = group.model.onDidRemovePanel(() => {
-            if (group.model.isEmpty) {
-                this.setEdgeGroupCollapsed(group, true);
-            }
+            // Collapse when the group becomes empty
+            const autoCollapseDisposable = group.model.onDidRemovePanel(() => {
+                if (group.model.isEmpty) {
+                    this.setEdgeGroupCollapsed(group, true);
+                }
+            });
+
+            service.add(position, group, autoCollapseDisposable);
+            this._onDidAddGroup.fire(group);
+
+            this._shellManager!.addEdgeView(
+                position,
+                options,
+                group as IEdgeGroupHost
+            );
+
+            return group.api;
         });
-
-        service.add(position, group, autoCollapseDisposable);
-        this._onDidAddGroup.fire(group);
-
-        this._shellManager!.addEdgeView(
-            position,
-            options,
-            group as IEdgeGroupHost
-        );
-
-        return group.api;
     }
 
     getEdgeGroup(
@@ -2013,22 +2348,26 @@ export class DockviewComponent
             );
         }
 
-        // Remove panels inside the group first
-        for (const panel of [...group.panels]) {
-            this.removePanel(panel, {
-                removeEmptyGroup: false,
-                skipDispose: false,
-            });
-        }
+        // One transaction — the per-panel removals below nest via the depth
+        // counter, so consumers see a single edge-group removal.
+        this.mutation('remove', () => {
+            // Remove panels inside the group first
+            for (const panel of [...group.panels]) {
+                this.removePanel(panel, {
+                    removeEmptyGroup: false,
+                    skipDispose: false,
+                });
+            }
 
-        // Remove from the shell splitview
-        this._shellManager!.removeEdgeView(position);
+            // Remove from the shell splitview
+            this._shellManager!.removeEdgeView(position);
 
-        // Clean up service-tracked state + group itself
-        service.remove(position);
-        group.dispose();
-        this._groups.delete(group.id);
-        this._onDidRemoveGroup.fire(group);
+            // Clean up service-tracked state + group itself
+            service.remove(position);
+            group.dispose();
+            this._groups.delete(group.id);
+            this._onDidRemoveGroup.fire(group);
+        });
     }
 
     setEdgeGroupCollapsed(group: DockviewGroupPanel, collapsed: boolean): void {
@@ -2173,6 +2512,15 @@ export class DockviewComponent
     }
 
     fromJSON(
+        data: SerializedDockview,
+        options?: { reuseExistingPanels: boolean }
+    ): void {
+        // One 'load' transaction for the whole deserialization — the many
+        // nested add/remove mutations join it via the depth counter.
+        this.mutation('load', () => this._doFromJSON(data, options));
+    }
+
+    private _doFromJSON(
         data: SerializedDockview,
         options?: { reuseExistingPanels: boolean }
     ): void {
@@ -2642,6 +2990,10 @@ export class DockviewComponent
     }
 
     clear(): void {
+        this.mutation('clear', () => this._doClear());
+    }
+
+    private _doClear(): void {
         const groups = Array.from(this._groups.values()).map((_) => _.value);
 
         const hasActiveGroup = !!this.activeGroup;
@@ -2667,14 +3019,24 @@ export class DockviewComponent
     }
 
     closeAllGroups(): void {
-        for (const entry of this._groups.entries()) {
-            const [_, group] = entry;
+        // One transaction — the per-panel removals inside nest via the depth
+        // counter, so consumers (undo, announcements) see a single mutation.
+        this.mutation('remove', () => {
+            for (const entry of this._groups.entries()) {
+                const [_, group] = entry;
 
-            group.value.model.closeAllPanels();
-        }
+                group.value.model.closeAllPanels();
+            }
+        });
     }
 
     addPanel<T extends object = Parameters>(
+        options: AddPanelOptions<T>
+    ): DockviewPanel {
+        return this.mutation('add', () => this._doAddPanel(options));
+    }
+
+    private _doAddPanel<T extends object = Parameters>(
         options: AddPanelOptions<T>
     ): DockviewPanel {
         if (this.panels.find((_) => _.id === options.id)) {
@@ -2884,6 +3246,19 @@ export class DockviewComponent
             removeEmptyGroup: true,
         }
     ): void {
+        this.mutation('remove', () => this._doRemovePanel(panel, options));
+    }
+
+    private _doRemovePanel(
+        panel: IDockviewPanel,
+        options: {
+            removeEmptyGroup: boolean;
+            skipDispose?: boolean;
+            skipSetActiveGroup?: boolean;
+        } = {
+            removeEmptyGroup: true,
+        }
+    ): void {
         const group = panel.group;
 
         if (!group) {
@@ -2914,6 +3289,10 @@ export class DockviewComponent
     }
 
     addGroup(options?: AddGroupOptions): DockviewGroupPanel {
+        return this.mutation('add', () => this._doAddGroup(options));
+    }
+
+    private _doAddGroup(options?: AddGroupOptions): DockviewGroupPanel {
         if (options) {
             let referenceGroup: DockviewGroupPanel | undefined;
 
@@ -3007,7 +3386,7 @@ export class DockviewComponent
               }
             | undefined
     ): void {
-        this.doRemoveGroup(group, options);
+        this.mutation('remove', () => this.doRemoveGroup(group, options));
     }
 
     /**
@@ -3254,7 +3633,69 @@ export class DockviewComponent
         }
     }
 
+    /**
+     * Bracket a structural mutation with `onWillMutateLayout` /
+     * `onDidMutateLayout`. Re-entrant: nested calls (a compound operation such
+     * as a drag that relocates a panel) join the outermost transaction, so the
+     * events fire exactly once around the whole operation. `kind` reflects the
+     * outermost mutation.
+     */
+    mutation<T>(kind: DockviewLayoutMutationKind, func: () => T): T {
+        const outer = this._mutationDepth === 0;
+        const origin = this._mutationOrigin;
+        if (outer) {
+            this._onWillMutateLayout.fire({ kind, origin });
+        }
+        this._mutationDepth++;
+        try {
+            return func();
+        } finally {
+            this._mutationDepth--;
+            if (outer) {
+                this._onDidMutateLayout.fire({ kind, origin });
+            }
+        }
+    }
+
+    /**
+     * The origin of the mutation currently in progress (`'user'` by default).
+     * Read inside a `mutation()`'s lifetime to learn whether the change was
+     * driven by application code (via the {@link DockviewApi}) or a user
+     * gesture.
+     */
+    mutationOrigin(): DockviewLayoutMutationOrigin {
+        return this._mutationOrigin;
+    }
+
+    /**
+     * Run `func` with the mutation origin set to `origin`, restoring the
+     * previous value afterwards. Used by the DockviewApi boundary to tag
+     * programmatic mutations as `'api'`; nested mutations inherit the
+     * outermost origin (a re-entrant call does not overwrite it).
+     */
+    withMutationOrigin<T>(
+        origin: DockviewLayoutMutationOrigin,
+        func: () => T
+    ): T {
+        // Only the outermost caller sets the origin — a nested mutation keeps
+        // whatever the enclosing operation established.
+        if (this._mutationDepth > 0) {
+            return func();
+        }
+        const previous = this._mutationOrigin;
+        this._mutationOrigin = origin;
+        try {
+            return func();
+        } finally {
+            this._mutationOrigin = previous;
+        }
+    }
+
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void {
+        this.mutation('move', () => this._doMoveGroupOrPanel(options));
+    }
+
+    private _doMoveGroupOrPanel(options: MoveGroupOrPanelOptions): void {
         const destinationGroup = options.to.group;
         const sourceGroupId = options.from.groupId;
         const sourceItemId = options.from.panelId;
@@ -3702,6 +4143,23 @@ export class DockviewComponent
     }
 
     moveGroup(options: MoveGroupOptions): void {
+        this.mutation('move', () => this._doMoveGroup(options));
+    }
+
+    // Bracket maximize/restore as a 'maximize' transaction. The maximized node
+    // is serialized by the gridview (`SerializedGridview.maximizedNode`), so
+    // the state round-trips through toJSON/fromJSON and is restorable on undo.
+    // When the exit is a side-effect of another bracketed operation (e.g. a
+    // move that activates a different group) the depth counter folds it in.
+    override maximizeGroup(panel: DockviewGroupPanel): void {
+        this.mutation('maximize', () => super.maximizeGroup(panel));
+    }
+
+    override exitMaximizedGroup(): void {
+        this.mutation('maximize', () => super.exitMaximizedGroup());
+    }
+
+    private _doMoveGroup(options: MoveGroupOptions): void {
         const from = options.from.group;
         const to = options.to.group;
         const target = options.to.position;
@@ -4024,10 +4482,10 @@ export class DockviewComponent
         if (!this._groups.has(view.id)) {
             const disposable = new CompositeDisposable(
                 view.model.onTabDragStart((event) => {
-                    this._onWillDragPanel.fire(event);
+                    this._advancedDnDService?.dispatchWillDragPanel(event);
                 }),
                 view.model.onGroupDragStart((event) => {
-                    this._onWillDragGroup.fire(event);
+                    this._advancedDnDService?.dispatchWillDragGroup(event);
                 }),
                 view.model.onMove((event) => {
                     const { groupId, itemId, target, index, tabGroupId } =
@@ -4049,15 +4507,17 @@ export class DockviewComponent
                     this._onDidDrop.fire(event);
                 }),
                 view.model.onWillDrop((event) => {
-                    this._onWillDrop.fire(event);
+                    this._advancedDnDService?.dispatchWillDrop(event);
                 }),
                 view.model.onWillShowOverlay((event) => {
                     if (this.options.disableDnd) {
+                        // Engine policy — stays in core, ahead of any
+                        // customisation dispatch.
                         event.preventDefault();
                         return;
                     }
 
-                    this._onWillShowOverlay.fire(event);
+                    this._advancedDnDService?.dispatchWillShowOverlay(event);
                 }),
                 view.model.onUnhandledDragOverEvent((event) => {
                     this._onUnhandledDragOverEvent.fire(event);

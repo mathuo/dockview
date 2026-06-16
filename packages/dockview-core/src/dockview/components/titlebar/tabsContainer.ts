@@ -56,6 +56,7 @@ export interface ITabsContainer extends IDisposable {
     direction: DockviewHeaderDirection;
     delete(id: string): void;
     indexOf(id: string): number;
+    getTabId(panelId: string): string | undefined;
     setActive(isGroupActive: boolean): void;
     setActivePanel(panel: IDockviewPanel): void;
     isActive(tab: Tab): boolean;
@@ -358,6 +359,10 @@ export class TabsContainer
 
     indexOf(id: string): number {
         return this.tabs.indexOf(id);
+    }
+
+    getTabId(panelId: string): string | undefined {
+        return this.tabs.getTabId(panelId);
     }
 
     setActive(_isGroupActive: boolean) {
