@@ -8,6 +8,7 @@ import { DockviewMessages } from './accessibilityMessages';
 export type { DockviewMessages } from './accessibilityMessages';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
+import { Box } from '../types';
 import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
 import { GroupOptions } from './dockviewGroupPanelModel';
 import { DockviewGroupDropLocation } from './events';
@@ -170,6 +171,24 @@ export type DockviewHeaderDirection = 'horizontal' | 'vertical';
 
 export type DockviewDndStrategy = 'auto' | 'pointer' | 'html5';
 
+/**
+ * Context handed to {@link DockviewOptions.transformFloatingGroupDrag} on each
+ * pointer-move frame while a floating group is being dragged.
+ */
+export interface FloatingGroupDragContext {
+    /** The floating group being dragged. */
+    readonly group: DockviewGroupPanel;
+    /** Proposed top-left + size this frame, in container pixels (pre-clamp). */
+    readonly proposed: Box;
+    /** Size of the container the floating group is dragged within. */
+    readonly container: { width: number; height: number };
+    /**
+     * Bounds of the other floating groups (relative to the same container),
+     * snapshotted at drag start.
+     */
+    readonly others: readonly Box[];
+}
+
 export interface DockviewOptions {
     /**
      * Disable the auto-resizing which is controlled through a `ResizeObserver`.
@@ -185,6 +204,20 @@ export interface DockviewOptions {
               minimumHeightWithinViewport?: number;
               minimumWidthWithinViewport?: number;
           };
+    /**
+     * Adjust a floating group's position while it is being dragged. Runs on
+     * each pointer-move frame with the proposed top-left (before the container
+     * clamp) and returns an adjusted top-left, or nothing to leave it
+     * unchanged. Use it for snapping, alignment, or custom bounds. Move only —
+     * resizing a floating group is unaffected.
+     *
+     * `context.others` holds the bounds of the other floating groups (relative
+     * to the same container), snapshotted at drag start, so the callback can
+     * align the dragged group against its siblings.
+     */
+    transformFloatingGroupDrag?: (
+        context: FloatingGroupDragContext
+    ) => { top: number; left: number } | void;
     /**
      * Selects which element moves a floating group when dragged.
      *
@@ -404,6 +437,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         singleTabMode: undefined,
         disableFloatingGroups: undefined,
         floatingGroupBounds: undefined,
+        transformFloatingGroupDrag: undefined,
         floatingGroupDragHandle: undefined,
         popoutUrl: undefined,
         nonce: undefined,
