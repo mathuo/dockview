@@ -97,6 +97,7 @@ GridviewOptions
 GridviewPanel
 GridviewPanelApi
 GroupDragEvent
+GroupNavigationDirection
 GroupPanelPartInitParameters
 GroupviewPanelState
 HeaderPartInitParameters

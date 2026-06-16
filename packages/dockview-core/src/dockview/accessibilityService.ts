@@ -343,44 +343,15 @@ export class AccessibilityService
         direction: 'left' | 'right' | 'up' | 'down'
     ): void {
         const current = this.host.activeGroup;
-        if (!current || current.api.location.type !== 'grid') {
+        if (!current) {
             return;
         }
-        const from = current.element.getBoundingClientRect();
-        const fromX = from.left + from.width / 2;
-        const fromY = from.top + from.height / 2;
-
-        let best: DockviewGroupPanel | undefined;
-        let bestDistance = Number.POSITIVE_INFINITY;
-        for (const group of this.host.groups) {
-            if (group === current || group.api.location.type !== 'grid') {
-                continue;
-            }
-            const rect = group.element.getBoundingClientRect();
-            const dx = rect.left + rect.width / 2 - fromX;
-            const dy = rect.top + rect.height / 2 - fromY;
-            // require the candidate to sit predominantly in the asked-for
-            // direction (dominant axis), so 'left' ignores a group that's
-            // mostly above/below.
-            const inDirection =
-                direction === 'left'
-                    ? dx < 0 && Math.abs(dx) >= Math.abs(dy)
-                    : direction === 'right'
-                      ? dx > 0 && Math.abs(dx) >= Math.abs(dy)
-                      : direction === 'up'
-                        ? dy < 0 && Math.abs(dy) >= Math.abs(dx)
-                        : dy > 0 && Math.abs(dy) >= Math.abs(dx);
-            if (!inDirection) {
-                continue;
-            }
-            const distance = dx * dx + dy * dy;
-            if (distance < bestDistance) {
-                bestDistance = distance;
-                best = group;
-            }
-        }
-
-        this._focusGroup(best);
+        // Geometry lives on the host as the shared `adjacentGroupInDirection`
+        // primitive (also public on the api), so mouse and keyboard navigation
+        // agree on what "the group to the left" is.
+        this._focusGroup(
+            this.host.adjacentGroupInDirection(current, direction)
+        );
     }
 
     private _focusGroup(target: DockviewGroupPanel | undefined): void {
