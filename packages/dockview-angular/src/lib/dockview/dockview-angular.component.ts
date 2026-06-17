@@ -96,7 +96,6 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() className?: string;
     @Input() orientation?: 'horizontal' | 'vertical';
     @Input() hideBorders?: boolean;
-    @Input() rootOverlayModel?: 'always' | 'never';
     @Input() defaultTabComponent_?: string;
     @Input() tabHeight?: number;
     @Input() disableFloatingGroups?: boolean;

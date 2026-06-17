@@ -237,10 +237,6 @@ export interface DockviewOptions {
     debug?: boolean;
     // #start dnd
     dndEdges?: false | DroptargetOverlayModel;
-    /**
-     * @deprecated use `dndEdges` instead. To be removed in a future version.
-     * */
-    rootOverlayModel?: DroptargetOverlayModel;
     disableDnd?: boolean;
     /**
      * Selects which drag-and-drop implementation is active.
@@ -444,7 +440,6 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         defaultRenderer: undefined,
         defaultHeaderPosition: undefined,
         debug: undefined,
-        rootOverlayModel: undefined,
         locked: undefined,
         disableDnd: undefined,
         dndStrategy: undefined,
