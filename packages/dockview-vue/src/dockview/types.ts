@@ -3,7 +3,7 @@ import {
     type DockviewOptions,
     type DockviewReadyEvent,
     type DockviewWillDropEvent,
-} from 'dockview-core';
+} from 'dockview';
 import type { VueComponent } from '../utils';
 
 export interface VueProps {

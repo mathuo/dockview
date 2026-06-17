@@ -1,23 +1,20 @@
 # AGENTS.md - dockview
 
-Legacy React bindings package, kept as an alias for backwards compatibility. New projects should install [`dockview-react`](../dockview-react/AGENTS.md) instead — see the repo-root README and docs site for the canonical install instructions.
+The canonical **vanilla JavaScript / TypeScript** package — a thin re-export of
+[`dockview-core`](../dockview-core/AGENTS.md). This is the package framework-agnostic
+consumers should install (`npm install dockview`). Framework bindings live in the
+`dockview-<framework>` packages, all of which depend on this package.
 
-Note: this package still contains the actual React source. `dockview-react` is the thin re-export wrapper that has become the canonical public name. Don't move source between packages without coordinating a publish plan.
+> History: prior to v7 this package contained the React bindings. Those now live in
+> [`dockview-react`](../dockview-react/AGENTS.md). See the repo-root README / docs for
+> the v7 migration notes.
 
 ## Overview
 
-- Re-exports everything from `dockview-core` plus React-specific components
-- Peer dependency: `react ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0`
+- `src/index.ts` is one line: `export * from 'dockview-core'`
+- No unique source; functionality lives in `dockview-core`
 - Runtime dependency: `dockview-core`
-
-## Source Structure
-
-- `src/dockview/` - React components for dockview (DockviewReact, etc.)
-- `src/gridview/` - React components for gridview
-- `src/splitview/` - React components for splitview
-- `src/paneview/` - React components for paneview
-- `src/react.ts` - React utilities (HOCs, hooks)
-- `src/index.ts` - Main entry point, re-exports core + React components
+- No `react` peer dependency
 
 ## Build
 
@@ -25,12 +22,12 @@ Note: this package still contains the actual React source. `dockview-react` is t
 - `build:esm` - TypeScript compilation to ESM
 - `build:css` - Copies CSS from `dockview-core` (`node scripts/copy-css.js`)
 - `build` - All three above in sequence
-- `build:bundle` - Rollup UMD bundle (externalizes `react` and `react-dom`)
+- `build:bundle` - Rollup bundle (UMD bundle is self-contained for CDN; the npm package bundle externalizes `dockview-core`)
 - `clean` - Remove `dist/`, `.build/`, `.rollup.cache/`
 
 ## Testing
 
-- `test` - Jest with ts-jest, jsdom environment
+- `test` - Jest with ts-jest, jsdom environment (smoke test asserting the core re-export)
 - Uses `moduleNameMapper` to resolve `dockview-core` from source
 - Config: `jest.config.ts` (project name: `dockview`)
 

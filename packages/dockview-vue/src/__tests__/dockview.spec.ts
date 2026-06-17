@@ -2,7 +2,7 @@ import { describe, test, expect, vi, afterEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
 import { defineComponent, nextTick } from 'vue';
 import DockviewVue from '../dockview/dockview.vue';
-import { DockviewApi } from 'dockview-core';
+import { DockviewApi } from 'dockview';
 
 const MockPanel = defineComponent({
     name: 'MockPanel',

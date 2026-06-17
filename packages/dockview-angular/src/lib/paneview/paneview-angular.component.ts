@@ -24,7 +24,7 @@ import {
     PROPERTY_KEYS_PANEVIEW,
     PaneviewFrameworkOptions,
     PaneviewComponentOptions,
-} from 'dockview-core';
+} from 'dockview';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
 import { PaneviewAngularReadyEvent } from './types';

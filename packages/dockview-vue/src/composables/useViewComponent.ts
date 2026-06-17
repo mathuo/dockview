@@ -7,7 +7,7 @@ import {
     getCurrentInstance,
     type ComponentInternalInstance,
 } from 'vue';
-import type { DockviewIDisposable } from 'dockview-core';
+import type { DockviewIDisposable } from 'dockview';
 import { findComponent } from '../utils';
 
 export interface ViewComponentConfig<

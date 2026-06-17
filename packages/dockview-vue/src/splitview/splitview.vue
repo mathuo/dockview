@@ -5,7 +5,7 @@ import {
     PROPERTY_KEYS_SPLITVIEW,
     type SplitviewFrameworkOptions,
     createSplitview,
-} from 'dockview-core';
+} from 'dockview';
 import { useViewComponent } from '../composables/useViewComponent';
 import { VueSplitviewPanelView } from './view';
 import type { ISplitviewVueProps, SplitviewVueEvents } from './types';

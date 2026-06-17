@@ -5,7 +5,7 @@ import {
     Parameters,
     ITabRenderer,
     DockviewComponent,
-} from 'dockview-core';
+} from 'dockview';
 import './app.scss';
 
 class DefaultPanel implements IContentRenderer {

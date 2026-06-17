@@ -2,7 +2,7 @@ import type {
     GridviewApi,
     GridviewOptions,
     GridviewPanelApi,
-} from 'dockview-core';
+} from 'dockview';
 import type { VueComponent } from '../utils';
 
 export interface GridviewReadyEvent {

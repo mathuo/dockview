@@ -1,4 +1,4 @@
-import 'dockview-core/dist/styles/dockview.css';
+import 'dockview/dist/styles/dockview.css';
 import {
     createPaneview,
     PaneviewPanel,
@@ -7,7 +7,7 @@ import {
     themeAbyss,
     PanelUpdateEvent,
     PanePanelComponentInitParameter,
-} from 'dockview-core';
+} from 'dockview';
 
 class Panel extends PaneviewPanel {
     private readonly _bodyComponent: IPanePart;

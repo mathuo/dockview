@@ -41,29 +41,41 @@ const DOCKVIEW_CDN = {
     },
     vue: {
         remote: {
+            // dockview-core is resolved transitively (dockview-vue -> dockview
+            // -> dockview-core); it is not imported directly by user code.
             'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}`,
+            dockview: `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}`,
             'dockview-vue': `https://cdn.jsdelivr.net/npm/dockview-vue@${DOCKVIEW_VERSION}`,
         },
         local: {
             'dockview-core': `${local}/dockview-core`,
+            dockview: `${local}/dockview`,
             'dockview-vue': `${local}/dockview-vue`,
         },
     },
     typescript: {
         remote: {
+            // dockview-core is resolved transitively (dockview -> dockview-core);
+            // it is not imported directly by user code.
             'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}`,
+            dockview: `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}`,
         },
         local: {
             'dockview-core': `${local}/dockview-core`,
+            dockview: `${local}/dockview`,
         },
     },
     angular: {
         remote: {
+            // dockview-core is resolved transitively (dockview-angular ->
+            // dockview -> dockview-core); it is not imported directly by user code.
             'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}`,
+            dockview: `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}`,
             'dockview-angular': `https://cdn.jsdelivr.net/npm/dockview-angular@${DOCKVIEW_VERSION}`,
         },
         local: {
             'dockview-core': `${local}/dockview-core`,
+            dockview: `${local}/dockview`,
             'dockview-angular': `${local}/dockview-angular`,
         },
     },

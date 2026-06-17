@@ -3,7 +3,7 @@ import { Component, DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 
 import { PaneviewAngularComponent } from '../lib/paneview/paneview-angular.component';
-import { PaneviewApi, PaneviewDropEvent } from 'dockview-core';
+import { PaneviewApi, PaneviewDropEvent } from 'dockview';
 import { setupTestBed, getTestComponents } from './__test_utils__/test-helpers';
 
 describe('PaneviewAngularComponent', () => {

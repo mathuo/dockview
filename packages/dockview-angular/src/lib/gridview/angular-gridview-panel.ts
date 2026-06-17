@@ -4,7 +4,7 @@ import {
     EnvironmentInjector,
     TemplateRef,
 } from '@angular/core';
-import { GridviewPanel, IFrameworkPart } from 'dockview-core';
+import { GridviewPanel, IFrameworkPart } from 'dockview';
 import { AngularRenderer } from '../utils/angular-renderer';
 
 export class AngularGridviewPanel extends GridviewPanel {

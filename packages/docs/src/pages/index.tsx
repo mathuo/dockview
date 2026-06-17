@@ -206,7 +206,7 @@ function Frameworks() {
         },
         {
             name: 'TypeScript',
-            pkg: 'dockview-core',
+            pkg: 'dockview',
             logo: '/img/js-icon.svg',
         },
     ];

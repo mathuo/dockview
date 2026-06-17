@@ -2,7 +2,7 @@ import {
     IPanePart,
     PanePanelComponentInitParameter,
     PanelUpdateEvent,
-} from 'dockview-core';
+} from 'dockview';
 import { type ComponentInternalInstance } from 'vue';
 import { VuePart, type VueComponent } from '../utils';
 import type { IPaneviewVuePanelProps } from './types';

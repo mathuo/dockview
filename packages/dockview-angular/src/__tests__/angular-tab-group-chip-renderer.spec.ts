@@ -6,7 +6,7 @@ import {
     Injector,
 } from '@angular/core';
 import { fromPartial } from '@total-typescript/shoehorn';
-import { DockviewApi, ITabGroup } from 'dockview-core';
+import { DockviewApi, ITabGroup } from 'dockview';
 import { AngularTabGroupChipRenderer } from '../lib/dockview/angular-tab-group-chip-renderer';
 
 @Component({

@@ -6,7 +6,7 @@ import {
     Orientation,
     PROPERTY_KEYS_SPLITVIEW,
     SplitviewApi,
-} from 'dockview-core';
+} from 'dockview';
 import SplitviewVue from '../splitview/splitview.vue';
 import { VueSplitviewPanelView } from '../splitview/view';
 import { VuePart } from '../utils';

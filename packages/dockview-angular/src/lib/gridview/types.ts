@@ -1,5 +1,5 @@
 import { TemplateRef, Type } from '@angular/core';
-import { GridviewOptions, GridviewApi } from 'dockview-core';
+import { GridviewOptions, GridviewApi } from 'dockview';
 
 export interface GridviewAngularReadyEvent {
     api: GridviewApi;
@@ -14,4 +14,4 @@ export interface GridviewAngularEvents {
 }
 
 // Re-export commonly used types from dockview-core
-export { GridviewApi, GridviewOptions } from 'dockview-core';
+export { GridviewApi, GridviewOptions } from 'dockview';

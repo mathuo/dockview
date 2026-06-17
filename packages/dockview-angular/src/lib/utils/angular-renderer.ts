@@ -8,7 +8,7 @@ import {
     TemplateRef,
     Type,
 } from '@angular/core';
-import { IContentRenderer, IFrameworkPart, Parameters } from 'dockview-core';
+import { IContentRenderer, IFrameworkPart, Parameters } from 'dockview';
 
 export interface AngularRendererOptions<T = unknown> {
     component: Type<T> | TemplateRef<T>;

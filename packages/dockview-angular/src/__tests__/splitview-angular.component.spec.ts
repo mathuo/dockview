@@ -3,7 +3,7 @@ import { Component, DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 
 import { SplitviewAngularComponent } from '../lib/splitview/splitview-angular.component';
-import { SplitviewApi } from 'dockview-core';
+import { SplitviewApi } from 'dockview';
 import { setupTestBed, getTestComponents } from './__test_utils__/test-helpers';
 
 describe('SplitviewAngularComponent', () => {

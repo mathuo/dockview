@@ -10,7 +10,7 @@ const config: JestConfigWithTsJest = {
         '<rootDir>/packages/dockview-react/src/**/*.{js,jsx,ts,tsx}',
     ],
     setupFiles: [
-        // '<rootDir>/packages/dockview-react/src/__tests__/__mocks__/resizeObserver.js',
+        '<rootDir>/packages/dockview-react/src/__tests__/__mocks__/resizeObserver.js',
     ],
     setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
     coveragePathIgnorePatterns: ['/node_modules/'],
@@ -19,8 +19,8 @@ const config: JestConfigWithTsJest = {
         '^dockview$': '<rootDir>/packages/dockview/src/index.ts',
     },
     modulePathIgnorePatterns: [
-        // '<rootDir>/packages/dockview-react/src/__tests__/__mocks__',
-        // '<rootDir>/packages/dockview-react/src/__tests__/__test_utils__',
+        '<rootDir>/packages/dockview-react/src/__tests__/__mocks__',
+        '<rootDir>/packages/dockview-react/src/__tests__/__test_utils__',
     ],
     coverageDirectory: '<rootDir>/packages/dockview-react/coverage/',
     // testResultsProcessor inherited from root config

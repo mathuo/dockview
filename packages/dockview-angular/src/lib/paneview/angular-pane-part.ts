@@ -8,7 +8,7 @@ import {
     IPanePart,
     PanelUpdateEvent,
     PanePanelComponentInitParameter,
-} from 'dockview-core';
+} from 'dockview';
 import { AngularRenderer } from '../utils/angular-renderer';
 
 export class AngularPanePart implements IPanePart {

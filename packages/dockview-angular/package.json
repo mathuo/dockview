@@ -67,7 +67,7 @@
         "format:check": "prettier --check 'src/**/*.{ts,tsx,js,jsx}'"
     },
     "dependencies": {
-        "dockview-core": "^6.6.1"
+        "dockview": "^6.6.1"
     },
     "peerDependencies": {
         "@angular/common": ">=21.0.6",

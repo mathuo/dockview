@@ -38,7 +38,7 @@ import {
     DockviewPanelRenderer,
     DockviewTheme,
     DroptargetOverlayModel,
-} from 'dockview-core';
+} from 'dockview';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularRenderer } from '../utils/angular-renderer';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';

@@ -23,7 +23,7 @@ import {
     PROPERTY_KEYS_GRIDVIEW,
     GridviewFrameworkOptions,
     GridviewComponentOptions,
-} from 'dockview-core';
+} from 'dockview';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
 import { GridviewAngularReadyEvent } from './types';

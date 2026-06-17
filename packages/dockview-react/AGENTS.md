@@ -1,19 +1,43 @@
 # AGENTS.md - dockview-react
 
-Canonical React bindings package — the public install name users should reach for (`npm install dockview-react`). All documentation, READMEs, and examples point at this package.
+The **React bindings** package (`npm install dockview-react`). Contains the actual React
+source — `DockviewReact` and the gridview/splitview/paneview React components, portal
+bridge, hooks. All documentation, READMEs, and examples point at this package for React.
+
+> History: prior to v7 this source lived in the `dockview` package and `dockview-react`
+> was a thin re-export of it. From v7 the source lives here, and `dockview` is the
+> vanilla re-export of `dockview-core`.
 
 ## Overview
 
-- Entire source is one line: `export * from 'dockview'`
-- Re-exports the implementation from the `dockview` package, which is kept as a legacy alias for backwards compatibility
-- No unique source code in this package; functionality lives in the `dockview` package
+- Re-exports everything from `dockview` (which re-exports `dockview-core`) plus React-specific components
+- Peer dependency: `react ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0`
+- Runtime dependency: `dockview` (not `dockview-core` directly)
+
+## Source Structure
+
+- `src/dockview/` - React components for dockview (DockviewReact, etc.)
+- `src/gridview/` - React components for gridview
+- `src/splitview/` - React components for splitview
+- `src/paneview/` - React components for paneview
+- `src/react.ts` - React utilities (HOCs, hooks, portal bridge)
+- `src/index.ts` - Main entry point, re-exports `dockview` + React components
 
 ## Build
 
-- Build and config mirror the `dockview` package (tsc CJS + ESM, copy-css, rollup bundle)
+- `build:cjs` - TypeScript compilation to CommonJS
+- `build:esm` - TypeScript compilation to ESM
+- `build:css` - Copies CSS from `dockview-core` (`node scripts/copy-css.js`)
+- `build` - All three above in sequence
+- `build:bundle` - Rollup UMD bundle (self-contained for CDN; externalizes `react` and `react-dom`)
 - `clean` - Remove `dist/`, `.build/`, `.rollup.cache/`
+
+## Testing
+
+- `test` - Jest with ts-jest, jsdom environment
+- Uses `moduleNameMapper` to resolve `dockview` and `dockview-core` from source
+- Config: `jest.config.ts` (project name: `dockview-react`)
 
 ## Dependencies
 
-- Depends on: `dockview` (not `dockview-core` directly)
-- Build chain: `dockview-core` -> `dockview` -> `dockview-react`
+- Depends on: `dockview` (build chain: `dockview-core` -> `dockview` -> `dockview-react`)

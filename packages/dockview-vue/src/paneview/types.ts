@@ -3,7 +3,7 @@ import type {
     PaneviewDropEvent,
     PaneviewOptions,
     PaneviewPanelApi,
-} from 'dockview-core';
+} from 'dockview';
 import type { VueComponent } from '../utils';
 
 export interface PaneviewReadyEvent {

@@ -5,7 +5,7 @@ import {
     createPaneview,
     PaneviewApi,
     PROPERTY_KEYS_PANEVIEW,
-} from 'dockview-core';
+} from 'dockview';
 import PaneviewVue from '../paneview/paneview.vue';
 import { VuePaneviewPanelView } from '../paneview/view';
 import * as paneviewTypes from '../paneview/types';

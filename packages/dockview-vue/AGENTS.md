@@ -6,7 +6,7 @@ Vue 3 bindings for dockview.
 
 - Uses Vue SFCs (`.vue` files) and composition API
 - Peer dependency: `vue ^3.4.0`
-- Runtime dependency: `dockview-core`
+- Runtime dependency: `dockview` (re-exports `dockview-core`)
 
 ## Build
 
@@ -31,4 +31,4 @@ Vue 3 bindings for dockview.
 
 ## Dependencies
 
-- Depends on: `dockview-core` (must be built first)
+- Depends on: `dockview` (must be built first; build chain: dockview-core -> dockview -> this)

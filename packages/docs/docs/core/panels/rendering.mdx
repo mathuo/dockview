@@ -218,7 +218,7 @@ When you implement a custom `IContentRenderer` (typically only relevant for vani
 - `onHide()` — fires when the panel becomes hidden (another tab in the group is selected, or the group is hidden).
 
 ```ts
-import { IContentRenderer, GroupPanelPartInitParameters } from 'dockview-core';
+import { IContentRenderer, GroupPanelPartInitParameters } from 'dockview';
 
 class MyPanel implements IContentRenderer {
     private readonly _element: HTMLElement;

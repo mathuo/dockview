@@ -3,7 +3,7 @@
  */
 
 // Re-export everything from dockview-core
-export * from 'dockview-core';
+export * from 'dockview';
 
 // Angular module
 export * from './lib/dockview-angular.module';
