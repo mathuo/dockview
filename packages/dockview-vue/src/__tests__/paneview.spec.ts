@@ -1,11 +1,7 @@
 import { describe, test, expect, afterEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
 import { defineComponent } from 'vue';
-import {
-    createPaneview,
-    PaneviewApi,
-    PROPERTY_KEYS_PANEVIEW,
-} from 'dockview';
+import { createPaneview, PaneviewApi, PROPERTY_KEYS_PANEVIEW } from 'dockview';
 import PaneviewVue from '../paneview/paneview.vue';
 import { VuePaneviewPanelView } from '../paneview/view';
 import * as paneviewTypes from '../paneview/types';
