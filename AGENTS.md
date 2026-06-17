@@ -136,6 +136,12 @@ NX handles build ordering automatically via `dependsOn: ["^build"]`. The depende
 -   Serialization provides snapshot-based state persistence
 -   APIs provide reactive interfaces with event subscriptions
 
+### Coding Conventions
+
+-   When fixing a bug, write a failing test that reproduces it first, then make it pass.
+-   Code comments describe the current state of the code, not its history. Don't reference the fix, PR, or what changed unless that context is critical to understanding the code as it stands.
+-   Keep comments brief and concise.
+
 ## Release Management
 
 ### Creating Release Notes

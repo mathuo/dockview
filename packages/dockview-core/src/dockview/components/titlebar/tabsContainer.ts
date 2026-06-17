@@ -509,7 +509,9 @@ export class TabsContainer
                                 const panel = this.group.panels.find(
                                     (p) => p.id === firstPanelId
                                 );
-                                panel?.api.setActive();
+                                this.accessor.withOrigin('user', () =>
+                                    panel?.api.setActive()
+                                );
                             }
                         });
 
@@ -554,7 +556,9 @@ export class TabsContainer
                             tg.expand();
                         }
                         tab.element.scrollIntoView();
-                        tab.panel.api.setActive();
+                        this.accessor.withOrigin('user', () =>
+                            tab.panel.api.setActive()
+                        );
                     });
                     wrapper.appendChild(child);
 

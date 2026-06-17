@@ -49,7 +49,7 @@ export const EventLogPanel: React.FC<{ api: DockviewApi }> = ({ api }) => {
                 add(`Panel removed: ${e.id}`, 'panel')
             ),
             api.onDidActivePanelChange((e) =>
-                add(`Active panel: ${e?.id ?? 'none'}`, 'panel')
+                add(`Active panel: ${e.panel?.id ?? 'none'}`, 'panel')
             ),
             api.onDidMovePanel((e) =>
                 add(`Panel moved: ${e.panel.id}`, 'panel')

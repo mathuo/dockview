@@ -26,6 +26,7 @@ DefaultDockviewDeserialzier
 DefaultTab
 Direction
 DistributeSizing
+DockviewActivePanelChangeEvent
 DockviewApi
 DockviewComponent
 DockviewComponentOptions
@@ -52,11 +53,11 @@ DockviewIDisposable
 DockviewKeybindings
 DockviewLayoutMutationEvent
 DockviewLayoutMutationKind
-DockviewLayoutMutationOrigin
 DockviewMaximizedGroupChanged
 DockviewMessages
 DockviewMutableDisposable
 DockviewOptions
+DockviewOrigin
 DockviewPanel
 DockviewPanelApi
 DockviewPanelMoveParams

@@ -284,17 +284,28 @@ export type DockviewLayoutMutationKind =
     | 'clear';
 
 /**
- * Who caused a layout mutation: `'user'` for mutations driven by direct
- * interaction (drag-and-drop, tab UI, keyboard docking) and `'api'` for those
- * entered through a {@link DockviewApi} method called by application code.
- * Lets consumers (e.g. an undo stack) treat the app's own programmatic changes
- * differently from end-user gestures.
+ * Who caused an operation: `'user'` for changes driven by direct interaction
+ * (drag-and-drop, tab UI, keyboard docking) and `'api'` for those entered
+ * through a {@link DockviewApi} method called by application code. Lets
+ * consumers (e.g. an undo stack, or a context-sync listener) treat the app's
+ * own programmatic changes differently from end-user gestures.
  */
-export type DockviewLayoutMutationOrigin = 'user' | 'api';
+export type DockviewOrigin = 'user' | 'api';
 
 export interface DockviewLayoutMutationEvent {
     readonly kind: DockviewLayoutMutationKind;
-    readonly origin: DockviewLayoutMutationOrigin;
+    readonly origin: DockviewOrigin;
+}
+
+/**
+ * Fired by `onDidActivePanelChange` when the active panel changes. Carries the
+ * {@link DockviewOrigin} so consumers can distinguish a user clicking a tab
+ * from a programmatic `setActive` call (e.g. to avoid feedback loops when
+ * syncing context off the active panel).
+ */
+export interface DockviewActivePanelChangeEvent {
+    readonly panel: IDockviewPanel | undefined;
+    readonly origin: DockviewOrigin;
 }
 
 export interface PopoutGroupChangeSizeEvent {
@@ -332,16 +343,13 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onWillDrop: Event<DockviewWillDropEvent>;
     readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;
     readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent>;
-    mutationOrigin(): DockviewLayoutMutationOrigin;
-    withMutationOrigin<T>(
-        origin: DockviewLayoutMutationOrigin,
-        func: () => T
-    ): T;
+    currentOrigin(): DockviewOrigin;
+    withOrigin<T>(origin: DockviewOrigin, func: () => T): T;
     readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent>;
     readonly onDidRemovePanel: Event<IDockviewPanel>;
     readonly onDidAddPanel: Event<IDockviewPanel>;
     readonly onDidLayoutFromJSON: Event<void>;
-    readonly onDidActivePanelChange: Event<IDockviewPanel | undefined>;
+    readonly onDidActivePanelChange: Event<DockviewActivePanelChangeEvent>;
     readonly onWillDragPanel: Event<TabDragEvent>;
     readonly onWillDragGroup: Event<GroupDragEvent>;
     readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
@@ -460,10 +468,13 @@ export class DockviewComponent
     // Compound operations (e.g. a drag that relocates a panel) nest via the
     // depth counter and bracket as a single transaction. See `mutation()`.
     private _mutationDepth = 0;
-    // Current mutation origin. Defaults to `'user'`; the DockviewApi boundary
+    // Current operation origin. Defaults to `'user'`; the DockviewApi boundary
     // flips it to `'api'` for the duration of a programmatic call via
-    // `withMutationOrigin`. Nested mutations inherit the outer origin.
-    private _mutationOrigin: DockviewLayoutMutationOrigin = 'user';
+    // `withOrigin`. Nested operations inherit the outermost origin (tracked by
+    // `_originDepth`, independent of mutation bracketing so it also covers
+    // active-panel changes that are not structural mutations).
+    private _origin: DockviewOrigin = 'user';
+    private _originDepth = 0;
     private readonly _onWillMutateLayout =
         new Emitter<DockviewLayoutMutationEvent>();
     readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent> =
@@ -511,10 +522,9 @@ export class DockviewComponent
     private readonly _onDidLayoutFromJSON = new Emitter<void>();
     readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutFromJSON.event;
 
-    private readonly _onDidActivePanelChange = new Emitter<
-        IDockviewPanel | undefined
-    >({ replay: true });
-    readonly onDidActivePanelChange: Event<IDockviewPanel | undefined> =
+    private readonly _onDidActivePanelChange =
+        new Emitter<DockviewActivePanelChangeEvent>({ replay: true });
+    readonly onDidActivePanelChange: Event<DockviewActivePanelChangeEvent> =
         this._onDidActivePanelChange.event;
 
     private readonly _onDidMovePanel = new Emitter<MovePanelEvent>();
@@ -3594,7 +3604,7 @@ export class DockviewComponent
 
         if (!options?.skipActive) {
             if (this.activePanel !== activePanel) {
-                this._onDidActivePanelChange.fire(this.activePanel);
+                this.fireActivePanelChange(this.activePanel);
             }
         }
 
@@ -3642,7 +3652,7 @@ export class DockviewComponent
      */
     mutation<T>(kind: DockviewLayoutMutationKind, func: () => T): T {
         const outer = this._mutationDepth === 0;
-        const origin = this._mutationOrigin;
+        const origin = this._origin;
         if (outer) {
             this._onWillMutateLayout.fire({ kind, origin });
         }
@@ -3658,37 +3668,44 @@ export class DockviewComponent
     }
 
     /**
-     * The origin of the mutation currently in progress (`'user'` by default).
-     * Read inside a `mutation()`'s lifetime to learn whether the change was
-     * driven by application code (via the {@link DockviewApi}) or a user
-     * gesture.
+     * The origin of the operation currently in progress (`'user'` by default).
+     * Read inside a `mutation()` or active-panel change to learn whether the
+     * change was driven by application code (via the {@link DockviewApi}) or a
+     * user gesture.
      */
-    mutationOrigin(): DockviewLayoutMutationOrigin {
-        return this._mutationOrigin;
+    currentOrigin(): DockviewOrigin {
+        return this._origin;
     }
 
     /**
-     * Run `func` with the mutation origin set to `origin`, restoring the
+     * Run `func` with the operation origin set to `origin`, restoring the
      * previous value afterwards. Used by the DockviewApi boundary to tag
-     * programmatic mutations as `'api'`; nested mutations inherit the
-     * outermost origin (a re-entrant call does not overwrite it).
+     * programmatic operations as `'api'`, and by user-gesture handlers to tag
+     * `'user'`. Only the outermost caller sets the origin — a nested call (or a
+     * call made while a mutation is already in flight) keeps whatever the
+     * enclosing operation established, so the trigger always wins.
      */
-    withMutationOrigin<T>(
-        origin: DockviewLayoutMutationOrigin,
-        func: () => T
-    ): T {
-        // Only the outermost caller sets the origin — a nested mutation keeps
-        // whatever the enclosing operation established.
-        if (this._mutationDepth > 0) {
+    withOrigin<T>(origin: DockviewOrigin, func: () => T): T {
+        if (this._originDepth > 0 || this._mutationDepth > 0) {
             return func();
         }
-        const previous = this._mutationOrigin;
-        this._mutationOrigin = origin;
+        const previous = this._origin;
+        this._origin = origin;
+        this._originDepth++;
         try {
             return func();
         } finally {
-            this._mutationOrigin = previous;
+            this._originDepth--;
+            this._origin = previous;
         }
+    }
+
+    /**
+     * Fire `onDidActivePanelChange` with the panel and the current operation
+     * {@link DockviewOrigin}. Callers keep their own dedupe guards.
+     */
+    private fireActivePanelChange(panel: IDockviewPanel | undefined): void {
+        this._onDidActivePanelChange.fire({ panel, origin: this._origin });
     }
 
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void {
@@ -4419,9 +4436,9 @@ export class DockviewComponent
 
         if (
             !this._moving &&
-            activePanel !== this._onDidActivePanelChange.value
+            activePanel !== this._onDidActivePanelChange.value?.panel
         ) {
-            this._onDidActivePanelChange.fire(activePanel);
+            this.fireActivePanelChange(activePanel);
         }
     }
 
@@ -4440,9 +4457,9 @@ export class DockviewComponent
 
         if (
             !this._moving &&
-            activePanel !== this._onDidActivePanelChange.value
+            activePanel !== this._onDidActivePanelChange.value?.panel
         ) {
-            this._onDidActivePanelChange.fire(activePanel);
+            this.fireActivePanelChange(activePanel);
         }
     }
 
@@ -4543,8 +4560,11 @@ export class DockviewComponent
                         return;
                     }
 
-                    if (this._onDidActivePanelChange.value !== event.panel) {
-                        this._onDidActivePanelChange.fire(event.panel);
+                    if (
+                        this._onDidActivePanelChange.value?.panel !==
+                        event.panel
+                    ) {
+                        this.fireActivePanelChange(event.panel);
                     }
                 }),
                 Event.any(

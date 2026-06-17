@@ -15,6 +15,7 @@ import { DockviewPanelApi } from '../../../../api/dockviewPanelApi';
 describe('tabsContainer', () => {
     test('that an external event does not render a drop target and calls through to the group mode', () => {
         const accessor = fromPartial<DockviewComponent>({
+            withOrigin: (_origin: any, fn: () => any) => fn(),
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},
@@ -73,6 +74,7 @@ describe('tabsContainer', () => {
 
     test('that a drag over event from another tab should render a drop target', () => {
         const accessor = fromPartial<DockviewComponent>({
+            withOrigin: (_origin: any, fn: () => any) => fn(),
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
@@ -148,6 +150,7 @@ describe('tabsContainer', () => {
 
     test('that dropping over the empty space should render a drop target', () => {
         const accessor = fromPartial<DockviewComponent>({
+            withOrigin: (_origin: any, fn: () => any) => fn(),
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
@@ -219,6 +222,7 @@ describe('tabsContainer', () => {
         'that dropping over the empty space does not render a drop target when group is locked=%p (regression #990)',
         (lockedValue) => {
             const accessor = fromPartial<DockviewComponent>({
+                withOrigin: (_origin: any, fn: () => any) => fn(),
                 id: 'testcomponentid',
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
@@ -287,6 +291,7 @@ describe('tabsContainer', () => {
 
     test('that dropping the first tab should render a drop target', () => {
         const accessor = fromPartial<DockviewComponent>({
+            withOrigin: (_origin: any, fn: () => any) => fn(),
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
@@ -356,6 +361,7 @@ describe('tabsContainer', () => {
 
     test('that dropping a tab from another component should not render a drop target', () => {
         const accessor = fromPartial<DockviewComponent>({
+            withOrigin: (_origin: any, fn: () => any) => fn(),
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
@@ -430,6 +436,7 @@ describe('tabsContainer', () => {
 
     test('left actions', () => {
         const accessor = fromPartial<DockviewComponent>({
+            withOrigin: (_origin: any, fn: () => any) => fn(),
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
@@ -497,6 +504,7 @@ describe('tabsContainer', () => {
 
     test('right actions', () => {
         const accessor = fromPartial<DockviewComponent>({
+            withOrigin: (_origin: any, fn: () => any) => fn(),
             id: 'testcomponentid',
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
@@ -564,6 +572,7 @@ describe('tabsContainer', () => {
 
     test('that a tab will become floating when clicked if not floating and shift is selected', () => {
         const accessor = fromPartial<DockviewComponent>({
+            withOrigin: (_origin: any, fn: () => any) => fn(),
             options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
@@ -623,6 +632,7 @@ describe('tabsContainer', () => {
 
     test('that an edge group cannot be floated via shift+click', () => {
         const accessor = fromPartial<DockviewComponent>({
+            withOrigin: (_origin: any, fn: () => any) => fn(),
             options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
@@ -672,6 +682,7 @@ describe('tabsContainer', () => {
 
     test('that a tab that is already floating cannot be floated again', () => {
         const accessor = fromPartial<DockviewComponent>({
+            withOrigin: (_origin: any, fn: () => any) => fn(),
             options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
@@ -726,6 +737,7 @@ describe('tabsContainer', () => {
 
     test('that selecting a tab with shift down will move that tab into a new floating group', () => {
         const accessor = fromPartial<DockviewComponent>({
+            withOrigin: (_origin: any, fn: () => any) => fn(),
             options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
@@ -785,6 +797,7 @@ describe('tabsContainer', () => {
 
     test('pre header actions', () => {
         const accessor = fromPartial<DockviewComponent>({
+            withOrigin: (_origin: any, fn: () => any) => fn(),
             options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
@@ -855,6 +868,7 @@ describe('tabsContainer', () => {
 
     test('left header actions', () => {
         const accessor = fromPartial<DockviewComponent>({
+            withOrigin: (_origin: any, fn: () => any) => fn(),
             options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
@@ -925,6 +939,7 @@ describe('tabsContainer', () => {
 
     test('right header actions', () => {
         const accessor = fromPartial<DockviewComponent>({
+            withOrigin: (_origin: any, fn: () => any) => fn(),
             options: {},
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
@@ -996,6 +1011,7 @@ describe('tabsContainer', () => {
     test('class dv-single-tab is present when only one tab exists`', () => {
         const cut = new TabsContainer(
             fromPartial<DockviewComponent>({
+                withOrigin: (_origin: any, fn: () => any) => fn(),
                 options: {},
                 onDidOptionsChange: jest
                     .fn()
@@ -1030,6 +1046,7 @@ describe('tabsContainer', () => {
     describe('updateDragAndDropState', () => {
         test('that updateDragAndDropState calls updateDragAndDropState on tabs and voidContainer', () => {
             const accessor = fromPartial<DockviewComponent>({
+                withOrigin: (_origin: any, fn: () => any) => fn(),
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
                 options: {},
@@ -1071,6 +1088,7 @@ describe('tabsContainer', () => {
             };
 
             const accessor = fromPartial<DockviewComponent>({
+                withOrigin: (_origin: any, fn: () => any) => fn(),
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
                 options: {},
@@ -1212,6 +1230,7 @@ describe('tabsContainer', () => {
             };
 
             const accessor = fromPartial<DockviewComponent>({
+                withOrigin: (_origin: any, fn: () => any) => fn(),
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
                 options: {},
@@ -1343,6 +1362,7 @@ describe('tabsContainer', () => {
             };
 
             const accessor = fromPartial<DockviewComponent>({
+                withOrigin: (_origin: any, fn: () => any) => fn(),
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
                 options: {},
@@ -1466,6 +1486,7 @@ describe('tabsContainer', () => {
 
     test('direction setter toggles CSS classes', () => {
         const accessor = fromPartial<DockviewComponent>({
+            withOrigin: (_origin: any, fn: () => any) => fn(),
             onDidAddPanel: jest.fn(),
             onDidRemovePanel: jest.fn(),
             options: {},

@@ -275,8 +275,8 @@ export class AppComponent implements OnDestroy {
                 this.groupCount = this.api!.groups.length;
                 this.cd.markForCheck();
             }),
-            this.api.onDidActivePanelChange((panel) => {
-                this.activePanelId = panel?.id ?? '';
+            this.api.onDidActivePanelChange((event) => {
+                this.activePanelId = event.panel?.id ?? '';
                 this.cd.markForCheck();
             })
         );
