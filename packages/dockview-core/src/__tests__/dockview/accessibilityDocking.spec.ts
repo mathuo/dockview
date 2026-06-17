@@ -199,6 +199,87 @@ describe('accessibility: tab switching', () => {
 });
 
 /**
+ * Jump focus from panel content into the active group's tab strip
+ * (Ctrl+Shift+\ by default), from where the tablist's own roving-tabindex
+ * arrow navigation takes over.
+ */
+describe('accessibility: focus the tab strip', () => {
+    let container: HTMLElement;
+    let dockview: DockviewComponent;
+
+    const make = (
+        keyboardNavigation: boolean | { keymap?: Record<string, string> }
+    ): void => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            keyboardNavigation,
+        });
+        dockview.layout(1000, 1000);
+    };
+
+    const threeTabs = (): void => {
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        dockview.addPanel({ id: 'p2', component: 'default', title: 'P2' });
+        dockview.addPanel({ id: 'p3', component: 'default', title: 'P3' });
+    };
+
+    afterEach(() => {
+        dockview.dispose();
+        container.remove();
+    });
+
+    test('Ctrl+Shift+\\ focuses the active group active tab', () => {
+        make(true);
+        threeTabs(); // one group, p3 active
+
+        fireEvent.keyDown(dockview.element, {
+            key: '\\',
+            ctrlKey: true,
+            shiftKey: true,
+        });
+
+        const active = document.activeElement as HTMLElement;
+        expect(active?.getAttribute('role')).toBe('tab');
+        expect(active?.textContent).toContain('P3');
+    });
+
+    test('a rebound focusTabs keymap is honoured (and the default no longer fires)', () => {
+        make({ keymap: { focusTabs: 'alt+t' } });
+        threeTabs();
+
+        fireEvent.keyDown(dockview.element, {
+            key: '\\',
+            ctrlKey: true,
+            shiftKey: true,
+        });
+        expect(
+            (document.activeElement as HTMLElement)?.getAttribute('role')
+        ).not.toBe('tab');
+
+        fireEvent.keyDown(dockview.element, { key: 't', altKey: true });
+        expect((document.activeElement as HTMLElement)?.textContent).toContain(
+            'P3'
+        );
+    });
+
+    test('does nothing when keyboardNavigation is off', () => {
+        make(false);
+        threeTabs();
+
+        fireEvent.keyDown(dockview.element, {
+            key: '\\',
+            ctrlKey: true,
+            shiftKey: true,
+        });
+        expect(
+            (document.activeElement as HTMLElement)?.getAttribute('role')
+        ).not.toBe('tab');
+    });
+});
+
+/**
  * Move focus between groups by keyboard — F6 / Shift+F6 step to the next /
  * previous group in gridview order (wrapping round).
  */

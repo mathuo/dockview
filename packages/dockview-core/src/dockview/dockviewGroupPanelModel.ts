@@ -1168,6 +1168,10 @@ export class DockviewGroupPanelModel
         this.contentContainer.element.focus();
     }
 
+    focusActiveTab(): void {
+        this.tabsContainer.focusActiveTab();
+    }
+
     set renderContainer(value: OverlayRenderContainer | null) {
         this.panels.forEach((panel) => {
             this.renderContainer.detatch(panel);

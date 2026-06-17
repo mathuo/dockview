@@ -121,6 +121,8 @@ export interface DockviewKeybindings {
     focusGroupDown: string;
     /** Arm keyboard docking of the active panel. Default `ctrl+m`. */
     dock: string;
+    /** Move focus from panel content to the focused group's tab strip. Default `ctrl+shift+\`. */
+    focusTabs: string;
 }
 
 export interface KeyboardNavigationOptions {

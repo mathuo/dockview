@@ -59,6 +59,7 @@ export interface ITabsContainer extends IDisposable {
     getTabId(panelId: string): string | undefined;
     setActive(isGroupActive: boolean): void;
     setActivePanel(panel: IDockviewPanel): void;
+    focusActiveTab(): void;
     isActive(tab: Tab): boolean;
     closePanel(panel: IDockviewPanel): void;
     openPanel(panel: IDockviewPanel, index?: number): void;
@@ -376,6 +377,10 @@ export class TabsContainer
 
     setActivePanel(panel: IDockviewPanel): void {
         this.tabs.setActivePanel(panel);
+    }
+
+    focusActiveTab(): void {
+        this.tabs.focusActiveTab();
     }
 
     openPanel(panel: IDockviewPanel, index: number = this.tabs.size): void {

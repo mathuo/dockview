@@ -704,6 +704,79 @@ describe('tabs', () => {
         });
     });
 
+    describe('keyboard tab close', () => {
+        function createClosablePanel(id: string): {
+            panel: IDockviewPanel;
+            close: jest.Mock;
+        } {
+            const close = jest.fn();
+            const panel = fromPartial<IDockviewPanel>({
+                id,
+                api: fromPartial({ close }),
+                view: fromPartial<IDockviewPanelModel>({
+                    tab: {
+                        element: document.createElement('div'),
+                        init: jest.fn(),
+                        update: jest.fn(),
+                        dispose: jest.fn(),
+                    },
+                }),
+            });
+            return { panel, close };
+        }
+
+        test.each(['Delete', 'Backspace'])(
+            'pressing %s on a focused tab closes its panel',
+            (key) => {
+                const { tabs } = createTabsForDropTest();
+                const panels = ['p1', 'p2', 'p3'].map((id) =>
+                    createClosablePanel(id)
+                );
+                panels.forEach(({ panel }) => tabs.openPanel(panel));
+
+                fireEvent.keyDown(getTabElements(tabs)[1], { key });
+
+                expect(panels[1].close).toHaveBeenCalledTimes(1);
+                expect(panels[0].close).not.toHaveBeenCalled();
+                expect(panels[2].close).not.toHaveBeenCalled();
+            }
+        );
+
+        test('ignores the key when focus is not on a tab element', () => {
+            const { tabs } = createTabsForDropTest();
+            const { panel, close } = createClosablePanel('p1');
+            tabs.openPanel(panel);
+
+            fireEvent.keyDown((tabs as any)._tabsList, { key: 'Delete' });
+
+            expect(close).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('focusActiveTab', () => {
+        test('moves DOM focus to the tab of the group active panel', () => {
+            const { tabs } = createTabsForDropTest();
+            document.body.appendChild(tabs.element);
+
+            const p1 = createMockPanel('p1');
+            const p2 = createMockPanel('p2');
+            tabs.openPanel(p1);
+            tabs.openPanel(p2);
+            // The group reports p2 as active.
+            (tabs as any).group.activePanel = p2;
+
+            tabs.focusActiveTab();
+
+            expect(document.activeElement).toBe(getTabElements(tabs)[1]);
+            tabs.element.remove();
+        });
+
+        test('does not throw when there are no tabs', () => {
+            const { tabs } = createTabsForDropTest();
+            expect(() => tabs.focusActiveTab()).not.toThrow();
+        });
+    });
+
     describe('direction', () => {
         test('direction setter toggles CSS classes', () => {
             const cut = new Tabs(

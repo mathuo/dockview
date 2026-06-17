@@ -36,6 +36,7 @@ const DEFAULT_KEYMAP: DockviewKeybindings = {
     focusGroupUp: 'ctrl+shift+arrowup',
     focusGroupDown: 'ctrl+shift+arrowdown',
     dock: 'ctrl+m',
+    focusTabs: 'ctrl+shift+\\',
 };
 
 /**
@@ -310,10 +311,19 @@ export class AccessibilityService
         } else if (matchesBinding(e, keymap.focusGroupDown)) {
             this._consume(e);
             this._focusGroupInDirection('down');
+        } else if (matchesBinding(e, keymap.focusTabs)) {
+            this._consume(e);
+            this._focusTabs();
         }
     }
 
     // --- navigation (uses the public group API + the adjacentGroup primitive) ---
+
+    private _focusTabs(): void {
+        // Jump from panel content to the active group's tab strip; the
+        // tablist's own roving-tabindex handler takes over from there.
+        this.host.activeGroup?.model.focusActiveTab();
+    }
 
     private _switchTab(reverse: boolean): void {
         const group = this.host.activeGroup;
