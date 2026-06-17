@@ -7,7 +7,7 @@
   "version": "1.0.0",
   "main": "src/index.ts",
   "dependencies": {
-    "dockview-core": "*"
+    "dockview": "*"
   },
   "devDependencies": {
     "typescript": "^4.9.5",

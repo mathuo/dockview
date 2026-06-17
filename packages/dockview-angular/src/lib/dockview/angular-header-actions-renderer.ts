@@ -17,7 +17,7 @@ import {
     IDockviewHeaderActionsProps,
     IDockviewPanel,
     IHeaderActionsRenderer,
-} from 'dockview-core';
+} from 'dockview';
 
 /**
  * Angular implementation of a header-actions renderer. Mirrors the React

@@ -1,4 +1,4 @@
-import 'dockview-core/dist/styles/dockview.css';
+import 'dockview/dist/styles/dockview.css';
 import {
     createDockview,
     DockviewGroupPanel,
@@ -7,7 +7,7 @@ import {
     IGroupHeaderProps,
     IHeaderActionsRenderer,
     themeAbyss,
-} from 'dockview-core';
+} from 'dockview';
 import './index.css';
 
 class Panel implements IContentRenderer {

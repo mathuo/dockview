@@ -20,7 +20,7 @@ import {
     DockviewReadyEvent,
     SerializedDockview,
 } from 'dockview-angular';
-import 'dockview-core/dist/styles/dockview.css';
+import 'dockview-angular/dist/styles/dockview.css';
 
 const STORAGE_KEY = 'angular_demo_dockview_layout';
 

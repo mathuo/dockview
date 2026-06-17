@@ -6,7 +6,7 @@ import {
     Injector,
 } from '@angular/core';
 import { fromPartial } from '@total-typescript/shoehorn';
-import { DockviewApi, IDockviewGroupPanel } from 'dockview-core';
+import { DockviewApi, IDockviewGroupPanel } from 'dockview';
 import { AngularGroupDragGhostRenderer } from '../lib/dockview/angular-group-drag-ghost-renderer';
 
 @Component({

@@ -1,4 +1,4 @@
-export * from 'dockview-core';
+export * from 'dockview';
 
 import DockviewVue from './dockview/dockview.vue';
 import SplitviewVue from './splitview/splitview.vue';

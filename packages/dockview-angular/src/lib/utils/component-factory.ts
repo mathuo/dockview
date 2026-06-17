@@ -14,7 +14,7 @@ import {
     GridviewPanel,
     SplitviewPanel,
     IPanePart,
-} from 'dockview-core';
+} from 'dockview';
 import { AngularRenderer } from './angular-renderer';
 import { AngularHeaderActionsRenderer } from '../dockview/angular-header-actions-renderer';
 import { AngularGridviewPanel } from '../gridview/angular-gridview-panel';

@@ -3,7 +3,7 @@ import { Component, DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 
 import { GridviewAngularComponent } from '../lib/gridview/gridview-angular.component';
-import { GridviewApi } from 'dockview-core';
+import { GridviewApi } from 'dockview';
 import { setupTestBed, getTestComponents } from './__test_utils__/test-helpers';
 
 describe('GridviewAngularComponent', () => {

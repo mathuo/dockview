@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 // Import core functionality that we know works
-import * as core from 'dockview-core';
+import * as core from 'dockview';
 import * as splitviewView from '../splitview/view';
 import * as gridviewView from '../gridview/view';
 import * as paneviewView from '../paneview/view';

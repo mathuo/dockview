@@ -5,7 +5,7 @@ import {
     PROPERTY_KEYS_PANEVIEW,
     type PaneviewFrameworkOptions,
     createPaneview,
-} from 'dockview-core';
+} from 'dockview';
 import { useViewComponent } from '../composables/useViewComponent';
 import { VuePaneviewPanelView } from './view';
 import type { IPaneviewVueProps, PaneviewVueEvents } from './types';

@@ -5,7 +5,7 @@ Angular bindings for dockview using standalone components and NgModule.
 ## Overview
 
 - Peer dependencies: `@angular/core >=21.0.6`, `@angular/common >=21.0.6`, `rxjs >=7.0.0`
-- Runtime dependency: `dockview-core`
+- Runtime dependency: `dockview` (re-exports `dockview-core`)
 - Entry point: `src/public-api.ts` (ng-packagr entry)
 
 ## Source Structure
@@ -41,4 +41,4 @@ Angular bindings for dockview using standalone components and NgModule.
 
 ## Dependencies
 
-- Depends on: `dockview-core` (must be built first)
+- Depends on: `dockview` (must be built first; build chain: dockview-core -> dockview -> this)

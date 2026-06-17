@@ -7,7 +7,7 @@ import {
     EmbeddedViewRef,
     createComponent,
 } from '@angular/core';
-import { ITabGroupChipRenderer, ITabGroup, DockviewApi } from 'dockview-core';
+import { ITabGroupChipRenderer, ITabGroup, DockviewApi } from 'dockview';
 
 export interface IDockviewAngularTabGroupChipProps {
     tabGroup: ITabGroup;

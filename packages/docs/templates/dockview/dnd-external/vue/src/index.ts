@@ -1,6 +1,6 @@
 import { createApp, ref, onUnmounted, defineComponent, PropType } from 'vue';
 import { DockviewVue, DockviewReadyEvent, DockviewApi, positionToDirection, DockviewDidDropEvent, IDockviewPanelProps } from 'dockview-vue';
-import 'dockview-core/dist/styles/dockview.css';
+import 'dockview-vue/dist/styles/dockview.css';
 
 const DefaultPanel = defineComponent({
     name: 'DefaultPanel',

@@ -1,7 +1,7 @@
 <div align="center">
 <h1>dockview</h1>
 
-<p>React bindings for dockview — zero dependency layout manager supporting tabs, groups, grids and splitviews</p>
+<p>Zero dependency layout manager supporting tabs, groups, grids and splitviews</p>
 
 </div>
 
@@ -40,7 +40,12 @@ Please see the website: https://dockview.dev
 
 ## Quick Start
 
-Dockview has a peer dependency on `react >= 16.8.0` and `react-dom >= 16.8.0`. Install from [npm](https://www.npmjs.com/package/dockview):
+`dockview` is the vanilla JavaScript / TypeScript package. Using a framework? Install the
+matching bindings instead: [`dockview-react`](https://www.npmjs.com/package/dockview-react),
+[`dockview-vue`](https://www.npmjs.com/package/dockview-vue) or
+[`dockview-angular`](https://www.npmjs.com/package/dockview-angular).
+
+Install from [npm](https://www.npmjs.com/package/dockview):
 
 ```
 npm install dockview
@@ -52,31 +57,33 @@ Import the stylesheet:
 @import 'dockview/dist/styles/dockview.css';
 ```
 
-Apply a theme and render the component:
+Create a dockview instance:
 
-```tsx
-import { DockviewReact } from 'dockview';
+```ts
+import { DockviewComponent } from 'dockview';
 
-const components = {
-    myComponent: (props) => <div>Hello World</div>,
-};
+const element = document.getElementById('app');
 
-function App() {
-    return (
-        <div className="dockview-theme-dark" style={{ height: '400px' }}>
-            <DockviewReact
-                components={components}
-                onReady={(event) => {
-                    event.api.addPanel({
-                        id: 'panel_1',
-                        component: 'myComponent',
-                    });
-                }}
-            />
-        </div>
-    );
-}
+const dockview = new DockviewComponent(element, {
+    createComponent: (options) => {
+        switch (options.name) {
+            case 'my-component':
+                return {
+                    init: (params) => {
+                        params.containerElement.textContent = 'Hello World';
+                    },
+                };
+        }
+    },
+});
+
+dockview.addPanel({
+    id: 'panel_1',
+    component: 'my-component',
+});
 ```
+
+Apply a theme by adding a theme class (e.g. `dockview-theme-dark`) to a parent element.
 
 See the [documentation](https://dockview.dev) for full examples.
 

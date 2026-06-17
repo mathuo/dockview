@@ -6,7 +6,7 @@ import {
     GridviewApi,
     PROPERTY_KEYS_GRIDVIEW,
     Orientation,
-} from 'dockview-core';
+} from 'dockview';
 import GridviewVue from '../gridview/gridview.vue';
 import { VueGridviewPanelView } from '../gridview/view';
 import { VuePart } from '../utils';

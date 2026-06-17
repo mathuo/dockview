@@ -11,6 +11,7 @@ export default defineConfig({
         environment: 'jsdom',
         include: ['src/__tests__/**/*.spec.ts'],
         alias: {
+            dockview: resolve(__dirname, '../dockview/src/index.ts'),
             'dockview-core': resolve(__dirname, '../dockview-core/src/index.ts'),
         },
         setupFiles: [
@@ -31,12 +32,13 @@ export default defineConfig({
         rollupOptions: {
             // make sure to externalize deps that shouldn't be bundled
             // into your library
-            external: ['vue', 'dockview-core'],
+            external: ['vue', 'dockview', 'dockview-core'],
             output: {
                 // Provide global variables to use in the UMD build
                 // for externalized deps
                 globals: {
                     vue: 'Vue',
+                    dockview: 'dockview',
                     ['dockview-core']: 'DockviewCore',
                 },
             },

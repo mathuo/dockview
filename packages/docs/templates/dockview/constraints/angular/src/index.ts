@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { DockviewAngularModule } from 'dockview-angular';
 import { Subject } from 'rxjs';
-import 'dockview-core/dist/styles/dockview.css';
+import 'dockview-angular/dist/styles/dockview.css';
 
 // Default panel component with constraints
 @Component({

@@ -3,7 +3,7 @@ import {
     PanelViewInitParameters,
     SplitviewPanel,
     IFrameworkPart,
-} from 'dockview-core';
+} from 'dockview';
 import { type ComponentInternalInstance } from 'vue';
 import { VuePart, type VueComponent } from '../utils';
 import type { ISplitviewVuePanelProps } from './types';

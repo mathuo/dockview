@@ -21,11 +21,11 @@ import type {
     Parameters,
     TabPartInitParameters,
     WatermarkRendererInitParameters,
-} from 'dockview-core';
+} from 'dockview';
 import {
     DockviewCompositeDisposable,
     DockviewMutableDisposable,
-} from 'dockview-core';
+} from 'dockview';
 import {
     createVNode,
     type ComponentOptionsBase,

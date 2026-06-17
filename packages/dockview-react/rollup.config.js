@@ -67,7 +67,10 @@ function createBundle(format, options) {
 
     const plugins = [
         nodeResolve({
-            include: ['node_modules/dockview-core/**'],
+            include: [
+                'node_modules/dockview/**',
+                'node_modules/dockview-core/**',
+            ],
         }),
         typescript({
             tsconfig: 'tsconfig.esm.json',

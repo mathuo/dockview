@@ -1,4 +1,4 @@
-import { GridviewApi, GridviewPanel, IFrameworkPart } from 'dockview-core';
+import { GridviewApi, GridviewPanel, IFrameworkPart } from 'dockview';
 import { type ComponentInternalInstance } from 'vue';
 import { VuePart, type VueComponent } from '../utils';
 import type { IGridviewVuePanelProps } from './types';

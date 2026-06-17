@@ -23,7 +23,7 @@ import {
     PROPERTY_KEYS_SPLITVIEW,
     SplitviewFrameworkOptions,
     SplitviewComponentOptions,
-} from 'dockview-core';
+} from 'dockview';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
 import { SplitviewAngularReadyEvent } from './types';

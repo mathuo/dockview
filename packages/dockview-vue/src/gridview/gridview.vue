@@ -5,7 +5,7 @@ import {
     PROPERTY_KEYS_GRIDVIEW,
     type GridviewFrameworkOptions,
     createGridview,
-} from 'dockview-core';
+} from 'dockview';
 import { useViewComponent } from '../composables/useViewComponent';
 import { VueGridviewPanelView } from './view';
 import type { IGridviewVueProps, GridviewVueEvents } from './types';

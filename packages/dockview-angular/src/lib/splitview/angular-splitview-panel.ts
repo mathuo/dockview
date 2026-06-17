@@ -4,7 +4,7 @@ import {
     EnvironmentInjector,
     TemplateRef,
 } from '@angular/core';
-import { SplitviewPanel, IFrameworkPart } from 'dockview-core';
+import { SplitviewPanel, IFrameworkPart } from 'dockview';
 import { AngularRenderer } from '../utils/angular-renderer';
 
 export class AngularSplitviewPanel extends SplitviewPanel {

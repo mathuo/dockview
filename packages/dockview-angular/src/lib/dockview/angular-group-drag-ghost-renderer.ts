@@ -11,7 +11,7 @@ import {
     IGroupDragGhostRenderer,
     IDockviewGroupPanel,
     DockviewApi,
-} from 'dockview-core';
+} from 'dockview';
 
 export interface IDockviewAngularGroupDragGhostProps {
     group: IDockviewGroupPanel;

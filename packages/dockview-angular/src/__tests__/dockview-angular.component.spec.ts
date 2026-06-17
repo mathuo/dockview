@@ -3,7 +3,7 @@ import { Component, DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 
 import { DockviewAngularComponent } from '../lib/dockview/dockview-angular.component';
-import { DockviewApi } from 'dockview-core';
+import { DockviewApi } from 'dockview';
 import { setupTestBed, getTestComponents } from './__test_utils__/test-helpers';
 
 describe('DockviewAngularComponent', () => {

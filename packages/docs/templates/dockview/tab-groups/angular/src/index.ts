@@ -8,7 +8,7 @@ import {
     DockviewReadyEvent,
     themeAbyss,
 } from 'dockview-angular';
-import 'dockview-core/dist/styles/dockview.css';
+import 'dockview-angular/dist/styles/dockview.css';
 
 @Component({
     selector: 'default-panel',

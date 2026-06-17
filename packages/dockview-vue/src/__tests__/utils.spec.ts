@@ -14,7 +14,7 @@ import {
     DockviewGroupPanelModel,
     IDockviewPanel,
     IContextMenuItemComponentProps,
-} from 'dockview-core';
+} from 'dockview';
 import {
     VueContextMenuItemRenderer,
     VueHeaderActionsRenderer,

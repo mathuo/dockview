@@ -9,18 +9,13 @@ const config: JestConfigWithTsJest = {
     collectCoverageFrom: [
         '<rootDir>/packages/dockview/src/**/*.{js,jsx,ts,tsx}',
     ],
-    setupFiles: [
-        '<rootDir>/packages/dockview/src/__tests__/__mocks__/resizeObserver.js',
-    ],
+    setupFiles: [],
     setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
     coveragePathIgnorePatterns: ['/node_modules/'],
     moduleNameMapper: {
         '^dockview-core$': '<rootDir>/packages/dockview-core/src/index.ts',
     },
-    modulePathIgnorePatterns: [
-        '<rootDir>/packages/dockview/src/__tests__/__mocks__',
-        '<rootDir>/packages/dockview/src/__tests__/__test_utils__',
-    ],
+    modulePathIgnorePatterns: [],
     coverageDirectory: '<rootDir>/packages/dockview/coverage/',
     // testResultsProcessor inherited from root config
     testEnvironment: 'jsdom',

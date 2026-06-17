@@ -5,7 +5,7 @@ import {
     AngularLifecycleManager,
     createAngularDisposable,
 } from '../lib/utils/lifecycle-utils';
-import { DockviewIDisposable } from 'dockview-core';
+import { DockviewIDisposable } from 'dockview';
 
 describe('AngularDisposable', () => {
     let disposable: AngularDisposable;

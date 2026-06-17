@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Component, Injector, EnvironmentInjector } from '@angular/core';
 import { AngularFrameworkComponentFactory } from '../lib/utils/component-factory';
-import { CreateComponentOptions } from 'dockview-core';
+import { CreateComponentOptions } from 'dockview';
 
 @Component({
     standalone: false,

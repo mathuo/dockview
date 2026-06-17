@@ -5,7 +5,7 @@ import {
     DockviewGroupPanel,
     IDockviewPanel,
     IContextMenuItemComponentProps,
-} from 'dockview-core';
+} from 'dockview';
 import { DockviewAngularComponent } from '../lib/dockview/dockview-angular.component';
 import { AngularRenderer } from '../lib/utils/angular-renderer';
 import { setupTestBed, getTestComponents } from './__test_utils__/test-helpers';

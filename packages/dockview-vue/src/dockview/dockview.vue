@@ -6,7 +6,7 @@ import {
     type DockviewFrameworkOptions,
     type DockviewIDisposable,
     createDockview,
-} from 'dockview-core';
+} from 'dockview';
 import {
     ref,
     onMounted,

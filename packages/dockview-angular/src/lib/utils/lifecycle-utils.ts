@@ -1,6 +1,6 @@
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { DockviewIDisposable } from 'dockview-core';
+import { DockviewIDisposable } from 'dockview';
 
 export class AngularDisposable implements DockviewIDisposable {
     private _isDisposed = false;

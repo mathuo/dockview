@@ -2,7 +2,7 @@ import type {
     SplitviewApi,
     SplitviewOptions,
     SplitviewPanelApi,
-} from 'dockview-core';
+} from 'dockview';
 import type { VueComponent } from '../utils';
 
 export interface SplitviewReadyEvent {
