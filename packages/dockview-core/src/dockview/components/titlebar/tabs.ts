@@ -570,6 +570,40 @@ export class Tabs extends CompositeDisposable {
                     this._tabs[index].value.panel.api.setActive()
                 );
                 break;
+            case 'Delete':
+            case 'Backspace':
+                // Close the focused tab (Backspace covers macOS, where the
+                // primary delete key reports as Backspace).
+                event.preventDefault();
+                this._closeTab(index);
+                break;
+        }
+    }
+
+    /**
+     * Close the tab at `index` and move roving focus to a neighbouring tab so
+     * keyboard focus stays in the tablist.
+     */
+    private _closeTab(index: number): void {
+        const tab = this._tabs[index]?.value;
+        if (!tab) {
+            return;
+        }
+        // Resolve the post-close focus target before closing mutates the list:
+        // prefer the next tab, otherwise the previous.
+        const neighbourId = (
+            this._tabs[index + 1]?.value ?? this._tabs[index - 1]?.value
+        )?.panel.id;
+
+        tab.panel.api.close();
+
+        if (neighbourId !== undefined) {
+            const nextIndex = this._tabs.findIndex(
+                (t) => t.value.panel.id === neighbourId
+            );
+            if (nextIndex > -1) {
+                this._focusTab(nextIndex);
+            }
         }
     }
 
@@ -579,6 +613,18 @@ export class Tabs extends CompositeDisposable {
             this._tabs[i].value.element.tabIndex = i === index ? 0 : -1;
         }
         this._tabs[index].value.element.focus();
+    }
+
+    /** Move DOM focus to the active tab — the entry point into the tablist. */
+    focusActiveTab(): void {
+        if (this._tabs.length === 0) {
+            return;
+        }
+        const activeId = this.group.activePanel?.id;
+        const activeIndex = activeId
+            ? this._tabs.findIndex((t) => t.value.panel.id === activeId)
+            : -1;
+        this._focusTab(activeIndex > -1 ? activeIndex : 0);
     }
 
     setActivePanel(panel: IDockviewPanel): void {
