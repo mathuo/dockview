@@ -566,7 +566,9 @@ export class Tabs extends CompositeDisposable {
             case ' ':
                 // Manual activation of the focused tab.
                 event.preventDefault();
-                this._tabs[index].value.panel.api.setActive();
+                this.accessor.withOrigin('user', () =>
+                    this._tabs[index].value.panel.api.setActive()
+                );
                 break;
         }
     }

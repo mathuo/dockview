@@ -1,4 +1,5 @@
 import {
+    DockviewActivePanelChangeEvent,
     DockviewLayoutMutationEvent,
     DockviewMaximizedGroupChanged,
     FloatingGroupOptions,
@@ -679,9 +680,11 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     /**
-     * Invoked when the active panel changes. May be undefined if no panel is active.
+     * Invoked when the active panel changes. The event carries the active
+     * `panel` (may be undefined if no panel is active) and the
+     * {@link DockviewOrigin} (`'user'` vs `'api'`) of the change.
      */
-    get onDidActivePanelChange(): Event<IDockviewPanel | undefined> {
+    get onDidActivePanelChange(): Event<DockviewActivePanelChangeEvent> {
         return this.component.onDidActivePanelChange;
     }
 
@@ -924,7 +927,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     addPanel<T extends object = Parameters>(
         options: AddPanelOptions<T>
     ): IDockviewPanel {
-        return this.component.withMutationOrigin('api', () =>
+        return this.component.withOrigin('api', () =>
             this.component.addPanel(options)
         );
     }
@@ -933,7 +936,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      * Remove a panel given the panel object.
      */
     removePanel(panel: IDockviewPanel): void {
-        this.component.withMutationOrigin('api', () =>
+        this.component.withOrigin('api', () =>
             this.component.removePanel(panel)
         );
     }
@@ -949,7 +952,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      * Close all groups and panels.
      */
     closeAllGroups(): void {
-        return this.component.withMutationOrigin('api', () =>
+        return this.component.withOrigin('api', () =>
             this.component.closeAllGroups()
         );
     }
@@ -958,7 +961,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      * Remove a group and any panels within the group.
      */
     removeGroup(group: IDockviewGroupPanel): void {
-        this.component.withMutationOrigin('api', () =>
+        this.component.withOrigin('api', () =>
             this.component.removeGroup(<DockviewGroupPanel>group)
         );
     }
@@ -977,7 +980,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         item: IDockviewPanel | DockviewGroupPanel,
         options?: FloatingGroupOptions
     ): void {
-        return this.component.withMutationOrigin('api', () =>
+        return this.component.withOrigin('api', () =>
             this.component.addFloatingGroup(item, options)
         );
     }
@@ -989,7 +992,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         data: SerializedDockview,
         options?: { reuseExistingPanels: boolean }
     ): void {
-        this.component.withMutationOrigin('api', () =>
+        this.component.withOrigin('api', () =>
             this.component.fromJSON(data, options)
         );
     }
@@ -1005,7 +1008,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      * Reset the component back to an empty and default state.
      */
     clear(): void {
-        this.component.withMutationOrigin('api', () => this.component.clear());
+        this.component.withOrigin('api', () => this.component.clear());
     }
 
     /**
@@ -1050,7 +1053,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
             onWillClose?: (event: { id: string; window: Window }) => void;
         }
     ): Promise<boolean> {
-        return this.component.withMutationOrigin('api', () =>
+        return this.component.withOrigin('api', () =>
             this.component.addPopoutGroup(item, options)
         );
     }
@@ -1119,7 +1122,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         componentParams?: Record<string, unknown>;
     }): ITabGroup {
         const model = this._getGroupModel(options.groupId);
-        return this.component.withMutationOrigin('api', () =>
+        return this.component.withOrigin('api', () =>
             model.createTabGroup({
                 label: options.label,
                 color: options.color,
@@ -1130,7 +1133,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     dissolveTabGroup(options: { groupId: string; tabGroupId: string }): void {
         const model = this._getGroupModel(options.groupId);
-        this.component.withMutationOrigin('api', () =>
+        this.component.withOrigin('api', () =>
             model.dissolveTabGroup(options.tabGroupId)
         );
     }
@@ -1142,7 +1145,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         index?: number;
     }): void {
         const model = this._getGroupModel(options.groupId);
-        this.component.withMutationOrigin('api', () =>
+        this.component.withOrigin('api', () =>
             model.addPanelToTabGroup(
                 options.tabGroupId,
                 options.panelId,
@@ -1156,7 +1159,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         panelId: string;
     }): void {
         const model = this._getGroupModel(options.groupId);
-        this.component.withMutationOrigin('api', () =>
+        this.component.withOrigin('api', () =>
             model.removePanelFromTabGroup(options.panelId)
         );
     }

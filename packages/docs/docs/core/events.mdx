@@ -28,8 +28,13 @@ api.onDidAddPanel((panel: IDockviewPanel) => { });
 // Fires when a panel is removed (including when panels move between groups)
 api.onDidRemovePanel((panel: IDockviewPanel) => { });
 
-// Fires when the active panel changes. May be undefined if no panel is active.
-api.onDidActivePanelChange((panel: IDockviewPanel | undefined) => { });
+// Fires when the active panel changes. `panel` may be undefined if no panel is
+// active. `origin` is 'user' for a user gesture (e.g. clicking a tab) or 'api'
+// for a programmatic `setActive` call.
+api.onDidActivePanelChange((event: DockviewActivePanelChangeEvent) => {
+    // event.panel: IDockviewPanel | undefined
+    // event.origin: 'user' | 'api'
+});
 
 // Fires when a panel moves from one group to another
 api.onDidMovePanel((event: MovePanelEvent) => { });

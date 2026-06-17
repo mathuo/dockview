@@ -352,7 +352,7 @@ describe('layout mutation events', () => {
             dockview.api.addPanel({ id: 'p1', component: 'default' });
             dockview.addPanel({ id: 'p2', component: 'default' });
             expect(origins).toEqual(['api', 'user']);
-            expect(dockview.mutationOrigin()).toBe('user');
+            expect(dockview.currentOrigin()).toBe('user');
         });
     });
 });

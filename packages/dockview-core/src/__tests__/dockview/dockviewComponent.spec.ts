@@ -2799,7 +2799,7 @@ describe('dockviewComponent', () => {
             dockview.onDidRemovePanel((panel) => {
                 events.push({ type: 'REMOVE_PANEL', panel });
             }),
-            dockview.onDidActivePanelChange((panel) => {
+            dockview.onDidActivePanelChange(({ panel }) => {
                 events.push({ type: 'ACTIVE_PANEL', panel });
             }),
             dockview.onDidMovePanel(({ panel }) => {
@@ -3691,7 +3691,7 @@ describe('dockviewComponent', () => {
                 removePanel.push(panel);
             }),
             dockview.onDidActivePanelChange((event) => {
-                activePanel.push(event);
+                activePanel.push(event.panel);
             }),
             dockview.onDidMovePanel((event) => {
                 movedPanels.push(event.panel);

@@ -159,6 +159,14 @@ export class DockviewPanelApiImpl
         return this.group.api.getWindow();
     }
 
+    override setActive(): void {
+        // A bare `panel.api.setActive()` from application code is a
+        // programmatic activation. Tag it `'api'` so `onDidActivePanelChange`
+        // reports the correct origin; user-gesture call sites that route
+        // through here wrap the call in `withOrigin('user')` first, which wins.
+        this.accessor.withOrigin('api', () => super.setActive());
+    }
+
     moveTo(options: DockviewPanelMoveParams): void {
         this.accessor.moveGroupOrPanel({
             from: { groupId: this._group.id, panelId: this.panel.id },
