@@ -40,7 +40,7 @@ export interface IRootDropTargetService extends IDisposable {
     readonly onWillShowOverlay: Event<WillShowOverlayEvent>;
     /** Merged stream from both DnD backends. */
     readonly onDrop: Event<DroptargetEvent>;
-    /** Apply changed options (dndEdges, rootOverlayModel). */
+    /** Apply changed options (dndEdges). */
     setOptions(options: Partial<DockviewComponentOptions>): void;
 }
 
@@ -81,7 +81,10 @@ export class RootDropTargetService implements IRootDropTargetService {
         };
 
         const overlayModel =
-            host.options.rootOverlayModel ?? DEFAULT_ROOT_OVERLAY_MODEL;
+            typeof host.options.dndEdges === 'object' &&
+            host.options.dndEdges !== null
+                ? host.options.dndEdges
+                : DEFAULT_ROOT_OVERLAY_MODEL;
 
         this._html5Target = html5Backend.createDropTarget(host.element, {
             className: 'dv-drop-target-edge',
@@ -108,9 +111,8 @@ export class RootDropTargetService implements IRootDropTargetService {
             this._pointerTarget.onDrop
         );
 
-        // Apply remaining initial-state options (dndEdges) now that the
-        // targets exist. rootOverlayModel was already baked into the ctor
-        // args above; setOptions handles dndEdges + late changes.
+        // Apply initial-state options now that the targets exist; setOptions
+        // handles dndEdges (disable + overlay model) and late changes.
         this.setOptions(host.options);
     }
 
@@ -132,10 +134,6 @@ export class RootDropTargetService implements IRootDropTargetService {
                 this._html5Target.setOverlayModel(DEFAULT_ROOT_OVERLAY_MODEL);
                 this._pointerTarget.setOverlayModel(DEFAULT_ROOT_OVERLAY_MODEL);
             }
-        }
-
-        if ('rootOverlayModel' in options) {
-            this.setOptions({ dndEdges: options.dndEdges });
         }
     }
 
