@@ -73,7 +73,12 @@ import {
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
 import { FloatingTitleBar } from './components/titlebar/floatingTitleBar';
-import { assertModule, DockviewModule, ModuleRegistry } from './modules';
+import {
+    assertModule,
+    DockviewModule,
+    getRegisteredModules,
+    ModuleRegistry,
+} from './modules';
 import { AllModules } from './allModules';
 import { IFloatingGroupHost } from './floatingGroupService';
 import { IPopoutWindowHost } from './popoutWindowService';
@@ -941,9 +946,8 @@ export class DockviewComponent
         // subset to assert every module is independently removable (and the
         // opt-in module API will build on this later). Not part of the public
         // options surface.
-        const modules =
-            (options as { modules?: DockviewModule<any>[] }).modules ??
-            AllModules;
+        const modules = (options as { modules?: DockviewModule<any>[] })
+            .modules ?? [...AllModules, ...getRegisteredModules()];
         for (const module of modules) {
             this._moduleRegistry.register(module);
         }

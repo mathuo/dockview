@@ -1,15 +1,12 @@
 import { fireEvent } from '@testing-library/dom';
 import { fromPartial } from '@total-typescript/shoehorn';
-import { ContextMenuController } from '../../dockview/contextMenu';
-import { DockviewComponent } from '../../dockview/dockviewComponent';
-import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
-import { IDockviewPanel } from '../../dockview/dockviewPanel';
-import { PopupService } from '../../dockview/components/popupService';
-import {
-    DEFAULT_TAB_GROUP_COLORS,
-    TabGroupColorPalette,
-} from '../../dockview/tabGroupAccent';
-import { ITabGroup } from '../../dockview/tabGroup';
+import { ContextMenuController } from '../contextMenu';
+import { DockviewComponent } from 'dockview-core';
+import { DockviewGroupPanel } from 'dockview-core';
+import { IDockviewPanel } from 'dockview-core';
+import { PopupService } from 'dockview-core';
+import { DEFAULT_TAB_GROUP_COLORS, TabGroupColorPalette } from 'dockview-core';
+import { ITabGroup } from 'dockview-core';
 
 function makeAccessor(
     overrides: {

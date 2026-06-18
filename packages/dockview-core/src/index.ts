@@ -58,6 +58,7 @@ export {
     DockviewTabGroupChangeEvent,
     DockviewTabGroupCollapsedChangeEvent,
     DockviewTabGroupPanelChangeEvent,
+    DockviewGroupDropLocation,
 } from './dockview/events';
 export {
     TabDragEvent,
@@ -176,3 +177,25 @@ export {
     createPaneview,
     createSplitview,
 } from './api/entryPoints';
+export {
+    registerModules,
+    getRegisteredModules,
+    clearRegisteredModules,
+    defineModule,
+    DockviewModule,
+    ServiceCollection,
+} from './dockview/modules';
+export {
+    IAccessibilityHost,
+    IAccessibilityService,
+    IAdvancedDnDHost,
+    IAdvancedDnDService,
+    IContextMenuHost,
+    IContextMenuService,
+    ITabGroupChipsHost,
+    ITabGroupChipsService,
+} from './dockview/moduleContracts';
+export { resolveMessages } from './dockview/accessibilityMessages';
+export { findRelativeZIndexParent } from './dom';
+export { IDragGhostSpec } from './dnd/backend';
+export { LiveRegionModule } from './dockview/liveRegionService';

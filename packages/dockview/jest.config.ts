@@ -14,6 +14,8 @@ const config: JestConfigWithTsJest = {
     coveragePathIgnorePatterns: ['/node_modules/'],
     moduleNameMapper: {
         '^dockview-core$': '<rootDir>/packages/dockview-core/src/index.ts',
+        '^dockview-modules$':
+            '<rootDir>/packages/dockview-modules/src/index.ts',
     },
     modulePathIgnorePatterns: [],
     coverageDirectory: '<rootDir>/packages/dockview/coverage/',

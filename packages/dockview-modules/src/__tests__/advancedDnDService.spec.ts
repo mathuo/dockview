@@ -1,12 +1,10 @@
-import {
-    AdvancedDnDService,
-    IAdvancedDnDHost,
-} from '../../dockview/advancedDnDService';
-import { DockviewComponentOptions } from '../../dockview/options';
-import { DockviewApi } from '../../api/component.api';
-import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
-import { DockviewComponent } from '../../dockview/dockviewComponent';
-import { IContentRenderer } from '../../dockview/types';
+import { AdvancedDnDService } from '../advancedDnDService';
+import { IAdvancedDnDHost } from 'dockview-core';
+import { DockviewComponentOptions } from 'dockview-core';
+import { DockviewApi } from 'dockview-core';
+import { DockviewGroupPanel } from 'dockview-core';
+import { DockviewComponent } from 'dockview-core';
+import { IContentRenderer } from 'dockview-core';
 
 describe('AdvancedDnDService', () => {
     function createHost(
