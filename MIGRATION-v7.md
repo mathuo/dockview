@@ -91,6 +91,66 @@ package — use `dockview`** (or a framework package — `dockview-react` / `-vu
 `console.warn` is emitted when a component is constructed on bare `dockview-core`
 steering you to `dockview`.
 
+## Removed and changed APIs (breaking)
+
+These affect every consumer regardless of framework.
+
+### `rootOverlayModel` removed
+
+The `rootOverlayModel` option has been removed. It was a single static overlay
+model applied to the root drop target. Drop-overlay shaping is now driven by:
+
+- **`dropOverlayModel`** — a callback that shapes the overlay per drop target
+  (`(params: DropOverlayModelParams) => DroptargetOverlayModel | undefined`).
+  Return `undefined` to keep the default for that target.
+- **`dndEdges`** — configures the outer-layout edge overlay (the case
+  `rootOverlayModel` previously covered for edge drops). `dropOverlayModel` does
+  **not** dispatch the `'edge'` target.
+
+```diff
+- new DockviewComponent(el, {
+-     rootOverlayModel: { size: { value: 100, type: 'pixels' } },
+- });
++ new DockviewComponent(el, {
++     dropOverlayModel: (params) => ({ size: { value: 100, type: 'pixels' } }),
++ });
+```
+
+If you were using `rootOverlayModel` purely to size the outer edge overlay, use
+`dndEdges` instead.
+
+### `onDidActivePanelChange` payload changed
+
+`onDidActivePanelChange` now emits an event object instead of the panel
+directly, so it can also report whether the change came from a user interaction
+or an API call.
+
+```diff
+- api.onDidActivePanelChange((panel) => {
+-     console.log(panel?.id);
+- });
++ api.onDidActivePanelChange((event) => {
++     console.log(event.panel?.id);
++     console.log(event.origin); // 'user' | 'api'
++ });
+```
+
+The event shape is:
+
+```ts
+interface DockviewActivePanelChangeEvent {
+    readonly panel: IDockviewPanel | undefined;
+    readonly origin: 'user' | 'api';
+}
+```
+
+**Symptom if you don't migrate:** the handler argument is now an object, so
+`panel.id` / `panel.api` read as `undefined` (no error is thrown). Replace
+`panel` with `event.panel`.
+
+> The group-level `dockviewGroupPanelApi.onDidActivePanelChange` is unchanged
+> and continues to emit its existing payload (without `origin`).
+
 ## Vue / Angular users
 
 No source changes required — keep installing `dockview-vue` / `dockview-angular`
