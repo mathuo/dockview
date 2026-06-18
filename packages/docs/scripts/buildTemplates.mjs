@@ -12,8 +12,14 @@ const { version } = JSON.parse(
     )
 );
 
-const DOCKVIEW_VERSION = version;
+// Defaults to the published `dockview` version, but can be overridden via the
+// DOCKVIEW_VERSION env var to build the live examples against a specific
+// (e.g. experimental/prerelease) build for testing — without committing a
+// version that would break the normal docs build.
+const DOCKVIEW_VERSION = process.env.DOCKVIEW_VERSION || version;
 const USE_LOCAL_CDN = argv.slice(2).includes('--local');
+
+console.log(`[buildTemplates] using dockview version: ${DOCKVIEW_VERSION}`);
 
 const local = 'http://localhost:1111';
 
