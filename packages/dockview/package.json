@@ -53,10 +53,7 @@
         "./dist/styles/*": "./dist/styles/*",
         "./package.json": "./package.json"
     },
-    "sideEffects": [
-        "**/*.css",
-        "**/*.scss"
-    ],
+    "sideEffects": true,
     "files": [
         "dist",
         "README.md"
