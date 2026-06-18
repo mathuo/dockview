@@ -44,10 +44,16 @@
     "main": "./dist/package/main.cjs.js",
     "module": "./dist/package/main.esm.mjs",
     "types": "./dist/cjs/index.d.ts",
-    "sideEffects": [
-        "**/*.css",
-        "**/*.scss"
-    ],
+    "exports": {
+        ".": {
+            "types": "./dist/cjs/index.d.ts",
+            "import": "./dist/package/main.esm.mjs",
+            "require": "./dist/package/main.cjs.js"
+        },
+        "./dist/styles/*": "./dist/styles/*",
+        "./package.json": "./package.json"
+    },
+    "sideEffects": true,
     "files": [
         "dist",
         "README.md"

@@ -3,8 +3,10 @@ import { DockviewDefaultTab } from '../../dockview/defaultTab';
 import React, { act } from 'react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewApi, DockviewPanelApi, TitleEvent } from 'dockview';
-import { Emitter } from 'dockview-core/dist/cjs/events';
-import { Disposable } from 'dockview-core/dist/cjs/lifecycle';
+import {
+    DockviewEmitter as Emitter,
+    DockviewDisposable as Disposable,
+} from 'dockview';
 
 describe('defaultTab', () => {
     test('has close button by default', async () => {
