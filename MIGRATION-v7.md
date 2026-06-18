@@ -14,7 +14,18 @@ package.
 
 ## React users — action required (breaking)
 
-The React bindings moved from `dockview` to `dockview-react`.
+The React bindings moved from `dockview` to `dockview-react`. In v7 the
+`dockview` package is the vanilla JavaScript library (a re-export of
+`dockview-core`), so it no longer exports the React components.
+
+**Symptoms if you don't migrate** (the React names are simply gone — core names
+like `DockviewComponent` still resolve from `dockview`):
+
+- TypeScript: `error TS2305: Module '"dockview"' has no exported member 'DockviewReact'`
+- Runtime (JS): React throws *"Element type is invalid … got: undefined"* when
+  rendering `<DockviewReact />`, because the import resolves to `undefined`.
+
+The fix is to install and import from `dockview-react`:
 
 ```diff
 - npm install dockview
