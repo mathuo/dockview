@@ -19,3 +19,6 @@ yarn-error.log
 # NX
 .nx/cache
 .nx/workspace-data
+
+# Vite writes a transient bundled config next to vite.config.ts
+*.timestamp-*.mjs
