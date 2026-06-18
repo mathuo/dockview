@@ -235,3 +235,28 @@ export function getRegisteredModules(): DockviewModule<any>[] {
 export function clearRegisteredModules(): void {
     _globalModules.length = 0;
 }
+
+/**
+ * This marker exists for ONE purpose: a developer warning about the v7 package
+ * renames. It has no functional effect on dockview's behaviour. Following the
+ * renames, `dockview-core` is internal and `dockview` is the public JavaScript
+ * package; `dockview` calls {@link markDockviewPackageLoaded} on import so that
+ * `dockview-core` can detect — and warn about — being used directly.
+ */
+let _dockviewPackageLoaded = false;
+
+/**
+ * Called once by the `dockview` package on import, solely so `dockview-core`
+ * can warn when it is used directly (see above). Not used for anything else.
+ */
+export function markDockviewPackageLoaded(): void {
+    _dockviewPackageLoaded = true;
+}
+
+/**
+ * Whether the `dockview` package has been loaded in this process. Used only to
+ * gate the "don't use dockview-core directly" developer warning.
+ */
+export function isDockviewPackageLoaded(): boolean {
+    return _dockviewPackageLoaded;
+}

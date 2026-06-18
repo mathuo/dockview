@@ -77,6 +77,7 @@ import {
     assertModule,
     DockviewModule,
     getRegisteredModules,
+    isDockviewPackageLoaded,
     ModuleRegistry,
 } from './modules';
 import { AllModules } from './allModules';
@@ -426,6 +427,26 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void;
     isEdgeGroupVisible(position: EdgeGroupPosition): boolean;
     removeEdgeGroup(position: EdgeGroupPosition): void;
+}
+
+let _hasWarnedUsingCoreDirectly = false;
+
+/**
+ * `dockview-core` is an internal package. The public `dockview` package calls
+ * `markDockviewPackageLoaded()` on import; if that marker is absent the consumer
+ * is using `dockview-core` directly, so emit a one-time console warning
+ * steering them to `dockview`.
+ */
+function warnIfUsingCoreDirectly(): void {
+    if (_hasWarnedUsingCoreDirectly || isDockviewPackageLoaded()) {
+        return;
+    }
+    _hasWarnedUsingCoreDirectly = true;
+    console.warn(
+        'dockview: do not use "dockview-core" directly — it is an internal ' +
+            'package. Use the "dockview" package, the JavaScript version of ' +
+            'dockview, instead. This notice is shown once.'
+    );
 }
 
 export class DockviewComponent
@@ -946,12 +967,20 @@ export class DockviewComponent
         // subset to assert every module is independently removable (and the
         // opt-in module API will build on this later). Not part of the public
         // options surface.
-        const modules = (options as { modules?: DockviewModule<any>[] })
-            .modules ?? [...AllModules, ...getRegisteredModules()];
+        const explicitModules = (options as { modules?: DockviewModule<any>[] })
+            .modules;
+        const modules = explicitModules ?? [
+            ...AllModules,
+            ...getRegisteredModules(),
+        ];
         for (const module of modules) {
             this._moduleRegistry.register(module);
         }
         this._moduleRegistry.initialize(this);
+
+        // Purely a developer warning (no functional effect): nudge anyone using
+        // the internal `dockview-core` package directly towards `dockview`.
+        warnIfUsingCoreDirectly();
 
         this.popupService = new PopupService(this.element);
         this._api = new DockviewApi(this);

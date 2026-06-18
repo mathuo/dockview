@@ -1,4 +1,4 @@
-import { registerModules } from 'dockview-core';
+import { markDockviewPackageLoaded, registerModules } from 'dockview-core';
 import { Modules } from 'dockview-modules';
 
 export * from 'dockview-core';
@@ -10,3 +10,7 @@ export * from 'dockview-core';
  * `dockview-core` directly.
  */
 registerModules(Modules);
+
+// Mark the public package as loaded so `dockview-core` doesn't warn about
+// direct usage. Purely drives that developer warning — no functional effect.
+markDockviewPackageLoaded();
