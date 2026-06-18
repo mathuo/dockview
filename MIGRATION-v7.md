@@ -14,7 +14,18 @@ package.
 
 ## React users — action required (breaking)
 
-The React bindings moved from `dockview` to `dockview-react`.
+The React bindings moved from `dockview` to `dockview-react`. In v7 the
+`dockview` package is the vanilla JavaScript library (a re-export of
+`dockview-core`), so it no longer exports the React components.
+
+**Symptoms if you don't migrate** (the React names are simply gone — core names
+like `DockviewComponent` still resolve from `dockview`):
+
+- TypeScript: `error TS2305: Module '"dockview"' has no exported member 'DockviewReact'`
+- Runtime (JS): React throws *"Element type is invalid … got: undefined"* when
+  rendering `<DockviewReact />`, because the import resolves to `undefined`.
+
+The fix is to install and import from `dockview-react`:
 
 ```diff
 - npm install dockview
@@ -60,6 +71,25 @@ grep -rl "from 'dockview'" src | xargs sed -i '' "s/from 'dockview'/from 'dockvi
 
 `dockview-core` continues to be published and will keep working, but new code
 should depend on `dockview`.
+
+### `dockview-core` no longer bundles every feature (behaviour change)
+
+In v6, `dockview-core` shipped with all built-in features registered. In v7 a
+set of feature modules is no longer part of bare `dockview-core`:
+
+- **tab group chips** (chip rendering + the `onDid*TabGroup` events)
+- **context menus** (the built-in tab / chip right-click menus)
+- **advanced drag-and-drop** (`onWillDragPanel` / `onWillDragGroup` /
+  `onWillDrop` hooks, custom drag ghost / drop overlay)
+- **keyboard accessibility** (keyboard navigation / docking / live-region
+  announcements)
+
+These now live in the `dockview` package. **`dockview-core` is an internal
+package — use `dockview`** (or a framework package — `dockview-react` / `-vue` /
+`-angular`, which all consume `dockview`). Nothing throws if you stay on bare
+`dockview-core` — the affected features simply do nothing — so a one-time
+`console.warn` is emitted when a component is constructed on bare `dockview-core`
+steering you to `dockview`.
 
 ## Vue / Angular users
 

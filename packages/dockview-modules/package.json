@@ -1,35 +1,14 @@
 {
-    "name": "dockview",
+    "name": "dockview-modules",
     "version": "6.6.1",
-    "description": "Docking layout manager — tabs, groups, grids, splitviews, drag and drop, floating panels",
+    "private": true,
+    "description": "Separable feature modules for dockview",
     "keywords": [
-        "splitview",
-        "split-view",
-        "gridview",
-        "grid-view",
         "dockview",
-        "dock-view",
-        "grid",
-        "tabs",
         "layout",
         "layout manager",
-        "dock layout",
-        "dock",
         "docking",
-        "splitter",
-        "drag-and-drop",
-        "drag",
-        "drop",
-        "touch",
-        "mobile",
-        "typescript",
-        "zero-dependency",
-        "ide-layout",
-        "panel",
-        "resizable",
-        "floating",
-        "serialization",
-        "workbench"
+        "modules"
     ],
     "homepage": "https://github.com/mathuo/dockview",
     "bugs": {
@@ -44,10 +23,7 @@
     "main": "./dist/package/main.cjs.js",
     "module": "./dist/package/main.esm.mjs",
     "types": "./dist/cjs/index.d.ts",
-    "sideEffects": [
-        "**/*.css",
-        "**/*.scss"
-    ],
+    "sideEffects": false,
     "files": [
         "dist",
         "README.md"
@@ -55,13 +31,12 @@
     "scripts": {
         "build:bundle": "rollup -c",
         "build:cjs": "tsc --build ./tsconfig.json --verbose --extendedDiagnostics",
-        "build:css": "node scripts/copy-css.js",
         "build:esm": "tsc --build ./tsconfig.esm.json --verbose --extendedDiagnostics",
-        "build": "npm run build:cjs && npm run build:esm && npm run build:css",
+        "build": "npm run build:cjs && npm run build:esm",
         "clean": "rimraf dist/ .build/ .rollup.cache/",
         "rebuild": "npm run clean && npm run build",
-        "test": "jest --selectProjects dockview",
-        "test:cov": "jest --selectProjects dockview --coverage",
+        "test": "jest --selectProjects dockview-modules",
+        "test:cov": "jest --selectProjects dockview-modules --coverage",
         "lint": "eslint 'src/**/*.{ts,tsx,js,jsx}'",
         "lint:fix": "eslint 'src/**/*.{ts,tsx,js,jsx}' --fix",
         "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx}'",
@@ -69,8 +44,5 @@
     },
     "dependencies": {
         "dockview-core": "^6.6.1"
-    },
-    "devDependencies": {
-        "dockview-modules": "^6.6.1"
     }
 }

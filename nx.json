@@ -19,7 +19,7 @@
             "cache": true
         },
         "build:bundle": {
-            "dependsOn": ["build"],
+            "dependsOn": ["build", "^build:bundle"],
             "inputs": ["production", "^production"],
             "outputs": ["{projectRoot}/dist"],
             "cache": true

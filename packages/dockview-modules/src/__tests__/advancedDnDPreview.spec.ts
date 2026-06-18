@@ -1,6 +1,6 @@
-import { DockviewComponent } from '../../dockview/dockviewComponent';
-import { IContentRenderer } from '../../dockview/types';
-import { IAdvancedDnDService } from '../../dockview/advancedDnDService';
+import { DockviewComponent } from 'dockview-core';
+import { IContentRenderer } from 'dockview-core';
+import { IAdvancedDnDService } from 'dockview-core';
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');

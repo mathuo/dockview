@@ -1,9 +1,9 @@
 import { fireEvent } from '@testing-library/dom';
-import { DockviewComponent } from '../../dockview/dockviewComponent';
-import { IContentRenderer } from '../../dockview/types';
-import { GroupPanelPartInitParameters } from '../../dockview/types';
-import { PanelUpdateEvent } from '../../panel/types';
-import { Emitter } from '../../events';
+import { DockviewComponent } from 'dockview-core';
+import { IContentRenderer } from 'dockview-core';
+import { GroupPanelPartInitParameters } from 'dockview-core';
+import { PanelUpdateEvent } from 'dockview-core';
+import { DockviewEmitter as Emitter } from 'dockview-core';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');

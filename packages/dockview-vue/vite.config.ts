@@ -13,6 +13,10 @@ export default defineConfig({
         alias: {
             dockview: resolve(__dirname, '../dockview/src/index.ts'),
             'dockview-core': resolve(__dirname, '../dockview-core/src/index.ts'),
+            'dockview-modules': resolve(
+                __dirname,
+                '../dockview-modules/src/index.ts'
+            ),
         },
         setupFiles: [
             'src/__tests__/__mocks__/resizeObserver.vitest.ts',

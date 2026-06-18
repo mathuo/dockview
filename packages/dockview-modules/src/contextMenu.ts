@@ -1,15 +1,15 @@
-import { findRelativeZIndexParent } from '../dom';
-import { DockviewGroupPanel } from './dockviewGroupPanel';
-import { IDockviewPanel } from './dockviewPanel';
+import { findRelativeZIndexParent } from 'dockview-core';
+import { DockviewGroupPanel } from 'dockview-core';
+import { IDockviewPanel } from 'dockview-core';
 import {
     BuiltInChipContextMenuItem,
     ContextMenuItemConfig,
     ContextMenuItem,
-} from './options';
-import { ITabGroup } from './tabGroup';
-import { TabGroupColorPalette } from './tabGroupAccent';
-import { defineModule } from './modules';
-import { IContextMenuHost, IContextMenuService } from './moduleContracts';
+} from 'dockview-core';
+import { ITabGroup } from 'dockview-core';
+import { TabGroupColorPalette } from 'dockview-core';
+import { defineModule } from 'dockview-core';
+import { IContextMenuHost, IContextMenuService } from 'dockview-core';
 
 function popoverZIndexFor(target: EventTarget | null): string | undefined {
     if (!(target instanceof HTMLElement)) {

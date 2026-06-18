@@ -1,6 +1,6 @@
 import { fireEvent } from '@testing-library/dom';
-import { DockviewComponent } from '../../dockview/dockviewComponent';
-import { IContentRenderer } from '../../dockview/types';
+import { DockviewComponent } from 'dockview-core';
+import { IContentRenderer } from 'dockview-core';
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');

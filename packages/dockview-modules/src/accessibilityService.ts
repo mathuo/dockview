@@ -1,13 +1,16 @@
-import { CompositeDisposable, IDisposable } from '../lifecycle';
-import { Position } from '../dnd/droptarget';
-import { DockviewGroupPanel } from './dockviewGroupPanel';
-import { IDockviewPanel } from './dockviewPanel';
-import { DockviewKeybindings, KeyboardNavigationOptions } from './options';
-import { resolveMessages } from './accessibilityMessages';
-import { defineModule } from './modules';
+import {
+    DockviewCompositeDisposable as CompositeDisposable,
+    DockviewIDisposable as IDisposable,
+} from 'dockview-core';
+import { Position } from 'dockview-core';
+import { DockviewGroupPanel } from 'dockview-core';
+import { IDockviewPanel } from 'dockview-core';
+import { DockviewKeybindings, KeyboardNavigationOptions } from 'dockview-core';
+import { resolveMessages } from 'dockview-core';
+import { defineModule } from 'dockview-core';
 import { AdvancedDnDModule } from './advancedDnDService';
-import { LiveRegionModule } from './liveRegionService';
-import { IAccessibilityHost, IAccessibilityService } from './moduleContracts';
+import { LiveRegionModule } from 'dockview-core';
+import { IAccessibilityHost, IAccessibilityService } from 'dockview-core';
 
 type DockPhase = 'target' | 'edge';
 

@@ -3,28 +3,22 @@ import { FloatingGroupModule } from './floatingGroupService';
 import { PopoutWindowModule } from './popoutWindowService';
 import { WatermarkModule } from './watermarkService';
 import { EdgeGroupModule } from './edgeGroupService';
-import { TabGroupChipsModule } from './tabGroupChipsService';
-import { ContextMenuModule } from './contextMenu';
 import { RootDropTargetModule } from './rootDropTargetService';
 import { HeaderActionsModule } from './headerActionsService';
-import { AdvancedDnDModule } from './advancedDnDService';
 import { LiveRegionModule } from './liveRegionService';
-import { AccessibilityModule } from './accessibilityService';
 
 /**
- * Internal list of all built-in modules. Registered automatically by
- * DockviewComponent at construction time; not exported from the package.
+ * Internal list of the built-in modules that ship with the core. Registered
+ * automatically by DockviewComponent at construction time; not exported from
+ * the package. Additional modules contributed by sibling packages (via
+ * `registerModules(...)`) are appended at construction.
  */
 export const AllModules: DockviewModule<any>[] = [
     FloatingGroupModule,
     PopoutWindowModule,
     WatermarkModule,
     EdgeGroupModule,
-    TabGroupChipsModule,
-    ContextMenuModule,
     RootDropTargetModule,
     HeaderActionsModule,
-    AdvancedDnDModule,
     LiveRegionModule,
-    AccessibilityModule,
 ];

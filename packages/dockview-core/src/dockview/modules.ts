@@ -2,10 +2,11 @@
  * Internal module system for dockview.
  *
  * Modules are feature bundles that register services into the dockview
- * component. This is currently an internal-only system used to refactor
- * the core component into independently-extracted features. The public
- * surface (a `modules` option, framework wrappers, opt-in registration)
- * is reserved for a future major version.
+ * component. `registerModules(...)` is the one public entry point — it lets a
+ * sibling package contribute modules that `DockviewComponent` picks up at
+ * construction. The richer opt-in surface (a per-component `modules` option,
+ * framework wrappers) is still reserved for a future version; the module
+ * authoring API (`defineModule`, the service contracts) remains internal.
  */
 
 import { IDisposable } from '../lifecycle';
@@ -195,4 +196,67 @@ export class ModuleRegistry<THost> implements IDisposable {
             }
         }
     }
+}
+
+/**
+ * Process-global list of modules registered via {@link registerModules}.
+ * `DockviewComponent` appends these to its built-in set at construction, so
+ * importing a package that calls `registerModules(...)` (e.g. `dockview`)
+ * makes those modules available to every component in the process —
+ * modelled on AG Grid's `ModuleRegistry.registerModules`.
+ */
+const _globalModules: DockviewModule<any>[] = [];
+
+/**
+ * Register modules globally. Idempotent per `moduleName` — registering the
+ * same module twice is a no-op. Intended to be called once at import time by
+ * the package that bundles a given set of modules.
+ */
+export function registerModules(modules: DockviewModule<any>[]): void {
+    for (const module of modules) {
+        if (_globalModules.some((m) => m.moduleName === module.moduleName)) {
+            continue;
+        }
+        _globalModules.push(module);
+    }
+}
+
+/**
+ * Returns the globally-registered modules (a copy). `DockviewComponent` reads
+ * this to extend its built-in module set.
+ */
+export function getRegisteredModules(): DockviewModule<any>[] {
+    return [..._globalModules];
+}
+
+/**
+ * For tests — clears the global module registry.
+ */
+export function clearRegisteredModules(): void {
+    _globalModules.length = 0;
+}
+
+/**
+ * This marker exists for ONE purpose: a developer warning about the v7 package
+ * renames. It has no functional effect on dockview's behaviour. Following the
+ * renames, `dockview-core` is internal and `dockview` is the public JavaScript
+ * package; `dockview` calls {@link markDockviewPackageLoaded} on import so that
+ * `dockview-core` can detect — and warn about — being used directly.
+ */
+let _dockviewPackageLoaded = false;
+
+/**
+ * Called once by the `dockview` package on import, solely so `dockview-core`
+ * can warn when it is used directly (see above). Not used for anything else.
+ */
+export function markDockviewPackageLoaded(): void {
+    _dockviewPackageLoaded = true;
+}
+
+/**
+ * Whether the `dockview` package has been loaded in this process. Used only to
+ * gate the "don't use dockview-core directly" developer warning.
+ */
+export function isDockviewPackageLoaded(): boolean {
+    return _dockviewPackageLoaded;
 }
