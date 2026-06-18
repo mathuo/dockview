@@ -48,7 +48,14 @@ function createBundle(format, options) {
     const input = getInput(options);
     const file = outputFile(format, isMinified, withStyles);
 
-    const external = [];
+    const isUMD = format === 'umd';
+
+    // dockview-modules is a private, unpublished package — always bundle its
+    // code in. dockview-core is published: externalize it in the package
+    // builds, but inline it in the UMD bundle so the CDN build is self-contained.
+    const external = isUMD
+        ? ['react', 'react-dom']
+        : ['react', 'react-dom', 'dockview-core', /^dockview-core\//];
 
     const output = {
         file,
@@ -67,7 +74,12 @@ function createBundle(format, options) {
 
     const plugins = [
         nodeResolve({
-            include: ['node_modules/dockview-core/**'],
+            include: isUMD
+                ? [
+                      'node_modules/dockview-core/**',
+                      'node_modules/dockview-modules/**',
+                  ]
+                : ['node_modules/dockview-modules/**'],
         }),
         typescript({
             tsconfig: 'tsconfig.esm.json',
@@ -86,11 +98,6 @@ function createBundle(format, options) {
 
     if (format === 'umd') {
         output['name'] = name;
-    }
-
-    external.push('react', 'react-dom');
-
-    if (format === 'umd') {
         output.globals['react'] = 'React';
         output.globals['react-dom'] = 'ReactDOM';
     }

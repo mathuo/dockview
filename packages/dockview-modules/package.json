@@ -1,6 +1,7 @@
 {
     "name": "dockview-modules",
     "version": "6.6.1",
+    "private": true,
     "description": "Separable feature modules for dockview",
     "keywords": [
         "dockview",

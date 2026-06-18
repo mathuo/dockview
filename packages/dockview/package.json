@@ -68,7 +68,9 @@
         "format:check": "prettier --check 'src/**/*.{ts,tsx,js,jsx}'"
     },
     "dependencies": {
-        "dockview-core": "^6.6.1",
+        "dockview-core": "^6.6.1"
+    },
+    "devDependencies": {
         "dockview-modules": "^6.6.1"
     }
 }
