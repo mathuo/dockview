@@ -436,8 +436,20 @@ let _hasWarnedUsingCoreDirectly = false;
  * `markDockviewPackageLoaded()` on import; if that marker is absent the consumer
  * is using `dockview-core` directly, so emit a one-time console warning
  * steering them to `dockview`.
+ *
+ * Suppressed in production builds: it is a development-time nudge and most
+ * bundlers inline `process.env.NODE_ENV` so the branch is dropped entirely. The
+ * `typeof process` guard keeps this safe in plain browser/UMD contexts where
+ * `process` is undefined.
  */
 function warnIfUsingCoreDirectly(): void {
+    if (
+        typeof process !== 'undefined' &&
+        process.env &&
+        process.env.NODE_ENV === 'production'
+    ) {
+        return;
+    }
     if (_hasWarnedUsingCoreDirectly || isDockviewPackageLoaded()) {
         return;
     }
