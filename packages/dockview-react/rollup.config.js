@@ -69,6 +69,9 @@ function createBundle(format, options) {
     const output = {
         file,
         format,
+        // Emit the `__esModule` marker so interop-sensitive consumers (e.g.
+        // SystemJS, legacy AMD loaders) see the named exports.
+        esModule: true,
         sourcemap: isMinified && format === 'umd',
         globals: {},
         banner: [
