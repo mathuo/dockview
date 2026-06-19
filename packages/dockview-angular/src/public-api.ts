@@ -2,7 +2,7 @@
  * Public API Surface of dockview-angular
  */
 
-// Re-export everything from dockview-core
+// Re-export everything from dockview (which re-exports dockview-core)
 export * from 'dockview';
 
 // Angular module
