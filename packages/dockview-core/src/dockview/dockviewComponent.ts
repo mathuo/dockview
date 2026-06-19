@@ -367,6 +367,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidPopoutGroupSizeChange: Event<PopoutGroupChangeSizeEvent>;
     readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent>;
     readonly onDidAddPopoutGroup: Event<PopoutGroup>;
+    readonly onDidRemovePopoutGroup: Event<PopoutGroup>;
     readonly onDidOpenPopoutWindowFail: Event<void>;
     getPopouts(): PopoutGroup[];
     readonly onDidCreateTabGroup: Event<DockviewTabGroupChangeEvent>;
@@ -552,6 +553,10 @@ export class DockviewComponent
     private readonly _onDidAddPopoutGroup = new Emitter<PopoutGroup>();
     readonly onDidAddPopoutGroup: Event<PopoutGroup> =
         this._onDidAddPopoutGroup.event;
+
+    private readonly _onDidRemovePopoutGroup = new Emitter<PopoutGroup>();
+    readonly onDidRemovePopoutGroup: Event<PopoutGroup> =
+        this._onDidRemovePopoutGroup.event;
 
     private readonly _onDidOpenPopoutWindowFail = new Emitter<void>();
     readonly onDidOpenPopoutWindowFail: Event<void> =
@@ -990,6 +995,23 @@ export class DockviewComponent
         }
         this._moduleRegistry.initialize(this);
 
+        // Surface popout removal symmetrically with `onDidAddPopoutGroup`. The
+        // service is the single point every removal path funnels through — a
+        // genuine window close and an explicit removal alike — and it suppresses
+        // the event during component teardown.
+        const popoutWindowService = this._popoutWindowService;
+        if (popoutWindowService) {
+            this.addDisposables(
+                popoutWindowService.onDidRemove((entry) => {
+                    this._onDidRemovePopoutGroup.fire({
+                        id: entry.popoutGroup.id,
+                        group: entry.popoutGroup,
+                        window: entry.getWindow(),
+                    });
+                })
+            );
+        }
+
         // Purely a developer warning (no functional effect): nudge anyone using
         // the internal `dockview-core` package directly towards `dockview`.
         warnIfUsingCoreDirectly();
@@ -1073,6 +1095,7 @@ export class DockviewComponent
             this._onDidPopoutGroupSizeChange,
             this._onDidPopoutGroupPositionChange,
             this._onDidAddPopoutGroup,
+            this._onDidRemovePopoutGroup,
             this._onDidOpenPopoutWindowFail,
             this._onDidCreateTabGroup,
             this._onDidDestroyTabGroup,
