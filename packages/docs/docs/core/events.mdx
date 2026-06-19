@@ -231,8 +231,20 @@ Groups expose events via `group.api`:
 
 ```ts
 // Fires when the active panel within this group changes
-group.api.onDidActivePanelChange((event) => { });
+group.api.onDidActivePanelChange((event) => {
+    // event.panel: IDockviewPanel
+    // event.origin: 'user' | 'api'
+});
 
 // Fires when the group location changes (grid → floating → popout)
 group.api.onDidLocationChange(({ location }) => { });
 ```
+
+:::info
+There are two `onDidActivePanelChange` events that differ in **scope**:
+
+- **`api.onDidActivePanelChange`** (`DockviewActivePanelChangeEvent`) tracks the active panel across the **whole dockview**; `panel` may be `undefined`.
+- **`group.api.onDidActivePanelChange`** (`DockviewGroupActivePanelChangeEvent`) is scoped to a **single group**.
+
+Both carry an `origin` (`'user' | 'api'`) reporting whether the change came from a user gesture or an API call.
+:::

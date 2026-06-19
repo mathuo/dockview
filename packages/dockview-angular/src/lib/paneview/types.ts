@@ -15,5 +15,5 @@ export interface PaneviewAngularEvents {
     drop: PaneviewDropEvent;
 }
 
-// Re-export commonly used types from dockview-core
+// Re-export commonly used types from dockview
 export { PaneviewApi, PaneviewDropEvent, PaneviewOptions } from 'dockview';
