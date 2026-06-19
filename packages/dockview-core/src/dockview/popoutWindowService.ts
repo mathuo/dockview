@@ -1,4 +1,5 @@
 import { IDisposable } from '../lifecycle';
+import { Emitter, Event } from '../events';
 import { remove } from '../array';
 import { PopupService } from './components/popupService';
 import { PopoutWindow } from '../popoutWindow';
@@ -40,6 +41,8 @@ export interface IPopoutWindowHost {
 export interface IPopoutWindowService extends IDisposable {
     readonly entries: readonly PopoutGroupEntry[];
 
+    readonly onDidRemove: Event<PopoutGroupEntry>;
+
     add(entry: PopoutGroupEntry): void;
     remove(entry: PopoutGroupEntry): void;
 
@@ -76,6 +79,9 @@ export class PopoutWindowService implements IPopoutWindowService {
     private readonly _restorationCleanups = new Set<() => void>();
     private _restorationPromise: Promise<void> = Promise.resolve();
 
+    private readonly _onDidRemove = new Emitter<PopoutGroupEntry>();
+    readonly onDidRemove = this._onDidRemove.event;
+
     constructor(host: IPopoutWindowHost) {
         this._host = host;
     }
@@ -93,7 +99,12 @@ export class PopoutWindowService implements IPopoutWindowService {
     }
 
     remove(entry: PopoutGroupEntry): void {
-        remove(this._entries, entry);
+        // Fire only on a genuine removal, and not while the host component is
+        // tearing down (consumers don't want popout-removed events during
+        // dispose).
+        if (remove(this._entries, entry) && !this._host.isDisposed) {
+            this._onDidRemove.fire(entry);
+        }
     }
 
     findByGroup(group: DockviewGroupPanel): PopoutGroupEntry | undefined {
@@ -266,6 +277,7 @@ export class PopoutWindowService implements IPopoutWindowService {
     dispose(): void {
         this.cancelPendingRestorations();
         this.disposeAll();
+        this._onDidRemove.dispose();
     }
 }
 

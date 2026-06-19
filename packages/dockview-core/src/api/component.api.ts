@@ -802,6 +802,15 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.onDidAddPopoutGroup;
     }
 
+    /**
+     * Fires when a popout group is removed — whether the user closed its window
+     * or it was docked back programmatically. Symmetric with
+     * {@link onDidAddPopoutGroup}; not fired during component disposal.
+     */
+    get onDidRemovePopoutGroup(): Event<PopoutGroup> {
+        return this.component.onDidRemovePopoutGroup;
+    }
+
     get onDidOpenPopoutWindowFail(): Event<void> {
         return this.component.onDidOpenPopoutWindowFail;
     }

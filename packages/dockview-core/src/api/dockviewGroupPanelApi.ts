@@ -3,7 +3,7 @@ import { DockviewComponent } from '../dockview/dockviewComponent';
 import { Box } from '../types';
 import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
 import {
-    DockviewGroupChangeEvent,
+    DockviewGroupActivePanelChangeEvent,
     DockviewGroupLocation,
     DockviewGroupPanelLocked,
 } from '../dockview/dockviewGroupPanelModel';
@@ -34,7 +34,14 @@ export interface DockviewGroupPanelCollapsedChangeEvent {
 
 export interface DockviewGroupPanelApi extends GridviewPanelApi {
     readonly onDidLocationChange: Event<DockviewGroupPanelFloatingChangeEvent>;
-    readonly onDidActivePanelChange: Event<DockviewGroupChangeEvent>;
+    /**
+     * Fires when the active panel *within this group* changes. Scoped to the
+     * group, in contrast to the component-level
+     * `DockviewApi.onDidActivePanelChange` (which tracks the active panel across
+     * the whole dockview). Both carry an {@link DockviewOrigin} reporting
+     * whether the change came from a user gesture or an API call.
+     */
+    readonly onDidActivePanelChange: Event<DockviewGroupActivePanelChangeEvent>;
     /**
      * Fired when an edge group's collapsed state changes.
      * Never fires for non-edge groups.
@@ -90,7 +97,8 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     readonly onDidLocationChange: Event<DockviewGroupPanelFloatingChangeEvent> =
         this._onDidLocationChange.event;
 
-    readonly _onDidActivePanelChange = new Emitter<DockviewGroupChangeEvent>();
+    readonly _onDidActivePanelChange =
+        new Emitter<DockviewGroupActivePanelChangeEvent>();
     readonly onDidActivePanelChange = this._onDidActivePanelChange.event;
 
     readonly _onDidCollapsedChange =

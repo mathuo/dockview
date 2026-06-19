@@ -39,6 +39,7 @@ DockviewEmitter
 DockviewEvent
 DockviewFrameworkOptions
 DockviewGetTabGroupsOptions
+DockviewGroupActivePanelChangeEvent
 DockviewGroupChangeEvent
 DockviewGroupDropLocation
 DockviewGroupLocation

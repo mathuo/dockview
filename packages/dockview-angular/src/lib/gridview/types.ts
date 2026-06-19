@@ -13,5 +13,5 @@ export interface GridviewAngularEvents {
     ready: GridviewAngularReadyEvent;
 }
 
-// Re-export commonly used types from dockview-core
+// Re-export commonly used types from dockview
 export { GridviewApi, GridviewOptions } from 'dockview';

@@ -13,5 +13,5 @@ export interface SplitviewAngularEvents {
     ready: SplitviewAngularReadyEvent;
 }
 
-// Re-export commonly used types from dockview-core
+// Re-export commonly used types from dockview
 export { SplitviewApi, SplitviewOptions } from 'dockview';

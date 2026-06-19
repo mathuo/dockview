@@ -148,8 +148,10 @@ interface DockviewActivePanelChangeEvent {
 `panel.id` / `panel.api` read as `undefined` (no error is thrown). Replace
 `panel` with `event.panel`.
 
-> The group-level `dockviewGroupPanelApi.onDidActivePanelChange` is unchanged
-> and continues to emit its existing payload (without `origin`).
+> The group-level `dockviewGroupPanelApi.onDidActivePanelChange` keeps emitting
+> the panel and now additionally carries `origin` (its payload type is
+> `DockviewGroupActivePanelChangeEvent`). This is additive — existing handlers
+> reading `event.panel` keep working.
 
 ## Vue / Angular users
 
