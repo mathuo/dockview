@@ -1,7 +1,7 @@
 import { DockviewApi } from '../api/component.api';
 import { getPanelData, PanelTransfer } from '../dnd/dataTransfer';
 import { Droptarget, Position } from '../dnd/droptarget';
-import { DockviewComponent } from './dockviewComponent';
+import { DockviewComponent, DockviewOrigin } from './dockviewComponent';
 import { addClasses, isAncestor, removeClasses, toggleClass } from '../dom';
 import {
     addDisposableListener,
@@ -87,6 +87,16 @@ export interface GroupPanelViewState extends CoreGroupOptions {
 
 export interface DockviewGroupChangeEvent {
     readonly panel: IDockviewPanel;
+}
+
+/**
+ * Payload for the group-level `onDidActivePanelChange`. Extends
+ * {@link DockviewGroupChangeEvent} with the {@link DockviewOrigin} so it mirrors
+ * the component-level `DockviewActivePanelChangeEvent` — both report whether the
+ * change came from a user gesture or an API call.
+ */
+export interface DockviewGroupActivePanelChangeEvent extends DockviewGroupChangeEvent {
+    readonly origin: DockviewOrigin;
 }
 
 export interface CreateTabGroupOptions extends TabGroupOptions {
@@ -176,7 +186,7 @@ export interface IDockviewGroupPanelModel extends IPanel {
     readonly onWillDrop: Event<DockviewWillDropEvent>;
     readonly onDidAddPanel: Event<DockviewGroupChangeEvent>;
     readonly onDidRemovePanel: Event<DockviewGroupChangeEvent>;
-    readonly onDidActivePanelChange: Event<DockviewGroupChangeEvent>;
+    readonly onDidActivePanelChange: Event<DockviewGroupActivePanelChangeEvent>;
     readonly onMove: Event<GroupMoveEvent>;
     locked: DockviewGroupPanelLocked;
     headerPosition: DockviewHeaderPosition;
@@ -294,8 +304,8 @@ export class DockviewGroupPanelModel
         this._onDidRemovePanel.event;
 
     private readonly _onDidActivePanelChange =
-        new Emitter<DockviewGroupChangeEvent>();
-    readonly onDidActivePanelChange: Event<DockviewGroupChangeEvent> =
+        new Emitter<DockviewGroupActivePanelChangeEvent>();
+    readonly onDidActivePanelChange: Event<DockviewGroupActivePanelChangeEvent> =
         this._onDidActivePanelChange.event;
 
     private readonly _onUnhandledDragOverEvent =
@@ -1621,6 +1631,9 @@ export class DockviewGroupPanelModel
 
             this._onDidActivePanelChange.fire({
                 panel,
+                // `currentOrigin` is always present on the real component;
+                // default to 'user' for minimal test accessors.
+                origin: this.accessor.currentOrigin?.() ?? 'user',
             });
         }
 
