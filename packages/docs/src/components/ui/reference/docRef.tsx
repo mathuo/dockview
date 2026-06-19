@@ -84,6 +84,10 @@ export const Text = (props: { content: DocsContent[] }) => {
                                 {piece.text.substring(1, piece.text.length - 1)}
                             </code>
                         );
+                    case 'inline-tag':
+                        // e.g. `{@link SomeType}` — render the referenced symbol
+                        // name as inline code.
+                        return <code key={i}>{piece.text}</code>;
                     default:
                         throw new Error(`unhandled piece ${piece.kind}`);
                 }
