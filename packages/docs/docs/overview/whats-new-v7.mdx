@@ -1,0 +1,87 @@
+---
+title: What's new in v7
+sidebar_position: 4
+description: Highlights and breaking changes in Dockview 7.0 — package realignment, the module system, the accessibility pack, and more.
+---
+
+Dockview 7.0 realigns the package names so the ecosystem is consistent
+(`dockview` for vanilla, `dockview-<framework>` for each framework), introduces
+a [module system](/docs/core/modules), and ships a new
+[accessibility pack](/docs/advanced/accessibility) covering keyboard navigation
+and screen-reader announcements.
+
+This page covers the headline additions. For the upgrade steps and the
+[breaking changes](#breaking-changes), see [Migrating to v7](/docs/overview/migrating-to-v7).
+
+## Highlights
+
+### Package realignment
+
+`dockview` is now the **framework-agnostic** JavaScript package (a re-export of
+`dockview-core`), and the **React bindings moved to `dockview-react`**. Every
+framework package (`dockview-react` / `-vue` / `-angular`) consumes `dockview`.
+React users must switch their imports — see
+[Migrating to v7](/docs/overview/migrating-to-v7#react-users--action-required).
+
+### Module system
+
+Separable features — tab group chips, context menus, advanced drag-and-drop, and
+the accessibility pack — are now [modules](/docs/core/modules). The `dockview`
+package is batteries-included (it registers them all), while bare `dockview-core`
+ships without them. Authors can register modules explicitly with
+`registerModules` / `defineModule`.
+
+### Accessibility pack
+
+A new [`keyboardNavigation`](/docs/advanced/accessibility#keyboard-navigation)
+option enables a fully rebindable keymap: tab switching, F6 / spatial group
+focus, and `Ctrl+M` keyboard docking. Layout changes can also be narrated to
+screen readers via a built-in live region, with hooks
+([`announcements`](/docs/advanced/accessibility#screen-reader-announcements),
+`getAnnouncement`, `announcer`) and an i18n `messages` catalog.
+
+### Per-target drop overlays
+
+The new [`dropOverlayModel`](/docs/core/dnd/overlay) callback shapes the
+drag-and-drop overlay per target (size, activation threshold, small-element
+boundaries), replacing the removed static `rootOverlayModel`.
+
+### Popout lifecycle events
+
+`onDidAddPopoutGroup` and `onDidRemovePopoutGroup` fire as popout windows open
+and close (or dock back), and `getPopouts()` enumerates the open popout windows.
+See [Events](/docs/core/events) and [Popout Groups](/docs/core/groups/popoutGroups).
+
+### Floating groups & popout windows as nested layouts
+
+Floating groups and popout windows now host their own nested grid, so a single
+floating window or popout can hold a full splitview layout of groups rather than
+a single group. See [Floating Groups](/docs/core/groups/floatingGroups) and
+[Popout Groups](/docs/core/groups/popoutGroups).
+
+### Layout-mutation transaction events
+
+`onWillMutateLayout` / `onDidMutateLayout` bracket structural changes
+(add / remove / move / float / popout / maximize / load / clear) as a single
+transaction, each tagged with a `'user'` or `'api'` origin. See
+[Events](/docs/core/events).
+
+### Active-panel origin
+
+`onDidActivePanelChange` now reports whether the active panel changed from a user
+gesture or an API call via `event.origin`. This is a
+[breaking payload change](#breaking-changes).
+
+## Breaking changes
+
+v7's breaking changes are covered in full, with codemods, in
+[Migrating to v7](/docs/overview/migrating-to-v7):
+
+- **Package realignment** — React bindings moved from `dockview` to
+  `dockview-react`; `dockview` is now vanilla core.
+- **`rootOverlayModel` removed** — use [`dropOverlayModel`](/docs/core/dnd/overlay)
+  / `dndEdges` instead.
+- **`onDidActivePanelChange` payload** — now emits `{ panel, origin }` instead of
+  the panel directly.
+- **`dockview-core` no longer bundles every feature** — use `dockview` (or a
+  framework package), or register [modules](/docs/core/modules) explicitly.

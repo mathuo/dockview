@@ -1,0 +1,60 @@
+---
+title: Drop overlay
+sidebar_position: 5
+description: Shape the drag-and-drop overlay per target with the dropOverlayModel option.
+---
+
+# Drop overlay
+
+When you drag a panel or group over Dockview, a highlighted overlay previews
+where it will land. The `dropOverlayModel` option lets you shape that overlay
+**per drop target** — its size, the activation threshold, and the small-element
+boundaries.
+
+:::info
+`dropOverlayModel` replaces the v6 `rootOverlayModel` option. Where
+`rootOverlayModel` was a single static model, `dropOverlayModel` is a callback
+invoked per target. See [Migrating to v7](/docs/overview/migrating-to-v7#rootoverlaymodel-removed).
+:::
+
+## Usage
+
+`dropOverlayModel` is a callback that receives the target and returns a
+`DroptargetOverlayModel`, or `undefined` to keep the default for that target:
+
+```ts
+const options = {
+    dropOverlayModel: (params) => {
+        // params.location: which drop target ('tab' | 'header_space' | 'content')
+        // params.group: the group the target belongs to, where known
+        if (params.location === 'content') {
+            return {
+                size: { value: 100, type: 'pixels' },
+            };
+        }
+        return undefined; // default overlay for other targets
+    },
+};
+```
+
+The returned model accepts:
+
+| Field | Description |
+|---|---|
+| `size` | The size of the highlighted overlay region. |
+| `activationSize` | How close the pointer must be to a target before it activates. |
+| `smallWidthBoundary` | Width (px) below which the overlay switches to a thin-border indicator instead of a half-width highlight. Set `0` to always show the half-width overlay. |
+| `smallHeightBoundary` | Height (px) below which the overlay switches to a thin-border indicator instead of a half-height highlight. Set `0` to always show the half-height overlay. |
+
+## The outer edge overlay
+
+`dropOverlayModel` does **not** dispatch the `'edge'` target — the overlay shown
+when dragging to the outer edges of the whole layout. That is configured
+separately via the `dndEdges` option. If you were using `rootOverlayModel`
+purely to size the outer edge overlay, use `dndEdges` instead.
+
+:::warning
+Advanced drag-and-drop, including `dropOverlayModel`, is part of the
+[`dockview` package](/docs/core/modules) and is not active on bare
+`dockview-core`.
+:::

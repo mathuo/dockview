@@ -1,0 +1,127 @@
+---
+title: Accessibility
+description: Keyboard navigation and screen-reader announcements in Dockview.
+---
+
+# Accessibility
+
+Dockview ships an accessibility pack — keyboard navigation and screen-reader
+announcements — as part of the [`dockview` package](/docs/core/modules). It is a
+module, so it is included in `dockview` and the framework packages, but **not**
+in bare `dockview-core`.
+
+The options below are set the same way as any other Dockview option — via the
+options argument for vanilla (`createDockview(element, { ... })`) or via the
+component props/inputs for React, Vue, and Angular.
+
+## Keyboard navigation
+
+Set `keyboardNavigation` to `true` to enable the built-in keymap:
+
+```ts
+const options = {
+    keyboardNavigation: true,
+};
+```
+
+This wires up the following default bindings:
+
+| Action | Default | Binding key |
+|---|---|---|
+| Switch to the next tab in the focused group | `Ctrl+]` | `nextTab` |
+| Switch to the previous tab in the focused group | `Ctrl+[` | `prevTab` |
+| Move focus to the next group | `F6` | `focusNextGroup` |
+| Move focus to the previous group | `Shift+F6` | `focusPrevGroup` |
+| Move focus to the group on the left | `Ctrl+Shift+←` | `focusGroupLeft` |
+| Move focus to the group on the right | `Ctrl+Shift+→` | `focusGroupRight` |
+| Move focus to the group above | `Ctrl+Shift+↑` | `focusGroupUp` |
+| Move focus to the group below | `Ctrl+Shift+↓` | `focusGroupDown` |
+| Arm keyboard docking of the active panel | `Ctrl+M` | `dock` |
+| Move focus from panel content to the tab strip | `Ctrl+Shift+\` | `focusTabs` |
+
+### Rebinding keys
+
+Pass an object instead of `true` to override individual bindings. Unset keys
+keep their defaults:
+
+```ts
+const options = {
+    keyboardNavigation: {
+        keymap: {
+            nextTab: 'ctrl+tab',
+            prevTab: 'ctrl+shift+tab',
+            dock: 'ctrl+shift+m',
+        },
+    },
+};
+```
+
+Each binding is a string of `+`-separated parts, modifiers first. Recognised
+modifiers are `ctrl`, `shift`, `alt`, and `meta` (alias `cmd`); the final part
+is the [`KeyboardEvent.key`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key)
+to match, case-insensitively — e.g. `'ctrl+]'`, `'shift+f6'`, `'ctrl+m'`,
+`'ctrl+shift+arrowleft'`.
+
+:::info
+`Ctrl+M` arms **keyboard docking**: it enters a two-phase mode where you pick a
+target group and then an edge, letting you re-dock the active panel without a
+mouse.
+:::
+
+For *programmatic* focus movement (building your own shortcut handlers), see
+[Keyboard](/docs/advanced/keyboard).
+
+## Screen-reader announcements
+
+Dockview narrates layout changes — panels opening/closing, groups floating,
+docking, popping out, maximizing/restoring — through a visually-hidden ARIA live
+region. This is on by default. Opt out with:
+
+```ts
+const options = {
+    announcements: false,
+};
+```
+
+### Localising and overriding announcements
+
+`getAnnouncement` runs per event and lets you override or localise the spoken
+string. Return a string to use it, `null` / `''` to suppress that announcement,
+or `undefined` to fall through to the default:
+
+```ts
+const options = {
+    getAnnouncement: (event) => {
+        if (event.kind === 'maximize') {
+            return 'Panel maximised';
+        }
+        return undefined; // keep the default
+    },
+};
+```
+
+For full translations, provide a `messages` catalog. Each entry is a function
+that builds the string from the relevant context (e.g. the panel title); supply
+any subset — unset entries keep the English defaults:
+
+```ts
+const options = {
+    messages: {
+        panelOpened: (title) => `${title} ouvert`,
+        panelClosed: (title) => `${title} fermé`,
+        groupMaximized: (title) => `${title} agrandi`,
+    },
+};
+```
+
+### Routing to your own announcer
+
+If your app already manages a screen-reader live region, route Dockview's
+announcements to it with `announcer` instead of using the built-in region.
+`getAnnouncement` (localisation) still applies first:
+
+```ts
+const options = {
+    announcer: (event) => myLiveRegion.announce(event.message),
+};
+```

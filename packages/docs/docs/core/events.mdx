@@ -141,6 +141,12 @@ api.onDidAddPopoutGroup((event: PopoutGroup) => {
     event.window.focus();
 });
 
+// Fires when a popout group is removed — the user closed its window or it was
+// docked back programmatically. Not fired during component disposal.
+api.onDidRemovePopoutGroup((event: PopoutGroup) => {
+    // event.id, event.group
+});
+
 // Fires when a popout window is resized
 api.onDidPopoutGroupSizeChange((event: PopoutGroupChangeSizeEvent) => { });
 
