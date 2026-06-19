@@ -51,10 +51,11 @@ Install and import from `dockview-react`:
 + @import 'dockview-react/dist/styles/dockview.css';
 ```
 
-A one-shot codemod for a source tree:
+A one-shot codemod for a source tree (uses `perl` for cross-platform in-place
+editing — works on macOS and Linux):
 
 ```sh
-grep -rl "from 'dockview'" src | xargs sed -i '' "s/from 'dockview'/from 'dockview-react'/g"
+grep -rl "from 'dockview'" src | xargs perl -pi -e "s/from 'dockview'/from 'dockview-react'/g"
 ```
 
 ## Vanilla JavaScript / TypeScript users — recommended

@@ -41,6 +41,19 @@ You can control the bounding box of floating groups through the optional `floati
 -   `{minimumHeightWithinViewport?: number, minimumWidthWithinViewport?: number}` sets the respective dimension minimums that must appears within the docks viewport
 -   If no options are provided the defaults of `100px` minimum height and width within the viewport are set.
 
+### Drag handle
+
+`floatingGroupDragHandle` selects which element moves a floating group when dragged:
+
+-   `'titlebar'` (default): a dedicated, blank drag-handle bar is rendered above the group's tab bar. Dragging it moves the floating window; shift+drag (mouse) or long-press (touch) redocks the group back into the grid. Style it with the `--dv-floating-titlebar-*` theme variables.
+-   `'tabbar'`: the legacy behaviour — the empty space in the tab bar (the "void container") doubles as the move handle, with no dedicated bar rendered.
+
+```ts
+const api = createDockview(element, {
+    floatingGroupDragHandle: 'titlebar', // the default
+});
+```
+
 ### Customising drag behaviour
 
 `transformFloatingGroupDrag` lets you adjust a floating group's position while it is being dragged — for snapping to a grid, aligning to other floating groups, or constraining a group to a region. It runs on every pointer-move frame with the proposed top-left (before dockview's container clamp) and returns an adjusted top-left, or nothing to leave it unchanged. It affects moving only — resizing is unaffected.

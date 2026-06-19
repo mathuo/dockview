@@ -108,6 +108,8 @@ function parseType(obj) {
             return `[${obj.name}: ${parseType(obj.element)}]`;
         case 'typeOperator':
             return `${obj.operator} ${parseType(obj.target)}`;
+        case 'indexedAccess':
+            return `${parseType(obj.objectType)}[${parseType(obj.indexType)}]`;
         default:
             throw new Error(`unhandled type ${obj.type}`);
     }
@@ -187,6 +189,12 @@ function parseComplexType(obj) {
                 type: obj.type,
                 operator: obj.operator,
                 value: parseComplexType(obj.target),
+            };
+        case 'indexedAccess':
+            return {
+                type: obj.type,
+                objectType: parseComplexType(obj.objectType),
+                indexType: parseComplexType(obj.indexType),
             };
         default:
             throw new Error(`unhandled type ${obj.type}`);

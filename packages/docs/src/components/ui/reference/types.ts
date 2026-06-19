@@ -41,6 +41,11 @@ export function firstLevelTypes(value: TypeDescriptor.Type | null) {
             return firstLevelTypes((value as any).values);
         case 'typeOperator':
             return firstLevelTypes((value as any).value);
+        case 'indexedAccess':
+            return [
+                ...firstLevelTypes((value as any).objectType),
+                ...firstLevelTypes((value as any).indexType),
+            ];
         default:
             throw new Error('unreachable');
     }
@@ -158,6 +163,10 @@ export function codifyType(value: TypeDescriptor.Type | null, tabs = 0) {
             return codifyType((value as any).values);
         case 'typeOperator':
             return `${(value as any).operator} ${codifyType((value as any).value, tabs)}`;
+        case 'indexedAccess':
+            return `${codifyType((value as any).objectType)}[${codifyType(
+                (value as any).indexType
+            )}]`;
         default:
             throw new Error('unreachable');
     }
