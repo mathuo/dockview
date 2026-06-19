@@ -14,8 +14,14 @@ Popout groups **cannot** be maximized. Calling maximize function on groups in th
 <DocRef declaration="DockviewApi" methods={['addPopoutGroup']} />
 
 Dockview has built-in support for opening groups in new Windows.
-Each popout window can contain a single group with many panels and you can have as many popout
-windows as needed. You cannot dock multiple groups together in the same window.
+Each popout window hosts its own nested layout, so you can dock multiple groups
+together inside a single popout window, and you can have as many popout windows
+as needed.
+
+The popout lifecycle is observable: `onDidAddPopoutGroup` /
+`onDidRemovePopoutGroup` fire as windows open and close (or dock back), and
+`api.getPopouts()` enumerates the open popout windows — see
+[Events](/docs/core/events#popout-window).
 
 Popout windows require your website to have a blank `.html` page that can be used, by default this is set to `/popout.html` but
 can be configured to match requirements.
