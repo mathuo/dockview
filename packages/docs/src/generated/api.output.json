@@ -2331,7 +2331,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "DockviewOrigin",
-                                "target": 10591
+                                "target": 10589
                             },
                             {
                                 "kind": "text",
@@ -2388,7 +2388,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewOrigin",
-                            "target": 10591
+                            "target": 10589
                         },
                         {
                             "kind": "text",
@@ -3094,7 +3094,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "onDidAddPopoutGroup",
-                                "target": 5986
+                                "target": 5985
                             },
                             {
                                 "kind": "text",
@@ -3127,7 +3127,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "onDidAddPopoutGroup",
-                            "target": 5986
+                            "target": 5985
                         },
                         {
                             "kind": "text",
@@ -7755,7 +7755,7 @@
                                     "kind": "inline-tag",
                                     "tag": "@link",
                                     "text": "DockviewApi",
-                                    "target": 5954
+                                    "target": 5953
                                 },
                                 {
                                     "kind": "text",
@@ -7800,7 +7800,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewApi",
-                            "target": 5954
+                            "target": 5953
                         },
                         {
                             "kind": "text",
@@ -30066,7 +30066,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewOrigin",
-                            "target": 10591
+                            "target": 10589
                         },
                         {
                             "kind": "text",
@@ -30782,136 +30782,6 @@
         "kind": "interface",
         "name": "DockviewKeybindings",
         "children": [
-            {
-                "name": "dock",
-                "code": "string",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "string"
-                },
-                "flags": {},
-                "comment": {
-                    "summary": [
-                        {
-                            "kind": "text",
-                            "text": "Arm keyboard docking of the active panel. Default "
-                        },
-                        {
-                            "kind": "code",
-                            "text": "`ctrl+m`"
-                        },
-                        {
-                            "kind": "text",
-                            "text": "."
-                        }
-                    ]
-                }
-            },
-            {
-                "name": "focusGroupDown",
-                "code": "string",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "string"
-                },
-                "flags": {},
-                "comment": {
-                    "summary": [
-                        {
-                            "kind": "text",
-                            "text": "Move focus to the group spatially below. Default "
-                        },
-                        {
-                            "kind": "code",
-                            "text": "`ctrl+shift+arrowdown`"
-                        },
-                        {
-                            "kind": "text",
-                            "text": "."
-                        }
-                    ]
-                }
-            },
-            {
-                "name": "focusGroupLeft",
-                "code": "string",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "string"
-                },
-                "flags": {},
-                "comment": {
-                    "summary": [
-                        {
-                            "kind": "text",
-                            "text": "Move focus to the group spatially to the left. Default "
-                        },
-                        {
-                            "kind": "code",
-                            "text": "`ctrl+shift+arrowleft`"
-                        },
-                        {
-                            "kind": "text",
-                            "text": "."
-                        }
-                    ]
-                }
-            },
-            {
-                "name": "focusGroupRight",
-                "code": "string",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "string"
-                },
-                "flags": {},
-                "comment": {
-                    "summary": [
-                        {
-                            "kind": "text",
-                            "text": "Move focus to the group spatially to the right. Default "
-                        },
-                        {
-                            "kind": "code",
-                            "text": "`ctrl+shift+arrowright`"
-                        },
-                        {
-                            "kind": "text",
-                            "text": "."
-                        }
-                    ]
-                }
-            },
-            {
-                "name": "focusGroupUp",
-                "code": "string",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "string"
-                },
-                "flags": {},
-                "comment": {
-                    "summary": [
-                        {
-                            "kind": "text",
-                            "text": "Move focus to the group spatially above. Default "
-                        },
-                        {
-                            "kind": "code",
-                            "text": "`ctrl+shift+arrowup`"
-                        },
-                        {
-                            "kind": "text",
-                            "text": "."
-                        }
-                    ]
-                }
-            },
             {
                 "name": "focusNextGroup",
                 "code": "string",
@@ -31813,7 +31683,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "AnnouncementEvent",
-                            "target": 8471
+                            "target": 8470
                         },
                         {
                             "kind": "text",
@@ -32208,7 +32078,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DroptargetOverlayModel",
-                            "target": 10597
+                            "target": 10595
                         },
                         {
                             "kind": "text",
@@ -32876,7 +32746,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewMessages",
-                            "target": 8678
+                            "target": 8672
                         },
                         {
                             "kind": "text",
@@ -35088,7 +34958,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewOptions.floatingGroupDragHandle",
-                            "target": 8764
+                            "target": 8758
                         },
                         {
                             "kind": "text",
@@ -44960,6 +44830,33 @@
             "IDisposable"
         ]
     },
+    "IKeyboardDockingService": {
+        "kind": "interface",
+        "name": "IKeyboardDockingService",
+        "children": [
+            {
+                "name": "dispose",
+                "code": "(): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "dispose",
+                        "typeParameters": [],
+                        "parameters": [],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            }
+        ],
+        "extends": [
+            "IDisposable"
+        ]
+    },
     "INodeDescriptor": {
         "kind": "interface",
         "name": "INodeDescriptor",
@@ -49158,7 +49055,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewKeybindings",
-                            "target": 8661
+                            "target": 8660
                         },
                         {
                             "kind": "text",
@@ -52899,6 +52796,19 @@
                 }
             },
             {
+                "name": "keyboardDockingService",
+                "code": "IKeyboardDockingService",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "IKeyboardDockingService",
+                    "source": "dockview-core"
+                },
+                "flags": {
+                    "isOptional": true
+                }
+            },
+            {
                 "name": "liveRegionService",
                 "code": "ILiveRegionService",
                 "kind": "property",
@@ -54816,7 +54726,7 @@
                     "kind": "inline-tag",
                     "tag": "@link",
                     "text": "DockviewApi",
-                    "target": 5954
+                    "target": 5953
                 },
                 {
                     "kind": "text",

@@ -2,95 +2,50 @@ import {
     DockviewCompositeDisposable as CompositeDisposable,
     DockviewIDisposable as IDisposable,
 } from 'dockview-core';
-import { Position } from 'dockview-core';
 import { DockviewGroupPanel } from 'dockview-core';
-import { IDockviewPanel } from 'dockview-core';
 import { DockviewKeybindings, KeyboardNavigationOptions } from 'dockview-core';
-import { resolveMessages } from 'dockview-core';
 import { defineModule } from 'dockview-core';
-import { AdvancedDnDModule } from './advancedDnDService';
-import { LiveRegionModule } from 'dockview-core';
 import { IAccessibilityHost, IAccessibilityService } from 'dockview-core';
-
-type DockPhase = 'target' | 'edge';
-
-interface MoveState {
-    readonly source: IDockviewPanel;
-    readonly groups: DockviewGroupPanel[];
-    groupIndex: number;
-    phase: DockPhase;
-    position: Position;
-}
-
-const EDGE_FROM_KEY: Record<string, Position> = {
-    ArrowLeft: 'left',
-    ArrowRight: 'right',
-    ArrowUp: 'top',
-    ArrowDown: 'bottom',
-};
+import {
+    KEYBOARD_MOVE_ATTRIBUTE,
+    matchesBinding,
+    readKeyboardNavigation,
+} from './keyboardShared';
 
 const DEFAULT_KEYMAP: DockviewKeybindings = {
     nextTab: 'ctrl+]',
     prevTab: 'ctrl+[',
     focusNextGroup: 'f6',
     focusPrevGroup: 'shift+f6',
-    focusGroupLeft: 'ctrl+shift+arrowleft',
-    focusGroupRight: 'ctrl+shift+arrowright',
-    focusGroupUp: 'ctrl+shift+arrowup',
-    focusGroupDown: 'ctrl+shift+arrowdown',
-    dock: 'ctrl+m',
     focusTabs: 'ctrl+shift+\\',
 };
 
 /**
- * Does `e` match a binding string like `'ctrl+]'` / `'shift+f6'`? Modifiers
- * are matched exactly (a binding without `shift` will not fire while Shift is
- * held), and the final part is compared to `KeyboardEvent.key`, lower-cased.
- */
-function matchesBinding(e: KeyboardEvent, binding: string): boolean {
-    const parts = binding.toLowerCase().split('+');
-    const key = parts[parts.length - 1];
-    const mods = parts.slice(0, -1);
-    return (
-        e.ctrlKey === mods.includes('ctrl') &&
-        e.shiftKey === mods.includes('shift') &&
-        e.altKey === mods.includes('alt') &&
-        e.metaKey === (mods.includes('meta') || mods.includes('cmd')) &&
-        e.key.toLowerCase() === key
-    );
-}
-
-/**
- * Accessibility module — operate the dock without a mouse. Opt-in via
- * `keyboardNavigation`, with a rebindable {@link DockviewKeybindings} keymap.
+ * Keyboard navigation & focus management — operate the dock without a mouse.
+ * Opt-in via `keyboardNavigation`, with a rebindable {@link DockviewKeybindings}
+ * keymap.
  *
  * - **Switch tab** (`Ctrl+]` / `Ctrl+[`) — cycle the focused group's tabs.
- * - **Focus group** (`F6` / `Shift+F6` sequential, `Ctrl+Shift+Arrows`
- *   spatial) — move focus between groups.
- * - **Keyboard docking** (`Ctrl+M`) — arms a two-phase move of the active
- *   panel with a live drop preview + screen-reader narration:
- *     1. PICK TARGET — arrows cycle the groups (incl. the panel's own, so a tab
- *        can be split out); `Enter` selects one.
- *     2. PICK EDGE — arrows choose a split edge (left/right/top/bottom) or the
- *        centre (tab-into); `Enter` commits, `Escape` steps back.
- *   `Escape` from the target phase cancels.
- * - **Focus restore on close** (L4) — when removing a panel/group pulls focus
- *   out of the dock, focus returns to the neighbour the layout just activated
- *   instead of being stranded on `<body>`.
- * - **Floating `Esc`** (L4) — `Esc` inside a floating group returns focus to
- *   the control that had it before entering the float (polite: bubble phase,
+ * - **Focus group** (`F6` / `Shift+F6`) — move focus to the next / previous
+ *   group in sequence.
+ * - **Focus the tab strip** (`Ctrl+Shift+\`) — jump focus from panel content to
+ *   the active group's tab strip (the strip's roving-tabindex takes over).
+ * - **Focus restore on close** — when removing a panel/group pulls focus out of
+ *   the dock, focus returns to the neighbour the layout just activated instead
+ *   of being stranded on `<body>`.
+ * - **Floating `Esc`** — `Esc` inside a floating group returns focus to the
+ *   control that had it before entering the float (polite: bubble phase,
  *   respects `defaultPrevented`, so panel content keeps `Esc`).
- * - **Floating Tab-containment** (L4) — Tab wraps within the floating group so
- *   focus doesn't leak to the grid behind it.
+ * - **Floating Tab-containment** — Tab wraps within the floating group so focus
+ *   doesn't leak to the grid behind it.
  *
- * Cross-window (popout) focus is a later phase.
+ * Stands down while an advanced keyboard move is in progress (see
+ * {@link KEYBOARD_MOVE_ATTRIBUTE}) so the docking module owns the keys then.
  */
 export class AccessibilityService
     extends CompositeDisposable
     implements IAccessibilityService
 {
-    private _move: MoveState | null = null;
-    private _preview: IDisposable | undefined;
     private _focusWasInside = false;
     private _lastNonFloatFocus: HTMLElement | undefined;
 
@@ -100,7 +55,6 @@ export class AccessibilityService
         // Listen on the document (capture) rather than the dockview element:
         // edge groups live in the shell *outside* the gridview, and the shell
         // is created after this service, so a fixed element would miss them.
-        // Capture also lets move-mode keys beat the free tab-strip navigation.
         const doc = host.rootElement.ownerDocument;
         const onKeyDown = (e: KeyboardEvent): void => this._onKeyDown(e);
         doc.addEventListener('keydown', onKeyDown, true);
@@ -126,7 +80,6 @@ export class AccessibilityService
         doc.addEventListener('keydown', onEscape, false);
 
         this.addDisposables(
-            { dispose: () => this._clearPreview() },
             {
                 dispose: () =>
                     doc.removeEventListener('keydown', onKeyDown, true),
@@ -139,10 +92,10 @@ export class AccessibilityService
                 dispose: () =>
                     doc.removeEventListener('keydown', onEscape, false),
             },
-            // L4 focus management — when a close pulls focus out of the dock,
-            // return it to the neighbour the component just activated rather
-            // than leaving it stranded on <body>. Snapshot before the teardown
-            // (focus still on the closing panel), restore after.
+            // When a close pulls focus out of the dock, return it to the
+            // neighbour the component just activated rather than leaving it
+            // stranded on <body>. Snapshot before the teardown (focus still on
+            // the closing panel), restore after.
             host.onWillMutateLayout((e) => {
                 if (e.kind === 'remove' && this._nav) {
                     this._focusWasInside = this._isFocusInside();
@@ -161,6 +114,10 @@ export class AccessibilityService
         );
     }
 
+    private get _moveActive(): boolean {
+        return this.host.rootElement.hasAttribute(KEYBOARD_MOVE_ATTRIBUTE);
+    }
+
     private _isFocusInside(): boolean {
         const active = this.host.rootElement.ownerDocument.activeElement;
         return active instanceof Node && this.host.rootElement.contains(active);
@@ -169,7 +126,7 @@ export class AccessibilityService
     private _onFloatingEscape(e: KeyboardEvent): void {
         if (
             !this._nav ||
-            this._move ||
+            this._moveActive ||
             e.defaultPrevented ||
             e.key !== 'Escape'
         ) {
@@ -256,11 +213,7 @@ export class AccessibilityService
     }
 
     private get _nav(): KeyboardNavigationOptions | undefined {
-        const opt = this.host.options.keyboardNavigation;
-        if (!opt) {
-            return undefined;
-        }
-        return opt === true ? {} : opt;
+        return readKeyboardNavigation(this.host.options);
     }
 
     private get _keymap(): DockviewKeybindings {
@@ -271,8 +224,8 @@ export class AccessibilityService
         if (!this._nav) {
             return;
         }
-        if (this._move) {
-            this._onMoveKey(e);
+        // Stand down while the docking module is driving a keyboard move.
+        if (this._moveActive) {
             return;
         }
         // Only act on events originating inside *this* dockview.
@@ -288,9 +241,7 @@ export class AccessibilityService
             return;
         }
         const keymap = this._keymap;
-        if (matchesBinding(e, keymap.dock)) {
-            this._enterMoveMode(e);
-        } else if (matchesBinding(e, keymap.nextTab)) {
+        if (matchesBinding(e, keymap.nextTab)) {
             this._consume(e);
             this._switchTab(false);
         } else if (matchesBinding(e, keymap.prevTab)) {
@@ -302,18 +253,6 @@ export class AccessibilityService
         } else if (matchesBinding(e, keymap.focusPrevGroup)) {
             this._consume(e);
             this._cycleGroup(true);
-        } else if (matchesBinding(e, keymap.focusGroupLeft)) {
-            this._consume(e);
-            this._focusGroupInDirection('left');
-        } else if (matchesBinding(e, keymap.focusGroupRight)) {
-            this._consume(e);
-            this._focusGroupInDirection('right');
-        } else if (matchesBinding(e, keymap.focusGroupUp)) {
-            this._consume(e);
-            this._focusGroupInDirection('up');
-        } else if (matchesBinding(e, keymap.focusGroupDown)) {
-            this._consume(e);
-            this._focusGroupInDirection('down');
         } else if (matchesBinding(e, keymap.focusTabs)) {
             this._consume(e);
             this._focusTabs();
@@ -352,21 +291,6 @@ export class AccessibilityService
         this._focusGroup(target);
     }
 
-    private _focusGroupInDirection(
-        direction: 'left' | 'right' | 'up' | 'down'
-    ): void {
-        const current = this.host.activeGroup;
-        if (!current) {
-            return;
-        }
-        // Geometry lives on the host as the shared `adjacentGroupInDirection`
-        // primitive (also public on the api), so mouse and keyboard navigation
-        // agree on what "the group to the left" is.
-        this._focusGroup(
-            this.host.adjacentGroupInDirection(current, direction)
-        );
-    }
-
     private _focusGroup(target: DockviewGroupPanel | undefined): void {
         if (!target) {
             return;
@@ -380,147 +304,9 @@ export class AccessibilityService
         this.host.activeGroup?.model.focusContent();
     }
 
-    private _enterMoveMode(e: KeyboardEvent): void {
-        const source = this.host.activePanel;
-        const groups = this.host.groups;
-        if (!source || groups.length === 0) {
-            return;
-        }
-        e.preventDefault();
-        e.stopPropagation();
-        // Start on the panel's own group so a single group of tabs can still
-        // split a tab out via the edge phase.
-        const groupIndex = Math.max(0, groups.indexOf(source.group));
-        this._move = {
-            source,
-            groups,
-            groupIndex,
-            phase: 'target',
-            position: 'center',
-        };
-        this._render();
-    }
-
-    private _onMoveKey(e: KeyboardEvent): void {
-        const move = this._move!;
-
-        if (e.key === 'Escape') {
-            this._consume(e);
-            if (move.phase === 'edge') {
-                move.phase = 'target';
-                move.position = 'center';
-                this._render();
-            } else {
-                this._exit();
-                this.host.announce(this._messages.moveCancelled());
-                this._restoreFocus();
-            }
-            return;
-        }
-
-        if (e.key === 'Enter') {
-            this._consume(e);
-            if (move.phase === 'target') {
-                move.phase = 'edge';
-                move.position = 'center';
-                this._render();
-            } else {
-                this._commit();
-            }
-            return;
-        }
-
-        if (move.phase === 'target') {
-            const n = move.groups.length;
-            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-                this._consume(e);
-                move.groupIndex = (move.groupIndex + 1) % n;
-                this._render();
-            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-                this._consume(e);
-                move.groupIndex = (move.groupIndex - 1 + n) % n;
-                this._render();
-            }
-            return;
-        }
-
-        // edge phase
-        const edge = EDGE_FROM_KEY[e.key];
-        if (edge) {
-            this._consume(e);
-            move.position = edge;
-            this._render();
-        } else if (e.key === ' ' || e.key === 'c' || e.key === 'C') {
-            this._consume(e);
-            move.position = 'center';
-            this._render();
-        }
-    }
-
-    private get _messages() {
-        return resolveMessages(this.host.options.messages);
-    }
-
-    private _render(): void {
-        const move = this._move!;
-        const group = move.groups[move.groupIndex];
-        this._clearPreview();
-        this._preview = this.host.showDropPreview(group, move.position);
-
-        const name = group.activePanel?.title ?? group.id;
-        const m = this._messages;
-        if (move.phase === 'target') {
-            this.host.announce(
-                m.movePickTarget(
-                    this._label(move.source),
-                    name,
-                    move.groupIndex + 1,
-                    move.groups.length
-                )
-            );
-        } else {
-            this.host.announce(m.movePickEdge(move.position, name));
-        }
-    }
-
-    private _commit(): void {
-        const move = this._move!;
-        const group = move.groups[move.groupIndex];
-        const position = move.position;
-        const source = move.source;
-        const name = group.activePanel?.title ?? group.id;
-        const m = this._messages;
-        this._exit();
-        try {
-            this.host.dockPanel(source, group, position);
-            this.host.announce(
-                m.moveCommitted(this._label(source), name, position)
-            );
-        } catch {
-            this.host.announce(m.moveNotAllowed());
-        }
-        // The move re-renders the grid; pull focus back into the dock so the
-        // keymap keeps working without a click.
-        this._restoreFocus();
-    }
-
-    private _exit(): void {
-        this._clearPreview();
-        this._move = null;
-    }
-
-    private _clearPreview(): void {
-        this._preview?.dispose();
-        this._preview = undefined;
-    }
-
     private _consume(e: KeyboardEvent): void {
         e.preventDefault();
         e.stopPropagation();
-    }
-
-    private _label(panel: IDockviewPanel): string {
-        return panel.title ?? panel.id;
     }
 }
 
@@ -531,5 +317,4 @@ export const AccessibilityModule = defineModule<
     name: 'Accessibility',
     serviceKey: 'accessibilityService',
     create: (host) => new AccessibilityService(host),
-    dependsOn: [AdvancedDnDModule, LiveRegionModule],
 });

@@ -98,9 +98,9 @@ export interface AnnouncementEvent {
 /**
  * Key bindings for {@link DockviewComponentOptions.keyboardNavigation}. Each
  * value is a string of `+`-separated parts, modifiers first, e.g. `'ctrl+]'`,
- * `'shift+f6'`, `'ctrl+m'`. Recognised modifiers: `ctrl`, `shift`, `alt`,
- * `meta` (alias `cmd`). The final part is the `KeyboardEvent.key` to match,
- * case-insensitively (`'m'`, `']'`, `'f6'`, `'arrowleft'`).
+ * `'shift+f6'`. Recognised modifiers: `ctrl`, `shift`, `alt`, `meta` (alias
+ * `cmd`). The final part is the `KeyboardEvent.key` to match, case-insensitively
+ * (`']'`, `'f6'`, `'arrowleft'`).
  */
 export interface DockviewKeybindings {
     /** Switch to the next tab in the focused group. Default `ctrl+]`. */
@@ -111,16 +111,6 @@ export interface DockviewKeybindings {
     focusNextGroup: string;
     /** Move focus to the previous group. Default `shift+f6`. */
     focusPrevGroup: string;
-    /** Move focus to the group spatially to the left. Default `ctrl+shift+arrowleft`. */
-    focusGroupLeft: string;
-    /** Move focus to the group spatially to the right. Default `ctrl+shift+arrowright`. */
-    focusGroupRight: string;
-    /** Move focus to the group spatially above. Default `ctrl+shift+arrowup`. */
-    focusGroupUp: string;
-    /** Move focus to the group spatially below. Default `ctrl+shift+arrowdown`. */
-    focusGroupDown: string;
-    /** Arm keyboard docking of the active panel. Default `ctrl+m`. */
-    dock: string;
     /** Move focus from panel content to the focused group's tab strip. Default `ctrl+shift+\`. */
     focusTabs: string;
 }

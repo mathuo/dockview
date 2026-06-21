@@ -32,11 +32,6 @@ This wires up the following default bindings:
 | Switch to the previous tab in the focused group | `Ctrl+[` | `prevTab` |
 | Move focus to the next group | `F6` | `focusNextGroup` |
 | Move focus to the previous group | `Shift+F6` | `focusPrevGroup` |
-| Move focus to the group on the left | `Ctrl+Shift+←` | `focusGroupLeft` |
-| Move focus to the group on the right | `Ctrl+Shift+→` | `focusGroupRight` |
-| Move focus to the group above | `Ctrl+Shift+↑` | `focusGroupUp` |
-| Move focus to the group below | `Ctrl+Shift+↓` | `focusGroupDown` |
-| Arm keyboard docking of the active panel | `Ctrl+M` | `dock` |
 | Move focus from panel content to the tab strip | `Ctrl+Shift+\` | `focusTabs` |
 
 ### Rebinding keys
@@ -50,7 +45,6 @@ const options = {
         keymap: {
             nextTab: 'ctrl+tab',
             prevTab: 'ctrl+shift+tab',
-            dock: 'ctrl+shift+m',
         },
     },
 };
@@ -59,17 +53,10 @@ const options = {
 Each binding is a string of `+`-separated parts, modifiers first. Recognised
 modifiers are `ctrl`, `shift`, `alt`, and `meta` (alias `cmd`); the final part
 is the [`KeyboardEvent.key`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key)
-to match, case-insensitively — e.g. `'ctrl+]'`, `'shift+f6'`, `'ctrl+m'`,
-`'ctrl+shift+arrowleft'`.
+to match, case-insensitively — e.g. `'ctrl+]'`, `'shift+f6'`, `'ctrl+tab'`.
 
-:::info
-`Ctrl+M` arms **keyboard docking**: it enters a two-phase mode where you pick a
-target group and then an edge, letting you re-dock the active panel without a
-mouse.
-:::
-
-For *programmatic* focus movement (building your own shortcut handlers), see
-[Keyboard](/docs/advanced/keyboard).
+For *programmatic* focus movement (building your own shortcut handlers, e.g.
+moving focus by spatial direction), see [Keyboard](/docs/advanced/keyboard).
 
 ## Screen-reader announcements
 

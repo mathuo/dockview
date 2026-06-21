@@ -195,6 +195,7 @@ export {
     IAdvancedDnDService,
     IContextMenuHost,
     IContextMenuService,
+    IKeyboardDockingService,
     ITabGroupChipsHost,
     ITabGroupChipsService,
 } from './dockview/moduleContracts';

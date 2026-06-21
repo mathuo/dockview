@@ -14,6 +14,12 @@ export {
     AccessibilityService,
     AccessibilityModule,
 } from './accessibilityService';
+// Advanced keyboard docking is an optional module — exported for explicit
+// registration, but not part of the default `Modules` bundle below.
+export {
+    KeyboardDockingService,
+    KeyboardDockingModule,
+} from './keyboardDockingService';
 
 /**
  * The set of modules provided by this package. `dockview` registers these via

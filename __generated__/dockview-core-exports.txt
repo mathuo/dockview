@@ -138,6 +138,7 @@ IGroupHeaderProps
 IGroupPanelBaseProps
 IGroupPanelInitParameters
 IHeaderActionsRenderer
+IKeyboardDockingService
 INodeDescriptor
 IPanePart
 IPanel
