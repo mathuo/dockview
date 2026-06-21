@@ -20,6 +20,13 @@
 
 Please see the website: https://dockview.dev
 
+> **`dockview-core` is an internal package.** Install
+> **[`dockview`](https://www.npmjs.com/package/dockview)** instead — the vanilla
+> JavaScript / TypeScript package that ships the full feature set out of the box. Using a
+> framework? Install the bindings: [`dockview-react`](https://www.npmjs.com/package/dockview-react),
+> [`dockview-vue`](https://www.npmjs.com/package/dockview-vue) or
+> [`dockview-angular`](https://www.npmjs.com/package/dockview-angular).
+
 ## Features
 
 -   Serialization / deserialization with full layout management

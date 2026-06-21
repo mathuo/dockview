@@ -7,12 +7,12 @@
 
 ---
 
-[![npm version](https://badge.fury.io/js/dockview-core.svg)](https://www.npmjs.com/package/dockview-core)
-[![npm](https://img.shields.io/npm/dm/dockview-core)](https://www.npmjs.com/package/dockview-core)
+[![npm version](https://badge.fury.io/js/dockview.svg)](https://www.npmjs.com/package/dockview)
+[![npm](https://img.shields.io/npm/dm/dockview)](https://www.npmjs.com/package/dockview)
 [![CI Build](https://github.com/mathuo/dockview/workflows/CI/badge.svg)](https://github.com/mathuo/dockview/actions?query=workflow%3ACI)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mathuo_dockview&metric=coverage)](https://sonarcloud.io/summary/overall?id=mathuo_dockview)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mathuo_dockview&metric=alert_status)](https://sonarcloud.io/summary/overall?id=mathuo_dockview)
-[![Bundle Phobia](https://badgen.net/bundlephobia/minzip/dockview-core)](https://bundlephobia.com/result?p=dockview-core)
+[![Bundle Phobia](https://badgen.net/bundlephobia/minzip/dockview)](https://bundlephobia.com/result?p=dockview)
 
 ##
 
@@ -40,7 +40,7 @@ Please see the website: https://dockview.dev
 
 | Package | Description | Version |
 | --- | --- | --- |
-| [`dockview-core`](https://www.npmjs.com/package/dockview-core) | Core layout engine — zero dependencies, vanilla TypeScript | [![npm version](https://badge.fury.io/js/dockview-core.svg)](https://www.npmjs.com/package/dockview-core) |
+| [`dockview`](https://www.npmjs.com/package/dockview) | Vanilla JavaScript / TypeScript — zero dependencies, full feature set out of the box | [![npm version](https://badge.fury.io/js/dockview.svg)](https://www.npmjs.com/package/dockview) |
 | [`dockview-react`](https://www.npmjs.com/package/dockview-react) | React bindings (peer: `react` ≥16.8) | [![npm version](https://badge.fury.io/js/dockview-react.svg)](https://www.npmjs.com/package/dockview-react) |
 | [`dockview-vue`](https://www.npmjs.com/package/dockview-vue) | Vue 3 bindings (peer: `vue` ≥3.4) | [![npm version](https://badge.fury.io/js/dockview-vue.svg)](https://www.npmjs.com/package/dockview-vue) |
 | [`dockview-angular`](https://www.npmjs.com/package/dockview-angular) | Angular bindings (peer: `@angular/core` ≥21) | [![npm version](https://badge.fury.io/js/dockview-angular.svg)](https://www.npmjs.com/package/dockview-angular) |
@@ -48,10 +48,10 @@ Please see the website: https://dockview.dev
 ## Installation
 
 ```bash
+npm install dockview          # Vanilla JavaScript / TypeScript
 npm install dockview-react    # React
 npm install dockview-vue      # Vue
 npm install dockview-angular  # Angular
-npm install dockview-core     # Vanilla TypeScript
 ```
 
 ## Quick Start (React)
@@ -100,9 +100,9 @@ yarn format     # Run Prettier
 Build order is managed automatically by NX:
 
 ```
-dockview-core → dockview-react
-dockview-core → dockview-vue
-dockview-core → dockview-angular
+dockview-core → dockview → dockview-react
+dockview-core → dockview → dockview-vue
+dockview-core → dockview → dockview-angular
 ```
 
 ## Contributing

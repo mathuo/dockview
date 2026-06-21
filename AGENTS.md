@@ -21,8 +21,8 @@ See per-package `AGENTS.md` files under `packages/` for package-specific guidanc
 NX handles build ordering automatically via `dependsOn: ["^build"]`. The dependency chain is:
 
     dockview-core → dockview → dockview-react
-    dockview-core → dockview-vue
-    dockview-core → dockview-angular
+    dockview-core → dockview → dockview-vue
+    dockview-core → dockview → dockview-angular
 
 ### CSS Flow
 
@@ -55,9 +55,9 @@ NX handles build ordering automatically via `dependsOn: ["^build"]`. The depende
 
 ### Monorepo Structure
 
--   **packages/dockview-core** - Core layout engine (TypeScript, framework-agnostic, zero dependencies)
--   **packages/dockview-react** - Canonical React bindings package — what docs, READMEs, and examples point users at (`npm install dockview-react`). Re-exports the implementation from `packages/dockview`.
--   **packages/dockview** - Legacy alias kept for backwards compatibility. Still holds the actual React source; `dockview-react` re-exports from it.
+-   **packages/dockview-core** - Internal core layout engine (TypeScript, framework-agnostic, zero dependencies). Not a documented install target — consumers use `dockview` or a framework binding.
+-   **packages/dockview** - Canonical vanilla JavaScript / TypeScript package (`npm install dockview`). Batteries-included: re-exports the core API and registers the separable feature modules. No `react` peer dependency.
+-   **packages/dockview-react** - Canonical React bindings package — what docs, READMEs, and examples point users at (`npm install dockview-react`). Holds the actual React source and depends on `dockview`.
 -   **packages/dockview-vue** - Vue 3 bindings and components
 -   **packages/dockview-angular** - Angular bindings and components
 -   **packages/docs** - Documentation website (Docusaurus v3)
