@@ -1,7 +1,7 @@
 <div align="center">
 <h1>dockview-core</h1>
 
-<p>Framework-agnostic core layout engine — zero dependencies, vanilla TypeScript. Supports tabs, groups, grids and splitviews</p>
+<p>Framework-agnostic core layout engine — zero dependencies, JavaScript. Supports tabs, groups, grids and splitviews</p>
 
 </div>
 
@@ -21,7 +21,7 @@
 Please see the website: https://dockview.dev
 
 > **`dockview-core` is an internal package.** Install
-> **[`dockview`](https://www.npmjs.com/package/dockview)** instead — the vanilla
+> **[`dockview`](https://www.npmjs.com/package/dockview)** instead — the JavaScript
 > JavaScript / TypeScript package that ships the full feature set out of the box. Using a
 > framework? Install the bindings: [`dockview-react`](https://www.npmjs.com/package/dockview-react),
 > [`dockview-vue`](https://www.npmjs.com/package/dockview-vue) or

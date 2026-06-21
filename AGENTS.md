@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Dockview is a zero-dependency layout manager supporting tabs, groups, grids and splitviews. It provides framework support for React, Vue, Angular, and vanilla TypeScript. The project is organized as an NX monorepo (package-based approach) with Yarn v1 workspaces.
+Dockview is a zero-dependency layout manager supporting tabs, groups, grids and splitviews. It provides framework support for React, Vue, Angular, and JavaScript. The project is organized as an NX monorepo (package-based approach) with Yarn v1 workspaces.
 
 See per-package `AGENTS.md` files under `packages/` for package-specific guidance.
 
@@ -56,7 +56,7 @@ NX handles build ordering automatically via `dependsOn: ["^build"]`. The depende
 ### Monorepo Structure
 
 -   **packages/dockview-core** - Internal core layout engine (TypeScript, framework-agnostic, zero dependencies). Not a documented install target — consumers use `dockview` or a framework binding.
--   **packages/dockview** - Canonical vanilla JavaScript / TypeScript package (`npm install dockview`). Batteries-included: re-exports the core API and registers the separable feature modules. No `react` peer dependency.
+-   **packages/dockview** - Canonical JavaScript package (`npm install dockview`). Batteries-included: re-exports the core API and registers the separable feature modules. No `react` peer dependency.
 -   **packages/dockview-react** - Canonical React bindings package — what docs, READMEs, and examples point users at (`npm install dockview-react`). Holds the actual React source and depends on `dockview`.
 -   **packages/dockview-vue** - Vue 3 bindings and components
 -   **packages/dockview-angular** - Angular bindings and components

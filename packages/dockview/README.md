@@ -40,7 +40,7 @@ Please see the website: https://dockview.dev
 
 ## Quick Start
 
-`dockview` is the vanilla JavaScript / TypeScript package. Using a framework? Install the
+`dockview` is the JavaScript package. Using a framework? Install the
 matching bindings instead: [`dockview-react`](https://www.npmjs.com/package/dockview-react),
 [`dockview-vue`](https://www.npmjs.com/package/dockview-vue) or
 [`dockview-angular`](https://www.npmjs.com/package/dockview-angular).

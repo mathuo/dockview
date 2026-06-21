@@ -376,3 +376,32 @@
         transition: none;
     }
 }
+
+// GitHub-style ```diff code blocks. Prism's multiline diff match can bleed an
+// empty `.deleted` / `.inserted` token onto the following line, so key the line
+// highlight off the `+`/`-` *prefix* token (which is unambiguous) rather than any
+// `.inserted` / `.deleted` token. Also drop the theme's strike-through / underline.
+.theme-code-block {
+    .token-line:has(.token.prefix.inserted) {
+        background-color: rgba(46, 160, 67, 0.15);
+    }
+
+    .token-line:has(.token.prefix.deleted) {
+        background-color: rgba(248, 81, 73, 0.15);
+    }
+
+    .token.inserted,
+    .token.deleted {
+        text-decoration: none !important;
+    }
+}
+
+[data-theme='dark'] .theme-code-block {
+    .token-line:has(.token.prefix.inserted) {
+        background-color: rgba(46, 160, 67, 0.22);
+    }
+
+    .token-line:has(.token.prefix.deleted) {
+        background-color: rgba(248, 81, 73, 0.22);
+    }
+}

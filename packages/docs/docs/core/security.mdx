@@ -64,7 +64,7 @@ The recommended setup is to have your `popout.html` emit a `<meta name="csp-nonc
 <dockview-angular [nonce]="readCspNonce" (ready)="onReady($event)"></dockview-angular>
 ```
 
-```ts title="Vanilla"
+```ts title="JavaScript"
 import { createDockview } from 'dockview';
 
 const api = createDockview(element, {
