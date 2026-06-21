@@ -358,6 +358,7 @@ export class TabGroupManager {
                 getChipElement: (id) =>
                     this._chipRenderers.get(id)?.chip.element,
                 getDirection: () => this._ctx.getDirection(),
+                getHeaderPosition: () => this._ctx.group.model.headerPosition,
                 getColorPalette: () => this._ctx.accessor.tabGroupColorPalette,
             });
         }

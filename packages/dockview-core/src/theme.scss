@@ -265,7 +265,7 @@
                         &::after {
                             position: absolute;
                             left: 0px;
-                            top: 0px;
+                            bottom: 0px;
                             content: '';
                             width: 100%;
                             height: 1px;
@@ -485,7 +485,7 @@
                         &::after {
                             position: absolute;
                             left: 0px;
-                            top: 0px;
+                            bottom: 0px;
                             content: '';
                             width: 100%;
                             height: 2px;
@@ -504,7 +504,7 @@
                         &::after {
                             position: absolute;
                             left: 0px;
-                            top: 0px;
+                            bottom: 0px;
                             content: '';
                             width: 100%;
                             height: 2px;
@@ -1132,3 +1132,20 @@
         bottom: 0;
     }
 }
+
+// When the header is at the bottom, the active-tab marker sits on the tab's
+// top edge — the side nearest the content. (For a top header it sits on the
+// bottom edge; this overrides that.) The selector matches the full per-theme
+// active-marker chain so it still applies inside a theme.
+.dv-groupview.dv-groupview-header-bottom {
+    &.dv-active-group,
+    &.dv-inactive-group {
+        > .dv-tabs-and-actions-container
+            .dv-tabs-container
+            > .dv-tab.dv-active-tab::after {
+            top: 0px;
+            bottom: auto;
+        }
+    }
+}
+
