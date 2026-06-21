@@ -57,7 +57,7 @@ Use the component in your Angular template:
 ```typescript
 import { Component } from '@angular/core';
 import { DockviewModule } from 'dockview-angular';
-import { DockviewReadyEvent } from 'dockview-core';
+import { DockviewReadyEvent } from 'dockview-angular';
 
 @Component({
     selector: 'app-root',

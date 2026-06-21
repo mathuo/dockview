@@ -1,26 +1,17 @@
 ---
 title: Modules
 sidebar_position: 4
-description: How Dockview's separable feature modules work, and the difference between the dockview and dockview-core packages.
+description: How Dockview's separable feature modules work and how to author your own.
 ---
 
 # Modules
 
 In v7 a set of separable features is delivered as **modules**. This is mostly
-transparent — it determines which package you should depend on.
+transparent: the `dockview` package and the framework packages
+(`dockview-react`, `dockview-vue`, `dockview-angular`) register every built-in
+module for you, so the full feature set works out of the box.
 
-## `dockview` vs `dockview-core`
-
-| Package | Modules | Use it when |
-|---|---|---|
-| **`dockview`** | All built-in modules registered (batteries-included) | You're building a vanilla JS/TS app — **recommended** |
-| **`dockview-core`** | None — bare implementation | Advanced: you want the smallest core and will opt features in yourself |
-
-The framework packages (`dockview-react`, `dockview-vue`, `dockview-angular`)
-all depend on `dockview`, so they get the full feature set automatically.
-
-The following features are modules and are included in `dockview` but **not** in
-bare `dockview-core`:
+The following features are delivered as modules and are all included by default:
 
 - **tab group chips** — chip rendering and the `onDid*TabGroup` events
 - **context menus** — the built-in tab / chip right-click menus
@@ -30,19 +21,8 @@ bare `dockview-core`:
 - **accessibility** — [keyboard navigation, docking, and screen-reader
   announcements](/docs/advanced/accessibility)
 
-:::info
-If you construct a component on bare `dockview-core`, the affected features
-simply do nothing (nothing throws), and a one-time `console.warn` nudges you
-toward `dockview`. Use `dockview` (or a framework package) to get the full
-feature set.
-:::
-
 ```ts
-// Recommended — everything works out of the box
 import { createDockview } from 'dockview';
-
-// Advanced — bare core, the modules above are inactive
-import { createDockview } from 'dockview-core';
 ```
 
 ## Authoring a module (advanced)

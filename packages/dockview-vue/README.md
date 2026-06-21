@@ -67,7 +67,7 @@ Use the component in a Vue SFC:
 
 <script setup lang="ts">
 import { DockviewVue } from 'dockview-vue';
-import type { DockviewReadyEvent } from 'dockview-core';
+import type { DockviewReadyEvent } from 'dockview-vue';
 
 function onReady(event: DockviewReadyEvent) {
     event.api.addPanel({
