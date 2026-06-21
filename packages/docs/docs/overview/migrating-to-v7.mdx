@@ -8,13 +8,13 @@ description: How to upgrade from Dockview v6 to v7 — the package realignment a
 
 v7 realigns the package names so that **`dockview` is the framework-agnostic
 JavaScript package** and each framework has a matching `dockview-<framework>`
-package. There are also two small breaking API changes that affect every
+package. There are also a handful of breaking API changes that affect every
 consumer.
 
 | Package | v6 | v7 |
 |---|---|---|
-| `dockview-core` | Vanilla core (public) | Vanilla core — **internal implementation detail** |
-| `dockview` | **React bindings** | Vanilla JS / TypeScript (re-export of `dockview-core`) — **recommended for vanilla** |
+| `dockview-core` | JavaScript core (public) | JavaScript core — **internal implementation detail** |
+| `dockview` | **React bindings** | JavaScript (re-export of `dockview-core`) — **recommended** |
 | `dockview-react` | Re-export of `dockview` | **React bindings** |
 | `dockview-vue` | Vue bindings | Vue bindings (now consume `dockview`) |
 | `dockview-angular` | Angular bindings | Angular bindings (now consume `dockview`) |
@@ -22,7 +22,7 @@ consumer.
 ## React users — action required
 
 The React bindings **moved from `dockview` to `dockview-react`**. In v7 the
-`dockview` package is the vanilla JavaScript library (a re-export of
+`dockview` package is the JavaScript library (a re-export of
 `dockview-core`), so it no longer exports the React components.
 
 :::warning Symptoms if you don't migrate
@@ -58,7 +58,7 @@ editing — works on macOS and Linux):
 grep -rl "from 'dockview'" src | xargs perl -pi -e "s/from 'dockview'/from 'dockview-react'/g"
 ```
 
-## Vanilla JavaScript / TypeScript users — recommended
+## JavaScript users — recommended
 
 `dockview-core` is now considered an internal implementation detail. Install the
 `dockview` package instead — it re-exports the entire core API.
@@ -83,9 +83,8 @@ should depend on `dockview`.
 
 ### `dockview-core` no longer bundles every feature
 
-In v6, `dockview-core` shipped with all built-in features registered. In v7 a
-set of [feature modules](/docs/core/modules) is no longer part of bare
-`dockview-core`:
+In v6, `dockview-core` shipped with all built-in features registered. In v7 some
+built-in features are no longer part of bare `dockview-core`:
 
 - **tab group chips** (chip rendering + the `onDid*TabGroup` events)
 - **context menus** (the built-in tab / chip right-click menus)
@@ -94,13 +93,11 @@ set of [feature modules](/docs/core/modules) is no longer part of bare
 - **[keyboard accessibility](/docs/advanced/accessibility)** (keyboard
   navigation / focus management / screen-reader announcements)
 
-These now live in the `dockview` package, which registers them automatically.
+These now live in the `dockview` package, which enables them automatically.
 **`dockview-core` is an internal package — use `dockview`** (or a framework
 package — `dockview-react` / `-vue` / `-angular`, which all consume `dockview`).
 Nothing throws if you stay on bare `dockview-core` — the affected features
-simply do nothing — so a one-time `console.warn` is emitted when a component is
-constructed on bare `dockview-core` steering you to `dockview`. See
-[Modules](/docs/core/modules) for how to opt features back in on bare core.
+simply do nothing — and a one-time `console.warn` steers you to `dockview`.
 
 ## Removed and changed APIs
 
@@ -204,7 +201,7 @@ bundle:
 + https://cdn.jsdelivr.net/npm/dockview-react@7/dist/dockview-react.js
 ```
 
-The `dockview` UMD bundle now contains the vanilla API only.
+The `dockview` UMD bundle now contains the JavaScript API only.
 
 ---
 

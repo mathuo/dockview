@@ -5,11 +5,11 @@ This mono-repository has a number of packages containing the code for the dockvi
 ## dockview-core
 
 -   Contains the core logic for the dockview library.
--   Written entirely in vanilla JavaScript/TypeScript.
+-   Written entirely in JavaScript.
 
 ## dockview
 
--   The batteries-included vanilla JavaScript / TypeScript package — re-exports the core API and registers the separable feature modules so consumers get the full feature set out of the box.
+-   The batteries-included JavaScript package — re-exports the core API and registers the separable feature modules so consumers get the full feature set out of the box.
 -   The package framework-agnostic consumers should install (`npm install dockview`).
 -   Has no `react` peer dependency; framework bindings live in the `dockview-<framework>` packages.
 -   Published as [dockview](https://www.npmjs.com/package/dockview) on npm.

@@ -1,7 +1,7 @@
 <div align="center">
 <h1>dockview</h1>
 
-<p>Zero dependency layout manager supporting tabs, groups, grids and splitviews. Supports React, Vue, Angular and Vanilla TypeScript</p>
+<p>Zero dependency layout manager supporting tabs, groups, grids and splitviews. Supports React, Vue, Angular and JavaScript</p>
 
 </div>
 
@@ -40,7 +40,7 @@ Please see the website: https://dockview.dev
 
 | Package | Description | Version |
 | --- | --- | --- |
-| [`dockview`](https://www.npmjs.com/package/dockview) | Vanilla JavaScript / TypeScript — zero dependencies, full feature set out of the box | [![npm version](https://badge.fury.io/js/dockview.svg)](https://www.npmjs.com/package/dockview) |
+| [`dockview`](https://www.npmjs.com/package/dockview) | JavaScript — zero dependencies, full feature set out of the box | [![npm version](https://badge.fury.io/js/dockview.svg)](https://www.npmjs.com/package/dockview) |
 | [`dockview-react`](https://www.npmjs.com/package/dockview-react) | React bindings (peer: `react` ≥16.8) | [![npm version](https://badge.fury.io/js/dockview-react.svg)](https://www.npmjs.com/package/dockview-react) |
 | [`dockview-vue`](https://www.npmjs.com/package/dockview-vue) | Vue 3 bindings (peer: `vue` ≥3.4) | [![npm version](https://badge.fury.io/js/dockview-vue.svg)](https://www.npmjs.com/package/dockview-vue) |
 | [`dockview-angular`](https://www.npmjs.com/package/dockview-angular) | Angular bindings (peer: `@angular/core` ≥21) | [![npm version](https://badge.fury.io/js/dockview-angular.svg)](https://www.npmjs.com/package/dockview-angular) |
@@ -48,7 +48,7 @@ Please see the website: https://dockview.dev
 ## Installation
 
 ```bash
-npm install dockview          # Vanilla JavaScript / TypeScript
+npm install dockview          # JavaScript
 npm install dockview-react    # React
 npm install dockview-vue      # Vue
 npm install dockview-angular  # Angular

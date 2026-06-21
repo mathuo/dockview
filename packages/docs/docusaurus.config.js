@@ -329,7 +329,7 @@ const config = {
             prism: {
                 theme: lightCodeTheme,
                 darkTheme: darkCodeTheme,
-                additionalLanguages: ['markdown', 'latex'],
+                additionalLanguages: ['markdown', 'latex', 'diff'],
                 magicComments: [
                     {
                         className: 'theme-code-block-highlighted-line',
