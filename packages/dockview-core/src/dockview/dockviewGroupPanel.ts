@@ -10,7 +10,7 @@ import {
 import {
     GridviewPanel,
     IGridviewPanel,
-    Contraints,
+    Constraints,
 } from '../gridview/gridviewPanel';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 import {
@@ -29,8 +29,6 @@ export interface IDockviewGroupPanel extends IGridviewPanel<DockviewGroupPanelAp
     readonly activePanel: IDockviewPanel | undefined;
 }
 
-export type IDockviewGroupPanelPublic = IDockviewGroupPanel;
-
 export class DockviewGroupPanel
     extends GridviewPanel<DockviewGroupPanelApiImpl>
     implements IDockviewGroupPanel
@@ -38,7 +36,7 @@ export class DockviewGroupPanel
     private readonly _model: DockviewGroupPanelModel;
 
     // Track explicitly set constraints to override panel constraints
-    private _explicitConstraints: Partial<Contraints> = {};
+    private _explicitConstraints: Partial<Constraints> = {};
 
     override get minimumWidth(): number {
         // Check for explicitly set group constraint first

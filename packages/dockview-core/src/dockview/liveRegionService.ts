@@ -5,7 +5,7 @@ import { DockviewGroupPanel } from './dockviewGroupPanel';
 import {
     DockviewLayoutMutationEvent,
     DockviewLayoutMutationKind,
-    DockviewMaximizedGroupChanged,
+    DockviewMaximizedGroupChangeEvent,
 } from './dockviewComponent';
 import { DockviewComponentOptions, LiveRegionEvent } from './options';
 import { resolveMessages } from './accessibilityMessages';
@@ -24,7 +24,7 @@ export interface ILiveRegionHost {
     readonly onDidRemovePanel: Event<IDockviewPanel>;
     readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;
     readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent>;
-    readonly onDidMaximizedGroupChange: Event<DockviewMaximizedGroupChanged>;
+    readonly onDidMaximizedGroupChange: Event<DockviewMaximizedGroupChangeEvent>;
     readonly onDidAddGroup: Event<DockviewGroupPanel>;
     readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
 }

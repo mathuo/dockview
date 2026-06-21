@@ -2,7 +2,7 @@ import React from 'react';
 import {
     PaneviewPanelApi,
     PaneviewApi,
-    PaneviewDropEvent,
+    PaneviewDidDropEvent,
     createPaneview,
     PaneviewOptions,
     PROPERTY_KEYS_PANEVIEW,
@@ -32,7 +32,7 @@ export interface IPaneviewReactProps extends PaneviewOptions {
         string,
         React.FunctionComponent<IPaneviewPanelProps>
     >;
-    onDidDrop?(event: PaneviewDropEvent): void;
+    onDidDrop?(event: PaneviewDidDropEvent): void;
 }
 
 function extractCoreOptions(props: IPaneviewReactProps): PaneviewOptions {

@@ -5145,7 +5145,7 @@ describe('dockviewComponent', () => {
 
         let events: DockviewDndOverlayEvent[] = [];
 
-        dockview.onUnhandledDragOverEvent((e) => {
+        dockview.onUnhandledDragOver((e) => {
             events.push(e);
             e.accept();
         });

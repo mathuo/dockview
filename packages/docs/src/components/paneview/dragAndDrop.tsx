@@ -1,6 +1,6 @@
 import {
     IPaneviewPanelProps,
-    PaneviewDropEvent,
+    PaneviewDidDropEvent,
     PaneviewReact,
     PaneviewReadyEvent,
 } from 'dockview-react';
@@ -52,7 +52,7 @@ export const DragAndDropPaneview = () => {
         });
     };
 
-    const onDidDrop = (event: PaneviewDropEvent) => {
+    const onDidDrop = (event: PaneviewDidDropEvent) => {
         const index = event.api.panels.indexOf(event.panel);
 
         event.api.addPanel({

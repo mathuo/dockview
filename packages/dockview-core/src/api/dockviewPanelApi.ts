@@ -7,7 +7,7 @@ import { DockviewComponent } from '../dockview/dockviewComponent';
 import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
 import {
     DockviewGroupMoveParams,
-    DockviewGroupPanelFloatingChangeEvent,
+    DockviewGroupPanelLocationChangeEvent,
 } from './dockviewGroupPanelApi';
 import { DockviewGroupLocation } from '../dockview/dockviewGroupPanelModel';
 
@@ -49,7 +49,7 @@ export interface DockviewPanelApi extends Omit<
     readonly onDidTitleChange: Event<TitleEvent>;
     readonly onDidRendererChange: Event<RendererChangedEvent>;
     readonly location: DockviewGroupLocation;
-    readonly onDidLocationChange: Event<DockviewGroupPanelFloatingChangeEvent>;
+    readonly onDidLocationChange: Event<DockviewGroupPanelLocationChangeEvent>;
     close(): void;
     setTitle(title: string): void;
     setRenderer(renderer: DockviewPanelRenderer): void;
@@ -83,8 +83,8 @@ export class DockviewPanelApiImpl
     readonly onDidRendererChange = this._onDidRendererChange.event;
 
     private readonly _onDidLocationChange =
-        new Emitter<DockviewGroupPanelFloatingChangeEvent>();
-    readonly onDidLocationChange: Event<DockviewGroupPanelFloatingChangeEvent> =
+        new Emitter<DockviewGroupPanelLocationChangeEvent>();
+    readonly onDidLocationChange: Event<DockviewGroupPanelLocationChangeEvent> =
         this._onDidLocationChange.event;
 
     private readonly groupEventsDisposable = new MutableDisposable();

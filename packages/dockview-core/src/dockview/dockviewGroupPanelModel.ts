@@ -44,7 +44,7 @@ import {
 } from './options';
 import { OverlayRenderContainer } from '../overlay/overlayRenderContainer';
 import { TitleEvent } from '../api/dockviewPanelApi';
-import { Contraints } from '../gridview/gridviewPanel';
+import { Constraints } from '../gridview/gridviewPanel';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import {
     TabGroup,
@@ -67,7 +67,7 @@ interface CoreGroupOptions {
     hideHeader?: boolean;
     headerPosition?: 'top' | 'bottom' | 'left' | 'right';
     skipSetActive?: boolean;
-    constraints?: Partial<Contraints>;
+    constraints?: Partial<Constraints>;
     initialWidth?: number;
     initialHeight?: number;
 }
@@ -308,10 +308,10 @@ export class DockviewGroupPanelModel
     readonly onDidActivePanelChange: Event<DockviewGroupActivePanelChangeEvent> =
         this._onDidActivePanelChange.event;
 
-    private readonly _onUnhandledDragOverEvent =
+    private readonly _onUnhandledDragOver =
         new Emitter<DockviewDndOverlayEvent>();
-    readonly onUnhandledDragOverEvent: Event<DockviewDndOverlayEvent> =
-        this._onUnhandledDragOverEvent.event;
+    readonly onUnhandledDragOver: Event<DockviewDndOverlayEvent> =
+        this._onUnhandledDragOver.event;
 
     private readonly _tabGroups: TabGroup[] = [];
     private readonly _tabGroupMap = new Map<string, TabGroup>();
@@ -655,7 +655,7 @@ export class DockviewGroupPanelModel
             this._onDidAddPanel,
             this._onDidRemovePanel,
             this._onDidActivePanelChange,
-            this._onUnhandledDragOverEvent,
+            this._onUnhandledDragOver,
             this._onDidPanelTitleChange,
             this._onDidPanelParametersChange,
             this._onDidCreateTabGroup,
@@ -1701,7 +1701,7 @@ export class DockviewGroupPanelModel
             this.accessor.getPanel(this.id)
         );
 
-        this._onUnhandledDragOverEvent.fire(firedEvent);
+        this._onUnhandledDragOver.fire(firedEvent);
 
         return firedEvent.isAccepted;
     }

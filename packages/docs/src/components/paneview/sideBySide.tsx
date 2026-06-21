@@ -1,6 +1,6 @@
 import {
     IPaneviewPanelProps,
-    PaneviewDropEvent,
+    PaneviewDidDropEvent,
     PaneviewReact,
     PaneviewReadyEvent,
     PaneviewDndOverlayEvent,
@@ -62,7 +62,7 @@ export const SideBySidePaneview = () => {
         return checked;
     };
 
-    const onDidDrop = (event: PaneviewDropEvent) => {
+    const onDidDrop = (event: PaneviewDidDropEvent) => {
         const text = `onDidDrop ${event.position} ${event.panel.id}`;
 
         setLines((lines) => [...lines, { text, timestamp: new Date() }]);

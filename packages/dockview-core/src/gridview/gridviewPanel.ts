@@ -15,7 +15,7 @@ import { Emitter, Event } from '../events';
 import { IViewSize } from './gridview';
 import { BaseGrid, IGridPanelView } from './baseComponentGridview';
 
-export interface Contraints {
+export interface Constraints {
     minimumWidth?: number;
     maximumWidth?: number;
     minimumHeight?: number;

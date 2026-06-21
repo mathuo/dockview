@@ -114,7 +114,7 @@ export interface IPaneviewComponent extends IDisposable {
     readonly onDidDrop: Event<PaneviewDidDropEvent>;
     readonly onDidLayoutChange: Event<void>;
     readonly onDidLayoutFromJSON: Event<void>;
-    readonly onUnhandledDragOverEvent: Event<PaneviewDndOverlayEvent>;
+    readonly onUnhandledDragOver: Event<PaneviewDndOverlayEvent>;
     addPanel<T extends object = Parameters>(
         options: AddPaneviewComponentOptions<T>
     ): IPaneviewPanel;
@@ -152,10 +152,10 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
     private readonly _onDidRemoveView = new Emitter<PaneviewPanel>();
     readonly onDidRemoveView = this._onDidRemoveView.event;
 
-    private readonly _onUnhandledDragOverEvent =
+    private readonly _onUnhandledDragOver =
         new Emitter<PaneviewDndOverlayEvent>();
-    readonly onUnhandledDragOverEvent: Event<PaneviewDndOverlayEvent> =
-        this._onUnhandledDragOverEvent.event;
+    readonly onUnhandledDragOver: Event<PaneviewDndOverlayEvent> =
+        this._onUnhandledDragOver.event;
 
     private readonly _classNames: Classnames;
 
@@ -218,7 +218,7 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
             this._onDidDrop,
             this._onDidAddView,
             this._onDidRemoveView,
-            this._onUnhandledDragOverEvent
+            this._onUnhandledDragOver
         );
 
         this._classNames = new Classnames(this.element);
@@ -470,8 +470,8 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
             panel.onDidDrop((event) => {
                 this._onDidDrop.fire(event);
             }),
-            panel.onUnhandledDragOverEvent((event) => {
-                this._onUnhandledDragOverEvent.fire(event);
+            panel.onUnhandledDragOver((event) => {
+                this._onUnhandledDragOver.fire(event);
             })
         );
 

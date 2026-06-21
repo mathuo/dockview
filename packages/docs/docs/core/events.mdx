@@ -72,7 +72,7 @@ api.onDidLayoutChange(() => { });
 api.onDidLayoutFromJSON(() => { });
 
 // Fires when a group is maximized or un-maximized
-api.onDidMaximizedGroupChange((event: DockviewMaximizedGroupChanged) => { });
+api.onDidMaximizedGroupChange((event: DockviewMaximizedGroupChangeEvent) => { });
 ```
 
 ### Mutation boundary
@@ -122,7 +122,7 @@ api.onWillDragGroup((event: GroupDragEvent) => { });
 
 // Fires for drag-over events that dockview did not originate.
 // Call event.accept() to let dockview show a drop overlay for external drags.
-api.onUnhandledDragOverEvent((event: DockviewDndOverlayEvent) => {
+api.onUnhandledDragOver((event: DockviewDndOverlayEvent) => {
     event.accept();
 });
 ```

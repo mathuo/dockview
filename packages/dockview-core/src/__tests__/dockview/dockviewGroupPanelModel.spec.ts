@@ -888,7 +888,7 @@ describe('dockviewGroupPanelModel', () => {
 
         let counter = 0;
 
-        cut.onUnhandledDragOverEvent(() => {
+        cut.onUnhandledDragOver(() => {
             counter++;
         });
 
@@ -949,7 +949,7 @@ describe('dockviewGroupPanelModel', () => {
             new groupPanelMock() as DockviewGroupPanel
         );
 
-        cut.onUnhandledDragOverEvent((e) => {
+        cut.onUnhandledDragOver((e) => {
             e.accept();
         });
 
@@ -1040,7 +1040,7 @@ describe('dockviewGroupPanelModel', () => {
 
         let counter = 0;
 
-        cut.onUnhandledDragOverEvent(() => {
+        cut.onUnhandledDragOver(() => {
             counter++;
         });
 
@@ -1113,7 +1113,7 @@ describe('dockviewGroupPanelModel', () => {
 
         let counter = 0;
 
-        cut.onUnhandledDragOverEvent(() => {
+        cut.onUnhandledDragOver(() => {
             counter++;
         });
 
@@ -1388,7 +1388,7 @@ describe('dockviewGroupPanelModel', () => {
 
         let counter = 0;
 
-        cut.onUnhandledDragOverEvent(() => {
+        cut.onUnhandledDragOver(() => {
             counter++;
         });
 

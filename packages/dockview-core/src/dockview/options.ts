@@ -20,7 +20,7 @@ import {
     ITabGroupChipRenderer,
 } from './framework';
 import { FloatingGroupOptions } from './dockviewComponent';
-import { Contraints } from '../gridview/gridviewPanel';
+import { Constraints } from '../gridview/gridviewPanel';
 import { AcceptableEvent, IAcceptableEvent } from '../events';
 import { DockviewTheme } from './theme';
 import { ITabGroup } from './tabGroup';
@@ -593,7 +593,7 @@ export type AddPanelOptions<P extends object = Parameters> = {
     initialWidth?: number;
     initialHeight?: number;
 } & Partial<AddPanelOptionsUnion> &
-    Partial<Contraints>;
+    Partial<Constraints>;
 
 type AddGroupOptionsWithPanel = {
     referencePanel: string | IDockviewPanel;

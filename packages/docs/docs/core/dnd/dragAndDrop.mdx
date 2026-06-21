@@ -75,12 +75,12 @@ const api = createDockview(parentElement, {
 
 For interaction with the Drag events directly the component exposes some method to help determine whether external drag events should be interacted with or not.
 
-The `onDidDrop` handler and `onUnhandledDragOverEvent` registration use the same API across all frameworks — only the component wiring differs.
+The `onDidDrop` handler and `onUnhandledDragOver` registration use the same API across all frameworks — only the component wiring differs.
 
 ```ts
 /**
  * Called when a drop event does not originate from the dockview library
- * and passes the onUnhandledDragOverEvent condition.
+ * and passes the onUnhandledDragOver condition.
  */
 const onDidDrop = (event: DockviewDropEvent) => {
     const { group } = event;
@@ -102,7 +102,7 @@ const onDidDrop = (event: DockviewDropEvent) => {
  * allowing you to decide whether an overlay should be shown.
  */
 const onReady = (event: DockviewReadyEvent) => {
-    event.api.onUnhandledDragOverEvent((e) => {
+    event.api.onUnhandledDragOver((e) => {
         e.accept();
     });
 };
@@ -136,7 +136,7 @@ return (
 ```ts
 const api = createDockview(parentElement, { components });
 
-api.onUnhandledDragOverEvent((e) => e.accept());
+api.onUnhandledDragOver((e) => e.accept());
 parentElement.addEventListener('drop', (e) => onDidDrop(e));
 ```
 </FrameworkSpecific>

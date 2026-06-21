@@ -39,10 +39,10 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
     private readonly _onDidDrop = new Emitter<PaneviewDidDropEvent>();
     readonly onDidDrop = this._onDidDrop.event;
 
-    private readonly _onUnhandledDragOverEvent =
+    private readonly _onUnhandledDragOver =
         new Emitter<PaneviewDndOverlayEvent>();
-    readonly onUnhandledDragOverEvent: Event<PaneviewDndOverlayEvent> =
-        this._onUnhandledDragOverEvent.event;
+    readonly onUnhandledDragOver: Event<PaneviewDndOverlayEvent> =
+        this._onUnhandledDragOver.event;
 
     readonly accessor: IPaneviewComponent;
 
@@ -72,7 +72,7 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
 
         this.accessor = options.accessor;
 
-        this.addDisposables(this._onDidDrop, this._onUnhandledDragOverEvent);
+        this.addDisposables(this._onDidDrop, this._onUnhandledDragOver);
 
         if (!options.disableDnd) {
             this.initDragFeatures();
@@ -135,7 +135,7 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
                 this
             );
 
-            this._onUnhandledDragOverEvent.fire(firedEvent);
+            this._onUnhandledDragOver.fire(firedEvent);
 
             return firedEvent.isAccepted;
         };

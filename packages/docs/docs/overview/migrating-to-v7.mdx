@@ -161,6 +161,33 @@ it keeps emitting the panel and additionally carries `origin` (its payload type
 is `DockviewGroupActivePanelChangeEvent`). This is additive — handlers reading
 `event.panel` keep working.
 
+### Renamed types and events
+
+These are pure renames — the shape is unchanged, only the identifier moved.
+
+| v6 | v7 | Notes |
+|---|---|---|
+| `onUnhandledDragOverEvent` | `onUnhandledDragOver` | Event on the Dockview / Paneview API — dropped the redundant `Event` suffix |
+| `PaneviewDropEvent` | `PaneviewDidDropEvent` | Now matches `DockviewDidDropEvent` |
+| `DockviewMaximizedGroupChanged` | `DockviewMaximizedGroupChangeEvent` | Now matches every other `…ChangeEvent` payload type |
+| `DockviewGroupPanelFloatingChangeEvent` | `DockviewGroupPanelLocationChangeEvent` | Payload of `onDidLocationChange` — name now reflects the event |
+| `AddComponentOptions` | `AddGridviewComponentOptions` | Now matches `AddSplitviewComponentOptions` / `AddPaneviewComponentOptions` |
+| `Contraints` | `Constraints` | Typo fix (this type also feeds `AddPanelOptions`) |
+
+```diff
+- api.onUnhandledDragOverEvent((event) => event.accept());
++ api.onUnhandledDragOver((event) => event.accept());
+```
+
+### Removed APIs
+
+| Removed | Use instead |
+|---|---|
+| `IDockviewGroupPanelPublic` | `IDockviewGroupPanel` (it was a dead alias of it) |
+| `DockviewComponent.contextMenuController` | `DockviewComponent.contextMenuService`, or the documented context-menu options |
+| `DockviewAngularComponentOptions` (Angular) | `DockviewAngularOptions` |
+| `AngularComponentFactory.createComponent()` (Angular) | `createDockviewComponent()` |
+
 ## Vue / Angular users
 
 No source changes required — keep installing `dockview-vue` / `dockview-angular`

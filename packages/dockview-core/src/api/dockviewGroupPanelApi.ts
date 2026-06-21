@@ -33,7 +33,7 @@ export interface DockviewGroupPanelCollapsedChangeEvent {
 }
 
 export interface DockviewGroupPanelApi extends GridviewPanelApi {
-    readonly onDidLocationChange: Event<DockviewGroupPanelFloatingChangeEvent>;
+    readonly onDidLocationChange: Event<DockviewGroupPanelLocationChangeEvent>;
     /**
      * Fires when the active panel *within this group* changes. Scoped to the
      * group, in contrast to the component-level
@@ -81,7 +81,7 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
     isCollapsed(): boolean;
 }
 
-export interface DockviewGroupPanelFloatingChangeEvent {
+export interface DockviewGroupPanelLocationChangeEvent {
     readonly location: DockviewGroupLocation;
 }
 
@@ -93,8 +93,8 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     private _pendingSize: SizeEvent | undefined;
 
     readonly _onDidLocationChange =
-        new Emitter<DockviewGroupPanelFloatingChangeEvent>();
-    readonly onDidLocationChange: Event<DockviewGroupPanelFloatingChangeEvent> =
+        new Emitter<DockviewGroupPanelLocationChangeEvent>();
+    readonly onDidLocationChange: Event<DockviewGroupPanelLocationChangeEvent> =
         this._onDidLocationChange.event;
 
     readonly _onDidActivePanelChange =

@@ -22,7 +22,6 @@ export {
     IDockviewAngularPanelHeaderProps,
     IDockviewAngularWatermarkProps,
     IDockviewAngularHeaderActionsProps,
-    DockviewAngularComponentOptions,
 } from './lib/dockview/types';
 export { IDockviewAngularTabGroupChipProps } from './lib/dockview/angular-tab-group-chip-renderer';
 export { IDockviewAngularGroupDragGhostProps } from './lib/dockview/angular-group-drag-ghost-renderer';

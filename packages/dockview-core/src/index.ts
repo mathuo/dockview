@@ -41,7 +41,7 @@ export * from './gridview/baseComponentGridview';
 
 export {
     DraggablePaneviewPanel,
-    PaneviewDidDropEvent as PaneviewDropEvent,
+    PaneviewDidDropEvent,
 } from './paneview/draggablePaneviewPanel';
 
 export * from './dockview/components/panel/content';
@@ -123,6 +123,7 @@ export * from './gridview/gridviewPanel';
 export { SplitviewPanel, ISplitviewPanel } from './splitview/splitviewPanel';
 export * from './paneview/paneviewPanel';
 export * from './dockview/types';
+export { Box, AnchorPosition, AnchoredBox } from './types';
 
 export { DockviewPanelRenderer } from './overlay/overlayRenderContainer';
 
@@ -160,7 +161,7 @@ export {
 export { ExpansionEvent, PaneviewPanelApi } from './api/paneviewPanelApi';
 export {
     DockviewGroupPanelApi,
-    DockviewGroupPanelFloatingChangeEvent,
+    DockviewGroupPanelLocationChangeEvent,
     DockviewGroupPanelCollapsedChangeEvent,
     DockviewGroupMoveParams,
 } from './api/dockviewGroupPanelApi';

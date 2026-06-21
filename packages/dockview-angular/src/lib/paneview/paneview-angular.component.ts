@@ -19,7 +19,7 @@ import {
 import {
     PaneviewApi,
     PaneviewOptions,
-    PaneviewDropEvent,
+    PaneviewDidDropEvent,
     createPaneview,
     PROPERTY_KEYS_PANEVIEW,
     PaneviewFrameworkOptions,
@@ -70,7 +70,7 @@ export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() disableAutoResizing?: boolean;
 
     @Output() ready = new EventEmitter<PaneviewAngularReadyEvent>();
-    @Output() drop = new EventEmitter<PaneviewDropEvent>();
+    @Output() drop = new EventEmitter<PaneviewDidDropEvent>();
 
     private paneviewApi?: PaneviewApi;
     private lifecycleManager = new AngularLifecycleManager();
