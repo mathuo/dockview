@@ -86,3 +86,8 @@ v7's breaking changes are covered in full, with codemods, in
   the panel directly.
 - **`dockview-core` no longer bundles every feature** — use `dockview` (or a
   framework package), or register [modules](/docs/core/modules) explicitly.
+- **API naming cleanups** — a few public types/events were renamed for
+  consistency (e.g. `onUnhandledDragOverEvent` → `onUnhandledDragOver`,
+  `PaneviewDropEvent` → `PaneviewDidDropEvent`) and some dead/deprecated members
+  were removed. See [Migrating to v7](/docs/overview/migrating-to-v7) for the
+  full table.

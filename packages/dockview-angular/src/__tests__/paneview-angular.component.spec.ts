@@ -3,7 +3,7 @@ import { Component, DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 
 import { PaneviewAngularComponent } from '../lib/paneview/paneview-angular.component';
-import { PaneviewApi, PaneviewDropEvent } from 'dockview';
+import { PaneviewApi, PaneviewDidDropEvent } from 'dockview';
 import { setupTestBed, getTestComponents } from './__test_utils__/test-helpers';
 
 describe('PaneviewAngularComponent', () => {
@@ -218,13 +218,13 @@ class TestHostComponent {
     className = 'test-host';
     disableAutoResizing = false;
     api?: PaneviewApi;
-    lastDropEvent?: PaneviewDropEvent;
+    lastDropEvent?: PaneviewDidDropEvent;
 
     onReady(event: { api: PaneviewApi }) {
         this.api = event.api;
     }
 
-    onDrop(event: PaneviewDropEvent) {
+    onDrop(event: PaneviewDidDropEvent) {
         this.lastDropEvent = event;
     }
 }

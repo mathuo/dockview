@@ -31,7 +31,7 @@ export interface SerializedGridviewComponent {
     activePanel?: string;
 }
 
-export interface AddComponentOptions<
+export interface AddGridviewComponentOptions<
     T extends object = Parameters,
 > extends BaseComponentOptions<T> {
     minimumWidth?: number;
@@ -54,7 +54,7 @@ export interface IGridviewComponent extends IBaseGrid<GridviewPanel> {
     readonly onDidLayoutFromJSON: Event<void>;
     updateOptions(options: Partial<GridviewComponentOptions>): void;
     addPanel<T extends object = Parameters>(
-        options: AddComponentOptions<T>
+        options: AddGridviewComponentOptions<T>
     ): IGridviewPanel;
     removePanel(panel: IGridviewPanel, sizing?: Sizing): void;
     focus(): void;
@@ -322,7 +322,7 @@ export class GridviewComponent
     }
 
     public addPanel<T extends object = Parameters>(
-        options: AddComponentOptions<T>
+        options: AddGridviewComponentOptions<T>
     ): IGridviewPanel {
         let relativeLocation: number[] = options.location ?? [0];
 

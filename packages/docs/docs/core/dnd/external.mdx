@@ -9,7 +9,7 @@ External Dnd events can be intercepted through a number of utilities.
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 <DocRef declaration="DockviewApi"
-  methods={['onDidDrop', 'onUnhandledDragOverEvent']}
+  methods={['onDidDrop', 'onUnhandledDragOver']}
 />
 
 ## Intercepting Drag Events
@@ -20,7 +20,7 @@ You can intercept drag events to attach your own metadata using the `onWillDragP
 
 ## `nativeEvent` narrowing
 
-`event.nativeEvent` on drag-related events (`onWillDragPanel`, `onWillDragGroup`, `onWillDrop`, `onWillShowOverlay`, `onUnhandledDragOverEvent`) is typed as `DragEvent | PointerEvent` to cover both the HTML5 and pointer-event ([touch / pen](/docs/core/dnd/strategy)) backends.
+`event.nativeEvent` on drag-related events (`onWillDragPanel`, `onWillDragGroup`, `onWillDrop`, `onWillShowOverlay`, `onUnhandledDragOver`) is typed as `DragEvent | PointerEvent` to cover both the HTML5 and pointer-event ([touch / pen](/docs/core/dnd/strategy)) backends.
 
 Narrow before reading `DragEvent`-only fields like `dataTransfer`:
 

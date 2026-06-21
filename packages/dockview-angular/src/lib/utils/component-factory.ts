@@ -106,11 +106,6 @@ export class AngularFrameworkComponentFactory {
         );
     }
 
-    // Legacy method for backward compatibility
-    createComponent(options: CreateComponentOptions): IContentRenderer {
-        return this.createDockviewComponent(options);
-    }
-
     createTabComponent(
         options: CreateComponentOptions
     ): ITabRenderer | undefined {

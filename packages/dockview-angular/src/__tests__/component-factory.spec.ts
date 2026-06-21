@@ -328,21 +328,6 @@ describe('AngularFrameworkComponentFactory', () => {
         });
     });
 
-    describe('createComponent (legacy)', () => {
-        it('should delegate to createDockviewComponent', () => {
-            const options: CreateComponentOptions = {
-                id: 'test-id',
-                name: 'dockview-test',
-            };
-
-            const renderer = factory.createComponent(options);
-
-            expect(renderer).toBeDefined();
-            expect(renderer.element).toBeTruthy();
-            expect(renderer.element.tagName).toBe('TEST-DOCKVIEW-COMPONENT');
-        });
-    });
-
     describe('component initialization with data', () => {
         it('should pass options to dockview component', () => {
             const options: CreateComponentOptions = {

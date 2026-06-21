@@ -221,7 +221,7 @@ export class Tab extends CompositeDisposable {
                 this._onTabClick.fire(event);
             }),
             addDisposableListener(this._element, 'contextmenu', (event) => {
-                this.accessor.contextMenuController?.show(
+                this.accessor.contextMenuService?.show(
                     this.panel,
                     this.group,
                     event
@@ -232,7 +232,7 @@ export class Tab extends CompositeDisposable {
                     // Don't let a subsequent finger move arm a drag on top
                     // of the just-opened menu.
                     this.pointerDragSource.cancelPending();
-                    this.accessor.contextMenuController?.show(
+                    this.accessor.contextMenuService?.show(
                         this.panel,
                         this.group,
                         event

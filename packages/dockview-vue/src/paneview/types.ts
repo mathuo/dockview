@@ -1,6 +1,6 @@
 import type {
     PaneviewApi,
-    PaneviewDropEvent,
+    PaneviewDidDropEvent,
     PaneviewOptions,
     PaneviewPanelApi,
 } from 'dockview';
@@ -23,5 +23,5 @@ export interface IPaneviewVueProps extends PaneviewOptions {
 
 export type PaneviewVueEvents = {
     ready: [event: PaneviewReadyEvent];
-    didDrop: [event: PaneviewDropEvent];
+    didDrop: [event: PaneviewDidDropEvent];
 };

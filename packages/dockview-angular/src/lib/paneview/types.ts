@@ -1,5 +1,5 @@
 import { TemplateRef, Type } from '@angular/core';
-import { PaneviewOptions, PaneviewApi, PaneviewDropEvent } from 'dockview';
+import { PaneviewOptions, PaneviewApi, PaneviewDidDropEvent } from 'dockview';
 
 export interface PaneviewAngularReadyEvent {
     api: PaneviewApi;
@@ -12,8 +12,8 @@ export interface PaneviewAngularOptions extends PaneviewOptions {
 
 export interface PaneviewAngularEvents {
     ready: PaneviewAngularReadyEvent;
-    drop: PaneviewDropEvent;
+    drop: PaneviewDidDropEvent;
 }
 
 // Re-export commonly used types from dockview
-export { PaneviewApi, PaneviewDropEvent, PaneviewOptions } from 'dockview';
+export { PaneviewApi, PaneviewDidDropEvent, PaneviewOptions } from 'dockview';

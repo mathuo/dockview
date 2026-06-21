@@ -164,13 +164,13 @@ export interface DockviewPopoutGroupOptions {
      * Defaults to `/popout.html` if not provided
      */
     popoutUrl?: string;
-    referenceGroup?: DockviewGroupPanel;
     onDidOpen?: (event: { id: string; window: Window }) => void;
     onWillClose?: (event: { id: string; window: Window }) => void;
-    overridePopoutGroup?: DockviewGroupPanel;
 }
 
 interface DockviewPopoutGroupOptionsInternal extends DockviewPopoutGroupOptions {
+    referenceGroup?: DockviewGroupPanel;
+    overridePopoutGroup?: DockviewGroupPanel;
     /**
      * Restore into a pre-built nested gridview (multi-group popout window)
      * rather than creating one around a single group.
@@ -272,7 +272,7 @@ interface FloatingGroupOptionsInternal extends FloatingGroupOptions {
     skipActiveGroup?: boolean;
 }
 
-export interface DockviewMaximizedGroupChanged {
+export interface DockviewMaximizedGroupChangeEvent {
     group: DockviewGroupPanel;
     isMaximized: boolean;
 }
@@ -361,9 +361,9 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
     readonly onDidAddGroup: Event<DockviewGroupPanel>;
     readonly onDidActiveGroupChange: Event<DockviewGroupPanel | undefined>;
-    readonly onUnhandledDragOverEvent: Event<DockviewDndOverlayEvent>;
+    readonly onUnhandledDragOver: Event<DockviewDndOverlayEvent>;
     readonly onDidMovePanel: Event<MovePanelEvent>;
-    readonly onDidMaximizedGroupChange: Event<DockviewMaximizedGroupChanged>;
+    readonly onDidMaximizedGroupChange: Event<DockviewMaximizedGroupChangeEvent>;
     readonly onDidPopoutGroupSizeChange: Event<PopoutGroupChangeSizeEvent>;
     readonly onDidPopoutGroupPositionChange: Event<PopoutGroupChangePositionEvent>;
     readonly onDidAddPopoutGroup: Event<PopoutGroup>;
@@ -410,12 +410,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     ): void;
     addPopoutGroup(
         item: IDockviewPanel | DockviewGroupPanel,
-        options?: {
-            position?: Box;
-            popoutUrl?: string;
-            onDidOpen?: (event: { id: string; window: Window }) => void;
-            onWillClose?: (event: { id: string; window: Window }) => void;
-        }
+        options?: DockviewPopoutGroupOptions
     ): Promise<boolean>;
     fromJSON(data: any, options?: { reuseExistingPanels: boolean }): void;
     addEdgeGroup(
@@ -528,10 +523,10 @@ export class DockviewComponent
     readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent> =
         this._onWillShowOverlay.event;
 
-    private readonly _onUnhandledDragOverEvent =
+    private readonly _onUnhandledDragOver =
         new Emitter<DockviewDndOverlayEvent>();
-    readonly onUnhandledDragOverEvent: Event<DockviewDndOverlayEvent> =
-        this._onUnhandledDragOverEvent.event;
+    readonly onUnhandledDragOver: Event<DockviewDndOverlayEvent> =
+        this._onUnhandledDragOver.event;
 
     private readonly _onDidRemovePanel = new Emitter<IDockviewPanel>();
     readonly onDidRemovePanel: Event<IDockviewPanel> =
@@ -632,7 +627,7 @@ export class DockviewComponent
     }
 
     private readonly _onDidMaximizedGroupChange =
-        new Emitter<DockviewMaximizedGroupChanged>();
+        new Emitter<DockviewMaximizedGroupChangeEvent>();
     readonly onDidMaximizedGroupChange = this._onDidMaximizedGroupChange.event;
 
     private _shellManager: ShellManager | undefined;
@@ -782,7 +777,7 @@ export class DockviewComponent
             position,
             getPanelData
         );
-        this._onUnhandledDragOverEvent.fire(event);
+        this._onUnhandledDragOver.fire(event);
         return event.isAccepted;
     }
 
@@ -931,12 +926,9 @@ export class DockviewComponent
         });
     }
 
-    /**
-     * @deprecated Public access retained for backward compatibility. The
-     * underlying service is now owned by ContextMenuModule and may be
-     * undefined if the module is not registered.
-     */
-    get contextMenuController(): IContextMenuService | undefined {
+    get contextMenuService(): IContextMenuService | undefined {
+        // Owned by ContextMenuModule — undefined when the module is not
+        // registered, so callers must `?.`-guard.
         return this._moduleRegistry.services.contextMenuService;
     }
 
@@ -1090,7 +1082,7 @@ export class DockviewComponent
             this._onDidAddGroup,
             this._onDidRemoveGroup,
             this._onDidActiveGroupChange,
-            this._onUnhandledDragOverEvent,
+            this._onUnhandledDragOver,
             this._onDidMaximizedGroupChange,
             this._onDidPopoutGroupSizeChange,
             this._onDidPopoutGroupPositionChange,
@@ -4604,8 +4596,8 @@ export class DockviewComponent
 
                     this._advancedDnDService?.dispatchWillShowOverlay(event);
                 }),
-                view.model.onUnhandledDragOverEvent((event) => {
-                    this._onUnhandledDragOverEvent.fire(event);
+                view.model.onUnhandledDragOver((event) => {
+                    this._onUnhandledDragOver.fire(event);
                 }),
                 view.model.onDidAddPanel((event) => {
                     if (this._moving) {

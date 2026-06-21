@@ -1,7 +1,8 @@
 import {
     DockviewActivePanelChangeEvent,
     DockviewLayoutMutationEvent,
-    DockviewMaximizedGroupChanged,
+    DockviewMaximizedGroupChangeEvent,
+    DockviewPopoutGroupOptions,
     FloatingGroupOptions,
     GroupNavigationDirection,
     IDockviewComponent,
@@ -21,7 +22,7 @@ import {
 import { Parameters } from '../panel/types';
 import { Direction } from '../gridview/baseComponentGridview';
 import {
-    AddComponentOptions,
+    AddGridviewComponentOptions,
     IGridviewComponent,
     SerializedGridviewComponent,
 } from '../gridview/gridviewComponent';
@@ -51,7 +52,6 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from '../dockview/components/titlebar/tabsContainer';
-import { Box } from '../types';
 import {
     DockviewDidDropEvent,
     DockviewWillDropEvent,
@@ -316,8 +316,8 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
         return this.component.onDidDrop;
     }
 
-    get onUnhandledDragOverEvent(): Event<PaneviewDndOverlayEvent> {
-        return this.component.onUnhandledDragOverEvent;
+    get onUnhandledDragOver(): Event<PaneviewDndOverlayEvent> {
+        return this.component.onUnhandledDragOver;
     }
 
     constructor(private readonly component: IPaneviewComponent) {}
@@ -518,7 +518,7 @@ export class GridviewApi implements CommonApi<SerializedGridviewComponent> {
      * Add a panel and return the created object.
      */
     addPanel<T extends object = Parameters>(
-        options: AddComponentOptions<T>
+        options: AddGridviewComponentOptions<T>
     ): IGridviewPanel {
         return this.component.addPanel(options);
     }
@@ -781,8 +781,8 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.onWillDragPanel;
     }
 
-    get onUnhandledDragOverEvent(): Event<DockviewDndOverlayEvent> {
-        return this.component.onUnhandledDragOverEvent;
+    get onUnhandledDragOver(): Event<DockviewDndOverlayEvent> {
+        return this.component.onUnhandledDragOver;
     }
 
     get onDidPopoutGroupSizeChange(): Event<PopoutGroupChangeSizeEvent> {
@@ -1046,7 +1046,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         this.component.exitMaximizedGroup();
     }
 
-    get onDidMaximizedGroupChange(): Event<DockviewMaximizedGroupChanged> {
+    get onDidMaximizedGroupChange(): Event<DockviewMaximizedGroupChangeEvent> {
         return this.component.onDidMaximizedGroupChange;
     }
 
@@ -1055,12 +1055,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     addPopoutGroup(
         item: IDockviewPanel | DockviewGroupPanel,
-        options?: {
-            position?: Box;
-            popoutUrl?: string;
-            onDidOpen?: (event: { id: string; window: Window }) => void;
-            onWillClose?: (event: { id: string; window: Window }) => void;
-        }
+        options?: DockviewPopoutGroupOptions
     ): Promise<boolean> {
         return this.component.withOrigin('api', () =>
             this.component.addPopoutGroup(item, options)

@@ -439,14 +439,14 @@ describe('tab', () => {
     });
 
     describe('contextmenu event', () => {
-        test('right-clicking a tab calls contextMenuController.show with the panel and group', () => {
+        test('right-clicking a tab calls contextMenuService.show with the panel and group', () => {
             const showMock = jest.fn();
             const accessor = fromPartial<DockviewComponent>({
                 onDidOptionsChange: jest
                     .fn()
                     .mockReturnValue({ dispose: jest.fn() }),
                 options: {},
-                contextMenuController: { show: showMock },
+                contextMenuService: { show: showMock },
             });
 
             const panel = fromPartial<IDockviewPanel>({ id: 'panelId' });

@@ -11,7 +11,7 @@ import { IDockviewPanelModel } from './dockviewPanelModel';
 import { DockviewComponent } from './dockviewComponent';
 import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
 import { WillFocusEvent } from '../api/panelApi';
-import { Contraints } from '../gridview/gridviewPanel';
+import { Constraints } from '../gridview/gridviewPanel';
 
 export interface IDockviewPanel extends IDisposable, IPanel {
     readonly view: IDockviewPanelModel;
@@ -91,7 +91,7 @@ export class DockviewPanel
         private readonly containerApi: DockviewApi,
         group: DockviewGroupPanel,
         readonly view: IDockviewPanelModel,
-        options: { renderer?: DockviewPanelRenderer } & Partial<Contraints>
+        options: { renderer?: DockviewPanelRenderer } & Partial<Constraints>
     ) {
         super();
         this._renderer = options.renderer;

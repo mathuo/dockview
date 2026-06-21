@@ -36,9 +36,6 @@ export interface DockviewAngularOptions extends DockviewOptions {
     prefixHeaderActionsComponent?: Type<any> | TemplateRef<any>;
 }
 
-// Alias for backward compatibility
-export interface DockviewAngularComponentOptions extends DockviewAngularOptions {}
-
 export interface DockviewAngularEvents {
     ready: DockviewReadyEvent;
     didDrop: DockviewDidDropEvent;
