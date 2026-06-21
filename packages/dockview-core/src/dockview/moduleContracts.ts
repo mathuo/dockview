@@ -124,6 +124,12 @@ export interface IAccessibilityHost {
 
 export interface IAccessibilityService extends IDisposable {}
 
+/**
+ * Marker for the advanced keyboard docking service (spatial group focus +
+ * keyboard move mode). Self-driven; the component never calls into it.
+ */
+export interface IKeyboardDockingService extends IDisposable {}
+
 // --- AdvancedDnD ---
 
 export interface IAdvancedDnDHost {

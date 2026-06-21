@@ -1,6 +1,12 @@
 import { fireEvent } from '@testing-library/dom';
 import { DockviewComponent } from 'dockview-core';
+import { registerModules } from 'dockview-core';
 import { IContentRenderer } from 'dockview-core';
+import { KeyboardDockingModule } from '../keyboardDockingService';
+
+// Advanced keyboard docking (spatial focus + Ctrl+M move mode) is not part of
+// the default `Modules` bundle, so register it explicitly for these tests.
+registerModules([KeyboardDockingModule]);
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');
@@ -818,5 +824,49 @@ describe('accessibility: docking narration i18n', () => {
 
         fireEvent.keyDown(dockview.element, { key: 'Escape' });
         expect(region.textContent).toBe('Annule.');
+    });
+});
+
+/**
+ * While a keyboard move is armed, the default navigation keys must stand down
+ * so the move isn't double-handled (the docking module owns the keys then).
+ */
+describe('accessibility: move-mode takes precedence over navigation', () => {
+    let container: HTMLElement;
+    let dockview: DockviewComponent;
+
+    afterEach(() => {
+        dockview.dispose();
+        container.remove();
+    });
+
+    test('a navigation key (Ctrl+]) does not switch tabs while move mode is armed', () => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            keyboardNavigation: true,
+        });
+        dockview.layout(1000, 1000);
+        // two tabs in one group; p2 is active
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            title: 'P2',
+        });
+        expect(dockview.activePanel?.id).toBe('p2');
+
+        // arm keyboard docking
+        fireEvent.keyDown(dockview.element, { key: 'm', ctrlKey: true });
+
+        // a free nav key now must be ignored (no tab switch)
+        fireEvent.keyDown(dockview.element, { key: ']', ctrlKey: true });
+        expect(dockview.activePanel?.id).toBe('p2');
+
+        // cancelling restores normal navigation (Ctrl+] now switches tabs)
+        fireEvent.keyDown(dockview.element, { key: 'Escape' });
+        fireEvent.keyDown(dockview.element, { key: ']', ctrlKey: true });
+        expect(dockview.activePanel?.id).toBe('p1');
     });
 });
