@@ -45,6 +45,8 @@ interface DockingKeybindings {
     focusGroupDown: string;
     /** Arm keyboard docking of the active panel. Default `ctrl+m`. */
     dock: string;
+    /** Float the moving panel (terminal action during the target phase). Default `ctrl+shift+f`. */
+    float: string;
 }
 
 const DEFAULT_KEYMAP: DockingKeybindings = {
@@ -53,6 +55,7 @@ const DEFAULT_KEYMAP: DockingKeybindings = {
     focusGroupUp: 'ctrl+shift+arrowup',
     focusGroupDown: 'ctrl+shift+arrowdown',
     dock: 'ctrl+m',
+    float: 'ctrl+shift+f',
 };
 
 /**
@@ -67,7 +70,8 @@ const DEFAULT_KEYMAP: DockingKeybindings = {
  *        can be split out); `Enter` selects one.
  *     2. PICK EDGE — arrows choose a split edge (left/right/top/bottom) or the
  *        centre (tab-into); `Enter` commits, `Escape` steps back.
- *   `Escape` from the target phase cancels.
+ *   From the target phase, `Ctrl+Shift+F` floats the panel as a terminal
+ *   action; `Escape` cancels.
  *
  * While a move is in progress it marks the root with
  * {@link KEYBOARD_MOVE_ATTRIBUTE} so the default navigation listener stands
@@ -117,6 +121,7 @@ export class KeyboardDockingService
             focusGroupDown:
                 overrides.focusGroupDown ?? DEFAULT_KEYMAP.focusGroupDown,
             dock: overrides.dock ?? DEFAULT_KEYMAP.dock,
+            float: overrides.float ?? DEFAULT_KEYMAP.float,
         };
     }
 
@@ -241,6 +246,13 @@ export class KeyboardDockingService
         }
 
         if (move.phase === 'target') {
+            // Float is a terminal action from the target phase: pull the moving
+            // panel out into a new floating group instead of docking it.
+            if (matchesBinding(e, this._keymap.float)) {
+                this._consume(e);
+                this._float();
+                return;
+            }
             const n = move.groups.length;
             if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
                 this._consume(e);
@@ -307,6 +319,21 @@ export class KeyboardDockingService
         }
         // The move re-renders the grid; pull focus back into the dock so the
         // keymap keeps working without a click.
+        this._restoreFocus();
+    }
+
+    private _float(): void {
+        const move = this._move!;
+        const source = move.source;
+        const m = this._messages;
+        this._exit();
+        try {
+            this.host.floatPanel(source);
+            this.host.announce(m.moveFloated(this._label(source)));
+        } catch {
+            this.host.announce(m.moveNotAllowed());
+        }
+        // Floating re-renders the grid; pull focus back into the dock.
         this._restoreFocus();
     }
 

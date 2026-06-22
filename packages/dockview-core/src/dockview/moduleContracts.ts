@@ -120,6 +120,8 @@ export interface IAccessibilityHost {
         group: DockviewGroupPanel,
         position: Position
     ): void;
+    /** Float the panel into a new floating group — the keyboard-move "float" terminal action. */
+    floatPanel(panel: IDockviewPanel): void;
 }
 
 export interface IAccessibilityService extends IDisposable {}

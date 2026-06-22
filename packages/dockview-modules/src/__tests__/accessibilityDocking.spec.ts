@@ -104,6 +104,46 @@ describe('accessibility: keyboard docking', () => {
         expect(dockview.groups.length).toBe(2);
     });
 
+    test('Ctrl+Shift+F floats the moving panel from the target phase', () => {
+        make(true);
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        dockview.addPanel({ id: 'p2', component: 'default', title: 'P2' });
+        expect(dockview.groups.length).toBe(1); // p1, p2 tabs in one group
+        expect(dockview.floatingGroups.length).toBe(0);
+
+        fireEvent.keyDown(dockview.element, { key: 'm', ctrlKey: true });
+        expect(region().textContent).toContain('Moving P2');
+
+        // float as a terminal action — no edge phase
+        fireEvent.keyDown(dockview.element, {
+            key: 'f',
+            ctrlKey: true,
+            shiftKey: true,
+        });
+
+        expect(region().textContent).toBe('P2 floated.');
+        expect(dockview.floatingGroups.length).toBe(1);
+    });
+
+    test('float is rebindable', () => {
+        make({ keymap: { float: 'alt+f' } });
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        dockview.addPanel({ id: 'p2', component: 'default', title: 'P2' });
+
+        fireEvent.keyDown(dockview.element, { key: 'm', ctrlKey: true });
+        // the default binding no longer floats
+        fireEvent.keyDown(dockview.element, {
+            key: 'f',
+            ctrlKey: true,
+            shiftKey: true,
+        });
+        expect(dockview.floatingGroups.length).toBe(0);
+
+        // the rebound key does
+        fireEvent.keyDown(dockview.element, { key: 'f', altKey: true });
+        expect(dockview.floatingGroups.length).toBe(1);
+    });
+
     test('does nothing when keyboardNavigation is off (default)', () => {
         make(false);
         twoGroups();
