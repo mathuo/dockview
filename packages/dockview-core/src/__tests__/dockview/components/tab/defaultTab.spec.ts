@@ -117,6 +117,41 @@ describe('defaultTab', () => {
         expect(api.close).not.toHaveBeenCalled();
     });
 
+    test('that close button exposes an accessible name and hides the glyph', () => {
+        const cut = new DefaultTab();
+
+        const onDidTitleChange = new Emitter<TitleEvent>();
+        const api = fromPartial<DockviewPanelApi>({
+            onDidTitleChange: onDidTitleChange.event,
+            close: jest.fn(),
+        });
+        const containerApi = fromPartial<DockviewApi>({});
+
+        const action = cut.element.querySelector(
+            '.dv-default-tab-action'
+        ) as HTMLElement;
+
+        // role is set at construction, before init
+        expect(action.getAttribute('role')).toBe('button');
+        // the decorative glyph is hidden from assistive technology
+        expect(action.querySelector('svg')!.getAttribute('aria-hidden')).toBe(
+            'true'
+        );
+
+        cut.init({
+            api,
+            containerApi,
+            params: {},
+            title: 'title_abc',
+        });
+
+        // the accessible name is qualified with the panel title
+        expect(action.getAttribute('aria-label')).toBe('Close title_abc');
+
+        onDidTitleChange.fire({ title: 'title_def' });
+        expect(action.getAttribute('aria-label')).toBe('Close title_def');
+    });
+
     test('that close button is visible by default', () => {
         const cut = new DefaultTab();
 

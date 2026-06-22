@@ -24,7 +24,15 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
 
         this.action = document.createElement('div');
         this.action.className = 'dv-default-tab-action';
-        this.action.appendChild(createCloseButton());
+        // Expose the close affordance to assistive technology: a named button
+        // role so screen readers announce it, with the decorative glyph hidden.
+        // Keyboard users close the focused tab via the tab strip's Delete
+        // binding; this element is operated by pointer / AT.
+        this.action.setAttribute('role', 'button');
+        this.action.setAttribute('aria-label', 'Close');
+        const closeIcon = createCloseButton();
+        closeIcon.setAttribute('aria-hidden', 'true');
+        this.action.appendChild(closeIcon);
 
         this._element.appendChild(this._content);
         this._element.appendChild(this.action);
@@ -60,5 +68,11 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         if (this._content.textContent !== this._title) {
             this._content.textContent = this._title ?? '';
         }
+        // Qualify the close button with the panel title when available so the
+        // announced name disambiguates it from sibling tabs' close buttons.
+        this.action.setAttribute(
+            'aria-label',
+            this._title ? `Close ${this._title}` : 'Close'
+        );
     }
 }
