@@ -1,27 +1,27 @@
 /**
  * dockview
- * @version 7.0.1
+ * @version 7.0.2
  * @link https://github.com/mathuo/dockview
  * @license MIT
  */
 
 /**
  * dockview-core
- * @version 7.0.1
+ * @version 7.0.2
  * @link https://github.com/mathuo/dockview
  * @license MIT
  */
 
 /**
  * dockview-modules
- * @version 7.0.1
+ * @version 7.0.2
  * @link https://github.com/mathuo/dockview
  * @license MIT
  */
 
 /**
  * dockview-react
- * @version 7.0.1
+ * @version 7.0.2
  * @link https://github.com/mathuo/dockview
  * @license MIT
  */
