@@ -13,6 +13,9 @@ test-report.xml
 *.code-workspace
 yarn-error.log
 /build
+test-results/
+playwright-report/
+playwright/.cache/
 /docs/
 /generated/
 

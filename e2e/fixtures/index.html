@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>dockview e2e fixture</title>
+        <style>
+            html,
+            body,
+            #app {
+                margin: 0;
+                height: 100%;
+                width: 100%;
+            }
+            .dv-test-panel {
+                height: 100%;
+                box-sizing: border-box;
+                padding: 8px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="app"></div>
+
+        <!-- Built UMD bundles. dockview-core exposes the global "dockview-core";
+             dockview-modules expects it aliased as DockviewCore. -->
+        <script src="/packages/dockview-core/dist/dockview-core.js"></script>
+        <script>
+            window.DockviewCore = window['dockview-core'];
+        </script>
+        <script src="/packages/dockview-modules/dist/dockview-modules.js"></script>
+
+        <script>
+            (function () {
+                const core = window['dockview-core'];
+                const modules = window['dockview-modules'];
+
+                // Register the pro module set plus the optional keyboard-docking
+                // module so the harness can exercise cross-window keyboard work.
+                core.registerModules([
+                    ...modules.Modules,
+                    modules.KeyboardDockingModule,
+                ]);
+
+                const el = document.getElementById('app');
+                const dockview = new core.DockviewComponent(el, {
+                    keyboardNavigation: true,
+                    // A served (not about:blank) target avoids a 404 when the
+                    // popout window navigates before dockview injects content.
+                    popoutUrl: '/e2e/fixtures/popout.html',
+                    createComponent: (options) => {
+                        const element = document.createElement('div');
+                        element.className = 'dv-test-panel';
+                        element.tabIndex = 0;
+                        // Render the panel id so tests can identify which panel
+                        // (e.g. "beta") is showing in the popped-out window.
+                        element.textContent = options.id;
+                        return {
+                            element,
+                            init() {},
+                            layout() {},
+                            dispose() {},
+                        };
+                    },
+                });
+                dockview.layout(el.clientWidth, el.clientHeight);
+
+                // Test-facing handle.
+                window.__dv = {
+                    addPanel: (id) =>
+                        dockview.addPanel({
+                            id,
+                            component: 'default',
+                            title: id,
+                        }),
+                    popoutActiveGroup: () =>
+                        dockview.addPopoutGroup(dockview.activeGroup),
+                    groupCount: () => dockview.groups.length,
+                };
+                window.__ready = true;
+            })();
+        </script>
+    </body>
+</html>
