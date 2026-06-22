@@ -20,7 +20,7 @@ import {
     DockviewReadyEvent,
     SerializedDockview,
 } from 'dockview-angular';
-import 'dockview-core/dist/styles/dockview.css';
+import 'dockview-angular/dist/styles/dockview.css';
 
 const STORAGE_KEY = 'angular_demo_dockview_layout';
 
@@ -275,8 +275,8 @@ export class AppComponent implements OnDestroy {
                 this.groupCount = this.api!.groups.length;
                 this.cd.markForCheck();
             }),
-            this.api.onDidActivePanelChange((panel) => {
-                this.activePanelId = panel?.id ?? '';
+            this.api.onDidActivePanelChange((event) => {
+                this.activePanelId = event.panel?.id ?? '';
                 this.cd.markForCheck();
             })
         );

@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkdockview_docs=globalThis.webpackChunkdockview_docs||[]).push([[3338],{40936(e){e.exports=JSON.parse('{"name":"docusaurus-theme-search-algolia","id":"default"}')}}]);

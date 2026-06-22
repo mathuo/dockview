@@ -15,7 +15,7 @@ import {
     DockviewPanelApi,
     DockviewReadyEvent,
 } from 'dockview-angular';
-import 'dockview-core/dist/styles/dockview.css';
+import 'dockview-angular/dist/styles/dockview.css';
 
 const STORAGE_KEY = 'dockview_persistence_layout';
 

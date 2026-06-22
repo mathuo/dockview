@@ -1,10 +1,10 @@
-import 'dockview-core/dist/styles/dockview.css';
+import 'dockview/dist/styles/dockview.css';
 import {
     createSplitview,
     SplitviewPanel,
     IFrameworkPart,
     themeAbyss,
-} from 'dockview-core';
+} from 'dockview';
 
 const PANEL_COLORS = ['#1e1e1e', '#252526', '#2d2d30'];
 

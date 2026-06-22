@@ -1,11 +1,11 @@
-import 'dockview-core/dist/styles/dockview.css';
+import 'dockview/dist/styles/dockview.css';
 import {
     createGridview,
     IFrameworkPart,
     GridviewPanel,
     themeAbyss,
     Orientation,
-} from 'dockview-core';
+} from 'dockview';
 
 class Panel extends GridviewPanel {
     private readonly _frameworkPart: IFrameworkPart;

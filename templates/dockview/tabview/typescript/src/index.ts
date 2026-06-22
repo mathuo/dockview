@@ -1,10 +1,10 @@
-import 'dockview-core/dist/styles/dockview.css';
+import 'dockview/dist/styles/dockview.css';
 import {
     createDockview,
     GroupPanelPartInitParameters,
     IContentRenderer,
     themeAbyss,
-} from 'dockview-core';
+} from 'dockview';
 
 class Panel implements IContentRenderer {
     private readonly _element: HTMLElement;

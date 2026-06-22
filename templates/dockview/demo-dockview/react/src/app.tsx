@@ -164,8 +164,8 @@ const DockviewDemo = (props: { theme?: string }) => {
                 addLogLine(`Panel Added ${event.id}`);
             }),
             api.onDidActivePanelChange((event) => {
-                setActivePanel(event?.id);
-                addLogLine(`Panel Activated ${event?.id}`);
+                setActivePanel(event.panel?.id);
+                addLogLine(`Panel Activated ${event.panel?.id}`);
             }),
             api.onDidRemovePanel((event) => {
                 setPanels((_) => {

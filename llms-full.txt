@@ -1,6 +1,6 @@
 # Dockview — Full Reference
 
-> A zero dependency layout manager supporting tabs, groups, grids and splitviews for React, Vue, Angular, and vanilla TypeScript.
+> A zero dependency layout manager supporting tabs, groups, grids and splitviews for React, Vue, Angular, and JavaScript.
 
 Dockview is an open-source docking layout library that lets you build IDE-like and dashboard interfaces with resizable panels, draggable tabs, floating groups, and popout windows. It has zero runtime dependencies and works with React, Vue 3, Angular, and plain TypeScript.
 
@@ -23,30 +23,29 @@ Dockview is an open-source docking layout library that lets you build IDE-like a
 
 | Package | Framework | Install |
 |---|---|---|
-| dockview-core | Vanilla TypeScript | `npm install dockview-core` |
+| dockview | JavaScript | `npm install dockview` |
 | dockview-react | React | `npm install dockview-react` |
-| dockview | React (legacy alias) | `npm install dockview` |
 | dockview-vue | Vue 3 | `npm install dockview-vue` |
 | dockview-angular | Angular | `npm install dockview-angular` |
 
-## Quick Start — Vanilla TypeScript
+## Quick Start — JavaScript
 
 Install:
 
 ```
-npm install dockview-core
+npm install dockview
 ```
 
 Import the stylesheet:
 
 ```css
-@import 'dockview-core/dist/styles/dockview.css';
+@import 'dockview/dist/styles/dockview.css';
 ```
 
 Create a dockview instance:
 
 ```ts
-import { DockviewComponent } from 'dockview-core';
+import { DockviewComponent } from 'dockview';
 
 const element = document.getElementById('app');
 
@@ -144,7 +143,7 @@ Use the component in a Vue SFC:
 
 <script setup lang="ts">
 import { DockviewVue } from 'dockview-vue';
-import type { DockviewReadyEvent } from 'dockview-core';
+import type { DockviewReadyEvent } from 'dockview-vue';
 
 function onReady(event: DockviewReadyEvent) {
     event.api.addPanel({
@@ -174,7 +173,7 @@ Use the component:
 ```typescript
 import { Component } from '@angular/core';
 import { DockviewModule } from 'dockview-angular';
-import { DockviewReadyEvent } from 'dockview-core';
+import { DockviewReadyEvent } from 'dockview-angular';
 
 @Component({
     selector: 'app-root',

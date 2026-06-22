@@ -1,4 +1,4 @@
-import 'dockview-core/dist/styles/dockview.css';
+import 'dockview/dist/styles/dockview.css';
 import {
     createDockview,
     DockviewApi,
@@ -8,7 +8,7 @@ import {
     IWatermarkRenderer,
     themeAbyss,
     WatermarkRendererInitParameters,
-} from 'dockview-core';
+} from 'dockview';
 
 class Panel implements IContentRenderer {
     private readonly _element: HTMLElement;

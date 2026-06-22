@@ -4,7 +4,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { Component, Type, NgModule, Input, OnInit, OnDestroy } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { DockviewAngularModule, DockviewApi, DockviewReadyEvent } from 'dockview-angular';
-import 'dockview-core/dist/styles/dockview.css';
+import 'dockview-angular/dist/styles/dockview.css';
 
 interface CustomParams {
     myValue: number;
