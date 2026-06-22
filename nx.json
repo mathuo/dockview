@@ -44,10 +44,12 @@
     "release": {
         "projects": [
             "dockview-core",
+            "dockview-modules",
             "dockview",
             "dockview-vue",
             "dockview-react",
-            "dockview-angular"
+            "dockview-angular",
+            "dockview-docs"
         ],
         "projectsRelationship": "fixed",
         "version": {
@@ -68,5 +70,6 @@
         }
     },
     "defaultBase": "master",
-    "useInferencePlugins": false
+    "useInferencePlugins": false,
+    "analytics": false
 }
