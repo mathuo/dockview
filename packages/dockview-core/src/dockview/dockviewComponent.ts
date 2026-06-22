@@ -2787,6 +2787,12 @@ export class DockviewComponent
                     this.doSetGroupAndPanelActive(panel);
                 }
             }
+
+            // `gridview.deserialize()` rebuilds the grid without firing the
+            // BaseGrid add events the watermark module reacts to, so the
+            // watermark mounted during `clear()` would otherwise persist over
+            // the restored layout. Re-evaluate now the layout is in place.
+            this._watermarkService?.update();
         } catch (err) {
             console.error(
                 'dockview: failed to deserialize layout. Reverting changes',
