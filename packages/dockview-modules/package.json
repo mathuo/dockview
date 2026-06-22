@@ -1,6 +1,6 @@
 {
     "name": "dockview-modules",
-    "version": "7.0.0",
+    "version": "7.0.1",
     "private": true,
     "description": "Separable feature modules for dockview",
     "keywords": [
@@ -43,6 +43,6 @@
         "format:check": "prettier --check 'src/**/*.{ts,tsx,js,jsx}'"
     },
     "dependencies": {
-        "dockview-core": "^7.0.0"
+        "dockview-core": "^7.0.1"
     }
 }
