@@ -926,6 +926,12 @@ export class DockviewComponent
         });
     }
 
+    floatPanel(panel: IDockviewPanel): void {
+        // The accessibility host surface speaks in the public `IDockviewPanel`;
+        // the runtime instance is always a concrete `DockviewPanel`.
+        this.addFloatingGroup(panel as DockviewPanel);
+    }
+
     get contextMenuService(): IContextMenuService | undefined {
         // Owned by ContextMenuModule — undefined when the module is not
         // registered, so callers must `?.`-guard.

@@ -35,6 +35,8 @@ export interface DockviewMessages {
     moveCancelled(): string;
     /** A move the layout rejected. */
     moveNotAllowed(): string;
+    /** The panel was floated as a terminal move action. */
+    moveFloated(source: string): string;
 }
 
 /** Where a drop position lands, phrased for the *edge prompt*. */
@@ -68,6 +70,7 @@ export const DEFAULT_MESSAGES: DockviewMessages = {
         `${source} ${committedWhere(position, target)}.`,
     moveCancelled: () => `Move cancelled.`,
     moveNotAllowed: () => `That move is not allowed.`,
+    moveFloated: (source) => `${source} floated.`,
 };
 
 /** Merge an app's partial overrides over the English defaults. */
