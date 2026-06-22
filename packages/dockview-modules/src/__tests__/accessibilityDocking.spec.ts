@@ -104,6 +104,32 @@ describe('accessibility: keyboard docking', () => {
         expect(dockview.groups.length).toBe(2);
     });
 
+    test('renders the drop preview during the move and clears it on cancel', () => {
+        make(true);
+        twoGroups();
+        expect(container.querySelector('.dv-drop-target')).toBeNull();
+
+        // The move reuses the same drop-preview overlay a mouse drag shows, so
+        // keyboard and pointer previews stay a single source of truth.
+        fireEvent.keyDown(dockview.element, { key: 'm', ctrlKey: true });
+        expect(container.querySelector('.dv-drop-target')).not.toBeNull();
+
+        fireEvent.keyDown(dockview.element, { key: 'Escape' });
+        expect(container.querySelector('.dv-drop-target')).toBeNull();
+    });
+
+    test('clears the drop preview after committing a move', () => {
+        make(true);
+        twoGroups();
+
+        fireEvent.keyDown(dockview.element, { key: 'm', ctrlKey: true });
+        fireEvent.keyDown(dockview.element, { key: 'ArrowRight' }); // target the other group
+        fireEvent.keyDown(dockview.element, { key: 'Enter' }); // → edge phase
+        fireEvent.keyDown(dockview.element, { key: 'Enter' }); // commit (tab-into)
+
+        expect(container.querySelector('.dv-drop-target')).toBeNull();
+    });
+
     test('Ctrl+Shift+F floats the moving panel from the target phase', () => {
         make(true);
         dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
