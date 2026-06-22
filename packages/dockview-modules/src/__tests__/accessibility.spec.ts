@@ -345,4 +345,52 @@ describe('accessibility: tab keyboard navigation', () => {
         fireEvent.keyDown(t3, { key: ' ' });
         expect(p3.api.isActive).toBe(true);
     });
+
+    test('Delete / Backspace close the focused tab and keep focus in the strip', () => {
+        const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+        dockview.addPanel({ id: 'p2', component: 'default' });
+        dockview.addPanel({ id: 'p3', component: 'default' });
+        p1.api.setActive();
+        expect(realTabs()).toHaveLength(3);
+
+        // Delete the middle tab; roving focus moves to a neighbour, staying
+        // inside the tablist rather than falling back to <body>.
+        const t2 = realTabs()[1];
+        t2.focus();
+        fireEvent.keyDown(t2, { key: 'Delete' });
+
+        let tabs = realTabs();
+        expect(tabs).toHaveLength(2);
+        expect(container.contains(document.activeElement)).toBe(true);
+        expect(
+            (document.activeElement as HTMLElement).classList.contains('dv-tab')
+        ).toBe(true);
+
+        // Backspace also closes (the primary delete key on macOS).
+        const focused = document.activeElement as HTMLElement;
+        fireEvent.keyDown(focused, { key: 'Backspace' });
+        expect(realTabs()).toHaveLength(1);
+    });
+
+    test('vertical strips navigate with Up/Down, not Left/Right', () => {
+        const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+        dockview.addPanel({ id: 'p2', component: 'default' });
+        dockview.addPanel({ id: 'p3', component: 'default' });
+        p1.api.setActive();
+        // A left/right header lays the tab strip out vertically.
+        p1.api.group.api.setHeaderPosition('left');
+
+        const [t1, t2] = realTabs();
+        t1.focus();
+
+        // Horizontal keys are inert in a vertical strip.
+        fireEvent.keyDown(t1, { key: 'ArrowRight' });
+        expect(document.activeElement).toBe(t1);
+
+        // Down advances, Up retreats.
+        fireEvent.keyDown(t1, { key: 'ArrowDown' });
+        expect(document.activeElement).toBe(t2);
+        fireEvent.keyDown(t2, { key: 'ArrowUp' });
+        expect(document.activeElement).toBe(t1);
+    });
 });
