@@ -22,13 +22,12 @@
     padding: var(--dv-spacing-padding);
     background-color: var(--dv-group-view-background-color);
 
-    // When the dockview element is embedded inside a shell, the shell wrapper
-    // already carries the outer padding. Suppress it on the inner dockview
-    // element so the layout engine's pixel-exact gridview dimensions don't
-    // overflow the content box and trigger scrollbars.
-    // .dv-shell is only present in shell mode, so this rule is inherently
-    // scoped to shell mode and has no effect on standalone (non-shell) usage.
-    .dv-shell & {
+    // The theme root carries the outer padding above; the inner dockview
+    // element must stay flush so the layout engine's pixel-exact gridview
+    // dimensions don't overflow the content box and trigger scrollbars.
+    // .dv-dockview already has no padding, so this is a defensive zero that
+    // guarantees the inner element never picks up the spaced inset.
+    & .dv-dockview {
         padding: 0;
     }
 
