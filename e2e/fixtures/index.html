@@ -65,13 +65,16 @@
                 dockview.layout(el.clientWidth, el.clientHeight);
 
                 // Test-facing handle.
+                const panels = {};
                 window.__dv = {
-                    addPanel: (id) =>
-                        dockview.addPanel({
+                    addPanel: (id) => {
+                        panels[id] = dockview.addPanel({
                             id,
                             component: 'default',
                             title: id,
-                        }),
+                        });
+                    },
+                    closePanel: (id) => panels[id] && panels[id].api.close(),
                     popoutActiveGroup: () =>
                         dockview.addPopoutGroup(dockview.activeGroup),
                     groupCount: () => dockview.groups.length,

@@ -553,6 +553,12 @@ export class DockviewComponent
     readonly onDidRemovePopoutGroup: Event<PopoutGroup> =
         this._onDidRemovePopoutGroup.event;
 
+    private readonly _onDidChangePopouts = new Emitter<void>();
+    /** Fires whenever a popout window opens or closes — i.e. the set of popout
+     *  documents changed. Used by accessibility services that mirror per-window
+     *  state (e.g. a live region in each popout). */
+    readonly onDidChangePopouts: Event<void> = this._onDidChangePopouts.event;
+
     private readonly _onDidOpenPopoutWindowFail = new Emitter<void>();
     readonly onDidOpenPopoutWindowFail: Event<void> =
         this._onDidOpenPopoutWindowFail.event;
@@ -1094,6 +1100,15 @@ export class DockviewComponent
             this._onDidPopoutGroupPositionChange,
             this._onDidAddPopoutGroup,
             this._onDidRemovePopoutGroup,
+            this._onDidChangePopouts,
+            // Coalesce popout add/remove into a single "the popout set changed"
+            // signal for per-window accessibility state.
+            this._onDidAddPopoutGroup.event(() =>
+                this._onDidChangePopouts.fire()
+            ),
+            this._onDidRemovePopoutGroup.event(() =>
+                this._onDidChangePopouts.fire()
+            ),
             this._onDidOpenPopoutWindowFail,
             this._onDidCreateTabGroup,
             this._onDidDestroyTabGroup,
@@ -1297,6 +1312,12 @@ export class DockviewComponent
                 window: entry.getWindow(),
             })) ?? []
         );
+    }
+
+    /** The live popout `Window` handles — one per open popout group. The
+     *  narrow surface accessibility services need to mirror per-window state. */
+    getPopoutWindows(): Window[] {
+        return this.getPopouts().map((popout) => popout.window);
     }
 
     private _doAddPopoutGroup(
