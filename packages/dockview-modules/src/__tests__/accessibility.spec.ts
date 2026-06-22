@@ -194,6 +194,22 @@ describe('accessibility: WAI-ARIA tabs baseline', () => {
         expect(region.getAttribute('aria-label')).toBe('Renamed');
     });
 
+    test('region drops its aria-label when the active panel has no title', () => {
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            title: 'First',
+        });
+
+        const region = container.querySelector('.dv-groupview')!;
+        expect(region.getAttribute('aria-label')).toBe('First');
+
+        // An untitled active panel must not leave a stale name behind — the
+        // attribute is removed rather than set to an empty string.
+        panel1.api.setTitle('');
+        expect(region.getAttribute('aria-label')).toBeNull();
+    });
+
     test('floating group is a non-modal dialog', () => {
         dockview.addPanel({ id: 'panel1', component: 'default' });
         dockview.addPanel({
@@ -263,6 +279,23 @@ describe('accessibility: tab keyboard navigation', () => {
         tabs.filter((t) => t !== active[0]).forEach((t) =>
             expect(t.tabIndex).toBe(-1)
         );
+    });
+
+    test('roving tabindex follows panel activation, not just arrow keys', () => {
+        const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+        dockview.addPanel({ id: 'p2', component: 'default' });
+        const p3 = dockview.addPanel({ id: 'p3', component: 'default' }); // p3 active
+
+        const [t1, t2, t3] = realTabs();
+        expect([t1.tabIndex, t2.tabIndex, t3.tabIndex]).toEqual([-1, -1, 0]);
+
+        // Activating a panel (e.g. via a mouse click / the api) must move the
+        // single tab-stop to its tab so keyboard entry lands on the active tab.
+        p1.api.setActive();
+        expect([t1.tabIndex, t2.tabIndex, t3.tabIndex]).toEqual([0, -1, -1]);
+
+        p3.api.setActive();
+        expect([t1.tabIndex, t2.tabIndex, t3.tabIndex]).toEqual([-1, -1, 0]);
     });
 
     test('arrow keys move the roving focus along the strip', () => {
