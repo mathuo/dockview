@@ -4723,6 +4723,70 @@ describe('dockviewComponent', () => {
         ).toBe(1);
     });
 
+    test('that deserializing a populated layout removes the watermark', () => {
+        // Regression: fromJSON rebuilds the grid via gridview.deserialize(),
+        // which does not fire the BaseGrid add events the watermark module
+        // reacts to. The watermark mounted while the dockview was empty must
+        // still be removed once the restored layout has visible grid groups,
+        // otherwise it overlays (and blocks interaction with) the whole layout.
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            createComponent(options) {
+                switch (options.name) {
+                    case 'default':
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    default:
+                        throw new Error(`unsupported`);
+                }
+            },
+        });
+
+        // No groups yet → watermark mounted.
+        expect(
+            dockview.element.querySelectorAll('.dv-watermark-container').length
+        ).toBe(1);
+
+        dockview.fromJSON({
+            grid: {
+                orientation: Orientation.HORIZONTAL,
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                activeView: 'panel1',
+                                id: '1',
+                            },
+                            size: 100,
+                        },
+                    ],
+                },
+                height: 100,
+                width: 100,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    contentComponent: 'default',
+                    title: 'panel1',
+                },
+            },
+        });
+
+        expect(dockview.groups.length).toBe(1);
+
+        // Restored layout has a visible grid group → watermark removed.
+        expect(
+            dockview.element.querySelectorAll('.dv-watermark-container').length
+        ).toBe(0);
+    });
+
     test('empty', () => {
         const container = document.createElement('div');
 
