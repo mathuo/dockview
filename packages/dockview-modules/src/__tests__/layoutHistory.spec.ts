@@ -1,19 +1,14 @@
-import { DockviewComponent } from '../../dockview/dockviewComponent';
-import { IContentRenderer } from '../../dockview/types';
-import {
-    LayoutHistoryChangeEvent,
-    LayoutHistoryService,
-    ILayoutHistoryHost,
-} from '../../dockview/layoutHistoryService';
-import { Emitter } from '../../events';
-import {
-    DockviewLayoutMutationEvent,
-    SerializedDockview,
-} from '../../dockview/dockviewComponent';
+import { DockviewComponent } from 'dockview-core';
+import { IContentRenderer } from 'dockview-core';
+import { LayoutHistoryChangeEvent, ILayoutHistoryHost } from 'dockview-core';
+import { LayoutHistoryService } from '../layoutHistoryService';
+import { DockviewEmitter as Emitter } from 'dockview-core';
 import {
     DockviewComponentOptions,
+    DockviewLayoutMutationEvent,
     LayoutHistoryOptions,
-} from '../../dockview/options';
+    SerializedDockview,
+} from 'dockview-core';
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');

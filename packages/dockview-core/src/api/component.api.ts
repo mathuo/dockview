@@ -46,7 +46,7 @@ import {
     IDockviewGroupPanel,
 } from '../dockview/dockviewGroupPanel';
 import { Event } from '../events';
-import { LayoutHistoryChangeEvent } from '../dockview/layoutHistoryService';
+import { LayoutHistoryChangeEvent } from '../dockview/moduleContracts';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 import { PaneviewDidDropEvent } from '../paneview/draggablePaneviewPanel';
 import {

@@ -1,78 +1,25 @@
-import { CompositeDisposable, IDisposable } from '../lifecycle';
-import { Emitter, Event } from '../events';
 import {
+    DockviewCompositeDisposable as CompositeDisposable,
+    DockviewEmitter as Emitter,
+    DockviewEvent as Event,
+} from 'dockview-core';
+import {
+    DockviewComponentOptions,
     DockviewLayoutMutationEvent,
     DockviewLayoutMutationKind,
-    DockviewOrigin,
     SerializedDockview,
-} from './dockviewComponent';
-import { DockviewComponentOptions } from './options';
-import { defineModule } from './modules';
-
-/**
- * The narrow surface {@link LayoutHistoryService} needs from the host
- * (`DockviewComponent`). It reads/writes whole-layout snapshots and listens to
- * the mutation-transaction boundary — the only place a *pre-image* can be taken
- * before a mutation runs.
- */
-export interface ILayoutHistoryHost {
-    readonly options: DockviewComponentOptions;
-    toJSON(): SerializedDockview;
-    fromJSON(
-        data: SerializedDockview,
-        options?: { reuseExistingPanels: boolean }
-    ): void;
-    /** Fires before a structural mutation — used to capture the pre-image. */
-    readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;
-    /** Fires after a structural mutation — used to capture the post-image. */
-    readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent>;
-    /** Coalesced (microtask-buffered) ping after any layout change — the only
-     *  signal for sash resize, which does not go through the mutation boundary. */
-    readonly onDidLayoutChange: Event<void>;
-    /** Settles once any in-flight popout-window restoration (from `fromJSON`)
-     *  completes. Popouts re-open asynchronously, so undo/redo holds its guard
-     *  until this resolves. Already-resolved when nothing is restoring. */
-    readonly popoutRestorationPromise: Promise<void>;
-}
-
-/** Entry labels — the mutation kinds plus the synthetic `'resize'` (sash drag,
- *  which has no mutation-boundary kind of its own). */
-export type LayoutHistoryKind = DockviewLayoutMutationKind | 'resize';
-
-export interface LayoutHistoryChangeEvent {
-    readonly canUndo: boolean;
-    readonly canRedo: boolean;
-    readonly undoCount: number;
-    readonly redoCount: number;
-    readonly lastEntry?: {
-        kind: LayoutHistoryKind;
-        origin: DockviewOrigin;
-    };
-}
-
-/** A never-firing history-change event — the fallback when the module is absent
- *  (so `api.onDidChangeHistory` is always a valid, subscribable event). */
-export const NO_LAYOUT_HISTORY_CHANGES: Event<
-    LayoutHistoryChangeEvent
-> = () => ({
-    dispose: () => {
-        // noop — nothing ever fires
-    },
-});
-
-export interface ILayoutHistoryService extends IDisposable {
-    readonly canUndo: boolean;
-    readonly canRedo: boolean;
-    readonly onDidChangeHistory: Event<LayoutHistoryChangeEvent>;
-    undo(): void;
-    redo(): void;
-    /** Drop both stacks (e.g. on document switch). */
-    clear(): void;
-}
+} from 'dockview-core';
+import { defineModule } from 'dockview-core';
+import {
+    ILayoutHistoryHost,
+    ILayoutHistoryService,
+    LayoutHistoryChangeEvent,
+    LayoutHistoryKind,
+} from 'dockview-core';
 
 interface HistoryEntry {
     readonly kind: LayoutHistoryKind;
-    readonly origin: DockviewOrigin;
+    readonly origin: DockviewLayoutMutationEvent['origin'];
     /** Pre-image — what undo restores. */
     readonly before: SerializedDockview;
     /** Post-image — what redo restores. */
@@ -131,8 +78,9 @@ function resolveOptions(options: DockviewComponentOptions): {
  * step each off the will/did boundary. **Resize** (sash drag) has no boundary —
  * it's caught off the coalesced `onDidLayoutChange` ping, using the last settled
  * snapshot as the pre-image (the "lazy pre-image"), and a continuous drag is
- * debounced into a single entry. A bulk `load`/`clear` clears the stacks.
- * Cross-window async popout re-open is a later phase.
+ * debounced into a single entry. A bulk `load`/`clear` clears the stacks. Undo /
+ * redo restore popout windows, which re-open asynchronously — the guard is held
+ * across that re-open via `popoutRestorationPromise`.
  */
 export class LayoutHistoryService
     extends CompositeDisposable
@@ -376,7 +324,7 @@ export class LayoutHistoryService
     /**
      * Restore a snapshot. `reuseExistingPanels` is mandatory — without it every
      * undo disposes and recreates every renderer (content flash, lost focus).
-     * The re-entrancy flag stops the mutations this fires from re-recording.
+     * The re-entrancy guard stops the mutations this fires from re-recording.
      */
     private _apply(snapshot: SerializedDockview): void {
         this._applyDepth++;

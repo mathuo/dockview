@@ -197,6 +197,10 @@ export {
     IContextMenuHost,
     IContextMenuService,
     IKeyboardDockingService,
+    ILayoutHistoryHost,
+    ILayoutHistoryService,
+    LayoutHistoryChangeEvent,
+    LayoutHistoryKind,
     ITabGroupChipsHost,
     ITabGroupChipsService,
 } from './dockview/moduleContracts';
@@ -204,8 +208,3 @@ export { resolveMessages } from './dockview/accessibilityMessages';
 export { findRelativeZIndexParent } from './dom';
 export { IDragGhostSpec } from './dnd/backend';
 export { LiveRegionModule } from './dockview/liveRegionService';
-export {
-    LayoutHistoryModule,
-    LayoutHistoryChangeEvent,
-    ILayoutHistoryService,
-} from './dockview/layoutHistoryService';

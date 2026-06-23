@@ -141,6 +141,8 @@ IGroupPanelBaseProps
 IGroupPanelInitParameters
 IHeaderActionsRenderer
 IKeyboardDockingService
+ILayoutHistoryHost
+ILayoutHistoryService
 INodeDescriptor
 IPanePart
 IPanel
@@ -167,6 +169,9 @@ IWatermarkPanelProps
 IWatermarkRenderer
 InvisibleSizing
 KeyboardNavigationOptions
+LayoutHistoryChangeEvent
+LayoutHistoryKind
+LayoutHistoryOptions
 LayoutPriority
 LiveRegionEvent
 LiveRegionModule

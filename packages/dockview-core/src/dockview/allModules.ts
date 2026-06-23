@@ -6,7 +6,6 @@ import { EdgeGroupModule } from './edgeGroupService';
 import { RootDropTargetModule } from './rootDropTargetService';
 import { HeaderActionsModule } from './headerActionsService';
 import { LiveRegionModule } from './liveRegionService';
-import { LayoutHistoryModule } from './layoutHistoryService';
 
 /**
  * Internal list of the built-in modules that ship with the core. Registered
@@ -22,5 +21,4 @@ export const AllModules: DockviewModule<any>[] = [
     RootDropTargetModule,
     HeaderActionsModule,
     LiveRegionModule,
-    LayoutHistoryModule,
 ];

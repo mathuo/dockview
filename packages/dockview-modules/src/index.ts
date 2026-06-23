@@ -3,6 +3,7 @@ import { TabGroupChipsModule } from './tabGroupChipsService';
 import { ContextMenuModule } from './contextMenu';
 import { AdvancedDnDModule } from './advancedDnDService';
 import { AccessibilityModule } from './accessibilityService';
+import { LayoutHistoryModule } from './layoutHistoryService';
 
 export {
     TabGroupChipsService,
@@ -14,6 +15,10 @@ export {
     AccessibilityService,
     AccessibilityModule,
 } from './accessibilityService';
+export {
+    LayoutHistoryService,
+    LayoutHistoryModule,
+} from './layoutHistoryService';
 // Advanced keyboard docking is an optional module — exported for explicit
 // registration, but not part of the default `Modules` bundle below.
 export {
@@ -30,4 +35,5 @@ export const Modules: DockviewModule<any>[] = [
     ContextMenuModule,
     AdvancedDnDModule,
     AccessibilityModule,
+    LayoutHistoryModule,
 ];

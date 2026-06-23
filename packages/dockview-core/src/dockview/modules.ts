@@ -17,12 +17,12 @@ import { IEdgeGroupService } from './edgeGroupService';
 import { IRootDropTargetService } from './rootDropTargetService';
 import { IHeaderActionsService } from './headerActionsService';
 import { ILiveRegionService } from './liveRegionService';
-import { ILayoutHistoryService } from './layoutHistoryService';
 import {
     IAccessibilityService,
     IAdvancedDnDService,
     IContextMenuService,
     IKeyboardDockingService,
+    ILayoutHistoryService,
     ITabGroupChipsService,
 } from './moduleContracts';
 

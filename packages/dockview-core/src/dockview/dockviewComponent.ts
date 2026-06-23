@@ -90,6 +90,8 @@ import {
     IAdvancedDnDHost,
     IContextMenuHost,
     IContextMenuService,
+    ILayoutHistoryHost,
+    LayoutHistoryChangeEvent,
     ITabGroupChipsHost,
 } from './moduleContracts';
 import { IHeaderActionsHost } from './headerActionsService';
@@ -108,11 +110,6 @@ import { StrictEventsSequencing } from './strictEventsSequencing';
 import { PopupService } from './components/popupService';
 import { IRootDropTargetHost } from './rootDropTargetService';
 import { ILiveRegionHost } from './liveRegionService';
-import {
-    ILayoutHistoryHost,
-    LayoutHistoryChangeEvent,
-    NO_LAYOUT_HISTORY_CHANGES,
-} from './layoutHistoryService';
 import { IDragGhostSpec } from '../dnd/backend';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import { themeAbyss } from './theme';
@@ -437,6 +434,15 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidChangeHistory: Event<LayoutHistoryChangeEvent>;
     readonly popoutRestorationPromise: Promise<void>;
 }
+
+/** A never-firing history-change event — the fallback `onDidChangeHistory`
+ *  returns when the LayoutHistory module is absent, so the api event is always
+ *  valid and subscribable. */
+const NO_LAYOUT_HISTORY_CHANGES: Event<LayoutHistoryChangeEvent> = () => ({
+    dispose: () => {
+        // noop — nothing ever fires
+    },
+});
 
 let _hasWarnedUsingCoreDirectly = false;
 
