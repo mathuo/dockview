@@ -204,3 +204,8 @@ export { resolveMessages } from './dockview/accessibilityMessages';
 export { findRelativeZIndexParent } from './dom';
 export { IDragGhostSpec } from './dnd/backend';
 export { LiveRegionModule } from './dockview/liveRegionService';
+export {
+    LayoutHistoryModule,
+    LayoutHistoryChangeEvent,
+    ILayoutHistoryService,
+} from './dockview/layoutHistoryService';

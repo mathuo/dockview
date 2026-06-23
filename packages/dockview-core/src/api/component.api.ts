@@ -46,6 +46,7 @@ import {
     IDockviewGroupPanel,
 } from '../dockview/dockviewGroupPanel';
 import { Event } from '../events';
+import { LayoutHistoryChangeEvent } from '../dockview/layoutHistoryService';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 import { PaneviewDidDropEvent } from '../paneview/draggablePaneviewPanel';
 import {
@@ -1018,6 +1019,40 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     clear(): void {
         this.component.withOrigin('api', () => this.component.clear());
+    }
+
+    /**
+     * Undo the previous recorded layout mutation. No-op when there is nothing
+     * to undo, when `layoutHistory.enabled` is not set, or when the
+     * LayoutHistory module is absent.
+     */
+    undo(): void {
+        this.component.undo();
+    }
+
+    /** Re-apply the next layout mutation undone via {@link undo}. */
+    redo(): void {
+        this.component.redo();
+    }
+
+    /** Whether {@link undo} would do something. Reactive via {@link onDidChangeHistory}. */
+    get canUndo(): boolean {
+        return this.component.canUndo;
+    }
+
+    /** Whether {@link redo} would do something. */
+    get canRedo(): boolean {
+        return this.component.canRedo;
+    }
+
+    /** Drop both undo and redo stacks (e.g. on document switch). */
+    clearHistory(): void {
+        this.component.clearHistory();
+    }
+
+    /** Fires whenever the undo/redo stacks change. */
+    get onDidChangeHistory(): Event<LayoutHistoryChangeEvent> {
+        return this.component.onDidChangeHistory;
     }
 
     /**

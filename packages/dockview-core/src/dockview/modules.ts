@@ -17,6 +17,7 @@ import { IEdgeGroupService } from './edgeGroupService';
 import { IRootDropTargetService } from './rootDropTargetService';
 import { IHeaderActionsService } from './headerActionsService';
 import { ILiveRegionService } from './liveRegionService';
+import { ILayoutHistoryService } from './layoutHistoryService';
 import {
     IAccessibilityService,
     IAdvancedDnDService,
@@ -38,6 +39,7 @@ export interface ServiceCollection {
     liveRegionService?: ILiveRegionService;
     accessibilityService?: IAccessibilityService;
     keyboardDockingService?: IKeyboardDockingService;
+    layoutHistoryService?: ILayoutHistoryService;
 }
 
 export interface DockviewModule<THost = unknown> {
