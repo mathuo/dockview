@@ -1,12 +1,10 @@
-import {
-    DockviewCompositeDisposable as CompositeDisposable,
-    DockviewIDisposable as IDisposable,
-} from 'dockview-core';
+import { DockviewCompositeDisposable as CompositeDisposable } from 'dockview-core';
 import { DockviewGroupPanel } from 'dockview-core';
 import { DockviewKeybindings, KeyboardNavigationOptions } from 'dockview-core';
 import { defineModule } from 'dockview-core';
 import { IAccessibilityHost, IAccessibilityService } from 'dockview-core';
 import {
+    bindDocumentListeners,
     KEYBOARD_MOVE_ATTRIBUTE,
     matchesBinding,
     readKeyboardNavigation,
@@ -55,43 +53,36 @@ export class AccessibilityService
         // Listen on the document (capture) rather than the dockview element:
         // edge groups live in the shell *outside* the gridview, and the shell
         // is created after this service, so a fixed element would miss them.
-        const doc = host.rootElement.ownerDocument;
-        const onKeyDown = (e: KeyboardEvent): void => this._onKeyDown(e);
-        doc.addEventListener('keydown', onKeyDown, true);
+        // Mirrored onto each popout document too (a separate `document`), so the
+        // keys, focus tracking and Esc-from-float work inside a popped-out window.
+        const onKeyDown = (e: Event): void =>
+            this._onKeyDown(e as KeyboardEvent);
 
-        // Remember the last control focused in the main dock (outside any
+        // Remember the last control focused anywhere in this dock (outside any
         // float) so Esc inside a floating group can return focus to its
         // invoking control. Observe-only — never consumes.
-        const onFocusIn = (e: FocusEvent): void => {
-            const t = e.target;
+        const onFocusIn = (e: Event): void => {
+            const t = (e as FocusEvent).target;
             if (
                 t instanceof HTMLElement &&
-                this.host.rootElement.contains(t) &&
+                this.host.ownsElement(t) &&
                 !t.closest('[role="dialog"]')
             ) {
                 this._lastNonFloatFocus = t;
             }
         };
-        doc.addEventListener('focusin', onFocusIn, true);
 
         // Esc-from-float restore runs in the BUBBLE phase and respects
         // defaultPrevented, so panel content that uses Esc keeps priority.
-        const onEscape = (e: KeyboardEvent): void => this._onFloatingEscape(e);
-        doc.addEventListener('keydown', onEscape, false);
+        const onEscape = (e: Event): void =>
+            this._onFloatingEscape(e as KeyboardEvent);
 
         this.addDisposables(
-            {
-                dispose: () =>
-                    doc.removeEventListener('keydown', onKeyDown, true),
-            },
-            {
-                dispose: () =>
-                    doc.removeEventListener('focusin', onFocusIn, true),
-            },
-            {
-                dispose: () =>
-                    doc.removeEventListener('keydown', onEscape, false),
-            },
+            bindDocumentListeners(host, [
+                { type: 'keydown', handler: onKeyDown, capture: true },
+                { type: 'focusin', handler: onFocusIn, capture: true },
+                { type: 'keydown', handler: onEscape, capture: false },
+            ]),
             // When a structural change pulls focus out of the dock, return it to
             // the neighbour the component just activated rather than leaving it
             // stranded on <body>. Snapshot before the change (focus still on the
@@ -130,9 +121,29 @@ export class AccessibilityService
         return e.kind === 'remove' || e.kind === 'maximize';
     }
 
+    /**
+     * The element that actually has focus, across windows — the `activeElement`
+     * of whichever document currently holds focus (a popout, else the main
+     * document). Each document tracks its own `activeElement` even when blurred,
+     * so we must pick the focused one rather than trust the main document.
+     */
+    private _activeElement(): Element | null {
+        const mainDoc = this.host.rootElement.ownerDocument;
+        for (const win of this.host.getPopoutWindows()) {
+            try {
+                if (win.document !== mainDoc && win.document.hasFocus()) {
+                    return win.document.activeElement;
+                }
+            } catch {
+                // A closing / cross-origin window can throw on access — ignore.
+            }
+        }
+        return mainDoc.activeElement;
+    }
+
     private _isFocusInside(): boolean {
-        const active = this.host.rootElement.ownerDocument.activeElement;
-        return active instanceof Node && this.host.rootElement.contains(active);
+        const active = this._activeElement();
+        return active instanceof Node && this.host.ownsElement(active);
     }
 
     private _onFloatingEscape(e: KeyboardEvent): void {
@@ -148,9 +159,10 @@ export class AccessibilityService
         if (!(target instanceof Element)) {
             return;
         }
-        // Only when focus is inside one of *this* dock's floating groups.
+        // Only when focus is inside one of *this* dock's floating groups
+        // (in any window).
         const float = target.closest('[role="dialog"]');
-        if (!float || !this.host.rootElement.contains(float)) {
+        if (!float || !this.host.ownsElement(float)) {
             return;
         }
         e.preventDefault();
@@ -169,7 +181,7 @@ export class AccessibilityService
             return false;
         }
         const float = target.closest('[role="dialog"]');
-        if (!float || !this.host.rootElement.contains(float)) {
+        if (!float || !this.host.ownsElement(float)) {
             return false;
         }
         // Always manage Tab inside a float, never just at the boundary: focus
@@ -212,7 +224,7 @@ export class AccessibilityService
         if (
             prev &&
             prev.isConnected &&
-            this.host.rootElement.contains(prev) &&
+            this.host.ownsElement(prev) &&
             !prev.closest('[role="dialog"]')
         ) {
             prev.focus();
@@ -240,11 +252,8 @@ export class AccessibilityService
         if (this._moveActive) {
             return;
         }
-        // Only act on events originating inside *this* dockview.
-        if (
-            !(e.target instanceof Node) ||
-            !this.host.rootElement.contains(e.target)
-        ) {
+        // Only act on events originating inside *this* dockview (any window).
+        if (!(e.target instanceof Node) || !this.host.ownsElement(e.target)) {
             return;
         }
         // Trap Tab within a floating group so focus doesn't leak to the grid

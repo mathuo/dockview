@@ -255,6 +255,22 @@ describe('LiveRegion announcer', () => {
         expect(region().textContent).toBe('P2 opened in a new window');
     });
 
+    test('a popout sharing the document does not get a duplicate region', async () => {
+        window.open = () => setupMockWindow();
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        const p2 = dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            title: 'P2',
+        });
+        await dockview.addPopoutGroup(p2);
+        // The mock popout reuses the main document, so per-window mounting is
+        // skipped — there is still exactly one polite region and announcements
+        // stay on it. (Real cross-document behaviour is covered by the e2e.)
+        expect(container.querySelectorAll('.dv-live-region')).toHaveLength(1);
+        expect(region().textContent).toBe('P2 opened in a new window');
+    });
+
     test('the messages catalog localises announcement strings', () => {
         dockview.dispose();
         container = document.createElement('div');
