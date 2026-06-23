@@ -435,6 +435,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly canRedo: boolean;
     clearHistory(): void;
     readonly onDidChangeHistory: Event<LayoutHistoryChangeEvent>;
+    readonly popoutRestorationPromise: Promise<void>;
 }
 
 let _hasWarnedUsingCoreDirectly = false;

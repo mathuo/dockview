@@ -29,6 +29,10 @@ export interface ILayoutHistoryHost {
     /** Coalesced (microtask-buffered) ping after any layout change — the only
      *  signal for sash resize, which does not go through the mutation boundary. */
     readonly onDidLayoutChange: Event<void>;
+    /** Settles once any in-flight popout-window restoration (from `fromJSON`)
+     *  completes. Popouts re-open asynchronously, so undo/redo holds its guard
+     *  until this resolves. Already-resolved when nothing is restoring. */
+    readonly popoutRestorationPromise: Promise<void>;
 }
 
 /** Entry labels — the mutation kinds plus the synthetic `'resize'` (sash drag,
@@ -139,9 +143,14 @@ export class LayoutHistoryService
     private readonly _redo: HistoryEntry[] = [];
     /** Pre-image captured on `onWillMutateLayout`, consumed on `onDidMutateLayout`. */
     private _pendingBefore: SerializedDockview | undefined;
-    /** True while an undo/redo apply is running, so the recorder ignores the
-     *  mutation events the apply itself fires (re-entrancy). */
-    private _applying = false;
+    /** >0 while an undo/redo apply is in flight (counter, not a boolean, so an
+     *  apply that starts before a previous one's async popout restoration has
+     *  settled still keeps the guard up). The recorder ignores all boundary /
+     *  layout events while it's active (re-entrancy). */
+    private _applyDepth = 0;
+    private get _applying(): boolean {
+        return this._applyDepth > 0;
+    }
 
     // --- resize coalescing (off the post-only onDidLayoutChange ping) ---
     /** The last settled snapshot — the pre-image for the next resize run. */
@@ -370,16 +379,33 @@ export class LayoutHistoryService
      * The re-entrancy flag stops the mutations this fires from re-recording.
      */
     private _apply(snapshot: SerializedDockview): void {
-        this._applying = true;
+        this._applyDepth++;
+        const release = (): void => {
+            this._applyDepth = Math.max(0, this._applyDepth - 1);
+        };
+        let restoresPopout: boolean;
         try {
             this._host.fromJSON(snapshot, { reuseExistingPanels: true });
-        } finally {
-            this._applying = false;
+            // The applied layout is the new resting state; its trailing layout
+            // ping is a settle, not a resize.
+            this._baseline = snapshot;
+            this._mutationSettlePending = true;
+            restoresPopout = (snapshot.popoutGroups?.length ?? 0) > 0;
+        } catch (e) {
+            release();
+            throw e;
         }
-        // The applied layout is the new resting state; its trailing layout ping
-        // is a settle, not a resize.
-        this._baseline = snapshot;
-        this._mutationSettlePending = true;
+        if (restoresPopout) {
+            // Floating groups restore synchronously, but popout WINDOWS re-open
+            // asynchronously and re-fire the mutation boundary on the root once
+            // their window loads — hold the guard until that settles, or the
+            // re-open records a spurious entry.
+            this._host.popoutRestorationPromise.then(release, release);
+        } else {
+            // Common case: nothing async, release now so a user mutation made
+            // right after undo/redo is still recorded.
+            release();
+        }
     }
 
     clear(): void {

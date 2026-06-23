@@ -264,6 +264,7 @@ describe('LayoutHistory resize coalescing', () => {
             onWillMutateLayout: will.event,
             onDidMutateLayout: did.event,
             onDidLayoutChange: layout.event,
+            popoutRestorationPromise: Promise.resolve(),
             setOptions(o: LayoutHistoryOptions): void {
                 opts = o;
             },

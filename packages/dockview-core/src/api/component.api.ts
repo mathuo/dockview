@@ -1056,6 +1056,16 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     /**
+     * Resolves once any in-flight popout-window restoration completes. Popout
+     * windows re-open asynchronously, so after an {@link undo} / {@link redo} (or
+     * {@link fromJSON}) that re-opens a popout, await this to know the window is
+     * ready. Already-resolved when nothing is restoring.
+     */
+    get popoutRestorationPromise(): Promise<void> {
+        return this.component.popoutRestorationPromise;
+    }
+
+    /**
      * Move the focus progmatically to the next panel or group.
      */
     moveToNext(options?: MovementOptions): void {
