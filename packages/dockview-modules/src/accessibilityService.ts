@@ -83,18 +83,25 @@ export class AccessibilityService
                 { type: 'focusin', handler: onFocusIn, capture: true },
                 { type: 'keydown', handler: onEscape, capture: false },
             ]),
-            // When a close pulls focus out of the dock, return it to the
-            // neighbour the component just activated rather than leaving it
-            // stranded on <body>. Snapshot before the teardown (focus still on
-            // the closing panel), restore after.
+            // When a structural change pulls focus out of the dock, return it to
+            // the neighbour the component just activated rather than leaving it
+            // stranded on <body>. Snapshot before the change (focus still on the
+            // affected panel), restore after.
+            //
+            // - `remove`: closing the focused panel/group.
+            // - `maximize`: maximizing a *different* group hides the focused
+            //   one, blurring it to <body>. (Maximizing the focused group keeps
+            //   its DOM in place, so focus stays inside and we no-op — which is
+            //   exactly what the was-inside / not-inside guard checks, so we
+            //   never steal focus from a mouse user who maximized in place.)
             host.onWillMutateLayout((e) => {
-                if (e.kind === 'remove' && this._nav) {
+                if (this._restoresFocus(e) && this._nav) {
                     this._focusWasInside = this._isFocusInside();
                 }
             }),
             host.onDidMutateLayout((e) => {
                 if (
-                    e.kind === 'remove' &&
+                    this._restoresFocus(e) &&
                     this._nav &&
                     this._focusWasInside &&
                     !this._isFocusInside()
@@ -107,6 +114,11 @@ export class AccessibilityService
 
     private get _moveActive(): boolean {
         return this.host.rootElement.hasAttribute(KEYBOARD_MOVE_ATTRIBUTE);
+    }
+
+    /** Mutations that can strand focus on `<body>` and so warrant a restore. */
+    private _restoresFocus(e: { kind: string }): boolean {
+        return e.kind === 'remove' || e.kind === 'maximize';
     }
 
     /**
