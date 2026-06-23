@@ -71,6 +71,25 @@ describe('EdgeGroupView', () => {
             expect(group.element.dataset.testid).toBe('dv-edge-group-my-panel');
         });
 
+        test('isPinned is true by default', () => {
+            const group = makeGroup();
+            const view = new EdgeGroupView({ id: 'test' }, group, 'horizontal');
+            expect(view.isPinned).toBe(true);
+        });
+
+        test('isPinned is false when pinned option is false', () => {
+            const group = makeGroup();
+            const view = new EdgeGroupView(
+                { id: 'test', pinned: false },
+                group,
+                'horizontal'
+            );
+            expect(view.isPinned).toBe(false);
+            expect(group.element.classList.contains('dv-edge-unpinned')).toBe(
+                true
+            );
+        });
+
         test('isCollapsed is true when collapsed option is true', () => {
             const group = makeGroup();
             const view = new EdgeGroupView(
@@ -459,6 +478,22 @@ describe('ShellManager', () => {
             expect(shell.isEdgeGroupVisible('bottom')).toBe(false);
             shell.dispose();
         });
+
+        test('restores pinned=false from serialized state', () => {
+            const shell = makeShell({ left: { id: 'left' } });
+            shell.fromJSON({
+                left: { size: 200, visible: true, pinned: false },
+            });
+            expect(shell.isEdgeGroupPinned('left')).toBe(false);
+            shell.dispose();
+        });
+
+        test('pinned defaults to true when absent from serialized state', () => {
+            const shell = makeShell({ left: { id: 'left' } });
+            shell.fromJSON({ left: { size: 200, visible: true } });
+            expect(shell.isEdgeGroupPinned('left')).toBe(true);
+            shell.dispose();
+        });
     });
 
     describe('defaultCollapsedSize', () => {
@@ -583,6 +618,242 @@ describe('ShellManager', () => {
             expect(container.contains(shell.element)).toBe(true);
             shell.dispose();
             expect(container.contains(shell.element)).toBe(false);
+        });
+    });
+
+    describe('unpinned overlay behaviour', () => {
+        test('expanding an unpinned group creates an overlay element', () => {
+            const shell = makeShell({ left: { id: 'left', collapsed: true } });
+            shell.setEdgeGroupPinned('left', false);
+
+            shell.setEdgeGroupCollapsed('left', false);
+
+            expect((shell as any)._overlayElement).not.toBeNull();
+            expect((shell as any)._overlayPosition).toBe('left');
+            shell.dispose();
+        });
+
+        test('collapsing an unpinned group hides the overlay', () => {
+            const shell = makeShell({ left: { id: 'left', collapsed: true } });
+            shell.setEdgeGroupPinned('left', false);
+            shell.setEdgeGroupCollapsed('left', false);
+
+            shell.setEdgeGroupCollapsed('left', true);
+
+            expect((shell as any)._overlayElement).toBeNull();
+            expect((shell as any)._overlayPosition).toBeNull();
+            shell.dispose();
+        });
+
+        test('switching to unpinned collapses an expanded group in the splitview', () => {
+            const shell = makeShell({ left: { id: 'left' } });
+            expect(shell.isEdgeGroupCollapsed('left')).toBe(false);
+
+            shell.setEdgeGroupPinned('left', false);
+
+            expect(shell.isEdgeGroupCollapsed('left')).toBe(true);
+            shell.dispose();
+        });
+
+        test('switching unpinned→pinned while overlay is open closes overlay and expands in layout', () => {
+            const shell = makeShell({ left: { id: 'left', collapsed: true } });
+            shell.setEdgeGroupPinned('left', false);
+            shell.setEdgeGroupCollapsed('left', false); // open overlay
+
+            shell.setEdgeGroupPinned('left', true); // restore pin
+
+            expect((shell as any)._overlayElement).toBeNull();
+            expect(shell.isEdgeGroupCollapsed('left')).toBe(false);
+            shell.dispose();
+        });
+
+        test('overlay is cleaned up on shell dispose', () => {
+            const shell = makeShell({ left: { id: 'left', collapsed: true } });
+            shell.setEdgeGroupPinned('left', false);
+            shell.setEdgeGroupCollapsed('left', false);
+            expect((shell as any)._overlayElement).not.toBeNull();
+
+            shell.dispose();
+            // No throw and overlay reference cleared
+            expect((shell as any)._overlayElement).toBeNull();
+        });
+
+        test('pinned group expand/collapse still goes through splitview (not overlay)', () => {
+            const shell = makeShell({ left: { id: 'left', collapsed: true } });
+            // pinned by default
+            shell.setEdgeGroupCollapsed('left', false);
+
+            expect((shell as any)._overlayElement).toBeNull();
+            expect(shell.isEdgeGroupCollapsed('left')).toBe(false);
+            shell.dispose();
+        });
+
+        test('group element is moved into overlay div and a placeholder is inserted in its slot', () => {
+            const shell = makeShell({ left: { id: 'left', collapsed: true } });
+            shell.setEdgeGroupPinned('left', false);
+            const leftView = (shell as any)._leftView as EdgeGroupView;
+            const groupEl = leftView.element;
+            // Before opening: group element is inside the dv-view slot
+            const slotBefore = groupEl.parentElement;
+            expect(slotBefore).not.toBeNull();
+
+            shell.setEdgeGroupCollapsed('left', false);
+
+            const overlay: HTMLElement = (shell as any)._overlayElement;
+            // Group element is now inside the overlay div
+            expect(overlay.contains(groupEl)).toBe(true);
+            // A transparent placeholder sits in the original slot
+            const placeholder: HTMLElement = (shell as any)._overlayPlaceholder;
+            expect(placeholder).not.toBeNull();
+            expect(slotBefore!.contains(placeholder)).toBe(true);
+            shell.dispose();
+        });
+
+        test('group element is restored to its original slot and placeholder removed on hide', () => {
+            const shell = makeShell({ left: { id: 'left', collapsed: true } });
+            shell.setEdgeGroupPinned('left', false);
+            const leftView = (shell as any)._leftView as EdgeGroupView;
+            const groupEl = leftView.element;
+            const slotBefore = groupEl.parentElement;
+
+            shell.setEdgeGroupCollapsed('left', false);
+            const placeholder: HTMLElement = (shell as any)._overlayPlaceholder;
+
+            shell.setEdgeGroupCollapsed('left', true); // hide overlay
+
+            // Placeholder removed from DOM
+            expect(placeholder.parentElement).toBeNull();
+            // Group element is back in the original slot
+            expect(slotBefore!.contains(groupEl)).toBe(true);
+            expect((shell as any)._overlayPlaceholder).toBeNull();
+            shell.dispose();
+        });
+
+        test('switching unpinned→pinned while overlay already auto-dismissed still expands in layout', () => {
+            const shell = makeShell({ left: { id: 'left', collapsed: true } });
+            shell.setEdgeGroupPinned('left', false);
+            shell.setEdgeGroupCollapsed('left', false); // open overlay
+
+            // Simulate auto-dismiss (e.g. pointerdown outside) before setPinned runs
+            shell.setEdgeGroupCollapsed('left', true); // overlay closed, group back collapsed
+            expect((shell as any)._overlayElement).toBeNull();
+
+            // Now pin — should expand even though overlay was already dismissed
+            shell.setEdgeGroupPinned('left', true);
+
+            expect(shell.isEdgeGroupCollapsed('left')).toBe(false);
+            expect((shell as any)._overlayElement).toBeNull();
+            shell.dispose();
+        });
+
+        test('dv-edge-overlay-visible class is added on show and removed on hide', () => {
+            const shell = makeShell({ left: { id: 'left', collapsed: true } });
+            shell.setEdgeGroupPinned('left', false);
+            const leftView = (shell as any)._leftView as EdgeGroupView;
+            const groupEl = leftView.element;
+
+            shell.setEdgeGroupCollapsed('left', false);
+            expect(groupEl.classList.contains('dv-edge-overlay-visible')).toBe(
+                true
+            );
+
+            shell.setEdgeGroupCollapsed('left', true);
+            expect(groupEl.classList.contains('dv-edge-overlay-visible')).toBe(
+                false
+            );
+            shell.dispose();
+        });
+
+        test('opening a second overlay dismisses the first', () => {
+            const shell = makeShell({
+                left: { id: 'left', collapsed: true },
+                right: { id: 'right', collapsed: true },
+            });
+            shell.setEdgeGroupPinned('left', false);
+            shell.setEdgeGroupPinned('right', false);
+
+            shell.setEdgeGroupCollapsed('left', false);
+            expect((shell as any)._overlayPosition).toBe('left');
+
+            shell.setEdgeGroupCollapsed('right', false);
+            expect((shell as any)._overlayPosition).toBe('right');
+            // Left overlay must be gone
+            const leftView = (shell as any)._leftView as EdgeGroupView;
+            expect(
+                leftView.element.classList.contains('dv-edge-overlay-visible')
+            ).toBe(false);
+            shell.dispose();
+        });
+    });
+
+    describe('setEdgeGroupPinned / isEdgeGroupPinned', () => {
+        test('pinned is true by default', () => {
+            const shell = makeShell({ left: { id: 'left' } });
+            expect(shell.isEdgeGroupPinned('left')).toBe(true);
+            shell.dispose();
+        });
+
+        test('pinned can be set to false', () => {
+            const shell = makeShell({ left: { id: 'left' } });
+            shell.setEdgeGroupPinned('left', false);
+            expect(shell.isEdgeGroupPinned('left')).toBe(false);
+            shell.dispose();
+        });
+
+        test('pinned can be toggled back to true', () => {
+            const shell = makeShell({ left: { id: 'left' } });
+            shell.setEdgeGroupPinned('left', false);
+            shell.setEdgeGroupPinned('left', true);
+            expect(shell.isEdgeGroupPinned('left')).toBe(true);
+            shell.dispose();
+        });
+
+        test('pinned=false adds dv-edge-unpinned CSS class', () => {
+            const shell = makeShell({ left: { id: 'left' } });
+            const leftView = (shell as any)._leftView as EdgeGroupView;
+            shell.setEdgeGroupPinned('left', false);
+            expect(
+                leftView.element.classList.contains('dv-edge-unpinned')
+            ).toBe(true);
+            shell.dispose();
+        });
+
+        test('pinned=true removes dv-edge-unpinned CSS class', () => {
+            const shell = makeShell({ left: { id: 'left' } });
+            const leftView = (shell as any)._leftView as EdgeGroupView;
+            shell.setEdgeGroupPinned('left', false);
+            shell.setEdgeGroupPinned('left', true);
+            expect(
+                leftView.element.classList.contains('dv-edge-unpinned')
+            ).toBe(false);
+            shell.dispose();
+        });
+
+        test('unconfigured position returns true (default) and does not throw', () => {
+            const shell = makeShell({});
+            expect(shell.isEdgeGroupPinned('left')).toBe(true);
+            expect(() => shell.setEdgeGroupPinned('left', false)).not.toThrow();
+            shell.dispose();
+        });
+
+        test('pinned option false initialises unpinned', () => {
+            const shell = makeShell({ right: { id: 'right', pinned: false } });
+            expect(shell.isEdgeGroupPinned('right')).toBe(false);
+            shell.dispose();
+        });
+
+        test('works for all four positions', () => {
+            const shell = makeShell({
+                top: { id: 'top' },
+                bottom: { id: 'bottom' },
+                left: { id: 'left' },
+                right: { id: 'right' },
+            });
+            for (const pos of ['top', 'bottom', 'left', 'right'] as const) {
+                shell.setEdgeGroupPinned(pos, false);
+                expect(shell.isEdgeGroupPinned(pos)).toBe(false);
+            }
+            shell.dispose();
         });
     });
 

@@ -27,7 +27,26 @@
         flex-direction: row-reverse;
     }
 
+    // Edge groups: clip content so that height:100% inside panel content
+    // resolves against the content container, not the group or overlay element.
+    // Without this, panel content overflows the content area into the tab strip
+    // and steals pointer events, making tabs and buttons unclickable.
+    &.dv-groupview-edge > .dv-content-container {
+        overflow: hidden;
+    }
+
     &.dv-groupview-edge.dv-edge-collapsed > .dv-content-container {
         display: none;
+    }
+
+    // Unpinned groups: content is hidden in the layout slot (only tab strip shows)
+    &.dv-groupview-edge.dv-edge-unpinned > .dv-content-container {
+        display: none;
+    }
+
+    // When the overlay is visible, show content inside the overlay div.
+    // Override both dv-edge-collapsed and dv-edge-unpinned hide rules.
+    &.dv-groupview-edge.dv-edge-overlay-visible > .dv-content-container {
+        display: flex;
     }
 }
