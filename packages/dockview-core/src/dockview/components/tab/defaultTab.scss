@@ -27,8 +27,11 @@
 .dv-tab {
     flex-shrink: 0;
 
-    &:focus-within,
-    &:focus {
+    // Keyboard-only focus ring: :focus-visible suppresses it on mouse click,
+    // :has(:focus-visible) keeps it when a child (e.g. the close button) is
+    // keyboard-focused — the descendant case the old :focus-within covered.
+    &:focus-visible,
+    &:has(:focus-visible) {
         position: relative;
 
         &::after {
