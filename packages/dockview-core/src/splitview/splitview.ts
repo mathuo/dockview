@@ -439,7 +439,10 @@ export class Splitview {
                     item.enabled = false;
                 }
 
-                const iframes = disableIframePointEvents();
+                // The sash may live in a popout document; bind the drag to that
+                // document so pointermove/up are heard there, not on the opener.
+                const doc = sash.ownerDocument ?? document;
+                const iframes = disableIframePointEvents(doc);
 
                 const start =
                     this._orientation === Orientation.HORIZONTAL
@@ -552,18 +555,18 @@ export class Splitview {
 
                     this.saveProportions();
 
-                    document.removeEventListener('pointermove', onPointerMove);
-                    document.removeEventListener('pointerup', end);
-                    document.removeEventListener('pointercancel', end);
-                    document.removeEventListener('contextmenu', end);
+                    doc.removeEventListener('pointermove', onPointerMove);
+                    doc.removeEventListener('pointerup', end);
+                    doc.removeEventListener('pointercancel', end);
+                    doc.removeEventListener('contextmenu', end);
 
                     this._onDidSashEnd.fire(undefined);
                 };
 
-                document.addEventListener('pointermove', onPointerMove);
-                document.addEventListener('pointerup', end);
-                document.addEventListener('pointercancel', end);
-                document.addEventListener('contextmenu', end);
+                doc.addEventListener('pointermove', onPointerMove);
+                doc.addEventListener('pointerup', end);
+                doc.addEventListener('pointercancel', end);
+                doc.addEventListener('contextmenu', end);
             };
 
             sash.addEventListener('pointerdown', onPointerStart);

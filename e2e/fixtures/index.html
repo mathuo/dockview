@@ -72,6 +72,21 @@
                             component: 'default',
                             title: id,
                         }),
+                    // Create a new panel and move it to the right of the
+                    // popped-out group — the move lands in the popout's own
+                    // gridview, producing a second group (and so a sash) there.
+                    splitIntoPopout: (id) => {
+                        const popoutGroup = dockview.getPopouts()[0].group;
+                        const panel = dockview.addPanel({
+                            id,
+                            component: 'default',
+                            title: id,
+                        });
+                        panel.api.moveTo({
+                            group: popoutGroup,
+                            position: 'right',
+                        });
+                    },
                     popoutActiveGroup: () =>
                         dockview.addPopoutGroup(dockview.activeGroup),
                     groupCount: () => dockview.groups.length,

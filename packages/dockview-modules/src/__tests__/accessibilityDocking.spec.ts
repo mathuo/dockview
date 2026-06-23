@@ -659,6 +659,41 @@ describe('accessibility: focus across maximize', () => {
         expect(group.api.isMaximized()).toBe(false);
         expect(container.contains(document.activeElement)).toBe(true);
     });
+
+    test('maximizing a different group restores focus into the maximized group', () => {
+        make();
+        dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
+        dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            title: 'P2',
+            position: { direction: 'right' },
+        });
+        const [g1, g2] = dockview.groups;
+
+        // Focus lives in g1; we maximize the *other* group (g2), which hides g1.
+        (g1.element.querySelector('.dv-tab') as HTMLElement).focus();
+        expect(container.contains(document.activeElement)).toBe(true);
+
+        // jsdom doesn't blur a hidden element (the whole reason this case slips
+        // through in unit-land), so emulate the real browser dropping focus to
+        // <body> when g1 is hidden — during the will phase, after the service
+        // has already snapshotted that focus was inside the dock.
+        const sub = dockview.onWillMutateLayout((e) => {
+            if (e.kind === 'maximize') {
+                (document.activeElement as HTMLElement | null)?.blur();
+            }
+        });
+        // setActive (which maximize calls) does not move DOM focus, so a call to
+        // the maximized group's focusContent can only come from the restore.
+        const spy = jest.spyOn(g2.model, 'focusContent');
+
+        g2.api.maximize();
+        sub.dispose();
+
+        expect(g2.api.isMaximized()).toBe(true);
+        expect(spy).toHaveBeenCalled();
+    });
 });
 
 /**
