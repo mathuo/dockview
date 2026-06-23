@@ -553,6 +553,12 @@ export class DockviewComponent
     readonly onDidRemovePopoutGroup: Event<PopoutGroup> =
         this._onDidRemovePopoutGroup.event;
 
+    private readonly _onDidChangePopouts = new Emitter<void>();
+    /** Fires whenever a popout window opens or closes — i.e. the set of popout
+     *  documents changed. Used by accessibility services that mirror per-window
+     *  state (e.g. a live region in each popout). */
+    readonly onDidChangePopouts: Event<void> = this._onDidChangePopouts.event;
+
     private readonly _onDidOpenPopoutWindowFail = new Emitter<void>();
     readonly onDidOpenPopoutWindowFail: Event<void> =
         this._onDidOpenPopoutWindowFail.event;
@@ -829,6 +835,26 @@ export class DockviewComponent
     }
 
     /**
+     * Does this dock own `node`, in any of its windows? True when the node is
+     * inside the main shell, or inside one of this component's popout documents.
+     * A popout window hosts only this component's content, so whole-document
+     * membership is sufficient there; the main document may hold sibling docks,
+     * so it must be a containment check. A same-document popout (the jsdom mock)
+     * is already covered by the main check and contributes nothing.
+     */
+    ownsElement(node: Node): boolean {
+        if (this.rootElement.contains(node)) {
+            return true;
+        }
+        const mainDoc = this.rootElement.ownerDocument;
+        const doc = node.ownerDocument;
+        if (!doc || doc === mainDoc) {
+            return false;
+        }
+        return this.getPopoutWindows().some((win) => win.document === doc);
+    }
+
+    /**
      * The next / previous group in gridview (spatial) order, wrapping round.
      * The keyboard accessibility module's focus navigation is built on this
      * primitive — the only piece that needs the grid internals; the rest of
@@ -1094,6 +1120,15 @@ export class DockviewComponent
             this._onDidPopoutGroupPositionChange,
             this._onDidAddPopoutGroup,
             this._onDidRemovePopoutGroup,
+            this._onDidChangePopouts,
+            // Coalesce popout add/remove into a single "the popout set changed"
+            // signal for per-window accessibility state.
+            this._onDidAddPopoutGroup.event(() =>
+                this._onDidChangePopouts.fire()
+            ),
+            this._onDidRemovePopoutGroup.event(() =>
+                this._onDidChangePopouts.fire()
+            ),
             this._onDidOpenPopoutWindowFail,
             this._onDidCreateTabGroup,
             this._onDidDestroyTabGroup,
@@ -1297,6 +1332,12 @@ export class DockviewComponent
                 window: entry.getWindow(),
             })) ?? []
         );
+    }
+
+    /** The live popout `Window` handles — one per open popout group. The
+     *  narrow surface accessibility services need to mirror per-window state. */
+    getPopoutWindows(): Window[] {
+        return this.getPopouts().map((popout) => popout.window);
     }
 
     private _doAddPopoutGroup(

@@ -97,6 +97,20 @@ export interface IAccessibilityHost {
     readonly activeGroup: DockviewGroupPanel | undefined;
     readonly activePanel: IDockviewPanel | undefined;
     /**
+     * Live popout `Window` handles + a signal when that set changes. Keyboard
+     * services attach their document listeners to each popout document too, so
+     * the keys work *inside* a popped-out window (a separate `document`).
+     */
+    getPopoutWindows(): Window[];
+    readonly onDidChangePopouts: Event<void>;
+    /**
+     * Does this dock own `node`, in *any* of its windows? True when the node is
+     * inside the main shell, or inside one of this component's popout documents.
+     * Replaces a single-document `rootElement.contains` so keyboard handling and
+     * focus gating recognise events/elements that live in a popout window.
+     */
+    ownsElement(node: Node): boolean;
+    /**
      * The next / previous group in gridview (spatial) order, wrapping round —
      * the one piece of navigation that needs the grid internals. All other
      * focus logic lives in the service, using the public group API.

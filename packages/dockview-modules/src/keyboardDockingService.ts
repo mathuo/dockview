@@ -11,6 +11,7 @@ import { AdvancedDnDModule } from './advancedDnDService';
 import { LiveRegionModule } from 'dockview-core';
 import { IAccessibilityHost, IKeyboardDockingService } from 'dockview-core';
 import {
+    bindDocumentListeners,
     KEYBOARD_MOVE_ATTRIBUTE,
     matchesBinding,
     readKeyboardNavigation,
@@ -88,17 +89,17 @@ export class KeyboardDockingService
         super();
 
         // Capture phase, on the document — matches the navigation listener so
-        // edge groups (outside the gridview) are covered.
-        const doc = host.rootElement.ownerDocument;
-        const onKeyDown = (e: KeyboardEvent): void => this._onKeyDown(e);
-        doc.addEventListener('keydown', onKeyDown, true);
+        // edge groups (outside the gridview) are covered. Mirrored onto each
+        // popout document so docking can be driven from inside a popped-out
+        // window (a separate `document`).
+        const onKeyDown = (e: Event): void =>
+            this._onKeyDown(e as KeyboardEvent);
 
         this.addDisposables(
             { dispose: () => this._exit() },
-            {
-                dispose: () =>
-                    doc.removeEventListener('keydown', onKeyDown, true),
-            }
+            bindDocumentListeners(host, [
+                { type: 'keydown', handler: onKeyDown, capture: true },
+            ])
         );
     }
 
@@ -137,11 +138,8 @@ export class KeyboardDockingService
             this._onMoveKey(e);
             return;
         }
-        // Only act on events originating inside *this* dockview.
-        if (
-            !(e.target instanceof Node) ||
-            !this.host.rootElement.contains(e.target)
-        ) {
+        // Only act on events originating inside *this* dockview (any window).
+        if (!(e.target instanceof Node) || !this.host.ownsElement(e.target)) {
             return;
         }
         const keymap = this._keymap;
