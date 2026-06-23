@@ -1,6 +1,19 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { IContentRenderer } from '../../dockview/types';
-import { LayoutHistoryChangeEvent } from '../../dockview/layoutHistoryService';
+import {
+    LayoutHistoryChangeEvent,
+    LayoutHistoryService,
+    ILayoutHistoryHost,
+} from '../../dockview/layoutHistoryService';
+import { Emitter } from '../../events';
+import {
+    DockviewLayoutMutationEvent,
+    SerializedDockview,
+} from '../../dockview/dockviewComponent';
+import {
+    DockviewComponentOptions,
+    LayoutHistoryOptions,
+} from '../../dockview/options';
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');
@@ -209,5 +222,161 @@ describe('LayoutHistory undo/redo', () => {
         expect(d.canRedo).toBe(false);
 
         d.dispose();
+    });
+});
+
+/**
+ * Resize coalescing (Phase C). Sash resize has no mutation boundary, so it's
+ * caught off the coalesced `onDidLayoutChange` ping with a lazy pre-image and
+ * debounced into one entry. Driven against a fake host with fake timers so the
+ * algorithm is deterministic (no real layout / microtask timing).
+ */
+describe('LayoutHistory resize coalescing', () => {
+    interface FakeHost extends ILayoutHistoryHost {
+        will: Emitter<DockviewLayoutMutationEvent>;
+        did: Emitter<DockviewLayoutMutationEvent>;
+        layout: Emitter<void>;
+        snapshot: number; // stands in for the layout state
+        setOptions(o: LayoutHistoryOptions): void;
+    }
+
+    const makeHost = (
+        layoutHistory: LayoutHistoryOptions = { enabled: true }
+    ): FakeHost => {
+        const will = new Emitter<DockviewLayoutMutationEvent>();
+        const did = new Emitter<DockviewLayoutMutationEvent>();
+        const layout = new Emitter<void>();
+        let opts: LayoutHistoryOptions = layoutHistory;
+        const host: FakeHost = {
+            will,
+            did,
+            layout,
+            snapshot: 0,
+            get options(): DockviewComponentOptions {
+                return { layoutHistory: opts } as DockviewComponentOptions;
+            },
+            toJSON(): SerializedDockview {
+                return { n: host.snapshot } as unknown as SerializedDockview;
+            },
+            fromJSON(data: SerializedDockview): void {
+                host.snapshot = (data as unknown as { n: number }).n;
+            },
+            onWillMutateLayout: will.event,
+            onDidMutateLayout: did.event,
+            onDidLayoutChange: layout.event,
+            setOptions(o: LayoutHistoryOptions): void {
+                opts = o;
+            },
+        };
+        return host;
+    };
+
+    beforeEach(() => jest.useFakeTimers());
+    afterEach(() => jest.useRealTimers());
+
+    /** Fire the initial settle so a baseline exists, like the first real layout. */
+    const seed = (h: FakeHost): void => {
+        h.snapshot = 0;
+        h.layout.fire();
+    };
+
+    test('coalesces a continuous resize drag into one entry', () => {
+        const h = makeHost({ enabled: true, coalesceMs: 400 });
+        const svc = new LayoutHistoryService(h);
+        seed(h);
+
+        // a "drag" — several pings, each a slightly different layout
+        h.snapshot = 1;
+        h.layout.fire();
+        h.snapshot = 2;
+        h.layout.fire();
+        h.snapshot = 3;
+        h.layout.fire();
+        expect(svc.canUndo).toBe(false); // not finalized while the drag is live
+
+        jest.advanceTimersByTime(400);
+        expect(svc.canUndo).toBe(true); // exactly one entry for the whole drag
+
+        svc.undo(); // restores the pre-drag baseline (0), not an intermediate
+        expect(h.snapshot).toBe(0);
+        svc.redo();
+        expect(h.snapshot).toBe(3);
+
+        svc.dispose();
+    });
+
+    test('a discrete mutation finalizes the pending resize first (no fold)', () => {
+        const h = makeHost({ enabled: true, coalesceMs: 400 });
+        const svc = new LayoutHistoryService(h);
+        seed(h);
+
+        h.snapshot = 1;
+        h.layout.fire(); // open a resize run (before=0)
+
+        // a discrete close arrives mid-window — must close the resize run first
+        h.will.fire({ kind: 'remove', origin: 'user' });
+        h.snapshot = 2;
+        h.did.fire({ kind: 'remove', origin: 'user' });
+
+        // two distinct steps: the resize (0→1) and the remove (1→2)
+        svc.undo();
+        expect(h.snapshot).toBe(1); // undo the remove
+        svc.undo();
+        expect(h.snapshot).toBe(0); // undo the resize
+        expect(svc.canUndo).toBe(false);
+
+        svc.dispose();
+    });
+
+    test('a resize that nets no change is not recorded', () => {
+        const h = makeHost({ enabled: true, coalesceMs: 400 });
+        const svc = new LayoutHistoryService(h);
+        seed(h);
+
+        h.snapshot = 1;
+        h.layout.fire();
+        h.snapshot = 0; // dragged back to where it started
+        h.layout.fire();
+        jest.advanceTimersByTime(400);
+
+        expect(svc.canUndo).toBe(false);
+
+        svc.dispose();
+    });
+
+    test('the mutation settle ping does not start a resize run', () => {
+        const h = makeHost({ enabled: true });
+        const svc = new LayoutHistoryService(h);
+        seed(h);
+
+        // a discrete mutation, then its trailing layout ping (the settle)
+        h.will.fire({ kind: 'add', origin: 'user' });
+        h.snapshot = 1;
+        h.did.fire({ kind: 'add', origin: 'user' });
+        h.layout.fire(); // settle — must NOT open a resize run
+        jest.advanceTimersByTime(1000);
+
+        // only the discrete add is recorded
+        svc.undo();
+        expect(h.snapshot).toBe(0);
+        expect(svc.canUndo).toBe(false);
+
+        svc.dispose();
+    });
+
+    test('recordResize:false ignores resize pings', () => {
+        const h = makeHost({ enabled: true, recordResize: false });
+        const svc = new LayoutHistoryService(h);
+        seed(h);
+
+        h.snapshot = 1;
+        h.layout.fire();
+        h.snapshot = 2;
+        h.layout.fire();
+        jest.advanceTimersByTime(1000);
+
+        expect(svc.canUndo).toBe(false);
+
+        svc.dispose();
     });
 });

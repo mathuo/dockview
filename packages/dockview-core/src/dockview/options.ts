@@ -407,6 +407,12 @@ export interface LayoutHistoryOptions {
     /** Clear the stacks when the whole layout is replaced via `fromJSON` /
      *  `clear`. Default `true`. */
     clearOnFromJSON?: boolean;
+    /** Record sash-resize as undoable steps, coalescing a continuous drag into
+     *  a single entry. Default `true`. */
+    recordResize?: boolean;
+    /** Debounce window (ms) for coalescing a continuous resize drag into one
+     *  undo entry. Default `400`. */
+    coalesceMs?: number;
 }
 
 export type TabAnimation = 'smooth' | 'default';
