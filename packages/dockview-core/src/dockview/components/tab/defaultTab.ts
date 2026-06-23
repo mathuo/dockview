@@ -2,12 +2,18 @@ import { CompositeDisposable } from '../../../lifecycle';
 import { ITabRenderer, GroupPanelPartInitParameters } from '../../types';
 import { addDisposableListener } from '../../../events';
 import { createCloseButton } from '../../../svg';
+import {
+    DEFAULT_MESSAGES,
+    DockviewMessages,
+} from '../../accessibilityMessages';
 
 export class DefaultTab extends CompositeDisposable implements ITabRenderer {
     private readonly _element: HTMLElement;
     private readonly _content: HTMLElement;
     private readonly action: HTMLElement;
     private _title: string | undefined;
+    /** English defaults until `init` supplies the app's resolved catalog. */
+    private _messages: DockviewMessages = DEFAULT_MESSAGES;
 
     get element(): HTMLElement {
         return this._element;
@@ -26,10 +32,13 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         this.action.className = 'dv-default-tab-action';
         // Expose the close affordance to assistive technology: a named button
         // role so screen readers announce it, with the decorative glyph hidden.
-        // Keyboard users close the focused tab via the tab strip's Delete
-        // binding; this element is operated by pointer / AT.
+        // `tabindex=-1` keeps it out of the sequential tab order (the tab strip's
+        // roving tabindex owns that, and keyboard users close via its Delete
+        // binding) while still making it programmatically focusable, so the
+        // button role is honest and AT can activate it (a synthesized click,
+        // handled below).
         this.action.setAttribute('role', 'button');
-        this.action.setAttribute('aria-label', 'Close');
+        this.action.setAttribute('tabindex', '-1');
         const closeIcon = createCloseButton();
         closeIcon.setAttribute('aria-hidden', 'true');
         this.action.appendChild(closeIcon);
@@ -42,6 +51,8 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
 
     init(params: GroupPanelPartInitParameters): void {
         this._title = params.title;
+        // Localise the close-button name via the app's resolved catalog.
+        this._messages = params.containerApi.messages ?? DEFAULT_MESSAGES;
 
         this.addDisposables(
             params.api.onDidTitleChange((event) => {
@@ -72,7 +83,9 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         // announced name disambiguates it from sibling tabs' close buttons.
         this.action.setAttribute(
             'aria-label',
-            this._title ? `Close ${this._title}` : 'Close'
+            this._title
+                ? this._messages.closeTab(this._title)
+                : this._messages.closeTabPlain()
         );
     }
 }

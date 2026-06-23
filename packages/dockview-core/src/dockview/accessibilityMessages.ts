@@ -19,6 +19,12 @@ export interface DockviewMessages {
     groupDocked(title: string): string;
     groupPoppedOut(title: string): string;
 
+    // --- tab affordances ---
+    /** Accessible name for a tab's close button, qualified with the panel title. */
+    closeTab(title: string): string;
+    /** Accessible name for a tab's close button when the panel has no title. */
+    closeTabPlain(): string;
+
     // --- keyboard-docking narration ---
     /** Target phase: which group is highlighted, and how to proceed. */
     movePickTarget(
@@ -61,6 +67,9 @@ export const DEFAULT_MESSAGES: DockviewMessages = {
     groupFloated: (title) => `${title} floated`,
     groupDocked: (title) => `${title} docked`,
     groupPoppedOut: (title) => `${title} opened in a new window`,
+
+    closeTab: (title) => `Close ${title}`,
+    closeTabPlain: () => `Close`,
 
     movePickTarget: (source, target, current, total) =>
         `Moving ${source}. Target ${target}, ${current} of ${total}. Enter to choose where, Escape to cancel.`,
