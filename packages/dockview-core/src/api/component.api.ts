@@ -19,6 +19,10 @@ import {
     DockviewDndOverlayEvent,
     MovementOptions,
 } from '../dockview/options';
+import {
+    DockviewMessages,
+    resolveMessages,
+} from '../dockview/accessibilityMessages';
 import { Parameters } from '../panel/types';
 import { Direction } from '../gridview/baseComponentGridview';
 import {
@@ -905,6 +909,15 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     get activeGroup(): DockviewGroupPanel | undefined {
         return this.component.activeGroup;
+    }
+
+    /**
+     * The resolved accessibility message catalog (the app's `messages`
+     * overrides merged over the English defaults). Used by parts that surface
+     * localisable AT strings, e.g. the default tab's close-button label.
+     */
+    get messages(): DockviewMessages {
+        return resolveMessages(this.component.options.messages);
     }
 
     constructor(private readonly component: IDockviewComponent) {}
