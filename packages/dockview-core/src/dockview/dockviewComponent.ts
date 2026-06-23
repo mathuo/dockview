@@ -835,6 +835,26 @@ export class DockviewComponent
     }
 
     /**
+     * Does this dock own `node`, in any of its windows? True when the node is
+     * inside the main shell, or inside one of this component's popout documents.
+     * A popout window hosts only this component's content, so whole-document
+     * membership is sufficient there; the main document may hold sibling docks,
+     * so it must be a containment check. A same-document popout (the jsdom mock)
+     * is already covered by the main check and contributes nothing.
+     */
+    ownsElement(node: Node): boolean {
+        if (this.rootElement.contains(node)) {
+            return true;
+        }
+        const mainDoc = this.rootElement.ownerDocument;
+        const doc = node.ownerDocument;
+        if (!doc || doc === mainDoc) {
+            return false;
+        }
+        return this.getPopoutWindows().some((win) => win.document === doc);
+    }
+
+    /**
      * The next / previous group in gridview (spatial) order, wrapping round.
      * The keyboard accessibility module's focus navigation is built on this
      * primitive — the only piece that needs the grid internals; the rest of
