@@ -425,6 +425,12 @@ export interface AutoHideEdgeGroupOptions {
     /** Show panel icons (where available) alongside the strip activators.
      *  Default true. */
     showIcons?: boolean;
+    /** ms the pointer must dwell on a strip activator before the peek opens.
+     *  Default 250. Keyboard focus opens immediately (no delay). */
+    openDelay?: number;
+    /** ms after the pointer leaves both the strip and the peek overlay before
+     *  the peek closes. Re-entering either cancels it. Default 300. */
+    closeDelay?: number;
 }
 
 export type TabAnimation = 'smooth' | 'default';

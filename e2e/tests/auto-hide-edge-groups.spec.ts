@@ -33,6 +33,20 @@ test.describe('auto-hide edge groups (peek)', () => {
         await expect(overlay).toHaveCount(0);
     });
 
+    test('hovering an activator opens the peek', async ({ page }) => {
+        await page.goto('/e2e/fixtures/index.html');
+        await page.waitForFunction(() => (window as any).__ready === true);
+        await page.evaluate(() => (window as any).__dv.setupAutoHideEdge());
+
+        await page.locator('.dv-edge-activator').first().hover();
+        // opens after the hover (openDelay); expect auto-waits
+        await expect(page.locator('.dv-edge-peek')).toBeVisible();
+
+        // moving the pointer far away closes it after closeDelay
+        await page.mouse.move(900, 500);
+        await expect(page.locator('.dv-edge-peek')).toHaveCount(0);
+    });
+
     test('the pin button re-docks the edge group (and now reflows once)', async ({
         page,
     }) => {

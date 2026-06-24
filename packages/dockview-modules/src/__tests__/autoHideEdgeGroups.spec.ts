@@ -1,3 +1,4 @@
+import { fireEvent } from '@testing-library/dom';
 import { DockviewComponent } from 'dockview-core';
 import { IContentRenderer } from 'dockview-core';
 
@@ -177,5 +178,71 @@ describe('auto-hide edge groups', () => {
         expect(peek()).toBeNull();
 
         d.dispose();
+    });
+
+    describe('hover / focus peek (Phase 3)', () => {
+        const strip = (d: DockviewComponent): HTMLElement =>
+            d.getEdgeGroupPanel('left')!.element;
+
+        afterEach(() => jest.useRealTimers());
+
+        test('hover opens the peek after openDelay', () => {
+            const d = make({ openDelay: 100, closeDelay: 100 });
+            collapsedEdgeWithPanel(d);
+            jest.useFakeTimers();
+
+            fireEvent.pointerEnter(activators()[0]);
+            jest.advanceTimersByTime(99);
+            expect(peek()).toBeNull(); // not yet
+
+            jest.advanceTimersByTime(1);
+            expect(peek()).toBeTruthy(); // openDelay elapsed
+
+            d.dispose();
+        });
+
+        test('leaving the strip closes the peek after closeDelay', () => {
+            const d = make({ openDelay: 100, closeDelay: 100 });
+            collapsedEdgeWithPanel(d);
+            activators()[0].click(); // open immediately
+            expect(peek()).toBeTruthy();
+            jest.useFakeTimers();
+
+            fireEvent.pointerLeave(strip(d));
+            jest.advanceTimersByTime(99);
+            expect(peek()).toBeTruthy(); // still open within the window
+
+            jest.advanceTimersByTime(1);
+            expect(peek()).toBeNull(); // closed
+
+            d.dispose();
+        });
+
+        test('re-entering the overlay cancels the close (no flicker)', () => {
+            const d = make({ openDelay: 100, closeDelay: 100 });
+            collapsedEdgeWithPanel(d);
+            activators()[0].click();
+            const overlay = peek()!;
+            jest.useFakeTimers();
+
+            fireEvent.pointerLeave(strip(d)); // arm close
+            fireEvent.pointerEnter(overlay); // crossing the gap cancels it
+            jest.advanceTimersByTime(1000);
+
+            expect(peek()).toBeTruthy(); // never closed
+
+            d.dispose();
+        });
+
+        test('keyboard focus opens immediately (no delay)', () => {
+            const d = make({ openDelay: 100, closeDelay: 100 });
+            collapsedEdgeWithPanel(d);
+            jest.useFakeTimers();
+
+            fireEvent.focus(activators()[0]);
+            expect(peek()).toBeTruthy(); // no timer advance needed
+
+            d.dispose();
+        });
     });
 });

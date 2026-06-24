@@ -8,8 +8,17 @@ import {
     IAutoHideEdgeGroupService,
 } from 'dockview-core';
 
-function isEnabled(o: boolean | AutoHideEdgeGroupOptions | undefined): boolean {
-    return !!o;
+function resolveOptions(o: boolean | AutoHideEdgeGroupOptions | undefined): {
+    enabled: boolean;
+    openDelay: number;
+    closeDelay: number;
+} {
+    const obj = typeof o === 'object' ? o : {};
+    return {
+        enabled: !!o,
+        openDelay: obj.openDelay ?? 250,
+        closeDelay: obj.closeDelay ?? 300,
+    };
 }
 
 /**
@@ -34,12 +43,22 @@ class EdgeGroupController extends CompositeDisposable {
         | { overlay: HTMLElement; content: HTMLElement; parent: HTMLElement }
         | undefined;
     private _closeListeners: CompositeDisposable | undefined;
+    private _openTimer: ReturnType<typeof setTimeout> | undefined;
+    private _closeTimer: ReturnType<typeof setTimeout> | undefined;
 
     constructor(
         private readonly group: DockviewGroupPanel,
         private readonly host: IAutoHideEdgeGroupHost
     ) {
         super();
+
+        const strip = this.group.element;
+        // Crossing the gap between strip and the slid-out overlay must not flap
+        // the peek: a single shared close timer, cancelled by re-entering either.
+        const onEnter = (): void => this._cancelClose();
+        const onLeave = (): void => this._scheduleClose();
+        strip.addEventListener('pointerenter', onEnter);
+        strip.addEventListener('pointerleave', onLeave);
 
         this.addDisposables(
             this.group.api.onDidCollapsedChange(() => {
@@ -50,6 +69,9 @@ class EdgeGroupController extends CompositeDisposable {
             this.group.model.onDidRemovePanel(() => this._renderStrip()),
             {
                 dispose: () => {
+                    strip.removeEventListener('pointerenter', onEnter);
+                    strip.removeEventListener('pointerleave', onLeave);
+                    this._clearTimers();
                     this._closePeek();
                     this._removeStrip();
                 },
@@ -59,8 +81,12 @@ class EdgeGroupController extends CompositeDisposable {
         this._renderStrip();
     }
 
+    private get _opts() {
+        return resolveOptions(this.host.options.autoHideEdgeGroups);
+    }
+
     private get _enabled(): boolean {
-        return isEnabled(this.host.options.autoHideEdgeGroups);
+        return this._opts.enabled;
     }
 
     private get _position(): EdgeGroupPosition | undefined {
@@ -88,7 +114,13 @@ class EdgeGroupController extends CompositeDisposable {
             button.className = 'dv-edge-activator';
             button.type = 'button';
             button.textContent = panel.title ?? panel.id;
-            button.addEventListener('click', () => this._onActivator(panel));
+            // Click or keyboard-focus opens immediately (discoverable); hover
+            // opens after `openDelay`.
+            button.addEventListener('click', () => this._openFor(panel));
+            button.addEventListener('focus', () => this._openFor(panel));
+            button.addEventListener('pointerenter', () =>
+                this._scheduleOpen(panel)
+            );
             strip.appendChild(button);
         }
 
@@ -101,10 +133,49 @@ class EdgeGroupController extends CompositeDisposable {
         this._strip = undefined;
     }
 
-    private _onActivator(panel: IDockviewPanel): void {
-        // Make the clicked panel active, then peek it (or pin if it can't peek).
+    /** Open the peek for a specific panel now (click / focus path). */
+    private _openFor(panel: IDockviewPanel): void {
+        this._cancelOpen();
+        this._cancelClose();
         panel.api.setActive();
         this.openPeek();
+    }
+
+    /** Open the peek for a panel after `openDelay` (hover path). */
+    private _scheduleOpen(panel: IDockviewPanel): void {
+        this._cancelOpen();
+        this._cancelClose();
+        this._openTimer = setTimeout(
+            () => this._openFor(panel),
+            this._opts.openDelay
+        );
+    }
+
+    private _cancelOpen(): void {
+        if (this._openTimer !== undefined) {
+            clearTimeout(this._openTimer);
+            this._openTimer = undefined;
+        }
+    }
+
+    private _scheduleClose(): void {
+        this._cancelClose();
+        this._closeTimer = setTimeout(
+            () => this._closePeek(),
+            this._opts.closeDelay
+        );
+    }
+
+    private _cancelClose(): void {
+        if (this._closeTimer !== undefined) {
+            clearTimeout(this._closeTimer);
+            this._closeTimer = undefined;
+        }
+    }
+
+    private _clearTimers(): void {
+        this._cancelOpen();
+        this._cancelClose();
     }
 
     // --- peek ---
@@ -235,6 +306,27 @@ class EdgeGroupController extends CompositeDisposable {
         };
         doc.addEventListener('keydown', onKeyDown, true);
         doc.addEventListener('pointerdown', onPointerDown, true);
+
+        // Hover bookkeeping on the overlay itself, mirroring the strip: entering
+        // cancels the shared close timer, leaving (re)arms it.
+        const overlay = this._peek!.overlay;
+        const onOverlayEnter = (): void => this._cancelClose();
+        const onOverlayLeave = (): void => this._scheduleClose();
+        // Keyboard: tabbing focus out of the whole peek (strip + overlay) closes.
+        const onFocusOut = (e: Event): void => {
+            const next = (e as FocusEvent).relatedTarget;
+            if (
+                next instanceof Node &&
+                (overlay.contains(next) || this.group.element.contains(next))
+            ) {
+                return;
+            }
+            this._scheduleClose();
+        };
+        overlay.addEventListener('pointerenter', onOverlayEnter);
+        overlay.addEventListener('pointerleave', onOverlayLeave);
+        overlay.addEventListener('focusout', onFocusOut);
+
         this._closeListeners = new CompositeDisposable(
             {
                 dispose: () =>
@@ -243,12 +335,20 @@ class EdgeGroupController extends CompositeDisposable {
             {
                 dispose: () =>
                     doc.removeEventListener('pointerdown', onPointerDown, true),
+            },
+            {
+                dispose: () => {
+                    overlay.removeEventListener('pointerenter', onOverlayEnter);
+                    overlay.removeEventListener('pointerleave', onOverlayLeave);
+                    overlay.removeEventListener('focusout', onFocusOut);
+                },
             }
         );
     }
 
     /** Restore the reparented content and remove the overlay (no layout change). */
     private _closePeek(): void {
+        this._clearTimers();
         this._closeListeners?.dispose();
         this._closeListeners = undefined;
         const peek = this._peek;
