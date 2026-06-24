@@ -90,6 +90,8 @@ import {
     IAdvancedDnDHost,
     IContextMenuHost,
     IContextMenuService,
+    ILayoutHistoryHost,
+    LayoutHistoryChangeEvent,
     ITabGroupChipsHost,
 } from './moduleContracts';
 import { IHeaderActionsHost } from './headerActionsService';
@@ -423,7 +425,24 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void;
     isEdgeGroupVisible(position: EdgeGroupPosition): boolean;
     removeEdgeGroup(position: EdgeGroupPosition): void;
+    // layout history (undo / redo)
+    undo(): void;
+    redo(): void;
+    readonly canUndo: boolean;
+    readonly canRedo: boolean;
+    clearHistory(): void;
+    readonly onDidChangeHistory: Event<LayoutHistoryChangeEvent>;
+    readonly popoutRestorationPromise: Promise<void>;
 }
+
+/** A never-firing history-change event — the fallback `onDidChangeHistory`
+ *  returns when the LayoutHistory module is absent, so the api event is always
+ *  valid and subscribable. */
+const NO_LAYOUT_HISTORY_CHANGES: Event<LayoutHistoryChangeEvent> = () => ({
+    dispose: () => {
+        // noop — nothing ever fires
+    },
+});
 
 let _hasWarnedUsingCoreDirectly = false;
 
@@ -471,7 +490,8 @@ export class DockviewComponent
         IHeaderActionsHost,
         IAdvancedDnDHost,
         ILiveRegionHost,
-        IAccessibilityHost
+        IAccessibilityHost,
+        ILayoutHistoryHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
@@ -763,6 +783,43 @@ export class DockviewComponent
 
     get headerActionsService() {
         return this._moduleRegistry.services.headerActionsService;
+    }
+
+    private get _layoutHistoryService() {
+        // Optional like every other module service; `?.`-guarded so the module
+        // can be removed from AllModules without crashing the component.
+        return this._moduleRegistry.services.layoutHistoryService;
+    }
+
+    /** Undo the previous recorded layout mutation (no-op if nothing to undo or
+     *  the LayoutHistory module is absent). Requires `layoutHistory.enabled`. */
+    undo(): void {
+        this._layoutHistoryService?.undo();
+    }
+
+    /** Re-apply the next layout mutation (no-op if nothing to redo). */
+    redo(): void {
+        this._layoutHistoryService?.redo();
+    }
+
+    get canUndo(): boolean {
+        return this._layoutHistoryService?.canUndo ?? false;
+    }
+
+    get canRedo(): boolean {
+        return this._layoutHistoryService?.canRedo ?? false;
+    }
+
+    /** Drop both undo and redo stacks. */
+    clearHistory(): void {
+        this._layoutHistoryService?.clear();
+    }
+
+    get onDidChangeHistory(): Event<LayoutHistoryChangeEvent> {
+        return (
+            this._layoutHistoryService?.onDidChangeHistory ??
+            NO_LAYOUT_HISTORY_CHANGES
+        );
     }
 
     isGridEmpty(): boolean {

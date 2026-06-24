@@ -365,6 +365,14 @@ export interface DockviewOptions {
      */
     keyboardNavigation?: boolean | KeyboardNavigationOptions;
     /**
+     * Undo / redo for layout mutations (close / move / float / popout / add /
+     * maximize / tab-group changes). Off by default — set `{ enabled: true }`
+     * to record. Drive it via `api.undo()` / `api.redo()`; dockview binds no
+     * keys itself (that's the host app's call, and collides with the keyboard
+     * navigation keymap). Honoured live via `updateOptions`.
+     */
+    layoutHistory?: LayoutHistoryOptions;
+    /**
      * Replace the built-in tab group color palette with a user-defined list.
      *
      * Each entry has an `id` (stored on `tabGroup.color` and serialized),
@@ -386,6 +394,25 @@ export interface DockviewOptions {
      *   custom chip renderers can still read it and roll their own visual.
      */
     tabGroupAccent?: 'palette' | 'off';
+}
+
+export interface LayoutHistoryOptions {
+    /** Record mutations. Default `false` (module is registered but inert). */
+    enabled?: boolean;
+    /** Max undo depth (bounded ring). Default `25`. */
+    depth?: number;
+    /** Also record mutations originating from `DockviewApi` calls (the app's
+     *  own programmatic changes). Default `false` — only user gestures. */
+    undoableProgrammaticMutations?: boolean;
+    /** Clear the stacks when the whole layout is replaced via `fromJSON` /
+     *  `clear`. Default `true`. */
+    clearOnFromJSON?: boolean;
+    /** Record sash-resize as undoable steps, coalescing a continuous drag into
+     *  a single entry. Default `true`. */
+    recordResize?: boolean;
+    /** Debounce window (ms) for coalescing a continuous resize drag into one
+     *  undo entry. Default `400`. */
+    coalesceMs?: number;
 }
 
 export type TabAnimation = 'smooth' | 'default';
@@ -451,6 +478,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         announcer: undefined,
         messages: undefined,
         keyboardNavigation: undefined,
+        layoutHistory: undefined,
         tabGroupColors: undefined,
         tabGroupAccent: undefined,
     };

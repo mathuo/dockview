@@ -22,6 +22,7 @@ import {
     IAdvancedDnDService,
     IContextMenuService,
     IKeyboardDockingService,
+    ILayoutHistoryService,
     ITabGroupChipsService,
 } from './moduleContracts';
 
@@ -38,6 +39,7 @@ export interface ServiceCollection {
     liveRegionService?: ILiveRegionService;
     accessibilityService?: IAccessibilityService;
     keyboardDockingService?: IKeyboardDockingService;
+    layoutHistoryService?: ILayoutHistoryService;
 }
 
 export interface DockviewModule<THost = unknown> {

@@ -197,6 +197,10 @@ export {
     IContextMenuHost,
     IContextMenuService,
     IKeyboardDockingService,
+    ILayoutHistoryHost,
+    ILayoutHistoryService,
+    LayoutHistoryChangeEvent,
+    LayoutHistoryKind,
     ITabGroupChipsHost,
     ITabGroupChipsService,
 } from './dockview/moduleContracts';

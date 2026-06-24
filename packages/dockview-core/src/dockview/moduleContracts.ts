@@ -17,7 +17,10 @@ import { PopupService } from './components/popupService';
 import { DockviewComponentOptions } from './options';
 import {
     DockviewLayoutMutationEvent,
+    DockviewLayoutMutationKind,
+    DockviewOrigin,
     GroupNavigationDirection,
+    SerializedDockview,
 } from './dockviewComponent';
 import { DockviewWillDropEvent } from './dockviewGroupPanelModel';
 import {
@@ -188,4 +191,57 @@ export interface IAdvancedDnDService extends IDisposable {
         group: DockviewGroupPanel,
         position: Position
     ): IDisposable;
+}
+
+// --- LayoutHistory ---
+
+/**
+ * The narrow surface the layout-history service needs from the host
+ * (`DockviewComponent`). It reads/writes whole-layout snapshots and listens to
+ * the mutation-transaction boundary — the only place a *pre-image* can be taken
+ * before a mutation runs.
+ */
+export interface ILayoutHistoryHost {
+    readonly options: DockviewComponentOptions;
+    toJSON(): SerializedDockview;
+    fromJSON(
+        data: SerializedDockview,
+        options?: { reuseExistingPanels: boolean }
+    ): void;
+    /** Fires before a structural mutation — used to capture the pre-image. */
+    readonly onWillMutateLayout: Event<DockviewLayoutMutationEvent>;
+    /** Fires after a structural mutation — used to capture the post-image. */
+    readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent>;
+    /** Coalesced (microtask-buffered) ping after any layout change — the only
+     *  signal for sash resize, which does not go through the mutation boundary. */
+    readonly onDidLayoutChange: Event<void>;
+    /** Settles once any in-flight popout-window restoration (from `fromJSON`)
+     *  completes. Popouts re-open asynchronously, so undo/redo holds its guard
+     *  until this resolves. Already-resolved when nothing is restoring. */
+    readonly popoutRestorationPromise: Promise<void>;
+}
+
+/** Entry labels — the mutation kinds plus the synthetic `'resize'` (sash drag,
+ *  which has no mutation-boundary kind of its own). */
+export type LayoutHistoryKind = DockviewLayoutMutationKind | 'resize';
+
+export interface LayoutHistoryChangeEvent {
+    readonly canUndo: boolean;
+    readonly canRedo: boolean;
+    readonly undoCount: number;
+    readonly redoCount: number;
+    readonly lastEntry?: {
+        kind: LayoutHistoryKind;
+        origin: DockviewOrigin;
+    };
+}
+
+export interface ILayoutHistoryService extends IDisposable {
+    readonly canUndo: boolean;
+    readonly canRedo: boolean;
+    readonly onDidChangeHistory: Event<LayoutHistoryChangeEvent>;
+    undo(): void;
+    redo(): void;
+    /** Drop both stacks (e.g. on document switch). */
+    clear(): void;
 }
