@@ -194,6 +194,8 @@ export {
     IAccessibilityService,
     IAdvancedDnDHost,
     IAdvancedDnDService,
+    IAutoHideEdgeGroupHost,
+    IAutoHideEdgeGroupService,
     IContextMenuHost,
     IContextMenuService,
     IKeyboardDockingService,
@@ -208,3 +210,4 @@ export { resolveMessages } from './dockview/accessibilityMessages';
 export { findRelativeZIndexParent } from './dom';
 export { IDragGhostSpec } from './dnd/backend';
 export { LiveRegionModule } from './dockview/liveRegionService';
+export { EdgeGroupModule } from './dockview/edgeGroupService';

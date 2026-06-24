@@ -88,6 +88,7 @@ import { IEdgeGroupServiceHost } from './edgeGroupService';
 import {
     IAccessibilityHost,
     IAdvancedDnDHost,
+    IAutoHideEdgeGroupHost,
     IContextMenuHost,
     IContextMenuService,
     ILayoutHistoryHost,
@@ -425,6 +426,11 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void;
     isEdgeGroupVisible(position: EdgeGroupPosition): boolean;
     removeEdgeGroup(position: EdgeGroupPosition): void;
+    getEdgeGroupPanel(
+        position: EdgeGroupPosition
+    ): DockviewGroupPanel | undefined;
+    pinEdgeGroup(position: EdgeGroupPosition): void;
+    autoHideEdgeGroup(position: EdgeGroupPosition): void;
     // layout history (undo / redo)
     undo(): void;
     redo(): void;
@@ -491,7 +497,8 @@ export class DockviewComponent
         IAdvancedDnDHost,
         ILiveRegionHost,
         IAccessibilityHost,
-        ILayoutHistoryHost
+        ILayoutHistoryHost,
+        IAutoHideEdgeGroupHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
@@ -2496,6 +2503,25 @@ export class DockviewComponent
         position: EdgeGroupPosition
     ): DockviewGroupPanelApi | undefined {
         return this._edgeGroupService?.get(position)?.api;
+    }
+
+    /** The edge group panel at a position (the model, not the api). */
+    getEdgeGroupPanel(
+        position: EdgeGroupPosition
+    ): DockviewGroupPanel | undefined {
+        return this._edgeGroupService?.get(position);
+    }
+
+    /** Pin (expand) the edge group at a position — auto-hide module feature. */
+    pinEdgeGroup(position: EdgeGroupPosition): void {
+        this._moduleRegistry.services.autoHideEdgeGroupService?.pin(position);
+    }
+
+    /** Auto-hide (collapse to strip) the edge group at a position. */
+    autoHideEdgeGroup(position: EdgeGroupPosition): void {
+        this._moduleRegistry.services.autoHideEdgeGroupService?.autoHide(
+            position
+        );
     }
 
     setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void {

@@ -1163,6 +1163,19 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         this.component.removeEdgeGroup(position);
     }
 
+    /**
+     * Pin (expand) the collapsed edge group at `position`. Requires the
+     * auto-hide edge groups module; no-op when it is absent.
+     */
+    pinEdgeGroup(position: EdgeGroupPosition): void {
+        this.component.pinEdgeGroup(position);
+    }
+
+    /** Auto-hide (collapse to a strip) the edge group at `position`. */
+    autoHideEdgeGroup(position: EdgeGroupPosition): void {
+        this.component.autoHideEdgeGroup(position);
+    }
+
     updateOptions(options: Partial<DockviewComponentOptions>) {
         this.component.updateOptions(options);
     }

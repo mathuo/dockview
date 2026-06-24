@@ -23,6 +23,7 @@ import {
     SerializedDockview,
 } from './dockviewComponent';
 import { DockviewWillDropEvent } from './dockviewGroupPanelModel';
+import { EdgeGroupPosition } from './dockviewShell';
 import {
     GroupDragEvent,
     TabDragEvent,
@@ -244,4 +245,33 @@ export interface ILayoutHistoryService extends IDisposable {
     redo(): void;
     /** Drop both stacks (e.g. on document switch). */
     clear(): void;
+}
+
+// --- AutoHideEdgeGroup ---
+
+/**
+ * The narrow surface the auto-hide service needs from the host
+ * (`DockviewComponent`). Collapse/expand is delegated to the existing free
+ * edge-group machinery (`setEdgeGroupCollapsed` → shell) — the module owns
+ * interaction + presentation, never layout/sizing.
+ */
+export interface IAutoHideEdgeGroupHost {
+    readonly options: DockviewComponentOptions;
+    /** Fires when any group is added — the service filters for `location.type === 'edge'`. */
+    readonly onDidAddGroup: Event<DockviewGroupPanel>;
+    readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
+    /** The edge group at a position, or undefined. */
+    getEdgeGroupPanel(
+        position: EdgeGroupPosition
+    ): DockviewGroupPanel | undefined;
+    /** Collapse/expand an edge group — the single mutate path (fires
+     *  `onDidCollapsedChange`, no-op guarded). */
+    setEdgeGroupCollapsed(group: DockviewGroupPanel, collapsed: boolean): void;
+}
+
+export interface IAutoHideEdgeGroupService extends IDisposable {
+    /** Pin (re-dock / expand) the edge group at `position`. */
+    pin(position: EdgeGroupPosition): void;
+    /** Auto-hide (collapse to strip) the edge group at `position`. */
+    autoHide(position: EdgeGroupPosition): void;
 }

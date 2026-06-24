@@ -373,6 +373,12 @@ export interface DockviewOptions {
      */
     layoutHistory?: LayoutHistoryOptions;
     /**
+     * VS Code-style "auto hide" for edge groups: render clickable activators in
+     * a collapsed edge group's strip so it can be pinned back. Off by default →
+     * today's baseline (an empty collapsed strip) is unchanged.
+     */
+    autoHideEdgeGroups?: boolean | AutoHideEdgeGroupOptions;
+    /**
      * Replace the built-in tab group color palette with a user-defined list.
      *
      * Each entry has an `id` (stored on `tabGroup.color` and serialized),
@@ -413,6 +419,12 @@ export interface LayoutHistoryOptions {
     /** Debounce window (ms) for coalescing a continuous resize drag into one
      *  undo entry. Default `400`. */
     coalesceMs?: number;
+}
+
+export interface AutoHideEdgeGroupOptions {
+    /** Show panel icons (where available) alongside the strip activators.
+     *  Default true. */
+    showIcons?: boolean;
 }
 
 export type TabAnimation = 'smooth' | 'default';
@@ -479,6 +491,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         messages: undefined,
         keyboardNavigation: undefined,
         layoutHistory: undefined,
+        autoHideEdgeGroups: undefined,
         tabGroupColors: undefined,
         tabGroupAccent: undefined,
     };

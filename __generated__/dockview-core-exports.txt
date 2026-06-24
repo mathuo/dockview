@@ -10,6 +10,7 @@ AddSplitviewComponentOptions
 AnchorPosition
 AnchoredBox
 AnnouncementEvent
+AutoHideEdgeGroupOptions
 BaseComponentOptions
 BaseGrid
 BaseGridOptions
@@ -83,6 +84,7 @@ DockviewWillShowOverlayLocationEvent
 DraggablePaneviewPanel
 DropOverlayModelParams
 DroptargetOverlayModel
+EdgeGroupModule
 EdgeGroupOptions
 EdgeGroupPosition
 ExpansionEvent
@@ -114,6 +116,8 @@ IAccessibilityHost
 IAccessibilityService
 IAdvancedDnDHost
 IAdvancedDnDService
+IAutoHideEdgeGroupHost
+IAutoHideEdgeGroupService
 IBaseGrid
 IBaseView
 IContentContainer
