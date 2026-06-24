@@ -272,6 +272,9 @@ export interface IAutoHideEdgeGroupHost {
     readonly floatingOverlayHost: HTMLElement;
     /** The size an edge group expands to — sizes the peek overlay. */
     getEdgeGroupExpandedSize(position: EdgeGroupPosition): number;
+    /** Record the peek state so `group.api.isPeeking()` / `onDidPeekChange`
+     *  reflect it (the module owns the actual overlay). */
+    setEdgeGroupPeeking(group: DockviewGroupPanel, peeking: boolean): void;
 }
 
 export interface IAutoHideEdgeGroupService extends IDisposable {

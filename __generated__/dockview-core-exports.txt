@@ -53,6 +53,7 @@ DockviewGroupPanelApi
 DockviewGroupPanelCollapsedChangeEvent
 DockviewGroupPanelLocationChangeEvent
 DockviewGroupPanelModel
+DockviewGroupPanelPeekChangeEvent
 DockviewHeaderDirection
 DockviewHeaderPosition
 DockviewIDisposable

@@ -431,6 +431,9 @@ export interface AutoHideEdgeGroupOptions {
     /** ms after the pointer leaves both the strip and the peek overlay before
      *  the peek closes. Re-entering either cancels it. Default 300. */
     closeDelay?: number;
+    /** Slide the peek overlay in. Default true; ignored when the OS requests
+     *  reduced motion. */
+    animate?: boolean;
 }
 
 export type TabAnimation = 'smooth' | 'default';

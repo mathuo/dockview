@@ -12,13 +12,22 @@ function resolveOptions(o: boolean | AutoHideEdgeGroupOptions | undefined): {
     enabled: boolean;
     openDelay: number;
     closeDelay: number;
+    animate: boolean;
 } {
     const obj = typeof o === 'object' ? o : {};
     return {
         enabled: !!o,
         openDelay: obj.openDelay ?? 250,
         closeDelay: obj.closeDelay ?? 300,
+        animate: obj.animate ?? true,
     };
+}
+
+function prefersReducedMotion(doc: Document): boolean {
+    const mq = doc.defaultView?.matchMedia?.(
+        '(prefers-reduced-motion: reduce)'
+    );
+    return !!mq?.matches;
 }
 
 /**
@@ -231,7 +240,38 @@ class EdgeGroupController extends CompositeDisposable {
         this.host.floatingOverlayHost.appendChild(overlay);
         this._peek = { overlay, content, parent };
         this._positionOverlay(overlay);
+        this._animateIn(overlay);
         this._armCloseListeners();
+        this.host.setEdgeGroupPeeking(this.group, true);
+    }
+
+    /** Slide the overlay in from the strip edge (unless reduced-motion / off). */
+    private _animateIn(overlay: HTMLElement): void {
+        const position = this._position;
+        const doc = this.group.element.ownerDocument;
+        if (
+            !position ||
+            !this._opts.animate ||
+            prefersReducedMotion(doc) ||
+            typeof doc.defaultView?.requestAnimationFrame !== 'function'
+        ) {
+            return;
+        }
+        const from =
+            position === 'left'
+                ? 'translateX(-100%)'
+                : position === 'right'
+                  ? 'translateX(100%)'
+                  : position === 'top'
+                    ? 'translateY(-100%)'
+                    : 'translateY(100%)';
+        overlay.style.transform = from;
+        // force a reflow so the transition runs from `from`
+        void overlay.offsetWidth;
+        overlay.style.transition = 'transform 150ms ease-out';
+        doc.defaultView.requestAnimationFrame(() => {
+            overlay.style.transform = 'translate(0, 0)';
+        });
     }
 
     /** Anchor the overlay to the strip's inner edge, sized to the group's
@@ -359,6 +399,7 @@ class EdgeGroupController extends CompositeDisposable {
         // Put the live content back where it came from before removing the overlay.
         peek.parent.appendChild(peek.content);
         peek.overlay.remove();
+        this.host.setEdgeGroupPeeking(this.group, false);
     }
 
     isPeeking(): boolean {

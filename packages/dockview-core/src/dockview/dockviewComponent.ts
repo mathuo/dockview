@@ -2613,6 +2613,29 @@ export class DockviewComponent
             : false;
     }
 
+    /** Edge groups currently peeking (auto-hide). The peek state is owned by the
+     *  auto-hide module; the component just records it so `group.api.isPeeking()`
+     *  / `onDidPeekChange` work. */
+    private readonly _peekingGroups = new Set<DockviewGroupPanel>();
+
+    isEdgeGroupPeeking(group: DockviewGroupPanel): boolean {
+        return this._peekingGroups.has(group);
+    }
+
+    /** Set the peek state and fire the group's `onDidPeekChange` (called by the
+     *  auto-hide service). */
+    setEdgeGroupPeeking(group: DockviewGroupPanel, peeking: boolean): void {
+        if (this._peekingGroups.has(group) === peeking) {
+            return;
+        }
+        if (peeking) {
+            this._peekingGroups.add(group);
+        } else {
+            this._peekingGroups.delete(group);
+        }
+        group.api._onDidPeekChange.fire({ isPeeking: peeking });
+    }
+
     private updateDragAndDropState(): void {
         // Update draggable state for all tabs and void containers
         for (const group of this.groups) {

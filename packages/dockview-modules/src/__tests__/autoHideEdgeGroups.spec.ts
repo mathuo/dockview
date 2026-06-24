@@ -148,6 +148,28 @@ describe('auto-hide edge groups', () => {
         d.dispose();
     });
 
+    test('group.api.isPeeking + onDidPeekChange reflect the peek', () => {
+        const d = make(true);
+        collapsedEdgeWithPanel(d);
+        const api = d.getEdgeGroup('left')!;
+        const events: boolean[] = [];
+        const sub = api.onDidPeekChange((e) => events.push(e.isPeeking));
+
+        expect(api.isPeeking()).toBe(false);
+
+        activators()[0].click();
+        expect(api.isPeeking()).toBe(true);
+
+        document.dispatchEvent(
+            new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+        );
+        expect(api.isPeeking()).toBe(false);
+        expect(events).toEqual([true, false]);
+
+        sub.dispose();
+        d.dispose();
+    });
+
     test('the strip tracks panel add/remove while collapsed', () => {
         const d = make(true);
         collapsedEdgeWithPanel(d, 'A');
