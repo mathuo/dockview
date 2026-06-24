@@ -1,5 +1,5 @@
 import { DockviewCompositeDisposable as CompositeDisposable } from 'dockview-core';
-import { DockviewGroupPanel } from 'dockview-core';
+import { DockviewGroupPanel, IDockviewPanel } from 'dockview-core';
 import { EdgeGroupPosition } from 'dockview-core';
 import { AutoHideEdgeGroupOptions } from 'dockview-core';
 import { defineModule, EdgeGroupModule } from 'dockview-core';
@@ -8,27 +8,32 @@ import {
     IAutoHideEdgeGroupService,
 } from 'dockview-core';
 
-function resolveOptions(o: boolean | AutoHideEdgeGroupOptions | undefined): {
-    enabled: boolean;
-    showIcons: boolean;
-} {
-    if (!o) {
-        return { enabled: false, showIcons: true };
-    }
-    if (o === true) {
-        return { enabled: true, showIcons: true };
-    }
-    return { enabled: true, showIcons: o.showIcons ?? true };
+function isEnabled(o: boolean | AutoHideEdgeGroupOptions | undefined): boolean {
+    return !!o;
 }
 
 /**
- * Renders the collapsed-strip activators for a single edge group and pins the
- * group when one is clicked. The activator list mirrors the group's panels and
- * is shown only while the group is collapsed and the feature is enabled — so
- * with `autoHideEdgeGroups` off the baseline (empty) strip is untouched.
+ * Strip activators + slide-out peek for a single edge group.
+ *
+ * - **Strip** (Phase 1): when the group is collapsed, render a clickable
+ *   activator per panel.
+ * - **Peek** (Phase 2): clicking an activator slides the panel out as an
+ *   overlay on the shared floating-overlay host — the live content element is
+ *   reparented (state preserved) and the grid is **not** reflowed (the splitview
+ *   view stays locked at `collapsedSize`). A pin button re-docks it; `Esc` or a
+ *   pointer-down outside closes it.
+ *
+ * Limited to `onlyWhenVisible` renderers; an `always`-renderer panel (whose live
+ * element lives in the shared render overlay) falls back to pinning. Hover/focus
+ * debounce + animation are later phases.
  */
-class EdgeStripController extends CompositeDisposable {
+class EdgeGroupController extends CompositeDisposable {
     private _strip: HTMLElement | undefined;
+    // open peek: the reparented content + where to put it back
+    private _peek:
+        | { overlay: HTMLElement; content: HTMLElement; parent: HTMLElement }
+        | undefined;
+    private _closeListeners: CompositeDisposable | undefined;
 
     constructor(
         private readonly group: DockviewGroupPanel,
@@ -37,22 +42,35 @@ class EdgeStripController extends CompositeDisposable {
         super();
 
         this.addDisposables(
-            this.group.api.onDidCollapsedChange(() => this._render()),
-            this.group.model.onDidAddPanel(() => this._render()),
-            this.group.model.onDidRemovePanel(() => this._render()),
-            { dispose: () => this._removeStrip() }
+            this.group.api.onDidCollapsedChange(() => {
+                this._closePeek();
+                this._renderStrip();
+            }),
+            this.group.model.onDidAddPanel(() => this._renderStrip()),
+            this.group.model.onDidRemovePanel(() => this._renderStrip()),
+            {
+                dispose: () => {
+                    this._closePeek();
+                    this._removeStrip();
+                },
+            }
         );
 
-        this._render();
+        this._renderStrip();
     }
 
     private get _enabled(): boolean {
-        return resolveOptions(this.host.options.autoHideEdgeGroups).enabled;
+        return isEnabled(this.host.options.autoHideEdgeGroups);
     }
 
-    /** Rebuild the activator strip from the current panels, or remove it when
-     *  the group is expanded / the feature is off. */
-    private _render(): void {
+    private get _position(): EdgeGroupPosition | undefined {
+        const location = this.group.api.location;
+        return location.type === 'edge' ? location.position : undefined;
+    }
+
+    // --- strip ---
+
+    private _renderStrip(): void {
         if (!this._enabled || !this.group.api.isCollapsed()) {
             this._removeStrip();
             return;
@@ -62,8 +80,6 @@ class EdgeStripController extends CompositeDisposable {
         const doc = this.group.element.ownerDocument;
         const strip = doc.createElement('div');
         strip.className = 'dv-edge-activator-strip';
-        // Minimal inline layout so the strip is usable before any theme styles
-        // it; visual polish (orientation, icons) is a follow-up phase.
         strip.style.display = 'flex';
         strip.style.flexWrap = 'wrap';
 
@@ -72,13 +88,7 @@ class EdgeStripController extends CompositeDisposable {
             button.className = 'dv-edge-activator';
             button.type = 'button';
             button.textContent = panel.title ?? panel.id;
-            // Clicking an activator pins (expands) the group and activates the
-            // panel. Pin goes through the host's single collapse mutate path.
-            // (Listeners are GC'd with the button when the strip is removed.)
-            button.addEventListener('click', () => {
-                this.host.setEdgeGroupCollapsed(this.group, false);
-                panel.api.setActive();
-            });
+            button.addEventListener('click', () => this._onActivator(panel));
             strip.appendChild(button);
         }
 
@@ -90,13 +100,191 @@ class EdgeStripController extends CompositeDisposable {
         this._strip?.remove();
         this._strip = undefined;
     }
+
+    private _onActivator(panel: IDockviewPanel): void {
+        // Make the clicked panel active, then peek it (or pin if it can't peek).
+        panel.api.setActive();
+        this.openPeek();
+    }
+
+    // --- peek ---
+
+    openPeek(): void {
+        if (!this._enabled || !this.group.api.isCollapsed()) {
+            return;
+        }
+        const panel = this.group.activePanel;
+        if (!panel) {
+            return;
+        }
+        // The `always` renderer's element lives in the shared render overlay, not
+        // the content container — reparenting it is a later phase; pin instead.
+        if (panel.api.renderer === 'always') {
+            this.pin();
+            return;
+        }
+        if (this._peek) {
+            this._closePeek();
+        }
+
+        const content = panel.view.content.element;
+        const parent = content.parentElement;
+        if (!parent) {
+            return;
+        }
+
+        const doc = this.group.element.ownerDocument;
+        const overlay = doc.createElement('div');
+        overlay.className = 'dv-edge-peek';
+        overlay.style.position = 'absolute';
+        overlay.style.background = 'var(--dv-group-view-background-color)';
+        overlay.style.overflow = 'hidden';
+        overlay.style.boxSizing = 'border-box';
+        // Sit above grid content (the floating-overlay host is pointer-events:
+        // none, so opt this child back in) and take pointer events for the
+        // slid-out panel + its pin button.
+        overlay.style.zIndex = '999';
+        overlay.style.pointerEvents = 'auto';
+
+        // A small header with a pin affordance (re-dock).
+        const pinButton = doc.createElement('button');
+        pinButton.className = 'dv-edge-peek-pin';
+        pinButton.type = 'button';
+        pinButton.textContent = 'Pin';
+        pinButton.addEventListener('click', () => this.pin());
+        overlay.appendChild(pinButton);
+
+        // Reparent the live content into the overlay (state preserved).
+        overlay.appendChild(content);
+
+        this.host.floatingOverlayHost.appendChild(overlay);
+        this._peek = { overlay, content, parent };
+        this._positionOverlay(overlay);
+        this._armCloseListeners();
+    }
+
+    /** Anchor the overlay to the strip's inner edge, sized to the group's
+     *  expanded size — relative to the floating-overlay host. No grid reflow. */
+    private _positionOverlay(overlay: HTMLElement): void {
+        const position = this._position;
+        if (!position) {
+            return;
+        }
+        const strip = this.group.element.getBoundingClientRect();
+        const host = this.host.floatingOverlayHost.getBoundingClientRect();
+        const size = this.host.getEdgeGroupExpandedSize(position);
+        const left = strip.left - host.left;
+        const top = strip.top - host.top;
+
+        switch (position) {
+            case 'left':
+                Object.assign(overlay.style, {
+                    left: `${left + strip.width}px`,
+                    top: `${top}px`,
+                    width: `${size}px`,
+                    height: `${strip.height}px`,
+                });
+                break;
+            case 'right':
+                Object.assign(overlay.style, {
+                    left: `${left - size}px`,
+                    top: `${top}px`,
+                    width: `${size}px`,
+                    height: `${strip.height}px`,
+                });
+                break;
+            case 'top':
+                Object.assign(overlay.style, {
+                    left: `${left}px`,
+                    top: `${top + strip.height}px`,
+                    width: `${strip.width}px`,
+                    height: `${size}px`,
+                });
+                break;
+            case 'bottom':
+                Object.assign(overlay.style, {
+                    left: `${left}px`,
+                    top: `${top - size}px`,
+                    width: `${strip.width}px`,
+                    height: `${size}px`,
+                });
+                break;
+        }
+    }
+
+    private _armCloseListeners(): void {
+        const doc = this.group.element.ownerDocument;
+        const onKeyDown = (e: Event): void => {
+            if ((e as KeyboardEvent).key === 'Escape') {
+                this._closePeek();
+            }
+        };
+        const onPointerDown = (e: Event): void => {
+            const target = e.target;
+            if (!(target instanceof Node)) {
+                return;
+            }
+            // A click on the strip or inside the peek keeps it open.
+            if (
+                this._peek?.overlay.contains(target) ||
+                this.group.element.contains(target)
+            ) {
+                return;
+            }
+            this._closePeek();
+        };
+        doc.addEventListener('keydown', onKeyDown, true);
+        doc.addEventListener('pointerdown', onPointerDown, true);
+        this._closeListeners = new CompositeDisposable(
+            {
+                dispose: () =>
+                    doc.removeEventListener('keydown', onKeyDown, true),
+            },
+            {
+                dispose: () =>
+                    doc.removeEventListener('pointerdown', onPointerDown, true),
+            }
+        );
+    }
+
+    /** Restore the reparented content and remove the overlay (no layout change). */
+    private _closePeek(): void {
+        this._closeListeners?.dispose();
+        this._closeListeners = undefined;
+        const peek = this._peek;
+        this._peek = undefined;
+        if (!peek) {
+            return;
+        }
+        // Put the live content back where it came from before removing the overlay.
+        peek.parent.appendChild(peek.content);
+        peek.overlay.remove();
+    }
+
+    isPeeking(): boolean {
+        return this._peek !== undefined;
+    }
+
+    peek(open: boolean): void {
+        if (open) {
+            this.openPeek();
+        } else {
+            this._closePeek();
+        }
+    }
+
+    /** Re-dock: restore content, then expand via the host's collapse path. */
+    pin(): void {
+        this._closePeek();
+        this.host.setEdgeGroupCollapsed(this.group, false);
+    }
 }
 
 /**
- * Auto-hide edge groups (VS-style). Phase 1: a collapsed edge group renders
- * clickable activators in its strip; clicking one pins (expands) the group.
- * Opt-in via `autoHideEdgeGroups` (default off → baseline strip unchanged).
- * The slide-out peek + pin/unpin animation + serialization are later phases.
+ * Auto-hide edge groups (VS-style). A collapsed edge group renders clickable
+ * activators; clicking one slides the panel out as a non-reflowing overlay
+ * (peek), with a pin button to re-dock. Opt-in via `autoHideEdgeGroups`
+ * (default off → baseline strip unchanged).
  */
 export class AutoHideEdgeGroupService
     extends CompositeDisposable
@@ -104,7 +292,7 @@ export class AutoHideEdgeGroupService
 {
     private readonly _controllers = new Map<
         DockviewGroupPanel,
-        EdgeStripController
+        EdgeGroupController
     >();
 
     constructor(private readonly host: IAutoHideEdgeGroupHost) {
@@ -129,7 +317,7 @@ export class AutoHideEdgeGroupService
         ) {
             return;
         }
-        this._controllers.set(group, new EdgeStripController(group, this.host));
+        this._controllers.set(group, new EdgeGroupController(group, this.host));
     }
 
     private _untrack(group: DockviewGroupPanel): void {
@@ -140,10 +328,23 @@ export class AutoHideEdgeGroupService
         }
     }
 
+    private _controllerAt(
+        position: EdgeGroupPosition
+    ): EdgeGroupController | undefined {
+        const group = this.host.getEdgeGroupPanel(position);
+        return group ? this._controllers.get(group) : undefined;
+    }
+
     pin(position: EdgeGroupPosition): void {
         const group = this.host.getEdgeGroupPanel(position);
         if (group) {
-            this.host.setEdgeGroupCollapsed(group, false);
+            // Use the controller so an open peek is torn down cleanly first.
+            const controller = this._controllers.get(group);
+            if (controller) {
+                controller.pin();
+            } else {
+                this.host.setEdgeGroupCollapsed(group, false);
+            }
         }
     }
 
@@ -152,6 +353,10 @@ export class AutoHideEdgeGroupService
         if (group) {
             this.host.setEdgeGroupCollapsed(group, true);
         }
+    }
+
+    peek(position: EdgeGroupPosition, peek: boolean): void {
+        this._controllerAt(position)?.peek(peek);
     }
 }
 

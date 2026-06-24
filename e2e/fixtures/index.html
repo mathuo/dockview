@@ -47,6 +47,8 @@
                     // Record layout history so the harness can exercise undo/redo
                     // (incl. async popout re-open).
                     layoutHistory: { enabled: true },
+                    // Enable auto-hide edge groups (collapsed-strip peek).
+                    autoHideEdgeGroups: true,
                     // A served (not about:blank) target avoids a 404 when the
                     // popout window navigates before dockview injects content.
                     popoutUrl: '/e2e/fixtures/popout.html',
@@ -103,6 +105,29 @@
                     redo: () => dockview.redo(),
                     canUndo: () => dockview.canUndo,
                     awaitPopoutRestore: () => dockview.popoutRestorationPromise,
+                    // Auto-hide edge: a center panel + a collapsed left edge
+                    // group with one panel, for peek tests.
+                    setupAutoHideEdge: () => {
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        dockview.addEdgeGroup('left', {
+                            id: 'edge-left',
+                            initialSize: 220,
+                        });
+                        dockview.addPanel({
+                            id: 'sidebar',
+                            component: 'default',
+                            title: 'Sidebar',
+                            position: {
+                                referenceGroup: 'edge-left',
+                                direction: 'within',
+                            },
+                        });
+                        dockview.autoHideEdgeGroup('left');
+                    },
                 };
                 window.__ready = true;
             })();

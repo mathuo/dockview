@@ -3,6 +3,9 @@ import { IContentRenderer } from 'dockview-core';
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');
+    constructor() {
+        this.element.className = 'dv-test-content';
+    }
     init(): void {
         // noop
     }
@@ -15,9 +18,10 @@ class TestPanel implements IContentRenderer {
 }
 
 /**
- * Auto-hide edge groups (Phase 1) — a collapsed edge group renders clickable
- * activators in its strip; clicking one pins (expands) the group. Opt-in via
- * `autoHideEdgeGroups`; off → today's baseline (empty strip) is unchanged.
+ * Auto-hide edge groups. Phase 1: a collapsed edge group renders clickable
+ * activators. Phase 2: clicking one slides the panel out as a non-reflowing
+ * overlay (peek) on the floating-overlay host; a pin button re-docks it; Esc /
+ * pointer-down outside closes it. Opt-in via `autoHideEdgeGroups`.
  */
 describe('auto-hide edge groups', () => {
     let container: HTMLElement;
@@ -35,7 +39,6 @@ describe('auto-hide edge groups', () => {
         return dockview;
     };
 
-    /** Add a left edge group with one panel, then collapse it. */
     const collapsedEdgeWithPanel = (
         dockview: DockviewComponent,
         title = 'Explorer'
@@ -54,6 +57,10 @@ describe('auto-hide edge groups', () => {
         Array.from(
             container.querySelectorAll('.dv-edge-activator')
         ) as HTMLElement[];
+    const peek = (): HTMLElement | null =>
+        container.querySelector('.dv-edge-peek');
+    const collapsed = (d: DockviewComponent): boolean =>
+        d.getEdgeGroup('left')!.isCollapsed();
 
     afterEach(() => {
         container.remove();
@@ -63,7 +70,7 @@ describe('auto-hide edge groups', () => {
         const d = make(true);
         collapsedEdgeWithPanel(d, 'Explorer');
 
-        expect(d.getEdgeGroup('left')!.isCollapsed()).toBe(true);
+        expect(collapsed(d)).toBe(true);
         const buttons = activators();
         expect(buttons.length).toBe(1);
         expect(buttons[0].textContent).toBe('Explorer');
@@ -71,35 +78,71 @@ describe('auto-hide edge groups', () => {
         d.dispose();
     });
 
-    test('clicking an activator pins (expands) the group and clears the strip', () => {
+    test('clicking an activator peeks: overlay shown, content reparented, no reflow', () => {
         const d = make(true);
         collapsedEdgeWithPanel(d);
-        expect(activators().length).toBe(1);
 
         activators()[0].click();
 
-        expect(d.getEdgeGroup('left')!.isCollapsed()).toBe(false);
-        expect(activators().length).toBe(0);
+        const overlay = peek();
+        expect(overlay).toBeTruthy();
+        expect(overlay!.querySelector('.dv-test-content')).toBeTruthy();
+        expect(collapsed(d)).toBe(true);
 
         d.dispose();
     });
 
-    test('api.pinEdgeGroup / autoHideEdgeGroup toggle the strip', () => {
+    test('the pin button re-docks (expands) the group and removes the peek', () => {
         const d = make(true);
-        d.addEdgeGroup('left', { id: 'edge-left', initialSize: 200 });
-        d.addPanel({
-            id: 'p1',
-            component: 'default',
-            title: 'Output',
-            position: { referenceGroup: 'edge-left', direction: 'within' },
-        });
+        collapsedEdgeWithPanel(d);
+        activators()[0].click();
+        expect(peek()).toBeTruthy();
 
-        d.api.autoHideEdgeGroup('left');
-        expect(activators().length).toBe(1);
+        (peek()!.querySelector('.dv-edge-peek-pin') as HTMLElement).click();
+
+        expect(collapsed(d)).toBe(false);
+        expect(peek()).toBeNull();
+
+        d.dispose();
+    });
+
+    test('Escape closes the peek, restores content, stays collapsed', () => {
+        const d = make(true);
+        collapsedEdgeWithPanel(d);
+        activators()[0].click();
+        expect(peek()).toBeTruthy();
+
+        document.dispatchEvent(
+            new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+        );
+
+        expect(peek()).toBeNull();
+        expect(collapsed(d)).toBe(true);
+        expect(
+            d
+                .getEdgeGroupPanel('left')!
+                .element.querySelector('.dv-test-content')
+        ).toBeTruthy();
+
+        d.dispose();
+    });
+
+    test('api.peekEdgeGroup / pinEdgeGroup / autoHideEdgeGroup', () => {
+        const d = make(true);
+        collapsedEdgeWithPanel(d);
+
+        d.api.peekEdgeGroup('left', true);
+        expect(peek()).toBeTruthy();
+        expect(collapsed(d)).toBe(true);
+
+        d.api.peekEdgeGroup('left', false);
+        expect(peek()).toBeNull();
 
         d.api.pinEdgeGroup('left');
-        expect(activators().length).toBe(0);
-        expect(d.getEdgeGroup('left')!.isCollapsed()).toBe(false);
+        expect(collapsed(d)).toBe(false);
+
+        d.api.autoHideEdgeGroup('left');
+        expect(collapsed(d)).toBe(true);
 
         d.dispose();
     });
@@ -124,12 +167,14 @@ describe('auto-hide edge groups', () => {
         d.dispose();
     });
 
-    test('off (default): a collapsed edge group renders no activators', () => {
+    test('off (default): no activators and no peek', () => {
         const d = make(undefined);
         collapsedEdgeWithPanel(d);
 
-        expect(d.getEdgeGroup('left')!.isCollapsed()).toBe(true);
-        expect(activators().length).toBe(0); // baseline strip untouched
+        expect(collapsed(d)).toBe(true);
+        expect(activators().length).toBe(0);
+        d.api.peekEdgeGroup('left', true);
+        expect(peek()).toBeNull();
 
         d.dispose();
     });

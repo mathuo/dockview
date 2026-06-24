@@ -1176,6 +1176,15 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         this.component.autoHideEdgeGroup(position);
     }
 
+    /**
+     * Peek (slide out as an overlay, without reflowing the grid) or close the
+     * collapsed edge group at `position`. No-op when the auto-hide module is
+     * absent or the group is not collapsed.
+     */
+    peekEdgeGroup(position: EdgeGroupPosition, peek: boolean): void {
+        this.component.peekEdgeGroup(position, peek);
+    }
+
     updateOptions(options: Partial<DockviewComponentOptions>) {
         this.component.updateOptions(options);
     }

@@ -777,6 +777,12 @@ export class ShellManager implements IDisposable {
         return this._getView(position)?.isCollapsed ?? false;
     }
 
+    /** The size an edge group expands to (its pre-collapse size) — used to size
+     *  the auto-hide peek overlay. */
+    getEdgeGroupExpandedSize(position: EdgeGroupPosition): number {
+        return this._getView(position)?.lastExpandedSize ?? 0;
+    }
+
     private _getView(position: EdgeGroupPosition): EdgeGroupView | undefined {
         switch (position) {
             case 'top':
