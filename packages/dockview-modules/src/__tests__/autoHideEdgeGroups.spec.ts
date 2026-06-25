@@ -130,6 +130,18 @@ describe('auto-hide edge groups', () => {
         d.dispose();
     });
 
+    test('the peek gets an opaque background so it is never see-through', () => {
+        const d = make(true);
+        collapsedEdgeWithPanel(d);
+        // simulate a themed group background (the floating peek must inherit it)
+        strip(d).style.backgroundColor = 'rgb(10, 20, 30)';
+
+        d.api.peekEdgeGroup('left', true);
+        expect(peek()!.style.backgroundColor).toBe('rgb(10, 20, 30)');
+
+        d.dispose();
+    });
+
     test('off (default): peeking is a no-op', () => {
         const d = make(undefined);
         collapsedEdgeWithPanel(d);

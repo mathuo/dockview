@@ -170,6 +170,25 @@ class EdgeGroupController extends CompositeDisposable {
         this._cancelClose();
     }
 
+    /** The first opaque computed background walking up from the group — so the
+     *  floating peek is never see-through, whatever (if anything) the consumer
+     *  themed. Returns '' if nothing opaque is found (let the stylesheet win). */
+    private _resolveBackground(): string {
+        const win = this.group.element.ownerDocument.defaultView;
+        if (!win) {
+            return '';
+        }
+        let el: HTMLElement | null = this.group.element;
+        while (el) {
+            const bg = win.getComputedStyle(el).backgroundColor;
+            if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
+                return bg;
+            }
+            el = el.parentElement;
+        }
+        return '';
+    }
+
     // --- peek ---
 
     openPeek(): void {
@@ -206,6 +225,16 @@ class EdgeGroupController extends CompositeDisposable {
         // so opt this child back in).
         overlay.style.zIndex = '999';
         overlay.style.pointerEvents = 'auto';
+        // The peek FLOATS over other content, so it must be opaque — a docked
+        // group can be transparent (the shell shows through harmlessly), but a
+        // floating one can't. The `.dv-edge-peek` stylesheet rule defaults it to
+        // the group-view background, but if the consumer hasn't set that var the
+        // peek would be see-through; derive an opaque background from the live
+        // group (falling back up the tree) so it's never transparent.
+        const background = this._resolveBackground();
+        if (background) {
+            overlay.style.backgroundColor = background;
+        }
 
         const header = doc.createElement('div');
         header.className = 'dv-edge-peek-header';
