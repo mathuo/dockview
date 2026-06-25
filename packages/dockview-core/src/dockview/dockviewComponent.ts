@@ -432,7 +432,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     pinEdgeGroup(position: EdgeGroupPosition): void;
     autoHideEdgeGroup(position: EdgeGroupPosition): void;
     peekEdgeGroup(position: EdgeGroupPosition, peek: boolean): void;
-    readonly floatingOverlayHost: HTMLElement;
+    readonly overlayRoot: HTMLElement;
     getEdgeGroupExpandedSize(position: EdgeGroupPosition): number;
     // layout history (undo / redo)
     undo(): void;
@@ -2535,9 +2535,11 @@ export class DockviewComponent
         );
     }
 
-    /** The shared overlay host the auto-hide peek mounts on. */
-    get floatingOverlayHost(): HTMLElement {
-        return this._floatingOverlayHost ?? this.gridview.element;
+    /** The auto-hide peek mounts on the shell — the same element the
+     *  `OverlayRenderContainer` roots on — so `always` content re-anchors in the
+     *  peek's coordinate space. */
+    get overlayRoot(): HTMLElement {
+        return this.rootElement;
     }
 
     /** The size an edge group expands to (pre-collapse) — sizes the peek. */

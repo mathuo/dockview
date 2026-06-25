@@ -21,6 +21,13 @@
     <body>
         <div id="app"></div>
 
+        <!-- Built stylesheet so layout-sensitive behaviour (overlay host
+             positioning, edge-group peek) matches real usage. -->
+        <link
+            rel="stylesheet"
+            href="/packages/dockview-core/dist/styles/dockview.css"
+        />
+
         <!-- Built UMD bundles. dockview-core exposes the global "dockview-core";
              dockview-modules expects it aliased as DockviewCore. -->
         <script src="/packages/dockview-core/dist/dockview-core.js"></script>

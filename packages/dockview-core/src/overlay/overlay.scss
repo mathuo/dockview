@@ -34,6 +34,43 @@
     }
 }
 
+// Auto-hide edge group "peek": the active panel slid out over the content.
+.dv-edge-peek {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--dv-group-view-background-color);
+    border: 1px solid var(--dv-separator-border);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+
+    > .dv-edge-peek-header {
+        display: flex;
+        justify-content: flex-end;
+        flex-shrink: 0;
+        padding: 2px;
+    }
+
+    // the reparented panel content fills the rest of the overlay
+    > :not(.dv-edge-peek-header) {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: auto;
+    }
+
+    .dv-edge-peek-pin {
+        cursor: pointer;
+        border: none;
+        border-radius: 3px;
+        padding: 2px 8px;
+        font-size: 11px;
+        color: var(--dv-activegroup-visiblepanel-tab-color);
+        background-color: transparent;
+
+        &:hover {
+            background-color: var(--dv-icon-hover-background-color);
+        }
+    }
+}
+
 // A floating window hosts its own gridview as the overlay content; it must
 // fill the resize container so its size tracks the overlay box.
 .dv-resize-container > .dv-grid-view {

@@ -267,9 +267,10 @@ export interface IAutoHideEdgeGroupHost {
     /** Collapse/expand an edge group — the single mutate path (fires
      *  `onDidCollapsedChange`, no-op guarded). */
     setEdgeGroupCollapsed(group: DockviewGroupPanel, collapsed: boolean): void;
-    /** The shared overlay host the slide-out peek mounts on (same stacking
-     *  context as floating groups). */
-    readonly floatingOverlayHost: HTMLElement;
+    /** The element the slide-out peek mounts on — the shell, which is also the
+     *  `OverlayRenderContainer` root, so `always`-rendered content anchors in
+     *  the same coordinate space as the peek. */
+    readonly overlayRoot: HTMLElement;
     /** The size an edge group expands to — sizes the peek overlay. */
     getEdgeGroupExpandedSize(position: EdgeGroupPosition): number;
     /** Record the peek state so `group.api.isPeeking()` / `onDidPeekChange`
