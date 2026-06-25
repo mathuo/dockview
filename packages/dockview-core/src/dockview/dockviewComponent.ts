@@ -2547,6 +2547,12 @@ export class DockviewComponent
         return this._shellManager?.getEdgeGroupExpandedSize(position) ?? 0;
     }
 
+    /** Re-anchor `renderer:'always'` overlays (used by the auto-hide peek as it
+     *  reparents / slides a group's content container). */
+    repositionOverlays(): void {
+        this.overlayRenderContainer.updateAllPositions();
+    }
+
     setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void {
         this._shellManager!.setEdgeGroupVisible(position, visible);
     }

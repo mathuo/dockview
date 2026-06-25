@@ -188,12 +188,14 @@ describe('auto-hide edge groups', () => {
             d.dispose();
         });
 
-        test('focus opens immediately', () => {
+        test('focus opens (deferred out of the focus event)', () => {
             const d = make({ openDelay: 100, closeDelay: 100 });
             collapsedEdgeWithPanel(d);
             jest.useFakeTimers();
 
             fireEvent.focusIn(strip(d));
+            expect(peek()).toBeNull(); // scheduled, not synchronous
+            jest.advanceTimersByTime(0);
             expect(peek()).toBeTruthy();
 
             d.dispose();

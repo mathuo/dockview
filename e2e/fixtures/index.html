@@ -112,9 +112,11 @@
                     redo: () => dockview.redo(),
                     canUndo: () => dockview.canUndo,
                     awaitPopoutRestore: () => dockview.popoutRestorationPromise,
+                    peekEdge: (position, on) =>
+                        dockview.api.peekEdgeGroup(position, on),
                     // Auto-hide edge: a center panel + a collapsed left edge
                     // group with one panel, for peek tests.
-                    setupAutoHideEdge: () => {
+                    setupAutoHideEdge: (renderer) => {
                         dockview.addPanel({
                             id: 'main',
                             component: 'default',
@@ -128,6 +130,9 @@
                             id: 'sidebar',
                             component: 'default',
                             title: 'Sidebar',
+                            // default 'onlyWhenVisible'; pass 'always' to exercise
+                            // the render-overlay re-anchor path of the peek.
+                            renderer: renderer || undefined,
                             position: {
                                 referenceGroup: 'edge-left',
                                 direction: 'within',
