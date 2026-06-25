@@ -72,7 +72,7 @@ export class OverlayRenderContainer extends CompositeDisposable {
             disposable: IDisposable;
             destroy: IDisposable;
             element: HTMLElement;
-            resize?: () => void;
+            resize?: (forceVisible?: boolean) => void;
         }
     > = {};
 
@@ -111,6 +111,21 @@ export class OverlayRenderContainer extends CompositeDisposable {
                 entry.resize();
             }
         }
+    }
+
+    /**
+     * Reposition a single panel's overlay over its reference container,
+     * optionally forcing it visible even when the panel is not currently
+     * "visible" (e.g. its group is collapsed). Used by the auto-hide peek to
+     * slide an `always`-rendered panel out without reparenting it or mutating
+     * the panel's visibility state. No-op if the panel isn't overlay-rendered.
+     */
+    repositionPanelOverlay(panelId: string, forceVisible = false): void {
+        if (this._disposed) {
+            return;
+        }
+        this.positionCache.invalidate();
+        this.map[panelId]?.resize?.(forceVisible);
     }
 
     detatch(panel: IDockviewPanel): boolean {
@@ -163,7 +178,7 @@ export class OverlayRenderContainer extends CompositeDisposable {
             this.element.appendChild(focusContainer);
         }
 
-        const resize = () => {
+        const resize = (forceVisible = false) => {
             const panelId = panel.api.id;
 
             if (this.pendingUpdates.has(panelId)) {
@@ -201,7 +216,7 @@ export class OverlayRenderContainer extends CompositeDisposable {
                 // leave a hidden panel visually visible at a stale position,
                 // because onDidDimensionsChange skips non-visible panels and
                 // never recomputes their box on subsequent resizes.
-                if (panel.api.isVisible) {
+                if (panel.api.isVisible || forceVisible) {
                     focusContainer.style.visibility = '';
                     focusContainer.style.pointerEvents = '';
                 } else {

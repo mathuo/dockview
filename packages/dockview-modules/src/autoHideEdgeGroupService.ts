@@ -1,5 +1,6 @@
 import { DockviewCompositeDisposable as CompositeDisposable } from 'dockview-core';
 import { DockviewGroupPanel } from 'dockview-core';
+import { IDockviewPanel } from 'dockview-core';
 import { EdgeGroupPosition } from 'dockview-core';
 import { AutoHideEdgeGroupOptions } from 'dockview-core';
 import { defineModule, EdgeGroupModule } from 'dockview-core';
@@ -49,11 +50,17 @@ function prefersReducedMotion(doc: Document): boolean {
  * content): for `onlyWhenVisible` the content lives inside it and moves with it;
  * for `always` the container is just the position reference the shared render
  * overlay anchors to — the content's parent (the render overlay) never changes,
- * we only re-run its positioning (`repositionOverlays`) as the container slides.
+ * we only re-run its positioning (`repositionPanelOverlay`, force-visible) as the
+ * container slides, so the panel's own visibility state is never touched.
  */
 class EdgeGroupController extends CompositeDisposable {
     private _peek:
-        | { overlay: HTMLElement; content: HTMLElement; parent: HTMLElement }
+        | {
+              overlay: HTMLElement;
+              content: HTMLElement;
+              parent: HTMLElement;
+              panel: IDockviewPanel;
+          }
         | undefined;
     private _closeListeners: CompositeDisposable | undefined;
     private _openTimer: ReturnType<typeof setTimeout> | undefined;
@@ -97,11 +104,14 @@ class EdgeGroupController extends CompositeDisposable {
             // strip visible with nothing extra to render.
             this.group.api.onDidCollapsedChange(() => this._closePeek()),
             // Activating a different tab while peeking: the content container
-            // already shows the new active `onlyWhenVisible` panel; re-anchor so
-            // the new active `always` panel covers it too.
+            // already shows the new active `onlyWhenVisible` panel; release the
+            // old `always` overlay and re-anchor the new active one over it.
             this.group.api.onDidActivePanelChange(() => {
-                if (this._peek) {
-                    this.host.repositionOverlays();
+                const next = this.group.activePanel;
+                if (this._peek && next) {
+                    this.host.repositionPanelOverlay(this._peek.panel, false);
+                    this._peek.panel = next;
+                    this.host.repositionPanelOverlay(next, true);
                 }
             }),
             {
@@ -195,13 +205,14 @@ class EdgeGroupController extends CompositeDisposable {
         if (!this._gate()) {
             return;
         }
-        if (!this.group.activePanel) {
+        const panel = this.group.activePanel;
+        if (!panel) {
             return;
         }
         // Reparent the whole content CONTAINER (not the panel's content element)
         // so BOTH renderers work: `onlyWhenVisible` content lives inside it, and
         // an `always` panel's render overlay is anchored to it (re-anchored via
-        // repositionOverlays). It un-hides automatically once out of the
+        // repositionPanelOverlay). It un-hides automatically once out of the
         // collapsed group's subtree.
         const content = this.group.element.querySelector<HTMLElement>(
             '.dv-content-container'
@@ -262,11 +273,20 @@ class EdgeGroupController extends CompositeDisposable {
         overlay.appendChild(content);
 
         this.host.overlayRoot.appendChild(overlay);
-        this._peek = { overlay, content, parent };
+        this._peek = { overlay, content, parent, panel };
         this._positionOverlay(overlay);
         this._armCloseListeners();
         this.host.setEdgeGroupPeeking(this.group, true);
         this._animateIn(overlay);
+    }
+
+    /** Re-anchor the peeked `always` panel's render overlay over the (current)
+     *  content-container box, force-showing it. No-op for `onlyWhenVisible`
+     *  (whose content rides inside the reparented container). */
+    private _syncOverlay(): void {
+        if (this._peek) {
+            this.host.repositionPanelOverlay(this._peek.panel, true);
+        }
     }
 
     /**
@@ -286,7 +306,7 @@ class EdgeGroupController extends CompositeDisposable {
             typeof win?.requestAnimationFrame !== 'function' ||
             typeof win.performance?.now !== 'function'
         ) {
-            this.host.repositionOverlays();
+            this._syncOverlay();
             return;
         }
 
@@ -305,7 +325,7 @@ class EdgeGroupController extends CompositeDisposable {
             overlay.style.transform =
                 t >= 1 ? '' : `translate${axis}(${remaining}%)`;
             // Re-anchor `always` content over the container's transformed box.
-            this.host.repositionOverlays();
+            this._syncOverlay();
             if (t < 1) {
                 win.requestAnimationFrame(step);
             }
@@ -436,8 +456,10 @@ class EdgeGroupController extends CompositeDisposable {
         peek.parent.appendChild(peek.content);
         peek.overlay.remove();
         this.host.setEdgeGroupPeeking(this.group, false);
-        // Re-anchor `always` content back over the (now collapsed) container.
-        this.host.repositionOverlays();
+        // Re-anchor the `always` overlay back over the (now collapsed, in-group)
+        // container — forceVisible:false lets it hide again as the panel is no
+        // longer visible.
+        this.host.repositionPanelOverlay(peek.panel, false);
     }
 
     isPeeking(): boolean {

@@ -276,11 +276,12 @@ export interface IAutoHideEdgeGroupHost {
     /** Record the peek state so `group.api.isPeeking()` / `onDidPeekChange`
      *  reflect it (the module owns the actual overlay). */
     setEdgeGroupPeeking(group: DockviewGroupPanel, peeking: boolean): void;
-    /** Re-anchor `renderer:'always'` panel overlays over their reference
-     *  containers. The peek reparents a group's content container into the
-     *  slide-out overlay, so the always-rendered content must re-anchor over its
-     *  new (and, during the slide, moving) box. */
-    repositionOverlays(): void;
+    /** Reposition a single `renderer:'always'` panel's overlay over its
+     *  reference container, optionally forcing it visible. The peek reparents a
+     *  group's content container into the slide-out overlay; the always-rendered
+     *  content is NOT reparented (its parent stays constant) — it's re-anchored
+     *  over the moving container and force-shown for the duration of the peek. */
+    repositionPanelOverlay(panel: IDockviewPanel, forceVisible: boolean): void;
 }
 
 export interface IAutoHideEdgeGroupService extends IDisposable {

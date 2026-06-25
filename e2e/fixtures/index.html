@@ -117,7 +117,7 @@
                     // Auto-hide edge: a center panel + a collapsed left edge
                     // group with one panel, for peek tests.
                     setupAutoHideEdge: (renderer) => {
-                        dockview.addPanel({
+                        const main = dockview.addPanel({
                             id: 'main',
                             component: 'default',
                             title: 'main',
@@ -139,6 +139,11 @@
                             },
                         });
                         dockview.autoHideEdgeGroup('left');
+                        // Activate main so the collapsed edge group is NOT the
+                        // active group — this makes its panel report isVisible
+                        // false (as in a real app), exercising the peek's
+                        // force-visible path for `always` content.
+                        main.api.setActive();
                     },
                 };
                 window.__ready = true;

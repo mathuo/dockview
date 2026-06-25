@@ -2547,10 +2547,15 @@ export class DockviewComponent
         return this._shellManager?.getEdgeGroupExpandedSize(position) ?? 0;
     }
 
-    /** Re-anchor `renderer:'always'` overlays (used by the auto-hide peek as it
-     *  reparents / slides a group's content container). */
-    repositionOverlays(): void {
-        this.overlayRenderContainer.updateAllPositions();
+    /** Reposition a single `renderer:'always'` panel's overlay over its
+     *  reference container, optionally forcing it visible (the auto-hide peek
+     *  slides an `always` panel out without reparenting it or touching its
+     *  visibility state). No-op for non-overlay-rendered panels. */
+    repositionPanelOverlay(panel: IDockviewPanel, forceVisible: boolean): void {
+        this.overlayRenderContainer.repositionPanelOverlay(
+            panel.api.id,
+            forceVisible
+        );
     }
 
     setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void {
