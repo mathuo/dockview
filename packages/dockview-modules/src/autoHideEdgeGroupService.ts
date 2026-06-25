@@ -57,6 +57,7 @@ class EdgeGroupController extends CompositeDisposable {
     private _peek:
         | {
               overlay: HTMLElement;
+              header: HTMLElement;
               content: HTMLElement;
               parent: HTMLElement;
               panel: IDockviewPanel;
@@ -161,7 +162,11 @@ class EdgeGroupController extends CompositeDisposable {
     }
 
     private _scheduleClose(): void {
-        this._cancelClose();
+        // Idempotent: a document pointermove drives this on every move, so don't
+        // restart a running timer (that would prevent it ever firing).
+        if (this._closeTimer !== undefined) {
+            return;
+        }
         this._closeTimer = setTimeout(
             () => this._closePeek(),
             this._opts.closeDelay
@@ -247,24 +252,39 @@ class EdgeGroupController extends CompositeDisposable {
             overlay.style.backgroundColor = background;
         }
 
+        // The Pin header is a SEPARATE sibling overlay (not a child of the peek)
+        // so it can sit ABOVE an `always` panel's render overlay, which is itself
+        // a sibling lifted above the peek backdrop (peek bg < always content <
+        // pin). It's click-through except for the button so it never blocks the
+        // peeked content.
         const header = doc.createElement('div');
         header.className = 'dv-edge-peek-header';
-        // Float the header so the content container can fill the whole overlay
-        // (its box anchors `always`-rendered content) — layout must not depend
-        // on the consumer loading the stylesheet.
         header.style.position = 'absolute';
-        header.style.top = '0';
-        header.style.right = '0';
-        header.style.zIndex = '1';
+        header.style.zIndex = '1001';
+        header.style.pointerEvents = 'none';
+        header.style.display = 'flex';
+        header.style.justifyContent = 'flex-end';
+        header.style.alignItems = 'flex-start';
+        header.style.padding = '4px';
         const pinButton = doc.createElement('button');
         pinButton.className = 'dv-edge-peek-pin';
         pinButton.type = 'button';
         pinButton.title = 'Pin';
         pinButton.setAttribute('aria-label', 'Pin');
         pinButton.textContent = 'Pin';
+        // Self-contained cosmetics (it floats over the content, so needs its own
+        // surface) — the stylesheet refines these but they must not depend on it.
+        pinButton.style.pointerEvents = 'auto';
+        pinButton.style.cursor = 'pointer';
+        pinButton.style.border = '1px solid transparent';
+        pinButton.style.borderRadius = '3px';
+        pinButton.style.padding = '2px 8px';
+        pinButton.style.fontSize = '11px';
+        if (background) {
+            pinButton.style.backgroundColor = background;
+        }
         pinButton.addEventListener('click', () => this.pin());
         header.appendChild(pinButton);
-        overlay.appendChild(header);
 
         // Reparent the live content into the overlay (state preserved). Fill the
         // overlay so it doesn't depend on the consumer's stylesheet for layout.
@@ -273,7 +293,8 @@ class EdgeGroupController extends CompositeDisposable {
         overlay.appendChild(content);
 
         this.host.overlayRoot.appendChild(overlay);
-        this._peek = { overlay, content, parent, panel };
+        this.host.overlayRoot.appendChild(header);
+        this._peek = { overlay, header, content, parent, panel };
         this._positionOverlay(overlay);
         this._armCloseListeners();
         this.host.setEdgeGroupPeeking(this.group, true);
@@ -334,7 +355,9 @@ class EdgeGroupController extends CompositeDisposable {
     }
 
     /** Anchor the overlay to the strip's inner edge, sized to the group's
-     *  expanded size — relative to the floating-overlay host. No grid reflow. */
+     *  expanded size — relative to the overlay root. No grid reflow. The Pin
+     *  header tracks the same box (it's a separate sibling so it can sit above
+     *  an `always` render overlay). */
     private _positionOverlay(overlay: HTMLElement): void {
         const position = this._position;
         if (!position) {
@@ -346,40 +369,68 @@ class EdgeGroupController extends CompositeDisposable {
         const left = strip.left - host.left;
         const top = strip.top - host.top;
 
+        let box: { left: number; top: number; width: number; height: number };
         switch (position) {
             case 'left':
-                Object.assign(overlay.style, {
-                    left: `${left + strip.width}px`,
-                    top: `${top}px`,
-                    width: `${size}px`,
-                    height: `${strip.height}px`,
-                });
+                box = {
+                    left: left + strip.width,
+                    top,
+                    width: size,
+                    height: strip.height,
+                };
                 break;
             case 'right':
-                Object.assign(overlay.style, {
-                    left: `${left - size}px`,
-                    top: `${top}px`,
-                    width: `${size}px`,
-                    height: `${strip.height}px`,
-                });
+                box = {
+                    left: left - size,
+                    top,
+                    width: size,
+                    height: strip.height,
+                };
                 break;
             case 'top':
-                Object.assign(overlay.style, {
-                    left: `${left}px`,
-                    top: `${top + strip.height}px`,
-                    width: `${strip.width}px`,
-                    height: `${size}px`,
-                });
+                box = {
+                    left,
+                    top: top + strip.height,
+                    width: strip.width,
+                    height: size,
+                };
                 break;
             case 'bottom':
-                Object.assign(overlay.style, {
-                    left: `${left}px`,
-                    top: `${top - size}px`,
-                    width: `${strip.width}px`,
-                    height: `${size}px`,
-                });
+                box = {
+                    left,
+                    top: top - size,
+                    width: strip.width,
+                    height: size,
+                };
                 break;
         }
+
+        const apply = (el: HTMLElement): void => {
+            el.style.left = `${box.left}px`;
+            el.style.top = `${box.top}px`;
+            el.style.width = `${box.width}px`;
+            el.style.height = `${box.height}px`;
+        };
+        apply(overlay);
+        if (this._peek) {
+            apply(this._peek.header);
+        }
+    }
+
+    /** Is the point within the strip or the peek's box? Geometry-based so it
+     *  works regardless of which stacking layer the pointer is actually over —
+     *  for `always` the content is a separate render overlay ON TOP of the peek,
+     *  so element-based enter/leave on the peek would miss it. */
+    private _pointWithinPeek(x: number, y: number): boolean {
+        if (!this._peek) {
+            return false;
+        }
+        const within = (r: DOMRect): boolean =>
+            x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+        return (
+            within(this._peek.overlay.getBoundingClientRect()) ||
+            within(this.group.element.getBoundingClientRect())
+        );
     }
 
     private _armCloseListeners(): void {
@@ -391,20 +442,22 @@ class EdgeGroupController extends CompositeDisposable {
             }
         };
         const onPointerDown = (e: Event): void => {
-            const target = e.target;
-            if (!(target instanceof Node)) {
-                return;
-            }
-            if (
-                overlay.contains(target) ||
-                this.group.element.contains(target)
-            ) {
+            const pe = e as PointerEvent;
+            if (this._pointWithinPeek(pe.clientX, pe.clientY)) {
                 return;
             }
             this._closePeek();
         };
-        const onOverlayEnter = (): void => this._cancelClose();
-        const onOverlayLeave = (): void => this._scheduleClose();
+        // Keep-open / close by pointer geometry, not by element containment —
+        // the peeked content may be a sibling render overlay on top of the peek.
+        const onPointerMove = (e: Event): void => {
+            const pe = e as PointerEvent;
+            if (this._pointWithinPeek(pe.clientX, pe.clientY)) {
+                this._cancelClose();
+            } else {
+                this._scheduleClose();
+            }
+        };
         const onFocusOut = (e: Event): void => {
             const next = (e as FocusEvent).relatedTarget;
             if (
@@ -417,8 +470,7 @@ class EdgeGroupController extends CompositeDisposable {
         };
         doc.addEventListener('keydown', onKeyDown, true);
         doc.addEventListener('pointerdown', onPointerDown, true);
-        overlay.addEventListener('pointerenter', onOverlayEnter);
-        overlay.addEventListener('pointerleave', onOverlayLeave);
+        doc.addEventListener('pointermove', onPointerMove, true);
         overlay.addEventListener('focusout', onFocusOut);
 
         this._closeListeners = new CompositeDisposable(
@@ -431,11 +483,12 @@ class EdgeGroupController extends CompositeDisposable {
                     doc.removeEventListener('pointerdown', onPointerDown, true),
             },
             {
-                dispose: () => {
-                    overlay.removeEventListener('pointerenter', onOverlayEnter);
-                    overlay.removeEventListener('pointerleave', onOverlayLeave);
-                    overlay.removeEventListener('focusout', onFocusOut);
-                },
+                dispose: () =>
+                    doc.removeEventListener('pointermove', onPointerMove, true),
+            },
+            {
+                dispose: () =>
+                    overlay.removeEventListener('focusout', onFocusOut),
             }
         );
     }
@@ -455,6 +508,7 @@ class EdgeGroupController extends CompositeDisposable {
         peek.content.style.height = '';
         peek.parent.appendChild(peek.content);
         peek.overlay.remove();
+        peek.header.remove();
         this.host.setEdgeGroupPeeking(this.group, false);
         // Re-anchor the `always` overlay back over the (now collapsed, in-group)
         // container — forceVisible:false lets it hide again as the panel is no

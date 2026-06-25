@@ -87,7 +87,9 @@ describe('auto-hide edge groups', () => {
         collapsedEdgeWithPanel(d);
         d.api.peekEdgeGroup('left', true);
 
-        (peek()!.querySelector('.dv-edge-peek-pin') as HTMLElement).click();
+        // the Pin button is a separate sibling overlay (so it can layer above an
+        // `always` render overlay), not a child of the peek element.
+        (container.querySelector('.dv-edge-peek-pin') as HTMLElement).click();
 
         expect(collapsed(d)).toBe(false);
         expect(peek()).toBeNull();
@@ -185,15 +187,19 @@ describe('auto-hide edge groups', () => {
             d.dispose();
         });
 
-        test('re-entering the overlay cancels the close (no flicker)', () => {
+        test('pointer over the peek region cancels the close (no flicker)', () => {
             const d = make({ openDelay: 100, closeDelay: 100 });
             collapsedEdgeWithPanel(d);
             d.api.peekEdgeGroup('left', true);
-            const overlay = peek()!;
             jest.useFakeTimers();
 
+            // leaving the strip schedules a close...
             fireEvent.pointerLeave(strip(d));
-            fireEvent.pointerEnter(overlay);
+            // ...but a pointermove within the peek box cancels it. Keep-open is
+            // geometry-based (the peeked content may be a sibling overlay on
+            // top); in jsdom all rects are 0×0 at the origin, so (0,0) is
+            // "within" and a non-zero point is "outside".
+            fireEvent.pointerMove(document, { clientX: 0, clientY: 0 });
             jest.advanceTimersByTime(1000);
             expect(peek()).toBeTruthy();
 

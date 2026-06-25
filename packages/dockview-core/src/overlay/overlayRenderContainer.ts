@@ -223,6 +223,10 @@ export class OverlayRenderContainer extends CompositeDisposable {
                     focusContainer.style.visibility = 'hidden';
                     focusContainer.style.pointerEvents = 'none';
                 }
+                // When force-shown for an auto-hide peek, lift the overlay above
+                // the peek's own (opaque) backdrop so the content is visible;
+                // otherwise leave the default stacking.
+                focusContainer.style.zIndex = forceVisible ? '1000' : '';
 
                 toggleClass(
                     focusContainer,

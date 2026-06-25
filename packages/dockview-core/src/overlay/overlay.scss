@@ -34,40 +34,44 @@
     }
 }
 
-// Auto-hide edge group "peek": the active panel slid out over the content.
+// Auto-hide edge group "peek": the active panel slid out over the content. The
+// backdrop, the peeked content, and the Pin header are three separate sibling
+// overlays (the `always` render overlay can't be nested), layered by z-index.
 .dv-edge-peek {
-    display: flex;
-    flex-direction: column;
     background-color: var(--dv-group-view-background-color);
     border: 1px solid var(--dv-separator-border);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 
-    > .dv-edge-peek-header {
-        display: flex;
-        justify-content: flex-end;
-        flex-shrink: 0;
-        padding: 2px;
-    }
-
-    // the reparented panel content fills the rest of the overlay
-    > :not(.dv-edge-peek-header) {
-        flex: 1 1 auto;
-        min-height: 0;
+    // the reparented content container fills the backdrop
+    > * {
+        width: 100%;
+        height: 100%;
         overflow: auto;
     }
+}
 
-    .dv-edge-peek-pin {
-        cursor: pointer;
-        border: none;
-        border-radius: 3px;
-        padding: 2px 8px;
-        font-size: 11px;
-        color: var(--dv-activegroup-visiblepanel-tab-color);
-        background-color: transparent;
+// The Pin header is a sibling overlay so it can sit above an `always` panel's
+// render overlay; click-through except for the button itself.
+.dv-edge-peek-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding: 4px;
+    pointer-events: none;
+}
 
-        &:hover {
-            background-color: var(--dv-icon-hover-background-color);
-        }
+.dv-edge-peek-pin {
+    pointer-events: auto;
+    cursor: pointer;
+    border: 1px solid var(--dv-separator-border);
+    border-radius: 3px;
+    padding: 2px 8px;
+    font-size: 11px;
+    color: var(--dv-activegroup-visiblepanel-tab-color);
+    background-color: var(--dv-group-view-background-color);
+
+    &:hover {
+        background-color: var(--dv-icon-hover-background-color);
     }
 }
 

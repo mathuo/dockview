@@ -67,6 +67,19 @@ test.describe('auto-hide edge groups (peek)', () => {
         );
         expect(stillInRenderOverlay).toBe(true);
 
+        // STACKING: the always content must paint ABOVE the peek's opaque
+        // backdrop — position alone isn't enough (regression guard).
+        const topIsContent = await page.evaluate(() => {
+            const pk = document.querySelector('.dv-edge-peek')!;
+            const r = pk.getBoundingClientRect();
+            const el = document.elementFromPoint(
+                r.x + r.width / 2,
+                r.y + r.height / 2
+            );
+            return !!el?.closest('.dv-render-overlay');
+        });
+        expect(topIsContent).toBe(true);
+
         // no grid reflow while peeking
         expect(
             Math.abs((await mainBox(page))!.width - before.width)

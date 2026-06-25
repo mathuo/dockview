@@ -115,9 +115,10 @@
                     peekEdge: (position, on) =>
                         dockview.api.peekEdgeGroup(position, on),
                     // Auto-hide edge: a center panel + a collapsed left edge
-                    // group with one panel, for peek tests.
+                    // group with one panel, for peek tests. Pass renderer
+                    // 'always' to exercise the render-overlay (z-index) path.
                     setupAutoHideEdge: (renderer) => {
-                        const main = dockview.addPanel({
+                        dockview.addPanel({
                             id: 'main',
                             component: 'default',
                             title: 'main',
@@ -130,8 +131,6 @@
                             id: 'sidebar',
                             component: 'default',
                             title: 'Sidebar',
-                            // default 'onlyWhenVisible'; pass 'always' to exercise
-                            // the render-overlay re-anchor path of the peek.
                             renderer: renderer || undefined,
                             position: {
                                 referenceGroup: 'edge-left',
@@ -139,11 +138,6 @@
                             },
                         });
                         dockview.autoHideEdgeGroup('left');
-                        // Activate main so the collapsed edge group is NOT the
-                        // active group — this makes its panel report isVisible
-                        // false (as in a real app), exercising the peek's
-                        // force-visible path for `always` content.
-                        main.api.setActive();
                     },
                 };
                 window.__ready = true;
