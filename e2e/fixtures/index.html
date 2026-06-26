@@ -110,6 +110,7 @@
                     redo: () => dockview.redo(),
                     canUndo: () => dockview.canUndo,
                     awaitPopoutRestore: () => dockview.popoutRestorationPromise,
+                    floatingCount: () => dockview.floatingGroups.length,
                     // Two floating groups for Smart Guides: a target float on
                     // the left (left edge ~120) and a draggable float to its
                     // right. Dragging the right one near x=120 should snap +

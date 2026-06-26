@@ -203,6 +203,7 @@ export {
     LayoutHistoryKind,
     ISmartGuidesHost,
     ISmartGuidesService,
+    SmartGuidesSnapPosition,
     ITabGroupChipsHost,
     ITabGroupChipsService,
 } from './dockview/moduleContracts';

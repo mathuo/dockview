@@ -768,6 +768,45 @@ export class DockviewComponent
         return this._floatingOverlayHost ?? this.gridview.element;
     }
 
+    /** ISmartGuidesHost — the other floats' group identity + container-relative
+     *  box, for the snap-together detector. */
+    getFloatingGroupSnapshots(
+        exclude: DockviewGroupPanel
+    ): readonly { group: DockviewGroupPanel; box: Box }[] {
+        const container = this.getFloatingContainer();
+        const containerRect = container.getBoundingClientRect();
+        return this.floatingGroups
+            .filter((floating) => floating.group !== exclude)
+            .map((floating) => {
+                const rect = floating.overlay.element.getBoundingClientRect();
+                return {
+                    group: floating.group,
+                    box: {
+                        left: rect.left - containerRect.left,
+                        top: rect.top - containerRect.top,
+                        width: rect.width,
+                        height: rect.height,
+                    },
+                };
+            });
+    }
+
+    /** ISmartGuidesHost — dock/merge a dragged float into a target group via the
+     *  existing move primitive (so events + undo cover it). */
+    mergeFloatInto(
+        dragged: DockviewGroupPanel,
+        target: DockviewGroupPanel,
+        position: Position
+    ): void {
+        if (dragged === target) {
+            return;
+        }
+        this.moveGroupOrPanel({
+            from: { groupId: dragged.id },
+            to: { group: target, position },
+        });
+    }
+
     private get _smartGuidesService() {
         // Optional like every module service — `?.`-guarded everywhere so the
         // module can be removed without crashing the float drag loop.

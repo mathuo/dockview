@@ -3,15 +3,21 @@ import {
     DockviewGroupPanel,
     FloatingGroupDragContext,
     SmartGuidesOptions,
+    SmartGuidesSnapPosition,
 } from 'dockview-core';
 import { defineModule, FloatingGroupModule } from 'dockview-core';
 import { ISmartGuidesHost, ISmartGuidesService } from 'dockview-core';
+
+/** Fraction of the perpendicular extents that must overlap for an edge to read
+ *  as an adjacency (dock-beside) rather than a glancing touch. */
+const ADJACENCY_OVERLAP = 0.5;
 
 interface ResolvedOptions {
     enabled: boolean;
     snapDistance: number;
     releaseDistance: number;
     showGuides: boolean;
+    snapTogether: boolean;
     className: string | undefined;
     snapFloats: boolean;
     snapContainer: boolean;
@@ -25,11 +31,26 @@ function resolveOptions(o: SmartGuidesOptions | undefined): ResolvedOptions {
         snapDistance: o?.snapDistance ?? 8,
         releaseDistance: o?.releaseDistance ?? 4,
         showGuides: o?.showGuides ?? true,
+        snapTogether: o?.snapTogether ?? true,
         className: o?.className,
         snapFloats: o?.snapTargets?.floats ?? true,
         snapContainer: o?.snapTargets?.container ?? true,
         containerInset: o?.snapTargets?.containerInset,
     };
+}
+
+interface Rect {
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+}
+
+/** A pending dock/merge intent the drag is currently suggesting. */
+interface MergeIntent {
+    readonly target: DockviewGroupPanel;
+    readonly position: SmartGuidesSnapPosition;
+    readonly preview: Rect;
 }
 
 type CandidateKind = 'edge' | 'center';
@@ -61,6 +82,7 @@ interface AxisResult {
 class GuideLayer {
     private readonly _element: HTMLElement;
     private readonly _lines: HTMLElement[] = [];
+    private _preview: HTMLElement | undefined;
 
     constructor(container: HTMLElement, className: string | undefined) {
         const doc = container.ownerDocument;
@@ -108,14 +130,47 @@ class GuideLayer {
         }
     }
 
+    /** Show (or hide, when `box` is undefined) the dock/merge drop-preview. */
+    renderPreview(box: Rect | undefined): void {
+        if (!box) {
+            if (this._preview) {
+                this._preview.style.display = 'none';
+            }
+            return;
+        }
+        const preview = this._ensurePreview();
+        preview.style.display = 'block';
+        preview.style.left = `${box.left}px`;
+        preview.style.top = `${box.top}px`;
+        preview.style.width = `${box.width}px`;
+        preview.style.height = `${box.height}px`;
+    }
+
     clear(): void {
         for (const line of this._lines) {
             line.style.display = 'none';
         }
+        this.renderPreview(undefined);
     }
 
     dispose(): void {
         this._element.remove();
+    }
+
+    private _ensurePreview(): HTMLElement {
+        if (!this._preview) {
+            const preview = this._element.ownerDocument.createElement('div');
+            preview.className = 'dv-smart-guide-preview';
+            preview.style.position = 'absolute';
+            preview.style.boxSizing = 'border-box';
+            preview.style.backgroundColor =
+                'var(--dv-smart-guides-preview-color, rgba(31, 156, 240, 0.18))';
+            preview.style.border =
+                '1px solid var(--dv-smart-guides-color, #1f9cf0)';
+            this._element.appendChild(preview);
+            this._preview = preview;
+        }
+        return this._preview;
     }
 
     private _lineAt(i: number): HTMLElement {
@@ -140,8 +195,12 @@ interface DragSession {
     readonly x: Candidate[];
     readonly y: Candidate[];
     readonly layer: GuideLayer;
+    /** Other floats with identity + box, for snap-together (built once). */
+    readonly targets: readonly { group: DockviewGroupPanel; box: Rect }[];
     engagedX: number | undefined;
     engagedY: number | undefined;
+    /** The dock/merge suggestion active this frame, committed on drop. */
+    pendingMerge: MergeIntent | undefined;
 }
 
 const SOURCE_RANK: Record<CandidateSource, number> = { float: 0, container: 1 };
@@ -169,9 +228,10 @@ export class SmartGuidesService
         super();
 
         this.addDisposables(
-            // Drag end (pointerup / cancel) tears the per-drag guides down.
+            // Drag end (pointerup / cancel): commit any pending snap-together,
+            // then tear the per-drag guides down.
             this.host.onDidEndFloatingGroupDrag((group) =>
-                this._endSession(group)
+                this._commitAndEnd(group)
             ),
             {
                 dispose: () => {
@@ -217,19 +277,25 @@ export class SmartGuidesService
         session.engagedX = resX?.coord;
         session.engagedY = resY?.coord;
 
-        const snappedLeft = proposed.left + (resX?.delta ?? 0);
-        const snappedTop = proposed.top + (resY?.delta ?? 0);
+        const snappedBox: Rect = {
+            left: proposed.left + (resX?.delta ?? 0),
+            top: proposed.top + (resY?.delta ?? 0),
+            width: proposed.width,
+            height: proposed.height,
+        };
+
+        // Snap-together: a dock/merge suggestion, committed on drop.
+        const merge = opts.snapTogether
+            ? this._detectSnapTogether(snappedBox, session.targets, opts)
+            : undefined;
+        session.pendingMerge = merge;
 
         if (opts.showGuides) {
             session.layer.render(
-                this._guideLines(session, {
-                    left: snappedLeft,
-                    top: snappedTop,
-                    width: proposed.width,
-                    height: proposed.height,
-                }),
+                this._guideLines(session, snappedBox),
                 context.container
             );
+            session.layer.renderPreview(merge?.preview);
         } else {
             session.layer.clear();
         }
@@ -237,7 +303,7 @@ export class SmartGuidesService
         if (!resX && !resY) {
             return;
         }
-        return { top: snappedTop, left: snappedLeft };
+        return { top: snappedBox.top, left: snappedBox.left };
     }
 
     private _startSession(
@@ -308,8 +374,10 @@ export class SmartGuidesService
             x,
             y,
             layer,
+            targets: this.host.getFloatingGroupSnapshots(context.group),
             engagedX: undefined,
             engagedY: undefined,
+            pendingMerge: undefined,
         };
         this._sessions.set(context.group, session);
         return session;
@@ -423,6 +491,76 @@ export class SmartGuidesService
         return lines;
     }
 
+    /**
+     * Detect a dock/merge intent for the snapped box against the other floats:
+     * a tab-strip overlap (tops flush + stacked) suggests a **center** merge
+     * into a shared tabset; an edge flush against a target's opposite edge —
+     * with ≥ 50% perpendicular overlap — suggests docking **beside** it. Returns
+     * the first match (with the drop-preview rect), or `undefined`.
+     */
+    private _detectSnapTogether(
+        box: Rect,
+        targets: readonly { group: DockviewGroupPanel; box: Rect }[],
+        opts: ResolvedOptions
+    ): MergeIntent | undefined {
+        const d = edges(box);
+        for (const t of targets) {
+            const e = edges(t.box);
+            const within = (a: number, b: number): boolean =>
+                Math.abs(a - b) <= opts.snapDistance;
+            const hOverlap = overlapRatio(d.left, d.right, e.left, e.right);
+            const vOverlap = overlapRatio(d.top, d.bottom, e.top, e.bottom);
+
+            // Tabset merge: tops flush + the boxes stacked (strong overlap).
+            if (within(d.top, e.top) && hOverlap >= ADJACENCY_OVERLAP) {
+                return { target: t.group, position: 'center', preview: t.box };
+            }
+            // Edge adjacency: a dragged edge meets the target's opposite edge.
+            if (within(d.right, e.left) && vOverlap >= ADJACENCY_OVERLAP) {
+                return {
+                    target: t.group,
+                    position: 'left',
+                    preview: half(t.box, 'left'),
+                };
+            }
+            if (within(d.left, e.right) && vOverlap >= ADJACENCY_OVERLAP) {
+                return {
+                    target: t.group,
+                    position: 'right',
+                    preview: half(t.box, 'right'),
+                };
+            }
+            if (within(d.bottom, e.top) && hOverlap >= ADJACENCY_OVERLAP) {
+                return {
+                    target: t.group,
+                    position: 'top',
+                    preview: half(t.box, 'top'),
+                };
+            }
+            if (within(d.top, e.bottom) && hOverlap >= ADJACENCY_OVERLAP) {
+                return {
+                    target: t.group,
+                    position: 'bottom',
+                    preview: half(t.box, 'bottom'),
+                };
+            }
+        }
+        return undefined;
+    }
+
+    private _commitAndEnd(group: DockviewGroupPanel): void {
+        const session = this._sessions.get(group);
+        if (!session) {
+            return;
+        }
+        const pending = session.pendingMerge;
+        // Tear the overlay down before the layout mutates.
+        this._endSession(group);
+        if (pending) {
+            this.host.mergeFloatInto(group, pending.target, pending.position);
+        }
+    }
+
     private _endSession(group: DockviewGroupPanel): void {
         const session = this._sessions.get(group);
         if (!session) {
@@ -430,6 +568,43 @@ export class SmartGuidesService
         }
         this._sessions.delete(group);
         session.layer.dispose();
+    }
+}
+
+interface Edges {
+    left: number;
+    right: number;
+    top: number;
+    bottom: number;
+}
+
+function edges(r: Rect): Edges {
+    return {
+        left: r.left,
+        right: r.left + r.width,
+        top: r.top,
+        bottom: r.top + r.height,
+    };
+}
+
+/** Overlap of `[a1,a2]` and `[b1,b2]` as a fraction of the smaller extent. */
+function overlapRatio(a1: number, a2: number, b1: number, b2: number): number {
+    const overlap = Math.max(0, Math.min(a2, b2) - Math.max(a1, b1));
+    const smaller = Math.min(a2 - a1, b2 - b1);
+    return smaller > 0 ? overlap / smaller : 0;
+}
+
+/** The half of `r` the dragged float would occupy when docked at `side`. */
+function half(r: Rect, side: 'left' | 'right' | 'top' | 'bottom'): Rect {
+    switch (side) {
+        case 'left':
+            return { ...r, width: r.width / 2 };
+        case 'right':
+            return { ...r, left: r.left + r.width / 2, width: r.width / 2 };
+        case 'top':
+            return { ...r, height: r.height / 2 };
+        case 'bottom':
+            return { ...r, top: r.top + r.height / 2, height: r.height / 2 };
     }
 }
 

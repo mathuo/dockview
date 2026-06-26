@@ -5,9 +5,10 @@ import { test, expect } from '@playwright/test';
  * Real-browser only: the snap reads the live container/overlay geometry the
  * float drag loop works in, which jsdom (no layout) can't produce.
  *
- * Dragging one float so an edge/center lines up with another float or the
- * container (within `snapDistance`) snaps it and paints alignment guides; X and
- * Y resolve independently; guides are torn down on drop.
+ * Dragging one float so an edge/center lines up with another float (within
+ * `snapDistance`) snaps it and paints alignment guides; bringing a float flush
+ * over another suggests a dock/merge, committed on drop; guides are torn down
+ * on drop.
  */
 test.describe('smart guides (floating snap)', () => {
     const setup = async (page) => {
@@ -60,17 +61,15 @@ test.describe('smart guides (floating snap)', () => {
         await page.mouse.down();
         // Tiny nudge locks a clean grab offset before the long drag.
         await page.mouse.move(startX + 1, startY);
-        // Land the float's left edge ~4px right of the target's left edge —
-        // inside the 12px snapDistance, so it snaps exactly onto it.
+        // Drag left only (Y unchanged → the floats never vertically overlap, so
+        // no dock suggestion): land the left edge ~4px right of the target's.
         await page.mouse.move(targetBox.x + grab + 5, startY, { steps: 20 });
 
-        // a vertical guide is drawn at the target's left edge
         const guides = await visibleGuides(page);
         expect(guides.some((g) => g.w <= 2 && near(g.x, targetBox.x))).toBe(
             true
         );
 
-        // the float snapped exactly onto the target's left edge
         const snapped = (await mover.boundingBox())!;
         expect(near(snapped.x, targetBox.x)).toBe(true);
 
@@ -78,14 +77,19 @@ test.describe('smart guides (floating snap)', () => {
 
         // guides are an interaction overlay — gone once the drag ends
         await expect(page.locator('.dv-smart-guides')).toHaveCount(0);
-        const after = (await mover.boundingBox())!;
-        expect(near(after.x, targetBox.x)).toBe(true);
+        // still two separate floats — an edge alignment is not a merge
+        expect(
+            await page.evaluate(() => (window as any).__dv.floatingCount())
+        ).toBe(2);
     });
 
-    test('X and Y snap independently — aligning to a corner draws both guides', async ({
+    test('snap-together: dropping a float flush over another merges them', async ({
         page,
     }) => {
         await setup(page);
+        expect(
+            await page.evaluate(() => (window as any).__dv.floatingCount())
+        ).toBe(2);
 
         const mover = overlayWith(page, 'mover');
         const target = overlayWith(page, 'target');
@@ -103,29 +107,25 @@ test.describe('smart guides (floating snap)', () => {
         await page.mouse.move(startX, startY);
         await page.mouse.down();
         await page.mouse.move(startX + 1, startY + 1);
-        // Drag toward the target's top-left corner: left edge → target left,
-        // top edge → target top (both within the snap distance).
+        // Drag the mover on top of the target (tops flush, fully overlapping) —
+        // a tabset-merge suggestion.
         await page.mouse.move(
-            targetBox.x + grabX + 5,
-            targetBox.y + grabY + 5,
+            targetBox.x + grabX + 4,
+            targetBox.y + grabY + 4,
             { steps: 25 }
         );
 
-        const guides = await visibleGuides(page);
-        // a vertical guide at the target's left edge...
-        expect(guides.some((g) => g.w <= 2 && near(g.x, targetBox.x))).toBe(
-            true
-        );
-        // ...and a horizontal guide at the target's top edge
-        expect(guides.some((g) => g.h <= 2 && near(g.y, targetBox.y))).toBe(
-            true
-        );
-
-        const snapped = (await mover.boundingBox())!;
-        expect(near(snapped.x, targetBox.x)).toBe(true);
-        expect(near(snapped.y, targetBox.y)).toBe(true);
+        // a drop-preview rectangle is shown over the merge target
+        await expect(page.locator('.dv-smart-guide-preview')).toBeVisible();
 
         await page.mouse.up();
+
+        // the two floats merged into one (mover docked into the target)
+        await expect
+            .poll(() =>
+                page.evaluate(() => (window as any).__dv.floatingCount())
+            )
+            .toBe(1);
         await expect(page.locator('.dv-smart-guides')).toHaveCount(0);
     });
 
@@ -144,6 +144,7 @@ test.describe('smart guides (floating snap)', () => {
         await page.mouse.move(startX + 40, startY + 30, { steps: 8 });
 
         expect(await visibleGuides(page)).toHaveLength(0);
+        await expect(page.locator('.dv-smart-guide-preview')).toHaveCount(0);
 
         await page.mouse.up();
         await expect(page.locator('.dv-smart-guides')).toHaveCount(0);

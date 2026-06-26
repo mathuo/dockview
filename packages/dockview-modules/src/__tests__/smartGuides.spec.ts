@@ -5,6 +5,7 @@ import {
     FloatingGroupDragContext,
     ISmartGuidesHost,
     SmartGuidesOptions,
+    SmartGuidesSnapPosition,
 } from 'dockview-core';
 import { SmartGuidesService } from '../smartGuidesService';
 
@@ -21,17 +22,32 @@ describe('smart guides', () => {
     let container: HTMLElement;
     let endEmitter: Emitter<DockviewGroupPanel>;
     let service: SmartGuidesService;
+    let snapshots: { group: DockviewGroupPanel; box: Box }[];
+    let mergeCalls: {
+        dragged: DockviewGroupPanel;
+        target: DockviewGroupPanel;
+        position: SmartGuidesSnapPosition;
+    }[];
     // Distinct identity per drag — the service keys per-drag state by group.
     const group = {} as DockviewGroupPanel;
 
-    const make = (smartGuides: SmartGuidesOptions | undefined): void => {
+    const make = (
+        smartGuides: SmartGuidesOptions | undefined,
+        floats: { group: DockviewGroupPanel; box: Box }[] = []
+    ): void => {
         container = document.createElement('div');
         document.body.appendChild(container);
         endEmitter = new Emitter<DockviewGroupPanel>();
+        snapshots = floats;
+        mergeCalls = [];
         const host: ISmartGuidesHost = {
             options: { smartGuides } as any,
             getFloatingContainer: () => container,
             onDidEndFloatingGroupDrag: endEmitter.event,
+            getFloatingGroupSnapshots: () => snapshots,
+            mergeFloatInto: (dragged, target, position) => {
+                mergeCalls.push({ dragged, target, position });
+            },
         };
         service = new SmartGuidesService(host);
     };
@@ -257,5 +273,111 @@ describe('smart guides', () => {
             ])
         );
         expect(result).toEqual({ top: 400, left: 100 });
+    });
+
+    // --- snap-together ---
+
+    const targetGroup = { id: 'target' } as DockviewGroupPanel;
+    const preview = (): HTMLElement | null =>
+        container.querySelector('.dv-smart-guide-preview');
+    // Disable alignment (no float/container candidates) so the snapped box is
+    // the raw proposed box — the snap-together geometry is then exact.
+    const noAlign = (extra: SmartGuidesOptions = {}): SmartGuidesOptions => ({
+        snapTargets: { floats: false, container: false },
+        ...extra,
+    });
+
+    test('edge-adjacency suggests docking beside the target and commits on drop', () => {
+        const t: Box = { left: 300, top: 100, width: 200, height: 200 };
+        make(noAlign(), [{ group: targetGroup, box: t }]);
+
+        // dragged right edge (150+150=300) meets the target's left edge (300),
+        // with full vertical overlap → dock on the target's left.
+        service.transformFloatingGroupDrag(
+            ctx({ left: 150, top: 100, width: 150, height: 200 }, [])
+        );
+
+        const p = preview();
+        expect(p).toBeTruthy();
+        expect(p!.style.display).toBe('block');
+        // preview is the left half of the target
+        expect(p!.style.left).toBe('300px');
+        expect(p!.style.width).toBe('100px');
+        expect(p!.style.height).toBe('200px');
+        expect(mergeCalls).toHaveLength(0);
+
+        endEmitter.fire(group);
+        expect(mergeCalls).toEqual([
+            { dragged: group, target: targetGroup, position: 'left' },
+        ]);
+    });
+
+    test('overlapping tab strips suggest a center (tabset) merge', () => {
+        const t: Box = { left: 100, top: 100, width: 200, height: 200 };
+        make(noAlign(), [{ group: targetGroup, box: t }]);
+
+        // tops flush (100) and the boxes stacked (90% horizontal overlap).
+        service.transformFloatingGroupDrag(
+            ctx({ left: 120, top: 100, width: 200, height: 200 }, [])
+        );
+
+        const p = preview()!;
+        expect(p.style.display).toBe('block');
+        // the whole target is previewed for a tabset merge
+        expect(p.style.left).toBe('100px');
+        expect(p.style.width).toBe('200px');
+
+        endEmitter.fire(group);
+        expect(mergeCalls).toEqual([
+            { dragged: group, target: targetGroup, position: 'center' },
+        ]);
+    });
+
+    test('`snapTogether: false` never suggests or commits a merge', () => {
+        const t: Box = { left: 300, top: 100, width: 200, height: 200 };
+        make(noAlign({ snapTogether: false }), [
+            { group: targetGroup, box: t },
+        ]);
+
+        service.transformFloatingGroupDrag(
+            ctx({ left: 150, top: 100, width: 150, height: 200 }, [])
+        );
+        expect(preview()?.style.display ?? 'none').toBe('none');
+
+        endEmitter.fire(group);
+        expect(mergeCalls).toHaveLength(0);
+    });
+
+    test('moving away from a target clears the pending merge before drop', () => {
+        const t: Box = { left: 300, top: 100, width: 200, height: 200 };
+        make(noAlign(), [{ group: targetGroup, box: t }]);
+
+        // engage adjacency...
+        service.transformFloatingGroupDrag(
+            ctx({ left: 150, top: 100, width: 150, height: 200 }, [])
+        );
+        // ...then drag well clear of it
+        service.transformFloatingGroupDrag(
+            ctx({ left: 10, top: 600, width: 150, height: 200 }, [])
+        );
+        expect(preview()!.style.display).toBe('none');
+
+        endEmitter.fire(group);
+        expect(mergeCalls).toHaveLength(0);
+    });
+
+    test('an edge that barely overlaps the target is not an adjacency', () => {
+        // dragged right edge meets target left edge, but only 40% vertical
+        // overlap (< 50%) → no dock suggestion.
+        const t: Box = { left: 300, top: 100, width: 200, height: 200 };
+        make(noAlign(), [{ group: targetGroup, box: t }]);
+
+        service.transformFloatingGroupDrag(
+            ctx({ left: 150, top: 280, width: 150, height: 50 }, [])
+        );
+        expect(preview()?.style.display ?? 'none').toBe('none');
+
+        endEmitter.fire(group);
+        expect(mergeCalls).toHaveLength(0);
     });
 });

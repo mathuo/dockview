@@ -7,6 +7,7 @@
 import { IDisposable } from '../lifecycle';
 import { Event } from '../events';
 import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
+import { Box } from '../types';
 import { IDragGhostSpec } from '../dnd/backend';
 import { DockviewApi } from '../api/component.api';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
@@ -273,7 +274,33 @@ export interface ISmartGuidesHost {
      * harmless no-op.
      */
     readonly onDidEndFloatingGroupDrag: Event<DockviewGroupPanel>;
+    /**
+     * The live floating windows other than `exclude`, each with its group
+     * identity and container-relative box — the snap-together detector needs
+     * identity (which neighbour to dock into), not just geometry.
+     */
+    getFloatingGroupSnapshots(
+        exclude: DockviewGroupPanel
+    ): readonly { group: DockviewGroupPanel; box: Box }[];
+    /**
+     * Commit a snap-together: dock / merge the dragged float into a target group
+     * at `position`. Reuses the existing move primitive (`moveGroupOrPanel`) so
+     * events + undo cover it; a no-op when `dragged === target`.
+     */
+    mergeFloatInto(
+        dragged: DockviewGroupPanel,
+        target: DockviewGroupPanel,
+        position: SmartGuidesSnapPosition
+    ): void;
 }
+
+/** Where a snapped-together float docks relative to its target. */
+export type SmartGuidesSnapPosition =
+    | 'left'
+    | 'right'
+    | 'top'
+    | 'bottom'
+    | 'center';
 
 export interface ISmartGuidesService extends IDisposable {
     /**

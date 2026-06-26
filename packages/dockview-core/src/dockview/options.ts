@@ -210,6 +210,10 @@ export interface SmartGuidesOptions {
     releaseDistance?: number;
     /** Render the alignment guide lines while snapping. Default `true`. */
     showGuides?: boolean;
+    /** Detect a dock/merge intent when the dragged float comes flush against
+     *  another float (edge-adjacency) or overlaps its tab strip (tabset merge),
+     *  and commit it on drop. Default `true`. */
+    snapTogether?: boolean;
     /** Which alignment sources to snap against (floats + container by default). */
     snapTargets?: SmartGuidesSnapTargets;
     /** Extra class applied to the guide overlay layer, for theming. */
