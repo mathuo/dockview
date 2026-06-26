@@ -280,8 +280,18 @@ export interface IAutoHideEdgeGroupHost {
      *  reference container, optionally forcing it visible. The peek reparents a
      *  group's content container into the slide-out overlay; the always-rendered
      *  content is NOT reparented (its parent stays constant) — it's re-anchored
-     *  over the moving container and force-shown for the duration of the peek. */
-    repositionPanelOverlay(panel: IDockviewPanel, forceVisible: boolean): void;
+     *  over the moving container and force-shown for the duration of the peek.
+     *  `clip` (viewport rect) clips the overlay to the peek's reveal window so an
+     *  `always` panel emerges from the strip's inner edge instead of sliding in
+     *  from the screen edge; omit it to clear any clip. */
+    repositionPanelOverlay(
+        panel: IDockviewPanel,
+        forceVisible: boolean,
+        clip?: DOMRect
+    ): void;
+    /** Announce a message to assistive technology via the shared live region
+     *  (no-op when no live-region service / `announcements: false`). */
+    announce(message: string): void;
 }
 
 export interface IAutoHideEdgeGroupService extends IDisposable {

@@ -50,28 +50,60 @@
     }
 }
 
-// The Pin header is a sibling overlay so it can sit above an `always` panel's
-// render overlay; click-through except for the button itself.
+// The title bar is a sibling overlay so it can sit above an `always` panel's
+// render overlay. It occupies the top band of the peek (the content is inset
+// below it), with the panel title to the left and pin + close to the right.
 .dv-edge-peek-header {
     display: flex;
-    justify-content: flex-end;
-    align-items: flex-start;
-    padding: 4px;
-    pointer-events: none;
+    align-items: center;
+    gap: 4px;
+    padding: 0 4px 0 8px;
+    box-sizing: border-box;
+    background-color: var(--dv-group-view-background-color);
+    border: 1px solid var(--dv-separator-border);
+    border-bottom: none;
+    color: var(--dv-activegroup-visiblepanel-tab-color);
+    font-size: 12px;
 }
 
-.dv-edge-peek-pin {
-    pointer-events: auto;
-    cursor: pointer;
-    border: 1px solid var(--dv-separator-border);
-    border-radius: 3px;
-    padding: 2px 8px;
-    font-size: 11px;
-    color: var(--dv-activegroup-visiblepanel-tab-color);
-    background-color: var(--dv-group-view-background-color);
+.dv-edge-peek-title {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
-    &:hover {
-        background-color: var(--dv-icon-hover-background-color);
+// Nested under the header so the two-class selector (specificity 0,2,0) wins
+// over broad app `button {}` rules (e.g. `.app button`, 0,1,1) that would
+// otherwise paint a border/outline on the chrome icons.
+.dv-edge-peek-header {
+    // Behave like the tab close icon: borderless, monotone, with a hover
+    // background highlight.
+    .dv-edge-peek-pin,
+    .dv-edge-peek-close {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        cursor: pointer;
+        border: none;
+        padding: 4px;
+        color: inherit;
+        background: transparent;
+        outline: none;
+
+        &:hover {
+            border-radius: 2px;
+            background-color: var(--dv-icon-hover-background-color);
+        }
+
+        // Keyboard-only focus ring (suppressed on mouse click).
+        &:focus-visible {
+            border-radius: 2px;
+            outline: 1px solid var(--dv-tab-divider-color);
+            outline-offset: -1px;
+        }
     }
 }
 

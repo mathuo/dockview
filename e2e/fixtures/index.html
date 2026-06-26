@@ -139,6 +139,35 @@
                         });
                         dockview.autoHideEdgeGroup('left');
                     },
+                    // Two `always`-rendered panels in one edge group, for the
+                    // peek tab-switch test (each renders its own overlay).
+                    setupAutoHideEdgeMulti: () => {
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        dockview.addEdgeGroup('left', {
+                            id: 'edge-left',
+                            initialSize: 220,
+                        });
+                        for (const [id, title] of [
+                            ['a', 'Alpha'],
+                            ['b', 'Bravo'],
+                        ]) {
+                            dockview.addPanel({
+                                id,
+                                component: 'default',
+                                title,
+                                renderer: 'always',
+                                position: {
+                                    referenceGroup: 'edge-left',
+                                    direction: 'within',
+                                },
+                            });
+                        }
+                        dockview.autoHideEdgeGroup('left');
+                    },
                 };
                 window.__ready = true;
             })();

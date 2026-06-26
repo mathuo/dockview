@@ -72,7 +72,12 @@ export class OverlayRenderContainer extends CompositeDisposable {
             disposable: IDisposable;
             destroy: IDisposable;
             element: HTMLElement;
-            resize?: (forceVisible?: boolean) => void;
+            resize?: () => void;
+            /** Sticky peek state (set via `repositionPanelOverlay`): force the
+             *  overlay visible despite the panel being collapsed, and clip it to
+             *  the peek's reveal window. Preserved across internal resizes. */
+            forceVisible?: boolean;
+            clip?: DOMRect;
         }
     > = {};
 
@@ -120,12 +125,24 @@ export class OverlayRenderContainer extends CompositeDisposable {
      * slide an `always`-rendered panel out without reparenting it or mutating
      * the panel's visibility state. No-op if the panel isn't overlay-rendered.
      */
-    repositionPanelOverlay(panelId: string, forceVisible = false): void {
+    repositionPanelOverlay(
+        panelId: string,
+        forceVisible = false,
+        clip?: DOMRect
+    ): void {
         if (this._disposed) {
             return;
         }
+        const entry = this.map[panelId];
+        if (!entry) {
+            return;
+        }
+        // Set the sticky peek state, then reposition; `resize()` reads it back
+        // so it survives any concurrent internal resize.
+        entry.forceVisible = forceVisible;
+        entry.clip = clip;
         this.positionCache.invalidate();
-        this.map[panelId]?.resize?.(forceVisible);
+        entry.resize?.();
     }
 
     detatch(panel: IDockviewPanel): boolean {
@@ -178,7 +195,7 @@ export class OverlayRenderContainer extends CompositeDisposable {
             this.element.appendChild(focusContainer);
         }
 
-        const resize = (forceVisible = false) => {
+        const resize = () => {
             const panelId = panel.api.id;
 
             if (this.pendingUpdates.has(panelId)) {
@@ -190,9 +207,18 @@ export class OverlayRenderContainer extends CompositeDisposable {
             requestAnimationFrame(() => {
                 this.pendingUpdates.delete(panelId);
 
-                if (this.isDisposed || !this.map[panelId]) {
+                const entry = this.map[panelId];
+                if (this.isDisposed || !entry) {
                     return;
                 }
+                // `forceVisible` / `clip` are sticky per-panel state owned by
+                // the peek (set via `repositionPanelOverlay`). Read them at paint
+                // time so an unrelated `resize()` (visibility / layout) can't
+                // clobber a force-shown, clipped peek panel back to hidden — a
+                // peeked panel's `isVisible` is false (its group is collapsed),
+                // so without the sticky force it would render nothing.
+                const forceVisible = entry.forceVisible ?? false;
+                const clip = entry.clip;
 
                 const box = this.positionCache.getPosition(
                     referenceContainer.element
@@ -227,6 +253,33 @@ export class OverlayRenderContainer extends CompositeDisposable {
                 // the peek's own (opaque) backdrop so the content is visible;
                 // otherwise leave the default stacking.
                 focusContainer.style.zIndex = forceVisible ? '1000' : '';
+
+                // Clip to the peek's reveal window so an `always` panel emerges
+                // from the strip's inner edge as the container slides, rather
+                // than appearing on the dock side of it. `box` is in page
+                // coordinates (`getDomNodePagePosition`) but `clip` is a
+                // viewport rect, so shift it by the scroll offset before taking
+                // the inset (otherwise the clip is wrong in a scrolled document).
+                if (clip) {
+                    const view = this.element.ownerDocument.defaultView;
+                    const sx = view?.scrollX ?? 0;
+                    const sy = view?.scrollY ?? 0;
+                    const top = clip.top + sy;
+                    const left = clip.left + sx;
+                    const insetTop = Math.max(0, top - box.top);
+                    const insetLeft = Math.max(0, left - box.left);
+                    const insetRight = Math.max(
+                        0,
+                        box.left + width - (clip.right + sx)
+                    );
+                    const insetBottom = Math.max(
+                        0,
+                        box.top + height - (clip.bottom + sy)
+                    );
+                    focusContainer.style.clipPath = `inset(${insetTop}px ${insetRight}px ${insetBottom}px ${insetLeft}px)`;
+                } else {
+                    focusContainer.style.clipPath = '';
+                }
 
                 toggleClass(
                     focusContainer,

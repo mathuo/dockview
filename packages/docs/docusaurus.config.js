@@ -91,6 +91,14 @@ const config = {
                                         __dirname,
                                         '../dockview/src'
                                     ),
+                                    // Without this, dockview-modules resolves to
+                                    // its built dist/, so editing module source
+                                    // (e.g. auto-hide edge groups) does nothing
+                                    // until a rebuild + dev-server restart.
+                                    'dockview-modules$': path.join(
+                                        __dirname,
+                                        '../dockview-modules/src'
+                                    ),
                                 }),
                                 react: path.join(
                                     __dirname,

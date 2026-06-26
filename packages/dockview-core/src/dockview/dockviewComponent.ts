@@ -2551,10 +2551,15 @@ export class DockviewComponent
      *  reference container, optionally forcing it visible (the auto-hide peek
      *  slides an `always` panel out without reparenting it or touching its
      *  visibility state). No-op for non-overlay-rendered panels. */
-    repositionPanelOverlay(panel: IDockviewPanel, forceVisible: boolean): void {
+    repositionPanelOverlay(
+        panel: IDockviewPanel,
+        forceVisible: boolean,
+        clip?: DOMRect
+    ): void {
         this.overlayRenderContainer.repositionPanelOverlay(
             panel.api.id,
-            forceVisible
+            forceVisible,
+            clip
         );
     }
 

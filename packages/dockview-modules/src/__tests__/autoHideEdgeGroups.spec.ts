@@ -19,22 +19,24 @@ class TestPanel implements IContentRenderer {
 }
 
 /**
- * Auto-hide edge groups. A collapsed edge group's native tabs are the peek
- * triggers (hover/focus/click) — no parallel strip. Peeking slides the active
- * panel out as a non-reflowing overlay; a pin button re-docks; Esc / leave /
- * focus-out close. Opt-in via `autoHideEdgeGroups`.
+ * Auto-hide ("pinnable") edge groups — VS tool-window model. A collapsed edge
+ * group's native tabs are CLICK triggers (no hover): click a tab → peek it as a
+ * non-reflowing overlay with a title bar (title + pin + close); click it again /
+ * outside / Esc → hide; pin → dock; close → close the panel.
  */
 describe('auto-hide edge groups', () => {
     let container: HTMLElement;
 
     const make = (
-        autoHideEdgeGroups: DockviewComponent['options']['autoHideEdgeGroups']
+        autoHideEdgeGroups: DockviewComponent['options']['autoHideEdgeGroups'],
+        extra: Partial<DockviewComponent['options']> = {}
     ): DockviewComponent => {
         container = document.createElement('div');
         document.body.appendChild(container);
         const dockview = new DockviewComponent(container, {
             createComponent: () => new TestPanel(),
             autoHideEdgeGroups,
+            ...extra,
         });
         dockview.layout(1000, 1000);
         return dockview;
@@ -60,6 +62,8 @@ describe('auto-hide edge groups', () => {
         d.getEdgeGroup('left')!.isCollapsed();
     const strip = (d: DockviewComponent): HTMLElement =>
         d.getEdgeGroupPanel('left')!.element;
+    const tabs = (d: DockviewComponent): HTMLElement[] =>
+        Array.from(strip(d).querySelectorAll('.dv-tab'));
 
     afterEach(() => {
         container.remove();
@@ -77,7 +81,37 @@ describe('auto-hide edge groups', () => {
 
         d.api.peekEdgeGroup('left', false);
         expect(peek()).toBeNull();
-        expect(strip(d).querySelector('.dv-test-content')).toBeTruthy(); // content restored
+        expect(strip(d).querySelector('.dv-test-content')).toBeTruthy();
+
+        d.dispose();
+    });
+
+    test('clicking a tab peeks it; clicking it again hides it (no reflow)', () => {
+        const d = make(true);
+        collapsedEdgeWithPanel(d);
+
+        fireEvent.click(tabs(d)[0]);
+        expect(peek()).toBeTruthy();
+        expect(collapsed(d)).toBe(true); // native expand suppressed
+
+        fireEvent.click(tabs(d)[0]);
+        expect(peek()).toBeNull();
+        expect(collapsed(d)).toBe(true);
+
+        d.dispose();
+    });
+
+    test('the peek has a title bar with the title, a pin and a close button', () => {
+        const d = make(true);
+        collapsedEdgeWithPanel(d, 'Explorer');
+        d.api.peekEdgeGroup('left', true);
+
+        const title = container.querySelector('.dv-edge-peek-title');
+        const pin = container.querySelector('.dv-edge-peek-pin');
+        const close = container.querySelector('.dv-edge-peek-close');
+        expect(title?.textContent).toBe('Explorer');
+        expect(pin?.getAttribute('aria-label')).toBe('Pin');
+        expect(close?.getAttribute('aria-label')).toBe('Close');
 
         d.dispose();
     });
@@ -87,12 +121,23 @@ describe('auto-hide edge groups', () => {
         collapsedEdgeWithPanel(d);
         d.api.peekEdgeGroup('left', true);
 
-        // the Pin button is a separate sibling overlay (so it can layer above an
-        // `always` render overlay), not a child of the peek element.
         (container.querySelector('.dv-edge-peek-pin') as HTMLElement).click();
 
         expect(collapsed(d)).toBe(false);
         expect(peek()).toBeNull();
+
+        d.dispose();
+    });
+
+    test('the close button closes the panel and removes the peek', () => {
+        const d = make(true);
+        collapsedEdgeWithPanel(d);
+        d.api.peekEdgeGroup('left', true);
+
+        (container.querySelector('.dv-edge-peek-close') as HTMLElement).click();
+
+        expect(peek()).toBeNull();
+        expect(d.panels.find((p) => p.id === 'p1')).toBeUndefined();
 
         d.dispose();
     });
@@ -110,6 +155,35 @@ describe('auto-hide edge groups', () => {
         expect(peek()).toBeNull();
         expect(collapsed(d)).toBe(true);
         expect(strip(d).querySelector('.dv-test-content')).toBeTruthy();
+
+        d.dispose();
+    });
+
+    test('clicking outside hides; clicking empty strip space does not', () => {
+        const d = make(true);
+        collapsedEdgeWithPanel(d);
+        d.api.peekEdgeGroup('left', true);
+
+        // give the strip a real box; the peek/overlay rects stay 0×0 at origin
+        jest.spyOn(strip(d), 'getBoundingClientRect').mockReturnValue({
+            left: 0,
+            top: 0,
+            right: 40,
+            bottom: 600,
+            width: 40,
+            height: 600,
+            x: 0,
+            y: 0,
+            toJSON() {},
+        } as DOMRect);
+
+        // pointer-down on empty strip space → stays open
+        fireEvent.pointerDown(document, { clientX: 20, clientY: 300 });
+        expect(peek()).toBeTruthy();
+
+        // pointer-down outside the strip + peek → hides
+        fireEvent.pointerDown(document, { clientX: 500, clientY: 300 });
+        expect(peek()).toBeNull();
 
         d.dispose();
     });
@@ -132,10 +206,43 @@ describe('auto-hide edge groups', () => {
         d.dispose();
     });
 
+    test('clicking a different tab switches the peeked panel and retitles', () => {
+        const d = make(true);
+        d.addEdgeGroup('left', { id: 'edge-left', initialSize: 200 });
+        const p1 = d.addPanel({
+            id: 'p1',
+            component: 'default',
+            title: 'One',
+            position: { referenceGroup: 'edge-left', direction: 'within' },
+        });
+        d.addPanel({
+            id: 'p2',
+            component: 'default',
+            title: 'Two',
+            position: { referenceGroup: 'edge-left', direction: 'within' },
+        });
+        p1.api.setActive();
+        d.autoHideEdgeGroup('left');
+
+        fireEvent.click(tabs(d)[0]); // peek One
+        expect(peek()).toBeTruthy();
+        expect(
+            container.querySelector('.dv-edge-peek-title')?.textContent
+        ).toBe('One');
+
+        fireEvent.click(tabs(d)[1]); // switch to Two
+        expect(peek()).toBeTruthy();
+        expect(d.getEdgeGroupPanel('left')!.activePanel!.id).toBe('p2');
+        expect(
+            container.querySelector('.dv-edge-peek-title')?.textContent
+        ).toBe('Two');
+
+        d.dispose();
+    });
+
     test('the peek gets an opaque background so it is never see-through', () => {
         const d = make(true);
         collapsedEdgeWithPanel(d);
-        // simulate a themed group background (the floating peek must inherit it)
         strip(d).style.backgroundColor = 'rgb(10, 20, 30)';
 
         d.api.peekEdgeGroup('left', true);
@@ -155,66 +262,124 @@ describe('auto-hide edge groups', () => {
         d.dispose();
     });
 
-    describe('hover / focus triggers', () => {
-        afterEach(() => jest.useRealTimers());
+    describe('docked (pinned) tool-window chrome', () => {
+        test('pinning renders a docked title bar and moves tabs to the bottom', () => {
+            const d = make(true);
+            collapsedEdgeWithPanel(d, 'Explorer');
+            expect(collapsed(d)).toBe(true);
 
-        test('hover (pointerenter) opens after openDelay', () => {
-            const d = make({ openDelay: 100, closeDelay: 100 });
-            collapsedEdgeWithPanel(d);
-            jest.useFakeTimers();
+            // pin (expand)
+            d.api.peekEdgeGroup('left', true);
+            (
+                container.querySelector('.dv-edge-peek-pin') as HTMLElement
+            ).click();
+            expect(collapsed(d)).toBe(false);
 
-            fireEvent.pointerEnter(strip(d));
-            jest.advanceTimersByTime(99);
-            expect(peek()).toBeNull();
-            jest.advanceTimersByTime(1);
-            expect(peek()).toBeTruthy();
+            // docked chrome: a title bar inside the group + header at the bottom
+            const bar = strip(d).querySelector(
+                '.dv-edge-peek-header'
+            ) as HTMLElement;
+            expect(bar).toBeTruthy();
+            expect(bar.querySelector('.dv-edge-peek-title')?.textContent).toBe(
+                'Explorer'
+            );
+            expect(d.getEdgeGroupPanel('left')!.api.getHeaderPosition()).toBe(
+                'bottom'
+            );
 
             d.dispose();
         });
 
-        test('leaving the strip closes after closeDelay', () => {
-            const d = make({ openDelay: 100, closeDelay: 100 });
+        test('auto-hiding (docked pin) removes the chrome and restores the strip orientation', () => {
+            const d = make(true);
+            collapsedEdgeWithPanel(d, 'Explorer');
+            d.api.peekEdgeGroup('left', true);
+            (
+                container.querySelector('.dv-edge-peek-pin') as HTMLElement
+            ).click(); // dock
+            expect(collapsed(d)).toBe(false);
+
+            // the docked pushpin auto-hides
+            (
+                strip(d).querySelector('.dv-edge-peek-pin') as HTMLElement
+            ).click();
+
+            expect(collapsed(d)).toBe(true);
+            expect(strip(d).querySelector('.dv-edge-peek-header')).toBeNull();
+            // strip orientation restored to the edge position
+            expect(d.getEdgeGroupPanel('left')!.api.getHeaderPosition()).toBe(
+                'left'
+            );
+
+            d.dispose();
+        });
+
+        test('the docked close button closes the active panel', () => {
+            const d = make(true);
             collapsedEdgeWithPanel(d);
             d.api.peekEdgeGroup('left', true);
-            jest.useFakeTimers();
+            (
+                container.querySelector('.dv-edge-peek-pin') as HTMLElement
+            ).click(); // dock
 
-            fireEvent.pointerLeave(strip(d));
-            jest.advanceTimersByTime(99);
+            (
+                strip(d).querySelector('.dv-edge-peek-close') as HTMLElement
+            ).click();
+            expect(d.panels.find((p) => p.id === 'p1')).toBeUndefined();
+
+            d.dispose();
+        });
+    });
+
+    describe('accessibility', () => {
+        test('Enter on a focused tab toggles the peek (focus into content)', () => {
+            const d = make(true);
+            collapsedEdgeWithPanel(d);
+            const tab = tabs(d)[0];
+            tab.focus();
+
+            fireEvent.keyDown(tab, { key: 'Enter' });
             expect(peek()).toBeTruthy();
-            jest.advanceTimersByTime(1);
+            expect(peek()!.contains(document.activeElement)).toBe(true);
+
+            fireEvent.keyDown(tab, { key: 'Enter' });
             expect(peek()).toBeNull();
 
             d.dispose();
         });
 
-        test('pointer over the peek region cancels the close (no flicker)', () => {
-            const d = make({ openDelay: 100, closeDelay: 100 });
+        test('Escape returns focus to the tab', () => {
+            const d = make(true);
             collapsedEdgeWithPanel(d);
-            d.api.peekEdgeGroup('left', true);
-            jest.useFakeTimers();
+            const tab = tabs(d)[0];
+            tab.focus();
+            fireEvent.keyDown(tab, { key: 'Enter' });
+            expect(peek()!.contains(document.activeElement)).toBe(true);
 
-            // leaving the strip schedules a close...
-            fireEvent.pointerLeave(strip(d));
-            // ...but a pointermove within the peek box cancels it. Keep-open is
-            // geometry-based (the peeked content may be a sibling overlay on
-            // top); in jsdom all rects are 0×0 at the origin, so (0,0) is
-            // "within" and a non-zero point is "outside".
-            fireEvent.pointerMove(document, { clientX: 0, clientY: 0 });
-            jest.advanceTimersByTime(1000);
-            expect(peek()).toBeTruthy();
+            document.dispatchEvent(
+                new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+            );
+
+            expect(peek()).toBeNull();
+            expect(document.activeElement).toBe(tab);
 
             d.dispose();
         });
 
-        test('focus opens (deferred out of the focus event)', () => {
-            const d = make({ openDelay: 100, closeDelay: 100 });
-            collapsedEdgeWithPanel(d);
-            jest.useFakeTimers();
+        test('announces the panel when peeked and when pinned', () => {
+            const messages: string[] = [];
+            const d = make(true, {
+                announcer: (e) => messages.push(e.message),
+            });
+            collapsedEdgeWithPanel(d, 'Explorer');
 
-            fireEvent.focusIn(strip(d));
-            expect(peek()).toBeNull(); // scheduled, not synchronous
-            jest.advanceTimersByTime(0);
-            expect(peek()).toBeTruthy();
+            d.api.peekEdgeGroup('left', true);
+            expect(messages).toContain('Explorer shown');
+
+            (
+                container.querySelector('.dv-edge-peek-pin') as HTMLElement
+            ).click();
+            expect(messages).toContain('Explorer pinned');
 
             d.dispose();
         });
