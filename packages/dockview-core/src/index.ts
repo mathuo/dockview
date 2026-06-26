@@ -201,6 +201,8 @@ export {
     ILayoutHistoryService,
     LayoutHistoryChangeEvent,
     LayoutHistoryKind,
+    ISmartGuidesHost,
+    ISmartGuidesService,
     ITabGroupChipsHost,
     ITabGroupChipsService,
 } from './dockview/moduleContracts';
@@ -208,3 +210,4 @@ export { resolveMessages } from './dockview/accessibilityMessages';
 export { findRelativeZIndexParent } from './dom';
 export { IDragGhostSpec } from './dnd/backend';
 export { LiveRegionModule } from './dockview/liveRegionService';
+export { FloatingGroupModule } from './dockview/floatingGroupService';

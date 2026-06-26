@@ -14,7 +14,7 @@ import { IDockviewPanel } from './dockviewPanel';
 import { ITabGroup } from './tabGroup';
 import { TabGroupColorPalette } from './tabGroupAccent';
 import { PopupService } from './components/popupService';
-import { DockviewComponentOptions } from './options';
+import { DockviewComponentOptions, FloatingGroupDragContext } from './options';
 import {
     DockviewLayoutMutationEvent,
     DockviewLayoutMutationKind,
@@ -244,4 +244,45 @@ export interface ILayoutHistoryService extends IDisposable {
     redo(): void;
     /** Drop both stacks (e.g. on document switch). */
     clear(): void;
+}
+
+// --- SmartGuides ---
+
+/**
+ * The narrow surface the Smart Guides service needs from the host
+ * (`DockviewComponent`). The service owns candidate generation, snap resolution
+ * and the guide overlay; it only reads the floating container (for guide
+ * geometry) and the drag-end signal from the host, never mutating layout. The
+ * per-frame snap itself is driven by the component composing the service into
+ * the float drag loop's `transformFloatingGroupDrag`, so it is not a host
+ * member.
+ */
+export interface ISmartGuidesHost {
+    readonly options: DockviewComponentOptions;
+    /**
+     * The positioning parent for floating groups, in whose coordinate space the
+     * guide overlay is drawn (container-relative, never client/viewport space).
+     * This is the same element floats are placed in
+     * (`_floatingOverlayHost ?? gridview.element`).
+     */
+    getFloatingContainer(): HTMLElement;
+    /**
+     * Fires with the dragged group when a floating group's move-drag ends
+     * (pointerup / cancel) — the signal to tear down the guides and per-drag
+     * state. A resize-end fires it too; with no active drag session that is a
+     * harmless no-op.
+     */
+    readonly onDidEndFloatingGroupDrag: Event<DockviewGroupPanel>;
+}
+
+export interface ISmartGuidesService extends IDisposable {
+    /**
+     * Snap the proposed drag position against the other floating groups,
+     * drawing an alignment guide on the snapped edge. Returns an adjusted
+     * top-left, or nothing to leave the proposed position unchanged — which is
+     * also the pass-through when `smartGuides` is unset / disabled.
+     */
+    transformFloatingGroupDrag(
+        context: FloatingGroupDragContext
+    ): { top: number; left: number } | void;
 }

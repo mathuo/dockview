@@ -23,6 +23,7 @@ import {
     IContextMenuService,
     IKeyboardDockingService,
     ILayoutHistoryService,
+    ISmartGuidesService,
     ITabGroupChipsService,
 } from './moduleContracts';
 
@@ -40,6 +41,7 @@ export interface ServiceCollection {
     accessibilityService?: IAccessibilityService;
     keyboardDockingService?: IKeyboardDockingService;
     layoutHistoryService?: ILayoutHistoryService;
+    smartGuidesService?: ISmartGuidesService;
 }
 
 export interface DockviewModule<THost = unknown> {

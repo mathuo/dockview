@@ -59,7 +59,7 @@ import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
 import { Parameters } from '../panel/types';
-import { Overlay } from '../overlay/overlay';
+import { Overlay, OverlayDragContext } from '../overlay/overlay';
 import {
     Classnames,
     getDockviewTheme,
@@ -92,6 +92,7 @@ import {
     IContextMenuService,
     ILayoutHistoryHost,
     LayoutHistoryChangeEvent,
+    ISmartGuidesHost,
     ITabGroupChipsHost,
 } from './moduleContracts';
 import { IHeaderActionsHost } from './headerActionsService';
@@ -491,7 +492,8 @@ export class DockviewComponent
         IAdvancedDnDHost,
         ILiveRegionHost,
         IAccessibilityHost,
-        ILayoutHistoryHost
+        ILayoutHistoryHost,
+        ISmartGuidesHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
@@ -582,6 +584,14 @@ export class DockviewComponent
     private readonly _onDidOpenPopoutWindowFail = new Emitter<void>();
     readonly onDidOpenPopoutWindowFail: Event<void> =
         this._onDidOpenPopoutWindowFail.event;
+
+    private readonly _onDidEndFloatingGroupDrag =
+        new Emitter<DockviewGroupPanel>();
+    /** Fires with the dragged group when a floating group's move/resize drag
+     *  ends — consumed by the Smart Guides service (`ISmartGuidesHost`) to tear
+     *  down its per-drag guides. */
+    readonly onDidEndFloatingGroupDrag: Event<DockviewGroupPanel> =
+        this._onDidEndFloatingGroupDrag.event;
 
     private readonly _onDidLayoutFromJSON = new Emitter<void>();
     readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutFromJSON.event;
@@ -748,6 +758,63 @@ export class DockviewComponent
                     height: rect.height,
                 };
             });
+    }
+
+    /**
+     * ISmartGuidesHost — the positioning parent floats are placed in, also the
+     * coordinate space the Smart Guides overlay draws its alignment lines in.
+     */
+    getFloatingContainer(): HTMLElement {
+        return this._floatingOverlayHost ?? this.gridview.element;
+    }
+
+    private get _smartGuidesService() {
+        // Optional like every module service — `?.`-guarded everywhere so the
+        // module can be removed without crashing the float drag loop.
+        return this._moduleRegistry.services.smartGuidesService;
+    }
+
+    /**
+     * Compose the float drag-position transform from the public
+     * `transformFloatingGroupDrag` option and the optional Smart Guides module,
+     * so an app and the module can both nudge a single drag rather than one
+     * clobbering the other. Returns `undefined` when neither is active, leaving
+     * the overlay's drag loop byte-for-byte unchanged (removability — the
+     * sibling-box snapshot is skipped too; see {@link ISmartGuidesHost}).
+     */
+    private _buildFloatingDragTransform(
+        anchorGroup: DockviewGroupPanel
+    ):
+        | ((
+              context: OverlayDragContext
+          ) => { top: number; left: number } | void)
+        | undefined {
+        const publicTransform = this.options.transformFloatingGroupDrag;
+        if (!publicTransform && !this._smartGuidesService) {
+            return undefined;
+        }
+        return (context) => {
+            // 1. the app's transform runs first on the raw proposed box...
+            const appResult = publicTransform?.({
+                group: anchorGroup,
+                proposed: context.proposed,
+                container: context.container,
+                others: context.others,
+            });
+            // 2. ...then the module snaps the (possibly) app-adjusted position,
+            //    so its guides reflect the final on-screen alignment.
+            const proposed = appResult
+                ? { ...context.proposed, ...appResult }
+                : context.proposed;
+            const snapped =
+                this._smartGuidesService?.transformFloatingGroupDrag({
+                    group: anchorGroup,
+                    proposed,
+                    container: context.container,
+                    others: context.others,
+                });
+            return snapped ?? appResult ?? undefined;
+        };
     }
 
     private get _floatingGroupService() {
@@ -1187,6 +1254,7 @@ export class DockviewComponent
                 this._onDidChangePopouts.fire()
             ),
             this._onDidOpenPopoutWindowFail,
+            this._onDidEndFloatingGroupDrag,
             this._onDidCreateTabGroup,
             this._onDidDestroyTabGroup,
             this._onDidAddPanelToTabGroup,
@@ -2242,15 +2310,8 @@ export class DockviewComponent
                     : (this.options.floatingGroupBounds
                           ?.minimumHeightWithinViewport ??
                       DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE),
-            transformDragPosition: this.options.transformFloatingGroupDrag
-                ? (context) =>
-                      this.options.transformFloatingGroupDrag!({
-                          group: anchorGroup,
-                          proposed: context.proposed,
-                          container: context.container,
-                          others: context.others,
-                      })
-                : undefined,
+            transformDragPosition:
+                this._buildFloatingDragTransform(anchorGroup),
             getSiblingBoxes: () => this._gatherFloatingGroupBoxes(anchorGroup),
         });
 
@@ -2273,6 +2334,14 @@ export class DockviewComponent
             anchorGroup,
             overlay,
             floatingGridview
+        );
+
+        // Surface the end of a move/resize drag so the Smart Guides module can
+        // tear down its per-drag guides (no-op when the module is absent).
+        floatingGroupPanel.addDisposables(
+            overlay.onDidChangeEnd(() =>
+                this._onDidEndFloatingGroupDrag.fire(anchorGroup)
+            )
         );
 
         if (titleBar) {

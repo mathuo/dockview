@@ -181,6 +181,23 @@ export interface FloatingGroupDragContext {
     readonly others: readonly Box[];
 }
 
+/**
+ * Options for the Smart Guides module — Figma-style alignment guides + magnetic
+ * snapping while dragging a floating group. Omit `smartGuides` entirely to leave
+ * float dragging unchanged: the module is then inert and the drag loop is a
+ * byte-for-byte pass-through.
+ */
+export interface SmartGuidesOptions {
+    /** Master switch. Defaults to `true` when `smartGuides` is present. */
+    enabled?: boolean;
+    /** Distance, in px, within which a dragged edge engages a snap. Default `8`. */
+    snapDistance?: number;
+    /** Render the alignment guide lines while snapping. Default `true`. */
+    showGuides?: boolean;
+    /** Extra class applied to the guide overlay layer, for theming. */
+    className?: string;
+}
+
 export interface DockviewOptions {
     /**
      * Disable the auto-resizing which is controlled through a `ResizeObserver`.
@@ -210,6 +227,12 @@ export interface DockviewOptions {
     transformFloatingGroupDrag?: (
         context: FloatingGroupDragContext
     ) => { top: number; left: number } | void;
+    /**
+     * Enable Smart Guides — alignment guides + magnetic snapping while a
+     * floating group is being dragged. Omit to disable entirely (float dragging
+     * is then unchanged). Provided by the Smart Guides module.
+     */
+    smartGuides?: SmartGuidesOptions;
     /**
      * Selects which element moves a floating group when dragged.
      *
@@ -453,6 +476,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         disableFloatingGroups: undefined,
         floatingGroupBounds: undefined,
         transformFloatingGroupDrag: undefined,
+        smartGuides: undefined,
         floatingGroupDragHandle: undefined,
         popoutUrl: undefined,
         nonce: undefined,

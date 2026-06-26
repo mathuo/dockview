@@ -87,6 +87,7 @@ EdgeGroupOptions
 EdgeGroupPosition
 ExpansionEvent
 FloatingGroupDragContext
+FloatingGroupModule
 FloatingGroupOptions
 FocusEvent
 GetTabContextMenuItemsParams
@@ -153,6 +154,8 @@ IPaneviewPanel
 ISerializedBranchNode
 ISerializedLeafNode
 ISerializedNode
+ISmartGuidesHost
+ISmartGuidesService
 ISplitViewDescriptor
 ISplitviewComponent
 ISplitviewPanel
@@ -236,6 +239,7 @@ SerializedTabGroup
 ServiceCollection
 SizeEvent
 Sizing
+SmartGuidesOptions
 SplitSizing
 SplitViewOptions
 Splitview
