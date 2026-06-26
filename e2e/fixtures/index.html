@@ -48,8 +48,12 @@
                     // (incl. async popout re-open).
                     layoutHistory: { enabled: true },
                     // Smart Guides — alignment + snapping for floating groups.
-                    // Inert unless a float is dragged near another float.
-                    smartGuides: { snapDistance: 12 },
+                    // Float-only here so the harness geometry is deterministic
+                    // (container-edge snapping is covered by unit tests).
+                    smartGuides: {
+                        snapDistance: 12,
+                        snapTargets: { container: false },
+                    },
                     // A served (not about:blank) target avoids a 404 when the
                     // popout window navigates before dockview injects content.
                     popoutUrl: '/e2e/fixtures/popout.html',

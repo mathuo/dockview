@@ -181,6 +181,17 @@ export interface FloatingGroupDragContext {
     readonly others: readonly Box[];
 }
 
+/** Which alignment sources Smart Guides snaps a dragged floating group to. */
+export interface SmartGuidesSnapTargets {
+    /** Align to the other floating groups' edges + centers. Default `true`. */
+    floats?: boolean;
+    /** Align to the container's edges + center. Default `true`. */
+    container?: boolean;
+    /** Also emit inset guide lines this many px inside the container edges
+     *  (e.g. a content margin). Default `undefined` (no inset lines). */
+    containerInset?: number;
+}
+
 /**
  * Options for the Smart Guides module — Figma-style alignment guides + magnetic
  * snapping while dragging a floating group. Omit `smartGuides` entirely to leave
@@ -190,10 +201,17 @@ export interface FloatingGroupDragContext {
 export interface SmartGuidesOptions {
     /** Master switch. Defaults to `true` when `smartGuides` is present. */
     enabled?: boolean;
-    /** Distance, in px, within which a dragged edge engages a snap. Default `8`. */
+    /** Distance, in px, within which a dragged edge/center engages a snap.
+     *  Default `8`. */
     snapDistance?: number;
+    /** Extra px beyond `snapDistance` the pointer must travel before an engaged
+     *  snap releases — asymmetric hysteresis that stops boundary oscillation.
+     *  Default `4`. */
+    releaseDistance?: number;
     /** Render the alignment guide lines while snapping. Default `true`. */
     showGuides?: boolean;
+    /** Which alignment sources to snap against (floats + container by default). */
+    snapTargets?: SmartGuidesSnapTargets;
     /** Extra class applied to the guide overlay layer, for theming. */
     className?: string;
 }

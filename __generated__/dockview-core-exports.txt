@@ -240,6 +240,7 @@ ServiceCollection
 SizeEvent
 Sizing
 SmartGuidesOptions
+SmartGuidesSnapTargets
 SplitSizing
 SplitViewOptions
 Splitview

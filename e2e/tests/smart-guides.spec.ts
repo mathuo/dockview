@@ -5,9 +5,9 @@ import { test, expect } from '@playwright/test';
  * Real-browser only: the snap reads the live container/overlay geometry the
  * float drag loop works in, which jsdom (no layout) can't produce.
  *
- * Phase 1: dragging one float so an edge lines up with another float's edge
- * (within `snapDistance`) snaps it exactly and paints one alignment guide; the
- * guide is torn down on drop.
+ * Dragging one float so an edge/center lines up with another float or the
+ * container (within `snapDistance`) snaps it and paints alignment guides; X and
+ * Y resolve independently; guides are torn down on drop.
  */
 test.describe('smart guides (floating snap)', () => {
     const setup = async (page) => {
@@ -20,6 +20,24 @@ test.describe('smart guides (floating snap)', () => {
         page.locator('.dv-resize-container', {
             has: page.locator('.dv-test-panel', { hasText: text }),
         });
+
+    // Rects of the guide lines currently being painted (pooled hidden ones out).
+    const visibleGuides = (
+        page
+    ): Promise<{ x: number; y: number; w: number; h: number }[]> =>
+        page.evaluate(() =>
+            Array.from(
+                document.querySelectorAll<HTMLElement>('.dv-smart-guide')
+            )
+                .filter((l) => l.style.display === 'block')
+                .map((l) => {
+                    const r = l.getBoundingClientRect();
+                    return { x: r.x, y: r.y, w: r.width, h: r.height };
+                })
+        );
+
+    const near = (a: number, b: number, tol = 2): boolean =>
+        Math.abs(a - b) < tol;
 
     test('snaps a dragged float edge to another float and draws a guide', async ({
         page,
@@ -36,37 +54,79 @@ test.describe('smart guides (floating snap)', () => {
 
         const startX = tb.x + tb.width / 2;
         const startY = tb.y + tb.height / 2;
-        // Pointer offset within the float — the float's left edge tracks
-        // (pointerX - grab) once the drag is underway.
         const grab = startX - moverBox.x;
 
         await page.mouse.move(startX, startY);
         await page.mouse.down();
-        // A tiny first nudge locks a clean grab offset before the long drag
-        // (the overlay captures the offset on the first pointer-move frame).
+        // Tiny nudge locks a clean grab offset before the long drag.
         await page.mouse.move(startX + 1, startY);
         // Land the float's left edge ~4px right of the target's left edge —
         // inside the 12px snapDistance, so it snaps exactly onto it.
-        const finalX = targetBox.x + grab + 5;
-        await page.mouse.move(finalX, startY, { steps: 20 });
+        await page.mouse.move(targetBox.x + grab + 5, startY, { steps: 20 });
 
-        // a single alignment guide is shown, at the target's left edge
-        const guide = page.locator('.dv-smart-guide');
-        await expect(guide).toBeVisible();
-        const gb = (await guide.boundingBox())!;
-        expect(Math.abs(gb.x - targetBox.x)).toBeLessThan(2);
+        // a vertical guide is drawn at the target's left edge
+        const guides = await visibleGuides(page);
+        expect(guides.some((g) => g.w <= 2 && near(g.x, targetBox.x))).toBe(
+            true
+        );
 
         // the float snapped exactly onto the target's left edge
         const snapped = (await mover.boundingBox())!;
-        expect(Math.abs(snapped.x - targetBox.x)).toBeLessThan(2);
+        expect(near(snapped.x, targetBox.x)).toBe(true);
 
         await page.mouse.up();
 
         // guides are an interaction overlay — gone once the drag ends
         await expect(page.locator('.dv-smart-guides')).toHaveCount(0);
-        // ...and the snapped position persists
         const after = (await mover.boundingBox())!;
-        expect(Math.abs(after.x - targetBox.x)).toBeLessThan(2);
+        expect(near(after.x, targetBox.x)).toBe(true);
+    });
+
+    test('X and Y snap independently — aligning to a corner draws both guides', async ({
+        page,
+    }) => {
+        await setup(page);
+
+        const mover = overlayWith(page, 'mover');
+        const target = overlayWith(page, 'target');
+        const handle = mover.locator('.dv-floating-titlebar');
+
+        const targetBox = (await target.boundingBox())!;
+        const moverBox = (await mover.boundingBox())!;
+        const tb = (await handle.boundingBox())!;
+
+        const startX = tb.x + tb.width / 2;
+        const startY = tb.y + tb.height / 2;
+        const grabX = startX - moverBox.x;
+        const grabY = startY - moverBox.y;
+
+        await page.mouse.move(startX, startY);
+        await page.mouse.down();
+        await page.mouse.move(startX + 1, startY + 1);
+        // Drag toward the target's top-left corner: left edge → target left,
+        // top edge → target top (both within the snap distance).
+        await page.mouse.move(
+            targetBox.x + grabX + 5,
+            targetBox.y + grabY + 5,
+            { steps: 25 }
+        );
+
+        const guides = await visibleGuides(page);
+        // a vertical guide at the target's left edge...
+        expect(guides.some((g) => g.w <= 2 && near(g.x, targetBox.x))).toBe(
+            true
+        );
+        // ...and a horizontal guide at the target's top edge
+        expect(guides.some((g) => g.h <= 2 && near(g.y, targetBox.y))).toBe(
+            true
+        );
+
+        const snapped = (await mover.boundingBox())!;
+        expect(near(snapped.x, targetBox.x)).toBe(true);
+        expect(near(snapped.y, targetBox.y)).toBe(true);
+
+        await page.mouse.up();
+        await expect(page.locator('.dv-smart-guides')).toHaveCount(0);
     });
 
     test('no guide while dragging away from every edge', async ({ page }) => {
@@ -80,11 +140,10 @@ test.describe('smart guides (floating snap)', () => {
 
         await page.mouse.move(startX, startY);
         await page.mouse.down();
-        // drag further right / into open space, away from the target float
-        await page.mouse.move(startX + 150, startY + 20, { steps: 8 });
+        // a small drag into open space, away from the target float + edges
+        await page.mouse.move(startX + 40, startY + 30, { steps: 8 });
 
-        // the guide line is never shown (the layer may exist, the line stays hidden)
-        await expect(page.locator('.dv-smart-guide')).toBeHidden();
+        expect(await visibleGuides(page)).toHaveLength(0);
 
         await page.mouse.up();
         await expect(page.locator('.dv-smart-guides')).toHaveCount(0);
