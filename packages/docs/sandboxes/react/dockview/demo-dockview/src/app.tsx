@@ -789,6 +789,7 @@ const DockviewDemo = (props: {
                                             onReady={onReady}
                                             theme={effectiveTheme}
                                             floatingGroupDragHandle="titlebar"
+                                            smartGuides={{ snapDistance: 8 }}
                                             getTabContextMenuItems={
                                                 getTabContextMenuItems
                                             }
