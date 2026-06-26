@@ -80,6 +80,7 @@ DockviewTheme
 DockviewUnhandledDragOverEvent
 DockviewWillDropEvent
 DockviewWillShowOverlayLocationEvent
+DragModifiers
 DraggablePaneviewPanel
 DropOverlayModelParams
 DroptargetOverlayModel
@@ -240,8 +241,11 @@ ServiceCollection
 SizeEvent
 Sizing
 SmartGuidesOptions
+SmartGuidesSnapEvent
 SmartGuidesSnapPosition
 SmartGuidesSnapTargets
+SmartGuidesSnapTogetherEvent
+SnapModifier
 SplitSizing
 SplitViewOptions
 Splitview

@@ -10,7 +10,7 @@ import {
     MutableDisposable,
 } from '../lifecycle';
 import { clamp } from '../math';
-import { AnchoredBox, Box } from '../types';
+import { AnchoredBox, Box, DragModifiers } from '../types';
 
 /**
  * Context handed to {@link OverlayOptions.transformDragPosition} each
@@ -23,6 +23,8 @@ export interface OverlayDragContext {
     readonly container: { width: number; height: number };
     /** Bounds of the sibling overlays, snapshotted at drag start. */
     readonly others: readonly Box[];
+    /** Modifier-key state from this frame's pointer event. */
+    readonly modifiers: DragModifiers;
 }
 
 class AriaLevelTracker {
@@ -429,6 +431,12 @@ export class Overlay extends CompositeDisposable {
                                 height: containerRect.height,
                             },
                             others: siblingBoxes,
+                            modifiers: {
+                                altKey: e.altKey,
+                                ctrlKey: e.ctrlKey,
+                                metaKey: e.metaKey,
+                                shiftKey: e.shiftKey,
+                            },
                         });
                         if (adjusted) {
                             proposedTop = adjusted.top;

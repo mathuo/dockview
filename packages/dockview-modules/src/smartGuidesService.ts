@@ -1,9 +1,17 @@
-import { DockviewCompositeDisposable as CompositeDisposable } from 'dockview-core';
+import {
+    DockviewCompositeDisposable as CompositeDisposable,
+    DockviewEmitter as Emitter,
+    DockviewEvent as Event,
+} from 'dockview-core';
 import {
     DockviewGroupPanel,
+    DragModifiers,
     FloatingGroupDragContext,
     SmartGuidesOptions,
+    SmartGuidesSnapEvent,
     SmartGuidesSnapPosition,
+    SmartGuidesSnapTogetherEvent,
+    SnapModifier,
 } from 'dockview-core';
 import { defineModule, FloatingGroupModule } from 'dockview-core';
 import { ISmartGuidesHost, ISmartGuidesService } from 'dockview-core';
@@ -18,10 +26,12 @@ interface ResolvedOptions {
     releaseDistance: number;
     showGuides: boolean;
     snapTogether: boolean;
+    disableSnapModifier: SnapModifier | false;
     className: string | undefined;
     snapFloats: boolean;
     snapContainer: boolean;
     containerInset: number | undefined;
+    snapSplitters: boolean;
 }
 
 function resolveOptions(o: SmartGuidesOptions | undefined): ResolvedOptions {
@@ -32,10 +42,12 @@ function resolveOptions(o: SmartGuidesOptions | undefined): ResolvedOptions {
         releaseDistance: o?.releaseDistance ?? 4,
         showGuides: o?.showGuides ?? true,
         snapTogether: o?.snapTogether ?? true,
+        disableSnapModifier: o?.disableSnapModifier ?? 'alt',
         className: o?.className,
         snapFloats: o?.snapTargets?.floats ?? true,
         snapContainer: o?.snapTargets?.container ?? true,
         containerInset: o?.snapTargets?.containerInset,
+        snapSplitters: o?.snapTargets?.splitters ?? false,
     };
 }
 
@@ -54,7 +66,7 @@ interface MergeIntent {
 }
 
 type CandidateKind = 'edge' | 'center';
-type CandidateSource = 'float' | 'container';
+type CandidateSource = 'float' | 'container' | 'splitter';
 
 /** A 1-D alignment line on one axis: its container-relative px + provenance
  *  (used to prioritise which line wins a contested snap). */
@@ -203,7 +215,11 @@ interface DragSession {
     pendingMerge: MergeIntent | undefined;
 }
 
-const SOURCE_RANK: Record<CandidateSource, number> = { float: 0, container: 1 };
+const SOURCE_RANK: Record<CandidateSource, number> = {
+    float: 0,
+    container: 1,
+    splitter: 2,
+};
 
 /**
  * Smart Guides — Figma-style alignment guides + magnetic snapping for floating
@@ -223,11 +239,25 @@ export class SmartGuidesService
     implements ISmartGuidesService
 {
     private readonly _sessions = new Map<DockviewGroupPanel, DragSession>();
+    /** Runtime option overrides (from `setEnabled` / `updateOptions`), merged
+     *  over the host's `smartGuides` option. */
+    private _override: Partial<SmartGuidesOptions> = {};
+
+    private readonly _onDidSnapFloat = new Emitter<SmartGuidesSnapEvent>();
+    readonly onDidSnapFloat: Event<SmartGuidesSnapEvent> =
+        this._onDidSnapFloat.event;
+
+    private readonly _onDidSnapTogether =
+        new Emitter<SmartGuidesSnapTogetherEvent>();
+    readonly onDidSnapTogether: Event<SmartGuidesSnapTogetherEvent> =
+        this._onDidSnapTogether.event;
 
     constructor(private readonly host: ISmartGuidesHost) {
         super();
 
         this.addDisposables(
+            this._onDidSnapFloat,
+            this._onDidSnapTogether,
             // Drag end (pointerup / cancel): commit any pending snap-together,
             // then tear the per-drag guides down.
             this.host.onDidEndFloatingGroupDrag((group) =>
@@ -243,8 +273,54 @@ export class SmartGuidesService
         );
     }
 
+    get enabled(): boolean {
+        return this._opts.enabled;
+    }
+
+    setEnabled(enabled: boolean): void {
+        this.updateOptions({ enabled });
+    }
+
+    updateOptions(options: Partial<SmartGuidesOptions>): void {
+        this._override = {
+            ...this._override,
+            ...options,
+            // Merge `snapTargets` rather than replacing the whole sub-object.
+            snapTargets: options.snapTargets
+                ? { ...this._override.snapTargets, ...options.snapTargets }
+                : this._override.snapTargets,
+        };
+    }
+
     private get _opts(): ResolvedOptions {
-        return resolveOptions(this.host.options.smartGuides);
+        const base = this.host.options.smartGuides;
+        if (!base && Object.keys(this._override).length === 0) {
+            return resolveOptions(undefined);
+        }
+        return resolveOptions({
+            ...base,
+            ...this._override,
+            snapTargets: {
+                ...base?.snapTargets,
+                ...this._override.snapTargets,
+            },
+        });
+    }
+
+    /** Whether the configured disable-modifier is held this frame. */
+    private _gated(opts: ResolvedOptions, modifiers: DragModifiers): boolean {
+        switch (opts.disableSnapModifier) {
+            case 'alt':
+                return modifiers.altKey;
+            case 'ctrl':
+                return modifiers.ctrlKey;
+            case 'meta':
+                return modifiers.metaKey;
+            case 'shift':
+                return modifiers.shiftKey;
+            default:
+                return false;
+        }
     }
 
     transformFloatingGroupDrag(
@@ -254,6 +330,19 @@ export class SmartGuidesService
         if (!opts.enabled) {
             // Disabled mid-drag (or never on): drop any guides, pass through.
             this._endSession(context.group);
+            return;
+        }
+
+        // Modifier gate (default Alt): suspend snapping + guides while held; the
+        // float follows the pointer freely and re-engages on release.
+        if (this._gated(opts, context.modifiers)) {
+            const existing = this._sessions.get(context.group);
+            if (existing) {
+                existing.layer.clear();
+                existing.engagedX = undefined;
+                existing.engagedY = undefined;
+                existing.pendingMerge = undefined;
+            }
             return;
         }
 
@@ -363,6 +452,25 @@ export class SmartGuidesService
                         source: 'container',
                     }
                 );
+            }
+        }
+        // The grid's splitters behind the float (a vertical sash → an x line,
+        // a horizontal sash → a y line).
+        if (opts.snapSplitters) {
+            for (const r of this.host.getGridSplitterRects()) {
+                if (r.width <= r.height) {
+                    x.push({
+                        coord: r.left + r.width / 2,
+                        kind: 'edge',
+                        source: 'splitter',
+                    });
+                } else {
+                    y.push({
+                        coord: r.top + r.height / 2,
+                        kind: 'edge',
+                        source: 'splitter',
+                    });
+                }
             }
         }
 
@@ -554,10 +662,25 @@ export class SmartGuidesService
             return;
         }
         const pending = session.pendingMerge;
+        const axes: ('x' | 'y')[] = [];
+        if (session.engagedX !== undefined) {
+            axes.push('x');
+        }
+        if (session.engagedY !== undefined) {
+            axes.push('y');
+        }
         // Tear the overlay down before the layout mutates.
         this._endSession(group);
+        // A merge supersedes a plain alignment for the drop's outcome.
         if (pending) {
             this.host.mergeFloatInto(group, pending.target, pending.position);
+            this._onDidSnapTogether.fire({
+                dragged: group,
+                target: pending.target,
+                position: pending.position,
+            });
+        } else if (axes.length > 0) {
+            this._onDidSnapFloat.fire({ group, axes });
         }
     }
 

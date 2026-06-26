@@ -8,7 +8,7 @@ import { DockviewMessages } from './accessibilityMessages';
 export type { DockviewMessages } from './accessibilityMessages';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
-import { Box } from '../types';
+import { Box, DragModifiers } from '../types';
 import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
 import { GroupOptions } from './dockviewGroupPanelModel';
 import { DockviewGroupDropLocation } from './events';
@@ -179,7 +179,12 @@ export interface FloatingGroupDragContext {
      * snapshotted at drag start.
      */
     readonly others: readonly Box[];
+    /** Modifier-key state from this frame's pointer event. */
+    readonly modifiers: DragModifiers;
 }
+
+/** A keyboard modifier that, while held, suspends Smart Guides snapping. */
+export type SnapModifier = 'alt' | 'ctrl' | 'meta' | 'shift';
 
 /** Which alignment sources Smart Guides snaps a dragged floating group to. */
 export interface SmartGuidesSnapTargets {
@@ -190,6 +195,9 @@ export interface SmartGuidesSnapTargets {
     /** Also emit inset guide lines this many px inside the container edges
      *  (e.g. a content margin). Default `undefined` (no inset lines). */
     containerInset?: number;
+    /** Align to the underlying grid's splitter (sash) positions. Default
+     *  `false`. */
+    splitters?: boolean;
 }
 
 /**
@@ -216,6 +224,10 @@ export interface SmartGuidesOptions {
     snapTogether?: boolean;
     /** Which alignment sources to snap against (floats + container by default). */
     snapTargets?: SmartGuidesSnapTargets;
+    /** Hold this modifier while dragging to temporarily suspend snapping +
+     *  guides (Figma/Keynote parity). `false` disables the gate. Default
+     *  `'alt'`. */
+    disableSnapModifier?: SnapModifier | false;
     /** Extra class applied to the guide overlay layer, for theming. */
     className?: string;
 }

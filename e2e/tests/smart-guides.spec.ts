@@ -129,6 +129,38 @@ test.describe('smart guides (floating snap)', () => {
         await expect(page.locator('.dv-smart-guides')).toHaveCount(0);
     });
 
+    test('holding Alt suspends snapping (the float follows the pointer)', async ({
+        page,
+    }) => {
+        await setup(page);
+
+        const mover = overlayWith(page, 'mover');
+        const target = overlayWith(page, 'target');
+        const handle = mover.locator('.dv-floating-titlebar');
+
+        const targetBox = (await target.boundingBox())!;
+        const moverBox = (await mover.boundingBox())!;
+        const tb = (await handle.boundingBox())!;
+        const startX = tb.x + tb.width / 2;
+        const startY = tb.y + tb.height / 2;
+        const grab = startX - moverBox.x;
+
+        await page.keyboard.down('Alt');
+        await page.mouse.move(startX, startY);
+        await page.mouse.down();
+        await page.mouse.move(startX + 1, startY);
+        // would normally snap the left edge onto the target's — but Alt is held
+        await page.mouse.move(targetBox.x + grab + 5, startY, { steps: 20 });
+
+        // no guides, and the edge is NOT pulled onto the target (stays ~5px off)
+        expect(await visibleGuides(page)).toHaveLength(0);
+        const box = (await mover.boundingBox())!;
+        expect(box.x).toBeGreaterThan(targetBox.x + 2);
+
+        await page.mouse.up();
+        await page.keyboard.up('Alt');
+    });
+
     test('no guide while dragging away from every edge', async ({ page }) => {
         await setup(page);
 

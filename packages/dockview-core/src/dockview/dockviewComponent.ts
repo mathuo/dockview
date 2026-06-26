@@ -33,6 +33,7 @@ import {
     isPanelOptionsWithPanel,
     MovementOptions,
     DockviewHeaderPosition,
+    SmartGuidesOptions,
 } from './options';
 import {
     BaseGrid,
@@ -93,6 +94,8 @@ import {
     ILayoutHistoryHost,
     LayoutHistoryChangeEvent,
     ISmartGuidesHost,
+    SmartGuidesSnapEvent,
+    SmartGuidesSnapTogetherEvent,
     ITabGroupChipsHost,
 } from './moduleContracts';
 import { IHeaderActionsHost } from './headerActionsService';
@@ -267,6 +270,12 @@ export interface FloatingGroupOptions {
      * group only. See {@link DockviewOptions.floatingGroupDragHandle}.
      */
     dragHandle?: 'titlebar' | 'tabbar';
+    /**
+     * Exclude this floating group from Smart Guides — it never snaps and shows
+     * no guides when dragged (e.g. a pinned HUD). See
+     * {@link DockviewOptions.smartGuides}.
+     */
+    disableSmartGuides?: boolean;
 }
 
 interface FloatingGroupOptionsInternal extends FloatingGroupOptions {
@@ -434,12 +443,26 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     clearHistory(): void;
     readonly onDidChangeHistory: Event<LayoutHistoryChangeEvent>;
     readonly popoutRestorationPromise: Promise<void>;
+    // smart guides
+    readonly smartGuidesEnabled: boolean;
+    setSmartGuidesEnabled(enabled: boolean): void;
+    updateSmartGuidesOptions(options: Partial<SmartGuidesOptions>): void;
+    readonly onDidSnapFloat: Event<SmartGuidesSnapEvent>;
+    readonly onDidSnapTogether: Event<SmartGuidesSnapTogetherEvent>;
 }
 
 /** A never-firing history-change event — the fallback `onDidChangeHistory`
  *  returns when the LayoutHistory module is absent, so the api event is always
  *  valid and subscribable. */
 const NO_LAYOUT_HISTORY_CHANGES: Event<LayoutHistoryChangeEvent> = () => ({
+    dispose: () => {
+        // noop — nothing ever fires
+    },
+});
+
+/** A never-firing event — the fallback the Smart Guides snap events return when
+ *  the module is absent, so the api events are always subscribable. */
+const NO_EVENT: Event<any> = () => ({
     dispose: () => {
         // noop — nothing ever fires
     },
@@ -807,10 +830,52 @@ export class DockviewComponent
         });
     }
 
+    /** ISmartGuidesHost — the main grid's splitter (sash) rectangles, in the
+     *  floating container's coordinate space, for the optional splitter target. */
+    getGridSplitterRects(): Box[] {
+        const origin = this.getFloatingContainer().getBoundingClientRect();
+        const result: Box[] = [];
+        this.gridview.element.querySelectorAll('.dv-sash').forEach((sash) => {
+            const r = sash.getBoundingClientRect();
+            result.push({
+                left: r.left - origin.left,
+                top: r.top - origin.top,
+                width: r.width,
+                height: r.height,
+            });
+        });
+        return result;
+    }
+
     private get _smartGuidesService() {
         // Optional like every module service — `?.`-guarded everywhere so the
         // module can be removed without crashing the float drag loop.
         return this._moduleRegistry.services.smartGuidesService;
+    }
+
+    /** Whether Smart Guides snapping is currently active. */
+    get smartGuidesEnabled(): boolean {
+        return this._smartGuidesService?.enabled ?? false;
+    }
+
+    /** Toggle Smart Guides snapping at runtime (no-op if the module is absent). */
+    setSmartGuidesEnabled(enabled: boolean): void {
+        this._smartGuidesService?.setEnabled(enabled);
+    }
+
+    /** Merge a partial Smart Guides option override in at runtime. */
+    updateSmartGuidesOptions(options: Partial<SmartGuidesOptions>): void {
+        this._smartGuidesService?.updateOptions(options);
+    }
+
+    /** Fires when a dragged float commits an alignment snap on drop. */
+    get onDidSnapFloat(): Event<SmartGuidesSnapEvent> {
+        return this._smartGuidesService?.onDidSnapFloat ?? NO_EVENT;
+    }
+
+    /** Fires when a dragged float commits a dock/merge on drop. */
+    get onDidSnapTogether(): Event<SmartGuidesSnapTogetherEvent> {
+        return this._smartGuidesService?.onDidSnapTogether ?? NO_EVENT;
     }
 
     /**
@@ -822,14 +887,17 @@ export class DockviewComponent
      * sibling-box snapshot is skipped too; see {@link ISmartGuidesHost}).
      */
     private _buildFloatingDragTransform(
-        anchorGroup: DockviewGroupPanel
+        anchorGroup: DockviewGroupPanel,
+        disableSmartGuides: boolean
     ):
         | ((
               context: OverlayDragContext
           ) => { top: number; left: number } | void)
         | undefined {
         const publicTransform = this.options.transformFloatingGroupDrag;
-        if (!publicTransform && !this._smartGuidesService) {
+        // Per-float opt-out: this window never consults the module.
+        const useGuides = !disableSmartGuides;
+        if (!publicTransform && !(useGuides && this._smartGuidesService)) {
             return undefined;
         }
         return (context) => {
@@ -839,19 +907,22 @@ export class DockviewComponent
                 proposed: context.proposed,
                 container: context.container,
                 others: context.others,
+                modifiers: context.modifiers,
             });
             // 2. ...then the module snaps the (possibly) app-adjusted position,
             //    so its guides reflect the final on-screen alignment.
             const proposed = appResult
                 ? { ...context.proposed, ...appResult }
                 : context.proposed;
-            const snapped =
-                this._smartGuidesService?.transformFloatingGroupDrag({
-                    group: anchorGroup,
-                    proposed,
-                    container: context.container,
-                    others: context.others,
-                });
+            const snapped = useGuides
+                ? this._smartGuidesService?.transformFloatingGroupDrag({
+                      group: anchorGroup,
+                      proposed,
+                      container: context.container,
+                      others: context.others,
+                      modifiers: context.modifiers,
+                  })
+                : undefined;
             return snapped ?? appResult ?? undefined;
         };
     }
@@ -2272,6 +2343,7 @@ export class DockviewComponent
                 dragHandle: options?.dragHandle,
                 inDragMode: options?.inDragMode,
                 skipActiveGroup: options?.skipActiveGroup,
+                disableSmartGuides: options?.disableSmartGuides,
             }
         );
     }
@@ -2308,6 +2380,7 @@ export class DockviewComponent
             dragHandle?: 'titlebar' | 'tabbar';
             inDragMode?: boolean;
             skipActiveGroup?: boolean;
+            disableSmartGuides?: boolean;
         }
     ): void {
         const service = assertModule(
@@ -2349,8 +2422,10 @@ export class DockviewComponent
                     : (this.options.floatingGroupBounds
                           ?.minimumHeightWithinViewport ??
                       DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE),
-            transformDragPosition:
-                this._buildFloatingDragTransform(anchorGroup),
+            transformDragPosition: this._buildFloatingDragTransform(
+                anchorGroup,
+                options?.disableSmartGuides ?? false
+            ),
             getSiblingBoxes: () => this._gatherFloatingGroupBoxes(anchorGroup),
         });
 

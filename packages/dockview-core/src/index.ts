@@ -123,7 +123,7 @@ export * from './gridview/gridviewPanel';
 export { SplitviewPanel, ISplitviewPanel } from './splitview/splitviewPanel';
 export * from './paneview/paneviewPanel';
 export * from './dockview/types';
-export { Box, AnchorPosition, AnchoredBox } from './types';
+export { Box, AnchorPosition, AnchoredBox, DragModifiers } from './types';
 
 export { DockviewPanelRenderer } from './overlay/overlayRenderContainer';
 
@@ -204,6 +204,8 @@ export {
     ISmartGuidesHost,
     ISmartGuidesService,
     SmartGuidesSnapPosition,
+    SmartGuidesSnapEvent,
+    SmartGuidesSnapTogetherEvent,
     ITabGroupChipsHost,
     ITabGroupChipsService,
 } from './dockview/moduleContracts';

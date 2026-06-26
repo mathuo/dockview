@@ -15,7 +15,11 @@ import { IDockviewPanel } from './dockviewPanel';
 import { ITabGroup } from './tabGroup';
 import { TabGroupColorPalette } from './tabGroupAccent';
 import { PopupService } from './components/popupService';
-import { DockviewComponentOptions, FloatingGroupDragContext } from './options';
+import {
+    DockviewComponentOptions,
+    FloatingGroupDragContext,
+    SmartGuidesOptions,
+} from './options';
 import {
     DockviewLayoutMutationEvent,
     DockviewLayoutMutationKind,
@@ -283,6 +287,12 @@ export interface ISmartGuidesHost {
         exclude: DockviewGroupPanel
     ): readonly { group: DockviewGroupPanel; box: Box }[];
     /**
+     * The underlying grid's splitter (sash) rectangles, in the same
+     * container-relative space, for the optional `snapTargets.splitters` source.
+     * Empty when there are no sashes.
+     */
+    getGridSplitterRects(): Box[];
+    /**
      * Commit a snap-together: dock / merge the dragged float into a target group
      * at `position`. Reuses the existing move primitive (`moveGroupOrPanel`) so
      * events + undo cover it; a no-op when `dragged === target`.
@@ -302,6 +312,20 @@ export type SmartGuidesSnapPosition =
     | 'bottom'
     | 'center';
 
+/** Fired when a dragged float commits an alignment snap on drop. */
+export interface SmartGuidesSnapEvent {
+    readonly group: DockviewGroupPanel;
+    /** Which axes were snapped at release. */
+    readonly axes: ('x' | 'y')[];
+}
+
+/** Fired when a dragged float commits a dock/merge on drop. */
+export interface SmartGuidesSnapTogetherEvent {
+    readonly dragged: DockviewGroupPanel;
+    readonly target: DockviewGroupPanel;
+    readonly position: SmartGuidesSnapPosition;
+}
+
 export interface ISmartGuidesService extends IDisposable {
     /**
      * Snap the proposed drag position against the other floating groups,
@@ -312,4 +336,12 @@ export interface ISmartGuidesService extends IDisposable {
     transformFloatingGroupDrag(
         context: FloatingGroupDragContext
     ): { top: number; left: number } | void;
+    /** Whether snapping is currently active (option present + enabled). */
+    readonly enabled: boolean;
+    /** Toggle snapping at runtime (overrides `smartGuides.enabled`). */
+    setEnabled(enabled: boolean): void;
+    /** Merge a partial option override in at runtime. */
+    updateOptions(options: Partial<SmartGuidesOptions>): void;
+    readonly onDidSnapFloat: Event<SmartGuidesSnapEvent>;
+    readonly onDidSnapTogether: Event<SmartGuidesSnapTogetherEvent>;
 }

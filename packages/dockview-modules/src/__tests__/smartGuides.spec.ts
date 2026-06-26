@@ -2,12 +2,21 @@ import { DockviewEmitter as Emitter } from 'dockview-core';
 import {
     Box,
     DockviewGroupPanel,
+    DragModifiers,
     FloatingGroupDragContext,
     ISmartGuidesHost,
     SmartGuidesOptions,
     SmartGuidesSnapPosition,
+    SmartGuidesSnapTogetherEvent,
 } from 'dockview-core';
 import { SmartGuidesService } from '../smartGuidesService';
+
+const NO_MODIFIERS: DragModifiers = {
+    altKey: false,
+    ctrlKey: false,
+    metaKey: false,
+    shiftKey: false,
+};
 
 /**
  * Smart Guides — independent X/Y edge + center snapping against other floats and
@@ -23,6 +32,7 @@ describe('smart guides', () => {
     let endEmitter: Emitter<DockviewGroupPanel>;
     let service: SmartGuidesService;
     let snapshots: { group: DockviewGroupPanel; box: Box }[];
+    let splitterRects: Box[];
     let mergeCalls: {
         dragged: DockviewGroupPanel;
         target: DockviewGroupPanel;
@@ -39,12 +49,14 @@ describe('smart guides', () => {
         document.body.appendChild(container);
         endEmitter = new Emitter<DockviewGroupPanel>();
         snapshots = floats;
+        splitterRects = [];
         mergeCalls = [];
         const host: ISmartGuidesHost = {
             options: { smartGuides } as any,
             getFloatingContainer: () => container,
             onDidEndFloatingGroupDrag: endEmitter.event,
             getFloatingGroupSnapshots: () => snapshots,
+            getGridSplitterRects: () => splitterRects,
             mergeFloatInto: (dragged, target, position) => {
                 mergeCalls.push({ dragged, target, position });
             },
@@ -52,11 +64,16 @@ describe('smart guides', () => {
         service = new SmartGuidesService(host);
     };
 
-    const ctx = (proposed: Box, others: Box[]): FloatingGroupDragContext => ({
+    const ctx = (
+        proposed: Box,
+        others: Box[],
+        modifiers: DragModifiers = NO_MODIFIERS
+    ): FloatingGroupDragContext => ({
         group,
         proposed,
         container: { width: 1000, height: 1000 },
         others,
+        modifiers,
     });
 
     // Lines the layer is currently painting (pooled hidden ones excluded).
@@ -379,5 +396,164 @@ describe('smart guides', () => {
 
         endEmitter.fire(group);
         expect(mergeCalls).toHaveLength(0);
+    });
+
+    // --- modifier gate ---
+
+    const alt: DragModifiers = { ...NO_MODIFIERS, altKey: true };
+
+    test('holding the disable modifier (default Alt) suspends snapping', () => {
+        make(floatsOnly());
+        const other: Box = { left: 100, top: 50, width: 200, height: 150 };
+        const box: Box = { left: 106, top: 400, width: 50, height: 50 };
+
+        // Alt held → no snap, no guides
+        expect(
+            service.transformFloatingGroupDrag(ctx(box, [other], alt))
+        ).toBeUndefined();
+        expect(visibleLines()).toHaveLength(0);
+
+        // released → snaps again on the next frame
+        expect(service.transformFloatingGroupDrag(ctx(box, [other]))).toEqual({
+            top: 400,
+            left: 100,
+        });
+    });
+
+    test('the disable modifier is configurable', () => {
+        make(floatsOnly({ disableSnapModifier: 'shift' }));
+        const other: Box = { left: 100, top: 50, width: 200, height: 150 };
+        const box: Box = { left: 106, top: 400, width: 50, height: 50 };
+
+        // Alt is no longer the gate → still snaps with Alt held
+        expect(
+            service.transformFloatingGroupDrag(ctx(box, [other], alt))
+        ).toEqual({ top: 400, left: 100 });
+        // Shift held → suspended
+        expect(
+            service.transformFloatingGroupDrag(
+                ctx(box, [other], { ...NO_MODIFIERS, shiftKey: true })
+            )
+        ).toBeUndefined();
+    });
+
+    test('`disableSnapModifier: false` ignores modifiers', () => {
+        make(floatsOnly({ disableSnapModifier: false }));
+        const other: Box = { left: 100, top: 50, width: 200, height: 150 };
+        expect(
+            service.transformFloatingGroupDrag(
+                ctx(
+                    { left: 106, top: 400, width: 50, height: 50 },
+                    [other],
+                    alt
+                )
+            )
+        ).toEqual({ top: 400, left: 100 });
+    });
+
+    // --- splitter targets ---
+
+    test('snaps to a grid splitter when `snapTargets.splitters` is on', () => {
+        make({
+            snapTargets: { floats: false, container: false, splitters: true },
+        });
+        // a vertical sash at x = 300
+        splitterRects = [{ left: 300, top: 0, width: 0, height: 1000 }];
+
+        const result = service.transformFloatingGroupDrag(
+            ctx({ left: 305, top: 400, width: 50, height: 50 }, [])
+        );
+        expect(result).toEqual({ top: 400, left: 300 });
+        expect(visibleLines()[0].style.left).toBe('300px');
+    });
+
+    test('splitters are off by default', () => {
+        make({ snapTargets: { floats: false, container: false } });
+        splitterRects = [{ left: 300, top: 0, width: 0, height: 1000 }];
+        expect(
+            service.transformFloatingGroupDrag(
+                ctx({ left: 305, top: 400, width: 50, height: 50 }, [])
+            )
+        ).toBeUndefined();
+    });
+
+    // --- runtime options ---
+
+    test('setEnabled toggles snapping at runtime', () => {
+        make(floatsOnly());
+        const other: Box = { left: 100, top: 50, width: 200, height: 150 };
+        const box: Box = { left: 106, top: 400, width: 50, height: 50 };
+
+        service.setEnabled(false);
+        expect(service.enabled).toBe(false);
+        expect(
+            service.transformFloatingGroupDrag(ctx(box, [other]))
+        ).toBeUndefined();
+
+        service.setEnabled(true);
+        expect(service.enabled).toBe(true);
+        expect(service.transformFloatingGroupDrag(ctx(box, [other]))).toEqual({
+            top: 400,
+            left: 100,
+        });
+    });
+
+    test('updateOptions merges an override at runtime', () => {
+        make(floatsOnly());
+        const other: Box = { left: 100, top: 50, width: 200, height: 150 };
+        // 25px away — outside the default 8px, inside an overridden 30px.
+        service.updateOptions({ snapDistance: 30 });
+        expect(
+            service.transformFloatingGroupDrag(
+                ctx({ left: 125, top: 400, width: 50, height: 50 }, [other])
+            )
+        ).toEqual({ top: 400, left: 100 });
+    });
+
+    test('setEnabled(true) activates even when `smartGuides` was unset', () => {
+        make(undefined);
+        service.setEnabled(true);
+        expect(
+            service.transformFloatingGroupDrag(
+                ctx({ left: 106, top: 400, width: 50, height: 50 }, [
+                    { left: 100, top: 50, width: 200, height: 150 },
+                ])
+            )
+        ).toEqual({ top: 400, left: 100 });
+    });
+
+    // --- events ---
+
+    test('onDidSnapFloat fires on drop with the snapped axes', () => {
+        make(floatsOnly());
+        const events: { axes: ('x' | 'y')[] }[] = [];
+        service.onDidSnapFloat((e) => events.push({ axes: e.axes }));
+
+        service.transformFloatingGroupDrag(
+            ctx({ left: 106, top: 400, width: 50, height: 50 }, [
+                { left: 100, top: 50, width: 200, height: 150 },
+            ])
+        );
+        endEmitter.fire(group);
+        expect(events).toEqual([{ axes: ['x'] }]);
+    });
+
+    test('onDidSnapTogether fires on a merge drop (and not onDidSnapFloat)', () => {
+        const t: Box = { left: 300, top: 100, width: 200, height: 200 };
+        make(noAlign(), [{ group: targetGroup, box: t }]);
+        const together: SmartGuidesSnapTogetherEvent[] = [];
+        const aligned: unknown[] = [];
+        service.onDidSnapTogether((e) => together.push(e));
+        service.onDidSnapFloat((e) => aligned.push(e));
+
+        service.transformFloatingGroupDrag(
+            ctx({ left: 150, top: 100, width: 150, height: 200 }, [])
+        );
+        endEmitter.fire(group);
+
+        expect(together).toEqual([
+            { dragged: group, target: targetGroup, position: 'left' },
+        ]);
+        expect(aligned).toHaveLength(0);
     });
 });
