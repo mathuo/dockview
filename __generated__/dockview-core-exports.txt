@@ -29,6 +29,7 @@ DEFAULT_TAB_GROUP_COLORS
 DefaultDockviewDeserialzier
 DefaultTab
 Direction
+DismissableLayerOptions
 DistributeSizing
 DockviewActivePanelChangeEvent
 DockviewApi
@@ -263,9 +264,12 @@ VisibilityEvent
 WatermarkRendererInitParameters
 applyTabGroupAccent
 clearRegisteredModules
+createCloseButton
+createDismissableLayer
 createDockview
 createGridview
 createPaneview
+createPinButton
 createSplitview
 defineModule
 directionToPosition
@@ -287,8 +291,10 @@ isPanelOptionsWithPanel
 markDockviewPackageLoaded
 orthogonal
 positionToDirection
+prefersReducedMotion
 registerModules
 resolveMessages
+resolveOpaqueBackground
 resolveTabGroupAccent
 themeAbyss
 themeAbyssSpaced
