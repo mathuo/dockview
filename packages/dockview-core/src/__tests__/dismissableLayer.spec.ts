@@ -124,4 +124,36 @@ describe('createDismissableLayer', () => {
         keydown('Escape');
         expect(onDismiss).toHaveBeenCalledTimes(1); // no further calls
     });
+
+    test('focusOut dismisses when focus lands outside the layer', () => {
+        const onDismiss = jest.fn();
+        const layer = createDismissableLayer({
+            onDismiss,
+            focusOut: true,
+            elements: () => [inside],
+        });
+
+        inside.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+        expect(onDismiss).not.toHaveBeenCalled();
+        outside.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+        expect(onDismiss).toHaveBeenCalledTimes(1);
+
+        layer.dispose();
+    });
+
+    test('focusOut uses an isFocusInside predicate when provided', () => {
+        const onDismiss = jest.fn();
+        const layer = createDismissableLayer({
+            onDismiss,
+            focusOut: true,
+            isFocusInside: (el) => el === inside,
+        });
+
+        inside.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+        expect(onDismiss).not.toHaveBeenCalled();
+        outside.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+        expect(onDismiss).toHaveBeenCalledTimes(1);
+
+        layer.dispose();
+    });
 });

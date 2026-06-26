@@ -42,6 +42,14 @@ export interface DismissableLayerOptions {
     /** Dismiss on window resize, skipping touch-driven resizes (default
      *  `false`). */
     readonly resize?: boolean;
+    /** Dismiss when focus moves to an element *outside* the layer (default
+     *  `false`) — the "slide back on focus loss" behaviour. */
+    readonly focusOut?: boolean;
+    /** Whether a newly-focused element is inside the layer (for
+     *  {@link focusOut}). Defaults to a `contains` check against
+     *  {@link elements} — provide this for geometry-based testing when the
+     *  content is a sibling overlay stacked on top of the layer. */
+    readonly isFocusInside?: (focused: Element) => boolean;
     /** Listen in the capture phase (default `false`). Use capture when the
      *  layer must see the event before content handlers stop its propagation. */
     readonly capture?: boolean;
@@ -53,9 +61,9 @@ export interface DismissableLayerOptions {
  * The shared dismissal lifecycle behind transient surfaces (popovers, menus,
  * peeks): while it lives it watches a configurable set of dismiss signals
  * (Escape / extra keys, outside-pointerdown with an optional grace window,
- * window resize) and calls `onDismiss`. Inside/outside is decided by an
- * `isInside` predicate (geometry) or a `contains` check against `elements`.
- * Dispose to detach every listener.
+ * window resize, focus moving outside) and calls `onDismiss`. Inside/outside is
+ * decided by an `isInside` predicate (geometry) or a `contains` check against
+ * `elements`. Dispose to detach every listener.
  *
  * It owns only the *signals* — not the surface element, its position, or any
  * hover/keep-open policy — so callers keep their own element lifecycle and
@@ -133,6 +141,30 @@ export function createDismissableLayer(
                 options.onDismiss();
             })
         );
+    }
+
+    if (options.focusOut) {
+        const isFocusInside = (focused: Element): boolean => {
+            if (options.isFocusInside) {
+                return options.isFocusInside(focused);
+            }
+            return (options.elements?.() ?? []).some((el) =>
+                el.contains(focused)
+            );
+        };
+        // `focusin` bubbles to the window; capture so it's seen regardless of
+        // content handlers.
+        const onFocusIn = (event: FocusEvent): void => {
+            const target = event.target;
+            if (target instanceof Element && !isFocusInside(target)) {
+                options.onDismiss();
+            }
+        };
+        win.addEventListener('focusin', onFocusIn, capture);
+        disposables.addDisposables({
+            dispose: () =>
+                win.removeEventListener('focusin', onFocusIn, capture),
+        });
     }
 
     return disposables;

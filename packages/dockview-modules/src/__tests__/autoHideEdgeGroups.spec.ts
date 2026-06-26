@@ -366,6 +366,57 @@ describe('auto-hide edge groups', () => {
             d.dispose();
         });
 
+        test('focus landing outside the peek closes it (keyboard tab-away)', () => {
+            const d = make(true);
+            collapsedEdgeWithPanel(d);
+            d.api.peekEdgeGroup('left', true);
+            expect(peek()).toBeTruthy();
+
+            // the strip is the keep-open region (peek/header rects stay 0×0)
+            jest.spyOn(strip(d), 'getBoundingClientRect').mockReturnValue({
+                left: 0,
+                top: 0,
+                right: 40,
+                bottom: 600,
+                width: 40,
+                height: 600,
+                x: 0,
+                y: 0,
+                toJSON() {},
+            } as DOMRect);
+
+            const mkAt = (cx: number, cy: number): HTMLElement => {
+                const el = document.createElement('button');
+                document.body.appendChild(el);
+                jest.spyOn(el, 'getBoundingClientRect').mockReturnValue({
+                    left: cx - 5,
+                    top: cy - 5,
+                    right: cx + 5,
+                    bottom: cy + 5,
+                    width: 10,
+                    height: 10,
+                    x: cx - 5,
+                    y: cy - 5,
+                    toJSON() {},
+                } as DOMRect);
+                return el;
+            };
+
+            // focus inside the region → stays open
+            const inside = mkAt(20, 300);
+            inside.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+            expect(peek()).toBeTruthy();
+
+            // focus outside → closes
+            const outside = mkAt(500, 500);
+            outside.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+            expect(peek()).toBeNull();
+
+            inside.remove();
+            outside.remove();
+            d.dispose();
+        });
+
         test('announces the panel when peeked and when pinned', () => {
             const messages: string[] = [];
             const d = make(true, {

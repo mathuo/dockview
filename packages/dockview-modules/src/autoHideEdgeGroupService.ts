@@ -205,11 +205,9 @@ class EdgeGroupController extends CompositeDisposable {
         const doc = this.group.element.ownerDocument;
         const bar = doc.createElement('div');
         bar.className = 'dv-edge-peek-header';
-        bar.style.display = 'flex';
-        bar.style.alignItems = 'center';
-        bar.style.gap = '4px';
-        bar.style.boxSizing = 'border-box';
-        bar.style.padding = '0 4px 0 8px';
+        // Layout/cosmetics are owned by `.dv-edge-peek-header` / -title in the
+        // stylesheet (overlay.scss). Only the resolved opaque background is
+        // dynamic — the floating peek must never be see-through.
         if (opts.background) {
             bar.style.backgroundColor = opts.background;
         }
@@ -217,11 +215,6 @@ class EdgeGroupController extends CompositeDisposable {
         const titleEl = doc.createElement('span');
         titleEl.className = 'dv-edge-peek-title';
         titleEl.textContent = opts.title;
-        titleEl.style.flex = '1 1 auto';
-        titleEl.style.overflow = 'hidden';
-        titleEl.style.textOverflow = 'ellipsis';
-        titleEl.style.whiteSpace = 'nowrap';
-        titleEl.style.fontSize = '12px';
         bar.appendChild(titleEl);
 
         const mk = (
@@ -551,19 +544,30 @@ class EdgeGroupController extends CompositeDisposable {
 
     private _armCloseListeners(): void {
         const doc = this.group.element.ownerDocument;
-        // Esc + outside-pointerdown dismissal (the shared transient-layer
-        // lifecycle). Inside/outside is geometry-based because an `always`
-        // panel's content is a sibling overlay on top; capture phase so it sees
-        // the event before content handlers can stop it.
+        // The whole dismissal lifecycle (Esc + outside-pointerdown + resize +
+        // focus-out) is the shared layer's job. Inside/outside is geometry-based
+        // — for a pointer event and for a focused element's centre — because an
+        // `always` panel's content is a sibling overlay on top, not inside the
+        // peek's DOM subtree. Capture so it's seen before content handlers.
+        const withinCentre = (el: Element): boolean => {
+            const r = el.getBoundingClientRect();
+            return this._pointWithinPeek(
+                r.left + r.width / 2,
+                r.top + r.height / 2
+            );
+        };
         this._closeListeners = new CompositeDisposable(
             createDismissableLayer({
                 window: doc.defaultView ?? window,
                 capture: true,
                 onDismiss: () => this._closePeek(),
                 isInside: (e) => this._pointWithinPeek(e.clientX, e.clientY),
-                // The peek is anchored to the strip and doesn't re-layout on
-                // resize; close it (popover-style) rather than leave it stale.
+                // Anchored to the strip and not re-laid-out on resize → close
+                // (popover-style) rather than leave it stale. Focus leaving the
+                // peek closes it (the VS "slide back on focus loss").
                 resize: true,
+                focusOut: true,
+                isFocusInside: withinCentre,
             })
         );
     }
