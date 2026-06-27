@@ -254,12 +254,13 @@ describe('contentContainer', () => {
         expect(cut.element.childNodes.length).toBe(1);
     });
 
-    test('the dropPositionResolver option drives the content drop target', () => {
+    test('the resolved drop-position resolver drives the content drop target', () => {
         const resolver = { resolve: () => ({ position: 'right' as const }) };
 
         const cut = new ContentContainer(
             fromPartial<DockviewComponent>({
-                options: { dropPositionResolver: resolver },
+                getDropPositionResolver: () => resolver,
+                options: {},
                 resolveDropOverlayModel: () => undefined,
             }),
             fromPartial<DockviewGroupPanelModel>({

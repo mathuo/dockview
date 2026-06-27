@@ -54,3 +54,17 @@
         }
     }
 }
+
+// Drop Guide ("compass") — the aim-at-a-cell cross painted over a group's
+// content while dragging. The module positions + sizes the cells inline; only
+// the theming lives here (override the CSS vars to restyle).
+.dv-drop-guide {
+    z-index: 1001;
+}
+
+.dv-drop-guide-cell {
+    box-sizing: border-box;
+    border-radius: 2px;
+    border: 1px solid var(--dv-drop-guide-color, #1f9cf0);
+    background-color: var(--dv-drop-guide-cell-color, rgba(31, 156, 240, 0.25));
+}

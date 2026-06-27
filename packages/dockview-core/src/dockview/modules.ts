@@ -21,6 +21,7 @@ import {
     IAccessibilityService,
     IAdvancedDnDService,
     IContextMenuService,
+    IDropGuideService,
     IKeyboardDockingService,
     ILayoutHistoryService,
     ITabGroupChipsService,
@@ -40,6 +41,7 @@ export interface ServiceCollection {
     accessibilityService?: IAccessibilityService;
     keyboardDockingService?: IKeyboardDockingService;
     layoutHistoryService?: ILayoutHistoryService;
+    dropGuideService?: IDropGuideService;
 }
 
 export interface DockviewModule<THost = unknown> {

@@ -11,6 +11,7 @@ import {
     directionToPosition,
     DroptargetOverlayModel,
     Position,
+    PositionResolver,
 } from '../dnd/droptarget';
 import { tail, sequenceEquals } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
@@ -90,6 +91,7 @@ import {
     IAdvancedDnDHost,
     IContextMenuHost,
     IContextMenuService,
+    IDropGuideHost,
     ILayoutHistoryHost,
     LayoutHistoryChangeEvent,
     ITabGroupChipsHost,
@@ -491,7 +493,8 @@ export class DockviewComponent
         IAdvancedDnDHost,
         ILiveRegionHost,
         IAccessibilityHost,
-        ILayoutHistoryHost
+        ILayoutHistoryHost,
+        IDropGuideHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
@@ -779,6 +782,23 @@ export class DockviewComponent
         // AllModules. Absent ⇒ the onWill* hooks simply don't fire (≡ no
         // subscriber), which is invisible to apps not customising DnD.
         return this._moduleRegistry.services.advancedDnDService;
+    }
+
+    private get _dropGuideService() {
+        return this._moduleRegistry.services.dropGuideService;
+    }
+
+    /**
+     * The drop-position resolver installed on the group content drop targets —
+     * the app's `dropPositionResolver` option if set, else the Drop Guide
+     * module's compass resolver (undefined when the compass is disabled). Read
+     * live by the content drop targets; undefined ⇒ default cursor-quadrant.
+     */
+    getDropPositionResolver(): PositionResolver | undefined {
+        return (
+            this.options.dropPositionResolver ??
+            this._dropGuideService?.resolver
+        );
     }
 
     get headerActionsService() {

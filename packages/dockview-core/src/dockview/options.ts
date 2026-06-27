@@ -256,6 +256,13 @@ export interface DockviewOptions {
      * {@link DockviewApi.updateOptions}.
      */
     dropPositionResolver?: PositionResolver;
+    /**
+     * Show an aim-at-a-cell "compass" drop guide over a group while dragging,
+     * instead of resolving the drop by which quadrant the cursor is in. Default
+     * off ⇒ the cursor-quadrant behaviour, unchanged. Provided by the Drop Guide
+     * module. Pass an object to restrict which inner cells appear (`zones`).
+     */
+    dndGuide?: boolean | { zones?: Position[] };
     // #end dnd
     locked?: boolean;
     className?: string;
@@ -479,6 +486,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         noPanelsOverlay: undefined,
         dndEdges: undefined,
         dropPositionResolver: undefined,
+        dndGuide: undefined,
         theme: undefined,
         disableTabsOverflowList: undefined,
         scrollbars: undefined,

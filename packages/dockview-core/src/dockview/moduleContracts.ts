@@ -6,7 +6,11 @@
  */
 import { IDisposable } from '../lifecycle';
 import { Event } from '../events';
-import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
+import {
+    DroptargetOverlayModel,
+    Position,
+    PositionResolver,
+} from '../dnd/droptarget';
 import { IDragGhostSpec } from '../dnd/backend';
 import { DockviewApi } from '../api/component.api';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
@@ -244,4 +248,32 @@ export interface ILayoutHistoryService extends IDisposable {
     redo(): void;
     /** Drop both stacks (e.g. on document switch). */
     clear(): void;
+}
+
+// --- DropGuide ---
+
+/**
+ * The narrow surface the Drop Guide ("compass") service needs from the host
+ * (`DockviewComponent`). The service owns the compass widget + the cell
+ * hit-test resolver; the component installs that resolver at the drop-target
+ * seam (`dropPositionResolver`) and surfaces the drag-over signal the widget
+ * follows. It never re-implements drop resolution or the commit path.
+ */
+export interface IDropGuideHost {
+    readonly options: DockviewComponentOptions;
+    /**
+     * Fires on each drag-over with the hovered group + native event — the
+     * signal the compass widget mounts/follows. The service filters for
+     * `kind === 'content'`.
+     */
+    readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent>;
+}
+
+export interface IDropGuideService extends IDisposable {
+    /**
+     * The cell hit-test resolver, installed by the host at the drop-target seam
+     * in place of the default cursor-quadrant logic — or `undefined` when the
+     * compass is disabled (`dndGuide` unset), so the default behaviour runs.
+     */
+    readonly resolver: PositionResolver | undefined;
 }

@@ -122,7 +122,7 @@ export class ContentContainer
             canDisplayOverlay,
             getOverrideTarget,
             overlayModel: this.accessor.resolveDropOverlayModel?.('content'),
-            getPositionResolver: () => accessor.options.dropPositionResolver,
+            getPositionResolver: () => accessor.getDropPositionResolver?.(),
         });
 
         this.pointerDropTarget = pointerBackend.createDropTarget(this.element, {
@@ -136,7 +136,7 @@ export class ContentContainer
             className: 'dv-drop-target-content',
             getOverrideTarget,
             overlayModel: this.accessor.resolveDropOverlayModel?.('content'),
-            getPositionResolver: () => accessor.options.dropPositionResolver,
+            getPositionResolver: () => accessor.getDropPositionResolver?.(),
         });
 
         this.addDisposables(

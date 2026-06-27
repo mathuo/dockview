@@ -199,6 +199,8 @@ export {
     IAdvancedDnDService,
     IContextMenuHost,
     IContextMenuService,
+    IDropGuideHost,
+    IDropGuideService,
     IKeyboardDockingService,
     ILayoutHistoryHost,
     ILayoutHistoryService,
