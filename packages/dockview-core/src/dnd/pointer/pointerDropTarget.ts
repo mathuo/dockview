@@ -15,6 +15,7 @@ import {
     IDropTarget,
     MeasuredValue,
     Position,
+    PositionResolver,
     WillShowOverlayEvent,
 } from '../droptarget';
 import { PointerDragController } from './pointerDragController';
@@ -34,6 +35,12 @@ export interface PointerDropTargetOptions {
     /** Outline element for positioning; falls back to the drop element. */
     getOverlayOutline?: () => HTMLElement | null;
     className?: string;
+    /**
+     * Supply a {@link PositionResolver} that overrides how a pointer location
+     * resolves to a drop {@link Position}. A lazy getter so the source can
+     * change at runtime; `undefined` (default) uses the cursor-quadrant logic.
+     */
+    getPositionResolver?: () => PositionResolver | undefined;
 }
 
 /** Pointer-driven counterpart to `Droptarget` with identical visual output. */
@@ -133,7 +140,13 @@ export class PointerDropTarget
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
 
-        const quadrant = this._calculateQuadrant(x, y, width, height);
+        const quadrant = this._resolvePosition(
+            x,
+            y,
+            width,
+            height,
+            event.pointerEvent
+        );
 
         if (quadrant === null) {
             this._removeOverlay();
@@ -216,6 +229,35 @@ export class PointerDropTarget
                 nativeEvent: event.pointerEvent,
             });
         }
+    }
+
+    /**
+     * Resolve the drop {@link Position}: defer to an injected
+     * {@link PositionResolver} when present, otherwise the built-in
+     * cursor-quadrant logic (unchanged). Shares the resolver with the HTML5
+     * backend.
+     */
+    private _resolvePosition(
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        event: DragEvent | PointerEvent
+    ): Position | null {
+        const resolver = this.options.getPositionResolver?.();
+        if (resolver) {
+            return (
+                resolver.resolve({
+                    x,
+                    y,
+                    width,
+                    height,
+                    zones: this._acceptedTargetZonesSet,
+                    event,
+                })?.position ?? null
+            );
+        }
+        return this._calculateQuadrant(x, y, width, height);
     }
 
     private _calculateQuadrant(

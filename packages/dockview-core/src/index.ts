@@ -133,6 +133,9 @@ export {
     directionToPosition,
     MeasuredValue,
     DroptargetOverlayModel,
+    PositionResolver,
+    PositionResolverArgs,
+    PositionResolverResult,
 } from './dnd/droptarget';
 
 export {
