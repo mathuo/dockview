@@ -29,6 +29,7 @@ const NO_MODIFIERS: DragModifiers = {
  */
 describe('smart guides', () => {
     let container: HTMLElement;
+    let startEmitter: Emitter<DockviewGroupPanel>;
     let endEmitter: Emitter<DockviewGroupPanel>;
     let service: SmartGuidesService;
     let snapshots: { group: DockviewGroupPanel; box: Box }[];
@@ -47,6 +48,7 @@ describe('smart guides', () => {
     ): void => {
         container = document.createElement('div');
         document.body.appendChild(container);
+        startEmitter = new Emitter<DockviewGroupPanel>();
         endEmitter = new Emitter<DockviewGroupPanel>();
         snapshots = floats;
         splitterRects = [];
@@ -54,6 +56,7 @@ describe('smart guides', () => {
         const host: ISmartGuidesHost = {
             options: { smartGuides } as any,
             getFloatingContainer: () => container,
+            onDidStartFloatingGroupDrag: startEmitter.event,
             onDidEndFloatingGroupDrag: endEmitter.event,
             getFloatingGroupSnapshots: () => snapshots,
             getGridSplitterRects: () => splitterRects,
@@ -476,19 +479,33 @@ describe('smart guides', () => {
         make({
             snapTargets: { floats: false, container: false, splitters: true },
         });
-        // a vertical sash at x = 300
-        splitterRects = [{ left: 300, top: 0, width: 0, height: 1000 }];
+        // a 4px-wide vertical sash spanning 300..304 → candidate at centre 302
+        splitterRects = [{ left: 300, top: 0, width: 4, height: 1000 }];
 
         const result = service.transformFloatingGroupDrag(
             ctx({ left: 305, top: 400, width: 50, height: 50 }, [])
         );
-        expect(result).toEqual({ top: 400, left: 300 });
-        expect(visibleLines()[0].style.left).toBe('300px');
+        expect(result).toEqual({ top: 400, left: 302 });
+        expect(visibleLines()[0].style.left).toBe('302px');
+    });
+
+    test('a hidden (zero-area) sash is not a snap candidate', () => {
+        make({
+            snapTargets: { floats: false, container: false, splitters: true },
+        });
+        // a collapsed sash measures 0×0 — must not become a phantom line at x=0
+        splitterRects = [{ left: 0, top: 0, width: 0, height: 0 }];
+        expect(
+            service.transformFloatingGroupDrag(
+                ctx({ left: 3, top: 400, width: 50, height: 50 }, [])
+            )
+        ).toBeUndefined();
+        expect(visibleLines()).toHaveLength(0);
     });
 
     test('splitters are off by default', () => {
         make({ snapTargets: { floats: false, container: false } });
-        splitterRects = [{ left: 300, top: 0, width: 0, height: 1000 }];
+        splitterRects = [{ left: 300, top: 0, width: 4, height: 1000 }];
         expect(
             service.transformFloatingGroupDrag(
                 ctx({ left: 305, top: 400, width: 50, height: 50 }, [])
@@ -574,5 +591,56 @@ describe('smart guides', () => {
             { dragged: group, target: targetGroup, position: 'left' },
         ]);
         expect(aligned).toHaveLength(0);
+    });
+
+    // --- review regressions ---
+
+    test('a drag that aborts without an end leaves no stale guide for the next drag', () => {
+        // A redock long-press aborts via cancelPendingDrag (no end event); the
+        // next drag's start signal must discard the leftover session + layer.
+        make(floatsOnly());
+        const other: Box = { left: 100, top: 50, width: 200, height: 150 };
+        service.transformFloatingGroupDrag(
+            ctx({ left: 106, top: 400, width: 50, height: 50 }, [other])
+        );
+        expect(container.querySelector('.dv-smart-guides')).toBeTruthy();
+
+        // ...no end fires (aborted). Start of the next drag tears it down.
+        startEmitter.fire(group);
+        expect(container.querySelector('.dv-smart-guides')).toBeNull();
+    });
+
+    test('top-aligning a float off to the side of a target is not a merge', () => {
+        // Wide float, tops flush, ≥50% horizontal overlap of the narrow target —
+        // but its CENTRE is past the target's edge, so it is an alignment, not a
+        // tabset stack. Must NOT suggest or commit a merge.
+        const t: Box = { left: 100, top: 100, width: 100, height: 200 };
+        make(noAlign(), [{ group: targetGroup, box: t }]);
+
+        service.transformFloatingGroupDrag(
+            ctx({ left: 120, top: 100, width: 300, height: 200 }, [])
+        );
+        expect(preview()?.style.display ?? 'none').toBe('none');
+
+        endEmitter.fire(group);
+        expect(mergeCalls).toHaveLength(0);
+    });
+
+    test('`showGuides: false` still previews + commits a pending merge', () => {
+        // showGuides hides alignment LINES only — a merge that will commit on
+        // drop must never be silent.
+        const t: Box = { left: 300, top: 100, width: 200, height: 200 };
+        make(noAlign({ showGuides: false }), [{ group: targetGroup, box: t }]);
+
+        service.transformFloatingGroupDrag(
+            ctx({ left: 150, top: 100, width: 150, height: 200 }, [])
+        );
+        expect(visibleLines()).toHaveLength(0); // no alignment lines
+        expect(preview()!.style.display).toBe('block'); // but the merge preview shows
+
+        endEmitter.fire(group);
+        expect(mergeCalls).toEqual([
+            { dragged: group, target: targetGroup, position: 'left' },
+        ]);
     });
 });

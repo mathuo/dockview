@@ -4,6 +4,7 @@ import {
     DockviewEvent as Event,
 } from 'dockview-core';
 import {
+    Box,
     DockviewGroupPanel,
     DragModifiers,
     FloatingGroupDragContext,
@@ -51,12 +52,9 @@ function resolveOptions(o: SmartGuidesOptions | undefined): ResolvedOptions {
     };
 }
 
-interface Rect {
-    left: number;
-    top: number;
-    width: number;
-    height: number;
-}
+/** Local alias for the core geometry type — keeps these container-relative
+ *  boxes named `Rect` at the call sites while reusing one structural source. */
+type Rect = Box;
 
 /** A pending dock/merge intent the drag is currently suggesting. */
 interface MergeIntent {
@@ -277,6 +275,13 @@ export class SmartGuidesService
         this.addDisposables(
             this._onDidSnapFloat,
             this._onDidSnapTogether,
+            // Drag start: discard any session left over from a drag that ended
+            // without a pointerup (a redock long-press aborts via
+            // `cancelPendingDrag`, which fires no end event) so this drag builds
+            // fresh candidates and never reuses a stale guide layer.
+            this.host.onDidStartFloatingGroupDrag((group) =>
+                this._endSession(group)
+            ),
             // Drag end (pointerup / cancel): commit any pending snap-together,
             // then tear the per-drag guides down.
             this.host.onDidEndFloatingGroupDrag((group) =>
@@ -311,19 +316,39 @@ export class SmartGuidesService
         };
     }
 
+    private _optsCache:
+        | {
+              base: SmartGuidesOptions | undefined;
+              override: Partial<SmartGuidesOptions>;
+              resolved: ResolvedOptions;
+          }
+        | undefined;
+
     private get _opts(): ResolvedOptions {
+        // Read each pointer-move frame, but the inputs (the host option +
+        // runtime override) change only a handful of times per session. Cache by
+        // reference identity — `updateOptions` replaces `_override` with a fresh
+        // object and a host option change swaps `smartGuides`, so either edit
+        // invalidates this without per-frame re-resolution/allocation.
         const base = this.host.options.smartGuides;
-        if (!base && Object.keys(this._override).length === 0) {
-            return resolveOptions(undefined);
+        const override = this._override;
+        const cache = this._optsCache;
+        if (cache && cache.base === base && cache.override === override) {
+            return cache.resolved;
         }
-        return resolveOptions({
-            ...base,
-            ...this._override,
-            snapTargets: {
-                ...base?.snapTargets,
-                ...this._override.snapTargets,
-            },
-        });
+        const resolved =
+            !base && Object.keys(override).length === 0
+                ? resolveOptions(undefined)
+                : resolveOptions({
+                      ...base,
+                      ...override,
+                      snapTargets: {
+                          ...base?.snapTargets,
+                          ...override.snapTargets,
+                      },
+                  });
+        this._optsCache = { base, override, resolved };
+        return resolved;
     }
 
     /** Whether the configured disable-modifier is held this frame. */
@@ -398,15 +423,14 @@ export class SmartGuidesService
             : undefined;
         session.pendingMerge = merge;
 
-        if (opts.showGuides) {
-            session.layer.render(
-                this._guideLines(session, snappedBox),
-                context.container
-            );
-            session.layer.renderPreview(merge?.preview);
-        } else {
-            session.layer.clear();
-        }
+        // `showGuides` governs the alignment lines only. The dock/merge preview
+        // always shows when a merge is pending — it's the warning for an action
+        // that WILL commit on drop, so it must never be silent.
+        session.layer.render(
+            opts.showGuides ? this._guideLines(session, snappedBox) : [],
+            context.container
+        );
+        session.layer.renderPreview(merge?.preview);
 
         if (!resX && !resY) {
             return;
@@ -477,6 +501,12 @@ export class SmartGuidesService
         // a horizontal sash → a y line).
         if (opts.snapSplitters) {
             for (const r of this.host.getGridSplitterRects()) {
+                // Skip hidden / collapsed sashes (zero-area rects) — a real sash
+                // has a positive extent on both axes; a 0×0 rect would otherwise
+                // become a phantom candidate at coord 0 (the container edge).
+                if (r.width <= 0 || r.height <= 0) {
+                    continue;
+                }
                 if (r.width <= r.height) {
                     x.push({
                         coord: r.left + r.width / 2,
@@ -638,8 +668,16 @@ export class SmartGuidesService
             const hOverlap = overlapRatio(d.left, d.right, e.left, e.right);
             const vOverlap = overlapRatio(d.top, d.bottom, e.top, e.bottom);
 
-            // Tabset merge: tops flush + the boxes stacked (strong overlap).
-            if (within(d.top, e.top) && hOverlap >= ADJACENCY_OVERLAP) {
+            // Tabset merge: the dragged float's CENTRE sits over the target (it
+            // is genuinely stacked on top), with the tab strips flush. Requiring
+            // the centre inside — not just top-alignment + edge overlap — stops a
+            // plain top/edge alignment of two overlapping floats from being read
+            // as a merge (§11: tabset-merge only on centre overlap).
+            const cx = (d.left + d.right) / 2;
+            const cy = (d.top + d.bottom) / 2;
+            const centreInside =
+                cx >= e.left && cx <= e.right && cy >= e.top && cy <= e.bottom;
+            if (within(d.top, e.top) && centreInside) {
                 return { target: t.group, position: 'center', preview: t.box };
             }
             // Edge adjacency: a dragged edge meets the target's opposite edge.

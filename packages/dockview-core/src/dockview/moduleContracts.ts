@@ -272,6 +272,13 @@ export interface ISmartGuidesHost {
      */
     getFloatingContainer(): HTMLElement;
     /**
+     * Fires with the dragged group the first time a floating group move-drag
+     * actually moves — the signal to (re)build per-drag state from a clean slate.
+     * Tears down any session left over from a drag that ended without a normal
+     * pointerup (e.g. a redock long-press, which aborts without an end event).
+     */
+    readonly onDidStartFloatingGroupDrag: Event<DockviewGroupPanel>;
+    /**
      * Fires with the dragged group when a floating group's move-drag ends
      * (pointerup / cancel) — the signal to tear down the guides and per-drag
      * state. A resize-end fires it too; with no active drag session that is a

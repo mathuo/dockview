@@ -608,6 +608,14 @@ export class DockviewComponent
     readonly onDidOpenPopoutWindowFail: Event<void> =
         this._onDidOpenPopoutWindowFail.event;
 
+    private readonly _onDidStartFloatingGroupDrag =
+        new Emitter<DockviewGroupPanel>();
+    /** Fires with the dragged group when a floating group move-drag first moves
+     *  — consumed by the Smart Guides service (`ISmartGuidesHost`) to start each
+     *  drag from a clean slate (a redock long-press aborts with no end event). */
+    readonly onDidStartFloatingGroupDrag: Event<DockviewGroupPanel> =
+        this._onDidStartFloatingGroupDrag.event;
+
     private readonly _onDidEndFloatingGroupDrag =
         new Emitter<DockviewGroupPanel>();
     /** Fires with the dragged group when a floating group's move/resize drag
@@ -768,19 +776,8 @@ export class DockviewComponent
     private _gatherFloatingGroupBoxes(
         exclude: DockviewGroupPanel
     ): readonly Box[] {
-        const container = this._floatingOverlayHost ?? this.gridview.element;
-        const containerRect = container.getBoundingClientRect();
-        return this.floatingGroups
-            .filter((floating) => floating.group !== exclude)
-            .map((floating) => {
-                const rect = floating.overlay.element.getBoundingClientRect();
-                return {
-                    left: rect.left - containerRect.left,
-                    top: rect.top - containerRect.top,
-                    width: rect.width,
-                    height: rect.height,
-                };
-            });
+        // Same geometry as the snap-together snapshot, minus the group identity.
+        return this.getFloatingGroupSnapshots(exclude).map((s) => s.box);
     }
 
     /**
@@ -821,7 +818,10 @@ export class DockviewComponent
         target: DockviewGroupPanel,
         position: Position
     ): void {
-        if (dragged === target) {
+        // The target was captured at drag start; it may have been closed /
+        // removed before the drop committed. Bail rather than move into a dead
+        // group (a self-drop is also a no-op).
+        if (dragged === target || !this.getPanel(target.id)) {
             return;
         }
         this.moveGroupOrPanel({
@@ -882,9 +882,12 @@ export class DockviewComponent
      * Compose the float drag-position transform from the public
      * `transformFloatingGroupDrag` option and the optional Smart Guides module,
      * so an app and the module can both nudge a single drag rather than one
-     * clobbering the other. Returns `undefined` when neither is active, leaving
-     * the overlay's drag loop byte-for-byte unchanged (removability — the
-     * sibling-box snapshot is skipped too; see {@link ISmartGuidesHost}).
+     * clobbering the other. Returns `undefined` only when the app option is
+     * unset AND the module is absent (the removability case) — then no transform
+     * is installed and the sibling-box snapshot is skipped, so the drag loop is
+     * truly byte-for-byte unchanged. When the module is present but `smartGuides`
+     * is unset it installs a cheap pass-through (the service snaps nothing and
+     * early-returns), so observable drag behaviour is still unchanged.
      */
     private _buildFloatingDragTransform(
         anchorGroup: DockviewGroupPanel,
@@ -1364,6 +1367,7 @@ export class DockviewComponent
                 this._onDidChangePopouts.fire()
             ),
             this._onDidOpenPopoutWindowFail,
+            this._onDidStartFloatingGroupDrag,
             this._onDidEndFloatingGroupDrag,
             this._onDidCreateTabGroup,
             this._onDidDestroyTabGroup,
@@ -2450,9 +2454,15 @@ export class DockviewComponent
             floatingGridview
         );
 
-        // Surface the end of a move/resize drag so the Smart Guides module can
-        // tear down its per-drag guides (no-op when the module is absent).
+        // Surface the start + end of a move drag so the Smart Guides module can
+        // (re)build then tear down its per-drag guides. Start (re)sets a clean
+        // slate even if a prior drag aborted without an end (redock long-press);
+        // end fires on pointerup/cancel (and harmlessly on resize-end). No-ops
+        // when the module is absent.
         floatingGroupPanel.addDisposables(
+            overlay.onDidStartMoving(() =>
+                this._onDidStartFloatingGroupDrag.fire(anchorGroup)
+            ),
             overlay.onDidChangeEnd(() =>
                 this._onDidEndFloatingGroupDrag.fire(anchorGroup)
             )
