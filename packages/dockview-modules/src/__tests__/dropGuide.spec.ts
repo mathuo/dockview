@@ -8,21 +8,28 @@ import {
 import { DropGuideService } from '../dropGuideService';
 
 /**
- * Drop Guide ("compass") — Phase 1. The cell hit-test is pure geometry
- * (container-relative px) so it's driven directly; the widget lifecycle is
+ * Drop Guide ("compass"). The cell hit-test is pure geometry (container-relative
+ * px) so it's driven directly; the widget + edge-preview + gating lifecycle is
  * driven via a mock `onWillShowOverlay` host signal.
  */
 describe('drop guide', () => {
     let overlayEmitter: Emitter<DockviewWillShowOverlayLocationEvent>;
     let service: DropGuideService;
+    let layoutEl: HTMLElement;
+    let canDrop: (position: Position) => boolean;
 
     const make = (
-        dndGuide: { zones?: Position[] } | boolean | undefined
+        dndGuide: { zones?: Position[]; edges?: boolean } | boolean | undefined
     ): void => {
         overlayEmitter = new Emitter<DockviewWillShowOverlayLocationEvent>();
+        layoutEl = document.createElement('div');
+        document.body.appendChild(layoutEl);
+        canDrop = () => true;
         service = new DropGuideService({
             options: { dndGuide } as any,
             onWillShowOverlay: overlayEmitter.event,
+            canDropOnGroup: (_group, position) => canDrop(position),
+            getLayoutElement: () => layoutEl,
         });
     };
 
@@ -155,6 +162,52 @@ describe('drop guide', () => {
         // the drag ending tears the widget down
         window.dispatchEvent(new Event('pointerup'));
         expect(content.querySelector('.dv-drop-guide')).toBeNull();
+    });
+
+    test('per-cell gating hides cells the drop would reject', () => {
+        make(true);
+        const { group, content } = groupWithContent();
+        canDrop = (p) => p !== 'center'; // the group rejects a tab-into
+
+        overlayEmitter.fire({
+            kind: 'content',
+            group,
+        } as DockviewWillShowOverlayLocationEvent);
+
+        // centre inner cell hidden → 4 inner + 4 outer; edge cells are unaffected
+        expect(content.querySelectorAll('.dv-drop-guide-cell')).toHaveLength(8);
+        expect(content.querySelector('.dv-drop-guide-cell-center')).toBeNull();
+    });
+
+    test('an outer cell previews the layout edge, cleared on inner / drop', () => {
+        make(true);
+        const { group } = groupWithContent();
+        const over = (edge: boolean, position: Position) =>
+            overlayEmitter.fire({
+                kind: 'content',
+                group,
+                edge,
+                position,
+            } as DockviewWillShowOverlayLocationEvent);
+
+        over(true, 'right'); // outer cell → a band over the layout's right edge
+        const band = layoutEl.querySelector<HTMLElement>(
+            '.dv-drop-guide-edge-preview'
+        );
+        expect(band).toBeTruthy();
+        expect(band!.style.width).toBe('50%');
+        expect(band!.style.height).toBe('100%');
+
+        over(false, 'center'); // inner cell → cleared
+        expect(
+            layoutEl.querySelector('.dv-drop-guide-edge-preview')
+        ).toBeNull();
+
+        over(true, 'top'); // re-show, then end the drag → cleared
+        window.dispatchEvent(new Event('pointerup'));
+        expect(
+            layoutEl.querySelector('.dv-drop-guide-edge-preview')
+        ).toBeNull();
     });
 
     test('does not paint a non-content overlay or when disabled', () => {

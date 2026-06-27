@@ -267,6 +267,19 @@ export interface IDropGuideHost {
      * `kind === 'content'`.
      */
     readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent>;
+    /**
+     * Whether a drop at `position` on `group`'s content is actually allowed
+     * (the per-position `canDisplayOverlay` veto) — used to gate which compass
+     * cells are shown, so only legal drops appear.
+     */
+    canDropOnGroup(
+        group: DockviewGroupPanel,
+        position: Position,
+        event: DragEvent | PointerEvent
+    ): boolean;
+    /** The layout root element — the surface the outer-cell edge preview is
+     *  drawn over (its coordinate space). */
+    getLayoutElement(): HTMLElement;
 }
 
 export interface IDropGuideService extends IDisposable {

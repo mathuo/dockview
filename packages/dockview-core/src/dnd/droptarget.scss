@@ -77,3 +77,14 @@
         rgba(31, 156, 240, 0.12)
     );
 }
+
+.dv-drop-guide-edge-preview {
+    // The whole-layout-edge dock preview for an outer compass cell.
+    z-index: 1001;
+    box-sizing: border-box;
+    background-color: var(
+        --dv-drop-guide-edge-preview-color,
+        rgba(31, 156, 240, 0.18)
+    );
+    border: 1px solid var(--dv-drop-guide-color, #1f9cf0);
+}

@@ -789,6 +789,7 @@ const DockviewDemo = (props: {
                                             onReady={onReady}
                                             theme={effectiveTheme}
                                             floatingGroupDragHandle="titlebar"
+                                            dndGuide={true}
                                             getTabContextMenuItems={
                                                 getTabContextMenuItems
                                             }

@@ -788,6 +788,37 @@ export class DockviewComponent
         return this._moduleRegistry.services.dropGuideService;
     }
 
+    /** IDropGuideHost — whether a content drop at `position` on `group` is
+     *  allowed, for compass cell gating (only legal cells are shown). Mirrors the
+     *  content drop target's `canDisplayOverlay` (`content.ts`): a same-component
+     *  drag is always allowed; otherwise the per-position veto decides. */
+    canDropOnGroup(
+        group: DockviewGroupPanel,
+        position: Position,
+        event: DragEvent | PointerEvent
+    ): boolean {
+        const model = group.model;
+        if (
+            model.locked === 'no-drop-target' ||
+            (model.locked && position === 'center')
+        ) {
+            return false;
+        }
+        const data = getPanelData();
+        if (!data && event.shiftKey && model.location.type !== 'floating') {
+            return false;
+        }
+        if (data && data.viewId === this.id) {
+            return true;
+        }
+        return model.canDisplayOverlay(event, position, 'content');
+    }
+
+    /** IDropGuideHost — the layout root, the outer-cell edge preview's surface. */
+    getLayoutElement(): HTMLElement {
+        return this.gridview.element;
+    }
+
     /**
      * The drop-position resolver installed on the group content drop targets —
      * the app's `dropPositionResolver` option if set, else the Drop Guide

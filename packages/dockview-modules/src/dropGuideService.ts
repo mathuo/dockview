@@ -20,7 +20,7 @@ const GAP = 4;
 
 /** The inner drop cells, in render order. */
 const INNER_CELLS: Position[] = ['center', 'top', 'bottom', 'left', 'right'];
-/** The four directional cells, used for both the inner ring and the outer ring. */
+/** The four directional cells (the inner ring's arms + the outer ring). */
 const DIRECTIONS: Exclude<Position, 'center'>[] = [
     'top',
     'bottom',
@@ -106,7 +106,8 @@ function listen(
  * The {@link PositionResolver} the host installs at the drop-target seam in
  * place of the cursor-quadrant logic: hit-test the pointer against the compass
  * cells (centred cross), gated by the target's accepted zones intersected with
- * the configured `dndGuide.zones`. A miss (a dead corner) returns `null`.
+ * the configured `dndGuide.zones`. A miss (a dead corner) returns `null`. A
+ * per-cell veto is enforced by the drop target itself (`canDisplayOverlay`).
  */
 class CompassResolver implements PositionResolver {
     constructor(
@@ -160,7 +161,12 @@ class CompassWidget {
         this._element = el;
     }
 
-    render(zones: ReadonlySet<Position>, includeEdges: boolean): void {
+    /** Paint the cells `gate` accepts, so only legal drops are shown. */
+    render(
+        zones: ReadonlySet<Position>,
+        includeEdges: boolean,
+        gate: (cell: { position: Position; edge: boolean }) => boolean
+    ): void {
         const doc = this._element.ownerDocument;
         const rect = this._element.getBoundingClientRect();
         const cells = compassCells(
@@ -168,7 +174,7 @@ class CompassWidget {
             rect.height,
             zones,
             includeEdges
-        );
+        ).filter(gate);
         this._element.replaceChildren();
         for (const cell of cells) {
             const el = doc.createElement('div');
@@ -193,13 +199,14 @@ class CompassWidget {
  * Drop Guide ("compass") — a VS Code-style aim-at-a-cell drop overlay for group
  * docking. While a panel/group is dragged over a group, a cross of cells is
  * painted over it and the dragged item snaps to whichever cell the cursor is
- * over (instead of the cursor-quadrant of the target). The actual drop
- * resolution + commit stay in core: the service installs a {@link CompassResolver}
- * at the drop-target seam and paints the widget; the existing overlay renders
- * the aimed cell's preview. Opt-in via `dndGuide` (default off → unchanged).
+ * over (instead of the cursor-quadrant of the target). Drop resolution + commit
+ * stay in core: the service installs a {@link CompassResolver} at the drop-target
+ * seam and paints the widget. Opt-in via `dndGuide` (default off → unchanged).
  *
  * Inner cells split/merge the hovered group; the outer ring (`edge` cells) docks
- * against the whole layout (core routes `edge`-flagged drops to the layout edge).
+ * against the whole layout (core routes `edge`-flagged drops to the layout edge),
+ * previewed by a band over the layout edge. Cells the drop would reject are
+ * hidden (per-cell gating).
  */
 export class DropGuideService
     extends CompositeDisposable
@@ -210,6 +217,7 @@ export class DropGuideService
         | { group: DockviewGroupPanel; widget: CompassWidget }
         | undefined;
     private _endListeners: CompositeDisposable | undefined;
+    private _edgePreview: HTMLElement | undefined;
 
     constructor(private readonly host: IDropGuideHost) {
         super();
@@ -253,14 +261,24 @@ export class DropGuideService
     }
 
     private _onWillShowOverlay(e: DockviewWillShowOverlayLocationEvent): void {
-        // Phase 1 covers the group content target only.
+        // The compass covers the group content target.
         if (!this._enabled || e.kind !== 'content' || !e.group) {
             return;
         }
-        this._mount(e.group);
+        this._mount(e.group, e.nativeEvent);
+        // An outer cell previews the whole-layout-edge dock; an inner cell uses
+        // the group's own overlay, so clear any edge preview.
+        if (e.edge) {
+            this._showEdgePreview(e.position);
+        } else {
+            this._clearEdgePreview();
+        }
     }
 
-    private _mount(group: DockviewGroupPanel): void {
+    private _mount(
+        group: DockviewGroupPanel,
+        event: DragEvent | PointerEvent
+    ): void {
         if (this._mounted?.group === group) {
             return; // already showing on this group
         }
@@ -278,7 +296,12 @@ export class DropGuideService
         const configured = this._configuredZones();
         widget.render(
             configured ? intersect(all, configured) : all,
-            this._edgesEnabled()
+            this._edgesEnabled(),
+            // Hide cells the drop would reject. Outer (edge) cells dock the whole
+            // layout, not this group, so the group veto doesn't apply to them.
+            (cell) =>
+                cell.edge ||
+                this.host.canDropOnGroup(group, cell.position, event)
         );
         this._mounted = { group, widget };
 
@@ -294,11 +317,38 @@ export class DropGuideService
         );
     }
 
+    /** Highlight the whole-layout edge the outer cell would dock against. */
+    private _showEdgePreview(position: Position): void {
+        const layout = this.host.getLayoutElement();
+        if (!this._edgePreview) {
+            const el = layout.ownerDocument.createElement('div');
+            el.className = 'dv-drop-guide-edge-preview';
+            el.style.position = 'absolute';
+            el.style.pointerEvents = 'none';
+            layout.appendChild(el);
+            this._edgePreview = el;
+        }
+        const el = this._edgePreview;
+        const edges: Record<string, Partial<CSSStyleDeclaration>> = {
+            top: { inset: '0 0 auto 0', width: '100%', height: '50%' },
+            bottom: { inset: 'auto 0 0 0', width: '100%', height: '50%' },
+            left: { inset: '0 auto 0 0', width: '50%', height: '100%' },
+            right: { inset: '0 0 0 auto', width: '50%', height: '100%' },
+        };
+        Object.assign(el.style, edges[position] ?? {});
+    }
+
+    private _clearEdgePreview(): void {
+        this._edgePreview?.remove();
+        this._edgePreview = undefined;
+    }
+
     private _unmount(): void {
         this._endListeners?.dispose();
         this._endListeners = undefined;
         this._mounted?.widget.dispose();
         this._mounted = undefined;
+        this._clearEdgePreview();
     }
 }
 
