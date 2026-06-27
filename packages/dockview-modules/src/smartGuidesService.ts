@@ -21,6 +21,10 @@ import { ISmartGuidesHost, ISmartGuidesService } from 'dockview-core';
  *  as an adjacency (dock-beside) rather than a glancing touch. */
 const ADJACENCY_OVERLAP = 0.5;
 
+/** Score offset that ranks every edge-adjacency below every centre stack, so a
+ *  genuine tabset stack always wins over a dock-beside suggestion. */
+const MERGE_ADJACENCY_BASE = 1e6;
+
 interface ResolvedOptions {
     enabled: boolean;
     snapDistance: number;
@@ -83,6 +87,16 @@ interface Probe {
 interface AxisResult {
     readonly coord: number;
     readonly delta: number;
+    /** Index into the 3 probes (leading edge / centre / trailing edge) that
+     *  latched onto the candidate — tracked so the sticky branch keeps gluing
+     *  the SAME part of the box rather than silently switching probes. */
+    readonly probe: number;
+}
+
+/** The candidate an axis is currently snapped to, plus the probe holding it. */
+interface AxisEngagement {
+    readonly coord: number;
+    readonly probe: number;
 }
 
 /**
@@ -226,8 +240,8 @@ interface DragSession {
     readonly layer: GuideLayer;
     /** Other floats with identity + box, for snap-together (built once). */
     readonly targets: readonly { group: DockviewGroupPanel; box: Rect }[];
-    engagedX: number | undefined;
-    engagedY: number | undefined;
+    engagedX: AxisEngagement | undefined;
+    engagedY: AxisEngagement | undefined;
     /** The dock/merge suggestion active this frame, committed on drop. */
     pendingMerge: MergeIntent | undefined;
 }
@@ -331,8 +345,18 @@ export class SmartGuidesService
         // object and a host option change swaps `smartGuides`, so either edit
         // invalidates this without per-frame re-resolution/allocation.
         const base = this.host.options.smartGuides;
-        const override = this._override;
         const cache = this._optsCache;
+        // An explicit app-level option update swaps the `smartGuides` reference
+        // (component `updateOptions` rebuilds the options object). That wins over
+        // earlier runtime overrides — drop them so the two don't fight (#10).
+        if (
+            cache &&
+            cache.base !== base &&
+            Object.keys(this._override).length > 0
+        ) {
+            this._override = {};
+        }
+        const override = this._override;
         if (cache && cache.base === base && cache.override === override) {
             return cache.resolved;
         }
@@ -407,8 +431,12 @@ export class SmartGuidesService
             session.engagedY,
             opts
         );
-        session.engagedX = resX?.coord;
-        session.engagedY = resY?.coord;
+        session.engagedX = resX
+            ? { coord: resX.coord, probe: resX.probe }
+            : undefined;
+        session.engagedY = resY
+            ? { coord: resY.coord, probe: resY.probe }
+            : undefined;
 
         const snappedBox: Rect = {
             left: proposed.left + (resX?.delta ?? 0),
@@ -561,26 +589,31 @@ export class SmartGuidesService
     private _resolveAxis(
         candidates: Candidate[],
         probes: Probe[],
-        engaged: number | undefined,
+        engaged: AxisEngagement | undefined,
         opts: ResolvedOptions
     ): AxisResult | undefined {
-        // Sticky: stay on the engaged line until past snapDistance + release.
+        // Sticky: stay glued via the SAME probe that engaged (not the nearest of
+        // all three) until that probe moves past snapDistance + release — so a
+        // small float can't silently re-latch its centre onto an edge line.
         if (engaged !== undefined) {
-            const delta = this._nearestDelta(engaged, probes);
-            if (
-                delta !== undefined &&
-                Math.abs(delta) <= opts.snapDistance + opts.releaseDistance
-            ) {
-                return { coord: engaged, delta };
+            const delta = engaged.coord - probes[engaged.probe].coord;
+            if (Math.abs(delta) <= opts.snapDistance + opts.releaseDistance) {
+                return { coord: engaged.coord, delta, probe: engaged.probe };
             }
         }
 
         // Acquire: the highest-priority candidate within the engage threshold.
         let best:
-            | { coord: number; delta: number; key: [number, number, number] }
+            | {
+                  coord: number;
+                  delta: number;
+                  probe: number;
+                  key: [number, number, number];
+              }
             | undefined;
         for (const c of candidates) {
-            for (const p of probes) {
+            for (let pi = 0; pi < probes.length; pi++) {
+                const p = probes[pi];
                 const delta = c.coord - p.coord;
                 if (Math.abs(delta) > opts.snapDistance) {
                     continue;
@@ -592,23 +625,13 @@ export class SmartGuidesService
                     Math.abs(delta),
                 ];
                 if (best === undefined || this._keyLess(key, best.key)) {
-                    best = { coord: c.coord, delta, key };
+                    best = { coord: c.coord, delta, probe: pi, key };
                 }
             }
         }
-        return best ? { coord: best.coord, delta: best.delta } : undefined;
-    }
-
-    /** Smallest signed delta from any probe to `coord`. */
-    private _nearestDelta(coord: number, probes: Probe[]): number | undefined {
-        let best: number | undefined;
-        for (const p of probes) {
-            const delta = coord - p.coord;
-            if (best === undefined || Math.abs(delta) < Math.abs(best)) {
-                best = delta;
-            }
-        }
-        return best;
+        return best
+            ? { coord: best.coord, delta: best.delta, probe: best.probe }
+            : undefined;
     }
 
     private _keyLess(
@@ -649,66 +672,106 @@ export class SmartGuidesService
     }
 
     /**
-     * Detect a dock/merge intent for the snapped box against the other floats:
-     * a tab-strip overlap (tops flush + stacked) suggests a **center** merge
-     * into a shared tabset; an edge flush against a target's opposite edge —
-     * with ≥ 50% perpendicular overlap — suggests docking **beside** it. Returns
-     * the first match (with the drop-preview rect), or `undefined`.
+     * Detect a dock/merge intent for the snapped box against the other floats,
+     * choosing the **best** target rather than the first in iteration order: a
+     * tab-strip overlap (the dragged centre over a target) suggests a **center**
+     * merge into a shared tabset; an edge flush against a target's opposite edge
+     * — with ≥ 50% perpendicular overlap — suggests docking **beside** it. Among
+     * matches, a centre stack beats an adjacency, and within a kind the nearest
+     * target wins.
      */
     private _detectSnapTogether(
         box: Rect,
         targets: readonly { group: DockviewGroupPanel; box: Rect }[],
         opts: ResolvedOptions
     ): MergeIntent | undefined {
-        const d = edges(box);
+        let best: { intent: MergeIntent; score: number } | undefined;
         for (const t of targets) {
-            const e = edges(t.box);
-            const within = (a: number, b: number): boolean =>
-                Math.abs(a - b) <= opts.snapDistance;
-            const hOverlap = overlapRatio(d.left, d.right, e.left, e.right);
-            const vOverlap = overlapRatio(d.top, d.bottom, e.top, e.bottom);
+            const candidate = this._intentForTarget(box, t, opts);
+            if (candidate && (!best || candidate.score < best.score)) {
+                best = candidate;
+            }
+        }
+        return best?.intent;
+    }
 
-            // Tabset merge: the dragged float's CENTRE sits over the target (it
-            // is genuinely stacked on top), with the tab strips flush. Requiring
-            // the centre inside — not just top-alignment + edge overlap — stops a
-            // plain top/edge alignment of two overlapping floats from being read
-            // as a merge (§11: tabset-merge only on centre overlap).
-            const cx = (d.left + d.right) / 2;
-            const cy = (d.top + d.bottom) / 2;
-            const centreInside =
-                cx >= e.left && cx <= e.right && cy >= e.top && cy <= e.bottom;
-            if (within(d.top, e.top) && centreInside) {
-                return { target: t.group, position: 'center', preview: t.box };
+    /** The single best dock/merge intent for one target (or undefined), with a
+     *  lower-is-better score: a centre stack always outranks an adjacency, and
+     *  the score breaks ties by nearness so clustered floats dock into the
+     *  closest neighbour. */
+    private _intentForTarget(
+        box: Rect,
+        target: { group: DockviewGroupPanel; box: Rect },
+        opts: ResolvedOptions
+    ): { intent: MergeIntent; score: number } | undefined {
+        const d = edges(box);
+        const e = edges(target.box);
+        const within = (a: number, b: number): boolean =>
+            Math.abs(a - b) <= opts.snapDistance;
+        const hOverlap = overlapRatio(d.left, d.right, e.left, e.right);
+        const vOverlap = overlapRatio(d.top, d.bottom, e.top, e.bottom);
+
+        // Tabset merge: the dragged float's CENTRE sits over the target (it is
+        // genuinely stacked on top), with the tab strips flush. Requiring the
+        // centre inside — not just top-alignment + edge overlap — stops a plain
+        // alignment of two overlapping floats reading as a merge (§11).
+        const cx = (d.left + d.right) / 2;
+        const cy = (d.top + d.bottom) / 2;
+        const centreInside =
+            cx >= e.left && cx <= e.right && cy >= e.top && cy <= e.bottom;
+        if (within(d.top, e.top) && centreInside) {
+            const tcx = (e.left + e.right) / 2;
+            const tcy = (e.top + e.bottom) / 2;
+            return {
+                intent: {
+                    target: target.group,
+                    position: 'center',
+                    preview: target.box,
+                },
+                // centre stacks always beat adjacencies; nearer centre wins
+                score: Math.hypot(cx - tcx, cy - tcy),
+            };
+        }
+
+        // Edge adjacency: a dragged edge meets the target's opposite edge. Take
+        // the side with the smallest gap.
+        type Side = 'left' | 'right' | 'top' | 'bottom';
+        let adj: { position: Side; gap: number } | undefined;
+        const consider = (ok: boolean, gap: number, position: Side): void => {
+            if (ok && (!adj || gap < adj.gap)) {
+                adj = { position, gap };
             }
-            // Edge adjacency: a dragged edge meets the target's opposite edge.
-            if (within(d.right, e.left) && vOverlap >= ADJACENCY_OVERLAP) {
-                return {
-                    target: t.group,
-                    position: 'left',
-                    preview: half(t.box, 'left'),
-                };
-            }
-            if (within(d.left, e.right) && vOverlap >= ADJACENCY_OVERLAP) {
-                return {
-                    target: t.group,
-                    position: 'right',
-                    preview: half(t.box, 'right'),
-                };
-            }
-            if (within(d.bottom, e.top) && hOverlap >= ADJACENCY_OVERLAP) {
-                return {
-                    target: t.group,
-                    position: 'top',
-                    preview: half(t.box, 'top'),
-                };
-            }
-            if (within(d.top, e.bottom) && hOverlap >= ADJACENCY_OVERLAP) {
-                return {
-                    target: t.group,
-                    position: 'bottom',
-                    preview: half(t.box, 'bottom'),
-                };
-            }
+        };
+        consider(
+            within(d.right, e.left) && vOverlap >= ADJACENCY_OVERLAP,
+            Math.abs(d.right - e.left),
+            'left'
+        );
+        consider(
+            within(d.left, e.right) && vOverlap >= ADJACENCY_OVERLAP,
+            Math.abs(d.left - e.right),
+            'right'
+        );
+        consider(
+            within(d.bottom, e.top) && hOverlap >= ADJACENCY_OVERLAP,
+            Math.abs(d.bottom - e.top),
+            'top'
+        );
+        consider(
+            within(d.top, e.bottom) && hOverlap >= ADJACENCY_OVERLAP,
+            Math.abs(d.top - e.bottom),
+            'bottom'
+        );
+        if (adj) {
+            return {
+                intent: {
+                    target: target.group,
+                    position: adj.position,
+                    preview: half(target.box, adj.position),
+                },
+                // ranked after every centre stack; nearer edge wins among these
+                score: MERGE_ADJACENCY_BASE + adj.gap,
+            };
         }
         return undefined;
     }

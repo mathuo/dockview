@@ -32,6 +32,8 @@ describe('smart guides', () => {
     let startEmitter: Emitter<DockviewGroupPanel>;
     let endEmitter: Emitter<DockviewGroupPanel>;
     let service: SmartGuidesService;
+    // Mutable so a test can simulate an app-level option update (new reference).
+    let hostOptions: { smartGuides: SmartGuidesOptions | undefined };
     let snapshots: { group: DockviewGroupPanel; box: Box }[];
     let splitterRects: Box[];
     let mergeCalls: {
@@ -53,8 +55,9 @@ describe('smart guides', () => {
         snapshots = floats;
         splitterRects = [];
         mergeCalls = [];
+        hostOptions = { smartGuides };
         const host: ISmartGuidesHost = {
-            options: { smartGuides } as any,
+            options: hostOptions as any,
             getFloatingContainer: () => container,
             onDidStartFloatingGroupDrag: startEmitter.event,
             onDidEndFloatingGroupDrag: endEmitter.event,
@@ -642,5 +645,67 @@ describe('smart guides', () => {
         expect(mergeCalls).toEqual([
             { dragged: group, target: targetGroup, position: 'left' },
         ]);
+    });
+
+    test('an engaged edge stays glued on a small float (no probe switch)', () => {
+        // A 20px-wide float: as it moves, its centre probe can get nearer to the
+        // engaged line than the latched edge. It must keep gluing the EDGE, not
+        // silently re-snap its centre (which would jump the box).
+        make(floatsOnly());
+        const other: Box = { left: 100, top: 50, width: 200, height: 150 };
+        // engage the left edge on x=100
+        expect(
+            service.transformFloatingGroupDrag(
+                ctx({ left: 100, top: 400, width: 20, height: 50 }, [other])
+            )
+        ).toEqual({ top: 400, left: 100 });
+        // move to left=92: centre (102) is now nearer 100 than the edge (92),
+        // but the edge stays glued (within release) → left snaps back to 100.
+        expect(
+            service.transformFloatingGroupDrag(
+                ctx({ left: 92, top: 400, width: 20, height: 50 }, [other])
+            )
+        ).toEqual({ top: 400, left: 100 });
+    });
+
+    test('snap-together docks into the nearest target, not the first', () => {
+        const near = { id: 'near' } as DockviewGroupPanel;
+        const far = { id: 'far' } as DockviewGroupPanel;
+        // `far` is first in iteration order but its right edge (96) is further
+        // from the dragged left edge (102) than `near`'s (100).
+        make(noAlign(), [
+            { group: far, box: { left: 0, top: 100, width: 96, height: 200 } },
+            {
+                group: near,
+                box: { left: 0, top: 100, width: 100, height: 200 },
+            },
+        ]);
+
+        service.transformFloatingGroupDrag(
+            ctx({ left: 102, top: 100, width: 100, height: 200 }, [])
+        );
+        endEmitter.fire(group);
+        expect(mergeCalls).toEqual([
+            { dragged: group, target: near, position: 'right' },
+        ]);
+    });
+
+    test('a fresh app-level option update overrides earlier runtime options', () => {
+        make({ snapDistance: 8 });
+        const other: Box = { left: 100, top: 50, width: 200, height: 150 };
+        const at = (left: number) =>
+            service.transformFloatingGroupDrag(
+                ctx({ left, top: 400, width: 50, height: 50 }, [other])
+            );
+
+        // runtime override widens the snap distance...
+        service.updateOptions({ snapDistance: 30 });
+        expect(at(125)).toEqual({ top: 400, left: 100 }); // 25px away → snaps
+        endEmitter.fire(group);
+
+        // ...then the app sets `smartGuides` afresh (new reference) → the runtime
+        // override is dropped and the new option wins.
+        hostOptions.smartGuides = { snapDistance: 8 };
+        expect(at(125)).toBeUndefined(); // 25px > 8 → no snap
     });
 });
