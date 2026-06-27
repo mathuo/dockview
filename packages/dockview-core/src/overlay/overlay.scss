@@ -264,3 +264,23 @@
         }
     }
 }
+
+// Smart Guides — alignment lines + dock/merge drop-preview painted in the
+// floating container while a float is dragged. The module positions + sizes
+// these inline; only the theming lives here (override the CSS vars to restyle).
+.dv-smart-guides {
+    pointer-events: none;
+}
+
+.dv-smart-guide {
+    background-color: var(--dv-smart-guides-color, #1f9cf0);
+}
+
+.dv-smart-guide-preview {
+    box-sizing: border-box;
+    background-color: var(
+        --dv-smart-guides-preview-color,
+        rgba(31, 156, 240, 0.18)
+    );
+    border: 1px solid var(--dv-smart-guides-color, #1f9cf0);
+}

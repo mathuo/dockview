@@ -229,6 +229,25 @@ describe('smart guides', () => {
         expect(visibleLines()).toHaveLength(0);
     });
 
+    test('a guide reappears after the snap is lost and re-acquired', () => {
+        // Guards the per-frame write dedup: a re-acquired alignment must redraw
+        // rather than being skipped as "unchanged".
+        make(floatsOnly());
+        const other: Box = { left: 100, top: 50, width: 200, height: 150 };
+        const at = (left: number) =>
+            service.transformFloatingGroupDrag(
+                ctx({ left, top: 400, width: 50, height: 50 }, [other])
+            );
+
+        at(106); // engage x=100
+        expect(visibleLines()).toHaveLength(1);
+        at(500); // well clear of every edge → guide hidden
+        expect(visibleLines()).toHaveLength(0);
+        at(106); // re-acquire the same edge → guide shown again
+        expect(visibleLines()).toHaveLength(1);
+        expect(visibleLines()[0].style.left).toBe('100px');
+    });
+
     test('inert when `smartGuides` is unset — no overlay, no adjustment', () => {
         make(undefined);
         const result = service.transformFloatingGroupDrag(

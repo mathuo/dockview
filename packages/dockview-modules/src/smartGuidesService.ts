@@ -95,6 +95,11 @@ class GuideLayer {
     private readonly _element: HTMLElement;
     private readonly _lines: HTMLElement[] = [];
     private _preview: HTMLElement | undefined;
+    // Last-applied state — a frame whose guides are unchanged skips the DOM
+    // write entirely (no interleaved reads, so the browser coalesces what does
+    // change into a single reflow at paint).
+    private _lastLines = '';
+    private _lastPreview = '';
 
     constructor(container: HTMLElement, className: string | undefined) {
         const doc = container.ownerDocument;
@@ -118,6 +123,13 @@ class GuideLayer {
         lines: { axis: 'x' | 'y'; coord: number }[],
         size: { width: number; height: number }
     ): void {
+        const signature =
+            `${size.width}x${size.height}:` +
+            lines.map((l) => `${l.axis}${l.coord}`).join('|');
+        if (signature === this._lastLines) {
+            return;
+        }
+        this._lastLines = signature;
         for (let i = 0; i < lines.length; i++) {
             const line = this._lineAt(i);
             const { axis, coord } = lines[i];
@@ -144,6 +156,13 @@ class GuideLayer {
 
     /** Show (or hide, when `box` is undefined) the dock/merge drop-preview. */
     renderPreview(box: Rect | undefined): void {
+        const signature = box
+            ? `${box.left},${box.top},${box.width},${box.height}`
+            : '';
+        if (signature === this._lastPreview) {
+            return;
+        }
+        this._lastPreview = signature;
         if (!box) {
             if (this._preview) {
                 this._preview.style.display = 'none';
@@ -162,6 +181,9 @@ class GuideLayer {
         for (const line of this._lines) {
             line.style.display = 'none';
         }
+        // Invalidate so the next (possibly identical) render re-applies the
+        // now-hidden lines rather than dedup-skipping them.
+        this._lastLines = '';
         this.renderPreview(undefined);
     }
 
@@ -172,13 +194,11 @@ class GuideLayer {
     private _ensurePreview(): HTMLElement {
         if (!this._preview) {
             const preview = this._element.ownerDocument.createElement('div');
+            // Cosmetics (background + border) are owned by the stylesheet
+            // (`.dv-smart-guide-preview` in overlay.scss); only geometry is set
+            // inline below.
             preview.className = 'dv-smart-guide-preview';
             preview.style.position = 'absolute';
-            preview.style.boxSizing = 'border-box';
-            preview.style.backgroundColor =
-                'var(--dv-smart-guides-preview-color, rgba(31, 156, 240, 0.18))';
-            preview.style.border =
-                '1px solid var(--dv-smart-guides-color, #1f9cf0)';
             this._element.appendChild(preview);
             this._preview = preview;
         }
@@ -189,11 +209,10 @@ class GuideLayer {
         let line = this._lines[i];
         if (!line) {
             line = this._element.ownerDocument.createElement('div');
+            // Colour is owned by the stylesheet (`.dv-smart-guide` in
+            // overlay.scss); only geometry is set inline by `render`.
             line.className = 'dv-smart-guide';
             line.style.position = 'absolute';
-            // Themable via a CSS var, with a sensible default so it works untouched.
-            line.style.backgroundColor =
-                'var(--dv-smart-guides-color, #1f9cf0)';
             this._element.appendChild(line);
             this._lines[i] = line;
         }
