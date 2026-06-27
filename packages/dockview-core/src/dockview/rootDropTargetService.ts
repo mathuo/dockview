@@ -92,6 +92,7 @@ export class RootDropTargetService implements IRootDropTargetService {
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
             overlayModel,
             getOverrideTarget: () => host.rootDropTargetOverrideTarget(),
+            getPositionResolver: () => host.options.dropPositionResolver,
         });
 
         this._pointerTarget = pointerBackend.createDropTarget(host.element, {
@@ -100,6 +101,7 @@ export class RootDropTargetService implements IRootDropTargetService {
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
             overlayModel,
             getOverrideTarget: () => host.rootDropTargetOverrideTarget(),
+            getPositionResolver: () => host.options.dropPositionResolver,
         });
 
         this.onWillShowOverlay = Event.any(

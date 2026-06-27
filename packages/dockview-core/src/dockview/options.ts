@@ -9,7 +9,11 @@ export type { DockviewMessages } from './accessibilityMessages';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
 import { Box } from '../types';
-import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
+import {
+    DroptargetOverlayModel,
+    Position,
+    PositionResolver,
+} from '../dnd/droptarget';
 import { GroupOptions } from './dockviewGroupPanelModel';
 import { DockviewGroupDropLocation } from './events';
 import { IDockviewPanel } from './dockviewPanel';
@@ -243,6 +247,15 @@ export interface DockviewOptions {
      * - `'html5'`: HTML5 drag-and-drop only — disables touch / pen drag.
      */
     dndStrategy?: DockviewDndStrategy;
+    /**
+     * Override how a pointer location maps to a drop {@link Position} (or `null`
+     * for no drop) on the 5-way group/layout drop targets — the group content
+     * and the whole-layout edges — replacing the built-in cursor-quadrant logic.
+     * Tab/header reorder targets are unaffected. Unset ⇒ the default quadrant
+     * behaviour, unchanged. Read live, so it can be swapped via
+     * {@link DockviewApi.updateOptions}.
+     */
+    dropPositionResolver?: PositionResolver;
     // #end dnd
     locked?: boolean;
     className?: string;
@@ -465,6 +478,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         className: undefined,
         noPanelsOverlay: undefined,
         dndEdges: undefined,
+        dropPositionResolver: undefined,
         theme: undefined,
         disableTabsOverflowList: undefined,
         scrollbars: undefined,
