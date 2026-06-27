@@ -217,6 +217,9 @@ PopoutGroup
 PopoutGroupChangePositionEvent
 PopoutGroupChangeSizeEvent
 Position
+PositionResolver
+PositionResolverArgs
+PositionResolverResult
 RendererChangedEvent
 SashState
 SerializedDockview

@@ -72,6 +72,40 @@ export function positionToDirection(position: Position): Direction {
 
 export type Position = 'top' | 'bottom' | 'left' | 'right' | 'center';
 
+/** The pointer location within a drop target, handed to a {@link PositionResolver}. */
+export interface PositionResolverArgs {
+    /** Pointer X within the target element (px from its left edge). */
+    readonly x: number;
+    /** Pointer Y within the target element (px from its top edge). */
+    readonly y: number;
+    readonly width: number;
+    readonly height: number;
+    /** The drop zones this target currently accepts. */
+    readonly zones: ReadonlySet<Position>;
+    /** The originating drag event (HTML5 or pointer backend). */
+    readonly event: DragEvent | PointerEvent;
+}
+
+export interface PositionResolverResult {
+    readonly position: Position;
+    /**
+     * Marks an outer / whole-layout-edge cell. The built-in drop overlay only
+     * reads `position`; consumers that route edge cells differently can read this.
+     */
+    readonly edge?: boolean;
+}
+
+/**
+ * Pluggable replacement for the built-in cursor-quadrant drop resolution.
+ * Supplied via {@link DroptargetOptions.positionResolver}, it maps a pointer
+ * location within a target to a drop {@link Position} — or `null` for no drop —
+ * instead of the default threshold-band quadrant. Both DnD backends consult the
+ * same resolver. Unset ⇒ the default quadrant behaviour, byte-for-byte unchanged.
+ */
+export interface PositionResolver {
+    resolve(args: PositionResolverArgs): PositionResolverResult | null;
+}
+
 export type CanDisplayOverlay = (
     dragEvent: DragEvent | PointerEvent,
     state: Position
@@ -121,6 +155,13 @@ export interface DroptargetOptions {
     getOverrideTarget?: () => DropTargetTargetModel | undefined;
     className?: string;
     getOverlayOutline?: () => HTMLElement | null;
+    /**
+     * Supply a {@link PositionResolver} that overrides how a pointer location
+     * resolves to a drop {@link Position}. A lazy getter (like
+     * {@link getOverrideTarget}) so the source can change at runtime; returning
+     * `undefined` — the default — uses the built-in cursor-quadrant logic.
+     */
+    getPositionResolver?: () => PositionResolver | undefined;
 }
 
 /**
@@ -216,13 +257,7 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
                 const x = (e.clientX ?? 0) - rect.left;
                 const y = (e.clientY ?? 0) - rect.top;
 
-                const quadrant = this.calculateQuadrant(
-                    this._acceptedTargetZonesSet,
-                    x,
-                    y,
-                    width,
-                    height
-                );
+                const quadrant = this.resolvePosition(x, y, width, height, e);
 
                 /**
                  * If the event has already been used by another DropTarget instance
@@ -386,6 +421,40 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
             width,
             height,
             this.options.overlayModel
+        );
+    }
+
+    /**
+     * Resolve the drop {@link Position} for a pointer location: defer to an
+     * injected {@link PositionResolver} when present, otherwise the built-in
+     * cursor-quadrant logic (unchanged).
+     */
+    private resolvePosition(
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        event: DragEvent | PointerEvent
+    ): Position | null {
+        const resolver = this.options.getPositionResolver?.();
+        if (resolver) {
+            return (
+                resolver.resolve({
+                    x,
+                    y,
+                    width,
+                    height,
+                    zones: this._acceptedTargetZonesSet,
+                    event,
+                })?.position ?? null
+            );
+        }
+        return this.calculateQuadrant(
+            this._acceptedTargetZonesSet,
+            x,
+            y,
+            width,
+            height
         );
     }
 
