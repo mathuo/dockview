@@ -611,14 +611,18 @@ export class DockviewGroupPanelModel
                 this.handleDropEvent(
                     'content',
                     event.nativeEvent,
-                    event.position
+                    event.position,
+                    undefined,
+                    event.edge
                 );
             }),
             this.contentContainer.pointerDropTarget.onDrop((event) => {
                 this.handleDropEvent(
                     'content',
                     event.nativeEvent,
-                    event.position
+                    event.position,
+                    undefined,
+                    event.edge
                 );
             }),
             this.tabsContainer.onWillShowOverlay((event) => {
@@ -1710,9 +1714,17 @@ export class DockviewGroupPanelModel
         type: 'header' | 'content',
         event: DragEvent | PointerEvent,
         position: Position,
-        index?: number
+        index?: number,
+        edge?: boolean
     ): void {
         if (this.locked === 'no-drop-target') {
+            return;
+        }
+
+        // An `edge` content drop (a resolver's outer "dock to the layout edge"
+        // cell) docks against the whole layout, not this group.
+        if (type === 'content' && edge) {
+            this.accessor.dockToLayoutEdge(event, position);
             return;
         }
 

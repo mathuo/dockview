@@ -45,14 +45,50 @@ describe('drop guide', () => {
 
     // 200x100 target: centre cell ≈ x[81,119] y[31,69]; left ≈ x[39,77];
     // right ≈ x[123,161]; top ≈ y[-11,27]; bottom ≈ y[73,111] (all x[81,119]).
-    test('hit-tests the pointer against the compass cells', () => {
+    test('hit-tests the pointer against the inner compass cells', () => {
         make(true);
         const r = service.resolver!;
-        expect(r.resolve(args(100, 50))).toEqual({ position: 'center' });
-        expect(r.resolve(args(58, 50))).toEqual({ position: 'left' });
-        expect(r.resolve(args(140, 50))).toEqual({ position: 'right' });
-        expect(r.resolve(args(100, 10))).toEqual({ position: 'top' });
-        expect(r.resolve(args(100, 90))).toEqual({ position: 'bottom' });
+        expect(r.resolve(args(100, 50))).toEqual({
+            position: 'center',
+            edge: false,
+        });
+        expect(r.resolve(args(58, 50))).toEqual({
+            position: 'left',
+            edge: false,
+        });
+        expect(r.resolve(args(140, 50))).toEqual({
+            position: 'right',
+            edge: false,
+        });
+        expect(r.resolve(args(100, 10))).toEqual({
+            position: 'top',
+            edge: false,
+        });
+        expect(r.resolve(args(100, 90))).toEqual({
+            position: 'bottom',
+            edge: false,
+        });
+    });
+
+    // 400x400 target: outer top cell ≈ x[181,219] y[97,135] (one ring beyond
+    // the inner top), flagged `edge` to dock against the whole layout.
+    test('outer cells resolve with the edge flag', () => {
+        make(true);
+        expect(
+            service.resolver!.resolve(args(200, 110, undefined, 400, 400))
+        ).toEqual({ position: 'top', edge: true });
+    });
+
+    test('`edges: false` hides the outer cells', () => {
+        make({ edges: false });
+        // the outer-top point is no longer a cell
+        expect(
+            service.resolver!.resolve(args(200, 110, undefined, 400, 400))
+        ).toBeNull();
+        // ...but the inner ring still resolves
+        expect(
+            service.resolver!.resolve(args(200, 200, undefined, 400, 400))
+        ).toEqual({ position: 'center', edge: false });
     });
 
     test('a dead corner (no cell) resolves to null', () => {
@@ -66,15 +102,17 @@ describe('drop guide', () => {
         expect(service.resolver!.resolve(args(58, 50, ['center']))).toBeNull();
         expect(service.resolver!.resolve(args(100, 50, ['center']))).toEqual({
             position: 'center',
+            edge: false,
         });
     });
 
-    test('`dndGuide.zones` restricts which cells the compass offers', () => {
+    test('`dndGuide.zones` restricts which inner cells the compass offers', () => {
         make({ zones: ['center'] });
         // left is in the target's zones but excluded by the option
         expect(service.resolver!.resolve(args(58, 50))).toBeNull();
         expect(service.resolver!.resolve(args(100, 50))).toEqual({
             position: 'center',
+            edge: false,
         });
     });
 
@@ -108,7 +146,11 @@ describe('drop guide', () => {
 
         const guide = content.querySelector('.dv-drop-guide');
         expect(guide).toBeTruthy();
-        expect(content.querySelectorAll('.dv-drop-guide-cell')).toHaveLength(5);
+        // 5 inner cells + 4 outer (edge) cells
+        expect(content.querySelectorAll('.dv-drop-guide-cell')).toHaveLength(9);
+        expect(
+            content.querySelectorAll('.dv-drop-guide-cell-edge')
+        ).toHaveLength(4);
 
         // the drag ending tears the widget down
         window.dispatchEvent(new Event('pointerup'));

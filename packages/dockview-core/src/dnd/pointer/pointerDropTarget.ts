@@ -51,6 +51,7 @@ export class PointerDropTarget
     private _targetElement: HTMLElement | undefined;
     private _overlayElement: HTMLElement | undefined;
     private _state: Position | undefined;
+    private _edge = false;
     private _acceptedTargetZonesSet: Set<Position>;
 
     private readonly _onDrop = new Emitter<DroptargetEvent>();
@@ -140,7 +141,7 @@ export class PointerDropTarget
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
 
-        const quadrant = this._resolvePosition(
+        const resolved = this._resolvePosition(
             x,
             y,
             width,
@@ -148,10 +149,12 @@ export class PointerDropTarget
             event.pointerEvent
         );
 
-        if (quadrant === null) {
+        if (resolved === null) {
             this._removeOverlay();
             return;
         }
+
+        const quadrant = resolved.position;
 
         if (!this.options.canDisplayOverlay(event.pointerEvent, quadrant)) {
             if (overrideTarget) {
@@ -164,12 +167,23 @@ export class PointerDropTarget
         const willShow = new WillShowOverlayEvent({
             nativeEvent: event.pointerEvent,
             position: quadrant,
+            edge: resolved.edge,
         });
         this._onWillShowOverlay.fire(willShow);
         if (willShow.defaultPrevented) {
             this._removeOverlay();
             return;
         }
+
+        // An `edge` cell reports its position but renders nothing — the consumer
+        // (e.g. the layout-edge dock) owns the preview + commit.
+        if (resolved.edge) {
+            this._removeOverlay();
+            this._state = quadrant;
+            this._edge = true;
+            return;
+        }
+        this._edge = false;
 
         if (overrideTarget) {
             renderAnchoredOverlay({
@@ -220,6 +234,7 @@ export class PointerDropTarget
 
     private _onDropEvent(event: PointerDragEvent): void {
         const state = this._state;
+        const edge = this._edge;
         const overrideTarget = this.options.getOverrideTarget?.();
         this._removeOverlay();
         overrideTarget?.clear();
@@ -227,6 +242,7 @@ export class PointerDropTarget
             this._onDrop.fire({
                 position: state,
                 nativeEvent: event.pointerEvent,
+                edge,
             });
         }
     }
@@ -243,21 +259,23 @@ export class PointerDropTarget
         width: number,
         height: number,
         event: DragEvent | PointerEvent
-    ): Position | null {
+    ): { position: Position; edge: boolean } | null {
         const resolver = this.options.getPositionResolver?.();
         if (resolver) {
-            return (
-                resolver.resolve({
-                    x,
-                    y,
-                    width,
-                    height,
-                    zones: this._acceptedTargetZonesSet,
-                    event,
-                })?.position ?? null
-            );
+            const result = resolver.resolve({
+                x,
+                y,
+                width,
+                height,
+                zones: this._acceptedTargetZonesSet,
+                event,
+            });
+            return result
+                ? { position: result.position, edge: !!result.edge }
+                : null;
         }
-        return this._calculateQuadrant(x, y, width, height);
+        const position = this._calculateQuadrant(x, y, width, height);
+        return position ? { position, edge: false } : null;
     }
 
     private _calculateQuadrant(
@@ -292,6 +310,7 @@ export class PointerDropTarget
     }
 
     private _removeOverlay(): void {
+        this._edge = false;
         if (this._targetElement) {
             this._state = undefined;
             this._targetElement.parentElement?.classList.remove(

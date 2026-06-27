@@ -20,41 +20,67 @@ const GAP = 4;
 
 /** The inner drop cells, in render order. */
 const INNER_CELLS: Position[] = ['center', 'top', 'bottom', 'left', 'right'];
+/** The four directional cells, used for both the inner ring and the outer ring. */
+const DIRECTIONS: Exclude<Position, 'center'>[] = [
+    'top',
+    'bottom',
+    'left',
+    'right',
+];
 
 interface CompassCell {
     readonly position: Position;
     readonly left: number;
     readonly top: number;
     readonly size: number;
+    /** An outer cell that docks against the whole layout, not this group. */
+    readonly edge: boolean;
 }
 
+const UNIT: Record<Position, { dx: number; dy: number }> = {
+    center: { dx: 0, dy: 0 },
+    top: { dx: 0, dy: -1 },
+    bottom: { dx: 0, dy: 1 },
+    left: { dx: -1, dy: 0 },
+    right: { dx: 1, dy: 0 },
+};
+
 /**
- * The cross of cells centred in a `width`×`height` target, restricted to
- * `zones`. The resolver hit-tests against these rects and the widget paints
- * them — one geometry, so you aim at exactly the cell you see.
+ * The cross of cells centred in a `width`×`height` target: the inner ring
+ * (split/merge this group, restricted to `zones`) plus, when `includeEdges`, an
+ * outer ring of directional cells that dock against the whole layout. The
+ * resolver hit-tests these rects and the widget paints them — one geometry, so
+ * you aim at exactly the cell you see.
  */
 function compassCells(
     width: number,
     height: number,
-    zones: ReadonlySet<Position>
+    zones: ReadonlySet<Position>,
+    includeEdges: boolean
 ): CompassCell[] {
     const half = CELL / 2;
     const step = CELL + GAP;
     const cx = width / 2 - half;
     const cy = height / 2 - half;
-    const offset: Record<Position, { left: number; top: number }> = {
-        center: { left: cx, top: cy },
-        top: { left: cx, top: cy - step },
-        bottom: { left: cx, top: cy + step },
-        left: { left: cx - step, top: cy },
-        right: { left: cx + step, top: cy },
-    };
-    return INNER_CELLS.filter((p) => zones.has(p)).map((p) => ({
+    const cell = (p: Position, ring: number, edge: boolean): CompassCell => ({
         position: p,
-        left: offset[p].left,
-        top: offset[p].top,
+        left: cx + UNIT[p].dx * step * ring,
+        top: cy + UNIT[p].dy * step * ring,
         size: CELL,
-    }));
+        edge,
+    });
+    const cells: CompassCell[] = [];
+    for (const p of INNER_CELLS) {
+        if (zones.has(p)) {
+            cells.push(cell(p, p === 'center' ? 0 : 1, false));
+        }
+    }
+    if (includeEdges) {
+        for (const p of DIRECTIONS) {
+            cells.push(cell(p, 2, true));
+        }
+    }
+    return cells;
 }
 
 function intersect(
@@ -86,7 +112,8 @@ class CompassResolver implements PositionResolver {
     constructor(
         private readonly configuredZones: () =>
             | ReadonlySet<Position>
-            | undefined
+            | undefined,
+        private readonly edgesEnabled: () => boolean
     ) {}
 
     resolve(args: PositionResolverArgs): PositionResolverResult | null {
@@ -94,14 +121,20 @@ class CompassResolver implements PositionResolver {
         const zones = configured
             ? intersect(args.zones, configured)
             : args.zones;
-        for (const cell of compassCells(args.width, args.height, zones)) {
+        const cells = compassCells(
+            args.width,
+            args.height,
+            zones,
+            this.edgesEnabled()
+        );
+        for (const cell of cells) {
             if (
                 args.x >= cell.left &&
                 args.x <= cell.left + cell.size &&
                 args.y >= cell.top &&
                 args.y <= cell.top + cell.size
             ) {
-                return { position: cell.position };
+                return { position: cell.position, edge: cell.edge };
             }
         }
         return null;
@@ -127,14 +160,21 @@ class CompassWidget {
         this._element = el;
     }
 
-    render(zones: ReadonlySet<Position>): void {
+    render(zones: ReadonlySet<Position>, includeEdges: boolean): void {
         const doc = this._element.ownerDocument;
         const rect = this._element.getBoundingClientRect();
-        const cells = compassCells(rect.width, rect.height, zones);
+        const cells = compassCells(
+            rect.width,
+            rect.height,
+            zones,
+            includeEdges
+        );
         this._element.replaceChildren();
         for (const cell of cells) {
             const el = doc.createElement('div');
-            el.className = `dv-drop-guide-cell dv-drop-guide-cell-${cell.position}`;
+            el.className =
+                `dv-drop-guide-cell dv-drop-guide-cell-${cell.position}` +
+                (cell.edge ? ' dv-drop-guide-cell-edge' : '');
             el.style.position = 'absolute';
             el.style.left = `${cell.left}px`;
             el.style.top = `${cell.top}px`;
@@ -158,7 +198,8 @@ class CompassWidget {
  * at the drop-target seam and paints the widget; the existing overlay renders
  * the aimed cell's preview. Opt-in via `dndGuide` (default off → unchanged).
  *
- * Phase 1: inner cells (split/merge this group) on the group content target.
+ * Inner cells split/merge the hovered group; the outer ring (`edge` cells) docks
+ * against the whole layout (core routes `edge`-flagged drops to the layout edge).
  */
 export class DropGuideService
     extends CompositeDisposable
@@ -173,7 +214,10 @@ export class DropGuideService
     constructor(private readonly host: IDropGuideHost) {
         super();
 
-        this._resolver = new CompassResolver(() => this._configuredZones());
+        this._resolver = new CompassResolver(
+            () => this._configuredZones(),
+            () => this._edgesEnabled()
+        );
 
         this.addDisposables(
             this.host.onWillShowOverlay((e) => this._onWillShowOverlay(e)),
@@ -197,6 +241,15 @@ export class DropGuideService
             return new Set(guide.zones);
         }
         return undefined;
+    }
+
+    /** Whether the outer whole-layout-edge cells are shown (default true). */
+    private _edgesEnabled(): boolean {
+        const guide = this.host.options.dndGuide;
+        if (guide && typeof guide === 'object') {
+            return guide.edges !== false;
+        }
+        return !!guide;
     }
 
     private _onWillShowOverlay(e: DockviewWillShowOverlayLocationEvent): void {
@@ -223,7 +276,10 @@ export class DropGuideService
         const widget = new CompassWidget(content);
         const all = new Set(INNER_CELLS);
         const configured = this._configuredZones();
-        widget.render(configured ? intersect(all, configured) : all);
+        widget.render(
+            configured ? intersect(all, configured) : all,
+            this._edgesEnabled()
+        );
         this._mounted = { group, widget };
 
         // The drag has no "left everything" event; tear the widget down when the

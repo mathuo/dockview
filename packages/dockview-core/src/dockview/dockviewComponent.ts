@@ -801,6 +801,60 @@ export class DockviewComponent
         );
     }
 
+    /**
+     * Dock the dragged item against the whole-layout edge at `position` (the
+     * orthogonalized root group), as the layout-edge drop zones do. Shared by
+     * the root drop target and by an `edge`-flagged drop on a group content
+     * target (a position resolver that marks an outer "dock to the layout edge"
+     * cell). No-op when there is no active drag data.
+     */
+    dockToLayoutEdge(
+        nativeEvent: DragEvent | PointerEvent,
+        position: Position
+    ): void {
+        const willDropEvent = new DockviewWillDropEvent({
+            nativeEvent,
+            position,
+            panel: undefined,
+            api: this._api,
+            group: undefined,
+            getData: getPanelData,
+            kind: 'edge',
+        });
+
+        this._onWillDrop.fire(willDropEvent);
+
+        if (willDropEvent.defaultPrevented) {
+            return;
+        }
+
+        const data = getPanelData();
+
+        if (data) {
+            this.moveGroupOrPanel({
+                from: {
+                    groupId: data.groupId,
+                    panelId: data.panelId ?? undefined,
+                },
+                to: {
+                    group: this.orthogonalize(position),
+                    position: 'center',
+                },
+            });
+        } else {
+            this._onDidDrop.fire(
+                new DockviewDidDropEvent({
+                    nativeEvent,
+                    position,
+                    panel: undefined,
+                    api: this._api,
+                    group: undefined,
+                    getData: getPanelData,
+                })
+            );
+        }
+    }
+
     get headerActionsService() {
         return this._moduleRegistry.services.headerActionsService;
     }
@@ -1295,49 +1349,9 @@ export class DockviewComponent
                         })
                     );
                 }),
-                rootDropTarget.onDrop((event) => {
-                    const willDropEvent = new DockviewWillDropEvent({
-                        nativeEvent: event.nativeEvent,
-                        position: event.position,
-                        panel: undefined,
-                        api: this._api,
-                        group: undefined,
-                        getData: getPanelData,
-                        kind: 'edge',
-                    });
-
-                    this._onWillDrop.fire(willDropEvent);
-
-                    if (willDropEvent.defaultPrevented) {
-                        return;
-                    }
-
-                    const data = getPanelData();
-
-                    if (data) {
-                        this.moveGroupOrPanel({
-                            from: {
-                                groupId: data.groupId,
-                                panelId: data.panelId ?? undefined,
-                            },
-                            to: {
-                                group: this.orthogonalize(event.position),
-                                position: 'center',
-                            },
-                        });
-                    } else {
-                        this._onDidDrop.fire(
-                            new DockviewDidDropEvent({
-                                nativeEvent: event.nativeEvent,
-                                position: event.position,
-                                panel: undefined,
-                                api: this._api,
-                                group: undefined,
-                                getData: getPanelData,
-                            })
-                        );
-                    }
-                })
+                rootDropTarget.onDrop((event) =>
+                    this.dockToLayoutEdge(event.nativeEvent, event.position)
+                )
             );
         }
 

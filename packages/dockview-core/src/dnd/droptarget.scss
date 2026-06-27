@@ -68,3 +68,12 @@
     border: 1px solid var(--dv-drop-guide-color, #1f9cf0);
     background-color: var(--dv-drop-guide-cell-color, rgba(31, 156, 240, 0.25));
 }
+
+.dv-drop-guide-cell-edge {
+    // Outer "dock to the whole layout" cells read distinct from the inner ring.
+    border-style: dashed;
+    background-color: var(
+        --dv-drop-guide-edge-cell-color,
+        rgba(31, 156, 240, 0.12)
+    );
+}

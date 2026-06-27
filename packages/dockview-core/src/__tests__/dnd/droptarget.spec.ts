@@ -97,6 +97,37 @@ describe('droptarget', () => {
             expect(calls[0].zones.has('center')).toBe(true);
         });
 
+        test('an edge cell reports edge + renders no overlay', () => {
+            let dropped: { position: Position; edge?: boolean } | undefined;
+            droptarget = new Droptarget(element, {
+                canDisplayOverlay: () => true,
+                acceptedTargetZones: ALL,
+                getPositionResolver: () => ({
+                    resolve: () => ({ position: 'top', edge: true }),
+                }),
+            });
+            droptarget.onDrop((e) => {
+                dropped = e;
+            });
+
+            fireEvent.dragEnter(element);
+            fireEvent(
+                element,
+                createOffsetDragOverEvent({ clientX: 100, clientY: 50 })
+            );
+
+            // no group overlay is drawn for an edge cell...
+            expect(
+                element.querySelector('.dv-drop-target-dropzone')
+            ).toBeNull();
+            // ...but the position is still reported on drop, flagged edge
+            expect(droptarget.state).toBe('top');
+            fireEvent.drop(element);
+            expect(dropped).toEqual(
+                expect.objectContaining({ position: 'top', edge: true })
+            );
+        });
+
         test('a null result shows no drop target', () => {
             droptarget = new Droptarget(element, {
                 canDisplayOverlay: () => true,
