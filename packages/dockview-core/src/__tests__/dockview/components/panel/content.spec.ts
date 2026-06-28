@@ -264,7 +264,7 @@ describe('contentContainer', () => {
                 resolveDropOverlayModel: () => undefined,
             }),
             fromPartial<DockviewGroupPanelModel>({
-                canDisplayOverlay: () => true,
+                canDisplayContentOverlay: () => true,
             })
         );
 

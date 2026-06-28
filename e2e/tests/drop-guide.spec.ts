@@ -88,6 +88,15 @@ test.describe('drop guide (compass)', () => {
         await expect
             .poll(() => page.evaluate(() => (window as any).__dv.groupCount()))
             .toBe(2);
+        // ...and it actually moved to that edge: the 'left' tab, which started
+        // left of 'right', is now to its right (a no-op dock would leave it left).
+        const leftAfter = (await page
+            .locator('.dv-tab', { hasText: 'left' })
+            .boundingBox())!;
+        const rightAfter = (await page
+            .locator('.dv-tab', { hasText: 'right' })
+            .boundingBox())!;
+        expect(leftAfter.x).toBeGreaterThan(rightAfter.x);
         await expect(page.locator('.dv-drop-guide')).toHaveCount(0);
     });
 });

@@ -11,7 +11,6 @@ import { DockviewComponent } from '../../dockviewComponent';
 import { Droptarget, IDropTarget, Position } from '../../../dnd/droptarget';
 import { pointerBackend } from '../../../dnd/backend';
 import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
-import { getPanelData } from '../../../dnd/dataTransfer';
 
 let _contentId = 0;
 /** Stable DOM id so each tab's `aria-controls` can reference its tabpanel. */
@@ -83,30 +82,7 @@ export class ContentContainer
         const canDisplayOverlay = (
             event: DragEvent | PointerEvent,
             position: Position
-        ): boolean => {
-            if (
-                this.group.locked === 'no-drop-target' ||
-                (this.group.locked && position === 'center')
-            ) {
-                return false;
-            }
-
-            const data = getPanelData();
-
-            if (
-                !data &&
-                event.shiftKey &&
-                this.group.location.type !== 'floating'
-            ) {
-                return false;
-            }
-
-            if (data && data.viewId === this.accessor.id) {
-                return true;
-            }
-
-            return this.group.canDisplayOverlay(event, position, 'content');
-        };
+        ): boolean => this.group.canDisplayContentOverlay(event, position);
 
         // `dropTarget` stays the concrete `Droptarget` (not via the backend
         // factory) because overlayRenderContainer forwards HTML5 drag events

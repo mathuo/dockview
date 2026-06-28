@@ -1710,6 +1710,36 @@ export class DockviewGroupPanelModel
         return firedEvent.isAccepted;
     }
 
+    /**
+     * Whether a content drop at `position` is allowed: the locked rules, the
+     * shift-to-not-drop gesture, the same-component shortcut, then the
+     * `canDisplayOverlay` veto. The single source of truth for the content drop
+     * target (`content.ts`) and the compass cell gating (`canDropOnGroup`).
+     */
+    canDisplayContentOverlay(
+        event: DragEvent | PointerEvent,
+        position: Position
+    ): boolean {
+        if (
+            this.locked === 'no-drop-target' ||
+            (this.locked && position === 'center')
+        ) {
+            return false;
+        }
+
+        const data = getPanelData();
+
+        if (!data && event.shiftKey && this.location.type !== 'floating') {
+            return false;
+        }
+
+        if (data && data.viewId === this.accessor.id) {
+            return true;
+        }
+
+        return this.canDisplayOverlay(event, position, 'content');
+    }
+
     private handleDropEvent(
         type: 'header' | 'content',
         event: DragEvent | PointerEvent,

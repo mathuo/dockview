@@ -37,6 +37,15 @@ interface CompassCell {
     readonly edge: boolean;
 }
 
+/** Half-size band along each layout edge, keyed by the outer cell's direction. */
+const EDGE_PREVIEW_INSETS: Record<Position, Partial<CSSStyleDeclaration>> = {
+    center: {},
+    top: { inset: '0 0 auto 0', width: '100%', height: '50%' },
+    bottom: { inset: 'auto 0 0 0', width: '100%', height: '50%' },
+    left: { inset: '0 auto 0 0', width: '50%', height: '100%' },
+    right: { inset: '0 0 0 auto', width: '50%', height: '100%' },
+};
+
 const UNIT: Record<Position, { dx: number; dy: number }> = {
     center: { dx: 0, dy: 0 },
     top: { dx: 0, dy: -1 },
@@ -297,11 +306,12 @@ export class DropGuideService
         widget.render(
             configured ? intersect(all, configured) : all,
             this._edgesEnabled(),
-            // Hide cells the drop would reject. Outer (edge) cells dock the whole
-            // layout, not this group, so the group veto doesn't apply to them.
-            (cell) =>
-                cell.edge ||
-                this.host.canDropOnGroup(group, cell.position, event)
+            // Hide cells the drop would reject. Outer (edge) cells are gated the
+            // same way they commit: the drop target routes an edge drop to the
+            // layout edge only after the group's own content veto passes, so the
+            // compass must apply that veto here too or it would paint a cell that
+            // does nothing on drop.
+            (cell) => this.host.canDropOnGroup(group, cell.position, event)
         );
         this._mounted = { group, widget };
 
@@ -317,7 +327,12 @@ export class DropGuideService
         );
     }
 
-    /** Highlight the whole-layout edge the outer cell would dock against. */
+    /**
+     * Highlight the whole-layout edge the outer cell would dock against. The
+     * band is a half-size approximation — the real dock size is decided by the
+     * grid on commit, not known here — so it indicates the edge, not the exact
+     * resulting bounds.
+     */
     private _showEdgePreview(position: Position): void {
         const layout = this.host.getLayoutElement();
         if (!this._edgePreview) {
@@ -328,14 +343,7 @@ export class DropGuideService
             layout.appendChild(el);
             this._edgePreview = el;
         }
-        const el = this._edgePreview;
-        const edges: Record<string, Partial<CSSStyleDeclaration>> = {
-            top: { inset: '0 0 auto 0', width: '100%', height: '50%' },
-            bottom: { inset: 'auto 0 0 0', width: '100%', height: '50%' },
-            left: { inset: '0 auto 0 0', width: '50%', height: '100%' },
-            right: { inset: '0 0 0 auto', width: '50%', height: '100%' },
-        };
-        Object.assign(el.style, edges[position] ?? {});
+        Object.assign(this._edgePreview.style, EDGE_PREVIEW_INSETS[position]);
     }
 
     private _clearEdgePreview(): void {
