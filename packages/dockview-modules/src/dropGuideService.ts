@@ -37,15 +37,6 @@ interface CompassCell {
     readonly edge: boolean;
 }
 
-/** Half-size band along each layout edge, keyed by the outer cell's direction. */
-const EDGE_PREVIEW_INSETS: Record<Position, Partial<CSSStyleDeclaration>> = {
-    center: {},
-    top: { inset: '0 0 auto 0', width: '100%', height: '50%' },
-    bottom: { inset: 'auto 0 0 0', width: '100%', height: '50%' },
-    left: { inset: '0 auto 0 0', width: '50%', height: '100%' },
-    right: { inset: '0 0 0 auto', width: '50%', height: '100%' },
-};
-
 const UNIT: Record<Position, { dx: number; dy: number }> = {
     center: { dx: 0, dy: 0 },
     top: { dx: 0, dy: -1 },
@@ -346,6 +337,10 @@ export class DropGuideService
      * band is a half-size approximation — the real dock size is decided by the
      * grid on commit, not known here — so it indicates the edge, not the exact
      * resulting bounds.
+     *
+     * Positioned with explicit pixels against the band's offset parent (the
+     * layout element is not guaranteed to establish a containing block), so the
+     * band stays inside the layout box and never overflows / shifts the content.
      */
     private _showEdgePreview(position: Position): void {
         const layout = this.host.getLayoutElement();
@@ -357,7 +352,26 @@ export class DropGuideService
             layout.appendChild(el);
             this._edgePreview = el;
         }
-        Object.assign(this._edgePreview.style, EDGE_PREVIEW_INSETS[position]);
+        const el = this._edgePreview;
+        const lRect = layout.getBoundingClientRect();
+        const pRect = (el.offsetParent ?? layout).getBoundingClientRect();
+        const x = lRect.left - pRect.left;
+        const y = lRect.top - pRect.top;
+        const w = lRect.width;
+        const h = lRect.height;
+        const box: Record<Position, [number, number, number, number]> = {
+            // [left, top, width, height]
+            center: [x, y, w, h],
+            top: [x, y, w, h / 2],
+            bottom: [x, y + h / 2, w, h / 2],
+            left: [x, y, w / 2, h],
+            right: [x + w / 2, y, w / 2, h],
+        };
+        const [left, top, width, height] = box[position];
+        el.style.left = `${left}px`;
+        el.style.top = `${top}px`;
+        el.style.width = `${width}px`;
+        el.style.height = `${height}px`;
     }
 
     private _clearEdgePreview(): void {

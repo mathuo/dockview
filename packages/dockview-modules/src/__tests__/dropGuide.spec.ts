@@ -220,6 +220,18 @@ describe('drop guide', () => {
 
     test('an outer cell previews the layout edge, cleared on inner / drop', () => {
         make(true);
+        // a 400x300 layout; the band is positioned in explicit px against it
+        jest.spyOn(layoutEl, 'getBoundingClientRect').mockReturnValue({
+            left: 0,
+            top: 0,
+            width: 400,
+            height: 300,
+            right: 400,
+            bottom: 300,
+            x: 0,
+            y: 0,
+            toJSON: () => ({}),
+        } as DOMRect);
         const { group } = groupWithContent();
         const over = (edge: boolean, position: Position) =>
             overlayEmitter.fire({
@@ -229,13 +241,14 @@ describe('drop guide', () => {
                 position,
             } as DockviewWillShowOverlayLocationEvent);
 
-        over(true, 'right'); // outer cell → a band over the layout's right edge
+        over(true, 'right'); // outer cell → a band over the layout's right half
         const band = layoutEl.querySelector<HTMLElement>(
             '.dv-drop-guide-edge-preview'
         );
         expect(band).toBeTruthy();
-        expect(band!.style.width).toBe('50%');
-        expect(band!.style.height).toBe('100%');
+        expect(band!.style.left).toBe('200px');
+        expect(band!.style.width).toBe('200px');
+        expect(band!.style.height).toBe('300px');
 
         over(false, 'center'); // inner cell → cleared
         expect(
