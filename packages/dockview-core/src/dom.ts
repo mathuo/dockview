@@ -547,3 +547,35 @@ export function findRelativeZIndexParent(el: HTMLElement): HTMLElement | null {
 
     return tmp;
 }
+
+/** Whether the user has requested reduced motion — the JS counterpart to the
+ *  `prefers-reduced-motion` media query, for animations driven in script. */
+export function prefersReducedMotion(doc: Document = document): boolean {
+    const mq = doc.defaultView?.matchMedia?.(
+        '(prefers-reduced-motion: reduce)'
+    );
+    return !!mq?.matches;
+}
+
+/** The first opaque computed background colour walking up from `element` (the
+ *  element itself, then its ancestors). Use to give a floating/overlapping
+ *  surface a non-see-through backdrop derived from the live DOM. Returns `''`
+ *  when nothing opaque is found (let the stylesheet decide). */
+export function resolveOpaqueBackground(element: HTMLElement): string {
+    const win = element.ownerDocument.defaultView;
+    if (!win) {
+        return '';
+    }
+    let el: HTMLElement | null = element;
+    while (el) {
+        const bg = win.getComputedStyle(el).backgroundColor;
+        // Skip `transparent` and any fully-transparent colour — a computed
+        // `rgba(…, 0)` (e.g. `rgba(255,255,255,0)`) is see-through regardless of
+        // its RGB, so it isn't an opaque backdrop.
+        if (bg && bg !== 'transparent' && !/,\s*0\)\s*$/.test(bg)) {
+            return bg;
+        }
+        el = el.parentElement;
+    }
+    return '';
+}

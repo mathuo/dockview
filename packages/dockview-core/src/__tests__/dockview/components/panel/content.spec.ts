@@ -11,6 +11,7 @@ import { IDockviewPanelModel } from '../../../../dockview/dockviewPanelModel';
 import { DockviewComponent } from '../../../../dockview/dockviewComponent';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewGroupPanelModel } from '../../../../dockview/dockviewGroupPanelModel';
+import { createOffsetDragOverEvent } from '../../../__test_utils__/utils';
 import { OverlayRenderContainer } from '../../../../overlay/overlayRenderContainer';
 
 class TestContentRenderer
@@ -251,5 +252,33 @@ describe('contentContainer', () => {
         expect(panel1.view.content.element.parentElement).toBeNull();
         expect(panel2.view.content.element.parentElement).toBe(cut.element);
         expect(cut.element.childNodes.length).toBe(1);
+    });
+
+    test('the dropPositionResolver option drives the content drop target', () => {
+        const resolver = { resolve: () => ({ position: 'right' as const }) };
+
+        const cut = new ContentContainer(
+            fromPartial<DockviewComponent>({
+                options: { dropPositionResolver: resolver },
+                resolveDropOverlayModel: () => undefined,
+            }),
+            fromPartial<DockviewGroupPanelModel>({
+                canDisplayOverlay: () => true,
+            })
+        );
+
+        jest.spyOn(cut.element, 'offsetWidth', 'get').mockReturnValue(200);
+        jest.spyOn(cut.element, 'offsetHeight', 'get').mockReturnValue(100);
+
+        fireEvent.dragEnter(cut.element);
+        fireEvent(
+            cut.element,
+            createOffsetDragOverEvent({ clientX: 100, clientY: 50 })
+        );
+
+        // 100,50 in 200x100 is the centre by default; the option forces right.
+        expect(cut.dropTarget.state).toBe('right');
+
+        cut.dispose();
     });
 });

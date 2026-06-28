@@ -417,6 +417,13 @@ export class DockviewGroupPanelModel
         return this.tabsContainer;
     }
 
+    /** The panel whose tab owns `element` (the tab itself or a descendant of
+     *  it), or `undefined` when the target isn't a tab. The robust inverse of a
+     *  tab→panel lookup — no positional/DOM-order assumptions. */
+    getPanelForTab(element: Element): IDockviewPanel | undefined {
+        return this.tabsContainer.getPanelForTab(element);
+    }
+
     get isContentFocused(): boolean {
         if (!document.activeElement) {
             return false;

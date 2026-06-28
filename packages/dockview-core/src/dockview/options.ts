@@ -9,7 +9,11 @@ export type { DockviewMessages } from './accessibilityMessages';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
 import { Box, DragModifiers } from '../types';
-import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
+import {
+    DroptargetOverlayModel,
+    Position,
+    PositionResolver,
+} from '../dnd/droptarget';
 import { GroupOptions } from './dockviewGroupPanelModel';
 import { DockviewGroupDropLocation } from './events';
 import { IDockviewPanel } from './dockviewPanel';
@@ -300,6 +304,15 @@ export interface DockviewOptions {
      * - `'html5'`: HTML5 drag-and-drop only — disables touch / pen drag.
      */
     dndStrategy?: DockviewDndStrategy;
+    /**
+     * Override how a pointer location maps to a drop {@link Position} (or `null`
+     * for no drop) on the 5-way group/layout drop targets — the group content
+     * and the whole-layout edges — replacing the built-in cursor-quadrant logic.
+     * Tab/header reorder targets are unaffected. Unset ⇒ the default quadrant
+     * behaviour, unchanged. Read live, so it can be swapped via
+     * {@link DockviewApi.updateOptions}.
+     */
+    dropPositionResolver?: PositionResolver;
     // #end dnd
     locked?: boolean;
     className?: string;
@@ -430,6 +443,12 @@ export interface DockviewOptions {
      */
     layoutHistory?: LayoutHistoryOptions;
     /**
+     * VS Code-style "auto hide" for edge groups: render clickable activators in
+     * a collapsed edge group's strip so it can be pinned back. Off by default →
+     * today's baseline (an empty collapsed strip) is unchanged.
+     */
+    autoHideEdgeGroups?: boolean | AutoHideEdgeGroupOptions;
+    /**
      * Replace the built-in tab group color palette with a user-defined list.
      *
      * Each entry has an `id` (stored on `tabGroup.color` and serialized),
@@ -470,6 +489,18 @@ export interface LayoutHistoryOptions {
     /** Debounce window (ms) for coalescing a continuous resize drag into one
      *  undo entry. Default `400`. */
     coalesceMs?: number;
+}
+
+export interface AutoHideEdgeGroupOptions {
+    /** ms the pointer must dwell on the collapsed strip before the peek opens.
+     *  Default 250. Keyboard focus opens immediately (no delay). */
+    openDelay?: number;
+    /** ms after the pointer leaves both the strip and the peek overlay before
+     *  the peek closes. Re-entering either cancels it. Default 300. */
+    closeDelay?: number;
+    /** Slide the peek overlay in. Default true; ignored when the OS requests
+     *  reduced motion. */
+    animate?: boolean;
 }
 
 export type TabAnimation = 'smooth' | 'default';
@@ -523,6 +554,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         className: undefined,
         noPanelsOverlay: undefined,
         dndEdges: undefined,
+        dropPositionResolver: undefined,
         theme: undefined,
         disableTabsOverflowList: undefined,
         scrollbars: undefined,
@@ -537,6 +569,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         messages: undefined,
         keyboardNavigation: undefined,
         layoutHistory: undefined,
+        autoHideEdgeGroups: undefined,
         tabGroupColors: undefined,
         tabGroupAccent: undefined,
     };

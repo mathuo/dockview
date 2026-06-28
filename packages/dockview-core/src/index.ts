@@ -133,6 +133,9 @@ export {
     directionToPosition,
     MeasuredValue,
     DroptargetOverlayModel,
+    PositionResolver,
+    PositionResolverArgs,
+    PositionResolverResult,
 } from './dnd/droptarget';
 
 export {
@@ -163,6 +166,7 @@ export {
     DockviewGroupPanelApi,
     DockviewGroupPanelLocationChangeEvent,
     DockviewGroupPanelCollapsedChangeEvent,
+    DockviewGroupPanelPeekChangeEvent,
     DockviewGroupMoveParams,
 } from './api/dockviewGroupPanelApi';
 export {
@@ -194,6 +198,8 @@ export {
     IAccessibilityService,
     IAdvancedDnDHost,
     IAdvancedDnDService,
+    IAutoHideEdgeGroupHost,
+    IAutoHideEdgeGroupService,
     IContextMenuHost,
     IContextMenuService,
     IKeyboardDockingService,
@@ -210,7 +216,17 @@ export {
     ITabGroupChipsService,
 } from './dockview/moduleContracts';
 export { resolveMessages } from './dockview/accessibilityMessages';
-export { findRelativeZIndexParent } from './dom';
+export {
+    findRelativeZIndexParent,
+    prefersReducedMotion,
+    resolveOpaqueBackground,
+} from './dom';
+export {
+    createDismissableLayer,
+    DismissableLayerOptions,
+} from './dismissableLayer';
 export { IDragGhostSpec } from './dnd/backend';
 export { LiveRegionModule } from './dockview/liveRegionService';
 export { FloatingGroupModule } from './dockview/floatingGroupService';
+export { EdgeGroupModule } from './dockview/edgeGroupService';
+export { createCloseButton, createPinButton } from './svg';

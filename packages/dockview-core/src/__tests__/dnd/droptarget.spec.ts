@@ -64,6 +64,74 @@ describe('droptarget', () => {
         expect(element.querySelector('.dv-drop-target-dropzone')).toBeNull();
     });
 
+    describe('positionResolver', () => {
+        const ALL: Position[] = ['left', 'right', 'top', 'bottom', 'center'];
+
+        test('overrides the default quadrant and receives the pointer args', () => {
+            const calls: any[] = [];
+            droptarget = new Droptarget(element, {
+                canDisplayOverlay: () => true,
+                acceptedTargetZones: ALL,
+                getPositionResolver: () => ({
+                    resolve: (args) => {
+                        calls.push(args);
+                        return { position: 'right' };
+                    },
+                }),
+            });
+
+            fireEvent.dragEnter(element);
+            fireEvent(
+                element,
+                createOffsetDragOverEvent({ clientX: 100, clientY: 50 })
+            );
+
+            // 100,50 within 200x100 is the centre by default — the resolver wins.
+            expect(droptarget.state).toBe('right');
+            expect(calls[0]).toMatchObject({
+                x: 100,
+                y: 50,
+                width: 200,
+                height: 100,
+            });
+            expect(calls[0].zones.has('center')).toBe(true);
+        });
+
+        test('a null result shows no drop target', () => {
+            droptarget = new Droptarget(element, {
+                canDisplayOverlay: () => true,
+                acceptedTargetZones: ['center'],
+                getPositionResolver: () => ({ resolve: () => null }),
+            });
+
+            fireEvent.dragEnter(element);
+            fireEvent(
+                element,
+                createOffsetDragOverEvent({ clientX: 100, clientY: 50 })
+            );
+
+            expect(
+                element.querySelector('.dv-drop-target-dropzone')
+            ).toBeNull();
+            expect(droptarget.state).toBeUndefined();
+        });
+
+        test('absent → the default quadrant is unchanged', () => {
+            droptarget = new Droptarget(element, {
+                canDisplayOverlay: () => true,
+                acceptedTargetZones: ['left', 'center'],
+            });
+
+            fireEvent.dragEnter(element);
+            fireEvent(
+                element,
+                createOffsetDragOverEvent({ clientX: 2, clientY: 50 })
+            );
+            // x=2 of width 200 is inside the 20% left band.
+            expect(droptarget.state).toBe('left');
+        });
+    });
+
     test('directionToPosition', () => {
         expect(directionToPosition('above')).toBe('top');
         expect(directionToPosition('below')).toBe('bottom');

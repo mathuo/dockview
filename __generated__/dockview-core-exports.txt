@@ -10,6 +10,7 @@ AddSplitviewComponentOptions
 AnchorPosition
 AnchoredBox
 AnnouncementEvent
+AutoHideEdgeGroupOptions
 BaseComponentOptions
 BaseGrid
 BaseGridOptions
@@ -28,6 +29,7 @@ DEFAULT_TAB_GROUP_COLORS
 DefaultDockviewDeserialzier
 DefaultTab
 Direction
+DismissableLayerOptions
 DistributeSizing
 DockviewActivePanelChangeEvent
 DockviewApi
@@ -52,6 +54,7 @@ DockviewGroupPanelApi
 DockviewGroupPanelCollapsedChangeEvent
 DockviewGroupPanelLocationChangeEvent
 DockviewGroupPanelModel
+DockviewGroupPanelPeekChangeEvent
 DockviewHeaderDirection
 DockviewHeaderPosition
 DockviewIDisposable
@@ -84,6 +87,7 @@ DragModifiers
 DraggablePaneviewPanel
 DropOverlayModelParams
 DroptargetOverlayModel
+EdgeGroupModule
 EdgeGroupOptions
 EdgeGroupPosition
 ExpansionEvent
@@ -116,6 +120,8 @@ IAccessibilityHost
 IAccessibilityService
 IAdvancedDnDHost
 IAdvancedDnDService
+IAutoHideEdgeGroupHost
+IAutoHideEdgeGroupService
 IBaseGrid
 IBaseView
 IContentContainer
@@ -221,6 +227,9 @@ PopoutGroup
 PopoutGroupChangePositionEvent
 PopoutGroupChangeSizeEvent
 Position
+PositionResolver
+PositionResolverArgs
+PositionResolverResult
 RendererChangedEvent
 SashState
 SerializedDockview
@@ -268,9 +277,12 @@ VisibilityEvent
 WatermarkRendererInitParameters
 applyTabGroupAccent
 clearRegisteredModules
+createCloseButton
+createDismissableLayer
 createDockview
 createGridview
 createPaneview
+createPinButton
 createSplitview
 defineModule
 directionToPosition
@@ -292,8 +304,10 @@ isPanelOptionsWithPanel
 markDockviewPackageLoaded
 orthogonal
 positionToDirection
+prefersReducedMotion
 registerModules
 resolveMessages
+resolveOpaqueBackground
 resolveTabGroupAccent
 themeAbyss
 themeAbyssSpaced

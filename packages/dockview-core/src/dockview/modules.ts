@@ -20,6 +20,7 @@ import { ILiveRegionService } from './liveRegionService';
 import {
     IAccessibilityService,
     IAdvancedDnDService,
+    IAutoHideEdgeGroupService,
     IContextMenuService,
     IKeyboardDockingService,
     ILayoutHistoryService,
@@ -42,6 +43,7 @@ export interface ServiceCollection {
     keyboardDockingService?: IKeyboardDockingService;
     layoutHistoryService?: ILayoutHistoryService;
     smartGuidesService?: ISmartGuidesService;
+    autoHideEdgeGroupService?: IAutoHideEdgeGroupService;
 }
 
 export interface DockviewModule<THost = unknown> {

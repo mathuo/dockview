@@ -21,6 +21,13 @@
     <body>
         <div id="app"></div>
 
+        <!-- Built stylesheet so layout-sensitive behaviour (overlay host
+             positioning, edge-group peek) matches real usage. -->
+        <link
+            rel="stylesheet"
+            href="/packages/dockview-core/dist/styles/dockview.css"
+        />
+
         <!-- Built UMD bundles. dockview-core exposes the global "dockview-core";
              dockview-modules expects it aliased as DockviewCore. -->
         <script src="/packages/dockview-core/dist/dockview-core.js"></script>
@@ -54,6 +61,8 @@
                         snapDistance: 12,
                         snapTargets: { container: false },
                     },
+                    // Enable auto-hide edge groups (collapsed-strip peek).
+                    autoHideEdgeGroups: true,
                     // A served (not about:blank) target avoids a 404 when the
                     // popout window navigates before dockview injects content.
                     popoutUrl: '/e2e/fixtures/popout.html',
@@ -111,6 +120,8 @@
                     canUndo: () => dockview.canUndo,
                     awaitPopoutRestore: () => dockview.popoutRestorationPromise,
                     floatingCount: () => dockview.floatingGroups.length,
+                    peekEdge: (position, on) =>
+                        dockview.api.peekEdgeGroup(position, on),
                     // Two floating groups for Smart Guides: a target float on
                     // the left (left edge ~120) and a draggable float to its
                     // right. Dragging the right one near x=120 should snap +
@@ -143,6 +154,60 @@
                             width: 200,
                             height: 160,
                         });
+                    },
+                    // Auto-hide edge: a center panel + a collapsed left edge
+                    // group with one panel, for peek tests. Pass renderer
+                    // 'always' to exercise the render-overlay (z-index) path.
+                    setupAutoHideEdge: (renderer) => {
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        dockview.addEdgeGroup('left', {
+                            id: 'edge-left',
+                            initialSize: 220,
+                        });
+                        dockview.addPanel({
+                            id: 'sidebar',
+                            component: 'default',
+                            title: 'Sidebar',
+                            renderer: renderer || undefined,
+                            position: {
+                                referenceGroup: 'edge-left',
+                                direction: 'within',
+                            },
+                        });
+                        dockview.autoHideEdgeGroup('left');
+                    },
+                    // Two `always`-rendered panels in one edge group, for the
+                    // peek tab-switch test (each renders its own overlay).
+                    setupAutoHideEdgeMulti: () => {
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        dockview.addEdgeGroup('left', {
+                            id: 'edge-left',
+                            initialSize: 220,
+                        });
+                        for (const [id, title] of [
+                            ['a', 'Alpha'],
+                            ['b', 'Bravo'],
+                        ]) {
+                            dockview.addPanel({
+                                id,
+                                component: 'default',
+                                title,
+                                renderer: 'always',
+                                position: {
+                                    referenceGroup: 'edge-left',
+                                    direction: 'within',
+                                },
+                            });
+                        }
+                        dockview.autoHideEdgeGroup('left');
                     },
                 };
                 window.__ready = true;
