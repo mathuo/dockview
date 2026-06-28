@@ -523,6 +523,17 @@ export class Tabs extends CompositeDisposable {
         return this._tabMap.get(panelId)?.value.element.id;
     }
 
+    /** Inverse of {@link getTabId}: the panel whose tab owns `element` (the tab
+     *  itself or any descendant of it), or `undefined` for non-tab targets. */
+    getPanelForTab(element: Element): IDockviewPanel | undefined {
+        for (const { value } of this._tabs) {
+            if (value.element === element || value.element.contains(element)) {
+                return value.panel;
+            }
+        }
+        return undefined;
+    }
+
     isActive(tab: Tab): boolean {
         return (
             this.selectedIndex > -1 &&

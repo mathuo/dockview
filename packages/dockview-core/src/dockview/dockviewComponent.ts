@@ -88,6 +88,7 @@ import { IEdgeGroupServiceHost } from './edgeGroupService';
 import {
     IAccessibilityHost,
     IAdvancedDnDHost,
+    IAutoHideEdgeGroupHost,
     IContextMenuHost,
     IContextMenuService,
     ILayoutHistoryHost,
@@ -425,6 +426,14 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void;
     isEdgeGroupVisible(position: EdgeGroupPosition): boolean;
     removeEdgeGroup(position: EdgeGroupPosition): void;
+    getEdgeGroupPanel(
+        position: EdgeGroupPosition
+    ): DockviewGroupPanel | undefined;
+    pinEdgeGroup(position: EdgeGroupPosition): void;
+    autoHideEdgeGroup(position: EdgeGroupPosition): void;
+    peekEdgeGroup(position: EdgeGroupPosition, peek: boolean): void;
+    readonly overlayRoot: HTMLElement;
+    getEdgeGroupExpandedSize(position: EdgeGroupPosition): number;
     // layout history (undo / redo)
     undo(): void;
     redo(): void;
@@ -491,7 +500,8 @@ export class DockviewComponent
         IAdvancedDnDHost,
         ILiveRegionHost,
         IAccessibilityHost,
-        ILayoutHistoryHost
+        ILayoutHistoryHost,
+        IAutoHideEdgeGroupHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
@@ -2498,6 +2508,61 @@ export class DockviewComponent
         return this._edgeGroupService?.get(position)?.api;
     }
 
+    /** The edge group panel at a position (the model, not the api). */
+    getEdgeGroupPanel(
+        position: EdgeGroupPosition
+    ): DockviewGroupPanel | undefined {
+        return this._edgeGroupService?.get(position);
+    }
+
+    /** Pin (expand) the edge group at a position — auto-hide module feature. */
+    pinEdgeGroup(position: EdgeGroupPosition): void {
+        this._moduleRegistry.services.autoHideEdgeGroupService?.pin(position);
+    }
+
+    /** Auto-hide (collapse to strip) the edge group at a position. */
+    autoHideEdgeGroup(position: EdgeGroupPosition): void {
+        this._moduleRegistry.services.autoHideEdgeGroupService?.autoHide(
+            position
+        );
+    }
+
+    /** Peek (slide out) / close the collapsed edge group at a position. */
+    peekEdgeGroup(position: EdgeGroupPosition, peek: boolean): void {
+        this._moduleRegistry.services.autoHideEdgeGroupService?.peek(
+            position,
+            peek
+        );
+    }
+
+    /** The auto-hide peek mounts on the shell — the same element the
+     *  `OverlayRenderContainer` roots on — so `always` content re-anchors in the
+     *  peek's coordinate space. */
+    get overlayRoot(): HTMLElement {
+        return this.rootElement;
+    }
+
+    /** The size an edge group expands to (pre-collapse) — sizes the peek. */
+    getEdgeGroupExpandedSize(position: EdgeGroupPosition): number {
+        return this._shellManager?.getEdgeGroupExpandedSize(position) ?? 0;
+    }
+
+    /** Reposition a single `renderer:'always'` panel's overlay over its
+     *  reference container, optionally forcing it visible (the auto-hide peek
+     *  slides an `always` panel out without reparenting it or touching its
+     *  visibility state). No-op for non-overlay-rendered panels. */
+    repositionPanelOverlay(
+        panel: IDockviewPanel,
+        forceVisible: boolean,
+        clip?: DOMRect
+    ): void {
+        this.overlayRenderContainer.repositionPanelOverlay(
+            panel.api.id,
+            forceVisible,
+            clip
+        );
+    }
+
     setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void {
         this._shellManager!.setEdgeGroupVisible(position, visible);
     }
@@ -2564,6 +2629,29 @@ export class DockviewComponent
         return position
             ? this._shellManager!.isEdgeGroupCollapsed(position)
             : false;
+    }
+
+    /** Edge groups currently peeking (auto-hide). The peek state is owned by the
+     *  auto-hide module; the component just records it so `group.api.isPeeking()`
+     *  / `onDidPeekChange` work. */
+    private readonly _peekingGroups = new Set<DockviewGroupPanel>();
+
+    isEdgeGroupPeeking(group: DockviewGroupPanel): boolean {
+        return this._peekingGroups.has(group);
+    }
+
+    /** Set the peek state and fire the group's `onDidPeekChange` (called by the
+     *  auto-hide service). */
+    setEdgeGroupPeeking(group: DockviewGroupPanel, peeking: boolean): void {
+        if (this._peekingGroups.has(group) === peeking) {
+            return;
+        }
+        if (peeking) {
+            this._peekingGroups.add(group);
+        } else {
+            this._peekingGroups.delete(group);
+        }
+        group.api._onDidPeekChange.fire({ isPeeking: peeking });
     }
 
     private updateDragAndDropState(): void {
