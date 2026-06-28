@@ -816,6 +816,12 @@ export class DockviewComponent
             : content;
     }
 
+    /** IDropGuideHost — the layout root (`.dv-dockview`, a positioned element),
+     *  the surface the outer-cell landing preview is drawn over. */
+    getLayoutElement(): HTMLElement {
+        return this.gridview.element;
+    }
+
     /**
      * The drop-position resolver installed on the group content drop targets —
      * the app's `dropPositionResolver` option if set, else the Drop Guide

@@ -37,6 +37,15 @@ interface CompassCell {
     readonly edge: boolean;
 }
 
+/** Half-of-the-layout band along each edge, keyed by the outer cell's direction. */
+const EDGE_PREVIEW_INSETS: Record<Position, Partial<CSSStyleDeclaration>> = {
+    center: {},
+    top: { inset: '0 0 auto 0', width: '100%', height: '50%' },
+    bottom: { inset: 'auto 0 0 0', width: '100%', height: '50%' },
+    left: { inset: '0 auto 0 0', width: '50%', height: '100%' },
+    right: { inset: '0 0 0 auto', width: '50%', height: '100%' },
+};
+
 const UNIT: Record<Position, { dx: number; dy: number }> = {
     center: { dx: 0, dy: 0 },
     top: { dx: 0, dy: -1 },
@@ -256,6 +265,7 @@ export class DropGuideService
         | { group: DockviewGroupPanel; widget: CompassWidget }
         | undefined;
     private _endListeners: CompositeDisposable | undefined;
+    private _edgePreview: HTMLElement | undefined;
 
     constructor(private readonly host: IDropGuideHost) {
         super();
@@ -304,8 +314,38 @@ export class DropGuideService
             return;
         }
         this._mount(e.group, e.nativeEvent);
-        // Fires per drag-over frame: light up the cell being aimed at.
+        // Fires per drag-over frame: light up the cell being aimed at, and for
+        // an outer cell preview the layout-edge region the panel would land in.
         this._mounted?.widget.setActive(e.position, e.edge);
+        if (e.edge) {
+            this._showEdgePreview(e.position);
+        } else {
+            this._clearEdgePreview();
+        }
+    }
+
+    /**
+     * Preview the whole-layout-edge region an outer cell docks into — the half
+     * the panel will occupy — styled with the same theme variables as a real
+     * drop overlay so it reads identically. Drawn over the layout root (a
+     * positioned element), beneath the compass.
+     */
+    private _showEdgePreview(position: Position): void {
+        const layout = this.host.getLayoutElement();
+        if (!this._edgePreview) {
+            const el = layout.ownerDocument.createElement('div');
+            el.className = 'dv-drop-guide-edge-preview';
+            el.style.position = 'absolute';
+            el.style.pointerEvents = 'none';
+            layout.appendChild(el);
+            this._edgePreview = el;
+        }
+        Object.assign(this._edgePreview.style, EDGE_PREVIEW_INSETS[position]);
+    }
+
+    private _clearEdgePreview(): void {
+        this._edgePreview?.remove();
+        this._edgePreview = undefined;
     }
 
     private _mount(
@@ -360,6 +400,7 @@ export class DropGuideService
         this._endListeners = undefined;
         this._mounted?.widget.dispose();
         this._mounted = undefined;
+        this._clearEdgePreview();
     }
 }
 

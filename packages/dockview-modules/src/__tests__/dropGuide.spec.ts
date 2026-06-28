@@ -17,11 +17,14 @@ describe('drop guide', () => {
     let service: DropGuideService;
     let canDrop: (position: Position) => boolean;
     let dropOverlayEl: (group: DockviewGroupPanel) => HTMLElement | undefined;
+    let layoutEl: HTMLElement;
 
     const make = (
         dndGuide: { zones?: Position[]; edges?: boolean } | boolean | undefined
     ): void => {
         overlayEmitter = new Emitter<DockviewWillShowOverlayLocationEvent>();
+        layoutEl = document.createElement('div');
+        document.body.appendChild(layoutEl);
         canDrop = () => true;
         // the drop target measures the content container by default
         dropOverlayEl = (group) =>
@@ -33,6 +36,7 @@ describe('drop guide', () => {
             canDropOnGroup: (_group, position) => canDrop(position),
             getDropOverlayElement: (group: DockviewGroupPanel) =>
                 dropOverlayEl(group),
+            getLayoutElement: () => layoutEl,
         });
     };
 
@@ -224,6 +228,37 @@ describe('drop guide', () => {
         const active = content.querySelectorAll('.dv-drop-guide-cell-active');
         expect(active).toHaveLength(1);
         expect(active[0].classList).toContain('dv-drop-guide-cell-center');
+    });
+
+    test('an outer cell previews the layout-edge landing region', () => {
+        make(true);
+        const { group } = groupWithContent();
+        const over = (edge: boolean, position: Position) =>
+            overlayEmitter.fire({
+                kind: 'content',
+                group,
+                edge,
+                position,
+            } as DockviewWillShowOverlayLocationEvent);
+
+        over(true, 'right'); // outer-right → the layout's right-half region
+        const band = layoutEl.querySelector<HTMLElement>(
+            '.dv-drop-guide-edge-preview'
+        );
+        expect(band).toBeTruthy();
+        expect(band!.style.width).toBe('50%');
+        expect(band!.style.height).toBe('100%');
+
+        over(false, 'center'); // inner cell → preview cleared
+        expect(
+            layoutEl.querySelector('.dv-drop-guide-edge-preview')
+        ).toBeNull();
+
+        over(true, 'top'); // re-show, then end the drag → cleared
+        window.dispatchEvent(new Event('pointerup'));
+        expect(
+            layoutEl.querySelector('.dv-drop-guide-edge-preview')
+        ).toBeNull();
     });
 
     test('per-cell gating hides cells the drop would reject', () => {

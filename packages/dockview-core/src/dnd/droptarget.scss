@@ -87,3 +87,13 @@
     );
     border-style: solid;
 }
+
+.dv-drop-guide-edge-preview {
+    // The whole-layout-edge region an outer cell docks into. Reuses the real
+    // drop-overlay theme variables so it reads identically to any other drop
+    // preview; sits beneath the compass cross (z below `.dv-drop-guide`).
+    z-index: 1000;
+    box-sizing: border-box;
+    background-color: var(--dv-drag-over-background-color);
+    border: var(--dv-drag-over-border);
+}

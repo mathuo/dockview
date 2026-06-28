@@ -284,6 +284,9 @@ export interface IDropGuideHost {
      * actually resolves, not a different box.
      */
     getDropOverlayElement(group: DockviewGroupPanel): HTMLElement | undefined;
+    /** The layout root element — the (positioned) surface the outer-cell
+     *  landing preview is drawn over (where a whole-layout-edge dock lands). */
+    getLayoutElement(): HTMLElement;
 }
 
 export interface IDropGuideService extends IDisposable {
