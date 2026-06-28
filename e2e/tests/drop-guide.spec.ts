@@ -85,6 +85,11 @@ test.describe('drop guide (compass)', () => {
         // sweep out to the far outer cell — the cross must not move (the drop
         // target removing its `.dv-drop-target` class once made it re-anchor)
         await page.mouse.move(cx + 84, cy, { steps: 10 });
+        // guard the regression is actually exercised: confirm we reached an
+        // outer (edge) cell, the only path that removes `.dv-drop-target`
+        await expect(
+            page.locator('.dv-drop-guide-cell-edge.dv-drop-guide-cell-active')
+        ).toBeVisible();
         const atOuter = (await centre.boundingBox())!;
 
         expect(atOuter.x).toBeCloseTo(atInner.x, 0);

@@ -314,9 +314,12 @@ export class DropGuideService
             return;
         }
         this._mount(e.group, e.nativeEvent);
+        if (!this._mounted) {
+            return; // no compass mounted (e.g. no content container) — nothing to drive
+        }
         // Fires per drag-over frame: light up the cell being aimed at, and for
         // an outer cell preview the layout-edge region the panel would land in.
-        this._mounted?.widget.setActive(e.position, e.edge);
+        this._mounted.widget.setActive(e.position, e.edge);
         if (e.edge) {
             this._showEdgePreview(e.position);
         } else {

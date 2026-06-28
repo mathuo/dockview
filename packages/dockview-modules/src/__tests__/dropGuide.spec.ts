@@ -230,6 +230,22 @@ describe('drop guide', () => {
         expect(active[0].classList).toContain('dv-drop-guide-cell-center');
     });
 
+    test('no orphan edge preview when the group has no content container', () => {
+        make(true);
+        const element = document.createElement('div'); // no .dv-content-container
+        document.body.appendChild(element);
+        overlayEmitter.fire({
+            kind: 'content',
+            group: { element } as DockviewGroupPanel,
+            edge: true,
+            position: 'right',
+        } as DockviewWillShowOverlayLocationEvent);
+        // the compass never mounted, so nothing should be drawn anywhere
+        expect(
+            layoutEl.querySelector('.dv-drop-guide-edge-preview')
+        ).toBeNull();
+    });
+
     test('an outer cell previews the layout-edge landing region', () => {
         make(true);
         const { group } = groupWithContent();
