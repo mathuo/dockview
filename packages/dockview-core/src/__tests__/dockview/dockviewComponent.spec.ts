@@ -300,6 +300,44 @@ describe('dockviewComponent', () => {
             expect(voidContainer.draggable).toBe(false);
         });
 
+        test('group.model.getPanelForTab maps a tab element to its panel', () => {
+            dockview = new DockviewComponent(container, {
+                createComponent(options) {
+                    return new PanelContentPartTest(options.id, options.name);
+                },
+            });
+            dockview.layout(500, 500);
+            const p1 = dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+            dockview.addPanel({ id: 'panel2', component: 'default' });
+            const group = p1.group;
+
+            const tabEls = Array.from(
+                group.element.querySelectorAll('.dv-tab')
+            ) as HTMLElement[];
+            expect(tabEls.length).toBe(2);
+
+            // each tab element resolves to a distinct panel
+            const r1 = group.model.getPanelForTab(tabEls[0]);
+            const r2 = group.model.getPanelForTab(tabEls[1]);
+            expect(new Set([r1?.id, r2?.id])).toEqual(
+                new Set(['panel1', 'panel2'])
+            );
+
+            // a descendant of a tab resolves to the same panel as the tab
+            const inner = (tabEls[0].querySelector('*') ??
+                tabEls[0]) as HTMLElement;
+            expect(group.model.getPanelForTab(inner)?.id).toBe(r1?.id);
+
+            // a non-tab element (the void container) resolves to undefined
+            const voidEl = group.element.querySelector(
+                '.dv-void-container'
+            ) as HTMLElement;
+            expect(group.model.getPanelForTab(voidEl)).toBeUndefined();
+        });
+
         test('disableDnd overrides dndStrategy', () => {
             dockview = new DockviewComponent(container, {
                 createComponent(options) {

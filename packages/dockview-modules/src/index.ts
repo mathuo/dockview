@@ -5,6 +5,7 @@ import { AdvancedDnDModule } from './advancedDnDService';
 import { AccessibilityModule } from './accessibilityService';
 import { LayoutHistoryModule } from './layoutHistoryService';
 import { DropGuideModule } from './dropGuideService';
+import { AutoHideEdgeGroupModule } from './autoHideEdgeGroupService';
 
 export {
     TabGroupChipsService,
@@ -21,6 +22,10 @@ export {
     LayoutHistoryModule,
 } from './layoutHistoryService';
 export { DropGuideService, DropGuideModule } from './dropGuideService';
+export {
+    AutoHideEdgeGroupService,
+    AutoHideEdgeGroupModule,
+} from './autoHideEdgeGroupService';
 // Advanced keyboard docking is an optional module — exported for explicit
 // registration, but not part of the default `Modules` bundle below.
 export {
@@ -39,4 +44,5 @@ export const Modules: DockviewModule<any>[] = [
     AccessibilityModule,
     LayoutHistoryModule,
     DropGuideModule,
+    AutoHideEdgeGroupModule,
 ];

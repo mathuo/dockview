@@ -21,6 +21,13 @@
     <body>
         <div id="app"></div>
 
+        <!-- Built stylesheet so layout-sensitive behaviour (overlay host
+             positioning, edge-group peek) matches real usage. -->
+        <link
+            rel="stylesheet"
+            href="/packages/dockview-core/dist/styles/dockview.css"
+        />
+
         <!-- Built UMD bundles. dockview-core exposes the global "dockview-core";
              dockview-modules expects it aliased as DockviewCore. -->
         <script src="/packages/dockview-core/dist/dockview-core.js"></script>
@@ -47,6 +54,8 @@
                     // Record layout history so the harness can exercise undo/redo
                     // (incl. async popout re-open).
                     layoutHistory: { enabled: true },
+                    // Enable auto-hide edge groups (collapsed-strip peek).
+                    autoHideEdgeGroups: true,
                     // A served (not about:blank) target avoids a 404 when the
                     // popout window navigates before dockview injects content.
                     popoutUrl: '/e2e/fixtures/popout.html',
@@ -121,6 +130,62 @@
                             title: 'right',
                             position: { direction: 'right' },
                         });
+                    },
+                    peekEdge: (position, on) =>
+                        dockview.api.peekEdgeGroup(position, on),
+                    // Auto-hide edge: a center panel + a collapsed left edge
+                    // group with one panel, for peek tests. Pass renderer
+                    // 'always' to exercise the render-overlay (z-index) path.
+                    setupAutoHideEdge: (renderer) => {
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        dockview.addEdgeGroup('left', {
+                            id: 'edge-left',
+                            initialSize: 220,
+                        });
+                        dockview.addPanel({
+                            id: 'sidebar',
+                            component: 'default',
+                            title: 'Sidebar',
+                            renderer: renderer || undefined,
+                            position: {
+                                referenceGroup: 'edge-left',
+                                direction: 'within',
+                            },
+                        });
+                        dockview.autoHideEdgeGroup('left');
+                    },
+                    // Two `always`-rendered panels in one edge group, for the
+                    // peek tab-switch test (each renders its own overlay).
+                    setupAutoHideEdgeMulti: () => {
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        dockview.addEdgeGroup('left', {
+                            id: 'edge-left',
+                            initialSize: 220,
+                        });
+                        for (const [id, title] of [
+                            ['a', 'Alpha'],
+                            ['b', 'Bravo'],
+                        ]) {
+                            dockview.addPanel({
+                                id,
+                                component: 'default',
+                                title,
+                                renderer: 'always',
+                                position: {
+                                    referenceGroup: 'edge-left',
+                                    direction: 'within',
+                                },
+                            });
+                        }
+                        dockview.autoHideEdgeGroup('left');
                     },
                 };
                 window.__ready = true;

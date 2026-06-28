@@ -1,19 +1,10 @@
 import { shiftAbsoluteElementIntoView } from '../../dom';
-import { addDisposableListener } from '../../events';
+import { createDismissableLayer } from '../../dismissableLayer';
 import {
     CompositeDisposable,
     Disposable,
     MutableDisposable,
 } from '../../lifecycle';
-
-function isCoarsePrimaryInput(win: Window): boolean {
-    if (!win.matchMedia) {
-        return false;
-    }
-    const coarse = win.matchMedia('(pointer: coarse)').matches;
-    const fine = win.matchMedia('(pointer: fine)').matches;
-    return coarse && !fine;
-}
 
 export class PopupService extends CompositeDisposable {
     private readonly _element: HTMLElement;
@@ -77,63 +68,24 @@ export class PopupService extends CompositeDisposable {
 
         this._active = wrapper;
 
-        // Outside-pointerdown dismissal is suppressed for a short grace
-        // window after opening. Touch long-press callers (chip / tab context
-        // menus) open the popover while the user's finger is still pressing
-        // the source element — Android Chrome can dispatch a follow-up
-        // synthetic pointerdown tied to the gesture, and the release-then-
-        // retap motion can land just outside the wrapper. Either would
-        // dismiss the popover before the user can see or interact with it.
-        // The grace window is short enough that intentional outside taps
-        // still feel responsive.
-        const openedAt = Date.now();
+        // Outside-pointerdown dismissal is suppressed for a short grace window:
+        // touch long-press callers (chip / tab context menus) open the popover
+        // while the user's finger is still pressing the source — Android Chrome
+        // can dispatch a follow-up pointerdown tied to the gesture that lands
+        // just outside the wrapper and would dismiss it before it's seen. Enter
+        // dismisses as well (commit-and-close); resize dismisses except on
+        // touch-primary input, where a resize is usually the on-screen keyboard
+        // (e.g. focusing a rename input) rather than intent to dismiss.
         const POINTERDOWN_GRACE_MS = 200;
 
-        this._activeDisposable.value = new CompositeDisposable(
-            addDisposableListener(this._window, 'pointerdown', (event) => {
-                if (Date.now() - openedAt < POINTERDOWN_GRACE_MS) {
-                    return;
-                }
-
-                const target = event.target;
-
-                if (!(target instanceof HTMLElement)) {
-                    return;
-                }
-
-                let el: HTMLElement | null = target;
-
-                while (el && el !== wrapper) {
-                    el = el?.parentElement ?? null;
-                }
-
-                if (el) {
-                    return; // clicked within popover
-                }
-
-                this.close();
-            }),
-            addDisposableListener(this._window, 'keydown', (event) => {
-                if (event.key === 'Escape' || event.key === 'Enter') {
-                    this.close();
-                }
-            }),
-            addDisposableListener(this._window, 'resize', () => {
-                // On touch-primary devices, common interactions resize the
-                // window: on-screen keyboard pop, orientation change, browser
-                // address-bar collapse. None of these mean "the user wants
-                // the popover dismissed". Specifically, focusing the chip
-                // context menu's rename input pops the keyboard, which would
-                // otherwise close the menu the moment the user goes to edit
-                // it. Desktop / hybrid input keeps the existing behaviour —
-                // there a resize genuinely means the user has resized the
-                // window and the popover position is now stale.
-                if (isCoarsePrimaryInput(this._window)) {
-                    return;
-                }
-                this.close();
-            })
-        );
+        this._activeDisposable.value = createDismissableLayer({
+            window: this._window,
+            onDismiss: () => this.close(),
+            elements: () => (this._active ? [this._active] : []),
+            keys: ['Enter'],
+            pointerDownGraceMs: POINTERDOWN_GRACE_MS,
+            resize: true,
+        });
 
         this._window.requestAnimationFrame(() => {
             shiftAbsoluteElementIntoView(wrapper, this._root);

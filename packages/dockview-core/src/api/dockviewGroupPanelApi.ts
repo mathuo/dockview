@@ -32,6 +32,10 @@ export interface DockviewGroupPanelCollapsedChangeEvent {
     readonly isCollapsed: boolean;
 }
 
+export interface DockviewGroupPanelPeekChangeEvent {
+    readonly isPeeking: boolean;
+}
+
 export interface DockviewGroupPanelApi extends GridviewPanelApi {
     readonly onDidLocationChange: Event<DockviewGroupPanelLocationChangeEvent>;
     /**
@@ -47,6 +51,12 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
      * Never fires for non-edge groups.
      */
     readonly onDidCollapsedChange: Event<DockviewGroupPanelCollapsedChangeEvent>;
+    /**
+     * Fired when an edge group's auto-hide *peek* state changes (the slid-out
+     * overlay shown/hidden while the group stays logically collapsed). Never
+     * fires for non-edge groups or without the auto-hide module.
+     */
+    readonly onDidPeekChange: Event<DockviewGroupPanelPeekChangeEvent>;
     readonly location: DockviewGroupLocation;
     /**
      * Whether this group is locked against drop interactions.
@@ -79,6 +89,8 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
      * Always returns false for non-edge groups.
      */
     isCollapsed(): boolean;
+    /** True while this edge group is peeking (auto-hide slid-out overlay). */
+    isPeeking(): boolean;
 }
 
 export interface DockviewGroupPanelLocationChangeEvent {
@@ -105,6 +117,11 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
         new Emitter<DockviewGroupPanelCollapsedChangeEvent>();
     readonly onDidCollapsedChange: Event<DockviewGroupPanelCollapsedChangeEvent> =
         this._onDidCollapsedChange.event;
+
+    readonly _onDidPeekChange =
+        new Emitter<DockviewGroupPanelPeekChangeEvent>();
+    readonly onDidPeekChange: Event<DockviewGroupPanelPeekChangeEvent> =
+        this._onDidPeekChange.event;
 
     get location(): DockviewGroupLocation {
         if (!this._group) {
@@ -157,6 +174,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             this._onDidLocationChange,
             this._onDidActivePanelChange,
             this._onDidCollapsedChange,
+            this._onDidPeekChange,
             this._onDidVisibilityChange.event((event) => {
                 // When becoming visible, apply any pending size change
                 if (event.isVisible && this._pendingSize) {
@@ -277,6 +295,13 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             return false;
         }
         return this.accessor.isEdgeGroupCollapsed(this._group);
+    }
+
+    isPeeking(): boolean {
+        if (!this._group) {
+            return false;
+        }
+        return this.accessor.isEdgeGroupPeeking(this._group);
     }
 
     initialize(group: DockviewGroupPanel): void {

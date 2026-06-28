@@ -27,6 +27,7 @@ import {
     SerializedDockview,
 } from './dockviewComponent';
 import { DockviewWillDropEvent } from './dockviewGroupPanelModel';
+import { EdgeGroupPosition } from './dockviewShell';
 import {
     GroupDragEvent,
     TabDragEvent,
@@ -296,4 +297,60 @@ export interface IDropGuideService extends IDisposable {
      * compass is disabled (`dndGuide` unset), so the default behaviour runs.
      */
     readonly resolver: PositionResolver | undefined;
+}
+
+// --- AutoHideEdgeGroup ---
+
+/**
+ * The narrow surface the auto-hide service needs from the host
+ * (`DockviewComponent`). Collapse/expand is delegated to the existing free
+ * edge-group machinery (`setEdgeGroupCollapsed` → shell) — the module owns
+ * interaction + presentation, never layout/sizing.
+ */
+export interface IAutoHideEdgeGroupHost {
+    readonly options: DockviewComponentOptions;
+    /** Fires when any group is added — the service filters for `location.type === 'edge'`. */
+    readonly onDidAddGroup: Event<DockviewGroupPanel>;
+    readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
+    /** The edge group at a position, or undefined. */
+    getEdgeGroupPanel(
+        position: EdgeGroupPosition
+    ): DockviewGroupPanel | undefined;
+    /** Collapse/expand an edge group — the single mutate path (fires
+     *  `onDidCollapsedChange`, no-op guarded). */
+    setEdgeGroupCollapsed(group: DockviewGroupPanel, collapsed: boolean): void;
+    /** The element the slide-out peek mounts on — the shell, which is also the
+     *  `OverlayRenderContainer` root, so `always`-rendered content anchors in
+     *  the same coordinate space as the peek. */
+    readonly overlayRoot: HTMLElement;
+    /** The size an edge group expands to — sizes the peek overlay. */
+    getEdgeGroupExpandedSize(position: EdgeGroupPosition): number;
+    /** Record the peek state so `group.api.isPeeking()` / `onDidPeekChange`
+     *  reflect it (the module owns the actual overlay). */
+    setEdgeGroupPeeking(group: DockviewGroupPanel, peeking: boolean): void;
+    /** Reposition a single `renderer:'always'` panel's overlay over its
+     *  reference container, optionally forcing it visible. The peek reparents a
+     *  group's content container into the slide-out overlay; the always-rendered
+     *  content is NOT reparented (its parent stays constant) — it's re-anchored
+     *  over the moving container and force-shown for the duration of the peek.
+     *  `clip` (viewport rect) clips the overlay to the peek's reveal window so an
+     *  `always` panel emerges from the strip's inner edge instead of sliding in
+     *  from the screen edge; omit it to clear any clip. */
+    repositionPanelOverlay(
+        panel: IDockviewPanel,
+        forceVisible: boolean,
+        clip?: DOMRect
+    ): void;
+    /** Announce a message to assistive technology via the shared live region
+     *  (no-op when no live-region service / `announcements: false`). */
+    announce(message: string): void;
+}
+
+export interface IAutoHideEdgeGroupService extends IDisposable {
+    /** Peek (true) / close (false) the collapsed edge group at `position`. */
+    peek(position: EdgeGroupPosition, peek: boolean): void;
+    /** Pin (re-dock / expand) the edge group at `position`. */
+    pin(position: EdgeGroupPosition): void;
+    /** Auto-hide (collapse to strip) the edge group at `position`. */
+    autoHide(position: EdgeGroupPosition): void;
 }
