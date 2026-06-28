@@ -145,8 +145,19 @@ class CompassResolver implements PositionResolver {
 /** The cross of cells painted over the hovered group's content area. */
 class CompassWidget {
     private readonly _element: HTMLElement;
+    private readonly _container: HTMLElement;
+    private readonly _priorPosition: string;
 
     constructor(container: HTMLElement) {
+        this._container = container;
+        // Pin a stable containing block. The drop target sets `position:
+        // relative` on this element only while an inner-cell overlay shows (the
+        // `.dv-drop-target` class), and removes it for edge cells — without this
+        // the absolutely-positioned compass re-anchors to a higher ancestor on
+        // an outer cell and visibly jumps. Restored on dispose.
+        this._priorPosition = container.style.position;
+        container.style.position = 'relative';
+
         const doc = container.ownerDocument;
         const el = doc.createElement('div');
         el.className = 'dv-drop-guide';
@@ -202,6 +213,7 @@ class CompassWidget {
 
     dispose(): void {
         this._element.remove();
+        this._container.style.position = this._priorPosition;
     }
 }
 

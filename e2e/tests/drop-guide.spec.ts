@@ -57,6 +57,42 @@ test.describe('drop guide (compass)', () => {
         await expect(page.locator('.dv-drop-guide')).toHaveCount(0);
     });
 
+    test('the compass holds position from an inner to an outer cell', async ({
+        page,
+    }) => {
+        await setup(page);
+        const tab = (await page
+            .locator('.dv-tab', { hasText: 'left' })
+            .boundingBox())!;
+        const content = (await rightContent(page).boundingBox())!;
+        const cx = content.x + content.width / 2;
+        const cy = content.y + content.height / 2;
+
+        await page.mouse.move(tab.x + tab.width / 2, tab.y + tab.height / 2);
+        await page.mouse.down();
+        await page.mouse.move(
+            tab.x + tab.width / 2 + 6,
+            tab.y + tab.height / 2
+        );
+
+        const centre = rightContent(page).locator('.dv-drop-guide-cell-center');
+
+        // hover the centre (inner) cell, record where the cross sits
+        await page.mouse.move(cx, cy, { steps: 20 });
+        await expect(centre).toBeVisible();
+        const atInner = (await centre.boundingBox())!;
+
+        // sweep out to the far outer cell — the cross must not move (the drop
+        // target removing its `.dv-drop-target` class once made it re-anchor)
+        await page.mouse.move(cx + 84, cy, { steps: 10 });
+        const atOuter = (await centre.boundingBox())!;
+
+        expect(atOuter.x).toBeCloseTo(atInner.x, 0);
+        expect(atOuter.y).toBeCloseTo(atInner.y, 0);
+
+        await page.mouse.up();
+    });
+
     test('dropping on an outer cell docks against the whole layout (not a merge)', async ({
         page,
     }) => {
