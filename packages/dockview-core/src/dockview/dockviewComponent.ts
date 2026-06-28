@@ -800,11 +800,6 @@ export class DockviewComponent
         return group.model.canDisplayContentOverlay(event, position);
     }
 
-    /** IDropGuideHost — the layout root, the outer-cell edge preview's surface. */
-    getLayoutElement(): HTMLElement {
-        return this.gridview.element;
-    }
-
     /** IDropGuideHost — the frame the content drop target measures (mirrors the
      *  `getOverlayOutline` rule in `content.ts`): the whole group when
      *  `dndPanelOverlay === 'group'`, else just the content. The compass paints

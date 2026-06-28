@@ -214,9 +214,8 @@ class CompassWidget {
  * seam and paints the widget. Opt-in via `dndGuide` (default off → unchanged).
  *
  * Inner cells split/merge the hovered group; the outer ring (`edge` cells) docks
- * against the whole layout (core routes `edge`-flagged drops to the layout edge),
- * previewed by a band over the layout edge. Cells the drop would reject are
- * hidden (per-cell gating).
+ * against the whole layout (core routes `edge`-flagged drops to the layout edge).
+ * Cells the drop would reject are hidden (per-cell gating).
  */
 export class DropGuideService
     extends CompositeDisposable
@@ -227,7 +226,6 @@ export class DropGuideService
         | { group: DockviewGroupPanel; widget: CompassWidget }
         | undefined;
     private _endListeners: CompositeDisposable | undefined;
-    private _edgePreview: HTMLElement | undefined;
 
     constructor(private readonly host: IDropGuideHost) {
         super();
@@ -276,13 +274,6 @@ export class DropGuideService
             return;
         }
         this._mount(e.group, e.nativeEvent);
-        // An outer cell previews the whole-layout-edge dock; an inner cell uses
-        // the group's own overlay, so clear any edge preview.
-        if (e.edge) {
-            this._showEdgePreview(e.position);
-        } else {
-            this._clearEdgePreview();
-        }
     }
 
     private _mount(
@@ -332,59 +323,11 @@ export class DropGuideService
         );
     }
 
-    /**
-     * Highlight the whole-layout edge the outer cell would dock against. The
-     * band is a half-size approximation — the real dock size is decided by the
-     * grid on commit, not known here — so it indicates the edge, not the exact
-     * resulting bounds.
-     *
-     * Positioned with explicit pixels against the band's offset parent (the
-     * layout element is not guaranteed to establish a containing block), so the
-     * band stays inside the layout box and never overflows / shifts the content.
-     */
-    private _showEdgePreview(position: Position): void {
-        const layout = this.host.getLayoutElement();
-        if (!this._edgePreview) {
-            const el = layout.ownerDocument.createElement('div');
-            el.className = 'dv-drop-guide-edge-preview';
-            el.style.position = 'absolute';
-            el.style.pointerEvents = 'none';
-            layout.appendChild(el);
-            this._edgePreview = el;
-        }
-        const el = this._edgePreview;
-        const lRect = layout.getBoundingClientRect();
-        const pRect = (el.offsetParent ?? layout).getBoundingClientRect();
-        const x = lRect.left - pRect.left;
-        const y = lRect.top - pRect.top;
-        const w = lRect.width;
-        const h = lRect.height;
-        const box: Record<Position, [number, number, number, number]> = {
-            // [left, top, width, height]
-            center: [x, y, w, h],
-            top: [x, y, w, h / 2],
-            bottom: [x, y + h / 2, w, h / 2],
-            left: [x, y, w / 2, h],
-            right: [x + w / 2, y, w / 2, h],
-        };
-        const [left, top, width, height] = box[position];
-        el.style.left = `${left}px`;
-        el.style.top = `${top}px`;
-        el.style.width = `${width}px`;
-        el.style.height = `${height}px`;
-    }
-
-    private _clearEdgePreview(): void {
-        this._edgePreview?.remove();
-        this._edgePreview = undefined;
-    }
-
     private _unmount(): void {
         this._endListeners?.dispose();
         this._endListeners = undefined;
         this._mounted?.widget.dispose();
         this._mounted = undefined;
-        this._clearEdgePreview();
     }
 }
 

@@ -78,9 +78,8 @@ test.describe('drop guide (compass)', () => {
         );
         await page.mouse.move(cx, cy, { steps: 15 });
         await expect(page.locator('.dv-drop-guide')).toBeVisible();
-        // aim at the outer-right cell → the layout-edge band previews the dock
+        // aim at the outer-right cell, then drop
         await page.mouse.move(outerRightX, cy, { steps: 6 });
-        await expect(page.locator('.dv-drop-guide-edge-preview')).toBeVisible();
         await page.mouse.up();
 
         // the left panel docked to the layout's right edge as its OWN group —

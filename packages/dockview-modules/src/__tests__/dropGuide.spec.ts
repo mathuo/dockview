@@ -15,7 +15,6 @@ import { DropGuideService } from '../dropGuideService';
 describe('drop guide', () => {
     let overlayEmitter: Emitter<DockviewWillShowOverlayLocationEvent>;
     let service: DropGuideService;
-    let layoutEl: HTMLElement;
     let canDrop: (position: Position) => boolean;
     let dropOverlayEl: (group: DockviewGroupPanel) => HTMLElement | undefined;
 
@@ -23,8 +22,6 @@ describe('drop guide', () => {
         dndGuide: { zones?: Position[]; edges?: boolean } | boolean | undefined
     ): void => {
         overlayEmitter = new Emitter<DockviewWillShowOverlayLocationEvent>();
-        layoutEl = document.createElement('div');
-        document.body.appendChild(layoutEl);
         canDrop = () => true;
         // the drop target measures the content container by default
         dropOverlayEl = (group) =>
@@ -34,7 +31,6 @@ describe('drop guide', () => {
             options: { dndGuide } as any,
             onWillShowOverlay: overlayEmitter.event,
             canDropOnGroup: (_group, position) => canDrop(position),
-            getLayoutElement: () => layoutEl,
             getDropOverlayElement: (group: DockviewGroupPanel) =>
                 dropOverlayEl(group),
         });
@@ -216,50 +212,6 @@ describe('drop guide', () => {
         // centre inner cell hidden → 4 inner + 4 outer; edge cells are unaffected
         expect(content.querySelectorAll('.dv-drop-guide-cell')).toHaveLength(8);
         expect(content.querySelector('.dv-drop-guide-cell-center')).toBeNull();
-    });
-
-    test('an outer cell previews the layout edge, cleared on inner / drop', () => {
-        make(true);
-        // a 400x300 layout; the band is positioned in explicit px against it
-        jest.spyOn(layoutEl, 'getBoundingClientRect').mockReturnValue({
-            left: 0,
-            top: 0,
-            width: 400,
-            height: 300,
-            right: 400,
-            bottom: 300,
-            x: 0,
-            y: 0,
-            toJSON: () => ({}),
-        } as DOMRect);
-        const { group } = groupWithContent();
-        const over = (edge: boolean, position: Position) =>
-            overlayEmitter.fire({
-                kind: 'content',
-                group,
-                edge,
-                position,
-            } as DockviewWillShowOverlayLocationEvent);
-
-        over(true, 'right'); // outer cell → a band over the layout's right half
-        const band = layoutEl.querySelector<HTMLElement>(
-            '.dv-drop-guide-edge-preview'
-        );
-        expect(band).toBeTruthy();
-        expect(band!.style.left).toBe('200px');
-        expect(band!.style.width).toBe('200px');
-        expect(band!.style.height).toBe('300px');
-
-        over(false, 'center'); // inner cell → cleared
-        expect(
-            layoutEl.querySelector('.dv-drop-guide-edge-preview')
-        ).toBeNull();
-
-        over(true, 'top'); // re-show, then end the drag → cleared
-        window.dispatchEvent(new Event('pointerup'));
-        expect(
-            layoutEl.querySelector('.dv-drop-guide-edge-preview')
-        ).toBeNull();
     });
 
     test('does not paint a non-content overlay or when disabled', () => {
