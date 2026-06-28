@@ -238,6 +238,13 @@ class CompassWidget {
         }
     }
 
+    /** Clear the aimed-cell highlight (cursor is over no cell). */
+    clearActive(): void {
+        for (const c of this._cells) {
+            c.el.classList.remove('dv-drop-guide-cell-active');
+        }
+    }
+
     dispose(): void {
         this._element.remove();
         this._container.style.position = this._priorPosition;
@@ -262,7 +269,11 @@ export class DropGuideService
 {
     private readonly _resolver: CompassResolver;
     private _mounted:
-        | { group: DockviewGroupPanel; widget: CompassWidget }
+        | {
+              group: DockviewGroupPanel;
+              widget: CompassWidget;
+              outline: HTMLElement;
+          }
         | undefined;
     private _endListeners: CompositeDisposable | undefined;
     private _edgePreview: HTMLElement | undefined;
@@ -317,12 +328,39 @@ export class DropGuideService
         if (!this._mounted) {
             return; // no compass mounted (e.g. no content container) — nothing to drive
         }
-        // Fires per drag-over frame: light up the cell being aimed at, and for
-        // an outer cell preview the layout-edge region the panel would land in.
+        // Fires per drag-over frame while over a cell: light up the cell being
+        // aimed at, and for an outer cell preview the layout-edge region. A move
+        // off the cells is handled by `_clearFeedbackIfOffCells` (this event
+        // doesn't fire in a dead zone).
         this._mounted.widget.setActive(e.position, e.edge);
         if (e.edge) {
             this._showEdgePreview(e.position);
         } else {
+            this._clearEdgePreview();
+        }
+    }
+
+    /**
+     * Clear the feedback when the cursor is over no cell (a dead zone between
+     * cells, or off the group). `onWillShowOverlay` only fires on a cell, so
+     * without this the highlight + edge preview would linger. Only ever clears —
+     * setting stays with `onWillShowOverlay` — so the two never conflict.
+     */
+    private _clearFeedbackIfOffCells(event: DragEvent | PointerEvent): void {
+        if (!this._mounted) {
+            return;
+        }
+        const rect = this._mounted.outline.getBoundingClientRect();
+        const onCell = this._resolver.resolve({
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top,
+            width: rect.width,
+            height: rect.height,
+            zones: new Set(INNER_CELLS),
+            event,
+        });
+        if (!onCell) {
+            this._mounted.widget.clearActive();
             this._clearEdgePreview();
         }
     }
@@ -373,6 +411,10 @@ export class DropGuideService
         // The frame the drop target measures (the whole group or just the
         // content, per `dndPanelOverlay`); fall back to the content container.
         const outline = this.host.getDropOverlayElement(group) ?? content;
+        // Cache the veto per direction: the inner and outer cell of a direction
+        // share a position, and `canDropOnGroup` can fire `onUnhandledDragOver`
+        // for a cross-component drag — so resolve each position at most once.
+        const allowed = new Map<Position, boolean>();
         widget.render(
             outline,
             configured ? intersect(all, configured) : all,
@@ -382,19 +424,31 @@ export class DropGuideService
             // layout edge only after the group's own content veto passes, so the
             // compass must apply that veto here too or it would paint a cell that
             // does nothing on drop.
-            (cell) => this.host.canDropOnGroup(group, cell.position, event)
+            (cell) => {
+                let ok = allowed.get(cell.position);
+                if (ok === undefined) {
+                    ok = this.host.canDropOnGroup(group, cell.position, event);
+                    allowed.set(cell.position, ok);
+                }
+                return ok;
+            }
         );
-        this._mounted = { group, widget };
+        this._mounted = { group, widget, outline };
 
-        // The drag has no "left everything" event; tear the widget down when the
-        // drag ends (drop / dragend / pointerup / cancel) in the group's window.
+        // The drag has no "left everything" event. Tear the widget down when the
+        // drag ends (drop / dragend / pointerup / cancel); drive the feedback off
+        // every move so it tracks dead zones the overlay event skips.
         const win = group.element.ownerDocument.defaultView ?? window;
         const end = (): void => this._unmount();
+        const move = (ev: Event): void =>
+            this._clearFeedbackIfOffCells(ev as DragEvent | PointerEvent);
         this._endListeners = new CompositeDisposable(
             listen(win, 'drop', end),
             listen(win, 'dragend', end),
             listen(win, 'pointerup', end),
-            listen(win, 'pointercancel', end)
+            listen(win, 'pointercancel', end),
+            listen(win, 'pointermove', move),
+            listen(win, 'dragover', move)
         );
     }
 

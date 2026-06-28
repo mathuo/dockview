@@ -98,6 +98,40 @@ test.describe('drop guide (compass)', () => {
         await page.mouse.up();
     });
 
+    test('feedback clears when the cursor moves into a dead zone', async ({
+        page,
+    }) => {
+        await setup(page);
+        const tab = (await page
+            .locator('.dv-tab', { hasText: 'left' })
+            .boundingBox())!;
+        const content = (await rightContent(page).boundingBox())!;
+        const cx = content.x + content.width / 2;
+        const cy = content.y + content.height / 2;
+        const band = page.locator('.dv-drop-guide-edge-preview');
+
+        await page.mouse.move(tab.x + tab.width / 2, tab.y + tab.height / 2);
+        await page.mouse.down();
+        await page.mouse.move(
+            tab.x + tab.width / 2 + 6,
+            tab.y + tab.height / 2
+        );
+
+        await page.mouse.move(cx + 84, cy, { steps: 10 }); // outer-right cell
+        await expect(band).toBeVisible();
+
+        // move far off the cross (still inside the group) — feedback must clear
+        await page.mouse.move(cx + 250, cy + 200, { steps: 10 });
+        await expect(band).toHaveCount(0);
+        await expect(page.locator('.dv-drop-guide-cell-active')).toHaveCount(0);
+
+        // ...and return when back on the cell
+        await page.mouse.move(cx + 84, cy, { steps: 10 });
+        await expect(band).toBeVisible();
+
+        await page.mouse.up();
+    });
+
     test('dropping on an outer cell docks against the whole layout (not a merge)', async ({
         page,
     }) => {

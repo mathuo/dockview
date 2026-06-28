@@ -18,6 +18,7 @@ describe('drop guide', () => {
     let canDrop: (position: Position) => boolean;
     let dropOverlayEl: (group: DockviewGroupPanel) => HTMLElement | undefined;
     let layoutEl: HTMLElement;
+    let gateCalls: Position[];
 
     const make = (
         dndGuide: { zones?: Position[]; edges?: boolean } | boolean | undefined
@@ -26,6 +27,7 @@ describe('drop guide', () => {
         layoutEl = document.createElement('div');
         document.body.appendChild(layoutEl);
         canDrop = () => true;
+        gateCalls = [];
         // the drop target measures the content container by default
         dropOverlayEl = (group) =>
             group.element.querySelector<HTMLElement>('.dv-content-container') ??
@@ -33,7 +35,10 @@ describe('drop guide', () => {
         service = new DropGuideService({
             options: { dndGuide } as any,
             onWillShowOverlay: overlayEmitter.event,
-            canDropOnGroup: (_group, position) => canDrop(position),
+            canDropOnGroup: (_group, position) => {
+                gateCalls.push(position);
+                return canDrop(position);
+            },
             getDropOverlayElement: (group: DockviewGroupPanel) =>
                 dropOverlayEl(group),
             getLayoutElement: () => layoutEl,
@@ -275,6 +280,20 @@ describe('drop guide', () => {
         expect(
             layoutEl.querySelector('.dv-drop-guide-edge-preview')
         ).toBeNull();
+    });
+
+    test('queries the drop veto at most once per direction (no per-cell fan-out)', () => {
+        make(true);
+        const { group } = groupWithContent();
+        overlayEmitter.fire({
+            kind: 'content',
+            group,
+        } as DockviewWillShowOverlayLocationEvent);
+
+        // 9 cells but inner+outer of a direction share a position — the veto
+        // (which can fire onUnhandledDragOver) must run at most once per position.
+        expect(gateCalls.length).toBe(new Set(gateCalls).size);
+        expect(gateCalls.length).toBeLessThanOrEqual(5);
     });
 
     test('per-cell gating hides cells the drop would reject', () => {
