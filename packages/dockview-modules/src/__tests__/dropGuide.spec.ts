@@ -199,6 +199,33 @@ describe('drop guide', () => {
         expect(center.style.top).toBe('71px');
     });
 
+    test('highlights the aimed cell (the only feedback for an outer cell)', () => {
+        make(true);
+        const { group, content } = groupWithContent();
+        const over = (edge: boolean, position: Position) =>
+            overlayEmitter.fire({
+                kind: 'content',
+                group,
+                edge,
+                position,
+            } as DockviewWillShowOverlayLocationEvent);
+
+        over(true, 'right'); // outer-right cell
+        expect(
+            content.querySelector(
+                '.dv-drop-guide-cell-right.dv-drop-guide-cell-edge.dv-drop-guide-cell-active'
+            )
+        ).toBeTruthy();
+        expect(
+            content.querySelectorAll('.dv-drop-guide-cell-active')
+        ).toHaveLength(1);
+
+        over(false, 'center'); // moves to the inner centre — only it is active
+        const active = content.querySelectorAll('.dv-drop-guide-cell-active');
+        expect(active).toHaveLength(1);
+        expect(active[0].classList).toContain('dv-drop-guide-cell-center');
+    });
+
     test('per-cell gating hides cells the drop would reject', () => {
         make(true);
         const { group, content } = groupWithContent();

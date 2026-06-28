@@ -114,8 +114,11 @@ test.describe('drop guide (compass)', () => {
         );
         await page.mouse.move(cx, cy, { steps: 15 });
         await expect(page.locator('.dv-drop-guide')).toBeVisible();
-        // aim at the outer-right cell, then drop
+        // aim at the outer-right cell → it lights up as the active cell
         await page.mouse.move(outerRightX, cy, { steps: 6 });
+        await expect(
+            page.locator('.dv-drop-guide-cell-edge.dv-drop-guide-cell-active')
+        ).toBeVisible();
         await page.mouse.up();
 
         // the left panel docked to the layout's right edge as its OWN group —

@@ -147,6 +147,8 @@ class CompassWidget {
     private readonly _element: HTMLElement;
     private readonly _container: HTMLElement;
     private readonly _priorPosition: string;
+    private _cells: { position: Position; edge: boolean; el: HTMLElement }[] =
+        [];
 
     constructor(container: HTMLElement) {
         this._container = container;
@@ -197,6 +199,7 @@ class CompassWidget {
             includeEdges
         ).filter(gate);
         this._element.replaceChildren();
+        this._cells = [];
         for (const cell of cells) {
             const el = doc.createElement('div');
             el.className =
@@ -208,6 +211,21 @@ class CompassWidget {
             el.style.width = `${cell.size}px`;
             el.style.height = `${cell.size}px`;
             this._element.appendChild(el);
+            this._cells.push({ position: cell.position, edge: cell.edge, el });
+        }
+    }
+
+    /**
+     * Highlight the cell the cursor is aiming at — the only hover feedback an
+     * outer (edge) cell gets, since the drop target draws no overlay for it.
+     * `edge` disambiguates the inner vs outer cell that share a direction.
+     */
+    setActive(position: Position, edge: boolean): void {
+        for (const c of this._cells) {
+            c.el.classList.toggle(
+                'dv-drop-guide-cell-active',
+                c.position === position && c.edge === edge
+            );
         }
     }
 
@@ -286,6 +304,8 @@ export class DropGuideService
             return;
         }
         this._mount(e.group, e.nativeEvent);
+        // Fires per drag-over frame: light up the cell being aimed at.
+        this._mounted?.widget.setActive(e.position, e.edge);
     }
 
     private _mount(
