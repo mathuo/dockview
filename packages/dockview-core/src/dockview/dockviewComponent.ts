@@ -805,6 +805,22 @@ export class DockviewComponent
         return this.gridview.element;
     }
 
+    /** IDropGuideHost — the frame the content drop target measures (mirrors the
+     *  `getOverlayOutline` rule in `content.ts`): the whole group when
+     *  `dndPanelOverlay === 'group'`, else just the content. The compass paints
+     *  in this frame so its cells align with where a drop resolves. */
+    getDropOverlayElement(group: DockviewGroupPanel): HTMLElement | undefined {
+        const content = group.element.querySelector<HTMLElement>(
+            '.dv-content-container'
+        );
+        if (!content) {
+            return undefined;
+        }
+        return this.options.theme?.dndPanelOverlay === 'group'
+            ? (content.parentElement ?? content)
+            : content;
+    }
+
     /**
      * The drop-position resolver installed on the group content drop targets —
      * the app's `dropPositionResolver` option if set, else the Drop Guide

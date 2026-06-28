@@ -280,6 +280,13 @@ export interface IDropGuideHost {
     /** The layout root element — the surface the outer-cell edge preview is
      *  drawn over (its coordinate space). */
     getLayoutElement(): HTMLElement;
+    /**
+     * The element the content drop target measures its quadrants against (the
+     * `dndPanelOverlay` outline — the whole group, or just its content). The
+     * compass paints its cells in this frame so they line up with where a drop
+     * actually resolves, not a different box.
+     */
+    getDropOverlayElement(group: DockviewGroupPanel): HTMLElement | undefined;
 }
 
 export interface IDropGuideService extends IDisposable {

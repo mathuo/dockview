@@ -17,6 +17,7 @@ describe('drop guide', () => {
     let service: DropGuideService;
     let layoutEl: HTMLElement;
     let canDrop: (position: Position) => boolean;
+    let dropOverlayEl: (group: DockviewGroupPanel) => HTMLElement | undefined;
 
     const make = (
         dndGuide: { zones?: Position[]; edges?: boolean } | boolean | undefined
@@ -25,11 +26,17 @@ describe('drop guide', () => {
         layoutEl = document.createElement('div');
         document.body.appendChild(layoutEl);
         canDrop = () => true;
+        // the drop target measures the content container by default
+        dropOverlayEl = (group) =>
+            group.element.querySelector<HTMLElement>('.dv-content-container') ??
+            undefined;
         service = new DropGuideService({
             options: { dndGuide } as any,
             onWillShowOverlay: overlayEmitter.event,
             canDropOnGroup: (_group, position) => canDrop(position),
             getLayoutElement: () => layoutEl,
+            getDropOverlayElement: (group: DockviewGroupPanel) =>
+                dropOverlayEl(group),
         });
     };
 
@@ -162,6 +169,38 @@ describe('drop guide', () => {
         // the drag ending tears the widget down
         window.dispatchEvent(new Event('pointerup'));
         expect(content.querySelector('.dv-drop-guide')).toBeNull();
+    });
+
+    test('paints cells in the drop-target outline frame, translated into its box', () => {
+        make(true);
+        const { group, content } = groupWithContent();
+        // the drop target measures a frame offset from the content the widget
+        // mounts in (e.g. dndPanelOverlay: 'group' includes the tab header).
+        const outline = document.createElement('div');
+        jest.spyOn(outline, 'getBoundingClientRect').mockReturnValue({
+            left: 10,
+            top: 40,
+            width: 200,
+            height: 100,
+            right: 210,
+            bottom: 140,
+            x: 10,
+            y: 40,
+            toJSON: () => ({}),
+        } as DOMRect);
+        dropOverlayEl = () => outline;
+
+        overlayEmitter.fire({
+            kind: 'content',
+            group,
+        } as DockviewWillShowOverlayLocationEvent);
+
+        // centre cell: (200/2 - 19) + dx(10), (100/2 - 19) + dy(40)
+        const center = content.querySelector<HTMLElement>(
+            '.dv-drop-guide-cell-center'
+        )!;
+        expect(center.style.left).toBe('91px');
+        expect(center.style.top).toBe('71px');
     });
 
     test('per-cell gating hides cells the drop would reject', () => {

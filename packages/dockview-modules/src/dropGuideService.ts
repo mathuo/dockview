@@ -170,17 +170,27 @@ class CompassWidget {
         this._element = el;
     }
 
-    /** Paint the cells `gate` accepts, so only legal drops are shown. */
+    /**
+     * Paint the cells `gate` accepts (so only legal drops show), centred on
+     * `outline` — the frame the drop target measures — and translated into this
+     * widget's own box so the cells line up with where a drop resolves even when
+     * the two boxes differ (e.g. `dndPanelOverlay: 'group'` measures the whole
+     * group, but the widget is mounted in the content container).
+     */
     render(
+        outline: HTMLElement,
         zones: ReadonlySet<Position>,
         includeEdges: boolean,
         gate: (cell: { position: Position; edge: boolean }) => boolean
     ): void {
         const doc = this._element.ownerDocument;
-        const rect = this._element.getBoundingClientRect();
+        const elRect = this._element.getBoundingClientRect();
+        const oRect = outline.getBoundingClientRect();
+        const dx = oRect.left - elRect.left;
+        const dy = oRect.top - elRect.top;
         const cells = compassCells(
-            rect.width,
-            rect.height,
+            oRect.width,
+            oRect.height,
             zones,
             includeEdges
         ).filter(gate);
@@ -191,8 +201,8 @@ class CompassWidget {
                 `dv-drop-guide-cell dv-drop-guide-cell-${cell.position}` +
                 (cell.edge ? ' dv-drop-guide-cell-edge' : '');
             el.style.position = 'absolute';
-            el.style.left = `${cell.left}px`;
-            el.style.top = `${cell.top}px`;
+            el.style.left = `${cell.left + dx}px`;
+            el.style.top = `${cell.top + dy}px`;
             el.style.width = `${cell.size}px`;
             el.style.height = `${cell.size}px`;
             this._element.appendChild(el);
@@ -303,7 +313,11 @@ export class DropGuideService
         const widget = new CompassWidget(content);
         const all = new Set(INNER_CELLS);
         const configured = this._configuredZones();
+        // The frame the drop target measures (the whole group or just the
+        // content, per `dndPanelOverlay`); fall back to the content container.
+        const outline = this.host.getDropOverlayElement(group) ?? content;
         widget.render(
+            outline,
             configured ? intersect(all, configured) : all,
             this._edgesEnabled(),
             // Hide cells the drop would reject. Outer (edge) cells are gated the
