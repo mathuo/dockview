@@ -54,6 +54,13 @@
                     // Record layout history so the harness can exercise undo/redo
                     // (incl. async popout re-open).
                     layoutHistory: { enabled: true },
+                    // Smart Guides — alignment + snapping for floating groups.
+                    // Float-only here so the harness geometry is deterministic
+                    // (container-edge snapping is covered by unit tests).
+                    smartGuides: {
+                        snapDistance: 12,
+                        snapTargets: { container: false },
+                    },
                     // Enable auto-hide edge groups (collapsed-strip peek).
                     autoHideEdgeGroups: true,
                     // A served (not about:blank) target avoids a 404 when the
@@ -112,8 +119,42 @@
                     redo: () => dockview.redo(),
                     canUndo: () => dockview.canUndo,
                     awaitPopoutRestore: () => dockview.popoutRestorationPromise,
+                    floatingCount: () => dockview.floatingGroups.length,
                     peekEdge: (position, on) =>
                         dockview.api.peekEdgeGroup(position, on),
+                    // Two floating groups for Smart Guides: a target float on
+                    // the left (left edge ~120) and a draggable float to its
+                    // right. Dragging the right one near x=120 should snap +
+                    // draw a guide.
+                    setupSmartGuides: () => {
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        const target = dockview.addPanel({
+                            id: 'target',
+                            component: 'default',
+                            title: 'target',
+                        });
+                        dockview.addFloatingGroup(target, {
+                            x: 120,
+                            y: 80,
+                            width: 200,
+                            height: 160,
+                        });
+                        const mover = dockview.addPanel({
+                            id: 'mover',
+                            component: 'default',
+                            title: 'mover',
+                        });
+                        dockview.addFloatingGroup(mover, {
+                            x: 450,
+                            y: 300,
+                            width: 200,
+                            height: 160,
+                        });
+                    },
                     // Auto-hide edge: a center panel + a collapsed left edge
                     // group with one panel, for peek tests. Pass renderer
                     // 'always' to exercise the render-overlay (z-index) path.

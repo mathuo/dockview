@@ -18,6 +18,7 @@ import {
     DockviewComponentOptions,
     DockviewDndOverlayEvent,
     MovementOptions,
+    SmartGuidesOptions,
 } from '../dockview/options';
 import {
     DockviewMessages,
@@ -50,7 +51,11 @@ import {
     IDockviewGroupPanel,
 } from '../dockview/dockviewGroupPanel';
 import { Event } from '../events';
-import { LayoutHistoryChangeEvent } from '../dockview/moduleContracts';
+import {
+    LayoutHistoryChangeEvent,
+    SmartGuidesSnapEvent,
+    SmartGuidesSnapTogetherEvent,
+} from '../dockview/moduleContracts';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 import { PaneviewDidDropEvent } from '../paneview/draggablePaneviewPanel';
 import {
@@ -1066,6 +1071,35 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     /** Fires whenever the undo/redo stacks change. */
     get onDidChangeHistory(): Event<LayoutHistoryChangeEvent> {
         return this.component.onDidChangeHistory;
+    }
+
+    /**
+     * Whether Smart Guides snapping is active (the `smartGuides` option is
+     * present + enabled and the module is registered). Reactive via
+     * {@link setSmartGuidesEnabled}.
+     */
+    get smartGuidesEnabled(): boolean {
+        return this.component.smartGuidesEnabled;
+    }
+
+    /** Toggle Smart Guides snapping at runtime (no-op when the module is absent). */
+    setSmartGuidesEnabled(enabled: boolean): void {
+        this.component.setSmartGuidesEnabled(enabled);
+    }
+
+    /** Merge a partial Smart Guides option override in at runtime. */
+    updateSmartGuidesOptions(options: Partial<SmartGuidesOptions>): void {
+        this.component.updateSmartGuidesOptions(options);
+    }
+
+    /** Fires when a dragged floating group commits an alignment snap on drop. */
+    get onDidSnapFloat(): Event<SmartGuidesSnapEvent> {
+        return this.component.onDidSnapFloat;
+    }
+
+    /** Fires when a dragged floating group docks/merges into another on drop. */
+    get onDidSnapTogether(): Event<SmartGuidesSnapTogetherEvent> {
+        return this.component.onDidSnapTogether;
     }
 
     /**

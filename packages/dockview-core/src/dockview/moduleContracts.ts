@@ -7,6 +7,7 @@
 import { IDisposable } from '../lifecycle';
 import { Event } from '../events';
 import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
+import { Box } from '../types';
 import { IDragGhostSpec } from '../dnd/backend';
 import { DockviewApi } from '../api/component.api';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
@@ -14,7 +15,11 @@ import { IDockviewPanel } from './dockviewPanel';
 import { ITabGroup } from './tabGroup';
 import { TabGroupColorPalette } from './tabGroupAccent';
 import { PopupService } from './components/popupService';
-import { DockviewComponentOptions } from './options';
+import {
+    DockviewComponentOptions,
+    FloatingGroupDragContext,
+    SmartGuidesOptions,
+} from './options';
 import {
     DockviewLayoutMutationEvent,
     DockviewLayoutMutationKind,
@@ -245,6 +250,108 @@ export interface ILayoutHistoryService extends IDisposable {
     redo(): void;
     /** Drop both stacks (e.g. on document switch). */
     clear(): void;
+}
+
+// --- SmartGuides ---
+
+/**
+ * The narrow surface the Smart Guides service needs from the host
+ * (`DockviewComponent`). The service owns candidate generation, snap resolution
+ * and the guide overlay; it only reads the floating container (for guide
+ * geometry) and the drag-end signal from the host, never mutating layout. The
+ * per-frame snap itself is driven by the component composing the service into
+ * the float drag loop's `transformFloatingGroupDrag`, so it is not a host
+ * member.
+ */
+export interface ISmartGuidesHost {
+    readonly options: DockviewComponentOptions;
+    /**
+     * The positioning parent for floating groups, in whose coordinate space the
+     * guide overlay is drawn (container-relative, never client/viewport space).
+     * This is the same element floats are placed in
+     * (`_floatingOverlayHost ?? gridview.element`).
+     */
+    getFloatingContainer(): HTMLElement;
+    /**
+     * Fires with the dragged group the first time a floating group move-drag
+     * actually moves — the signal to (re)build per-drag state from a clean slate.
+     * Tears down any session left over from a drag that ended without a normal
+     * pointerup (e.g. a redock long-press, which aborts without an end event).
+     */
+    readonly onDidStartFloatingGroupDrag: Event<DockviewGroupPanel>;
+    /**
+     * Fires with the dragged group when a floating group's move-drag ends
+     * (pointerup / cancel) — the signal to tear down the guides and per-drag
+     * state. A resize-end fires it too; with no active drag session that is a
+     * harmless no-op.
+     */
+    readonly onDidEndFloatingGroupDrag: Event<DockviewGroupPanel>;
+    /**
+     * The live floating windows other than `exclude`, each with its group
+     * identity and container-relative box — the snap-together detector needs
+     * identity (which neighbour to dock into), not just geometry.
+     */
+    getFloatingGroupSnapshots(
+        exclude: DockviewGroupPanel
+    ): readonly { group: DockviewGroupPanel; box: Box }[];
+    /**
+     * The underlying grid's splitter (sash) rectangles, in the same
+     * container-relative space, for the optional `snapTargets.splitters` source.
+     * Empty when there are no sashes.
+     */
+    getGridSplitterRects(): Box[];
+    /**
+     * Commit a snap-together: dock / merge the dragged float into a target group
+     * at `position`. Reuses the existing move primitive (`moveGroupOrPanel`) so
+     * events + undo cover it; a no-op when `dragged === target`.
+     */
+    mergeFloatInto(
+        dragged: DockviewGroupPanel,
+        target: DockviewGroupPanel,
+        position: SmartGuidesSnapPosition
+    ): void;
+}
+
+/** Where a snapped-together float docks relative to its target. */
+export type SmartGuidesSnapPosition =
+    | 'left'
+    | 'right'
+    | 'top'
+    | 'bottom'
+    | 'center';
+
+/** Fired when a dragged float commits an alignment snap on drop. */
+export interface SmartGuidesSnapEvent {
+    readonly group: DockviewGroupPanel;
+    /** Which axes were snapped at release. */
+    readonly axes: ('x' | 'y')[];
+}
+
+/** Fired when a dragged float commits a dock/merge on drop. */
+export interface SmartGuidesSnapTogetherEvent {
+    readonly dragged: DockviewGroupPanel;
+    readonly target: DockviewGroupPanel;
+    readonly position: SmartGuidesSnapPosition;
+}
+
+export interface ISmartGuidesService extends IDisposable {
+    /**
+     * Snap the proposed drag position against the other floating groups,
+     * drawing an alignment guide on the snapped edge. Returns an adjusted
+     * top-left, or nothing to leave the proposed position unchanged — which is
+     * also the pass-through when `smartGuides` is unset / disabled.
+     */
+    transformFloatingGroupDrag(
+        context: FloatingGroupDragContext
+    ): { top: number; left: number } | void;
+    /** Whether snapping is currently active (option present + enabled). */
+    readonly enabled: boolean;
+    /** Toggle snapping at runtime (overrides `smartGuides.enabled`). */
+    setEnabled(enabled: boolean): void;
+    /** Merge a partial option override in at runtime. */
+    updateOptions(options: Partial<SmartGuidesOptions>): void;
+    readonly onDidSnapFloat: Event<SmartGuidesSnapEvent>;
+    readonly onDidSnapTogether: Event<SmartGuidesSnapTogetherEvent>;
 }
 
 // --- AutoHideEdgeGroup ---

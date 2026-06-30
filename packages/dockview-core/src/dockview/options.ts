@@ -8,7 +8,7 @@ import { DockviewMessages } from './accessibilityMessages';
 export type { DockviewMessages } from './accessibilityMessages';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
-import { Box } from '../types';
+import { Box, DragModifiers } from '../types';
 import {
     DroptargetOverlayModel,
     Position,
@@ -183,6 +183,57 @@ export interface FloatingGroupDragContext {
      * snapshotted at drag start.
      */
     readonly others: readonly Box[];
+    /** Modifier-key state from this frame's pointer event. */
+    readonly modifiers: DragModifiers;
+}
+
+/** A keyboard modifier that, while held, suspends Smart Guides snapping. */
+export type SnapModifier = 'alt' | 'ctrl' | 'meta' | 'shift';
+
+/** Which alignment sources Smart Guides snaps a dragged floating group to. */
+export interface SmartGuidesSnapTargets {
+    /** Align to the other floating groups' edges + centers. Default `true`. */
+    floats?: boolean;
+    /** Align to the container's edges + center. Default `true`. */
+    container?: boolean;
+    /** Also emit inset guide lines this many px inside the container edges
+     *  (e.g. a content margin). Default `undefined` (no inset lines). */
+    containerInset?: number;
+    /** Align to the underlying grid's splitter (sash) positions. Default
+     *  `false`. */
+    splitters?: boolean;
+}
+
+/**
+ * Options for the Smart Guides module — Figma-style alignment guides + magnetic
+ * snapping while dragging a floating group. Omit `smartGuides` entirely to leave
+ * float dragging unchanged: the module is then inert and the drag loop is a
+ * byte-for-byte pass-through.
+ */
+export interface SmartGuidesOptions {
+    /** Master switch. Defaults to `true` when `smartGuides` is present. */
+    enabled?: boolean;
+    /** Distance, in px, within which a dragged edge/center engages a snap.
+     *  Default `8`. */
+    snapDistance?: number;
+    /** Extra px beyond `snapDistance` the pointer must travel before an engaged
+     *  snap releases — asymmetric hysteresis that stops boundary oscillation.
+     *  Default `4`. */
+    releaseDistance?: number;
+    /** Render the alignment guide lines while snapping. Default `true`. */
+    showGuides?: boolean;
+    /** Detect a dock/merge intent when the dragged float comes flush against
+     *  another float (edge-adjacency) or overlaps its tab strip (tabset merge),
+     *  and commit it on drop. Default `true`. */
+    snapTogether?: boolean;
+    /** Which alignment sources to snap against (floats + container by default). */
+    snapTargets?: SmartGuidesSnapTargets;
+    /** Hold this modifier while dragging to temporarily suspend snapping +
+     *  guides (Figma/Keynote parity). `false` disables the gate. Default
+     *  `'alt'`. */
+    disableSnapModifier?: SnapModifier | false;
+    /** Extra class applied to the guide overlay layer, for theming. */
+    className?: string;
 }
 
 export interface DockviewOptions {
@@ -214,6 +265,12 @@ export interface DockviewOptions {
     transformFloatingGroupDrag?: (
         context: FloatingGroupDragContext
     ) => { top: number; left: number } | void;
+    /**
+     * Enable Smart Guides — alignment guides + magnetic snapping while a
+     * floating group is being dragged. Omit to disable entirely (float dragging
+     * is then unchanged). Provided by the Smart Guides module.
+     */
+    smartGuides?: SmartGuidesOptions;
     /**
      * Selects which element moves a floating group when dragged.
      *
@@ -484,6 +541,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         disableFloatingGroups: undefined,
         floatingGroupBounds: undefined,
         transformFloatingGroupDrag: undefined,
+        smartGuides: undefined,
         floatingGroupDragHandle: undefined,
         popoutUrl: undefined,
         nonce: undefined,

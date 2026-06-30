@@ -123,7 +123,7 @@ export * from './gridview/gridviewPanel';
 export { SplitviewPanel, ISplitviewPanel } from './splitview/splitviewPanel';
 export * from './paneview/paneviewPanel';
 export * from './dockview/types';
-export { Box, AnchorPosition, AnchoredBox } from './types';
+export { Box, AnchorPosition, AnchoredBox, DragModifiers } from './types';
 
 export { DockviewPanelRenderer } from './overlay/overlayRenderContainer';
 
@@ -207,6 +207,11 @@ export {
     ILayoutHistoryService,
     LayoutHistoryChangeEvent,
     LayoutHistoryKind,
+    ISmartGuidesHost,
+    ISmartGuidesService,
+    SmartGuidesSnapPosition,
+    SmartGuidesSnapEvent,
+    SmartGuidesSnapTogetherEvent,
     ITabGroupChipsHost,
     ITabGroupChipsService,
 } from './dockview/moduleContracts';
@@ -222,5 +227,6 @@ export {
 } from './dismissableLayer';
 export { IDragGhostSpec } from './dnd/backend';
 export { LiveRegionModule } from './dockview/liveRegionService';
+export { FloatingGroupModule } from './dockview/floatingGroupService';
 export { EdgeGroupModule } from './dockview/edgeGroupService';
 export { createCloseButton, createPinButton } from './svg';
