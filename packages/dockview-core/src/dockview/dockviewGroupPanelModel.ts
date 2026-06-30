@@ -193,6 +193,7 @@ export interface IDockviewGroupPanelModel extends IPanel {
     setActive(isActive: boolean): void;
     initialize(): void;
     relayout(): void;
+    readonly tabsListElement: HTMLElement;
     // state
     isPanelActive: (panel: IDockviewPanel) => boolean;
     indexOf(panel: IDockviewPanel): number;
@@ -416,6 +417,12 @@ export class DockviewGroupPanelModel
 
     get header(): IHeader {
         return this.tabsContainer;
+    }
+
+    /** The scrollable tab list element (`.dv-tabs-container`) — exposed for the
+     *  multi-row wrap controller to measure rows / toggle the wrap class. */
+    get tabsListElement(): HTMLElement {
+        return this.tabsContainer.tabsListElement;
     }
 
     /** The panel whose tab owns `element` (the tab itself or a descendant of

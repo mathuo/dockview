@@ -136,6 +136,15 @@ export class Tabs extends CompositeDisposable {
         return this._element;
     }
 
+    /**
+     * The scrollable tab list (`.dv-tabs-container`) holding the tab elements —
+     * exposed (read-only) so the multi-row wrap controller can measure the
+     * wrapped row count and toggle the wrap class. Not the outer header element.
+     */
+    get tabsListElement(): HTMLElement {
+        return this._tabsList;
+    }
+
     set voidContainer(el: HTMLElement | null) {
         this._voidContainerListeners?.dispose();
         this._voidContainerListeners = null;

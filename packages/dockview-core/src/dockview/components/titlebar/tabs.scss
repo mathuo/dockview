@@ -5,6 +5,20 @@
     overflow: auto;
     scrollbar-width: thin; // firefox
 
+    /**
+     * Multi-row (wrapping) tabs. Inert until the `MultiRowTabsModule` toggles
+     * `.dv-tabs-container--wrap` on this element (`overflow.mode: 'wrap'`):
+     * tabs wrap onto multiple rows instead of clipping into the dropdown, and
+     * the strip grows to fit (the header grows via the `:has()` rule in
+     * tabsContainer.scss; the free header-aware content-sizing seam then shrinks
+     * the content area to match). Restricted to horizontal headers in v1.
+     */
+    &.dv-tabs-container--wrap:not(.dv-tabs-container-vertical) {
+        flex-wrap: wrap;
+        height: auto;
+        overflow: visible;
+    }
+
     /* GPU optimizations for smooth scrolling */
     will-change: scroll-position;
     transform: translate3d(0, 0, 0);

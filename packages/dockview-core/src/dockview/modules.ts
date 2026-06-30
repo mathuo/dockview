@@ -25,6 +25,7 @@ import {
     IDropGuideService,
     IKeyboardDockingService,
     ILayoutHistoryService,
+    IMultiRowTabsService,
     ISmartGuidesService,
     ITabGroupChipsService,
 } from './moduleContracts';
@@ -46,6 +47,7 @@ export interface ServiceCollection {
     dropGuideService?: IDropGuideService;
     smartGuidesService?: ISmartGuidesService;
     autoHideEdgeGroupService?: IAutoHideEdgeGroupService;
+    multiRowTabsService?: IMultiRowTabsService;
 }
 
 export interface DockviewModule<THost = unknown> {

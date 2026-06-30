@@ -209,6 +209,8 @@ export {
     ILayoutHistoryService,
     LayoutHistoryChangeEvent,
     LayoutHistoryKind,
+    IMultiRowTabsHost,
+    IMultiRowTabsService,
     ISmartGuidesHost,
     ISmartGuidesService,
     SmartGuidesSnapPosition,

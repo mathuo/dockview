@@ -461,3 +461,37 @@ export interface IAutoHideEdgeGroupService extends IDisposable {
     /** Auto-hide (collapse to strip) the edge group at `position`. */
     autoHide(position: EdgeGroupPosition): void;
 }
+
+// --- MultiRowTabs ---
+
+/**
+ * The narrow surface the multi-row (wrapping) tabs service needs from the host
+ * (`DockviewComponent`). The wrap layout itself is CSS; the service only toggles
+ * the wrap class on a group's tab list, measures the wrapped row count, and asks
+ * the host to relayout so the now-taller header shrinks the content area
+ * (the free header-aware content-sizing seam does the actual subtraction). It
+ * owns no tab model, overflow detection, or panel sizing math.
+ */
+export interface IMultiRowTabsHost {
+    readonly options: DockviewComponentOptions;
+    /** Fires when any group is added — the service attaches a wrap controller. */
+    readonly onDidAddGroup: Event<DockviewGroupPanel>;
+    readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
+    /**
+     * The scrollable tab list element (`.dv-tabs-container`) for a group — the
+     * element the wrap class is toggled on and whose child tab geometry the
+     * row-count measurement reads. Undefined if the group has no tab header.
+     */
+    getTabsListElement(group: DockviewGroupPanel): HTMLElement | undefined;
+    /**
+     * Re-run a group's layout with its current dimensions so a header-height
+     * change (a new wrapped row) propagates to the content + active panel. Wraps
+     * the free `DockviewGroupPanel.relayout()`.
+     */
+    relayoutGroup(group: DockviewGroupPanel): void;
+}
+
+export interface IMultiRowTabsService extends IDisposable {
+    /** Whether wrap mode is currently active (`overflow.mode === 'wrap'`). */
+    readonly enabled: boolean;
+}
