@@ -205,6 +205,14 @@ export class DockviewGroupPanel
         this.model.layout(width, height);
     }
 
+    /**
+     * Re-run the group's layout with its current dimensions, propagating a
+     * header-size change down to the content + active panel.
+     */
+    relayout(): void {
+        this.model.relayout();
+    }
+
     getComponent(): IFrameworkPart {
         return this._model;
     }

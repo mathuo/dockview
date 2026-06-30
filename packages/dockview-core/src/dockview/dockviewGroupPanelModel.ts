@@ -192,6 +192,7 @@ export interface IDockviewGroupPanelModel extends IPanel {
     headerPosition: DockviewHeaderPosition;
     setActive(isActive: boolean): void;
     initialize(): void;
+    relayout(): void;
     // state
     isPanelActive: (panel: IDockviewPanel) => boolean;
     indexOf(panel: IDockviewPanel): number;
@@ -457,7 +458,8 @@ export class DockviewGroupPanelModel
         // resize the active panel to fit the new header direction
         // if not, the panel will overflow the tabs container
         if (this._activePanel?.layout) {
-            this._activePanel.layout(this._width, this._height);
+            const { width, height } = this.contentDimensions();
+            this._activePanel.layout(width, height);
         }
 
         this.updateHeaderActions();
@@ -1508,11 +1510,45 @@ export class DockviewGroupPanelModel
         this._width = width;
         this._height = height;
 
-        this.contentContainer.layout(this._width, this._height);
+        const { width: contentWidth, height: contentHeight } =
+            this.contentDimensions();
+
+        this.contentContainer.layout(contentWidth, contentHeight);
 
         if (this._activePanel?.layout) {
-            this._activePanel.layout(this._width, this._height);
+            this._activePanel.layout(contentWidth, contentHeight);
         }
+    }
+
+    /**
+     * Re-run the group's layout with its current dimensions. Used to propagate a
+     * header-size change (e.g. a header that grew/shrank without the group box
+     * changing) down to the content + active panel.
+     */
+    public relayout(): void {
+        this.layout(this._width, this._height);
+    }
+
+    /**
+     * The dimensions available to the content/panel: the group box minus the
+     * header along its axis. The header (`dv-tabs-and-actions-container`) is
+     * laid out top/bottom (subtract its height) or left/right (subtract its
+     * width); a hidden header has `display:none` so its `offset*` is 0 and
+     * nothing is subtracted.
+     */
+    private contentDimensions(): { width: number; height: number } {
+        const headerEl = this.tabsContainer.element;
+        const horizontal =
+            this.headerPosition === 'top' || this.headerPosition === 'bottom';
+
+        return {
+            width: horizontal
+                ? this._width
+                : Math.max(0, this._width - headerEl.offsetWidth),
+            height: horizontal
+                ? Math.max(0, this._height - headerEl.offsetHeight)
+                : this._height,
+        };
     }
 
     private _removePanel(
@@ -1633,7 +1669,8 @@ export class DockviewGroupPanelModel
 
             this.contentContainer.openPanel(panel);
 
-            panel.layout(this._width, this._height);
+            const { width, height } = this.contentDimensions();
+            panel.layout(width, height);
 
             this.updateMru(panel);
 
