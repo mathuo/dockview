@@ -80,7 +80,12 @@
                         return {
                             element,
                             init() {},
-                            layout() {},
+                            // Record the content-area dimensions the group hands
+                            // each panel so the content-sizing seam (group box
+                            // minus header) is observable to the harness.
+                            layout(width, height) {
+                                panelDimensions[options.id] = { width, height };
+                            },
                             dispose() {},
                         };
                     },
@@ -89,6 +94,9 @@
 
                 // Test-facing handle.
                 const panels = {};
+                // Last content-area dimensions each panel was laid out with,
+                // keyed by panel id (written by the panel's layout() above).
+                const panelDimensions = {};
                 window.__dv = {
                     addPanel: (id) => {
                         panels[id] = dockview.addPanel({
@@ -97,6 +105,9 @@
                             title: id,
                         });
                     },
+                    // The content-area dimensions a panel was last laid out
+                    // with — the seam reports the group box minus the header.
+                    panelDimensions: (id) => panelDimensions[id],
                     closePanel: (id) => panels[id] && panels[id].api.close(),
                     // Create a new panel and move it to the right of the
                     // popped-out group — the move lands in the popout's own

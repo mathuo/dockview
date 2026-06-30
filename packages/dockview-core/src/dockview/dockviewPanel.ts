@@ -273,7 +273,8 @@ export class DockviewPanel
     }
 
     public layout(width: number, height: number): void {
-        // TODO: Can we somehow do height without header height or indicate what the header height is?
+        // `width`/`height` are the content-area dimensions (the group box minus
+        // the header), computed by DockviewGroupPanelModel.contentDimensions().
         this.api._onDidDimensionChange.fire({
             width,
             height: height,
