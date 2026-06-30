@@ -1310,6 +1310,15 @@ export class Tabs extends CompositeDisposable {
             return false;
         }
 
+        // Multi-row wrap mode: the smooth single-row reorder is x-only and
+        // breaks across wrapped rows, so skip it for a wrapped strip. Dragging a
+        // tab out to detach/redock still works (that's a separate path), and the
+        // `default` animation mode keeps its per-tab drop targets (2-D safe).
+        // True cross-row reorder ships in a later phase.
+        if (this._tabsList.classList.contains('dv-tabs-container--wrap')) {
+            return false;
+        }
+
         // Stale-state guard: if a previous drag's anim state is still here
         // but the current drag is a different identity, drop the stale one
         // so the new drag starts from a clean slate.
