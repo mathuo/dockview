@@ -494,4 +494,13 @@ export interface IPinnedTabsService extends IDisposable {
     /** Pure predicate (handed to each group's `Tabs`) — true keeps the panel
      *  out of the overflow dropdown. */
     isExcludedFromOverflow(panelId: string): boolean;
+    /** Clamp/redirect a proposed header drop `index` against the group's pin
+     *  boundary so the dragged panel lands on the correct side. May flip the
+     *  panel's pinned state instead of clamping when
+     *  `togglePinOnCrossBoundaryDrag` is enabled. */
+    resolveDropIndex(
+        group: DockviewGroupPanel,
+        panelId: string,
+        index: number
+    ): number;
 }

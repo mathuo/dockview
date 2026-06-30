@@ -1,5 +1,8 @@
 import { DockviewComponent, IContentRenderer } from 'dockview-core';
-import { computePinnedFirstOrder } from '../pinnedTabsService';
+import {
+    computePinnedFirstOrder,
+    PinnedTabsService,
+} from '../pinnedTabsService';
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');
@@ -196,5 +199,147 @@ describe('pinned tabs — integration', () => {
         c.api.setPinned(false);
         const after = spy.mock.calls[spy.mock.calls.length - 1][0];
         expect(after('c')).toBe(false);
+    });
+
+    test('each group is wired with a clamping drop-index resolver', () => {
+        const dockview = make({
+            enabled: true,
+            togglePinOnCrossBoundaryDrag: false,
+        });
+        const first = dockview.addPanel({ id: 'first', component: 'default' });
+        // Spy on the header prototype before the next group is created so its
+        // wiring call is captured.
+        const proto = Object.getPrototypeOf(first.api.group.model.header);
+        const spy = jest.spyOn(proto, 'setDropIndexResolver');
+
+        const x = dockview.addPanel({
+            id: 'x',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+        dockview.addPanel({ id: 'y', component: 'default' }); // joins x's group
+
+        expect(spy).toHaveBeenCalled();
+        const resolve = spy.mock.calls[spy.mock.calls.length - 1][0] as (
+            panelId: string,
+            index: number
+        ) => number;
+
+        x.api.setPinned(true); // group [x(pinned), y]; boundary for dragging y = 1
+        // An unpinned tab cannot land left of the pin boundary.
+        expect(resolve('y', 0)).toBe(1);
+        // A pinned tab cannot land in the unpinned zone.
+        expect(resolve('x', 5)).toBe(0);
+
+        spy.mockRestore();
+    });
+});
+
+describe('pinned tabs — reorder guard', () => {
+    const makeService = (pinnedTabs: unknown): PinnedTabsService => {
+        const stub: any = () => ({ dispose() {} });
+        return new PinnedTabsService({
+            options: { pinnedTabs },
+            onDidPanelPinnedChange: stub,
+            onDidAddGroup: stub,
+            onDidRemoveGroup: stub,
+        } as any);
+    };
+
+    const grp = (
+        panels: { id: string; pinned: boolean; setPinned?: jest.Mock }[]
+    ): any => ({
+        model: {
+            panels: panels.map((p) => ({
+                id: p.id,
+                api: {
+                    isPinned: p.pinned,
+                    setPinned: p.setPinned ?? jest.fn(),
+                },
+            })),
+        },
+    });
+
+    describe('clamp (togglePinOnCrossBoundaryDrag: false)', () => {
+        const svc = makeService({
+            enabled: true,
+            togglePinOnCrossBoundaryDrag: false,
+        });
+        const g = grp([
+            { id: 'p', pinned: true },
+            { id: 'a', pinned: false },
+            { id: 'b', pinned: false },
+        ]);
+
+        test('an unpinned tab is clamped to the pin boundary', () => {
+            expect(svc.resolveDropIndex(g, 'a', 0)).toBe(1);
+        });
+
+        test('an unpinned tab inside the unpinned zone is left alone', () => {
+            expect(svc.resolveDropIndex(g, 'a', 2)).toBe(2);
+        });
+
+        test('a pinned tab is clamped back into the pinned block', () => {
+            expect(svc.resolveDropIndex(g, 'p', 2)).toBe(0);
+        });
+
+        test('a pinned tab inside the pinned block is left alone', () => {
+            expect(svc.resolveDropIndex(g, 'p', 0)).toBe(0);
+        });
+
+        test('the boundary excludes the dragged panel (two pinned)', () => {
+            const g2 = grp([
+                { id: 'p1', pinned: true },
+                { id: 'p2', pinned: true },
+                { id: 'a', pinned: false },
+            ]);
+            expect(svc.resolveDropIndex(g2, 'a', 1)).toBe(2);
+            expect(svc.resolveDropIndex(g2, 'p1', 2)).toBe(1);
+        });
+
+        test('a panel not in the group passes through', () => {
+            expect(svc.resolveDropIndex(g, 'missing', 0)).toBe(0);
+        });
+    });
+
+    test('disabled feature passes the index through unchanged', () => {
+        const svc = makeService({ enabled: false });
+        const g = grp([
+            { id: 'p', pinned: true },
+            { id: 'a', pinned: false },
+        ]);
+        expect(svc.resolveDropIndex(g, 'a', 0)).toBe(0);
+    });
+
+    describe('flip (togglePinOnCrossBoundaryDrag: true, default)', () => {
+        test('dragging an unpinned tab into the pinned zone pins it', async () => {
+            const svc = makeService({ enabled: true });
+            const setPinned = jest.fn();
+            const g = grp([
+                { id: 'p', pinned: true },
+                { id: 'a', pinned: false, setPinned },
+            ]);
+
+            expect(svc.resolveDropIndex(g, 'a', 0)).toBe(0);
+            expect(setPinned).not.toHaveBeenCalled(); // deferred
+
+            await Promise.resolve();
+            expect(setPinned).toHaveBeenCalledWith(true);
+        });
+
+        test('dragging a pinned tab into the unpinned zone unpins it', async () => {
+            const svc = makeService({ enabled: true });
+            const setPinned = jest.fn();
+            const g = grp([
+                { id: 'p', pinned: true, setPinned },
+                { id: 'a', pinned: false },
+            ]);
+
+            // boundary excluding p = 0; index 1 crosses into the unpinned zone
+            expect(svc.resolveDropIndex(g, 'p', 1)).toBe(1);
+
+            await Promise.resolve();
+            expect(setPinned).toHaveBeenCalledWith(false);
+        });
     });
 });

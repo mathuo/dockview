@@ -73,6 +73,8 @@ export interface ITabsContainer extends IDisposable {
     updateTabGroups(): void;
     refreshTabGroupAccent(): void;
     setOverflowExclude(fn: (panelId: string) => boolean): void;
+    setDropIndexResolver(fn: (panelId: string, index: number) => number): void;
+    resolveDropIndex(panelId: string, index: number): number;
 }
 
 export class TabsContainer
@@ -92,6 +94,15 @@ export class TabsContainer
 
     private _hidden = false;
     private _direction: DockviewHeaderDirection = 'horizontal';
+    /**
+     * Clamps/redirects a header drop index — wired by the PinnedTabs module to
+     * keep drops on the correct side of the pin boundary. Identity by default
+     * so behaviour is unchanged when the module is absent.
+     */
+    private _dropIndexResolver: (panelId: string, index: number) => number = (
+        _panelId,
+        index
+    ) => index;
 
     private dropdownPart: DropdownElement | null = null;
     private _overflowTabs: string[] = [];
@@ -400,6 +411,14 @@ export class TabsContainer
 
     setOverflowExclude(fn: (panelId: string) => boolean): void {
         this.tabs.setOverflowExclude(fn);
+    }
+
+    setDropIndexResolver(fn: (panelId: string, index: number) => number): void {
+        this._dropIndexResolver = fn;
+    }
+
+    resolveDropIndex(panelId: string, index: number): number {
+        return this._dropIndexResolver(panelId, index);
     }
 
     private updateClassnames(): void {

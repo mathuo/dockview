@@ -95,10 +95,14 @@ export class PinnedTabsService implements IPinnedTabsService {
                     this.isExcludedFromOverflow
                 );
             }),
-            // Every group's tab strip consults the same pinned predicate.
+            // Every group's tab strip consults the pinned predicate (overflow)
+            // and the pin-boundary resolver (reorder guard).
             this._host.onDidAddGroup((group) => {
                 group.model.header.setOverflowExclude(
                     this.isExcludedFromOverflow
+                );
+                group.model.header.setDropIndexResolver((panelId, index) =>
+                    this.resolveDropIndex(group, panelId, index)
                 );
             }),
             // Drop bookkeeping for groups that go away.
@@ -120,6 +124,65 @@ export class PinnedTabsService implements IPinnedTabsService {
         }
         return this._pinnedIds.has(panelId);
     };
+
+    /**
+     * Keep a header drop on the correct side of the pin boundary. With
+     * `togglePinOnCrossBoundaryDrag` (default on) a drop that crosses the
+     * boundary flips the dragged panel's pinned state instead of being clamped
+     * — the flip is deferred to a microtask so it runs after the in-progress
+     * move settles, then the pinned-change handler re-orders the strip.
+     *
+     * The boundary is the pinned count *excluding the dragged panel* (it is
+     * removed and re-inserted during the move, so the index is post-removal).
+     */
+    resolveDropIndex(
+        group: DockviewGroupPanel,
+        panelId: string,
+        index: number
+    ): number {
+        if (!this._host.options.pinnedTabs?.enabled) {
+            return index;
+        }
+
+        const dragged = group.model.panels.find((p) => p.id === panelId);
+        if (!dragged) {
+            // Cross-group drop — the boundary is enforced within a group only.
+            return index;
+        }
+
+        let boundary = 0;
+        for (const panel of group.model.panels) {
+            if (panel.id !== panelId && panel.api.isPinned) {
+                boundary++;
+            }
+        }
+
+        const flip =
+            this._host.options.pinnedTabs?.togglePinOnCrossBoundaryDrag !==
+            false;
+
+        if (dragged.api.isPinned) {
+            // A pinned tab may land anywhere in [0, boundary].
+            if (index <= boundary) {
+                return index;
+            }
+            if (flip) {
+                queueMicrotask(() => dragged.api.setPinned(false));
+                return index;
+            }
+            return boundary;
+        }
+
+        // An unpinned tab may land anywhere in [boundary, end].
+        if (index >= boundary) {
+            return index;
+        }
+        if (flip) {
+            queueMicrotask(() => dragged.api.setPinned(true));
+            return index;
+        }
+        return boundary;
+    }
 
     /**
      * Re-assert the pinned-first invariant on `group`'s tab strip by moving

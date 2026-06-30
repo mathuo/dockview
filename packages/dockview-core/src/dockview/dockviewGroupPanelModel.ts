@@ -174,6 +174,9 @@ export interface IHeader {
     /** Register a predicate that keeps matching panels out of the overflow
      *  dropdown (used by the PinnedTabs module). No-op default. */
     setOverflowExclude(fn: (panelId: string) => boolean): void;
+    /** Register a resolver that clamps/redirects a header drop index (used by
+     *  the PinnedTabs module to enforce the pin boundary). Identity default. */
+    setDropIndexResolver(fn: (panelId: string, index: number) => number): void;
 }
 
 export type DockviewGroupPanelLocked = boolean | 'no-drop-target';
@@ -568,11 +571,22 @@ export class DockviewGroupPanelModel
                 const dragData = getPanelData();
                 const draggedPanelId = dragData?.panelId ?? null;
 
+                // Let an injected resolver (PinnedTabs) clamp/redirect the drop
+                // index — e.g. so an unpinned tab cannot land left of a pinned
+                // one. Identity by default; only same-panel header drops carry
+                // a panel id to resolve against.
+                const resolvedIndex = draggedPanelId
+                    ? this.tabsContainer.resolveDropIndex(
+                          draggedPanelId,
+                          event.index
+                      )
+                    : event.index;
+
                 this.handleDropEvent(
                     'header',
                     event.event,
                     'center',
-                    event.index
+                    resolvedIndex
                 );
 
                 // Update tab group membership after the move completes
