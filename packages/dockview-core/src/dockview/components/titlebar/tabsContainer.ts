@@ -72,6 +72,7 @@ export interface ITabsContainer extends IDisposable {
     updateDragAndDropState(): void;
     updateTabGroups(): void;
     refreshTabGroupAccent(): void;
+    setOverflowExclude(fn: (panelId: string) => boolean): void;
 }
 
 export class TabsContainer
@@ -395,6 +396,10 @@ export class TabsContainer
 
     closePanel(panel: IDockviewPanel): void {
         this.delete(panel.id);
+    }
+
+    setOverflowExclude(fn: (panelId: string) => boolean): void {
+        this.tabs.setOverflowExclude(fn);
     }
 
     private updateClassnames(): void {

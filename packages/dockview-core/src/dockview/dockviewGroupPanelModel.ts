@@ -171,6 +171,9 @@ export class DockviewWillDropEvent extends DockviewDidDropEvent {
 export interface IHeader {
     hidden: boolean;
     direction: DockviewHeaderDirection;
+    /** Register a predicate that keeps matching panels out of the overflow
+     *  dropdown (used by the PinnedTabs module). No-op default. */
+    setOverflowExclude(fn: (panelId: string) => boolean): void;
 }
 
 export type DockviewGroupPanelLocked = boolean | 'no-drop-target';

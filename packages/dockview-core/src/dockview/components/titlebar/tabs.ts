@@ -66,6 +66,15 @@ export class Tabs extends CompositeDisposable {
     private readonly _tabMap = new Map<string, IValueDisposable<Tab>>();
     private selectedIndex = -1;
     private _showTabsOverflowControl = false;
+    /**
+     * Predicate that keeps a panel's tab out of the overflow dropdown
+     * regardless of visibility — wired by the PinnedTabs module so pinned tabs
+     * never overflow. Defaults to a no-op so behaviour is unchanged when the
+     * module is absent. Must stay a pure lookup (no DOM reads) — it runs inside
+     * the overflow filter, which the `OverflowObserver` re-fires on every
+     * resize.
+     */
+    private _overflowExclude: (panelId: string) => boolean = () => false;
     private _direction: DockviewHeaderDirection = 'horizontal';
     private _animState: TabAnimationState | null = null;
     private readonly _pendingMarginCleanups = new Map<
@@ -98,6 +107,18 @@ export class Tabs extends CompositeDisposable {
         reset: boolean;
     }>();
     readonly onOverflowTabsChange = this._onOverflowTabsChange.event;
+
+    /**
+     * Register a predicate excluding panels from the overflow dropdown (pinned
+     * tabs). Re-evaluates the dropdown immediately if overflow is being
+     * observed. Passing `() => false` restores default behaviour.
+     */
+    setOverflowExclude(fn: (panelId: string) => boolean): void {
+        this._overflowExclude = fn;
+        if (this._showTabsOverflowControl) {
+            this.toggleDropdown({ reset: false });
+        }
+    }
 
     get showTabsOverflowControl(): boolean {
         return this._showTabsOverflowControl;
@@ -995,6 +1016,7 @@ export class Tabs extends CompositeDisposable {
         const tabs = this._tabs
             .filter(
                 (tab) =>
+                    !this._overflowExclude(tab.value.panel.id) &&
                     !isChildEntirelyVisibleWithinParent(
                         tab.value.element,
                         this._tabsList
@@ -1030,7 +1052,10 @@ export class Tabs extends CompositeDisposable {
                 // appear in the dropdown.
                 if (tg.collapsed) {
                     for (const pid of tg.panelIds) {
-                        if (!overflowTabSet.has(pid)) {
+                        if (
+                            !overflowTabSet.has(pid) &&
+                            !this._overflowExclude(pid)
+                        ) {
                             overflowTabSet.add(pid);
                             tabs.push(pid);
                         }

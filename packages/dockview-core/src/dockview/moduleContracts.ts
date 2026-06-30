@@ -491,4 +491,7 @@ export interface IPinnedTabsHost {
 export interface IPinnedTabsService extends IDisposable {
     /** Re-assert the pinned-first invariant on a single group's tab strip. */
     enforceOrder(group: DockviewGroupPanel): void;
+    /** Pure predicate (handed to each group's `Tabs`) — true keeps the panel
+     *  out of the overflow dropdown. */
+    isExcludedFromOverflow(panelId: string): boolean;
 }

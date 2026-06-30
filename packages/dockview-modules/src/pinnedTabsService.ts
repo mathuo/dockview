@@ -60,6 +60,10 @@ export class PinnedTabsService implements IPinnedTabsService {
     /** Per-group canonical pinned order (panel ids in pin sequence). */
     private readonly _pinnedOrder = new Map<DockviewGroupPanel, string[]>();
 
+    /** Flat set of pinned panel ids — the overflow-exclusion lookup. Panel ids
+     *  are unique component-wide, so a single set serves every group. */
+    private readonly _pinnedIds = new Set<string>();
+
     /** Re-entrancy guard: reordering moves panels, which must not re-trigger. */
     private _enforcing = false;
 
@@ -72,10 +76,12 @@ export class PinnedTabsService implements IPinnedTabsService {
                 const order = this._orderFor(group);
 
                 if (event.isPinned) {
+                    this._pinnedIds.add(event.panel.id);
                     if (!order.includes(event.panel.id)) {
                         order.push(event.panel.id);
                     }
                 } else {
+                    this._pinnedIds.delete(event.panel.id);
                     const at = order.indexOf(event.panel.id);
                     if (at !== -1) {
                         order.splice(at, 1);
@@ -83,6 +89,17 @@ export class PinnedTabsService implements IPinnedTabsService {
                 }
 
                 this.enforceOrder(group);
+                // Refresh the dropdown so the pin takes effect immediately
+                // rather than waiting for the next resize/observer fire.
+                group.model.header.setOverflowExclude(
+                    this.isExcludedFromOverflow
+                );
+            }),
+            // Every group's tab strip consults the same pinned predicate.
+            this._host.onDidAddGroup((group) => {
+                group.model.header.setOverflowExclude(
+                    this.isExcludedFromOverflow
+                );
             }),
             // Drop bookkeeping for groups that go away.
             this._host.onDidRemoveGroup((group) => {
@@ -90,6 +107,19 @@ export class PinnedTabsService implements IPinnedTabsService {
             })
         );
     }
+
+    /**
+     * Keep a panel's tab out of the overflow dropdown when it is pinned. A pure
+     * `Set.has` lookup (no DOM reads) so it is safe to call from the overflow
+     * filter, which re-fires on every resize. Returns `false` while the feature
+     * is dormant.
+     */
+    readonly isExcludedFromOverflow = (panelId: string): boolean => {
+        if (!this._host.options.pinnedTabs?.enabled) {
+            return false;
+        }
+        return this._pinnedIds.has(panelId);
+    };
 
     /**
      * Re-assert the pinned-first invariant on `group`'s tab strip by moving
@@ -145,6 +175,7 @@ export class PinnedTabsService implements IPinnedTabsService {
     dispose(): void {
         this._disposable.dispose();
         this._pinnedOrder.clear();
+        this._pinnedIds.clear();
     }
 
     private _isPinned(group: DockviewGroupPanel, panelId: string): boolean {

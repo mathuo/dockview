@@ -177,4 +177,24 @@ describe('pinned tabs — integration', () => {
         expect(order()).toEqual(['c', 'a', 'b']);
         expect(a.api.isActive).toBe(true);
     });
+
+    test('pinning feeds the tab strip an overflow-exclusion predicate', () => {
+        const dockview = make({ enabled: true });
+        const { a, c } = threePanels(dockview);
+
+        const header = a.api.group.model.header;
+        const spy = jest.spyOn(header, 'setOverflowExclude');
+
+        c.api.setPinned(true);
+
+        expect(spy).toHaveBeenCalled();
+        const predicate = spy.mock.calls[spy.mock.calls.length - 1][0];
+        // The pinned tab is excluded from overflow; unpinned tabs are not.
+        expect(predicate('c')).toBe(true);
+        expect(predicate('a')).toBe(false);
+
+        c.api.setPinned(false);
+        const after = spy.mock.calls[spy.mock.calls.length - 1][0];
+        expect(after('c')).toBe(false);
+    });
 });
