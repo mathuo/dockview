@@ -34,6 +34,7 @@ import {
     isPanelOptionsWithPanel,
     MovementOptions,
     DockviewHeaderPosition,
+    SmartGuidesOptions,
 } from './options';
 import {
     BaseGrid,
@@ -60,7 +61,7 @@ import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
 import { Parameters } from '../panel/types';
-import { Overlay } from '../overlay/overlay';
+import { Overlay, OverlayDragContext } from '../overlay/overlay';
 import {
     Classnames,
     getDockviewTheme,
@@ -95,6 +96,9 @@ import {
     IDropGuideHost,
     ILayoutHistoryHost,
     LayoutHistoryChangeEvent,
+    ISmartGuidesHost,
+    SmartGuidesSnapEvent,
+    SmartGuidesSnapTogetherEvent,
     ITabGroupChipsHost,
 } from './moduleContracts';
 import { IHeaderActionsHost } from './headerActionsService';
@@ -269,6 +273,12 @@ export interface FloatingGroupOptions {
      * group only. See {@link DockviewOptions.floatingGroupDragHandle}.
      */
     dragHandle?: 'titlebar' | 'tabbar';
+    /**
+     * Exclude this floating group from Smart Guides — it never snaps and shows
+     * no guides when dragged (e.g. a pinned HUD). See
+     * {@link DockviewOptions.smartGuides}.
+     */
+    disableSmartGuides?: boolean;
 }
 
 interface FloatingGroupOptionsInternal extends FloatingGroupOptions {
@@ -444,12 +454,26 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     clearHistory(): void;
     readonly onDidChangeHistory: Event<LayoutHistoryChangeEvent>;
     readonly popoutRestorationPromise: Promise<void>;
+    // smart guides
+    readonly smartGuidesEnabled: boolean;
+    setSmartGuidesEnabled(enabled: boolean): void;
+    updateSmartGuidesOptions(options: Partial<SmartGuidesOptions>): void;
+    readonly onDidSnapFloat: Event<SmartGuidesSnapEvent>;
+    readonly onDidSnapTogether: Event<SmartGuidesSnapTogetherEvent>;
 }
 
 /** A never-firing history-change event — the fallback `onDidChangeHistory`
  *  returns when the LayoutHistory module is absent, so the api event is always
  *  valid and subscribable. */
 const NO_LAYOUT_HISTORY_CHANGES: Event<LayoutHistoryChangeEvent> = () => ({
+    dispose: () => {
+        // noop — nothing ever fires
+    },
+});
+
+/** A never-firing event — the fallback the Smart Guides snap events return when
+ *  the module is absent, so the api events are always subscribable. */
+const NO_EVENT: Event<any> = () => ({
     dispose: () => {
         // noop — nothing ever fires
     },
@@ -504,6 +528,7 @@ export class DockviewComponent
         IAccessibilityHost,
         ILayoutHistoryHost,
         IDropGuideHost,
+        ISmartGuidesHost,
         IAutoHideEdgeGroupHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
@@ -595,6 +620,22 @@ export class DockviewComponent
     private readonly _onDidOpenPopoutWindowFail = new Emitter<void>();
     readonly onDidOpenPopoutWindowFail: Event<void> =
         this._onDidOpenPopoutWindowFail.event;
+
+    private readonly _onDidStartFloatingGroupDrag =
+        new Emitter<DockviewGroupPanel>();
+    /** Fires with the dragged group when a floating group move-drag first moves
+     *  — consumed by the Smart Guides service (`ISmartGuidesHost`) to start each
+     *  drag from a clean slate (a redock long-press aborts with no end event). */
+    readonly onDidStartFloatingGroupDrag: Event<DockviewGroupPanel> =
+        this._onDidStartFloatingGroupDrag.event;
+
+    private readonly _onDidEndFloatingGroupDrag =
+        new Emitter<DockviewGroupPanel>();
+    /** Fires with the dragged group when a floating group's move/resize drag
+     *  ends — consumed by the Smart Guides service (`ISmartGuidesHost`) to tear
+     *  down its per-drag guides. */
+    readonly onDidEndFloatingGroupDrag: Event<DockviewGroupPanel> =
+        this._onDidEndFloatingGroupDrag.event;
 
     private readonly _onDidLayoutFromJSON = new Emitter<void>();
     readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutFromJSON.event;
@@ -748,19 +789,158 @@ export class DockviewComponent
     private _gatherFloatingGroupBoxes(
         exclude: DockviewGroupPanel
     ): readonly Box[] {
-        const container = this._floatingOverlayHost ?? this.gridview.element;
+        // Same geometry as the snap-together snapshot, minus the group identity.
+        return this.getFloatingGroupSnapshots(exclude).map((s) => s.box);
+    }
+
+    /**
+     * ISmartGuidesHost — the positioning parent floats are placed in, also the
+     * coordinate space the Smart Guides overlay draws its alignment lines in.
+     */
+    getFloatingContainer(): HTMLElement {
+        return this._floatingOverlayHost ?? this.gridview.element;
+    }
+
+    /** ISmartGuidesHost — the other floats' group identity + container-relative
+     *  box, for the snap-together detector. */
+    getFloatingGroupSnapshots(
+        exclude: DockviewGroupPanel
+    ): readonly { group: DockviewGroupPanel; box: Box }[] {
+        const container = this.getFloatingContainer();
         const containerRect = container.getBoundingClientRect();
         return this.floatingGroups
             .filter((floating) => floating.group !== exclude)
             .map((floating) => {
                 const rect = floating.overlay.element.getBoundingClientRect();
                 return {
-                    left: rect.left - containerRect.left,
-                    top: rect.top - containerRect.top,
-                    width: rect.width,
-                    height: rect.height,
+                    group: floating.group,
+                    box: {
+                        left: rect.left - containerRect.left,
+                        top: rect.top - containerRect.top,
+                        width: rect.width,
+                        height: rect.height,
+                    },
                 };
             });
+    }
+
+    /** ISmartGuidesHost — dock/merge a dragged float into a target group via the
+     *  existing move primitive (so events + undo cover it). */
+    mergeFloatInto(
+        dragged: DockviewGroupPanel,
+        target: DockviewGroupPanel,
+        position: Position
+    ): void {
+        // The target was captured at drag start; it may have been closed /
+        // removed before the drop committed. Bail rather than move into a dead
+        // group (a self-drop is also a no-op).
+        if (dragged === target || !this.getPanel(target.id)) {
+            return;
+        }
+        this.moveGroupOrPanel({
+            from: { groupId: dragged.id },
+            to: { group: target, position },
+        });
+    }
+
+    /** ISmartGuidesHost — the main grid's splitter (sash) rectangles, in the
+     *  floating container's coordinate space, for the optional splitter target. */
+    getGridSplitterRects(): Box[] {
+        const origin = this.getFloatingContainer().getBoundingClientRect();
+        const result: Box[] = [];
+        this.gridview.element.querySelectorAll('.dv-sash').forEach((sash) => {
+            const r = sash.getBoundingClientRect();
+            result.push({
+                left: r.left - origin.left,
+                top: r.top - origin.top,
+                width: r.width,
+                height: r.height,
+            });
+        });
+        return result;
+    }
+
+    private get _smartGuidesService() {
+        // Optional like every module service — `?.`-guarded everywhere so the
+        // module can be removed without crashing the float drag loop.
+        return this._moduleRegistry.services.smartGuidesService;
+    }
+
+    /** Whether Smart Guides snapping is currently active. */
+    get smartGuidesEnabled(): boolean {
+        return this._smartGuidesService?.enabled ?? false;
+    }
+
+    /** Toggle Smart Guides snapping at runtime (no-op if the module is absent). */
+    setSmartGuidesEnabled(enabled: boolean): void {
+        this._smartGuidesService?.setEnabled(enabled);
+    }
+
+    /** Merge a partial Smart Guides option override in at runtime. */
+    updateSmartGuidesOptions(options: Partial<SmartGuidesOptions>): void {
+        this._smartGuidesService?.updateOptions(options);
+    }
+
+    /** Fires when a dragged float commits an alignment snap on drop. */
+    get onDidSnapFloat(): Event<SmartGuidesSnapEvent> {
+        return this._smartGuidesService?.onDidSnapFloat ?? NO_EVENT;
+    }
+
+    /** Fires when a dragged float commits a dock/merge on drop. */
+    get onDidSnapTogether(): Event<SmartGuidesSnapTogetherEvent> {
+        return this._smartGuidesService?.onDidSnapTogether ?? NO_EVENT;
+    }
+
+    /**
+     * Compose the float drag-position transform from the public
+     * `transformFloatingGroupDrag` option and the optional Smart Guides module,
+     * so an app and the module can both nudge a single drag rather than one
+     * clobbering the other. Returns `undefined` only when the app option is
+     * unset AND the module is absent (the removability case) — then no transform
+     * is installed and the sibling-box snapshot is skipped, so the drag loop is
+     * truly byte-for-byte unchanged. When the module is present but `smartGuides`
+     * is unset it installs a cheap pass-through (the service snaps nothing and
+     * early-returns), so observable drag behaviour is still unchanged.
+     */
+    private _buildFloatingDragTransform(
+        anchorGroup: DockviewGroupPanel,
+        disableSmartGuides: boolean
+    ):
+        | ((
+              context: OverlayDragContext
+          ) => { top: number; left: number } | void)
+        | undefined {
+        const publicTransform = this.options.transformFloatingGroupDrag;
+        // Per-float opt-out: this window never consults the module.
+        const useGuides = !disableSmartGuides;
+        if (!publicTransform && !(useGuides && this._smartGuidesService)) {
+            return undefined;
+        }
+        return (context) => {
+            // 1. the app's transform runs first on the raw proposed box...
+            const appResult = publicTransform?.({
+                group: anchorGroup,
+                proposed: context.proposed,
+                container: context.container,
+                others: context.others,
+                modifiers: context.modifiers,
+            });
+            // 2. ...then the module snaps the (possibly) app-adjusted position,
+            //    so its guides reflect the final on-screen alignment.
+            const proposed = appResult
+                ? { ...context.proposed, ...appResult }
+                : context.proposed;
+            const snapped = useGuides
+                ? this._smartGuidesService?.transformFloatingGroupDrag({
+                      group: anchorGroup,
+                      proposed,
+                      container: context.container,
+                      others: context.others,
+                      modifiers: context.modifiers,
+                  })
+                : undefined;
+            return snapped ?? appResult ?? undefined;
+        };
     }
 
     private get _floatingGroupService() {
@@ -1305,6 +1485,8 @@ export class DockviewComponent
                 this._onDidChangePopouts.fire()
             ),
             this._onDidOpenPopoutWindowFail,
+            this._onDidStartFloatingGroupDrag,
+            this._onDidEndFloatingGroupDrag,
             this._onDidCreateTabGroup,
             this._onDidDestroyTabGroup,
             this._onDidAddPanelToTabGroup,
@@ -2243,6 +2425,7 @@ export class DockviewComponent
                 dragHandle: options?.dragHandle,
                 inDragMode: options?.inDragMode,
                 skipActiveGroup: options?.skipActiveGroup,
+                disableSmartGuides: options?.disableSmartGuides,
             }
         );
     }
@@ -2279,6 +2462,7 @@ export class DockviewComponent
             dragHandle?: 'titlebar' | 'tabbar';
             inDragMode?: boolean;
             skipActiveGroup?: boolean;
+            disableSmartGuides?: boolean;
         }
     ): void {
         const service = assertModule(
@@ -2320,15 +2504,10 @@ export class DockviewComponent
                     : (this.options.floatingGroupBounds
                           ?.minimumHeightWithinViewport ??
                       DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE),
-            transformDragPosition: this.options.transformFloatingGroupDrag
-                ? (context) =>
-                      this.options.transformFloatingGroupDrag!({
-                          group: anchorGroup,
-                          proposed: context.proposed,
-                          container: context.container,
-                          others: context.others,
-                      })
-                : undefined,
+            transformDragPosition: this._buildFloatingDragTransform(
+                anchorGroup,
+                options?.disableSmartGuides ?? false
+            ),
             getSiblingBoxes: () => this._gatherFloatingGroupBoxes(anchorGroup),
         });
 
@@ -2351,6 +2530,20 @@ export class DockviewComponent
             anchorGroup,
             overlay,
             floatingGridview
+        );
+
+        // Surface the start + end of a move drag so the Smart Guides module can
+        // (re)build then tear down its per-drag guides. Start (re)sets a clean
+        // slate even if a prior drag aborted without an end (redock long-press);
+        // end fires on pointerup/cancel (and harmlessly on resize-end). No-ops
+        // when the module is absent.
+        floatingGroupPanel.addDisposables(
+            overlay.onDidStartMoving(() =>
+                this._onDidStartFloatingGroupDrag.fire(anchorGroup)
+            ),
+            overlay.onDidChangeEnd(() =>
+                this._onDidEndFloatingGroupDrag.fire(anchorGroup)
+            )
         );
 
         if (titleBar) {

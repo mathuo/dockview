@@ -25,6 +25,7 @@ import {
     IDropGuideService,
     IKeyboardDockingService,
     ILayoutHistoryService,
+    ISmartGuidesService,
     ITabGroupChipsService,
 } from './moduleContracts';
 
@@ -43,6 +44,7 @@ export interface ServiceCollection {
     keyboardDockingService?: IKeyboardDockingService;
     layoutHistoryService?: ILayoutHistoryService;
     dropGuideService?: IDropGuideService;
+    smartGuidesService?: ISmartGuidesService;
     autoHideEdgeGroupService?: IAutoHideEdgeGroupService;
 }
 
