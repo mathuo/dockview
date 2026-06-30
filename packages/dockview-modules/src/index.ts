@@ -4,6 +4,7 @@ import { ContextMenuModule } from './contextMenu';
 import { AdvancedDnDModule } from './advancedDnDService';
 import { AccessibilityModule } from './accessibilityService';
 import { LayoutHistoryModule } from './layoutHistoryService';
+import { DropGuideModule } from './dropGuideService';
 import { SmartGuidesModule } from './smartGuidesService';
 import { AutoHideEdgeGroupModule } from './autoHideEdgeGroupService';
 
@@ -21,6 +22,7 @@ export {
     LayoutHistoryService,
     LayoutHistoryModule,
 } from './layoutHistoryService';
+export { DropGuideService, DropGuideModule } from './dropGuideService';
 export { SmartGuidesService, SmartGuidesModule } from './smartGuidesService';
 export {
     AutoHideEdgeGroupService,
@@ -43,6 +45,7 @@ export const Modules: DockviewModule<any>[] = [
     AdvancedDnDModule,
     AccessibilityModule,
     LayoutHistoryModule,
+    DropGuideModule,
     SmartGuidesModule,
     AutoHideEdgeGroupModule,
 ];

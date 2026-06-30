@@ -6,7 +6,11 @@
  */
 import { IDisposable } from '../lifecycle';
 import { Event } from '../events';
-import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
+import {
+    DroptargetOverlayModel,
+    Position,
+    PositionResolver,
+} from '../dnd/droptarget';
 import { Box } from '../types';
 import { IDragGhostSpec } from '../dnd/backend';
 import { DockviewApi } from '../api/component.api';
@@ -250,6 +254,54 @@ export interface ILayoutHistoryService extends IDisposable {
     redo(): void;
     /** Drop both stacks (e.g. on document switch). */
     clear(): void;
+}
+
+// --- DropGuide ---
+
+/**
+ * The narrow surface the Drop Guide ("compass") service needs from the host
+ * (`DockviewComponent`). The service owns the compass widget + the cell
+ * hit-test resolver; the component installs that resolver at the drop-target
+ * seam (`dropPositionResolver`) and surfaces the drag-over signal the widget
+ * follows. It never re-implements drop resolution or the commit path.
+ */
+export interface IDropGuideHost {
+    readonly options: DockviewComponentOptions;
+    /**
+     * Fires on each drag-over with the hovered group + native event — the
+     * signal the compass widget mounts/follows. The service filters for
+     * `kind === 'content'`.
+     */
+    readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent>;
+    /**
+     * Whether a drop at `position` on `group`'s content is actually allowed
+     * (the per-position `canDisplayOverlay` veto) — used to gate which compass
+     * cells are shown, so only legal drops appear.
+     */
+    canDropOnGroup(
+        group: DockviewGroupPanel,
+        position: Position,
+        event: DragEvent | PointerEvent
+    ): boolean;
+    /**
+     * The element the content drop target measures its quadrants against (the
+     * `dndPanelOverlay` outline — the whole group, or just its content). The
+     * compass paints its cells in this frame so they line up with where a drop
+     * actually resolves, not a different box.
+     */
+    getDropOverlayElement(group: DockviewGroupPanel): HTMLElement | undefined;
+    /** The layout root element — the (positioned) surface the outer-cell
+     *  landing preview is drawn over (where a whole-layout-edge dock lands). */
+    getLayoutElement(): HTMLElement;
+}
+
+export interface IDropGuideService extends IDisposable {
+    /**
+     * The cell hit-test resolver, installed by the host at the drop-target seam
+     * in place of the default cursor-quadrant logic — or `undefined` when the
+     * compass is disabled (`dndGuide` unset), so the default behaviour runs.
+     */
+    readonly resolver: PositionResolver | undefined;
 }
 
 // --- SmartGuides ---

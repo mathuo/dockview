@@ -22,6 +22,7 @@ import {
     IAdvancedDnDService,
     IAutoHideEdgeGroupService,
     IContextMenuService,
+    IDropGuideService,
     IKeyboardDockingService,
     ILayoutHistoryService,
     ISmartGuidesService,
@@ -42,6 +43,7 @@ export interface ServiceCollection {
     accessibilityService?: IAccessibilityService;
     keyboardDockingService?: IKeyboardDockingService;
     layoutHistoryService?: ILayoutHistoryService;
+    dropGuideService?: IDropGuideService;
     smartGuidesService?: ISmartGuidesService;
     autoHideEdgeGroupService?: IAutoHideEdgeGroupService;
 }

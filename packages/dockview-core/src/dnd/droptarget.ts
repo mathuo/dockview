@@ -12,6 +12,12 @@ export interface DroptargetEvent {
     readonly position: Position;
     /** Narrow with `instanceof DragEvent` before reading `dataTransfer`. */
     readonly nativeEvent: DragEvent | PointerEvent;
+    /**
+     * The resolved cell was marked `edge` by a {@link PositionResolver} — an
+     * "outer" cell that should dock against the whole layout, not this target.
+     * The target renders no overlay for it; the consumer routes the commit.
+     */
+    readonly edge?: boolean;
 }
 
 export class WillShowOverlayEvent
@@ -26,10 +32,16 @@ export class WillShowOverlayEvent
         return this.options.position;
     }
 
+    /** See {@link DroptargetEvent.edge}. */
+    get edge(): boolean {
+        return !!this.options.edge;
+    }
+
     constructor(
         private readonly options: {
             nativeEvent: DragEvent | PointerEvent;
             position: Position;
+            edge?: boolean;
         }
     ) {
         super();
@@ -182,6 +194,8 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
     private targetElement: HTMLElement | undefined;
     private overlayElement: HTMLElement | undefined;
     private _state: Position | undefined;
+    /** The current state was resolved as an `edge` cell (see DroptargetEvent). */
+    private _edge = false;
     private _acceptedTargetZonesSet: Set<Position>;
 
     private readonly _onDrop = new Emitter<DroptargetEvent>();
@@ -257,18 +271,20 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
                 const x = (e.clientX ?? 0) - rect.left;
                 const y = (e.clientY ?? 0) - rect.top;
 
-                const quadrant = this.resolvePosition(x, y, width, height, e);
+                const resolved = this.resolvePosition(x, y, width, height, e);
 
                 /**
                  * If the event has already been used by another DropTarget instance
                  * then don't show a second drop target, only one target should be
                  * active at any one time
                  */
-                if (this.isAlreadyUsed(e) || quadrant === null) {
+                if (this.isAlreadyUsed(e) || resolved === null) {
                     // no drop target should be displayed
                     this.removeDropTarget();
                     return;
                 }
+
+                const quadrant = resolved.position;
 
                 if (!this.options.canDisplayOverlay(e, quadrant)) {
                     if (overrideTarget) {
@@ -281,6 +297,7 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
                 const willShowOverlayEvent = new WillShowOverlayEvent({
                     nativeEvent: e,
                     position: quadrant,
+                    edge: resolved.edge,
                 });
 
                 /**
@@ -295,6 +312,16 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
                 }
 
                 this.markAsUsed(e);
+
+                // An `edge` cell reports its position but renders nothing — the
+                // consumer (e.g. the layout-edge dock) owns the preview + commit.
+                if (resolved.edge) {
+                    this.removeDropTarget();
+                    this._state = quadrant;
+                    this._edge = true;
+                    return;
+                }
+                this._edge = false;
 
                 if (overrideTarget) {
                     //
@@ -332,6 +359,7 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
                         this._onDrop.fire({
                             position: this._state,
                             nativeEvent: e,
+                            edge: this._edge,
                         });
                     }
                 }
@@ -344,6 +372,7 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
                 e.preventDefault();
 
                 const state = this._state;
+                const edge = this._edge;
 
                 this.removeDropTarget();
 
@@ -353,7 +382,11 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
                     // only stop the propagation of the event if we are dealing with it
                     // which is only when the target has state
                     e.stopPropagation();
-                    this._onDrop.fire({ position: state, nativeEvent: e });
+                    this._onDrop.fire({
+                        position: state,
+                        nativeEvent: e,
+                        edge,
+                    });
                 }
             },
         });
@@ -435,27 +468,29 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
         width: number,
         height: number,
         event: DragEvent | PointerEvent
-    ): Position | null {
+    ): { position: Position; edge: boolean } | null {
         const resolver = this.options.getPositionResolver?.();
         if (resolver) {
-            return (
-                resolver.resolve({
-                    x,
-                    y,
-                    width,
-                    height,
-                    zones: this._acceptedTargetZonesSet,
-                    event,
-                })?.position ?? null
-            );
+            const result = resolver.resolve({
+                x,
+                y,
+                width,
+                height,
+                zones: this._acceptedTargetZonesSet,
+                event,
+            });
+            return result
+                ? { position: result.position, edge: !!result.edge }
+                : null;
         }
-        return this.calculateQuadrant(
+        const position = this.calculateQuadrant(
             this._acceptedTargetZonesSet,
             x,
             y,
             width,
             height
         );
+        return position ? { position, edge: false } : null;
     }
 
     private calculateQuadrant(
@@ -493,8 +528,10 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
     }
 
     private removeDropTarget(): void {
+        // Always clear state — an `edge` cell sets state with no overlay element.
+        this._state = undefined;
+        this._edge = false;
         if (this.targetElement) {
-            this._state = undefined;
             this.targetElement.parentElement?.classList.remove(
                 'dv-drop-target'
             );

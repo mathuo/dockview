@@ -202,6 +202,8 @@ export {
     IAutoHideEdgeGroupService,
     IContextMenuHost,
     IContextMenuService,
+    IDropGuideHost,
+    IDropGuideService,
     IKeyboardDockingService,
     ILayoutHistoryHost,
     ILayoutHistoryService,

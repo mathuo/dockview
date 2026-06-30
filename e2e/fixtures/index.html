@@ -66,6 +66,10 @@
                     // A served (not about:blank) target avoids a 404 when the
                     // popout window navigates before dockview injects content.
                     popoutUrl: '/e2e/fixtures/popout.html',
+                    // Drop Guide ("compass") + pointer DnD so a panel drag is
+                    // drivable in the harness. Inert unless a drag occurs.
+                    dndGuide: true,
+                    dndStrategy: 'pointer',
                     createComponent: (options) => {
                         const element = document.createElement('div');
                         element.className = 'dv-test-panel';
@@ -119,6 +123,21 @@
                     redo: () => dockview.redo(),
                     canUndo: () => dockview.canUndo,
                     awaitPopoutRestore: () => dockview.popoutRestorationPromise,
+                    // Two side-by-side groups for Drop Guide: dragging the left
+                    // group's tab over the right group shows the compass.
+                    setupDropGuide: () => {
+                        dockview.addPanel({
+                            id: 'left',
+                            component: 'default',
+                            title: 'left',
+                        });
+                        dockview.addPanel({
+                            id: 'right',
+                            component: 'default',
+                            title: 'right',
+                            position: { direction: 'right' },
+                        });
+                    },
                     floatingCount: () => dockview.floatingGroups.length,
                     peekEdge: (position, on) =>
                         dockview.api.peekEdgeGroup(position, on),
