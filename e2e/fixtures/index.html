@@ -49,8 +49,18 @@
                 ]);
 
                 const el = document.getElementById('app');
+                // `?pinned=separate-row` exercises the two-row pinned layout;
+                // any other value uses the default inline mode.
+                const pinnedMode =
+                    new URLSearchParams(location.search).get('pinned') ===
+                    'separate-row'
+                        ? 'separate-row'
+                        : 'inline';
                 const dockview = new core.DockviewComponent(el, {
                     keyboardNavigation: true,
+                    // Pinned tabs — inert until a panel is pinned. `separate-row`
+                    // mounts the pinned second row (real-browser geometry).
+                    pinnedTabs: { enabled: true, mode: pinnedMode },
                     // Record layout history so the harness can exercise undo/redo
                     // (incl. async popout re-open).
                     layoutHistory: { enabled: true },
@@ -105,6 +115,22 @@
                             title: id,
                         });
                     },
+                    // Pinned tabs: add `n` panels then pin the given ids.
+                    setupPinned: (ids, pinnedIds) => {
+                        for (const id of ids) {
+                            panels[id] = dockview.addPanel({
+                                id,
+                                component: 'default',
+                                title: id,
+                            });
+                        }
+                        for (const id of pinnedIds || []) {
+                            panels[id].api.setPinned(true);
+                        }
+                    },
+                    setPinned: (id, pinned) =>
+                        panels[id] && panels[id].api.setPinned(pinned),
+                    isPinned: (id) => panels[id] && panels[id].api.isPinned,
                     // The content-area dimensions a panel was last laid out
                     // with — the seam reports the group box minus the header.
                     panelDimensions: (id) => panelDimensions[id],

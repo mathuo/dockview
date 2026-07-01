@@ -593,9 +593,12 @@ const DockviewDemo = (props: {
                 | 'closeOthers'
                 | 'closeAll'
                 | 'separator'
+                | 'pin'
                 | { component: React.FC<IContextMenuItemComponentProps> }
                 | { label: string; action: () => void }
             )[] = [
+                'pin',
+                'separator',
                 'close',
                 'closeOthers',
                 'closeAll',
@@ -789,6 +792,7 @@ const DockviewDemo = (props: {
                                             onReady={onReady}
                                             theme={effectiveTheme}
                                             autoHideEdgeGroups
+                                            pinnedTabs={{ enabled: true }}
                                             floatingGroupDragHandle="titlebar"
                                             dndGuide={true}
                                             smartGuides={{ snapDistance: 8 }}

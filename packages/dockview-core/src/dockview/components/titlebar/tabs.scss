@@ -211,7 +211,10 @@ $dv-pin-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/sv
 // Pinned tabs, second-row mode (`mode: 'separate-row'`). The pinned row is
 // mounted into the header by the module via the `setPinnedRow` seam; the header
 // wraps it onto its own full-width line above the main strip and grows to fit.
-.dv-tabs-and-actions-container--pinned-row {
+// Double class = higher specificity than the base
+// `.dv-tabs-and-actions-container { height: var(...) }`, so `height: auto` wins
+// regardless of stylesheet order and the header can grow to two rows.
+.dv-tabs-and-actions-container.dv-tabs-and-actions-container--pinned-row {
     flex-wrap: wrap;
     height: auto;
     min-height: var(--dv-tabs-and-actions-container-height);
