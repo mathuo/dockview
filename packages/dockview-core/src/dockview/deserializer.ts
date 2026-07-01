@@ -69,6 +69,10 @@ export class DefaultDockviewDeserialzier implements IPanelDeserializer {
             params: params ?? {},
         });
 
+        if (panelData.pinned) {
+            panel.setPinned(true);
+        }
+
         return panel;
     }
 }

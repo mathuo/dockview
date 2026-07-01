@@ -64,6 +64,9 @@ export class PinnedTabsService implements IPinnedTabsService {
      *  are unique component-wide, so a single set serves every group. */
     private readonly _pinnedIds = new Set<string>();
 
+    /** Live groups, tracked so a `fromJSON` restore can seed every strip. */
+    private readonly _groups = new Set<DockviewGroupPanel>();
+
     /** Re-entrancy guard: reordering moves panels, which must not re-trigger. */
     private _enforcing = false;
 
@@ -98,6 +101,7 @@ export class PinnedTabsService implements IPinnedTabsService {
             // Every group's tab strip consults the pinned predicate (overflow)
             // and the pin-boundary resolver (reorder guard).
             this._host.onDidAddGroup((group) => {
+                this._groups.add(group);
                 group.model.header.setOverflowExclude(
                     this.isExcludedFromOverflow
                 );
@@ -107,9 +111,34 @@ export class PinnedTabsService implements IPinnedTabsService {
             }),
             // Drop bookkeeping for groups that go away.
             this._host.onDidRemoveGroup((group) => {
+                this._groups.delete(group);
                 this._pinnedOrder.delete(group);
+            }),
+            // A restore populates panels' `isPinned` directly (not via the
+            // gated setter), so seed the store from them and re-assert the
+            // invariant once the layout is fully built.
+            this._host.onDidLayoutFromJSON(() => {
+                for (const group of this._groups) {
+                    this._seedFromRestore(group);
+                }
             })
         );
+    }
+
+    /** Seed pinned bookkeeping from a restored group's panels (already in
+     *  pinned-first strip order) and re-assert the invariant + overflow. */
+    private _seedFromRestore(group: DockviewGroupPanel): void {
+        const order = this._orderFor(group);
+        for (const panel of group.model.panels) {
+            if (panel.api.isPinned) {
+                this._pinnedIds.add(panel.id);
+                if (!order.includes(panel.id)) {
+                    order.push(panel.id);
+                }
+            }
+        }
+        this.enforceOrder(group);
+        group.model.header.setOverflowExclude(this.isExcludedFromOverflow);
     }
 
     /**
@@ -242,6 +271,7 @@ export class PinnedTabsService implements IPinnedTabsService {
         this._disposable.dispose();
         this._pinnedOrder.clear();
         this._pinnedIds.clear();
+        this._groups.clear();
     }
 
     private _isPinned(group: DockviewGroupPanel, panelId: string): boolean {

@@ -171,6 +171,8 @@ export class DockviewPanel
             maximumHeight: this._maximumHeight,
             minimumWidth: this._minimumWidth,
             maximumWidth: this._maximumWidth,
+            // Emit only when pinned so existing layouts stay byte-stable.
+            pinned: this._pinned ? true : undefined,
         };
     }
 
@@ -246,6 +248,7 @@ export class DockviewPanel
         this.update({ params: state.params ?? {} });
         this.setTitle(state.title ?? this.id);
         this.setRenderer(state.renderer ?? this.accessor.renderer);
+        this.setPinned(state.pinned ?? false);
 
         // state.contentComponent;
         // state.tabComponent;

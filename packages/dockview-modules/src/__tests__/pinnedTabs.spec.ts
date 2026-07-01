@@ -243,6 +243,7 @@ describe('pinned tabs — reorder guard', () => {
             onDidPanelPinnedChange: stub,
             onDidAddGroup: stub,
             onDidRemoveGroup: stub,
+            onDidLayoutFromJSON: stub,
         } as any);
     };
 
@@ -361,5 +362,79 @@ describe('pinned tabs — reorder guard', () => {
             await Promise.resolve();
             expect(setPinned).toHaveBeenCalledWith(false);
         });
+    });
+});
+
+describe('pinned tabs — serialization', () => {
+    const containers: HTMLElement[] = [];
+
+    const make = (
+        pinnedTabs: DockviewComponent['options']['pinnedTabs']
+    ): DockviewComponent => {
+        const container = document.createElement('div');
+        document.body.appendChild(container);
+        containers.push(container);
+        const dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            pinnedTabs,
+        });
+        dockview.layout(1000, 1000);
+        return dockview;
+    };
+
+    afterEach(() => {
+        while (containers.length) {
+            containers.pop()!.remove();
+        }
+    });
+
+    const buildPinned = (dockview: DockviewComponent): void => {
+        dockview.addPanel({ id: 'a', component: 'default' });
+        dockview.addPanel({ id: 'b', component: 'default' });
+        const c = dockview.addPanel({ id: 'c', component: 'default' });
+        c.api.setPinned(true); // order becomes [c, a, b]
+    };
+
+    test('toJSON emits pinned only for pinned panels', () => {
+        const dockview = make({ enabled: true });
+        buildPinned(dockview);
+
+        const json = dockview.api.toJSON();
+
+        expect(json.panels['c'].pinned).toBe(true);
+        expect(json.panels['a'].pinned).toBeUndefined();
+        expect(json.panels['b'].pinned).toBeUndefined();
+    });
+
+    test('a round-trip preserves pinned state and pinned-first order', () => {
+        const source = make({ enabled: true });
+        buildPinned(source);
+        const json = source.api.toJSON();
+
+        const target = make({ enabled: true });
+        target.api.fromJSON(json);
+
+        const c = target.api.getPanel('c')!;
+        expect(c.api.isPinned).toBe(true);
+        expect(target.api.getPanel('a')!.api.isPinned).toBe(false);
+        expect(c.api.group.model.panels.map((p) => p.id)).toEqual([
+            'c',
+            'a',
+            'b',
+        ]);
+    });
+
+    test('a layout without a pinned key loads unpinned (back-compat)', () => {
+        const source = make({ enabled: true });
+        source.addPanel({ id: 'a', component: 'default' });
+        source.addPanel({ id: 'b', component: 'default' });
+        const json = source.api.toJSON();
+        expect(json.panels['a'].pinned).toBeUndefined();
+
+        const target = make({ enabled: true });
+        target.api.fromJSON(json);
+
+        expect(target.api.getPanel('a')!.api.isPinned).toBe(false);
+        expect(target.api.getPanel('b')!.api.isPinned).toBe(false);
     });
 });
