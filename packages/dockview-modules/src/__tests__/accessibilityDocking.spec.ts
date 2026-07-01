@@ -4,8 +4,10 @@ import { registerModules } from 'dockview-core';
 import { IContentRenderer } from 'dockview-core';
 import { KeyboardDockingModule } from '../keyboardDockingService';
 
-// Advanced keyboard docking (spatial focus + Ctrl+M move mode) is not part of
-// the default `Modules` bundle, so register it explicitly for these tests.
+// Keyboard docking (spatial focus + Ctrl+M move mode) ships in the default
+// `Modules` bundle, but register it explicitly here so this spec is
+// self-contained regardless of the jest setup — `registerModules` dedups by
+// name, so this is a no-op when the bundle is already registered.
 registerModules([KeyboardDockingModule]);
 
 class TestPanel implements IContentRenderer {

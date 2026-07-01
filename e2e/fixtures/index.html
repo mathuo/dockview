@@ -98,6 +98,22 @@
                     // drivable in the harness. Inert unless a drag occurs.
                     dndGuide: true,
                     dndStrategy: 'pointer',
+                    // Tab context menu (ContextMenuModule) — inert until a tab
+                    // is right-clicked. Safe to set globally: no other spec
+                    // right-clicks a tab.
+                    getTabContextMenuItems: () => [
+                        'close',
+                        'closeOthers',
+                        'closeAll',
+                    ],
+                    // Tab-group chip context menu (TabGroupChipsModule) — inert
+                    // until a chip is right-clicked, which only the tab-group
+                    // chip spec does.
+                    getTabGroupChipContextMenuItems: () => [
+                        'rename',
+                        'separator',
+                        { label: 'Custom Action', action: () => {} },
+                    ],
                     createComponent: (options) => {
                         const element = document.createElement('div');
                         element.className = 'dv-test-panel';
@@ -205,6 +221,58 @@
                             title: 'right',
                             position: { direction: 'right' },
                         });
+                    },
+                    // Keyboard navigation (AccessibilityModule): id of the
+                    // currently-active group so a spec can assert F6/Shift+F6
+                    // moved the active group.
+                    activeGroupId: () => dockview.activeGroup?.id,
+                    // Two side-by-side groups for keyboard navigation — like
+                    // setupDropGuide but with stable ids the spec can compare.
+                    setupTwoGroups: () => {
+                        panels['one'] = dockview.addPanel({
+                            id: 'one',
+                            component: 'default',
+                            title: 'one',
+                        });
+                        panels['two'] = dockview.addPanel({
+                            id: 'two',
+                            component: 'default',
+                            title: 'two',
+                            position: { direction: 'right' },
+                        });
+                        return {
+                            first: panels['one'].group.id,
+                            second: panels['two'].group.id,
+                        };
+                    },
+                    // Tab-group chips: three panels in one group, then a tab
+                    // group (label "Monitoring") containing two of them so a
+                    // `.dv-tab-group-chip` renders in the header. Returns the
+                    // ids the chip spec needs. The chip mounts on a microtask.
+                    setupTabGroupChip: () => {
+                        for (const id of ['red', 'green', 'blue']) {
+                            panels[id] = dockview.addPanel({
+                                id,
+                                component: 'default',
+                                title: id,
+                            });
+                        }
+                        const groupId = panels['red'].group.id;
+                        const tabGroup = dockview.api.createTabGroup({
+                            groupId,
+                            label: 'Monitoring',
+                        });
+                        dockview.api.addPanelToTabGroup({
+                            groupId,
+                            tabGroupId: tabGroup.id,
+                            panelId: 'red',
+                        });
+                        dockview.api.addPanelToTabGroup({
+                            groupId,
+                            tabGroupId: tabGroup.id,
+                            panelId: 'green',
+                        });
+                        return { groupId, tabGroupId: tabGroup.id };
                     },
                     floatingCount: () => dockview.floatingGroups.length,
                     peekEdge: (position, on) =>
