@@ -187,13 +187,19 @@
     .dv-default-tab {
         min-width: 0;
     }
+
+    // Pinned tabs have no close button (Chrome / VS-Code style) — pinning
+    // protects the tab from an accidental close. Close via the context menu or
+    // the keyboard, or unpin first.
+    .dv-default-tab-action {
+        display: none;
+    }
 }
 
 .dv-tab.dv-tab--pinned-compact {
-    // Icon-only: the default renderer hides its title + close button; a custom
+    // Icon-only: the default renderer additionally hides its title; a custom
     // tab renderer receives the class and styles itself.
-    .dv-default-tab-content,
-    .dv-default-tab-action {
+    .dv-default-tab-content {
         display: none;
     }
 

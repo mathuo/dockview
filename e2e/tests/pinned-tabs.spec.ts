@@ -89,8 +89,10 @@ test.describe('pinned tabs', () => {
         // The title is still shown (not compact by default)…
         await expect(pinned.locator('.dv-default-tab-content')).toBeVisible();
         await expect(pinned).toContainText('alpha');
-        // …and a pin glyph is rendered.
+        // …a pin glyph is rendered…
         await expect(pinned.locator('.dv-tab-pin .dv-svg')).toBeVisible();
+        // …and the close button is hidden (pinning protects from a stray close).
+        await expect(pinned.locator('.dv-default-tab-action')).toBeHidden();
     });
 
     test('compact: a pinned tab hides its title but keeps the pin glyph', async ({
