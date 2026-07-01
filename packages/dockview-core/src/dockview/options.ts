@@ -498,7 +498,11 @@ export interface PinnedTabsOptions {
     mode?: 'inline' | 'separate-row';
     /** Render pinned tabs icon-only (VS-Code / Chrome style). Default true. */
     compact?: boolean;
-    /** Drag a tab across the pin boundary to toggle its pinned state. Default true. */
+    /**
+     * Drag a tab across the pin boundary to toggle its pinned state
+     * (VS-Code-style). Default false — dragging across the boundary is clamped
+     * back, matching Chrome, where pinning is an explicit action only.
+     */
     togglePinOnCrossBoundaryDrag?: boolean;
     /** Add a Pin/Unpin item to the tab context menu (requires ContextMenuModule). Default true. */
     contextMenuItem?: boolean;

@@ -157,9 +157,12 @@ export class PinnedTabsService implements IPinnedTabsService {
             }
         }
 
+        // Default: clamp (Chrome-style — dragging across the boundary is
+        // refused). Opt in to flipping the pinned state with
+        // `togglePinOnCrossBoundaryDrag: true` (VS-Code-style).
         const flip =
-            this._host.options.pinnedTabs?.togglePinOnCrossBoundaryDrag !==
-            false;
+            this._host.options.pinnedTabs?.togglePinOnCrossBoundaryDrag ===
+            true;
 
         if (dragged.api.isPinned) {
             // A pinned tab may land anywhere in [0, boundary].

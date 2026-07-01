@@ -311,9 +311,26 @@ describe('pinned tabs — reorder guard', () => {
         expect(svc.resolveDropIndex(g, 'a', 0)).toBe(0);
     });
 
-    describe('flip (togglePinOnCrossBoundaryDrag: true, default)', () => {
+    test('the default (no togglePinOnCrossBoundaryDrag) clamps, not flips', async () => {
+        const svc = makeService({ enabled: true });
+        const setPinned = jest.fn();
+        const g = grp([
+            { id: 'p', pinned: true },
+            { id: 'a', pinned: false, setPinned },
+        ]);
+
+        // Cross-boundary drop is clamped to the boundary, and nothing flips.
+        expect(svc.resolveDropIndex(g, 'a', 0)).toBe(1);
+        await Promise.resolve();
+        expect(setPinned).not.toHaveBeenCalled();
+    });
+
+    describe('flip (togglePinOnCrossBoundaryDrag: true)', () => {
         test('dragging an unpinned tab into the pinned zone pins it', async () => {
-            const svc = makeService({ enabled: true });
+            const svc = makeService({
+                enabled: true,
+                togglePinOnCrossBoundaryDrag: true,
+            });
             const setPinned = jest.fn();
             const g = grp([
                 { id: 'p', pinned: true },
@@ -328,7 +345,10 @@ describe('pinned tabs — reorder guard', () => {
         });
 
         test('dragging a pinned tab into the unpinned zone unpins it', async () => {
-            const svc = makeService({ enabled: true });
+            const svc = makeService({
+                enabled: true,
+                togglePinOnCrossBoundaryDrag: true,
+            });
             const setPinned = jest.fn();
             const g = grp([
                 { id: 'p', pinned: true, setPinned },
