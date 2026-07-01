@@ -6,6 +6,7 @@ import {
     PanelTransfer,
 } from '../../../dnd/dataTransfer';
 import { toggleClass } from '../../../dom';
+import { createPinButton } from '../../../svg';
 import { DockviewComponent } from '../../dockviewComponent';
 import { ITabRenderer } from '../../types';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
@@ -41,6 +42,7 @@ export class Tab extends CompositeDisposable {
     private readonly panelTransfer =
         LocalSelectionTransfer.getInstance<PanelTransfer>();
     private _direction: DockviewHeaderDirection = 'horizontal';
+    private _pinIndicator: HTMLElement | undefined = undefined;
 
     private readonly _onPointDown = new Emitter<MouseEvent>();
     readonly onPointerDown: Event<MouseEvent> = this._onPointDown.event;
@@ -264,10 +266,26 @@ export class Tab extends CompositeDisposable {
 
     private _updatePinnedClasses(): void {
         const pinned = this.panel.api?.isPinned ?? false;
+        // Compact (icon-only) is opt-in: dockview's default tab has no favicon,
+        // so a pinned tab keeps its title by default and just gains a pin glyph.
         const compact =
-            pinned && this.accessor.options.pinnedTabs?.compact !== false;
+            pinned && this.accessor.options.pinnedTabs?.compact === true;
         toggleClass(this.element, 'dv-tab--pinned', pinned);
         toggleClass(this.element, 'dv-tab--pinned-compact', compact);
+
+        // A real inline pin glyph (inherits `currentColor` via `.dv-svg`) —
+        // more robust and themeable than a CSS mask, and the only visual
+        // identity a compact pinned tab has.
+        if (pinned && !this._pinIndicator) {
+            const indicator = document.createElement('div');
+            indicator.className = 'dv-tab-pin';
+            indicator.appendChild(createPinButton());
+            this._element.insertBefore(indicator, this._element.firstChild);
+            this._pinIndicator = indicator;
+        } else if (!pinned && this._pinIndicator) {
+            this._pinIndicator.remove();
+            this._pinIndicator = undefined;
+        }
     }
 
     public setActive(isActive: boolean): void {

@@ -106,11 +106,31 @@ describe('pinned tabs — integration', () => {
         return document.getElementById(id)!;
     };
 
-    test('a pinned tab gets dv-tab--pinned and dv-tab--pinned-compact', () => {
+    test('a pinned tab is labelled by default (marker + glyph, not compact)', () => {
         const dockview = make({ enabled: true });
         const { c } = threePanels(dockview);
 
         expect(tabEl(c).classList.contains('dv-tab--pinned')).toBe(false);
+        expect(tabEl(c).querySelector('.dv-tab-pin')).toBeNull();
+
+        c.api.setPinned(true);
+
+        expect(tabEl(c).classList.contains('dv-tab--pinned')).toBe(true);
+        // Default is labelled — not compact.
+        expect(tabEl(c).classList.contains('dv-tab--pinned-compact')).toBe(
+            false
+        );
+        // A pin glyph is injected.
+        expect(tabEl(c).querySelector('.dv-tab-pin')).not.toBeNull();
+
+        c.api.setPinned(false);
+        expect(tabEl(c).classList.contains('dv-tab--pinned')).toBe(false);
+        expect(tabEl(c).querySelector('.dv-tab-pin')).toBeNull();
+    });
+
+    test('compact: true renders the pinned tab icon-only', () => {
+        const dockview = make({ enabled: true, compact: true });
+        const { c } = threePanels(dockview);
 
         c.api.setPinned(true);
 
@@ -118,24 +138,7 @@ describe('pinned tabs — integration', () => {
         expect(tabEl(c).classList.contains('dv-tab--pinned-compact')).toBe(
             true
         );
-
-        c.api.setPinned(false);
-        expect(tabEl(c).classList.contains('dv-tab--pinned')).toBe(false);
-        expect(tabEl(c).classList.contains('dv-tab--pinned-compact')).toBe(
-            false
-        );
-    });
-
-    test('compact: false keeps the pinned marker without the compact class', () => {
-        const dockview = make({ enabled: true, compact: false });
-        const { c } = threePanels(dockview);
-
-        c.api.setPinned(true);
-
-        expect(tabEl(c).classList.contains('dv-tab--pinned')).toBe(true);
-        expect(tabEl(c).classList.contains('dv-tab--pinned-compact')).toBe(
-            false
-        );
+        expect(tabEl(c).querySelector('.dv-tab-pin')).not.toBeNull();
     });
 
     test('the pinned class survives a reorder (which recreates the tab)', () => {

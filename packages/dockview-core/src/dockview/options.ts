@@ -499,7 +499,12 @@ export interface PinnedTabsOptions {
      * (Phase 1 implements `'inline'` only.)
      */
     mode?: 'inline' | 'separate-row';
-    /** Render pinned tabs icon-only (VS-Code / Chrome style). Default true. */
+    /**
+     * Render pinned tabs icon-only (title + close button hidden), VS-Code /
+     * Chrome style. Default false — dockview's default tab has no favicon, so
+     * pinned tabs stay labelled (with a pin glyph) unless you opt in. Best
+     * enabled alongside a custom tab renderer that shows an icon.
+     */
     compact?: boolean;
     /**
      * Drag a tab across the pin boundary to toggle its pinned state

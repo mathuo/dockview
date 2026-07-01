@@ -7,10 +7,15 @@ import { test, expect, Page } from '@playwright/test';
  * pinned tab excluded from the dropdown while the strip clips).
  */
 test.describe('pinned tabs', () => {
-    const setup = async (page: Page, mode?: 'separate-row') => {
-        await page.goto(
-            '/e2e/fixtures/index.html' + (mode ? `?pinned=${mode}` : '')
-        );
+    const setup = async (
+        page: Page,
+        opts: { mode?: 'separate-row'; compact?: boolean } = {}
+    ) => {
+        const query = new URLSearchParams();
+        if (opts.mode) query.set('pinned', opts.mode);
+        if (opts.compact) query.set('compact', '1');
+        const qs = query.toString();
+        await page.goto('/e2e/fixtures/index.html' + (qs ? `?${qs}` : ''));
         await page.waitForFunction(() => (window as any).__ready === true);
     };
 
@@ -20,7 +25,7 @@ test.describe('pinned tabs', () => {
     test('separate-row: the pinned row grows the header and reflows content', async ({
         page,
     }) => {
-        await setup(page, 'separate-row');
+        await setup(page, { mode: 'separate-row' });
         await page.evaluate(() =>
             (window as any).__dv.setupPinned(['a', 'b', 'c'], [])
         );
@@ -72,10 +77,26 @@ test.describe('pinned tabs', () => {
         ).toBeLessThan(2);
     });
 
-    test('compact: a pinned tab hides its title and shrinks', async ({
+    test('default: a pinned tab keeps its title and shows a pin glyph', async ({
         page,
     }) => {
         await setup(page);
+        await page.evaluate(() =>
+            (window as any).__dv.setupPinned(['alpha', 'bravo'], ['alpha'])
+        );
+
+        const pinned = page.locator('.dv-tab--pinned');
+        // The title is still shown (not compact by default)…
+        await expect(pinned.locator('.dv-default-tab-content')).toBeVisible();
+        await expect(pinned).toContainText('alpha');
+        // …and a pin glyph is rendered.
+        await expect(pinned.locator('.dv-tab-pin .dv-svg')).toBeVisible();
+    });
+
+    test('compact: a pinned tab hides its title but keeps the pin glyph', async ({
+        page,
+    }) => {
+        await setup(page, { compact: true });
         await page.evaluate(() =>
             (window as any).__dv.setupPinned(['alpha', 'bravo'], ['alpha'])
         );
@@ -84,6 +105,10 @@ test.describe('pinned tabs', () => {
         await expect(
             page.locator('.dv-tab--pinned-compact .dv-default-tab-content')
         ).toBeHidden();
+        // …but the pin glyph is still visible (its only identity)…
+        await expect(
+            page.locator('.dv-tab--pinned-compact .dv-tab-pin .dv-svg')
+        ).toBeVisible();
 
         // …and it is narrower than a normal (titled) tab.
         const compact = (await box(page, '.dv-tab--pinned-compact'))!;
