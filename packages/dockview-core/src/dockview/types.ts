@@ -78,4 +78,7 @@ export interface GroupviewPanelState {
     minimumHeight?: number;
     maximumWidth?: number;
     maximumHeight?: number;
+    /** Pinned tab state (PinnedTabs module). Emitted only when `true`; absent
+     *  layouts load unpinned. */
+    pinned?: boolean;
 }

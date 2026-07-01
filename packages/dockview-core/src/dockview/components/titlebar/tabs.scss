@@ -158,6 +158,133 @@
     }
 }
 
+// Pinned tabs (PinnedTabs module). Presentation only — the classes are inert
+// unless a panel is pinned (nothing pins panels without the module), so this is
+// a no-op for the default free layout. `--pinned` marks a pinned tab and shows
+// a leading pin glyph (a real inline SVG injected by the tab, `.dv-tab-pin`);
+// `--pinned-compact` (opt-in) additionally hides the title + close button,
+// Chrome-style, leaving just the glyph.
+.dv-tab.dv-tab--pinned {
+    // Only lay the tab out as a flex row when a glyph was actually injected
+    // (default renderer). A custom tab renderer gets the class but keeps its
+    // own layout.
+    &:has(.dv-tab-pin) {
+        display: flex;
+        align-items: center;
+    }
+
+    .dv-tab-pin {
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
+        margin-right: 4px;
+        opacity: 0.7;
+        // Decorative indicator — clicks/drags belong to the tab beneath it.
+        pointer-events: none;
+
+        .dv-svg {
+            width: 11px;
+            height: 11px;
+        }
+    }
+
+    // Let the title shrink (ellipsis) beside the glyph rather than overflow.
+    .dv-default-tab {
+        min-width: 0;
+    }
+
+    // Pinned tabs have no close button (Chrome / VS-Code style) — pinning
+    // protects the tab from an accidental close. Close via the context menu or
+    // the keyboard, or unpin first.
+    .dv-default-tab-action {
+        display: none;
+    }
+}
+
+.dv-tab.dv-tab--pinned-compact {
+    // Icon-only: the default renderer additionally hides its title; a custom
+    // tab renderer receives the class and styles itself.
+    .dv-default-tab-content {
+        display: none;
+    }
+
+    .dv-tab-pin {
+        margin-right: 0;
+    }
+}
+
+// Pinned tabs, second-row mode (`mode: 'separate-row'`). The pinned row is
+// mounted into the header by the module via the `setPinnedRow` seam; the header
+// wraps it onto its own full-width line above the main strip and grows to fit.
+// Double class = higher specificity than the base
+// `.dv-tabs-and-actions-container { height: var(...) }`, so `height: auto` wins
+// regardless of stylesheet order and the header can grow to two rows.
+.dv-tabs-and-actions-container.dv-tabs-and-actions-container--pinned-row {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: var(--dv-tabs-and-actions-container-height);
+    align-content: flex-start;
+
+    .dv-pinned-row {
+        flex: 0 0 100%;
+        order: -1;
+    }
+
+    // Pinned tabs live in the pinned row; hide their (still-present) copies in
+    // the main strip.
+    .dv-tab.dv-tab--pinned {
+        display: none;
+    }
+}
+
+.dv-pinned-row {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: var(--dv-tabs-and-actions-container-height);
+    padding: 2px 4px;
+    background-color: var(--dv-tabs-and-actions-container-background-color);
+    border-bottom: 1px solid var(--dv-tab-divider-color);
+}
+
+.dv-pinned-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-sizing: border-box;
+    padding: 0.25rem 0.5rem;
+    font-size: var(--dv-tab-font-size);
+    cursor: pointer;
+    user-select: none;
+    background-color: var(--dv-activegroup-hiddenpanel-tab-background-color);
+    color: var(--dv-activegroup-hiddenpanel-tab-color);
+
+    &.dv-pinned-tab--active {
+        background-color: var(
+            --dv-activegroup-visiblepanel-tab-background-color
+        );
+        color: var(--dv-activegroup-visiblepanel-tab-color);
+    }
+
+    .dv-pinned-tab-label {
+        max-width: 120px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .dv-pinned-tab-unpin {
+        flex-shrink: 0;
+        opacity: 0.6;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .dv-tab {
         transition: none !important;

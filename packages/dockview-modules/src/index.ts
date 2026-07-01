@@ -6,6 +6,7 @@ import { LayoutHistoryModule } from './layoutHistoryService';
 import { DropGuideModule } from './dropGuideService';
 import { SmartGuidesModule } from './smartGuidesService';
 import { AutoHideEdgeGroupModule } from './autoHideEdgeGroupService';
+import { PinnedTabsModule } from './pinnedTabsService';
 
 export {
     TabGroupChipsService,
@@ -26,6 +27,11 @@ export {
     AutoHideEdgeGroupService,
     AutoHideEdgeGroupModule,
 } from './autoHideEdgeGroupService';
+export {
+    PinnedTabsService,
+    PinnedTabsModule,
+    computePinnedFirstOrder,
+} from './pinnedTabsService';
 // Advanced keyboard docking is an optional module — exported for explicit
 // registration, but not part of the default `Modules` bundle below.
 export {
@@ -45,4 +51,5 @@ export const Modules: DockviewModule<any>[] = [
     DropGuideModule,
     SmartGuidesModule,
     AutoHideEdgeGroupModule,
+    PinnedTabsModule,
 ];

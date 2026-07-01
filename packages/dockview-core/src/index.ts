@@ -152,6 +152,7 @@ export {
 } from './api/gridviewPanelApi';
 export {
     TitleEvent,
+    PinnedChangeEvent,
     RendererChangedEvent,
     DockviewPanelApi,
     DockviewPanelMoveParams,
@@ -216,6 +217,8 @@ export {
     SmartGuidesSnapTogetherEvent,
     ITabGroupChipsHost,
     ITabGroupChipsService,
+    IPinnedTabsHost,
+    IPinnedTabsService,
 } from './dockview/moduleContracts';
 export { resolveMessages } from './dockview/accessibilityMessages';
 export {

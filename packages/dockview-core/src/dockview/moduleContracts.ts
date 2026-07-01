@@ -28,6 +28,7 @@ import {
     DockviewLayoutMutationEvent,
     DockviewLayoutMutationKind,
     DockviewOrigin,
+    DockviewPanelPinnedChangeEvent,
     GroupNavigationDirection,
     SerializedDockview,
 } from './dockviewComponent';
@@ -460,4 +461,53 @@ export interface IAutoHideEdgeGroupService extends IDisposable {
     pin(position: EdgeGroupPosition): void;
     /** Auto-hide (collapse to strip) the edge group at `position`. */
     autoHide(position: EdgeGroupPosition): void;
+}
+
+// --- PinnedTabs ---
+
+/**
+ * The narrow surface the pinned-tabs service reads from the host
+ * (`DockviewComponent`). Pinned state itself lives on the panel
+ * (`panel.api.isPinned`, mutated through the gated
+ * `DockviewComponent.setPanelPinned`); the module only observes pinned-state
+ * changes and re-orders each group's tab strip so pinned tabs render first. No
+ * layout or sizing is touched.
+ */
+export interface IPinnedTabsHost {
+    readonly options: DockviewComponentOptions;
+    readonly onDidAddGroup: Event<DockviewGroupPanel>;
+    readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
+    /** Fires after a panel's pinned flag is mutated via the gated
+     *  `setPanelPinned` — the service's sole trigger to re-order the strip. */
+    readonly onDidPanelPinnedChange: Event<DockviewPanelPinnedChangeEvent>;
+    /** Fires after a `fromJSON` restore completes — the service seeds its
+     *  pinned store from the restored panels' `isPinned` flags and re-asserts
+     *  the invariant. */
+    readonly onDidLayoutFromJSON: Event<void>;
+    /** Fires when a panel is removed — the service prunes it from its pinned
+     *  bookkeeping so a closed pinned panel's id can't leak. */
+    readonly onDidRemovePanel: Event<IDockviewPanel>;
+}
+
+/**
+ * Pinned-tabs module service. Its presence is what
+ * `DockviewComponent.setPanelPinned` checks (via `assertModule`) before
+ * mutating pinned state; the pinned-first ordering is enforced internally and
+ * reactively as panels are pinned/unpinned, added, or moved.
+ */
+export interface IPinnedTabsService extends IDisposable {
+    /** Re-assert the pinned-first invariant on a single group's tab strip. */
+    enforceOrder(group: DockviewGroupPanel): void;
+    /** Pure predicate (handed to each group's `Tabs`) — true keeps the panel
+     *  out of the overflow dropdown. */
+    isExcludedFromOverflow(panelId: string): boolean;
+    /** Clamp/redirect a proposed header drop `index` against the group's pin
+     *  boundary so the dragged panel lands on the correct side. May flip the
+     *  panel's pinned state instead of clamping when
+     *  `togglePinOnCrossBoundaryDrag` is enabled. */
+    resolveDropIndex(
+        group: DockviewGroupPanel,
+        panelId: string,
+        index: number
+    ): number;
 }

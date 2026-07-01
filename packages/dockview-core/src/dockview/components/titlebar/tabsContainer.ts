@@ -72,6 +72,11 @@ export interface ITabsContainer extends IDisposable {
     updateDragAndDropState(): void;
     updateTabGroups(): void;
     refreshTabGroupAccent(): void;
+    setOverflowExclude(fn: (panelId: string) => boolean): void;
+    refreshOverflow(): void;
+    setDropIndexResolver(fn: (panelId: string, index: number) => number): void;
+    resolveDropIndex(panelId: string, index: number): number;
+    setPinnedRow(el: HTMLElement | undefined): void;
 }
 
 export class TabsContainer
@@ -91,6 +96,18 @@ export class TabsContainer
 
     private _hidden = false;
     private _direction: DockviewHeaderDirection = 'horizontal';
+    /**
+     * Clamps/redirects a header drop index — wired by the PinnedTabs module to
+     * keep drops on the correct side of the pin boundary. Identity by default
+     * so behaviour is unchanged when the module is absent.
+     */
+    private _dropIndexResolver: (panelId: string, index: number) => number = (
+        _panelId,
+        index
+    ) => index;
+    /** The pinned second-row element (PinnedTabs `separate-row` mode), owned by
+     *  the module and mounted here. Undefined when there is no row. */
+    private _pinnedRow: HTMLElement | undefined = undefined;
 
     private dropdownPart: DropdownElement | null = null;
     private _overflowTabs: string[] = [];
@@ -395,6 +412,43 @@ export class TabsContainer
 
     closePanel(panel: IDockviewPanel): void {
         this.delete(panel.id);
+    }
+
+    setOverflowExclude(fn: (panelId: string) => boolean): void {
+        this.tabs.setOverflowExclude(fn);
+    }
+
+    refreshOverflow(): void {
+        this.tabs.refreshOverflow();
+    }
+
+    setPinnedRow(el: HTMLElement | undefined): void {
+        if (this._pinnedRow === el) {
+            return;
+        }
+        if (this._pinnedRow) {
+            this._pinnedRow.remove();
+        }
+        this._pinnedRow = el;
+        if (el) {
+            el.classList.add('dv-pinned-row');
+            // `order: -1` (in SCSS) keeps it visually first; the header wraps
+            // it onto its own line above the main strip.
+            this._element.insertBefore(el, this._element.firstChild);
+        }
+        toggleClass(
+            this._element,
+            'dv-tabs-and-actions-container--pinned-row',
+            !!el
+        );
+    }
+
+    setDropIndexResolver(fn: (panelId: string, index: number) => number): void {
+        this._dropIndexResolver = fn;
+    }
+
+    resolveDropIndex(panelId: string, index: number): number {
+        return this._dropIndexResolver(panelId, index);
     }
 
     private updateClassnames(): void {

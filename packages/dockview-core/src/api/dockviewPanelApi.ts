@@ -15,6 +15,10 @@ export interface TitleEvent {
     readonly title: string;
 }
 
+export interface PinnedChangeEvent {
+    readonly isPinned: boolean;
+}
+
 export interface RendererChangedEvent {
     readonly renderer: DockviewPanelRenderer;
 }
@@ -44,14 +48,28 @@ export interface DockviewPanelApi extends Omit<
     readonly isGroupActive: boolean;
     readonly renderer: DockviewPanelRenderer;
     readonly title: string | undefined;
+    /**
+     * Whether this panel's tab is pinned. Pinned tabs render before unpinned
+     * tabs, never overflow, and resist cross-boundary reorder. Owned by the
+     * PinnedTabs module. Reads `false` until a panel is pinned, which requires
+     * `pinnedTabs.enabled` (both `setPinned` and restore are gated on it), so a
+     * component with pinning disabled always reports `false`.
+     */
+    readonly isPinned: boolean;
     readonly onDidActiveGroupChange: Event<ActiveGroupEvent>;
     readonly onDidGroupChange: Event<GroupChangedEvent>;
     readonly onDidTitleChange: Event<TitleEvent>;
+    readonly onDidChangePinned: Event<PinnedChangeEvent>;
     readonly onDidRendererChange: Event<RendererChangedEvent>;
     readonly location: DockviewGroupLocation;
     readonly onDidLocationChange: Event<DockviewGroupPanelLocationChangeEvent>;
     close(): void;
     setTitle(title: string): void;
+    /**
+     * Pin or unpin this panel's tab. No-op (warns once) when the PinnedTabs
+     * module is not registered, and dormant unless `pinnedTabs.enabled` is set.
+     */
+    setPinned(pinned: boolean): void;
     setRenderer(renderer: DockviewPanelRenderer): void;
     moveTo(options: DockviewPanelMoveParams): void;
     maximize(): void;
@@ -72,6 +90,9 @@ export class DockviewPanelApiImpl
 
     readonly _onDidTitleChange = new Emitter<TitleEvent>();
     readonly onDidTitleChange = this._onDidTitleChange.event;
+
+    readonly _onDidChangePinned = new Emitter<PinnedChangeEvent>();
+    readonly onDidChangePinned = this._onDidChangePinned.event;
 
     private readonly _onDidActiveGroupChange = new Emitter<ActiveGroupEvent>();
     readonly onDidActiveGroupChange = this._onDidActiveGroupChange.event;
@@ -95,6 +116,10 @@ export class DockviewPanelApiImpl
 
     get title(): string | undefined {
         return this.panel.title;
+    }
+
+    get isPinned(): boolean {
+        return this.panel.isPinned;
     }
 
     get isGroupActive(): boolean {
@@ -149,6 +174,7 @@ export class DockviewPanelApiImpl
             this.groupEventsDisposable,
             this._onDidRendererChange,
             this._onDidTitleChange,
+            this._onDidChangePinned,
             this._onDidGroupChange,
             this._onDidActiveGroupChange,
             this._onDidLocationChange
@@ -183,6 +209,10 @@ export class DockviewPanelApiImpl
 
     setTitle(title: string): void {
         this.panel.setTitle(title);
+    }
+
+    setPinned(pinned: boolean): void {
+        this.accessor.setPanelPinned(this.panel, pinned);
     }
 
     setRenderer(renderer: DockviewPanelRenderer): void {

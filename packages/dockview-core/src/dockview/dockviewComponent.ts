@@ -100,6 +100,7 @@ import {
     SmartGuidesSnapEvent,
     SmartGuidesSnapTogetherEvent,
     ITabGroupChipsHost,
+    IPinnedTabsService,
 } from './moduleContracts';
 import { IHeaderActionsHost } from './headerActionsService';
 import { AnchoredBox, AnchorPosition, Box } from '../types';
@@ -329,6 +330,15 @@ export interface DockviewActivePanelChangeEvent {
     readonly origin: DockviewOrigin;
 }
 
+/**
+ * Fired by `onDidPanelPinnedChange` when a panel is pinned or unpinned via the
+ * PinnedTabs module. `isPinned` is the new state.
+ */
+export interface DockviewPanelPinnedChangeEvent {
+    readonly panel: IDockviewPanel;
+    readonly isPinned: boolean;
+}
+
 export interface PopoutGroupChangeSizeEvent {
     width: number;
     height: number;
@@ -371,6 +381,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidAddPanel: Event<IDockviewPanel>;
     readonly onDidLayoutFromJSON: Event<void>;
     readonly onDidActivePanelChange: Event<DockviewActivePanelChangeEvent>;
+    readonly onDidPanelPinnedChange: Event<DockviewPanelPinnedChangeEvent>;
     readonly onWillDragPanel: Event<TabDragEvent>;
     readonly onWillDragGroup: Event<GroupDragEvent>;
     readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
@@ -396,6 +407,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     updateOptions(options: DockviewOptions): void;
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void;
     moveGroup(options: MoveGroupOptions): void;
+    setPanelPinned(panel: DockviewPanel, pinned: boolean): void;
     doSetGroupActive: (group: DockviewGroupPanel, skipFocus?: boolean) => void;
     removeGroup: (group: DockviewGroupPanel) => void;
     addPanel<T extends object = Parameters>(
@@ -644,6 +656,11 @@ export class DockviewComponent
         new Emitter<DockviewActivePanelChangeEvent>({ replay: true });
     readonly onDidActivePanelChange: Event<DockviewActivePanelChangeEvent> =
         this._onDidActivePanelChange.event;
+
+    private readonly _onDidPanelPinnedChange =
+        new Emitter<DockviewPanelPinnedChangeEvent>();
+    readonly onDidPanelPinnedChange: Event<DockviewPanelPinnedChangeEvent> =
+        this._onDidPanelPinnedChange.event;
 
     private readonly _onDidMovePanel = new Emitter<MovePanelEvent>();
     readonly onDidMovePanel = this._onDidMovePanel.event;
@@ -1319,6 +1336,44 @@ export class DockviewComponent
         return this._moduleRegistry.services.contextMenuService;
     }
 
+    private get _pinnedTabsService(): IPinnedTabsService | undefined {
+        // Owned by PinnedTabsModule. Undefined when the module is not
+        // registered.
+        return this._moduleRegistry.services.pinnedTabsService;
+    }
+
+    /**
+     * Pin/unpin a panel's tab. The single gated entry point behind
+     * `panel.api.setPinned`. Dormant unless `pinnedTabs.enabled` is set (a
+     * silent no-op), and a warn-once no-op when the PinnedTabs module is not
+     * registered. When active it mutates the panel's pinned flag (which fires
+     * `panel.api.onDidChangePinned`) and the component-level
+     * `onDidPanelPinnedChange`; the module reacts to enforce pinned-first
+     * ordering.
+     */
+    setPanelPinned(panel: DockviewPanel, pinned: boolean): void {
+        if (panel.isPinned === pinned) {
+            return;
+        }
+
+        if (!this.options.pinnedTabs?.enabled) {
+            // Feature dormant — pinning is opt-in via `pinnedTabs.enabled`.
+            return;
+        }
+
+        const service = assertModule(
+            this._pinnedTabsService,
+            'PinnedTabs',
+            'setPinned'
+        );
+        if (!service) {
+            return;
+        }
+
+        panel.setPinned(pinned);
+        this._onDidPanelPinnedChange.fire({ panel, isPinned: pinned });
+    }
+
     get mountElement(): HTMLElement {
         return this.gridview.element;
     }
@@ -1450,6 +1505,7 @@ export class DockviewComponent
             this._onWillDragGroup,
             this._onWillShowOverlay,
             this._onDidActivePanelChange,
+            this._onDidPanelPinnedChange,
             this._onDidAddPanel,
             this._onDidRemovePanel,
             this._onDidLayoutFromJSON,
