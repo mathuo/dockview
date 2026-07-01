@@ -251,6 +251,15 @@ export type OverflowThumbnailRenderer = (
     | undefined;
 
 /**
+ * The CSS class the `MultiRowTabsModule` toggles on a group's tab list
+ * (`.dv-tabs-container`) to switch it into wrap layout. Shared here so core
+ * (the reorder controller's wrap detection + the SCSS rules) and the module
+ * agree on the one string — renaming it in one place would otherwise silently
+ * break the seam across the package boundary.
+ */
+export const OVERFLOW_WRAP_TABS_CLASS = 'dv-tabs-container--wrap';
+
+/**
  * Tab-header overflow behaviour. One shared block across the overflow axis:
  * `mode` chooses dropdown vs wrap; the remaining fields enrich the dropdown.
  * Each capability names the module it needs — without that module the field is
@@ -264,7 +273,10 @@ export interface DockviewOverflowOptions {
     mode?: 'dropdown' | 'wrap';
     /**
      * Wrap mode only: cap the number of header rows; the surplus tabs spill to
-     * the dropdown. Default: unbounded. Requires the `MultiRowTabsModule`.
+     * the dropdown.
+     *
+     * NOT YET IMPLEMENTED — reserved for a follow-up. Wrap is currently
+     * unbounded regardless of this value; setting it has no effect today.
      */
     maxRows?: number;
     /**

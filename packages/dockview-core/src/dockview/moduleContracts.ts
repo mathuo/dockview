@@ -477,6 +477,9 @@ export interface IMultiRowTabsHost {
     /** Fires when any group is added — the service attaches a wrap controller. */
     readonly onDidAddGroup: Event<DockviewGroupPanel>;
     readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
+    /** Fires after `updateOptions` — the service re-applies wrap to every group
+     *  so a runtime `overflow.mode` change takes effect. */
+    readonly onDidOptionsChange: Event<void>;
     /**
      * The scrollable tab list element (`.dv-tabs-container`) for a group — the
      * element the wrap class is toggled on and whose child tab geometry the

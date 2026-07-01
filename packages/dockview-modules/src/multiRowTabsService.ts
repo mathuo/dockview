@@ -2,11 +2,10 @@ import {
     DockviewCompositeDisposable as CompositeDisposable,
     DockviewGroupPanel,
     DockviewOverflowOptions,
+    OVERFLOW_WRAP_TABS_CLASS as WRAP_CLASS,
     defineModule,
 } from 'dockview-core';
 import { IMultiRowTabsHost, IMultiRowTabsService } from 'dockview-core';
-
-const WRAP_CLASS = 'dv-tabs-container--wrap';
 
 function isWrapMode(overflow: DockviewOverflowOptions | undefined): boolean {
     return typeof overflow === 'object' && overflow?.mode === 'wrap';
@@ -125,6 +124,10 @@ export class MultiRowTabsService
         this.addDisposables(
             this.host.onDidAddGroup((group) => this._track(group)),
             this.host.onDidRemoveGroup((group) => this._untrack(group)),
+            // Re-apply wrap to every group on a runtime `overflow.mode` change.
+            this.host.onDidOptionsChange(() =>
+                this._controllers.forEach((c) => c.apply())
+            ),
             {
                 dispose: () => {
                     this._controllers.forEach((c) => c.dispose());

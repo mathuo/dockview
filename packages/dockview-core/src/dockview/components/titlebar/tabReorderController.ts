@@ -3,7 +3,10 @@ import { toggleClass } from '../../../dom';
 import { CompositeDisposable, IValueDisposable } from '../../../lifecycle';
 import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
-import { DockviewHeaderDirection } from '../../options';
+import {
+    DockviewHeaderDirection,
+    OVERFLOW_WRAP_TABS_CLASS,
+} from '../../options';
 import { Tab } from '../tab/tab';
 import { TabDropIndexEvent } from './tabsContainer';
 import { TabGroupManager } from './tabGroups';
@@ -98,7 +101,7 @@ export class TabReorderController extends CompositeDisposable {
      *  (`MultiRowTabsModule`, `overflow.mode: 'wrap'`). In wrap, the 1-D
      *  gap/FLIP animation is suppressed and reorder uses a 2-D hit-test. */
     private get _wrapMode(): boolean {
-        return this._tabsList.classList.contains('dv-tabs-container--wrap');
+        return this._tabsList.classList.contains(OVERFLOW_WRAP_TABS_CLASS);
     }
 
     get animState(): TabAnimationState | null {
@@ -243,7 +246,13 @@ export class TabReorderController extends CompositeDisposable {
             this._wrapMode &&
             e &&
             this._animState &&
+            // intra-group single-tab reorder only: `sourceIndex === -1` is a
+            // cross-group drag (handled by the cross-group machinery), and
+            // `sourceTabGroupId` is a group-chip drag (handled by the chip drop
+            // target — which does NOT null `_animState`, so committing here too
+            // would double-commit).
             this._animState.sourceIndex !== -1 &&
+            !this._animState.sourceTabGroupId &&
             this._animState.currentInsertionIndex !== null &&
             this.isPointInsideTabsList(e.clientX, e.clientY)
         ) {
@@ -758,11 +767,17 @@ export class TabReorderController extends CompositeDisposable {
         }
         rows.sort((a, b) => a.top - b.top);
 
-        // Pick the row: the one whose vertical span contains clientY, else
-        // clamp above→first / below→last.
+        // Pick the row whose vertical span contains clientY; if the pointer is
+        // in an inter-row gap (or above/below all rows), pick the nearest row by
+        // vertical distance — NOT a blanket clamp to the last row, which would
+        // misroute a between-rows hover to the bottom row.
         let row = rows.find((r) => clientY >= r.top && clientY <= r.bottom);
         if (!row) {
-            row = clientY < rows[0].top ? rows[0] : rows[rows.length - 1];
+            const distance = (r: (typeof rows)[number]) =>
+                clientY < r.top ? r.top - clientY : clientY - r.bottom;
+            row = rows.reduce((nearest, r) =>
+                distance(r) < distance(nearest) ? r : nearest
+            );
         }
 
         // Within the row, insert before the first tab whose horizontal midpoint

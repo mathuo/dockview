@@ -120,6 +120,23 @@ describe('multi-row tabs (wrap mode)', () => {
         dockview.dispose();
     });
 
+    test('a runtime overflow.mode change is applied to existing groups', () => {
+        const dockview = make(); // starts as dropdown (no wrap)
+        const panel = dockview.addPanel({ id: 'a', component: 'default' });
+        const list = panel.group.model.tabsListElement;
+        expect(list.classList.contains(WRAP_CLASS)).toBe(false);
+
+        // turn wrap on at runtime
+        dockview.updateOptions({ overflow: { mode: 'wrap' } });
+        expect(list.classList.contains(WRAP_CLASS)).toBe(true);
+
+        // ...and back off
+        dockview.updateOptions({ overflow: { mode: 'dropdown' } });
+        expect(list.classList.contains(WRAP_CLASS)).toBe(false);
+
+        dockview.dispose();
+    });
+
     test('removing a group disposes its wrap controller without throwing', () => {
         const dockview = make({ mode: 'wrap' });
         const a = dockview.addPanel({ id: 'a', component: 'default' });
