@@ -4,7 +4,7 @@ import {
     IContentRenderer,
     TabDragEvent,
     GroupDragEvent,
-} from 'dockview-core';
+} from '../../index';
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');

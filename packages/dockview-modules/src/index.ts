@@ -1,7 +1,6 @@
 import { DockviewModule } from 'dockview-core';
 import { TabGroupChipsModule } from './tabGroupChipsService';
 import { ContextMenuModule } from './contextMenu';
-import { AdvancedDnDModule } from './advancedDnDService';
 import { AccessibilityModule } from './accessibilityService';
 import { LayoutHistoryModule } from './layoutHistoryService';
 import { DropGuideModule } from './dropGuideService';
@@ -13,7 +12,6 @@ export {
     TabGroupChipsModule,
 } from './tabGroupChipsService';
 export { ContextMenuController, ContextMenuModule } from './contextMenu';
-export { AdvancedDnDService, AdvancedDnDModule } from './advancedDnDService';
 export {
     AccessibilityService,
     AccessibilityModule,
@@ -42,7 +40,6 @@ export {
 export const Modules: DockviewModule<any>[] = [
     TabGroupChipsModule,
     ContextMenuModule,
-    AdvancedDnDModule,
     AccessibilityModule,
     LayoutHistoryModule,
     DropGuideModule,
