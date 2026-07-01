@@ -86,10 +86,11 @@ test.describe('multi-row tabs (wrap mode)', () => {
 
     // Phase 3: 2-D cross-row drag reorder (smooth mode). A tab dragged from a
     // lower row to a slot on an upper row reorders across the row boundary.
-    test('a tab drags across rows to reorder (smooth mode)', async ({
-        page,
-    }) => {
-        await page.goto('/e2e/fixtures/index.html?overflow=wrap&smooth=1');
+    // Covers both animation modes: default (per-tab drop targets — the common
+    // case) and smooth (the tabs-list / pointer-end commit path). `tabAnimation`
+    // defaults to 'default', so both must work.
+    const reorderAcrossRows = async (page, query: string) => {
+        await page.goto(`/e2e/fixtures/index.html?${query}`);
         await page.waitForFunction(() => (window as any).__ready === true);
         await page.evaluate(() => (window as any).__dv.setupWrapTabs(20));
 
@@ -113,14 +114,12 @@ test.describe('multi-row tabs (wrap mode)', () => {
         expect(rows).toBeGreaterThan(1);
 
         // drag the last tab (a lower row) to the front (first tab, upper row)
-        const source = page.locator('.dv-tab', {
-            hasText: 'wrap-tab-long-title-19',
-        });
-        const target = page.locator('.dv-tab', {
-            hasText: 'wrap-tab-long-title-0',
-        });
-        const s = (await source.boundingBox())!;
-        const t = (await target.boundingBox())!;
+        const s = (await page
+            .locator('.dv-tab', { hasText: 'wrap-tab-long-title-19' })
+            .boundingBox())!;
+        const t = (await page
+            .locator('.dv-tab', { hasText: 'wrap-tab-long-title-0' })
+            .boundingBox())!;
 
         await page.mouse.move(s.x + s.width / 2, s.y + s.height / 2);
         await page.mouse.down();
@@ -135,5 +134,17 @@ test.describe('multi-row tabs (wrap mode)', () => {
         expect(after[0]).toContain('wrap-tab-long-title-19');
         expect([...after].sort()).toEqual([...before].sort());
         expect(after).not.toEqual(before);
+    };
+
+    test('a tab drags across rows to reorder (default mode)', async ({
+        page,
+    }) => {
+        await reorderAcrossRows(page, 'overflow=wrap');
+    });
+
+    test('a tab drags across rows to reorder (smooth mode)', async ({
+        page,
+    }) => {
+        await reorderAcrossRows(page, 'overflow=wrap&smooth=1');
     });
 });

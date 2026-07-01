@@ -440,8 +440,12 @@ export class TabReorderController extends CompositeDisposable {
 
         // Multi-row wrap: the 1-D x-accumulation below assumes a single row.
         // In wrap use a 2-D hit-test (row by y, slot by x within the row) and
-        // a discrete drop indicator instead of the gap animation.
-        if (this._wrapMode) {
+        // a discrete drop indicator instead of the gap animation. Group-chip
+        // drags are excluded — they carry group-move semantics ("can't drop
+        // inside another group") the single-tab hit-test doesn't model, and
+        // chips don't wrap in v1, so they keep the 1-D path (whose gap animation
+        // no-ops in wrap anyway).
+        if (this._wrapMode && !this._animState.sourceTabGroupId) {
             this.handleWrappedDragOver(event.clientX, event.clientY ?? 0);
             return;
         }
