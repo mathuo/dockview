@@ -75,6 +75,7 @@ export interface ITabsContainer extends IDisposable {
     setOverflowExclude(fn: (panelId: string) => boolean): void;
     setDropIndexResolver(fn: (panelId: string, index: number) => number): void;
     resolveDropIndex(panelId: string, index: number): number;
+    setPinnedRow(el: HTMLElement | undefined): void;
 }
 
 export class TabsContainer
@@ -103,6 +104,9 @@ export class TabsContainer
         _panelId,
         index
     ) => index;
+    /** The pinned second-row element (PinnedTabs `separate-row` mode), owned by
+     *  the module and mounted here. Undefined when there is no row. */
+    private _pinnedRow: HTMLElement | undefined = undefined;
 
     private dropdownPart: DropdownElement | null = null;
     private _overflowTabs: string[] = [];
@@ -411,6 +415,27 @@ export class TabsContainer
 
     setOverflowExclude(fn: (panelId: string) => boolean): void {
         this.tabs.setOverflowExclude(fn);
+    }
+
+    setPinnedRow(el: HTMLElement | undefined): void {
+        if (this._pinnedRow === el) {
+            return;
+        }
+        if (this._pinnedRow) {
+            this._pinnedRow.remove();
+        }
+        this._pinnedRow = el;
+        if (el) {
+            el.classList.add('dv-pinned-row');
+            // `order: -1` (in SCSS) keeps it visually first; the header wraps
+            // it onto its own line above the main strip.
+            this._element.insertBefore(el, this._element.firstChild);
+        }
+        toggleClass(
+            this._element,
+            'dv-tabs-and-actions-container--pinned-row',
+            !!el
+        );
     }
 
     setDropIndexResolver(fn: (panelId: string, index: number) => number): void {

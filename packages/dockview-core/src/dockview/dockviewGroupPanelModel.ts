@@ -177,6 +177,9 @@ export interface IHeader {
     /** Register a resolver that clamps/redirects a header drop index (used by
      *  the PinnedTabs module to enforce the pin boundary). Identity default. */
     setDropIndexResolver(fn: (panelId: string, index: number) => number): void;
+    /** Mount (or clear, with `undefined`) a second tab row above the main strip
+     *  (PinnedTabs `separate-row` mode). The module owns the element. */
+    setPinnedRow(el: HTMLElement | undefined): void;
 }
 
 export type DockviewGroupPanelLocked = boolean | 'no-drop-target';

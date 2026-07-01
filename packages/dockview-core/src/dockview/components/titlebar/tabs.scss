@@ -208,6 +208,75 @@ $dv-pin-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/sv
     }
 }
 
+// Pinned tabs, second-row mode (`mode: 'separate-row'`). The pinned row is
+// mounted into the header by the module via the `setPinnedRow` seam; the header
+// wraps it onto its own full-width line above the main strip and grows to fit.
+.dv-tabs-and-actions-container--pinned-row {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: var(--dv-tabs-and-actions-container-height);
+    align-content: flex-start;
+
+    .dv-pinned-row {
+        flex: 0 0 100%;
+        order: -1;
+    }
+
+    // Pinned tabs live in the pinned row; hide their (still-present) copies in
+    // the main strip.
+    .dv-tab.dv-tab--pinned {
+        display: none;
+    }
+}
+
+.dv-pinned-row {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: var(--dv-tabs-and-actions-container-height);
+    padding: 2px 4px;
+    background-color: var(--dv-tabs-and-actions-container-background-color);
+    border-bottom: 1px solid var(--dv-tab-divider-color);
+}
+
+.dv-pinned-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-sizing: border-box;
+    padding: 0.25rem 0.5rem;
+    font-size: var(--dv-tab-font-size);
+    cursor: pointer;
+    user-select: none;
+    background-color: var(--dv-activegroup-hiddenpanel-tab-background-color);
+    color: var(--dv-activegroup-hiddenpanel-tab-color);
+
+    &.dv-pinned-tab--active {
+        background-color: var(
+            --dv-activegroup-visiblepanel-tab-background-color
+        );
+        color: var(--dv-activegroup-visiblepanel-tab-color);
+    }
+
+    .dv-pinned-tab-label {
+        max-width: 120px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .dv-pinned-tab-unpin {
+        flex-shrink: 0;
+        opacity: 0.6;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .dv-tab {
         transition: none !important;

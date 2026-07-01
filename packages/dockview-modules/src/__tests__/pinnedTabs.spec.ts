@@ -1,3 +1,4 @@
+import { fireEvent } from '@testing-library/dom';
 import { DockviewComponent, IContentRenderer } from 'dockview-core';
 import {
     computePinnedFirstOrder,
@@ -484,5 +485,107 @@ describe('pinned tabs — serialization', () => {
 
         expect(target.api.getPanel('a')!.api.isPinned).toBe(false);
         expect(target.api.getPanel('b')!.api.isPinned).toBe(false);
+    });
+});
+
+describe('pinned tabs — separate-row mode', () => {
+    let container: HTMLElement;
+
+    const make = (
+        pinnedTabs: DockviewComponent['options']['pinnedTabs']
+    ): DockviewComponent => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        const dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            pinnedTabs,
+        });
+        dockview.layout(1000, 1000);
+        return dockview;
+    };
+
+    afterEach(() => {
+        container.remove();
+    });
+
+    const row = () => container.querySelector('.dv-pinned-row');
+    const rowTabs = () =>
+        Array.from(container.querySelectorAll('.dv-pinned-tab'));
+    const headerHasRowClass = () =>
+        !!container.querySelector('.dv-tabs-and-actions-container--pinned-row');
+
+    const seed = (dockview: DockviewComponent) => {
+        const a = dockview.addPanel({ id: 'a', component: 'default' });
+        const b = dockview.addPanel({ id: 'b', component: 'default' });
+        return { a, b };
+    };
+
+    test('pinning mounts a second row containing the pinned tab', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const { a } = seed(dockview);
+
+        expect(row()).toBeNull();
+
+        a.api.setPinned(true);
+
+        expect(row()).not.toBeNull();
+        expect(headerHasRowClass()).toBe(true);
+        expect(rowTabs().map((el) => el.textContent)).toEqual(['a']);
+    });
+
+    test('unpinning the last pinned tab removes (collapses) the row', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const { a } = seed(dockview);
+
+        a.api.setPinned(true);
+        expect(row()).not.toBeNull();
+
+        a.api.setPinned(false);
+        expect(row()).toBeNull();
+        expect(headerHasRowClass()).toBe(false);
+    });
+
+    test('clicking a row tab activates its panel', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const { a, b } = seed(dockview);
+
+        a.api.setPinned(true);
+        b.api.setActive();
+        expect(a.api.isActive).toBe(false);
+
+        fireEvent.click(rowTabs()[0]);
+        expect(a.api.isActive).toBe(true);
+    });
+
+    test('clicking the unpin glyph unpins the panel and clears the row', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const { a } = seed(dockview);
+
+        a.api.setPinned(true);
+        const unpin = container.querySelector('.dv-pinned-tab-unpin')!;
+
+        fireEvent.click(unpin);
+
+        expect(a.api.isPinned).toBe(false);
+        expect(row()).toBeNull();
+    });
+
+    test('the row tab label tracks the panel title', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const { a } = seed(dockview);
+
+        a.api.setPinned(true);
+        a.api.setTitle('Renamed');
+
+        expect(rowTabs()[0].textContent).toBe('Renamed');
+    });
+
+    test('inline mode never mounts a second row', () => {
+        const dockview = make({ enabled: true, mode: 'inline' });
+        const { a } = seed(dockview);
+
+        a.api.setPinned(true);
+
+        expect(row()).toBeNull();
     });
 });

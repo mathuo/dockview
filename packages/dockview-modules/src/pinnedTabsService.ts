@@ -1,10 +1,129 @@
 import {
     DockviewCompositeDisposable as CompositeDisposable,
+    DockviewMutableDisposable as MutableDisposable,
     DockviewGroupPanel,
+    IDockviewPanel,
+    createPinButton,
     defineModule,
     IPinnedTabsHost,
     IPinnedTabsService,
 } from 'dockview-core';
+
+/**
+ * The pinned second row (`mode: 'separate-row'`). Renders each pinned panel as
+ * a lightweight tab in a strip mounted above the main tab bar via the core
+ * `setPinnedRow` seam; the main strip hides its (still-present) pinned tabs via
+ * CSS. Click a row tab to activate its panel; click its pin glyph to unpin
+ * (which returns it to the main strip). The row collapses (unmounts) when the
+ * group has no pinned panels.
+ *
+ * MVP: cross-row drag-and-drop and custom tab renderers in the row are not yet
+ * implemented — the row shows the panel title only.
+ */
+class SecondRowController extends CompositeDisposable {
+    private readonly _row: HTMLElement;
+    private readonly _titleSubs = new MutableDisposable();
+    private _mounted = false;
+
+    constructor(private readonly group: DockviewGroupPanel) {
+        super();
+
+        this._row = document.createElement('div');
+        this._row.className = 'dv-pinned-row';
+
+        const onClick = (event: MouseEvent) => {
+            const tabEl = (event.target as HTMLElement).closest(
+                '.dv-pinned-tab'
+            ) as HTMLElement | null;
+            if (!tabEl) {
+                return;
+            }
+            const panel = this.group.model.panels.find(
+                (p) => p.id === tabEl.dataset.panelId
+            );
+            if (!panel) {
+                return;
+            }
+            if ((event.target as HTMLElement).closest('.dv-pinned-tab-unpin')) {
+                panel.api.setPinned(false);
+            } else {
+                panel.api.setActive();
+            }
+        };
+        this._row.addEventListener('click', onClick);
+
+        this.addDisposables(
+            this._titleSubs,
+            {
+                dispose: () => this._row.removeEventListener('click', onClick),
+            },
+            this.group.model.onDidRemovePanel(() => this.render()),
+            this.group.model.onDidActivePanelChange(() => this.render()),
+            { dispose: () => this._unmount() }
+        );
+
+        this.render();
+    }
+
+    render(): void {
+        const pinned = this.group.model.panels.filter((p) => p.api.isPinned);
+
+        this._row.replaceChildren(...pinned.map((p) => this._buildTab(p)));
+
+        // Re-render when any pinned panel's title changes (rebuilt each render
+        // so subscriptions track the current pinned set).
+        this._titleSubs.value = new CompositeDisposable(
+            ...pinned.map((p) => p.api.onDidTitleChange(() => this.render()))
+        );
+
+        if (pinned.length > 0) {
+            this._mount();
+        } else {
+            this._unmount();
+        }
+    }
+
+    private _buildTab(panel: IDockviewPanel): HTMLElement {
+        const el = document.createElement('div');
+        el.className = 'dv-pinned-tab';
+        el.dataset.panelId = panel.id;
+        if (this.group.model.activePanel === panel) {
+            el.classList.add('dv-pinned-tab--active');
+        }
+        const title = panel.title ?? panel.id;
+        el.title = title;
+
+        const label = document.createElement('span');
+        label.className = 'dv-pinned-tab-label';
+        label.textContent = title;
+        el.appendChild(label);
+
+        const unpin = createPinButton();
+        unpin.classList.add('dv-pinned-tab-unpin');
+        el.appendChild(unpin);
+
+        return el;
+    }
+
+    private _mount(): void {
+        if (this._mounted) {
+            return;
+        }
+        this.group.model.header.setPinnedRow(this._row);
+        this._mounted = true;
+        // The header grew by a row — reflow content for the new height.
+        this.group.model.relayout();
+    }
+
+    private _unmount(): void {
+        if (!this._mounted) {
+            return;
+        }
+        this.group.model.header.setPinnedRow(undefined);
+        this._mounted = false;
+        this.group.model.relayout();
+    }
+}
 
 /**
  * Compute the pinned-first tab order for a group.
@@ -46,12 +165,13 @@ export function computePinnedFirstOrder(
  * Enforces the pinned-first invariant on each group's tab strip. Pinned state
  * itself lives on the panel (`panel.api.isPinned`, mutated through the gated
  * `DockviewComponent.setPanelPinned`); this service only reacts to
- * pinned-state changes and reorders the strip — it never mutates pinned state,
- * touches layout, or re-implements the tab list.
+ * pinned-state changes and reorders the strip — it never mutates pinned state
+ * (except the deliberate cross-boundary-drag flip) or re-implements the tab
+ * list.
  *
- * Phase 1: `inline` mode ordering only. Overflow exclusion, the cross-boundary
- * reorder guard, compact rendering, serialization and the second row are later
- * phases.
+ * Owns: pinned-first ordering, overflow exclusion, the reorder guard, and (in
+ * `separate-row` mode) the pinned second row. Compact rendering + serialization
+ * live in core, keyed off the panel's pinned state.
  */
 export class PinnedTabsService implements IPinnedTabsService {
     private readonly _host: IPinnedTabsHost;
@@ -67,8 +187,21 @@ export class PinnedTabsService implements IPinnedTabsService {
     /** Live groups, tracked so a `fromJSON` restore can seed every strip. */
     private readonly _groups = new Set<DockviewGroupPanel>();
 
+    /** Per-group pinned second row (only in `separate-row` mode). */
+    private readonly _secondRows = new Map<
+        DockviewGroupPanel,
+        SecondRowController
+    >();
+
     /** Re-entrancy guard: reordering moves panels, which must not re-trigger. */
     private _enforcing = false;
+
+    private get _separateRow(): boolean {
+        return (
+            !!this._host.options.pinnedTabs?.enabled &&
+            this._host.options.pinnedTabs?.mode === 'separate-row'
+        );
+    }
 
     constructor(host: IPinnedTabsHost) {
         this._host = host;
@@ -97,6 +230,8 @@ export class PinnedTabsService implements IPinnedTabsService {
                 group.model.header.setOverflowExclude(
                     this.isExcludedFromOverflow
                 );
+                // Move the tab in/out of the pinned second row.
+                this._secondRows.get(group)?.render();
             }),
             // Every group's tab strip consults the pinned predicate (overflow)
             // and the pin-boundary resolver (reorder guard).
@@ -108,11 +243,16 @@ export class PinnedTabsService implements IPinnedTabsService {
                 group.model.header.setDropIndexResolver((panelId, index) =>
                     this.resolveDropIndex(group, panelId, index)
                 );
+                if (this._separateRow) {
+                    this._secondRows.set(group, new SecondRowController(group));
+                }
             }),
             // Drop bookkeeping for groups that go away.
             this._host.onDidRemoveGroup((group) => {
                 this._groups.delete(group);
                 this._pinnedOrder.delete(group);
+                this._secondRows.get(group)?.dispose();
+                this._secondRows.delete(group);
             }),
             // A restore populates panels' `isPinned` directly (not via the
             // gated setter), so seed the store from them and re-assert the
@@ -139,6 +279,7 @@ export class PinnedTabsService implements IPinnedTabsService {
         }
         this.enforceOrder(group);
         group.model.header.setOverflowExclude(this.isExcludedFromOverflow);
+        this._secondRows.get(group)?.render();
     }
 
     /**
@@ -269,6 +410,10 @@ export class PinnedTabsService implements IPinnedTabsService {
 
     dispose(): void {
         this._disposable.dispose();
+        for (const controller of this._secondRows.values()) {
+            controller.dispose();
+        }
+        this._secondRows.clear();
         this._pinnedOrder.clear();
         this._pinnedIds.clear();
         this._groups.clear();
