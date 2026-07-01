@@ -152,6 +152,7 @@ export {
 } from './api/gridviewPanelApi';
 export {
     TitleEvent,
+    PinnedChangeEvent,
     RendererChangedEvent,
     DockviewPanelApi,
     DockviewPanelMoveParams,
@@ -209,6 +210,8 @@ export {
     ILayoutHistoryService,
     LayoutHistoryChangeEvent,
     LayoutHistoryKind,
+    IMultiRowTabsHost,
+    IMultiRowTabsService,
     ISmartGuidesHost,
     ISmartGuidesService,
     SmartGuidesSnapPosition,
@@ -216,6 +219,8 @@ export {
     SmartGuidesSnapTogetherEvent,
     ITabGroupChipsHost,
     ITabGroupChipsService,
+    IPinnedTabsHost,
+    IPinnedTabsService,
 } from './dockview/moduleContracts';
 export { resolveMessages } from './dockview/accessibilityMessages';
 export {
@@ -229,6 +234,10 @@ export {
 } from './dismissableLayer';
 export { IDragGhostSpec } from './dnd/backend';
 export { LiveRegionModule } from './dockview/liveRegionService';
+export {
+    AdvancedDnDModule,
+    AdvancedDnDService,
+} from './dockview/advancedDnDService';
 export { FloatingGroupModule } from './dockview/floatingGroupService';
 export { EdgeGroupModule } from './dockview/edgeGroupService';
 export { createCloseButton, createPinButton } from './svg';

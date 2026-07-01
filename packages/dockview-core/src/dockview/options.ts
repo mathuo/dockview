@@ -41,7 +41,10 @@ export type BuiltInContextMenuItem =
     | 'close'
     | 'closeOthers'
     | 'closeAll'
-    | 'separator';
+    | 'separator'
+    // Toggle the panel's pinned state (PinnedTabs module). Renders as
+    // "Pin tab" / "Unpin tab"; a no-op when pinning is not enabled.
+    | 'pin';
 
 export type BuiltInChipContextMenuItem = 'separator' | 'colorPicker' | 'rename';
 
@@ -236,6 +239,66 @@ export interface SmartGuidesOptions {
     className?: string;
 }
 
+/**
+ * Per-row content preview for the advanced overflow dropdown. The substrate
+ * cannot snapshot arbitrary panel content, so the app supplies the preview.
+ * Reserved for `AdvancedOverflowModule` (see `advanced-overflow.md`); ignored
+ * until that module is present.
+ */
+export type OverflowThumbnailRenderer = (
+    panel: IDockviewPanel
+) =>
+    | HTMLElement
+    | { element: HTMLElement; dispose?: () => void }
+    | { src: string }
+    | undefined;
+
+/**
+ * The CSS class the `MultiRowTabsModule` toggles on a group's tab list
+ * (`.dv-tabs-container`) to switch it into wrap layout. Shared here so core
+ * (the reorder controller's wrap detection + the SCSS rules) and the module
+ * agree on the one string — renaming it in one place would otherwise silently
+ * break the seam across the package boundary.
+ */
+export const OVERFLOW_WRAP_TABS_CLASS = 'dv-tabs-container--wrap';
+
+/**
+ * Tab-header overflow behaviour. One shared block across the overflow axis:
+ * `mode` chooses dropdown vs wrap; the remaining fields enrich the dropdown.
+ * Each capability names the module it needs — without that module the field is
+ * ignored and the free single-row strip + dropdown is used.
+ */
+export interface DockviewOverflowOptions {
+    /**
+     * What happens when tabs don't fit. Default `'dropdown'` (today's free
+     * path). `'wrap'` requires the `MultiRowTabsModule`.
+     */
+    mode?: 'dropdown' | 'wrap';
+    /**
+     * Wrap mode only: cap the number of header rows; the surplus tabs spill to
+     * the dropdown.
+     *
+     * NOT YET IMPLEMENTED — reserved for a follow-up. Wrap is currently
+     * unbounded regardless of this value; setting it has no effect today.
+     */
+    maxRows?: number;
+    /**
+     * Filter input over the group's tabs. Reserved for `AdvancedOverflowModule`;
+     * ignored until that module is present. Default: false.
+     */
+    search?: boolean | { placeholder?: string; scope?: 'overflow' | 'group' };
+    /**
+     * Order the dropdown by most-recently-activated. Reserved for
+     * `AdvancedOverflowModule`; ignored until present. Default: false.
+     */
+    mru?: boolean;
+    /**
+     * Per-row content preview in the dropdown. Reserved for
+     * `AdvancedOverflowModule`; ignored until present.
+     */
+    thumbnails?: boolean | OverflowThumbnailRenderer;
+}
+
 export interface DockviewOptions {
     /**
      * Disable the auto-resizing which is controlled through a `ResizeObserver`.
@@ -330,6 +393,20 @@ export interface DockviewOptions {
     noPanelsOverlay?: 'emptyGroup' | 'watermark';
     theme?: DockviewTheme;
     disableTabsOverflowList?: boolean;
+    /**
+     * How the tab header behaves when there are more tabs than fit on one row.
+     *
+     * The single-row strip + chevron dropdown is the default and is free. The
+     * `'wrap'` mode (tabs wrap onto multiple rows and the header grows) requires
+     * the `MultiRowTabsModule`; without that module `'wrap'` is ignored and the
+     * dropdown is used. The `search`/`mru`/`thumbnails` fields enrich the
+     * dropdown and require the `AdvancedOverflowModule`; they are ignored when
+     * that module is absent.
+     *
+     * Omitting `overflow` is identical to today's behaviour
+     * (`mode: 'dropdown'`).
+     */
+    overflow?: DockviewOverflowOptions;
     /**
      * Select `native` to use built-in scrollbar behaviours and `custom` to use an internal implementation
      * that allows for improved scrollbar overlay UX.
@@ -478,6 +555,39 @@ export interface DockviewOptions {
      *   custom chip renderers can still read it and roll their own visual.
      */
     tabGroupAccent?: 'palette' | 'off';
+    /**
+     * Pin tabs so they render before all unpinned tabs in their group, never
+     * overflow into the dropdown, and resist reorder across the pin boundary.
+     * Modelled on VS Code / Chrome pinned tabs. Owned by the PinnedTabs
+     * module; dormant unless `enabled` is set.
+     */
+    pinnedTabs?: PinnedTabsOptions;
+}
+
+export interface PinnedTabsOptions {
+    /** Master switch. Default: undefined (dormant — pinning is a no-op). */
+    enabled?: boolean;
+    /**
+     * `'inline'` (default) keeps pinned tabs first within the existing strip;
+     * `'separate-row'` renders them on their own VS-Code-style row.
+     * (Phase 1 implements `'inline'` only.)
+     */
+    mode?: 'inline' | 'separate-row';
+    /**
+     * Render pinned tabs icon-only (title + close button hidden), VS-Code /
+     * Chrome style. Default false — dockview's default tab has no favicon, so
+     * pinned tabs stay labelled (with a pin glyph) unless you opt in. Best
+     * enabled alongside a custom tab renderer that shows an icon.
+     */
+    compact?: boolean;
+    /**
+     * Drag a tab across the pin boundary to toggle its pinned state
+     * (VS-Code-style). Default false — dragging across the boundary is clamped
+     * back, matching Chrome, where pinning is an explicit action only.
+     */
+    togglePinOnCrossBoundaryDrag?: boolean;
+    /** Add a Pin/Unpin item to the tab context menu (requires ContextMenuModule). Default true. */
+    contextMenuItem?: boolean;
 }
 
 export interface LayoutHistoryOptions {
@@ -566,6 +676,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         dndGuide: undefined,
         theme: undefined,
         disableTabsOverflowList: undefined,
+        overflow: undefined,
         scrollbars: undefined,
         getTabContextMenuItems: undefined,
         getTabGroupChipContextMenuItems: undefined,
@@ -581,6 +692,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         autoHideEdgeGroups: undefined,
         tabGroupColors: undefined,
         tabGroupAccent: undefined,
+        pinnedTabs: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];

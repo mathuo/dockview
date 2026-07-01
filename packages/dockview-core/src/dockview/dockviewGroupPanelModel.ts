@@ -171,6 +171,18 @@ export class DockviewWillDropEvent extends DockviewDidDropEvent {
 export interface IHeader {
     hidden: boolean;
     direction: DockviewHeaderDirection;
+    /** Register a predicate that keeps matching panels out of the overflow
+     *  dropdown (used by the PinnedTabs module). No-op default. */
+    setOverflowExclude(fn: (panelId: string) => boolean): void;
+    /** Re-evaluate the overflow dropdown now (e.g. after the exclusion set
+     *  changed). */
+    refreshOverflow(): void;
+    /** Register a resolver that clamps/redirects a header drop index (used by
+     *  the PinnedTabs module to enforce the pin boundary). Identity default. */
+    setDropIndexResolver(fn: (panelId: string, index: number) => number): void;
+    /** Mount (or clear, with `undefined`) a second tab row above the main strip
+     *  (PinnedTabs `separate-row` mode). The module owns the element. */
+    setPinnedRow(el: HTMLElement | undefined): void;
 }
 
 export type DockviewGroupPanelLocked = boolean | 'no-drop-target';
@@ -193,6 +205,7 @@ export interface IDockviewGroupPanelModel extends IPanel {
     setActive(isActive: boolean): void;
     initialize(): void;
     relayout(): void;
+    readonly tabsListElement: HTMLElement;
     // state
     isPanelActive: (panel: IDockviewPanel) => boolean;
     indexOf(panel: IDockviewPanel): number;
@@ -418,6 +431,12 @@ export class DockviewGroupPanelModel
         return this.tabsContainer;
     }
 
+    /** The scrollable tab list element (`.dv-tabs-container`) — exposed for the
+     *  multi-row wrap controller to measure rows / toggle the wrap class. */
+    get tabsListElement(): HTMLElement {
+        return this.tabsContainer.tabsListElement;
+    }
+
     /** The panel whose tab owns `element` (the tab itself or a descendant of
      *  it), or `undefined` when the target isn't a tab. The robust inverse of a
      *  tab→panel lookup — no positional/DOM-order assumptions. */
@@ -565,11 +584,22 @@ export class DockviewGroupPanelModel
                 const dragData = getPanelData();
                 const draggedPanelId = dragData?.panelId ?? null;
 
+                // Let an injected resolver (PinnedTabs) clamp/redirect the drop
+                // index — e.g. so an unpinned tab cannot land left of a pinned
+                // one. Identity by default; only same-panel header drops carry
+                // a panel id to resolve against.
+                const resolvedIndex = draggedPanelId
+                    ? this.tabsContainer.resolveDropIndex(
+                          draggedPanelId,
+                          event.index
+                      )
+                    : event.index;
+
                 this.handleDropEvent(
                     'header',
                     event.event,
                     'center',
-                    event.index
+                    resolvedIndex
                 );
 
                 // Update tab group membership after the move completes

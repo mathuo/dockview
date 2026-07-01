@@ -7,6 +7,8 @@ AddPanelOptions
 AddPanelPositionOptions
 AddPaneviewComponentOptions
 AddSplitviewComponentOptions
+AdvancedDnDModule
+AdvancedDnDService
 AnchorPosition
 AnchoredBox
 AnnouncementEvent
@@ -67,9 +69,11 @@ DockviewModule
 DockviewMutableDisposable
 DockviewOptions
 DockviewOrigin
+DockviewOverflowOptions
 DockviewPanel
 DockviewPanelApi
 DockviewPanelMoveParams
+DockviewPanelPinnedChangeEvent
 DockviewPanelRenderer
 DockviewPopoutGroupOptions
 DockviewReadyEvent
@@ -153,6 +157,8 @@ IHeaderActionsRenderer
 IKeyboardDockingService
 ILayoutHistoryHost
 ILayoutHistoryService
+IMultiRowTabsHost
+IMultiRowTabsService
 INodeDescriptor
 IPanePart
 IPanel
@@ -160,6 +166,8 @@ IPanelDeserializer
 IPaneview
 IPaneviewComponent
 IPaneviewPanel
+IPinnedTabsHost
+IPinnedTabsService
 ISerializedBranchNode
 ISerializedLeafNode
 ISerializedNode
@@ -193,7 +201,9 @@ MeasuredValue
 MovePanelEvent
 MovementOptions
 MovementOptions2
+OVERFLOW_WRAP_TABS_CLASS
 Orientation
+OverflowThumbnailRenderer
 PROPERTY_KEYS_DOCKVIEW
 PROPERTY_KEYS_GRIDVIEW
 PROPERTY_KEYS_PANEVIEW
@@ -225,6 +235,8 @@ PaneviewPanel
 PaneviewPanelApi
 PaneviewUnhandledDragOverEvent
 Parameters
+PinnedChangeEvent
+PinnedTabsOptions
 PopoutGroup
 PopoutGroupChangePositionEvent
 PopoutGroupChangeSizeEvent

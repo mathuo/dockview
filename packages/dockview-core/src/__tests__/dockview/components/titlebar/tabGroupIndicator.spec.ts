@@ -231,6 +231,58 @@ describe('WrapTabGroupIndicator', () => {
         indicator.dispose();
         expect(indicator.underlines.size).toBe(0);
     });
+
+    test('wrapped strip draws one underline segment per row a group spans', () => {
+        const tabsList = document.createElement('div');
+        tabsList.classList.add('dv-tabs-container--wrap');
+
+        const makeTab = (top: number) => {
+            const el = document.createElement('div');
+            el.getBoundingClientRect = () =>
+                ({
+                    top,
+                    bottom: top + 26,
+                    left: 0,
+                    right: 50,
+                    width: 50,
+                    height: 26,
+                }) as DOMRect;
+            return { value: { element: el } };
+        };
+        // two tabs of the group on different rows (top 0 and top 30)
+        const tabMap = new Map<string, any>([
+            ['a', makeTab(0)],
+            ['b', makeTab(30)],
+        ]);
+
+        const tg = new TabGroup('tg-1', { label: 'Test', color: 'blue' });
+        tg.addPanel('a');
+        tg.addPanel('b');
+
+        const ctx = createContext({
+            tabsList,
+            getTabGroups: () => [tg],
+            getTabMap: () => tabMap as any,
+            getActivePanelId: () => 'a',
+            getHeaderPosition: () => 'top',
+        });
+        const indicator = new WrapTabGroupIndicator(ctx);
+        indicator.syncUnderlineElements(new Set(['tg-1']));
+        // simulate a leftover background from a prior non-wrap `none` render
+        indicator.getUnderline('tg-1')!.style.backgroundColor = 'red';
+        (indicator as any)._positionUnderlinesSync();
+
+        const underline = indicator.getUnderline('tg-1')!;
+        const path = underline.querySelector('path')!;
+        const d = path.getAttribute('d') ?? '';
+        // one straight segment per row → two `M` (move) commands
+        const segments = (d.match(/M /g) ?? []).length;
+        expect(segments).toBe(2);
+        // stale non-wrap background is cleared (no colored block behind the SVG)
+        expect(underline.style.backgroundColor).toBe('');
+
+        indicator.dispose();
+    });
 });
 
 describe('indicator type identity', () => {

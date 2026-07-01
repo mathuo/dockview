@@ -69,6 +69,14 @@ export class DefaultDockviewDeserialzier implements IPanelDeserializer {
             params: params ?? {},
         });
 
+        // Only honour the serialized pinned flag when pinning is enabled —
+        // otherwise a layout saved with pinning would restore a pinned tab
+        // (glyph, hidden close, no unpin path) into a component that can't
+        // interact with it. Disabled → the `pinned` key is ignored (unpinned).
+        if (panelData.pinned && this.accessor.options.pinnedTabs?.enabled) {
+            panel.setPinned(true);
+        }
+
         return panel;
     }
 }

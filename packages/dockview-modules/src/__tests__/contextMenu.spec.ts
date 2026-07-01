@@ -836,4 +836,53 @@ describe('ContextMenuController', () => {
             }
         });
     });
+
+    describe("'pin' built-in item", () => {
+        const pinPanel = (isPinned: boolean, setPinned = jest.fn()) =>
+            fromPartial<IDockviewPanel>({
+                api: { isPinned, setPinned, close: jest.fn() },
+            });
+
+        test('renders "Pin tab" and pins on click when unpinned', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['pin']),
+            });
+            const controller = new ContextMenuController(accessor);
+            const setPinned = jest.fn();
+
+            controller.show(
+                pinPanel(false, setPinned),
+                makeGroup(),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const item = menuEl.querySelector('.dv-context-menu-item')!;
+            expect(item.textContent).toBe('Pin tab');
+
+            fireEvent.click(item);
+            expect(setPinned).toHaveBeenCalledWith(true);
+        });
+
+        test('renders "Unpin tab" and unpins on click when pinned', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['pin']),
+            });
+            const controller = new ContextMenuController(accessor);
+            const setPinned = jest.fn();
+
+            controller.show(
+                pinPanel(true, setPinned),
+                makeGroup(),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const item = menuEl.querySelector('.dv-context-menu-item')!;
+            expect(item.textContent).toBe('Unpin tab');
+
+            fireEvent.click(item);
+            expect(setPinned).toHaveBeenCalledWith(false);
+        });
+    });
 });
