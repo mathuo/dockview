@@ -17,6 +17,18 @@
         flex-wrap: wrap;
         height: auto;
         overflow: visible;
+        // Pack wrapped rows from the top so a partial last row doesn't spread.
+        align-content: flex-start;
+
+        // Single-row height comes from the container filling the header
+        // (`height: 100%`); once the container is `height: auto` for wrapping,
+        // each flex line collapses to the tab's content height, leaving a gap
+        // below the tabs. Give each wrapped tab the base row height so every
+        // row matches the single-row header height (no gap, and the header
+        // grows in whole-row increments).
+        .dv-tab {
+            height: var(--dv-tabs-and-actions-container-height);
+        }
 
         // Discrete drop indicator for 2-D cross-row reorder (the 1-D gap
         // animation is suppressed in wrap). A bar on the leading/trailing edge

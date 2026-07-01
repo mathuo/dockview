@@ -15,6 +15,17 @@
     &:has(.dv-tabs-container--wrap) {
         height: auto;
         min-height: var(--dv-tabs-and-actions-container-height);
+        // Keep the header chrome (prefix / left / right actions, drag void) on
+        // the first row instead of stretching + centering across the full
+        // multi-row height — only the tab list grows downward.
+        align-items: flex-start;
+
+        > .dv-pre-actions-container,
+        > .dv-left-actions-container,
+        > .dv-right-actions-container,
+        > .dv-void-container {
+            height: var(--dv-tabs-and-actions-container-height);
+        }
     }
 
     &.dv-single-tab.dv-full-width-single-tab {

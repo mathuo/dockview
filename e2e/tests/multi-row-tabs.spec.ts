@@ -40,6 +40,44 @@ test.describe('multi-row tabs (wrap mode)', () => {
         expect(header.height).toBeGreaterThan(44);
     });
 
+    test('wrapped rows fill the row height (no gap) and header chrome stays on the first row', async ({
+        page,
+    }) => {
+        await setup(page);
+
+        const m = await page.evaluate(() => {
+            const header = document.querySelector(
+                '.dv-tabs-and-actions-container'
+            ) as HTMLElement;
+            const tab = document.querySelector(
+                '.dv-tabs-container .dv-tab'
+            ) as HTMLElement;
+            const right = document.querySelector(
+                '.dv-right-actions-container'
+            ) as HTMLElement;
+            const rowH = parseFloat(
+                getComputedStyle(header).getPropertyValue(
+                    '--dv-tabs-and-actions-container-height'
+                )
+            );
+            return {
+                rowH,
+                headerH: header.offsetHeight,
+                tabH: tab.offsetHeight,
+                rightH: right ? right.offsetHeight : 0,
+            };
+        });
+
+        expect(m.rowH).toBeGreaterThan(0); // the row-height var resolves
+        // header actually wrapped to more than one row
+        expect(m.headerH).toBeGreaterThan(m.rowH);
+        // each wrapped tab fills a full row — no gap below the tab
+        expect(m.tabH).toBe(m.rowH);
+        // header actions sit on the first row, not stretched across all rows
+        expect(m.rightH).toBe(m.rowH);
+        expect(m.rightH).toBeLessThan(m.headerH);
+    });
+
     test('content shrinks to the area below the multi-row header', async ({
         page,
     }) => {

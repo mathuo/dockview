@@ -1,5 +1,9 @@
 import { IValueDisposable } from '../../../lifecycle';
-import { DockviewHeaderDirection, DockviewHeaderPosition } from '../../options';
+import {
+    DockviewHeaderDirection,
+    DockviewHeaderPosition,
+    OVERFLOW_WRAP_TABS_CLASS,
+} from '../../options';
 import { Tab } from '../tab/tab';
 import { ITabGroup } from '../../tabGroup';
 import {
@@ -126,6 +130,12 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
         const containerRect = this._ctx.tabsList.getBoundingClientRect();
         const tabGroups = this._ctx.getTabGroups();
         const isVertical = this._ctx.getDirection() === 'vertical';
+        // Multi-row wrap (`MultiRowTabsModule`): a group's tabs can span rows,
+        // which the single horizontal-bar model below can't represent. Draw a
+        // per-row segment instead. Horizontal headers only (wrap is horizontal).
+        const wrapped =
+            !isVertical &&
+            this._ctx.tabsList.classList.contains(OVERFLOW_WRAP_TABS_CLASS);
         const containerCrossSize = isVertical
             ? containerRect.width
             : containerRect.height;
@@ -145,6 +155,16 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
             }
 
             underline.style.display = '';
+
+            if (wrapped) {
+                this._positionWrappedUnderline(
+                    underline,
+                    tg,
+                    containerRect,
+                    tabMap
+                );
+                continue;
+            }
 
             const chipEl = this._ctx.getChipElement(tg.id);
 
@@ -255,9 +275,10 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
             } else {
                 underline.style.left = `${startEdge}px`;
                 underline.style.width = `${Math.max(0, span)}px`;
-                // Clear vertical properties
+                // Clear vertical properties (incl. any wrap-mode overrides)
                 underline.style.top = '';
                 underline.style.height = '';
+                underline.style.bottom = '';
             }
 
             this.applyShape(
@@ -271,6 +292,106 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
                 isVertical
             );
         }
+    }
+
+    /**
+     * Position a group's underline across a multi-row (wrapped) tab strip. The
+     * single horizontal-bar model can't span rows, so the element is sized to
+     * cover the group's row span and an SVG draws one straight segment under
+     * each row's run of the group's tabs. (The active-tab wrap-around bump is
+     * omitted in wrap for now — the per-row lines still convey membership.)
+     */
+    private _positionWrappedUnderline(
+        underline: HTMLElement,
+        tg: ITabGroup,
+        containerRect: DOMRect,
+        tabMap: Map<string, IValueDisposable<Tab>>
+    ): void {
+        const t = 2; // line thickness
+        const color = resolveTabGroupAccent(
+            tg.color,
+            this._ctx.getColorPalette()
+        );
+        if (color === undefined) {
+            underline.style.display = 'none';
+            return;
+        }
+
+        // Bucket the group's tabs into rows by top edge (2px tolerance).
+        type Row = { top: number; bottom: number; left: number; right: number };
+        const rows: Row[] = [];
+        for (const pid of tg.panelIds) {
+            const te = tabMap.get(pid);
+            if (!te) {
+                continue;
+            }
+            const r = te.value.element.getBoundingClientRect();
+            if (r.width === 0 && r.height === 0) {
+                continue; // hidden / collapsed
+            }
+            const top = r.top - containerRect.top;
+            const row = rows.find((x) => Math.abs(x.top - top) <= 2);
+            if (row) {
+                row.left = Math.min(row.left, r.left - containerRect.left);
+                row.right = Math.max(row.right, r.right - containerRect.left);
+                row.bottom = Math.max(row.bottom, r.bottom - containerRect.top);
+            } else {
+                rows.push({
+                    top,
+                    bottom: r.bottom - containerRect.top,
+                    left: r.left - containerRect.left,
+                    right: r.right - containerRect.left,
+                });
+            }
+        }
+
+        if (rows.length === 0) {
+            underline.style.display = 'none';
+            return;
+        }
+
+        const overline = this._ctx.getHeaderPosition() === 'bottom';
+        const minTop = Math.min(...rows.map((r) => r.top));
+        const maxBottom = Math.max(...rows.map((r) => r.bottom));
+        const width = containerRect.width;
+        const height = Math.max(0, maxBottom - minTop);
+
+        // Cover the group's row span; the SVG inside draws the per-row lines.
+        underline.style.left = '0px';
+        underline.style.top = `${minTop}px`;
+        underline.style.bottom = 'auto';
+        underline.style.width = `${width}px`;
+        underline.style.height = `${height}px`;
+
+        let svg = underline.firstElementChild as SVGSVGElement | null;
+        let path: SVGPathElement;
+        if (!svg || svg.tagName !== 'svg') {
+            underline.replaceChildren();
+            svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.style.display = 'block';
+            path = document.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'path'
+            );
+            path.setAttribute('fill', 'none');
+            svg.appendChild(path);
+            underline.appendChild(svg);
+        } else {
+            path = svg.firstElementChild as SVGPathElement;
+        }
+        svg.setAttribute('width', String(width));
+        svg.setAttribute('height', String(height));
+        path.setAttribute('stroke', color);
+        path.setAttribute('stroke-width', String(t));
+
+        let d = '';
+        for (const row of rows) {
+            const y = overline
+                ? row.top - minTop + t / 2
+                : row.bottom - minTop - t / 2;
+            d += `M ${row.left},${y} L ${row.right},${y} `;
+        }
+        path.setAttribute('d', d.trim());
     }
 }
 
