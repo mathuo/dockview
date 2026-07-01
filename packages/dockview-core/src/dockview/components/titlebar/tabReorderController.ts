@@ -775,8 +775,9 @@ export class TabReorderController extends CompositeDisposable {
         if (!row) {
             const distance = (r: (typeof rows)[number]) =>
                 clientY < r.top ? r.top - clientY : clientY - r.bottom;
-            row = rows.reduce((nearest, r) =>
-                distance(r) < distance(nearest) ? r : nearest
+            row = rows.reduce(
+                (nearest, r) => (distance(r) < distance(nearest) ? r : nearest),
+                rows[0]
             );
         }
 
