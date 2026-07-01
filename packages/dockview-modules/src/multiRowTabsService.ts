@@ -35,11 +35,18 @@ function countRows(list: HTMLElement): number {
  * the host to relayout so the now-taller header shrinks the content area (the
  * free header-aware content-sizing seam does the subtraction). v1 wraps only
  * horizontal headers — a hidden or vertical header is a no-op.
+ *
+ * Wrap is (re)evaluated on construction and on `overflow` option changes. A
+ * runtime header-direction flip (`setHeaderPosition` horizontal↔vertical) is
+ * NOT re-evaluated — core exposes no direction-change signal today; the CSS
+ * guard (`:not(.dv-tabs-container-vertical)`) still prevents a vertical header
+ * from visually wrapping, so this is a stale-class edge, not a broken layout.
  */
 class WrapController extends CompositeDisposable {
     private _wrapped = false;
     private _rowCount = 0;
     private _observer: ResizeObserver | undefined;
+    private _pendingMeasure: { win: Window; handle: number } | undefined;
 
     constructor(
         private readonly group: DockviewGroupPanel,
@@ -72,12 +79,36 @@ class WrapController extends CompositeDisposable {
 
         if (wrap && list) {
             list.classList.add(WRAP_CLASS);
-            this._observer = new ResizeObserver(() => this.measure());
+            // Mutating layout synchronously inside the ResizeObserver callback
+            // trips the browser's "ResizeObserver loop" warning, so the RO
+            // schedules the measure on the next frame. The initial measure runs
+            // synchronously (it's not inside an RO callback).
+            this._observer = new ResizeObserver(() =>
+                this.scheduleMeasure(list)
+            );
             this._observer.observe(list);
             this.measure();
         } else {
             this.teardown();
         }
+    }
+
+    private scheduleMeasure(list: HTMLElement): void {
+        if (this._pendingMeasure) {
+            return;
+        }
+        const win = list.ownerDocument.defaultView;
+        if (!win) {
+            this.measure();
+            return;
+        }
+        this._pendingMeasure = {
+            win,
+            handle: win.requestAnimationFrame(() => {
+                this._pendingMeasure = undefined;
+                this.measure();
+            }),
+        };
     }
 
     private measure(): void {
@@ -96,6 +127,10 @@ class WrapController extends CompositeDisposable {
     }
 
     private teardown(): void {
+        this._pendingMeasure?.win.cancelAnimationFrame(
+            this._pendingMeasure.handle
+        );
+        this._pendingMeasure = undefined;
         this._observer?.disconnect();
         this._observer = undefined;
         this._rowCount = 0;

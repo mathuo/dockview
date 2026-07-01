@@ -25,7 +25,10 @@ import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { DockviewWillShowOverlayLocationEvent } from '../../events';
 import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
-import { DockviewHeaderDirection } from '../../options';
+import {
+    DockviewHeaderDirection,
+    OVERFLOW_WRAP_TABS_CLASS,
+} from '../../options';
 import { Tab } from '../tab/tab';
 import { TabDragEvent, TabDropIndexEvent } from './tabsContainer';
 import { ITabGroup } from '../../tabGroup';
@@ -750,19 +753,29 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                     // drag image, then open the gap at the source position in
                     // the same paint frame — no visual jump.
                     // Both collapse and gap must be instant (no transition).
+                    // In wrap mode there is no gap (the 1-D transforms no-op),
+                    // and collapsing the source would reflow the wrapped rows
+                    // mid-drag under the 2-D hit-test — so skip the collapse and
+                    // leave the source in place.
                     this._pendingCollapse = true;
                     requestAnimationFrame(() => {
                         this._pendingCollapse = false;
                         if (!this._animState) {
                             return;
                         }
-                        // Collapse source tab instantly (no transition)
-                        tab.element.style.transition = 'none';
-                        toggleClass(tab.element, 'dv-tab--dragging', true);
-                        void tab.element.offsetHeight; // force reflow
+                        const wrap = this._tabsList.classList.contains(
+                            OVERFLOW_WRAP_TABS_CLASS
+                        );
+                        if (!wrap) {
+                            // Collapse source tab instantly (no transition)
+                            tab.element.style.transition = 'none';
+                            toggleClass(tab.element, 'dv-tab--dragging', true);
+                            void tab.element.offsetHeight; // force reflow
+                        }
 
                         this._animState.currentInsertionIndex ??= sourceIndex;
                         // Apply gap with transitions disabled on the target
+                        // (no-op in wrap).
                         this.applyDragOverTransforms(true);
 
                         // Re-enable transitions for subsequent moves

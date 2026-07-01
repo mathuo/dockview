@@ -798,8 +798,14 @@ export class TabReorderController extends CompositeDisposable {
         if (count === 0) {
             return;
         }
+        const sourceId = this._animState?.sourceTabId;
         if (index < count) {
             const el = this._tabs[index].value.element;
+            // The slot at the source's own position is a no-op drop; don't draw
+            // the indicator on the dragged tab itself.
+            if (this._tabs[index].value.panel.id === sourceId) {
+                return;
+            }
             el.classList.add('dv-tab--reorder-before');
             this._wrapIndicatorEl = el;
         } else {
