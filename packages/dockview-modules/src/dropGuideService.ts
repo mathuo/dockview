@@ -12,7 +12,7 @@ import {
 } from 'dockview-core';
 import { defineModule } from 'dockview-core';
 import { IDropGuideHost, IDropGuideService } from 'dockview-core';
-import { AdvancedDnDModule } from './advancedDnDService';
+import { AdvancedDnDModule } from 'dockview-core';
 
 /** Size (px) of each compass cell + the gap between them. */
 const CELL = 38;
