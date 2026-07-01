@@ -46,6 +46,8 @@ export interface GroupDragEvent {
 
 export interface ITabsContainer extends IDisposable {
     readonly element: HTMLElement;
+    /** The scrollable tab list element (`.dv-tabs-container`); see `Tabs.tabsListElement`. */
+    readonly tabsListElement: HTMLElement;
     readonly panels: string[];
     readonly size: number;
     readonly onDrop: Event<TabDropIndexEvent>;
@@ -172,6 +174,10 @@ export class TabsContainer
 
     get element(): HTMLElement {
         return this._element;
+    }
+
+    get tabsListElement(): HTMLElement {
+        return this.tabs.tabsListElement;
     }
 
     constructor(

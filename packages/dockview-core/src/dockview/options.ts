@@ -239,6 +239,66 @@ export interface SmartGuidesOptions {
     className?: string;
 }
 
+/**
+ * Per-row content preview for the advanced overflow dropdown. The substrate
+ * cannot snapshot arbitrary panel content, so the app supplies the preview.
+ * Reserved for `AdvancedOverflowModule` (see `advanced-overflow.md`); ignored
+ * until that module is present.
+ */
+export type OverflowThumbnailRenderer = (
+    panel: IDockviewPanel
+) =>
+    | HTMLElement
+    | { element: HTMLElement; dispose?: () => void }
+    | { src: string }
+    | undefined;
+
+/**
+ * The CSS class the `MultiRowTabsModule` toggles on a group's tab list
+ * (`.dv-tabs-container`) to switch it into wrap layout. Shared here so core
+ * (the reorder controller's wrap detection + the SCSS rules) and the module
+ * agree on the one string — renaming it in one place would otherwise silently
+ * break the seam across the package boundary.
+ */
+export const OVERFLOW_WRAP_TABS_CLASS = 'dv-tabs-container--wrap';
+
+/**
+ * Tab-header overflow behaviour. One shared block across the overflow axis:
+ * `mode` chooses dropdown vs wrap; the remaining fields enrich the dropdown.
+ * Each capability names the module it needs — without that module the field is
+ * ignored and the free single-row strip + dropdown is used.
+ */
+export interface DockviewOverflowOptions {
+    /**
+     * What happens when tabs don't fit. Default `'dropdown'` (today's free
+     * path). `'wrap'` requires the `MultiRowTabsModule`.
+     */
+    mode?: 'dropdown' | 'wrap';
+    /**
+     * Wrap mode only: cap the number of header rows; the surplus tabs spill to
+     * the dropdown.
+     *
+     * NOT YET IMPLEMENTED — reserved for a follow-up. Wrap is currently
+     * unbounded regardless of this value; setting it has no effect today.
+     */
+    maxRows?: number;
+    /**
+     * Filter input over the group's tabs. Reserved for `AdvancedOverflowModule`;
+     * ignored until that module is present. Default: false.
+     */
+    search?: boolean | { placeholder?: string; scope?: 'overflow' | 'group' };
+    /**
+     * Order the dropdown by most-recently-activated. Reserved for
+     * `AdvancedOverflowModule`; ignored until present. Default: false.
+     */
+    mru?: boolean;
+    /**
+     * Per-row content preview in the dropdown. Reserved for
+     * `AdvancedOverflowModule`; ignored until present.
+     */
+    thumbnails?: boolean | OverflowThumbnailRenderer;
+}
+
 export interface DockviewOptions {
     /**
      * Disable the auto-resizing which is controlled through a `ResizeObserver`.
@@ -333,6 +393,20 @@ export interface DockviewOptions {
     noPanelsOverlay?: 'emptyGroup' | 'watermark';
     theme?: DockviewTheme;
     disableTabsOverflowList?: boolean;
+    /**
+     * How the tab header behaves when there are more tabs than fit on one row.
+     *
+     * The single-row strip + chevron dropdown is the default and is free. The
+     * `'wrap'` mode (tabs wrap onto multiple rows and the header grows) requires
+     * the `MultiRowTabsModule`; without that module `'wrap'` is ignored and the
+     * dropdown is used. The `search`/`mru`/`thumbnails` fields enrich the
+     * dropdown and require the `AdvancedOverflowModule`; they are ignored when
+     * that module is absent.
+     *
+     * Omitting `overflow` is identical to today's behaviour
+     * (`mode: 'dropdown'`).
+     */
+    overflow?: DockviewOverflowOptions;
     /**
      * Select `native` to use built-in scrollbar behaviours and `custom` to use an internal implementation
      * that allows for improved scrollbar overlay UX.
@@ -602,6 +676,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         dndGuide: undefined,
         theme: undefined,
         disableTabsOverflowList: undefined,
+        overflow: undefined,
         scrollbars: undefined,
         getTabContextMenuItems: undefined,
         getTabGroupChipContextMenuItems: undefined,

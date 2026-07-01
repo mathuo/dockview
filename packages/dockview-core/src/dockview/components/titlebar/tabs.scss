@@ -5,6 +5,53 @@
     overflow: auto;
     scrollbar-width: thin; // firefox
 
+    /**
+     * Multi-row (wrapping) tabs. Inert until the `MultiRowTabsModule` toggles
+     * `.dv-tabs-container--wrap` on this element (`overflow.mode: 'wrap'`):
+     * tabs wrap onto multiple rows instead of clipping into the dropdown, and
+     * the strip grows to fit (the header grows via the `:has()` rule in
+     * tabsContainer.scss; the free header-aware content-sizing seam then shrinks
+     * the content area to match). Restricted to horizontal headers in v1.
+     */
+    &.dv-tabs-container--wrap:not(.dv-tabs-container-vertical) {
+        flex-wrap: wrap;
+        height: auto;
+        overflow: visible;
+        // Pack wrapped rows from the top so a partial last row doesn't spread.
+        align-content: flex-start;
+
+        // Single-row height comes from the container filling the header
+        // (`height: 100%`); once the container is `height: auto` for wrapping,
+        // each flex line collapses to the tab's content height, leaving a gap
+        // below the tabs. Give each wrapped tab the base row height so every
+        // row matches the single-row header height (no gap, and the header
+        // grows in whole-row increments).
+        .dv-tab {
+            height: var(--dv-tabs-and-actions-container-height);
+        }
+
+        // Discrete drop indicator for 2-D cross-row reorder (the 1-D gap
+        // animation is suppressed in wrap). A bar on the leading/trailing edge
+        // of the tab the drop would land before/after.
+        .dv-tab--reorder-before::after,
+        .dv-tab--reorder-after::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            z-index: 10;
+            pointer-events: none;
+            background-color: var(--dv-drag-over-border-color);
+        }
+        .dv-tab--reorder-before::after {
+            left: 0;
+        }
+        .dv-tab--reorder-after::after {
+            right: 0;
+        }
+    }
+
     /* GPU optimizations for smooth scrolling */
     will-change: scroll-position;
     transform: translate3d(0, 0, 0);

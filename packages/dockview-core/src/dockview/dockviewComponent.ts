@@ -96,6 +96,7 @@ import {
     IDropGuideHost,
     ILayoutHistoryHost,
     LayoutHistoryChangeEvent,
+    IMultiRowTabsHost,
     ISmartGuidesHost,
     SmartGuidesSnapEvent,
     SmartGuidesSnapTogetherEvent,
@@ -541,7 +542,8 @@ export class DockviewComponent
         ILayoutHistoryHost,
         IDropGuideHost,
         ISmartGuidesHost,
-        IAutoHideEdgeGroupHost
+        IAutoHideEdgeGroupHost,
+        IMultiRowTabsHost
 {
     private readonly nextGroupId = sequentialNumberGenerator();
     private readonly _deserializer = new DefaultDockviewDeserialzier(this);
@@ -1021,6 +1023,20 @@ export class DockviewComponent
         return this.options.theme?.dndPanelOverlay === 'group'
             ? (content.parentElement ?? content)
             : content;
+    }
+
+    /** IMultiRowTabsHost — the group's scrollable tab list (`.dv-tabs-container`),
+     *  the element the wrap controller toggles + measures. */
+    getTabsListElement(group: DockviewGroupPanel): HTMLElement | undefined {
+        return group.model.header.hidden
+            ? undefined
+            : group.model.tabsListElement;
+    }
+
+    /** IMultiRowTabsHost — re-run a group's layout so a wrapped-header height
+     *  change propagates to the content + active panel. */
+    relayoutGroup(group: DockviewGroupPanel): void {
+        group.relayout();
     }
 
     /** IDropGuideHost — the layout root (`.dv-dockview`, a positioned element),

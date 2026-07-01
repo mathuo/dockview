@@ -69,6 +69,7 @@ DockviewModule
 DockviewMutableDisposable
 DockviewOptions
 DockviewOrigin
+DockviewOverflowOptions
 DockviewPanel
 DockviewPanelApi
 DockviewPanelMoveParams
@@ -156,6 +157,8 @@ IHeaderActionsRenderer
 IKeyboardDockingService
 ILayoutHistoryHost
 ILayoutHistoryService
+IMultiRowTabsHost
+IMultiRowTabsService
 INodeDescriptor
 IPanePart
 IPanel
@@ -198,7 +201,9 @@ MeasuredValue
 MovePanelEvent
 MovementOptions
 MovementOptions2
+OVERFLOW_WRAP_TABS_CLASS
 Orientation
+OverflowThumbnailRenderer
 PROPERTY_KEYS_DOCKVIEW
 PROPERTY_KEYS_GRIDVIEW
 PROPERTY_KEYS_PANEVIEW

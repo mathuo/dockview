@@ -49,21 +49,35 @@
                 ]);
 
                 const el = document.getElementById('app');
+                const params = new URLSearchParams(location.search);
+                // Opt-in multi-row (wrapping) tabs via `?overflow=wrap` so the
+                // wrap behaviour is exercised without affecting other specs.
+                const overflow =
+                    params.get('overflow') === 'wrap'
+                        ? { mode: 'wrap' }
+                        : undefined;
+                // `?smooth=1` turns on the smooth tab reorder animation (needed
+                // to exercise the 2-D cross-row wrap reorder path).
+                const theme =
+                    params.get('smooth') === '1'
+                        ? { ...core.themeAbyss, tabAnimation: 'smooth' }
+                        : undefined;
                 // `?pinned=separate-row` exercises the two-row pinned layout;
                 // `?compact=1` opts into icon-only pinned tabs.
-                const pinnedParams = new URLSearchParams(location.search);
                 const pinnedMode =
-                    pinnedParams.get('pinned') === 'separate-row'
+                    params.get('pinned') === 'separate-row'
                         ? 'separate-row'
                         : 'inline';
                 const dockview = new core.DockviewComponent(el, {
                     keyboardNavigation: true,
+                    overflow,
+                    theme,
                     // Pinned tabs — inert until a panel is pinned. `separate-row`
                     // mounts the pinned second row (real-browser geometry).
                     pinnedTabs: {
                         enabled: true,
                         mode: pinnedMode,
-                        compact: pinnedParams.get('compact') === '1',
+                        compact: params.get('compact') === '1',
                     },
                     // Record layout history so the harness can exercise undo/redo
                     // (incl. async popout re-open).
@@ -138,6 +152,19 @@
                     // The content-area dimensions a panel was last laid out
                     // with — the seam reports the group box minus the header.
                     panelDimensions: (id) => panelDimensions[id],
+                    // Add `count` long-titled tabs to a single group so the
+                    // strip overflows its width — under `?overflow=wrap` they
+                    // wrap onto multiple rows.
+                    setupWrapTabs: (count) => {
+                        for (let i = 0; i < count; i++) {
+                            const id = `wrap-tab-${i}`;
+                            panels[id] = dockview.addPanel({
+                                id,
+                                component: 'default',
+                                title: `wrap-tab-long-title-${i}`,
+                            });
+                        }
+                    },
                     closePanel: (id) => panels[id] && panels[id].api.close(),
                     // Create a new panel and move it to the right of the
                     // popped-out group — the move lands in the popout's own
