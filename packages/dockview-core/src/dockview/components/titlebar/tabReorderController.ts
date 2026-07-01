@@ -229,11 +229,16 @@ export class TabReorderController extends CompositeDisposable {
         clientY: number;
         pointerEvent: PointerEvent;
     }): void {
-        // Multi-row wrap intra-group reorder: in smooth wrap the per-tab pointer
-        // drop target delegates to the content override and doesn't reorder, so
-        // commit the reorder from the computed 2-D insertion index when the drag
-        // ends over the strip. (HTML5 wrap drops commit via the tabs-list `drop`
-        // listener, which already reads `currentInsertionIndex`.)
+        // Multi-row wrap intra-group reorder — the pointer-backend analog of the
+        // HTML5 tabs-list `drop` commit. In smooth wrap the per-tab pointer drop
+        // target doesn't latch a drop state for the intra-group drag, so its
+        // `onDrop` never fires; commit the reorder from the computed 2-D
+        // insertion index when the drag ends over the strip. This can't
+        // double-commit: `tab.onDrop` nulls `_animState` before this runs (the
+        // backend calls `handleDrop` before `onDragEnd`), so if the per-tab path
+        // *did* fire, `_animState` is already null and this is skipped. (HTML5
+        // wrap drops commit via the tabs-list `drop` listener, which likewise
+        // reads `currentInsertionIndex`.)
         if (
             this._wrapMode &&
             e &&
