@@ -8,6 +8,29 @@ const { name, version, homepage, license } = require('./package.json');
 const input = join(__dirname, './src/index.ts');
 const outputDir = join(__dirname, 'dist');
 
+// Stamp the build date into `releaseDate.ts` so license validation is
+// version-based: the `__DOCKVIEW_RELEASE_DATE__` token becomes the day this
+// bundle was built. Runs before the typescript transform so it operates on the
+// raw source. Zero-dependency (an inline transform, not @rollup/plugin-replace).
+function stampReleaseDate() {
+    const iso = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
+    return {
+        name: 'stamp-release-date',
+        transform(code, id) {
+            if (
+                id.replace(/\\/g, '/').endsWith('/src/releaseDate.ts') &&
+                code.includes('__DOCKVIEW_RELEASE_DATE__')
+            ) {
+                return {
+                    code: code.replace(/__DOCKVIEW_RELEASE_DATE__/g, iso),
+                    map: null,
+                };
+            }
+            return null;
+        },
+    };
+}
+
 function outputFile(format, isMinified) {
     if (format === 'umd') {
         let filename = join(outputDir, name);
@@ -54,6 +77,7 @@ function createBundle(format, options) {
     }
 
     const plugins = [
+        stampReleaseDate(),
         typescript({
             tsconfig: 'tsconfig.esm.json',
             outDir: outputDir,

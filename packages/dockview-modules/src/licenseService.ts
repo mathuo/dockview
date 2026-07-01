@@ -24,6 +24,7 @@ import {
     validateLicense,
 } from './licenseValidator';
 import { LicenseRegistry } from './licenseRegistry';
+import { DOCKVIEW_RELEASE_DATE } from './releaseDate';
 
 // The `ServiceCollection` slot is added HERE, not in core — so `dockview-core`
 // never names `licenseService`. Compile-time only; the module system stores /
@@ -48,8 +49,12 @@ export interface ILicenseService extends IDisposable {
 }
 
 export interface LicenseServiceOptions {
-    /** Injectable clock for deterministic tests. Defaults to `new Date()`. */
-    now?: () => Date;
+    /**
+     * Injectable dockview release date for deterministic tests. Defaults to the
+     * baked-in `DOCKVIEW_RELEASE_DATE`. Enforcement is version-based, so this is
+     * the build's publish date, NOT the current wall-clock time.
+     */
+    releaseDate?: () => Date;
     /** Injectable origin for tests. Defaults to `location.hostname`. */
     hostname?: () => string;
 }
@@ -77,7 +82,7 @@ export class LicenseService implements ILicenseService {
     }
 
     refresh(): void {
-        this._state = validateLicense(LicenseRegistry.key, this.now());
+        this._state = validateLicense(LicenseRegistry.key, this.releaseDate());
         this.evaluate();
     }
 
@@ -87,8 +92,10 @@ export class LicenseService implements ILicenseService {
 
     // --- internals ---
 
-    private now(): Date {
-        return this.options.now ? this.options.now() : new Date();
+    private releaseDate(): Date {
+        return this.options.releaseDate
+            ? this.options.releaseDate()
+            : DOCKVIEW_RELEASE_DATE;
     }
 
     private hostname(): string {
@@ -107,14 +114,6 @@ export class LicenseService implements ILicenseService {
         }
         if (this.isValid) {
             this.removeWatermark();
-            // Perpetual key past its support window: still works, note once.
-            if (this._state === 'valid-expired-support') {
-                LicenseRegistry.warnOnce(
-                    'license:expired-support',
-                    `dockview: this license's update window has ended — your version keeps working. Renew at ${INFO_URL}`,
-                    'info'
-                );
-            }
             return;
         }
         this.renderWatermark();
@@ -128,6 +127,12 @@ export class LicenseService implements ILicenseService {
                 `dockview: the license key could not be verified (it may be malformed or corrupted). ${INFO_URL}`,
                 'error'
             );
+        } else if (this._state === 'expired') {
+            LicenseRegistry.warnOnce(
+                'license:expired',
+                `dockview: this license key does not cover this version of dockview (released after the license's window). dockview keeps working, but a watermark is shown. Renew at ${INFO_URL}`,
+                'error'
+            );
         } else {
             LicenseRegistry.warnOnce(
                 'license:missing',
@@ -138,9 +143,13 @@ export class LicenseService implements ILicenseService {
     }
 
     private watermarkText(): string {
-        return this._state === 'invalid'
-            ? 'dockview — Invalid License'
-            : 'dockview — Unlicensed';
+        if (this._state === 'invalid') {
+            return 'dockview — Invalid License';
+        }
+        if (this._state === 'expired') {
+            return 'dockview — License Expired';
+        }
+        return 'dockview — Unlicensed';
     }
 
     private renderWatermark(): void {

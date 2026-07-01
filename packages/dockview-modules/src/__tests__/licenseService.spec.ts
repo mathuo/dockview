@@ -44,7 +44,7 @@ describe('LicenseService', () => {
 
     test('no key → watermark + one console.error (package presence = enterprise use)', () => {
         const { host, root } = makeHost();
-        new LicenseService(host, { now: () => IN_WINDOW, ...REMOTE });
+        new LicenseService(host, { releaseDate: () => IN_WINDOW, ...REMOTE });
         expect(watermark(root)?.textContent).toBe('dockview — Unlicensed');
         expect(errSpy).toHaveBeenCalledTimes(1);
     });
@@ -53,7 +53,7 @@ describe('LicenseService', () => {
         LicenseManager.setLicenseKey(GOLDEN_KEY);
         const { host, root } = makeHost();
         const svc = new LicenseService(host, {
-            now: () => IN_WINDOW,
+            releaseDate: () => IN_WINDOW,
             ...REMOTE,
         });
         expect(svc.state).toBe('valid');
@@ -65,7 +65,7 @@ describe('LicenseService', () => {
         LicenseManager.setLicenseKey(INVALID_KEY);
         const { host, root } = makeHost();
         const svc = new LicenseService(host, {
-            now: () => IN_WINDOW,
+            releaseDate: () => IN_WINDOW,
             ...REMOTE,
         });
         expect(svc.state).toBe('invalid');
@@ -73,23 +73,22 @@ describe('LicenseService', () => {
         expect(errSpy).toHaveBeenCalledTimes(1);
     });
 
-    test('valid-expired-support → no watermark, one console.info', () => {
+    test('expired (build released after ValidUntil) → "License Expired" watermark + console.error', () => {
         LicenseManager.setLicenseKey(GOLDEN_KEY);
         const { host, root } = makeHost();
         const svc = new LicenseService(host, {
-            now: () => AFTER_WINDOW,
+            releaseDate: () => AFTER_WINDOW,
             ...REMOTE,
         });
-        expect(svc.state).toBe('valid-expired-support');
-        expect(watermark(root)).toBeNull();
-        expect(infoSpy).toHaveBeenCalledTimes(1);
-        expect(errSpy).not.toHaveBeenCalled();
+        expect(svc.state).toBe('expired');
+        expect(watermark(root)?.textContent).toBe('dockview — License Expired');
+        expect(errSpy).toHaveBeenCalledTimes(1);
     });
 
     test('localhost fully suppresses the watermark AND the warning', () => {
         const { host, root } = makeHost();
         const svc = new LicenseService(host, {
-            now: () => IN_WINDOW,
+            releaseDate: () => IN_WINDOW,
             hostname: () => 'localhost',
         });
         expect(svc.state).toBe('missing');
@@ -99,14 +98,14 @@ describe('LicenseService', () => {
 
     test('watermark is click-through (pointer-events: none)', () => {
         const { host, root } = makeHost();
-        new LicenseService(host, { now: () => IN_WINDOW, ...REMOTE });
+        new LicenseService(host, { releaseDate: () => IN_WINDOW, ...REMOTE });
         expect(watermark(root)!.style.pointerEvents).toBe('none');
     });
 
     test('refresh does not duplicate the watermark, and logs once (de-dup)', () => {
         const { host, root } = makeHost();
         const svc = new LicenseService(host, {
-            now: () => IN_WINDOW,
+            releaseDate: () => IN_WINDOW,
             ...REMOTE,
         });
         svc.refresh();
@@ -118,7 +117,7 @@ describe('LicenseService', () => {
     test('setting a valid key after the watermark shows removes it (refresh)', () => {
         const { host, root } = makeHost();
         const svc = new LicenseService(host, {
-            now: () => IN_WINDOW,
+            releaseDate: () => IN_WINDOW,
             ...REMOTE,
         });
         expect(watermark(root)).not.toBeNull();
@@ -131,7 +130,7 @@ describe('LicenseService', () => {
     test('dispose removes the watermark from the DOM', () => {
         const { host, root } = makeHost();
         const svc = new LicenseService(host, {
-            now: () => IN_WINDOW,
+            releaseDate: () => IN_WINDOW,
             ...REMOTE,
         });
         expect(watermark(root)).not.toBeNull();

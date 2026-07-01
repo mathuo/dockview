@@ -14,7 +14,7 @@
 
 export type LicenseState =
     | 'valid' // within [ValidFrom, ValidUntil]
-    | 'valid-expired-support' // perpetual key past ValidUntil — still functional
+    | 'expired' // past ValidUntil — no longer licensed, watermarked
     | 'invalid' // checksum mismatch / malformed / corrupt
     | 'missing'; // no key supplied
 
@@ -175,16 +175,20 @@ export function parseLicenseKey(key: string): ParsedLicense | null {
 }
 
 /**
- * Validate a key against `now`. Pure — `now` is injected so the result is
- * deterministic and testable; the service passes `new Date()`.
+ * Validate a key against the running dockview build's `releaseDate` (injected,
+ * so the result is deterministic and testable; the service passes the baked-in
+ * `DOCKVIEW_RELEASE_DATE`).
  *
- * `ValidUntil` is a support/update window, not a kill switch: a key past it is
- * still functional (`valid-expired-support`). A key before `ValidFrom` is
- * treated leniently as `valid` (the only realistic cause is client clock skew).
+ * Enforcement is VERSION-based, not wall-clock: a key covers every dockview
+ * version released on or before its `ValidUntil` date. If this build was
+ * released after `ValidUntil` the key is `expired` (watermarked); otherwise it
+ * is `valid` — so a deployed app on a covered version keeps working forever,
+ * and only upgrading to a build past the license window trips the watermark. A
+ * build released before `ValidFrom` is treated leniently as `valid`.
  */
 export function validateLicense(
     key: string | undefined,
-    now: Date
+    releaseDate: Date
 ): LicenseState {
     if (!key || !cleanKey(key)) {
         return 'missing';
@@ -193,22 +197,22 @@ export function validateLicense(
     if (!parsed || !parsed.validUntil) {
         return 'invalid';
     }
-    // Compare at UTC-date granularity (keys carry dates, not times); the key is
-    // valid through the whole of its ValidUntil day.
-    const today = Date.UTC(
-        now.getUTCFullYear(),
-        now.getUTCMonth(),
-        now.getUTCDate()
+    // Compare at UTC-date granularity (keys carry dates, not times): a build
+    // released on the ValidUntil day is still covered.
+    const release = Date.UTC(
+        releaseDate.getUTCFullYear(),
+        releaseDate.getUTCMonth(),
+        releaseDate.getUTCDate()
     );
-    if (today > parsed.validUntil.getTime()) {
-        return 'valid-expired-support';
+    if (release > parsed.validUntil.getTime()) {
+        return 'expired';
     }
     return 'valid';
 }
 
 /** Whether a state means "licensed" (no watermark). */
 export function isValidLicense(state: LicenseState): boolean {
-    return state === 'valid' || state === 'valid-expired-support';
+    return state === 'valid';
 }
 
 /**

@@ -101,13 +101,13 @@ describe('validateLicense', () => {
         ).toBe('valid');
     });
 
-    test('valid-expired-support the day after ValidUntil (perpetual)', () => {
+    test('expired when the build was released after ValidUntil', () => {
         expect(
             validateLicense(GOLDEN_KEY, new Date(Date.UTC(2027, 6, 2)))
-        ).toBe('valid-expired-support');
+        ).toBe('expired');
     });
 
-    test('lenient: before ValidFrom still counts as valid (clock skew)', () => {
+    test('lenient: a build released before ValidFrom still counts as valid', () => {
         expect(
             validateLicense(GOLDEN_KEY, new Date(Date.UTC(2026, 0, 1)))
         ).toBe('valid');
@@ -132,9 +132,9 @@ describe('validateLicense', () => {
 });
 
 describe('isValidLicense', () => {
-    test('valid and valid-expired-support are licensed; others are not', () => {
+    test('only valid is licensed; expired / invalid / missing are not', () => {
         expect(isValidLicense('valid')).toBe(true);
-        expect(isValidLicense('valid-expired-support')).toBe(true);
+        expect(isValidLicense('expired')).toBe(false);
         expect(isValidLicense('invalid')).toBe(false);
         expect(isValidLicense('missing')).toBe(false);
     });

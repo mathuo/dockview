@@ -39,6 +39,14 @@ export {
     KeyboardDockingService,
     KeyboardDockingModule,
 } from './keyboardDockingService';
+export { LicenseService, LicenseModule } from './licenseService';
+export { LicenseManager } from './licenseRegistry';
+export type {
+    ILicenseService,
+    ILicenseHost,
+    LicenseServiceOptions,
+} from './licenseService';
+export type { LicenseState } from './licenseValidator';
 
 /**
  * The set of modules provided by this package. `dockview` registers these via
