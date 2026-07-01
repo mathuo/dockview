@@ -174,6 +174,9 @@ export interface IHeader {
     /** Register a predicate that keeps matching panels out of the overflow
      *  dropdown (used by the PinnedTabs module). No-op default. */
     setOverflowExclude(fn: (panelId: string) => boolean): void;
+    /** Re-evaluate the overflow dropdown now (e.g. after the exclusion set
+     *  changed). */
+    refreshOverflow(): void;
     /** Register a resolver that clamps/redirects a header drop index (used by
      *  the PinnedTabs module to enforce the pin boundary). Identity default. */
     setDropIndexResolver(fn: (panelId: string, index: number) => number): void;

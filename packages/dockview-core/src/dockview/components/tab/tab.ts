@@ -275,14 +275,18 @@ export class Tab extends CompositeDisposable {
 
         // A real inline pin glyph (inherits `currentColor` via `.dv-svg`) —
         // more robust and themeable than a CSS mask, and the only visual
-        // identity a compact pinned tab has.
-        if (pinned && !this._pinIndicator) {
+        // identity a compact pinned tab has. Only injected for the default tab
+        // renderer: a custom `tabComponent` owns its own markup, so we don't
+        // prepend a glyph or force flex layout on it (it still gets the
+        // `dv-tab--pinned` class to style itself).
+        const wantGlyph = pinned && !this.panel.api?.tabComponent;
+        if (wantGlyph && !this._pinIndicator) {
             const indicator = document.createElement('div');
             indicator.className = 'dv-tab-pin';
             indicator.appendChild(createPinButton());
             this._element.insertBefore(indicator, this._element.firstChild);
             this._pinIndicator = indicator;
-        } else if (!pinned && this._pinIndicator) {
+        } else if (!wantGlyph && this._pinIndicator) {
             this._pinIndicator.remove();
             this._pinIndicator = undefined;
         }

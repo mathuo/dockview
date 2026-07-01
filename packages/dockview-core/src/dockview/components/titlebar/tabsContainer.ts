@@ -73,6 +73,7 @@ export interface ITabsContainer extends IDisposable {
     updateTabGroups(): void;
     refreshTabGroupAccent(): void;
     setOverflowExclude(fn: (panelId: string) => boolean): void;
+    refreshOverflow(): void;
     setDropIndexResolver(fn: (panelId: string, index: number) => number): void;
     resolveDropIndex(panelId: string, index: number): number;
     setPinnedRow(el: HTMLElement | undefined): void;
@@ -415,6 +416,10 @@ export class TabsContainer
 
     setOverflowExclude(fn: (panelId: string) => boolean): void {
         this.tabs.setOverflowExclude(fn);
+    }
+
+    refreshOverflow(): void {
+        this.tabs.refreshOverflow();
     }
 
     setPinnedRow(el: HTMLElement | undefined): void {

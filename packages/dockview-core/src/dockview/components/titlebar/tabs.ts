@@ -115,6 +115,12 @@ export class Tabs extends CompositeDisposable {
      */
     setOverflowExclude(fn: (panelId: string) => boolean): void {
         this._overflowExclude = fn;
+        this.refreshOverflow();
+    }
+
+    /** Re-evaluate the overflow dropdown now (e.g. after the exclusion set
+     *  changed) instead of waiting for the next resize/scroll observer fire. */
+    refreshOverflow(): void {
         if (this._showTabsOverflowControl) {
             this.toggleDropdown({ reset: false });
         }

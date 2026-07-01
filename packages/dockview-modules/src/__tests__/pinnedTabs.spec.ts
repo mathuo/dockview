@@ -128,6 +128,44 @@ describe('pinned tabs — integration', () => {
         expect(tabEl(c).querySelector('.dv-tab-pin')).toBeNull();
     });
 
+    test('a custom tab renderer is not disrupted when pinned', () => {
+        // A component with a custom tab renderer (its own markup).
+        const localContainer = document.createElement('div');
+        document.body.appendChild(localContainer);
+        const dockview = new DockviewComponent(localContainer, {
+            createComponent: () => new TestPanel(),
+            createTabComponent: () => ({
+                element: (() => {
+                    const e = document.createElement('div');
+                    e.className = 'my-custom-tab';
+                    return e;
+                })(),
+                init: () => undefined,
+                dispose: () => undefined,
+            }),
+            pinnedTabs: { enabled: true, compact: true },
+        });
+        dockview.layout(1000, 1000);
+
+        const p = dockview.addPanel({
+            id: 'p',
+            component: 'default',
+            tabComponent: 'custom',
+        });
+        p.api.setPinned(true);
+
+        const tab = document.getElementById(
+            p.api.group.model.header.getTabId('p')!
+        )!;
+        // The pinned marker class is applied so the custom tab can style itself.
+        expect(tab.classList.contains('dv-tab--pinned')).toBe(true);
+        // But no glyph is injected and the custom markup is intact.
+        expect(tab.querySelector('.dv-tab-pin')).toBeNull();
+        expect(tab.querySelector('.my-custom-tab')).not.toBeNull();
+
+        localContainer.remove();
+    });
+
     test('compact: true renders the pinned tab icon-only', () => {
         const dockview = make({ enabled: true, compact: true });
         const { c } = threePanels(dockview);
@@ -233,35 +271,51 @@ describe('pinned tabs — integration', () => {
         expect(a.api.isActive).toBe(true);
     });
 
+    // The overflow-exclusion predicate is a stable function installed onto each
+    // group's header when the group is created. Capture it by spying on the
+    // header prototype and creating a fresh group.
+    const captureOverflowPredicate = (
+        dockview: DockviewComponent,
+        anchor: { api: any }
+    ) => {
+        const spy = jest.spyOn(
+            Object.getPrototypeOf(anchor.api.group.model.header),
+            'setOverflowExclude'
+        );
+        const fresh = dockview.addPanel({
+            id: 'fresh',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+        const predicate = spy.mock.calls[spy.mock.calls.length - 1][0] as (
+            id: string
+        ) => boolean;
+        spy.mockRestore();
+        return { predicate, freshGroup: fresh.api.group };
+    };
+
     test('pinning feeds the tab strip an overflow-exclusion predicate', () => {
         const dockview = make({ enabled: true });
-        const { a, c } = threePanels(dockview);
-
-        const header = a.api.group.model.header;
-        const spy = jest.spyOn(header, 'setOverflowExclude');
+        const a = dockview.addPanel({ id: 'a', component: 'default' });
+        const c = dockview.addPanel({ id: 'c', component: 'default' });
+        const { predicate } = captureOverflowPredicate(dockview, a);
 
         c.api.setPinned(true);
-
-        expect(spy).toHaveBeenCalled();
-        const predicate = spy.mock.calls[spy.mock.calls.length - 1][0];
         // The pinned tab is excluded from overflow; unpinned tabs are not.
         expect(predicate('c')).toBe(true);
         expect(predicate('a')).toBe(false);
 
         c.api.setPinned(false);
-        const after = spy.mock.calls[spy.mock.calls.length - 1][0];
-        expect(after('c')).toBe(false);
+        expect(predicate('c')).toBe(false);
     });
 
     test('closing a pinned panel prunes it from the overflow-exclusion set', () => {
         const dockview = make({ enabled: true });
-        const { a, c } = threePanels(dockview);
-
-        const header = a.api.group.model.header;
-        const spy = jest.spyOn(header, 'setOverflowExclude');
+        const a = dockview.addPanel({ id: 'a', component: 'default' });
+        const c = dockview.addPanel({ id: 'c', component: 'default' });
+        const { predicate } = captureOverflowPredicate(dockview, a);
 
         c.api.setPinned(true);
-        const predicate = spy.mock.calls[spy.mock.calls.length - 1][0];
         expect(predicate('c')).toBe(true);
 
         // A close is not an unpin — the id must still be pruned so it can't

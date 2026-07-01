@@ -165,8 +165,13 @@
 // `--pinned-compact` (opt-in) additionally hides the title + close button,
 // Chrome-style, leaving just the glyph.
 .dv-tab.dv-tab--pinned {
-    display: flex;
-    align-items: center;
+    // Only lay the tab out as a flex row when a glyph was actually injected
+    // (default renderer). A custom tab renderer gets the class but keeps its
+    // own layout.
+    &:has(.dv-tab-pin) {
+        display: flex;
+        align-items: center;
+    }
 
     .dv-tab-pin {
         display: inline-flex;
