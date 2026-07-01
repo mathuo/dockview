@@ -100,6 +100,54 @@ describe('pinned tabs — integration', () => {
         return { a, b, c, order };
     };
 
+    const tabEl = (panel: { api: any }): HTMLElement => {
+        const id = panel.api.group.model.header.getTabId(panel.id)!;
+        return document.getElementById(id)!;
+    };
+
+    test('a pinned tab gets dv-tab--pinned and dv-tab--pinned-compact', () => {
+        const dockview = make({ enabled: true });
+        const { c } = threePanels(dockview);
+
+        expect(tabEl(c).classList.contains('dv-tab--pinned')).toBe(false);
+
+        c.api.setPinned(true);
+
+        expect(tabEl(c).classList.contains('dv-tab--pinned')).toBe(true);
+        expect(tabEl(c).classList.contains('dv-tab--pinned-compact')).toBe(
+            true
+        );
+
+        c.api.setPinned(false);
+        expect(tabEl(c).classList.contains('dv-tab--pinned')).toBe(false);
+        expect(tabEl(c).classList.contains('dv-tab--pinned-compact')).toBe(
+            false
+        );
+    });
+
+    test('compact: false keeps the pinned marker without the compact class', () => {
+        const dockview = make({ enabled: true, compact: false });
+        const { c } = threePanels(dockview);
+
+        c.api.setPinned(true);
+
+        expect(tabEl(c).classList.contains('dv-tab--pinned')).toBe(true);
+        expect(tabEl(c).classList.contains('dv-tab--pinned-compact')).toBe(
+            false
+        );
+    });
+
+    test('the pinned class survives a reorder (which recreates the tab)', () => {
+        const dockview = make({ enabled: true });
+        const { a, c } = threePanels(dockview);
+
+        c.api.setPinned(true);
+        // Reorder unpinned tabs to force the strip (and tab elements) to rebuild.
+        a.api.moveTo({ index: 2 });
+
+        expect(tabEl(c).classList.contains('dv-tab--pinned')).toBe(true);
+    });
+
     test('pinning reorders the tab so pinned tabs render first', () => {
         const dockview = make({ enabled: true });
         const { c, order } = threePanels(dockview);

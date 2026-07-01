@@ -158,6 +158,56 @@
     }
 }
 
+// Pinned tabs (PinnedTabs module). Presentation only — the classes are inert
+// unless a panel is pinned (nothing pins panels without the module), so this
+// is a no-op for the default free layout. `--pinned` marks a pinned tab;
+// `--pinned-compact` renders it icon-only, Chrome-style: title text and the
+// close button are hidden and a pin glyph is shown. The pin glyph is masked
+// from `currentColor` so it inherits the theme's tab foreground.
+$dv-pin-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H6c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z'/></svg>")
+    no-repeat center / contain;
+
+.dv-tab.dv-tab--pinned {
+    // Pinned tabs never clip — the unpinned tabs are the ones that overflow
+    // (mirrors the module's overflow-exclusion predicate on the JS side).
+    flex-shrink: 0;
+
+    // A small leading pin glyph on the default tab renderer.
+    .dv-default-tab-content::before {
+        content: '';
+        display: inline-block;
+        width: 11px;
+        height: 11px;
+        margin-right: 4px;
+        vertical-align: -1px;
+        opacity: 0.6;
+        background-color: currentColor;
+        -webkit-mask: $dv-pin-mask;
+        mask: $dv-pin-mask;
+    }
+}
+
+.dv-tab.dv-tab--pinned-compact {
+    // Icon-only: the default renderer hides its title + close button; a custom
+    // tab renderer receives the class and styles itself.
+    .dv-default-tab-content,
+    .dv-default-tab-action {
+        display: none;
+    }
+
+    // Standalone pin glyph (the leading glyph above lives inside the now-hidden
+    // content element).
+    &::after {
+        content: '';
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        background-color: currentColor;
+        -webkit-mask: $dv-pin-mask;
+        mask: $dv-pin-mask;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .dv-tab {
         transition: none !important;

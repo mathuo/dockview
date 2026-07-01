@@ -91,6 +91,12 @@ export class Tab extends CompositeDisposable {
 
         toggleClass(this.element, 'dv-inactive-tab', true);
 
+        // Pinned tabs get a marker class (and, unless disabled, a compact
+        // icon-only class). Driven off the panel's pinned state — inert when
+        // nothing is pinned (i.e. when the PinnedTabs module is absent) — and
+        // re-applied here because a reorder recreates the Tab.
+        this._updatePinnedClasses();
+
         const canDisplayOverlay = (
             event: DragEvent | PointerEvent,
             position: Position
@@ -207,7 +213,12 @@ export class Tab extends CompositeDisposable {
                 const model = this._buildOverlayModel();
                 this.dropTarget.setOverlayModel(model);
                 this.pointerDropTarget.setOverlayModel(model);
+                // `pinnedTabs.compact` may have changed.
+                this._updatePinnedClasses();
             }),
+            this.panel.api?.onDidChangePinned?.(() => {
+                this._updatePinnedClasses();
+            }) ?? { dispose: () => {} },
             addDisposableListener(this._element, 'dragend', () => {
                 // The shared onDragEnd handler already fires _onDragEnd via
                 // the HTML5 backend; just strip the dragging class here.
@@ -249,6 +260,14 @@ export class Tab extends CompositeDisposable {
             this.pointerDropTarget,
             this.pointerDragSource
         );
+    }
+
+    private _updatePinnedClasses(): void {
+        const pinned = this.panel.api?.isPinned ?? false;
+        const compact =
+            pinned && this.accessor.options.pinnedTabs?.compact !== false;
+        toggleClass(this.element, 'dv-tab--pinned', pinned);
+        toggleClass(this.element, 'dv-tab--pinned-compact', compact);
     }
 
     public setActive(isActive: boolean): void {

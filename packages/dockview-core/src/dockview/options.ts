@@ -41,7 +41,10 @@ export type BuiltInContextMenuItem =
     | 'close'
     | 'closeOthers'
     | 'closeAll'
-    | 'separator';
+    | 'separator'
+    // Toggle the panel's pinned state (PinnedTabs module). Renders as
+    // "Pin tab" / "Unpin tab"; a no-op when pinning is not enabled.
+    | 'pin';
 
 export type BuiltInChipContextMenuItem = 'separator' | 'colorPicker' | 'rename';
 
