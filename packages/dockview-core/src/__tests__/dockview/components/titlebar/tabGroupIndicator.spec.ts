@@ -268,6 +268,8 @@ describe('WrapTabGroupIndicator', () => {
         });
         const indicator = new WrapTabGroupIndicator(ctx);
         indicator.syncUnderlineElements(new Set(['tg-1']));
+        // simulate a leftover background from a prior non-wrap `none` render
+        indicator.getUnderline('tg-1')!.style.backgroundColor = 'red';
         (indicator as any)._positionUnderlinesSync();
 
         const underline = indicator.getUnderline('tg-1')!;
@@ -276,6 +278,8 @@ describe('WrapTabGroupIndicator', () => {
         // one straight segment per row → two `M` (move) commands
         const segments = (d.match(/M /g) ?? []).length;
         expect(segments).toBe(2);
+        // stale non-wrap background is cleared (no colored block behind the SVG)
+        expect(underline.style.backgroundColor).toBe('');
 
         indicator.dispose();
     });

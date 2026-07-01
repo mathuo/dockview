@@ -269,9 +269,10 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
             if (isVertical) {
                 underline.style.top = `${startEdge}px`;
                 underline.style.height = `${Math.max(0, span)}px`;
-                // Clear horizontal properties
+                // Clear horizontal properties (incl. any wrap-mode overrides)
                 underline.style.left = '';
                 underline.style.width = '';
+                underline.style.bottom = '';
             } else {
                 underline.style.left = `${startEdge}px`;
                 underline.style.width = `${Math.max(0, span)}px`;
@@ -362,23 +363,12 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
         underline.style.bottom = 'auto';
         underline.style.width = `${width}px`;
         underline.style.height = `${height}px`;
+        // The `none` indicator paints the underline element itself; clear any
+        // background left over from a non-wrap render so it doesn't show as a
+        // block behind the per-row SVG segments after a runtime wrap toggle.
+        underline.style.backgroundColor = '';
 
-        let svg = underline.firstElementChild as SVGSVGElement | null;
-        let path: SVGPathElement;
-        if (!svg || svg.tagName !== 'svg') {
-            underline.replaceChildren();
-            svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.style.display = 'block';
-            path = document.createElementNS(
-                'http://www.w3.org/2000/svg',
-                'path'
-            );
-            path.setAttribute('fill', 'none');
-            svg.appendChild(path);
-            underline.appendChild(svg);
-        } else {
-            path = svg.firstElementChild as SVGPathElement;
-        }
+        const { svg, path } = this.ensureSvgPath(underline);
         svg.setAttribute('width', String(width));
         svg.setAttribute('height', String(height));
         path.setAttribute('stroke', color);
@@ -392,6 +382,37 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
             d += `M ${row.left},${y} L ${row.right},${y} `;
         }
         path.setAttribute('d', d.trim());
+    }
+
+    /**
+     * Ensure the underline element holds a single reusable `<svg><path/></svg>`
+     * (created once, reused across frames) and return them.
+     */
+    protected ensureSvgPath(underline: HTMLElement): {
+        svg: SVGSVGElement;
+        path: SVGPathElement;
+    } {
+        const existing = underline.firstElementChild as SVGSVGElement | null;
+        if (existing && existing.tagName === 'svg') {
+            return {
+                svg: existing,
+                path: existing.firstElementChild as SVGPathElement,
+            };
+        }
+        underline.replaceChildren();
+        const svg = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'svg'
+        );
+        svg.style.display = 'block';
+        const path = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'path'
+        );
+        path.setAttribute('fill', 'none');
+        svg.appendChild(path);
+        underline.appendChild(svg);
+        return { svg, path };
     }
 }
 
@@ -461,22 +482,7 @@ export class WrapTabGroupIndicator extends BaseTabGroupIndicator {
         }
 
         // Ensure SVG + path child exists (created once, reused)
-        let svg = underline.firstElementChild as SVGSVGElement | null;
-        let path: SVGPathElement;
-        if (!svg || svg.tagName !== 'svg') {
-            underline.replaceChildren();
-            svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.style.display = 'block';
-            path = document.createElementNS(
-                'http://www.w3.org/2000/svg',
-                'path'
-            );
-            path.setAttribute('fill', 'none');
-            svg.appendChild(path);
-            underline.appendChild(svg);
-        } else {
-            path = svg.firstElementChild as SVGPathElement;
-        }
+        const { svg, path } = this.ensureSvgPath(underline);
 
         path.setAttribute('stroke', color);
         path.setAttribute('stroke-width', String(t));
