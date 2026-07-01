@@ -68,6 +68,8 @@ export class TabReorderController extends CompositeDisposable {
     private _voidContainer: HTMLElement | null = null;
     private _extendedDropZone: HTMLElement | null = null;
     private _pointerInsideTabsList = false;
+    /** The tab element currently carrying a wrap-mode drop indicator, if any. */
+    private _wrapIndicatorEl: HTMLElement | null = null;
 
     // Field-name mirrors so the extracted method bodies can stay verbatim.
     private get _tabs(): IValueDisposable<Tab>[] {
@@ -90,6 +92,13 @@ export class TabReorderController extends CompositeDisposable {
     }
     private get _tabGroupManager(): TabGroupManager {
         return this.host.tabGroupManager;
+    }
+
+    /** Whether the tab strip is in multi-row wrap layout
+     *  (`MultiRowTabsModule`, `overflow.mode: 'wrap'`). In wrap, the 1-D
+     *  gap/FLIP animation is suppressed and reorder uses a 2-D hit-test. */
+    private get _wrapMode(): boolean {
+        return this._tabsList.classList.contains('dv-tabs-container--wrap');
     }
 
     get animState(): TabAnimationState | null {
@@ -207,7 +216,7 @@ export class TabReorderController extends CompositeDisposable {
         }
 
         this._pointerInsideTabsList = true;
-        this.processDragOver(clientX);
+        this.processDragOver(clientX, clientY);
     }
 
     /**
@@ -215,9 +224,61 @@ export class TabReorderController extends CompositeDisposable {
      * inside-strip flag and tear down any smooth-reorder anim state the
      * dragover bridge may have installed.
      */
-    handlePointerDragEnd(): void {
+    handlePointerDragEnd(e?: {
+        clientX: number;
+        clientY: number;
+        pointerEvent: PointerEvent;
+    }): void {
+        // Multi-row wrap intra-group reorder: in smooth wrap the per-tab pointer
+        // drop target delegates to the content override and doesn't reorder, so
+        // commit the reorder from the computed 2-D insertion index when the drag
+        // ends over the strip. (HTML5 wrap drops commit via the tabs-list `drop`
+        // listener, which already reads `currentInsertionIndex`.)
+        if (
+            this._wrapMode &&
+            e &&
+            this._animState &&
+            this._animState.sourceIndex !== -1 &&
+            this._animState.currentInsertionIndex !== null &&
+            this.isPointInsideTabsList(e.clientX, e.clientY)
+        ) {
+            this.commitWrapReorder(e.pointerEvent);
+        }
         this._pointerInsideTabsList = false;
         this.resetDragAnimation();
+    }
+
+    private isPointInsideTabsList(clientX: number, clientY: number): boolean {
+        const doc = this._tabsList.ownerDocument ?? document;
+        const el = doc.elementFromPoint(clientX, clientY);
+        return !!el && this._tabsList.contains(el);
+    }
+
+    /** Commit a wrap-mode intra-group reorder from the current 2-D insertion
+     *  index (adjusted for the source's own position), then clear drag state. */
+    private commitWrapReorder(event: PointerEvent): void {
+        const animState = this._animState;
+        if (!animState || animState.currentInsertionIndex === null) {
+            return;
+        }
+        const insertionIndex = animState.currentInsertionIndex;
+        const sourceIndex = animState.sourceIndex;
+        const adjustedIndex =
+            insertionIndex -
+            (sourceIndex !== -1 && sourceIndex < insertionIndex ? 1 : 0);
+
+        this._animState = null;
+        this.clearWrapDropIndicator();
+        this.uncollapseSourceTab(animState.sourceTabId);
+
+        if (adjustedIndex === sourceIndex) {
+            return;
+        }
+        this.host.fireDrop({
+            event,
+            index: adjustedIndex,
+            targetTabGroupId: null,
+        });
     }
 
     /**
@@ -228,17 +289,8 @@ export class TabReorderController extends CompositeDisposable {
      * ownership of the drag — HTML5 callers use this to gate
      * `event.preventDefault()`.
      */
-    processDragOver(clientX: number): boolean {
+    processDragOver(clientX: number, clientY?: number): boolean {
         if (this.accessor.options.disableDnd) {
-            return false;
-        }
-
-        // Multi-row wrap mode: the smooth single-row reorder is x-only and
-        // breaks across wrapped rows, so skip it for a wrapped strip. Dragging a
-        // tab out to detach/redock still works (that's a separate path), and the
-        // `default` animation mode keeps its per-tab drop targets (2-D safe).
-        // True cross-row reorder ships in a later phase.
-        if (this._tabsList.classList.contains('dv-tabs-container--wrap')) {
             return false;
         }
 
@@ -332,7 +384,7 @@ export class TabReorderController extends CompositeDisposable {
         if (this._animState!.sourceIndex !== -1) {
             this.group.model.dropTargetContainer?.model?.clear();
         }
-        this.handleDragOver({ clientX });
+        this.handleDragOver({ clientX, clientY });
         return true;
     }
 
@@ -376,8 +428,16 @@ export class TabReorderController extends CompositeDisposable {
         }
     }
 
-    handleDragOver(event: { clientX: number }): void {
+    handleDragOver(event: { clientX: number; clientY?: number }): void {
         if (!this._animState) {
+            return;
+        }
+
+        // Multi-row wrap: the 1-D x-accumulation below assumes a single row.
+        // In wrap use a 2-D hit-test (row by y, slot by x within the row) and
+        // a discrete drop indicator instead of the gap animation.
+        if (this._wrapMode) {
+            this.handleWrappedDragOver(event.clientX, event.clientY ?? 0);
             return;
         }
 
@@ -617,6 +677,123 @@ export class TabReorderController extends CompositeDisposable {
     }
 
     /**
+     * Multi-row wrap drag-over: resolve the 2-D insertion slot and show a
+     * discrete drop indicator. No gap/FLIP animation (that's 1-D and fights the
+     * flow layout — `applyDragOverTransforms`/`runFlipAnimation` no-op in wrap).
+     */
+    private handleWrappedDragOver(clientX: number, clientY: number): void {
+        if (!this._animState) {
+            return;
+        }
+        const index = this.computeWrappedInsertionIndex(clientX, clientY);
+        // targetTabGroupId stays null — wrap reorder is single-tab within the
+        // group; group-chip drops keep the 1-D path (chips don't wrap in v1).
+        if (
+            index === this._animState.currentInsertionIndex &&
+            this._animState.targetTabGroupId === null
+        ) {
+            return;
+        }
+        this._animState.currentInsertionIndex = index;
+        this._animState.targetTabGroupId = null;
+        this.updateWrapDropIndicator(index);
+    }
+
+    /**
+     * The insertion slot (index into the full tab list) for a pointer at
+     * `(clientX, clientY)` over a wrapped strip: pick the row whose vertical
+     * span contains `clientY` (clamped to first/last), then the slot within that
+     * row by x-midpoint. Excludes the drag source so its own position doesn't
+     * bias the result; the drop path adjusts for the source offset.
+     */
+    private computeWrappedInsertionIndex(
+        clientX: number,
+        clientY: number
+    ): number {
+        const sourceId = this._animState?.sourceTabId;
+        const sourceGroupIds = this._animState?.sourceGroupPanelIds;
+
+        const entries: { index: number; rect: DOMRect }[] = [];
+        for (let i = 0; i < this._tabs.length; i++) {
+            const tab = this._tabs[i].value;
+            if (tab.panel.id === sourceId) {
+                continue;
+            }
+            if (sourceGroupIds?.has(tab.panel.id)) {
+                continue;
+            }
+            entries.push({
+                index: i,
+                rect: tab.element.getBoundingClientRect(),
+            });
+        }
+        if (entries.length === 0) {
+            return this._tabs.length;
+        }
+
+        // Bucket into rows by top edge (2px tolerance for sub-pixel rounding).
+        const rows: { top: number; bottom: number; items: typeof entries }[] =
+            [];
+        for (const entry of entries) {
+            const row = rows.find((r) => Math.abs(r.top - entry.rect.top) <= 2);
+            if (row) {
+                row.items.push(entry);
+                row.bottom = Math.max(row.bottom, entry.rect.bottom);
+            } else {
+                rows.push({
+                    top: entry.rect.top,
+                    bottom: entry.rect.bottom,
+                    items: [entry],
+                });
+            }
+        }
+        rows.sort((a, b) => a.top - b.top);
+
+        // Pick the row: the one whose vertical span contains clientY, else
+        // clamp above→first / below→last.
+        let row = rows.find((r) => clientY >= r.top && clientY <= r.bottom);
+        if (!row) {
+            row = clientY < rows[0].top ? rows[0] : rows[rows.length - 1];
+        }
+
+        // Within the row, insert before the first tab whose horizontal midpoint
+        // is past the pointer; past all of them → after the row's last tab.
+        const items = row.items.sort((a, b) => a.rect.left - b.rect.left);
+        for (const item of items) {
+            const midpoint = item.rect.left + item.rect.width / 2;
+            if (clientX < midpoint) {
+                return item.index;
+            }
+        }
+        return items[items.length - 1].index + 1;
+    }
+
+    private updateWrapDropIndicator(index: number): void {
+        this.clearWrapDropIndicator();
+        const count = this._tabs.length;
+        if (count === 0) {
+            return;
+        }
+        if (index < count) {
+            const el = this._tabs[index].value.element;
+            el.classList.add('dv-tab--reorder-before');
+            this._wrapIndicatorEl = el;
+        } else {
+            const el = this._tabs[count - 1].value.element;
+            el.classList.add('dv-tab--reorder-after');
+            this._wrapIndicatorEl = el;
+        }
+    }
+
+    private clearWrapDropIndicator(): void {
+        this._wrapIndicatorEl?.classList.remove(
+            'dv-tab--reorder-before',
+            'dv-tab--reorder-after'
+        );
+        this._wrapIndicatorEl = null;
+    }
+
+    /**
      * Batch-remove a CSS class from multiple elements instantly,
      * forcing only a single reflow for the entire batch.
      */
@@ -655,6 +832,11 @@ export class TabReorderController extends CompositeDisposable {
     }
 
     applyDragOverTransforms(skipTransition = false): void {
+        // The gap animation is 1-D (single-row margin shifting) and fights the
+        // wrap flow layout — wrap uses a discrete drop indicator instead.
+        if (this._wrapMode) {
+            return;
+        }
         if (
             !this._animState ||
             this._animState.currentInsertionIndex === null
@@ -829,6 +1011,8 @@ export class TabReorderController extends CompositeDisposable {
     }
 
     resetTabTransforms(): void {
+        this.clearWrapDropIndicator();
+
         // Cancel any pending margin transitionend listeners
         for (const [, cleanup] of this._pendingMarginCleanups) {
             cleanup();
@@ -974,6 +1158,12 @@ export class TabReorderController extends CompositeDisposable {
         isCrossGroup: boolean = false,
         animRange?: { from: number; to: number }
     ): void {
+        // The FLIP is a 1-D (single-axis) slide; across wrapped rows it would
+        // animate wrong deltas, so wrap does a discrete reorder (no FLIP).
+        if (this._wrapMode) {
+            return;
+        }
+
         const isVertical = this._direction === 'vertical';
         let hasAnimation = false;
 

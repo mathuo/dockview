@@ -56,9 +56,16 @@
                     params.get('overflow') === 'wrap'
                         ? { mode: 'wrap' }
                         : undefined;
+                // `?smooth=1` turns on the smooth tab reorder animation (needed
+                // to exercise the 2-D cross-row wrap reorder path).
+                const theme =
+                    params.get('smooth') === '1'
+                        ? { ...core.themeAbyss, tabAnimation: 'smooth' }
+                        : undefined;
                 const dockview = new core.DockviewComponent(el, {
                     keyboardNavigation: true,
                     overflow,
+                    theme,
                     // Record layout history so the harness can exercise undo/redo
                     // (incl. async popout re-open).
                     layoutHistory: { enabled: true },

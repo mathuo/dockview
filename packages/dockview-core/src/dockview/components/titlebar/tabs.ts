@@ -326,8 +326,8 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
             // down smooth-reorder anim state the dragover bridge may
             // have installed. The chip's pointer drag source handles
             // its own transfer payload + iframe-shield cleanup.
-            PointerDragController.getInstance().onDragEnd(() => {
-                this._reorder.handlePointerDragEnd();
+            PointerDragController.getInstance().onDragEnd((e) => {
+                this._reorder.handlePointerDragEnd(e);
             }),
             // Pointer-event mirror of the HTML5 dragover / dragleave handlers
             // below. Drives smooth-reorder for `dndStrategy: 'pointer'` and
@@ -410,7 +410,12 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                 this._tabsList,
                 'dragover',
                 (event) => {
-                    if (this._reorder.processDragOver(event.clientX)) {
+                    if (
+                        this._reorder.processDragOver(
+                            event.clientX,
+                            event.clientY
+                        )
+                    ) {
                         // Allow `drop` to fire on the tabs list container.
                         event.preventDefault();
                     }

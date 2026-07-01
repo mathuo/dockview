@@ -17,6 +17,27 @@
         flex-wrap: wrap;
         height: auto;
         overflow: visible;
+
+        // Discrete drop indicator for 2-D cross-row reorder (the 1-D gap
+        // animation is suppressed in wrap). A bar on the leading/trailing edge
+        // of the tab the drop would land before/after.
+        .dv-tab--reorder-before::after,
+        .dv-tab--reorder-after::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            z-index: 10;
+            pointer-events: none;
+            background-color: var(--dv-drag-over-border-color);
+        }
+        .dv-tab--reorder-before::after {
+            left: 0;
+        }
+        .dv-tab--reorder-after::after {
+            right: 0;
+        }
     }
 
     /* GPU optimizations for smooth scrolling */
