@@ -1048,14 +1048,14 @@ export class Tabs extends CompositeDisposable {
                 tabGroups.push(tg.id);
 
                 // For collapsed groups whose chip is clipped, ensure all
-                // member tabs are included in the overflow list so they
-                // appear in the dropdown.
+                // member tabs are included in the overflow list so they appear
+                // in the dropdown. Pinned members are NOT excluded here: a
+                // collapsed group's members aren't rendered as visible tabs, so
+                // the dropdown is their only reachable path — excluding a pinned
+                // one would make it unreachable.
                 if (tg.collapsed) {
                     for (const pid of tg.panelIds) {
-                        if (
-                            !overflowTabSet.has(pid) &&
-                            !this._overflowExclude(pid)
-                        ) {
+                        if (!overflowTabSet.has(pid)) {
                             overflowTabSet.add(pid);
                             tabs.push(pid);
                         }

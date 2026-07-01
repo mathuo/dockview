@@ -248,7 +248,12 @@ export class DockviewPanel
         this.update({ params: state.params ?? {} });
         this.setTitle(state.title ?? this.id);
         this.setRenderer(state.renderer ?? this.accessor.renderer);
-        this.setPinned(state.pinned ?? false);
+        // Honour the serialized pinned flag only when pinning is enabled (see
+        // the deserializer for the rationale); disabled → load unpinned.
+        this.setPinned(
+            (state.pinned ?? false) &&
+                !!this.accessor.options.pinnedTabs?.enabled
+        );
 
         // state.contentComponent;
         // state.tabComponent;

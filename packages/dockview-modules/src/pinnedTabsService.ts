@@ -57,6 +57,9 @@ class SecondRowController extends CompositeDisposable {
             {
                 dispose: () => this._row.removeEventListener('click', onClick),
             },
+            // A pinned panel can arrive by a cross-group move (no pin-change
+            // event fires), so re-render on add as well as remove.
+            this.group.model.onDidAddPanel(() => this.render()),
             this.group.model.onDidRemovePanel(() => this.render()),
             this.group.model.onDidActivePanelChange(() => this.render()),
             { dispose: () => this._unmount() }
@@ -254,6 +257,17 @@ export class PinnedTabsService implements IPinnedTabsService {
                 this._secondRows.get(group)?.dispose();
                 this._secondRows.delete(group);
             }),
+            // Drop a removed panel from the pinned bookkeeping so its id can't
+            // leak into the overflow-exclusion set (a close is not an unpin).
+            this._host.onDidRemovePanel((panel) => {
+                this._pinnedIds.delete(panel.id);
+                for (const order of this._pinnedOrder.values()) {
+                    const at = order.indexOf(panel.id);
+                    if (at !== -1) {
+                        order.splice(at, 1);
+                    }
+                }
+            }),
             // A restore populates panels' `isPinned` directly (not via the
             // gated setter), so seed the store from them and re-assert the
             // invariant once the layout is fully built.
@@ -296,11 +310,12 @@ export class PinnedTabsService implements IPinnedTabsService {
     };
 
     /**
-     * Keep a header drop on the correct side of the pin boundary. With
-     * `togglePinOnCrossBoundaryDrag` (default on) a drop that crosses the
-     * boundary flips the dragged panel's pinned state instead of being clamped
-     * — the flip is deferred to a microtask so it runs after the in-progress
-     * move settles, then the pinned-change handler re-orders the strip.
+     * Keep a header drop on the correct side of the pin boundary. By default a
+     * cross-boundary drop is **clamped** back (Chrome-style). Opt in to
+     * flipping the dragged panel's pinned state with
+     * `togglePinOnCrossBoundaryDrag: true` (VS-Code-style) — the flip is
+     * deferred to a microtask so it runs after the in-progress move settles,
+     * then the pinned-change handler re-orders the strip.
      *
      * The boundary is the pinned count *excluding the dragged panel* (it is
      * removed and re-inserted during the move, so the index is post-removal).

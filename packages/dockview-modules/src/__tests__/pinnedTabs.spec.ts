@@ -253,6 +253,23 @@ describe('pinned tabs — integration', () => {
         expect(after('c')).toBe(false);
     });
 
+    test('closing a pinned panel prunes it from the overflow-exclusion set', () => {
+        const dockview = make({ enabled: true });
+        const { a, c } = threePanels(dockview);
+
+        const header = a.api.group.model.header;
+        const spy = jest.spyOn(header, 'setOverflowExclude');
+
+        c.api.setPinned(true);
+        const predicate = spy.mock.calls[spy.mock.calls.length - 1][0];
+        expect(predicate('c')).toBe(true);
+
+        // A close is not an unpin — the id must still be pruned so it can't
+        // linger in the exclusion set and mis-exclude a future reused id.
+        c.api.close();
+        expect(predicate('c')).toBe(false);
+    });
+
     test('each group is wired with a clamping drop-index resolver', () => {
         const dockview = make({
             enabled: true,
@@ -296,6 +313,7 @@ describe('pinned tabs — reorder guard', () => {
             onDidAddGroup: stub,
             onDidRemoveGroup: stub,
             onDidLayoutFromJSON: stub,
+            onDidRemovePanel: stub,
         } as any);
     };
 
@@ -476,6 +494,20 @@ describe('pinned tabs — serialization', () => {
         ]);
     });
 
+    test('a pinned layout loads unpinned when pinning is disabled', () => {
+        const source = make({ enabled: true });
+        buildPinned(source);
+        const json = source.api.toJSON();
+        expect(json.panels['c'].pinned).toBe(true);
+
+        // Restore into a component with pinning disabled → the `pinned` key is
+        // ignored, so the tab is not left pinned-but-unmanageable.
+        const target = make({ enabled: false });
+        target.api.fromJSON(json);
+
+        expect(target.api.getPanel('c')!.api.isPinned).toBe(false);
+    });
+
     test('a layout without a pinned key loads unpinned (back-compat)', () => {
         const source = make({ enabled: true });
         source.addPanel({ id: 'a', component: 'default' });
@@ -590,5 +622,25 @@ describe('pinned tabs — separate-row mode', () => {
         a.api.setPinned(true);
 
         expect(row()).toBeNull();
+    });
+
+    test('a pinned panel moved into a group renders in that group row', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const a = dockview.addPanel({ id: 'a', component: 'default' });
+        a.api.setPinned(true);
+        expect(rowTabs().map((el) => el.textContent)).toEqual(['a']);
+
+        // A second group, then move the pinned panel into it — no pin-change
+        // event fires, only onDidAddPanel on the destination group.
+        const z = dockview.addPanel({
+            id: 'z',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+        a.api.moveTo({ group: z.api.group });
+
+        // Exactly one pinned row tab ('a'), now living in the destination group.
+        expect(rowTabs().map((el) => el.textContent)).toEqual(['a']);
+        expect(a.api.group).toBe(z.api.group);
     });
 });

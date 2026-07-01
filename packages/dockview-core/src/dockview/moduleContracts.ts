@@ -484,6 +484,9 @@ export interface IPinnedTabsHost {
      *  pinned store from the restored panels' `isPinned` flags and re-asserts
      *  the invariant. */
     readonly onDidLayoutFromJSON: Event<void>;
+    /** Fires when a panel is removed — the service prunes it from its pinned
+     *  bookkeeping so a closed pinned panel's id can't leak. */
+    readonly onDidRemovePanel: Event<IDockviewPanel>;
 }
 
 /**

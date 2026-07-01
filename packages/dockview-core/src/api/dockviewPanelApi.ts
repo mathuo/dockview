@@ -51,8 +51,9 @@ export interface DockviewPanelApi extends Omit<
     /**
      * Whether this panel's tab is pinned. Pinned tabs render before unpinned
      * tabs, never overflow, and resist cross-boundary reorder. Owned by the
-     * PinnedTabs module — reads `false` when the module is absent or
-     * `pinnedTabs` is not enabled.
+     * PinnedTabs module. Reads `false` until a panel is pinned, which requires
+     * `pinnedTabs.enabled` (both `setPinned` and restore are gated on it), so a
+     * component with pinning disabled always reports `false`.
      */
     readonly isPinned: boolean;
     readonly onDidActiveGroupChange: Event<ActiveGroupEvent>;
