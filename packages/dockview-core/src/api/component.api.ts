@@ -1,5 +1,6 @@
 import {
     DockviewActivePanelChangeEvent,
+    DockviewPanelPinnedChangeEvent,
     DockviewLayoutMutationEvent,
     DockviewMaximizedGroupChangeEvent,
     DockviewPopoutGroupOptions,
@@ -696,6 +697,14 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     get onDidActivePanelChange(): Event<DockviewActivePanelChangeEvent> {
         return this.component.onDidActivePanelChange;
+    }
+
+    /**
+     * Fired when a panel is pinned or unpinned (PinnedTabs module). Carries the
+     * panel and its new `isPinned` state.
+     */
+    get onDidPanelPinnedChange(): Event<DockviewPanelPinnedChangeEvent> {
+        return this.component.onDidPanelPinnedChange;
     }
 
     /**

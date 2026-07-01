@@ -26,6 +26,7 @@ import {
     IKeyboardDockingService,
     ILayoutHistoryService,
     IMultiRowTabsService,
+    IPinnedTabsService,
     ISmartGuidesService,
     ITabGroupChipsService,
 } from './moduleContracts';
@@ -48,6 +49,7 @@ export interface ServiceCollection {
     smartGuidesService?: ISmartGuidesService;
     autoHideEdgeGroupService?: IAutoHideEdgeGroupService;
     multiRowTabsService?: IMultiRowTabsService;
+    pinnedTabsService?: IPinnedTabsService;
 }
 
 export interface DockviewModule<THost = unknown> {

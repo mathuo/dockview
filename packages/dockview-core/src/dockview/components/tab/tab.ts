@@ -6,6 +6,7 @@ import {
     PanelTransfer,
 } from '../../../dnd/dataTransfer';
 import { toggleClass } from '../../../dom';
+import { createPinButton } from '../../../svg';
 import { DockviewComponent } from '../../dockviewComponent';
 import { ITabRenderer } from '../../types';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
@@ -41,6 +42,7 @@ export class Tab extends CompositeDisposable {
     private readonly panelTransfer =
         LocalSelectionTransfer.getInstance<PanelTransfer>();
     private _direction: DockviewHeaderDirection = 'horizontal';
+    private _pinIndicator: HTMLElement | undefined = undefined;
 
     private readonly _onPointDown = new Emitter<MouseEvent>();
     readonly onPointerDown: Event<MouseEvent> = this._onPointDown.event;
@@ -90,6 +92,12 @@ export class Tab extends CompositeDisposable {
         }
 
         toggleClass(this.element, 'dv-inactive-tab', true);
+
+        // Pinned tabs get a marker class (and, unless disabled, a compact
+        // icon-only class). Driven off the panel's pinned state — inert when
+        // nothing is pinned (i.e. when the PinnedTabs module is absent) — and
+        // re-applied here because a reorder recreates the Tab.
+        this._updatePinnedClasses();
 
         const canDisplayOverlay = (
             event: DragEvent | PointerEvent,
@@ -207,7 +215,12 @@ export class Tab extends CompositeDisposable {
                 const model = this._buildOverlayModel();
                 this.dropTarget.setOverlayModel(model);
                 this.pointerDropTarget.setOverlayModel(model);
+                // `pinnedTabs.compact` may have changed.
+                this._updatePinnedClasses();
             }),
+            this.panel.api?.onDidChangePinned?.(() => {
+                this._updatePinnedClasses();
+            }) ?? { dispose: () => {} },
             addDisposableListener(this._element, 'dragend', () => {
                 // The shared onDragEnd handler already fires _onDragEnd via
                 // the HTML5 backend; just strip the dragging class here.
@@ -249,6 +262,34 @@ export class Tab extends CompositeDisposable {
             this.pointerDropTarget,
             this.pointerDragSource
         );
+    }
+
+    private _updatePinnedClasses(): void {
+        const pinned = this.panel.api?.isPinned ?? false;
+        // Compact (icon-only) is opt-in: dockview's default tab has no favicon,
+        // so a pinned tab keeps its title by default and just gains a pin glyph.
+        const compact =
+            pinned && this.accessor.options.pinnedTabs?.compact === true;
+        toggleClass(this.element, 'dv-tab--pinned', pinned);
+        toggleClass(this.element, 'dv-tab--pinned-compact', compact);
+
+        // A real inline pin glyph (inherits `currentColor` via `.dv-svg`) —
+        // more robust and themeable than a CSS mask, and the only visual
+        // identity a compact pinned tab has. Only injected for the default tab
+        // renderer: a custom `tabComponent` owns its own markup, so we don't
+        // prepend a glyph or force flex layout on it (it still gets the
+        // `dv-tab--pinned` class to style itself).
+        const wantGlyph = pinned && !this.panel.api?.tabComponent;
+        if (wantGlyph && !this._pinIndicator) {
+            const indicator = document.createElement('div');
+            indicator.className = 'dv-tab-pin';
+            indicator.appendChild(createPinButton());
+            this._element.insertBefore(indicator, this._element.firstChild);
+            this._pinIndicator = indicator;
+        } else if (!wantGlyph && this._pinIndicator) {
+            this._pinIndicator.remove();
+            this._pinIndicator = undefined;
+        }
     }
 
     public setActive(isActive: boolean): void {

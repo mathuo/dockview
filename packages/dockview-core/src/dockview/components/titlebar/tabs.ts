@@ -52,6 +52,15 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
     private readonly _tabMap = new Map<string, IValueDisposable<Tab>>();
     private selectedIndex = -1;
     private _showTabsOverflowControl = false;
+    /**
+     * Predicate that keeps a panel's tab out of the overflow dropdown
+     * regardless of visibility — wired by the PinnedTabs module so pinned tabs
+     * never overflow. Defaults to a no-op so behaviour is unchanged when the
+     * module is absent. Must stay a pure lookup (no DOM reads) — it runs inside
+     * the overflow filter, which the `OverflowObserver` re-fires on every
+     * resize.
+     */
+    private _overflowExclude: (panelId: string) => boolean = () => false;
     private _direction: DockviewHeaderDirection = 'horizontal';
     private _voidContainerListeners: IDisposable | null = null;
 
@@ -114,6 +123,24 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
         reset: boolean;
     }>();
     readonly onOverflowTabsChange = this._onOverflowTabsChange.event;
+
+    /**
+     * Register a predicate excluding panels from the overflow dropdown (pinned
+     * tabs). Re-evaluates the dropdown immediately if overflow is being
+     * observed. Passing `() => false` restores default behaviour.
+     */
+    setOverflowExclude(fn: (panelId: string) => boolean): void {
+        this._overflowExclude = fn;
+        this.refreshOverflow();
+    }
+
+    /** Re-evaluate the overflow dropdown now (e.g. after the exclusion set
+     *  changed) instead of waiting for the next resize/scroll observer fire. */
+    refreshOverflow(): void {
+        if (this._showTabsOverflowControl) {
+            this.toggleDropdown({ reset: false });
+        }
+    }
 
     get showTabsOverflowControl(): boolean {
         return this._showTabsOverflowControl;
@@ -1034,6 +1061,7 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
         const tabs = this._tabs
             .filter(
                 (tab) =>
+                    !this._overflowExclude(tab.value.panel.id) &&
                     !isChildEntirelyVisibleWithinParent(
                         tab.value.element,
                         this._tabsList
@@ -1065,8 +1093,11 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                 tabGroups.push(tg.id);
 
                 // For collapsed groups whose chip is clipped, ensure all
-                // member tabs are included in the overflow list so they
-                // appear in the dropdown.
+                // member tabs are included in the overflow list so they appear
+                // in the dropdown. Pinned members are NOT excluded here: a
+                // collapsed group's members aren't rendered as visible tabs, so
+                // the dropdown is their only reachable path — excluding a pinned
+                // one would make it unreachable.
                 if (tg.collapsed) {
                     for (const pid of tg.panelIds) {
                         if (!overflowTabSet.has(pid)) {

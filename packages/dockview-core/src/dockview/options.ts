@@ -41,7 +41,10 @@ export type BuiltInContextMenuItem =
     | 'close'
     | 'closeOthers'
     | 'closeAll'
-    | 'separator';
+    | 'separator'
+    // Toggle the panel's pinned state (PinnedTabs module). Renders as
+    // "Pin tab" / "Unpin tab"; a no-op when pinning is not enabled.
+    | 'pin';
 
 export type BuiltInChipContextMenuItem = 'separator' | 'colorPicker' | 'rename';
 
@@ -552,6 +555,39 @@ export interface DockviewOptions {
      *   custom chip renderers can still read it and roll their own visual.
      */
     tabGroupAccent?: 'palette' | 'off';
+    /**
+     * Pin tabs so they render before all unpinned tabs in their group, never
+     * overflow into the dropdown, and resist reorder across the pin boundary.
+     * Modelled on VS Code / Chrome pinned tabs. Owned by the PinnedTabs
+     * module; dormant unless `enabled` is set.
+     */
+    pinnedTabs?: PinnedTabsOptions;
+}
+
+export interface PinnedTabsOptions {
+    /** Master switch. Default: undefined (dormant — pinning is a no-op). */
+    enabled?: boolean;
+    /**
+     * `'inline'` (default) keeps pinned tabs first within the existing strip;
+     * `'separate-row'` renders them on their own VS-Code-style row.
+     * (Phase 1 implements `'inline'` only.)
+     */
+    mode?: 'inline' | 'separate-row';
+    /**
+     * Render pinned tabs icon-only (title + close button hidden), VS-Code /
+     * Chrome style. Default false — dockview's default tab has no favicon, so
+     * pinned tabs stay labelled (with a pin glyph) unless you opt in. Best
+     * enabled alongside a custom tab renderer that shows an icon.
+     */
+    compact?: boolean;
+    /**
+     * Drag a tab across the pin boundary to toggle its pinned state
+     * (VS-Code-style). Default false — dragging across the boundary is clamped
+     * back, matching Chrome, where pinning is an explicit action only.
+     */
+    togglePinOnCrossBoundaryDrag?: boolean;
+    /** Add a Pin/Unpin item to the tab context menu (requires ContextMenuModule). Default true. */
+    contextMenuItem?: boolean;
 }
 
 export interface LayoutHistoryOptions {
@@ -656,6 +692,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         autoHideEdgeGroups: undefined,
         tabGroupColors: undefined,
         tabGroupAccent: undefined,
+        pinnedTabs: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];

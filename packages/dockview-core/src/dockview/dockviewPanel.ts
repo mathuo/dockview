@@ -23,6 +23,8 @@ export interface IDockviewPanel extends IDisposable, IPanel {
     readonly minimumHeight?: number;
     readonly maximumWidth?: number;
     readonly maximumHeight?: number;
+    readonly isPinned: boolean;
+    setPinned(pinned: boolean): void;
     updateParentGroup(
         group: DockviewGroupPanel,
         options?: { skipSetActive?: boolean }
@@ -45,6 +47,7 @@ export class DockviewPanel
     private _params?: Parameters;
     private _title: string | undefined;
     private _renderer: DockviewPanelRenderer | undefined;
+    private _pinned = false;
 
     private _minimumWidth: number | undefined;
     private _minimumHeight: number | undefined;
@@ -57,6 +60,10 @@ export class DockviewPanel
 
     get title(): string | undefined {
         return this._title;
+    }
+
+    get isPinned(): boolean {
+        return this._pinned;
     }
 
     get group(): DockviewGroupPanel {
@@ -164,6 +171,8 @@ export class DockviewPanel
             maximumHeight: this._maximumHeight,
             minimumWidth: this._minimumWidth,
             maximumWidth: this._maximumWidth,
+            // Emit only when pinned so existing layouts stay byte-stable.
+            pinned: this._pinned ? true : undefined,
         };
     }
 
@@ -179,6 +188,21 @@ export class DockviewPanel
             this.view.setTitle(title);
             this.api._onDidTitleChange.fire({ title });
         }
+    }
+
+    /**
+     * Low-level pinned-state mutation. Sets the flag and fires the panel-api
+     * event. The public, module-gated entry point is
+     * `panel.api.setPinned` → `DockviewComponent.setPanelPinned`, which decides
+     * whether pinning is active before reaching here; this method itself does
+     * not gate, so the ordering module and serialization can drive it directly.
+     */
+    setPinned(pinned: boolean): void {
+        if (this._pinned === pinned) {
+            return;
+        }
+        this._pinned = pinned;
+        this.api._onDidChangePinned.fire({ isPinned: pinned });
     }
 
     setRenderer(renderer: DockviewPanelRenderer): void {
@@ -224,6 +248,12 @@ export class DockviewPanel
         this.update({ params: state.params ?? {} });
         this.setTitle(state.title ?? this.id);
         this.setRenderer(state.renderer ?? this.accessor.renderer);
+        // Honour the serialized pinned flag only when pinning is enabled (see
+        // the deserializer for the rationale); disabled → load unpinned.
+        this.setPinned(
+            (state.pinned ?? false) &&
+                !!this.accessor.options.pinnedTabs?.enabled
+        );
 
         // state.contentComponent;
         // state.tabComponent;

@@ -201,6 +201,14 @@ export class ContextMenuController implements IContextMenuService {
                         [...group.panels].forEach((p) => p.api.close());
                     })
                 );
+            } else if (item === 'pin') {
+                menuEl.appendChild(
+                    buildItem(
+                        panel.api.isPinned ? 'Unpin tab' : 'Pin tab',
+                        close,
+                        () => panel.api.setPinned(!panel.api.isPinned)
+                    )
+                );
             } else if (isItemConfig(item) && item.element) {
                 menuEl.appendChild(item.element);
             } else if (isItemConfig(item) && item.component) {
