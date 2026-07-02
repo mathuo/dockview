@@ -2,6 +2,7 @@ import {
     DockviewComponent,
     DockviewBreakpointChangeEvent,
     IContentRenderer,
+    LayoutPriority,
 } from 'dockview-core';
 
 class TestPanel implements IContentRenderer {
@@ -278,6 +279,73 @@ describe('ResponsiveLayout module', () => {
             dv.exitMaximizedGroup();
             dv.reflow();
             expect(dv.groups.length).toBe(1); // now applied
+        });
+
+        test('restack applies to the live layout without losing panels', () => {
+            const dv = make({
+                debounceMs: 0,
+                breakpoints: [
+                    { name: 'lg', maxWidth: Infinity },
+                    {
+                        name: 'sm',
+                        maxWidth: 640,
+                        exitAt: 720,
+                        rules: [{ kind: 'restack' as const }],
+                    },
+                ],
+            });
+            dv.layout(1000, 500);
+            dv.api.addPanel({ id: 'p1', component: 'default' });
+            dv.api.addPanel({
+                id: 'p2',
+                component: 'default',
+                position: { direction: 'below' },
+            });
+            dv.reflow();
+
+            dv.layout(500, 500);
+            dv.reflow(); // restack
+            expect(dv.api.panels.map((p) => p.id).sort()).toEqual(['p1', 'p2']);
+
+            dv.layout(1000, 500);
+            dv.reflow(); // widen — restore
+            expect(dv.api.panels.map((p) => p.id).sort()).toEqual(['p1', 'p2']);
+        });
+
+        test('hide parks a low-priority group but keeps its panel alive', () => {
+            const dv = make({
+                debounceMs: 0,
+                breakpoints: [
+                    { name: 'lg', maxWidth: Infinity },
+                    {
+                        name: 'sm',
+                        maxWidth: 640,
+                        exitAt: 720,
+                        rules: [{ kind: 'hide' as const }],
+                    },
+                ],
+            });
+            dv.layout(1000, 500);
+            dv.api.addPanel({ id: 'p1', component: 'default' });
+            const p2 = dv.api.addPanel({
+                id: 'p2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            // mark p2's group low-priority so `hide` parks it
+            p2.api.group.api.priority = LayoutPriority.Low;
+            dv.reflow();
+
+            dv.layout(500, 500);
+            dv.reflow(); // hide
+
+            // the panel survives (parked, not destroyed)
+            expect(dv.api.getPanel('p2')).toBeDefined();
+            expect(dv.api.panels.map((p) => p.id).sort()).toEqual(['p1', 'p2']);
+
+            dv.layout(1000, 500);
+            dv.reflow(); // widen — restore
+            expect(dv.api.panels.map((p) => p.id).sort()).toEqual(['p1', 'p2']);
         });
     });
 });

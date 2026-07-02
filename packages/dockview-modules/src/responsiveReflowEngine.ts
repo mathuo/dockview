@@ -59,34 +59,33 @@ export function computeGroupPriority(
     return score + (isActive ? 0.5 : 0);
 }
 
-/** Depth-first, left-to-right list of every leaf group in the grid tree. */
-function collectLeaves(node: GridNode): GroupState[] {
+/** Depth-first, left-to-right list of every leaf node in the grid tree. */
+function collectLeafNodes(node: GridNode): GridNode[] {
     if (node.type === 'leaf') {
-        return [node.data as GroupState];
+        return [node];
     }
-    const children = node.data as GridNode[];
-    return children.flatMap((child) => collectLeaves(child));
+    return (node.data as GridNode[]).flatMap((child) =>
+        collectLeafNodes(child)
+    );
 }
 
 /**
- * Fold every side-by-side group in the grid into a single tabbed group. The
- * highest-priority group is the host (its id + settings survive); the remaining
- * groups' panels become tabs after it, in descending priority order (document
- * order breaks ties). The globally-active panel stays active, so collapsing
- * keeps the user on the same tab.
- *
- * Pure and non-destructive: `canonical` is cloned, never mutated — which is why
- * widening (re-deriving with no collapse rule) reproduces it byte-for-byte.
+ * Fold every side-by-side group into a single tabbed group. The highest-priority
+ * group is the host (its id + settings survive); the remaining groups' panels
+ * become tabs after it in descending priority order (document order breaks
+ * ties). The globally-active panel stays active. Mutates + returns `layout`
+ * (already a private clone).
  */
-function collapseToTabs(canonical: SerializedDockview): SerializedDockview {
-    const result = clone(canonical);
-    const leaves = collectLeaves(result.grid.root as GridNode);
+function collapseToTabs(layout: SerializedDockview): SerializedDockview {
+    const leaves = collectLeafNodes(layout.grid.root as GridNode).map(
+        (node) => node.data as GroupState
+    );
 
     if (leaves.length <= 1) {
-        return result; // already a single group — nothing to fold
+        return layout; // already a single group — nothing to fold
     }
 
-    const activeGroupId = canonical.activeGroup;
+    const activeGroupId = layout.activeGroup;
 
     const ordered = leaves
         .map((group, index) => ({
@@ -103,7 +102,6 @@ function collapseToTabs(canonical: SerializedDockview): SerializedDockview {
 
     const host = ordered[0].group;
     const mergedViews = ordered.flatMap((entry) => entry.group.views);
-    // keep the user on the panel they were looking at
     const activeGroup = leaves.find((group) => group.id === activeGroupId);
     const activeView = activeGroup?.activeView ?? host.activeView;
 
@@ -112,54 +110,113 @@ function collapseToTabs(canonical: SerializedDockview): SerializedDockview {
         views: mergedViews,
         activeView,
     };
-    // per-group tab-group chips reference only the host's panels; drop them
-    // rather than carry a stale reference through the merge (v1).
     delete mergedGroup.tabGroups;
 
-    // The grid root must stay a branch (dockview's `fromJSON` requires it); a
-    // single collapsed group is a branch with one leaf child that fills the
-    // primary axis.
+    // Keep the root a branch (dockview's `fromJSON` requires it): a single
+    // collapsed group is a branch with one leaf child filling the primary axis.
     const primary =
-        result.grid.orientation === Orientation.HORIZONTAL
-            ? result.grid.width
-            : result.grid.height;
+        layout.grid.orientation === Orientation.HORIZONTAL
+            ? layout.grid.width
+            : layout.grid.height;
 
-    result.grid = {
-        ...result.grid,
+    layout.grid = {
+        ...layout.grid,
         root: {
             type: 'branch',
             data: [{ type: 'leaf', data: mergedGroup, size: primary }],
         } as unknown as SerializedDockview['grid']['root'],
     };
-    result.activeGroup = host.id;
+    layout.activeGroup = host.id;
 
-    return result;
+    return layout;
+}
+
+/**
+ * Flip the layout's primary axis (columns <-> rows). Nested branches alternate
+ * orientation from the root, so flipping the root orientation restacks the whole
+ * tree. Sizes are carried through and rescaled to fit on layout. Mutates +
+ * returns `layout`.
+ */
+function restack(layout: SerializedDockview): SerializedDockview {
+    layout.grid = {
+        ...layout.grid,
+        orientation:
+            layout.grid.orientation === Orientation.HORIZONTAL
+                ? Orientation.VERTICAL
+                : Orientation.HORIZONTAL,
+    };
+    return layout;
+}
+
+/**
+ * Park the low-priority groups by marking them `visible: false` — the group and
+ * its panels survive (re-shown on widen), they are just not laid out. The
+ * single highest-priority group is always kept visible so the layout is never
+ * left empty. Mutates + returns `layout`.
+ *
+ * (An overflow affordance to reach parked groups while collapsed is a later
+ * refinement; the core hide/restore is complete here.)
+ */
+function hide(layout: SerializedDockview): SerializedDockview {
+    const leaves = collectLeafNodes(layout.grid.root as GridNode);
+    if (leaves.length <= 1) {
+        return layout;
+    }
+
+    const activeGroupId = layout.activeGroup;
+    let top = leaves[0];
+    let topScore = -Infinity;
+    for (const node of leaves) {
+        const group = node.data as GroupState;
+        const score = computeGroupPriority(group, group.id === activeGroupId);
+        if (score > topScore) {
+            topScore = score;
+            top = node;
+        }
+    }
+
+    for (const node of leaves) {
+        const group = node.data as GroupState;
+        if (node !== top && group.priority === LayoutPriority.Low) {
+            node.visible = false;
+        }
+    }
+    return layout;
 }
 
 /**
  * Project the **derived** layout from the **canonical** one by applying the
- * active rule chain. Pure: `(canonical, rules) -> SerializedDockview`, no DOM,
- * no side effects, never mutates `canonical`.
+ * active rule chain in array order. Pure: `(canonical, rules) ->
+ * SerializedDockview`, no DOM, no side effects, never mutates `canonical`.
  *
- * Phase 3 implements `collapseToTabs`; `restack` / `hide` land in later phases.
- * With no matching rule the transform is the identity (a clone of canonical).
+ * With no rules the transform is the identity (a clone of canonical).
  */
 export function deriveLayout(
     canonical: SerializedDockview,
     rules: readonly ReflowRule[]
 ): SerializedDockview {
-    if (rules.some((rule) => rule.kind === 'collapseToTabs')) {
-        return collapseToTabs(canonical);
+    let layout = clone(canonical);
+    for (const rule of rules) {
+        switch (rule.kind) {
+            case 'collapseToTabs':
+                layout = collapseToTabs(layout);
+                break;
+            case 'restack':
+                layout = restack(layout);
+                break;
+            case 'hide':
+                layout = hide(layout);
+                break;
+        }
     }
-    return clone(canonical);
+    return layout;
 }
 
 /**
  * Diff the live layout against a derived target, returning the ops needed to
- * reconcile them. Phase 2/3 report a single `replace` when the transformed part
- * (grid + panels) differs, and — critically — **zero ops when they are
- * identical**, which is the idempotence guard for the identity / top-breakpoint
- * case. The minimal, move-based diff lands in Phase 4.
+ * reconcile them. Reports a single `replace` when the transformed part (grid +
+ * panels) differs, and — critically — **zero ops when identical** (the
+ * idempotence guard). The minimal, move-based diff lands in a later phase.
  *
  * Only `grid` + `panels` are compared: floating groups, popouts and edge groups
  * are outside the reflow's scope and pass through untouched.

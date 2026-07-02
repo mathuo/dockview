@@ -75,6 +75,16 @@ const collapsedGroup = (l: SerializedDockview): any =>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (l.grid.root as any).data[0].data;
 
+// every leaf node (with `visible` + `data`) in the grid tree
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const leafNodes = (l: SerializedDockview): any[] => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const walk = (n: any): any[] =>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        n.type === 'leaf' ? [n] : n.data.flatMap((c: any) => walk(c));
+    return walk(l.grid.root);
+};
+
 const make = (): SerializedDockview =>
     ({
         grid: {
@@ -124,13 +134,9 @@ describe('reflow engine (Phase 2 — identity)', () => {
             expect(canonical.panels.a).toBeDefined();
         });
 
-        test('rules other than collapseToTabs are identity for now (restack/hide land later)', () => {
+        test('an empty rule chain is the identity', () => {
             const canonical = make();
-            const derived = deriveLayout(canonical, [
-                { kind: 'restack' },
-                { kind: 'hide' },
-            ]);
-            expect(derived).toEqual(canonical);
+            expect(deriveLayout(canonical, [])).toEqual(canonical);
         });
     });
 
@@ -269,6 +275,78 @@ describe('reflow engine — Phase 3 (CollapsePass)', () => {
             const canonical = makeMulti();
             const derived = deriveLayout(canonical, COLLAPSE);
             expect(derived.panels).toEqual(canonical.panels);
+        });
+    });
+});
+
+describe('reflow engine — Phase 5 (RestackPass + HidePass)', () => {
+    describe('restack', () => {
+        test('flips the primary axis', () => {
+            const derived = deriveLayout(makeMulti(), [{ kind: 'restack' }]);
+            expect(derived.grid.orientation).toBe('VERTICAL');
+        });
+
+        test('is reversible and non-mutating', () => {
+            const canonical = makeMulti();
+            const snapshot = JSON.stringify(canonical);
+            deriveLayout(canonical, [{ kind: 'restack' }]);
+            expect(JSON.stringify(canonical)).toBe(snapshot); // untouched
+            expect(deriveLayout(canonical, [])).toEqual(canonical); // widen = identity
+        });
+    });
+
+    describe('hide', () => {
+        test('parks Low-priority groups (visible:false), leaves the rest', () => {
+            const derived = deriveLayout(
+                makeMulti({ g3: LayoutPriority.Low }),
+                [{ kind: 'hide' }]
+            );
+            const nodes = leafNodes(derived);
+            expect(nodes.find((n) => n.data.id === 'g3').visible).toBe(false);
+            // untouched groups keep their (undefined => visible) state
+            expect(
+                nodes.find((n) => n.data.id === 'g1').visible
+            ).toBeUndefined();
+            expect(
+                nodes.find((n) => n.data.id === 'g2').visible
+            ).toBeUndefined();
+        });
+
+        test('never hides the highest-priority group (layout never left empty)', () => {
+            const derived = deriveLayout(
+                makeMulti(
+                    {
+                        g1: LayoutPriority.Low,
+                        g2: LayoutPriority.Low,
+                        g3: LayoutPriority.Low,
+                    },
+                    'g1'
+                ),
+                [{ kind: 'hide' }]
+            );
+            const visible = leafNodes(derived).filter(
+                (n) => n.visible !== false
+            );
+            expect(visible).toHaveLength(1); // the active/top group survives
+            expect(visible[0].data.id).toBe('g1');
+        });
+
+        test('does not park anything when no group is Low', () => {
+            const derived = deriveLayout(makeMulti(), [{ kind: 'hide' }]);
+            expect(leafNodes(derived).every((n) => n.visible !== false)).toBe(
+                true
+            );
+        });
+    });
+
+    describe('rule chains', () => {
+        test('apply in array order (restack then collapseToTabs)', () => {
+            const derived = deriveLayout(makeMulti(), [
+                { kind: 'restack' },
+                { kind: 'collapseToTabs' },
+            ]);
+            expect(derived.grid.orientation).toBe('VERTICAL'); // restacked
+            expect(collapsedGroup(derived).views).toHaveLength(4); // collapsed
         });
     });
 });
