@@ -13,7 +13,7 @@ import {
 import { BreakpointResolver } from './responsiveBreakpointResolver';
 import { SizeObserver } from './responsiveSizeObserver';
 import { CanonicalStore } from './responsiveCanonicalStore';
-import { deriveLayout, diffLayouts } from './responsiveReflowEngine';
+import { deriveLayout } from './responsiveReflowEngine';
 
 const DEFAULT_DEBOUNCE_MS = 120;
 
@@ -22,15 +22,19 @@ const DEFAULT_DEBOUNCE_MS = 120;
  *
  * - Phase 1: resolves the active breakpoint from the container width (with
  *   hysteresis + debounce) and fires `onDidBreakpointChange`.
- * - Phase 2: introduces the canonical/derived split — it holds the canonical
- *   ("wide") layout, projects the derived layout from it via `deriveLayout`
- *   (identity for now), and serializes the *canonical* through `toJSON` so a
- *   narrow-width save never bakes a collapsed layout in. No reflow transforms
- *   are applied yet, so the derived layout equals the live one.
+ * - Phase 2: the canonical/derived split — holds the canonical ("wide") layout
+ *   and serializes *it* (not the collapsed view) through `toJSON`.
+ * - Phase 3: `deriveLayout` projects a collapsed layout via `collapseToTabs`.
+ * - Phase 4: **applies** the derived layout to the live component. On the first
+ *   collapse it freezes the current layout as canonical, then reconciles the
+ *   live tree to each breakpoint's derived target (reusing panel instances).
+ *   Widening back to the canonical band restores the frozen layout exactly. A
+ *   reentrancy guard stops the apply's own layout events from re-triggering,
+ *   and reflow defers while a group is maximized.
  *
- * Reactive like `LayoutHistoryService`: it subscribes to the host in its
- * constructor (services are created eagerly) and owns teardown via
- * `CompositeDisposable`.
+ * Known limitation (resolved in a later phase): edits made *while collapsed* are
+ * not yet folded back into canonical, so saving in a collapsed state persists
+ * the pre-edit wide layout.
  */
 export class ResponsiveLayoutService
     extends CompositeDisposable
@@ -38,13 +42,18 @@ export class ResponsiveLayoutService
 {
     private resolver: BreakpointResolver | undefined;
     private observer: SizeObserver | undefined;
+    private options: DockviewResponsiveOptions | undefined;
     private _activeBreakpoint: string | undefined;
 
     private readonly _canonical = new CanonicalStore();
-    /** True once the live layout is a *derived* (collapsed) projection of
-     *  canonical. Always false in Phase 2 (identity transform only). */
+    /** True once the live layout is a derived (collapsed) projection. */
     private _derived = false;
-    private _rules: readonly ReflowRule[] = [];
+    /** The breakpoint whose reflow has actually been applied to the live tree —
+     *  distinct from `_activeBreakpoint`, so a layout that *starts* inside a
+     *  band (never crossing a boundary) still applies on the first settle. */
+    private _appliedBreakpoint: string | undefined;
+    /** Guards against the apply's own layout events re-triggering a reflow. */
+    private _applying = false;
 
     private readonly _onDidBreakpointChange =
         new Emitter<DockviewBreakpointChangeEvent>();
@@ -65,10 +74,20 @@ export class ResponsiveLayoutService
         this.addDisposables(
             // re-settle on every layout/size ping; the observer debounces so a
             // continuous drag-resize only resolves once it settles
-            this.host.onDidLayoutChange(() => this.observer?.signal()),
-            // a fresh layout replaces the canonical baseline; re-resolve for the
-            // current width against it
-            this.host.onDidLayoutFromJSON(() => this.reflow())
+            this.host.onDidLayoutChange(() => {
+                if (!this._applying) {
+                    this.observer?.signal();
+                }
+            }),
+            // a fresh (external) load replaces the canonical baseline
+            this.host.onDidLayoutFromJSON(() => {
+                if (!this._applying) {
+                    this._derived = false;
+                    this._appliedBreakpoint = undefined;
+                    this._canonical.clear();
+                    this.reflow();
+                }
+            })
         );
     }
 
@@ -77,16 +96,17 @@ export class ResponsiveLayoutService
         this.observer?.dispose();
         this.observer = undefined;
         this.resolver = undefined;
+        this.options = undefined;
         this._activeBreakpoint = undefined;
+        this._appliedBreakpoint = undefined;
         this._canonical.clear();
         this._derived = false;
-        this._rules = [];
 
         if (!options || options.breakpoints.length === 0) {
             return; // inert until configured
         }
 
-        this._rules = options.rules ?? [];
+        this.options = options;
         this.resolver = new BreakpointResolver(options.breakpoints);
         this.observer = new SizeObserver(
             () => this.host.width,
@@ -108,12 +128,6 @@ export class ResponsiveLayoutService
         }
     }
 
-    /**
-     * The canonical (wide) `grid` + `panels` to persist, or `undefined` to let
-     * `toJSON` serialize the live tree. Only diverges from live once the layout
-     * is actually derived/collapsed (Phase 3+); in Phase 2 it is always
-     * `undefined`, so serialization is byte-identical to today.
-     */
     serializeCanonical():
         | Pick<SerializedDockview, 'grid' | 'panels'>
         | undefined {
@@ -129,38 +143,87 @@ export class ResponsiveLayoutService
             return;
         }
         const next = this.resolver.resolve(width, this._activeBreakpoint);
-        if (next === undefined || next === this._activeBreakpoint) {
+        if (next === undefined) {
             return;
         }
+
+        const changed = next !== this._activeBreakpoint;
+        const needsApply = next !== this._appliedBreakpoint;
+        if (!changed && !needsApply) {
+            return; // already resolved *and* applied for this band
+        }
+
+        // Defer while maximized — a restore fires `onDidLayoutChange`, which
+        // re-runs this. Neither pointer advances, so it is re-detected then.
+        if (this.host.hasMaximizedGroup()) {
+            return;
+        }
+
         const from = this._activeBreakpoint;
         this._activeBreakpoint = next;
-        this.applyReflow();
-        this._onDidBreakpointChange.fire({ from, to: next, width });
+        this._appliedBreakpoint = next;
+        this.applyReflow(next);
+
+        // only a genuine breakpoint change is an `onDidBreakpointChange` — an
+        // apply that merely catches up a same-band initial layout is silent
+        if (changed) {
+            this._onDidBreakpointChange.fire({ from, to: next, width });
+        }
     }
 
     /**
-     * Project the derived layout from canonical and reconcile the live tree to
-     * it. Phase 2 is identity-only: canonical mirrors the live layout, the
-     * derived target equals it, the diff is empty, and nothing is applied — so
-     * `_derived` stays false and `serializeCanonical` keeps returning the live
-     * tree. The collapse/restack/hide transforms and the minimal-diff apply
-     * arrive in later phases.
+     * Reconcile the live layout to the breakpoint's derived target.
+     *
+     * - Collapsing band: freeze the current layout as canonical on the *first*
+     *   collapse, then apply `deriveLayout(canonical, rules)`.
+     * - Canonical band (no rules): restore the frozen wide layout exactly.
      */
-    private applyReflow(): void {
-        // Phase 3 ships the pure collapse engine (`deriveLayout` supports
-        // `collapseToTabs`), but the service does not yet APPLY a derived layout
-        // to the live tree — that, and the rebase safety that keeps canonical in
-        // sync with user edits, arrive in later phases. Until then the live
-        // layout is never collapsed, so we derive with the identity transform
-        // and canonical simply mirrors live (never stale relative to on-screen).
-        this._canonical.set(this.host.toJSON());
+    private applyReflow(breakpoint: string): void {
+        const rules = this.effectiveRules(breakpoint);
 
-        const target = deriveLayout(this._canonical.get(), []);
-        const ops = diffLayouts(this.host.toJSON(), target);
+        this._applying = true;
+        try {
+            if (rules.length === 0) {
+                // widest / canonical band — restore the wide layout
+                if (this._derived) {
+                    this.host.fromJSON(this._canonical.get(), {
+                        reuseExistingPanels: true,
+                    });
+                    this._derived = false;
+                }
+                return;
+            }
 
-        // identity transform => zero ops => the live layout already matches the
-        // derived target, so it is not a collapsed projection.
-        this._derived = ops.length > 0;
+            // collapsing band — freeze the wide layout the first time
+            if (!this._derived) {
+                this._canonical.set(this.host.toJSON());
+            }
+            const target = deriveLayout(this._canonical.get(), rules);
+            this.host.fromJSON(target, { reuseExistingPanels: true });
+            this._derived = true;
+        } finally {
+            this._applying = false;
+        }
+    }
+
+    /**
+     * The complete rule chain for a breakpoint. A breakpoint's own `rules` win;
+     * otherwise the widest band is the identity (canonical) and every narrower
+     * band falls back to the default `rules`.
+     */
+    private effectiveRules(breakpoint: string): readonly ReflowRule[] {
+        const options = this.options;
+        if (!options) {
+            return [];
+        }
+        const bp = options.breakpoints.find((b) => b.name === breakpoint);
+        if (bp?.rules) {
+            return bp.rules;
+        }
+        const widest = options.breakpoints.reduce((a, b) =>
+            b.maxWidth > a.maxWidth ? b : a
+        );
+        return bp === widest ? [] : (options.rules ?? []);
     }
 
     override dispose(): void {

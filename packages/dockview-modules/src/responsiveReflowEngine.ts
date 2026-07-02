@@ -1,5 +1,6 @@
 import {
     LayoutPriority,
+    Orientation,
     ReflowRule,
     SerializedDockview,
     SerializedGridObject,
@@ -115,11 +116,19 @@ function collapseToTabs(canonical: SerializedDockview): SerializedDockview {
     // rather than carry a stale reference through the merge (v1).
     delete mergedGroup.tabGroups;
 
+    // The grid root must stay a branch (dockview's `fromJSON` requires it); a
+    // single collapsed group is a branch with one leaf child that fills the
+    // primary axis.
+    const primary =
+        result.grid.orientation === Orientation.HORIZONTAL
+            ? result.grid.width
+            : result.grid.height;
+
     result.grid = {
         ...result.grid,
         root: {
-            type: 'leaf',
-            data: mergedGroup,
+            type: 'branch',
+            data: [{ type: 'leaf', data: mergedGroup, size: primary }],
         } as unknown as SerializedDockview['grid']['root'],
     };
     result.activeGroup = host.id;

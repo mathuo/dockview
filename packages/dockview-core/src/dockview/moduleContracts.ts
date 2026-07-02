@@ -567,6 +567,17 @@ export interface IResponsiveLayoutHost {
     readonly onDidLayoutFromJSON: Event<void>;
     /** Snapshot the live layout (used to capture / refresh canonical). */
     toJSON(): SerializedDockview;
+    /**
+     * Reconcile the live layout to a target. Reuses existing panel instances
+     * (`reuseExistingPanels`) so a reflow re-parents panels rather than
+     * re-creating them.
+     */
+    fromJSON(
+        data: SerializedDockview,
+        options: { reuseExistingPanels: boolean }
+    ): void;
+    /** Whether a group is currently maximized — reflow defers until restore. */
+    hasMaximizedGroup(): boolean;
 }
 
 /**

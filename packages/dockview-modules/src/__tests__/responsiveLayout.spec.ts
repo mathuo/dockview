@@ -176,4 +176,108 @@ describe('ResponsiveLayout module', () => {
         plain.layout(500, 500);
         expect(JSON.stringify(plain.toJSON())).toBe(withResponsive);
     });
+
+    // --- Phase 4: applying the derived layout to the live component ---
+
+    describe('apply (collapse reaches the live layout)', () => {
+        // 'sm' collapses side-by-side groups to tabs; 'lg' is canonical (identity)
+        const COLLAPSE_BP = [
+            { name: 'lg', maxWidth: Infinity },
+            {
+                name: 'sm',
+                maxWidth: 640,
+                exitAt: 720,
+                rules: [{ kind: 'collapseToTabs' as const }],
+            },
+        ];
+
+        const withThreeGroups = () => {
+            const dv = make({ debounceMs: 0, breakpoints: COLLAPSE_BP });
+            dv.layout(1000, 500);
+            const p1 = dv.api.addPanel({ id: 'p1', component: 'default' });
+            dv.api.addPanel({
+                id: 'p2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            dv.api.addPanel({
+                id: 'p3',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            dv.reflow();
+            return { dv, p1 };
+        };
+
+        test('collapses side-by-side groups into one on narrow, restores on wide', () => {
+            const { dv } = withThreeGroups();
+            expect(dv.activeBreakpoint).toBe('lg');
+            expect(dv.groups.length).toBe(3);
+
+            dv.layout(500, 500);
+            dv.reflow();
+            expect(dv.activeBreakpoint).toBe('sm');
+            expect(dv.groups.length).toBe(1);
+            expect(dv.groups[0].panels.map((p) => p.id).sort()).toEqual([
+                'p1',
+                'p2',
+                'p3',
+            ]);
+
+            dv.layout(1000, 500);
+            dv.reflow();
+            expect(dv.activeBreakpoint).toBe('lg');
+            expect(dv.groups.length).toBe(3);
+        });
+
+        test('reuses panel instances across a collapse (no teardown)', () => {
+            const { dv, p1 } = withThreeGroups();
+            dv.layout(500, 500);
+            dv.reflow();
+            expect(dv.api.getPanel('p1')).toBe(p1);
+        });
+
+        test('serializes the canonical (wide) layout while collapsed', () => {
+            const { dv } = withThreeGroups();
+            dv.layout(500, 500);
+            dv.reflow();
+            expect(dv.groups.length).toBe(1); // collapsed live
+
+            const saved = dv.toJSON();
+
+            // loading the save into a fresh wide component restores 3 groups —
+            // proving the *wide* canonical was serialized, not the collapse
+            const restored = make({ debounceMs: 0, breakpoints: COLLAPSE_BP });
+            restored.layout(1000, 500);
+            restored.fromJSON(saved);
+            restored.reflow();
+            expect(restored.groups.length).toBe(3);
+        });
+
+        test('fires one breakpoint-change event per transition (no re-entrant reflow)', () => {
+            const { dv } = withThreeGroups();
+            const events: string[] = [];
+            dv.onDidBreakpointChange((e) => events.push(e.to));
+
+            dv.layout(500, 500);
+            dv.reflow();
+            dv.layout(1000, 500);
+            dv.reflow();
+
+            expect(events).toEqual(['sm', 'lg']);
+        });
+
+        test('defers reflow while a group is maximized, then applies on restore', () => {
+            const { dv, p1 } = withThreeGroups();
+
+            p1.api.group.api.maximize();
+            dv.layout(500, 500);
+            dv.reflow();
+            expect(dv.groups.length).toBe(3); // deferred — not collapsed
+
+            dv.exitMaximizedGroup();
+            dv.reflow();
+            expect(dv.groups.length).toBe(1); // now applied
+        });
+    });
 });

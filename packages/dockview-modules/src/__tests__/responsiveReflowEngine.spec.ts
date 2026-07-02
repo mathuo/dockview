@@ -69,8 +69,11 @@ const makeMulti = (
 
 const COLLAPSE = [{ kind: 'collapseToTabs' as const }];
 
+// the single merged group inside the collapsed root (a branch with one leaf)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const rootData = (l: SerializedDockview): any => (l.grid.root as any).data;
+const collapsedGroup = (l: SerializedDockview): any =>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (l.grid.root as any).data[0].data;
 
 const make = (): SerializedDockview =>
     ({
@@ -194,8 +197,11 @@ describe('reflow engine — Phase 3 (CollapsePass)', () => {
     describe('collapseToTabs', () => {
         test('folds side-by-side groups into a single tabbed group', () => {
             const derived = deriveLayout(makeMulti(), COLLAPSE);
-            expect(derived.grid.root.type).toBe('leaf');
-            expect(rootData(derived).views).toHaveLength(4);
+            // the root stays a branch (dockview requires it) with one leaf
+            expect(derived.grid.root.type).toBe('branch');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            expect((derived.grid.root as any).data).toHaveLength(1);
+            expect(collapsedGroup(derived).views).toHaveLength(4);
         });
 
         test('orders tabs by priority (Fill first), document order breaking ties', () => {
@@ -205,7 +211,7 @@ describe('reflow engine — Phase 3 (CollapsePass)', () => {
                 COLLAPSE
             );
             // g2(c) first (Fill), then g1(a,b) (Normal+active), then g3(d)
-            expect(rootData(derived).views).toEqual(['c', 'a', 'b', 'd']);
+            expect(collapsedGroup(derived).views).toEqual(['c', 'a', 'b', 'd']);
         });
 
         test('the highest-priority group is the host (its id survives)', () => {
@@ -213,7 +219,7 @@ describe('reflow engine — Phase 3 (CollapsePass)', () => {
                 makeMulti({ g2: LayoutPriority.Fill }),
                 COLLAPSE
             );
-            expect(rootData(derived).id).toBe('g2');
+            expect(collapsedGroup(derived).id).toBe('g2');
             expect(derived.activeGroup).toBe('g2');
         });
 
@@ -223,7 +229,7 @@ describe('reflow engine — Phase 3 (CollapsePass)', () => {
                 makeMulti({ g2: LayoutPriority.Fill }, 'g1'),
                 COLLAPSE
             );
-            expect(rootData(derived).activeView).toBe('a');
+            expect(collapsedGroup(derived).activeView).toBe('a');
         });
 
         test('a single-group layout is unchanged (nothing to fold)', () => {
