@@ -43,6 +43,7 @@ export enum LayoutPriority {
     Low = 'low', // view is offered space last
     High = 'high', // view is offered space first
     Normal = 'normal', // view is offered space in view order
+    Fill = 'fill', // view absorbs all remaining space; siblings keep fixed sizes
 }
 
 export interface IBaseView extends IDisposable {
@@ -674,12 +675,32 @@ export class Splitview {
         this.addView(view, sizing, to);
     }
 
+    /**
+     * A view with `LayoutPriority.Fill` absorbs all surplus/deficit space while
+     * its siblings keep their current sizes. When one is present the splitview
+     * switches out of proportional redistribution: siblings are held fixed and
+     * `distributeEmptySpace` funnels the difference into the fill view(s) first.
+     */
+    private hasFillView(): boolean {
+        // a hidden fill view can't absorb anything, so it doesn't trigger fill
+        // mode — the layout falls back to normal (proportional) distribution.
+        return this.viewItems.some(
+            (item) => item.priority === LayoutPriority.Fill && item.visible
+        );
+    }
+
     public layout(size: number, orthogonalSize: number): void {
         const previousSize = Math.max(this.size, this._contentSize);
         this.size = size;
         this.orthogonalSize = orthogonalSize;
 
-        if (!this.proportions) {
+        if (this.hasFillView()) {
+            /**
+             * Fill mode: the siblings keep their sizes; `distributeEmptySpace`
+             * below hands the entire `size - contentSize` delta to the fill
+             * view(s), so there is nothing to rescale here.
+             */
+        } else if (!this.proportions) {
             const indexes = range(this.viewItems.length);
             const lowPriorityIndexes = indexes.filter(
                 (i) => this.viewItems[i].priority === LayoutPriority.Low
@@ -733,13 +754,20 @@ export class Splitview {
     ): void {
         const contentSize = this.viewItems.reduce((r, i) => r + i.size, 0);
 
-        this.resize(
-            this.viewItems.length - 1,
-            this._size - contentSize,
-            undefined,
-            lowPriorityIndexes,
-            highPriorityIndexes
-        );
+        if (!this.hasFillView()) {
+            this.resize(
+                this.viewItems.length - 1,
+                this._size - contentSize,
+                undefined,
+                lowPriorityIndexes,
+                highPriorityIndexes
+            );
+        }
+        /**
+         * In fill mode the sibling sizes are already settled (they are held
+         * fixed); `distributeEmptySpace` funnels the remaining delta into the
+         * fill view(s), so the `resize` pass above is skipped.
+         */
         this.distributeEmptySpace();
         this.layoutViews();
         this.saveProportions();
@@ -756,8 +784,45 @@ export class Splitview {
         const highPriorityIndexes = indexes.filter(
             (i) => this.viewItems[i].priority === LayoutPriority.High
         );
+        const fillPriorityIndexes = indexes.filter(
+            (i) =>
+                this.viewItems[i].priority === LayoutPriority.Fill &&
+                this.viewItems[i].visible
+        );
+
+        /**
+         * Fill views take precedence over every other priority: they share the
+         * surplus/deficit equally between them and absorb it entirely, leaving
+         * their siblings at a fixed size. Only once every fill view has hit a
+         * min/max constraint does any leftover spill to the ordered siblings
+         * below.
+         */
+        if (fillPriorityIndexes.length > 0) {
+            let remaining = fillPriorityIndexes.length;
+            for (const index of fillPriorityIndexes) {
+                if (emptyDelta === 0) {
+                    break;
+                }
+                const item = this.viewItems[index];
+                const share = Math.round(emptyDelta / remaining);
+                const size = clamp(
+                    item.size + share,
+                    item.minimumSize,
+                    item.maximumSize
+                );
+                emptyDelta -= size - item.size;
+                item.size = size;
+                remaining--;
+            }
+        }
 
         for (const index of highPriorityIndexes) {
+            pushToStart(indexes, index);
+        }
+
+        // fills stay ahead of high priority in the fallback ordering too, so any
+        // leftover from a clamped fill lands on another fill before a sibling.
+        for (const index of fillPriorityIndexes) {
             pushToStart(indexes, index);
         }
 

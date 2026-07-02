@@ -88,6 +88,191 @@ describe('splitview', () => {
         jest.clearAllMocks();
     });
 
+    test('LayoutPriority.Fill absorbs surplus/deficit while siblings stay fixed', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: true,
+        });
+
+        splitview.layout(1000, 500);
+
+        const side1 = new Testview(50, Number.POSITIVE_INFINITY);
+        const fill = new Testview(
+            50,
+            Number.POSITIVE_INFINITY,
+            LayoutPriority.Fill
+        );
+        const side2 = new Testview(50, Number.POSITIVE_INFINITY);
+
+        splitview.addView(side1); // index 0
+        splitview.addView(fill); // index 1
+        splitview.addView(side2); // index 2
+
+        // pin the two side panels to fixed sizes; the fill view compensates
+        splitview.resizeView(0, 200);
+        splitview.resizeView(2, 150);
+
+        expect(splitview.getViewSize(0)).toBe(200);
+        expect(splitview.getViewSize(2)).toBe(150);
+        expect(splitview.getViewSize(1)).toBe(650); // 1000 - 200 - 150
+
+        // grow the container: only the fill view grows
+        splitview.layout(1200, 500);
+        expect(splitview.getViewSize(0)).toBe(200);
+        expect(splitview.getViewSize(2)).toBe(150);
+        expect(splitview.getViewSize(1)).toBe(850);
+
+        // shrink the container: only the fill view shrinks
+        splitview.layout(700, 500);
+        expect(splitview.getViewSize(0)).toBe(200);
+        expect(splitview.getViewSize(2)).toBe(150);
+        expect(splitview.getViewSize(1)).toBe(350);
+
+        splitview.dispose();
+    });
+
+    test('LayoutPriority.Fill absorbs add/remove of siblings', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: true,
+        });
+
+        splitview.layout(1000, 500);
+
+        const side1 = new Testview(50, Number.POSITIVE_INFINITY);
+        const fill = new Testview(
+            50,
+            Number.POSITIVE_INFINITY,
+            LayoutPriority.Fill
+        );
+
+        splitview.addView(side1); // index 0
+        splitview.addView(fill); // index 1
+        splitview.resizeView(0, 200);
+
+        expect(splitview.getViewSize(0)).toBe(200);
+        expect(splitview.getViewSize(1)).toBe(800);
+
+        // add another fixed sibling — the fill view yields the space, not the
+        // existing side panel
+        const side2 = new Testview(50, Number.POSITIVE_INFINITY);
+        splitview.addView(side2, 250, 2);
+
+        expect(splitview.getViewSize(0)).toBe(200);
+        expect(splitview.getViewSize(2)).toBe(250);
+        expect(splitview.getViewSize(1)).toBe(550); // 1000 - 200 - 250
+
+        // remove the new sibling — the fill view reclaims the space
+        splitview.removeView(2);
+        expect(splitview.getViewSize(0)).toBe(200);
+        expect(splitview.getViewSize(1)).toBe(800);
+
+        splitview.dispose();
+    });
+
+    test('multiple LayoutPriority.Fill views share the surplus equally', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: true,
+        });
+
+        splitview.layout(1000, 500);
+
+        const fill1 = new Testview(
+            50,
+            Number.POSITIVE_INFINITY,
+            LayoutPriority.Fill
+        );
+        const fill2 = new Testview(
+            50,
+            Number.POSITIVE_INFINITY,
+            LayoutPriority.Fill
+        );
+
+        splitview.addView(fill1); // index 0
+        splitview.addView(fill2); // index 1
+
+        // both fill views split the container equally
+        expect(splitview.getViewSize(0)).toBe(500);
+        expect(splitview.getViewSize(1)).toBe(500);
+
+        // the surplus from growing the container is shared equally
+        splitview.layout(1200, 500);
+        expect(splitview.getViewSize(0)).toBe(600);
+        expect(splitview.getViewSize(1)).toBe(600);
+
+        // and the deficit from shrinking it
+        splitview.layout(800, 500);
+        expect(splitview.getViewSize(0)).toBe(400);
+        expect(splitview.getViewSize(1)).toBe(400);
+
+        splitview.dispose();
+    });
+
+    test('LayoutPriority.Fill takes precedence over High (High stays fixed)', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: true,
+        });
+
+        splitview.layout(1000, 500);
+
+        const high = new Testview(
+            50,
+            Number.POSITIVE_INFINITY,
+            LayoutPriority.High
+        );
+        const fill = new Testview(
+            50,
+            Number.POSITIVE_INFINITY,
+            LayoutPriority.Fill
+        );
+
+        splitview.addView(high); // index 0
+        splitview.addView(fill); // index 1
+
+        splitview.resizeView(0, 300);
+        expect(splitview.getViewSize(0)).toBe(300);
+        expect(splitview.getViewSize(1)).toBe(700);
+
+        // grow: the fill view absorbs everything even though `High` would
+        // normally be offered space first
+        splitview.layout(1200, 500);
+        expect(splitview.getViewSize(0)).toBe(300);
+        expect(splitview.getViewSize(1)).toBe(900);
+
+        splitview.dispose();
+    });
+
+    test('LayoutPriority.Fill works in a vertical splitview', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.VERTICAL,
+            proportionalLayout: true,
+        });
+
+        splitview.layout(1000, 500);
+
+        const side = new Testview(50, Number.POSITIVE_INFINITY);
+        const fill = new Testview(
+            50,
+            Number.POSITIVE_INFINITY,
+            LayoutPriority.Fill
+        );
+
+        splitview.addView(side); // index 0
+        splitview.addView(fill); // index 1
+
+        splitview.resizeView(0, 200);
+        expect(splitview.getViewSize(0)).toBe(200);
+        expect(splitview.getViewSize(1)).toBe(800);
+
+        splitview.layout(600, 500);
+        expect(splitview.getViewSize(0)).toBe(200);
+        expect(splitview.getViewSize(1)).toBe(400);
+
+        splitview.dispose();
+    });
+
     test('vertical splitview', () => {
         const splitview = new Splitview(container, {
             orientation: Orientation.HORIZONTAL,
