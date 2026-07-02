@@ -1,0 +1,300 @@
+---
+title: Layout History
+description: Undo and redo layout mutations — close, move, float, popout, maximize and resize — with a bounded history stack.
+sidebar_position: 3
+enterprise: true
+sidebar_custom_props:
+    enterprise: true
+---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+Dockview can keep a bounded undo/redo stack of layout mutations, giving you
+_Ctrl+Z for your layout_. Closing a panel by accident, dragging a group to the
+wrong split, floating something, maximizing or a fat-fingered resize can all be
+reverted with `api.undo()` and re-applied with `api.redo()`.
+
+The feature is **off by default** and records nothing until you opt in.
+
+## Enabling
+
+Turn history on by setting the `layoutHistory` option with `{ enabled: true }`.
+The option is honoured live, so you can toggle it at runtime via
+`updateOptions`.
+
+<FrameworkSpecific framework="React">
+    <DocRef declaration="IDockviewReactProps" methods={['layoutHistory']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+    <DocRef declaration="IDockviewVueProps" methods={['layoutHistory']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+    <DocRef
+        declaration="DockviewComponentOptions"
+        methods={['layoutHistory']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+    <DocRef declaration="IDockviewAngularProps" methods={['layoutHistory']} />
+</FrameworkSpecific>
+
+<DocRef declaration="LayoutHistoryOptions" />
+
+<FrameworkSpecific framework="React">
+    ```tsx
+    <DockviewReact
+        onReady={onReady}
+        components={components}
+        layoutHistory={{ enabled: true }}
+    />
+    ```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Vue'>
+```vue
+<template>
+    <dockview-vue
+        @ready="onReady"
+        :layoutHistory="{ enabled: true }"
+    />
+</template>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Angular'>
+```html
+<dv-dockview
+    (ready)="onReady($event)"
+    [layoutHistory]="{ enabled: true }"
+></dv-dockview>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+```ts
+import { createDockview } from 'dockview';
+
+const api = createDockview(parentElement, {
+createComponent: (options) => {/* ... */},
+layoutHistory: { enabled: true },
+});
+
+````
+</FrameworkSpecific>
+
+## What gets recorded
+
+Each undoable step is a full snapshot of the layout captured before and after
+the mutation, so an undo restores the whole layout — including a closed panel's
+`params` and `title`.
+
+The following **structural mutations** each record one undo step:
+
+-   `add` / `remove` — adding and closing panels or groups
+-   `move` — dragging or moving a panel or group to a new location
+-   `float` — floating a group
+-   `popout` — opening a group in a popout window
+-   `maximize` — maximizing / restoring a group
+-   `tab-group` — tab-group changes (such as recolouring)
+
+**Resize** (dragging a sash) has no discrete mutation boundary, so it is caught
+separately and a continuous drag is coalesced into a single entry. It is
+recorded by default; set `recordResize: false` to ignore resizes, and tune the
+debounce window with `coalesceMs` (default `400`ms).
+
+:::info
+A panel's state is only restorable on undo if it is serialized into the panel's
+`params`. State held imperatively outside `params` (for example a chart's zoom
+kept in a closure) is not captured by the snapshot — this is the same constraint
+that [`fromJSON`](/docs/core/state/load) already imposes.
+:::
+
+### History depth
+
+The stack is a bounded ring. `depth` (default `25`) caps how many undo steps are
+retained; pushing past the limit drops the oldest entry.
+
+### User vs programmatic mutations
+
+By default only **user gestures** (drag-dock, tab close button, sash resize)
+enter the stack — a programmatic `DockviewApi` call such as `api.addPanel(...)`
+is treated as the app's own state management and is not something the end user
+expects `Ctrl+Z` to revert. Set `undoableProgrammaticMutations: true` to record
+those too.
+
+### Clearing on a full restore
+
+Loading a whole new layout via [`fromJSON`](/docs/core/state/load) (or calling
+`api.clear()`) clears the history by default, so undo can't resurrect a layout
+from a different session. Set `clearOnFromJSON: false` to keep the stacks across
+a full restore.
+
+## Driving undo / redo
+
+Dockview binds no keyboard shortcuts itself — wiring `Ctrl+Z` / `Ctrl+Shift+Z`
+(or toolbar buttons) to `api.undo()` / `api.redo()` is the host app's call. Use
+`canUndo` / `canRedo` to drive the disabled state of your controls, and listen
+to `onDidChangeHistory` to keep them in sync as the stacks change.
+
+<DocRef declaration="DockviewApi" methods={['undo', 'redo', 'canUndo', 'canRedo', 'clearHistory', 'onDidChangeHistory']} />
+
+`onDidChangeHistory` fires whenever the undo/redo stacks change (on every push,
+undo, redo and clear) and carries the reactive state:
+
+<DocRef declaration="LayoutHistoryChangeEvent" />
+
+<FrameworkSpecific framework='React'>
+```tsx
+const [api, setApi] = React.useState<DockviewApi>();
+const [canUndo, setCanUndo] = React.useState(false);
+const [canRedo, setCanRedo] = React.useState(false);
+
+React.useEffect(() => {
+    if (!api) {
+        return;
+    }
+
+    setCanUndo(api.canUndo);
+    setCanRedo(api.canRedo);
+
+    const disposable = api.onDidChangeHistory((event) => {
+        setCanUndo(event.canUndo);
+        setCanRedo(event.canRedo);
+    });
+
+    return () => disposable.dispose();
+}, [api]);
+
+return (
+    <>
+        <button disabled={!canUndo} onClick={() => api?.undo()}>
+            Undo
+        </button>
+        <button disabled={!canRedo} onClick={() => api?.redo()}>
+            Redo
+        </button>
+    </>
+);
+````
+
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Vue'>
+```vue
+<script setup lang="ts">
+import { ref, onUnmounted } from 'vue';
+import type { DockviewApi, DockviewReadyEvent } from 'dockview-vue';
+
+const api = ref<DockviewApi>();
+const canUndo = ref(false);
+const canRedo = ref(false);
+let disposable: { dispose(): void } | undefined;
+
+function onReady(event: DockviewReadyEvent) {
+api.value = event.api;
+canUndo.value = event.api.canUndo;
+canRedo.value = event.api.canRedo;
+disposable = event.api.onDidChangeHistory((e) => {
+canUndo.value = e.canUndo;
+canRedo.value = e.canRedo;
+});
+}
+
+onUnmounted(() => disposable?.dispose());
+
+</script>
+
+<template>
+    <button :disabled="!canUndo" @click="api?.undo()">Undo</button>
+    <button :disabled="!canRedo" @click="api?.redo()">Redo</button>
+    <dockview-vue @ready="onReady" :layoutHistory="{ enabled: true }" />
+</template>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Angular'>
+```ts
+import { Component, OnDestroy } from '@angular/core';
+import type { DockviewApi, DockviewReadyEvent } from 'dockview-angular';
+
+@Component({
+selector: 'app-root',
+template: `         <button [disabled]="!canUndo" (click)="api?.undo()">Undo</button>
+        <button [disabled]="!canRedo" (click)="api?.redo()">Redo</button>
+        <dv-dockview
+            (ready)="onReady($event)"
+            [layoutHistory]="{ enabled: true }"
+        ></dv-dockview>
+    `,
+})
+export class AppComponent implements OnDestroy {
+api: DockviewApi | undefined;
+canUndo = false;
+canRedo = false;
+private disposable: { dispose(): void } | undefined;
+
+    onReady(event: DockviewReadyEvent) {
+        this.api = event.api;
+        this.canUndo = event.api.canUndo;
+        this.canRedo = event.api.canRedo;
+        this.disposable = event.api.onDidChangeHistory((e) => {
+            this.canUndo = e.canUndo;
+            this.canRedo = e.canRedo;
+        });
+    }
+
+    ngOnDestroy() {
+        this.disposable?.dispose();
+    }
+
+}
+
+````
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+```ts
+import { createDockview } from 'dockview';
+
+const api = createDockview(parentElement, {
+    createComponent: (options) => {
+        /* ... */
+    },
+    layoutHistory: { enabled: true },
+});
+
+const disposable = api.onDidChangeHistory((event) => {
+    undoButton.disabled = !event.canUndo;
+    redoButton.disabled = !event.canRedo;
+});
+
+undoButton.addEventListener('click', () => api.undo());
+redoButton.addEventListener('click', () => api.redo());
+
+// Call disposable.dispose() when tearing down the dock
+````
+
+</FrameworkSpecific>
+
+## Cross-window support
+
+Undo and redo restore the whole layout, including floating groups and popout
+windows — a mutation made _inside_ a popout window is still a mutation of the
+same dock and records a single step on the shared stack.
+
+Floating groups restore synchronously, but popout **windows** re-open
+asynchronously. If an undo or redo re-opens a closed popout, await
+`api.popoutRestorationPromise` to know the window is ready.
+
+:::caution
+Browsers only allow `window.open` from within a user gesture. An undo re-opening
+a popout must originate from a trusted user event (a keyboard shortcut or a
+button click); otherwise the popout falls back to an inline group.
+:::
+
+## Live Example
+
+<CodeRunner id="dockview/layout-history" height={400} />

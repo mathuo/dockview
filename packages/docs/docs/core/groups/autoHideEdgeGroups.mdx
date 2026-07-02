@@ -1,0 +1,132 @@
+---
+title: Auto-hide Edge Groups
+description: Turn a collapsed edge group into a Visual Studio-style pinnable tool window that peeks open as an overlay on demand, without reflowing the grid.
+sidebar_position: 6
+enterprise: true
+sidebar_custom_props:
+    enterprise: true
+---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+import { CodeRunner } from '@site/src/components/ui/codeRunner';
+
+Auto-hide turns a collapsed edge group into a **Visual Studio-style pinnable tool window**. Instead of a plain header strip, the collapsed group shows a strip of tab activators; **clicking a tab peeks the panel open as an overlay that floats over your content without reflowing the grid**. A pin button docks it permanently; closing hides it again.
+
+For the basics of creating, sizing, collapsing, and serializing edge groups, see [Edge Groups](/docs/core/groups/edgeGroups).
+
+Enable it with the `autoHideEdgeGroups` option — pass `true`, or an options object to tune the behaviour:
+
+<FrameworkSpecific framework="React">
+    ```tsx
+    <DockviewReact
+        autoHideEdgeGroups={true}
+        onReady={onReady}
+        components={components}
+    />
+    ```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+```vue
+<dockview-vue :auto-hide-edge-groups="true" @ready="onReady" />
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+```html
+<dockview-angular [autoHideEdgeGroups]="true" (ready)="onReady($event)"></dockview-angular>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+```ts
+const api = createDockview(element, {
+    autoHideEdgeGroups: true,
+    createComponent,
+});
+```
+</FrameworkSpecific>
+
+Auto-hide is **off by default** — leaving `autoHideEdgeGroups` unset (or `false`) keeps the plain collapse/expand behaviour, with no peek overlay.
+
+<CodeRunner id="dockview/auto-hide-edge-groups" height={400} />
+
+## The click-to-peek model
+
+Auto-hide is entirely **click-driven** — there is no hover interaction. Once an edge group is auto-hidden (collapsed) it renders a strip of its tabs along the edge, and:
+
+- **Click a tab** → that tab's panel **peeks** out as an overlay anchored to the strip's inner edge. The group stays logically collapsed, so **the grid is not reflowed** — the panel simply floats over your content. The overlay carries a **title bar** (the active panel's title on the left; a **pin** and a **close** button on the right).
+- **Click the same tab again**, **click anywhere outside** the strip and peek, or press **Escape** → the peek hides. Clicking empty space inside the strip does nothing.
+- **Click a different tab** while peeking → the peek switches to that panel and retitles.
+- **Pin** → the group **docks** (expands) permanently. A docked group renders as a tool window: the title bar sits on top and the tab strip moves to the bottom. Pinning again auto-hides it back to the strip.
+- **Close** → closes the active panel.
+
+Peeking is a transient interaction and is never serialized: a layout saved during a peek restores as a collapsed (auto-hidden) group.
+
+## Options
+
+<DocRef declaration="AutoHideEdgeGroupOptions" />
+
+```ts
+const api = createDockview(element, {
+    autoHideEdgeGroups: {
+        openDelay: 250,
+        closeDelay: 300,
+        animate: true,
+    },
+    createComponent,
+});
+```
+
+- `openDelay` — milliseconds the pointer must dwell on the strip before the peek opens (keyboard focus opens immediately). Default `250`.
+- `closeDelay` — milliseconds after leaving both the strip and the peek overlay before it closes; re-entering either cancels it. Default `300`.
+- `animate` — slide the peek overlay in. Default `true`; ignored when the OS requests reduced motion.
+
+## API
+
+Drive the peek/pin state programmatically:
+
+<DocRef
+    declaration="DockviewApi"
+    methods={['peekEdgeGroup', 'pinEdgeGroup', 'autoHideEdgeGroup']}
+/>
+
+```ts
+// slide the collapsed left edge group out as a peek overlay (no grid reflow)
+api.peekEdgeGroup('left', true);
+
+// hide the peek again
+api.peekEdgeGroup('left', false);
+
+// pin (dock/expand) the left edge group permanently
+api.pinEdgeGroup('left');
+
+// auto-hide (collapse to a strip) the left edge group
+api.autoHideEdgeGroup('left');
+```
+
+`peekEdgeGroup` and `pinEdgeGroup` require the auto-hide edge groups module and are no-ops without it; `autoHideEdgeGroup` collapses the group in all cases.
+
+## Observing the peek state
+
+Each edge group's `api` exposes its peek state alongside the existing collapse state. `isPeeking()` is `true` while the slid-out overlay is shown (the group is still logically collapsed), and `onDidPeekChange` fires whenever that toggles:
+
+<DocRef
+    declaration="DockviewGroupPanelApi"
+    methods={['isPeeking', 'onDidPeekChange']}
+/>
+
+```ts
+const groupApi = api.getEdgeGroup('left');
+
+const isPeeking = groupApi?.isPeeking(); // boolean
+
+groupApi?.onDidPeekChange((event) => {
+    console.log('peeking:', event.isPeeking);
+});
+```
+
+:::info
+The peek overlay shares the same stacking context as floating and popout groups, so it layers correctly above them without any manual `z-index` handling. Auto-hide is only available for edge groups; it has no effect on grid, floating, or popout groups.
+:::

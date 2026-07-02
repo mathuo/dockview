@@ -1,0 +1,132 @@
+import 'dockview-vue/dist/styles/dockview.css';
+import { PropType, createApp, defineComponent } from 'vue';
+
+import {
+    DockviewVue,
+    DockviewApi,
+    DockviewReadyEvent,
+    IDockviewPanelProps,
+} from 'dockview-vue';
+
+const Panel = defineComponent({
+    name: 'Panel',
+    props: {
+        params: {
+            type: Object as PropType<IDockviewPanelProps>,
+            required: true,
+        },
+    },
+    data() {
+        return {
+            title: '',
+        };
+    },
+    mounted() {
+        const disposable = this.params.api.onDidTitleChange(() => {
+            this.title = this.params.api.title;
+        });
+        this.title = this.params.api.title;
+
+        return () => {
+            disposable.dispose();
+        };
+    },
+    template: `
+      <div style="height:100%;padding:20px;color:white;">
+        <div>{{title}}</div>
+      </div>`,
+});
+
+let panelCount = 5;
+
+const App = defineComponent({
+    name: 'App',
+    components: {
+        'dockview-vue': DockviewVue,
+        default: Panel,
+    },
+    data() {
+        return {
+            api: undefined as DockviewApi | undefined,
+            canUndo: false,
+            canRedo: false,
+        };
+    },
+    methods: {
+        onReady(event: DockviewReadyEvent) {
+            this.api = event.api;
+
+            event.api.addPanel({
+                id: 'panel_1',
+                component: 'default',
+                title: 'Panel 1',
+            });
+            event.api.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                title: 'Panel 2',
+            });
+            event.api.addPanel({
+                id: 'panel_3',
+                component: 'default',
+                title: 'Panel 3',
+            });
+            event.api.addPanel({
+                id: 'panel_4',
+                component: 'default',
+                title: 'Panel 4',
+                position: { direction: 'right' },
+            });
+            event.api.addPanel({
+                id: 'panel_5',
+                component: 'default',
+                title: 'Panel 5',
+            });
+
+            // The seed layout shouldn't be undoable — start with a clean history.
+            event.api.clearHistory();
+
+            this.canUndo = event.api.canUndo;
+            this.canRedo = event.api.canRedo;
+            event.api.onDidChangeHistory((e) => {
+                this.canUndo = e.canUndo;
+                this.canRedo = e.canRedo;
+            });
+        },
+        undo() {
+            this.api?.undo();
+        },
+        redo() {
+            this.api?.redo();
+        },
+        addPanel() {
+            this.api?.addPanel({
+                id: `panel_${++panelCount}`,
+                component: 'default',
+                title: `Panel ${panelCount}`,
+            });
+        },
+    },
+    template: `
+      <div style="height:100%;display:flex;flex-direction:column;">
+        <div style="height:25px;display:flex;gap:4px;">
+          <button :disabled="!canUndo" @click="undo">Undo</button>
+          <button :disabled="!canRedo" @click="redo">Redo</button>
+          <button @click="addPanel">Add Panel</button>
+        </div>
+        <div style="flex-grow:1;">
+          <dockview-vue
+            style="width:100%;height:100%"
+            class="dockview-theme-abyss"
+            :layoutHistory="{ enabled: true, undoableProgrammaticMutations: true }"
+            @ready="onReady"
+          </dockview-vue>
+        </div>
+      </div>`,
+});
+
+const app = createApp(App);
+app.config.errorHandler = (err) => {
+    console.log(err);
+};
+app.mount(document.getElementById('app')!);

@@ -1,0 +1,58 @@
+---
+title: Focus Navigation
+description: Free, framework-agnostic DockviewApi methods for moving focus between panels and groups programmatically.
+sidebar_position: 3
+---
+
+`DockviewApi` exposes a small set of free, framework-agnostic methods for moving
+focus between panels and groups programmatically. They are part of `dockview-core`
+and work in every framework binding — useful for wiring up your own keyboard
+shortcut handlers. The rebindable keymap and keyboard docking are a separate,
+enterprise feature covered in [Keyboard Navigation](/docs/advanced/keyboard).
+
+## Programmatic Focus Navigation
+
+`DockviewApi` provides two methods for moving focus between panels and groups programmatically, useful for building keyboard shortcut handlers:
+
+```ts
+// Move focus to the next panel or group
+api.moveToNext({ includePanel: true });
+
+// Move focus to the previous panel or group
+api.moveToPrevious({ includePanel: true });
+```
+
+Both accept an optional `options` object:
+
+| Option         | Type                 | Description                                                                                                  |
+| -------------- | -------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `includePanel` | `boolean`            | If `true`, cycles through individual panels within groups. If `false` (default), cycles through groups only. |
+| `group`        | `DockviewGroupPanel` | Scope navigation to start from a specific group.                                                             |
+
+```ts
+// Cycle only through groups (not individual panels within them)
+api.moveToNext();
+
+// Cycle through all panels across all groups
+api.moveToNext({ includePanel: true });
+```
+
+## Spatial Navigation
+
+`moveToNext` / `moveToPrevious` cycle through groups in list order. To navigate by _visual_ direction instead, `adjacentGroupInDirection` returns the nearest grid group to the left, right, above, or below a given group (by comparing their centre points). Floating and popout groups are ignored, and it returns `undefined` when there is no group in that direction.
+
+```ts
+const left = api.adjacentGroupInDirection(api.activeGroup, 'left');
+if (left) {
+    left.focus();
+}
+```
+
+Each group also exposes its rendered geometry, relative to the top-left of the dockview root, via `group.api.boundingBox` (`undefined` for popout groups). Combined with `api.groups`, this lets you build a custom spatial map or overview:
+
+```ts
+const layout = api.groups.map((group) => ({
+    group,
+    box: group.api.boundingBox,
+}));
+```

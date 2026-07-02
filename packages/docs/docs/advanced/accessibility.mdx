@@ -1,21 +1,49 @@
 ---
 title: Accessibility
-description: Keyboard navigation and screen-reader announcements in Dockview.
+description: The ARIA semantics, keyboard support and screen-reader announcements Dockview ships out of the box.
+sidebar_position: 1
 ---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 # Accessibility
 
-Dockview ships an accessibility pack — keyboard navigation and screen-reader
-announcements — included out of the box in the `dockview` package and the
-framework packages.
+Dockview ships a baseline of accessibility in core — WAI-ARIA roles and labels,
+roving-tabindex navigation within the tab strip, screen-reader announcements of
+layout changes, and keyboard-only focus indicators — included out of the box in
+the `dockview` package and the framework packages. No configuration is required
+for the semantics below; the options on this page tune the announcements and the
+opt-in keymap.
 
-The options below are set the same way as any other Dockview option — via the
-options argument for JavaScript (`createDockview(element, { ... })`) or via the
-component props/inputs for React, Vue, and Angular.
+## ARIA roles and labels
+
+The tab headers are marked up as a WAI-ARIA [Tabs](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/)
+widget, and groups and floating windows carry landmark roles, so assistive
+technology can describe the layout:
+
+- The tab strip is a `role="tablist"` (with `aria-orientation`), each tab a
+  `role="tab"` carrying `aria-selected` and `aria-controls`.
+- Panel content is a `role="tabpanel"` labelled by its tab (`aria-labelledby`).
+- Each group is a `role="region"` labelled by its active panel's title.
+- A floating group is a non-modal `role="dialog"` named from its active panel,
+  so the grid behind it stays reachable.
+- Close buttons expose an accessible name that includes the panel title (e.g.
+  "Close Orders").
+
+These roles are reactive — activating a tab, floating a group or calling
+`setTitle` updates the relevant attributes.
 
 ## Keyboard navigation
 
-Set `keyboardNavigation` to `true` to enable the built-in keymap:
+Within the tab strip, Dockview uses a roving tabindex: only one tab is a tab
+stop, and the arrow keys move between tabs once the strip has focus. `Home` /
+`End` jump to the first / last tab, and `Enter` / `Space` activate the focused
+tab. This within-strip navigation is always on.
+
+Broader keyboard operability — switching tabs, cycling groups with `F6`, jumping
+focus to the tab strip, and keyboard-driven docking — is enabled with the
+`keyboardNavigation` option and is documented in full on the
+[Keyboard](/docs/advanced/keyboard) page, including the rebindable keymap.
 
 ```ts
 const options = {
@@ -23,45 +51,57 @@ const options = {
 };
 ```
 
-This wires up the following default bindings:
+## Focus indicators
 
-| Action | Default | Binding key |
-|---|---|---|
-| Switch to the next tab in the focused group | `Ctrl+]` | `nextTab` |
-| Switch to the previous tab in the focused group | `Ctrl+[` | `prevTab` |
-| Move focus to the next group | `F6` | `focusNextGroup` |
-| Move focus to the previous group | `Shift+F6` | `focusPrevGroup` |
-| Move focus from panel content to the tab strip | `Ctrl+Shift+\` | `focusTabs` |
-
-### Rebinding keys
-
-Pass an object instead of `true` to override individual bindings. Unset keys
-keep their defaults:
-
-```ts
-const options = {
-    keyboardNavigation: {
-        keymap: {
-            nextTab: 'ctrl+tab',
-            prevTab: 'ctrl+shift+tab',
-        },
-    },
-};
-```
-
-Each binding is a string of `+`-separated parts, modifiers first. Recognised
-modifiers are `ctrl`, `shift`, `alt`, and `meta` (alias `cmd`); the final part
-is the [`KeyboardEvent.key`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key)
-to match, case-insensitively — e.g. `'ctrl+]'`, `'shift+f6'`, `'ctrl+tab'`.
-
-For *programmatic* focus movement (building your own shortcut handlers, e.g.
-moving focus by spatial direction), see [Keyboard](/docs/advanced/keyboard).
+Keyboard focus is drawn with a `:focus-visible` outline, so the focus ring
+appears when you tab to a control but is suppressed on plain mouse clicks. It is
+themeable through the theme's CSS custom properties, and honours `:has(:focus-visible)`
+so the ring still shows when a child control (such as a tab's close button) is
+focused by keyboard.
 
 ## Screen-reader announcements
 
 Dockview narrates layout changes — panels opening/closing, groups floating,
-docking, popping out, maximizing/restoring — through a visually-hidden ARIA live
-region. This is on by default. Opt out with:
+docking, popping out, maximizing/restoring — through visually-hidden ARIA live
+regions (a polite region for routine status and an assertive one for
+cancellations). This is on by default.
+
+Each window gets its own live region: the main document plus every popout
+window. Announcements are routed to the region of the window that currently has
+focus, so a screen-reader user working inside a popped-out group hears them in
+that window rather than the opener.
+
+The announcement behaviour is configured with the following options:
+
+<FrameworkSpecific framework="React">
+    <DocRef
+        declaration="IDockviewReactProps"
+        methods={['announcements', 'getAnnouncement', 'messages', 'announcer']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+    <DocRef
+        declaration="IDockviewVueProps"
+        methods={['announcements', 'getAnnouncement', 'messages', 'announcer']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+    <DocRef
+        declaration="DockviewComponentOptions"
+        methods={['announcements', 'getAnnouncement', 'messages', 'announcer']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+    <DocRef
+        declaration="IDockviewAngularProps"
+        methods={['announcements', 'getAnnouncement', 'messages', 'announcer']}
+    />
+</FrameworkSpecific>
+
+Opt out entirely with:
 
 ```ts
 const options = {
@@ -103,11 +143,13 @@ const options = {
 ### Routing to your own announcer
 
 If your app already manages a screen-reader live region, route Dockview's
-announcements to it with `announcer` instead of using the built-in region.
-`getAnnouncement` (localisation) still applies first:
+announcements to it with `announcer` instead of using the built-in regions.
+`getAnnouncement` (localisation) still applies first, and each event carries the
+resolved `message` and a `politeness` of `'polite'` or `'assertive'`:
 
 ```ts
 const options = {
-    announcer: (event) => myLiveRegion.announce(event.message),
+    announcer: (event) =>
+        myLiveRegion.announce(event.message, event.politeness),
 };
 ```

@@ -1,0 +1,97 @@
+---
+title: What's new in v8
+sidebar_position: 3
+description: Highlights and breaking changes in Dockview 8.0 — pinned tabs, multi-row tabs, smarter drag-and-drop, layout history, and more.
+---
+
+Dockview 8.0 is an additive release focused on the tab header and drag-and-drop:
+pinned and wrapping tabs, an aim-at-a-cell drop compass and floating-group
+snapping, undo/redo for layout changes, auto-hide edge groups, and keyboard
+docking across popout windows. Every new capability is opt-in through a new
+`DockviewOptions` field, so upgrading is safe by default.
+
+This page covers the headline additions. For the upgrade notes and the single
+[breaking change](#breaking-changes), see
+[Migrating to v8](/docs/overview/migrating-to-v8).
+
+:::info The `dockview-enterprise` package
+v8 introduces `dockview-enterprise`, a separately-licensed package for the
+features marked **Enterprise** in [Features](/docs/overview/features) — pinned
+tabs, multi-row tabs, the drop guide compass, smart guides, layout history,
+auto-hide edge groups, and keyboard docking. The free, open-source `dockview`
+packages are unchanged.
+:::
+
+## Highlights
+
+### Pinned tabs
+
+The new [`pinnedTabs`](/docs/core/panels/pinnedTabs) option lets a panel be
+pinned to the front of the tab strip, keeping it in place while other tabs come
+and go. Pinned tabs stay ahead of unpinned ones, are excluded from the overflow
+dropdown, and can render compact (hiding the close button, Chrome-style) or on a
+separate row. Pinning round-trips through serialization and can be toggled from
+the built-in tab context menu via the new `'pin'` menu item.
+
+### Multi-row (wrapping) tabs & overflow
+
+The new [`overflow`](/docs/core/panels/tabOverflow) option controls what happens
+when there are more tabs than fit on one row. The default single-row strip with
+a chevron dropdown is unchanged; setting `overflow.mode: 'wrap'` instead wraps
+the tabs onto multiple rows and grows the header to fit, with full cross-row
+drag-and-drop reordering. See [Multi-row tabs](/docs/core/panels/multiRowTabs).
+
+### Drop guide compass
+
+The new [`dndGuide`](/docs/core/dnd/dropGuide) option replaces the
+cursor-quadrant drop logic with a VS Code-style "compass" that highlights the
+cell you are aiming at while dragging, and previews docking a group to the
+whole-layout edge. For finer control, the new
+[`dropPositionResolver`](/docs/core/dnd/dropGuide) option lets you override how a
+pointer location maps to a drop position on the group and layout-edge targets.
+See [Drop guide](/docs/core/dnd/dropGuide).
+
+### Smart guides
+
+The new [`smartGuides`](/docs/core/dnd/smartGuides) option adds Figma-style
+alignment guides and magnetic snapping while a floating group is dragged. Edges
+and centers snap to other floating groups, the container, and optionally the
+underlying grid splitters, with asymmetric hysteresis to stop boundary
+oscillation; a modifier key temporarily suspends snapping, and flush floats can
+snap together into a docked or merged group. See
+[Smart guides](/docs/core/dnd/smartGuides).
+
+### Layout history (undo/redo)
+
+The new [`layoutHistory`](/docs/core/state/history) option records structural
+layout mutations and lets you undo and redo them — move, float, popout,
+maximize, add, and remove — coalescing resize gestures and spanning popout
+windows. See [Layout history](/docs/core/state/history).
+
+### Auto-hide edge groups
+
+Groups docked against an edge of the layout can now collapse to a strip and peek
+back into view on demand, VS Code tool-window style. Enable it with the new
+[`autoHideEdgeGroups`](/docs/core/groups/autoHideEdgeGroups) option; clicking a collapsed
+tab peeks the group, and you can pin it back to a docked group or dismiss it. See
+[Auto-hide edge groups](/docs/core/groups/autoHideEdgeGroups).
+
+### Keyboard docking across popout windows & refreshed a11y
+
+Keyboard docking now works across popout windows, so you can move a group into or
+out of a popout entirely from the keyboard, with a dedicated "float" terminal
+action. It builds on refreshed accessibility work — per-window live regions with
+focus-aware routing, `:focus-visible` focus indicators, and honest, localised
+accessible names on tab controls. See [Keyboard navigation](/docs/advanced/keyboard)
+and [Accessibility](/docs/advanced/accessibility).
+
+## Breaking changes
+
+v8 is additive — every new feature above is opt-in and off by default. There is
+a single behavioural change to be aware of, covered in full in
+[Migrating to v8](/docs/overview/migrating-to-v8):
+
+- **Reported panel dimensions** — `onDidDimensionsChange` (and the height passed
+  to renderers) now report the **content area** (the group box minus the header)
+  instead of the header-inclusive group box. CSS-fill renderers are unaffected;
+  only consumers that read the numeric dimensions need to check this.
