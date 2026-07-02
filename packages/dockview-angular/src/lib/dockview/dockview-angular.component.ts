@@ -38,6 +38,7 @@ import {
     DockviewPanelRenderer,
     DockviewTheme,
     DroptargetOverlayModel,
+    DockviewResponsiveOptions,
 } from 'dockview';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularRenderer } from '../utils/angular-renderer';
@@ -127,6 +128,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     )[];
     @Input() tabGroupColors?: DockviewTabGroupColorEntry[];
     @Input() tabGroupAccent?: 'palette' | 'off';
+    @Input() responsive?: DockviewResponsiveOptions;
 
     @Output() ready = new EventEmitter<DockviewReadyEvent>();
     @Output() didDrop = new EventEmitter<DockviewDidDropEvent>();
