@@ -5,7 +5,7 @@ import {
     ITabRenderer,
 } from '../../dockview/types';
 import { PanelUpdateEvent } from '../../panel/types';
-import { Orientation } from '../../splitview/splitview';
+import { LayoutPriority, Orientation } from '../../splitview/splitview';
 import { CompositeDisposable } from '../../lifecycle';
 import { Emitter } from '../../events';
 import { DockviewPanel, IDockviewPanel } from '../../dockview/dockviewPanel';
@@ -126,6 +126,109 @@ describe('dockviewComponent', () => {
                 }
             },
         });
+    });
+
+    test('group LayoutPriority is settable via addGroup and round-trips through JSON', () => {
+        const create = (el: HTMLElement) =>
+            new DockviewComponent(el, {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'default':
+                            return new PanelContentPartTest(
+                                options.id,
+                                options.name
+                            );
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            });
+
+        const containerA = document.createElement('div');
+        const dv = create(containerA);
+        dv.layout(1000, 500);
+
+        // priority set at group-creation time reaches the group (grid leaf)
+        dv.addPanel({ id: 'p1', component: 'default' });
+        const fillGroup = dv.addGroup({
+            direction: 'right',
+            priority: LayoutPriority.Fill,
+        });
+        dv.addPanel({
+            id: 'p2',
+            component: 'default',
+            position: { referenceGroup: fillGroup },
+        });
+
+        expect(fillGroup.priority).toBe(LayoutPriority.Fill);
+        expect(fillGroup.api.priority).toBe(LayoutPriority.Fill);
+
+        // it is present in the serialized group state
+        const state = dv.toJSON();
+        expect(JSON.stringify(state)).toContain('"priority":"fill"');
+
+        // and restored when loaded into a fresh component
+        const containerB = document.createElement('div');
+        const dv2 = create(containerB);
+        dv2.layout(1000, 500);
+        dv2.fromJSON(state);
+
+        const restored = dv2.groups.find(
+            (g) => g.priority === LayoutPriority.Fill
+        );
+        expect(restored).toBeDefined();
+        expect(restored!.panels.map((p) => p.id)).toContain('p2');
+
+        dv.dispose();
+        dv2.dispose();
+    });
+
+    test('group LayoutPriority is settable at runtime via the group api', () => {
+        dockview.layout(1000, 500);
+
+        const panel = dockview.addPanel({ id: 'p1', component: 'default' });
+        const group = panel.group;
+
+        expect(group.api.priority).toBeUndefined();
+
+        group.api.priority = LayoutPriority.Fill;
+        expect(group.api.priority).toBe(LayoutPriority.Fill);
+        expect(group.priority).toBe(LayoutPriority.Fill);
+    });
+
+    test('a group with LayoutPriority.Fill absorbs resize while siblings stay fixed', () => {
+        dockview.layout(600, 1000);
+
+        const p1 = dockview.addPanel({ id: 'p1', component: 'default' });
+        const p2 = dockview.addPanel({
+            id: 'p2',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+        const p3 = dockview.addPanel({
+            id: 'p3',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+
+        expect(p1.api.width).toBe(200);
+        expect(p2.api.width).toBe(200);
+        expect(p3.api.width).toBe(200);
+
+        // make the middle group the fill group (runtime — forces a relayout)
+        p2.api.group.api.priority = LayoutPriority.Fill;
+
+        // grow the container: only the fill group grows; siblings stay fixed
+        dockview.layout(900, 1000);
+        expect(p1.api.width).toBe(200);
+        expect(p3.api.width).toBe(200);
+        expect(p2.api.width).toBe(500);
+
+        // shrink the container: only the fill group shrinks
+        dockview.layout(700, 1000);
+        expect(p1.api.width).toBe(200);
+        expect(p3.api.width).toBe(200);
+        expect(p2.api.width).toBe(300);
     });
 
     test('update className', () => {

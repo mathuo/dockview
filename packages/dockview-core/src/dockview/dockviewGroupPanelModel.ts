@@ -16,6 +16,7 @@ import {
     DockviewWillShowOverlayLocationEventOptions,
 } from './events';
 import { IViewSize } from '../gridview/gridview';
+import { LayoutPriority } from '../splitview/splitview';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import {
     IPanel,
@@ -70,6 +71,12 @@ interface CoreGroupOptions {
     constraints?: Partial<Constraints>;
     initialWidth?: number;
     initialHeight?: number;
+    /**
+     * The group's layout priority within the grid. `LayoutPriority.Fill` makes
+     * the group absorb surplus/deficit space while its siblings keep fixed
+     * sizes. Applies to the group (the grid leaf), not individual panels.
+     */
+    priority?: LayoutPriority;
 }
 
 export interface GroupOptions extends CoreGroupOptions {
@@ -1277,6 +1284,10 @@ export class DockviewGroupPanelModel
 
         if (this.headerPosition !== 'top') {
             result.headerPosition = this.headerPosition;
+        }
+
+        if (this.groupPanel?.priority !== undefined) {
+            result.priority = this.groupPanel.priority;
         }
 
         if (this._tabGroups.length > 0) {

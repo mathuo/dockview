@@ -2671,6 +2671,7 @@ export class DockviewComponent
                     headerPosition,
                     views,
                     activeView,
+                    priority,
                 } = data;
 
                 if (typeof id !== 'string') {
@@ -2684,6 +2685,7 @@ export class DockviewComponent
                     locked: !!locked,
                     hideHeader: !!hideHeader,
                     headerPosition,
+                    priority,
                 });
                 this._onDidAddGroup.fire(group);
 
@@ -4560,7 +4562,9 @@ export class DockviewComponent
         }
 
         const view = new DockviewGroupPanel(this, id, options);
-        view.init({ params: {}, accessor: this });
+        // the group is the grid leaf, so its layout priority lives on the view
+        // (inherited from GridviewPanel); apply it via init like a gridview panel
+        view.init({ params: {}, accessor: this, priority: options.priority });
 
         if (!this._groups.has(view.id)) {
             const disposable = new CompositeDisposable(

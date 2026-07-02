@@ -70,6 +70,24 @@ export abstract class GridviewPanel<
         return this._priority;
     }
 
+    set priority(value: LayoutPriority | undefined) {
+        if (this._priority === value) {
+            return;
+        }
+        this._priority = value;
+        // Re-run the whole grid layout so the new priority propagates up the
+        // branch tree — a nested branch reports its highest child priority to
+        // its parent, and a purely local splitview relayout would miss that.
+        // (`_params` is only populated once `init` has run, i.e. for runtime
+        // changes; the construction-time value is applied through `init`.)
+        const params = this._params as GridviewInitParameters | undefined;
+        params?.accessor.layout(
+            params.accessor.width,
+            params.accessor.height,
+            true
+        );
+    }
+
     get snap(): boolean {
         return this._snap;
     }
