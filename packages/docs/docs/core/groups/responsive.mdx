@@ -1,0 +1,191 @@
+---
+title: Responsive Layout
+description: Container-size-driven reflow — collapse, restack and hide groups as the layout narrows, and restore the wide arrangement losslessly when there is room again.
+sidebar_position: 6
+enterprise: true
+sidebar_custom_props:
+    enterprise: true
+---
+
+import { CodeRunner } from '@site/src/components/ui/codeRunner';
+
+Dockview layouts are normally **static with respect to their container size** — a
+grid authored for a 1600px desk just squashes at 600px. Responsive layout makes
+the grid **reflow** as its container resizes: collapsing side-by-side groups into
+tabs when narrow, restacking columns into rows, hiding low-priority groups — and
+**restoring the exact wide arrangement** when the container grows again.
+
+Crucially it reacts to the **container** size, not the viewport (it is the CSS
+_container-query_ idea applied to a docking tree). A dockview embedded in a 400px
+sidebar reflows to its narrow form even on a 4K monitor.
+
+The feature is **off by default** and inert until you configure `responsive`.
+
+<CodeRunner id="dockview/responsive" height={450} />
+
+> Resize the pane above past ~600px to watch the three groups collapse into a
+> single tabbed group, and back out again above ~680px.
+
+## Enabling
+
+Set the `responsive` option with a list of `breakpoints`. Each breakpoint is a
+container-width band with a set of `rules` describing how the layout should
+reflow inside it. Omit `rules` on the widest band — that is the _canonical_
+(authored) layout.
+
+<FrameworkSpecific framework="React">
+    ```tsx
+    <DockviewReact
+        onReady={onReady}
+        components={components}
+        responsive={{
+            breakpoints: [
+                { name: 'lg', maxWidth: Infinity },
+                {
+                    name: 'sm',
+                    maxWidth: 600,
+                    exitAt: 680,
+                    rules: [{ kind: 'collapseToTabs' }],
+                },
+            ],
+        }}
+    />
+    ```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+```vue
+<dockview-vue
+    class="dockview-theme-abyss"
+    :responsive="responsive"
+    @ready="onReady"
+/>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+```html
+<dv-dockview
+    [components]="components"
+    [responsive]="responsive"
+    (ready)="onReady($event)">
+</dv-dockview>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+```ts
+const api = createDockview(element, {
+    responsive: {
+        breakpoints: [
+            { name: 'lg', maxWidth: Infinity },
+            {
+                name: 'sm',
+                maxWidth: 600,
+                exitAt: 680,
+                rules: [{ kind: 'collapseToTabs' }],
+            },
+        ],
+    },
+});
+```
+</FrameworkSpecific>
+
+## Breakpoints
+
+A breakpoint is active when `containerWidth <= maxWidth` and no narrower
+breakpoint fits. The optional `enterAt` / `exitAt` add **hysteresis**: the layout
+collapses at `<= enterAt` but only expands once the width climbs back to
+`>= exitAt`. That dead band absorbs the width delta a reflow itself introduces,
+so a collapse can never bounce straight back (no strobing at the threshold). Both
+default to `maxWidth`.
+
+| Field      | Meaning                                                        |
+| ---------- | -------------------------------------------------------------- |
+| `name`     | Identifier for the band, surfaced on `onDidBreakpointChange`.  |
+| `maxWidth` | Active when `containerWidth <= maxWidth`; `Infinity` = widest. |
+| `enterAt`  | Collapse into this band at `<= enterAt` (default `maxWidth`).  |
+| `exitAt`   | Expand out of this band at `>= exitAt` (default `maxWidth`).   |
+| `rules`    | The reflow transform for this band (see below).                |
+
+## Rules
+
+Each breakpoint declares the **complete** transform for its band as an ordered
+list of rules (they are not additively stacked across breakpoints):
+
+- **`collapseToTabs`** — fold side-by-side groups into one tabbed group. Tabs are
+  ordered by group priority (a group's [`LayoutPriority`](#priority), with `Fill`
+  surviving longest), and the group you are working in stays active.
+- **`restack`** — flip the primary axis (columns ↔ rows).
+- **`hide`** — park `Low`-priority groups (they and their panels survive, hidden,
+  and reappear on widen). The highest-priority group is always kept visible.
+
+A default `rules` chain on the `responsive` option applies to every band below
+the widest unless that band overrides it.
+
+## Priority {#priority}
+
+Reflow decisions are driven by each group's
+[`LayoutPriority`](/docs/core/groups/edgeGroups) — `Fill` > `High` > `Normal` >
+`Low`, with the active group getting a tie-break bonus. Mark the central content
+area `Fill` to keep it visible and filling the longest; mark peripheral groups
+`Low` so `hide` parks them first.
+
+```ts
+group.api.priority = LayoutPriority.Fill;
+```
+
+## Lossless restore & serialization
+
+Reflow is a **reversible projection**, never a destructive mutation. Dockview
+holds the **canonical** (wide) layout and _derives_ the collapsed layout from it,
+so widening always reproduces the authored arrangement exactly — split ratios and
+active panels included.
+
+Because of this, `toJSON()` always serializes the **canonical** (wide) layout,
+even while collapsed — a narrow-width save never bakes the collapse in. Edits you
+make while collapsed (closing a tab, adding a panel) are folded back onto
+canonical so they survive widening.
+
+```ts
+api.getCanonicalLayout(); // the wide layout, even while collapsed
+api.setCanonicalLayout(data); // replace it, then re-derive for the current width
+```
+
+Control how collapsed-state edits are handled with `responsive.rebase`:
+
+| `rebase`    | Behaviour                                                   |
+| ----------- | ----------------------------------------------------------- |
+| `'auto'`    | (default) fold edits onto canonical so widening keeps them. |
+| `'discard'` | treat collapsed-state edits as ephemeral (lost on widen).   |
+| `'manual'`  | leave canonical untouched and fire `onDidRebaseConflict`.   |
+
+## Events
+
+```ts
+api.onDidBreakpointChange((e) => {
+    console.log(`reflowed ${e.from} → ${e.to} at ${e.width}px`);
+});
+api.activeBreakpoint; // the current breakpoint name, or undefined
+api.reflow(); // force a re-resolution against the current width
+```
+
+## Free alternative
+
+If you only need a coarse swap you can hand-roll it against the public API —
+observe the component width via `onDidLayoutChange` and swap layouts with
+`toJSON` / `fromJSON` past a threshold:
+
+```ts
+let narrow = false;
+api.onDidLayoutChange(() => {
+    const isNarrow = api.width <= 600;
+    if (isNarrow === narrow) return;
+    narrow = isNarrow;
+    api.fromJSON(isNarrow ? narrowLayout : wideLayout);
+});
+```
+
+This is destructive (it re-instantiates panels), thrash-prone, and you own both
+snapshots by hand — exactly the pain the responsive engine removes — but nothing
+is taken away from the free tier.
