@@ -1,6 +1,7 @@
 ---
 title: Loading State
 description: How to restore a previously saved Dockview layout from a serialized state object.
+sidebar_position: 2
 ---
 
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
@@ -8,7 +9,10 @@ import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 This section described loading a dock layout.
 
-<DocRef declaration="DockviewApi" methods={['fromJSON', 'onDidLayoutFromJSON']} />
+<DocRef
+    declaration="DockviewApi"
+    methods={['fromJSON', 'onDidLayoutFromJSON']}
+/>
 
 ## Load A Layout
 
@@ -37,10 +41,12 @@ const onReady = (event: DockviewReadyEvent) => {
     if (!success) {
         // perhaps load a default layout?
     }
+
 };
 
 return <DockviewComponent onReady={onReady}/>;
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
@@ -72,7 +78,8 @@ function onReady(event: DockviewReadyEvent) {
 <template>
     <dockview-vue @ready="onReady" />
 </template>
-```
+````
+
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
@@ -81,12 +88,12 @@ import { Component } from '@angular/core';
 import type { DockviewReadyEvent } from 'dockview-angular';
 
 @Component({
-    selector: 'app-root',
-    template: `<dv-dockview (ready)="onReady($event)"></dv-dockview>`,
+selector: 'app-root',
+template: `<dv-dockview (ready)="onReady($event)"></dv-dockview>`,
 })
 export class AppComponent {
-    onReady(event: DockviewReadyEvent) {
-        let success = false;
+onReady(event: DockviewReadyEvent) {
+let success = false;
 
         const mySerializedLayout = localStorage.getItem('my_layout');
 
@@ -104,8 +111,10 @@ export class AppComponent {
             // perhaps load a default layout?
         }
     }
+
 }
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
@@ -131,11 +140,10 @@ if (mySerializedLayout) {
 if (!success) {
     // perhaps load a default layout?
 }
-```
+````
+
 </FrameworkSpecific>
 
 # Live Example
 
-<CodeRunner id="dockview/layout"/>
-
-
+<CodeRunner id="dockview/layout" />

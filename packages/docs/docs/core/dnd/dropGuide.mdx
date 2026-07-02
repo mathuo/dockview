@@ -1,0 +1,82 @@
+---
+title: 'Drop Guide'
+sidebar_position: 6
+description: Show a VS Code-style aim-at-a-cell compass while dragging over a group.
+enterprise: true
+sidebar_custom_props:
+    enterprise: true
+---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+By default Dockview resolves a drop from the quadrant of the target the cursor happens to be over. The **drop guide**
+replaces that with an explicit, VS Code-style _compass_: a fixed cross of cells rendered over the group you are dragging
+over. You aim at a cell to choose the drop direction, and only the drops that are actually possible are shown.
+
+## Compass drop guide
+
+Enable the compass with the `dndGuide` option. With it off (the default) the existing cursor-quadrant behaviour is
+unchanged.
+
+<FrameworkSpecific framework="React">
+    <DocRef declaration="IDockviewReactProps" methods={['dndGuide']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+    <DocRef declaration="IDockviewVueProps" methods={['dndGuide']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+    <DocRef declaration="DockviewComponentOptions" methods={['dndGuide']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+    <DocRef declaration="IDockviewAngularProps" methods={['dndGuide']} />
+</FrameworkSpecific>
+
+```tsx
+const api = createDockview(element, {
+    // enable the compass with default configuration
+    dndGuide: true,
+});
+```
+
+While dragging over an accepting group the compass shows:
+
+- **Inner cells** (`top` / `bottom` / `left` / `right` / `center`) — split this group on that edge, or `center` to
+  tab into the group. These have the same result as today's cursor quadrants.
+- **Outer cells** (`top` / `bottom` / `left` / `right`) — dock against the **whole layout** edge, even though the
+  cursor is over a group.
+
+A cell is only shown when a drop there is actually possible, so the compass reflects exactly the legal drops for the
+hovered target. The compass behaves identically for the HTML5 and pointer (touch / pen) drag backends, and renders over
+groups in floating containers and popout windows.
+
+### Configuration
+
+Pass an object instead of `true` to restrict the guide:
+
+```tsx
+const api = createDockview(element, {
+    dndGuide: {
+        // only offer these inner cells (default: all accepted zones)
+        zones: ['center'],
+        // include the outer whole-layout-edge cells (default: true)
+        edges: false,
+    },
+});
+```
+
+- `zones` — restrict which **inner** cells appear. For example `['center']` allows reorder / merge only.
+  Defaults to all zones the target accepts.
+- `edges` — include the **outer** whole-layout-edge cells. Defaults to `true`; set `false` for group-only docking.
+
+## Live Example
+
+<CodeRunner id="dockview/drop-guide" height={300} />
+
+## See also
+
+- [Smart Guides](/docs/core/dnd/smartGuides) — alignment snapping for floating groups.
+- [Drop overlay](/docs/core/dnd/overlay) — customise the overlay that previews the resolved drop zone.
+- [Drop Position Resolver](/docs/core/dnd/dropPosition) — a free, lower-level seam to override where a pointer maps to a drop position.

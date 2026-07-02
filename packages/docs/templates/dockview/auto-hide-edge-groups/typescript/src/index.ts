@@ -1,0 +1,88 @@
+import 'dockview/dist/styles/dockview.css';
+import {
+    createDockview,
+    GroupPanelPartInitParameters,
+    IContentRenderer,
+    themeAbyss,
+} from 'dockview';
+
+class Panel implements IContentRenderer {
+    private readonly _element: HTMLElement;
+
+    get element(): HTMLElement {
+        return this._element;
+    }
+
+    constructor() {
+        this._element = document.createElement('div');
+        this._element.style.padding = '20px';
+        this._element.style.color = 'white';
+    }
+
+    init(parameters: GroupPanelPartInitParameters): void {
+        this._element.textContent = parameters.title ?? 'Panel';
+    }
+}
+
+const api = createDockview(document.getElementById('app'), {
+    theme: themeAbyss,
+    // Enable Visual Studio-style pinnable tool windows on edge groups.
+    autoHideEdgeGroups: true,
+    createComponent: (options) => {
+        switch (options.name) {
+            case 'default':
+                return new Panel();
+        }
+    },
+});
+
+// some regular grid panels to peek over
+api.addPanel({ id: 'doc_1', component: 'default', title: 'Document' });
+api.addPanel({
+    id: 'doc_2',
+    component: 'default',
+    title: 'Preview',
+    position: { direction: 'right', referencePanel: 'doc_1' },
+});
+
+// a left edge group with a couple of tool windows
+api.addEdgeGroup('left', {
+    id: 'left-edge',
+    initialSize: 240,
+    minimumSize: 150,
+});
+api.addPanel({
+    id: 'explorer',
+    component: 'default',
+    title: 'Explorer',
+    position: { referenceGroup: 'left-edge' },
+});
+api.addPanel({
+    id: 'search',
+    component: 'default',
+    title: 'Search',
+    position: { referenceGroup: 'left-edge' },
+});
+
+// a bottom edge group
+api.addEdgeGroup('bottom', {
+    id: 'bottom-edge',
+    initialSize: 200,
+    minimumSize: 100,
+});
+api.addPanel({
+    id: 'output',
+    component: 'default',
+    title: 'Output',
+    position: { referenceGroup: 'bottom-edge' },
+});
+api.addPanel({
+    id: 'problems',
+    component: 'default',
+    title: 'Problems',
+    position: { referenceGroup: 'bottom-edge' },
+});
+
+// auto-hide both edge groups to their strips — click a tab to peek
+api.autoHideEdgeGroup('left');
+api.autoHideEdgeGroup('bottom');

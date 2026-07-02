@@ -1,0 +1,110 @@
+import {
+    DockviewApi,
+    DockviewReact,
+    DockviewReadyEvent,
+    IDockviewPanelProps,
+} from 'dockview-react';
+import React from 'react';
+
+const components = {
+    default: (props: IDockviewPanelProps) => {
+        return (
+            <div
+                style={{
+                    height: '100%',
+                    padding: '20px',
+                    background: 'var(--dv-group-view-background-color)',
+                }}
+            >
+                {props.api.title}
+            </div>
+        );
+    },
+};
+
+let panelCount = 5;
+
+function loadDefaultLayout(api: DockviewApi) {
+    api.addPanel({ id: 'panel_1', component: 'default', title: 'Panel 1' });
+    api.addPanel({ id: 'panel_2', component: 'default', title: 'Panel 2' });
+    api.addPanel({ id: 'panel_3', component: 'default', title: 'Panel 3' });
+    api.addPanel({
+        id: 'panel_4',
+        component: 'default',
+        title: 'Panel 4',
+        position: { direction: 'right' },
+    });
+    api.addPanel({ id: 'panel_5', component: 'default', title: 'Panel 5' });
+}
+
+const App = () => {
+    const [api, setApi] = React.useState<DockviewApi>();
+    const [canUndo, setCanUndo] = React.useState(false);
+    const [canRedo, setCanRedo] = React.useState(false);
+
+    const onReady = (event: DockviewReadyEvent) => {
+        loadDefaultLayout(event.api);
+        // The seed layout shouldn't be undoable — start with a clean history.
+        event.api.clearHistory();
+        setApi(event.api);
+    };
+
+    React.useEffect(() => {
+        if (!api) {
+            return;
+        }
+
+        setCanUndo(api.canUndo);
+        setCanRedo(api.canRedo);
+
+        const disposable = api.onDidChangeHistory((event) => {
+            setCanUndo(event.canUndo);
+            setCanRedo(event.canRedo);
+        });
+
+        return () => disposable.dispose();
+    }, [api]);
+
+    return (
+        <div
+            style={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+            }}
+        >
+            <div style={{ height: '25px', display: 'flex', gap: '4px' }}>
+                <button disabled={!canUndo} onClick={() => api?.undo()}>
+                    Undo
+                </button>
+                <button disabled={!canRedo} onClick={() => api?.redo()}>
+                    Redo
+                </button>
+                <button
+                    onClick={() =>
+                        api?.addPanel({
+                            id: `panel_${++panelCount}`,
+                            component: 'default',
+                            title: `Panel ${panelCount}`,
+                        })
+                    }
+                >
+                    Add Panel
+                </button>
+            </div>
+            <div style={{ flexGrow: 1 }}>
+                <DockviewReact
+                    onReady={onReady}
+                    components={components}
+                    layoutHistory={{
+                        enabled: true,
+                        undoableProgrammaticMutations: true,
+                    }}
+                    className="dockview-theme-abyss"
+                />
+            </div>
+        </div>
+    );
+};
+
+export default App;
