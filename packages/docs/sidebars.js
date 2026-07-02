@@ -40,7 +40,7 @@ const sidebars = {
         },
         {
             type: 'category',
-            label: 'Advanced Features',
+            label: 'Keyboard & Accessibility',
             collapsible: false,
             collapsed: false,
             className: 'sidebar-section-header',
