@@ -27,6 +27,7 @@ import {
     ILayoutHistoryService,
     IMultiRowTabsService,
     IPinnedTabsService,
+    IResponsiveLayoutService,
     ISmartGuidesService,
     ITabGroupChipsService,
 } from './moduleContracts';
@@ -50,6 +51,7 @@ export interface ServiceCollection {
     autoHideEdgeGroupService?: IAutoHideEdgeGroupService;
     multiRowTabsService?: IMultiRowTabsService;
     pinnedTabsService?: IPinnedTabsService;
+    responsiveLayoutService?: IResponsiveLayoutService;
 }
 
 export interface DockviewModule<THost = unknown> {

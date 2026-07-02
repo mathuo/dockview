@@ -1,0 +1,112 @@
+import {
+    DockviewComponent,
+    DockviewBreakpointChangeEvent,
+    IContentRenderer,
+} from 'dockview-core';
+
+class TestPanel implements IContentRenderer {
+    element = document.createElement('div');
+    init(): void {
+        // noop
+    }
+    layout(): void {
+        // noop
+    }
+    dispose(): void {
+        // noop
+    }
+}
+
+/**
+ * ResponsiveLayout — Phase 1 (seam + skeleton). The module resolves the active
+ * breakpoint from the container width (hysteresis + debounce) and fires
+ * `onDidBreakpointChange`. No reflow transforms yet.
+ *
+ * Uses `debounceMs: 0` + `reflow()` for deterministic, synchronous resolution
+ * (the debounce itself is unit-tested in `responsiveSizeObserver.spec.ts`).
+ */
+describe('ResponsiveLayout module', () => {
+    let container: HTMLElement;
+
+    const BREAKPOINTS = [
+        { name: 'lg', maxWidth: Infinity },
+        { name: 'md', maxWidth: 1000, exitAt: 1080 },
+        { name: 'sm', maxWidth: 640, exitAt: 720 },
+    ];
+
+    const make = (responsive?: DockviewComponent['options']['responsive']) => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        return new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            responsive,
+        });
+    };
+
+    afterEach(() => {
+        container.remove();
+    });
+
+    test('resolves + fires onDidBreakpointChange as the container crosses breakpoints', () => {
+        const dockview = make({ debounceMs: 0, breakpoints: BREAKPOINTS });
+
+        const events: DockviewBreakpointChangeEvent[] = [];
+        dockview.onDidBreakpointChange((e) => events.push(e));
+
+        const at = (width: number): string | undefined => {
+            dockview.layout(width, 500);
+            dockview.reflow();
+            return dockview.activeBreakpoint;
+        };
+
+        expect(at(1200)).toBe('lg');
+        expect(at(800)).toBe('md');
+        expect(at(500)).toBe('sm');
+
+        // hysteresis: growing back into the dead band [640, 720] stays 'sm'
+        expect(at(700)).toBe('sm');
+        // and only expands at exitAt
+        expect(at(720)).toBe('md');
+
+        expect(events.map((e) => e.to)).toEqual(['lg', 'md', 'sm', 'md']);
+        expect(events[0]).toMatchObject({ from: 'sm', to: 'lg', width: 1200 });
+    });
+
+    test('is inert when `responsive` is not configured', () => {
+        const dockview = make();
+
+        const events: DockviewBreakpointChangeEvent[] = [];
+        dockview.onDidBreakpointChange((e) => events.push(e));
+
+        dockview.layout(1200, 500);
+        dockview.reflow();
+        dockview.layout(400, 500);
+        dockview.reflow();
+
+        expect(dockview.activeBreakpoint).toBeUndefined();
+        expect(events).toEqual([]);
+    });
+
+    test('is inert with an empty breakpoint set', () => {
+        const dockview = make({ breakpoints: [] });
+        dockview.layout(400, 500);
+        dockview.reflow();
+        expect(dockview.activeBreakpoint).toBeUndefined();
+    });
+
+    test('exposes the same surface through the public api', () => {
+        const dockview = make({ debounceMs: 0, breakpoints: BREAKPOINTS });
+        const api = dockview.api;
+
+        const events: DockviewBreakpointChangeEvent[] = [];
+        api.onDidBreakpointChange((e) => events.push(e));
+
+        // baseline at construction (width 0) is already the narrowest ('sm'),
+        // so widen to force a real change through the public surface
+        dockview.layout(1200, 500);
+        api.reflow();
+
+        expect(api.activeBreakpoint).toBe('lg');
+        expect(events.map((e) => e.to)).toEqual(['lg']);
+    });
+});

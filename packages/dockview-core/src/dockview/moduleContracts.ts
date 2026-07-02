@@ -20,6 +20,7 @@ import { ITabGroup } from './tabGroup';
 import { TabGroupColorPalette } from './tabGroupAccent';
 import { PopupService } from './components/popupService';
 import {
+    DockviewBreakpointChangeEvent,
     DockviewComponentOptions,
     FloatingGroupDragContext,
     SmartGuidesOptions,
@@ -547,4 +548,33 @@ export interface IPinnedTabsService extends IDisposable {
         panelId: string,
         index: number
     ): number;
+}
+
+/**
+ * Narrow surface the {@link IResponsiveLayoutService} reads from the component:
+ * the observed container box + the coalesced size ping. The host is the
+ * `DockviewComponent`; this interface keeps the service decoupled from it.
+ */
+export interface IResponsiveLayoutHost {
+    readonly options: DockviewComponentOptions;
+    /** The observed container width (grid box). */
+    readonly width: number;
+    /** The observed container height (grid box). */
+    readonly height: number;
+    /** Coalesced (microtask-buffered) ping after any layout/size change. */
+    readonly onDidLayoutChange: Event<void>;
+}
+
+/**
+ * Container-size-driven reflow. Phase 1 resolves the active breakpoint (with
+ * hysteresis) and fires {@link onDidBreakpointChange}; the reflow transforms
+ * land in later phases.
+ */
+export interface IResponsiveLayoutService extends IDisposable {
+    /** The active breakpoint name, or `undefined` when `responsive` is unset. */
+    readonly activeBreakpoint: string | undefined;
+    /** Fires after the derived layout switches breakpoint. */
+    readonly onDidBreakpointChange: Event<DockviewBreakpointChangeEvent>;
+    /** Force a re-resolution against the current width. */
+    reflow(): void;
 }

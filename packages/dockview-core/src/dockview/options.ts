@@ -562,6 +562,56 @@ export interface DockviewOptions {
      * module; dormant unless `enabled` is set.
      */
     pinnedTabs?: PinnedTabsOptions;
+    /**
+     * Container-size-driven reflow: the layout adapts as its container (not the
+     * viewport) crosses width breakpoints. Owned by the `ResponsiveLayoutModule`;
+     * ignored (no reflow, no observer taps) when that module is absent, and
+     * inert until `breakpoints` are configured.
+     */
+    responsive?: DockviewResponsiveOptions;
+}
+
+/**
+ * A container-width band for {@link DockviewOptions.responsive}. The active
+ * breakpoint is the narrowest one whose band the container width sits inside;
+ * `enterAt`/`exitAt` add hysteresis so a reflow can't bounce the measurement
+ * back across the threshold.
+ */
+export interface ResponsiveBreakpoint {
+    /** Identifier, e.g. `'sm' | 'md' | 'lg'`. Unique within a set. */
+    name: string;
+    /** Active when `containerWidth <= maxWidth`. Use `Infinity` for the widest. */
+    maxWidth: number;
+    /** Collapse into this breakpoint at `<= enterAt`. Defaults to `maxWidth`. */
+    enterAt?: number;
+    /** Expand out of this breakpoint at `>= exitAt`. Defaults to `maxWidth`. */
+    exitAt?: number;
+    /** The reflow transform for this band (reserved for a later phase). */
+    rules?: ReflowRule[];
+}
+
+/** A single reflow transform. The transform set expands in later phases. */
+export type ReflowRule =
+    | { kind: 'collapseToTabs' }
+    | { kind: 'restack' }
+    | { kind: 'hide' };
+
+export interface DockviewResponsiveOptions {
+    /** Which dimension drives reflow. Default `'width'`. */
+    observe?: 'width' | 'height' | 'both';
+    /** Resize-settle window (ms) before a breakpoint is resolved. Default 120. */
+    debounceMs?: number;
+    /** Breakpoints, widest → narrowest. The widest is the canonical band. */
+    breakpoints: ResponsiveBreakpoint[];
+    /** Default rule chain applied below the widest band unless a breakpoint overrides it. */
+    rules?: ReflowRule[];
+}
+
+/** Fired after the active breakpoint changes. */
+export interface DockviewBreakpointChangeEvent {
+    from: string | undefined;
+    to: string;
+    width: number;
 }
 
 export interface PinnedTabsOptions {
@@ -693,6 +743,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         tabGroupColors: undefined,
         tabGroupAccent: undefined,
         pinnedTabs: undefined,
+        responsive: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];

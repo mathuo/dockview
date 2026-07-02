@@ -24,6 +24,7 @@ import { DefaultDockviewDeserialzier } from './deserializer';
 import {
     AddGroupOptions,
     AddPanelOptions,
+    DockviewBreakpointChangeEvent,
     DockviewComponentOptions,
     DockviewDndOverlayEvent,
     DockviewOptions,
@@ -368,6 +369,9 @@ export interface PopoutGroup {
 
 export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly activePanel: IDockviewPanel | undefined;
+    readonly activeBreakpoint: string | undefined;
+    readonly onDidBreakpointChange: Event<DockviewBreakpointChangeEvent>;
+    reflow(): void;
     readonly totalPanels: number;
     readonly panels: IDockviewPanel[];
     readonly orientation: Orientation;
@@ -883,6 +887,31 @@ export class DockviewComponent
         // Optional like every module service — `?.`-guarded everywhere so the
         // module can be removed without crashing the float drag loop.
         return this._moduleRegistry.services.smartGuidesService;
+    }
+
+    private get _responsiveLayoutService() {
+        return this._moduleRegistry.services.responsiveLayoutService;
+    }
+
+    /**
+     * The active responsive breakpoint name, or `undefined` when `responsive`
+     * is not configured / the `ResponsiveLayoutModule` is absent.
+     */
+    get activeBreakpoint(): string | undefined {
+        return this._responsiveLayoutService?.activeBreakpoint;
+    }
+
+    /** Fires after the responsive layout switches breakpoint. */
+    get onDidBreakpointChange(): Event<DockviewBreakpointChangeEvent> {
+        return (
+            this._responsiveLayoutService?.onDidBreakpointChange ??
+            Event.any<DockviewBreakpointChangeEvent>()
+        );
+    }
+
+    /** Force a responsive re-resolution against the current container width. */
+    reflow(): void {
+        this._responsiveLayoutService?.reflow();
     }
 
     /** Whether Smart Guides snapping is currently active. */

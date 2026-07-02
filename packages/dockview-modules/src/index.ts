@@ -9,6 +9,7 @@ import { AutoHideEdgeGroupModule } from './autoHideEdgeGroupService';
 import { MultiRowTabsModule } from './multiRowTabsService';
 import { PinnedTabsModule } from './pinnedTabsService';
 import { KeyboardDockingModule } from './keyboardDockingService';
+import { ResponsiveLayoutModule } from './responsiveLayoutService';
 
 export {
     TabGroupChipsService,
@@ -39,6 +40,12 @@ export {
     KeyboardDockingService,
     KeyboardDockingModule,
 } from './keyboardDockingService';
+export {
+    ResponsiveLayoutService,
+    ResponsiveLayoutModule,
+} from './responsiveLayoutService';
+export { BreakpointResolver } from './responsiveBreakpointResolver';
+export { SizeObserver } from './responsiveSizeObserver';
 
 /**
  * The set of modules provided by this package. `dockview` registers these via
@@ -55,4 +62,5 @@ export const Modules: DockviewModule<any>[] = [
     MultiRowTabsModule,
     PinnedTabsModule,
     KeyboardDockingModule,
+    ResponsiveLayoutModule,
 ];

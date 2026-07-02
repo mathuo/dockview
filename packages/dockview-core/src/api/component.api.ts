@@ -16,6 +16,7 @@ import {
 import {
     AddGroupOptions,
     AddPanelOptions,
+    DockviewBreakpointChangeEvent,
     DockviewComponentOptions,
     DockviewDndOverlayEvent,
     MovementOptions,
@@ -737,6 +738,24 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     get onDidLayoutChange(): Event<void> {
         return this.component.onDidLayoutChange;
+    }
+
+    /**
+     * The active responsive breakpoint name, or `undefined` when `responsive`
+     * is not configured (or the `ResponsiveLayoutModule` is absent).
+     */
+    get activeBreakpoint(): string | undefined {
+        return this.component.activeBreakpoint;
+    }
+
+    /** Fires after the responsive layout switches breakpoint. */
+    get onDidBreakpointChange(): Event<DockviewBreakpointChangeEvent> {
+        return this.component.onDidBreakpointChange;
+    }
+
+    /** Force a responsive re-resolution against the current container width. */
+    reflow(): void {
+        this.component.reflow();
     }
 
     /**

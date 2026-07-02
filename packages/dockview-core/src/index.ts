@@ -212,6 +212,8 @@ export {
     LayoutHistoryKind,
     IMultiRowTabsHost,
     IMultiRowTabsService,
+    IResponsiveLayoutHost,
+    IResponsiveLayoutService,
     ISmartGuidesHost,
     ISmartGuidesService,
     SmartGuidesSnapPosition,
