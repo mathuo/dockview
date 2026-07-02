@@ -7,10 +7,10 @@
  * watermark and logs one console warning. Features are NEVER disabled; the
  * watermark is the enforcement.
  *
- * ZERO core footprint: the `ServiceCollection` slot is declaration-merged from
- * here (not declared in core), the watermark anchors to the existing generic
- * `rootElement`, the watermark is styled INLINE (no core SCSS), and all
- * contracts live in this package. See `enterprise-modules/license.md`.
+ * ZERO core footprint: the `ServiceCollection` slot is declaration-merged onto
+ * `dockview` (never declared in `dockview-core`), the watermark anchors to the
+ * existing generic `rootElement`, the watermark is styled INLINE (no core SCSS),
+ * and all contracts live in this package.
  */
 
 import { defineModule, DockviewIDisposable as IDisposable } from 'dockview';

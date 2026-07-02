@@ -1,45 +1,62 @@
 # AGENTS.md - dockview-enterprise
 
-A separately-published home for a subset of dockview's feature modules. Depends
-on `dockview-core`; consumed by `dockview` (which registers these modules so the
-batteries-included entry point keeps its full feature set).
-
-> Neutral alias — keep commercial/tier language out of this package, its code,
-> and commit messages.
+The separately-published **enterprise** package: dockview's paid feature modules
+plus the license gate. Depends only on `dockview` (the free package) at an exact
+version and re-exports it (`export * from 'dockview'`), so it is a drop-in
+superset — mirrors `ag-grid-enterprise` -> `ag-grid-community`. Importing it
+self-registers its modules + the license check.
 
 ## Modules hosted here
 
+`src/index.ts` exports each module + service and a `Modules` bundle array, then
+calls `registerModules(Modules)` at import (a side effect — hence
+`sideEffects: true` in package.json).
+
 - `TabGroupChipsModule` (`tabGroupChipsService.ts`)
 - `ContextMenuModule` (`contextMenu.ts`)
-- `AdvancedDnDModule` (`advancedDnDService.ts`)
-- `AccessibilityModule` (`accessibilityService.ts`) — `dependsOn` AdvancedDnD
-  (here) and LiveRegion (stays in core)
+- `AccessibilityModule` (`accessibilityService.ts`) — keyboard navigation;
+  `dependsOn` `AdvancedDnDModule` + `LiveRegionModule` (both in core)
+- `LayoutHistoryModule` (`layoutHistoryService.ts`)
+- `DropGuideModule` (`dropGuideService.ts`) — `dependsOn` `AdvancedDnDModule` (core)
+- `SmartGuidesModule` (`smartGuidesService.ts`) — `dependsOn` `FloatingGroupModule` (core)
+- `AutoHideEdgeGroupModule` (`autoHideEdgeGroupService.ts`) — `dependsOn` `EdgeGroupModule` (core)
+- `MultiRowTabsModule` (`multiRowTabsService.ts`)
+- `PinnedTabsModule` (`pinnedTabsService.ts`)
+- `KeyboardDockingModule` (`keyboardDockingService.ts`) — `dependsOn` `AdvancedDnDModule` + `LiveRegionModule` (core)
+- `LicenseModule` (`licenseService.ts`) — the license gate; renders a corner
+  watermark unless a valid key is set (localhost suppressed). Supported by
+  `LicenseManager` (`licenseRegistry.ts`), the pure verifier
+  (`licenseValidator.ts`), and the build-stamped `DOCKVIEW_RELEASE_DATE`
+  (`releaseDate.ts`).
 
-`src/index.ts` exports each module plus a `Modules` bundle array.
+(`AdvancedDnD` is FREE and lives in `dockview-core` now, not here.)
 
 ## How it fits the module system
 
-- Core owns the contracts: the `ServiceCollection` slots and the `IFooService`
-  / `IFooHost` interfaces in `dockview-core` (`dockview/moduleContracts.ts`).
-  Core code only ever touches `services.fooService?.` — never an implementation
-  here. Option types also stay in core (`dockview/options.ts`).
-- These files import what they need from the `dockview-core` **main entry**
-  (`'dockview-core'`); the few internals they require (`defineModule`, the
-  contracts, `resolveMessages`, `findRelativeZIndexParent`, `IDragGhostSpec`,
-  `LiveRegionModule`) are exported from core's public index. No `dist/` deep
+- Core owns the contracts: the `ServiceCollection` slots and `IFooService` /
+  `IFooHost` interfaces in `dockview-core` (`dockview/moduleContracts.ts`);
+  option types stay in core (`dockview/options.ts`). The license slot is the one
+  exception — it is declaration-merged onto `dockview`'s `ServiceCollection`
+  from `licenseService.ts` (never declared in core).
+- These files import everything they need from **`dockview`** (which re-exports
+  all of `dockview-core`) — NOT from `dockview-core` directly. No `dist/` deep
   imports.
-- Registration is global: `dockview` calls `registerModules(Modules)` at import
-  time. `DockviewComponent` appends globally-registered modules to its built-in
-  set at construction.
+- Registration is global + automatic: this package calls
+  `registerModules(Modules)` at import, so `import 'dockview-enterprise'`
+  activates the modules + license for every `DockviewComponent` in the process.
 
 ## Build / Test
 
 - `build` - tsc CJS + ESM (no CSS; styles live in core)
-- `build:bundle` - rollup; externalizes `dockview-core`
+- `build:bundle` - rollup; externalizes `dockview`. Also stamps the build date
+  into `releaseDate.ts` (replacing the `__DOCKVIEW_RELEASE_DATE__` token) for
+  version-based license expiry.
 - `test` - Jest (jsdom). `src/__tests__/registerModules.ts` registers `Modules`
   globally so a default `DockviewComponent` in tests has the full feature set;
-  ResizeObserver/PointerEvent jsdom mocks are reused from core.
+  ResizeObserver/PointerEvent jsdom mocks are reused from core. Localhost
+  suppresses the license watermark, so tests are unaffected by `LicenseModule`.
 
 ## Dependencies
 
-- Depends on: `dockview-core` (build chain: `dockview-core` -> `dockview-enterprise` -> `dockview`)
+- Depends on: `dockview` (exact version). Build chain: `dockview-core` ->
+  `dockview` -> `dockview-enterprise`.
