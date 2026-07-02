@@ -75,12 +75,16 @@ function removePanel(canonical: SerializedDockview, id: string): void {
             group.activeView = group.views[0];
         }
     }
-    const pruned = prune(canonical.grid.root as GridNode);
-    // never leave a null root — an emptied layout keeps an empty branch
-    canonical.grid.root = (pruned ?? {
-        type: 'branch',
-        data: [],
-    }) as unknown as SerializedDockview['grid']['root'];
+    let root = prune(canonical.grid.root as GridNode);
+    if (root === undefined) {
+        // an emptied layout keeps an empty branch
+        root = { type: 'branch', data: [] };
+    } else if (root.type === 'leaf') {
+        // dockview requires the grid root to be a branch, so a layout pruned
+        // down to a single group is a branch with that one leaf.
+        root = { type: 'branch', data: [root] };
+    }
+    canonical.grid.root = root as unknown as SerializedDockview['grid']['root'];
 }
 
 function addPanel(
@@ -124,6 +128,10 @@ function reactivate(
  * adds (insert into the canonical active group), and active-tab changes. Moves
  * / resizes *within* the collapsed layout don't change the panel set and so are
  * naturally ignored. Pure: the input `canonical` is never mutated.
+ *
+ * Limitation: only *grid* panels are reconciled. Floating a panel or popping one
+ * out while collapsed is treated as a grid add, so such panels are not tracked
+ * as floats on widen — avoid float/popout operations while collapsed for now.
  */
 export function rebaseCanonical(
     canonicalIn: SerializedDockview,

@@ -328,6 +328,23 @@ describe('ResponsiveLayout module', () => {
             expect(dv.api.panels.map((p) => p.id).sort()).toEqual(['p1', 'p3']);
         });
 
+        test('auto-rebase: closing down to a single group then widening does not crash', () => {
+            // regression: rebase pruned the canonical root to a bare leaf, which
+            // fromJSON rejects on widen ("root must be of type branch")
+            const { dv } = withThreeGroups();
+            dv.layout(500, 500);
+            dv.reflow(); // collapse to 1 group (p1,p2,p3)
+
+            dv.api.removePanel(dv.api.getPanel('p1')!);
+            dv.api.removePanel(dv.api.getPanel('p2')!); // canonical now one group
+
+            expect(() => {
+                dv.layout(1000, 500);
+                dv.reflow(); // widen — restore canonical
+            }).not.toThrow();
+            expect(dv.api.panels.map((p) => p.id)).toEqual(['p3']);
+        });
+
         test('auto-rebase: a panel added while collapsed survives widening', () => {
             const { dv } = withThreeGroups();
             dv.layout(500, 500);

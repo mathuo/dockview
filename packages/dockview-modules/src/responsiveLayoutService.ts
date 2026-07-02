@@ -159,11 +159,15 @@ export class ResponsiveLayoutService
     }
 
     /** The canonical (wide) layout — the frozen baseline while collapsed, or the
-     *  live layout when not. */
+     *  live layout when not. Returned as a copy so callers can't mutate the
+     *  service's internal canonical. */
     getCanonicalLayout(): SerializedDockview {
-        return this._derived && this._canonical.has()
-            ? this._canonical.get()
-            : this.host.serializeLiveLayout();
+        if (this._derived && this._canonical.has()) {
+            return JSON.parse(
+                JSON.stringify(this._canonical.get())
+            ) as SerializedDockview;
+        }
+        return this.host.serializeLiveLayout();
     }
 
     /** Replace the canonical (wide) layout, then re-derive for the current width. */

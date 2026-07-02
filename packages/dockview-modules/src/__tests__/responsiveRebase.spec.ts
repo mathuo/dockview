@@ -73,6 +73,23 @@ describe('rebaseCanonical', () => {
         expect(leaves(next)[0].id).toBe('g2');
     });
 
+    test('pruning down to a single group keeps the root a branch', () => {
+        // closing panels until only g3 survives must NOT leave a bare-leaf root
+        // (dockview's fromJSON requires a branch root)
+        const canonical = layout([
+            { id: 'g1', views: ['a'] },
+            { id: 'g2', views: ['b'] },
+            { id: 'g3', views: ['c'] },
+        ]);
+        const live = layout([{ id: 'g3', views: ['c'] }]); // a + b closed
+
+        const { canonical: next } = rebaseCanonical(canonical, live);
+        expect(next.grid.root.type).toBe('branch');
+        expect(ids(next)).toEqual(['c']);
+        expect(leaves(next)).toHaveLength(1);
+        expect(leaves(next)[0].id).toBe('g3');
+    });
+
     test('adding a panel while collapsed inserts it into the active canonical group', () => {
         const canonical = layout(
             [
