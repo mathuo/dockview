@@ -385,6 +385,15 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.gridview.element.style.width = `${width}px`;
 
         this.gridview.layout(width, height);
+
+        // A container resize is a layout change: emit the (coalesced) size
+        // signal so size-driven consumers — the ResponsiveLayout and
+        // LayoutHistory modules both treat `onDidLayoutChange` as the raw size
+        // signal — re-settle. Structural mutations and interactive sash drags
+        // already fire this via `gridview.onDidChange`, but a programmatic
+        // `layout(w, h)` (auto-resize observer, popout/floating resize) does
+        // not, so without this a pure container resize never reflows.
+        this._bufferOnDidLayoutChange.fire();
     }
 
     public dispose(): void {

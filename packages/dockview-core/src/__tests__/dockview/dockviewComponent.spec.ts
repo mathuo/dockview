@@ -128,6 +128,33 @@ describe('dockviewComponent', () => {
         });
     });
 
+    test('layout(width, height) fires onDidLayoutChange on a container resize', async () => {
+        // A container resize is a layout change: consumers that key off
+        // `onDidLayoutChange` as the raw size signal (e.g. the ResponsiveLayout
+        // and LayoutHistory modules) rely on a bare `layout(w, h)` — with no
+        // structural mutation and no interactive sash drag — emitting it. This
+        // guards the exact regression where a programmatic resize was silent, so
+        // container-driven reflow never fired. `onDidLayoutChange` is coalesced
+        // via a microtask, so we await it.
+        const flush = async () => {
+            await new Promise((r) => setTimeout(r, 0));
+            await Promise.resolve();
+        };
+
+        dockview.layout(1000, 500);
+        await flush(); // settle any signal from establishing the baseline
+
+        let fired = 0;
+        dockview.onDidLayoutChange(() => {
+            fired++;
+        });
+
+        // a pure resize (no structural change) must signal
+        dockview.layout(600, 500);
+        await flush();
+        expect(fired).toBeGreaterThanOrEqual(1);
+    });
+
     test('group LayoutPriority is settable via addGroup and round-trips through JSON', () => {
         const create = (el: HTMLElement) =>
             new DockviewComponent(el, {

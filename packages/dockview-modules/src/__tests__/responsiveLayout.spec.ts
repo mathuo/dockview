@@ -231,6 +231,39 @@ describe('ResponsiveLayout module', () => {
             expect(dv.groups.length).toBe(3);
         });
 
+        // Regression guard for the seam every other test skips: a container
+        // resize must reflow *on its own*, without an explicit `reflow()`. The
+        // trigger chain is `component.layout(w, h)` → `onDidLayoutChange`
+        // (coalesced, microtask) → `SizeObserver.signal()` → `resolveAt`. The
+        // rest of the suite pumps `reflow()` directly and so never exercises the
+        // `layout()` → `onDidLayoutChange` hop — the exact link that regressed
+        // (a bare `layout()` used not to fire `onDidLayoutChange`, so the live
+        // demo never collapsed on resize). `debounceMs: 0` makes the settle
+        // synchronous; we only await the `AsapEvent` microtask.
+        test('reflows automatically on layout() alone — no explicit reflow()', async () => {
+            const flush = async () => {
+                for (let i = 0; i < 3; i++) {
+                    await Promise.resolve();
+                }
+            };
+
+            const { dv } = withThreeGroups();
+            expect(dv.activeBreakpoint).toBe('lg');
+            expect(dv.groups.length).toBe(3);
+
+            // narrow the container ONLY — no reflow() call
+            dv.layout(500, 500);
+            await flush();
+            expect(dv.activeBreakpoint).toBe('sm');
+            expect(dv.groups.length).toBe(1);
+
+            // widen back out — again driven purely by the resize
+            dv.layout(1000, 500);
+            await flush();
+            expect(dv.activeBreakpoint).toBe('lg');
+            expect(dv.groups.length).toBe(3);
+        });
+
         test('reuses panel instances across a collapse (no teardown)', () => {
             const { dv, p1 } = withThreeGroups();
             dv.layout(500, 500);
