@@ -8,6 +8,7 @@ import {
 } from 'dockview';
 import { useViewComponent } from '../composables/useViewComponent';
 import { VuePaneviewPanelView } from './view';
+import DockviewPortals from '../dockviewPortals.vue';
 import type { IPaneviewVueProps, PaneviewVueEvents } from './types';
 
 function extractCoreOptions(props: IPaneviewVueProps): PaneviewOptions {
@@ -24,13 +25,13 @@ function extractCoreOptions(props: IPaneviewVueProps): PaneviewOptions {
 const emit = defineEmits<PaneviewVueEvents>();
 const props = defineProps<IPaneviewVueProps>();
 
-const { el } = useViewComponent(
+const { el, registry } = useViewComponent(
     {
         componentName: 'paneview-vue',
         propertyKeys: PROPERTY_KEYS_PANEVIEW,
         createApi: createPaneview,
-        createView: (id, name, component, instance) =>
-            new VuePaneviewPanelView(id, component, instance),
+        createView: (id, name, component, instance, registry) =>
+            new VuePaneviewPanelView(id, component, instance, registry),
         extractCoreOptions,
         onApiCreated: (api) => [
             api.onDidDrop((event) => emit('didDrop', event)),
@@ -43,4 +44,5 @@ const { el } = useViewComponent(
 
 <template>
     <div ref="el" style="height: 100%; width: 100%" />
+    <DockviewPortals :entries="registry.entries" />
 </template>

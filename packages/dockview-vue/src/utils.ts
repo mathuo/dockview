@@ -31,6 +31,10 @@ import {
     type ComponentOptionsBase,
     render,
     cloneVNode,
+    markRaw,
+    shallowReactive,
+    shallowRef,
+    type ShallowRef,
     type DefineComponent,
     type ComponentInternalInstance,
 } from 'vue';
@@ -124,8 +128,70 @@ export function mountVueComponent<T extends Record<string, any>>(
     };
 }
 
+export interface VueMountDisposable {
+    update: (props: Record<string, any>) => void;
+    dispose: () => void;
+}
+
+/**
+ * A single component to be teleported by the host's `<DockviewPortals>`.
+ *
+ * `props` is a {@link ShallowRef} so reassigning it triggers a re-render
+ * without Vue deeply proxying the value — the params object carries raw
+ * dockview API instances that must NOT be made reactive.
+ */
+export interface VueMountEntry {
+    readonly id: number;
+    readonly component: VueComponent;
+    readonly target: HTMLElement;
+    readonly props: ShallowRef<Record<string, any>>;
+}
+
+let nextMountEntryId = 0;
+
+/**
+ * Shared, reactive registry of components that a host (`dockview.vue`,
+ * `splitview.vue`, ...) renders via `<Teleport>` instead of the detached
+ * `render()` root used by {@link mountVueComponent}.
+ *
+ * Teleporting keeps each panel a true descendant of the host in the Vue
+ * component tree, so framework features that walk the tree work natively:
+ * KeepAlive (`onActivated`/`onDeactivated`), `provide`/`inject`, `<Suspense>`
+ * and error boundaries.
+ */
+export class VueRendererRegistry {
+    readonly entries = shallowReactive<VueMountEntry[]>([]);
+
+    mount(
+        component: VueComponent,
+        target: HTMLElement,
+        props: Record<string, any>
+    ): VueMountDisposable {
+        const entry: VueMountEntry = {
+            id: nextMountEntryId++,
+            component: markRaw(component),
+            target,
+            props: shallowRef(props),
+        };
+        this.entries.push(entry);
+
+        return {
+            update: (newProps: Record<string, any>) => {
+                entry.props.value = { ...entry.props.value, ...newProps };
+            },
+            dispose: () => {
+                const index = this.entries.indexOf(entry);
+                if (index !== -1) {
+                    this.entries.splice(index, 1);
+                }
+            },
+        };
+    }
+}
+
 abstract class AbstractVueRenderer {
     protected readonly _element: HTMLElement;
+    protected _renderDisposable: VueMountDisposable | undefined;
 
     get element(): HTMLElement {
         return this._element;
@@ -133,12 +199,31 @@ abstract class AbstractVueRenderer {
 
     constructor(
         protected readonly component: VueComponent,
-        protected readonly parent: ComponentInternalInstance
+        protected readonly parent: ComponentInternalInstance,
+        protected readonly registry?: VueRendererRegistry
     ) {
         this._element = document.createElement('div');
         this.element.className = 'dv-vue-part';
         this.element.style.height = '100%';
         this.element.style.width = '100%';
+    }
+
+    /**
+     * Mount `component` into `this.element`. When a {@link VueRendererRegistry}
+     * is provided the component is teleported by the host (keeping it in the
+     * Vue component tree); otherwise it falls back to the detached
+     * {@link mountVueComponent} render root.
+     */
+    protected mount(props: Record<string, any>): void {
+        this._renderDisposable?.dispose();
+        this._renderDisposable = this.registry
+            ? this.registry.mount(this.component, this.element, props)
+            : mountVueComponent(
+                  this.component,
+                  this.parent,
+                  props,
+                  this.element
+              );
     }
 }
 
@@ -146,9 +231,6 @@ export class VueRenderer
     extends AbstractVueRenderer
     implements ITabRenderer, IContentRenderer
 {
-    private _renderDisposable:
-        | { update: (props: any) => void; dispose: () => void }
-        | undefined;
     private _api: DockviewPanelApi | undefined;
     private _containerApi: DockviewApi | undefined;
 
@@ -163,13 +245,7 @@ export class VueRenderer
             tabLocation: parameters.tabLocation,
         };
 
-        this._renderDisposable?.dispose();
-        this._renderDisposable = mountVueComponent(
-            this.component,
-            this.parent,
-            { params: props },
-            this.element
-        );
+        this.mount({ params: props });
     }
 
     update(event: PanelUpdateEvent<Parameters>): void {
@@ -196,10 +272,6 @@ export class VueWatermarkRenderer
     extends AbstractVueRenderer
     implements IWatermarkRenderer
 {
-    private _renderDisposable:
-        | { update: (props: any) => void; dispose: () => void }
-        | undefined;
-
     get element(): HTMLElement {
         return this._element;
     }
@@ -210,13 +282,7 @@ export class VueWatermarkRenderer
             containerApi: parameters.containerApi,
         };
 
-        this._renderDisposable?.dispose();
-        this._renderDisposable = mountVueComponent(
-            this.component,
-            this.parent,
-            { params: props },
-            this.element
-        );
+        this.mount({ params: props });
     }
 
     update(event: PanelUpdateEvent<Parameters>): void {
@@ -232,9 +298,6 @@ export class VueHeaderActionsRenderer
     extends AbstractVueRenderer
     implements IHeaderActionsRenderer
 {
-    private _renderDisposable:
-        | { update: (props: any) => void; dispose: () => void }
-        | undefined;
     private readonly _mutableDisposable = new DockviewMutableDisposable();
     private _baseProps: IGroupHeaderProps | undefined;
 
@@ -245,9 +308,10 @@ export class VueHeaderActionsRenderer
     constructor(
         component: VueComponent,
         parent: ComponentInternalInstance,
-        private readonly group: DockviewGroupPanel
+        private readonly group: DockviewGroupPanel,
+        registry?: VueRendererRegistry
     ) {
-        super(component, parent);
+        super(component, parent, registry);
     }
 
     init(props: IGroupHeaderProps): void {
@@ -271,13 +335,7 @@ export class VueHeaderActionsRenderer
             })
         );
 
-        this._renderDisposable?.dispose();
-        this._renderDisposable = mountVueComponent(
-            this.component,
-            this.parent,
-            { params: this.buildEnrichedProps() },
-            this.element
-        );
+        this.mount({ params: this.buildEnrichedProps() });
     }
 
     dispose(): void {
@@ -310,18 +368,8 @@ export class VueContextMenuItemRenderer
     extends AbstractVueRenderer
     implements IContextMenuItemRenderer
 {
-    private _renderDisposable:
-        | { update: (props: any) => void; dispose: () => void }
-        | undefined;
-
     init(props: IContextMenuItemComponentProps): void {
-        this._renderDisposable?.dispose();
-        this._renderDisposable = mountVueComponent(
-            this.component,
-            this.parent,
-            { params: props },
-            this.element
-        );
+        this.mount({ params: props });
     }
 
     dispose(): void {
@@ -333,34 +381,28 @@ export class VueTabGroupChipRenderer
     extends AbstractVueRenderer
     implements ITabGroupChipRenderer
 {
-    private _renderDisposable:
-        | { update: (props: any) => void; dispose: () => void }
-        | undefined;
-
     get element(): HTMLElement {
         return this._element;
     }
 
-    constructor(component: VueComponent, parent: ComponentInternalInstance) {
-        super(component, parent);
+    constructor(
+        component: VueComponent,
+        parent: ComponentInternalInstance,
+        registry?: VueRendererRegistry
+    ) {
+        super(component, parent, registry);
         this.element.style.height = '';
         this.element.style.width = '';
         this.element.style.display = 'inline-flex';
     }
 
     init(params: { tabGroup: ITabGroup; api: DockviewApi }): void {
-        this._renderDisposable?.dispose();
-        this._renderDisposable = mountVueComponent(
-            this.component,
-            this.parent,
-            {
-                params: {
-                    tabGroup: params.tabGroup,
-                    api: params.api,
-                },
+        this.mount({
+            params: {
+                tabGroup: params.tabGroup,
+                api: params.api,
             },
-            this.element
-        );
+        });
     }
 
     update(params: { tabGroup: ITabGroup }): void {
@@ -378,30 +420,24 @@ export class VueGroupDragGhostRenderer
     extends AbstractVueRenderer
     implements IGroupDragGhostRenderer
 {
-    private _renderDisposable:
-        | { update: (props: any) => void; dispose: () => void }
-        | undefined;
-
-    constructor(component: VueComponent, parent: ComponentInternalInstance) {
-        super(component, parent);
+    constructor(
+        component: VueComponent,
+        parent: ComponentInternalInstance,
+        registry?: VueRendererRegistry
+    ) {
+        super(component, parent, registry);
         this.element.style.height = '';
         this.element.style.width = '';
         this.element.style.display = 'inline-flex';
     }
 
     init(params: { group: IDockviewGroupPanel; api: DockviewApi }): void {
-        this._renderDisposable?.dispose();
-        this._renderDisposable = mountVueComponent(
-            this.component,
-            this.parent,
-            {
-                params: {
-                    group: params.group,
-                    api: params.api,
-                },
+        this.mount({
+            params: {
+                group: params.group,
+                api: params.api,
             },
-            this.element
-        );
+        });
     }
 
     dispose(): void {
@@ -410,25 +446,26 @@ export class VueGroupDragGhostRenderer
 }
 
 export class VuePart<T extends Record<string, any> = any> {
-    private _renderDisposable:
-        | { update: (props: any) => void; dispose: () => void }
-        | undefined;
+    private _renderDisposable: VueMountDisposable | undefined;
 
     constructor(
         private readonly element: HTMLElement,
         private readonly vueComponent: VueComponent<T>,
         private readonly parent: ComponentInternalInstance,
-        private props: T
+        private props: T,
+        private readonly registry?: VueRendererRegistry
     ) {}
 
     init(): void {
         this._renderDisposable?.dispose();
-        this._renderDisposable = mountVueComponent(
-            this.vueComponent,
-            this.parent,
-            this.props,
-            this.element
-        );
+        this._renderDisposable = this.registry
+            ? this.registry.mount(this.vueComponent, this.element, this.props)
+            : mountVueComponent(
+                  this.vueComponent,
+                  this.parent,
+                  this.props,
+                  this.element
+              );
     }
 
     update(props: T): void {

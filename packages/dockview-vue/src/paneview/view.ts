@@ -4,7 +4,7 @@ import {
     PanelUpdateEvent,
 } from 'dockview';
 import { type ComponentInternalInstance } from 'vue';
-import { VuePart, type VueComponent } from '../utils';
+import { VuePart, VueRendererRegistry, type VueComponent } from '../utils';
 import type { IPaneviewVuePanelProps } from './types';
 
 export class VuePaneviewPanelView implements IPanePart {
@@ -18,7 +18,8 @@ export class VuePaneviewPanelView implements IPanePart {
     constructor(
         public readonly id: string,
         private readonly vueComponent: VueComponent<IPaneviewVuePanelProps>,
-        private readonly parent: ComponentInternalInstance
+        private readonly parent: ComponentInternalInstance,
+        private readonly registry?: VueRendererRegistry
     ) {
         this._element = document.createElement('div');
         this._element.style.height = '100%';
@@ -26,12 +27,18 @@ export class VuePaneviewPanelView implements IPanePart {
     }
 
     public init(parameters: PanePanelComponentInitParameter): void {
-        this.part = new VuePart(this.element, this.vueComponent, this.parent, {
-            params: parameters.params,
-            api: parameters.api,
-            title: parameters.title,
-            containerApi: parameters.containerApi,
-        });
+        this.part = new VuePart(
+            this.element,
+            this.vueComponent,
+            this.parent,
+            {
+                params: parameters.params,
+                api: parameters.api,
+                title: parameters.title,
+                containerApi: parameters.containerApi,
+            },
+            this.registry
+        );
         this.part.init();
     }
 

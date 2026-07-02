@@ -8,7 +8,7 @@ import {
     type ComponentInternalInstance,
 } from 'vue';
 import type { DockviewIDisposable } from 'dockview';
-import { findComponent } from '../utils';
+import { findComponent, VueRendererRegistry } from '../utils';
 
 export interface ViewComponentConfig<
     TApi,
@@ -28,7 +28,8 @@ export interface ViewComponentConfig<
         id: string,
         name: string | undefined,
         component: any,
-        instance: ComponentInternalInstance
+        instance: ComponentInternalInstance,
+        registry: VueRendererRegistry
     ) => TView;
     extractCoreOptions: (props: TProps) => TOptions;
     onApiCreated?: (api: TApi) => DockviewIDisposable[];
@@ -60,6 +61,13 @@ export function useViewComponent<
     const el = ref<HTMLElement | null>(null);
     const instance = ref<TApi | null>(null);
     const eventDisposables: DockviewIDisposable[] = [];
+
+    /**
+     * Components are teleported into the view's DOM (rendered by
+     * `<DockviewPortals>` in the host template) so panels stay in the Vue
+     * component tree. See {@link VueRendererRegistry}.
+     */
+    const registry = new VueRendererRegistry();
 
     config.propertyKeys.forEach((coreOptionKey) => {
         watch(
@@ -99,7 +107,8 @@ export function useViewComponent<
                             options.id,
                             options.name,
                             component! as any,
-                            inst
+                            inst,
+                            registry
                         );
                     },
                 } as unknown as Partial<TOptions>);
@@ -131,7 +140,8 @@ export function useViewComponent<
                     options.id,
                     options.name,
                     component! as any,
-                    inst
+                    inst,
+                    registry
                 );
             },
         } as TFrameworkOptions;
@@ -164,5 +174,6 @@ export function useViewComponent<
     return {
         el,
         instance,
+        registry,
     };
 }

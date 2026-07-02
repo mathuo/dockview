@@ -8,6 +8,7 @@ import {
 } from 'dockview';
 import { useViewComponent } from '../composables/useViewComponent';
 import { VueSplitviewPanelView } from './view';
+import DockviewPortals from '../dockviewPortals.vue';
 import type { ISplitviewVueProps, SplitviewVueEvents } from './types';
 
 function extractCoreOptions(props: ISplitviewVueProps): SplitviewOptions {
@@ -24,13 +25,13 @@ function extractCoreOptions(props: ISplitviewVueProps): SplitviewOptions {
 const emit = defineEmits<SplitviewVueEvents>();
 const props = defineProps<ISplitviewVueProps>();
 
-const { el } = useViewComponent(
+const { el, registry } = useViewComponent(
     {
         componentName: 'splitview-vue',
         propertyKeys: PROPERTY_KEYS_SPLITVIEW,
         createApi: createSplitview,
-        createView: (id, name, component, instance) =>
-            new VueSplitviewPanelView(id, name, component, instance),
+        createView: (id, name, component, instance, registry) =>
+            new VueSplitviewPanelView(id, name, component, instance, registry),
         extractCoreOptions,
     },
     props,
@@ -40,4 +41,5 @@ const { el } = useViewComponent(
 
 <template>
     <div ref="el" style="height: 100%; width: 100%" />
+    <DockviewPortals :entries="registry.entries" />
 </template>
