@@ -8,6 +8,7 @@ import {
     DockviewGroupPanelLocked,
 } from '../dockview/dockviewGroupPanelModel';
 import { DockviewHeaderPosition } from '../dockview/options';
+import { LayoutPriority } from '../splitview/splitview';
 import { Emitter, Event } from '../events';
 import {
     GridviewPanelApi,
@@ -145,6 +146,25 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             throw new Error(NOT_INITIALIZED_MESSAGE);
         }
         this._group.locked = value;
+    }
+
+    /**
+     * The group's layout priority within the grid. Setting `LayoutPriority.Fill`
+     * makes the group absorb surplus/deficit space while its siblings keep a
+     * fixed size; the change relayouts the containing branch.
+     */
+    get priority(): LayoutPriority | undefined {
+        if (!this._group) {
+            throw new Error(NOT_INITIALIZED_MESSAGE);
+        }
+        return this._group.priority;
+    }
+
+    set priority(value: LayoutPriority | undefined) {
+        if (!this._group) {
+            throw new Error(NOT_INITIALIZED_MESSAGE);
+        }
+        this._group.priority = value;
     }
 
     constructor(

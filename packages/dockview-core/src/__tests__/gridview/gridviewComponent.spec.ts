@@ -2,7 +2,7 @@ import { GridviewComponent } from '../../gridview/gridviewComponent';
 import { GridviewPanel } from '../../gridview/gridviewPanel';
 import { CompositeDisposable } from '../../lifecycle';
 import { IFrameworkPart } from '../../panel/types';
-import { Orientation } from '../../splitview/splitview';
+import { LayoutPriority, Orientation } from '../../splitview/splitview';
 
 class TestGridview extends GridviewPanel {
     constructor(id: string, componentName: string) {
@@ -78,6 +78,52 @@ describe('gridview', () => {
         const panel = gridview.getPanel('panel_1');
 
         expect(panel?.api.isVisible).toBeTruthy();
+    });
+
+    test('LayoutPriority.Fill round-trips through toJSON/fromJSON', () => {
+        const create = () =>
+            new GridviewComponent(container, {
+                proportionalLayout: false,
+                orientation: Orientation.VERTICAL,
+                createComponent: (options) => {
+                    switch (options.name) {
+                        case 'default':
+                            return new TestGridview(options.id, options.name);
+                        default:
+                            throw new Error('unsupported');
+                    }
+                },
+            });
+
+        const gridview = create();
+        gridview.layout(800, 400);
+
+        gridview.addPanel({
+            id: 'content',
+            component: 'default',
+            priority: LayoutPriority.Fill,
+        });
+
+        expect(gridview.getPanel('content')!.priority).toBe(
+            LayoutPriority.Fill
+        );
+
+        const state = JSON.parse(JSON.stringify(gridview.toJSON()));
+
+        // the fill priority is present in the serialized output
+        expect(JSON.stringify(state)).toContain('"priority":"fill"');
+
+        // and it is restored when loaded into a fresh component
+        const restored = create();
+        restored.layout(800, 400);
+        restored.fromJSON(state);
+
+        expect(restored.getPanel('content')!.priority).toBe(
+            LayoutPriority.Fill
+        );
+
+        gridview.dispose();
+        restored.dispose();
     });
 
     test('remove panel', () => {

@@ -125,7 +125,9 @@ export class BranchNode extends CompositeDisposable implements IView {
                 : c.priority
         );
 
-        if (priorities.some((p) => p === LayoutPriority.High)) {
+        if (priorities.some((p) => p === LayoutPriority.Fill)) {
+            return LayoutPriority.Fill;
+        } else if (priorities.some((p) => p === LayoutPriority.High)) {
             return LayoutPriority.High;
         } else if (priorities.some((p) => p === LayoutPriority.Low)) {
             return LayoutPriority.Low;
