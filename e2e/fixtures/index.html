@@ -28,25 +28,20 @@
             href="/packages/dockview-core/dist/styles/dockview.css"
         />
 
-        <!-- Built UMD bundles. dockview-core exposes the global "dockview-core";
-             dockview-modules expects it aliased as DockviewCore. -->
-        <script src="/packages/dockview-core/dist/dockview-core.js"></script>
-        <script>
-            window.DockviewCore = window['dockview-core'];
-        </script>
-        <script src="/packages/dockview-modules/dist/dockview-modules.js"></script>
+        <!-- Built UMD bundles. `dockview` (self-contained — bundles core in)
+             exposes the global `dockview`; `dockview-enterprise` externalizes it
+             and, when it loads, self-registers its feature modules + the license
+             check into that same core registry. -->
+        <script src="/packages/dockview/dist/dockview.js"></script>
+        <script src="/packages/dockview-enterprise/dist/dockview-enterprise.js"></script>
 
         <script>
             (function () {
-                const core = window['dockview-core'];
-                const modules = window['dockview-modules'];
+                const lib = window['dockview'];
 
-                // Register the full module set plus the optional keyboard-docking
-                // module so the harness can exercise cross-window keyboard work.
-                core.registerModules([
-                    ...modules.Modules,
-                    modules.KeyboardDockingModule,
-                ]);
+                // The enterprise feature modules (incl. keyboard docking + the
+                // license check) self-register when dockview-enterprise.js loads
+                // above, so no explicit registerModules call is needed here.
 
                 const el = document.getElementById('app');
                 const params = new URLSearchParams(location.search);
@@ -60,7 +55,7 @@
                 // to exercise the 2-D cross-row wrap reorder path).
                 const theme =
                     params.get('smooth') === '1'
-                        ? { ...core.themeAbyss, tabAnimation: 'smooth' }
+                        ? { ...lib.themeAbyss, tabAnimation: 'smooth' }
                         : undefined;
                 // `?pinned=separate-row` exercises the two-row pinned layout;
                 // `?compact=1` opts into icon-only pinned tabs.
@@ -68,7 +63,7 @@
                     params.get('pinned') === 'separate-row'
                         ? 'separate-row'
                         : 'inline';
-                const dockview = new core.DockviewComponent(el, {
+                const dockview = new lib.DockviewComponent(el, {
                     keyboardNavigation: true,
                     overflow,
                     theme,

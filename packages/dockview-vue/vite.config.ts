@@ -12,15 +12,16 @@ export default defineConfig({
         include: ['src/__tests__/**/*.spec.ts'],
         alias: {
             dockview: resolve(__dirname, '../dockview/src/index.ts'),
-            'dockview-core': resolve(__dirname, '../dockview-core/src/index.ts'),
-            'dockview-modules': resolve(
+            'dockview-core': resolve(
                 __dirname,
-                '../dockview-modules/src/index.ts'
+                '../dockview-core/src/index.ts'
+            ),
+            'dockview-enterprise': resolve(
+                __dirname,
+                '../dockview-enterprise/src/index.ts'
             ),
         },
-        setupFiles: [
-            'src/__tests__/__mocks__/resizeObserver.vitest.ts',
-        ],
+        setupFiles: ['src/__tests__/__mocks__/resizeObserver.vitest.ts'],
     },
 
     build: {

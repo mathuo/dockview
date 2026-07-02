@@ -75,8 +75,5 @@
     },
     "dependencies": {
         "dockview-core": "^7.0.2"
-    },
-    "devDependencies": {
-        "dockview-modules": "^7.0.2"
     }
 }

@@ -4,8 +4,8 @@ import {
     DockviewOverflowOptions,
     OVERFLOW_WRAP_TABS_CLASS as WRAP_CLASS,
     defineModule,
-} from 'dockview-core';
-import { IMultiRowTabsHost, IMultiRowTabsService } from 'dockview-core';
+} from 'dockview';
+import { IMultiRowTabsHost, IMultiRowTabsService } from 'dockview';
 
 function isWrapMode(overflow: DockviewOverflowOptions | undefined): boolean {
     return typeof overflow === 'object' && overflow?.mode === 'wrap';

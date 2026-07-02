@@ -16,8 +16,8 @@
         "packages/*"
     ],
     "scripts": {
-        "build": "nx run-many -t build --projects=dockview-core,dockview-modules,dockview,dockview-vue,dockview-react,dockview-angular",
-        "build:bundle": "nx run-many -t build:bundle --projects=dockview-core,dockview-modules,dockview,dockview-vue,dockview-react,dockview-angular",
+        "build": "nx run-many -t build --projects=dockview-core,dockview-enterprise,dockview,dockview-vue,dockview-react,dockview-angular",
+        "build:bundle": "nx run-many -t build:bundle --projects=dockview-core,dockview-enterprise,dockview,dockview-vue,dockview-react,dockview-angular",
         "clean": "nx run-many -t clean",
         "docs": "typedoc && node scripts/docs.mjs",
         "lint": "nx run-many -t lint",

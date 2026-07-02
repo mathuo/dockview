@@ -2,7 +2,7 @@ import {
     DockviewComponentOptions,
     DockviewIDisposable as IDisposable,
     KeyboardNavigationOptions,
-} from 'dockview-core';
+} from 'dockview';
 
 /**
  * Marks (on the dockview root element) that a keyboard move is in progress, so

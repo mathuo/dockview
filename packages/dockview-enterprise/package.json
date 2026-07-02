@@ -1,14 +1,13 @@
 {
-    "name": "dockview-modules",
+    "name": "dockview-enterprise",
     "version": "7.0.2",
-    "private": true,
-    "description": "Separable feature modules for dockview",
+    "description": "Enterprise feature modules and licensing for dockview",
     "keywords": [
         "dockview",
         "layout",
         "layout manager",
         "docking",
-        "modules"
+        "enterprise"
     ],
     "homepage": "https://github.com/mathuo/dockview",
     "bugs": {
@@ -23,7 +22,7 @@
     "main": "./dist/package/main.cjs.js",
     "module": "./dist/package/main.esm.mjs",
     "types": "./dist/cjs/index.d.ts",
-    "sideEffects": false,
+    "sideEffects": true,
     "files": [
         "dist",
         "README.md"
@@ -35,14 +34,14 @@
         "build": "npm run build:cjs && npm run build:esm",
         "clean": "rimraf dist/ .build/ .rollup.cache/",
         "rebuild": "npm run clean && npm run build",
-        "test": "jest --selectProjects dockview-modules",
-        "test:cov": "jest --selectProjects dockview-modules --coverage",
+        "test": "jest --selectProjects dockview-enterprise",
+        "test:cov": "jest --selectProjects dockview-enterprise --coverage",
         "lint": "eslint 'src/**/*.{ts,tsx,js,jsx}'",
         "lint:fix": "eslint 'src/**/*.{ts,tsx,js,jsx}' --fix",
         "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx}'",
         "format:check": "prettier --check 'src/**/*.{ts,tsx,js,jsx}'"
     },
     "dependencies": {
-        "dockview-core": "^7.0.2"
+        "dockview": "7.0.2"
     }
 }

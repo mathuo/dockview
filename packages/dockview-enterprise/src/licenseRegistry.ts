@@ -11,7 +11,7 @@
  * license.md` §5.
  */
 
-import { DockviewEmitter, DockviewEvent } from 'dockview-core';
+import { DockviewEmitter, DockviewEvent } from 'dockview';
 
 class LicenseRegistryImpl {
     private _key: string | undefined;

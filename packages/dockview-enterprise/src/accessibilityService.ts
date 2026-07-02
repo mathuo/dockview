@@ -1,8 +1,8 @@
-import { DockviewCompositeDisposable as CompositeDisposable } from 'dockview-core';
-import { DockviewGroupPanel } from 'dockview-core';
-import { DockviewKeybindings, KeyboardNavigationOptions } from 'dockview-core';
-import { defineModule } from 'dockview-core';
-import { IAccessibilityHost, IAccessibilityService } from 'dockview-core';
+import { DockviewCompositeDisposable as CompositeDisposable } from 'dockview';
+import { DockviewGroupPanel } from 'dockview';
+import { DockviewKeybindings, KeyboardNavigationOptions } from 'dockview';
+import { defineModule } from 'dockview';
+import { IAccessibilityHost, IAccessibilityService } from 'dockview';
 import {
     bindDocumentListeners,
     KEYBOARD_MOVE_ATTRIBUTE,

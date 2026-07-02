@@ -1,4 +1,4 @@
-import { DockviewModule } from 'dockview-core';
+import { DockviewModule, registerModules } from 'dockview';
 import { TabGroupChipsModule } from './tabGroupChipsService';
 import { ContextMenuModule } from './contextMenu';
 import { AccessibilityModule } from './accessibilityService';
@@ -9,6 +9,13 @@ import { AutoHideEdgeGroupModule } from './autoHideEdgeGroupService';
 import { MultiRowTabsModule } from './multiRowTabsService';
 import { PinnedTabsModule } from './pinnedTabsService';
 import { KeyboardDockingModule } from './keyboardDockingService';
+import { LicenseModule } from './licenseService';
+
+// Re-export the full dockview (free) API so `dockview-enterprise` is a drop-in
+// superset — mirrors AG Grid's `ag-grid-enterprise` re-exporting
+// `ag-grid-community`. Also runs dockview's own load-time side effects
+// (e.g. markDockviewPackageLoaded) via the re-exported module.
+export * from 'dockview';
 
 export {
     TabGroupChipsService,
@@ -49,8 +56,10 @@ export type {
 export type { LicenseState } from './licenseValidator';
 
 /**
- * The set of modules provided by this package. `dockview` registers these via
- * `registerModules(Modules)` so they are available to every component.
+ * The enterprise feature modules, including the license gate. Registered
+ * automatically on import (below), so merely importing `dockview-enterprise`
+ * activates these modules — and the license watermark-unless-licensed check —
+ * for every component in the process.
  */
 export const Modules: DockviewModule<any>[] = [
     TabGroupChipsModule,
@@ -63,4 +72,10 @@ export const Modules: DockviewModule<any>[] = [
     MultiRowTabsModule,
     PinnedTabsModule,
     KeyboardDockingModule,
+    LicenseModule,
 ];
+
+// Self-register on import (a side effect — hence `sideEffects: true` in
+// package.json). This makes the package batteries-included: no explicit
+// registerModules() call is required of the consumer.
+registerModules(Modules);

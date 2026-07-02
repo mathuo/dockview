@@ -2,12 +2,12 @@ import { JestConfigWithTsJest } from 'ts-jest';
 
 const config: JestConfigWithTsJest = {
     preset: 'ts-jest',
-    roots: ['<rootDir>/packages/dockview-modules'],
-    modulePaths: ['<rootDir>/packages/dockview-modules/src'],
-    displayName: { name: 'dockview-modules', color: 'blue' },
+    roots: ['<rootDir>/packages/dockview-enterprise'],
+    modulePaths: ['<rootDir>/packages/dockview-enterprise/src'],
+    displayName: { name: 'dockview-enterprise', color: 'blue' },
     rootDir: '../../',
     collectCoverageFrom: [
-        '<rootDir>/packages/dockview-modules/src/**/*.{js,jsx,ts,tsx}',
+        '<rootDir>/packages/dockview-enterprise/src/**/*.{js,jsx,ts,tsx}',
     ],
     setupFiles: [
         // ResizeObserver / PointerEvent are not implemented in jsdom; reuse the
@@ -17,18 +17,21 @@ const config: JestConfigWithTsJest = {
     ],
     setupFilesAfterEnv: [
         '<rootDir>/jest-setup.ts',
-        '<rootDir>/packages/dockview-modules/src/__tests__/registerModules.ts',
+        '<rootDir>/packages/dockview-enterprise/src/__tests__/registerModules.ts',
     ],
     coveragePathIgnorePatterns: ['/node_modules/'],
     moduleNameMapper: {
         '^dockview-core$': '<rootDir>/packages/dockview-core/src/index.ts',
-        '^dockview-modules$':
-            '<rootDir>/packages/dockview-modules/src/index.ts',
+        // The enterprise source imports the base API from `dockview` (not
+        // `dockview-core`), so map it to the dockview source too.
+        '^dockview$': '<rootDir>/packages/dockview/src/index.ts',
+        '^dockview-enterprise$':
+            '<rootDir>/packages/dockview-enterprise/src/index.ts',
     },
     modulePathIgnorePatterns: [
-        '<rootDir>/packages/dockview-modules/src/__tests__/registerModules.ts',
+        '<rootDir>/packages/dockview-enterprise/src/__tests__/registerModules.ts',
     ],
-    coverageDirectory: '<rootDir>/packages/dockview-modules/coverage/',
+    coverageDirectory: '<rootDir>/packages/dockview-enterprise/coverage/',
     // testResultsProcessor inherited from root config
     testEnvironment: 'jsdom',
     transform: {

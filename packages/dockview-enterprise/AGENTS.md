@@ -1,4 +1,4 @@
-# AGENTS.md - dockview-modules
+# AGENTS.md - dockview-enterprise
 
 A separately-published home for a subset of dockview's feature modules. Depends
 on `dockview-core`; consumed by `dockview` (which registers these modules so the
@@ -42,4 +42,4 @@ batteries-included entry point keeps its full feature set).
 
 ## Dependencies
 
-- Depends on: `dockview-core` (build chain: `dockview-core` -> `dockview-modules` -> `dockview`)
+- Depends on: `dockview-core` (build chain: `dockview-core` -> `dockview-enterprise` -> `dockview`)

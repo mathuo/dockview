@@ -13,10 +13,7 @@
  * contracts live in this package. See `enterprise-modules/license.md`.
  */
 
-import {
-    defineModule,
-    DockviewIDisposable as IDisposable,
-} from 'dockview-core';
+import { defineModule, DockviewIDisposable as IDisposable } from 'dockview';
 import {
     LicenseState,
     isLocalhostHostname,
@@ -26,10 +23,12 @@ import {
 import { LicenseRegistry } from './licenseRegistry';
 import { DOCKVIEW_RELEASE_DATE } from './releaseDate';
 
-// The `ServiceCollection` slot is added HERE, not in core — so `dockview-core`
-// never names `licenseService`. Compile-time only; the module system stores /
-// reads services by string key at runtime.
-declare module 'dockview-core' {
+// The `ServiceCollection` slot is added HERE, not in core — so core never names
+// `licenseService`. Augmenting `dockview` (which re-exports core's
+// `ServiceCollection`) keeps the package free of any `dockview-core` reference.
+// Compile-time only; the module system stores/reads services by string key at
+// runtime.
+declare module 'dockview' {
     interface ServiceCollection {
         licenseService?: ILicenseService;
     }

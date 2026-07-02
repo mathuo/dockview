@@ -48,10 +48,9 @@ function outputFile(format, isMinified) {
     return `${filename}.${ext}`;
 }
 
-// dockview-core (and its deep internal paths) is a declared dependency and is
-// always externalized — the bundle ships only the module implementations.
-const isCoreExternal = (id) =>
-    id === 'dockview-core' || id.startsWith('dockview-core/');
+// `dockview` (the free package, this package's sole base dependency) is always
+// externalized — the bundle ships only the enterprise module implementations.
+const isBaseExternal = (id) => id === 'dockview' || id.startsWith('dockview/');
 
 function createBundle(format, options) {
     const { isMinified } = options;
@@ -61,7 +60,7 @@ function createBundle(format, options) {
         file,
         format,
         sourcemap: isMinified && format === 'umd',
-        globals: { 'dockview-core': 'DockviewCore' },
+        globals: { dockview: 'dockview' },
         banner: [
             `/**`,
             ` * ${name}`,
@@ -94,7 +93,7 @@ function createBundle(format, options) {
         input,
         output,
         plugins,
-        external: isCoreExternal,
+        external: isBaseExternal,
     };
 }
 

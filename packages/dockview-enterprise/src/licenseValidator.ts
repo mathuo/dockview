@@ -2,7 +2,7 @@
  * License key validation — pure, dependency-free, synchronous.
  *
  * This is a re-implementation of the issuer's scheme
- * (`dockview-licencing/src/lib/{checksum,licence}.ts`) so `dockview-modules`
+ * (`dockview-licencing/src/lib/{checksum,licence}.ts`) so `dockview-enterprise`
  * can verify a key entirely offline. It MUST stay byte-compatible with the
  * issuer — the cross-repo golden fixture in the spec (a real minted key) is
  * the guard against drift.

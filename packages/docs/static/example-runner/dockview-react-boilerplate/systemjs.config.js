@@ -52,7 +52,7 @@
             // exports from a CJS module when that flag is present). `dockview`
             // is consumed only via `require()` from dockview-react, so it can
             // use the inlined `dist/package` bundle — which avoids the dangling
-            // `require('dockview-modules')` present in its tsc `dist/cjs` build.
+            // `require('dockview-enterprise')` present in its tsc `dist/cjs` build.
             'dockview-core': {
                 main: './dist/cjs/index.js',
                 format: 'cjs',

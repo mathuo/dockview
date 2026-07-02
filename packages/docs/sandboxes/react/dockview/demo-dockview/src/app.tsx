@@ -13,6 +13,14 @@ import {
     GetTabGroupChipContextMenuItemsParams,
     DEFAULT_TAB_GROUP_COLORS,
 } from 'dockview-react';
+// Side-effect import: registers the enterprise feature modules (pinned tabs,
+// smart guides, drop guide, auto-hide, context menu, tab-group chips, …) and
+// the license check into the global registry. Required now that the free
+// `dockview`/`dockview-react` packages no longer bundle them.
+// NOTE: on a deployed (non-localhost) origin this shows a license watermark
+// until `LicenseManager.setLicenseKey('<vendor key>')` is called; localhost
+// (the sandbox/dev preview) suppresses it.
+import 'dockview-enterprise';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import './app.scss';

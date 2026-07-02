@@ -1,4 +1,4 @@
-# dockview-modules
+# dockview-enterprise
 
 Separable feature modules for [dockview](https://github.com/mathuo/dockview).
 
@@ -10,7 +10,7 @@ feature set out of the box.
 ```ts
 // dockview (the batteries-included entry) does this for you:
 import { registerModules } from 'dockview-core';
-import { Modules } from 'dockview-modules';
+import { Modules } from 'dockview-enterprise';
 
 registerModules(Modules);
 ```
