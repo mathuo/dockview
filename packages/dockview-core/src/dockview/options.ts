@@ -586,11 +586,25 @@ export interface ResponsiveBreakpoint {
     enterAt?: number;
     /** Expand out of this breakpoint at `>= exitAt`. Defaults to `maxWidth`. */
     exitAt?: number;
-    /** The reflow transform for this band (reserved for a later phase). */
+    /**
+     * The reflow transform chain for this band, applied in array order. Omit for
+     * a no-op band (e.g. the widest/canonical breakpoint).
+     */
     rules?: ReflowRule[];
 }
 
-/** A single reflow transform. The transform set expands in later phases. */
+/**
+ * A single reflow transform. Transforms are composable — a breakpoint's `rules`
+ * chain applies them in order to project the derived layout from the canonical
+ * one:
+ * - `collapseToTabs` — fold every group into one tabbed group (panels merged,
+ *   reachable via tabs). The highest-priority group hosts the merge.
+ * - `restack` — flip the layout's primary axis (columns ↔ rows); groups stay
+ *   separate, just reoriented.
+ * - `hide` — park low-priority groups (`visible: false`); they and their panels
+ *   survive and re-show on widen, with the highest-priority group always kept
+ *   visible so the layout is never empty.
+ */
 export type ReflowRule =
     | { kind: 'collapseToTabs' }
     | { kind: 'restack' }

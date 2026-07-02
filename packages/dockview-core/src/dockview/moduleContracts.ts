@@ -589,9 +589,10 @@ export interface IResponsiveLayoutHost {
 }
 
 /**
- * Container-size-driven reflow. Phase 1 resolves the active breakpoint (with
- * hysteresis) and fires {@link onDidBreakpointChange}; the reflow transforms
- * land in later phases.
+ * Container-size-driven reflow. Resolves the active breakpoint (with hysteresis
+ * via `enterAt`/`exitAt`), fires {@link onDidBreakpointChange}, and applies the
+ * breakpoint's reflow transform chain (`collapseToTabs` / `restack` / `hide`) to
+ * project the derived layout from the canonical one.
  */
 export interface IResponsiveLayoutService extends IDisposable {
     /** The active breakpoint name, or `undefined` when `responsive` is unset. */
