@@ -373,6 +373,8 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidBreakpointChange: Event<DockviewBreakpointChangeEvent>;
     readonly onDidRebaseConflict: Event<{ reason: string }>;
     reflow(): void;
+    getCanonicalLayout(): SerializedDockview;
+    setCanonicalLayout(data: SerializedDockview): void;
     readonly totalPanels: number;
     readonly panels: IDockviewPanel[];
     readonly orientation: Orientation;
@@ -921,6 +923,28 @@ export class DockviewComponent
     /** Force a responsive re-resolution against the current container width. */
     reflow(): void {
         this._responsiveLayoutService?.reflow();
+    }
+
+    /**
+     * The canonical (wide) responsive layout — the frozen baseline while
+     * collapsed. Falls back to the live layout when the module is absent.
+     */
+    getCanonicalLayout(): SerializedDockview {
+        return (
+            this._responsiveLayoutService?.getCanonicalLayout() ?? this.toJSON()
+        );
+    }
+
+    /**
+     * Replace the canonical (wide) responsive layout, then re-derive for the
+     * current width. Falls back to `fromJSON` when the module is absent.
+     */
+    setCanonicalLayout(data: SerializedDockview): void {
+        if (this._responsiveLayoutService) {
+            this._responsiveLayoutService.setCanonicalLayout(data);
+        } else {
+            this.fromJSON(data);
+        }
     }
 
     /** Whether Smart Guides snapping is currently active. */

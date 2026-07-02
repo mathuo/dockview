@@ -610,4 +610,8 @@ export interface IResponsiveLayoutService extends IDisposable {
         | undefined;
     /** Fires when an edit made while collapsed could not be cleanly rebased. */
     readonly onDidRebaseConflict: Event<{ reason: string }>;
+    /** The canonical (wide) layout — the frozen baseline while collapsed. */
+    getCanonicalLayout(): SerializedDockview;
+    /** Replace the canonical (wide) layout, then re-derive for the current width. */
+    setCanonicalLayout(data: SerializedDockview): void;
 }

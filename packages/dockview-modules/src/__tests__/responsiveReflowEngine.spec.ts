@@ -276,6 +276,17 @@ describe('reflow engine — Phase 3 (CollapsePass)', () => {
             const derived = deriveLayout(canonical, COLLAPSE);
             expect(derived.panels).toEqual(canonical.panels);
         });
+
+        test('floating groups pass through the transform (out of reflow scope)', () => {
+            const canonical = makeMulti();
+            (canonical as { floatingGroups: unknown[] }).floatingGroups = [
+                { id: 'f1' },
+            ];
+            const derived = deriveLayout(canonical, COLLAPSE);
+            expect(
+                (derived as { floatingGroups: unknown[] }).floatingGroups
+            ).toEqual([{ id: 'f1' }]);
+        });
     });
 });
 

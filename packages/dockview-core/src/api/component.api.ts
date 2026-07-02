@@ -764,6 +764,22 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     /**
+     * The canonical (wide) responsive layout — the frozen baseline while
+     * collapsed, or the live layout when not collapsed / not configured.
+     */
+    getCanonicalLayout(): SerializedDockview {
+        return this.component.getCanonicalLayout();
+    }
+
+    /**
+     * Replace the canonical (wide) responsive layout, then re-derive for the
+     * current container width.
+     */
+    setCanonicalLayout(data: SerializedDockview): void {
+        this.component.setCanonicalLayout(data);
+    }
+
+    /**
      * Invoked when a Drag'n'Drop event occurs that the component was unable to handle. Exposed for custom Drag'n'Drop functionality.
      */
     get onDidDrop(): Event<DockviewDidDropEvent> {

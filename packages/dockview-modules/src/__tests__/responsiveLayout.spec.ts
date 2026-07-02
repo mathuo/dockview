@@ -429,5 +429,71 @@ describe('ResponsiveLayout module', () => {
             dv.reflow(); // widen — restore
             expect(dv.api.panels.map((p) => p.id).sort()).toEqual(['p1', 'p2']);
         });
+
+        // --- Phase 7: public canonical API + float/popout exclusion ---
+
+        const countLeaves = (root: unknown): number => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const n = root as any;
+            return n.type === 'leaf'
+                ? 1
+                : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  n.data.reduce(
+                      (sum: number, c: any) => sum + countLeaves(c),
+                      0
+                  );
+        };
+
+        test('getCanonicalLayout reports the wide layout even while collapsed', () => {
+            const { dv } = withThreeGroups();
+            dv.layout(500, 500);
+            dv.reflow(); // collapse to 1 group
+            expect(dv.groups.length).toBe(1);
+
+            // canonical still describes the wide (3-group) layout
+            const canonical = dv.api.getCanonicalLayout();
+            expect(countLeaves(canonical.grid.root)).toBe(3);
+        });
+
+        test('setCanonicalLayout replaces the wide layout and re-derives', () => {
+            // build a 2-group layout to install as the new canonical
+            const source = make({ debounceMs: 0, breakpoints: COLLAPSE_BP });
+            source.layout(1000, 500);
+            source.api.addPanel({ id: 'x1', component: 'default' });
+            source.api.addPanel({
+                id: 'x2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            const newCanonical = source.toJSON();
+
+            const { dv } = withThreeGroups();
+            dv.layout(500, 500);
+            dv.reflow(); // collapse
+            dv.api.setCanonicalLayout(newCanonical);
+
+            dv.layout(1000, 500);
+            dv.reflow(); // widen — the new canonical is what expands
+            expect(dv.api.panels.map((p) => p.id).sort()).toEqual(['x1', 'x2']);
+        });
+
+        test('floating groups are untouched across a collapse/widen', () => {
+            const { dv, p1 } = withThreeGroups();
+            dv.addFloatingGroup(p1.api.group); // float p1 out of the grid
+            dv.reflow();
+
+            dv.layout(500, 500);
+            dv.reflow(); // collapse the grid
+            dv.layout(1000, 500);
+            dv.reflow(); // widen
+
+            // the floated panel survives the reflow intact
+            expect(dv.api.getPanel('p1')).toBeDefined();
+            expect(dv.api.panels.map((p) => p.id).sort()).toEqual([
+                'p1',
+                'p2',
+                'p3',
+            ]);
+        });
     });
 });

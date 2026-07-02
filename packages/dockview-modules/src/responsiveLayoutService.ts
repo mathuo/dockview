@@ -158,6 +158,28 @@ export class ResponsiveLayoutService
         return { grid: canonical.grid, panels: canonical.panels };
     }
 
+    /** The canonical (wide) layout — the frozen baseline while collapsed, or the
+     *  live layout when not. */
+    getCanonicalLayout(): SerializedDockview {
+        return this._derived && this._canonical.has()
+            ? this._canonical.get()
+            : this.host.serializeLiveLayout();
+    }
+
+    /** Replace the canonical (wide) layout, then re-derive for the current width. */
+    setCanonicalLayout(data: SerializedDockview): void {
+        this._applying = true;
+        try {
+            this.host.fromJSON(data, { reuseExistingPanels: true });
+        } finally {
+            this._applying = false;
+        }
+        this._canonical.clear();
+        this._derived = false;
+        this._appliedBreakpoint = undefined;
+        this.reflow();
+    }
+
     private resolveAt(width: number): void {
         if (!this.resolver) {
             return;
@@ -206,9 +228,7 @@ export class ResponsiveLayoutService
             if (rules.length === 0) {
                 // widest / canonical band — restore the wide layout
                 if (this._derived) {
-                    this.host.fromJSON(this._canonical.get(), {
-                        reuseExistingPanels: true,
-                    });
+                    this.applyGrid(this._canonical.get());
                     this._derived = false;
                 }
                 return;
@@ -218,12 +238,30 @@ export class ResponsiveLayoutService
             if (!this._derived) {
                 this._canonical.set(this.host.toJSON());
             }
-            const target = deriveLayout(this._canonical.get(), rules);
-            this.host.fromJSON(target, { reuseExistingPanels: true });
+            this.applyGrid(deriveLayout(this._canonical.get(), rules));
             this._derived = true;
         } finally {
             this._applying = false;
         }
+    }
+
+    /**
+     * Reconcile the live tree to `source`'s grid + panels, but keep the *live*
+     * floating groups, popouts and edge groups — they are outside the reflow's
+     * scope, so a collapse/restore never tears them down or reverts a float the
+     * user moved while collapsed.
+     */
+    private applyGrid(source: SerializedDockview): void {
+        const live = this.host.serializeLiveLayout();
+        this.host.fromJSON(
+            {
+                ...live,
+                grid: source.grid,
+                panels: source.panels,
+                activeGroup: source.activeGroup,
+            },
+            { reuseExistingPanels: true }
+        );
     }
 
     /**
