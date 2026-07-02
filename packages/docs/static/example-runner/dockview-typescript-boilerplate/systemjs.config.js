@@ -44,6 +44,17 @@
                 format: 'cjs',
                 defaultExtension: 'js',
             },
+            // Examples import from `dockview` directly. Point it at the
+            // self-contained rollup bundle (which inlines the private
+            // `dockview-modules` package) rather than the tsc `dist/cjs` build,
+            // whose dangling `require('dockview-modules')` can't be resolved
+            // here. Without a `main`, SystemJS would request the bare package
+            // directory — a 404 (previously a fatal EISDIR) in the dev server.
+            dockview: {
+                main: './dist/package/main.cjs.js',
+                format: 'cjs',
+                defaultExtension: 'js',
+            },
         },
     });
 })(window);

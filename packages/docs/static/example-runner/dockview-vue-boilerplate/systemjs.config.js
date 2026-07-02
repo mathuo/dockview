@@ -48,6 +48,15 @@
                 format: 'cjs',
                 defaultExtension: 'js',
             },
+            // Point `dockview` at its self-contained rollup bundle (which
+            // inlines the private `dockview-modules` package). Without a `main`,
+            // SystemJS would request the bare package directory — a 404
+            // (previously a fatal EISDIR) in the dev server.
+            dockview: {
+                main: './dist/package/main.cjs.js',
+                format: 'cjs',
+                defaultExtension: 'js',
+            },
             'dockview-vue': {
                 main: './dist/dockview-vue.es.js',
                 format: 'esm',

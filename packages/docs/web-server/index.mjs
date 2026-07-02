@@ -13,7 +13,19 @@ const packagesPath = path.join(__dirname, '..', '..');
 function write(res, file) {
     const route = path.join(packagesPath, ...file);
 
-    if (!fs.existsSync(route)) {
+    // A missing path, or a path that resolves to a directory (e.g. a bare
+    // `dockview` package request whose SystemJS `main` isn't configured), must
+    // 404 rather than crash: `fs.readFileSync` on a directory throws EISDIR,
+    // which — uncaught here — would take the whole dev server down and break
+    // every example, not just the offending request.
+    let stat;
+    try {
+        stat = fs.statSync(route);
+    } catch {
+        stat = undefined;
+    }
+
+    if (!stat || !stat.isFile()) {
         res.writeHead(404);
         res.end('');
         return;
