@@ -1,5 +1,76 @@
-import { SerializedDockview } from 'dockview-core';
-import { deriveLayout, diffLayouts } from '../responsiveReflowEngine';
+import { LayoutPriority, SerializedDockview } from 'dockview-core';
+import {
+    computeGroupPriority,
+    deriveLayout,
+    diffLayouts,
+} from '../responsiveReflowEngine';
+
+/**
+ * `[g1(a,b) | g2(c) | g3(d)]` side by side, active group = g1.
+ * Priorities are passed in so tests can vary them.
+ */
+const makeMulti = (
+    priorities: {
+        g1?: LayoutPriority;
+        g2?: LayoutPriority;
+        g3?: LayoutPriority;
+    } = {},
+    activeGroup = 'g1'
+): SerializedDockview =>
+    ({
+        grid: {
+            root: {
+                type: 'branch',
+                data: [
+                    {
+                        type: 'leaf',
+                        size: 300,
+                        data: {
+                            id: 'g1',
+                            views: ['a', 'b'],
+                            activeView: 'a',
+                            priority: priorities.g1,
+                        },
+                    },
+                    {
+                        type: 'leaf',
+                        size: 400,
+                        data: {
+                            id: 'g2',
+                            views: ['c'],
+                            activeView: 'c',
+                            priority: priorities.g2,
+                        },
+                    },
+                    {
+                        type: 'leaf',
+                        size: 300,
+                        data: {
+                            id: 'g3',
+                            views: ['d'],
+                            activeView: 'd',
+                            priority: priorities.g3,
+                        },
+                    },
+                ],
+            },
+            width: 1000,
+            height: 500,
+            orientation: 'HORIZONTAL',
+        },
+        panels: {
+            a: { id: 'a' },
+            b: { id: 'b' },
+            c: { id: 'c' },
+            d: { id: 'd' },
+        },
+        activeGroup,
+    }) as unknown as SerializedDockview;
+
+const COLLAPSE = [{ kind: 'collapseToTabs' as const }];
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const rootData = (l: SerializedDockview): any => (l.grid.root as any).data;
 
 const make = (): SerializedDockview =>
     ({
@@ -50,11 +121,11 @@ describe('reflow engine (Phase 2 — identity)', () => {
             expect(canonical.panels.a).toBeDefined();
         });
 
-        test('rules do not change the identity output in Phase 2', () => {
+        test('rules other than collapseToTabs are identity for now (restack/hide land later)', () => {
             const canonical = make();
             const derived = deriveLayout(canonical, [
-                { kind: 'collapseToTabs' },
                 { kind: 'restack' },
+                { kind: 'hide' },
             ]);
             expect(derived).toEqual(canonical);
         });
@@ -88,6 +159,110 @@ describe('reflow engine (Phase 2 — identity)', () => {
                 { id: 'f' },
             ];
             expect(diffLayouts(live, target)).toEqual([]);
+        });
+    });
+});
+
+describe('reflow engine — Phase 3 (CollapsePass)', () => {
+    describe('computeGroupPriority', () => {
+        test('Fill outranks High outranks Normal outranks Low', () => {
+            const p = (v?: LayoutPriority) =>
+                computeGroupPriority({ priority: v }, false);
+            expect(p(LayoutPriority.Fill)).toBeGreaterThan(
+                p(LayoutPriority.High)
+            );
+            expect(p(LayoutPriority.High)).toBeGreaterThan(
+                p(LayoutPriority.Normal)
+            );
+            expect(p(LayoutPriority.Normal)).toBeGreaterThan(
+                p(LayoutPriority.Low)
+            );
+            expect(p(undefined)).toBe(p(LayoutPriority.Normal));
+        });
+
+        test('the active group gets a tie-break bonus over an equal-priority peer', () => {
+            expect(computeGroupPriority({}, true)).toBeGreaterThan(
+                computeGroupPriority({}, false)
+            );
+            // ...but the bonus never lifts Normal above High
+            expect(computeGroupPriority({}, true)).toBeLessThan(
+                computeGroupPriority({ priority: LayoutPriority.High }, false)
+            );
+        });
+    });
+
+    describe('collapseToTabs', () => {
+        test('folds side-by-side groups into a single tabbed group', () => {
+            const derived = deriveLayout(makeMulti(), COLLAPSE);
+            expect(derived.grid.root.type).toBe('leaf');
+            expect(rootData(derived).views).toHaveLength(4);
+        });
+
+        test('orders tabs by priority (Fill first), document order breaking ties', () => {
+            // g2 = Fill, g1/g3 = Normal; active = g1 (bonus lifts it over g3)
+            const derived = deriveLayout(
+                makeMulti({ g2: LayoutPriority.Fill }),
+                COLLAPSE
+            );
+            // g2(c) first (Fill), then g1(a,b) (Normal+active), then g3(d)
+            expect(rootData(derived).views).toEqual(['c', 'a', 'b', 'd']);
+        });
+
+        test('the highest-priority group is the host (its id survives)', () => {
+            const derived = deriveLayout(
+                makeMulti({ g2: LayoutPriority.Fill }),
+                COLLAPSE
+            );
+            expect(rootData(derived).id).toBe('g2');
+            expect(derived.activeGroup).toBe('g2');
+        });
+
+        test('keeps the user on the globally-active panel', () => {
+            // active group g1, active panel 'a' — even though g2(Fill) is host
+            const derived = deriveLayout(
+                makeMulti({ g2: LayoutPriority.Fill }, 'g1'),
+                COLLAPSE
+            );
+            expect(rootData(derived).activeView).toBe('a');
+        });
+
+        test('a single-group layout is unchanged (nothing to fold)', () => {
+            const single = {
+                grid: {
+                    root: {
+                        type: 'leaf',
+                        data: { id: 'only', views: ['a'], activeView: 'a' },
+                    },
+                    width: 800,
+                    height: 500,
+                    orientation: 'HORIZONTAL',
+                },
+                panels: { a: { id: 'a' } },
+                activeGroup: 'only',
+            } as unknown as SerializedDockview;
+            expect(deriveLayout(single, COLLAPSE)).toEqual(single);
+        });
+
+        test('does not mutate canonical', () => {
+            const canonical = makeMulti({ g2: LayoutPriority.Fill });
+            const snapshot = JSON.stringify(canonical);
+            deriveLayout(canonical, COLLAPSE);
+            expect(JSON.stringify(canonical)).toBe(snapshot);
+        });
+
+        test('reversible: widening (identity) after a collapse reproduces canonical byte-for-byte', () => {
+            const canonical = makeMulti({ g2: LayoutPriority.Fill });
+            // collapse (narrow)…
+            deriveLayout(canonical, COLLAPSE);
+            // …then widen (no rule = identity) re-derives canonical exactly
+            const widened = deriveLayout(canonical, []);
+            expect(widened).toEqual(canonical);
+        });
+
+        test('panels record is carried through untouched', () => {
+            const canonical = makeMulti();
+            const derived = deriveLayout(canonical, COLLAPSE);
+            expect(derived.panels).toEqual(canonical.panels);
         });
     });
 });

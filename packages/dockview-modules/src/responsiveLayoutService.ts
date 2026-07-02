@@ -147,12 +147,15 @@ export class ResponsiveLayoutService
      * arrive in later phases.
      */
     private applyReflow(): void {
-        // Refresh the canonical baseline from the live layout. Safe in Phase 2
-        // because we never collapse, so canonical never goes stale relative to
-        // what is on screen.
+        // Phase 3 ships the pure collapse engine (`deriveLayout` supports
+        // `collapseToTabs`), but the service does not yet APPLY a derived layout
+        // to the live tree — that, and the rebase safety that keeps canonical in
+        // sync with user edits, arrive in later phases. Until then the live
+        // layout is never collapsed, so we derive with the identity transform
+        // and canonical simply mirrors live (never stale relative to on-screen).
         this._canonical.set(this.host.toJSON());
 
-        const target = deriveLayout(this._canonical.get(), this._rules);
+        const target = deriveLayout(this._canonical.get(), []);
         const ops = diffLayouts(this.host.toJSON(), target);
 
         // identity transform => zero ops => the live layout already matches the
