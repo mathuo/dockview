@@ -312,6 +312,88 @@ describe('ResponsiveLayout module', () => {
             expect(dv.api.panels.map((p) => p.id).sort()).toEqual(['p1', 'p2']);
         });
 
+        // --- Phase 6: rebase edits made while collapsed ---
+
+        test('auto-rebase: closing a tab while collapsed keeps it gone after widening', () => {
+            const { dv } = withThreeGroups();
+            dv.layout(500, 500);
+            dv.reflow(); // collapse to 1 group (p1,p2,p3)
+            expect(dv.groups.length).toBe(1);
+
+            // close p2 while collapsed
+            dv.api.removePanel(dv.api.getPanel('p2')!);
+
+            dv.layout(1000, 500);
+            dv.reflow(); // widen — canonical was rebased, so p2 stays gone
+            expect(dv.api.panels.map((p) => p.id).sort()).toEqual(['p1', 'p3']);
+        });
+
+        test('auto-rebase: a panel added while collapsed survives widening', () => {
+            const { dv } = withThreeGroups();
+            dv.layout(500, 500);
+            dv.reflow();
+
+            dv.api.addPanel({ id: 'p4', component: 'default' }); // into the collapsed group
+
+            dv.layout(1000, 500);
+            dv.reflow();
+            expect(dv.api.panels.map((p) => p.id).sort()).toEqual([
+                'p1',
+                'p2',
+                'p3',
+                'p4',
+            ]);
+        });
+
+        test('rebase:discard drops edits made while collapsed', () => {
+            const dv = make({
+                debounceMs: 0,
+                rebase: 'discard',
+                breakpoints: COLLAPSE_BP,
+            });
+            dv.layout(1000, 500);
+            dv.api.addPanel({ id: 'p1', component: 'default' });
+            dv.api.addPanel({
+                id: 'p2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            dv.reflow();
+
+            dv.layout(500, 500);
+            dv.reflow(); // collapse
+            dv.api.removePanel(dv.api.getPanel('p2')!); // close while collapsed
+
+            dv.layout(1000, 500);
+            dv.reflow(); // widen — discard restores the frozen (pre-edit) canonical
+            expect(dv.api.panels.map((p) => p.id).sort()).toEqual(['p1', 'p2']);
+        });
+
+        test('rebase:manual fires onDidRebaseConflict instead of rebasing', () => {
+            const dv = make({
+                debounceMs: 0,
+                rebase: 'manual',
+                breakpoints: COLLAPSE_BP,
+            });
+            dv.layout(1000, 500);
+            dv.api.addPanel({ id: 'p1', component: 'default' });
+            dv.api.addPanel({
+                id: 'p2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+            dv.reflow();
+
+            const conflicts: { reason: string }[] = [];
+            dv.onDidRebaseConflict((e) => conflicts.push(e));
+
+            dv.layout(500, 500);
+            dv.reflow(); // collapse
+            dv.api.removePanel(dv.api.getPanel('p2')!); // edit while collapsed
+
+            expect(conflicts.length).toBeGreaterThan(0);
+        });
+
         test('hide parks a low-priority group but keeps its panel alive', () => {
             const dv = make({
                 debounceMs: 0,

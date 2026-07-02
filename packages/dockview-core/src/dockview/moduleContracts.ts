@@ -578,6 +578,14 @@ export interface IResponsiveLayoutHost {
     ): void;
     /** Whether a group is currently maximized — reflow defers until restore. */
     hasMaximizedGroup(): boolean;
+    /**
+     * The live grid serialization, bypassing the responsive `toJSON` canonical
+     * hook. Used by rebase to read the *derived* (collapsed) layout the user is
+     * editing, since `toJSON` reports canonical while collapsed.
+     */
+    serializeLiveLayout(): SerializedDockview;
+    /** Fires after a structural layout mutation (add / remove / move / …). */
+    readonly onDidMutateLayout: Event<DockviewLayoutMutationEvent>;
 }
 
 /**
@@ -600,4 +608,6 @@ export interface IResponsiveLayoutService extends IDisposable {
     serializeCanonical():
         | Pick<SerializedDockview, 'grid' | 'panels'>
         | undefined;
+    /** Fires when an edit made while collapsed could not be cleanly rebased. */
+    readonly onDidRebaseConflict: Event<{ reason: string }>;
 }

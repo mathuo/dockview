@@ -753,6 +753,11 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.onDidBreakpointChange;
     }
 
+    /** Fires when an edit made while collapsed could not be cleanly rebased. */
+    get onDidRebaseConflict(): Event<{ reason: string }> {
+        return this.component.onDidRebaseConflict;
+    }
+
     /** Force a responsive re-resolution against the current container width. */
     reflow(): void {
         this.component.reflow();

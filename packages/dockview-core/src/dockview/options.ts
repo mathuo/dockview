@@ -601,6 +601,13 @@ export interface DockviewResponsiveOptions {
     observe?: 'width' | 'height' | 'both';
     /** Resize-settle window (ms) before a breakpoint is resolved. Default 120. */
     debounceMs?: number;
+    /**
+     * How edits made *while collapsed* are folded back onto the canonical (wide)
+     * layout. `'auto'` (default) rebases them so widening keeps them; `'discard'`
+     * treats them as ephemeral (lost on widen); `'manual'` fires
+     * `onDidRebaseConflict` and leaves canonical untouched.
+     */
+    rebase?: 'auto' | 'discard' | 'manual';
     /** Breakpoints, widest → narrowest. The widest is the canonical band. */
     breakpoints: ResponsiveBreakpoint[];
     /** Default rule chain applied below the widest band unless a breakpoint overrides it. */

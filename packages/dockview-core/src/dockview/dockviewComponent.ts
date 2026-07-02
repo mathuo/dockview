@@ -371,6 +371,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly activePanel: IDockviewPanel | undefined;
     readonly activeBreakpoint: string | undefined;
     readonly onDidBreakpointChange: Event<DockviewBreakpointChangeEvent>;
+    readonly onDidRebaseConflict: Event<{ reason: string }>;
     reflow(): void;
     readonly totalPanels: number;
     readonly panels: IDockviewPanel[];
@@ -906,6 +907,14 @@ export class DockviewComponent
         return (
             this._responsiveLayoutService?.onDidBreakpointChange ??
             Event.any<DockviewBreakpointChangeEvent>()
+        );
+    }
+
+    /** Fires when an edit made while collapsed could not be cleanly rebased. */
+    get onDidRebaseConflict(): Event<{ reason: string }> {
+        return (
+            this._responsiveLayoutService?.onDidRebaseConflict ??
+            Event.any<{ reason: string }>()
         );
     }
 
@@ -3087,23 +3096,33 @@ export class DockviewComponent
      * @returns A JSON respresentation of the layout
      */
     toJSON(): SerializedDockview {
+        const live = this.serializeLiveLayout();
+
         // When the responsive layout is in a derived (collapsed) state, persist
         // the *canonical* (wide) grid + panels instead of the live tree, so a
-        // narrow-width save never bakes the collapse in. Returns `undefined`
-        // when not derived (or the module is absent) — then we serialize live.
+        // narrow-width save never bakes the collapse in. Floating/popout/edge
+        // groups are outside the reflow's scope and always come from live.
         const canonical = this._responsiveLayoutService?.serializeCanonical();
+        if (canonical) {
+            return { ...live, grid: canonical.grid, panels: canonical.panels };
+        }
+        return live;
+    }
 
-        const data = canonical?.grid ?? this.gridview.serialize();
+    /**
+     * The raw live layout serialization, bypassing the responsive canonical
+     * hook. `toJSON` builds on this; rebase uses it to read the derived layout.
+     */
+    serializeLiveLayout(): SerializedDockview {
+        const data = this.gridview.serialize();
 
-        const panels =
-            canonical?.panels ??
-            this.panels.reduce(
-                (collection, panel) => {
-                    collection[panel.id] = panel.toJSON();
-                    return collection;
-                },
-                {} as { [key: string]: GroupviewPanelState }
-            );
+        const panels = this.panels.reduce(
+            (collection, panel) => {
+                collection[panel.id] = panel.toJSON();
+                return collection;
+            },
+            {} as { [key: string]: GroupviewPanelState }
+        );
 
         const floats: SerializedFloatingGroup[] =
             this._floatingGroupService?.serialize() ?? [];

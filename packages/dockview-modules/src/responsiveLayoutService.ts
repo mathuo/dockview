@@ -14,6 +14,9 @@ import { BreakpointResolver } from './responsiveBreakpointResolver';
 import { SizeObserver } from './responsiveSizeObserver';
 import { CanonicalStore } from './responsiveCanonicalStore';
 import { deriveLayout } from './responsiveReflowEngine';
+import { rebaseCanonical } from './responsiveRebase';
+
+type RebaseMode = 'auto' | 'discard' | 'manual';
 
 const DEFAULT_DEBOUNCE_MS = 120;
 
@@ -31,10 +34,10 @@ const DEFAULT_DEBOUNCE_MS = 120;
  *   Widening back to the canonical band restores the frozen layout exactly. A
  *   reentrancy guard stops the apply's own layout events from re-triggering,
  *   and reflow defers while a group is maximized.
- *
- * Known limitation (resolved in a later phase): edits made *while collapsed* are
- * not yet folded back into canonical, so saving in a collapsed state persists
- * the pre-edit wide layout.
+ * - Phase 6: **rebase** — edits made while collapsed (close / add / activate)
+ *   are folded back onto canonical (by panel id) so widening keeps them.
+ *   `rebase: 'discard'` treats them as ephemeral; `'manual'` fires
+ *   `onDidRebaseConflict` and leaves canonical untouched.
  */
 export class ResponsiveLayoutService
     extends CompositeDisposable
@@ -54,11 +57,17 @@ export class ResponsiveLayoutService
     private _appliedBreakpoint: string | undefined;
     /** Guards against the apply's own layout events re-triggering a reflow. */
     private _applying = false;
+    /** How edits made while collapsed are folded back onto canonical. */
+    private _rebaseMode: RebaseMode = 'auto';
 
     private readonly _onDidBreakpointChange =
         new Emitter<DockviewBreakpointChangeEvent>();
     readonly onDidBreakpointChange: Event<DockviewBreakpointChangeEvent> =
         this._onDidBreakpointChange.event;
+
+    private readonly _onDidRebaseConflict = new Emitter<{ reason: string }>();
+    readonly onDidRebaseConflict: Event<{ reason: string }> =
+        this._onDidRebaseConflict.event;
 
     get activeBreakpoint(): string | undefined {
         return this._activeBreakpoint;
@@ -67,7 +76,10 @@ export class ResponsiveLayoutService
     constructor(private readonly host: IResponsiveLayoutHost) {
         super();
 
-        this.addDisposables(this._onDidBreakpointChange);
+        this.addDisposables(
+            this._onDidBreakpointChange,
+            this._onDidRebaseConflict
+        );
 
         this.configure(host.options.responsive);
 
@@ -87,6 +99,12 @@ export class ResponsiveLayoutService
                     this._canonical.clear();
                     this.reflow();
                 }
+            }),
+            // fold user edits made while collapsed back onto canonical
+            this.host.onDidMutateLayout(() => {
+                if (!this._applying && this._derived) {
+                    this.rebase();
+                }
             })
         );
     }
@@ -101,12 +119,14 @@ export class ResponsiveLayoutService
         this._appliedBreakpoint = undefined;
         this._canonical.clear();
         this._derived = false;
+        this._rebaseMode = 'auto';
 
         if (!options || options.breakpoints.length === 0) {
             return; // inert until configured
         }
 
         this.options = options;
+        this._rebaseMode = options.rebase ?? 'auto';
         this.resolver = new BreakpointResolver(options.breakpoints);
         this.observer = new SizeObserver(
             () => this.host.width,
@@ -203,6 +223,32 @@ export class ResponsiveLayoutService
             this._derived = true;
         } finally {
             this._applying = false;
+        }
+    }
+
+    /**
+     * Fold an edit made while collapsed back onto canonical, per the configured
+     * mode. `'discard'` leaves canonical frozen (the edit is lost on widen);
+     * `'manual'` leaves it untouched and fires `onDidRebaseConflict`; `'auto'`
+     * reconciles canonical with the live derived layout.
+     */
+    private rebase(): void {
+        if (this._rebaseMode === 'discard' || !this._canonical.has()) {
+            return;
+        }
+        if (this._rebaseMode === 'manual') {
+            this._onDidRebaseConflict.fire({
+                reason: 'layout edited while collapsed (rebase: manual)',
+            });
+            return;
+        }
+        const { canonical, conflict } = rebaseCanonical(
+            this._canonical.get(),
+            this.host.serializeLiveLayout()
+        );
+        this._canonical.set(canonical);
+        if (conflict) {
+            this._onDidRebaseConflict.fire({ reason: conflict });
         }
     }
 
