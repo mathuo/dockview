@@ -1,0 +1,135 @@
+---
+title: Features
+sidebar_position: 0.5
+description: A complete list of Dockview features — docking, drag & drop, floating groups, popout windows, theming, serialization and more.
+---
+
+A complete list of features Dockview provides.
+
+:::note Free and Enterprise
+Features ticked only under **Enterprise** are provided by the separate `dockview-enterprise` package, available from v8. Everything else is included in the free, open-source `dockview` packages. Enterprise includes every Free feature.
+
+The guiding rule: anything other free layout managers already offer (floating groups, popout windows, docking, theming) stays free in Dockview, so the free tier is never behind the competition. Enterprise is reserved for capabilities with no free equivalent elsewhere.
+:::
+
+### Layout
+
+| Feature        | Description                                                                                                                                                                 |                   Free                   |                Enterprise                |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------: | :--------------------------------------: |
+| Dockable grid  | Recursive grid of panels and groups with drag-to-resize splitters                                                                                                           | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Nested layouts | Compose [Gridview](/docs/other/gridview/overview), [Splitview](/docs/other/splitview/overview) and [Paneview](/docs/other/paneview/overview) inside or alongside a Dockview | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Watermark      | Custom [empty-state](/docs/core/watermark) when no panels are open                                                                                                          | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+
+### Tabs and headers
+
+| Feature               | Description                                                                                                     |                   Free                   |                Enterprise                |
+| --------------------- | --------------------------------------------------------------------------------------------------------------- | :--------------------------------------: | :--------------------------------------: |
+| Tab strip position    | Render the tab strip on top, bottom, left or right                                                              | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Headerless groups     | Groups can be rendered with no tab strip at all                                                                 | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Full-width single tab | A lone tab can stretch across the whole group header                                                            | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Custom tab components | Bring your own tab renderer per panel or globally                                                               | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Header action slots   | Render custom controls in the header's left, right or prefix area                                               | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Tab overflow menu     | Automatic overflow dropdown when tabs don't fit                                                                 | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Animated tab dragging | Smooth animated reorder while dragging tabs                                                                     | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Multi-row tabs        | Wrap tabs onto multiple rows instead of an overflow menu — see [Multi-row tabs](/docs/core/panels/multiRowTabs) |                                          | <span className="feature-check">✓</span> |
+| Pinned tabs           | Keep tabs first in the strip, out of the overflow menu — see [Pinned tabs](/docs/core/panels/pinnedTabs)        |                                          | <span className="feature-check">✓</span> |
+| Tab group chips       | Color-coded chips that group related tabs together                                                              |                                          | <span className="feature-check">✓</span> |
+| Custom chip renderer  | Replace the default chip with your own component                                                                |                                          | <span className="feature-check">✓</span> |
+| Tab context menus     | Custom right-click menus on tabs                                                                                | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Chip context menus    | Right-click menus on tab group chips                                                                            |                                          | <span className="feature-check">✓</span> |
+
+### Drag and drop
+
+| Feature                   | Description                                                                                                 |                   Free                   |                Enterprise                |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------- | :--------------------------------------: | :--------------------------------------: |
+| Tab drag and drop         | Reorder tabs and move them between groups                                                                   | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Group drag and drop       | Drag entire groups to restructure the layout                                                                | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| External drag and drop    | Accept drops from outside the layout — see [DnD docs](/docs/core/dnd/overview)                              | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Touch and pen support     | Switchable pointer-event backend for non-mouse input                                                        | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Per-feature opt-out       | Disable DnD, floating, overflow and more individually                                                       | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Edge drop zones           | Dock against the outer layout by dropping on the viewport edges via `dndEdges`                              | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| DnD backend strategy      | Choose the drag backend — `auto` (HTML5 + pointer), `pointer` or `html5` — via `dndStrategy`                | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Custom drop overlay       | Configure the shape and behaviour of drop targets                                                           |                                          | <span className="feature-check">✓</span> |
+| Custom group drag preview | Replace the default ghost shown while dragging a group                                                      |                                          | <span className="feature-check">✓</span> |
+| Drag and drop hooks       | Intercept and cancel drags with `onWillDragPanel`, `onWillDragGroup`, `onWillDrop`, `onWillShowOverlay`     | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Drop guide compass        | Aim-at-a-cell docking overlay that previews the landing region — see [Drop guide](/docs/core/dnd/dropGuide) |                                          | <span className="feature-check">✓</span> |
+| Smart guides              | Alignment guides and magnetic snapping for floating groups — see [Smart guides](/docs/core/dnd/smartGuides) |                                          | <span className="feature-check">✓</span> |
+
+### Groups and windows
+
+| Feature                  | Description                                                                                                                 |                   Free                   |                Enterprise                |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------: | :--------------------------------------: |
+| Maximize and restore     | Fill the layout with a single group, then restore                                                                           | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Floating groups          | Detachable, resizable overlay groups over the layout                                                                        | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Floating group bounds    | Keep floating groups within the viewport                                                                                    | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Popout windows           | Move a group into a native browser window with style and lifecycle sync                                                     | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Custom popout URL        | Render popout windows into your own host page via `popoutUrl`                                                               | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Edge groups              | Pin fixed groups to top, bottom, left or right (shell layout)                                                               | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Auto-hide edge groups    | Collapse edge groups to a strip and peek them on demand — see [Auto-hide edge groups](/docs/core/groups/autoHideEdgeGroups) |                                          | <span className="feature-check">✓</span> |
+| Locked groups and panels | Lock [groups and panels](/docs/core/locked) against drag and close                                                          | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+
+### Sizing
+
+| Feature                  | Description                                          |                   Free                   |                Enterprise                |
+| ------------------------ | ---------------------------------------------------- | :--------------------------------------: | :--------------------------------------: |
+| Drag-to-resize splitters | Resize between every panel and group                 | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Size constraints         | Min and max width / height on panels and groups      | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Auto-resize              | Reacts to container size changes (opt-out available) | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Borderless mode          | Chrome-free layouts via `hideBorders`                | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+
+### Rendering
+
+| Feature            | Description                                                                                               |                   Free                   |                Enterprise                |
+| ------------------ | --------------------------------------------------------------------------------------------------------- | :--------------------------------------: | :--------------------------------------: |
+| Render modes       | `onlyWhenVisible` (default, lazy), `alwaysVisible` and `deferred` modes — set per panel or as the default | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Custom scrollbars  | [Native or custom](/docs/core/scrollbars) scrollbar implementation                                        | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Strict CSP support | Works in strict Content-Security-Policy environments — see [Security](/docs/core/security)                | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+
+### State and persistence
+
+| Feature                  | Description                                                                                                                        |                   Free                   |                Enterprise                |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------: | :--------------------------------------: |
+| Save and restore layouts | `api.toJSON()` / `api.fromJSON()` round-trip the full layout — see [Save](/docs/core/state/save) and [Load](/docs/core/state/load) | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Full state capture       | Floating, popout and edge groups all serialize                                                                                     | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Custom panel state       | Persist and restore arbitrary per-panel state                                                                                      | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Empty state behaviour    | `emptyGroup`, watermark or custom component when no panels are open                                                                | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Layout history           | Undo and redo layout changes — see [Layout history](/docs/core/state/history)                                                      |                                          | <span className="feature-check">✓</span> |
+
+### Theming
+
+| Feature                 | Description                                                                          |                   Free                   |                Enterprise                |
+| ----------------------- | ------------------------------------------------------------------------------------ | :--------------------------------------: | :--------------------------------------: |
+| Built-in themes         | light, dark, abyss, dracula, replit, vs and more — see [Theming](/docs/core/theming) | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| CSS variable theming    | Override colors, spacing and chrome via CSS variables                                | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Tab group color palette | Configurable chip colors and accent mode                                             | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+
+### API and events
+
+| Feature                     | Description                                                                                         |                   Free                   |                Enterprise                |
+| --------------------------- | --------------------------------------------------------------------------------------------------- | :--------------------------------------: | :--------------------------------------: |
+| Programmatic layout control | Add, move and remove panels and groups from code                                                    | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Directional placement       | Place panels relative to others — left / right / above / below / within                             | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Panel and group APIs        | `setTitle`, `setSize`, `moveTo`, `setRenderer`, `close`, `maximize` on each panel and group         | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Active panel tracking       | `api.activePanel`, `api.activeGroup` and corresponding change events                                | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Panel lifecycle events      | Per-panel `onDidVisibilityChange`, `onDidFocusChange`, `onDidActiveChange`, `onDidDimensionsChange` | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Runtime option updates      | Change behaviour at runtime via `api.updateOptions()`                                               | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Comprehensive events        | Events for every interaction — see [Events](/docs/core/events)                                      | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Keyboard navigation         | `moveToNext` / `moveToPrevious` to cycle through panels                                             | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+
+### Accessibility
+
+| Feature                     | Description                                                                                                         |                   Free                   |                Enterprise                |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------- | :--------------------------------------: | :--------------------------------------: |
+| ARIA roles and labels       | Semantic roles, labels and roving tabindex across the tab strip — see [Accessibility](/docs/advanced/accessibility) | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Screen-reader announcements | Live-region announcements for layout changes, routed to the focused window                                          | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Focus indicators            | `:focus-visible` focus rings that appear for keyboard users only                                                    | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Keyboard docking            | Move and dock groups by keyboard, including across popout windows — see [Keyboard](/docs/advanced/keyboard)         |                                          | <span className="feature-check">✓</span> |
+
+### Framework support
+
+| Feature    | Description                                                                                    |                   Free                   |                Enterprise                |
+| ---------- | ---------------------------------------------------------------------------------------------- | :--------------------------------------: | :--------------------------------------: |
+| React      | First-class wrapper backed by the same core                                                    | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Vue 3      | First-class wrapper backed by the same core                                                    | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| Angular    | First-class wrapper backed by the same core                                                    | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
+| TypeScript | Fully typed public API, zero runtime dependencies, usable directly without a framework wrapper | <span className="feature-check">✓</span> | <span className="feature-check">✓</span> |
