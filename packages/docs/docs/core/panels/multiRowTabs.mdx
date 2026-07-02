@@ -1,0 +1,122 @@
+---
+title: Multi-row Tabs
+description: The multi-row (wrapping) tabs mode, where a group's tab strip wraps onto additional rows so every tab stays visible at once.
+sidebar_position: 8
+enterprise: true
+sidebar_custom_props:
+    enterprise: true
+---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+When a group accumulates more tabs than fit across the width of its header, the
+default behaviour is to collapse the surplus behind an overflow dropdown. Multi-row
+tabs offer an alternative: the strip wraps onto additional rows and the header grows
+to fit, so every tab stays visible at once. The default single-row dropdown behaviour
+is covered in [Tab Overflow](/docs/core/panels/tabOverflow).
+
+## Multi-row (wrapping) tabs
+
+Set `overflow.mode: 'wrap'` and, instead of clipping the surplus tabs into the
+dropdown, the tab strip wraps onto additional rows and the header grows to fit — a
+JetBrains-style layout where every tab stays visible at once. As tabs are added or
+removed, the header grows and shrinks by whole rows, and the panel content area
+resizes to match.
+
+<FrameworkSpecific framework="React">
+    <DocRef declaration="IDockviewReactProps" methods={['overflow']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+    <DocRef declaration="IDockviewVueProps" methods={['overflow']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+    <DocRef declaration="DockviewComponentOptions" methods={['overflow']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+    <DocRef declaration="IDockviewAngularProps" methods={['overflow']} />
+</FrameworkSpecific>
+
+<DocRef declaration="DockviewOverflowOptions" />
+
+<FrameworkSpecific framework="React">
+    ```tsx return <DockviewReact overflow={{ mode: 'wrap' }} {...rest} />; ```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Vue'>
+```html
+<dockview-vue :overflow="{ mode: 'wrap' }" />
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Angular'>
+```html
+<dv-dockview [overflow]="{ mode: 'wrap' }"></dv-dockview>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+```ts
+const api = createDockview(parentElement, {
+    overflow: { mode: 'wrap' },
+});
+
+// or toggle at runtime
+api.updateOptions({ overflow: { mode: 'wrap' } });
+
+```
+</FrameworkSpecific>
+
+:::info
+`overflow.mode: 'wrap'` is provided by the multi-row tabs module, which is included
+in the default `dockview` bundle. If you assemble your own set of modules and omit
+it, `mode: 'wrap'` is ignored and the standard single-row strip with the dropdown is
+used instead — no error, no regression.
+:::
+
+### `maxRows`
+
+`overflow.maxRows` is reserved to cap how many rows the header may grow to, spilling
+any surplus tabs back into the dropdown.
+
+:::warning
+`maxRows` is not yet implemented. Wrapping is currently unbounded regardless of the
+value, and setting it has no effect today.
+:::
+
+### Reordering across rows
+
+Tabs can be dragged to reorder them just as in the single-row strip, and in wrap mode
+the reorder is two-dimensional: you can drag a tab from one row onto another and drop
+it at any position, with a drop indicator showing where it will land. Dragging a tab
+out of the header to detach or float it works exactly as before.
+
+### Limitations
+
+- Wrapping applies to **horizontal** headers only. A group whose header is positioned
+  vertically (for example an edge group) does not wrap in this version.
+- `overflow.mode` is read when the layout is created and re-applied if you change it
+  via `updateOptions`. A runtime change of header direction is not re-evaluated.
+
+## Advanced overflow (experimental)
+
+The `overflow` block also carries `search`, `mru`, and `thumbnails` fields intended to
+enrich the dropdown into a searchable, most-recently-used, preview-capable tab
+switcher.
+
+:::warning
+These fields are reserved for a not-yet-shipped advanced overflow module and currently
+have **no effect**. They are documented here only as forward-looking API surface —
+setting them today does nothing. Rely on `mode` and (once implemented) `maxRows`.
+:::
+
+## Live Example
+
+The example below opens a single group with many panels and `overflow.mode: 'wrap'`,
+so the tabs wrap onto multiple rows. Add more tabs, or toggle back to the dropdown
+mode, to compare the two behaviours.
+
+<CodeRunner id="dockview/tab-overflow" height={300} />
+```

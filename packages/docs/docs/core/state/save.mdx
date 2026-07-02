@@ -1,6 +1,7 @@
 ---
 title: Saving State
 description: How to serialize and save the current Dockview layout state for later restoration.
+sidebar_position: 1
 ---
 
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
@@ -18,9 +19,9 @@ You can listen to the event `onDidlayoutChange` to determine when the layout has
 const [api, setApi] = React.useState<DockviewApi>();
 
 React.useEffect(() => {
-    if (!api) {
-        return;
-    }
+if (!api) {
+return;
+}
 
     const disposable = api.onDidLayoutChange(() => {
         const layout: SerializedDockview = api.toJSON();
@@ -28,14 +29,16 @@ React.useEffect(() => {
     });
 
     return () => disposable.dispose();
+
 }, [api]);
 
 const onReady = (event: DockviewReadyEvent) => {
-    setApi(event.api);
+setApi(event.api);
 };
 
 return <DockviewComponent onReady={onReady} />;
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
@@ -63,7 +66,8 @@ onUnmounted(() => {
 <template>
     <dockview-vue @ready="onReady" />
 </template>
-```
+````
+
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
@@ -72,12 +76,12 @@ import { Component, OnDestroy } from '@angular/core';
 import type { DockviewApi, DockviewReadyEvent, SerializedDockview } from 'dockview-angular';
 
 @Component({
-    selector: 'app-root',
-    template: `<dv-dockview (ready)="onReady($event)"></dv-dockview>`,
+selector: 'app-root',
+template: `<dv-dockview (ready)="onReady($event)"></dv-dockview>`,
 })
 export class AppComponent implements OnDestroy {
-    private api: DockviewApi;
-    private layoutDisposable: { dispose(): void };
+private api: DockviewApi;
+private layoutDisposable: { dispose(): void };
 
     onReady(event: DockviewReadyEvent) {
         this.api = event.api;
@@ -90,8 +94,10 @@ export class AppComponent implements OnDestroy {
     ngOnDestroy() {
         this.layoutDisposable?.dispose();
     }
+
 }
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
@@ -106,9 +112,10 @@ const disposable = api.onDidLayoutChange(() => {
 });
 
 // Call disposable.dispose() when tearing down the dock
-```
+````
+
 </FrameworkSpecific>
 
 # Live Example
 
-<CodeRunner id="dockview/layout"/>
+<CodeRunner id="dockview/layout" />

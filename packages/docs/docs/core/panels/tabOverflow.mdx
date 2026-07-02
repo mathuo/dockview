@@ -1,0 +1,51 @@
+---
+title: Tab Overflow
+description: How Dockview handles more tabs than fit in a header — the default overflow dropdown.
+sidebar_position: 7
+---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+When a group accumulates more tabs than fit across the width of its header, Dockview
+needs a way to keep every tab reachable. By default the surplus tabs are collapsed
+behind an overflow **dropdown**.
+
+## Default overflow (dropdown)
+
+Out of the box, tabs that no longer fit are clipped and collapsed behind a chevron
+button in the header's right actions. Clicking the chevron opens a dropdown listing
+the hidden tabs; a count badge shows how many are hidden. This is the default and
+requires no configuration — it is equivalent to `overflow.mode: 'dropdown'`.
+
+You can turn overflow handling off entirely with `disableTabsOverflowList`, in which
+case the strip simply scrolls.
+
+<FrameworkSpecific framework="React">
+    <DocRef
+        declaration="IDockviewReactProps"
+        methods={['disableTabsOverflowList']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+    <DocRef
+        declaration="IDockviewVueProps"
+        methods={['disableTabsOverflowList']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+    <DocRef
+        declaration="DockviewComponentOptions"
+        methods={['disableTabsOverflowList']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+    <DocRef
+        declaration="IDockviewAngularProps"
+        methods={['disableTabsOverflowList']}
+    />
+</FrameworkSpecific>
+
+To wrap tabs onto multiple rows, see [Multi-row Tabs](/docs/core/panels/multiRowTabs).
