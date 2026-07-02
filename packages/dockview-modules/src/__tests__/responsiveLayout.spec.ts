@@ -109,4 +109,71 @@ describe('ResponsiveLayout module', () => {
         expect(api.activeBreakpoint).toBe('lg');
         expect(events.map((e) => e.to)).toEqual(['lg']);
     });
+
+    // --- Phase 2: canonical / derived split + serialization ---
+
+    test('toJSON round-trips unchanged with the module active (identity)', () => {
+        const dockview = make({ debounceMs: 0, breakpoints: BREAKPOINTS });
+        dockview.layout(1000, 500);
+        dockview.api.addPanel({ id: 'p1', component: 'default' });
+        dockview.api.addPanel({
+            id: 'p2',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+
+        // drive a couple of breakpoint changes — the derived layout is identity,
+        // so nothing collapses and the serialized layout is unaffected
+        dockview.layout(500, 500);
+        dockview.reflow();
+        dockview.layout(1200, 500);
+        dockview.reflow();
+
+        const saved = dockview.toJSON();
+
+        const restored = make({ debounceMs: 0, breakpoints: BREAKPOINTS });
+        restored.layout(1200, 500);
+        restored.fromJSON(saved);
+
+        expect(restored.panels.map((p) => p.id).sort()).toEqual(['p1', 'p2']);
+        // and re-serializing the restored layout matches the saved one
+        expect(JSON.stringify(restored.toJSON())).toBe(JSON.stringify(saved));
+    });
+
+    test('serialization is idempotent across a breakpoint sweep', () => {
+        const dockview = make({ debounceMs: 0, breakpoints: BREAKPOINTS });
+        dockview.layout(1000, 500);
+        dockview.api.addPanel({ id: 'p1', component: 'default' });
+        dockview.api.addPanel({
+            id: 'p2',
+            component: 'default',
+            position: { direction: 'below' },
+        });
+
+        dockview.layout(1200, 500);
+        dockview.reflow();
+        const before = JSON.stringify(dockview.toJSON());
+
+        // sweep down and back up — identity reflow must not mutate the layout
+        for (const w of [800, 500, 700, 720, 1200]) {
+            dockview.layout(w, 500);
+            dockview.reflow();
+        }
+
+        const after = JSON.stringify(dockview.toJSON());
+        expect(after).toBe(before);
+    });
+
+    test('serializeCanonical returns undefined while not collapsed (Phase 2)', () => {
+        const dockview = make({ debounceMs: 0, breakpoints: BREAKPOINTS });
+        dockview.layout(500, 500);
+        dockview.reflow();
+        // the toJSON hook falls back to the live tree — identical to a component
+        // without the responsive option configured
+        const withResponsive = JSON.stringify(dockview.toJSON());
+
+        const plain = make();
+        plain.layout(500, 500);
+        expect(JSON.stringify(plain.toJSON())).toBe(withResponsive);
+    });
 });

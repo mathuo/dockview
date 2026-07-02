@@ -563,6 +563,10 @@ export interface IResponsiveLayoutHost {
     readonly height: number;
     /** Coalesced (microtask-buffered) ping after any layout/size change. */
     readonly onDidLayoutChange: Event<void>;
+    /** Fires after a `fromJSON` load — the signal to re-baseline canonical. */
+    readonly onDidLayoutFromJSON: Event<void>;
+    /** Snapshot the live layout (used to capture / refresh canonical). */
+    toJSON(): SerializedDockview;
 }
 
 /**
@@ -577,4 +581,12 @@ export interface IResponsiveLayoutService extends IDisposable {
     readonly onDidBreakpointChange: Event<DockviewBreakpointChangeEvent>;
     /** Force a re-resolution against the current width. */
     reflow(): void;
+    /**
+     * The canonical (wide) `grid` + `panels` for `DockviewComponent.toJSON` to
+     * persist, or `undefined` to serialize the live tree. Only diverges from
+     * live once the layout is a derived/collapsed projection.
+     */
+    serializeCanonical():
+        | Pick<SerializedDockview, 'grid' | 'panels'>
+        | undefined;
 }

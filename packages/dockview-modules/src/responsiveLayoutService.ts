@@ -6,21 +6,31 @@ import {
     DockviewResponsiveOptions,
     IResponsiveLayoutHost,
     IResponsiveLayoutService,
+    ReflowRule,
+    SerializedDockview,
     defineModule,
 } from 'dockview-core';
 import { BreakpointResolver } from './responsiveBreakpointResolver';
 import { SizeObserver } from './responsiveSizeObserver';
+import { CanonicalStore } from './responsiveCanonicalStore';
+import { deriveLayout, diffLayouts } from './responsiveReflowEngine';
 
 const DEFAULT_DEBOUNCE_MS = 120;
 
 /**
- * Phase 1 of the responsive-layout module: resolves the active breakpoint from
- * the container width (with hysteresis + debounce) and fires
- * `onDidBreakpointChange`. No reflow transforms yet — those land in later phases.
+ * The responsive-layout service.
  *
- * Reactive like `LayoutHistoryService`: it subscribes to the host's
- * `onDidLayoutChange` in its constructor (services are created eagerly) and owns
- * its teardown via `CompositeDisposable`.
+ * - Phase 1: resolves the active breakpoint from the container width (with
+ *   hysteresis + debounce) and fires `onDidBreakpointChange`.
+ * - Phase 2: introduces the canonical/derived split — it holds the canonical
+ *   ("wide") layout, projects the derived layout from it via `deriveLayout`
+ *   (identity for now), and serializes the *canonical* through `toJSON` so a
+ *   narrow-width save never bakes a collapsed layout in. No reflow transforms
+ *   are applied yet, so the derived layout equals the live one.
+ *
+ * Reactive like `LayoutHistoryService`: it subscribes to the host in its
+ * constructor (services are created eagerly) and owns teardown via
+ * `CompositeDisposable`.
  */
 export class ResponsiveLayoutService
     extends CompositeDisposable
@@ -29,6 +39,12 @@ export class ResponsiveLayoutService
     private resolver: BreakpointResolver | undefined;
     private observer: SizeObserver | undefined;
     private _activeBreakpoint: string | undefined;
+
+    private readonly _canonical = new CanonicalStore();
+    /** True once the live layout is a *derived* (collapsed) projection of
+     *  canonical. Always false in Phase 2 (identity transform only). */
+    private _derived = false;
+    private _rules: readonly ReflowRule[] = [];
 
     private readonly _onDidBreakpointChange =
         new Emitter<DockviewBreakpointChangeEvent>();
@@ -49,7 +65,10 @@ export class ResponsiveLayoutService
         this.addDisposables(
             // re-settle on every layout/size ping; the observer debounces so a
             // continuous drag-resize only resolves once it settles
-            this.host.onDidLayoutChange(() => this.observer?.signal())
+            this.host.onDidLayoutChange(() => this.observer?.signal()),
+            // a fresh layout replaces the canonical baseline; re-resolve for the
+            // current width against it
+            this.host.onDidLayoutFromJSON(() => this.reflow())
         );
     }
 
@@ -59,11 +78,15 @@ export class ResponsiveLayoutService
         this.observer = undefined;
         this.resolver = undefined;
         this._activeBreakpoint = undefined;
+        this._canonical.clear();
+        this._derived = false;
+        this._rules = [];
 
         if (!options || options.breakpoints.length === 0) {
             return; // inert until configured
         }
 
+        this._rules = options.rules ?? [];
         this.resolver = new BreakpointResolver(options.breakpoints);
         this.observer = new SizeObserver(
             () => this.host.width,
@@ -85,6 +108,22 @@ export class ResponsiveLayoutService
         }
     }
 
+    /**
+     * The canonical (wide) `grid` + `panels` to persist, or `undefined` to let
+     * `toJSON` serialize the live tree. Only diverges from live once the layout
+     * is actually derived/collapsed (Phase 3+); in Phase 2 it is always
+     * `undefined`, so serialization is byte-identical to today.
+     */
+    serializeCanonical():
+        | Pick<SerializedDockview, 'grid' | 'panels'>
+        | undefined {
+        if (!this._derived || !this._canonical.has()) {
+            return undefined;
+        }
+        const canonical = this._canonical.get();
+        return { grid: canonical.grid, panels: canonical.panels };
+    }
+
     private resolveAt(width: number): void {
         if (!this.resolver) {
             return;
@@ -95,7 +134,30 @@ export class ResponsiveLayoutService
         }
         const from = this._activeBreakpoint;
         this._activeBreakpoint = next;
+        this.applyReflow();
         this._onDidBreakpointChange.fire({ from, to: next, width });
+    }
+
+    /**
+     * Project the derived layout from canonical and reconcile the live tree to
+     * it. Phase 2 is identity-only: canonical mirrors the live layout, the
+     * derived target equals it, the diff is empty, and nothing is applied — so
+     * `_derived` stays false and `serializeCanonical` keeps returning the live
+     * tree. The collapse/restack/hide transforms and the minimal-diff apply
+     * arrive in later phases.
+     */
+    private applyReflow(): void {
+        // Refresh the canonical baseline from the live layout. Safe in Phase 2
+        // because we never collapse, so canonical never goes stale relative to
+        // what is on screen.
+        this._canonical.set(this.host.toJSON());
+
+        const target = deriveLayout(this._canonical.get(), this._rules);
+        const ops = diffLayouts(this.host.toJSON(), target);
+
+        // identity transform => zero ops => the live layout already matches the
+        // derived target, so it is not a collapsed projection.
+        this._derived = ops.length > 0;
     }
 
     override dispose(): void {

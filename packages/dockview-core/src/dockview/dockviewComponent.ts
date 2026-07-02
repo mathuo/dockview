@@ -3087,15 +3087,23 @@ export class DockviewComponent
      * @returns A JSON respresentation of the layout
      */
     toJSON(): SerializedDockview {
-        const data = this.gridview.serialize();
+        // When the responsive layout is in a derived (collapsed) state, persist
+        // the *canonical* (wide) grid + panels instead of the live tree, so a
+        // narrow-width save never bakes the collapse in. Returns `undefined`
+        // when not derived (or the module is absent) — then we serialize live.
+        const canonical = this._responsiveLayoutService?.serializeCanonical();
 
-        const panels = this.panels.reduce(
-            (collection, panel) => {
-                collection[panel.id] = panel.toJSON();
-                return collection;
-            },
-            {} as { [key: string]: GroupviewPanelState }
-        );
+        const data = canonical?.grid ?? this.gridview.serialize();
+
+        const panels =
+            canonical?.panels ??
+            this.panels.reduce(
+                (collection, panel) => {
+                    collection[panel.id] = panel.toJSON();
+                    return collection;
+                },
+                {} as { [key: string]: GroupviewPanelState }
+            );
 
         const floats: SerializedFloatingGroup[] =
             this._floatingGroupService?.serialize() ?? [];
