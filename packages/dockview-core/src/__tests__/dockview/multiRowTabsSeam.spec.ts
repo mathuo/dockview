@@ -30,7 +30,7 @@ class TestContentPart implements IContentRenderer {
 /**
  * The free seam the `MultiRowTabsModule` consumes (PR-A): the tab-list element
  * exposed up through the group model + host, and the `relayoutGroup` host hook.
- * The module itself (wrap layout) is tested in `dockview-modules`.
+ * The module itself (wrap layout) is tested in `dockview-enterprise`.
  */
 describe('multi-row tabs seam', () => {
     function createComponent() {

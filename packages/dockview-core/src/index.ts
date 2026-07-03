@@ -195,8 +195,8 @@ export {
     ServiceCollection,
 } from './dockview/modules';
 export {
-    IAccessibilityHost,
-    IAccessibilityService,
+    IKeyboardNavigationHost,
+    IKeyboardNavigationService,
     IAdvancedDnDHost,
     IAdvancedDnDService,
     IAutoHideEdgeGroupHost,

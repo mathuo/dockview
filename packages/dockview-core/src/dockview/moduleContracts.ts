@@ -97,9 +97,9 @@ export interface ITabGroupChipsService extends IDisposable {
     attachToGroup(group: DockviewGroupPanel): IDisposable;
 }
 
-// --- Accessibility ---
+// --- KeyboardNavigation ---
 
-export interface IAccessibilityHost {
+export interface IKeyboardNavigationHost {
     /**
      * The outermost dockview element (the shell, which also contains edge
      * groups). A getter — it must resolve to the shell once that exists, not
@@ -152,7 +152,7 @@ export interface IAccessibilityHost {
     floatPanel(panel: IDockviewPanel): void;
 }
 
-export interface IAccessibilityService extends IDisposable {}
+export interface IKeyboardNavigationService extends IDisposable {}
 
 /**
  * Marker for the advanced keyboard docking service (spatial group focus +

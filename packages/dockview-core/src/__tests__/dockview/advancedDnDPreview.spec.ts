@@ -35,7 +35,7 @@ describe('AdvancedDnD showPreviewOverlay', () => {
     afterEach(() => dockview.dispose());
 
     const service = (): IAdvancedDnDService =>
-        // internal seam — consumed by the (future) AccessibilityModule
+        // internal seam — consumed by the (future) KeyboardNavigationModule
         (
             dockview as unknown as {
                 _moduleRegistry: {

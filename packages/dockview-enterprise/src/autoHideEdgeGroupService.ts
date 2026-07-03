@@ -1,20 +1,17 @@
-import { DockviewCompositeDisposable as CompositeDisposable } from 'dockview-core';
-import { DockviewGroupPanel } from 'dockview-core';
-import { IDockviewPanel } from 'dockview-core';
-import { EdgeGroupPosition } from 'dockview-core';
-import { AutoHideEdgeGroupOptions } from 'dockview-core';
-import { defineModule, EdgeGroupModule } from 'dockview-core';
+import { DockviewCompositeDisposable as CompositeDisposable } from 'dockview';
+import { DockviewGroupPanel } from 'dockview';
+import { IDockviewPanel } from 'dockview';
+import { EdgeGroupPosition } from 'dockview';
+import { AutoHideEdgeGroupOptions } from 'dockview';
+import { defineModule, EdgeGroupModule } from 'dockview';
 import {
     createCloseButton,
     createDismissableLayer,
     createPinButton,
     prefersReducedMotion,
     resolveOpaqueBackground,
-} from 'dockview-core';
-import {
-    IAutoHideEdgeGroupHost,
-    IAutoHideEdgeGroupService,
-} from 'dockview-core';
+} from 'dockview';
+import { IAutoHideEdgeGroupHost, IAutoHideEdgeGroupService } from 'dockview';
 
 /** Height (px) of the title bar; the content/`always` overlay is inset below it
  *  so nothing paints under the bar. The title bar's own height is set inline to

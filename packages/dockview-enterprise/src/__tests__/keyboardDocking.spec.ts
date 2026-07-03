@@ -24,7 +24,7 @@ class TestPanel implements IContentRenderer {
 }
 
 /**
- * AccessibilityModule — keyboard docking thin vertical. Ctrl+M enters move
+ * KeyboardNavigationModule — keyboard docking thin vertical. Ctrl+M enters move
  * mode, arrows cycle the target, Enter docks (tab-into), Escape cancels.
  */
 describe('accessibility: keyboard docking', () => {

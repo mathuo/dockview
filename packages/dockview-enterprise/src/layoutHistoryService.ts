@@ -2,20 +2,20 @@ import {
     DockviewCompositeDisposable as CompositeDisposable,
     DockviewEmitter as Emitter,
     DockviewEvent as Event,
-} from 'dockview-core';
+} from 'dockview';
 import {
     DockviewComponentOptions,
     DockviewLayoutMutationEvent,
     DockviewLayoutMutationKind,
     SerializedDockview,
-} from 'dockview-core';
-import { defineModule } from 'dockview-core';
+} from 'dockview';
+import { defineModule } from 'dockview';
 import {
     ILayoutHistoryHost,
     ILayoutHistoryService,
     LayoutHistoryChangeEvent,
     LayoutHistoryKind,
-} from 'dockview-core';
+} from 'dockview';
 
 interface HistoryEntry {
     readonly kind: LayoutHistoryKind;

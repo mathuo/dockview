@@ -1,8 +1,8 @@
-import { DockviewCompositeDisposable as CompositeDisposable } from 'dockview-core';
-import { DockviewGroupPanel } from 'dockview-core';
-import { DockviewKeybindings, KeyboardNavigationOptions } from 'dockview-core';
-import { defineModule } from 'dockview-core';
-import { IAccessibilityHost, IAccessibilityService } from 'dockview-core';
+import { DockviewCompositeDisposable as CompositeDisposable } from 'dockview';
+import { DockviewGroupPanel } from 'dockview';
+import { DockviewKeybindings, KeyboardNavigationOptions } from 'dockview';
+import { defineModule } from 'dockview';
+import { IKeyboardNavigationHost, IKeyboardNavigationService } from 'dockview';
 import {
     bindDocumentListeners,
     KEYBOARD_MOVE_ATTRIBUTE,
@@ -40,14 +40,14 @@ const DEFAULT_KEYMAP: DockviewKeybindings = {
  * Stands down while an advanced keyboard move is in progress (see
  * {@link KEYBOARD_MOVE_ATTRIBUTE}) so the docking module owns the keys then.
  */
-export class AccessibilityService
+export class KeyboardNavigationService
     extends CompositeDisposable
-    implements IAccessibilityService
+    implements IKeyboardNavigationService
 {
     private _focusWasInside = false;
     private _lastNonFloatFocus: HTMLElement | undefined;
 
-    constructor(private readonly host: IAccessibilityHost) {
+    constructor(private readonly host: IKeyboardNavigationHost) {
         super();
 
         // Listen on the document (capture) rather than the dockview element:
@@ -331,11 +331,11 @@ export class AccessibilityService
     }
 }
 
-export const AccessibilityModule = defineModule<
-    'accessibilityService',
-    IAccessibilityHost
+export const KeyboardNavigationModule = defineModule<
+    'keyboardNavigationService',
+    IKeyboardNavigationHost
 >({
-    name: 'Accessibility',
-    serviceKey: 'accessibilityService',
-    create: (host) => new AccessibilityService(host),
+    name: 'KeyboardNavigation',
+    serviceKey: 'keyboardNavigationService',
+    create: (host) => new KeyboardNavigationService(host),
 });

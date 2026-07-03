@@ -8,7 +8,7 @@
             "path": "./packages/dockview-core"
         },
         {
-            "path": "./packages/dockview-modules"
+            "path": "./packages/dockview-enterprise"
         },
         {
             "path": "./packages/dockview-vue"

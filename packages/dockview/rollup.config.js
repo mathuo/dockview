@@ -50,9 +50,10 @@ function createBundle(format, options) {
 
     const isUMD = format === 'umd';
 
-    // dockview-modules is a private, unpublished package — always bundle its
-    // code in. dockview-core is published: externalize it in the package
-    // builds, but inline it in the UMD bundle so the CDN build is self-contained.
+    // dockview-core is published: externalize it in the package builds, but
+    // inline it in the UMD bundle so the CDN build is self-contained. (The
+    // enterprise feature modules now live in the separately-published
+    // dockview-enterprise package and are no longer bundled here.)
     const external = isUMD
         ? ['react', 'react-dom']
         : ['react', 'react-dom', 'dockview-core', /^dockview-core\//];
@@ -77,12 +78,10 @@ function createBundle(format, options) {
 
     const plugins = [
         nodeResolve({
-            include: isUMD
-                ? [
-                      'node_modules/dockview-core/**',
-                      'node_modules/dockview-modules/**',
-                  ]
-                : ['node_modules/dockview-modules/**'],
+            // UMD is self-contained: bundle dockview-core in. Package builds
+            // externalize dockview-core, so nothing needs bundling from
+            // node_modules there.
+            include: isUMD ? ['node_modules/dockview-core/**'] : [],
         }),
         typescript({
             tsconfig: 'tsconfig.esm.json',

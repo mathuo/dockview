@@ -6,7 +6,7 @@
             "dockview-core": ["packages/dockview-core/src/index.ts"],
             "dockview": ["packages/dockview/src/index.ts"],
             "dockview-react": ["packages/dockview-react/src/index.ts"],
-            "dockview-modules": ["packages/dockview-modules/src/index.ts"]
+            "dockview-enterprise": ["packages/dockview-enterprise/src/index.ts"]
         },
         "jsx": "react-jsx",
         "noImplicitAny": false,

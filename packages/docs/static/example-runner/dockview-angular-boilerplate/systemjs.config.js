@@ -66,10 +66,17 @@
                 format: 'cjs',
                 defaultExtension: 'js',
             },
-            // Point `dockview` at its self-contained rollup bundle (which
-            // inlines the private `dockview-modules` package). Without a `main`,
-            // SystemJS would request the bare package directory — a 404
-            // (previously a fatal EISDIR) in the dev server.
+            // `dockview-enterprise`: tsc `dist/cjs` build so SystemJS sees the
+            // named exports (e.g. `LicenseManager`). Examples that use it import it.
+            'dockview-enterprise': {
+                main: './dist/cjs/index.js',
+                format: 'cjs',
+                defaultExtension: 'js',
+            },
+            // Point `dockview` at its rollup bundle via an explicit `main`, so
+            // SystemJS doesn't request the bare package directory — a 404
+            // (previously a fatal EISDIR) in the dev server. The bundle requires
+            // only `dockview-core`, mapped above.
             dockview: {
                 main: './dist/package/main.cjs.js',
                 format: 'cjs',

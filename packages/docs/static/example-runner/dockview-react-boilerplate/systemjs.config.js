@@ -50,10 +50,16 @@
             // code via ES named imports, so they must use the tsc `dist/cjs`
             // build, which sets `__esModule` (SystemJS 0.21 only exposes named
             // exports from a CJS module when that flag is present). `dockview`
-            // is consumed only via `require()` from dockview-react, so it can
-            // use the inlined `dist/package` bundle — which avoids the dangling
-            // `require('dockview-modules')` present in its tsc `dist/cjs` build.
+            // is consumed only via `require()` from dockview-react, so it uses
+            // the inlined `dist/package` bundle.
             'dockview-core': {
+                main: './dist/cjs/index.js',
+                format: 'cjs',
+                defaultExtension: 'js',
+            },
+            // `dockview-enterprise`: tsc `dist/cjs` build so SystemJS sees the
+            // named exports (e.g. `LicenseManager`). Examples that use it import it.
+            'dockview-enterprise': {
                 main: './dist/cjs/index.js',
                 format: 'cjs',
                 defaultExtension: 'js',

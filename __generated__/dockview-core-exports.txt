@@ -120,8 +120,6 @@ GroupNavigationDirection
 GroupPanelPartInitParameters
 GroupviewPanelState
 HeaderPartInitParameters
-IAccessibilityHost
-IAccessibilityService
 IAdvancedDnDHost
 IAdvancedDnDService
 IAutoHideEdgeGroupHost
@@ -155,6 +153,8 @@ IGroupPanelBaseProps
 IGroupPanelInitParameters
 IHeaderActionsRenderer
 IKeyboardDockingService
+IKeyboardNavigationHost
+IKeyboardNavigationService
 ILayoutHistoryHost
 ILayoutHistoryService
 IMultiRowTabsHost

@@ -1,10 +1,10 @@
 import {
     DockviewCompositeDisposable as CompositeDisposable,
     DockviewIDisposable as IDisposable,
-} from 'dockview-core';
-import { DockviewGroupPanel } from 'dockview-core';
-import { defineModule } from 'dockview-core';
-import { ITabGroupChipsHost, ITabGroupChipsService } from 'dockview-core';
+} from 'dockview';
+import { DockviewGroupPanel } from 'dockview';
+import { defineModule } from 'dockview';
+import { ITabGroupChipsHost, ITabGroupChipsService } from 'dockview';
 
 export class TabGroupChipsService implements ITabGroupChipsService {
     private readonly _host: ITabGroupChipsHost;

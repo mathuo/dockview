@@ -44,7 +44,7 @@
     "release": {
         "projects": [
             "dockview-core",
-            "dockview-modules",
+            "dockview-enterprise",
             "dockview",
             "dockview-vue",
             "dockview-react",

@@ -8,6 +8,29 @@ const { name, version, homepage, license } = require('./package.json');
 const input = join(__dirname, './src/index.ts');
 const outputDir = join(__dirname, 'dist');
 
+// Stamp the build date into `releaseDate.ts` so license validation is
+// version-based: the `__DOCKVIEW_RELEASE_DATE__` token becomes the day this
+// bundle was built. Runs before the typescript transform so it operates on the
+// raw source. Zero-dependency (an inline transform, not @rollup/plugin-replace).
+function stampReleaseDate() {
+    const iso = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
+    return {
+        name: 'stamp-release-date',
+        transform(code, id) {
+            if (
+                id.replace(/\\/g, '/').endsWith('/src/releaseDate.ts') &&
+                code.includes('__DOCKVIEW_RELEASE_DATE__')
+            ) {
+                return {
+                    code: code.replace(/__DOCKVIEW_RELEASE_DATE__/g, iso),
+                    map: null,
+                };
+            }
+            return null;
+        },
+    };
+}
+
 function outputFile(format, isMinified) {
     if (format === 'umd') {
         let filename = join(outputDir, name);
@@ -25,10 +48,9 @@ function outputFile(format, isMinified) {
     return `${filename}.${ext}`;
 }
 
-// dockview-core (and its deep internal paths) is a declared dependency and is
-// always externalized — the bundle ships only the module implementations.
-const isCoreExternal = (id) =>
-    id === 'dockview-core' || id.startsWith('dockview-core/');
+// `dockview` (the free package, this package's sole base dependency) is always
+// externalized — the bundle ships only the enterprise module implementations.
+const isBaseExternal = (id) => id === 'dockview' || id.startsWith('dockview/');
 
 function createBundle(format, options) {
     const { isMinified } = options;
@@ -38,7 +60,7 @@ function createBundle(format, options) {
         file,
         format,
         sourcemap: isMinified && format === 'umd',
-        globals: { 'dockview-core': 'DockviewCore' },
+        globals: { dockview: 'dockview' },
         banner: [
             `/**`,
             ` * ${name}`,
@@ -54,6 +76,7 @@ function createBundle(format, options) {
     }
 
     const plugins = [
+        stampReleaseDate(),
         typescript({
             tsconfig: 'tsconfig.esm.json',
             outDir: outputDir,
@@ -70,7 +93,7 @@ function createBundle(format, options) {
         input,
         output,
         plugins,
-        external: isCoreExternal,
+        external: isBaseExternal,
     };
 }
 

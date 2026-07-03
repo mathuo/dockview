@@ -1,3 +1,4 @@
+import { LicenseManager } from 'dockview-enterprise';
 import 'zone.js';
 import '@angular/compiler';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
@@ -18,6 +19,11 @@ import {
     DockviewReadyEvent,
 } from 'dockview-angular';
 import 'dockview-angular/dist/styles/dockview.css';
+
+// dockview.dev docs license key — replace with your own key in production.
+LicenseManager.setLicenseKey(
+    '[KeyId:DOCKVIEW-DOCS]_[Company:Dockview]_[Plan:team]_[AppName:Dockview_Docs]_[Email:enterprise@dockview.dev]_[ValidFrom:01_Jan_2025]_[ValidUntil:01_Jan_2099]__aaa294ecec1eed47'
+);
 
 @Component({
     selector: 'default-panel',

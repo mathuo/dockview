@@ -1,7 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 
 /**
- * Keyboard navigation (AccessibilityModule, `keyboardNavigation: true`) —
+ * Keyboard navigation (KeyboardNavigationModule, `keyboardNavigation: true`) —
  * real-browser behaviour the jsdom unit tests cannot fully model: a document
  * `keydown` for F6 / Shift+F6 dispatched from the real focused element cycles
  * the active group and moves DOM focus into the newly-active group's content.

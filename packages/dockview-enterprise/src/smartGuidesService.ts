@@ -2,7 +2,7 @@ import {
     DockviewCompositeDisposable as CompositeDisposable,
     DockviewEmitter as Emitter,
     DockviewEvent as Event,
-} from 'dockview-core';
+} from 'dockview';
 import {
     Box,
     DockviewGroupPanel,
@@ -13,9 +13,9 @@ import {
     SmartGuidesSnapPosition,
     SmartGuidesSnapTogetherEvent,
     SnapModifier,
-} from 'dockview-core';
-import { defineModule, FloatingGroupModule } from 'dockview-core';
-import { ISmartGuidesHost, ISmartGuidesService } from 'dockview-core';
+} from 'dockview';
+import { defineModule, FloatingGroupModule } from 'dockview';
+import { ISmartGuidesHost, ISmartGuidesService } from 'dockview';
 
 /** Fraction of the perpendicular extents that must overlap for an edge to read
  *  as an adjacency (dock-beside) rather than a glancing touch. */

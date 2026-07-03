@@ -8,7 +8,7 @@ import { defineConfig, devices } from '@playwright/test';
  * static fixture page (built UMD bundles) in headless Chromium.
  *
  * Prerequisite: the UMD bundles must exist —
- *   yarn nx run-many -t build:bundle -p dockview-core dockview-modules
+ *   yarn nx run-many -t build:bundle -p dockview-core dockview-enterprise
  * then `yarn test:e2e`.
  */
 export default defineConfig({

@@ -20,7 +20,7 @@ main document, so a popout there is not a genuine second window.)
 The fixture loads the UMD bundles from `dist/`, so build them first:
 
 ```bash
-yarn nx run-many -t build:bundle -p dockview-core dockview-modules
+yarn nx run-many -t build:bundle -p dockview-core dockview-enterprise
 yarn playwright install chromium   # first time only
 yarn test:e2e
 ```
