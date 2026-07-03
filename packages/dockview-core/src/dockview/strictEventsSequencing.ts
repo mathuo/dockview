@@ -23,12 +23,12 @@ export class StrictEventsSequencing extends CompositeDisposable {
                 }
             }),
             this.accessor.onDidRemovePanel((panel) => {
-                if (!panels.has(panel.api.id)) {
+                if (panels.has(panel.api.id)) {
+                    panels.delete(panel.api.id);
+                } else {
                     throw new Error(
                         `dockview: Invalid event sequence. [onDidRemovePanel] called for panel ${panel.api.id} but panel does not exists`
                     );
-                } else {
-                    panels.delete(panel.api.id);
                 }
             }),
             this.accessor.onDidAddGroup((group) => {
@@ -41,12 +41,12 @@ export class StrictEventsSequencing extends CompositeDisposable {
                 }
             }),
             this.accessor.onDidRemoveGroup((group) => {
-                if (!groups.has(group.api.id)) {
+                if (groups.has(group.api.id)) {
+                    groups.delete(group.api.id);
+                } else {
                     throw new Error(
                         `dockview: Invalid event sequence. [onDidRemoveGroup] called for group ${group.api.id} but group does not exists`
                     );
-                } else {
-                    groups.delete(group.api.id);
                 }
             })
         );

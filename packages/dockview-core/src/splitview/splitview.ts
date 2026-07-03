@@ -664,7 +664,7 @@ export class Splitview {
     public moveView(from: number, to: number): void {
         const cachedVisibleSize = this.getViewCachedVisibleSize(from);
         const sizing =
-            typeof cachedVisibleSize === 'undefined'
+            cachedVisibleSize === undefined
                 ? this.getViewSize(from)
                 : Sizing.Invisible(cachedVisibleSize);
         const view = this.removeView(from, undefined, true);
@@ -676,23 +676,7 @@ export class Splitview {
         this.size = size;
         this.orthogonalSize = orthogonalSize;
 
-        if (!this.proportions) {
-            const indexes = range(this.viewItems.length);
-            const lowPriorityIndexes = indexes.filter(
-                (i) => this.viewItems[i].priority === LayoutPriority.Low
-            );
-            const highPriorityIndexes = indexes.filter(
-                (i) => this.viewItems[i].priority === LayoutPriority.High
-            );
-
-            this.resize(
-                this.viewItems.length - 1,
-                size - previousSize,
-                undefined,
-                lowPriorityIndexes,
-                highPriorityIndexes
-            );
-        } else {
+        if (this.proportions) {
             let total = 0;
 
             for (let i = 0; i < this.viewItems.length; i++) {
@@ -718,6 +702,22 @@ export class Splitview {
                     );
                 }
             }
+        } else {
+            const indexes = range(this.viewItems.length);
+            const lowPriorityIndexes = indexes.filter(
+                (i) => this.viewItems[i].priority === LayoutPriority.Low
+            );
+            const highPriorityIndexes = indexes.filter(
+                (i) => this.viewItems[i].priority === LayoutPriority.High
+            );
+
+            this.resize(
+                this.viewItems.length - 1,
+                size - previousSize,
+                undefined,
+                lowPriorityIndexes,
+                highPriorityIndexes
+            );
         }
 
         this.distributeEmptySpace();

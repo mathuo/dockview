@@ -781,18 +781,15 @@ export class Tabs extends CompositeDisposable {
                     return;
                 }
 
-                switch (event.button) {
-                    case 0:
-                        // Edge groups are skipped here: all their tab interaction
-                        // is handled by onTabClick to avoid race conditions with
-                        // active panel state.
-                        if (
-                            this.group.api.location.type !== 'edge' &&
-                            this.group.activePanel !== panel
-                        ) {
-                            this.group.model.openPanel(panel);
-                        }
-                        break;
+                // Edge groups are skipped here: all their tab interaction
+                // is handled by onTabClick to avoid race conditions with
+                // active panel state.
+                if (
+                    event.button === 0 &&
+                    this.group.api.location.type !== 'edge' &&
+                    this.group.activePanel !== panel
+                ) {
+                    this.group.model.openPanel(panel);
                 }
             }),
             tab.onDrop((event) => {
@@ -831,8 +828,9 @@ export class Tabs extends CompositeDisposable {
                             firstPositions,
                             animState.sourceTabId,
                             animState.sourceIndex === -1,
-                            animState.sourceIndex !== -1
-                                ? {
+                            animState.sourceIndex === -1
+                                ? undefined
+                                : {
                                       from: Math.min(
                                           animState.sourceIndex,
                                           dropIndex
@@ -842,7 +840,6 @@ export class Tabs extends CompositeDisposable {
                                           dropIndex
                                       ),
                                   }
-                                : undefined
                         );
                     }
                 } else {

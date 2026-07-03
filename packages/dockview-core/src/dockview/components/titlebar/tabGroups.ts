@@ -349,19 +349,16 @@ export class TabGroupManager {
             this._indicator = null;
         }
 
-        if (!this._indicator) {
-            this._indicator = new Ctor({
-                tabsList: this._ctx.tabsList,
-                getTabGroups: () => this._ctx.group.model.getTabGroups(),
-                getActivePanelId: () => this._ctx.group.activePanel?.id,
-                getTabMap: () => this._ctx.getTabMap(),
-                getChipElement: (id) =>
-                    this._chipRenderers.get(id)?.chip.element,
-                getDirection: () => this._ctx.getDirection(),
-                getHeaderPosition: () => this._ctx.group.model.headerPosition,
-                getColorPalette: () => this._ctx.accessor.tabGroupColorPalette,
-            });
-        }
+        this._indicator ??= new Ctor({
+            tabsList: this._ctx.tabsList,
+            getTabGroups: () => this._ctx.group.model.getTabGroups(),
+            getActivePanelId: () => this._ctx.group.activePanel?.id,
+            getTabMap: () => this._ctx.getTabMap(),
+            getChipElement: (id) => this._chipRenderers.get(id)?.chip.element,
+            getDirection: () => this._ctx.getDirection(),
+            getHeaderPosition: () => this._ctx.group.model.headerPosition,
+            getColorPalette: () => this._ctx.accessor.tabGroupColorPalette,
+        });
     }
 
     private _ensureChipForGroup(tabGroup: ITabGroup): void {

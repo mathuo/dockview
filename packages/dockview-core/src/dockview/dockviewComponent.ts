@@ -1379,11 +1379,11 @@ export class DockviewComponent
                     return false;
                 }
 
-                const referenceGroup = options?.referenceGroup
-                    ? options.referenceGroup
-                    : itemToPopout instanceof DockviewPanel
-                      ? itemToPopout.group
-                      : itemToPopout;
+                const referenceGroup =
+                    options?.referenceGroup ??
+                    (itemToPopout instanceof DockviewPanel
+                        ? itemToPopout.group
+                        : itemToPopout);
 
                 const referenceLocation = itemToPopout.api.location.type;
 
@@ -2674,7 +2674,7 @@ export class DockviewComponent
                 } = data;
 
                 if (typeof id !== 'string') {
-                    throw new Error(
+                    throw new TypeError(
                         'dockview: group id must be of type string'
                     );
                 }
@@ -2913,8 +2913,7 @@ export class DockviewComponent
                     }
                 }
 
-                for (let i = 0; i < createdPanels.length; i++) {
-                    const panel = createdPanels[i];
+                for (const panel of createdPanels) {
                     const isActive = activeView === panel.id;
                     edgeGroup.model.openPanel(panel, {
                         skipSetActive: !isActive,
@@ -3115,7 +3114,7 @@ export class DockviewComponent
     private _doAddPanel<T extends object = Parameters>(
         options: AddPanelOptions<T>
     ): DockviewPanel {
-        if (this.panels.find((_) => _.id === options.id)) {
+        if (this.panels.some((_) => _.id === options.id)) {
             throw new Error(
                 `dockview: panel with id ${options.id} already exists`
             );
@@ -3145,8 +3144,12 @@ export class DockviewComponent
                 index = options.position.index;
 
                 if (!referencePanel) {
+                    const referenceId =
+                        typeof options.position.referencePanel === 'string'
+                            ? options.position.referencePanel
+                            : options.position.referencePanel?.id;
                     throw new Error(
-                        `dockview: referencePanel '${options.position.referencePanel}' does not exist`
+                        `dockview: referencePanel '${referenceId}' does not exist`
                     );
                 }
 
@@ -3160,8 +3163,12 @@ export class DockviewComponent
                 index = options.position.index;
 
                 if (!referenceGroup) {
+                    const referenceId =
+                        typeof options.position.referenceGroup === 'string'
+                            ? options.position.referenceGroup
+                            : options.position.referenceGroup?.id;
                     throw new Error(
-                        `dockview: referenceGroup '${options.position.referenceGroup}' does not exist`
+                        `dockview: referenceGroup '${referenceId}' does not exist`
                     );
                 }
             } else {
@@ -3380,9 +3387,14 @@ export class DockviewComponent
                           )
                         : options.referencePanel;
 
+                const referencePanelId =
+                    typeof options.referencePanel === 'string'
+                        ? options.referencePanel
+                        : options.referencePanel?.id;
+
                 if (!referencePanel) {
                     throw new Error(
-                        `dockview: reference panel ${options.referencePanel} does not exist`
+                        `dockview: reference panel ${referencePanelId} does not exist`
                     );
                 }
 
@@ -3390,7 +3402,7 @@ export class DockviewComponent
 
                 if (!referenceGroup) {
                     throw new Error(
-                        `dockview: reference group for reference panel ${options.referencePanel} does not exist`
+                        `dockview: reference group for reference panel ${referencePanelId} does not exist`
                     );
                 }
             } else if (isGroupOptionsWithGroup(options)) {
@@ -3400,8 +3412,12 @@ export class DockviewComponent
                         : options.referenceGroup;
 
                 if (!referenceGroup) {
+                    const referenceId =
+                        typeof options.referenceGroup === 'string'
+                            ? options.referenceGroup
+                            : options.referenceGroup?.id;
                     throw new Error(
-                        `dockview: reference group ${options.referenceGroup} does not exist`
+                        `dockview: reference group ${referenceId} does not exist`
                     );
                 }
             } else {
@@ -3573,12 +3589,12 @@ export class DockviewComponent
             if (this.detachFromNestedWindow(group)) {
                 // The floating window hosts other groups and stays alive —
                 // finalize just this group.
-                if (!options?.skipDispose) {
-                    this.disposeGroupRecord(group);
-                } else {
+                if (options?.skipDispose) {
                     // Relocation: reset location so the destination root can
                     // re-tag it.
                     group.model.location = { type: 'grid' };
+                } else {
+                    this.disposeGroupRecord(group);
                 }
 
                 this.activateFallbackGroupIfRemoved(group, options?.skipActive);
@@ -3607,12 +3623,12 @@ export class DockviewComponent
             if (this.detachFromNestedWindow(group)) {
                 // The popout window hosts other groups and stays alive —
                 // finalize just this group.
-                if (!options?.skipDispose) {
-                    this.disposeGroupRecord(group);
-                } else {
+                if (options?.skipDispose) {
                     // Relocation: reset location so the destination root can
                     // re-tag it.
                     group.model.location = { type: 'grid' };
+                } else {
+                    this.disposeGroupRecord(group);
                 }
 
                 this.activateFallbackGroupIfRemoved(group, options?.skipActive);
@@ -4539,9 +4555,7 @@ export class DockviewComponent
     }
 
     createGroup(options?: GroupOptions): DockviewGroupPanel {
-        if (!options) {
-            options = {};
-        }
+        options ??= {};
 
         let id = options?.id;
 
@@ -4811,7 +4825,12 @@ export class DockviewComponent
             theme.edgeGroupCollapsedSize ?? 35
         );
 
-        if (theme.dndOverlayBorder !== undefined) {
+        if (theme.dndOverlayBorder === undefined) {
+            this.element.style.removeProperty('--dv-drag-over-border');
+            this._shellManager?.element.style.removeProperty(
+                '--dv-drag-over-border'
+            );
+        } else {
             this.element.style.setProperty(
                 '--dv-drag-over-border',
                 theme.dndOverlayBorder
@@ -4819,11 +4838,6 @@ export class DockviewComponent
             this._shellManager?.element.style.setProperty(
                 '--dv-drag-over-border',
                 theme.dndOverlayBorder
-            );
-        } else {
-            this.element.style.removeProperty('--dv-drag-over-border');
-            this._shellManager?.element.style.removeProperty(
-                '--dv-drag-over-border'
             );
         }
 

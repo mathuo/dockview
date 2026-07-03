@@ -62,7 +62,7 @@ export class LongPressDetector extends CompositeDisposable {
 
         // Source's owning window — popout drags fire on their own window.
         const targetWindow: Window =
-            this.element.ownerDocument?.defaultView ?? window;
+            this.element.ownerDocument?.defaultView ?? globalThis.window;
 
         this._timer = setTimeout(() => {
             this._timer = undefined;

@@ -26,9 +26,7 @@ export class PointerDragController extends CompositeDisposable {
     private static _instance: PointerDragController | undefined;
 
     static getInstance(): PointerDragController {
-        if (!PointerDragController._instance) {
-            PointerDragController._instance = new PointerDragController();
-        }
+        PointerDragController._instance ??= new PointerDragController();
         return PointerDragController._instance;
     }
 
@@ -136,7 +134,7 @@ export class PointerDragController extends CompositeDisposable {
         // Source's owning window — popout drags fire on their own window,
         // not the main one.
         const targetWindow: Window =
-            source.ownerDocument?.defaultView ?? window;
+            source.ownerDocument?.defaultView ?? globalThis.window;
 
         this._moveListener = addDisposableListener(
             targetWindow,

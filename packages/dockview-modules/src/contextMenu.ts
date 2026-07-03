@@ -66,11 +66,11 @@ function buildSeparator(): HTMLElement {
 }
 
 function isCoarsePrimaryInput(): boolean {
-    if (typeof window === 'undefined' || !window.matchMedia) {
+    if (globalThis.window === undefined || !globalThis.matchMedia) {
         return false;
     }
-    const coarse = window.matchMedia('(pointer: coarse)').matches;
-    const fine = window.matchMedia('(pointer: fine)').matches;
+    const coarse = globalThis.matchMedia('(pointer: coarse)').matches;
+    const fine = globalThis.matchMedia('(pointer: fine)').matches;
     return coarse && !fine;
 }
 
