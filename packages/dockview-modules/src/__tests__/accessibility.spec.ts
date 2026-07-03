@@ -75,7 +75,7 @@ describe('accessibility: WAI-ARIA tabs baseline', () => {
         expect(tabpanel.id).toBeTruthy();
 
         const tabs = realTabs();
-        expect(tabs.length).toBe(1);
+        expect(tabs).toHaveLength(1);
         expect(tabs[0].getAttribute('role')).toBe('tab');
         expect(tabs[0].id).toBeTruthy();
     });
@@ -86,7 +86,7 @@ describe('accessibility: WAI-ARIA tabs baseline', () => {
 
         const tabpanel = container.querySelector('.dv-content-container')!;
         const tabs = realTabs();
-        expect(tabs.length).toBe(2);
+        expect(tabs).toHaveLength(2);
 
         // aria-controls: every tab references the single group tabpanel.
         for (const tab of tabs) {
@@ -97,7 +97,7 @@ describe('accessibility: WAI-ARIA tabs baseline', () => {
         const selected = tabs.filter(
             (t) => t.getAttribute('aria-selected') === 'true'
         );
-        expect(selected.length).toBe(1);
+        expect(selected).toHaveLength(1);
         expect(tabpanel.getAttribute('aria-labelledby')).toBe(selected[0].id);
     });
 
@@ -114,7 +114,7 @@ describe('accessibility: WAI-ARIA tabs baseline', () => {
         const selectedBefore = realTabs().filter(
             (t) => t.getAttribute('aria-selected') === 'true'
         );
-        expect(selectedBefore.length).toBe(1);
+        expect(selectedBefore).toHaveLength(1);
         const activeTabId2 = selectedBefore[0].id;
         expect(tabpanel.getAttribute('aria-labelledby')).toBe(activeTabId2);
 
@@ -124,7 +124,7 @@ describe('accessibility: WAI-ARIA tabs baseline', () => {
         const selectedAfter = realTabs().filter(
             (t) => t.getAttribute('aria-selected') === 'true'
         );
-        expect(selectedAfter.length).toBe(1);
+        expect(selectedAfter).toHaveLength(1);
         expect(selectedAfter[0].id).not.toBe(activeTabId2);
         expect(tabpanel.getAttribute('aria-labelledby')).toBe(
             selectedAfter[0].id
@@ -142,7 +142,7 @@ describe('accessibility: WAI-ARIA tabs baseline', () => {
         const tabpanels = Array.from(
             container.querySelectorAll('.dv-content-container')
         ) as HTMLElement[];
-        expect(tabpanels.length).toBe(2);
+        expect(tabpanels).toHaveLength(2);
         expect(tabpanels[0].id).not.toBe(tabpanels[1].id);
 
         const ids = realTabs().map((t) => t.id);

@@ -10,7 +10,7 @@ import {
     pointerBackend,
 } from '../../../dnd/backend';
 import { DockviewComponent } from '../../dockviewComponent';
-import { Emitter, Event } from '../../../events';
+import { Emitter } from '../../../events';
 import {
     CompositeDisposable,
     Disposable,

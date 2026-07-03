@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import {
-    SplitviewApi,
     type SplitviewOptions,
     PROPERTY_KEYS_SPLITVIEW,
-    type SplitviewFrameworkOptions,
     createSplitview,
 } from 'dockview';
 import { useViewComponent } from '../composables/useViewComponent';

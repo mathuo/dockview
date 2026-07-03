@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import {
-    PaneviewApi,
     type PaneviewOptions,
     PROPERTY_KEYS_PANEVIEW,
-    type PaneviewFrameworkOptions,
     createPaneview,
 } from 'dockview';
 import { useViewComponent } from '../composables/useViewComponent';

@@ -580,8 +580,7 @@ describe('voidContainer', () => {
 
             expect(
                 cut.element.getElementsByClassName('dv-drop-target-dropzone')
-                    .length
-            ).toBe(1);
+            ).toHaveLength(1);
 
             cut.dispose();
         });

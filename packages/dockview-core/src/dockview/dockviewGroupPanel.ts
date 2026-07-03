@@ -36,7 +36,7 @@ export class DockviewGroupPanel
     private readonly _model: DockviewGroupPanelModel;
 
     // Track explicitly set constraints to override panel constraints
-    private _explicitConstraints: Partial<Constraints> = {};
+    private readonly _explicitConstraints: Partial<Constraints> = {};
 
     override get minimumWidth(): number {
         // Check for explicitly set group constraint first

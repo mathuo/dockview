@@ -177,7 +177,7 @@ describe('baseComponentGridview', () => {
 
         cut.doAddGroup(panel1);
 
-        expect(events.length).toBe(1);
+        expect(events).toHaveLength(1);
         expect(events[0]).toEqual({ type: 'add', panel: panel1 });
 
         const panel2 = new TestPanel(
@@ -193,11 +193,11 @@ describe('baseComponentGridview', () => {
 
         cut.doAddGroup(panel2);
 
-        expect(events.length).toBe(2);
+        expect(events).toHaveLength(2);
         expect(events[1]).toEqual({ type: 'add', panel: panel2 });
 
         cut.doRemoveGroup(panel1);
-        expect(events.length).toBe(3);
+        expect(events).toHaveLength(3);
         expect(events[2]).toEqual({ type: 'remove', panel: panel1 });
 
         disposable.dispose();

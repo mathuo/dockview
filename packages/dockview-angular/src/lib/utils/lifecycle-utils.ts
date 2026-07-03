@@ -36,7 +36,7 @@ export class AngularDisposable implements DockviewIDisposable {
 }
 
 export class AngularLifecycleManager {
-    private destroySubject = new Subject<void>();
+    private readonly destroySubject = new Subject<void>();
     private disposables: DockviewIDisposable[] = [];
 
     get destroy$(): Observable<void> {

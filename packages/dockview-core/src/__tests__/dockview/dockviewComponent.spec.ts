@@ -608,8 +608,8 @@ describe('dockviewComponent', () => {
             await dockview.addPopoutGroup(panel1.api.group);
 
             expect(panel1.api.location.type).toBe('popout');
-            expect(dockview.groups.length).toBe(4);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(4);
+            expect(dockview.panels).toHaveLength(3);
 
             panel1.api.group.api.moveTo({
                 group: panel2.api.group,
@@ -617,11 +617,11 @@ describe('dockviewComponent', () => {
             });
 
             expect(panel1.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(3);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(3);
+            expect(dockview.panels).toHaveLength(3);
 
             const query = dockview.element.querySelectorAll('.dv-view');
-            expect(query.length).toBe(3);
+            expect(query).toHaveLength(3);
         });
 
         test('that moving a popout group to specific position works correctly', async () => {
@@ -655,7 +655,7 @@ describe('dockviewComponent', () => {
 
             await dockview.addPopoutGroup(panel1.api.group);
             expect(panel1.api.location.type).toBe('popout');
-            expect(dockview.groups.length).toBe(3); // panel2 + hidden reference + popout
+            expect(dockview.groups).toHaveLength(3); // panel2 + hidden reference + popout
 
             // Move popout group to left of panel2
             panel1.api.group.api.moveTo({
@@ -665,8 +665,8 @@ describe('dockviewComponent', () => {
 
             // Core assertions: should be back in grid and positioned correctly
             expect(panel1.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(2); // Should clean up properly
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(2); // Should clean up properly
+            expect(dockview.panels).toHaveLength(2);
 
             // Verify both panels are visible and accessible
             expect(panel1.api.isVisible).toBe(true);
@@ -717,7 +717,7 @@ describe('dockviewComponent', () => {
                 expect(panel1.api.isVisible).toBe(true);
                 expect(panel2.api.isVisible).toBe(true);
                 expect(dockview.groups.length).toBeGreaterThanOrEqual(2);
-                expect(dockview.panels.length).toBe(2);
+                expect(dockview.panels).toHaveLength(2);
             });
         });
 
@@ -755,7 +755,7 @@ describe('dockviewComponent', () => {
 
             await dockview.addPopoutGroup(panel1.api.group);
             expect(panel1.api.location.type).toBe('popout');
-            expect(dockview.groups.length).toBe(3); // panel2 + hidden reference + popout
+            expect(dockview.groups).toHaveLength(3); // panel2 + hidden reference + popout
 
             // Move to new position - should clean up reference group
             panel1.api.group.api.moveTo({
@@ -764,7 +764,7 @@ describe('dockviewComponent', () => {
             });
 
             expect(panel1.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(2); // Just panel2 + panel1 in new position
+            expect(dockview.groups).toHaveLength(2); // Just panel2 + panel1 in new position
 
             // Reference group should be cleaned up (no longer exist)
             const referenceGroupStillExists = dockview.groups.some(
@@ -1137,11 +1137,11 @@ describe('dockviewComponent', () => {
         expect(panel2.group).toBe(destGroup);
 
         // Source group should be removed (was empty after move)
-        expect(dockview.groups.length).toBe(1);
+        expect(dockview.groups).toHaveLength(1);
 
         // Tab group should be recreated in destination
         const destTabGroups = destGroup.model.getTabGroups();
-        expect(destTabGroups.length).toBe(1);
+        expect(destTabGroups).toHaveLength(1);
         expect(destTabGroups[0].label).toBe('Feature');
         expect(destTabGroups[0].color).toBe('blue');
         expect(destTabGroups[0].panelIds).toContain('panel1');
@@ -1193,7 +1193,7 @@ describe('dockviewComponent', () => {
         });
 
         const destTabGroups = destGroup.model.getTabGroups();
-        expect(destTabGroups.length).toBe(1);
+        expect(destTabGroups).toHaveLength(1);
         expect(destTabGroups[0].collapsed).toBe(true);
         expect(destTabGroups[0].color).toBe('red');
 
@@ -1253,7 +1253,7 @@ describe('dockviewComponent', () => {
         expect(destCollapseEvents).toHaveLength(0);
 
         const destTabGroups = destGroup.model.getTabGroups();
-        expect(destTabGroups.length).toBe(1);
+        expect(destTabGroups).toHaveLength(1);
         expect(destTabGroups[0].collapsed).toBe(true);
 
         // Force synchronous chip rendering (updateTabGroups is normally
@@ -1314,7 +1314,7 @@ describe('dockviewComponent', () => {
         });
 
         // Should have 2 groups now
-        expect(dockview.groups.length).toBe(2);
+        expect(dockview.groups).toHaveLength(2);
 
         // panel3 stays in source
         expect(panel3.group).toBe(sourceGroup);
@@ -1327,7 +1327,7 @@ describe('dockviewComponent', () => {
         expect(newGroup.model.size).toBe(2);
 
         const newTabGroups = newGroup.model.getTabGroups();
-        expect(newTabGroups.length).toBe(1);
+        expect(newTabGroups).toHaveLength(1);
         expect(newTabGroups[0].label).toBe('Split');
         expect(newTabGroups[0].color).toBe('green');
 
@@ -1445,7 +1445,7 @@ describe('dockviewComponent', () => {
 
         // Tab group should have come along with its panels and metadata.
         const movedTabGroups = destGroup.model.getTabGroups();
-        expect(movedTabGroups.length).toBe(1);
+        expect(movedTabGroups).toHaveLength(1);
         const moved = movedTabGroups[0];
         expect(moved.label).toBe('Feature');
         expect(moved.color).toBe('blue');
@@ -1512,7 +1512,7 @@ describe('dockviewComponent', () => {
 
         // Tab group recreated and still collapsed.
         const tgs = destGroup.model.getTabGroups();
-        expect(tgs.length).toBe(1);
+        expect(tgs).toHaveLength(1);
         expect(tgs[0].collapsed).toBe(true);
         expect([...tgs[0].panelIds]).toEqual(['panel1', 'panel2']);
 
@@ -1559,14 +1559,14 @@ describe('dockviewComponent', () => {
 
         // Source group should be removed (it became empty); only the new
         // group at the right contains the panels.
-        expect(dockview.groups.length).toBe(1);
+        expect(dockview.groups).toHaveLength(1);
         const newGroup = panel1.group;
         expect(newGroup).not.toBe(sourceGroup);
         expect(panel2.group).toBe(newGroup);
         expect(newGroup.model.size).toBe(2);
 
         const newTabGroups = newGroup.model.getTabGroups();
-        expect(newTabGroups.length).toBe(1);
+        expect(newTabGroups).toHaveLength(1);
         expect(newTabGroups[0].label).toBe('All');
         expect(newTabGroups[0].color).toBe('red');
 
@@ -1869,13 +1869,13 @@ describe('dockviewComponent', () => {
             '.dv-branch-node > .dv-split-view-container > .dv-view-container > .dv-view'
         );
 
-        expect(viewQuery.length).toBe(1);
+        expect(viewQuery).toHaveLength(1);
 
         viewQuery = container.querySelectorAll(
             '.dv-branch-node > .dv-split-view-container > .dv-view-container > .dv-view:nth-child(1) >.dv-groupview > .dv-content-container > .testpanel-panel2'
         );
 
-        expect(viewQuery.length).toBe(1);
+        expect(viewQuery).toHaveLength(1);
 
         const group = dockview.getGroupPanel('panel1')!.group;
         dockview.moveGroupOrPanel({
@@ -1887,19 +1887,19 @@ describe('dockviewComponent', () => {
             '.dv-branch-node > .dv-split-view-container > .dv-view-container > .dv-view'
         );
 
-        expect(viewQuery.length).toBe(2);
+        expect(viewQuery).toHaveLength(2);
 
         viewQuery = container.querySelectorAll(
             '.dv-branch-node > .dv-split-view-container > .dv-view-container > .dv-view:nth-child(1) >.dv-groupview > .dv-content-container > .testpanel-panel2'
         );
 
-        expect(viewQuery.length).toBe(1);
+        expect(viewQuery).toHaveLength(1);
 
         viewQuery = container.querySelectorAll(
             '.dv-branch-node > .dv-split-view-container > .dv-view-container > .dv-view:nth-child(2) >.dv-groupview > .dv-content-container > .testpanel-panel1'
         );
 
-        expect(viewQuery.length).toBe(1);
+        expect(viewQuery).toHaveLength(1);
     });
 
     describe('serialization', () => {
@@ -1928,7 +1928,7 @@ describe('dockviewComponent', () => {
             dockview.addPanel({ id: 'panel2', component: 'default' });
             dockview.addPanel({ id: 'panel7', component: 'default' });
 
-            expect(parts.length).toBe(3);
+            expect(parts).toHaveLength(3);
 
             expect(parts.map((part) => part.isDisposed)).toEqual([
                 false,
@@ -2044,7 +2044,7 @@ describe('dockviewComponent', () => {
             dockview.addPanel({ id: 'panel2', component: 'default' });
             dockview.addPanel({ id: 'panel7', component: 'default' });
 
-            expect(parts.length).toBe(3);
+            expect(parts).toHaveLength(3);
 
             expect(parts.map((part) => part.isDisposed)).toEqual([
                 false,
@@ -2349,8 +2349,8 @@ describe('dockviewComponent', () => {
             expect(panel4.api.isMaximized()).toBeTruthy();
 
             api.clear();
-            expect(api.groups.length).toBe(0);
-            expect(api.panels.length).toBe(0);
+            expect(api.groups).toHaveLength(0);
+            expect(api.panels).toHaveLength(0);
 
             api.fromJSON(state);
             const newPanel4 = api.getPanel('panel4')!;
@@ -3002,7 +3002,7 @@ describe('dockviewComponent', () => {
         events = [];
         disposable.dispose();
 
-        expect(events.length).toBe(0);
+        expect(events).toHaveLength(0);
     });
 
     test('that removing a panel from a group reflects in the dockviewcomponent when searching for a panel', () => {
@@ -3104,8 +3104,8 @@ describe('dockviewComponent', () => {
             },
         });
 
-        expect(removedGroups.length).toBe(2);
-        expect(removedPanels.length).toBe(3);
+        expect(removedGroups).toHaveLength(2);
+        expect(removedPanels).toHaveLength(3);
 
         disposable.dispose();
     });
@@ -3130,11 +3130,11 @@ describe('dockviewComponent', () => {
             component: 'default',
         });
 
-        expect(container.childNodes.length).toBe(1);
+        expect(container.childNodes).toHaveLength(1);
 
         dockview.dispose();
 
-        expect(container.childNodes.length).toBe(0);
+        expect(container.childNodes).toHaveLength(0);
     });
 
     test('panel is disposed of when closed', () => {
@@ -3648,14 +3648,14 @@ describe('dockviewComponent', () => {
 
         const panel1Spy = jest.spyOn(panel1.group, 'dispose');
 
-        expect(dockview.groups.length).toBe(2);
+        expect(dockview.groups).toHaveLength(2);
 
         dockview.moveGroupOrPanel({
             from: { groupId: panel1.group.id },
             to: { group: panel3.group, position: 'center' },
         });
 
-        expect(dockview.groups.length).toBe(1);
+        expect(dockview.groups).toHaveLength(1);
         expect(panel1Spy).toHaveBeenCalledTimes(1);
     });
 
@@ -3781,13 +3781,13 @@ describe('dockviewComponent', () => {
 
         jest.runAllTimers();
 
-        expect(addGroup.length).toBe(4);
-        expect(removeGroup.length).toBe(0);
-        expect(activeGroup.length).toBe(1);
-        expect(addPanel.length).toBe(5);
-        expect(removePanel.length).toBe(0);
-        expect(activePanel.length).toBe(1);
-        expect(movedPanels.length).toBe(0);
+        expect(addGroup).toHaveLength(4);
+        expect(removeGroup).toHaveLength(0);
+        expect(activeGroup).toHaveLength(1);
+        expect(addPanel).toHaveLength(5);
+        expect(removePanel).toHaveLength(0);
+        expect(activePanel).toHaveLength(1);
+        expect(movedPanels).toHaveLength(0);
         expect(layoutChange).toBe(1);
         expect(layoutChangeFromJson).toBe(1);
 
@@ -3816,13 +3816,13 @@ describe('dockviewComponent', () => {
 
         jest.runAllTimers();
 
-        expect(addGroup.length).toBe(0);
-        expect(removeGroup.length).toBe(4);
-        expect(activeGroup.length).toBe(1);
-        expect(addPanel.length).toBe(0);
-        expect(removePanel.length).toBe(5);
-        expect(activePanel.length).toBe(1);
-        expect(movedPanels.length).toBe(0);
+        expect(addGroup).toHaveLength(0);
+        expect(removeGroup).toHaveLength(4);
+        expect(activeGroup).toHaveLength(1);
+        expect(addPanel).toHaveLength(0);
+        expect(removePanel).toHaveLength(5);
+        expect(activePanel).toHaveLength(1);
+        expect(movedPanels).toHaveLength(0);
         expect(layoutChange).toBe(1);
         expect(layoutChangeFromJson).toBe(1);
 
@@ -4125,17 +4125,17 @@ describe('dockviewComponent', () => {
         const viewQuery = group.element.querySelectorAll(
             '.dv-groupview > .dv-tabs-and-actions-container > .dv-scrollable > .dv-tabs-container > .dv-tab'
         );
-        expect(viewQuery.length).toBe(2);
+        expect(viewQuery).toHaveLength(2);
 
         const viewQuery2 = group.element.querySelectorAll(
             '.dv-groupview > .dv-tabs-and-actions-container > .dv-scrollable > .dv-tabs-container > .dv-tab > .dv-default-tab'
         );
-        expect(viewQuery2.length).toBe(1);
+        expect(viewQuery2).toHaveLength(1);
 
         const viewQuery3 = group.element.querySelectorAll(
             '.dv-groupview > .dv-tabs-and-actions-container > .dv-scrollable > .dv-tabs-container > .dv-tab > .panel-tab-part-panel2'
         );
-        expect(viewQuery3.length).toBe(1);
+        expect(viewQuery3).toHaveLength(1);
     });
 
     // load a layout with a default tab identifier when react default is present
@@ -4609,7 +4609,7 @@ describe('dockviewComponent', () => {
             },
         });
 
-        expect(dockview.groups.length).toBe(0);
+        expect(dockview.groups).toHaveLength(0);
     });
 
     test('updateOptions({ createWatermarkComponent }) swaps live watermarks', () => {
@@ -4631,13 +4631,13 @@ describe('dockviewComponent', () => {
 
         // No groups → dockview-level watermark mounted with the default renderer.
         expect(
-            dockview.element.querySelectorAll('.dv-watermark-container').length
-        ).toBe(1);
+            dockview.element.querySelectorAll('.dv-watermark-container')
+        ).toHaveLength(1);
         expect(
             dockview.element.querySelectorAll(
                 '.dv-watermark-container .dv-watermark-custom'
-            ).length
-        ).toBe(0);
+            )
+        ).toHaveLength(0);
 
         const customRenderers: HTMLElement[] = [];
 
@@ -4657,13 +4657,13 @@ describe('dockviewComponent', () => {
 
         // Same dockview-level container, but now wrapping the custom element.
         expect(
-            dockview.element.querySelectorAll('.dv-watermark-container').length
-        ).toBe(1);
+            dockview.element.querySelectorAll('.dv-watermark-container')
+        ).toHaveLength(1);
         expect(
             dockview.element.querySelectorAll(
                 '.dv-watermark-container .dv-watermark-custom'
-            ).length
-        ).toBe(1);
+            )
+        ).toHaveLength(1);
         expect(customRenderers).toHaveLength(1);
 
         // Toggling back to the default factory disposes the custom one and
@@ -4671,13 +4671,13 @@ describe('dockviewComponent', () => {
         dockview.updateOptions({ createWatermarkComponent: undefined });
 
         expect(
-            dockview.element.querySelectorAll('.dv-watermark-container').length
-        ).toBe(1);
+            dockview.element.querySelectorAll('.dv-watermark-container')
+        ).toHaveLength(1);
         expect(
             dockview.element.querySelectorAll(
                 '.dv-watermark-container .dv-watermark-custom'
-            ).length
-        ).toBe(0);
+            )
+        ).toHaveLength(0);
     });
 
     test('that deserializing an empty layout has zero groups and a watermark', () => {
@@ -4697,11 +4697,11 @@ describe('dockviewComponent', () => {
             },
         });
 
-        expect(dockview.groups.length).toBe(0);
+        expect(dockview.groups).toHaveLength(0);
 
         expect(
-            dockview.element.querySelectorAll('.dv-watermark-container').length
-        ).toBe(1);
+            dockview.element.querySelectorAll('.dv-watermark-container')
+        ).toHaveLength(1);
 
         dockview.fromJSON({
             grid: {
@@ -4716,11 +4716,11 @@ describe('dockviewComponent', () => {
             panels: {},
         });
 
-        expect(dockview.groups.length).toBe(0);
+        expect(dockview.groups).toHaveLength(0);
 
         expect(
-            dockview.element.querySelectorAll('.dv-watermark-container').length
-        ).toBe(1);
+            dockview.element.querySelectorAll('.dv-watermark-container')
+        ).toHaveLength(1);
     });
 
     test('that deserializing a populated layout removes the watermark', () => {
@@ -4747,8 +4747,8 @@ describe('dockviewComponent', () => {
 
         // No groups yet → watermark mounted.
         expect(
-            dockview.element.querySelectorAll('.dv-watermark-container').length
-        ).toBe(1);
+            dockview.element.querySelectorAll('.dv-watermark-container')
+        ).toHaveLength(1);
 
         dockview.fromJSON({
             grid: {
@@ -4779,12 +4779,12 @@ describe('dockviewComponent', () => {
             },
         });
 
-        expect(dockview.groups.length).toBe(1);
+        expect(dockview.groups).toHaveLength(1);
 
         // Restored layout has a visible grid group → watermark removed.
         expect(
-            dockview.element.querySelectorAll('.dv-watermark-container').length
-        ).toBe(0);
+            dockview.element.querySelectorAll('.dv-watermark-container')
+        ).toHaveLength(0);
     });
 
     test('empty', () => {
@@ -4935,46 +4935,46 @@ describe('dockviewComponent', () => {
             component: 'default',
         });
 
-        expect(dockview.element.querySelectorAll('.dv-view').length).toBe(1);
+        expect(dockview.element.querySelectorAll('.dv-view')).toHaveLength(1);
 
         const panel2 = dockview.addPanel({
             id: 'panel2',
             component: 'default',
         });
 
-        expect(dockview.element.querySelectorAll('.dv-view').length).toBe(1);
+        expect(dockview.element.querySelectorAll('.dv-view')).toHaveLength(1);
 
         const panel3 = dockview.addPanel({
             id: 'panel3',
             component: 'default',
         });
 
-        expect(dockview.element.querySelectorAll('.dv-view').length).toBe(1);
+        expect(dockview.element.querySelectorAll('.dv-view')).toHaveLength(1);
 
         dockview.moveGroupOrPanel({
             from: { groupId: panel3.group.id, panelId: panel3.id },
             to: { group: panel3.group, position: 'right' },
         });
 
-        expect(dockview.groups.length).toBe(2);
-        expect(dockview.element.querySelectorAll('.dv-view').length).toBe(2);
+        expect(dockview.groups).toHaveLength(2);
+        expect(dockview.element.querySelectorAll('.dv-view')).toHaveLength(2);
 
         dockview.moveGroupOrPanel({
             from: { groupId: panel2.group.id, panelId: panel2.id },
             to: { group: panel3.group, position: 'bottom' },
         });
 
-        expect(dockview.groups.length).toBe(3);
-        expect(dockview.element.querySelectorAll('.dv-view').length).toBe(4);
+        expect(dockview.groups).toHaveLength(3);
+        expect(dockview.element.querySelectorAll('.dv-view')).toHaveLength(4);
 
         dockview.moveGroupOrPanel({
             from: { groupId: panel1.group.id, panelId: panel1.id },
             to: { group: panel2.group, position: 'center' },
         });
 
-        expect(dockview.groups.length).toBe(2);
+        expect(dockview.groups).toHaveLength(2);
 
-        expect(dockview.element.querySelectorAll('.dv-view').length).toBe(2);
+        expect(dockview.element.querySelectorAll('.dv-view')).toHaveLength(2);
     });
 
     test('that fromJSON layouts are resized to the current dimensions', async () => {
@@ -5097,15 +5097,13 @@ describe('dockviewComponent', () => {
 
         expect(
             dockview.element.querySelectorAll('.dv-view-container > .dv-view')
-                .length
-        ).toBe(1);
+        ).toHaveLength(1);
 
         dockview.addFloatingGroup(panel1);
 
         expect(
             dockview.element.querySelectorAll('.dv-view-container > .dv-view')
-                .length
-        ).toBe(0);
+        ).toHaveLength(0);
     });
 
     test('that api.setSize applies to the overlay for floating panels', () => {
@@ -5136,7 +5134,7 @@ describe('dockviewComponent', () => {
         panel1.api.setSize({ height: 123, width: 256 });
 
         const items = container.querySelectorAll('.dv-resize-container');
-        expect(items.length).toBe(1);
+        expect(items).toHaveLength(1);
 
         const el = items[0] as HTMLElement;
 
@@ -5255,7 +5253,7 @@ describe('dockviewComponent', () => {
         expect(events[0].position).toBe('left');
         expect(events[0].target).toBe('edge');
         expect(events[0].getData).toBe(getPanelData);
-        expect(events.length).toBe(1);
+        expect(events).toHaveLength(1);
 
         // right
 
@@ -5272,7 +5270,7 @@ describe('dockviewComponent', () => {
         expect(events[1].position).toBe('right');
         expect(events[1].target).toBe('edge');
         expect(events[1].getData).toBe(getPanelData);
-        expect(events.length).toBe(2);
+        expect(events).toHaveLength(2);
 
         // top
 
@@ -5289,7 +5287,7 @@ describe('dockviewComponent', () => {
         expect(events[2].position).toBe('top');
         expect(events[2].target).toBe('edge');
         expect(events[2].getData).toBe(getPanelData);
-        expect(events.length).toBe(3);
+        expect(events).toHaveLength(3);
 
         // top
 
@@ -5306,7 +5304,7 @@ describe('dockviewComponent', () => {
         expect(events[3].position).toBe('bottom');
         expect(events[3].target).toBe('edge');
         expect(events[3].getData).toBe(getPanelData);
-        expect(events.length).toBe(4);
+        expect(events).toHaveLength(4);
 
         // center
 
@@ -5320,7 +5318,7 @@ describe('dockviewComponent', () => {
         fireEvent(dockview.element, eventCenter);
 
         // expect not to be called for center
-        expect(events.length).toBe(4);
+        expect(events).toHaveLength(4);
 
         dockview.removePanel(panel1);
         dockview.removePanel(panel2);
@@ -5340,7 +5338,7 @@ describe('dockviewComponent', () => {
         expect(events[4].position).toBe('center');
         expect(events[4].target).toBe('edge');
         expect(events[4].getData).toBe(getPanelData);
-        expect(events.length).toBe(5);
+        expect(events).toHaveLength(5);
     });
 
     test('corrupt layout: bad inline view', () => {
@@ -5365,15 +5363,15 @@ describe('dockviewComponent', () => {
 
         let el = dockview.element.querySelector('.dv-view-container');
         expect(el).toBeTruthy();
-        expect(el!.childNodes.length).toBe(0);
+        expect(el!.childNodes).toHaveLength(0);
 
         dockview.addPanel({
             id: 'panel_1',
             component: 'panelA',
         });
 
-        expect(dockview.groups.length).toBe(1);
-        expect(dockview.panels.length).toBe(1);
+        expect(dockview.groups).toHaveLength(1);
+        expect(dockview.panels).toHaveLength(1);
 
         el = dockview.element.querySelector('.dv-view-container');
         expect(el).toBeTruthy();
@@ -5426,12 +5424,12 @@ describe('dockviewComponent', () => {
             });
         }).toThrow("unsupported panel 'somethingBad'");
 
-        expect(dockview.groups.length).toBe(0);
-        expect(dockview.panels.length).toBe(0);
+        expect(dockview.groups).toHaveLength(0);
+        expect(dockview.panels).toHaveLength(0);
 
         el = dockview.element.querySelector('.dv-view-container');
         expect(el).toBeTruthy();
-        expect(el!.childNodes.length).toBe(0);
+        expect(el!.childNodes).toHaveLength(0);
     });
 
     test('corrupt layout: bad floating view', () => {
@@ -5456,7 +5454,7 @@ describe('dockviewComponent', () => {
 
         let el = dockview.element.querySelector('.dv-view-container');
         expect(el).toBeTruthy();
-        expect(el!.childNodes.length).toBe(0);
+        expect(el!.childNodes).toHaveLength(0);
 
         dockview.addPanel({
             id: 'panel_1',
@@ -5469,8 +5467,8 @@ describe('dockviewComponent', () => {
             floating: true,
         });
 
-        expect(dockview.groups.length).toBe(2);
-        expect(dockview.panels.length).toBe(2);
+        expect(dockview.groups).toHaveLength(2);
+        expect(dockview.panels).toHaveLength(2);
 
         el = container.querySelector('.dv-resize-container');
         expect(el).toBeTruthy();
@@ -5549,15 +5547,15 @@ describe('dockviewComponent', () => {
             });
         }).toThrow("unsupported panel 'panelC'");
 
-        expect(dockview.groups.length).toBe(0);
-        expect(dockview.panels.length).toBe(0);
+        expect(dockview.groups).toHaveLength(0);
+        expect(dockview.panels).toHaveLength(0);
 
         el = container.querySelector('.dv-resize-container');
         expect(el).toBeFalsy();
 
         el = dockview.element.querySelector('.dv-view-container');
         expect(el).toBeTruthy();
-        expect(el!.childNodes.length).toBe(0);
+        expect(el!.childNodes).toHaveLength(0);
     });
 
     test('that disableResizing is always true because the shell manages resizing', () => {
@@ -5625,16 +5623,16 @@ describe('dockviewComponent', () => {
 
             dockview.layout(1000, 500);
 
-            expect(dockview.groups.length).toBe(0);
+            expect(dockview.groups).toHaveLength(0);
             const panel = dockview.addPanel({
                 id: 'panel_1',
                 component: 'default',
                 floating: true,
             });
-            expect(dockview.groups.length).toBe(1);
+            expect(dockview.groups).toHaveLength(1);
 
             dockview.removePanel(panel);
-            expect(dockview.groups.length).toBe(0);
+            expect(dockview.groups).toHaveLength(0);
         });
 
         const createDockview = () =>
@@ -5760,8 +5758,8 @@ describe('dockviewComponent', () => {
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(2);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel2.group.id },
@@ -5770,8 +5768,8 @@ describe('dockviewComponent', () => {
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(2);
         });
 
         test('move a floating group of one tab to an existing fixed group', () => {
@@ -5806,8 +5804,8 @@ describe('dockviewComponent', () => {
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(2);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel2.group.id },
@@ -5816,8 +5814,8 @@ describe('dockviewComponent', () => {
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(1);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(1);
+            expect(dockview.panels).toHaveLength(2);
         });
 
         test('move a floating group of one tab to an existing floating group', () => {
@@ -5859,8 +5857,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(3);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(3);
+            expect(dockview.panels).toHaveLength(3);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel3.group.id },
@@ -5870,8 +5868,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(3);
         });
 
         describe('nested floating layout (multi-root)', () => {
@@ -5904,7 +5902,7 @@ describe('dockviewComponent', () => {
                     floating: true,
                 });
 
-                expect(dockview.floatingGroups.length).toBe(1);
+                expect(dockview.floatingGroups).toHaveLength(1);
 
                 // drag the whole grid group to the right of the floating group
                 dockview.moveGroupOrPanel({
@@ -5913,7 +5911,7 @@ describe('dockviewComponent', () => {
                 });
 
                 // still a single floating window, now hosting both groups
-                expect(dockview.floatingGroups.length).toBe(1);
+                expect(dockview.floatingGroups).toHaveLength(1);
                 expect(panel1.group.api.location.type).toBe('floating');
                 expect(panel2.group.api.location.type).toBe('floating');
                 expect(dockview.getGridviewForGroup(panel1.group)).toBe(
@@ -5959,7 +5957,7 @@ describe('dockviewComponent', () => {
                 expect(dockview.getGridviewForGroup(movedPanel.group)).toBe(
                     dockview.getGridviewForGroup(panel2.group)
                 );
-                expect(dockview.floatingGroups.length).toBe(1);
+                expect(dockview.floatingGroups).toHaveLength(1);
             });
 
             test('moving a group out of a multi-group window keeps the window alive', () => {
@@ -5986,7 +5984,7 @@ describe('dockviewComponent', () => {
                     from: { groupId: panel3.group.id },
                     to: { group: panel2.group, position: 'right' },
                 });
-                expect(dockview.floatingGroups.length).toBe(1);
+                expect(dockview.floatingGroups).toHaveLength(1);
                 expect(dockview.getGridviewForGroup(panel3.group)).toBe(
                     dockview.getGridviewForGroup(panel2.group)
                 );
@@ -6000,7 +5998,7 @@ describe('dockviewComponent', () => {
                 expect(panel3.group.api.location.type).toBe('grid');
                 expect(panel2.group.api.location.type).toBe('floating');
                 // the window survived because panel2's group still lives in it
-                expect(dockview.floatingGroups.length).toBe(1);
+                expect(dockview.floatingGroups).toHaveLength(1);
             });
 
             test('floating-to-floating move merges windows (source window closes)', () => {
@@ -6019,7 +6017,7 @@ describe('dockviewComponent', () => {
                     floating: true,
                 });
 
-                expect(dockview.floatingGroups.length).toBe(2);
+                expect(dockview.floatingGroups).toHaveLength(2);
 
                 dockview.moveGroupOrPanel({
                     from: { groupId: panel3.group.id },
@@ -6028,7 +6026,7 @@ describe('dockviewComponent', () => {
 
                 // panel3's single-group window closed; both groups now share
                 // panel2's window
-                expect(dockview.floatingGroups.length).toBe(1);
+                expect(dockview.floatingGroups).toHaveLength(1);
                 expect(panel2.group.api.location.type).toBe('floating');
                 expect(panel3.group.api.location.type).toBe('floating');
                 expect(dockview.getGridviewForGroup(panel3.group)).toBe(
@@ -6163,11 +6161,11 @@ describe('dockviewComponent', () => {
                 mockWindow.close();
 
                 expect(panel2.api.location.type).toBe('grid');
-                expect(dockview.panels.length).toBe(3);
+                expect(dockview.panels).toHaveLength(3);
 
                 // an orphaned group would trip clear() with 'Invalid grid element'
                 expect(() => dockview.clear()).not.toThrow();
-                expect(dockview.groups.length).toBe(0);
+                expect(dockview.groups).toHaveLength(0);
 
                 dockview.dispose();
             });
@@ -6215,7 +6213,7 @@ describe('dockviewComponent', () => {
                 // docked to the grid, splitting the window across two roots.
                 expect(panel2.api.location.type).toBe('grid');
                 expect(panel3.api.location.type).toBe('grid');
-                expect(dockview.floatingGroups.length).toBe(0);
+                expect(dockview.floatingGroups).toHaveLength(0);
                 expect(panel1.api.location.type).toBe('grid');
 
                 dockview.dispose();
@@ -6362,7 +6360,7 @@ describe('dockviewComponent', () => {
                 expect(loc('p1')).toBe('grid');
                 expect(loc('p2')).toBe('floating');
                 expect(loc('p3')).toBe('popout');
-                expect(dockview.floatingGroups.length).toBe(1);
+                expect(dockview.floatingGroups).toHaveLength(1);
 
                 jest.useRealTimers();
                 dockview.dispose();
@@ -6389,7 +6387,7 @@ describe('dockviewComponent', () => {
                     from: { groupId: panel3.group.id },
                     to: { group: panel2.group, position: 'right' },
                 });
-                expect(dockview.floatingGroups.length).toBe(1);
+                expect(dockview.floatingGroups).toHaveLength(1);
 
                 const json = dockview.toJSON();
                 // a multi-group window serializes as a nested grid
@@ -6400,12 +6398,12 @@ describe('dockviewComponent', () => {
                 restored.layout(1000, 500);
                 restored.fromJSON(json);
 
-                expect(restored.panels.length).toBe(3);
-                expect(restored.floatingGroups.length).toBe(1);
+                expect(restored.panels).toHaveLength(3);
+                expect(restored.floatingGroups).toHaveLength(1);
                 const floatingGroups = restored.groups.filter(
                     (g) => g.api.location.type === 'floating'
                 );
-                expect(floatingGroups.length).toBe(2);
+                expect(floatingGroups).toHaveLength(2);
                 expect(restored.getGridviewForGroup(floatingGroups[0])).toBe(
                     restored.getGridviewForGroup(floatingGroups[1])
                 );
@@ -6453,7 +6451,7 @@ describe('dockviewComponent', () => {
                     from: { groupId: panel2.group.id },
                     to: { group: panel1.group, position: 'right' },
                 });
-                expect(dockview.floatingGroups.length).toBe(1);
+                expect(dockview.floatingGroups).toHaveLength(1);
                 expect(fg.group).toBe(panel3.group);
 
                 // dragging the title bar now targets the promoted anchor, not
@@ -6469,7 +6467,7 @@ describe('dockviewComponent', () => {
                 Object.defineProperty(event, 'shiftKey', { value: true });
                 fireEvent(titlebar, event);
 
-                expect(groupDragEvents.length).toBe(1);
+                expect(groupDragEvents).toHaveLength(1);
                 expect(groupDragEvents[0].group).toBe(panel3.group);
 
                 dockview.dispose();
@@ -6518,8 +6516,8 @@ describe('dockviewComponent', () => {
                 expect(
                     dockview.groups.filter(
                         (g) => g.api.location.type === 'popout'
-                    ).length
-                ).toBe(0);
+                    )
+                ).toHaveLength(0);
                 // both members landed in the main grid (a hidden reference
                 // ghost group may also linger, as with single-group restore)
                 expect(
@@ -6529,7 +6527,7 @@ describe('dockviewComponent', () => {
                 ).toBeGreaterThanOrEqual(2);
 
                 expect(() => dockview.clear()).not.toThrow();
-                expect(dockview.groups.length).toBe(0);
+                expect(dockview.groups).toHaveLength(0);
 
                 jest.useRealTimers();
             });
@@ -6574,8 +6572,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(3);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel2.group.id },
@@ -6585,8 +6583,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
             expect(panel3.group.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(3);
         });
 
         test('move a floating group of many tabs to an existing fixed group', () => {
@@ -6628,8 +6626,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(3);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel2.group.id },
@@ -6639,8 +6637,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
             expect(panel3.group.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(1);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(1);
+            expect(dockview.panels).toHaveLength(3);
         });
 
         test('move a floating group of many tabs to an existing floating group', () => {
@@ -6689,8 +6687,8 @@ describe('dockviewComponent', () => {
             expect(panel2.group.api.location.type).toBe('floating');
             expect(panel3.group.api.location.type).toBe('floating');
             expect(panel4.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(3);
-            expect(dockview.panels.length).toBe(4);
+            expect(dockview.groups).toHaveLength(3);
+            expect(dockview.panels).toHaveLength(4);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel2.group.id },
@@ -6701,8 +6699,8 @@ describe('dockviewComponent', () => {
             expect(panel2.group.api.location.type).toBe('floating');
             expect(panel3.group.api.location.type).toBe('floating');
             expect(panel4.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(4);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(4);
         });
 
         test('move a floating tab of one tab to a new fixed group', () => {
@@ -6737,8 +6735,8 @@ describe('dockviewComponent', () => {
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(2);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel2.group.id, panelId: panel2.id },
@@ -6747,8 +6745,8 @@ describe('dockviewComponent', () => {
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(2);
         });
 
         test('move a floating tab of one tab to an existing fixed group', () => {
@@ -6783,8 +6781,8 @@ describe('dockviewComponent', () => {
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(2);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel2.group.id, panelId: panel2.id },
@@ -6793,8 +6791,8 @@ describe('dockviewComponent', () => {
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(1);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(1);
+            expect(dockview.panels).toHaveLength(2);
         });
 
         test('move a floating tab of one tab to an existing floating group', () => {
@@ -6836,8 +6834,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(3);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(3);
+            expect(dockview.panels).toHaveLength(3);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel3.group.id, panelId: panel3.id },
@@ -6847,8 +6845,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(3);
         });
 
         test('move a floating tab of many tabs to a new fixed group', () => {
@@ -6890,8 +6888,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(3);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel2.group.id, panelId: panel2.id },
@@ -6901,8 +6899,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(3);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(3);
+            expect(dockview.panels).toHaveLength(3);
         });
 
         test('move a floating tab of many tabs to an existing fixed group', () => {
@@ -6944,8 +6942,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(3);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel2.group.id, panelId: panel2.id },
@@ -6955,8 +6953,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(3);
         });
 
         test('move a floating tab of many tabs to an existing floating group', () => {
@@ -7005,8 +7003,8 @@ describe('dockviewComponent', () => {
             expect(panel2.group.api.location.type).toBe('floating');
             expect(panel3.group.api.location.type).toBe('floating');
             expect(panel4.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(3);
-            expect(dockview.panels.length).toBe(4);
+            expect(dockview.groups).toHaveLength(3);
+            expect(dockview.panels).toHaveLength(4);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel2.group.id, panelId: panel2.id },
@@ -7017,8 +7015,8 @@ describe('dockviewComponent', () => {
             expect(panel2.group.api.location.type).toBe('floating');
             expect(panel3.group.api.location.type).toBe('floating');
             expect(panel4.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(3);
-            expect(dockview.panels.length).toBe(4);
+            expect(dockview.groups).toHaveLength(3);
+            expect(dockview.panels).toHaveLength(4);
         });
 
         test('move a fixed tab of one tab to an existing floating group', () => {
@@ -7060,8 +7058,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(3);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(3);
+            expect(dockview.panels).toHaveLength(3);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel1.group.id, panelId: panel1.id },
@@ -7071,8 +7069,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('floating');
             expect(panel2.group.api.location.type).toBe('grid');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(3);
         });
 
         test('move a fixed tab of many tabs to an existing floating group', () => {
@@ -7113,8 +7111,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(3);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel1.group.id, panelId: panel1.id },
@@ -7124,8 +7122,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('floating');
             expect(panel2.group.api.location.type).toBe('grid');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(3);
         });
 
         test('move a fixed group of one tab to an existing floating group', () => {
@@ -7167,8 +7165,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(3);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(3);
+            expect(dockview.panels).toHaveLength(3);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel1.group.id },
@@ -7178,8 +7176,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('floating');
             expect(panel2.group.api.location.type).toBe('grid');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(3);
         });
 
         test('move a fixed group of many tabs to an existing floating group', () => {
@@ -7220,8 +7218,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(3);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel1.group.id },
@@ -7231,8 +7229,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('floating');
             expect(panel2.group.api.location.type).toBe('floating');
             expect(panel3.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(1);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(1);
+            expect(dockview.panels).toHaveLength(3);
         });
 
         test('move a fixed tab of one tab to a new floating group', () => {
@@ -7267,15 +7265,15 @@ describe('dockviewComponent', () => {
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(2);
 
             dockview.addFloatingGroup(panel2);
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(2);
         });
 
         test('move a fixed tab of many tabs to a new floating group', () => {
@@ -7309,15 +7307,15 @@ describe('dockviewComponent', () => {
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(1);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(1);
+            expect(dockview.panels).toHaveLength(2);
 
             dockview.addFloatingGroup(panel2);
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(2);
         });
 
         test('move a fixed group of one tab to a new floating group', () => {
@@ -7352,15 +7350,15 @@ describe('dockviewComponent', () => {
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(2);
 
             dockview.addFloatingGroup(panel2.group);
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(2);
         });
 
         test('move a fixed group of many tabs to a new floating group', () => {
@@ -7394,15 +7392,15 @@ describe('dockviewComponent', () => {
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(1);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(1);
+            expect(dockview.panels).toHaveLength(2);
 
             dockview.addFloatingGroup(panel2.group);
 
             expect(panel1.group.api.location.type).toBe('floating');
             expect(panel2.group.api.location.type).toBe('floating');
-            expect(dockview.groups.length).toBe(1);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(1);
+            expect(dockview.panels).toHaveLength(2);
         });
 
         test('component should remain visible when moving from floating back to new grid group (GitHub issue #996)', () => {
@@ -7859,8 +7857,8 @@ describe('dockviewComponent', () => {
             expect(
                 panel2.group.element.querySelectorAll(
                     '.dv-content-container > .testpanel-panel_2'
-                ).length
-            ).toBe(1);
+                )
+            ).toHaveLength(1);
 
             await dockview.addPopoutGroup(panel3);
             panel3.api.moveTo({ group: panel1.api.group, position: 'right' });
@@ -7871,13 +7869,13 @@ describe('dockviewComponent', () => {
             expect(
                 container.querySelectorAll(
                     '.dv-render-overlay > .testpanel-panel_3'
-                ).length
-            ).toBe(1);
+                )
+            ).toHaveLength(1);
             expect(
                 panel2.group.element.querySelectorAll(
                     '.dv-content-container > .testpanel-panel_3'
-                ).length
-            ).toBe(0);
+                )
+            ).toHaveLength(0);
         });
 
         test('move popout group of 1 panel inside grid', async () => {
@@ -7921,8 +7919,8 @@ describe('dockviewComponent', () => {
 
             panel2.api.moveTo({ position: 'top', group: panel3.group });
 
-            expect(dockview.panels.length).toBe(3);
-            expect(dockview.groups.length).toBe(3);
+            expect(dockview.panels).toHaveLength(3);
+            expect(dockview.groups).toHaveLength(3);
         });
 
         // Regression test for issue #1004: when a single-panel popout group is
@@ -8005,9 +8003,9 @@ describe('dockviewComponent', () => {
             });
 
             expect(panel2.api.location.type).toBe('grid');
-            expect(dockview.panels.length).toBe(4);
+            expect(dockview.panels).toHaveLength(4);
             // The empty popout reference group should have been cleaned up.
-            expect(dockview.groups.length).toBe(4);
+            expect(dockview.groups).toHaveLength(4);
 
             const gridOrder = collectGridPanelOrder(
                 JSON.parse(JSON.stringify(dockview.toJSON())).grid.root
@@ -8075,8 +8073,8 @@ describe('dockviewComponent', () => {
             ).not.toThrow();
 
             expect(panel2.api.location.type).toBe('grid');
-            expect(dockview.panels.length).toBe(4);
-            expect(dockview.groups.length).toBe(4);
+            expect(dockview.panels).toHaveLength(4);
+            expect(dockview.groups).toHaveLength(4);
 
             const gridOrder = collectGridPanelOrder(
                 JSON.parse(JSON.stringify(dockview.toJSON())).grid.root
@@ -8122,8 +8120,8 @@ describe('dockviewComponent', () => {
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(1);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(1);
+            expect(dockview.panels).toHaveLength(2);
 
             const events: SizeEvent[] = [];
 
@@ -8142,8 +8140,8 @@ describe('dockviewComponent', () => {
 
             expect(panel1.group.api.location.type).toBe('popout');
             expect(panel2.group.api.location.type).toBe('popout');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(2);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(2);
 
             if (panel2.api.location.type !== 'popout') {
                 fail('unexpected');
@@ -8228,7 +8226,7 @@ describe('dockviewComponent', () => {
              */
             await dockview.popoutRestorationPromise;
 
-            expect(dockview.panels.length).toBe(4);
+            expect(dockview.panels).toHaveLength(4);
 
             panel1 = dockview.api.getPanel('panel_1') as DockviewPanel;
             panel2 = dockview.api.getPanel('panel_2') as DockviewPanel;
@@ -8241,8 +8239,8 @@ describe('dockviewComponent', () => {
             expect(panel4.api.location.type).toBe('popout');
 
             dockview.clear();
-            expect(dockview.groups.length).toBe(0);
-            expect(dockview.panels.length).toBe(0);
+            expect(dockview.groups).toHaveLength(0);
+            expect(dockview.panels).toHaveLength(0);
         });
 
         test('close popout window object', async () => {
@@ -8297,8 +8295,8 @@ describe('dockviewComponent', () => {
             expect(panel3.group.api.location.type).toBe('grid');
 
             dockview.clear();
-            expect(dockview.groups.length).toBe(0);
-            expect(dockview.panels.length).toBe(0);
+            expect(dockview.groups).toHaveLength(0);
+            expect(dockview.panels).toHaveLength(0);
         });
 
         test('remove all panels from popout group', async () => {
@@ -8343,16 +8341,16 @@ describe('dockviewComponent', () => {
             expect(panel2.group.api.location.type).toBe('popout');
             expect(panel3.group.api.location.type).toBe('popout');
 
-            expect(dockview.panels.length).toBe(3);
-            expect(dockview.groups.length).toBe(3); // includes one hidden group
+            expect(dockview.panels).toHaveLength(3);
+            expect(dockview.groups).toHaveLength(3); // includes one hidden group
 
             panel2.api.moveTo({ group: panel1.group, position: 'left' });
-            expect(dockview.panels.length).toBe(3);
-            expect(dockview.groups.length).toBe(4);
+            expect(dockview.panels).toHaveLength(3);
+            expect(dockview.groups).toHaveLength(4);
 
             panel3.api.moveTo({ group: panel1.group, position: 'left' });
-            expect(dockview.panels.length).toBe(3);
-            expect(dockview.groups.length).toBe(3);
+            expect(dockview.panels).toHaveLength(3);
+            expect(dockview.groups).toHaveLength(3);
         });
 
         test('that can remove a popout group', async () => {
@@ -8381,14 +8379,14 @@ describe('dockviewComponent', () => {
 
             expect(await dockview.addPopoutGroup(panel1)).toBeTruthy();
 
-            expect(dockview.panels.length).toBe(1);
-            expect(dockview.groups.length).toBe(2);
+            expect(dockview.panels).toHaveLength(1);
+            expect(dockview.groups).toHaveLength(2);
             expect(panel1.api.group.api.location.type).toBe('popout');
 
             dockview.removePanel(panel1);
 
-            expect(dockview.panels.length).toBe(0);
-            expect(dockview.groups.length).toBe(0);
+            expect(dockview.panels).toHaveLength(0);
+            expect(dockview.groups).toHaveLength(0);
         });
 
         test('getPopupServiceForGroup returns a per-popout service rooted in the popout window', async () => {
@@ -8482,13 +8480,13 @@ describe('dockviewComponent', () => {
                 position: { direction: 'right' },
             });
 
-            expect(dockview.panels.length).toBe(4);
-            expect(dockview.groups.length).toBe(2);
+            expect(dockview.panels).toHaveLength(4);
+            expect(dockview.groups).toHaveLength(2);
 
             expect(await dockview.addPopoutGroup(panel1)).toBeTruthy();
 
-            expect(dockview.panels.length).toBe(4);
-            expect(dockview.groups.length).toBe(3);
+            expect(dockview.panels).toHaveLength(4);
+            expect(dockview.groups).toHaveLength(3);
 
             expect(panel1.api.location.type).toBe('popout');
 
@@ -8496,8 +8494,8 @@ describe('dockviewComponent', () => {
 
             await new Promise((resolve) => setTimeout(resolve, 0)); // popout views are completed as a promise so must complete microtask-queue
 
-            expect(dockview.panels.length).toBe(4);
-            expect(dockview.groups.length).toBe(3);
+            expect(dockview.panels).toHaveLength(4);
+            expect(dockview.groups).toHaveLength(3);
             expect(dockview.groups.every((g) => g.api.isVisible)).toBeTruthy();
         });
 
@@ -8541,16 +8539,16 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
             expect(panel3.group.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(3);
 
             expect(await dockview.addPopoutGroup(panel2.group)).toBeTruthy();
 
             expect(panel1.group.api.location.type).toBe('popout');
             expect(panel2.group.api.location.type).toBe('popout');
             expect(panel3.group.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(3);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(3);
+            expect(dockview.panels).toHaveLength(3);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel2.group.id, panelId: panel2.id },
@@ -8560,8 +8558,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('popout');
             expect(panel2.group.api.location.type).toBe('grid');
             expect(panel3.group.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(4);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(4);
+            expect(dockview.panels).toHaveLength(3);
 
             dockview.moveGroupOrPanel({
                 from: { groupId: panel1.group.id, panelId: panel1.id },
@@ -8571,8 +8569,8 @@ describe('dockviewComponent', () => {
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
             expect(panel3.group.api.location.type).toBe('grid');
-            expect(dockview.groups.length).toBe(2);
-            expect(dockview.panels.length).toBe(3);
+            expect(dockview.groups).toHaveLength(2);
+            expect(dockview.panels).toHaveLength(3);
         });
 
         test('persistance with custom url', async () => {
@@ -8657,7 +8655,7 @@ describe('dockviewComponent', () => {
             ]);
 
             dockview.clear();
-            expect(dockview.groups.length).toBe(0);
+            expect(dockview.groups).toHaveLength(0);
 
             dockview.fromJSON(state);
 
@@ -8744,12 +8742,11 @@ describe('dockviewComponent', () => {
             ]);
             expect(
                 dockview.groups.filter((g) => g.api.location.type === 'popout')
-                    .length
-            ).toBe(0);
+            ).toHaveLength(0);
 
             // and clearing the restored layout doesn't throw on orphaned groups
             expect(() => dockview.clear()).not.toThrow();
-            expect(dockview.groups.length).toBe(0);
+            expect(dockview.groups).toHaveLength(0);
 
             jest.useRealTimers();
         });
@@ -9201,7 +9198,7 @@ describe('dockviewComponent', () => {
                 position: { referencePanel: panel3, direction: 'within' },
             });
 
-            expect(api.groups.length).toBe(2);
+            expect(api.groups).toHaveLength(2);
             expect(panel1.group).toBe(panel2.group);
             expect(panel3.group).toBe(panel4.group);
 
@@ -9307,7 +9304,7 @@ describe('dockviewComponent', () => {
                 position: { referencePanel: panel1, direction: 'below' },
             });
 
-            expect(api.groups.length).toBe(3);
+            expect(api.groups).toHaveLength(3);
 
             panel1.group.api.setVisible(false);
             panel2.group.api.setVisible(false);
@@ -9431,7 +9428,7 @@ describe('dockviewComponent', () => {
                 group: panel1.group,
                 position: 'left',
             });
-            expect(api.groups.length).toBe(3);
+            expect(api.groups).toHaveLength(3);
             expect(panel2.api.isVisible).toBeFalsy();
             expect(panel2.api.group.api.isVisible).toBeFalsy();
 
@@ -10112,13 +10109,13 @@ describe('dockviewComponent', () => {
             position: { direction: 'right' },
         });
 
-        expect(api.panels.length).toBe(3);
-        expect(api.groups.length).toBe(2);
+        expect(api.panels).toHaveLength(3);
+        expect(api.groups).toHaveLength(2);
 
         api.addGroup({ direction: 'left' });
 
-        expect(api.panels.length).toBe(3);
-        expect(api.groups.length).toBe(3);
+        expect(api.panels).toHaveLength(3);
+        expect(api.groups).toHaveLength(3);
     });
 
     test('addGroup calls normalize method on gridview', () => {
@@ -10160,8 +10157,8 @@ describe('dockviewComponent', () => {
         expect(normalizeSpy).toHaveBeenCalled();
 
         // Should have the new empty group plus the existing group with panels
-        expect(api.panels.length).toBe(1);
-        expect(api.groups.length).toBe(2);
+        expect(api.panels).toHaveLength(1);
+        expect(api.groups).toHaveLength(2);
 
         normalizeSpy.mockRestore();
     });
@@ -10846,8 +10843,8 @@ describe('dockviewComponent', () => {
 
             // Tab group should have been auto-destroyed (isEmpty triggers dispose)
             expect(
-                dockview.api.getTabGroups({ groupId: panel2.group.id }).length
-            ).toBe(0);
+                dockview.api.getTabGroups({ groupId: panel2.group.id })
+            ).toHaveLength(0);
         });
 
         test('no-label group chip renders with empty label class', () => {
@@ -10943,7 +10940,7 @@ describe('dockviewComponent', () => {
             const restored = dockview.api.getTabGroups({
                 groupId: restoredGroup.id,
             });
-            expect(restored.length).toBe(2);
+            expect(restored).toHaveLength(2);
 
             const r1 = restored.find((tg) => tg.label === 'Alpha')!;
             expect(r1).toBeDefined();
@@ -11456,7 +11453,7 @@ describe('dockviewComponent', () => {
             // Shell is always created even with no edge panels
             expect(c.childNodes.length).toBeGreaterThan(0);
             dv.dispose();
-            expect(c.childNodes.length).toBe(0);
+            expect(c.childNodes).toHaveLength(0);
         });
 
         test('removeEdgeGroup removes the group and disposes its panels', () => {
@@ -11688,7 +11685,7 @@ describe('dockviewComponent', () => {
             });
             edgeP1.api.setActive();
 
-            expect(edgeGroup.panels.length).toBe(2);
+            expect(edgeGroup.panels).toHaveLength(2);
             expect(edgeGroup.activePanel?.id).toBe('edge-p1');
 
             dv.moveGroup({
@@ -11699,7 +11696,7 @@ describe('dockviewComponent', () => {
             // Edge group still exists at its position, now empty
             expect(dv.getEdgeGroup('left')).toBeDefined();
             expect(edgeGroup.api.location.type).toBe('edge');
-            expect(edgeGroup.panels.length).toBe(0);
+            expect(edgeGroup.panels).toHaveLength(0);
             // ...and auto-collapsed via the addEdgeGroup listener
             expect((dv as any)._shellManager.isEdgeGroupCollapsed('left')).toBe(
                 true

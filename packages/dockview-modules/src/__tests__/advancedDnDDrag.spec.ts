@@ -48,8 +48,8 @@ describe('advanced dnd: onWillDrag hooks', () => {
 
         fireEvent.dragStart(el);
 
-        expect(tabDragEvents.length).toBe(1);
-        expect(groupDragEvents.length).toBe(0);
+        expect(tabDragEvents).toHaveLength(1);
+        expect(groupDragEvents).toHaveLength(0);
 
         dockview.dispose();
     });
@@ -78,8 +78,8 @@ describe('advanced dnd: onWillDrag hooks', () => {
 
         fireEvent.dragStart(el);
 
-        expect(tabDragEvents.length).toBe(0);
-        expect(groupDragEvents.length).toBe(1);
+        expect(tabDragEvents).toHaveLength(0);
+        expect(groupDragEvents).toHaveLength(1);
 
         dockview.dispose();
     });

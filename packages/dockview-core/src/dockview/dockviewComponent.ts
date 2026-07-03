@@ -478,8 +478,8 @@ export class DockviewComponent
     private readonly _api: DockviewApi;
     private readonly _moduleRegistry = new ModuleRegistry<DockviewComponent>();
     private _options: Exclude<DockviewComponentOptions, 'orientation'>;
-    private _tabGroupColorPalette: TabGroupColorPalette;
-    private _shellThemeClassnames: Classnames | undefined;
+    private readonly _tabGroupColorPalette: TabGroupColorPalette;
+    private readonly _shellThemeClassnames: Classnames | undefined;
 
     readonly overlayRenderContainer: OverlayRenderContainer;
     readonly popupService: PopupService;
@@ -630,8 +630,8 @@ export class DockviewComponent
         new Emitter<DockviewMaximizedGroupChangeEvent>();
     readonly onDidMaximizedGroupChange = this._onDidMaximizedGroupChange.event;
 
-    private _shellManager: ShellManager | undefined;
-    private _floatingOverlayHost: HTMLDivElement | undefined;
+    private readonly _shellManager: ShellManager | undefined;
+    private readonly _floatingOverlayHost: HTMLDivElement | undefined;
     private _inShellLayout = false;
 
     private readonly _onDidRemoveGroup = new Emitter<DockviewGroupPanel>();

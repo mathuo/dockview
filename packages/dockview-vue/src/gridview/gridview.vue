@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import {
-    GridviewApi,
     type GridviewOptions,
     PROPERTY_KEYS_GRIDVIEW,
-    type GridviewFrameworkOptions,
     createGridview,
 } from 'dockview';
 import { useViewComponent } from '../composables/useViewComponent';

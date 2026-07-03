@@ -1,5 +1,5 @@
 import { DockviewComponent } from '../../dockviewComponent';
-import { addDisposableListener, Emitter, Event } from '../../../events';
+import { addDisposableListener, Emitter } from '../../../events';
 import { CompositeDisposable } from '../../../lifecycle';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { quasiPreventDefault } from '../../../dom';

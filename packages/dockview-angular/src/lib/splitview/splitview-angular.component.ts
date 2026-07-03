@@ -54,7 +54,7 @@ export interface SplitviewAngularOptions extends SplitviewOptions {
 })
 export class SplitviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @ViewChild('splitviewContainer', { static: true })
-    private containerRef!: ElementRef<HTMLDivElement>;
+    private readonly containerRef!: ElementRef<HTMLDivElement>;
 
     @Input() components!: Record<string, Type<any> | TemplateRef<any>>;
 
@@ -69,9 +69,9 @@ export class SplitviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Output() ready = new EventEmitter<SplitviewAngularReadyEvent>();
 
     private splitviewApi?: SplitviewApi;
-    private lifecycleManager = new AngularLifecycleManager();
-    private injector = inject(Injector);
-    private environmentInjector = inject(EnvironmentInjector);
+    private readonly lifecycleManager = new AngularLifecycleManager();
+    private readonly injector = inject(Injector);
+    private readonly environmentInjector = inject(EnvironmentInjector);
 
     ngOnInit(): void {
         this.initializeSplitview();

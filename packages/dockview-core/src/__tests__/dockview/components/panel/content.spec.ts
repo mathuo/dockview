@@ -244,12 +244,12 @@ describe('contentContainer', () => {
         cut.openPanel(panel1);
 
         expect(panel1.view.content.element.parentElement).toBe(cut.element);
-        expect(cut.element.childNodes.length).toBe(1);
+        expect(cut.element.childNodes).toHaveLength(1);
 
         cut.openPanel(panel2);
 
         expect(panel1.view.content.element.parentElement).toBeNull();
         expect(panel2.view.content.element.parentElement).toBe(cut.element);
-        expect(cut.element.childNodes.length).toBe(1);
+        expect(cut.element.childNodes).toHaveLength(1);
     });
 });

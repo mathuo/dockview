@@ -1002,7 +1002,7 @@ export class Splitview {
         toggleClass(sash.container, 'dv-minimum', state === SashState.MINIMUM);
     }
 
-    private resize = (
+    private readonly resize = (
         index: number,
         delta: number,
         sizes: number[] = this.viewItems.map((x) => x.size),

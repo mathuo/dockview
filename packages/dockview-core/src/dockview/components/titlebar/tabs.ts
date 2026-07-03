@@ -1,11 +1,6 @@
-import {
-    getPanelData,
-    LocalSelectionTransfer,
-    PanelTransfer,
-} from '../../../dnd/dataTransfer';
+import { getPanelData } from '../../../dnd/dataTransfer';
 import {
     addClasses,
-    disableIframePointEvents,
     isChildEntirelyVisibleWithinParent,
     OverflowObserver,
     removeClasses,
@@ -29,7 +24,6 @@ import { DockviewHeaderDirection } from '../../options';
 import { Tab } from '../tab/tab';
 import { TabDragEvent, TabDropIndexEvent } from './tabsContainer';
 import { ITabGroup } from '../../tabGroup';
-import { TabGroupChip } from './tabGroupChip';
 import { TabGroupManager } from './tabGroups';
 import { ITabGroupChipRenderer } from '../../framework';
 import { DroptargetEvent } from '../../../dnd/droptarget';
@@ -647,14 +641,12 @@ export class Tabs extends CompositeDisposable {
                     ) {
                         parentElement.scrollTop = running;
                     }
-                } else {
-                    if (
-                        running < parentElement.scrollLeft ||
-                        running + element.clientWidth >
-                            parentElement.scrollLeft + parentElement.clientWidth
-                    ) {
-                        parentElement.scrollLeft = running;
-                    }
+                } else if (
+                    running < parentElement.scrollLeft ||
+                    running + element.clientWidth >
+                        parentElement.scrollLeft + parentElement.clientWidth
+                ) {
+                    parentElement.scrollLeft = running;
                 }
             }
 
@@ -791,13 +783,14 @@ export class Tabs extends CompositeDisposable {
 
                 switch (event.button) {
                     case 0:
-                        if (this.group.api.location.type === 'edge') {
-                            // All tab interaction for edge groups is handled by
-                            // onTabClick to avoid race conditions with active panel state
-                        } else {
-                            if (this.group.activePanel !== panel) {
-                                this.group.model.openPanel(panel);
-                            }
+                        // Edge groups are skipped here: all their tab interaction
+                        // is handled by onTabClick to avoid race conditions with
+                        // active panel state.
+                        if (
+                            this.group.api.location.type !== 'edge' &&
+                            this.group.activePanel !== panel
+                        ) {
+                            this.group.model.openPanel(panel);
                         }
                         break;
                 }

@@ -8,12 +8,10 @@ import {
     DockviewEvent,
     Emitter,
     Event,
-    IDockviewEvent,
 } from '../events';
 import {
     DockviewGroupDropLocation,
     DockviewWillShowOverlayLocationEvent,
-    DockviewWillShowOverlayLocationEventOptions,
 } from './events';
 import { IViewSize } from '../gridview/gridview';
 import { CompositeDisposable, IDisposable } from '../lifecycle';

@@ -96,7 +96,7 @@ describe('paneviewComponent', () => {
         paneview.dispose();
 
         expect(container.parentElement).toBe(root);
-        expect(container.children.length).toBe(0);
+        expect(container.children).toHaveLength(0);
     });
 
     test('vertical panels', () => {
@@ -190,7 +190,9 @@ describe('paneviewComponent', () => {
             },
         });
 
-        expect(container.querySelectorAll('.dv-pane-container').length).toBe(1);
+        expect(container.querySelectorAll('.dv-pane-container')).toHaveLength(
+            1
+        );
 
         paneview.fromJSON({
             size: 6,
@@ -224,7 +226,9 @@ describe('paneviewComponent', () => {
             ],
         });
 
-        expect(container.querySelectorAll('.dv-pane-container').length).toBe(1);
+        expect(container.querySelectorAll('.dv-pane-container')).toHaveLength(
+            1
+        );
 
         paneview.layout(400, 800);
 

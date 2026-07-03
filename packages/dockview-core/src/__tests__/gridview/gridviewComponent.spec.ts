@@ -198,7 +198,7 @@ describe('gridview', () => {
             },
         });
 
-        expect(container.querySelectorAll('.dv-grid-view').length).toBe(1);
+        expect(container.querySelectorAll('.dv-grid-view')).toHaveLength(1);
 
         gridview.layout(800, 400);
         gridview.fromJSON({
@@ -245,7 +245,7 @@ describe('gridview', () => {
             activePanel: 'panel_1',
         });
 
-        expect(container.querySelectorAll('.dv-grid-view').length).toBe(1);
+        expect(container.querySelectorAll('.dv-grid-view')).toHaveLength(1);
 
         gridview.layout(800, 400, true);
 
@@ -495,7 +495,7 @@ describe('gridview', () => {
     });
 
     test('dispose of gridviewComponent', () => {
-        expect(container.childNodes.length).toBe(0);
+        expect(container.childNodes).toHaveLength(0);
 
         const gridview = new GridviewComponent(container, {
             proportionalLayout: false,
@@ -529,7 +529,7 @@ describe('gridview', () => {
 
         gridview.dispose();
 
-        expect(container.children.length).toBe(0);
+        expect(container.children).toHaveLength(0);
     });
 
     test('#1/VERTICAL', () => {
@@ -2054,9 +2054,9 @@ describe('gridview', () => {
 
         jest.runAllTimers();
 
-        expect(addGroup.length).toBe(4);
-        expect(removeGroup.length).toBe(0);
-        expect(activeGroup.length).toBe(1);
+        expect(addGroup).toHaveLength(4);
+        expect(removeGroup).toHaveLength(0);
+        expect(activeGroup).toHaveLength(1);
         expect(activeGroup[0]).toEqual(gridview.getPanel('panel_1'));
         expect(layoutChange).toBe(1);
         expect(layoutChangeFromJson).toBe(1);
@@ -2075,9 +2075,9 @@ describe('gridview', () => {
 
         jest.runAllTimers();
 
-        expect(addGroup.length).toBe(0);
-        expect(removeGroup.length).toBe(4);
-        expect(activeGroup.length).toBe(1);
+        expect(addGroup).toHaveLength(0);
+        expect(removeGroup).toHaveLength(4);
+        expect(activeGroup).toHaveLength(1);
         expect(layoutChange).toBe(2);
         expect(layoutChangeFromJson).toBe(2);
 
@@ -2797,7 +2797,7 @@ describe('gridview', () => {
 
         let el = gridview.element.querySelector('.dv-view-container');
         expect(el).toBeTruthy();
-        expect(el!.childNodes.length).toBe(0);
+        expect(el!.childNodes).toHaveLength(0);
 
         expect(() => {
             gridview.fromJSON({
@@ -2858,11 +2858,11 @@ describe('gridview', () => {
             });
         }).toThrow("unsupported panel 'somethingBad'");
 
-        expect(gridview.groups.length).toBe(0);
+        expect(gridview.groups).toHaveLength(0);
 
         el = gridview.element.querySelector('.dv-view-container');
         expect(el).toBeTruthy();
-        expect(el!.childNodes.length).toBe(0);
+        expect(el!.childNodes).toHaveLength(0);
     });
 
     test('that disableAutoResizing is false by default', () => {
