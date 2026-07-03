@@ -18,7 +18,7 @@ import { IRootDropTargetService } from './rootDropTargetService';
 import { IHeaderActionsService } from './headerActionsService';
 import { ILiveRegionService } from './liveRegionService';
 import {
-    IAccessibilityService,
+    IKeyboardNavigationService,
     IAdvancedDnDService,
     IAutoHideEdgeGroupService,
     IContextMenuService,
@@ -42,7 +42,7 @@ export interface ServiceCollection {
     headerActionsService?: IHeaderActionsService;
     advancedDnDService?: IAdvancedDnDService;
     liveRegionService?: ILiveRegionService;
-    accessibilityService?: IAccessibilityService;
+    keyboardNavigationService?: IKeyboardNavigationService;
     keyboardDockingService?: IKeyboardDockingService;
     layoutHistoryService?: ILayoutHistoryService;
     dropGuideService?: IDropGuideService;

@@ -1,6 +1,5 @@
 import {
     fnv1a,
-    isLocalhostHostname,
     isValidLicense,
     parseLicenseKey,
     validateLicense,
@@ -138,20 +137,4 @@ describe('isValidLicense', () => {
         expect(isValidLicense('invalid')).toBe(false);
         expect(isValidLicense('missing')).toBe(false);
     });
-});
-
-describe('isLocalhostHostname', () => {
-    test.each(['localhost', '127.0.0.1', '::1', '[::1]', 'app.localhost'])(
-        'suppresses on %s',
-        (h) => expect(isLocalhostHostname(h)).toBe(true)
-    );
-
-    test.each([
-        'example.com',
-        'app.acme.com',
-        'localhost.evil.com',
-        '10.0.0.5',
-    ])('does not suppress on %s', (h) =>
-        expect(isLocalhostHostname(h)).toBe(false)
-    );
 });

@@ -52,11 +52,14 @@
             // exports from a CJS module when that flag is present). `dockview`
             // is consumed only via `require()` from dockview-react, so it uses
             // the inlined `dist/package` bundle.
-            // NOTE: enterprise-feature examples (pinned tabs, smart guides, …)
-            // need a `dockview-enterprise` entry here plus a license key before
-            // they will register their modules in the runner — see the docs
-            // enterprise-split follow-up.
             'dockview-core': {
+                main: './dist/cjs/index.js',
+                format: 'cjs',
+                defaultExtension: 'js',
+            },
+            // `dockview-enterprise`: tsc `dist/cjs` build so SystemJS sees the
+            // named exports (e.g. `LicenseManager`). Examples that use it import it.
+            'dockview-enterprise': {
                 main: './dist/cjs/index.js',
                 format: 'cjs',
                 defaultExtension: 'js',

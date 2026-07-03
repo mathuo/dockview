@@ -1,7 +1,7 @@
 import { DockviewModule, registerModules } from 'dockview';
 import { TabGroupChipsModule } from './tabGroupChipsService';
 import { ContextMenuModule } from './contextMenu';
-import { AccessibilityModule } from './accessibilityService';
+import { KeyboardNavigationModule } from './keyboardNavigationService';
 import { LayoutHistoryModule } from './layoutHistoryService';
 import { DropGuideModule } from './dropGuideService';
 import { SmartGuidesModule } from './smartGuidesService';
@@ -23,9 +23,9 @@ export {
 } from './tabGroupChipsService';
 export { ContextMenuController, ContextMenuModule } from './contextMenu';
 export {
-    AccessibilityService,
-    AccessibilityModule,
-} from './accessibilityService';
+    KeyboardNavigationService,
+    KeyboardNavigationModule,
+} from './keyboardNavigationService';
 export {
     LayoutHistoryService,
     LayoutHistoryModule,
@@ -64,7 +64,7 @@ export type { LicenseState } from './licenseValidator';
 export const Modules: DockviewModule<any>[] = [
     TabGroupChipsModule,
     ContextMenuModule,
-    AccessibilityModule,
+    KeyboardNavigationModule,
     LayoutHistoryModule,
     DropGuideModule,
     SmartGuidesModule,

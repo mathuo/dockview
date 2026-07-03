@@ -24,14 +24,15 @@ function makeHost(): { host: ILicenseHost; root: HTMLElement } {
 const watermark = (root: HTMLElement) =>
     root.querySelector('.dv-license-watermark') as HTMLElement | null;
 
-// Off-localhost by default so the watermark isn't auto-suppressed.
-const REMOTE = { hostname: () => 'app.acme.com' };
-
 describe('LicenseService', () => {
     let errSpy: jest.SpyInstance;
     let infoSpy: jest.SpyInstance;
 
     beforeEach(() => {
+        // The shared test setup (registerModules.ts) sets a valid key so other
+        // suites aren't watermarked; clear it here so these unlicensed-path
+        // tests start from a clean registry.
+        LicenseRegistry._reset();
         errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
         infoSpy = jest.spyOn(console, 'info').mockImplementation(() => {});
     });
@@ -44,7 +45,7 @@ describe('LicenseService', () => {
 
     test('no key → watermark + one console.error (package presence = enterprise use)', () => {
         const { host, root } = makeHost();
-        new LicenseService(host, { releaseDate: () => IN_WINDOW, ...REMOTE });
+        new LicenseService(host, { releaseDate: () => IN_WINDOW });
         expect(watermark(root)?.textContent).toBe('dockview — Unlicensed');
         expect(errSpy).toHaveBeenCalledTimes(1);
     });
@@ -54,7 +55,6 @@ describe('LicenseService', () => {
         const { host, root } = makeHost();
         const svc = new LicenseService(host, {
             releaseDate: () => IN_WINDOW,
-            ...REMOTE,
         });
         expect(svc.state).toBe('valid');
         expect(watermark(root)).toBeNull();
@@ -66,7 +66,6 @@ describe('LicenseService', () => {
         const { host, root } = makeHost();
         const svc = new LicenseService(host, {
             releaseDate: () => IN_WINDOW,
-            ...REMOTE,
         });
         expect(svc.state).toBe('invalid');
         expect(watermark(root)?.textContent).toBe('dockview — Invalid License');
@@ -78,27 +77,15 @@ describe('LicenseService', () => {
         const { host, root } = makeHost();
         const svc = new LicenseService(host, {
             releaseDate: () => AFTER_WINDOW,
-            ...REMOTE,
         });
         expect(svc.state).toBe('expired');
         expect(watermark(root)?.textContent).toBe('dockview — License Expired');
         expect(errSpy).toHaveBeenCalledTimes(1);
     });
 
-    test('localhost fully suppresses the watermark AND the warning', () => {
-        const { host, root } = makeHost();
-        const svc = new LicenseService(host, {
-            releaseDate: () => IN_WINDOW,
-            hostname: () => 'localhost',
-        });
-        expect(svc.state).toBe('missing');
-        expect(watermark(root)).toBeNull();
-        expect(errSpy).not.toHaveBeenCalled();
-    });
-
     test('watermark is click-through (pointer-events: none)', () => {
         const { host, root } = makeHost();
-        new LicenseService(host, { releaseDate: () => IN_WINDOW, ...REMOTE });
+        new LicenseService(host, { releaseDate: () => IN_WINDOW });
         expect(watermark(root)!.style.pointerEvents).toBe('none');
     });
 
@@ -106,7 +93,6 @@ describe('LicenseService', () => {
         const { host, root } = makeHost();
         const svc = new LicenseService(host, {
             releaseDate: () => IN_WINDOW,
-            ...REMOTE,
         });
         svc.refresh();
         svc.refresh();
@@ -118,7 +104,6 @@ describe('LicenseService', () => {
         const { host, root } = makeHost();
         const svc = new LicenseService(host, {
             releaseDate: () => IN_WINDOW,
-            ...REMOTE,
         });
         expect(watermark(root)).not.toBeNull();
 
@@ -131,7 +116,6 @@ describe('LicenseService', () => {
         const { host, root } = makeHost();
         const svc = new LicenseService(host, {
             releaseDate: () => IN_WINDOW,
-            ...REMOTE,
         });
         expect(watermark(root)).not.toBeNull();
         svc.dispose();
@@ -140,6 +124,7 @@ describe('LicenseService', () => {
 });
 
 describe('LicenseModule', () => {
+    beforeEach(() => LicenseRegistry._reset());
     afterEach(() => LicenseRegistry._reset());
 
     const create = (host: ILicenseHost): ILicenseService =>

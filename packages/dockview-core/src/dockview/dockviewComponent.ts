@@ -88,7 +88,7 @@ import { IPopoutWindowHost } from './popoutWindowService';
 import { IWatermarkHost } from './watermarkService';
 import { IEdgeGroupServiceHost } from './edgeGroupService';
 import {
-    IAccessibilityHost,
+    IKeyboardNavigationHost,
     IAdvancedDnDHost,
     IAutoHideEdgeGroupHost,
     IContextMenuHost,
@@ -538,7 +538,7 @@ export class DockviewComponent
         IHeaderActionsHost,
         IAdvancedDnDHost,
         ILiveRegionHost,
-        IAccessibilityHost,
+        IKeyboardNavigationHost,
         ILayoutHistoryHost,
         IDropGuideHost,
         ISmartGuidesHost,
@@ -1215,7 +1215,7 @@ export class DockviewComponent
         return this._advancedDnDService?.resolveOverlayModel(location, group);
     }
 
-    // IAccessibilityHost — keyboard docking reaches the AdvancedDnD preview +
+    // IKeyboardNavigationHost — keyboard docking reaches the AdvancedDnD preview +
     // LiveRegion announcer through these so the service stays decoupled.
     /** Outermost element — the shell (incl. edge groups) once built, else the gridview. */
     get rootElement(): HTMLElement {
@@ -1246,7 +1246,7 @@ export class DockviewComponent
      * The next / previous group in gridview (spatial) order, wrapping round.
      * The keyboard accessibility module's focus navigation is built on this
      * primitive — the only piece that needs the grid internals; the rest of
-     * the navigation logic lives in the AccessibilityService.
+     * the navigation logic lives in the KeyboardNavigationService.
      */
     adjacentGroup(
         group: DockviewGroupPanel,

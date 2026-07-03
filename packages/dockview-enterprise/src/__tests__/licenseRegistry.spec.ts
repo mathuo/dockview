@@ -1,6 +1,8 @@
 import { LicenseManager, LicenseRegistry } from '../licenseRegistry';
 
 describe('LicenseRegistry / LicenseManager', () => {
+    // The shared test setup seeds a key; clear it so these tests start clean.
+    beforeEach(() => LicenseRegistry._reset());
     afterEach(() => LicenseRegistry._reset());
 
     describe('key resolution (static-only)', () => {

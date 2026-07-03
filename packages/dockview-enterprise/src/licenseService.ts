@@ -3,9 +3,8 @@
  *
  * The whole package is enterprise, so its mere presence means enterprise is in
  * use: this service validates the key on construction and — unless a valid key
- * is set (or we're on localhost) — renders a small inline-styled corner
- * watermark and logs one console warning. Features are NEVER disabled; the
- * watermark is the enforcement.
+ * is set — renders a small inline-styled corner watermark and logs one console
+ * warning. Features are NEVER disabled; the watermark is the enforcement.
  *
  * ZERO core footprint: the `ServiceCollection` slot is declaration-merged onto
  * `dockview` (never declared in `dockview-core`), the watermark anchors to the
@@ -16,7 +15,6 @@
 import { defineModule, DockviewIDisposable as IDisposable } from 'dockview';
 import {
     LicenseState,
-    isLocalhostHostname,
     isValidLicense,
     validateLicense,
 } from './licenseValidator';
@@ -54,8 +52,6 @@ export interface LicenseServiceOptions {
      * the build's publish date, NOT the current wall-clock time.
      */
     releaseDate?: () => Date;
-    /** Injectable origin for tests. Defaults to `location.hostname`. */
-    hostname?: () => string;
 }
 
 // TODO(§11 / no-pro-in-public): confirm final copy + URL. Neutral wording only.
@@ -97,20 +93,7 @@ export class LicenseService implements ILicenseService {
             : DOCKVIEW_RELEASE_DATE;
     }
 
-    private hostname(): string {
-        if (this.options.hostname) {
-            return this.options.hostname();
-        }
-        return typeof location !== 'undefined' ? location.hostname : '';
-    }
-
     private evaluate(): void {
-        // Full suppression on localhost — a dev environment is never watermarked
-        // or nagged.
-        if (isLocalhostHostname(this.hostname())) {
-            this.removeWatermark();
-            return;
-        }
         if (this.isValid) {
             this.removeWatermark();
             return;

@@ -37,11 +37,13 @@ const DOCKVIEW_CDN = {
         remote: {
             'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}`,
             dockview: `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}`,
+            'dockview-enterprise': `https://cdn.jsdelivr.net/npm/dockview-enterprise@${DOCKVIEW_VERSION}`,
             'dockview-react': `https://cdn.jsdelivr.net/npm/dockview-react@${DOCKVIEW_VERSION}`,
         },
         local: {
             'dockview-core': `${local}/dockview-core`,
             dockview: `${local}/dockview`,
+            'dockview-enterprise': `${local}/dockview-enterprise`,
             'dockview-react': `${local}/dockview-react`,
         },
     },
@@ -51,11 +53,13 @@ const DOCKVIEW_CDN = {
             // -> dockview-core); it is not imported directly by user code.
             'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}`,
             dockview: `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}`,
+            'dockview-enterprise': `https://cdn.jsdelivr.net/npm/dockview-enterprise@${DOCKVIEW_VERSION}`,
             'dockview-vue': `https://cdn.jsdelivr.net/npm/dockview-vue@${DOCKVIEW_VERSION}`,
         },
         local: {
             'dockview-core': `${local}/dockview-core`,
             dockview: `${local}/dockview`,
+            'dockview-enterprise': `${local}/dockview-enterprise`,
             'dockview-vue': `${local}/dockview-vue`,
         },
     },
@@ -65,10 +69,12 @@ const DOCKVIEW_CDN = {
             // it is not imported directly by user code.
             'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}`,
             dockview: `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}`,
+            'dockview-enterprise': `https://cdn.jsdelivr.net/npm/dockview-enterprise@${DOCKVIEW_VERSION}`,
         },
         local: {
             'dockview-core': `${local}/dockview-core`,
             dockview: `${local}/dockview`,
+            'dockview-enterprise': `${local}/dockview-enterprise`,
         },
     },
     angular: {
@@ -77,11 +83,13 @@ const DOCKVIEW_CDN = {
             // dockview -> dockview-core); it is not imported directly by user code.
             'dockview-core': `https://cdn.jsdelivr.net/npm/dockview-core@${DOCKVIEW_VERSION}`,
             dockview: `https://cdn.jsdelivr.net/npm/dockview@${DOCKVIEW_VERSION}`,
+            'dockview-enterprise': `https://cdn.jsdelivr.net/npm/dockview-enterprise@${DOCKVIEW_VERSION}`,
             'dockview-angular': `https://cdn.jsdelivr.net/npm/dockview-angular@${DOCKVIEW_VERSION}`,
         },
         local: {
             'dockview-core': `${local}/dockview-core`,
             dockview: `${local}/dockview`,
+            'dockview-enterprise': `${local}/dockview-enterprise`,
             'dockview-angular': `${local}/dockview-angular`,
         },
     },

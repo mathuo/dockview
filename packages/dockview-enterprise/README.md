@@ -23,7 +23,7 @@ everything `dockview` exports is re-exported here.
 import { DockviewComponent, LicenseManager } from 'dockview-enterprise';
 
 // Optional: set your license key. Without a valid key, dockview keeps working
-// but shows a small corner watermark (suppressed on localhost).
+// but shows a small corner watermark.
 LicenseManager.setLicenseKey('your-license-key');
 ```
 
@@ -44,5 +44,5 @@ import 'dockview-enterprise';
 
 Enterprise features are governed by a license key set via
 `LicenseManager.setLicenseKey(...)`. Without a valid key, dockview keeps working
-but shows a small corner watermark (suppressed on localhost). See
+but shows a small corner watermark. See
 <https://dockview.dev/enterprise>.

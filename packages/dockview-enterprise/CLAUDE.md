@@ -24,7 +24,7 @@ calls `registerModules(Modules)` at import (a side effect — hence
 - `PinnedTabsModule` (`pinnedTabsService.ts`)
 - `KeyboardDockingModule` (`keyboardDockingService.ts`) — `dependsOn` `AdvancedDnDModule` + `LiveRegionModule` (core)
 - `LicenseModule` (`licenseService.ts`) — the license gate; renders a corner
-  watermark unless a valid key is set (localhost suppressed). Supported by
+  watermark unless a valid key is set. Supported by
   `LicenseManager` (`licenseRegistry.ts`), the pure verifier
   (`licenseValidator.ts`), and the build-stamped `DOCKVIEW_RELEASE_DATE`
   (`releaseDate.ts`).
@@ -53,8 +53,8 @@ calls `registerModules(Modules)` at import (a side effect — hence
   version-based license expiry.
 - `test` - Jest (jsdom). `src/__tests__/registerModules.ts` registers `Modules`
   globally so a default `DockviewComponent` in tests has the full feature set;
-  ResizeObserver/PointerEvent jsdom mocks are reused from core. Localhost
-  suppresses the license watermark, so tests are unaffected by `LicenseModule`.
+  ResizeObserver/PointerEvent jsdom mocks are reused from core. It also seeds a valid license key so `LicenseModule`'s
+  watermark does not affect the feature suites.
 
 ## Dependencies
 

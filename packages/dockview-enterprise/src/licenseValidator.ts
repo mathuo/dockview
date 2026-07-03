@@ -214,19 +214,3 @@ export function validateLicense(
 export function isValidLicense(state: LicenseState): boolean {
     return state === 'valid';
 }
-
-/**
- * Localhost origins where the watermark is suppressed for local development
- * (so a dev environment isn't watermarked while building). Pure helper consumed by the
- * watermark-display decision in the service layer — kept out of `validateLicense`
- * so validation stays a pure key→state function.
- */
-export function isLocalhostHostname(hostname: string): boolean {
-    return (
-        hostname === 'localhost' ||
-        hostname === '127.0.0.1' ||
-        hostname === '::1' ||
-        hostname === '[::1]' ||
-        hostname.endsWith('.localhost')
-    );
-}

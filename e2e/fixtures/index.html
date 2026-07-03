@@ -42,6 +42,11 @@
                 // The enterprise feature modules (incl. keyboard docking + the
                 // license check) self-register when dockview-enterprise.js loads
                 // above, so no explicit registerModules call is needed here.
+                // Set a valid (far-future) key so the license check doesn't
+                // watermark the harness (localhost is no longer suppressed).
+                window['dockview-enterprise'].LicenseManager.setLicenseKey(
+                    '[KeyId:TEST]_[Company:Tests]_[Plan:team]_[AppName:Tests]_[Email:test@test]_[ValidFrom:01_Jan_2020]_[ValidUntil:01_Jan_2999]__8d12a26c8376cc3b'
+                );
 
                 const el = document.getElementById('app');
                 const params = new URLSearchParams(location.search);

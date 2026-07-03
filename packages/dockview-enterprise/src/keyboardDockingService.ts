@@ -9,7 +9,7 @@ import { resolveMessages } from 'dockview';
 import { defineModule } from 'dockview';
 import { AdvancedDnDModule } from 'dockview';
 import { LiveRegionModule } from 'dockview';
-import { IAccessibilityHost, IKeyboardDockingService } from 'dockview';
+import { IKeyboardNavigationHost, IKeyboardDockingService } from 'dockview';
 import {
     bindDocumentListeners,
     KEYBOARD_MOVE_ATTRIBUTE,
@@ -85,7 +85,7 @@ export class KeyboardDockingService
     private _move: MoveState | null = null;
     private _preview: IDisposable | undefined;
 
-    constructor(private readonly host: IAccessibilityHost) {
+    constructor(private readonly host: IKeyboardNavigationHost) {
         super();
 
         // Capture phase, on the document — matches the navigation listener so
@@ -358,7 +358,7 @@ export class KeyboardDockingService
 
 export const KeyboardDockingModule = defineModule<
     'keyboardDockingService',
-    IAccessibilityHost
+    IKeyboardNavigationHost
 >({
     name: 'KeyboardDocking',
     serviceKey: 'keyboardDockingService',
