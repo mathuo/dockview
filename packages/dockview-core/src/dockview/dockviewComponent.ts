@@ -3321,15 +3321,19 @@ export class DockviewComponent
 
     removePanel(
         panel: IDockviewPanel,
-        options: {
-            removeEmptyGroup: boolean;
+        options?: {
+            removeEmptyGroup?: boolean;
             skipDispose?: boolean;
             skipSetActiveGroup?: boolean;
-        } = {
-            removeEmptyGroup: true,
         }
     ): void {
-        this.mutation('remove', () => this._doRemovePanel(panel, options));
+        this.mutation('remove', () =>
+            this._doRemovePanel(panel, {
+                removeEmptyGroup: options?.removeEmptyGroup ?? true,
+                skipDispose: options?.skipDispose,
+                skipSetActiveGroup: options?.skipSetActiveGroup,
+            })
+        );
     }
 
     private _doRemovePanel(
@@ -3338,8 +3342,6 @@ export class DockviewComponent
             removeEmptyGroup: boolean;
             skipDispose?: boolean;
             skipSetActiveGroup?: boolean;
-        } = {
-            removeEmptyGroup: true,
         }
     ): void {
         const group = panel.group;
