@@ -108,7 +108,7 @@ export function fnv1a(input: string): string {
  */
 function cleanKey(key: string): string {
     // CR, LF, zero-width space/non-joiner/joiner (U+200B–200D), BOM (U+FEFF).
-    return key.replace(/[\r\n​‌‍﻿]/g, '').trim();
+    return key.replace(/\r|\n|\u200B|\u200C|\u200D|\uFEFF/g, '').trim();
 }
 
 /** Parse `DD_MMM_YYYY` (UTC) → Date, rejecting impossible dates (e.g. 31_Feb). */

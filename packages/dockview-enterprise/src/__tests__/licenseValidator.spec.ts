@@ -67,7 +67,7 @@ describe('parseLicenseKey', () => {
     });
 
     test('survives zero-width / CRLF noise pasted around the key', () => {
-        const noisy = `﻿ ${GOLDEN_KEY.slice(0, 10)}​${GOLDEN_KEY.slice(
+        const noisy = `\uFEFF ${GOLDEN_KEY.slice(0, 10)}\u200B${GOLDEN_KEY.slice(
             10
         )}\r\n`;
         expect(parseLicenseKey(noisy)).not.toBeNull();
