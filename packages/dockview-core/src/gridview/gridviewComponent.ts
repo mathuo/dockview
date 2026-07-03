@@ -382,11 +382,7 @@ export class GridviewComponent
                 }
                 this._groups.forEach((groupItem) => {
                     const group = groupItem.value;
-                    if (group !== panel) {
-                        group.setActive(false);
-                    } else {
-                        group.setActive(true);
-                    }
+                    group.setActive(group === panel);
                 });
             })
         );

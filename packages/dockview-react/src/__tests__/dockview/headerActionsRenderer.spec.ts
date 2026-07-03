@@ -36,7 +36,7 @@ describe('headerActionsRenderer', () => {
             groupPanel
         );
 
-        expect(cut.element.childNodes.length).toBe(0);
+        expect(cut.element.childNodes).toHaveLength(0);
         expect(cut.element.className).toBe('dv-react-part');
         expect(cut.part).toBeUndefined();
 

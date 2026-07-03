@@ -10,7 +10,7 @@ import {
     pointerBackend,
 } from '../../../dnd/backend';
 import { DockviewComponent } from '../../dockviewComponent';
-import { Emitter, Event } from '../../../events';
+import { Emitter } from '../../../events';
 import {
     CompositeDisposable,
     Disposable,
@@ -97,7 +97,7 @@ export class GroupDragSource extends CompositeDisposable {
 
         const buildMultiPanelsGhost = (): HTMLElement => {
             const ghostEl = document.createElement('div');
-            const style = window.getComputedStyle(this._element);
+            const style = globalThis.getComputedStyle(this._element);
             const bgColor = style.getPropertyValue(
                 '--dv-activegroup-visiblepanel-tab-background-color'
             );

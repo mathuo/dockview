@@ -49,7 +49,7 @@ describe('gridview', () => {
     });
 
     test('dispose of gridview', () => {
-        expect(container.childNodes.length).toBe(0);
+        expect(container.childNodes).toHaveLength(0);
 
         const gridview = new Gridview(
             false,
@@ -59,11 +59,11 @@ describe('gridview', () => {
 
         container.appendChild(gridview.element);
 
-        expect(container.childNodes.length).toBe(1);
+        expect(container.childNodes).toHaveLength(1);
 
         gridview.dispose();
 
-        expect(container.childNodes.length).toBe(0);
+        expect(container.childNodes).toHaveLength(0);
     });
 
     test('insertOrthogonalSplitviewAtRoot #1', () => {
@@ -177,8 +177,8 @@ describe('gridview', () => {
             width: 1000,
         });
         expect(
-            gridview.element.querySelectorAll('.mock-grid-view').length
-        ).toBe(3);
+            gridview.element.querySelectorAll('.mock-grid-view')
+        ).toHaveLength(3);
 
         gridview.removeView([1, 0], Sizing.Distribute);
 
@@ -204,8 +204,8 @@ describe('gridview', () => {
             width: 1000,
         });
         expect(
-            gridview.element.querySelectorAll('.mock-grid-view').length
-        ).toBe(2);
+            gridview.element.querySelectorAll('.mock-grid-view')
+        ).toHaveLength(2);
     });
 
     test('removeView: remove leaf from branch where branch remains branch and parent is root', () => {
@@ -260,8 +260,8 @@ describe('gridview', () => {
             width: 1000,
         });
         expect(
-            gridview.element.querySelectorAll('.mock-grid-view').length
-        ).toBe(4);
+            gridview.element.querySelectorAll('.mock-grid-view')
+        ).toHaveLength(4);
 
         gridview.removeView([1, 0], Sizing.Distribute);
 
@@ -298,8 +298,8 @@ describe('gridview', () => {
             width: 1000,
         });
         expect(
-            gridview.element.querySelectorAll('.mock-grid-view').length
-        ).toBe(3);
+            gridview.element.querySelectorAll('.mock-grid-view')
+        ).toHaveLength(3);
     });
 
     test('removeView: remove leaf where parent is root', () => {
@@ -348,8 +348,8 @@ describe('gridview', () => {
             width: 1000,
         });
         expect(
-            gridview.element.querySelectorAll('.mock-grid-view').length
-        ).toBe(3);
+            gridview.element.querySelectorAll('.mock-grid-view')
+        ).toHaveLength(3);
 
         gridview.removeView([0], Sizing.Distribute);
 
@@ -375,8 +375,8 @@ describe('gridview', () => {
             width: 1000,
         });
         expect(
-            gridview.element.querySelectorAll('.mock-grid-view').length
-        ).toBe(2);
+            gridview.element.querySelectorAll('.mock-grid-view')
+        ).toHaveLength(2);
     });
 
     test('removeView: remove leaf from branch where branch becomes leaf and parent is not root', () => {
@@ -437,8 +437,8 @@ describe('gridview', () => {
             width: 1000,
         });
         expect(
-            gridview.element.querySelectorAll('.mock-grid-view').length
-        ).toBe(4);
+            gridview.element.querySelectorAll('.mock-grid-view')
+        ).toHaveLength(4);
 
         gridview.removeView([1, 0, 0], Sizing.Distribute);
 
@@ -475,8 +475,8 @@ describe('gridview', () => {
             width: 1000,
         });
         expect(
-            gridview.element.querySelectorAll('.mock-grid-view').length
-        ).toBe(3);
+            gridview.element.querySelectorAll('.mock-grid-view')
+        ).toHaveLength(3);
     });
 
     test('removeView: remove leaf from branch where branch remains branch and parent is not root', () => {
@@ -543,8 +543,8 @@ describe('gridview', () => {
             width: 1000,
         });
         expect(
-            gridview.element.querySelectorAll('.mock-grid-view').length
-        ).toBe(5);
+            gridview.element.querySelectorAll('.mock-grid-view')
+        ).toHaveLength(5);
 
         gridview.removeView([1, 0, 1], Sizing.Distribute);
 
@@ -592,8 +592,8 @@ describe('gridview', () => {
             width: 1000,
         });
         expect(
-            gridview.element.querySelectorAll('.mock-grid-view').length
-        ).toBe(4);
+            gridview.element.querySelectorAll('.mock-grid-view')
+        ).toHaveLength(4);
     });
 
     test('removeView: remove leaf where parent is root', () => {
@@ -660,8 +660,8 @@ describe('gridview', () => {
             width: 1000,
         });
         expect(
-            gridview.element.querySelectorAll('.mock-grid-view').length
-        ).toBe(5);
+            gridview.element.querySelectorAll('.mock-grid-view')
+        ).toHaveLength(5);
 
         gridview.removeView([1, 1], Sizing.Distribute);
 
@@ -697,8 +697,8 @@ describe('gridview', () => {
             width: 1000,
         });
         expect(
-            gridview.element.querySelectorAll('.mock-grid-view').length
-        ).toBe(4);
+            gridview.element.querySelectorAll('.mock-grid-view')
+        ).toHaveLength(4);
     });
 
     test('that calling insertOrthogonalSplitviewAtRoot() for an empty view doesnt add any nodes', () => {
@@ -758,12 +758,12 @@ describe('gridview', () => {
         gridview.addView(view6, Sizing.Distribute, [1, 1, 0, 0, 0]);
 
         let el = gridview.element.querySelectorAll('.mock-grid-view');
-        expect(el.length).toBe(6);
+        expect(el).toHaveLength(6);
 
         gridview.remove(view2);
 
         el = gridview.element.querySelectorAll('.mock-grid-view');
-        expect(el.length).toBe(5);
+        expect(el).toHaveLength(5);
     });
 
     test('gridview nested proportional layouts', () => {
@@ -1232,8 +1232,8 @@ describe('gridview', () => {
             const afterNormalize = gridview.serialize();
             expect(afterNormalize).toEqual(beforeNormalize);
             expect(
-                gridview.element.querySelectorAll('.mock-grid-view').length
-            ).toBe(2);
+                gridview.element.querySelectorAll('.mock-grid-view')
+            ).toHaveLength(2);
         });
 
         test('should not normalize when root has single leaf child', () => {
@@ -1299,8 +1299,8 @@ describe('gridview', () => {
             gridview.addView(view1, Sizing.Distribute, [0]);
 
             expect(
-                gridview.element.querySelectorAll('.mock-grid-view').length
-            ).toBe(1);
+                gridview.element.querySelectorAll('.mock-grid-view')
+            ).toHaveLength(1);
         });
 
         test('normalize method exists and is callable', () => {

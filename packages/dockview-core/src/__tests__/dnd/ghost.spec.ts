@@ -26,6 +26,6 @@ describe('ghost', () => {
         jest.runAllTimers();
 
         expect(element.className).toBe('');
-        expect(element.parentElement).toBe(null);
+        expect(element.parentElement).toBeNull();
     });
 });

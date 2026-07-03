@@ -121,12 +121,10 @@ let _fallbackPalette: TabGroupColorPalette | undefined;
  * palette through.
  */
 function getFallbackPalette(): TabGroupColorPalette {
-    if (!_fallbackPalette) {
-        _fallbackPalette = new TabGroupColorPalette(
-            DEFAULT_TAB_GROUP_COLORS,
-            true
-        );
-    }
+    _fallbackPalette ??= new TabGroupColorPalette(
+        DEFAULT_TAB_GROUP_COLORS,
+        true
+    );
     return _fallbackPalette;
 }
 

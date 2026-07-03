@@ -203,7 +203,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     getWindow(): Window {
         return this.location.type === 'popout'
             ? this.location.getWindow()
-            : window;
+            : globalThis.window;
     }
 
     setHeaderPosition(position: DockviewHeaderPosition): void {

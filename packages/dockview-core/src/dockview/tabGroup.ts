@@ -170,9 +170,9 @@ export class TabGroup extends CompositeDisposable implements ITabGroup {
         }
 
         const insertIndex =
-            index !== undefined
-                ? Math.max(0, Math.min(index, this._panelIds.length))
-                : this._panelIds.length;
+            index === undefined
+                ? this._panelIds.length
+                : Math.max(0, Math.min(index, this._panelIds.length));
 
         this._panelIds.splice(insertIndex, 0, panelId);
         this._onDidPanelChange.fire({ panelId, type: 'add' });

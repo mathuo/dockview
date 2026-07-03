@@ -133,7 +133,11 @@ export class PointerDragSource extends CompositeDisposable {
                 ? initiationDelayOpt()
                 : initiationDelayOpt) ?? DEFAULT_TOUCH_INITIATION_DELAY;
         this._armed = !isTouch || initiationDelay <= 0;
-        if (isTouch && initiationDelay > 0 && isFinite(initiationDelay)) {
+        if (
+            isTouch &&
+            initiationDelay > 0 &&
+            Number.isFinite(initiationDelay)
+        ) {
             this._armTimer = setTimeout(() => {
                 this._armTimer = undefined;
                 this._armed = true;
@@ -149,7 +153,7 @@ export class PointerDragSource extends CompositeDisposable {
 
         // Source's owning window — popout drags fire on their own window.
         const targetWindow: Window =
-            this.element.ownerDocument?.defaultView ?? window;
+            this.element.ownerDocument?.defaultView ?? globalThis.window;
 
         this._pendingMoveListener = addDisposableListener(
             targetWindow,

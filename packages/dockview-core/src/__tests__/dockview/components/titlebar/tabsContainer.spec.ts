@@ -68,8 +68,8 @@ describe('tabsContainer', () => {
         expect(groupView.canDisplayOverlay).toHaveBeenCalled();
 
         expect(
-            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+            cut.element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
     });
 
     test('that a drag over event from another tab should render a drop target', () => {
@@ -140,8 +140,8 @@ describe('tabsContainer', () => {
         expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(0);
 
         expect(
-            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(1);
+            cut.element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(1);
         // expect(
         //     dropTargetContainer.getElementsByClassName('dv-drop-target-anchor')
         //         .length
@@ -214,8 +214,8 @@ describe('tabsContainer', () => {
         expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(0);
 
         expect(
-            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(1);
+            cut.element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(1);
     });
 
     test.each([true, 'no-drop-target' as const])(
@@ -284,8 +284,7 @@ describe('tabsContainer', () => {
 
             expect(
                 cut.element.getElementsByClassName('dv-drop-target-dropzone')
-                    .length
-            ).toBe(0);
+            ).toHaveLength(0);
         }
     );
 
@@ -355,8 +354,8 @@ describe('tabsContainer', () => {
         expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(0);
 
         expect(
-            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(1);
+            cut.element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(1);
     });
 
     test('that dropping a tab from another component should not render a drop target', () => {
@@ -430,8 +429,8 @@ describe('tabsContainer', () => {
         expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(1);
 
         expect(
-            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+            cut.element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
     });
 
     test('left actions', () => {
@@ -458,8 +457,8 @@ describe('tabsContainer', () => {
             '.dv-tabs-and-actions-container > .dv-left-actions-container'
         );
 
-        expect(query.length).toBe(1);
-        expect(query[0].children.length).toBe(0);
+        expect(query).toHaveLength(1);
+        expect(query[0].children).toHaveLength(0);
 
         // add left action
 
@@ -470,11 +469,11 @@ describe('tabsContainer', () => {
         query = cut.element.querySelectorAll(
             '.dv-tabs-and-actions-container > .dv-left-actions-container'
         );
-        expect(query.length).toBe(1);
+        expect(query).toHaveLength(1);
         expect(query[0].children.item(0)?.className).toBe(
             'test-left-actions-element'
         );
-        expect(query[0].children.length).toBe(1);
+        expect(query[0].children).toHaveLength(1);
 
         // add left action
 
@@ -485,11 +484,11 @@ describe('tabsContainer', () => {
         query = cut.element.querySelectorAll(
             '.dv-tabs-and-actions-container > .dv-left-actions-container'
         );
-        expect(query.length).toBe(1);
+        expect(query).toHaveLength(1);
         expect(query[0].children.item(0)?.className).toBe(
             'test-left-actions-element-2'
         );
-        expect(query[0].children.length).toBe(1);
+        expect(query[0].children).toHaveLength(1);
 
         // remove left action
 
@@ -498,8 +497,8 @@ describe('tabsContainer', () => {
             '.dv-tabs-and-actions-container > .dv-left-actions-container'
         );
 
-        expect(query.length).toBe(1);
-        expect(query[0].children.length).toBe(0);
+        expect(query).toHaveLength(1);
+        expect(query[0].children).toHaveLength(0);
     });
 
     test('right actions', () => {
@@ -526,8 +525,8 @@ describe('tabsContainer', () => {
             '.dv-tabs-and-actions-container > .dv-right-actions-container'
         );
 
-        expect(query.length).toBe(1);
-        expect(query[0].children.length).toBe(0);
+        expect(query).toHaveLength(1);
+        expect(query[0].children).toHaveLength(0);
 
         // add right action
 
@@ -538,11 +537,11 @@ describe('tabsContainer', () => {
         query = cut.element.querySelectorAll(
             '.dv-tabs-and-actions-container > .dv-right-actions-container'
         );
-        expect(query.length).toBe(1);
+        expect(query).toHaveLength(1);
         expect(query[0].children.item(0)?.className).toBe(
             'test-right-actions-element'
         );
-        expect(query[0].children.length).toBe(1);
+        expect(query[0].children).toHaveLength(1);
 
         // add right action
 
@@ -553,11 +552,11 @@ describe('tabsContainer', () => {
         query = cut.element.querySelectorAll(
             '.dv-tabs-and-actions-container > .dv-right-actions-container'
         );
-        expect(query.length).toBe(1);
+        expect(query).toHaveLength(1);
         expect(query[0].children.item(0)?.className).toBe(
             'test-right-actions-element-2'
         );
-        expect(query[0].children.length).toBe(1);
+        expect(query[0].children).toHaveLength(1);
 
         // remove right action
 
@@ -566,8 +565,8 @@ describe('tabsContainer', () => {
             '.dv-tabs-and-actions-container > .dv-right-actions-container'
         );
 
-        expect(query.length).toBe(1);
-        expect(query[0].children.length).toBe(0);
+        expect(query).toHaveLength(1);
+        expect(query[0].children).toHaveLength(0);
     });
 
     test('that a tab will become floating when clicked if not floating and shift is selected', () => {
@@ -841,14 +840,14 @@ describe('tabsContainer', () => {
 
         let result = cut.element.querySelector('.dv-pre-actions-container');
         expect(result).toBeTruthy();
-        expect(result!.childNodes.length).toBe(0);
+        expect(result!.childNodes).toHaveLength(0);
 
         const actions = document.createElement('div');
         cut.setPrefixActionsElement(actions);
 
         result = cut.element.querySelector('.dv-pre-actions-container');
         expect(result).toBeTruthy();
-        expect(result!.childNodes.length).toBe(1);
+        expect(result!.childNodes).toHaveLength(1);
         expect(result!.childNodes.item(0)).toBe(actions);
 
         const updatedActions = document.createElement('div');
@@ -856,14 +855,14 @@ describe('tabsContainer', () => {
 
         result = cut.element.querySelector('.dv-pre-actions-container');
         expect(result).toBeTruthy();
-        expect(result!.childNodes.length).toBe(1);
+        expect(result!.childNodes).toHaveLength(1);
         expect(result!.childNodes.item(0)).toBe(updatedActions);
 
         cut.setPrefixActionsElement(undefined);
 
         result = cut.element.querySelector('.dv-pre-actions-container');
         expect(result).toBeTruthy();
-        expect(result!.childNodes.length).toBe(0);
+        expect(result!.childNodes).toHaveLength(0);
     });
 
     test('left header actions', () => {
@@ -912,14 +911,14 @@ describe('tabsContainer', () => {
 
         let result = cut.element.querySelector('.dv-left-actions-container');
         expect(result).toBeTruthy();
-        expect(result!.childNodes.length).toBe(0);
+        expect(result!.childNodes).toHaveLength(0);
 
         const actions = document.createElement('div');
         cut.setLeftActionsElement(actions);
 
         result = cut.element.querySelector('.dv-left-actions-container');
         expect(result).toBeTruthy();
-        expect(result!.childNodes.length).toBe(1);
+        expect(result!.childNodes).toHaveLength(1);
         expect(result!.childNodes.item(0)).toBe(actions);
 
         const updatedActions = document.createElement('div');
@@ -927,14 +926,14 @@ describe('tabsContainer', () => {
 
         result = cut.element.querySelector('.dv-left-actions-container');
         expect(result).toBeTruthy();
-        expect(result!.childNodes.length).toBe(1);
+        expect(result!.childNodes).toHaveLength(1);
         expect(result!.childNodes.item(0)).toBe(updatedActions);
 
         cut.setLeftActionsElement(undefined);
 
         result = cut.element.querySelector('.dv-left-actions-container');
         expect(result).toBeTruthy();
-        expect(result!.childNodes.length).toBe(0);
+        expect(result!.childNodes).toHaveLength(0);
     });
 
     test('right header actions', () => {
@@ -983,14 +982,14 @@ describe('tabsContainer', () => {
 
         let result = cut.element.querySelector('.dv-right-actions-container');
         expect(result).toBeTruthy();
-        expect(result!.childNodes.length).toBe(0);
+        expect(result!.childNodes).toHaveLength(0);
 
         const actions = document.createElement('div');
         cut.setRightActionsElement(actions);
 
         result = cut.element.querySelector('.dv-right-actions-container');
         expect(result).toBeTruthy();
-        expect(result!.childNodes.length).toBe(1);
+        expect(result!.childNodes).toHaveLength(1);
         expect(result!.childNodes.item(0)).toBe(actions);
 
         const updatedActions = document.createElement('div');
@@ -998,14 +997,14 @@ describe('tabsContainer', () => {
 
         result = cut.element.querySelector('.dv-right-actions-container');
         expect(result).toBeTruthy();
-        expect(result!.childNodes.length).toBe(1);
+        expect(result!.childNodes).toHaveLength(1);
         expect(result!.childNodes.item(0)).toBe(updatedActions);
 
         cut.setRightActionsElement(undefined);
 
         result = cut.element.querySelector('.dv-right-actions-container');
         expect(result).toBeTruthy();
-        expect(result!.childNodes.length).toBe(0);
+        expect(result!.childNodes).toHaveLength(0);
     });
 
     test('class dv-single-tab is present when only one tab exists`', () => {

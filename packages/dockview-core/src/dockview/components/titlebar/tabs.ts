@@ -1,11 +1,6 @@
-import {
-    getPanelData,
-    LocalSelectionTransfer,
-    PanelTransfer,
-} from '../../../dnd/dataTransfer';
+import { getPanelData } from '../../../dnd/dataTransfer';
 import {
     addClasses,
-    disableIframePointEvents,
     isChildEntirelyVisibleWithinParent,
     OverflowObserver,
     removeClasses,
@@ -32,7 +27,6 @@ import {
 import { Tab } from '../tab/tab';
 import { TabDragEvent, TabDropIndexEvent } from './tabsContainer';
 import { ITabGroup } from '../../tabGroup';
-import { TabGroupChip } from './tabGroupChip';
 import { TabGroupManager } from './tabGroups';
 import { ITabGroupChipRenderer } from '../../framework';
 import { DroptargetEvent } from '../../../dnd/droptarget';
@@ -714,14 +708,12 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                     ) {
                         parentElement.scrollTop = running;
                     }
-                } else {
-                    if (
-                        running < parentElement.scrollLeft ||
-                        running + element.clientWidth >
-                            parentElement.scrollLeft + parentElement.clientWidth
-                    ) {
-                        parentElement.scrollLeft = running;
-                    }
+                } else if (
+                    running < parentElement.scrollLeft ||
+                    running + element.clientWidth >
+                        parentElement.scrollLeft + parentElement.clientWidth
+                ) {
+                    parentElement.scrollLeft = running;
                 }
             }
 
@@ -866,17 +858,15 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                     return;
                 }
 
-                switch (event.button) {
-                    case 0:
-                        if (this.group.api.location.type === 'edge') {
-                            // All tab interaction for edge groups is handled by
-                            // onTabClick to avoid race conditions with active panel state
-                        } else {
-                            if (this.group.activePanel !== panel) {
-                                this.group.model.openPanel(panel);
-                            }
-                        }
-                        break;
+                // Edge groups are skipped here: all their tab interaction
+                // is handled by onTabClick to avoid race conditions with
+                // active panel state.
+                if (
+                    event.button === 0 &&
+                    this.group.api.location.type !== 'edge' &&
+                    this.group.activePanel !== panel
+                ) {
+                    this.group.model.openPanel(panel);
                 }
             }),
             tab.onDrop((event) => {
@@ -915,8 +905,9 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                             firstPositions,
                             animState.sourceTabId,
                             animState.sourceIndex === -1,
-                            animState.sourceIndex !== -1
-                                ? {
+                            animState.sourceIndex === -1
+                                ? undefined
+                                : {
                                       from: Math.min(
                                           animState.sourceIndex,
                                           dropIndex
@@ -926,7 +917,6 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
                                           dropIndex
                                       ),
                                   }
-                                : undefined
                         );
                     }
                 } else {

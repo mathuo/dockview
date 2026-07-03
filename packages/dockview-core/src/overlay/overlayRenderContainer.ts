@@ -11,7 +11,7 @@ import { IDockviewPanel } from '../dockview/dockviewPanel';
 import { DockviewComponent } from '../dockview/dockviewComponent';
 
 class PositionCache {
-    private cache = new Map<
+    private readonly cache = new Map<
         Element,
         {
             rect: { left: number; top: number; width: number; height: number };

@@ -8,12 +8,10 @@ import {
     DockviewEvent,
     Emitter,
     Event,
-    IDockviewEvent,
 } from '../events';
 import {
     DockviewGroupDropLocation,
     DockviewWillShowOverlayLocationEvent,
-    DockviewWillShowOverlayLocationEventOptions,
 } from './events';
 import { IViewSize } from '../gridview/gridview';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
@@ -1179,9 +1177,9 @@ export class DockviewGroupPanelModel
     restoreTabGroups(serializedGroups: SerializedTabGroup[]): void {
         // Bump counter past any restored numeric suffixes to avoid ID collisions
         for (const data of serializedGroups) {
-            const match = data.id.match(/-(\d+)$/);
+            const match = /-(\d+)$/.exec(data.id);
             if (match) {
-                const num = parseInt(match[1], 10) + 1;
+                const num = Number.parseInt(match[1], 10) + 1;
                 if (num > this._tabGroupIdCounter) {
                     this._tabGroupIdCounter = num;
                 }
@@ -1333,12 +1331,8 @@ export class DockviewGroupPanelModel
         panel?: IDockviewPanel;
         suppressRoll?: boolean;
     }): void {
-        if (!options) {
-            options = {};
-        }
-        if (!options.panel) {
-            options.panel = this.activePanel;
-        }
+        options ??= {};
+        options.panel ??= this.activePanel;
 
         const index = options.panel ? this.panels.indexOf(options.panel) : -1;
 
@@ -1346,10 +1340,10 @@ export class DockviewGroupPanelModel
 
         if (index < this.panels.length - 1) {
             normalizedIndex = index + 1;
-        } else if (!options.suppressRoll) {
-            normalizedIndex = 0;
-        } else {
+        } else if (options.suppressRoll) {
             return;
+        } else {
+            normalizedIndex = 0;
         }
 
         this.openPanel(this.panels[normalizedIndex]);
@@ -1359,12 +1353,8 @@ export class DockviewGroupPanelModel
         panel?: IDockviewPanel;
         suppressRoll?: boolean;
     }): void {
-        if (!options) {
-            options = {};
-        }
-        if (!options.panel) {
-            options.panel = this.activePanel;
-        }
+        options ??= {};
+        options.panel ??= this.activePanel;
 
         if (!options.panel) {
             return;
@@ -1376,10 +1366,10 @@ export class DockviewGroupPanelModel
 
         if (index > 0) {
             normalizedIndex = index - 1;
-        } else if (!options.suppressRoll) {
-            normalizedIndex = this.panels.length - 1;
-        } else {
+        } else if (options.suppressRoll) {
             return;
+        } else {
+            normalizedIndex = this.panels.length - 1;
         }
 
         this.openPanel(this.panels[normalizedIndex]);

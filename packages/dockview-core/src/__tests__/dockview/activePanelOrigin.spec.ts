@@ -98,7 +98,7 @@ describe('active panel change origin', () => {
 
         p1.api.setActive();
 
-        expect(events.length).toBe(1);
+        expect(events).toHaveLength(1);
         expect(events[0].panel).toBe(p1);
         expect(events[0].origin).toBe('api');
     });

@@ -21,10 +21,12 @@ import {
     VueContextMenuItemRenderer,
     VueTabGroupChipRenderer,
     VueRenderer,
+    VueRendererRegistry,
     VueWatermarkRenderer,
     findComponent,
     resolveComponent,
 } from '../utils';
+import DockviewPortals from '../dockviewPortals.vue';
 import type { IDockviewVueProps, VueEvents } from './types';
 
 const DEFAULT_VUE_TAB = 'props.defaultTabComponent';
@@ -61,6 +63,13 @@ PROPERTY_KEYS_DOCKVIEW.forEach((coreOptionKey) => {
 
 const inst = getCurrentInstance()!;
 
+/**
+ * Components are mounted into dockview's DOM via `<Teleport>` (rendered by
+ * `<DockviewPortals>` below) rather than detached `render()` roots, keeping
+ * panels in the Vue component tree. See {@link VueRendererRegistry}.
+ */
+const registry = new VueRendererRegistry();
+
 watch(
     () => props.tabGroupChipComponent,
     (newValue) => {
@@ -69,7 +78,11 @@ watch(
                 createTabGroupChipComponent: newValue
                     ? () => {
                           const component = resolveComponent(newValue, inst);
-                          return new VueTabGroupChipRenderer(component!, inst);
+                          return new VueTabGroupChipRenderer(
+                              component!,
+                              inst,
+                              registry
+                          );
                       }
                     : undefined,
             });
@@ -87,7 +100,8 @@ watch(
                           const component = resolveComponent(newValue, inst);
                           return new VueGroupDragGhostRenderer(
                               component!,
-                              inst
+                              inst,
+                              registry
                           );
                       }
                     : undefined,
@@ -123,7 +137,7 @@ watch(
                     }
 
                     if (component) {
-                        return new VueRenderer(component, inst);
+                        return new VueRenderer(component, inst, registry);
                     }
                     return undefined;
                 },
@@ -140,7 +154,11 @@ watch(
                 createWatermarkComponent: newValue
                     ? () => {
                           const component = resolveComponent(newValue, inst);
-                          return new VueWatermarkRenderer(component!, inst);
+                          return new VueWatermarkRenderer(
+                              component!,
+                              inst,
+                              registry
+                          );
                       }
                     : undefined,
             });
@@ -159,7 +177,8 @@ watch(
                           return new VueHeaderActionsRenderer(
                               component!,
                               inst,
-                              group
+                              group,
+                              registry
                           );
                       }
                     : undefined,
@@ -179,7 +198,8 @@ watch(
                           return new VueHeaderActionsRenderer(
                               component!,
                               inst,
-                              group
+                              group,
+                              registry
                           );
                       }
                     : undefined,
@@ -199,7 +219,8 @@ watch(
                           return new VueHeaderActionsRenderer(
                               component!,
                               inst,
-                              group
+                              group,
+                              registry
                           );
                       }
                     : undefined,
@@ -224,7 +245,7 @@ onMounted(() => {
                 options.name,
                 props.components
             );
-            return new VueRenderer(component!, inst);
+            return new VueRenderer(component!, inst, registry);
         },
         createTabComponent(options) {
             let component =
@@ -238,7 +259,7 @@ onMounted(() => {
             }
 
             if (component) {
-                return new VueRenderer(component, inst);
+                return new VueRenderer(component, inst, registry);
             }
             return undefined;
         },
@@ -249,7 +270,7 @@ onMounted(() => {
                       inst
                   );
 
-                  return new VueWatermarkRenderer(component!, inst);
+                  return new VueWatermarkRenderer(component!, inst, registry);
               }
             : undefined,
         createLeftHeaderActionComponent: props.leftHeaderActionsComponent
@@ -258,7 +279,12 @@ onMounted(() => {
                       props.leftHeaderActionsComponent,
                       inst
                   );
-                  return new VueHeaderActionsRenderer(component!, inst, group);
+                  return new VueHeaderActionsRenderer(
+                      component!,
+                      inst,
+                      group,
+                      registry
+                  );
               }
             : undefined,
         createPrefixHeaderActionComponent: props.prefixHeaderActionsComponent
@@ -267,7 +293,12 @@ onMounted(() => {
                       props.prefixHeaderActionsComponent,
                       inst
                   );
-                  return new VueHeaderActionsRenderer(component!, inst, group);
+                  return new VueHeaderActionsRenderer(
+                      component!,
+                      inst,
+                      group,
+                      registry
+                  );
               }
             : undefined,
         createRightHeaderActionComponent: props.rightHeaderActionsComponent
@@ -276,7 +307,12 @@ onMounted(() => {
                       props.rightHeaderActionsComponent,
                       inst
                   );
-                  return new VueHeaderActionsRenderer(component!, inst, group);
+                  return new VueHeaderActionsRenderer(
+                      component!,
+                      inst,
+                      group,
+                      registry
+                  );
               }
             : undefined,
         createContextMenuItemComponent: (options) => {
@@ -288,7 +324,7 @@ onMounted(() => {
                 options.component as string,
                 props.components
             );
-            return new VueContextMenuItemRenderer(component!, inst);
+            return new VueContextMenuItemRenderer(component!, inst, registry);
         },
     };
 
@@ -304,7 +340,7 @@ onMounted(() => {
         const chipValue = props.tabGroupChipComponent;
         coreOptions.createTabGroupChipComponent = () => {
             const component = resolveComponent(chipValue, inst);
-            return new VueTabGroupChipRenderer(component!, inst);
+            return new VueTabGroupChipRenderer(component!, inst, registry);
         };
     }
 
@@ -312,7 +348,7 @@ onMounted(() => {
         const ghostValue = props.groupDragGhostComponent;
         coreOptions.createGroupDragGhostComponent = () => {
             const component = resolveComponent(ghostValue, inst);
-            return new VueGroupDragGhostRenderer(component!, inst);
+            return new VueGroupDragGhostRenderer(component!, inst, registry);
         };
     }
 
@@ -358,4 +394,5 @@ onBeforeUnmount(() => {
 
 <template>
     <div ref="el" />
+    <DockviewPortals :entries="registry.entries" />
 </template>

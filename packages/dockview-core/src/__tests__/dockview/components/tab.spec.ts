@@ -89,8 +89,8 @@ describe('tab', () => {
         expect(groupView.canDisplayOverlay).toHaveBeenCalled();
 
         expect(
-            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+            cut.element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
     });
 
     test('that if you drag over yourself a drop target is shown', () => {
@@ -135,8 +135,8 @@ describe('tab', () => {
         expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(0);
 
         expect(
-            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(1);
+            cut.element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(1);
     });
 
     test('that if you drag over another tab a drop target is shown', () => {
@@ -181,8 +181,8 @@ describe('tab', () => {
         expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(0);
 
         expect(
-            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(1);
+            cut.element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(1);
     });
 
     test('that dropping on a tab with the same id but from a different component should not render a drop over and call through to the group model', () => {
@@ -233,8 +233,8 @@ describe('tab', () => {
         expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(1);
 
         expect(
-            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+            cut.element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
     });
 
     test('that dropping on a tab from a different component should not render a drop over and call through to the group model', () => {
@@ -285,8 +285,8 @@ describe('tab', () => {
         expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(1);
 
         expect(
-            cut.element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+            cut.element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
     });
 
     describe('pointer (touch) drag', () => {

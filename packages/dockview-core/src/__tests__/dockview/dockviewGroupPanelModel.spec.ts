@@ -379,7 +379,7 @@ describe('dockviewGroupPanelModel', () => {
         const panel2 = new TestPanel('panel2', panelApi);
         const panel3 = new TestPanel('panel3', panelApi);
 
-        expect(events.length).toBe(0);
+        expect(events).toHaveLength(0);
 
         groupview.model.openPanel(panel1);
         expect(events).toEqual([
@@ -828,23 +828,23 @@ describe('dockviewGroupPanelModel', () => {
         const panel1 = new TestPanel('id_1', panelApi);
 
         cut.openPanel(panel1);
-        expect(contentContainer.length).toBe(1);
+        expect(contentContainer).toHaveLength(1);
         expect(contentContainer.item(0)).toBe(panel1.view.content.element);
 
         const panel2 = new TestPanel('id_2', panelApi);
 
         cut.openPanel(panel2);
-        expect(contentContainer.length).toBe(1);
+        expect(contentContainer).toHaveLength(1);
         expect(contentContainer.item(0)).toBe(panel2.view.content.element);
 
         const panel3 = new TestPanel('id_2', panelApi);
 
         cut.openPanel(panel3, { skipSetActive: true });
-        expect(contentContainer.length).toBe(1);
+        expect(contentContainer).toHaveLength(1);
         expect(contentContainer.item(0)).toBe(panel2.view.content.element);
 
         cut.openPanel(panel3);
-        expect(contentContainer.length).toBe(1);
+        expect(contentContainer).toHaveLength(1);
         expect(contentContainer.item(0)).toBe(panel3.view.content.element);
     });
 
@@ -907,8 +907,8 @@ describe('dockviewGroupPanelModel', () => {
         expect(counter).toBe(1);
 
         expect(
-            element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+            element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
     });
 
     test('that the .locked behaviour is as', () => {
@@ -974,32 +974,32 @@ describe('dockviewGroupPanelModel', () => {
         cut.locked = false;
         run(10);
         expect(
-            element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(1);
+            element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(1);
         fireEvent.dragEnd(element);
 
         // special case - locked with no possible target
         cut.locked = 'no-drop-target';
         run(10);
         expect(
-            element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+            element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
         fireEvent.dragEnd(element);
 
         // standard locked - only show if not center target
         cut.locked = true;
         run(10);
         expect(
-            element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(1);
+            element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(1);
         fireEvent.dragEnd(element);
 
         // standard locked but for center target - expect not shown
         cut.locked = true;
         run(25);
         expect(
-            element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+            element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
         fireEvent.dragEnd(element);
     });
 
@@ -1066,8 +1066,8 @@ describe('dockviewGroupPanelModel', () => {
         expect(counter).toBe(0);
 
         expect(
-            element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(1);
+            element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(1);
     });
 
     test('that should allow drop when dropping on self for same component id', () => {
@@ -1140,8 +1140,8 @@ describe('dockviewGroupPanelModel', () => {
         expect(counter).toBe(0);
 
         expect(
-            element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(1);
+            element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(1);
     });
 
     // Regression test for #1242: dropping a tab-group chip on the edge of
@@ -1244,7 +1244,7 @@ describe('dockviewGroupPanelModel', () => {
         );
         fireEvent.drop(target);
 
-        expect(moveEvents.length).toBe(1);
+        expect(moveEvents).toHaveLength(1);
         expect(moveEvents[0].target).toBe('right');
         expect(moveEvents[0].tabGroupId).toBe('tg-1');
         expect(moveEvents[0].itemId).toBeUndefined();
@@ -1340,7 +1340,7 @@ describe('dockviewGroupPanelModel', () => {
             fireEvent.drop(target);
         }
 
-        expect(moveEvents.length).toBe(0);
+        expect(moveEvents).toHaveLength(0);
 
         LocalSelectionTransfer.getInstance().clearData(PanelTransfer.prototype);
     });
@@ -1415,8 +1415,8 @@ describe('dockviewGroupPanelModel', () => {
         expect(counter).toBe(1);
 
         expect(
-            element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+            element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
     });
 
     test('that the watermark is removed when dispose is called', () => {
@@ -1450,14 +1450,14 @@ describe('dockviewGroupPanelModel', () => {
         cut.initialize();
 
         expect(
-            container.getElementsByClassName('watermark-test-container').length
-        ).toBe(1);
+            container.getElementsByClassName('watermark-test-container')
+        ).toHaveLength(1);
 
         cut.dispose();
 
         expect(
-            container.getElementsByClassName('watermark-test-container').length
-        ).toBe(0);
+            container.getElementsByClassName('watermark-test-container')
+        ).toHaveLength(0);
     });
 
     test('that watermark is added', () => {
@@ -1491,42 +1491,41 @@ describe('dockviewGroupPanelModel', () => {
         cut.initialize();
 
         expect(
-            container.getElementsByClassName('watermark-test-container').length
-        ).toBe(1);
+            container.getElementsByClassName('watermark-test-container')
+        ).toHaveLength(1);
 
         cut.openPanel(new TestPanel('panel1', panelApi));
 
         expect(
-            container.getElementsByClassName('watermark-test-container').length
-        ).toBe(0);
+            container.getElementsByClassName('watermark-test-container')
+        ).toHaveLength(0);
         expect(
             container.getElementsByClassName('dv-tabs-and-actions-container')
-                .length
-        ).toBe(1);
+        ).toHaveLength(1);
 
         cut.openPanel(new TestPanel('panel2', panelApi));
 
         expect(
-            container.getElementsByClassName('watermark-test-container').length
-        ).toBe(0);
+            container.getElementsByClassName('watermark-test-container')
+        ).toHaveLength(0);
 
         cut.removePanel('panel1');
 
         expect(
-            container.getElementsByClassName('watermark-test-container').length
-        ).toBe(0);
+            container.getElementsByClassName('watermark-test-container')
+        ).toHaveLength(0);
 
         cut.removePanel('panel2');
 
         expect(
-            container.getElementsByClassName('watermark-test-container').length
-        ).toBe(1);
+            container.getElementsByClassName('watermark-test-container')
+        ).toHaveLength(1);
 
         cut.openPanel(new TestPanel('panel1', panelApi));
 
         expect(
-            container.getElementsByClassName('watermark-test-container').length
-        ).toBe(0);
+            container.getElementsByClassName('watermark-test-container')
+        ).toHaveLength(0);
     });
 
     describe('tab groups', () => {
@@ -1777,7 +1776,7 @@ describe('dockviewGroupPanelModel', () => {
 
             const json = groupview.model.toJSON();
             expect(json.tabGroups).toBeDefined();
-            expect(json.tabGroups!.length).toBe(1);
+            expect(json.tabGroups!).toHaveLength(1);
             expect(json.tabGroups![0].id).toBe(tabGroup.id);
             expect(json.tabGroups![0].label).toBe('Group A');
             expect(json.tabGroups![0].color).toBe('blue');
@@ -1812,7 +1811,7 @@ describe('dockviewGroupPanelModel', () => {
             ]);
 
             const groups = groupview.model.getTabGroups();
-            expect(groups.length).toBe(1);
+            expect(groups).toHaveLength(1);
             expect(groups[0].id).toBe('tg-restored');
             expect(groups[0].label).toBe('Restored');
             expect(groups[0].color).toBe('red');
@@ -1834,7 +1833,7 @@ describe('dockviewGroupPanelModel', () => {
             ]);
 
             const groups = groupview.model.getTabGroups();
-            expect(groups.length).toBe(1);
+            expect(groups).toHaveLength(1);
             expect(groups[0].panelIds).toEqual(['panel1']);
         });
 
@@ -1852,7 +1851,7 @@ describe('dockviewGroupPanelModel', () => {
             ]);
 
             const groups = groupview.model.getTabGroups();
-            expect(groups.length).toBe(0);
+            expect(groups).toHaveLength(0);
         });
 
         test('collapsing all tab groups shows watermark', () => {
@@ -2024,17 +2023,17 @@ describe('dockviewGroupPanelModel', () => {
             tg2.collapse();
 
             const json = groupview.model.toJSON();
-            expect(json.tabGroups!.length).toBe(2);
+            expect(json.tabGroups!).toHaveLength(2);
 
             // Dissolve existing groups
             groupview.model.dissolveTabGroup(tg1.id);
             groupview.model.dissolveTabGroup(tg2.id);
-            expect(groupview.model.getTabGroups().length).toBe(0);
+            expect(groupview.model.getTabGroups()).toHaveLength(0);
 
             // Restore from JSON
             groupview.model.restoreTabGroups(json.tabGroups!);
             const restored = groupview.model.getTabGroups();
-            expect(restored.length).toBe(2);
+            expect(restored).toHaveLength(2);
             expect(restored[0].label).toBe('G1');
             expect(restored[0].color).toBe('purple');
             expect(restored[0].collapsed).toBe(false);

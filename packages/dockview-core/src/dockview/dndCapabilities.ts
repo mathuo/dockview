@@ -47,13 +47,13 @@ export function resolveDndCapabilities(
 }
 
 function isCoarsePrimaryInput(): boolean {
-    if (typeof window === 'undefined' || !window.matchMedia) {
+    if (globalThis.window === undefined || !globalThis.matchMedia) {
         return false;
     }
     // Coarse pointer without any fine pointer = phone-class device. A laptop
     // touchscreen reports both, and we want HTML5 to remain available there
     // because a real mouse is also plugged in.
-    const coarse = window.matchMedia('(pointer: coarse)').matches;
-    const fine = window.matchMedia('(pointer: fine)').matches;
+    const coarse = globalThis.matchMedia('(pointer: coarse)').matches;
+    const fine = globalThis.matchMedia('(pointer: fine)').matches;
     return coarse && !fine;
 }

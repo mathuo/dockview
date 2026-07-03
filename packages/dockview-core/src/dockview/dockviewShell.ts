@@ -123,9 +123,7 @@ export class EdgeGroupView implements IView {
         // Otherwise fall back to collapsedSize + 50 so the expanded state is
         // visually distinguishable from the collapsed state.
         this._expandedMinimumSize =
-            options.minimumSize !== undefined
-                ? options.minimumSize
-                : this._collapsedSize + 50;
+            options.minimumSize ?? this._collapsedSize + 50;
 
         this._lastExpandedSize = options.initialSize ?? 200;
 
@@ -587,7 +585,7 @@ export class ShellManager implements IDisposable {
             const baseCS = baseCfg.collapsedSize ?? defaultCollapsedSize;
             const newCS = baseCS + gapAdd;
             const baseMS = baseCfg.minimumSize;
-            const newMS = baseMS !== undefined ? baseMS + gapAdd : newCS + 50;
+            const newMS = baseMS === undefined ? newCS + 50 : baseMS + gapAdd;
             view.updateCollapsedSize(newCS, newMS);
         };
 

@@ -834,7 +834,7 @@ export class Gridview implements IDisposable {
         const [path, node] = this.getNode(location);
 
         if (!(node instanceof LeafNode)) {
-            throw new Error('invalid location');
+            throw new TypeError('invalid location');
         }
 
         for (let i = path.length - 1; i > -1; i--) {
@@ -880,7 +880,7 @@ export class Gridview implements IDisposable {
         const [, parent] = this.getNode(rest);
 
         if (!(parent instanceof BranchNode)) {
-            throw new Error('Invalid from location');
+            throw new TypeError('Invalid from location');
         }
 
         return parent.isChildVisible(index);
@@ -895,7 +895,7 @@ export class Gridview implements IDisposable {
         const [, parent] = this.getNode(rest);
 
         if (!(parent instanceof BranchNode)) {
-            throw new Error('Invalid from location');
+            throw new TypeError('Invalid from location');
         }
 
         this._onDidViewVisibilityChange.fire();
@@ -911,7 +911,7 @@ export class Gridview implements IDisposable {
         const [, parent] = this.getNode(parentLocation);
 
         if (!(parent instanceof BranchNode)) {
-            throw new Error('Invalid location');
+            throw new TypeError('Invalid location');
         }
 
         parent.moveChild(from, to);
@@ -997,13 +997,13 @@ export class Gridview implements IDisposable {
         const [pathToParent, parent] = this.getNode(rest);
 
         if (!(parent instanceof BranchNode)) {
-            throw new Error('Invalid location');
+            throw new TypeError('Invalid location');
         }
 
         const nodeToRemove = parent.children[index];
 
         if (!(nodeToRemove instanceof LeafNode)) {
-            throw new Error('Invalid location');
+            throw new TypeError('Invalid location');
         }
 
         parent.removeChild(index, sizing);
@@ -1126,7 +1126,7 @@ export class Gridview implements IDisposable {
         }
 
         if (!(node instanceof BranchNode)) {
-            throw new Error('Invalid location');
+            throw new TypeError('Invalid location');
         }
 
         const [index, ...rest] = location;

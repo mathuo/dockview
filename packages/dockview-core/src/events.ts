@@ -80,7 +80,7 @@ class LeakageMonitor {
 
 class Stacktrace {
     static create(): Stacktrace {
-        return new Stacktrace(new Error().stack ?? '');
+        return new Stacktrace(new Error('listener stacktrace').stack ?? '');
     }
 
     private constructor(readonly value: string) {}

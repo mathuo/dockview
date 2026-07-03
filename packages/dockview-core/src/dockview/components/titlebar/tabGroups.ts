@@ -1,6 +1,7 @@
 import { toggleClass } from '../../../dom';
 import { addDisposableListener } from '../../../events';
 import {
+    getPanelData,
     LocalSelectionTransfer,
     PanelTransfer,
 } from '../../../dnd/dataTransfer';
@@ -25,7 +26,6 @@ import { applyTabGroupAccent } from '../../tabGroupAccent';
 import { TabGroupChip } from './tabGroupChip';
 import { ITabGroupChipRenderer } from '../../framework';
 import { Droptarget, DroptargetEvent } from '../../../dnd/droptarget';
-import { getPanelData } from '../../../dnd/dataTransfer';
 import {
     ITabGroupIndicator,
     NoneTabGroupIndicator,
@@ -349,19 +349,16 @@ export class TabGroupManager {
             this._indicator = null;
         }
 
-        if (!this._indicator) {
-            this._indicator = new Ctor({
-                tabsList: this._ctx.tabsList,
-                getTabGroups: () => this._ctx.group.model.getTabGroups(),
-                getActivePanelId: () => this._ctx.group.activePanel?.id,
-                getTabMap: () => this._ctx.getTabMap(),
-                getChipElement: (id) =>
-                    this._chipRenderers.get(id)?.chip.element,
-                getDirection: () => this._ctx.getDirection(),
-                getHeaderPosition: () => this._ctx.group.model.headerPosition,
-                getColorPalette: () => this._ctx.accessor.tabGroupColorPalette,
-            });
-        }
+        this._indicator ??= new Ctor({
+            tabsList: this._ctx.tabsList,
+            getTabGroups: () => this._ctx.group.model.getTabGroups(),
+            getActivePanelId: () => this._ctx.group.activePanel?.id,
+            getTabMap: () => this._ctx.getTabMap(),
+            getChipElement: (id) => this._chipRenderers.get(id)?.chip.element,
+            getDirection: () => this._ctx.getDirection(),
+            getHeaderPosition: () => this._ctx.group.model.headerPosition,
+            getColorPalette: () => this._ctx.accessor.tabGroupColorPalette,
+        });
     }
 
     private _ensureChipForGroup(tabGroup: ITabGroup): void {

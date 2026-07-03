@@ -114,13 +114,13 @@ describe('GridviewVue Component', () => {
             component: 'test-component',
         });
 
-        expect(api.panels.length).toBe(1);
+        expect(api.panels).toHaveLength(1);
         expect(api.panels[0].id).toBe('grid-panel-1');
         expect(initSpy).toHaveBeenCalled();
 
         // Remove the panel
         api.removePanel(api.panels[0]);
-        expect(api.panels.length).toBe(0);
+        expect(api.panels).toHaveLength(0);
 
         initSpy.mockRestore();
         api.dispose();

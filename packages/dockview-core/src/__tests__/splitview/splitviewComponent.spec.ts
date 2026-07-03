@@ -46,7 +46,7 @@ describe('componentSplitview', () => {
         splitview.dispose();
 
         expect(container.parentElement).toBe(root);
-        expect(container.children.length).toBe(0);
+        expect(container.children).toHaveLength(0);
     });
 
     test('event leakage', () => {
@@ -122,14 +122,14 @@ describe('componentSplitview', () => {
 
         expect(panel1.api.isActive).toBeFalsy();
         expect(panel2.api.isActive).toBeTruthy();
-        expect(splitview.length).toBe(2);
+        expect(splitview).toHaveLength(2);
 
         splitview.removePanel(panel1);
         expect(panel2.api.isActive).toBeTruthy();
-        expect(splitview.length).toBe(1);
+        expect(splitview).toHaveLength(1);
 
         splitview.removePanel(panel2);
-        expect(splitview.length).toBe(0);
+        expect(splitview).toHaveLength(0);
     });
 
     test('horizontal dimensions', () => {
@@ -396,8 +396,8 @@ describe('componentSplitview', () => {
         splitview.layout(400, 6);
 
         expect(
-            container.querySelectorAll('.dv-split-view-container').length
-        ).toBe(1);
+            container.querySelectorAll('.dv-split-view-container')
+        ).toHaveLength(1);
 
         splitview.fromJSON({
             views: [
@@ -419,10 +419,10 @@ describe('componentSplitview', () => {
         });
 
         expect(
-            container.querySelectorAll('.dv-split-view-container').length
-        ).toBe(1);
+            container.querySelectorAll('.dv-split-view-container')
+        ).toHaveLength(1);
 
-        expect(splitview.length).toBe(3);
+        expect(splitview).toHaveLength(3);
 
         expect(JSON.parse(JSON.stringify(splitview.toJSON()))).toEqual({
             views: [
