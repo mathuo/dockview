@@ -27,7 +27,7 @@
     // dimensions don't overflow the content box and trigger scrollbars.
     // .dv-dockview already has no padding, so this is a defensive zero that
     // guarantees the inner element never picks up the spaced inset.
-    & .dv-dockview {
+    .dv-dockview {
         padding: 0;
     }
 
