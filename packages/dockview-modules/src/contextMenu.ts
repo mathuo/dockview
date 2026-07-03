@@ -66,7 +66,7 @@ function buildSeparator(): HTMLElement {
 }
 
 function isCoarsePrimaryInput(): boolean {
-    if (typeof globalThis.window === 'undefined' || !globalThis.matchMedia) {
+    if (globalThis.window === undefined || !globalThis.matchMedia) {
         return false;
     }
     const coarse = globalThis.matchMedia('(pointer: coarse)').matches;

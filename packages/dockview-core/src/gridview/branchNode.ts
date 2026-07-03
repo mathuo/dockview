@@ -119,13 +119,13 @@ export class BranchNode extends CompositeDisposable implements IView {
             return LayoutPriority.Normal;
         }
 
-        const priorities = this.children.map((c) =>
-            c.priority === undefined ? LayoutPriority.Normal : c.priority
+        const priorities = new Set(
+            this.children.map((c) => c.priority ?? LayoutPriority.Normal)
         );
 
-        if (priorities.includes(LayoutPriority.High)) {
+        if (priorities.has(LayoutPriority.High)) {
             return LayoutPriority.High;
-        } else if (priorities.includes(LayoutPriority.Low)) {
+        } else if (priorities.has(LayoutPriority.Low)) {
             return LayoutPriority.Low;
         }
 

@@ -47,7 +47,7 @@ export function resolveDndCapabilities(
 }
 
 function isCoarsePrimaryInput(): boolean {
-    if (typeof globalThis.window === 'undefined' || !globalThis.matchMedia) {
+    if (globalThis.window === undefined || !globalThis.matchMedia) {
         return false;
     }
     // Coarse pointer without any fine pointer = phone-class device. A laptop
