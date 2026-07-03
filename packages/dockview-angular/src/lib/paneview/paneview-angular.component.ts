@@ -57,7 +57,7 @@ export interface PaneviewAngularOptions extends PaneviewOptions {
 })
 export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @ViewChild('paneviewContainer', { static: true })
-    private containerRef!: ElementRef<HTMLDivElement>;
+    private readonly containerRef!: ElementRef<HTMLDivElement>;
 
     @Input() components!: Record<string, Type<any> | TemplateRef<any>>;
     @Input() headerComponents?: Record<string, Type<any> | TemplateRef<any>>;
@@ -73,9 +73,9 @@ export class PaneviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Output() drop = new EventEmitter<PaneviewDidDropEvent>();
 
     private paneviewApi?: PaneviewApi;
-    private lifecycleManager = new AngularLifecycleManager();
-    private injector = inject(Injector);
-    private environmentInjector = inject(EnvironmentInjector);
+    private readonly lifecycleManager = new AngularLifecycleManager();
+    private readonly injector = inject(Injector);
+    private readonly environmentInjector = inject(EnvironmentInjector);
 
     ngOnInit(): void {
         this.initializePaneview();

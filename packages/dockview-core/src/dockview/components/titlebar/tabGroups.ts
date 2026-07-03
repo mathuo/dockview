@@ -1,6 +1,7 @@
 import { toggleClass } from '../../../dom';
 import { addDisposableListener } from '../../../events';
 import {
+    getPanelData,
     LocalSelectionTransfer,
     PanelTransfer,
 } from '../../../dnd/dataTransfer';
@@ -25,7 +26,6 @@ import { applyTabGroupAccent } from '../../tabGroupAccent';
 import { TabGroupChip } from './tabGroupChip';
 import { ITabGroupChipRenderer } from '../../framework';
 import { Droptarget, DroptargetEvent } from '../../../dnd/droptarget';
-import { getPanelData } from '../../../dnd/dataTransfer';
 import {
     ITabGroupIndicator,
     NoneTabGroupIndicator,

@@ -1,15 +1,16 @@
 import {
     DockviewCompositeDisposable as CompositeDisposable,
     DockviewIDisposable as IDisposable,
+    Position,
+    DockviewGroupPanel,
+    IDockviewPanel,
+    resolveMessages,
+    defineModule,
+    LiveRegionModule,
+    IAccessibilityHost,
+    IKeyboardDockingService,
 } from 'dockview-core';
-import { Position } from 'dockview-core';
-import { DockviewGroupPanel } from 'dockview-core';
-import { IDockviewPanel } from 'dockview-core';
-import { resolveMessages } from 'dockview-core';
-import { defineModule } from 'dockview-core';
 import { AdvancedDnDModule } from './advancedDnDService';
-import { LiveRegionModule } from 'dockview-core';
-import { IAccessibilityHost, IKeyboardDockingService } from 'dockview-core';
 import {
     KEYBOARD_MOVE_ATTRIBUTE,
     matchesBinding,

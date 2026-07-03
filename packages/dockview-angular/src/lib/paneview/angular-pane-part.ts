@@ -12,7 +12,7 @@ import {
 import { AngularRenderer } from '../utils/angular-renderer';
 
 export class AngularPanePart implements IPanePart {
-    private renderer: AngularRenderer;
+    private readonly renderer: AngularRenderer;
 
     constructor(
         private readonly angularComponent: Type<any> | TemplateRef<any>,

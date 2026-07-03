@@ -1,18 +1,19 @@
 import {
     DockviewDisposable as Disposable,
     DockviewIDisposable as IDisposable,
-} from 'dockview-core';
-import { IDragGhostSpec } from 'dockview-core';
-import { DroptargetOverlayModel, Position } from 'dockview-core';
-import { GroupDragEvent, TabDragEvent } from 'dockview-core';
-import { DockviewWillDropEvent } from 'dockview-core';
-import { DockviewGroupPanel } from 'dockview-core';
-import {
+    IDragGhostSpec,
+    DroptargetOverlayModel,
+    Position,
+    GroupDragEvent,
+    TabDragEvent,
+    DockviewWillDropEvent,
+    DockviewGroupPanel,
     DockviewGroupDropLocation,
     DockviewWillShowOverlayLocationEvent,
+    defineModule,
+    IAdvancedDnDHost,
+    IAdvancedDnDService,
 } from 'dockview-core';
-import { defineModule } from 'dockview-core';
-import { IAdvancedDnDHost, IAdvancedDnDService } from 'dockview-core';
 
 /** Cursor offset of the group drag ghost, matched to the long-shipped default. */
 const GROUP_DRAG_GHOST_OFFSET_X = 30;
