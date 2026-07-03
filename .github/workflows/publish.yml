@@ -28,11 +28,11 @@ jobs:
             - run: npm install -g npm@latest
 
             - run: yarn
-            - run: npx nx run-many -t build --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
-            - run: npx nx run-many -t build:bundle --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
+            - run: npx nx run-many -t build --projects=dockview-core,dockview,dockview-enterprise,dockview-vue,dockview-react,dockview-angular
+            - run: npx nx run-many -t build:bundle --projects=dockview-core,dockview,dockview-enterprise,dockview-vue,dockview-react,dockview-angular
             - name: Publish to npm
               run: |
-                  for pkg in dockview-core dockview dockview-vue dockview-react dockview-angular; do
+                  for pkg in dockview-core dockview dockview-enterprise dockview-vue dockview-react dockview-angular; do
                     npm publish ./packages/$pkg --provenance --access public
                   done
     publish-experimental:
@@ -52,11 +52,11 @@ jobs:
             - run: npm install -g npm@latest
 
             - run: yarn
-            - run: npx nx run-many -t build --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
-            - run: npx nx run-many -t build:bundle --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
+            - run: npx nx run-many -t build --projects=dockview-core,dockview,dockview-enterprise,dockview-vue,dockview-react,dockview-angular
+            - run: npx nx run-many -t build:bundle --projects=dockview-core,dockview,dockview-enterprise,dockview-vue,dockview-react,dockview-angular
             - run: npx nx release version 0.0.0-experimental-$(git rev-parse --short HEAD)-$(date +%Y%m%d) --git-commit=false --git-tag=false
             - name: Publish to npm
               run: |
-                  for pkg in dockview-core dockview dockview-vue dockview-react dockview-angular; do
+                  for pkg in dockview-core dockview dockview-enterprise dockview-vue dockview-react dockview-angular; do
                     npm publish ./packages/$pkg --provenance --access public --tag experimental ${{ inputs.dry-run && '--dry-run' || '' }}
                   done

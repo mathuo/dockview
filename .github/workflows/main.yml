@@ -142,7 +142,7 @@ jobs:
                       ${{ runner.os }}-modules-
 
             - run: yarn
-            - run: npx nx run-many -t build --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
+            - run: npx nx run-many -t build --projects=dockview-core,dockview,dockview-enterprise,dockview-vue,dockview-react,dockview-angular
 
             - uses: actions/upload-artifact@v4
               with:
@@ -177,7 +177,7 @@ jobs:
                   name: build-output
                   path: packages/
 
-            - run: npx nx run-many -t build:bundle --projects=dockview-core,dockview,dockview-vue,dockview-react,dockview-angular
+            - run: npx nx run-many -t build:bundle --projects=dockview-core,dockview,dockview-enterprise,dockview-vue,dockview-react,dockview-angular
 
     test:
         runs-on: ubuntu-latest
