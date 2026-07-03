@@ -162,10 +162,10 @@ describe('TabGroup', () => {
         const changes: void[] = [];
         group.onDidChange(() => changes.push(undefined));
         group.setLabel('New Label');
-        expect(changes.length).toBe(1);
+        expect(changes).toHaveLength(1);
         // Setting same label should not fire
         group.setLabel('New Label');
-        expect(changes.length).toBe(1);
+        expect(changes).toHaveLength(1);
         group.dispose();
     });
 
@@ -174,10 +174,10 @@ describe('TabGroup', () => {
         const changes: void[] = [];
         group.onDidChange(() => changes.push(undefined));
         group.setColor('blue');
-        expect(changes.length).toBe(1);
+        expect(changes).toHaveLength(1);
         // Setting same color should not fire
         group.setColor('blue');
-        expect(changes.length).toBe(1);
+        expect(changes).toHaveLength(1);
         group.dispose();
     });
 
@@ -187,10 +187,10 @@ describe('TabGroup', () => {
         group.onDidChange(() => changes.push(undefined));
         group.setComponentParams({ icon: 'star' });
         expect(group.componentParams).toEqual({ icon: 'star' });
-        expect(changes.length).toBe(1);
+        expect(changes).toHaveLength(1);
         group.setComponentParams(undefined);
         expect(group.componentParams).toBeUndefined();
-        expect(changes.length).toBe(2);
+        expect(changes).toHaveLength(2);
         group.dispose();
     });
 

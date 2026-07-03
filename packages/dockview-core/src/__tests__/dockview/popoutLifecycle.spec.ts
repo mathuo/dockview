@@ -49,7 +49,7 @@ describe('popout lifecycle', () => {
 
         await dockview.addPopoutGroup(panel);
 
-        expect(events.length).toBe(1);
+        expect(events).toHaveLength(1);
         expect(events[0].hasGroup).toBe(true);
         expect(events[0].hasWindow).toBe(true);
         // the event id matches the now-enumerable popout
@@ -63,7 +63,7 @@ describe('popout lifecycle', () => {
         await dockview.addPopoutGroup(panel);
 
         const popouts = dockview.getPopouts();
-        expect(popouts.length).toBe(1);
+        expect(popouts).toHaveLength(1);
         expect(typeof popouts[0].id).toBe('string');
         expect(popouts[0].group).toBeDefined();
         expect(popouts[0].window).toBeDefined();
@@ -76,14 +76,14 @@ describe('popout lifecycle', () => {
         const panel = dockview.addPanel({ id: 'p1', component: 'default' });
         await dockview.addPopoutGroup(panel);
 
-        expect(fired.length).toBe(1);
+        expect(fired).toHaveLength(1);
         expect(dockview.api.getPopouts().map((p) => p.id)).toEqual(fired);
     });
 
     test('closing the popout window returns the panel, fires onDidRemovePopoutGroup, and clears getPopouts', async () => {
         const panel = dockview.addPanel({ id: 'p1', component: 'default' });
         await dockview.addPopoutGroup(panel);
-        expect(dockview.getPopouts().length).toBe(1);
+        expect(dockview.getPopouts()).toHaveLength(1);
 
         const popoutId = dockview.getPopouts()[0].id;
         const popoutWindow = dockview.getPopouts()[0].window;

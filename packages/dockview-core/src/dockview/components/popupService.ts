@@ -17,7 +17,7 @@ export class PopupService extends CompositeDisposable {
     // document so they render and dismiss correctly.
     private readonly _window: Window;
 
-    constructor(root: HTMLElement, win: Window = window) {
+    constructor(root: HTMLElement, win: Window = globalThis.window) {
         super();
 
         this._root = root;

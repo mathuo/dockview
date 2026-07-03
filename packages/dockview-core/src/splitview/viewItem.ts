@@ -19,7 +19,7 @@ export class ViewItem {
     }
 
     get visible(): boolean {
-        return typeof this._cachedVisibleSize === 'undefined';
+        return this._cachedVisibleSize === undefined;
     }
 
     get minimumSize(): number {

@@ -22,9 +22,9 @@ export class AngularRenderer<T = unknown>
     private componentRef: ComponentRef<T> | null = null;
     private viewRef: EmbeddedViewRef<T> | null = null;
     private _element: HTMLElement | null = null;
-    private appRef: ApplicationRef;
+    private readonly appRef: ApplicationRef;
 
-    constructor(private options: AngularRendererOptions<T>) {
+    constructor(private readonly options: AngularRendererOptions<T>) {
         this.appRef = options.injector.get(ApplicationRef);
     }
 

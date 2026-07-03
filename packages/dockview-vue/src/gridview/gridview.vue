@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import {
-    GridviewApi,
     type GridviewOptions,
     PROPERTY_KEYS_GRIDVIEW,
-    type GridviewFrameworkOptions,
     createGridview,
 } from 'dockview';
 import { useViewComponent } from '../composables/useViewComponent';
 import { VueGridviewPanelView } from './view';
+import DockviewPortals from '../dockviewPortals.vue';
 import type { IGridviewVueProps, GridviewVueEvents } from './types';
 
 function extractCoreOptions(props: IGridviewVueProps): GridviewOptions {
@@ -24,13 +23,13 @@ function extractCoreOptions(props: IGridviewVueProps): GridviewOptions {
 const emit = defineEmits<GridviewVueEvents>();
 const props = defineProps<IGridviewVueProps>();
 
-const { el } = useViewComponent(
+const { el, registry } = useViewComponent(
     {
         componentName: 'gridview-vue',
         propertyKeys: PROPERTY_KEYS_GRIDVIEW,
         createApi: createGridview,
-        createView: (id, name, component, instance) =>
-            new VueGridviewPanelView(id, name, component, instance),
+        createView: (id, name, component, instance, registry) =>
+            new VueGridviewPanelView(id, name, component, instance, registry),
         extractCoreOptions,
     },
     props,
@@ -40,4 +39,5 @@ const { el } = useViewComponent(
 
 <template>
     <div ref="el" style="height: 100%; width: 100%" />
+    <DockviewPortals :entries="registry.entries" />
 </template>

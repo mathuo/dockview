@@ -467,7 +467,7 @@ describe('tabs - animation', () => {
             expect(elements[1].style.transform).toBe('');
 
             // No rAF should be queued
-            expect(rAFCallbacks.length).toBe(0);
+            expect(rAFCallbacks).toHaveLength(0);
         });
     });
 

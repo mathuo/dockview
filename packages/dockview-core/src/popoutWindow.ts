@@ -19,14 +19,14 @@ export type PopoutWindowOptions = {
 export function assertSameOriginPopoutUrl(url: string): void {
     let resolved: URL;
     try {
-        resolved = new URL(url, window.location.href);
+        resolved = new URL(url, globalThis.location.href);
     } catch {
         throw new Error(`dockview: invalid popout URL: ${url}`);
     }
 
     const protocolOk =
         resolved.protocol === 'http:' || resolved.protocol === 'https:';
-    if (!protocolOk || resolved.origin !== window.location.origin) {
+    if (!protocolOk || resolved.origin !== globalThis.location.origin) {
         throw new Error(
             `dockview: popout URL must be same-origin http(s); got: ${url}`
         );
@@ -126,7 +126,7 @@ export class PopoutWindow extends CompositeDisposable {
             Disposable.from(() => {
                 externalWindow.close();
             }),
-            addDisposableListener(window, 'beforeunload', () => {
+            addDisposableListener(globalThis.window, 'beforeunload', () => {
                 /**
                  * before the main window closes we should close this popup too
                  * to be good citizens
@@ -165,9 +165,13 @@ export class PopoutWindow extends CompositeDisposable {
 
                     externalDocument.body.appendChild(container);
 
-                    addStyles(externalDocument, window.document.styleSheets, {
-                        nonce: this.options.nonce,
-                    });
+                    addStyles(
+                        externalDocument,
+                        globalThis.document.styleSheets,
+                        {
+                            nonce: this.options.nonce,
+                        }
+                    );
 
                     /**
                      * beforeunload must be registered after load for reasons I could not determine

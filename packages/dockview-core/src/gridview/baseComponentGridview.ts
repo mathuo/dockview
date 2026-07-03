@@ -338,9 +338,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
     }
 
     public moveToNext(options?: MovementOptions2): void {
-        if (!options) {
-            options = {};
-        }
+        options ??= {};
         if (!options.group) {
             if (!this.activeGroup) {
                 return;
@@ -354,9 +352,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
     }
 
     public moveToPrevious(options?: MovementOptions2): void {
-        if (!options) {
-            options = {};
-        }
+        options ??= {};
         if (!options.group) {
             if (!this.activeGroup) {
                 return;

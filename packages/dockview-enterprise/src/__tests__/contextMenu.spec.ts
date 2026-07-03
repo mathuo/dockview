@@ -728,7 +728,7 @@ describe('ContextMenuController', () => {
             const swatches = picker.querySelectorAll(
                 '.dv-context-menu-color-swatch'
             );
-            expect(swatches.length).toBe(DEFAULT_TAB_GROUP_COLORS.length);
+            expect(swatches).toHaveLength(DEFAULT_TAB_GROUP_COLORS.length);
 
             const first = swatches[0] as HTMLElement;
             expect(first.style.getPropertyValue('--dv-tab-group-color')).toBe(
@@ -766,7 +766,7 @@ describe('ContextMenuController', () => {
             const swatches = menuEl.querySelectorAll(
                 '.dv-context-menu-color-swatch'
             );
-            expect(swatches.length).toBe(2);
+            expect(swatches).toHaveLength(2);
             expect((swatches[0] as HTMLElement).title).toBe('Brand');
             expect(
                 (swatches[0] as HTMLElement).style.getPropertyValue(
@@ -796,8 +796,8 @@ describe('ContextMenuController', () => {
             )!;
             expect(picker).toBeTruthy();
             expect(
-                picker.querySelectorAll('.dv-context-menu-color-swatch').length
-            ).toBe(0);
+                picker.querySelectorAll('.dv-context-menu-color-swatch')
+            ).toHaveLength(0);
         });
     });
 

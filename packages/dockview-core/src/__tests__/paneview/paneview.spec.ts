@@ -79,34 +79,34 @@ describe('paneview', () => {
             maximumBodySize: Number.MAX_SAFE_INTEGER,
         });
 
-        expect(added.length).toBe(0);
-        expect(removed.length).toBe(0);
+        expect(added).toHaveLength(0);
+        expect(removed).toHaveLength(0);
 
         paneview.addPane(view1);
-        expect(added.length).toBe(1);
-        expect(removed.length).toBe(0);
+        expect(added).toHaveLength(1);
+        expect(removed).toHaveLength(0);
         expect(added[0]).toBe(view1);
 
         paneview.addPane(view2);
-        expect(added.length).toBe(2);
-        expect(removed.length).toBe(0);
+        expect(added).toHaveLength(2);
+        expect(removed).toHaveLength(0);
         expect(added[1]).toBe(view2);
 
         paneview.removePane(0);
-        expect(added.length).toBe(2);
-        expect(removed.length).toBe(1);
+        expect(added).toHaveLength(2);
+        expect(removed).toHaveLength(1);
         expect(removed[0]).toBe(view1);
 
         paneview.removePane(0);
-        expect(added.length).toBe(2);
-        expect(removed.length).toBe(2);
+        expect(added).toHaveLength(2);
+        expect(removed).toHaveLength(2);
         expect(removed[1]).toBe(view2);
 
         disposable.dispose();
     });
 
     test('dispose of paneview', () => {
-        expect(container.childNodes.length).toBe(0);
+        expect(container.childNodes).toHaveLength(0);
 
         const paneview = new Paneview(container, {
             orientation: Orientation.HORIZONTAL,
@@ -142,6 +142,6 @@ describe('paneview', () => {
 
         paneview.dispose();
 
-        expect(container.childNodes.length).toBe(0);
+        expect(container.childNodes).toHaveLength(0);
     });
 });

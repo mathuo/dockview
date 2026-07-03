@@ -16,7 +16,7 @@ describe('gridviewPanel', () => {
 
         const cut = new DockviewGroupPanel(accessor, 'id', {});
 
-        expect(cut.params).toEqual(undefined);
+        expect(cut.params).toBeUndefined();
 
         cut.update({ params: { variableA: 'A', variableB: 'B' } });
 

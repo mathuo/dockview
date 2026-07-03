@@ -80,7 +80,7 @@ export interface DockviewAngularOptions extends DockviewOptions {
 })
 export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @ViewChild('dockviewContainer', { static: true })
-    private containerRef!: ElementRef<HTMLDivElement>;
+    private readonly containerRef!: ElementRef<HTMLDivElement>;
 
     @Input() components!: Record<string, Type<any> | TemplateRef<any>>;
     @Input() tabComponents?: Record<string, Type<any> | TemplateRef<any>>;
@@ -133,9 +133,9 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Output() willDrop = new EventEmitter<DockviewWillDropEvent>();
 
     private dockviewApi?: DockviewApi;
-    private lifecycleManager = new AngularLifecycleManager();
-    private injector = inject(Injector);
-    private environmentInjector = inject(EnvironmentInjector);
+    private readonly lifecycleManager = new AngularLifecycleManager();
+    private readonly injector = inject(Injector);
+    private readonly environmentInjector = inject(EnvironmentInjector);
 
     ngOnInit(): void {
         this.initializeDockview();

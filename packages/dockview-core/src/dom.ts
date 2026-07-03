@@ -159,7 +159,7 @@ class FocusTracker extends CompositeDisposable implements IFocusTracker {
         const onBlur = () => {
             if (hasFocus) {
                 loosingFocus = true;
-                window.setTimeout(() => {
+                globalThis.setTimeout(() => {
                     if (loosingFocus) {
                         loosingFocus = false;
                         hasFocus = false;
