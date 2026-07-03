@@ -275,9 +275,7 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
             });
         }
 
-        if (!header) {
-            header = new DefaultHeader();
-        }
+        header ??= new DefaultHeader();
 
         const view = new PaneFramework({
             id: options.id,
@@ -405,9 +403,7 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
                         });
                     }
 
-                    if (!header) {
-                        header = new DefaultHeader();
-                    }
+                    header ??= new DefaultHeader();
 
                     const panel = new PaneFramework({
                         id: data.id,

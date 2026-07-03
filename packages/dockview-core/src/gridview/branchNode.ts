@@ -120,14 +120,12 @@ export class BranchNode extends CompositeDisposable implements IView {
         }
 
         const priorities = this.children.map((c) =>
-            typeof c.priority === 'undefined'
-                ? LayoutPriority.Normal
-                : c.priority
+            c.priority === undefined ? LayoutPriority.Normal : c.priority
         );
 
-        if (priorities.some((p) => p === LayoutPriority.High)) {
+        if (priorities.includes(LayoutPriority.High)) {
             return LayoutPriority.High;
-        } else if (priorities.some((p) => p === LayoutPriority.Low)) {
+        } else if (priorities.includes(LayoutPriority.Low)) {
             return LayoutPriority.Low;
         }
 
@@ -173,15 +171,7 @@ export class BranchNode extends CompositeDisposable implements IView {
         this.element = document.createElement('div');
         this.element.className = 'dv-branch-node';
 
-        if (!childDescriptors) {
-            this.splitview = new Splitview(this.element, {
-                orientation: this.orientation,
-                proportionalLayout,
-                styles,
-                margin,
-            });
-            this.splitview.layout(this.size, this.orthogonalSize);
-        } else {
+        if (childDescriptors) {
             const descriptor = {
                 views: childDescriptors.map((childDescriptor) => {
                     return {
@@ -205,6 +195,14 @@ export class BranchNode extends CompositeDisposable implements IView {
                 styles,
                 margin,
             });
+        } else {
+            this.splitview = new Splitview(this.element, {
+                orientation: this.orientation,
+                proportionalLayout,
+                styles,
+                margin,
+            });
+            this.splitview.layout(this.size, this.orthogonalSize);
         }
 
         this.disabled = disabled;

@@ -286,17 +286,17 @@ export class Overlay extends CompositeDisposable {
         const result: any = {};
 
         if (this.verticalAlignment === 'top') {
-            result.top = parseFloat(this._element.style.top);
+            result.top = Number.parseFloat(this._element.style.top);
         } else if (this.verticalAlignment === 'bottom') {
-            result.bottom = parseFloat(this._element.style.bottom);
+            result.bottom = Number.parseFloat(this._element.style.bottom);
         } else {
             result.top = element.top - container.top;
         }
 
         if (this.horiziontalAlignment === 'left') {
-            result.left = parseFloat(this._element.style.left);
+            result.left = Number.parseFloat(this._element.style.left);
         } else if (this.horiziontalAlignment === 'right') {
-            result.right = parseFloat(this._element.style.right);
+            result.right = Number.parseFloat(this._element.style.right);
         } else {
             result.left = element.left - container.left;
         }
@@ -379,7 +379,7 @@ export class Overlay extends CompositeDisposable {
                         }
                     },
                 },
-                addDisposableListener(window, 'pointermove', (e) => {
+                addDisposableListener(globalThis.window, 'pointermove', (e) => {
                     if (this._dragCancelled) {
                         return;
                     }
@@ -395,12 +395,10 @@ export class Overlay extends CompositeDisposable {
                     );
 
                     const overlayRect = this._element.getBoundingClientRect();
-                    if (offset === null) {
-                        offset = {
-                            x: e.clientX - overlayRect.left,
-                            y: e.clientY - overlayRect.top,
-                        };
-                    }
+                    offset ??= {
+                        x: e.clientX - overlayRect.left,
+                        y: e.clientY - overlayRect.top,
+                    };
 
                     const xOffset = Math.max(
                         0,
@@ -483,8 +481,8 @@ export class Overlay extends CompositeDisposable {
                         this._onDidStartMoving.fire();
                     }
                 }),
-                addDisposableListener(window, 'pointerup', end),
-                addDisposableListener(window, 'pointercancel', end)
+                addDisposableListener(globalThis.window, 'pointerup', end),
+                addDisposableListener(globalThis.window, 'pointercancel', end)
             );
         };
 
@@ -585,182 +583,185 @@ export class Overlay extends CompositeDisposable {
                 };
 
                 move.value = new CompositeDisposable(
-                    addDisposableListener(window, 'pointermove', (e) => {
-                        const containerRect =
-                            this.options.container.getBoundingClientRect();
-                        const overlayRect =
-                            this._element.getBoundingClientRect();
+                    addDisposableListener(
+                        globalThis.window,
+                        'pointermove',
+                        (e) => {
+                            const containerRect =
+                                this.options.container.getBoundingClientRect();
+                            const overlayRect =
+                                this._element.getBoundingClientRect();
 
-                        const y = e.clientY - containerRect.top;
-                        const x = e.clientX - containerRect.left;
+                            const y = e.clientY - containerRect.top;
+                            const x = e.clientX - containerRect.left;
 
-                        if (startPosition === null) {
                             // record the initial dimensions since as all subsequence moves are relative to this
-                            startPosition = {
+                            startPosition ??= {
                                 originalY: y,
                                 originalHeight: overlayRect.height,
                                 originalX: x,
                                 originalWidth: overlayRect.width,
                             };
+
+                            let top: number | undefined = undefined;
+                            let bottom: number | undefined = undefined;
+                            let height: number | undefined = undefined;
+                            let left: number | undefined = undefined;
+                            let right: number | undefined = undefined;
+                            let width: number | undefined = undefined;
+
+                            const moveTop = () => {
+                                // When dragging top handle, constrain top position to prevent oversizing
+                                const maxTop =
+                                    startPosition!.originalY +
+                                        startPosition!.originalHeight >
+                                    containerRect.height
+                                        ? Math.max(
+                                              0,
+                                              containerRect.height -
+                                                  Overlay.MINIMUM_HEIGHT
+                                          )
+                                        : Math.max(
+                                              0,
+                                              startPosition!.originalY +
+                                                  startPosition!
+                                                      .originalHeight -
+                                                  Overlay.MINIMUM_HEIGHT
+                                          );
+                                top = clamp(y, 0, maxTop);
+
+                                height =
+                                    startPosition!.originalY +
+                                    startPosition!.originalHeight -
+                                    top;
+
+                                bottom = containerRect.height - top - height;
+                            };
+
+                            const moveBottom = () => {
+                                top =
+                                    startPosition!.originalY -
+                                    startPosition!.originalHeight;
+
+                                // When dragging bottom handle, constrain height to container height
+                                const minHeight =
+                                    top < 0 &&
+                                    typeof this.options
+                                        .minimumInViewportHeight === 'number'
+                                        ? -top +
+                                          this.options.minimumInViewportHeight
+                                        : Overlay.MINIMUM_HEIGHT;
+
+                                const maxHeight =
+                                    containerRect.height - Math.max(0, top);
+
+                                height = clamp(y - top, minHeight, maxHeight);
+
+                                bottom = containerRect.height - top - height;
+                            };
+
+                            const moveLeft = () => {
+                                const maxLeft =
+                                    startPosition!.originalX +
+                                        startPosition!.originalWidth >
+                                    containerRect.width
+                                        ? Math.max(
+                                              0,
+                                              containerRect.width -
+                                                  Overlay.MINIMUM_WIDTH
+                                          ) // Prevent extending beyong right edge
+                                        : Math.max(
+                                              0,
+                                              startPosition!.originalX +
+                                                  startPosition!.originalWidth -
+                                                  Overlay.MINIMUM_WIDTH
+                                          );
+
+                                left = clamp(x, 0, maxLeft); // min is 0 (Not -Infinity) to prevent dragging beyond left edge
+
+                                width =
+                                    startPosition!.originalX +
+                                    startPosition!.originalWidth -
+                                    left;
+
+                                right = containerRect.width - left - width;
+                            };
+
+                            const moveRight = () => {
+                                left =
+                                    startPosition!.originalX -
+                                    startPosition!.originalWidth;
+
+                                // When dragging right handle, constrain width to container width
+                                const minWidth =
+                                    left < 0 &&
+                                    typeof this.options
+                                        .minimumInViewportWidth === 'number'
+                                        ? -left +
+                                          this.options.minimumInViewportWidth
+                                        : Overlay.MINIMUM_WIDTH;
+
+                                const maxWidth =
+                                    containerRect.width - Math.max(0, left);
+
+                                width = clamp(x - left, minWidth, maxWidth);
+
+                                right = containerRect.width - left - width;
+                            };
+
+                            switch (direction) {
+                                case 'top':
+                                    moveTop();
+                                    break;
+                                case 'bottom':
+                                    moveBottom();
+                                    break;
+                                case 'left':
+                                    moveLeft();
+                                    break;
+                                case 'right':
+                                    moveRight();
+                                    break;
+                                case 'topleft':
+                                    moveTop();
+                                    moveLeft();
+                                    break;
+                                case 'topright':
+                                    moveTop();
+                                    moveRight();
+                                    break;
+                                case 'bottomleft':
+                                    moveBottom();
+                                    moveLeft();
+                                    break;
+                                case 'bottomright':
+                                    moveBottom();
+                                    moveRight();
+                                    break;
+                            }
+
+                            const bounds: any = {};
+
+                            // Anchor to top or to bottom depending on which one is closer
+                            if (top! <= bottom!) {
+                                bounds.top = top;
+                            } else {
+                                bounds.bottom = bottom;
+                            }
+
+                            // Anchor to left or to right depending on which one is closer
+                            if (left! <= right!) {
+                                bounds.left = left;
+                            } else {
+                                bounds.right = right;
+                            }
+
+                            bounds.height = height;
+                            bounds.width = width;
+
+                            this.setBounds(bounds);
                         }
-
-                        let top: number | undefined = undefined;
-                        let bottom: number | undefined = undefined;
-                        let height: number | undefined = undefined;
-                        let left: number | undefined = undefined;
-                        let right: number | undefined = undefined;
-                        let width: number | undefined = undefined;
-
-                        const moveTop = () => {
-                            // When dragging top handle, constrain top position to prevent oversizing
-                            const maxTop =
-                                startPosition!.originalY +
-                                    startPosition!.originalHeight >
-                                containerRect.height
-                                    ? Math.max(
-                                          0,
-                                          containerRect.height -
-                                              Overlay.MINIMUM_HEIGHT
-                                      )
-                                    : Math.max(
-                                          0,
-                                          startPosition!.originalY +
-                                              startPosition!.originalHeight -
-                                              Overlay.MINIMUM_HEIGHT
-                                      );
-                            top = clamp(y, 0, maxTop);
-
-                            height =
-                                startPosition!.originalY +
-                                startPosition!.originalHeight -
-                                top;
-
-                            bottom = containerRect.height - top - height;
-                        };
-
-                        const moveBottom = () => {
-                            top =
-                                startPosition!.originalY -
-                                startPosition!.originalHeight;
-
-                            // When dragging bottom handle, constrain height to container height
-                            const minHeight =
-                                top < 0 &&
-                                typeof this.options.minimumInViewportHeight ===
-                                    'number'
-                                    ? -top +
-                                      this.options.minimumInViewportHeight
-                                    : Overlay.MINIMUM_HEIGHT;
-
-                            const maxHeight =
-                                containerRect.height - Math.max(0, top);
-
-                            height = clamp(y - top, minHeight, maxHeight);
-
-                            bottom = containerRect.height - top - height;
-                        };
-
-                        const moveLeft = () => {
-                            const maxLeft =
-                                startPosition!.originalX +
-                                    startPosition!.originalWidth >
-                                containerRect.width
-                                    ? Math.max(
-                                          0,
-                                          containerRect.width -
-                                              Overlay.MINIMUM_WIDTH
-                                      ) // Prevent extending beyong right edge
-                                    : Math.max(
-                                          0,
-                                          startPosition!.originalX +
-                                              startPosition!.originalWidth -
-                                              Overlay.MINIMUM_WIDTH
-                                      );
-
-                            left = clamp(x, 0, maxLeft); // min is 0 (Not -Infinity) to prevent dragging beyond left edge
-
-                            width =
-                                startPosition!.originalX +
-                                startPosition!.originalWidth -
-                                left;
-
-                            right = containerRect.width - left - width;
-                        };
-
-                        const moveRight = () => {
-                            left =
-                                startPosition!.originalX -
-                                startPosition!.originalWidth;
-
-                            // When dragging right handle, constrain width to container width
-                            const minWidth =
-                                left < 0 &&
-                                typeof this.options.minimumInViewportWidth ===
-                                    'number'
-                                    ? -left +
-                                      this.options.minimumInViewportWidth
-                                    : Overlay.MINIMUM_WIDTH;
-
-                            const maxWidth =
-                                containerRect.width - Math.max(0, left);
-
-                            width = clamp(x - left, minWidth, maxWidth);
-
-                            right = containerRect.width - left - width;
-                        };
-
-                        switch (direction) {
-                            case 'top':
-                                moveTop();
-                                break;
-                            case 'bottom':
-                                moveBottom();
-                                break;
-                            case 'left':
-                                moveLeft();
-                                break;
-                            case 'right':
-                                moveRight();
-                                break;
-                            case 'topleft':
-                                moveTop();
-                                moveLeft();
-                                break;
-                            case 'topright':
-                                moveTop();
-                                moveRight();
-                                break;
-                            case 'bottomleft':
-                                moveBottom();
-                                moveLeft();
-                                break;
-                            case 'bottomright':
-                                moveBottom();
-                                moveRight();
-                                break;
-                        }
-
-                        const bounds: any = {};
-
-                        // Anchor to top or to bottom depending on which one is closer
-                        if (top! <= bottom!) {
-                            bounds.top = top;
-                        } else {
-                            bounds.bottom = bottom;
-                        }
-
-                        // Anchor to left or to right depending on which one is closer
-                        if (left! <= right!) {
-                            bounds.left = left;
-                        } else {
-                            bounds.right = right;
-                        }
-
-                        bounds.height = height;
-                        bounds.width = width;
-
-                        this.setBounds(bounds);
-                    }),
+                    ),
                     {
                         dispose: () => {
                             iframes.release();
@@ -778,8 +779,12 @@ export class Overlay extends CompositeDisposable {
                             }
                         },
                     },
-                    addDisposableListener(window, 'pointerup', end),
-                    addDisposableListener(window, 'pointercancel', end)
+                    addDisposableListener(globalThis.window, 'pointerup', end),
+                    addDisposableListener(
+                        globalThis.window,
+                        'pointercancel',
+                        end
+                    )
                 );
             })
         );

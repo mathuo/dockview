@@ -99,11 +99,11 @@ export class ReactPart<
             throw new Error('invalid operation: resource is already disposed');
         }
 
-        if (!this.componentInstance) {
+        if (this.componentInstance) {
+            this.componentInstance.update(props);
+        } else {
             // if the component is yet to be mounted store the props
             this._initialProps = { ...this._initialProps, ...props };
-        } else {
-            this.componentInstance.update(props);
         }
     }
 
