@@ -49,7 +49,7 @@ describe('PointerDropTarget', () => {
         const dropzones = element.getElementsByClassName(
             'dv-drop-target-dropzone'
         );
-        expect(dropzones.length).toBe(1);
+        expect(dropzones).toHaveLength(1);
         expect(target.state).toBe('left');
 
         target.dispose();
@@ -82,8 +82,8 @@ describe('PointerDropTarget', () => {
         (target as any)._onDragOver(makeDragEvent(10, 20));
 
         expect(
-            element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+            element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
 
         target.dispose();
         document.body.removeChild(element);
@@ -114,13 +114,13 @@ describe('PointerDropTarget', () => {
 
         (target as any)._onDragOver(makeDragEvent(10, 20));
         expect(
-            element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(1);
+            element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(1);
 
         (target as any)._removeOverlay();
         expect(
-            element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+            element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
 
         target.dispose();
         document.body.removeChild(element);
@@ -163,8 +163,8 @@ describe('PointerDropTarget', () => {
             expect.objectContaining({ position: 'right' })
         );
         expect(
-            element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+            element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
 
         target.dispose();
         document.body.removeChild(element);
@@ -195,18 +195,18 @@ describe('PointerDropTarget', () => {
 
         (target as any)._onDragOver(makeDragEvent(10, 20));
         expect(
-            element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(1);
+            element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(1);
 
         target.disabled = true;
         expect(
-            element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+            element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
 
         (target as any)._onDragOver(makeDragEvent(10, 20));
         expect(
-            element.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+            element.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
 
         target.dispose();
         document.body.removeChild(element);

@@ -157,7 +157,7 @@ describe('droptarget', () => {
         let viewQuery = element.querySelectorAll(
             '.dv-drop-target > .dv-drop-target-dropzone > .dv-drop-target-selection'
         );
-        expect(viewQuery.length).toBe(1);
+        expect(viewQuery).toHaveLength(1);
 
         const target = element.querySelector(
             '.dv-drop-target-dropzone'
@@ -192,7 +192,7 @@ describe('droptarget', () => {
         viewQuery = element.querySelectorAll(
             '.dv-drop-target > .dv-drop-target-dropzone > .dv-drop-target-selection'
         );
-        expect(viewQuery.length).toBe(1);
+        expect(viewQuery).toHaveLength(1);
         expect(droptarget.state).toBe('left');
         check(
             element
@@ -214,7 +214,7 @@ describe('droptarget', () => {
         viewQuery = element.querySelectorAll(
             '.dv-drop-target > .dv-drop-target-dropzone > .dv-drop-target-selection'
         );
-        expect(viewQuery.length).toBe(1);
+        expect(viewQuery).toHaveLength(1);
         expect(droptarget.state).toBe('top');
         check(
             element
@@ -236,7 +236,7 @@ describe('droptarget', () => {
         viewQuery = element.querySelectorAll(
             '.dv-drop-target > .dv-drop-target-dropzone > .dv-drop-target-selection'
         );
-        expect(viewQuery.length).toBe(1);
+        expect(viewQuery).toHaveLength(1);
         expect(droptarget.state).toBe('bottom');
         check(
             element
@@ -258,7 +258,7 @@ describe('droptarget', () => {
         viewQuery = element.querySelectorAll(
             '.dv-drop-target > .dv-drop-target-dropzone > .dv-drop-target-selection'
         );
-        expect(viewQuery.length).toBe(1);
+        expect(viewQuery).toHaveLength(1);
         expect(droptarget.state).toBe('right');
         check(
             element
@@ -288,7 +288,7 @@ describe('droptarget', () => {
         fireEvent.dragLeave(target);
         expect(droptarget.state).toBe('center');
         viewQuery = element.querySelectorAll('.dv-drop-target');
-        expect(viewQuery.length).toBe(0);
+        expect(viewQuery).toHaveLength(0);
     });
 
     describe('calculateQuadrantAsPercentage', () => {

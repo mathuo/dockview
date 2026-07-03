@@ -138,7 +138,7 @@ describe('dom', () => {
             addStyles(targetDoc, sheets, { nonce: 'abc123' });
 
             const styles = targetDoc.head.querySelectorAll('style');
-            expect(styles.length).toBe(2);
+            expect(styles).toHaveLength(2);
             expect(styles[0].getAttribute('nonce')).toBe('abc123');
             expect(styles[1].getAttribute('nonce')).toBe('abc123');
             expect(styles[0].textContent).toBe('.a { color: red; }');
@@ -176,7 +176,7 @@ describe('dom', () => {
             );
             // The <link> already loads the sheet in the target document;
             // we must not also inject inline <style> for the same rules.
-            expect(targetDoc.head.querySelectorAll('style').length).toBe(0);
+            expect(targetDoc.head.querySelectorAll('style')).toHaveLength(0);
         });
 
         test('preserves source order when mixing href-bearing and inline sheets', () => {
@@ -192,7 +192,7 @@ describe('dom', () => {
             const appended = Array.from(targetDoc.head.children).filter(
                 (el) => el.tagName === 'STYLE' || el.tagName === 'LINK'
             );
-            expect(appended.length).toBe(3);
+            expect(appended).toHaveLength(3);
             expect(appended[0].tagName).toBe('STYLE');
             expect(appended[0].textContent).toBe('.first { color: red; }');
             expect(appended[1].tagName).toBe('LINK');
@@ -224,7 +224,7 @@ describe('dom', () => {
 
             expect(warn).toHaveBeenCalledTimes(1);
             const styles = targetDoc.head.querySelectorAll('style');
-            expect(styles.length).toBe(1);
+            expect(styles).toHaveLength(1);
             expect(styles[0].textContent).toBe('.after { color: green; }');
 
             warn.mockRestore();

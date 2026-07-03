@@ -62,7 +62,7 @@ describe('accessibility: keyboard docking', () => {
     test('target another group, centre, Enter → tab-into (groups merge)', () => {
         make(true);
         twoGroups(); // p1, p2 in separate groups; p2 active, targeting its own group
-        expect(dockview.groups.length).toBe(2);
+        expect(dockview.groups).toHaveLength(2);
 
         fireEvent.keyDown(dockview.element, { key: 'm', ctrlKey: true });
         expect(region().textContent).toContain('Moving P2');
@@ -74,14 +74,14 @@ describe('accessibility: keyboard docking', () => {
 
         // commit centre (tab-into)
         fireEvent.keyDown(dockview.element, { key: 'Enter' });
-        expect(dockview.groups.length).toBe(1);
+        expect(dockview.groups).toHaveLength(1);
     });
 
     test('split a tab out of a single group to an edge (creates a group)', () => {
         make(true);
         dockview.addPanel({ id: 'p1', component: 'default', title: 'P1' });
         dockview.addPanel({ id: 'p2', component: 'default', title: 'P2' });
-        expect(dockview.groups.length).toBe(1); // p1, p2 are tabs in one group
+        expect(dockview.groups).toHaveLength(1); // p1, p2 are tabs in one group
 
         fireEvent.keyDown(dockview.element, { key: 'm', ctrlKey: true });
         fireEvent.keyDown(dockview.element, { key: 'Enter' }); // pick the (only) group
@@ -89,7 +89,7 @@ describe('accessibility: keyboard docking', () => {
         expect(region().textContent).toContain('Split left of');
 
         fireEvent.keyDown(dockview.element, { key: 'Enter' });
-        expect(dockview.groups.length).toBe(2);
+        expect(dockview.groups).toHaveLength(2);
     });
 
     test('Escape cancels without changing the layout', () => {
@@ -101,7 +101,7 @@ describe('accessibility: keyboard docking', () => {
 
         fireEvent.keyDown(dockview.element, { key: 'Escape' });
         expect(region().textContent).toBe('Move cancelled.');
-        expect(dockview.groups.length).toBe(2);
+        expect(dockview.groups).toHaveLength(2);
     });
 
     test('does nothing when keyboardNavigation is off (default)', () => {
@@ -110,7 +110,7 @@ describe('accessibility: keyboard docking', () => {
 
         fireEvent.keyDown(dockview.element, { key: 'm', ctrlKey: true });
         expect(region().textContent).not.toContain('Moving');
-        expect(dockview.groups.length).toBe(2);
+        expect(dockview.groups).toHaveLength(2);
     });
 });
 
@@ -435,7 +435,7 @@ describe('accessibility: spatial group focus', () => {
     test('Ctrl+Shift+Right / Down focus the neighbouring group', () => {
         make();
         grid2x2();
-        expect(dockview.groups.length).toBe(4);
+        expect(dockview.groups).toHaveLength(4);
         groupOf('tl').api.setActive();
         expect(dockview.activeGroup).toBe(groupOf('tl'));
 

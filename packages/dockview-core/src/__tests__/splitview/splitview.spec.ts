@@ -130,48 +130,48 @@ describe('splitview', () => {
         let viewQuery = container.querySelectorAll(
             '.dv-split-view-container > .dv-view-container > .dv-view'
         );
-        expect(viewQuery.length).toBe(3);
+        expect(viewQuery).toHaveLength(3);
 
         let sashQuery = container.querySelectorAll(
             '.dv-split-view-container > .dv-sash-container > .dv-sash'
         );
-        expect(sashQuery.length).toBe(2);
+        expect(sashQuery).toHaveLength(2);
 
         splitview.removeView(2);
 
         viewQuery = container.querySelectorAll(
             '.dv-split-view-container > .dv-view-container > .dv-view'
         );
-        expect(viewQuery.length).toBe(2);
+        expect(viewQuery).toHaveLength(2);
 
         sashQuery = container.querySelectorAll(
             '.dv-split-view-container > .dv-sash-container > .dv-sash'
         );
-        expect(sashQuery.length).toBe(1);
+        expect(sashQuery).toHaveLength(1);
 
         splitview.removeView(0);
 
         viewQuery = container.querySelectorAll(
             '.dv-split-view-container > .dv-view-container > .dv-view'
         );
-        expect(viewQuery.length).toBe(1);
+        expect(viewQuery).toHaveLength(1);
 
         sashQuery = container.querySelectorAll(
             '.dv-split-view-container > .dv-sash-container > .dv-sash'
         );
-        expect(sashQuery.length).toBe(0);
+        expect(sashQuery).toHaveLength(0);
 
         splitview.removeView(0);
 
         viewQuery = container.querySelectorAll(
             '.dv-split-view-container > .dv-view-container > .dv-view'
         );
-        expect(viewQuery.length).toBe(0);
+        expect(viewQuery).toHaveLength(0);
 
         sashQuery = container.querySelectorAll(
             '.dv-split-view-container > .dv-sash-container > .dv-sash'
         );
-        expect(sashQuery.length).toBe(0);
+        expect(sashQuery).toHaveLength(0);
 
         splitview.dispose();
     });
@@ -190,14 +190,14 @@ describe('splitview', () => {
         let viewQuery = container.querySelectorAll(
             '.dv-split-view-container > .dv-view-container > .dv-view.visible'
         );
-        expect(viewQuery.length).toBe(2);
+        expect(viewQuery).toHaveLength(2);
 
         splitview.setViewVisible(1, false);
 
         viewQuery = container.querySelectorAll(
             '.dv-split-view-container > .dv-view-container > .dv-view.visible'
         );
-        expect(viewQuery.length).toBe(1);
+        expect(viewQuery).toHaveLength(1);
 
         splitview.dispose();
     });
@@ -545,34 +545,34 @@ describe('splitview', () => {
         const view1 = new Testview(0, 100);
         const view2 = new Testview(0, 100);
 
-        expect(added.length).toBe(0);
-        expect(removed.length).toBe(0);
+        expect(added).toHaveLength(0);
+        expect(removed).toHaveLength(0);
 
         splitview.addView(view1);
-        expect(added.length).toBe(1);
-        expect(removed.length).toBe(0);
+        expect(added).toHaveLength(1);
+        expect(removed).toHaveLength(0);
         expect(added[0]).toBe(view1);
 
         splitview.addView(view2);
-        expect(added.length).toBe(2);
-        expect(removed.length).toBe(0);
+        expect(added).toHaveLength(2);
+        expect(removed).toHaveLength(0);
         expect(added[1]).toBe(view2);
 
         splitview.removeView(0);
-        expect(added.length).toBe(2);
-        expect(removed.length).toBe(1);
+        expect(added).toHaveLength(2);
+        expect(removed).toHaveLength(1);
         expect(removed[0]).toBe(view1);
 
         splitview.removeView(0);
-        expect(added.length).toBe(2);
-        expect(removed.length).toBe(2);
+        expect(added).toHaveLength(2);
+        expect(removed).toHaveLength(2);
         expect(removed[1]).toBe(view2);
 
         disposable.dispose();
     });
 
     test('dispose of splitview', () => {
-        expect(container.childNodes.length).toBe(0);
+        expect(container.childNodes).toHaveLength(0);
 
         const splitview = new Splitview(container, {
             orientation: Orientation.HORIZONTAL,
@@ -596,7 +596,7 @@ describe('splitview', () => {
         listener.dispose();
 
         expect(anyEvents).toBeFalsy();
-        expect(container.childNodes.length).toBe(0);
+        expect(container.childNodes).toHaveLength(0);
     });
 
     test('dnd: pointer events to move sash', () => {

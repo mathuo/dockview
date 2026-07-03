@@ -167,7 +167,7 @@ describe('dockviewPanel', () => {
             }
         );
 
-        expect(cut.params).toEqual(undefined);
+        expect(cut.params).toBeUndefined();
 
         cut.update({ params: { variableA: 'A', variableB: 'B' } });
 

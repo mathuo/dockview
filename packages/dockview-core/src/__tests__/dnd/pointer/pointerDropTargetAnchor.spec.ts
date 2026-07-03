@@ -85,8 +85,8 @@ describe('PointerDropTarget — anchor / override target path', () => {
 
         // No in-place dropzone should have been added to the drop element.
         expect(
-            dropEl.getElementsByClassName('dv-drop-target-dropzone').length
-        ).toBe(0);
+            dropEl.getElementsByClassName('dv-drop-target-dropzone')
+        ).toHaveLength(0);
         // The anchor overlay should have been positioned (any non-empty
         // dimensions are fine — we just want to confirm the anchor path ran).
         expect(overlay.style.width).not.toBe('');

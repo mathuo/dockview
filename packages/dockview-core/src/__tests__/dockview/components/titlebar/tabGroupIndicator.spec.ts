@@ -239,10 +239,10 @@ describe('indicator type identity', () => {
         const none = new NoneTabGroupIndicator(ctx);
         const wrap = new WrapTabGroupIndicator(ctx);
 
-        expect(none instanceof NoneTabGroupIndicator).toBe(true);
-        expect(none instanceof WrapTabGroupIndicator).toBe(false);
-        expect(wrap instanceof WrapTabGroupIndicator).toBe(true);
-        expect(wrap instanceof NoneTabGroupIndicator).toBe(false);
+        expect(none).toBeInstanceOf(NoneTabGroupIndicator);
+        expect(none).not.toBeInstanceOf(WrapTabGroupIndicator);
+        expect(wrap).toBeInstanceOf(WrapTabGroupIndicator);
+        expect(wrap).not.toBeInstanceOf(NoneTabGroupIndicator);
 
         none.dispose();
         wrap.dispose();

@@ -104,8 +104,8 @@ describe('tabs', () => {
             expect(
                 cut.element.querySelectorAll(
                     '.dv-scrollable > .dv-tabs-container'
-                ).length
-            ).toBe(1);
+                )
+            ).toHaveLength(1);
         });
 
         test('enabled when disabled flag is false', () => {
@@ -124,8 +124,8 @@ describe('tabs', () => {
             expect(
                 cut.element.querySelectorAll(
                     '.dv-scrollable > .dv-tabs-container'
-                ).length
-            ).toBe(1);
+                )
+            ).toHaveLength(1);
         });
 
         test('disabled when disabled flag is true', () => {
@@ -144,8 +144,8 @@ describe('tabs', () => {
             expect(
                 cut.element.querySelectorAll(
                     '.dv-scrollable > .dv-tabs-container'
-                ).length
-            ).toBe(0);
+                )
+            ).toHaveLength(0);
         });
     });
 
@@ -419,7 +419,7 @@ describe('tabs', () => {
 
             // drop should now fire and emit the correct index
             fireEvent.drop(tabsList);
-            expect(drops.length).toBe(1);
+            expect(drops).toHaveLength(1);
         });
     });
 
@@ -600,7 +600,7 @@ describe('tabs', () => {
 
             fireEvent.drop(dropzone!);
 
-            expect(drops.length).toBe(1);
+            expect(drops).toHaveLength(1);
             expect(drops[0].index).toBe(0);
             expect(drops[0].targetTabGroupId).toBeNull();
         });
@@ -659,7 +659,7 @@ describe('tabs', () => {
 
             fireEvent.drop(dropzone!);
 
-            expect(drops.length).toBe(1);
+            expect(drops).toHaveLength(1);
             expect(drops[0].index).toBe(1);
             expect(drops[0].targetTabGroupId).toBeNull();
         });
@@ -698,7 +698,7 @@ describe('tabs', () => {
 
             cut.openPanel(panel1);
             cut.delete('panel1');
-            expect(cut.tabs.length).toBe(0);
+            expect(cut.tabs).toHaveLength(0);
 
             expect(() => cut.delete('panel1')).not.toThrow();
         });

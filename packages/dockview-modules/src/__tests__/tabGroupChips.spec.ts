@@ -122,8 +122,8 @@ describe('tab group events (TabGroupChipsModule)', () => {
             panelId: 'panel1',
         });
         // One removal from the restored group, one addition to newTg
-        expect(panelsRemoved.length).toBe(1);
-        expect(panelsAdded.length).toBe(1);
+        expect(panelsRemoved).toHaveLength(1);
+        expect(panelsAdded).toHaveLength(1);
         expect(panelsAdded[0]).toEqual({
             tgId: newTg.id,
             panelId: 'panel1',
@@ -139,7 +139,7 @@ describe('tab group events (TabGroupChipsModule)', () => {
             groupId: restoredGroup.id,
             panelId: 'panel1',
         });
-        expect(panelsRemoved.length).toBe(1);
+        expect(panelsRemoved).toHaveLength(1);
         expect(panelsRemoved[0]).toEqual({
             tgId: newTg.id,
             panelId: 'panel1',
@@ -231,7 +231,7 @@ describe('tab group events (TabGroupChipsModule)', () => {
         changes.length = 0;
         tg.setLabel('Updated');
         tg.setColor('red');
-        expect(changes.length).toBe(2);
+        expect(changes).toHaveLength(2);
 
         // 4. Collapse and expand
         tg.collapse();
