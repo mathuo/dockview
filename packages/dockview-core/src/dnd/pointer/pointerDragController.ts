@@ -140,7 +140,7 @@ export class PointerDragController extends CompositeDisposable {
             targetWindow,
             'pointermove',
             (e) => {
-                if (!this._active || e.pointerId !== this._active.pointerId) {
+                if (e.pointerId !== this._active?.pointerId) {
                     return;
                 }
                 this._handleMove(e);
@@ -151,7 +151,7 @@ export class PointerDragController extends CompositeDisposable {
             targetWindow,
             'pointerup',
             (e) => {
-                if (!this._active || e.pointerId !== this._active.pointerId) {
+                if (e.pointerId !== this._active?.pointerId) {
                     return;
                 }
                 this._handleEnd(e, true);
@@ -162,7 +162,7 @@ export class PointerDragController extends CompositeDisposable {
             targetWindow,
             'pointercancel',
             (e) => {
-                if (!this._active || e.pointerId !== this._active.pointerId) {
+                if (e.pointerId !== this._active?.pointerId) {
                     return;
                 }
                 this._handleEnd(e, false);

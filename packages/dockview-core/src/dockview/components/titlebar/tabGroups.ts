@@ -530,7 +530,7 @@ export class TabGroupManager {
                     return false;
                 }
                 const data = getPanelData();
-                if (data && this._ctx.accessor.id === data.viewId) {
+                if (this._ctx.accessor.id === data?.viewId) {
                     if (
                         this._ctx.accessor.options.theme?.tabAnimation ===
                         'smooth'

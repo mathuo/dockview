@@ -101,7 +101,7 @@ export class ContentContainer
                 return false;
             }
 
-            if (data && data.viewId === this.accessor.id) {
+            if (data?.viewId === this.accessor.id) {
                 return true;
             }
 
@@ -182,7 +182,7 @@ export class ContentContainer
             /**
              * If the currently attached panel is mounted directly to the content then remove it
              */
-            this._element.removeChild(this.panel.view.content.element);
+            this.panel.view.content.element.remove();
             this.panel.view.content.onHide?.();
         }
 
@@ -207,7 +207,7 @@ export class ContentContainer
                 if (
                     panel.view.content.element.parentElement === this._element
                 ) {
-                    this._element.removeChild(panel.view.content.element);
+                    panel.view.content.element.remove();
                 }
                 container = this.group.renderContainer.attach({
                     panel,
@@ -250,9 +250,7 @@ export class ContentContainer
     public closePanel(): void {
         if (this.panel) {
             if (this.panel.api.renderer === 'onlyWhenVisible') {
-                this.panel.view.content.element.parentElement?.removeChild(
-                    this.panel.view.content.element
-                );
+                this.panel.view.content.element.remove();
                 this.panel.view.content.onHide?.();
             }
         }

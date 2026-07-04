@@ -197,7 +197,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
                 this.forceRelayout();
             }),
             Disposable.from(() => {
-                this.element.parentElement?.removeChild(this.element);
+                this.element.remove();
             }),
             this.gridview.onDidChange(() => {
                 this._bufferOnDidLayoutChange.fire();

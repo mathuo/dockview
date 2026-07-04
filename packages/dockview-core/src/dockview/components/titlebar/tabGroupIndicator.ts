@@ -204,11 +204,8 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
                 tg.collapsed ||
                 tg.panelIds.some((pid) => {
                     const te = tabMap.get(pid);
-                    return (
-                        te &&
-                        te.value.element.classList.contains(
-                            'dv-tab--group-expanding'
-                        )
+                    return te?.value.element.classList.contains(
+                        'dv-tab--group-expanding'
                     );
                 });
 
@@ -342,7 +339,7 @@ export class WrapTabGroupIndicator extends BaseTabGroupIndicator {
         // Ensure SVG + path child exists (created once, reused)
         let svg = underline.firstElementChild as SVGSVGElement | null;
         let path: SVGPathElement;
-        if (!svg || svg.tagName !== 'svg') {
+        if (svg?.tagName !== 'svg') {
             underline.replaceChildren();
             svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.style.display = 'block';
