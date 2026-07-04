@@ -339,7 +339,9 @@ export class WrapTabGroupIndicator extends BaseTabGroupIndicator {
         // Ensure SVG + path child exists (created once, reused)
         let svg = underline.firstElementChild as SVGSVGElement | null;
         let path: SVGPathElement;
-        if (svg?.tagName !== 'svg') {
+        if (svg?.tagName === 'svg') {
+            path = svg.firstElementChild as SVGPathElement;
+        } else {
             underline.replaceChildren();
             svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.style.display = 'block';
@@ -350,8 +352,6 @@ export class WrapTabGroupIndicator extends BaseTabGroupIndicator {
             path.setAttribute('fill', 'none');
             svg.appendChild(path);
             underline.appendChild(svg);
-        } else {
-            path = svg.firstElementChild as SVGPathElement;
         }
 
         path.setAttribute('stroke', color);
