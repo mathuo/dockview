@@ -151,5 +151,39 @@ describe('component.api', () => {
                 expect(f).toHaveBeenCalledTimes(1);
             }
         });
+
+        test('activateNext / activatePrevious delegate to the component', () => {
+            const activateNext = jest.fn();
+            const activatePrevious = jest.fn();
+            const component: Partial<DockviewComponent> = {
+                activateNext,
+                activatePrevious,
+            };
+            const cut = new DockviewApi(<DockviewComponent>component);
+
+            cut.activateNext({ includePanel: true });
+            expect(activateNext).toHaveBeenCalledWith({ includePanel: true });
+
+            cut.activatePrevious();
+            expect(activatePrevious).toHaveBeenCalledTimes(1);
+        });
+
+        test('deprecated moveToNext / moveToPrevious alias activateNext / activatePrevious', () => {
+            const activateNext = jest.fn();
+            const activatePrevious = jest.fn();
+            const component: Partial<DockviewComponent> = {
+                activateNext,
+                activatePrevious,
+            };
+            const cut = new DockviewApi(<DockviewComponent>component);
+
+            cut.moveToNext({ includePanel: true });
+            expect(activateNext).toHaveBeenCalledWith({ includePanel: true });
+
+            cut.moveToPrevious({ includePanel: false });
+            expect(activatePrevious).toHaveBeenCalledWith({
+                includePanel: false,
+            });
+        });
     });
 });

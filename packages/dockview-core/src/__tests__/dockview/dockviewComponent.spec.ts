@@ -958,23 +958,23 @@ describe('dockviewComponent', () => {
         expect(dockview.activeGroup!.model.activePanel).toBe(panel3);
         expect(dockview.activeGroup!.model.indexOf(panel3!)).toBe(1);
 
-        dockview.moveToPrevious({ includePanel: true });
+        dockview.activatePrevious({ includePanel: true });
         expect(dockview.activeGroup).toBe(group2);
         expect(dockview.activeGroup!.model.activePanel).toBe(panel1);
 
-        dockview.moveToNext({ includePanel: true });
+        dockview.activateNext({ includePanel: true });
         expect(dockview.activeGroup).toBe(group2);
         expect(dockview.activeGroup!.model.activePanel).toBe(panel3);
 
-        dockview.moveToPrevious({ includePanel: false });
+        dockview.activatePrevious({ includePanel: false });
         expect(dockview.activeGroup).toBe(group1);
         expect(dockview.activeGroup!.model.activePanel).toBe(panel4);
 
-        dockview.moveToPrevious({ includePanel: true });
+        dockview.activatePrevious({ includePanel: true });
         expect(dockview.activeGroup).toBe(group1);
         expect(dockview.activeGroup!.model.activePanel).toBe(panel2);
 
-        dockview.moveToNext({ includePanel: false });
+        dockview.activateNext({ includePanel: false });
         expect(dockview.activeGroup).toBe(group2);
         expect(dockview.activeGroup!.model.activePanel).toBe(panel3);
     });

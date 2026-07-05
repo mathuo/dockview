@@ -337,7 +337,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.doRemoveGroup(group);
     }
 
-    public moveToNext(options?: MovementOptions2): void {
+    public activateNext(options?: MovementOptions2): void {
         options ??= {};
         if (!options.group) {
             if (!this.activeGroup) {
@@ -351,7 +351,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.doSetGroupActive(next as T);
     }
 
-    public moveToPrevious(options?: MovementOptions2): void {
+    public activatePrevious(options?: MovementOptions2): void {
         options ??= {};
         if (!options.group) {
             if (!this.activeGroup) {
