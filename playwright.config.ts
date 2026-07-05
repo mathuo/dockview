@@ -21,6 +21,12 @@ export default defineConfig({
         baseURL: 'http://localhost:4321',
         headless: true,
         trace: 'on-first-retry',
+        // Allow a pre-installed browser to be used when the CI image ships a
+        // Chromium that does not match the version Playwright would download
+        // (opt-in; no effect when the env var is unset).
+        launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE
+            ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE }
+            : undefined,
     },
     projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
     webServer: {

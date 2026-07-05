@@ -68,6 +68,18 @@
                     params.get('pinned') === 'separate-row'
                         ? 'separate-row'
                         : 'inline';
+                // `?resolver=left` (or any Position) installs a custom
+                // `dropPositionResolver` that always returns that position,
+                // overriding the pointer-quadrant / compass resolution — inert
+                // unless the param is present so other DnD specs are unaffected.
+                const resolverPosition = params.get('resolver');
+                const dropPositionResolver = resolverPosition
+                    ? { resolve: () => ({ position: resolverPosition }) }
+                    : undefined;
+                // `?pinmenu=1` adds the built-in `'pin'` tab context-menu item so
+                // the pin/unpin flow can be driven from the menu without changing
+                // the item count the base context-menu spec asserts.
+                const pinMenu = params.get('pinmenu') === '1';
                 const dockview = new lib.DockviewComponent(el, {
                     keyboardNavigation: true,
                     overflow,
@@ -98,14 +110,16 @@
                     // drivable in the harness. Inert unless a drag occurs.
                     dndGuide: true,
                     dndStrategy: 'pointer',
+                    // Custom drop-position resolver (opt-in via `?resolver=`),
+                    // which takes precedence over the compass at the same seam.
+                    dropPositionResolver,
                     // Tab context menu (ContextMenuModule) — inert until a tab
                     // is right-clicked. Safe to set globally: no other spec
                     // right-clicks a tab.
-                    getTabContextMenuItems: () => [
-                        'close',
-                        'closeOthers',
-                        'closeAll',
-                    ],
+                    getTabContextMenuItems: () =>
+                        pinMenu
+                            ? ['pin', 'separator', 'close']
+                            : ['close', 'closeOthers', 'closeAll'],
                     // Tab-group chip context menu (TabGroupChipsModule) — inert
                     // until a chip is right-clicked, which only the tab-group
                     // chip spec does.
@@ -182,6 +196,33 @@
                         }
                     },
                     closePanel: (id) => panels[id] && panels[id].api.close(),
+                    // Add a panel, optionally splitting a new group off in a
+                    // direction (records an 'add' mutation for layout history).
+                    addPanelAt: (id, direction) => {
+                        panels[id] = dockview.addPanel({
+                            id,
+                            component: 'default',
+                            title: id,
+                            position: direction ? { direction } : undefined,
+                        });
+                    },
+                    // Maximize/restore a panel's group + read the flag, for the
+                    // layout-history 'maximize' mutation.
+                    maximizeGroup: (id) =>
+                        panels[id] && panels[id].api.maximize(),
+                    isMaximized: (id) =>
+                        !!(panels[id] && panels[id].api.isMaximized()),
+                    // Serialization round-trip (e.g. pinned state persistence).
+                    snapshot: () => dockview.toJSON(),
+                    restore: (state) => dockview.fromJSON(state),
+                    // Tab titles in strip order for the first (or only) group —
+                    // lets a spec assert pinned tabs sort ahead of unpinned.
+                    tabTitles: () =>
+                        Array.from(
+                            document.querySelectorAll(
+                                '.dv-tabs-container .dv-tab'
+                            )
+                        ).map((t) => t.textContent.trim()),
                     // Create a new panel and move it to the right of the
                     // popped-out group — the move lands in the popout's own
                     // gridview, producing a second group (and so a sash) there.
@@ -206,6 +247,16 @@
                     undo: () => dockview.undo(),
                     redo: () => dockview.redo(),
                     canUndo: () => dockview.canUndo,
+                    canRedo: () => dockview.canRedo,
+                    // Subscribe to the Smart Guides snap events so a spec can
+                    // assert the public event API fires on a magnetic snap.
+                    recordSnaps: () => {
+                        window.__snaps = [];
+                        dockview.api.onDidSnapFloat((e) =>
+                            window.__snaps.push({ axes: e.axes })
+                        );
+                    },
+                    snaps: () => window.__snaps || [],
                     awaitPopoutRestore: () => dockview.popoutRestorationPromise,
                     // Two side-by-side groups for Drop Guide: dragging the left
                     // group's tab over the right group shows the compass.

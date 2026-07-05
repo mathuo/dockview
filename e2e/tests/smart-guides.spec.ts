@@ -161,6 +161,35 @@ test.describe('smart guides (floating snap)', () => {
         await page.keyboard.up('Alt');
     });
 
+    test('a magnetic snap fires the onDidSnapFloat event', async ({ page }) => {
+        await setup(page);
+        // Subscribe to the public snap event before dragging.
+        await page.evaluate(() => (window as any).__dv.recordSnaps());
+
+        const mover = overlayWith(page, 'mover');
+        const target = overlayWith(page, 'target');
+        const handle = mover.locator('.dv-floating-titlebar');
+
+        const targetBox = (await target.boundingBox())!;
+        const moverBox = (await mover.boundingBox())!;
+        const tb = (await handle.boundingBox())!;
+        const startX = tb.x + tb.width / 2;
+        const startY = tb.y + tb.height / 2;
+        const grab = startX - moverBox.x;
+
+        await page.mouse.move(startX, startY);
+        await page.mouse.down();
+        await page.mouse.move(startX + 1, startY);
+        // Snap the left edge onto the target's (the X axis).
+        await page.mouse.move(targetBox.x + grab + 5, startY, { steps: 20 });
+        await page.mouse.up();
+
+        // The event fired at least once, reporting an X-axis snap.
+        const snaps = await page.evaluate(() => (window as any).__dv.snaps());
+        expect(snaps.length).toBeGreaterThan(0);
+        expect(snaps.some((s: any) => s.axes.includes('x'))).toBe(true);
+    });
+
     test('no guide while dragging away from every edge', async ({ page }) => {
         await setup(page);
 

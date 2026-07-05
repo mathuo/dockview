@@ -78,6 +78,24 @@ test.describe('tab context menu', () => {
         );
     });
 
+    test('clicking "Close All" closes every panel in the group', async ({
+        page,
+    }) => {
+        await setup(page);
+        await page
+            .locator('.dv-tab', { hasText: 'bravo' })
+            .click({ button: 'right' });
+        await expect(page.locator('.dv-context-menu')).toBeVisible();
+
+        await page
+            .locator('.dv-context-menu-item', { hasText: 'Close All' })
+            .click();
+
+        // The whole group is emptied — no tabs remain.
+        await expect(page.locator('.dv-context-menu')).toHaveCount(0);
+        await expect(page.locator('.dv-tab')).toHaveCount(0);
+    });
+
     test('clicking outside the menu dismisses it without closing anything', async ({
         page,
     }) => {
