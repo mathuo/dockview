@@ -109,7 +109,7 @@ export class Tab extends CompositeDisposable {
 
             const data = getPanelData();
 
-            if (data && this.accessor.id === data.viewId) {
+            if (this.accessor.id === data?.viewId) {
                 // Smooth-reorder takes over the in-flight visual when active,
                 // so individual tab overlays are suppressed for internal drags.
                 if (this.accessor.options.theme?.tabAnimation === 'smooth') {
@@ -306,7 +306,7 @@ export class Tab extends CompositeDisposable {
 
     public setContent(part: ITabRenderer): void {
         if (this.content) {
-            this._element.removeChild(this.content.element);
+            this.content.element.remove();
         }
         this.content = part;
         this._element.appendChild(this.content.element);

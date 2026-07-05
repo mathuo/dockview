@@ -508,8 +508,7 @@ let _hasWarnedUsingCoreDirectly = false;
 function warnIfUsingCoreDirectly(): void {
     if (
         typeof process !== 'undefined' &&
-        process.env &&
-        process.env.NODE_ENV === 'production'
+        process.env?.NODE_ENV === 'production'
     ) {
         return;
     }
@@ -1472,7 +1471,7 @@ export class DockviewComponent
         // The shell always wraps the dockview element so edge groups can be
         // added at any time via addEdgeGroup() without re-parenting the DOM.
         this.disableResizing = true;
-        container.removeChild(this.element);
+        this.element.remove();
 
         this._shellManager = new ShellManager(
             container,
@@ -3846,15 +3845,19 @@ export class DockviewComponent
 
     removePanel(
         panel: IDockviewPanel,
-        options: {
-            removeEmptyGroup: boolean;
+        options?: {
+            removeEmptyGroup?: boolean;
             skipDispose?: boolean;
             skipSetActiveGroup?: boolean;
-        } = {
-            removeEmptyGroup: true,
         }
     ): void {
-        this.mutation('remove', () => this._doRemovePanel(panel, options));
+        this.mutation('remove', () =>
+            this._doRemovePanel(panel, {
+                removeEmptyGroup: options?.removeEmptyGroup ?? true,
+                skipDispose: options?.skipDispose,
+                skipSetActiveGroup: options?.skipSetActiveGroup,
+            })
+        );
     }
 
     private _doRemovePanel(
@@ -3863,8 +3866,6 @@ export class DockviewComponent
             removeEmptyGroup: boolean;
             skipDispose?: boolean;
             skipSetActiveGroup?: boolean;
-        } = {
-            removeEmptyGroup: true,
         }
     ): void {
         const group = panel.group;
@@ -4166,7 +4167,7 @@ export class DockviewComponent
                     const refGroup = selectedGroup.referenceGroup
                         ? this.getPanel(selectedGroup.referenceGroup)
                         : undefined;
-                    if (refGroup && refGroup.panels.length === 0) {
+                    if (refGroup?.panels.length === 0) {
                         this.removeGroup(refGroup);
                     }
                 }

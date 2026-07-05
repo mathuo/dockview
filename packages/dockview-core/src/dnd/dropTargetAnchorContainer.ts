@@ -34,9 +34,7 @@ export class DropTargetAnchorContainer extends CompositeDisposable {
         return {
             clear: () => {
                 if (this._model) {
-                    this._model.root.parentElement?.removeChild(
-                        this._model.root
-                    );
+                    this._model.root.remove();
                 }
                 this._model = undefined;
             },

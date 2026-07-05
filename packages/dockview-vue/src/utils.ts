@@ -57,7 +57,7 @@ export function findComponent(
     name: string,
     components?: Record<string, VueComponent | undefined>
 ): VueComponent | null {
-    if (components && components[name]) {
+    if (components?.[name]) {
         return components[name] as VueComponent;
     }
 
