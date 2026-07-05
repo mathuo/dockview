@@ -1,15 +1,12 @@
 ---
-title: Keyboard Navigation
+title: Keyboard navigation
 description: How to navigate and dock Dockview panels and groups with the keyboard.
 sidebar_position: 2
-enterprise: true
 sidebar_custom_props:
     enterprise: true
 ---
 
-import { MultiFrameworkContainer } from '@site/src/components/ui/container';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
-import DockviewKeyboard from '@site/sandboxes/keyboard-dockview/src/app';
 
 Dockview can be driven entirely from the keyboard — switching tabs, moving focus
 between groups, and even docking a panel into a new position, all without a
@@ -43,7 +40,7 @@ Set `keyboardNavigation` to `true` to turn on the built-in bindings:
 
 <FrameworkSpecific framework="Angular">
     <DocRef
-        declaration="IDockviewAngularProps"
+        declaration="DockviewAngularOptions"
         methods={['keyboardNavigation']}
     />
 </FrameworkSpecific>
@@ -126,10 +123,6 @@ For the free programmatic focus APIs (`moveToNext`, `moveToPrevious`,
 without the enterprise keymap, see
 [Focus Navigation](/docs/advanced/focus-navigation).
 
-## Live Example
+## Live example
 
-<MultiFrameworkContainer
-    height={600}
-    sandboxId="keyboard-dockview"
-    react={DockviewKeyboard}
-/>
+<CodeRunner id="dockview/keyboard" height={600} />

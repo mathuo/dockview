@@ -5,12 +5,16 @@ description: How to programmatically resize groups in Dockview.
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-<DocRef declaration="DockviewGroupPanelApi" methods={['height', 'width', 'setSize', 'onDidDimensionsChange']} />
+Resize a group programmatically by setting its height, width, or both. Because every panel lives inside a group, resizing a panel resizes the group that contains it.
 
+<DocRef
+    declaration="DockviewGroupPanelApi"
+    methods={['height', 'width', 'setSize', 'onDidDimensionsChange']}
+/>
 
-## Panel Resizing
+## Panel resizing
 
-Each Dockview contains of a number of groups and each group has a number of panels.
+Each Dockview contains a number of groups and each group has a number of panels.
 Logically a user may want to resize a panel, but this translates to resizing the group which contains that panel.
 
 You can set the size of a panel using `props.api.setSize(...)`.
@@ -24,7 +28,7 @@ props.api.setSize({
     width: 200,
 });
 
-// you could also resize the panels group, although not recommended it achieved the same result
+// you could also resize the panels group, although not recommended it achieves the same result
 props.api.group.api.setSize({
     height: 100,
     width: 200,
@@ -33,5 +37,9 @@ props.api.group.api.setSize({
 
 You can see an example invoking both approaches below.
 
+<CodeRunner framework="react" id="dockview/resize" />
 
-<CodeRunner framework="react" id="dockview/resize"/>
+## See also
+
+- [Constraints](/docs/core/groups/constraints) — set minimum and maximum group sizes
+- [Sizing and layout](/docs/core/sizing) — control initial and proportional sizing

@@ -1,16 +1,16 @@
 ---
-title: Remove Panel
+title: Remove panel
 sidebar_position: 4
 description: How to remove panels from the Dockview layout programmatically.
 ---
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-This section describes multiple ways to remove a panel.
+A panel can be removed either from its own panel API or from the container API. Removing a panel destroys its instance; the group is removed too once its last panel is gone.
 
-## Remove a Panel using the Panel API
+## Remove a panel using the Panel API
 
-<DocRef declaration="DockviewPanelApi" methods={["close"]}/>
+<DocRef declaration="DockviewPanelApi" methods={['close']} />
 
 Calling `close` on the panel API is the easiest way to close a panel through code.
 
@@ -18,13 +18,20 @@ Calling `close` on the panel API is the easiest way to close a panel through cod
 panel.api.close();
 ```
 
-## Remove a Panel using the API
-<DocRef declaration="DockviewApi" methods={["removePanel"]}/>
+## Remove a panel using the API
 
-Firstly, you can retrieve a reference to the panel given it's id and then you can
+<DocRef declaration="DockviewApi" methods={['removePanel']} />
+
+Firstly, you can retrieve a reference to the panel given its id and then you can
 pass that reference into `removePanel` to remove the panel.
 
 ```ts
 const panel: IDockviewPanel = api.getPanel('myPanel');
 api.removePanel(panel);
 ```
+
+## See also
+
+- [Adding panels](/docs/core/panels/add) — the counterpart for creating panels.
+- [Move panel](/docs/core/panels/move) — relocate a panel instead of destroying it.
+- [Panel API](/docs/api/dockview/panelApi) — the full set of per-panel methods, including `close`.

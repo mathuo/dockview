@@ -1,14 +1,20 @@
 ---
-title: Locked Groups
+title: Locked groups
 description: How to lock individual groups to prevent drag and drop interactions on them.
 ---
 
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
 
+Locking an individual group prevents users from dragging new panels into it, while leaving the rest of the layout fully interactive.
+
 ## Locked group
 
 Locking a group will disable all drop events for this group ensuring no additional panels can be added to the group through drop events.
-You can still add groups to a locked panel programatically using the API though.
+You can still add groups to a locked panel programmatically using the API though.
+
+:::info
+This page covers locking an individual group. To lock the entire layout against resizing and drag and drop, see [Locked](/docs/core/locked).
+:::
 
 ```tsx
 panel.group.locked = true;
@@ -21,4 +27,9 @@ panel.group.locked = 'no-drop-target';
 Use `true` to keep drop zones top, right, bottom, left for the group. Use `no-drop-target` to disable all drop zones. For you to get a
 better understanding of what this means, try and drag the panels in the example below to the locked groups.
 
-<CodeRunner id="dockview/locked"/>
+<CodeRunner id="dockview/locked" />
+
+## See also
+
+- [Managing groups](/docs/core/groups/add) — create, remove, and clear groups
+- [Move group](/docs/core/groups/move) — reposition a group within the layout

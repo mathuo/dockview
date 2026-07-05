@@ -1,6 +1,6 @@
 ---
-title: Drop Position Resolver
-sidebar_position: 5
+title: Drop position resolver
+sidebar_position: 6
 description: Override where a pointer location maps to a drop position with a free, pluggable core resolver.
 ---
 
@@ -34,7 +34,7 @@ unaffected). When unset, the built-in cursor-quadrant behaviour is used, unchang
 
 <FrameworkSpecific framework="Angular">
     <DocRef
-        declaration="IDockviewAngularProps"
+        declaration="DockviewAngularOptions"
         methods={['dropPositionResolver']}
     />
 </FrameworkSpecific>
@@ -96,3 +96,9 @@ The visual aim-at-a-cell overlay is covered in [Drop Guide](/docs/core/dnd/dropG
 installs its own resolver, so enable one or the other — `dndGuide` when you want the built-in aim-at-a-cell affordance,
 `dropPositionResolver` when you want full control over the resolved position.
 :::
+
+## See also
+
+- [Drop overlay](/docs/core/dnd/overlay) — shape the overlay that previews the resolved drop zone.
+- [Drop guide](/docs/core/dnd/dropGuide) — the aim-at-a-cell compass built on top of this resolver.
+- [Smart guides](/docs/core/dnd/smartGuides) — alignment snapping for floating groups.

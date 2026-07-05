@@ -1,29 +1,55 @@
 ---
-title: Group Controls
+title: Group controls
 description: How to add custom actions and controls to the Dockview group header bar.
 ---
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-This section describes how you can customize the header component of each group.
+Header action components let you render your own controls — buttons, menus, or status indicators — into the left, right, and prefix regions of a group's header bar. Use them to add per-group actions such as split, close, or a context menu.
 
-<FrameworkSpecific framework='React'>
-  <DocRef declaration="IDockviewReactProps" methods={['leftHeaderActionsComponent', 'rightHeaderActionsComponent', 'prefixHeaderActionsComponent']} />
+<FrameworkSpecific framework="React">
+    <DocRef
+        declaration="IDockviewReactProps"
+        methods={[
+            'leftHeaderActionsComponent',
+            'rightHeaderActionsComponent',
+            'prefixHeaderActionsComponent',
+        ]}
+    />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Vue'>
-  <DocRef declaration="IDockviewVueProps" methods={['leftHeaderActionsComponent', 'rightHeaderActionsComponent', 'prefixHeaderActionsComponent']} />
+<FrameworkSpecific framework="Vue">
+    <DocRef
+        declaration="IDockviewVueProps"
+        methods={[
+            'leftHeaderActionsComponent',
+            'rightHeaderActionsComponent',
+            'prefixHeaderActionsComponent',
+        ]}
+    />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Angular'>
-  <DocRef declaration="IDockviewAngularProps" methods={['leftHeaderActionsComponent', 'rightHeaderActionsComponent', 'prefixHeaderActionsComponent']} />
+<FrameworkSpecific framework="Angular">
+    <DocRef
+        declaration="DockviewAngularOptions"
+        methods={[
+            'leftHeaderActionsComponent',
+            'rightHeaderActionsComponent',
+            'prefixHeaderActionsComponent',
+        ]}
+    />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='JavaScript'>
-  <DocRef declaration="DockviewComponentOptions"
-    methods={['createLeftHeaderActionsElement', 'createRightHeaderActionsElement', 'createPrefixHeaderActionsElement']} />
+<FrameworkSpecific framework="JavaScript">
+    <DocRef
+        declaration="DockviewComponentOptions"
+        methods={[
+            'createLeftHeaderActionsElement',
+            'createRightHeaderActionsElement',
+            'createPrefixHeaderActionsElement',
+        ]}
+    />
 </FrameworkSpecific>
-
 
 <FrameworkSpecific framework='React'>
 ```tsx
@@ -32,11 +58,11 @@ const LeftComponent = (props: IDockviewHeaderActionsProps) => {
 };
 
 const RightComponent = (props: IDockviewHeaderActionsProps) => {
-    return <div>{/** content */}</div>;
+return <div>{/* * content */}</div>;
 };
 
 const PrefixComponent = (props: IDockviewHeaderActionsProps) => {
-    return <div>{/** content */}</div>;
+return <div>{/* * content */}</div>;
 };
 
 return <DockviewReact
@@ -44,7 +70,8 @@ return <DockviewReact
     rightHeaderActionsComponent={RightComponent}
     prefixHeaderActionsComponent={PrefixComponent}
 />;
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
@@ -64,7 +91,8 @@ import PrefixComponent from './PrefixComponent.vue';
         :components="{ LeftComponent, RightComponent, PrefixComponent }"
     />
 </template>
-```
+````
+
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
@@ -116,6 +144,7 @@ export class AppComponent {
     prefixComponent = PrefixComponent;
 }
 ```
+
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
@@ -140,7 +169,11 @@ const api = createDockview(parentElement, {
 ```
 </FrameworkSpecific>
 
-## Live Example
+## Live example
 
-<CodeRunner id="dockview/group-actions"/>
+<CodeRunner id="dockview/group-actions" />
 
+## See also
+
+- [Managing groups](/docs/core/groups/add) — create, remove, and clear groups
+- [Edge groups](/docs/core/groups/edgeGroups) — use the `location` prop to show controls specific to edge groups

@@ -4,20 +4,18 @@ sidebar_position: 5
 description: How to upgrade from Dockview v6 to v7 — the package realignment and the breaking API changes.
 ---
 
-# Migrating to v7
-
 v7 realigns the package names so that **`dockview` is the framework-agnostic
 JavaScript package** and each framework has a matching `dockview-<framework>`
 package. There are also a handful of breaking API changes that affect every
 consumer.
 
-| Package | v6 | v7 |
-|---|---|---|
-| `dockview-core` | JavaScript core (public) | JavaScript core — **internal implementation detail** |
-| `dockview` | **React bindings** | JavaScript (re-export of `dockview-core`) — **recommended** |
-| `dockview-react` | Re-export of `dockview` | **React bindings** |
-| `dockview-vue` | Vue bindings | Vue bindings (now consume `dockview`) |
-| `dockview-angular` | Angular bindings | Angular bindings (now consume `dockview`) |
+| Package            | v6                       | v7                                                          |
+| ------------------ | ------------------------ | ----------------------------------------------------------- |
+| `dockview-core`    | JavaScript core (public) | JavaScript core — **internal implementation detail**        |
+| `dockview`         | **React bindings**       | JavaScript (re-export of `dockview-core`) — **recommended** |
+| `dockview-react`   | Re-export of `dockview`  | **React bindings**                                          |
+| `dockview-vue`     | Vue bindings             | Vue bindings (now consume `dockview`)                       |
+| `dockview-angular` | Angular bindings         | Angular bindings (now consume `dockview`)                   |
 
 ## React users — action required
 
@@ -30,9 +28,9 @@ The React names are simply gone — core names like `DockviewComponent` still
 resolve from `dockview`, but the React components do not:
 
 - **TypeScript:** `error TS2305: Module '"dockview"' has no exported member 'DockviewReact'`
-- **Runtime (JS):** React throws *"Element type is invalid … got: undefined"* when
+- **Runtime (JS):** React throws _"Element type is invalid … got: undefined"_ when
   rendering `<DockviewReact />`, because the import resolves to `undefined`.
-:::
+  :::
 
 Install and import from `dockview-react`:
 
@@ -162,14 +160,14 @@ is `DockviewGroupActivePanelChangeEvent`). This is additive — handlers reading
 
 These are pure renames — the shape is unchanged, only the identifier moved.
 
-| v6 | v7 | Notes |
-|---|---|---|
-| `onUnhandledDragOverEvent` | `onUnhandledDragOver` | Event on the Dockview / Paneview API — dropped the redundant `Event` suffix |
-| `PaneviewDropEvent` | `PaneviewDidDropEvent` | Now matches `DockviewDidDropEvent` |
-| `DockviewMaximizedGroupChanged` | `DockviewMaximizedGroupChangeEvent` | Now matches every other `…ChangeEvent` payload type |
-| `DockviewGroupPanelFloatingChangeEvent` | `DockviewGroupPanelLocationChangeEvent` | Payload of `onDidLocationChange` — name now reflects the event |
-| `AddComponentOptions` | `AddGridviewComponentOptions` | Now matches `AddSplitviewComponentOptions` / `AddPaneviewComponentOptions` |
-| `Contraints` | `Constraints` | Typo fix (this type also feeds `AddPanelOptions`) |
+| v6                                      | v7                                      | Notes                                                                       |
+| --------------------------------------- | --------------------------------------- | --------------------------------------------------------------------------- |
+| `onUnhandledDragOverEvent`              | `onUnhandledDragOver`                   | Event on the Dockview / Paneview API — dropped the redundant `Event` suffix |
+| `PaneviewDropEvent`                     | `PaneviewDidDropEvent`                  | Now matches `DockviewDidDropEvent`                                          |
+| `DockviewMaximizedGroupChanged`         | `DockviewMaximizedGroupChangeEvent`     | Now matches every other `…ChangeEvent` payload type                         |
+| `DockviewGroupPanelFloatingChangeEvent` | `DockviewGroupPanelLocationChangeEvent` | Payload of `onDidLocationChange` — name now reflects the event              |
+| `AddComponentOptions`                   | `AddGridviewComponentOptions`           | Now matches `AddSplitviewComponentOptions` / `AddPaneviewComponentOptions`  |
+| `Contraints`                            | `Constraints`                           | Typo fix (this type also feeds `AddPanelOptions`)                           |
 
 ```diff
 - api.onUnhandledDragOverEvent((event) => event.accept());
@@ -178,12 +176,12 @@ These are pure renames — the shape is unchanged, only the identifier moved.
 
 ### Removed APIs
 
-| Removed | Use instead |
-|---|---|
-| `IDockviewGroupPanelPublic` | `IDockviewGroupPanel` (it was a dead alias of it) |
-| `DockviewComponent.contextMenuController` | `DockviewComponent.contextMenuService`, or the documented context-menu options |
-| `DockviewAngularComponentOptions` (Angular) | `DockviewAngularOptions` |
-| `AngularComponentFactory.createComponent()` (Angular) | `createDockviewComponent()` |
+| Removed                                               | Use instead                                                                    |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `IDockviewGroupPanelPublic`                           | `IDockviewGroupPanel` (it was a dead alias of it)                              |
+| `DockviewComponent.contextMenuController`             | `DockviewComponent.contextMenuService`, or the documented context-menu options |
+| `DockviewAngularComponentOptions` (Angular)           | `DockviewAngularOptions`                                                       |
+| `AngularComponentFactory.createComponent()` (Angular) | `createDockviewComponent()`                                                    |
 
 ## Vue / Angular users
 

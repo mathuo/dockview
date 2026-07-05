@@ -32,9 +32,9 @@ Documentation website built with Docusaurus v3.
 
 ### Sandboxes (legacy)
 
-- `sandboxes/` - Legacy code-sandbox sources, NOT used by `<CodeRunner>` (see above). In practice the demo (`demo-dockview`) is the main actively-used one; the rest are stale. A handful remain load-bearing because MDX pages / `src/` components import directly from `@site/sandboxes/<name>/src/app` (e.g. `rendering-dockview`, `externaldnd-dockview`, `demo-dockview`, `dockview-app`, `nativeapp-dockview`, `iframe-dockview`, `keyboard-dockview`, `fullwidthtab-dockview`). Removing or renaming files inside those will break the docs build.
-- Their dependencies (`ag-grid-community`, `ag-grid-react`, `react-dnd`, `@minoru/react-dnd-treeview`, etc.) are pulled in via `packages/docs/package.json` — don't delete them without first removing the corresponding sandbox import.
-- Long-term preference is still to migrate these examples out of `sandboxes/` and delete the directory. Until then, ask before changing sandbox content, and do NOT add new per-feature example sandboxes here — add a `templates/` example instead.
+- `sandboxes/` - **All per-feature example sandboxes were migrated to `templates/` and deleted.** The ONLY remaining sandboxes are `sandboxes/react/dockview/demo-dockview` and `demo-dockview-mobile`, both used exclusively by the `/demo` page (`src/pages/demo.tsx`) via `src/components/ui/exampleFrame.tsx` (a dynamic `import()`). Every docs `<CodeRunner>` embed now points at a `templates/` example.
+- **All `templates/dockview/*` examples cover all four frameworks** (react/vue/angular/typescript), except `demo-dockview` (react+angular, deliberately exempt). Non-react variants are a single `src/index.ts`; the enterprise `LicenseManager` boilerplate belongs ONLY in templates whose feature is actually enterprise (grep the react variant — if it has no `LicenseManager`, the feature is free/core and the other variants must not add it either).
+- Do NOT add new sandboxes — add a `templates/` example (all four frameworks). Some `package.json` deps that only served deleted sandboxes (`react-dnd`, `@minoru/react-dnd-treeview`, ag-grid, etc.) may now be prunable — verify against `demo-dockview` before removing.
 
 ### Framework Examples
 

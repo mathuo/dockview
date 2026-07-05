@@ -1,6 +1,7 @@
 ---
-title: Pinned Tabs
+title: Pinned tabs
 description: Pin tabs so they render first, never overflow, and resist reordering — modelled on VS Code and Chrome.
+sidebar_position: 8
 enterprise: true
 sidebar_custom_props:
     enterprise: true
@@ -33,7 +34,7 @@ Pinned tabs are dormant until you enable them through the `pinnedTabs` option. W
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="Angular">
-    <DocRef declaration="IDockviewAngularProps" methods={['pinnedTabs']} />
+    <DocRef declaration="DockviewAngularOptions" methods={['pinnedTabs']} />
 </FrameworkSpecific>
 
 ```tsx
@@ -48,7 +49,7 @@ const api = createDockview(element, {
 
 - **`enabled`** — the master switch. Leave it unset (or `false`) to keep pinning dormant; the tab strip then behaves identically to the default.
 - **`mode`** — `'inline'` (the default) keeps pinned tabs first within the existing tab strip. `'separate-row'` renders them on their own VS-Code-style row above the main strip; the row collapses when no tab in the group is pinned.
-- **`compact`** — render pinned tabs icon-only (title and close button hidden), like VS Code and Chrome. Defaults to `false` because dockview's default tab has no favicon, so pinned tabs stay labelled (with a pin glyph) unless you opt in. Best paired with a custom tab renderer that shows an icon.
+- **`compact`** — render pinned tabs icon-only (title and close button hidden), like VS Code and Chrome. Defaults to `false` because Dockview's default tab has no favicon, so pinned tabs stay labelled (with a pin glyph) unless you opt in. Best paired with a custom tab renderer that shows an icon.
 - **`togglePinOnCrossBoundaryDrag`** — when `true`, dragging a tab across the pin boundary toggles its pinned state (VS-Code behaviour). Defaults to `false`: dragging across the boundary is clamped back, matching Chrome, where pinning is an explicit action.
 - **`contextMenuItem`** — add a built-in "Pin"/"Unpin" item to the tab context menu. Defaults to `true`; requires the context menu to be available.
 
@@ -127,6 +128,12 @@ api.fromJSON(state); // pinned tabs are restored, in their pinned order
 Layouts saved before pinning was enabled — or restored into a component with `pinnedTabs` disabled — load as a normal, unpinned strip. The `pinned` key is simply ignored when pinning is off.
 :::
 
-## Live Example
+## Live example
 
 <CodeRunner id="dockview/pinned-tabs" height={300} />
+
+## See also
+
+- [Tabs](/docs/core/panels/tabs) — custom tab renderers and the tab context menu that hosts the `'pin'` item.
+- [Tab overflow](/docs/core/panels/tabOverflow) — the overflow dropdown that pinned tabs are excluded from.
+- [Multi-row tabs](/docs/core/panels/multiRowTabs) — an alternative way to keep every tab visible as the strip fills up.

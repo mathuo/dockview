@@ -1,13 +1,10 @@
 ---
-title: Rendering Panels
-sidebar_position: 5
+title: Rendering panels
+sidebar_position: 10
 description: How Dockview renders panels — lazy rendering, deferred mounting, and visibility behaviour.
 ---
 
-import { MultiFrameworkContainer } from '@site/src/components/ui/container';
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
-import RenderingDockview from '@site/sandboxes/rendering-dockview/src/app';
-import DockviewWithIFrames from '@site/sandboxes/iframe-dockview/src/app';
 
 Rendering type is an important consideration when creating your application and whether your panels should be destroyed when hidden.
 
@@ -16,11 +13,11 @@ Hosting an **iframe** in a panel needs `renderer: 'always'` — see [iframes](#i
 :::
 
 When a panel is selected all other panels in that group are not visible. The API does expose methods to determine whether your panel is visible or not
-and the panel instance only ever destroyed when removed however the question still remains, what to do with the partial DOM tree that makes up your panel and there are two options the dock can take:
+and the panel instance only ever destroyed when removed however the question still remains, what to do with the partial DOM tree that makes up your panel and there are two options Dockview can take:
 
 1. (_onlyWhenVisible_) Remove the element from the DOM tree to make space for the new panel.
 
-This will cause the element to loss any DOM-specific state such as scrollbar position and if you measure the size of any elements during this time you will mostly like see both a width and height of 0px,
+This will cause the element to lose any DOM-specific state such as scrollbar position and if you measure the size of any elements during this time you will most likely see both a width and height of 0px,
 this is also true for any active ResizeObservers.
 
 ```ts
@@ -31,9 +28,9 @@ api.addPanel({
 });
 ```
 
-2. (_always_) Keep the DOM tree alive but hide it in order to allow the select panels content to show.
+2. (_always_) Keep the DOM tree alive but hide it in order to allow the selected panel's content to show.
 
-This approach will maintain any DOM-sepcific state you had and is essential if you require the native scrollbar position to be preserved.
+This approach will maintain any DOM-specific state you had and is essential if you require the native scrollbar position to be preserved.
 
 ```ts
 api.addPanel({
@@ -43,16 +40,16 @@ api.addPanel({
 });
 ```
 
-Both are valid use-cases therefore the dock allows you to choose your rendering mode, the default however is the first option since this is the most memory efficient solution.
+Both are valid use-cases therefore Dockview allows you to choose your rendering mode, the default however is the first option since this is the most memory efficient solution.
 
-> You can change the `defaultRenderer` in the Dock [Options](/docs/api/dockview/options).
+> You can change the `defaultRenderer` in the Dockview [Options](/docs/api/dockview/options).
 
 :::info
-The panel instance is only ever destroyed when it is removed from the dock allowing you to still run code associated with the panel when it is not visible.
+The panel instance is only ever destroyed when it is removed from Dockview allowing you to still run code associated with the panel when it is not visible.
 The renderer only affects what happens to the DOM element.
 :::
 
-## Choose a Render Mode
+## Choose a render mode
 
 ```ts
 api.addPanel({
@@ -68,7 +65,7 @@ api.addPanel({
 });
 ```
 
-## Live Example
+## Live example
 
 <CodeRunner id="dockview/render-mode" />
 
@@ -210,12 +207,9 @@ class MyPanel implements IContentRenderer {
 
 Toggling the checkbox in the live example shows the panel component being destroyed when hidden and re-created when it becomes visible again.
 
-<MultiFrameworkContainer
-    sandboxId="rendering-dockview"
-    react={RenderingDockview}
-/>
+<CodeRunner id="dockview/render-mode" />
 
-## Visibility Lifecycle Hooks
+## Visibility lifecycle hooks
 
 When you implement a custom `IContentRenderer` (typically only relevant for JavaScript consumers), you can opt into two optional lifecycle hooks that fire when a panel transitions between hidden and visible. These hooks complement `api.onDidVisibilityChange` and run regardless of which `renderer` mode is in use:
 
@@ -256,7 +250,7 @@ Both hooks are optional. The framework wrappers (React, Vue, Angular) handle vis
 
 iframes need special attention because of how browsers render them: **re-parenting an iframe within the DOM reloads its contents.** Since docking moves a panel's element between groups, an iframe-hosting panel rendered the default way would reload every time it is moved. This is a documented browser behaviour — see the discussions [here](https://bugzilla.mozilla.org/show_bug.cgi?id=254144) and [here](https://github.com/whatwg/html/issues/5484).
 
-To keep an iframe alive, render its panel with `renderer: 'always'` so the element is never removed from the DOM (or set the dock's `defaultRenderer` to `'always'`):
+To keep an iframe alive, render its panel with `renderer: 'always'` so the element is never removed from the DOM (or set Dockview's `defaultRenderer` to `'always'`):
 
 ```tsx title="A panel that hosts an iframe"
 api.addPanel({
@@ -266,8 +260,9 @@ api.addPanel({
 });
 ```
 
-<MultiFrameworkContainer
-    sandboxId="iframe-dockview"
-    height={600}
-    react={DockviewWithIFrames}
-/>
+<CodeRunner id="dockview/iframe" height={600} />
+
+## See also
+
+- [Adding panels](/docs/core/panels/add) — set a panel's `renderer` mode when it is created.
+- [Update panel](/docs/core/panels/update) — how parameter changes drive a panel to re-render.

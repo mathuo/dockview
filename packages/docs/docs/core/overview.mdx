@@ -1,10 +1,10 @@
 ---
-title: Core Concepts
+title: Core concepts
 sidebar_position: 0
 description: Core concepts of Dockview — panels, groups, the API pattern, and how they fit together.
 ---
 
-Dockview organizes content into **panels** and **groups** arranged in a resizable grid. Understanding these primitives and the API pattern is all you need to get started.
+Dockview organises content into **panels** and **groups** arranged in a resizable grid. Understanding these primitives and the API pattern is all you need to get started.
 
 ## Panels
 
@@ -18,18 +18,15 @@ A group is a container that holds one or more panels and renders a tab bar at th
 
 Users can drag panels between groups, split groups to create new ones, and float or pop out groups as separate windows.
 
-## The API Pattern
+## The API pattern
 
 All mutations to the layout go through the `DockviewApi`. You receive the API instance via the `onReady` callback (or `ready` event in Vue/Angular), which fires once the component has mounted.
 
 Store the API reference in a ref or class property, as you will use it throughout the lifetime of your application.
 
-<FrameworkSpecific framework='JavaScript'>
-```tsx
-const element: HTMLElement
-const options: DockviewComponentOptions
-const api: DockviewApi = createDockview(element, options);
-```
+<FrameworkSpecific framework="JavaScript">
+    ```tsx const element: HTMLElement const options: DockviewComponentOptions
+    const api: DockviewApi = createDockview(element, options); ```
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='React'>
@@ -47,7 +44,7 @@ function onReady(event: DockviewReadyEvent) {
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
-```tsx
+```vue
 const App = {
     name: 'App',
     methods: {
@@ -65,7 +62,7 @@ const App = {
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
-```tsx
+```ts
 export class AppComponent {
     onReady(event: DockviewReadyEvent) {
         /**
@@ -78,16 +75,17 @@ export class AppComponent {
 
 // In template:
 <dv-dockview (ready)="onReady($event)"></dv-dockview>
-```
+
+````
 </FrameworkSpecific>
 
 See the full [API Reference](/docs/api/dockview/overview) for all available methods.
 
-## Drag & Drop
+## Drag and drop
 
 Drag and drop is built in. Users can drag panel tabs to rearrange them within a group, move them to a different group, split the layout to create a new group, or float a group. No configuration is required to enable this.
 
-See [Drag & Drop](/docs/core/dnd/overview) for customization and third-party drag source integration.
+See [Drag and drop](/docs/core/dnd/overview) for customisation and third-party drag source integration.
 
 ## Serialization
 
@@ -103,6 +101,6 @@ const saved = localStorage.getItem('my_layout');
 if (saved) {
     api.fromJSON(JSON.parse(saved));
 }
-```
+````
 
 See [Saving State](/docs/core/state/save) and [Loading State](/docs/core/state/load) for full examples.

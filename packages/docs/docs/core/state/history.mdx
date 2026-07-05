@@ -1,5 +1,5 @@
 ---
-title: Layout History
+title: Layout history
 description: Undo and redo layout mutations — close, move, float, popout, maximize and resize — with a bounded history stack.
 sidebar_position: 3
 enterprise: true
@@ -38,7 +38,7 @@ The option is honoured live, so you can toggle it at runtime via
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="Angular">
-    <DocRef declaration="IDockviewAngularProps" methods={['layoutHistory']} />
+    <DocRef declaration="DockviewAngularOptions" methods={['layoutHistory']} />
 </FrameworkSpecific>
 
 <DocRef declaration="LayoutHistoryOptions" />
@@ -295,6 +295,11 @@ a popout must originate from a trusted user event (a keyboard shortcut or a
 button click); otherwise the popout falls back to an inline group.
 :::
 
-## Live Example
+## Live example
 
 <CodeRunner id="dockview/layout-history" height={400} />
+
+## See also
+
+- [Saving state](/docs/core/state/save) — persist a layout snapshot with `toJSON`.
+- [Loading state](/docs/core/state/load) — restore a serialized layout with `fromJSON`.

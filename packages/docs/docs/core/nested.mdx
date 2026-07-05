@@ -1,14 +1,17 @@
 ---
-title: Nested Instances
+title: Nested instances
 description: How to nest multiple Dockview instances within each other to create complex layouts.
 sidebar_position: 4
 ---
 
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
 
-# Nested Dockviews
-
-You can safely create multiple dockview instances within one page and nest dockviews within other dockviews.
-If you wish to interact with the drop event from one dockview instance in another dockview instance you can implement the `api.onUnhandledDragOver` and `onDidDrop` props on `DockviewReact`.
+You can render multiple independent Dockview instances on one page, and even nest a Dockview instance inside a panel of another, to build compound layouts.
+If you wish to interact with the drop event from one Dockview instance in another Dockview instance you can implement the `api.onUnhandledDragOver` and `onDidDrop` props on `DockviewReact`.
 
 <CodeRunner id="dockview/nested" />
+
+## See also
+
+- [Core concepts](/docs/core/overview) — how panels, groups, and the API fit together
+- [Events](/docs/core/events) — `onUnhandledDragOver` and `onDidDrop` for bridging drops between instances

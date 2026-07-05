@@ -1,7 +1,7 @@
 ---
-title: Multi-row Tabs
+title: Multi-row tabs
 description: The multi-row (wrapping) tabs mode, where a group's tab strip wraps onto additional rows so every tab stays visible at once.
-sidebar_position: 8
+sidebar_position: 7
 enterprise: true
 sidebar_custom_props:
     enterprise: true
@@ -36,7 +36,7 @@ resizes to match.
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="Angular">
-    <DocRef declaration="IDockviewAngularProps" methods={['overflow']} />
+    <DocRef declaration="DockviewAngularOptions" methods={['overflow']} />
 </FrameworkSpecific>
 
 <DocRef declaration="DockviewOverflowOptions" />
@@ -112,11 +112,17 @@ have **no effect**. They are documented here only as forward-looking API surface
 setting them today does nothing. Rely on `mode` and (once implemented) `maxRows`.
 :::
 
-## Live Example
+## Live example
 
 The example below opens a single group with many panels and `overflow.mode: 'wrap'`,
 so the tabs wrap onto multiple rows. Add more tabs, or toggle back to the dropdown
 mode, to compare the two behaviours.
 
 <CodeRunner id="dockview/tab-overflow" height={300} />
+
+## See also
+
+- [Tab overflow](/docs/core/panels/tabOverflow) — the default single-row dropdown this mode replaces.
+- [Pinned tabs](/docs/core/panels/pinnedTabs) — another way to keep important tabs visible.
+- [Tab header position](/docs/core/panels/headerPosition) — wrapping applies to horizontal headers only.
 ```

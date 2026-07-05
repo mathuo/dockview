@@ -1,5 +1,5 @@
 ---
-title: Adding Panels
+title: Adding panels
 sidebar_position: 1
 description: How to add panels to the Dockview layout using api.addPanel() with position and size options.
 ---
@@ -7,16 +7,13 @@ description: How to add panels to the Dockview layout using api.addPanel() with 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
 
-This section describes how to add a new panel and the options you can provide.
+Panels are the content units of a Dockview layout. `addPanel` creates one from a registered component and controls where it opens, its title, tab renderer, initial parameters, size and floating state.
 
-
-Panels can be added through the dock api.
+Panels can be added through the Dockview API.
 
 <DocRef declaration="DockviewApi" methods={['addPanel']} />
 
-
-
-## Opening a Basic Panel
+## Opening a basic panel
 
 To open a panel requires a unique `id` and the name of the `component` to render.
 
@@ -25,14 +22,13 @@ const panel: IDockviewPanel = api.addPanel({
     id: 'my_unique_panel_id',
     component: 'my_component',
     // optionally set `inactive: true` to prevent the added panel becoming active automatically
-    inactive: true
+    inactive: true,
 });
 ```
 
-
 > See [Overview](/docs/core/overview) to register components.
 
-## Providing a Panel Title
+## Providing a panel title
 
 :::warning
 Registering and updating the title using these built-in variables only works for the default tab renderer.
@@ -40,7 +36,7 @@ If you use a custom tab render you can optionally access these variables to rend
 your own approach to rendering a tab title.
 :::
 
-Use `title` to provide a custom title for the panel. If no `title` is provided then the dock will render `id` in the tab.
+Use `title` to provide a custom title for the panel. If no `title` is provided then Dockview will render `id` in the tab.
 
 ```tsx
 api.addPanel({
@@ -54,9 +50,9 @@ api.addPanel({
 api.setTitle('my_new_custom_title');
 ```
 
-<CodeRunner  id="dockview/update-title" height={250}/>
+<CodeRunner id="dockview/update-title" height={250} />
 
-## Provide a custom Tab renderer
+## Provide a custom tab renderer
 
 :::info
 You can override the default tab renderer through the [Options](/docs/api/dockview/options).
@@ -74,9 +70,9 @@ const panel: IDockviewPanel = api.addPanel({
 
 > See [Tabs](/docs/core/panels/tabs) to learn how to register tab components.
 
-## Provide custom Parameters
+## Provide custom parameters
 
-Using the `params` option you can specific a simple object that is accessible in both the panel and tab renderer.
+Using the `params` option you can specify a simple object that is accessible in both the panel and tab renderer.
 To update these parameters after the panel has been created see [Update Panel](/docs/core/panels/update).
 
 ```ts
@@ -93,74 +89,72 @@ const panel: IDockviewPanel = api.addPanel({
 
 See [Panel Rendering](/docs/core/panels/rendering).
 
-## Positioning the Panel
+## Positioning the panel
 
 You can position a panel relative to an existing panel, group using `direction`. If you do not provide a reference panel
-or group then the panel will be positioned to the edge of the dock in the specified direction.
+or group then the panel will be positioned to the edge of the Dockview container in the specified direction.
 
 <DocRef declaration="Direction" />
 
-#### Relative to another Panel
+#### Relative to another panel
 
 ```ts
 const panel2: IDockviewPanel = api.addPanel({
     id: 'panel_2',
     component: 'default',
     position: {
-      referencePanel: 'panel_1',
-      direction: 'above'
-    }
+        referencePanel: 'panel_1',
+        direction: 'above',
+    },
 });
 
 api.addPanel({
     id: 'panel_3',
     component: 'default',
     position: {
-      referencePanel: panel2,
-      direction: 'above'
-    }
+        referencePanel: panel2,
+        direction: 'above',
+    },
 });
 
 api.addPanel({
     id: 'panel_4',
     component: 'default',
     position: {
-      referencePanel: panel2,
-      index: 2  // optionally specify which index to add the panel at
-    }
+        referencePanel: panel2,
+        index: 2, // optionally specify which index to add the panel at
+    },
 });
 ```
 
-#### Relative to another Group
+#### Relative to another group
 
 ```ts
 const panel2: IDockviewPanel = api.addPanel({
     id: 'panel_2',
     component: 'default',
     position: {
-      referenceGroup: 'panel_1',
-      direction: 'left'
-    }
+        referenceGroup: 'panel_1',
+        direction: 'left',
+    },
 });
-
-
 
 api.addPanel({
     id: 'panel_2',
     component: 'default',
     position: {
-      referenceGroup: panel2.group,
-      direction: 'left'
-    }
+        referenceGroup: panel2.group,
+        direction: 'left',
+    },
 });
 
 api.addPanel({
     id: 'panel_3',
     component: 'default',
     position: {
-      referenceGroup: panel2.group,
-          index: 2  // optionally specify which index to add the panel at
-    }
+        referenceGroup: panel2.group,
+        index: 2, // optionally specify which index to add the panel at
+    },
 });
 ```
 
@@ -171,14 +165,14 @@ const panel = api.addPanel({
     id: 'panel_2',
     component: 'default',
     position: {
-      direction: 'right'
-    }
+        direction: 'right',
+    },
 });
 ```
 
 ### Floating
 
-You should specific the `floating` option which can be either `true` or an object describing the position of the floating group.
+You should specify the `floating` option which can be either `true` or an object describing the position of the floating group.
 
 :::info
 The `position` property of the `floating` object accepts combinations of `top`, `left`, `bottom` and `right`.
@@ -188,26 +182,26 @@ The `position` property of the `floating` object accepts combinations of `top`, 
 api.addPanel({
     id: 'panel_1',
     component: 'default',
-    floating: true
+    floating: true,
 });
 
 api.addPanel({
-  id: 'panel_2',
-  component: 'default',
-  floating: {
-      position: { left: 10, top: 10 },
-      width: 300,
-      height: 300
-  }
+    id: 'panel_2',
+    component: 'default',
+    floating: {
+        position: { left: 10, top: 10 },
+        width: 300,
+        height: 300,
+    },
 });
 ```
 
-### Minimum and Maximum
+### Minimum and maximum
 
-You can define both minimum and maxmium widths and heights, these are persisted with layouts.
+You can define both minimum and maximum widths and heights, these are persisted with layouts.
 
 :::info
-Since panels exist within groups there are occasions where these boundaries will be ignored to prevent overflow and clipping issues within the dock.
+Since panels exist within groups there are occasions where these boundaries will be ignored to prevent overflow and clipping issues within Dockview.
 :::
 
 ```ts
@@ -217,19 +211,26 @@ api.addPanel({
     minimumWidth: 100,
     maximumWidth: 100,
     minimumHeight: 200,
-    maximumHeight: 2000
+    maximumHeight: 2000,
 });
 ```
 
-### Initial Size
+### Initial size
 
-You can define an `initialWidth` and `initialHeight`. The dock will may a best attempt to obey these inputs but it may not always be possible due to the constraints of the grid.
+You can define an `initialWidth` and `initialHeight`. Dockview will make a best attempt to obey these inputs but it may not always be possible due to the constraints of the grid.
 
 ```ts
 api.addPanel({
     id: 'panel_1',
     component: 'default',
     initialWidth: 100,
-    initialHeight: 100
+    initialHeight: 100,
 });
 ```
+
+## See also
+
+- [Registering panels](/docs/core/panels/register) — register the components that `addPanel` instantiates by name.
+- [Move panel](/docs/core/panels/move) — reposition a panel after it has been added.
+- [Remove panel](/docs/core/panels/remove) — remove a panel from the layout.
+- [Panel API](/docs/api/dockview/panelApi) — control an individual panel once it exists.

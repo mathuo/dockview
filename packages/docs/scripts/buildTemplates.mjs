@@ -126,10 +126,10 @@ const COMPONENTS = ['dockview', 'splitview', 'gridview', 'paneview'];
 const FRAMEWORKS = ['react', 'vue', 'typescript', 'angular'];
 
 const COMPONENT_SELECTORS = {
-    'dockview': '.dv-dockview',
-    'splitview': '.dv-split-view-container',
-    'gridview': '.dv-grid-view',
-    'paneview': '.dv-pane-container'
+    dockview: '.dv-dockview',
+    splitview: '.dv-split-view-container',
+    gridview: '.dv-grid-view',
+    paneview: '.dv-pane-container',
 };
 
 const list = [];
@@ -178,9 +178,7 @@ async function buildTemplates() {
                 const boilerplatePath = `${BOILERPLATE_PATH_PREFIX}${boilerplateName}/`;
 
                 const systemJsMap =
-                    DOCKVIEW_CDN[framework][
-                        USE_LOCAL_CDN ? 'local' : 'remote'
-                    ];
+                    DOCKVIEW_CDN[framework][USE_LOCAL_CDN ? 'local' : 'remote'];
 
                 const html = createIndexHTML({
                     title: `Dockview | ${folder} ${framework}`,

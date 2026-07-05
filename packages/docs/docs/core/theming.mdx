@@ -4,21 +4,48 @@ description: Theming Dockview Components
 title: Theming
 ---
 
-
-import { CSSVariablesTable, ThemeTable } from '@site/src/components/cssVariables';
+import {
+    CSSVariablesTable,
+    ThemeTable,
+} from '@site/src/components/cssVariables';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-Dockview components accept a `theme` property which is highly customizable. Theming is largely controlled through CSS variables, however some properties can only be adjusted by editing the `theme` object directly.
+Dockview components accept a `theme` property which is highly customisable. Theming is largely controlled through CSS variables, however some properties can only be adjusted by editing the `theme` object directly.
 
 Make sure you have imported `dockview.css` as described in [Installation](/docs/overview/installation).
 
-## Hiding Borders
+## Hiding borders
 
 The `hideBorders` option removes the borders rendered between groups in the grid. This is a layout option rather than a CSS variable, useful when your theme already provides sufficient visual separation between groups.
 
-<FrameworkSpecific framework='React'>
-```tsx
-<DockviewReact hideBorders={true} theme={themeAbyss} onReady={onReady} components={components} />
+<FrameworkSpecific framework="React">
+    ```tsx
+    <DockviewReact
+        hideBorders={true}
+        theme={themeAbyss}
+        onReady={onReady}
+        components={components}
+    />
+    ```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Vue'>
+```vue
+<script setup lang="ts">
+import { themeAbyss } from 'dockview-vue';
+
+const theme = themeAbyss;
+
+</script>
+
+<template>
+    <dockview-vue
+        :hideBorders="true"
+        :theme="theme"
+        :components="components"
+        @ready="onReady"
+    />
+</template>
 ```
 </FrameworkSpecific>
 
@@ -27,8 +54,7 @@ The `hideBorders` option removes the borders rendered between groups in the grid
 import { themeAbyss } from 'dockview';
 
 @Component({
-    template: `
-        <dv-dockview
+template: `         <dv-dockview
             [hideBorders]="true"
             [theme]="theme"
             [components]="components"
@@ -37,10 +63,11 @@ import { themeAbyss } from 'dockview';
     `,
 })
 export class AppComponent {
-    theme = themeAbyss;
-    // ...
+theme = themeAbyss;
+// ...
 }
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
@@ -50,7 +77,8 @@ const api = createDockview(element, {
     theme: themeAbyss,
     createComponent: (options) => new MyPanel(),
 });
-```
+````
+
 </FrameworkSpecific>
 
 ## Provided themes
@@ -60,16 +88,16 @@ const api = createDockview(element, {
 For dock components pass the theme object to the `theme` property. For other components such as split, pane, and grid views, set the theme's associated CSS class on the `className` property.
 
 ```tsx
-import { themeAbyss } from "dockview-react";
+import { themeAbyss } from 'dockview-react';
 
 // For dock components
-theme={themeAbyss}
+theme = { themeAbyss };
 
 // For other components
-const {className} = themeAbyss;
+const { className } = themeAbyss;
 ```
 
-<ThemeTable/>
+<ThemeTable />
 
 ## Build your own theme
 
@@ -124,33 +152,33 @@ Hint passed to the browser via the `color-scheme` CSS property — `'light'` or 
 
 The [live demo](/demo) includes an interactive theme builder that lets you tweak any CSS variable and the theme properties above, then copy the resulting theme object and CSS. This is the fastest way to author a custom theme without writing CSS by hand.
 
-
-## Customizing Theme
+## Customising theme
 
 The provided themes are controlled through CSS variables which can be overridden entirely for a new theme, or partially to tweak an existing one.
 
 <CSSVariablesTable />
 
-## Extending Theme
+## Extending theme
 
 You can extend existing themes or create new ones.
 
 As an example, if you wanted to extend the **dockview-theme-abyss** theme to display a border below the tabs container you may try:
 
-
 ```css
 .dockview-theme-abyss {
-  .dv-groupview {
-      &.dv-active-group {
-          > .dv-tabs-and-actions-container {
-              border-bottom: 2px solid var(--dv-activegroup-visiblepanel-tab-background-color);
-          }
-      }
-      &.dv-inactive-group {
-          > .dv-tabs-and-actions-container {
-              border-bottom: 2px solid var(--dv-inactivegroup-visiblepanel-tab-background-color);
-          }
-      }
-  }
+    .dv-groupview {
+        &.dv-active-group {
+            > .dv-tabs-and-actions-container {
+                border-bottom: 2px solid
+                    var(--dv-activegroup-visiblepanel-tab-background-color);
+            }
+        }
+        &.dv-inactive-group {
+            > .dv-tabs-and-actions-container {
+                border-bottom: 2px solid
+                    var(--dv-inactivegroup-visiblepanel-tab-background-color);
+            }
+        }
+    }
 }
 ```

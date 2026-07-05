@@ -1,33 +1,34 @@
 ---
-title: 'Disable Dnd'
-sidebar_position: 3
+title: 'Disable drag and drop'
+sidebar_position: 5
 description: How to disable drag and drop on specific panels, groups, or the entire Dockview layout.
 ---
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
+The `disableDnd` option switches Dockview's drag and drop off entirely, giving you a layout whose panels and groups cannot be rearranged by dragging. Reach for it when you want a fixed arrangement the user should not be able to change.
 
 :::info
-You may want to combine this with `locked={true}` to provide a locked grid with no dnd funtionality. See [Locked](/docs/core/locked) for more.
+You may want to combine this with `locked={true}` to provide a locked grid with no drag and drop functionality. See [Locked](/docs/core/locked) for more.
 :::
 
 <FrameworkSpecific framework="JavaScript">
-  <DocRef declaration="DockviewComponentOptions" methods={["disableDnd"]} />
+    <DocRef declaration="DockviewComponentOptions" methods={['disableDnd']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="React">
-  <DocRef declaration="IDockviewReactProps" methods={["disableDnd"]}  />
+    <DocRef declaration="IDockviewReactProps" methods={['disableDnd']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="Vue">
-  <DocRef declaration="IDockviewVueProps" methods={["disableDnd"]}  />
+    <DocRef declaration="IDockviewVueProps" methods={['disableDnd']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="Angular">
-  <DocRef declaration="IDockviewAngularProps" methods={["disableDnd"]}  />
+    <DocRef declaration="DockviewAngularOptions" methods={['disableDnd']} />
 </FrameworkSpecific>
 
+## See also
 
-
-
-
+- [Drag and drop strategy](/docs/core/dnd/strategy) — `disableDnd` overrides whichever backend is selected.
+- [Drag and drop](/docs/core/dnd/dragAndDrop) — the drag and drop behaviour you are switching off.

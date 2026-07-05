@@ -27,8 +27,95 @@
     margin: 0 auto;
 }
 
+// ─── Hero stats ───────────────────────────────────────────────────────────────
+
+.hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 28px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.hero-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.2;
+}
+
+.hero-stat-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+
+    &:hover {
+        text-decoration: none;
+
+        .hero-stat-value {
+            color: var(--ifm-color-primary);
+        }
+    }
+}
+
+.hero-stat-value {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--ifm-heading-color);
+    transition: color 0.15s;
+}
+
+.hero-stat-label {
+    font-size: 0.8rem;
+    color: var(--ifm-color-content-secondary);
+}
+
+// ─── Hero preview ─────────────────────────────────────────────────────────────
+
 .hero-preview {
+    position: relative;
+    display: block;
     margin-top: 48px;
+    border-radius: 8px;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+        .hero-preview-badge {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+    }
+}
+
+.hero-preview-badge {
+    position: absolute;
+    left: 50%;
+    bottom: 16px;
+    transform: translate(-50%, 6px);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: var(--ifm-color-primary);
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+    pointer-events: none;
 }
 
 @keyframes framework-in {
@@ -87,11 +174,17 @@
     font-size: 0.9rem;
     font-weight: 500;
     text-decoration: none;
-    transition: border-color 0.15s, background 0.15s;
+    transition:
+        border-color 0.15s,
+        background 0.15s;
 
     &:hover {
         border-color: var(--ifm-color-primary);
-        background: color-mix(in srgb, var(--ifm-color-primary) 12%, transparent);
+        background: color-mix(
+            in srgb,
+            var(--ifm-color-primary) 12%,
+            transparent
+        );
         color: var(--ifm-color-content);
         text-decoration: none;
     }
@@ -105,7 +198,6 @@
         flex-shrink: 0;
     }
 }
-
 
 .hero-gif {
     width: 100%;
@@ -215,6 +307,55 @@
     color: var(--ifm-color-content-secondary);
 }
 
+// ─── Call to action ───────────────────────────────────────────────────────────
+
+.cta-section {
+    padding: 80px 0;
+    background: var(--ifm-background-surface-color);
+}
+
+.cta-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.cta-title {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: var(--ifm-heading-color);
+}
+
+.cta-subtitle {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--ifm-color-content-secondary);
+    max-width: 460px;
+    margin: 0 0 24px;
+}
+
+.cta-install {
+    margin-bottom: 28px;
+
+    code {
+        display: inline-block;
+        padding: 12px 20px;
+        border-radius: 8px;
+        border: 1px solid var(--ifm-toc-border-color);
+        background: var(--ifm-background-color);
+        font-size: 0.95rem;
+        color: var(--ifm-color-content);
+    }
+}
+
+.cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
 
 @media (prefers-reduced-motion: reduce) {
     .hero-framework {
@@ -226,5 +367,15 @@
     .hero-fw-btn {
         transition: none;
     }
-}
 
+    .hero-preview,
+    .hero-preview-badge,
+    .hero-stat-value {
+        transition: none;
+    }
+
+    .hero-preview:hover {
+        transform: none;
+        box-shadow: none;
+    }
+}

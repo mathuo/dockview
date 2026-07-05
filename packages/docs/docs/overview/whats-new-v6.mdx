@@ -5,7 +5,7 @@ description: Highlights and breaking changes in Dockview 6.0 — Tab Groups, Edg
 ---
 
 Dockview 6.0 is the largest release since 4.0. It introduces two new structural features
-([Tab Groups](#tab-groups) and [Edge Groups](#edge-groups)), an overhauled theming
+([Tab groups](#tab-groups) and [Edge groups](#edge-groups)), an overhauled theming
 system with an [interactive theme builder](/demo), seven new
 built-in themes, and a richer event surface on `DockviewApi`.
 
@@ -14,11 +14,11 @@ you need to be aware of when upgrading from v5.
 
 ## Highlights
 
-### Tab Groups
+### Tab groups
 
-Panels inside a single dockview group can now be sub-grouped by a colored chip
+Panels inside a single Dockview group can now be sub-grouped by a coloured chip
 that sits in the tab bar. Tab groups support drag-and-drop reordering, collapse
-/ expand, inline rename, and a 9-color palette that can be customised or
+/ expand, inline rename, and a 9-colour palette that can be customised or
 disabled entirely. ([#1154](https://github.com/mathuo/dockview/pull/1154))
 
 ```ts
@@ -34,12 +34,12 @@ The full programmatic surface lives on `DockviewApi`:
 `removePanelFromTabGroup`, `moveTabGroup`, `getTabGroups`,
 `getTabGroupForPanel`.
 
-See [Tab Groups](/docs/core/panels/tabs#tab-groups) for the full reference.
+See [Tab groups](/docs/core/panels/tabs#tab-groups) for the full reference.
 
-### Edge Groups
+### Edge groups
 
 Edge groups are persistent, single-purpose panels anchored to one edge of the
-dockview shell — useful for activity bars, status panels, or output panes that
+Dockview shell — useful for activity bars, status panels, or output panes that
 shouldn't participate in normal layout drag-and-drop. They support collapse /
 expand with size memory and survive `toJSON` / `fromJSON`.
 ([#1122](https://github.com/mathuo/dockview/pull/1122),
@@ -61,7 +61,7 @@ api.addPanel({
 api.removeEdgeGroup('left');
 ```
 
-See [Edge Groups](/docs/core/groups/edgeGroups) for details.
+See [Edge groups](/docs/core/groups/edgeGroups) for details.
 
 ### Tab context menu
 
@@ -114,14 +114,14 @@ and `onDidRemoveGroup`. ([#1212](https://github.com/mathuo/dockview/pull/1212))
 The theme object gained five new properties for finer-grained styling
 control without touching SCSS:
 
-| Property | Purpose |
-|---|---|
-| `colorScheme` | `'light' \| 'dark'` — lets panel content adapt |
-| `tabAnimation` | `'smooth' \| 'default'` — moved here from `DockviewOptions` |
-| `tabGroupIndicator` | `'wrap' \| 'none'` — Chrome-style underline vs. flat bar |
-| `dndTabIndicator` | `'line' \| 'fill'` — drop-target style |
-| `dndOverlayBorder` | CSS expression for `--dv-drag-over-border` |
-| `edgeGroupCollapsedSize` | px override for collapsed edge group size |
+| Property                 | Purpose                                                     |
+| ------------------------ | ----------------------------------------------------------- |
+| `colorScheme`            | `'light' \| 'dark'` — lets panel content adapt              |
+| `tabAnimation`           | `'smooth' \| 'default'` — moved here from `DockviewOptions` |
+| `tabGroupIndicator`      | `'wrap' \| 'none'` — Chrome-style underline vs. flat bar    |
+| `dndTabIndicator`        | `'line' \| 'fill'` — drop-target style                      |
+| `dndOverlayBorder`       | CSS expression for `--dv-drag-over-border`                  |
+| `edgeGroupCollapsedSize` | px override for collapsed edge group size                   |
 
 The pre-existing spaced themes (`abyssSpaced`, `lightSpaced`) have been
 migrated to the CSS-variable system, which is also what powers the new

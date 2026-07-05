@@ -3,8 +3,6 @@ title: Security
 description: How Dockview behaves under strict Content Security Policy, Trusted Types, and other browser security primitives.
 ---
 
-# Security
-
 Dockview is designed to work in security-hardened environments: strict [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP), [Trusted Types](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API), and same-origin popouts. This page covers what Dockview does at runtime, what you need to allow, and how to configure Dockview so that a strict policy doesn't break popout windows.
 
 ## What Dockview does at runtime
@@ -46,9 +44,7 @@ The recommended setup is to have your `popout.html` emit a `<meta name="csp-nonc
 ```tsx title="React"
 <DockviewReact
     nonce={(doc) =>
-        doc
-            .querySelector<HTMLMetaElement>('meta[name="csp-nonce"]')
-            ?.content
+        doc.querySelector<HTMLMetaElement>('meta[name="csp-nonce"]')?.content
     }
     onReady={onReady}
     components={components}
@@ -69,10 +65,10 @@ import { createDockview } from 'dockview';
 
 const api = createDockview(element, {
     nonce: (doc) =>
-        doc
-            .querySelector<HTMLMetaElement>('meta[name="csp-nonce"]')
-            ?.content,
-    createComponent: (options) => { /* ... */ },
+        doc.querySelector<HTMLMetaElement>('meta[name="csp-nonce"]')?.content,
+    createComponent: (options) => {
+        /* ... */
+    },
 });
 ```
 
@@ -90,3 +86,6 @@ If your popout markup uses a different convention (for example a global like `wi
 
 Dockview is also compatible with [Trusted Types](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API) (`require-trusted-types-for 'script'`). Dockview clears DOM subtrees with `Node.replaceChildren()` rather than `element.innerHTML = ''`, which Trusted Types treats as a sink.
 
+## See also
+
+- [Popout windows](/docs/core/groups/popoutGroups) — the main feature affected by CSP and same-origin rules

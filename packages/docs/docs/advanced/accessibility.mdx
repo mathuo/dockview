@@ -6,8 +6,6 @@ sidebar_position: 1
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-# Accessibility
-
 Dockview ships a baseline of accessibility in core — WAI-ARIA roles and labels,
 roving-tabindex navigation within the tab strip, screen-reader announcements of
 layout changes, and keyboard-only focus indicators — included out of the box in
@@ -62,7 +60,7 @@ focused by keyboard.
 ## Screen-reader announcements
 
 Dockview narrates layout changes — panels opening/closing, groups floating,
-docking, popping out, maximizing/restoring — through visually-hidden ARIA live
+docking, popping out, maximising/restoring — through visually-hidden ARIA live
 regions (a polite region for routine status and an assertive one for
 cancellations). This is on by default.
 
@@ -96,7 +94,7 @@ The announcement behaviour is configured with the following options:
 
 <FrameworkSpecific framework="Angular">
     <DocRef
-        declaration="IDockviewAngularProps"
+        declaration="DockviewAngularOptions"
         methods={['announcements', 'getAnnouncement', 'messages', 'announcer']}
     />
 </FrameworkSpecific>
@@ -153,3 +151,8 @@ const options = {
         myLiveRegion.announce(event.message, event.politeness),
 };
 ```
+
+## See also
+
+- [Focus navigation](/docs/advanced/focus-navigation) — free `DockviewApi` methods for moving focus between panels and groups
+- [Keyboard](/docs/advanced/keyboard) — the opt-in keymap, `F6` group cycling and keyboard-driven docking

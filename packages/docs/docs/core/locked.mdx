@@ -7,12 +7,16 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-This section describes how to lock the dock to prevent movement.
+Locking the whole component prevents users from resizing groups with the drag handles between them. Combine it with disabling drag and drop for a fully static, read-only layout.
 
 :::info
-You may want to combine this with `disableDnd={true}` to provide a locked grid with no dnd funtionality. See [Disable Dnd](/docs/core/dnd/disable) for more.
+You may want to combine this with `disableDnd={true}` to provide a locked grid with no drag and drop functionality. See [Disable drag and drop](/docs/core/dnd/disable) for more.
 :::
 
-Locking the component prevent the resizing of components using the drag handles between panels.
+Locking the component prevents the resizing of components using the drag handles between panels.
 
-<CodeRunner id='dockview/locked'/>
+<CodeRunner id="dockview/locked" />
+
+## See also
+
+- [Locked groups](/docs/core/groups/locked) — lock a single group instead of the whole layout

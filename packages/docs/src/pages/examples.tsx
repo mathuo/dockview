@@ -42,38 +42,147 @@ const COMPONENTS: ComponentGroup[] = [
         description:
             'Full-featured docking layout with tabs, groups, drag & drop, floating panels, and popout windows.',
         examples: [
-            { name: 'basic', frameworks: ['react', 'vue', 'angular', 'typescript'] },
-            { name: 'constraints', frameworks: ['react', 'vue', 'angular'] },
-            { name: 'context-menu', frameworks: ['react', 'vue', 'angular', 'typescript'] },
-            { name: 'custom-header', frameworks: ['react', 'vue', 'angular', 'typescript'] },
-            { name: 'demo-dockview', frameworks: ['react'] },
-            { name: 'dnd-events', frameworks: ['react', 'vue'] },
-            { name: 'dnd-external', frameworks: ['react', 'vue'] },
-            { name: 'edge-groups', frameworks: ['react', 'vue', 'angular', 'typescript'] },
-            { name: 'floating-groups', frameworks: ['react', 'vue', 'angular'] },
-            { name: 'group-actions', frameworks: ['react', 'vue', 'angular', 'typescript'] },
-            { name: 'layout', frameworks: ['react', 'vue'] },
-            { name: 'locked', frameworks: ['react', 'vue', 'typescript'] },
-            { name: 'maximize-group', frameworks: ['react', 'vue'] },
-            { name: 'nested', frameworks: ['react', 'vue'] },
-            { name: 'popout-group', frameworks: ['react', 'vue'] },
-            { name: 'render-mode', frameworks: ['react', 'vue'] },
-            { name: 'resize', frameworks: ['react', 'vue'] },
-            { name: 'resize-container', frameworks: ['react', 'vue'] },
-            { name: 'scrollbars', frameworks: ['react', 'vue', 'typescript'] },
-            { name: 'tab-groups', frameworks: ['react', 'vue', 'angular', 'typescript'] },
-            { name: 'tabview', frameworks: ['react', 'vue', 'typescript'] },
-            { name: 'update-parameters', frameworks: ['react', 'vue', 'typescript'] },
-            { name: 'update-title', frameworks: ['react', 'vue', 'typescript'] },
-            { name: 'watermark', frameworks: ['react', 'vue', 'angular', 'typescript'] },
+            {
+                name: 'auto-hide-edge-groups',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'basic',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'constraints',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'context-menu',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'custom-header',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            { name: 'demo-dockview', frameworks: ['react', 'angular'] },
+            {
+                name: 'dnd-events',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'dnd-external',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'drop-guide',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'edge-groups',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'floating-groups',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'full-width-tab',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'group-actions',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'iframe',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'keyboard',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'layout',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'layout-history',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'locked',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'maximize-group',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'nested',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'pinned-tabs',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'popout-group',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'render-mode',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'resize',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'resize-container',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'scrollbars',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'smart-guides',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'tab-groups',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'tab-overflow',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'tabview',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'update-parameters',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'update-title',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
+            {
+                name: 'watermark',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
         ],
     },
     {
         component: 'splitview',
         label: 'Splitview',
-        description: 'Resizable split panels arranged horizontally or vertically.',
+        description:
+            'Resizable split panels arranged horizontally or vertically.',
         examples: [
-            { name: 'basic', frameworks: ['react', 'vue', 'angular', 'typescript'] },
+            {
+                name: 'basic',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
         ],
     },
     {
@@ -81,7 +190,10 @@ const COMPONENTS: ComponentGroup[] = [
         label: 'Gridview',
         description: 'Grid-based layout with resizable rows and columns.',
         examples: [
-            { name: 'basic', frameworks: ['react', 'vue', 'angular', 'typescript'] },
+            {
+                name: 'basic',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
         ],
     },
     {
@@ -89,7 +201,10 @@ const COMPONENTS: ComponentGroup[] = [
         label: 'Paneview',
         description: 'Collapsible accordion-style pane layout.',
         examples: [
-            { name: 'basic', frameworks: ['react', 'vue', 'angular', 'typescript'] },
+            {
+                name: 'basic',
+                frameworks: ['react', 'vue', 'angular', 'typescript'],
+            },
         ],
     },
 ];
@@ -101,7 +216,13 @@ function formatName(name: string): string {
         .join(' ');
 }
 
-function ExampleCard({ component, example }: { component: string; example: Example }) {
+function ExampleCard({
+    component,
+    example,
+}: {
+    component: string;
+    example: Example;
+}) {
     const anchorId = `${component}-${example.name}`;
     return (
         <div className="example-card" id={anchorId}>
@@ -141,7 +262,10 @@ function ComponentSection({ group }: { group: ComponentGroup }) {
     return (
         <section className="examples-component-section" id={group.component}>
             <div className="examples-component-header">
-                <h2 className="examples-component-title" id={`${group.component}-heading`}>
+                <h2
+                    className="examples-component-title"
+                    id={`${group.component}-heading`}
+                >
                     {group.label}
                 </h2>
                 <p className="examples-component-description">
