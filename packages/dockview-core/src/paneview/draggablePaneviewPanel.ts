@@ -175,7 +175,7 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
     private onDrop(event: DroptargetEvent): void {
         const data = getPaneData();
 
-        if (!data || data.viewId !== this.accessor.id) {
+        if (data?.viewId !== this.accessor.id) {
             // if there is no local drag event for this panel
             // or if the drag event was creating by another Paneview instance
             this._onDidDrop.fire({

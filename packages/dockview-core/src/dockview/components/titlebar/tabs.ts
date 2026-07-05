@@ -1160,7 +1160,7 @@ export class Tabs extends CompositeDisposable {
         }
         const data = getPanelData();
         const sourceIndex =
-            data && data.groupId === this.group.id && data.panelId
+            data?.groupId === this.group.id && data?.panelId
                 ? this._tabs.findIndex((x) => x.value.panel.id === data.panelId)
                 : -1;
         const adjustedIndex =

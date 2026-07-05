@@ -414,7 +414,7 @@ export class Splitview {
         const viewItem = new ViewItem(container, view, viewSize, {
             dispose: () => {
                 disposable.dispose();
-                this.viewContainer.removeChild(container);
+                container.remove();
             },
         });
 
@@ -572,7 +572,7 @@ export class Splitview {
                 container: sash,
                 disposable: () => {
                     sash.removeEventListener('pointerdown', onPointerStart);
-                    this.sashContainer.removeChild(sash);
+                    sash.remove();
                 },
             };
 
@@ -643,7 +643,7 @@ export class Splitview {
             this.relayout();
         }
 
-        if (sizing && sizing.type === 'distribute') {
+        if (sizing?.type === 'distribute') {
             this.distributeViewSizes();
         }
 
@@ -1160,7 +1160,7 @@ export class Splitview {
 
         for (let i = 0; i < this.element.children.length; i++) {
             if (this.element.children.item(i) === this.element) {
-                this.element.removeChild(this.element);
+                this.element.remove();
                 break;
             }
         }

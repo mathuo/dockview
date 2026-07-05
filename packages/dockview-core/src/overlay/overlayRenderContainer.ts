@@ -28,7 +28,7 @@ class PositionCache {
         height: number;
     } {
         const cached = this.cache.get(element);
-        if (cached && cached.frameId === this.currentFrameId) {
+        if (cached?.frameId === this.currentFrameId) {
             return cached.rect;
         }
 
@@ -321,10 +321,10 @@ export class OverlayRenderContainer extends CompositeDisposable {
 
         this.map[panel.api.id].destroy = Disposable.from(() => {
             if (contentElement.parentElement === focusContainer) {
-                focusContainer.removeChild(contentElement);
+                contentElement.remove();
             }
 
-            focusContainer.parentElement?.removeChild(focusContainer);
+            focusContainer.remove();
         });
 
         correctLayerPosition();
