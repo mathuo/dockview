@@ -71,22 +71,48 @@ export class EdgeGroupView implements IView {
 
     private _isCollapsed = false;
     private _lastExpandedSize: number;
-    private _collapsedSize: number;
-    private _expandedMinimumSize: number;
+
+    // Sizing is stored as pre-gap "base" values plus the current gap
+    // contribution (_gapAdd) so the effective collapsed size can be recomputed
+    // whenever either the theme gap OR the measured tab-strip size changes.
+    private _baseCollapsedSize: number;
+    private _baseMinimumSize: number | undefined;
+    private _gapAdd: number;
     private readonly _expandedMaximumSize: number;
+
+    // The live cross-axis size of the group's tab strip. When defined it wins
+    // over _baseCollapsedSize so a collapsed edge group tracks the tab height
+    // even when it is changed dynamically via the
+    // `--dv-tabs-and-actions-container-height` CSS variable (which the theme
+    // machinery never sees).
+    private _measuredTabSize: number | undefined;
+
+    private readonly _tabSizeDisposables = new CompositeDisposable();
+
+    /**
+     * The effective (pre-gap) collapsed size: the measured tab-strip size when
+     * available, otherwise the configured/theme base.
+     */
+    private get _effectiveBaseCollapsed(): number {
+        return this._measuredTabSize ?? this._baseCollapsedSize;
+    }
 
     get minimumSize(): number {
         // When collapsed, lock size to collapsedSize so sash can't drag it open
-        return this._isCollapsed
-            ? this._collapsedSize
-            : this._expandedMinimumSize;
+        if (this._isCollapsed) {
+            return this.collapsedSize;
+        }
+        // If the caller explicitly provides a minimumSize, respect it.
+        // Otherwise fall back to collapsedSize + 50 so the expanded state is
+        // visually distinguishable from the collapsed state.
+        return this._baseMinimumSize !== undefined
+            ? this._baseMinimumSize + this._gapAdd
+            : this._effectiveBaseCollapsed + 50 + this._gapAdd;
     }
 
     get maximumSize(): number {
         // When collapsed, lock size to collapsedSize so sash can't drag it open
-        return this._isCollapsed
-            ? this._collapsedSize
-            : this._expandedMaximumSize;
+        return this._isCollapsed ? this.collapsedSize : this._expandedMaximumSize;
     }
 
     get element(): HTMLElement {
@@ -102,13 +128,14 @@ export class EdgeGroupView implements IView {
     }
 
     get collapsedSize(): number {
-        return this._collapsedSize;
+        return this._effectiveBaseCollapsed + this._gapAdd;
     }
 
     constructor(
         options: EdgeGroupOptions,
         group: IEdgeGroupHost,
-        orientation: 'horizontal' | 'vertical'
+        orientation: 'horizontal' | 'vertical',
+        gapAdd = 0
     ) {
         this._group = group;
         this._orientation = orientation;
@@ -116,20 +143,58 @@ export class EdgeGroupView implements IView {
         group.element.classList.add('dv-edge-group');
         group.element.dataset.testid = `dv-edge-group-${options.id}`;
 
-        this._collapsedSize = options.collapsedSize ?? 35;
+        this._baseCollapsedSize = options.collapsedSize ?? 35;
+        this._baseMinimumSize = options.minimumSize;
+        this._gapAdd = gapAdd;
         this._expandedMaximumSize =
             options.maximumSize ?? Number.POSITIVE_INFINITY;
-        // If the caller explicitly provides a minimumSize, respect it.
-        // Otherwise fall back to collapsedSize + 50 so the expanded state is
-        // visually distinguishable from the collapsed state.
-        this._expandedMinimumSize =
-            options.minimumSize ?? this._collapsedSize + 50;
 
         this._lastExpandedSize = options.initialSize ?? 200;
 
         if (options.collapsed) {
             this._isCollapsed = true;
             group.element.classList.add('dv-edge-collapsed');
+        }
+
+        this._observeTabStrip();
+    }
+
+    /**
+     * Watch the group's tab strip so the collapsed size follows the live tab
+     * height. The strip's cross-axis size (height for top/bottom, width for
+     * left/right) is exactly what a collapsed edge group should occupy; a
+     * ResizeObserver keeps them in sync when the tab height changes at runtime.
+     */
+    private _observeTabStrip(): void {
+        const strip = this._group.element.querySelector(
+            '.dv-tabs-and-actions-container'
+        ) as HTMLElement | null;
+        if (!strip) {
+            return;
+        }
+        this._tabSizeDisposables.addDisposables(
+            watchElementResize(strip, () => {
+                this._applyMeasuredTabSize(
+                    this._orientation === 'vertical'
+                        ? strip.offsetHeight
+                        : strip.offsetWidth
+                );
+            })
+        );
+    }
+
+    /**
+     * Apply a freshly-measured tab-strip cross size. When the group is
+     * collapsed this resizes it in the parent splitview so the collapsed strip
+     * always shows the full tab height.
+     */
+    private _applyMeasuredTabSize(size: number): void {
+        if (size <= 0 || size === this._measuredTabSize) {
+            return;
+        }
+        this._measuredTabSize = size;
+        if (this._isCollapsed) {
+            this._onDidChange.fire({ size: this.collapsedSize });
         }
     }
 
@@ -171,19 +236,23 @@ export class EdgeGroupView implements IView {
     }
 
     /**
-     * Apply new effective collapsed and expanded-minimum sizes after a theme
-     * or gap change. The caller (ShellManager) is responsible for computing
-     * the correct values from the original config and the new gap.
+     * Apply a new base (pre-gap) collapsed size, base minimum size and gap
+     * contribution after a theme or gap change. Base values come from the
+     * original config; the ShellManager owns the gap arithmetic. A live
+     * measured tab size (if any) continues to win over the base collapsed size.
      */
-    updateCollapsedSize(
-        newCollapsedSize: number,
-        newExpandedMinimumSize: number
+    updateSizing(
+        baseCollapsedSize: number,
+        baseMinimumSize: number | undefined,
+        gapAdd: number
     ): void {
-        this._collapsedSize = newCollapsedSize;
-        this._expandedMinimumSize = newExpandedMinimumSize;
+        this._baseCollapsedSize = baseCollapsedSize;
+        this._baseMinimumSize = baseMinimumSize;
+        this._gapAdd = gapAdd;
     }
 
     dispose(): void {
+        this._tabSizeDisposables.dispose();
         this._onDidChange.dispose();
     }
 }
@@ -356,23 +425,6 @@ class MiddleColumnView implements IView, IDisposable {
     }
 }
 
-function adjustedOpts(
-    base: EdgeGroupOptions,
-    defaultCollapsed: number,
-    gapAdd: number
-): EdgeGroupOptions {
-    const effectiveCollapsed =
-        (base.collapsedSize ?? defaultCollapsed) + gapAdd;
-    const result: EdgeGroupOptions = {
-        ...base,
-        collapsedSize: effectiveCollapsed,
-    };
-    if (base.minimumSize !== undefined) {
-        result.minimumSize = base.minimumSize + gapAdd;
-    }
-    return result;
-}
-
 export class ShellManager implements IDisposable {
     private readonly _outerSplitview: Splitview;
     private readonly _middleColumn: MiddleColumnView;
@@ -495,13 +547,10 @@ export class ShellManager implements IDisposable {
         const orientation = isHorizontal ? 'horizontal' : 'vertical';
 
         const view = new EdgeGroupView(
-            adjustedOpts(
-                { collapsedSize: this._defaultCollapsedSize, ...options },
-                this._defaultCollapsedSize,
-                gapAdd
-            ),
+            { collapsedSize: this._defaultCollapsedSize, ...options },
             group,
-            orientation
+            orientation,
+            gapAdd
         );
 
         const initialSize = view.isCollapsed
@@ -583,10 +632,7 @@ export class ShellManager implements IDisposable {
             gapAdd: number
         ) => {
             const baseCS = baseCfg.collapsedSize ?? defaultCollapsedSize;
-            const newCS = baseCS + gapAdd;
-            const baseMS = baseCfg.minimumSize;
-            const newMS = baseMS === undefined ? newCS + 50 : baseMS + gapAdd;
-            view.updateCollapsedSize(newCS, newMS);
+            view.updateSizing(baseCS, baseCfg.minimumSize, gapAdd);
         };
 
         const topCfg = this._viewConfigs.get('top');
