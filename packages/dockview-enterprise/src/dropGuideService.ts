@@ -137,6 +137,8 @@ class CompassResolver implements PositionResolver {
             zones,
             this.edgesEnabled()
         );
+
+        // Exact hit — the fast path.
         for (const cell of cells) {
             if (
                 args.x >= cell.left &&
@@ -147,7 +149,47 @@ class CompassResolver implements PositionResolver {
                 return { position: cell.position, edge: cell.edge };
             }
         }
-        return null;
+
+        // Gap-fill. The cells form a plus/cross — a vertical column (all share
+        // the central cell's x) and a horizontal row (all share its y) —
+        // separated by a GAP-wide space. Exact hit-testing returns null in those
+        // gaps, so the drop overlay blinks out as the cursor crosses from one
+        // cell to its neighbour. Snap a pointer sitting in an on-axis gap to its
+        // nearest collinear cell (within one GAP) so the overlay stays put. A
+        // pointer off both axes (a corner) is a genuine dead zone → null.
+        const half = CELL / 2;
+        const cx = args.width / 2 - half; // the central cell's left
+        const cy = args.height / 2 - half; // the central cell's top
+        const inColumn = args.x >= cx && args.x <= cx + CELL;
+        const inRow = args.y >= cy && args.y <= cy + CELL;
+
+        let best: CompassCell | undefined;
+        let bestDist = Infinity;
+        for (const cell of cells) {
+            let dist: number;
+            if (inColumn && cell.left === cx) {
+                // a vertical neighbour — gap distance along y
+                dist = Math.max(
+                    cell.top - args.y,
+                    args.y - (cell.top + cell.size),
+                    0
+                );
+            } else if (inRow && cell.top === cy) {
+                // a horizontal neighbour — gap distance along x
+                dist = Math.max(
+                    cell.left - args.x,
+                    args.x - (cell.left + cell.size),
+                    0
+                );
+            } else {
+                continue;
+            }
+            if (dist <= GAP && dist < bestDist) {
+                bestDist = dist;
+                best = cell;
+            }
+        }
+        return best ? { position: best.position, edge: best.edge } : null;
     }
 }
 
