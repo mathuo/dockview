@@ -447,10 +447,15 @@ The component receives `panel`, `group`, `api`, `close`, and an optional `compon
 import { IContextMenuItemComponentProps } from 'dockview-react';
 
 const FloatMenuItem = ({ panel, api, close }: IContextMenuItemComponentProps) => (
+
 <div
-className="dv-context-menu-item"
-onClick={() => { api.addFloatingGroup(panel); close(); }} >
-Float tab
+    className="dv-context-menu-item"
+    onClick={() => {
+        api.addFloatingGroup(panel);
+        close();
+    }}
+>
+    Float tab
 </div>
 );
 

@@ -12,8 +12,7 @@ import { KeyboardDockingModule } from './keyboardDockingService';
 import { LicenseModule } from './licenseService';
 
 // Re-export the full dockview (free) API so `dockview-enterprise` is a drop-in
-// superset — mirrors AG Grid's `ag-grid-enterprise` re-exporting
-// `ag-grid-community`. Also runs dockview's own load-time side effects
+// superset of `dockview`. Also runs dockview's own load-time side effects
 // (e.g. markDockviewPackageLoaded) via the re-exported module.
 export * from 'dockview';
 

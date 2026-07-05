@@ -110,10 +110,9 @@ export function _resetMissingModuleWarnings(): void {
 
 /**
  * Returns the service if its module is registered, otherwise logs a
- * deduplicated console error and returns `undefined`. Modelled on AG Grid's
- * `assertModuleRegistered`: missing modules never throw — they degrade the
- * affected feature to a no-op so consuming applications don't crash in
- * production.
+ * deduplicated console error and returns `undefined`. Missing modules never
+ * throw — they degrade the affected feature to a no-op so consuming
+ * applications don't crash in production.
  *
  * Use at public-API entry points where the caller wants to surface which
  * module is missing. For internal/lifecycle paths, plain `?.` chaining on
@@ -216,8 +215,7 @@ export class ModuleRegistry<THost> implements IDisposable {
  * Process-global list of modules registered via {@link registerModules}.
  * `DockviewComponent` appends these to its built-in set at construction, so
  * importing a package that calls `registerModules(...)` (e.g. `dockview`)
- * makes those modules available to every component in the process —
- * modelled on AG Grid's `ModuleRegistry.registerModules`.
+ * makes those modules available to every component in the process.
  */
 const _globalModules: DockviewModule<any>[] = [];
 

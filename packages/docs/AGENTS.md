@@ -34,7 +34,7 @@ Documentation website built with Docusaurus v3.
 
 - `sandboxes/` - **All per-feature example sandboxes were migrated to `templates/` and deleted.** The ONLY remaining sandboxes are `sandboxes/react/dockview/demo-dockview` and `demo-dockview-mobile`, both used exclusively by the `/demo` page (`src/pages/demo.tsx`) via `src/components/ui/exampleFrame.tsx` (a dynamic `import()`). Every docs `<CodeRunner>` embed now points at a `templates/` example.
 - **All `templates/dockview/*` examples cover all four frameworks** (react/vue/angular/typescript), except `demo-dockview` (react+angular, deliberately exempt). Non-react variants are a single `src/index.ts`; the enterprise `LicenseManager` boilerplate belongs ONLY in templates whose feature is actually enterprise (grep the react variant — if it has no `LicenseManager`, the feature is free/core and the other variants must not add it either).
-- Do NOT add new sandboxes — add a `templates/` example (all four frameworks). Some `package.json` deps that only served deleted sandboxes (`react-dnd`, `@minoru/react-dnd-treeview`, ag-grid, etc.) may now be prunable — verify against `demo-dockview` before removing.
+- Do NOT add new sandboxes — add a `templates/` example (all four frameworks). Some `package.json` deps that only served the deleted sandboxes may now be prunable — check before removing.
 
 ### Framework Examples
 

@@ -3,8 +3,8 @@
 The separately-published **enterprise** package: dockview's paid feature modules
 plus the license gate. Depends only on `dockview` (the free package) at an exact
 version and re-exports it (`export * from 'dockview'`), so it is a drop-in
-superset — mirrors `ag-grid-enterprise` -> `ag-grid-community`. Importing it
-self-registers its modules + the license check.
+superset of the free package. Importing it self-registers its modules + the
+license check.
 
 ## Modules hosted here
 
