@@ -425,8 +425,8 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
         direction: GroupNavigationDirection
     ): DockviewGroupPanel | undefined;
     // events
-    moveToNext(options?: MovementOptions): void;
-    moveToPrevious(options?: MovementOptions): void;
+    activateNext(options?: MovementOptions): void;
+    activatePrevious(options?: MovementOptions): void;
     setActivePanel(panel: IDockviewPanel): void;
     focus(): void;
     toJSON(): SerializedDockview;
@@ -3006,7 +3006,7 @@ export class DockviewComponent
         this.doSetGroupAndPanelActive(panel.group);
     }
 
-    moveToNext(options: MovementOptions = {}): void {
+    activateNext(options: MovementOptions = {}): void {
         if (!options.group) {
             if (!this.activeGroup) {
                 return;
@@ -3029,7 +3029,7 @@ export class DockviewComponent
         this.doSetGroupAndPanelActive(next);
     }
 
-    moveToPrevious(options: MovementOptions = {}): void {
+    activatePrevious(options: MovementOptions = {}): void {
         if (!options.group) {
             if (!this.activeGroup) {
                 return;

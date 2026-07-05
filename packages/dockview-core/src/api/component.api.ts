@@ -1122,17 +1122,39 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     /**
-     * Move the focus progmatically to the next panel or group.
+     * Activate the next panel or group, moving focus programmatically. Pass
+     * `{ includePanel: true }` to step through the panels of the active group
+     * before advancing to the next group.
      */
-    moveToNext(options?: MovementOptions): void {
-        this.component.moveToNext(options);
+    activateNext(options?: MovementOptions): void {
+        this.component.activateNext(options);
     }
 
     /**
-     * Move the focus progmatically to the previous panel or group.
+     * Activate the previous panel or group, moving focus programmatically. Pass
+     * `{ includePanel: true }` to step through the panels of the active group
+     * before advancing to the previous group.
+     */
+    activatePrevious(options?: MovementOptions): void {
+        this.component.activatePrevious(options);
+    }
+
+    /**
+     * @deprecated Use {@link DockviewApi.activateNext} instead. Renamed because
+     * this advances the active panel/group (focus), it does not relocate a
+     * panel. Removal planned for a future major release.
+     */
+    moveToNext(options?: MovementOptions): void {
+        this.activateNext(options);
+    }
+
+    /**
+     * @deprecated Use {@link DockviewApi.activatePrevious} instead. Renamed
+     * because this advances the active panel/group (focus), it does not
+     * relocate a panel. Removal planned for a future major release.
      */
     moveToPrevious(options?: MovementOptions): void {
-        this.component.moveToPrevious(options);
+        this.activatePrevious(options);
     }
 
     maximizeGroup(panel: IDockviewPanel): void {

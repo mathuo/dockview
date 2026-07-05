@@ -4539,6 +4539,64 @@
                 }
             },
             {
+                "name": "activateNext",
+                "code": "(options?: MovementOptions2): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "activateNext",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "options",
+                                "code": "options?: MovementOptions2",
+                                "type": {
+                                    "type": "reference",
+                                    "value": "MovementOptions2",
+                                    "source": "dockview-core"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(options?: MovementOptions2): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "activatePrevious",
+                "code": "(options?: MovementOptions2): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "activatePrevious",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "options",
+                                "code": "options?: MovementOptions2",
+                                "type": {
+                                    "type": "reference",
+                                    "value": "MovementOptions2",
+                                    "source": "dockview-core"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(options?: MovementOptions2): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
                 "name": "addDisposables",
                 "code": "(args: IDisposable[]): void",
                 "kind": "method",
@@ -5030,64 +5088,6 @@
                             "value": "void"
                         },
                         "code": "(panel: BaseGrid.T): void",
-                        "kind": "callSignature"
-                    }
-                ]
-            },
-            {
-                "name": "moveToNext",
-                "code": "(options?: MovementOptions2): void",
-                "kind": "method",
-                "signature": [
-                    {
-                        "name": "moveToNext",
-                        "typeParameters": [],
-                        "parameters": [
-                            {
-                                "name": "options",
-                                "code": "options?: MovementOptions2",
-                                "type": {
-                                    "type": "reference",
-                                    "value": "MovementOptions2",
-                                    "source": "dockview-core"
-                                },
-                                "kind": "parameter"
-                            }
-                        ],
-                        "returnType": {
-                            "type": "intrinsic",
-                            "value": "void"
-                        },
-                        "code": "(options?: MovementOptions2): void",
-                        "kind": "callSignature"
-                    }
-                ]
-            },
-            {
-                "name": "moveToPrevious",
-                "code": "(options?: MovementOptions2): void",
-                "kind": "method",
-                "signature": [
-                    {
-                        "name": "moveToPrevious",
-                        "typeParameters": [],
-                        "parameters": [
-                            {
-                                "name": "options",
-                                "code": "options?: MovementOptions2",
-                                "type": {
-                                    "type": "reference",
-                                    "value": "MovementOptions2",
-                                    "source": "dockview-core"
-                                },
-                                "kind": "parameter"
-                            }
-                        ],
-                        "returnType": {
-                            "type": "intrinsic",
-                            "value": "void"
-                        },
-                        "code": "(options?: MovementOptions2): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -5988,7 +5988,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "redo",
-                                "target": 7355
+                                "target": 7367
                             },
                             {
                                 "kind": "text",
@@ -6013,7 +6013,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "redo",
-                            "target": 7355
+                            "target": 7367
                         },
                         {
                             "kind": "text",
@@ -6038,7 +6038,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "undo",
-                                "target": 7381
+                                "target": 7393
                             },
                             {
                                 "kind": "text",
@@ -6048,7 +6048,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "onDidChangeHistory",
-                                "target": 7168
+                                "target": 7174
                             },
                             {
                                 "kind": "text",
@@ -6073,7 +6073,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "undo",
-                            "target": 7381
+                            "target": 7393
                         },
                         {
                             "kind": "text",
@@ -6083,7 +6083,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "onDidChangeHistory",
-                            "target": 7168
+                            "target": 7174
                         },
                         {
                             "kind": "text",
@@ -6424,7 +6424,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "DockviewOrigin",
-                                "target": 12260
+                                "target": 12272
                             },
                             {
                                 "kind": "text",
@@ -6481,7 +6481,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewOrigin",
-                            "target": 12260
+                            "target": 12272
                         },
                         {
                             "kind": "text",
@@ -7279,7 +7279,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "onDidAddPopoutGroup",
-                                "target": 7166
+                                "target": 7172
                             },
                             {
                                 "kind": "text",
@@ -7312,7 +7312,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "onDidAddPopoutGroup",
-                            "target": 7166
+                            "target": 7172
                         },
                         {
                             "kind": "text",
@@ -7815,7 +7815,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "undo",
-                                "target": 7381
+                                "target": 7393
                             },
                             {
                                 "kind": "text",
@@ -7825,7 +7825,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "redo",
-                                "target": 7355
+                                "target": 7367
                             },
                             {
                                 "kind": "text",
@@ -7835,7 +7835,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "fromJSON",
-                                "target": 7296
+                                "target": 7308
                             },
                             {
                                 "kind": "text",
@@ -7867,7 +7867,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "undo",
-                            "target": 7381
+                            "target": 7393
                         },
                         {
                             "kind": "text",
@@ -7877,7 +7877,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "redo",
-                            "target": 7355
+                            "target": 7367
                         },
                         {
                             "kind": "text",
@@ -7887,7 +7887,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "fromJSON",
-                            "target": 7296
+                            "target": 7308
                         },
                         {
                             "kind": "text",
@@ -7950,7 +7950,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "setSmartGuidesEnabled",
-                                "target": 7376
+                                "target": 7388
                             },
                             {
                                 "kind": "text",
@@ -7983,7 +7983,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "setSmartGuidesEnabled",
-                            "target": 7376
+                            "target": 7388
                         },
                         {
                             "kind": "text",
@@ -8102,6 +8102,128 @@
                         {
                             "kind": "text",
                             "text": "Width of the component."
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "activateNext",
+                "code": "(options?: MovementOptions): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "activateNext",
+                        "comment": {
+                            "summary": [
+                                {
+                                    "kind": "text",
+                                    "text": "Activate the next panel or group, moving focus programmatically. Pass\n"
+                                },
+                                {
+                                    "kind": "code",
+                                    "text": "`{ includePanel: true }`"
+                                },
+                                {
+                                    "kind": "text",
+                                    "text": " to step through the panels of the active group\nbefore advancing to the next group."
+                                }
+                            ]
+                        },
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "options",
+                                "code": "options?: MovementOptions",
+                                "type": {
+                                    "type": "reference",
+                                    "value": "MovementOptions",
+                                    "source": "dockview-core"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(options?: MovementOptions): void",
+                        "kind": "callSignature"
+                    }
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Activate the next panel or group, moving focus programmatically. Pass\n"
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`{ includePanel: true }`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " to step through the panels of the active group\nbefore advancing to the next group."
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "activatePrevious",
+                "code": "(options?: MovementOptions): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "activatePrevious",
+                        "comment": {
+                            "summary": [
+                                {
+                                    "kind": "text",
+                                    "text": "Activate the previous panel or group, moving focus programmatically. Pass\n"
+                                },
+                                {
+                                    "kind": "code",
+                                    "text": "`{ includePanel: true }`"
+                                },
+                                {
+                                    "kind": "text",
+                                    "text": " to step through the panels of the active group\nbefore advancing to the previous group."
+                                }
+                            ]
+                        },
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "options",
+                                "code": "options?: MovementOptions",
+                                "type": {
+                                    "type": "reference",
+                                    "value": "MovementOptions",
+                                    "source": "dockview-core"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(options?: MovementOptions): void",
+                        "kind": "callSignature"
+                    }
+                ],
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Activate the previous panel or group, moving focus programmatically. Pass\n"
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`{ includePanel: true }`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " to step through the panels of the active group\nbefore advancing to the previous group."
                         }
                     ]
                 }
@@ -9645,10 +9767,26 @@
                     {
                         "name": "moveToNext",
                         "comment": {
-                            "summary": [
+                            "summary": [],
+                            "blockTags": [
                                 {
-                                    "kind": "text",
-                                    "text": "Move the focus progmatically to the next panel or group."
+                                    "tag": "@deprecated",
+                                    "content": [
+                                        {
+                                            "kind": "text",
+                                            "text": "Use "
+                                        },
+                                        {
+                                            "kind": "inline-tag",
+                                            "tag": "@link",
+                                            "text": "DockviewApi.activateNext",
+                                            "target": 7242
+                                        },
+                                        {
+                                            "kind": "text",
+                                            "text": " instead. Renamed because\nthis advances the active panel/group (focus), it does not relocate a\npanel. Removal planned for a future major release."
+                                        }
+                                    ]
                                 }
                             ]
                         },
@@ -9674,10 +9812,26 @@
                     }
                 ],
                 "comment": {
-                    "summary": [
+                    "summary": [],
+                    "blockTags": [
                         {
-                            "kind": "text",
-                            "text": "Move the focus progmatically to the next panel or group."
+                            "tag": "@deprecated",
+                            "content": [
+                                {
+                                    "kind": "text",
+                                    "text": "Use "
+                                },
+                                {
+                                    "kind": "inline-tag",
+                                    "tag": "@link",
+                                    "text": "DockviewApi.activateNext",
+                                    "target": 7242
+                                },
+                                {
+                                    "kind": "text",
+                                    "text": " instead. Renamed because\nthis advances the active panel/group (focus), it does not relocate a\npanel. Removal planned for a future major release."
+                                }
+                            ]
                         }
                     ]
                 }
@@ -9690,10 +9844,26 @@
                     {
                         "name": "moveToPrevious",
                         "comment": {
-                            "summary": [
+                            "summary": [],
+                            "blockTags": [
                                 {
-                                    "kind": "text",
-                                    "text": "Move the focus progmatically to the previous panel or group."
+                                    "tag": "@deprecated",
+                                    "content": [
+                                        {
+                                            "kind": "text",
+                                            "text": "Use "
+                                        },
+                                        {
+                                            "kind": "inline-tag",
+                                            "tag": "@link",
+                                            "text": "DockviewApi.activatePrevious",
+                                            "target": 7245
+                                        },
+                                        {
+                                            "kind": "text",
+                                            "text": " instead. Renamed\nbecause this advances the active panel/group (focus), it does not\nrelocate a panel. Removal planned for a future major release."
+                                        }
+                                    ]
                                 }
                             ]
                         },
@@ -9719,10 +9889,26 @@
                     }
                 ],
                 "comment": {
-                    "summary": [
+                    "summary": [],
+                    "blockTags": [
                         {
-                            "kind": "text",
-                            "text": "Move the focus progmatically to the previous panel or group."
+                            "tag": "@deprecated",
+                            "content": [
+                                {
+                                    "kind": "text",
+                                    "text": "Use "
+                                },
+                                {
+                                    "kind": "inline-tag",
+                                    "tag": "@link",
+                                    "text": "DockviewApi.activatePrevious",
+                                    "target": 7245
+                                },
+                                {
+                                    "kind": "text",
+                                    "text": " instead. Renamed\nbecause this advances the active panel/group (focus), it does not\nrelocate a panel. Removal planned for a future major release."
+                                }
+                            ]
                         }
                     ]
                 }
@@ -9875,7 +10061,7 @@
                                     "kind": "inline-tag",
                                     "tag": "@link",
                                     "text": "undo",
-                                    "target": 7381
+                                    "target": 7393
                                 },
                                 {
                                     "kind": "text",
@@ -9903,7 +10089,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "undo",
-                            "target": 7381
+                            "target": 7393
                         },
                         {
                             "kind": "text",
@@ -12187,6 +12373,64 @@
                 }
             },
             {
+                "name": "activateNext",
+                "code": "(options: MovementOptions): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "activateNext",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "options",
+                                "code": "options: MovementOptions",
+                                "type": {
+                                    "type": "reference",
+                                    "value": "MovementOptions",
+                                    "source": "dockview-core"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(options: MovementOptions): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "activatePrevious",
+                "code": "(options: MovementOptions): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "activatePrevious",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "options",
+                                "code": "options: MovementOptions",
+                                "type": {
+                                    "type": "reference",
+                                    "value": "MovementOptions",
+                                    "source": "dockview-core"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(options: MovementOptions): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
                 "name": "addDisposables",
                 "code": "(args: IDisposable[]): void",
                 "kind": "method",
@@ -13043,7 +13287,7 @@
                                     "kind": "inline-tag",
                                     "tag": "@link",
                                     "text": "DockviewApi",
-                                    "target": 7128
+                                    "target": 7134
                                 },
                                 {
                                     "kind": "text",
@@ -13088,7 +13332,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewApi",
-                            "target": 7128
+                            "target": 7134
                         },
                         {
                             "kind": "text",
@@ -15279,64 +15523,6 @@
                 ]
             },
             {
-                "name": "moveToNext",
-                "code": "(options: MovementOptions): void",
-                "kind": "method",
-                "signature": [
-                    {
-                        "name": "moveToNext",
-                        "typeParameters": [],
-                        "parameters": [
-                            {
-                                "name": "options",
-                                "code": "options: MovementOptions",
-                                "type": {
-                                    "type": "reference",
-                                    "value": "MovementOptions",
-                                    "source": "dockview-core"
-                                },
-                                "kind": "parameter"
-                            }
-                        ],
-                        "returnType": {
-                            "type": "intrinsic",
-                            "value": "void"
-                        },
-                        "code": "(options: MovementOptions): void",
-                        "kind": "callSignature"
-                    }
-                ]
-            },
-            {
-                "name": "moveToPrevious",
-                "code": "(options: MovementOptions): void",
-                "kind": "method",
-                "signature": [
-                    {
-                        "name": "moveToPrevious",
-                        "typeParameters": [],
-                        "parameters": [
-                            {
-                                "name": "options",
-                                "code": "options: MovementOptions",
-                                "type": {
-                                    "type": "reference",
-                                    "value": "MovementOptions",
-                                    "source": "dockview-core"
-                                },
-                                "kind": "parameter"
-                            }
-                        ],
-                        "returnType": {
-                            "type": "intrinsic",
-                            "value": "void"
-                        },
-                        "code": "(options: MovementOptions): void",
-                        "kind": "callSignature"
-                    }
-                ]
-            },
-            {
                 "name": "movingLock",
                 "code": "(func: (): T): T",
                 "kind": "method",
@@ -15899,7 +16085,7 @@
             },
             {
                 "name": "removePanel",
-                "code": "(panel: IDockviewPanel, options: { removeEmptyGroup: boolean, skipDispose?: boolean, skipSetActiveGroup?: boolean }): void",
+                "code": "(panel: IDockviewPanel, options?: { removeEmptyGroup?: boolean, skipDispose?: boolean, skipSetActiveGroup?: boolean }): void",
                 "kind": "method",
                 "signature": [
                     {
@@ -15918,12 +16104,12 @@
                             },
                             {
                                 "name": "options",
-                                "code": "options: { removeEmptyGroup: boolean, skipDispose?: boolean, skipSetActiveGroup?: boolean }",
+                                "code": "options?: { removeEmptyGroup?: boolean, skipDispose?: boolean, skipSetActiveGroup?: boolean }",
                                 "type": {
                                     "type": "reflection",
                                     "value": {
                                         "name": "__type",
-                                        "code": "{ removeEmptyGroup: boolean, skipDispose?: boolean, skipSetActiveGroup?: boolean }",
+                                        "code": "{ removeEmptyGroup?: boolean, skipDispose?: boolean, skipSetActiveGroup?: boolean }",
                                         "kind": "typeLiteral",
                                         "properties": [
                                             {
@@ -15934,7 +16120,9 @@
                                                     "type": "intrinsic",
                                                     "value": "boolean"
                                                 },
-                                                "flags": {}
+                                                "flags": {
+                                                    "isOptional": true
+                                                }
                                             },
                                             {
                                                 "name": "skipDispose",
@@ -15970,7 +16158,7 @@
                             "type": "intrinsic",
                             "value": "void"
                         },
-                        "code": "(panel: IDockviewPanel, options: { removeEmptyGroup: boolean, skipDispose?: boolean, skipSetActiveGroup?: boolean }): void",
+                        "code": "(panel: IDockviewPanel, options?: { removeEmptyGroup?: boolean, skipDispose?: boolean, skipSetActiveGroup?: boolean }): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -25908,6 +26096,64 @@
                 }
             },
             {
+                "name": "activateNext",
+                "code": "(options?: MovementOptions2): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "activateNext",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "options",
+                                "code": "options?: MovementOptions2",
+                                "type": {
+                                    "type": "reference",
+                                    "value": "MovementOptions2",
+                                    "source": "dockview-core"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(options?: MovementOptions2): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "activatePrevious",
+                "code": "(options?: MovementOptions2): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "activatePrevious",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "options",
+                                "code": "options?: MovementOptions2",
+                                "type": {
+                                    "type": "reference",
+                                    "value": "MovementOptions2",
+                                    "source": "dockview-core"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(options?: MovementOptions2): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
                 "name": "addDisposables",
                 "code": "(args: IDisposable[]): void",
                 "kind": "method",
@@ -26587,64 +26833,6 @@
                             "value": "void"
                         },
                         "code": "(panel: GridviewPanel, options: { direction: Direction, reference: string, size?: number }): void",
-                        "kind": "callSignature"
-                    }
-                ]
-            },
-            {
-                "name": "moveToNext",
-                "code": "(options?: MovementOptions2): void",
-                "kind": "method",
-                "signature": [
-                    {
-                        "name": "moveToNext",
-                        "typeParameters": [],
-                        "parameters": [
-                            {
-                                "name": "options",
-                                "code": "options?: MovementOptions2",
-                                "type": {
-                                    "type": "reference",
-                                    "value": "MovementOptions2",
-                                    "source": "dockview-core"
-                                },
-                                "kind": "parameter"
-                            }
-                        ],
-                        "returnType": {
-                            "type": "intrinsic",
-                            "value": "void"
-                        },
-                        "code": "(options?: MovementOptions2): void",
-                        "kind": "callSignature"
-                    }
-                ]
-            },
-            {
-                "name": "moveToPrevious",
-                "code": "(options?: MovementOptions2): void",
-                "kind": "method",
-                "signature": [
-                    {
-                        "name": "moveToPrevious",
-                        "typeParameters": [],
-                        "parameters": [
-                            {
-                                "name": "options",
-                                "code": "options?: MovementOptions2",
-                                "type": {
-                                    "type": "reference",
-                                    "value": "MovementOptions2",
-                                    "source": "dockview-core"
-                                },
-                                "kind": "parameter"
-                            }
-                        ],
-                        "returnType": {
-                            "type": "intrinsic",
-                            "value": "void"
-                        },
-                        "code": "(options?: MovementOptions2): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -36781,7 +36969,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "focusOut",
-                            "target": 9870
+                            "target": 9882
                         },
                         {
                             "kind": "text",
@@ -36799,7 +36987,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "elements",
-                            "target": 9866
+                            "target": 9878
                         },
                         {
                             "kind": "text",
@@ -36866,7 +37054,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DismissableLayerOptions.elements",
-                            "target": 9866
+                            "target": 9878
                         },
                         {
                             "kind": "text",
@@ -38047,7 +38235,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewOrigin",
-                            "target": 12260
+                            "target": 12272
                         },
                         {
                             "kind": "text",
@@ -39867,7 +40055,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "AnnouncementEvent",
-                            "target": 9795
+                            "target": 9807
                         },
                         {
                             "kind": "text",
@@ -40371,7 +40559,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DroptargetOverlayModel",
-                            "target": 12266
+                            "target": 12278
                         },
                         {
                             "kind": "text",
@@ -40434,7 +40622,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "Position",
-                            "target": 12308
+                            "target": 12320
                         },
                         {
                             "kind": "text",
@@ -40452,7 +40640,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewApi.updateOptions",
-                            "target": 7383
+                            "target": 7395
                         },
                         {
                             "kind": "text",
@@ -41141,7 +41329,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewMessages",
-                            "target": 10041
+                            "target": 10053
                         },
                         {
                             "kind": "text",
@@ -43915,7 +44103,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewOptions.smartGuides",
-                            "target": 10166
+                            "target": 10178
                         },
                         {
                             "kind": "text",
@@ -43962,7 +44150,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewOptions.floatingGroupDragHandle",
-                            "target": 10141
+                            "target": 10153
                         },
                         {
                             "kind": "text",
@@ -49530,6 +49718,64 @@
                 }
             },
             {
+                "name": "activateNext",
+                "code": "(options?: MovementOptions): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "activateNext",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "options",
+                                "code": "options?: MovementOptions",
+                                "type": {
+                                    "type": "reference",
+                                    "value": "MovementOptions",
+                                    "source": "dockview-core"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(options?: MovementOptions): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
+                "name": "activatePrevious",
+                "code": "(options?: MovementOptions): void",
+                "kind": "method",
+                "signature": [
+                    {
+                        "name": "activatePrevious",
+                        "typeParameters": [],
+                        "parameters": [
+                            {
+                                "name": "options",
+                                "code": "options?: MovementOptions",
+                                "type": {
+                                    "type": "reference",
+                                    "value": "MovementOptions",
+                                    "source": "dockview-core"
+                                },
+                                "kind": "parameter"
+                            }
+                        ],
+                        "returnType": {
+                            "type": "intrinsic",
+                            "value": "void"
+                        },
+                        "code": "(options?: MovementOptions): void",
+                        "kind": "callSignature"
+                    }
+                ]
+            },
+            {
                 "name": "addEdgeGroup",
                 "code": "(position: EdgeGroupPosition, options: EdgeGroupOptions): DockviewGroupPanelApi",
                 "kind": "method",
@@ -50442,64 +50688,6 @@
                             "value": "void"
                         },
                         "code": "(options: MoveGroupOrPanelOptions): void",
-                        "kind": "callSignature"
-                    }
-                ]
-            },
-            {
-                "name": "moveToNext",
-                "code": "(options?: MovementOptions): void",
-                "kind": "method",
-                "signature": [
-                    {
-                        "name": "moveToNext",
-                        "typeParameters": [],
-                        "parameters": [
-                            {
-                                "name": "options",
-                                "code": "options?: MovementOptions",
-                                "type": {
-                                    "type": "reference",
-                                    "value": "MovementOptions",
-                                    "source": "dockview-core"
-                                },
-                                "kind": "parameter"
-                            }
-                        ],
-                        "returnType": {
-                            "type": "intrinsic",
-                            "value": "void"
-                        },
-                        "code": "(options?: MovementOptions): void",
-                        "kind": "callSignature"
-                    }
-                ]
-            },
-            {
-                "name": "moveToPrevious",
-                "code": "(options?: MovementOptions): void",
-                "kind": "method",
-                "signature": [
-                    {
-                        "name": "moveToPrevious",
-                        "typeParameters": [],
-                        "parameters": [
-                            {
-                                "name": "options",
-                                "code": "options?: MovementOptions",
-                                "type": {
-                                    "type": "reference",
-                                    "value": "MovementOptions",
-                                    "source": "dockview-core"
-                                },
-                                "kind": "parameter"
-                            }
-                        ],
-                        "returnType": {
-                            "type": "intrinsic",
-                            "value": "void"
-                        },
-                        "code": "(options?: MovementOptions): void",
                         "kind": "callSignature"
                     }
                 ]
@@ -61491,7 +61679,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewKeybindings",
-                            "target": 10029
+                            "target": 10041
                         },
                         {
                             "kind": "text",
@@ -63112,7 +63300,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "PositionResolver",
-                            "target": 11968
+                            "target": 11980
                         },
                         {
                             "kind": "text",
@@ -68478,7 +68666,7 @@
                     "kind": "inline-tag",
                     "tag": "@link",
                     "text": "DockviewApi",
-                    "target": 7128
+                    "target": 7134
                 },
                 {
                     "kind": "text",
