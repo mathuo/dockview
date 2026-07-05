@@ -343,6 +343,12 @@
 // these inline; only the theming lives here (override the CSS vars to restyle).
 .dv-smart-guides {
     pointer-events: none;
+    // The guide layer mounts in `.dv-floating-overlay-host` (z-index: auto, no
+    // stacking context), so it competes directly with the shell-level render
+    // overlays. `always`/force-visible panel content carries an inline z-index
+    // (1000, or `--dv-overlay-z-index` + aria-level) and would otherwise paint
+    // over the alignment lines. Lift the guides clear of that whole band.
+    z-index: calc(var(--dv-overlay-z-index, 999) + 100);
 }
 
 .dv-smart-guide {
