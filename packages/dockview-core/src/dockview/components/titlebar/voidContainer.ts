@@ -90,7 +90,7 @@ export class VoidContainer extends CompositeDisposable {
 
             const data = getPanelData();
 
-            if (data && this.accessor.id === data.viewId) {
+            if (this.accessor.id === data?.viewId) {
                 return true;
             }
 

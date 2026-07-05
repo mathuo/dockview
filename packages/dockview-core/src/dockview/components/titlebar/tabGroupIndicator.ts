@@ -224,11 +224,8 @@ abstract class BaseTabGroupIndicator implements ITabGroupIndicator {
                 tg.collapsed ||
                 tg.panelIds.some((pid) => {
                     const te = tabMap.get(pid);
-                    return (
-                        te &&
-                        te.value.element.classList.contains(
-                            'dv-tab--group-expanding'
-                        )
+                    return te?.value.element.classList.contains(
+                        'dv-tab--group-expanding'
                     );
                 });
 

@@ -897,6 +897,6 @@ export class ShellManager implements IDisposable {
 
     dispose(): void {
         this._disposables.dispose();
-        this._shellElement.parentElement?.removeChild(this._shellElement);
+        this._shellElement.remove();
     }
 }

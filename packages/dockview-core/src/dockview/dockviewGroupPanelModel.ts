@@ -831,7 +831,7 @@ export class DockviewGroupPanelModel
 
         // Remove from any existing group first
         const existingGroup = this.getTabGroupForPanel(panelId);
-        if (existingGroup && existingGroup.id === tabGroupId) {
+        if (existingGroup?.id === tabGroupId) {
             return; // already in this group — no mutation
         }
 
@@ -861,7 +861,7 @@ export class DockviewGroupPanelModel
         newIndex: number
     ): void {
         const tabGroup = this._tabGroupMap.get(tabGroupId);
-        if (!tabGroup || !tabGroup.containsPanel(panelId)) {
+        if (!tabGroup?.containsPanel(panelId)) {
             return;
         }
 
@@ -1133,7 +1133,7 @@ export class DockviewGroupPanelModel
         for (let i = activePanelIndex + 1; i < this._panels.length; i++) {
             const candidate = this._panels[i];
             const candidateGroup = this._findTabGroupForPanel(candidate.id);
-            if (!candidateGroup || !candidateGroup.collapsed) {
+            if (!candidateGroup?.collapsed) {
                 this.doSetActivePanel(candidate);
                 this.updateContainer();
                 return;
@@ -1143,7 +1143,7 @@ export class DockviewGroupPanelModel
         for (let i = activePanelIndex - 1; i >= 0; i--) {
             const candidate = this._panels[i];
             const candidateGroup = this._findTabGroupForPanel(candidate.id);
-            if (!candidateGroup || !candidateGroup.collapsed) {
+            if (!candidateGroup?.collapsed) {
                 this.doSetActivePanel(candidate);
                 this.updateContainer();
                 return;
@@ -1516,7 +1516,7 @@ export class DockviewGroupPanelModel
         if (!this._activePanel && this.panels.length > 0) {
             const candidate = this._panels.find((p) => {
                 const tg = this._findTabGroupForPanel(p.id);
-                return !tg || !tg.collapsed;
+                return !tg?.collapsed;
             });
             if (candidate) {
                 this.doSetActivePanel(candidate);
@@ -1797,7 +1797,7 @@ export class DockviewGroupPanelModel
             return false;
         }
 
-        if (data && data.viewId === this.accessor.id) {
+        if (data?.viewId === this.accessor.id) {
             return true;
         }
 
