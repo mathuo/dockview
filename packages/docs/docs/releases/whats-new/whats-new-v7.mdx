@@ -1,6 +1,6 @@
 ---
 title: What's new in v7
-sidebar_position: 4
+sidebar_position: 2
 description: Highlights and breaking changes in Dockview 7.0 — package realignment, the accessibility pack, and more.
 ---
 
@@ -10,7 +10,7 @@ new [accessibility pack](/docs/advanced/accessibility) covering keyboard
 navigation and screen-reader announcements.
 
 This page covers the headline additions. For the upgrade steps and the
-[breaking changes](#breaking-changes), see [Migrating to v7](/docs/overview/migrating-to-v7).
+[breaking changes](#breaking-changes), see [Migrating to v7](/docs/releases/migrating/migrating-to-v7).
 
 ## Highlights
 
@@ -20,7 +20,7 @@ This page covers the headline additions. For the upgrade steps and the
 `dockview-core`), and the **React bindings moved to `dockview-react`**. Every
 framework package (`dockview-react` / `-vue` / `-angular`) consumes `dockview`.
 React users must switch their imports — see
-[Migrating to v7](/docs/overview/migrating-to-v7#react-users--action-required).
+[Migrating to v7](/docs/releases/migrating/migrating-to-v7#react-users--action-required).
 
 ### Keyboard navigation & announcements
 
@@ -67,7 +67,7 @@ gesture or an API call via `event.origin`. This is a
 ## Breaking changes
 
 v7's breaking changes are covered in full, with codemods, in
-[Migrating to v7](/docs/overview/migrating-to-v7):
+[Migrating to v7](/docs/releases/migrating/migrating-to-v7):
 
 - **Package realignment** — React bindings moved from `dockview` to
   `dockview-react`; `dockview` is now JavaScript core.
@@ -80,5 +80,5 @@ v7's breaking changes are covered in full, with codemods, in
 - **API naming cleanups** — a few public types/events were renamed for
   consistency (e.g. `onUnhandledDragOverEvent` → `onUnhandledDragOver`,
   `PaneviewDropEvent` → `PaneviewDidDropEvent`) and some dead/deprecated members
-  were removed. See [Migrating to v7](/docs/overview/migrating-to-v7) for the
+  were removed. See [Migrating to v7](/docs/releases/migrating/migrating-to-v7) for the
   full table.

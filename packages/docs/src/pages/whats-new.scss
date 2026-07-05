@@ -1,0 +1,80 @@
+.whats-new-page {
+    padding: 56px 0 80px;
+}
+
+.whats-new-hero {
+    max-width: 720px;
+    margin: 0 auto 16px;
+
+    h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 8px;
+    }
+
+    p {
+        color: var(--ifm-color-content-secondary);
+        margin: 0;
+    }
+}
+
+.releases-list {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.release {
+    padding: 24px 0;
+    border-top: 1px solid var(--ifm-toc-border-color);
+}
+
+.release-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.release-version {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--ifm-heading-color);
+
+    &:hover {
+        color: var(--ifm-color-primary);
+        text-decoration: none;
+    }
+}
+
+.release-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--ifm-color-primary);
+    border: 1px solid var(--ifm-color-primary);
+    padding: 2px 7px;
+    border-radius: 999px;
+}
+
+.release-summary {
+    color: var(--ifm-color-content-secondary);
+    line-height: 1.6;
+    margin: 0 0 10px;
+}
+
+.release-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+}
+
+.release-link {
+    font-weight: 600;
+    font-size: 0.95rem;
+
+    &--muted {
+        color: var(--ifm-color-content-secondary);
+        font-weight: 500;
+    }
+}
