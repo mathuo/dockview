@@ -1,6 +1,6 @@
 ---
-title: Tab Header Position
-sidebar_position: 6
+title: Tab header position
+sidebar_position: 9
 description: How to configure the position of the tab header bar on a Dockview group (top or bottom).
 ---
 
@@ -9,7 +9,7 @@ import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 By default the tab bar sits at the top of each group. You can change this to `bottom`, `left`, or `right`, either as a global default for all groups or per group at runtime.
 
-## Global Default
+## Global default
 
 Set `defaultHeaderPosition` in the component options to apply a position to all groups:
 
@@ -18,11 +18,12 @@ Set `defaultHeaderPosition` in the component options to apply a position to all 
 import { createDockview, themeAbyss } from 'dockview';
 
 const api = createDockview(element, {
-    theme: themeAbyss,
-    defaultHeaderPosition: 'bottom', // 'top' | 'bottom' | 'left' | 'right'
-    createComponent: (options) => new MyPanel(),
+theme: themeAbyss,
+defaultHeaderPosition: 'bottom', // 'top' | 'bottom' | 'left' | 'right'
+createComponent: (options) => new MyPanel(),
 });
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='React'>
@@ -32,7 +33,8 @@ const api = createDockview(element, {
     onReady={onReady}
     components={components}
 />
-```
+````
+
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
@@ -55,7 +57,7 @@ template: `
 ```
 </FrameworkSpecific>
 
-## Per-Group at Runtime
+## Per-group at runtime
 
 Each group's API exposes `setHeaderPosition` and `getHeaderPosition`, allowing you to change the tab bar position on individual groups independently:
 
@@ -75,6 +77,12 @@ const onReady = (event: DockviewReadyEvent) => {
 };
 ```
 
-## Live Example
+## Live example
 
-<CodeRunner id="dockview/header-position" height={400}/>
+<CodeRunner id="dockview/header-position" height={400} />
+
+## See also
+
+- [Tabs](/docs/core/panels/tabs) — customise how the tabs in the header are rendered.
+- [Tab overflow](/docs/core/panels/tabOverflow) — how surplus tabs are handled when the header runs out of room.
+- [Multi-row tabs](/docs/core/panels/multiRowTabs) — wrapping tabs, which applies to horizontal headers only.

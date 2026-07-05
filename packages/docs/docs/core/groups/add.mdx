@@ -1,5 +1,5 @@
 ---
-title: Managing Groups
+title: Managing groups
 sidebar_position: 0
 description: How to create, remove, and clear groups programmatically using the Dockview API.
 ---
@@ -8,7 +8,7 @@ import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 This page covers creating, removing, and clearing groups programmatically.
 
-## Adding a Group
+## Adding a group
 
 `api.addGroup()` creates an empty group and returns it. You can position it relative to an existing panel or group, or at an absolute edge of the layout.
 
@@ -43,7 +43,7 @@ api.addPanel({
 });
 ```
 
-## Removing a Group
+## Removing a group
 
 `api.removeGroup()` removes a group and all panels it contains.
 
@@ -62,7 +62,7 @@ You can also close a group through the group API itself:
 panel.group.api.close();
 ```
 
-## Closing All Groups
+## Closing all groups
 
 `api.closeAllGroups()` removes every group and panel from the layout, leaving it empty.
 
@@ -72,7 +72,7 @@ panel.group.api.close();
 api.closeAllGroups();
 ```
 
-## Clearing the Layout
+## Clearing the layout
 
 `api.clear()` resets the component back to a completely empty, default state. It is equivalent to `closeAllGroups()` but also resets any internal state.
 
@@ -86,4 +86,11 @@ Use `api.clear()` before calling `api.fromJSON()` to guarantee a clean starting 
 ```ts
 api.fromJSON(layout, { reuseExistingPanels: true });
 ```
+
 :::
+
+## See also
+
+- [Core concepts](/docs/core/overview) — how panels and groups fit together
+- [Move group](/docs/core/groups/move) — reposition a group once it exists
+- [Group controls](/docs/core/groups/controls) — add custom actions to a group header

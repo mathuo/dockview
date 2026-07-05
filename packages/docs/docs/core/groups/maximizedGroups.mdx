@@ -1,0 +1,70 @@
+---
+title: Maximized groups
+description: How to maximize a group to fill the Dockview viewport and restore it programmatically.
+---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+Maximizing a group temporarily expands it to fill the entire Dockview viewport, hiding the other groups until you restore it — handy for focusing on a single panel without changing the underlying layout.
+
+## Options
+
+<DocRef
+    declaration="DockviewApi"
+    methods={[
+        'maximizeGroup',
+        'hasMaximizedGroup',
+        'exitMaximizedGroup',
+        'onDidMaximizedGroupChange',
+    ]}
+/>
+
+```tsx
+const api: DockviewApi;
+
+// maximize a specified group
+api.maximizeGroup(group);
+
+// check whether a specific group is maximized
+const result: boolean = api.isMaximizedGroup(group);
+
+// if there is any maximized group exit the maximized state
+api.exitMaximizedGroup();
+
+// is there a maximized group
+const result: boolean = api.hasMaximizedGroup();
+```
+
+## Panel API
+
+<DocRef
+    declaration="DockviewPanelApi"
+    methods={['maximize', 'isMaximized', 'exitMaximized']}
+/>
+
+```tsx
+const api: DockviewPanelApi;
+
+// maximize the group
+api.maximize();
+
+// is this group maximized (if another group is maximized this method will still return false)
+const result: boolean = api.isMaximized();
+
+// exit only if this group is maximized (if another group is maximized this has no effect)
+api.exitMaximized();
+```
+
+:::tip
+`api.<maximize|isMaximized|exitMaximized>` is equivalent to `api.group.api.<maximize|isMaximized|exitMaximized>`.
+The methods exist on the panel `api` object for convenience.
+:::
+
+## Live examples
+
+<CodeRunner id="dockview/maximize-group" />
+
+## See also
+
+- [Floating groups](/docs/core/groups/floatingGroups) — float a group above the grid
+- [Popout windows](/docs/core/groups/popoutGroups) — move a group into a separate browser window

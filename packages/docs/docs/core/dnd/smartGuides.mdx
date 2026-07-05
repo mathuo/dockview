@@ -1,7 +1,7 @@
 ---
-title: Smart Guides
+title: Smart guides
 description: Alignment guides and magnetic snapping while dragging floating groups.
-sidebar_position: 6
+sidebar_position: 9
 enterprise: true
 sidebar_custom_props:
     enterprise: true
@@ -32,7 +32,7 @@ Enable Smart Guides through the `smartGuides` option. Omit it entirely to leave 
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="Angular">
-    <DocRef declaration="IDockviewAngularProps" methods={['smartGuides']} />
+    <DocRef declaration="DockviewAngularOptions" methods={['smartGuides']} />
 </FrameworkSpecific>
 
 The `smartGuides` option accepts a `SmartGuidesOptions` object:
@@ -154,8 +154,14 @@ api.onDidSnapTogether((event) => {
 });
 ```
 
-## Live Example
+## Live example
 
 Drag one of the floating groups towards the other, or towards a container edge, to see the alignment guides appear and the group snap into place. Hold `Alt` while dragging to move freely without snapping.
 
 <CodeRunner id="dockview/smart-guides" height={300} />
+
+## See also
+
+- [Drop guide](/docs/core/dnd/dropGuide) — aim-at-a-cell compass for docking into groups.
+- [Drop overlay](/docs/core/dnd/overlay) — shape the drop-preview overlay.
+- [Floating groups](/docs/core/groups/floatingGroups) — the floating groups Smart Guides align and snap.

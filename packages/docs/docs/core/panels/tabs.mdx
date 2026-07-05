@@ -1,18 +1,15 @@
 ---
 title: Tabs
-sidebar_position: 2
+sidebar_position: 5
 description: How to customize tab appearance and behaviour in Dockview, including custom tab components.
 ---
 
-import { MultiFrameworkContainer } from '@site/src/components/ui/container';
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
-import DockviewNative from '@site/sandboxes/fullwidthtab-dockview/src/app';
-import { attach as attachNativeDockview } from '@site/sandboxes/javascript/fullwidthtab-dockview/src/app';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-This section describes how to implement custom tab renderers
+Each panel is represented by a tab in its group's header. Dockview ships a default tab renderer, and this page covers replacing or extending it — custom tab components, accessing panel parameters, context menus, full-width and reorder behaviour, and tab groups.
 
-## Register a Tab Component
+## Register a tab component
 
 <FrameworkSpecific framework='React'>
 ```tsx
@@ -29,13 +26,13 @@ return <div>{/* * logic */}</div>
 }
 };
 
-return <DockviewReact tabComponents={tabComponents}/>
+return <DockviewReact tabComponents={components}/>
 
 ````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
-```tsx
+```ts
 const App = {
     name: 'App',
     components: {
@@ -62,7 +59,7 @@ const App = {
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
-```tsx
+```ts
 @Component({
     selector: 'tab-component-1',
     template: `<div>Custom Tab 1</div>`
@@ -109,7 +106,7 @@ tabComponents = {
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
-```tsx
+```ts
 class CustomTabRenderer implements IHeaderRenderer {
     private readonly _element: HTMLElement;
 
@@ -153,7 +150,7 @@ api.addPanel({
 
 </FrameworkSpecific>
 
-## Default Tab Renderer
+## Default tab renderer
 
 <FrameworkSpecific framework='React'>
 ```jsx
@@ -170,7 +167,7 @@ return <DockviewReact defaultTabRenderer={CustomTabRenderer}/>
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
-```tsx
+```ts
 const App = {
     name: 'App',
     components: {
@@ -197,7 +194,7 @@ const App = {
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
-```tsx
+```ts
 @Component({
     selector: 'custom-tab-renderer',
     template: `<div>Default Tab</div>`
@@ -231,7 +228,7 @@ defaultTabRenderer = CustomTabRenderer;
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
-```tsx
+```ts
 class DefaultTabRenderer implements IHeaderRenderer {
     private readonly _element: HTMLElement;
 
@@ -266,7 +263,7 @@ const api = createDockview(parentElement, {
 
 </FrameworkSpecific>
 
-## Accessing Custom Panel Parameters
+## Accessing custom panel parameters
 
 You can provide a generic type that matches the structure of the expected custom panels parameters
 to provide type-hints for the panel parameters which can be accessed via the `params` option.
@@ -352,7 +349,7 @@ class MyTab implements IHeaderRenderer {
 
 </FrameworkSpecific>
 
-## Extend the Default Tab Implementation
+## Extend the default tab implementation
 
 If you only want to make minor changes to the tab rendering you may be able to use the
 default implementation as a base. This could include:
@@ -397,7 +394,7 @@ The example below shows a custom tab renderer that displays the panel title alon
 
 <CodeRunner id="dockview/custom-header"/>
 
-## Tab Context Menu
+## Tab context menu
 
 Right-clicking a tab can show a context menu. This is opt-in — no menu is shown unless
 `getTabContextMenuItems` is provided. Return an empty array to suppress the menu for specific panels.
@@ -411,7 +408,7 @@ Right-clicking a tab can show a context menu. This is opt-in — no menu is show
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="Angular">
-  <DocRef declaration="IDockviewAngularProps" methods={['getTabContextMenuItems']} />
+  <DocRef declaration="DockviewAngularOptions" methods={['getTabContextMenuItems']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="JavaScript">
@@ -438,7 +435,7 @@ getTabContextMenuItems: (params) => [
     { label: 'Log panel id', action: () => console.log(params.panel.id) },
     { label: 'Disabled entry', action: () => {}, disabled: true },
 ]
-```
+````
 
 ### Custom component items
 
@@ -450,12 +447,11 @@ The component receives `panel`, `group`, `api`, `close`, and an optional `compon
 import { IContextMenuItemComponentProps } from 'dockview-react';
 
 const FloatMenuItem = ({ panel, api, close }: IContextMenuItemComponentProps) => (
-    <div
-        className="dv-context-menu-item"
-        onClick={() => { api.addFloatingGroup(panel); close(); }}
-    >
-        Float tab
-    </div>
+<div
+className="dv-context-menu-item"
+onClick={() => { api.addFloatingGroup(panel); close(); }} >
+Float tab
+</div>
 );
 
 <DockviewReact
@@ -502,8 +498,10 @@ export class FloatMenuItemComponent {
         this.api.addFloatingGroup(this.panel);
         this.close();
     }
+
 }
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="JavaScript">
@@ -523,35 +521,39 @@ class FloatMenuItem {
 
     dispose() {}
 }
-```
+````
+
 </FrameworkSpecific>
 
-<CodeRunner id="dockview/context-menu"/>
+<CodeRunner id="dockview/context-menu" />
 
-## Full Width Tab
+## Full width tab
 
 When a group has only one single tab you may want that tab to take the full width.
 
-<FrameworkSpecific framework='React'>
-  <DocRef declaration="IDockviewReactProps" methods={['singleTabMode']} />
+<FrameworkSpecific framework="React">
+    <DocRef declaration="IDockviewReactProps" methods={['singleTabMode']} />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Vue'>
-  <DocRef declaration="IDockviewVueProps" methods={['singleTabMode']} />
+<FrameworkSpecific framework="Vue">
+    <DocRef declaration="IDockviewVueProps" methods={['singleTabMode']} />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Angular'>
-  <DocRef declaration="IDockviewAngularProps" methods={['singleTabMode']} />
+<FrameworkSpecific framework="Angular">
+    <DocRef declaration="DockviewAngularOptions" methods={['singleTabMode']} />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='JavaScript'>
-  <DocRef declaration="DockviewComponentOptions" methods={['singleTabMode']} />
+<FrameworkSpecific framework="JavaScript">
+    <DocRef
+        declaration="DockviewComponentOptions"
+        methods={['singleTabMode']}
+    />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='React'>
 ```tsx
 return <DockviewReactComponent singleTabMode="fullwidth" />
-````
+```
 
 </FrameworkSpecific>
 
@@ -575,19 +577,15 @@ const api = createDockview(parentElement, {
 ```
 </FrameworkSpecific>
 
-<MultiFrameworkContainer
-    sandboxId="fullwidthtab-dockview"
-    react={DockviewNative}
-    typescript={attachNativeDockview}
-/>
+<CodeRunner id="dockview/full-width-tab" />
 
-## Tab Reorder Mode
+## Tab reorder mode
 
-Controls how tabs animate when reordered via drag-and-drop.
+Controls how tabs animate when reordered via drag and drop.
 
-| Mode        | Behavior                                                                        |
+| Mode        | Behaviour                                                                       |
 | ----------- | ------------------------------------------------------------------------------- |
-| `'default'` | Tabs swap positions instantly on drop — the original behavior.                  |
+| `'default'` | Tabs swap positions instantly on drop — the original behaviour.                 |
 | `'smooth'`  | Tabs slide smoothly to open a gap for the dragged tab, similar to browser tabs. |
 
 <CodeRunner id="dockview/tabview" height={300} />
@@ -605,6 +603,40 @@ return <DockviewReact theme={myTheme} />
 ````
 </FrameworkSpecific>
 
+<FrameworkSpecific framework='Vue'>
+```vue
+<script setup lang="ts">
+import { themeAbyss } from 'dockview-vue';
+
+const theme = { ...themeAbyss, tabAnimation: 'smooth' as const };
+</script>
+
+<template>
+    <dockview-vue :theme="theme" @ready="onReady" />
+</template>
+````
+
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Angular'>
+```ts
+import { themeAbyss } from 'dockview-angular';
+
+@Component({
+template: `         <dv-dockview
+            [theme]="theme"
+            (ready)="onReady($event)">
+        </dv-dockview>
+    `,
+})
+export class AppComponent {
+theme = { ...themeAbyss, tabAnimation: 'smooth' as const };
+// ...
+}
+
+````
+</FrameworkSpecific>
+
 <FrameworkSpecific framework='JavaScript'>
 ```ts
 const api = createDockview(parentElement, {
@@ -617,15 +649,15 @@ api.updateOptions({ theme: { ...themeAbyss, tabAnimation: 'smooth' } });
 
 </FrameworkSpecific>
 
-## Tab Groups
+## Tab groups
 
-Tab groups let you visually organize tabs within a panel using colored chips.
-Tabs can be grouped, collapsed, expanded, recolored, and reordered via drag-and-drop.
+Tab groups let you visually organise tabs within a panel using coloured chips.
+Tabs can be grouped, collapsed, expanded, recoloured, and reordered via drag and drop.
 Right-click a chip or tab to see available actions.
 
 <CodeRunner id="dockview/tab-groups" height={400} />
 
-### Creating and Managing Tab Groups
+### Creating and managing tab groups
 
 Use `DockviewApi` to create tab groups and assign panels to them:
 
@@ -664,7 +696,7 @@ api.moveTabGroup({
 });
 ```
 
-### Querying Tab Groups
+### Querying tab groups
 
 ```ts
 // Get all tab groups in a group panel
@@ -712,7 +744,7 @@ tabGroup.indexOfPanel('panel-1');
 
 `tabGroup.color` is any CSS color string — either an id from the active palette
 or a raw CSS literal (`'#abc123'`, `'rgb(...)'`). Resolution to a concrete value
-is handled by the dockview's color palette.
+is handled by Dockview's color palette.
 
 The default palette ships with 9 named entries:
 
@@ -752,6 +784,20 @@ const tabGroupColors = [
     ```
 </FrameworkSpecific>
 
+<FrameworkSpecific framework="Vue">
+```vue
+<template>
+    <dockview-vue :tabGroupColors="tabGroupColors" />
+</template>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+```html
+<dv-dockview [tabGroupColors]="tabGroupColors"></dv-dockview>
+```
+</FrameworkSpecific>
+
 <FrameworkSpecific framework="JavaScript">
 ```ts
 const api = createDockview(parentElement, { tabGroupColors });
@@ -768,7 +814,7 @@ chip renderers that want to read from it (e.g. to render their own picker).
 #### Disabling color
 
 Set `tabGroupAccent: 'off'` to opt out of the built-in color concept entirely.
-The dockview stops writing the `--dv-tab-group-color` custom property, hides
+Dockview stops writing the `--dv-tab-group-color` custom property, hides
 the color picker, and applies `dv-tab-group-chip--accent-off` to chips. The
 `tabGroup.color` field is still preserved as data — pair this with a
 `createTabGroupChipComponent` to own the chip visual end-to-end.
@@ -782,6 +828,27 @@ the color picker, and applies `dv-tab-group-chip--accent-off` to chips. The
 />
 ````
 
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+```vue
+<template>
+    <dockview-vue
+        tabGroupAccent="off"
+        tabGroupChipComponent="MyCustomChip"
+        :components="{ MyCustomChip }"
+    />
+</template>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+```html
+<dv-dockview
+    [tabGroupAccent]="'off'"
+    [tabGroupChipComponent]="MyCustomChip">
+</dv-dockview>
+```
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="JavaScript">
@@ -834,7 +901,7 @@ tabGroup.onDidDestroy(() => {});
 
 > See [Events](/docs/core/events#tab-groups) for the full event reference.
 
-### Chip Context Menu
+### Chip context menu
 
 Right-clicking a tab group chip can show a context menu. This is opt-in — no menu is shown unless
 `getTabGroupChipContextMenuItems` is provided. Return an empty array to suppress the menu for specific chips.
@@ -855,7 +922,7 @@ Right-clicking a tab group chip can show a context menu. This is opt-in — no m
 
 <FrameworkSpecific framework="Angular">
     <DocRef
-        declaration="IDockviewAngularProps"
+        declaration="DockviewAngularOptions"
         methods={['getTabGroupChipContextMenuItems']}
     />
 </FrameworkSpecific>
@@ -897,7 +964,7 @@ getTabGroupChipContextMenuItems: (params) => [
 ];
 ```
 
-### Custom Chip Renderer
+### Custom chip renderer
 
 To fully customize how tab group chips look, provide a `createTabGroupChipComponent` factory. It receives the `ITabGroup` and must return an `ITabGroupChipRenderer`.
 
@@ -917,7 +984,7 @@ To fully customize how tab group chips look, provide a `createTabGroupChipCompon
 
 <FrameworkSpecific framework="Angular">
     <DocRef
-        declaration="IDockviewAngularProps"
+        declaration="DockviewAngularOptions"
         methods={['createTabGroupChipComponent']}
     />
 </FrameworkSpecific>
@@ -971,7 +1038,7 @@ createTabGroupChipComponent: (tabGroup) => new MyChipRenderer(),
 
 ### Styling
 
-Tab group appearance can be customized through CSS custom properties:
+Tab group appearance can be customised through CSS custom properties:
 
 | Property | Default | Description |
 | --- | --- | --- |
@@ -1005,7 +1072,7 @@ interface SerializedTabGroup {
 }
 ````
 
-## Tab Height
+## Tab height
 
 Tab height can be controlled through CSS.
 

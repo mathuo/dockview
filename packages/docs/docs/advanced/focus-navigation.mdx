@@ -1,5 +1,5 @@
 ---
-title: Focus Navigation
+title: Focus navigation
 description: Free, framework-agnostic DockviewApi methods for moving focus between panels and groups programmatically.
 sidebar_position: 3
 ---
@@ -10,9 +10,9 @@ and work in every framework binding — useful for wiring up your own keyboard
 shortcut handlers. The rebindable keymap and keyboard docking are a separate,
 enterprise feature covered in [Keyboard Navigation](/docs/advanced/keyboard).
 
-## Programmatic Focus Navigation
+## Programmatic focus navigation
 
-`DockviewApi` provides two methods for moving focus between panels and groups programmatically, useful for building keyboard shortcut handlers:
+The two core methods are `moveToNext` and `moveToPrevious`:
 
 ```ts
 // Move focus to the next panel or group
@@ -37,7 +37,7 @@ api.moveToNext();
 api.moveToNext({ includePanel: true });
 ```
 
-## Spatial Navigation
+## Spatial navigation
 
 `moveToNext` / `moveToPrevious` cycle through groups in list order. To navigate by _visual_ direction instead, `adjacentGroupInDirection` returns the nearest grid group to the left, right, above, or below a given group (by comparing their centre points). Floating and popout groups are ignored, and it returns `undefined` when there is no group in that direction.
 
@@ -48,7 +48,7 @@ if (left) {
 }
 ```
 
-Each group also exposes its rendered geometry, relative to the top-left of the dockview root, via `group.api.boundingBox` (`undefined` for popout groups). Combined with `api.groups`, this lets you build a custom spatial map or overview:
+Each group also exposes its rendered geometry, relative to the top-left of the Dockview root, via `group.api.boundingBox` (`undefined` for popout groups). Combined with `api.groups`, this lets you build a custom spatial map or overview:
 
 ```ts
 const layout = api.groups.map((group) => ({
@@ -56,3 +56,8 @@ const layout = api.groups.map((group) => ({
     box: group.api.boundingBox,
 }));
 ```
+
+## See also
+
+- [Keyboard](/docs/advanced/keyboard) — the rebindable keymap and keyboard-driven docking built on top of these primitives
+- [Accessibility](/docs/advanced/accessibility) — the ARIA semantics and within-strip keyboard navigation Dockview ships by default

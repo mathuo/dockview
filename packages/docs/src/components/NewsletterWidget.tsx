@@ -34,20 +34,45 @@ const CloseIcon = () => (
     </svg>
 );
 
+const DISMISS_KEY = 'dv-newsletter-dismissed';
+
 export default function NewsletterWidget() {
-    const [hidden, setHidden] = React.useState(false);
+    // Start hidden during SSR / first paint, then reveal only if the visitor
+    // hasn't previously dismissed it. This avoids a flash on dismissed sessions.
+    const [hidden, setHidden] = React.useState(true);
+
+    React.useEffect(() => {
+        try {
+            setHidden(localStorage.getItem(DISMISS_KEY) === 'true');
+        } catch {
+            setHidden(false);
+        }
+    }, []);
+
+    const dismiss = () => {
+        setHidden(true);
+        try {
+            localStorage.setItem(DISMISS_KEY, 'true');
+        } catch {
+            /* storage unavailable — dismissal just won't persist */
+        }
+    };
 
     if (hidden) return null;
 
     return (
         <div className={styles.wrapper}>
-            <Link to="/newsletter" className={styles.trigger} aria-label="Newsletter signup">
+            <Link
+                to="/newsletter"
+                className={styles.trigger}
+                aria-label="Newsletter signup"
+            >
                 <MailIcon />
                 <span>Newsletter</span>
             </Link>
             <button
                 className={styles.dismiss}
-                onClick={() => setHidden(true)}
+                onClick={dismiss}
                 aria-label="Dismiss newsletter"
             >
                 <CloseIcon />

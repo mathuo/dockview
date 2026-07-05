@@ -1,5 +1,5 @@
 ---
-title: Auto-hide Edge Groups
+title: Auto-hide edge groups
 description: Turn a collapsed edge group into a Visual Studio-style pinnable tool window that peeks open as an overlay on demand, without reflowing the grid.
 sidebar_position: 6
 enterprise: true
@@ -130,3 +130,8 @@ groupApi?.onDidPeekChange((event) => {
 :::info
 The peek overlay shares the same stacking context as floating and popout groups, so it layers correctly above them without any manual `z-index` handling. Auto-hide is only available for edge groups; it has no effect on grid, floating, or popout groups.
 :::
+
+## See also
+
+- [Edge groups](/docs/core/groups/edgeGroups) — creating, sizing, collapsing, and serializing edge groups
+- [Group controls](/docs/core/groups/controls) — render controls specific to edge groups via the `location` prop

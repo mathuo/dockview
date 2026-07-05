@@ -121,7 +121,7 @@ const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
             }
         });
 
-        const disposable = api.onUnhandledDragOverEvent((event) => {
+        const disposable = api.onUnhandledDragOver((event) => {
             event.accept();
         });
 

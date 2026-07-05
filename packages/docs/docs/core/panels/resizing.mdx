@@ -1,20 +1,22 @@
 ---
 title: Resizing
+sidebar_position: 11
 description: How to programmatically resize a panel in Dockview.
 ---
 
-This section describes how to programatically resize a panel.
+Panels are sized indirectly through the group that contains them. The panel API mirrors the group's resize methods, so you can set a panel's height and width — or observe dimension changes — without reaching for the group directly.
 
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-<DocRef declaration="DockviewPanelApi" methods={['height', 'width', 'setSize', 'onDidDimensionsChange']} />
+<DocRef
+    declaration="DockviewPanelApi"
+    methods={['height', 'width', 'setSize', 'onDidDimensionsChange']}
+/>
 
+## Panel resizing
 
-
-## Panel Resizing
-
-Each dock contains groups and each group contains panels.
+Each Dockview instance contains groups and each group contains panels.
 Logically a user may want to resize a panel but this really translates to resizing the group which contains that panel.
 
 The panel resize methods are repeats of the same resize methods found on the group.
@@ -38,4 +40,9 @@ props.api.group.api.setSize({
 
 You can see an example invoking both approaches below.
 
-<CodeRunner id="dockview/resize"/>
+<CodeRunner id="dockview/resize" />
+
+## See also
+
+- [Adding panels](/docs/core/panels/add) — set `initialWidth`/`initialHeight` and minimum/maximum size constraints when creating a panel.
+- [Panel API](/docs/api/dockview/panelApi) — the panel API surface that exposes `setSize`, `height`, `width` and `onDidDimensionsChange`.

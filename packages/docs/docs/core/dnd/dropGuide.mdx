@@ -1,6 +1,6 @@
 ---
-title: 'Drop Guide'
-sidebar_position: 6
+title: 'Drop guide'
+sidebar_position: 8
 description: Show a VS Code-style aim-at-a-cell compass while dragging over a group.
 enterprise: true
 sidebar_custom_props:
@@ -31,10 +31,10 @@ unchanged.
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="Angular">
-    <DocRef declaration="IDockviewAngularProps" methods={['dndGuide']} />
+    <DocRef declaration="DockviewAngularOptions" methods={['dndGuide']} />
 </FrameworkSpecific>
 
-```tsx
+```ts
 const api = createDockview(element, {
     // enable the compass with default configuration
     dndGuide: true,
@@ -56,7 +56,7 @@ groups in floating containers and popout windows.
 
 Pass an object instead of `true` to restrict the guide:
 
-```tsx
+```ts
 const api = createDockview(element, {
     dndGuide: {
         // only offer these inner cells (default: all accepted zones)
@@ -71,7 +71,7 @@ const api = createDockview(element, {
   Defaults to all zones the target accepts.
 - `edges` — include the **outer** whole-layout-edge cells. Defaults to `true`; set `false` for group-only docking.
 
-## Live Example
+## Live example
 
 <CodeRunner id="dockview/drop-guide" height={300} />
 

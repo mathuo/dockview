@@ -1,5 +1,5 @@
 ---
-title: Edge Groups
+title: Edge groups
 description: How to create and manage edge groups in Dockview — groups that are pinned to the edges of the layout, like a VS Code sidebar or panel.
 ---
 
@@ -19,7 +19,7 @@ Edge groups **cannot** be maximized or converted into floating/popout windows. T
 The `dndEdges` prop controls the drag-and-drop overlay that appears when dragging panels to the far edges of the layout. See [Drag and Drop](/docs/core/dnd/dragAndDrop#drag-and-drop) for configuration details.
 :::
 
-## Adding Edge Groups
+## Adding edge groups
 
 Call `addEdgeGroup` in your `onReady` handler (or any time after initialization):
 
@@ -63,11 +63,11 @@ dockview.addEdgeGroup('bottom', {
 
 Calling `addEdgeGroup` for a position that is already registered throws an error.
 
-## Edge Group Options
+## Edge group options
 
 <DocRef declaration="EdgeGroupOptions" />
 
-## Adding Panels into an Edge Group
+## Adding panels into an edge group
 
 Use `addPanel` with a `position.referenceGroup` pointing at the edge group's `id`:
 
@@ -98,7 +98,7 @@ api.addPanel({
     ]}
 />
 
-## Collapse and Expand
+## Collapse and expand
 
 Edge groups can be collapsed to their header strip and expanded back to their last size programmatically, or by the user clicking the active tab.
 
@@ -136,7 +136,7 @@ When an edge group loses all of its panels it is automatically collapsed. Adding
 
 Collapsed edge groups can auto-hide and peek back on demand — see [Auto-hide Edge Groups](/docs/core/groups/autoHideEdgeGroups).
 
-## Custom Header Actions
+## Custom header actions
 
 The `location` prop in `rightHeaderActionsComponent`, `leftHeaderActionsComponent`, and `prefixHeaderActionsComponent` updates reactively when a group moves. Use it to show controls specific to edge groups.
 
@@ -234,3 +234,8 @@ const state = api.toJSON();
 
 api.fromJSON(state); // auto-creates and restores edge groups
 ```
+
+## See also
+
+- [Auto-hide edge groups](/docs/core/groups/autoHideEdgeGroups) — turn a collapsed edge group into a pinnable tool window
+- [Group controls](/docs/core/groups/controls) — render controls specific to edge groups via the `location` prop

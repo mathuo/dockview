@@ -1,5 +1,11 @@
 {
-    "entryPoints": ["packages/dockview", "packages/dockview-core", "packages/dockview-vue"],
+    "entryPoints": [
+        "packages/dockview",
+        "packages/dockview-core",
+        "packages/dockview-react",
+        "packages/dockview-vue",
+        "packages/dockview-angular"
+    ],
     "name": "Dockview",
     "entryPointStrategy": "packages",
     "includeVersion": true,

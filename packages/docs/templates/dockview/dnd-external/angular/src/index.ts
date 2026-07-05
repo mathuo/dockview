@@ -1,13 +1,7 @@
 import 'zone.js';
 import '@angular/compiler';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import {
-    Component,
-    NgModule,
-    Input,
-    Type,
-    OnDestroy,
-} from '@angular/core';
+import { Component, NgModule, Input, Type, OnDestroy } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import {
     DockviewAngularModule,
@@ -21,7 +15,9 @@ import 'dockview-angular/dist/styles/dockview.css';
 
 @Component({
     selector: 'default-panel',
-    template: `<div style="padding: 20px;"><div>{{ params?.title }}</div></div>`,
+    template: `<div style="padding: 20px;">
+        <div>{{ params?.title }}</div>
+    </div>`,
 })
 export class DefaultPanelComponent {
     @Input() api!: DockviewPanelApi;
@@ -37,13 +33,15 @@ export class DefaultPanelComponent {
                     tabindex="-1"
                     draggable="true"
                     (dragstart)="onExternalDragStart($event)"
-                    style="background: orange; padding: 0 8px; border-radius: 4px; width: 100px; cursor: pointer;">
+                    style="background: orange; padding: 0 8px; border-radius: 4px; width: 100px; cursor: pointer;"
+                >
                     Drag me into the dock
                 </span>
                 <div
                     (dragover)="$event.preventDefault()"
                     (drop)="onDropOutside($event)"
-                    style="padding: 0 4px; background: black; color: white; border-radius: 2px;">
+                    style="padding: 0 4px; background: black; color: white; border-radius: 2px;"
+                >
                     Drop a tab or group here to inspect the attached metadata
                 </div>
             </div>
@@ -52,7 +50,8 @@ export class DefaultPanelComponent {
                 [dndEdges]="dndEdges"
                 className="dockview-theme-abyss"
                 (ready)="onReady($event)"
-                (didDrop)="onDidDrop($event)">
+                (didDrop)="onDidDrop($event)"
+            >
             </dv-dockview>
         </div>
     `,
@@ -116,7 +115,7 @@ export class AppComponent implements OnDestroy {
                 );
             }),
             // Accept arbitrary outside drags into the dock.
-            api.onUnhandledDragOverEvent((event) => {
+            api.onUnhandledDragOver((event) => {
                 event.accept();
             })
         );

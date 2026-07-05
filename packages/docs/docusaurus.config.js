@@ -2,7 +2,7 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 
 const { themes } = require('prism-react-renderer');
-const lightCodeTheme = themes.oneLight;
+const lightCodeTheme = themes.github;
 const darkCodeTheme = themes.oneDark;
 
 // dracula
@@ -332,7 +332,7 @@ const config = {
                         ],
                     },
                 ],
-                copyright: `Copyright © ${new Date().getFullYear()} Dockview, Inc. Built with Docusaurus.`,
+                copyright: `Copyright © ${new Date().getFullYear()} Dockview, Inc.`,
             },
             prism: {
                 theme: lightCodeTheme,

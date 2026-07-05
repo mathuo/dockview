@@ -4,29 +4,33 @@ sidebar_position: 0
 description: Overview of the Gridview component — a resizable grid layout without tabs or drag and drop.
 ---
 
-import LiveExample from '@site/src/components/ui/exampleFrame';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-The implementation of the dock is a collection of nested *splitview* controls forming a *gridview*
-which is exposed as a seperate component to be used independantly.
+The implementation of Dockview is a collection of nested _splitview_ controls forming a _gridview_
+which is exposed as a separate component to be used independently.
 
-<FrameworkSpecific framework='React'>
-<DocRef declaration="IGridviewReactProps"/>
+<FrameworkSpecific framework="React">
+    <DocRef declaration="IGridviewReactProps" />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Vue'>
-<DocRef declaration="IGridviewVueProps"/>
+<FrameworkSpecific framework="Vue">
+    <DocRef declaration="IGridviewVueProps" />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Angular'>
-<DocRef declaration="GridviewAngularOptions"/>
+<FrameworkSpecific framework="Angular">
+    <DocRef declaration="GridviewAngularOptions" />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='JavaScript'>
-<DocRef declaration="GridviewComponentOptions"/>
+<FrameworkSpecific framework="JavaScript">
+    <DocRef declaration="GridviewComponentOptions" />
 </FrameworkSpecific>
 
-## Live Example
+## Live example
 
-<LiveExample framework='react' id='gridview/simple' />
+<CodeRunner id="gridview/basic" />
 
+## See also
+
+- [Gridview API](/docs/api/gridview/api) — methods and events for controlling the grid.
+- [Gridview options](/docs/api/gridview/options) — configuration when creating the component.
+- [Gridview panel API](/docs/api/gridview/panelApi) — control an individual panel.

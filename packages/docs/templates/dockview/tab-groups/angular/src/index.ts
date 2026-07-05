@@ -36,8 +36,11 @@ export class DefaultPanelComponent {
                 [components]="components"
                 [theme]="theme"
                 [disableFloatingGroups]="true"
-                [getTabGroupChipContextMenuItems]="getTabGroupChipContextMenuItems"
-                (ready)="onReady($event)">
+                [getTabGroupChipContextMenuItems]="
+                    getTabGroupChipContextMenuItems
+                "
+                (ready)="onReady($event)"
+            >
             </dv-dockview>
         </div>
     `,
@@ -45,8 +48,7 @@ export class DefaultPanelComponent {
 export class AppComponent {
     components: Record<string, Type<any>>;
     theme = { ...themeAbyss, tabAnimation: 'smooth' as const };
-    getTabGroupChipContextMenuItems = () =>
-        ['rename', 'colorPicker'] as const;
+    getTabGroupChipContextMenuItems = () => ['rename', 'colorPicker'] as const;
 
     constructor() {
         this.components = {

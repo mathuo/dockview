@@ -46,7 +46,7 @@ const SKIP_DOC = ['Event'];
 
 console.log('running docs');
 
-const forceBuild = true
+const forceBuild = true;
 
 if (forceBuild || !existsSync(TYPEDOC_OUTPUT_FILE)) {
     execSync(
@@ -63,18 +63,27 @@ if (forceBuild || !existsSync(TYPEDOC_OUTPUT_FILE)) {
 
 const content = JSON.parse(readFileSync(TYPEDOC_OUTPUT_FILE));
 
-const dockviewCore = content.children.find(
-    (child) => child.name === 'dockview-core'
-);
-const dockview = content.children.find((child) => child.name === 'dockview');
-const dockviewVue = content.children.find((child) => child.name === 'dockview-vue');
+// Iterate over every documented package (dockview, dockview-core,
+// dockview-react, dockview-vue, dockview-angular, ...) rather than a hard-coded
+// subset, so packages added to typedoc.json entryPoints are picked up
+// automatically. Declarations are name-keyed downstream, so re-exported
+// duplicates (e.g. DockviewApi via both `dockview` and `dockview-core`) simply
+// overwrite each other harmlessly.
+//
+// A package with multiple typedoc entryPoints (e.g. dockview-vue exposing
+// dockview/gridview/paneview/splitview types) nests its declarations one level
+// deeper inside per-file Module reflections; recurse through those so we always
+// arrive at the concrete declarations regardless of entryPoint count.
+function flattenModules(children) {
+    return (children ?? []).flatMap((child) =>
+        child.kind === ReflectionKind.Module
+            ? flattenModules(child.children)
+            : [child]
+    );
+}
 
-
-const declarations = [dockviewCore, dockview, dockviewVue]
-    .flatMap(
-        (item) => item.children
-        // .filter((child) => DOCUMENT_LIST.includes(child.name))
-    )
+const declarations = content.children
+    .flatMap((pkg) => flattenModules(pkg.children))
     .filter(Boolean);
 
 function parseTypeArguments(args) {
@@ -180,10 +189,10 @@ function parseComplexType(obj) {
                 values: obj.elements.map(parseComplexType),
             };
         case 'namedTupleMember':
-          return {
-            type: obj.type,
-            values: parseComplexType(obj.element),
-          };
+            return {
+                type: obj.type,
+                values: parseComplexType(obj.element),
+            };
         case 'typeOperator':
             return {
                 type: obj.type,
@@ -587,72 +596,76 @@ function createDocument(declarations) {
     const documentation = {};
 
     function parseDeclaration(declaration) {
-      const { children, name, extendedTypes } = declaration;
+        const { children, name, extendedTypes } = declaration;
 
-      /**
-       * 4: Namespace
-       * 8: Enum
-       * 64: Function
-       * 128: Class
-       * 256: Interface
-       * 2097152: TypeAlias
-       */
+        /**
+         * 4: Namespace
+         * 8: Enum
+         * 64: Function
+         * 128: Class
+         * 256: Interface
+         * 2097152: TypeAlias
+         */
 
-      const metadata = parseDeclarationMetadata(declaration);
+        const metadata = parseDeclarationMetadata(declaration);
 
-      documentation[name] = {
-          ...metadata,
-          name,
-          children: [],
-          extends: []
-      };
+        documentation[name] = {
+            ...metadata,
+            name,
+            children: [],
+            extends: [],
+        };
 
-      if (!children) {
-          documentation[name] = {
-              ...parse(declaration),
-          };
-          // documentation[name].metadata = parse(declaration);
-      }
-
-      if (children) {
-          for (const child of children) {
-              try {
-                  const { flags } = child;
-
-                  if (flags.isPrivate) {
-                      continue;
-                  }
-
-                  const output = parse(child);
-
-                  if (output) {
-                      output.pieces = Array.from(new Set(output.pieces))
-                          .filter(Boolean)
-                          .sort();
-                      delete output.pieces;
-                      // delete output.comment;
-
-                      documentation[name].children.push(output);
-                  }
-              } catch (err) {
-                  console.error('error', err, JSON.stringify(child, null, 4));
-                  process.exit(-1);
-              }
-          }
-      }
-
-      if(extendedTypes) {
-        for(const extendedType of extendedTypes) {
-          if(extendedType.package && extendedType.package.startsWith("dockview")) {
-            documentation[name].extends.push(extendedType.name);
-          }
+        if (!children) {
+            documentation[name] = {
+                ...parse(declaration),
+            };
+            // documentation[name].metadata = parse(declaration);
         }
 
-      }
+        if (children) {
+            for (const child of children) {
+                try {
+                    const { flags } = child;
+
+                    if (flags.isPrivate) {
+                        continue;
+                    }
+
+                    const output = parse(child);
+
+                    if (output) {
+                        output.pieces = Array.from(new Set(output.pieces))
+                            .filter(Boolean)
+                            .sort();
+                        delete output.pieces;
+                        // delete output.comment;
+
+                        documentation[name].children.push(output);
+                    }
+                } catch (err) {
+                    console.error('error', err, JSON.stringify(child, null, 4));
+                    process.exit(-1);
+                }
+            }
+        }
+
+        if (extendedTypes) {
+            for (const extendedType of extendedTypes) {
+                if (
+                    extendedType.package &&
+                    extendedType.package.startsWith('dockview')
+                ) {
+                    (documentation[name].extends ??= []).push(
+                        extendedType.name
+                    );
+                }
+            }
+        }
     }
 
     for (const declaration of declarations) {
-      parseDeclaration(declaration);
+        parseDeclaration(declaration);
     }
 
     return documentation;

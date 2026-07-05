@@ -1,5 +1,5 @@
 ---
-title: Loading State
+title: Loading state
 description: How to restore a previously saved Dockview layout from a serialized state object.
 sidebar_position: 2
 ---
@@ -7,16 +7,16 @@ sidebar_position: 2
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-This section described loading a dock layout.
+This section describes loading a dock layout.
 
 <DocRef
     declaration="DockviewApi"
     methods={['fromJSON', 'onDidLayoutFromJSON']}
 />
 
-## Load A Layout
+## Load a layout
 
-To load a layout you should a pass a valid object to `fromJSON`. If you try to load an invalid or corrupted layout the dock will throw an Error and the dock will reset gracefully ready
+To load a layout you should pass a valid object to `fromJSON`. If you try to load an invalid or corrupted layout Dockview will throw an error and reset gracefully, ready
 for another attempt with a valid object.
 
 You could load a previously saved layout from local storage for example.
@@ -144,6 +144,11 @@ if (!success) {
 
 </FrameworkSpecific>
 
-# Live Example
+## Live example
 
 <CodeRunner id="dockview/layout" />
+
+## See also
+
+- [Saving state](/docs/core/state/save) — serialize the current layout with `toJSON`.
+- [Layout history](/docs/core/state/history) — undo and redo layout changes without reloading from JSON.

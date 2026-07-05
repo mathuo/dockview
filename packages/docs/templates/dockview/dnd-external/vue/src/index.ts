@@ -1,5 +1,12 @@
 import { createApp, ref, onUnmounted, defineComponent, PropType } from 'vue';
-import { DockviewVue, DockviewReadyEvent, DockviewApi, positionToDirection, DockviewDidDropEvent, IDockviewPanelProps } from 'dockview-vue';
+import {
+    DockviewVue,
+    DockviewReadyEvent,
+    DockviewApi,
+    positionToDirection,
+    DockviewDidDropEvent,
+    IDockviewPanelProps,
+} from 'dockview-vue';
 import 'dockview-vue/dist/styles/dockview.css';
 
 const DefaultPanel = defineComponent({
@@ -29,7 +36,7 @@ const DefaultPanel = defineComponent({
         <div style="padding: 20px;">
             <div>{{ title || 'Panel' }}</div>
         </div>
-    `
+    `,
 });
 
 const DraggableElement = defineComponent({
@@ -49,8 +56,8 @@ const DraggableElement = defineComponent({
                 event.dataTransfer.effectAllowed = 'move';
                 event.dataTransfer.setData('text/plain', 'nothing');
             }
-        }
-    }
+        },
+    },
 });
 
 const App = defineComponent({
@@ -68,42 +75,64 @@ const App = defineComponent({
             if (!api.value) return;
 
             // Clear existing disposables
-            disposables.forEach(d => d?.dispose?.());
+            disposables.forEach((d) => d?.dispose?.());
             disposables.length = 0;
 
             // Pointer (touch) drags can't bridge to external HTML5 drop
             // zones outside dockview; narrow before reading dataTransfer.
-            const panelDragDisposable = api.value.onWillDragPanel((event: any) => {
-                if (!(event.nativeEvent instanceof DragEvent)) {
-                    return;
+            const panelDragDisposable = api.value.onWillDragPanel(
+                (event: any) => {
+                    if (!(event.nativeEvent instanceof DragEvent)) {
+                        return;
+                    }
+                    const dataTransfer = event.nativeEvent.dataTransfer;
+                    if (dataTransfer) {
+                        dataTransfer.setData(
+                            'text/plain',
+                            'Some custom panel data transfer data'
+                        );
+                        dataTransfer.setData(
+                            'text/json',
+                            '{text: "Some custom panel data transfer data"}'
+                        );
+                    }
                 }
-                const dataTransfer = event.nativeEvent.dataTransfer;
-                if (dataTransfer) {
-                    dataTransfer.setData('text/plain', 'Some custom panel data transfer data');
-                    dataTransfer.setData('text/json', '{text: "Some custom panel data transfer data"}');
-                }
-            });
+            );
 
-            const groupDragDisposable = api.value.onWillDragGroup((event: any) => {
-                if (!(event.nativeEvent instanceof DragEvent)) {
-                    return;
+            const groupDragDisposable = api.value.onWillDragGroup(
+                (event: any) => {
+                    if (!(event.nativeEvent instanceof DragEvent)) {
+                        return;
+                    }
+                    const dataTransfer = event.nativeEvent.dataTransfer;
+                    if (dataTransfer) {
+                        dataTransfer.setData(
+                            'text/plain',
+                            'Some custom group data transfer data'
+                        );
+                        dataTransfer.setData(
+                            'text/json',
+                            '{text: "Some custom group data transfer data"}'
+                        );
+                    }
                 }
-                const dataTransfer = event.nativeEvent.dataTransfer;
-                if (dataTransfer) {
-                    dataTransfer.setData('text/plain', 'Some custom group data transfer data');
-                    dataTransfer.setData('text/json', '{text: "Some custom group data transfer data"}');
+            );
+
+            const unhandledDragDisposable = api.value.onUnhandledDragOver(
+                (event: any) => {
+                    event.accept();
                 }
-            });
+            );
 
-            const unhandledDragDisposable = api.value.onUnhandledDragOverEvent((event: any) => {
-                event.accept();
-            });
-
-            disposables.push(panelDragDisposable, groupDragDisposable, unhandledDragDisposable);
+            disposables.push(
+                panelDragDisposable,
+                groupDragDisposable,
+                unhandledDragDisposable
+            );
         };
 
         onUnmounted(() => {
-            disposables.forEach(d => d?.dispose?.());
+            disposables.forEach((d) => d?.dispose?.());
         });
 
         const onReady = (event: DockviewReadyEvent) => {
@@ -188,7 +217,7 @@ const App = defineComponent({
                 @didDrop="onDidDrop">
             </dockview-vue>
         </div>
-    `
+    `,
 });
 
 createApp(App).mount('#app');
