@@ -65,7 +65,7 @@ Calling `addEdgeGroup` for a position that is already registered throws an error
 
 ## Edge group options
 
-<DocRef declaration="EdgeGroupOptions" />
+<DocRef declaration="AddEdgeGroupOptions" />
 
 ## Adding panels into an edge group
 
@@ -91,6 +91,7 @@ api.addPanel({
     declaration="DockviewApi"
     methods={[
         'addEdgeGroup',
+        'revealEdgeGroupWithData',
         'getEdgeGroup',
         'setEdgeGroupVisible',
         'isEdgeGroupVisible',
@@ -135,6 +136,44 @@ When an edge group loses all of its panels it is automatically collapsed. Adding
 :::
 
 Collapsed edge groups can auto-hide and peek back on demand — see [Auto-hide Edge Groups](/docs/core/groups/autoHideEdgeGroups).
+
+## Drag-revealed edges
+
+By default an edge must be created explicitly with `addEdgeGroup`, and an empty edge group collapses to a strip rather than disappearing. Set the `autoEdgeGroups` prop to make edges behave like a VS Code sidebar instead: an edge with no content takes up **zero space**, a drop zone for it appears only **while dragging**, and dropping a panel there reveals an edge group at that position. When its last panel leaves, the edge group tears down and the edge becomes invisible again.
+
+```ts
+const dockview = createDockview(element, {
+    // ...
+    autoEdgeGroups: true,
+});
+```
+
+When both `autoEdgeGroups` and `dndEdges` are enabled the outer edge presents two drop bands: the very outer band docks the panel as a new edge group, while a band just inside it splits the grid as normal.
+
+You can also reveal an edge group programmatically — for example from your own drop handler — with `revealEdgeGroupWithData`:
+
+```ts
+dockview.revealEdgeGroupWithData('left', {
+    groupId: draggedGroupId,
+    panelId: draggedPanelId,
+});
+```
+
+:::info
+`autoEdgeGroups` requires both the edge-group and root-drop-target functionality; it is a no-op if either is unavailable. Revealed edge groups still serialize and restore like any other edge group.
+:::
+
+## Auto-hide co-existence
+
+Auto-hide (the pinnable tool-window behaviour) is opt-in **per edge group**, so a static always-docked edge group and an auto-hiding one can co-exist in the same layout. Pass `autoHide` to `addEdgeGroup`, or toggle it at runtime with `api.setAutoHide`; either overrides the global `autoHideEdgeGroups` option for that group.
+
+```ts
+// this edge group auto-hides; others follow the global option
+api.addEdgeGroup('left', { id: 'left-group', autoHide: true });
+
+// toggle at runtime
+api.getEdgeGroup('right')?.setAutoHide(true);
+```
 
 ## Custom header actions
 

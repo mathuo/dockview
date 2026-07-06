@@ -7,6 +7,11 @@
     --dv-tabs-and-actions-container-height: 35px;
     --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);
     --dv-drag-over-border-color: transparent;
+    // Colour of the drag-reveal edge indicator line (auto edge groups). A
+    // dedicated token with a concrete default so it stays visible on themes
+    // that blank `--dv-drag-over-background-color` (e.g. the spaced themes);
+    // override per theme to match.
+    --dv-edge-dock-indicator-color: rgba(56, 139, 253, 0.9);
     --dv-tabs-container-scrollbar-color: #888;
     --dv-icon-hover-background-color: rgba(90, 93, 94, 0.31);
     --dv-floating-box-shadow:
@@ -1148,4 +1153,3 @@
         }
     }
 }
-

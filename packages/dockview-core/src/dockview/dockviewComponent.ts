@@ -125,6 +125,7 @@ import { themeAbyss } from './theme';
 import {
     EdgeGroupPosition,
     EdgeGroupOptions,
+    AddEdgeGroupOptions,
     SerializedEdgeGroups,
     ShellManager,
     IEdgeGroupHost,
@@ -443,8 +444,13 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     fromJSON(data: any, options?: { reuseExistingPanels: boolean }): void;
     addEdgeGroup(
         position: EdgeGroupPosition,
-        options: EdgeGroupOptions
+        options: AddEdgeGroupOptions
     ): DockviewGroupPanelApi;
+    revealEdgeGroupWithData(
+        position: EdgeGroupPosition,
+        data: { groupId: string; panelId?: string | null },
+        options?: { autoHide?: boolean }
+    ): void;
     getEdgeGroup(
         position: EdgeGroupPosition
     ): DockviewGroupPanelApi | undefined;
@@ -457,6 +463,12 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     pinEdgeGroup(position: EdgeGroupPosition): void;
     autoHideEdgeGroup(position: EdgeGroupPosition): void;
     peekEdgeGroup(position: EdgeGroupPosition, peek: boolean): void;
+    isEdgeGroupAutoHide(group: DockviewGroupPanel): boolean;
+    setEdgeGroupAutoHide(
+        group: DockviewGroupPanel,
+        value: boolean | undefined
+    ): void;
+    readonly onDidEdgeGroupAutoHideChange: Event<DockviewGroupPanel>;
     readonly overlayRoot: HTMLElement;
     getEdgeGroupExpandedSize(position: EdgeGroupPosition): number;
     // layout history (undo / redo)
@@ -735,6 +747,11 @@ export class DockviewComponent
     private readonly _onDidRemoveGroup = new Emitter<DockviewGroupPanel>();
     readonly onDidRemoveGroup: Event<DockviewGroupPanel> =
         this._onDidRemoveGroup.event;
+
+    private readonly _onDidEdgeGroupAutoHideChange =
+        new Emitter<DockviewGroupPanel>();
+    readonly onDidEdgeGroupAutoHideChange: Event<DockviewGroupPanel> =
+        this._onDidEdgeGroupAutoHideChange.event;
 
     protected readonly _onDidAddGroup = new Emitter<DockviewGroupPanel>();
     readonly onDidAddGroup: Event<DockviewGroupPanel> =
@@ -1053,7 +1070,8 @@ export class DockviewComponent
     getDropPositionResolver(): PositionResolver | undefined {
         return (
             this.options.dropPositionResolver ??
-            this._dropGuideService?.resolver
+            this._dropGuideService?.resolver ??
+            this._moduleRegistry.services.autoEdgeGroupService?.resolver
         );
     }
 
@@ -1085,6 +1103,23 @@ export class DockviewComponent
         }
 
         const data = getPanelData();
+
+        if (
+            data &&
+            position !== 'center' &&
+            this.options.autoEdgeGroups &&
+            this._edgeGroupService &&
+            !this._moduleRegistry.services.autoEdgeGroupService
+        ) {
+            // `autoEdgeGroups` baseline (single band): a root-edge drop reveals
+            // an edge group instead of splitting the grid. When the two-band
+            // drag-reveal affordance is registered it owns edge-drop routing —
+            // it preempts the outer band via `onWillDrop.preventDefault` and lets
+            // the inner band fall through here to the default grid split — so
+            // this single-band fallback is disabled.
+            this.revealEdgeGroupWithData(position, data);
+            return;
+        }
 
         if (data) {
             this.moveGroupOrPanel({
@@ -1539,6 +1574,7 @@ export class DockviewComponent
             }),
             this._onDidAddGroup,
             this._onDidRemoveGroup,
+            this._onDidEdgeGroupAutoHideChange,
             this._onDidActiveGroupChange,
             this._onUnhandledDragOver,
             this._onDidMaximizedGroupChange,
@@ -2793,7 +2829,7 @@ export class DockviewComponent
 
     addEdgeGroup(
         position: EdgeGroupPosition,
-        options: EdgeGroupOptions
+        options: AddEdgeGroupOptions
     ): DockviewGroupPanelApi {
         const service = assertModule(
             this._edgeGroupService,
@@ -2814,14 +2850,37 @@ export class DockviewComponent
             group.model.location = { type: 'edge', position };
             group.model.headerPosition = position;
 
-            // Collapse when the group becomes empty
+            // When the group becomes empty: an auto-reveal edge tears down to
+            // zero footprint; every other edge group collapses to its strip.
             const autoCollapseDisposable = group.model.onDidRemovePanel(() => {
-                if (group.model.isEmpty) {
+                if (!group.model.isEmpty) {
+                    return;
+                }
+                if (service.isAutoReveal(group)) {
+                    // Defer the teardown — disposing the group (and its
+                    // onDidRemovePanel emitter) from inside that emitter's own
+                    // dispatch corrupts the emitter / mutation depth. The
+                    // re-check no-ops if a concurrent move re-filled the edge.
+                    queueMicrotask(() => {
+                        if (
+                            group.model.isEmpty &&
+                            this._edgeGroupService?.includes(group)
+                        ) {
+                            this.removeEdgeGroup(position);
+                        }
+                    });
+                } else {
                     this.setEdgeGroupCollapsed(group, true);
                 }
             });
 
             service.add(position, group, autoCollapseDisposable);
+            if (options.autoHide !== undefined) {
+                service.setAutoHide(group, options.autoHide);
+            }
+            if (options.autoReveal !== undefined) {
+                service.setAutoReveal(group, options.autoReveal);
+            }
             this._onDidAddGroup.fire(group);
 
             this._shellManager!.addEdgeView(
@@ -2831,6 +2890,59 @@ export class DockviewComponent
             );
 
             return group.api;
+        });
+    }
+
+    /**
+     * Reveal (create-or-fill) the edge group at `position` and move the dragged
+     * item described by `data` into it. A newly created edge group is flagged
+     * `autoReveal` so it tears down to zero footprint when later emptied. If an
+     * edge group already exists there it is reused (and expanded if collapsed) —
+     * never re-created (`addEdgeGroup` throws on a duplicate position). No-op if
+     * the EdgeGroup module is absent.
+     *
+     * This is the primitive behind the drag-revealed edges; the two-band
+     * drag-reveal affordance and the `autoEdgeGroups` baseline both route here.
+     */
+    revealEdgeGroupWithData(
+        position: EdgeGroupPosition,
+        data: { groupId: string; panelId?: string | null },
+        options?: { autoHide?: boolean }
+    ): void {
+        const service = this._edgeGroupService;
+        if (!service) {
+            return;
+        }
+        this.mutation('add', () => {
+            let group = service.get(position);
+            if (!group) {
+                this.addEdgeGroup(position, {
+                    id: this.getNextGroupId(),
+                    autoReveal: true,
+                    autoHide: options?.autoHide,
+                });
+                group = service.get(position);
+            } else {
+                if (options?.autoHide !== undefined) {
+                    service.setAutoHide(group, options.autoHide);
+                }
+                if (this.isEdgeGroupCollapsed(group)) {
+                    this.setEdgeGroupCollapsed(group, false);
+                }
+            }
+            if (!group) {
+                return;
+            }
+            this.moveGroupOrPanel({
+                from: {
+                    groupId: data.groupId,
+                    panelId: data.panelId ?? undefined,
+                },
+                to: {
+                    group,
+                    position: 'center',
+                },
+            });
         });
     }
 
@@ -2872,6 +2984,16 @@ export class DockviewComponent
      *  peek's coordinate space. */
     get overlayRoot(): HTMLElement {
         return this.rootElement;
+    }
+
+    /** Viewport rect of the docked content area (the element the root/group drop
+     *  targets hit-test against) — used by the two-band drag-reveal affordance to
+     *  classify a pointer's distance from each edge. This is the gridview/center
+     *  container, which is inset when edge groups are present, so the outer band
+     *  sits at the boundary of the content area (adjacent to any existing edge
+     *  group) rather than at the shell's outer edge. */
+    getDropZoneRect(): DOMRect {
+        return this.element.getBoundingClientRect();
     }
 
     /** The size an edge group expands to (pre-collapse) — sizes the peek. */
@@ -2986,6 +3108,36 @@ export class DockviewComponent
         group.api._onDidPeekChange.fire({ isPeeking: peeking });
     }
 
+    /**
+     * Resolve whether an edge group should behave as an auto-hide (pinnable)
+     * tool window: the per-group flag when set, otherwise the global
+     * `autoHideEdgeGroups` option. This is what lets a static edge group and an
+     * auto-hiding one co-exist in the same layout.
+     */
+    isEdgeGroupAutoHide(group: DockviewGroupPanel): boolean {
+        const perGroup = this._edgeGroupService?.isAutoHide(group);
+        if (perGroup !== undefined) {
+            return perGroup;
+        }
+        return !!this.options.autoHideEdgeGroups;
+    }
+
+    /**
+     * Set (or clear, via `undefined`) the per-group auto-hide flag and notify
+     * the auto-hide module so it can dock/undock the group at runtime.
+     */
+    setEdgeGroupAutoHide(
+        group: DockviewGroupPanel,
+        value: boolean | undefined
+    ): void {
+        const service = this._edgeGroupService;
+        if (!service || !service.includes(group)) {
+            return;
+        }
+        service.setAutoHide(group, value);
+        this._onDidEdgeGroupAutoHideChange.fire(group);
+    }
+
     private updateDragAndDropState(): void {
         // Update draggable state for all tabs and void containers
         for (const group of this.groups) {
@@ -3091,11 +3243,20 @@ export class DockviewComponent
         if (this._edgeGroupService?.hasAny()) {
             const shellSerialized = this._shellManager!.toJSON();
 
-            // Augment each entry with the serialized group state
+            // Augment each entry with the serialized group state + the
+            // component-owned per-group presentation flags (the shell only
+            // knows geometry/collapse).
             for (const [position, group] of edgeEntries) {
                 const entry = shellSerialized[position];
                 if (entry) {
                     entry.group = group.toJSON();
+                    if (this._edgeGroupService!.isAutoReveal(group)) {
+                        entry.autoReveal = true;
+                    }
+                    const autoHide = this._edgeGroupService!.isAutoHide(group);
+                    if (autoHide !== undefined) {
+                        entry.autoHide = autoHide;
+                    }
                 }
             }
 
@@ -3413,7 +3574,17 @@ export class DockviewComponent
                     | GroupPanelViewState
                     | undefined;
                 const id = groupState?.id ?? `${_position}-group`;
-                this.addEdgeGroup(_position, { id });
+                // Trust the serialized per-group flags. Absent → unset (a
+                // static edge collapses to a strip; auto-hide inherits the
+                // global option). We deliberately do NOT fall back to the
+                // `autoEdgeGroups` option here, so a static edge group in a
+                // saved layout is never silently turned into a self-tearing-
+                // down one just because the option is on this session.
+                this.addEdgeGroup(_position, {
+                    id,
+                    autoReveal: fixedData.autoReveal,
+                    autoHide: fixedData.autoHide,
+                });
             }
         }
 

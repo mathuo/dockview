@@ -1,4 +1,6 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
+import { AllModules } from '../../dockview/allModules';
+import { EdgeGroupModule } from '../../dockview/edgeGroupService';
 import {
     GroupPanelPartInitParameters,
     IContentRenderer,
@@ -11823,6 +11825,238 @@ describe('dockviewComponent', () => {
 
             expect(dv.getEdgeGroup('left')).toBeDefined();
             dv.dispose();
+        });
+
+        describe('per-group auto-hide (Feature A)', () => {
+            test('isEdgeGroupAutoHide resolves the global option by default', () => {
+                const c = document.createElement('div');
+                const dv = new DockviewComponent(c, {
+                    createComponent(options) {
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    },
+                    autoHideEdgeGroups: true,
+                });
+                const group = dv.addEdgeGroup('left', { id: 'left-group' });
+                const panel = dv.getEdgeGroupPanel('left')!;
+                expect(dv.isEdgeGroupAutoHide(panel)).toBe(true);
+                void group;
+                dv.dispose();
+            });
+
+            test('per-group autoHide flag overrides the global option', () => {
+                const c = document.createElement('div');
+                const dv = new DockviewComponent(c, {
+                    createComponent(options) {
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    },
+                    autoHideEdgeGroups: false,
+                });
+                dv.addEdgeGroup('left', { id: 'left-group', autoHide: true });
+                dv.addEdgeGroup('right', { id: 'right-group' });
+
+                const left = dv.getEdgeGroupPanel('left')!;
+                const right = dv.getEdgeGroupPanel('right')!;
+                // static + auto-hiding co-exist in one layout
+                expect(dv.isEdgeGroupAutoHide(left)).toBe(true);
+                expect(dv.isEdgeGroupAutoHide(right)).toBe(false);
+                dv.dispose();
+            });
+
+            test('setEdgeGroupAutoHide fires onDidEdgeGroupAutoHideChange', () => {
+                const c = document.createElement('div');
+                const dv = createFixedDockview(c, ['left']);
+                const panel = dv.getEdgeGroupPanel('left')!;
+
+                const fired: string[] = [];
+                dv.onDidEdgeGroupAutoHideChange((g) => fired.push(g.id));
+
+                panel.api.setAutoHide(true);
+                expect(dv.isEdgeGroupAutoHide(panel)).toBe(true);
+                expect(fired).toEqual(['left-group']);
+
+                panel.api.setAutoHide(undefined); // clear → inherit global (off)
+                expect(dv.isEdgeGroupAutoHide(panel)).toBe(false);
+                dv.dispose();
+            });
+        });
+
+        describe('drag-revealed zero-footprint edges (Feature B)', () => {
+            function flush(): Promise<void> {
+                return new Promise((r) => setTimeout(r));
+            }
+
+            test('revealEdgeGroupWithData creates an auto-reveal edge and moves the panel in', () => {
+                const c = document.createElement('div');
+                const dv = new DockviewComponent(c, {
+                    createComponent(options) {
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    },
+                });
+                dv.layout(1000, 1000);
+
+                const panel = dv.addPanel({ id: 'p1', component: 'default' });
+                const fromGroupId = panel.group.id;
+
+                expect(dv.getEdgeGroup('left')).toBeUndefined();
+                dv.revealEdgeGroupWithData('left', {
+                    groupId: fromGroupId,
+                    panelId: 'p1',
+                });
+
+                const edge = dv.getEdgeGroup('left');
+                expect(edge).toBeDefined();
+                expect(edge!.location.type).toBe('edge');
+                const edgePanel = dv.getEdgeGroupPanel('left')!;
+                expect(edgePanel.panels.map((p) => p.id)).toContain('p1');
+                dv.dispose();
+            });
+
+            test('an emptied auto-reveal edge tears down to zero footprint', async () => {
+                const c = document.createElement('div');
+                const dv = new DockviewComponent(c, {
+                    createComponent(options) {
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    },
+                });
+                dv.layout(1000, 1000);
+
+                const panel = dv.addPanel({ id: 'p1', component: 'default' });
+                dv.revealEdgeGroupWithData('left', {
+                    groupId: panel.group.id,
+                    panelId: 'p1',
+                });
+                expect(dv.getEdgeGroup('left')).toBeDefined();
+
+                // close the only panel → deferred teardown
+                dv.getEdgeGroupPanel('left')!.panels[0].api.close();
+                await flush();
+
+                expect(dv.getEdgeGroup('left')).toBeUndefined();
+                dv.dispose();
+            });
+
+            test('an emptied static edge collapses to a strip (not torn down)', async () => {
+                const c = document.createElement('div');
+                const dv = createFixedDockview(c, ['left']);
+                dv.layout(1000, 1000);
+
+                dv.addPanel({
+                    id: 'p1',
+                    component: 'default',
+                    position: { referenceGroup: 'left-group' },
+                });
+                dv.getEdgeGroupPanel('left')!.panels[0].api.close();
+                await flush();
+
+                const edge = dv.getEdgeGroup('left');
+                expect(edge).toBeDefined();
+                expect(edge!.isCollapsed()).toBe(true);
+                dv.dispose();
+            });
+
+            test('revealing into an existing collapsed edge expands and fills it', () => {
+                const c = document.createElement('div');
+                const dv = createFixedDockview(c, ['left'], {
+                    left: { id: 'left-group', collapsed: true },
+                });
+                dv.layout(1000, 1000);
+
+                const panel = dv.addPanel({ id: 'p1', component: 'default' });
+                dv.revealEdgeGroupWithData('left', {
+                    groupId: panel.group.id,
+                    panelId: 'p1',
+                });
+
+                const edge = dv.getEdgeGroup('left')!;
+                expect(edge.isCollapsed()).toBe(false);
+                expect(
+                    dv.getEdgeGroupPanel('left')!.panels.map((p) => p.id)
+                ).toContain('p1');
+                dv.dispose();
+            });
+
+            test('toJSON records the autoReveal/autoHide flags and they round-trip', async () => {
+                const c = document.createElement('div');
+                const dv = new DockviewComponent(c, {
+                    createComponent(options) {
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    },
+                });
+                dv.layout(1000, 1000);
+
+                const panel = dv.addPanel({ id: 'p1', component: 'default' });
+                dv.revealEdgeGroupWithData(
+                    'left',
+                    { groupId: panel.group.id, panelId: 'p1' },
+                    { autoHide: true }
+                );
+
+                const json = dv.toJSON();
+                expect(json.edgeGroups?.left?.autoReveal).toBe(true);
+                expect(json.edgeGroups?.left?.autoHide).toBe(true);
+
+                // Round-trip into a fresh component; the restored edge must
+                // still tear down (autoReveal) when emptied.
+                const c2 = document.createElement('div');
+                const dv2 = new DockviewComponent(c2, {
+                    createComponent(options) {
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    },
+                });
+                dv2.layout(1000, 1000);
+                dv2.fromJSON(json);
+
+                const restored = dv2.getEdgeGroupPanel('left')!;
+                expect(dv2.isEdgeGroupAutoHide(restored)).toBe(true);
+                restored.panels[0].api.close();
+                await flush();
+                expect(dv2.getEdgeGroup('left')).toBeUndefined();
+
+                dv.dispose();
+                dv2.dispose();
+            });
+
+            test('revealEdgeGroupWithData is a no-op without the EdgeGroup module', () => {
+                const c = document.createElement('div');
+                const dv = new DockviewComponent(c, {
+                    createComponent(options) {
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    },
+                    // internal seam — register a subset (see moduleRemovability.spec)
+                    modules: AllModules.filter((m) => m !== EdgeGroupModule),
+                } as never);
+                dv.layout(1000, 1000);
+                const panel = dv.addPanel({ id: 'p1', component: 'default' });
+                expect(() =>
+                    dv.revealEdgeGroupWithData('left', {
+                        groupId: panel.group.id,
+                        panelId: 'p1',
+                    })
+                ).not.toThrow();
+                expect(dv.getEdgeGroup('left')).toBeUndefined();
+                dv.dispose();
+            });
         });
     });
 

@@ -91,6 +91,13 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
     isCollapsed(): boolean;
     /** True while this edge group is peeking (auto-hide slid-out overlay). */
     isPeeking(): boolean;
+    /**
+     * Opt this edge group in/out of auto-hide (pinnable tool-window) behaviour
+     * at runtime, overriding the global `autoHideEdgeGroups` option. Pass
+     * `undefined` to clear the override and inherit the global. No-op for
+     * non-edge groups or without the auto-hide module.
+     */
+    setAutoHide(value: boolean | undefined): void;
 }
 
 export interface DockviewGroupPanelLocationChangeEvent {
@@ -302,6 +309,13 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             return false;
         }
         return this.accessor.isEdgeGroupPeeking(this._group);
+    }
+
+    setAutoHide(value: boolean | undefined): void {
+        if (!this._group) {
+            return;
+        }
+        this.accessor.setEdgeGroupAutoHide(this._group, value);
     }
 
     initialize(group: DockviewGroupPanel): void {
