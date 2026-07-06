@@ -1,7 +1,8 @@
 ---
 title: Keyboard navigation
 description: How to navigate and dock Dockview panels and groups with the keyboard.
-sidebar_position: 2
+sidebar_position: 3
+enterprise: true
 sidebar_custom_props:
     enterprise: true
 ---
@@ -15,6 +16,8 @@ accessibility semantics that back it (ARIA roles, screen-reader announcements,
 focus indicators), see [Accessibility](/docs/advanced/accessibility); for the
 programmatic focus APIs (`activateNext`, `adjacentGroupInDirection`, …), see
 [Focus Navigation](/docs/advanced/focus-navigation).
+
+<CodeRunner id="dockview/keyboard" height={600} />
 
 ## Enabling the keymap
 
@@ -122,7 +125,3 @@ For the programmatic focus APIs (`activateNext`, `activatePrevious`,
 `adjacentGroupInDirection`, …) that let you build your own keyboard handlers
 without the enterprise keymap, see
 [Focus Navigation](/docs/advanced/focus-navigation).
-
-## Live example
-
-<CodeRunner id="dockview/keyboard" height={600} />

@@ -38,7 +38,7 @@
 
     --docusaurus-highlighted-code-line-bg: rgba(37, 99, 235, 0.08);
 
-    --ifm-navbar-background-color: #ffffff;
+    --ifm-navbar-background-color: #e6edfc;
     --ifm-navbar-link-color: #374151;
     --ifm-navbar-link-hover-color: #1d4ed8;
 
@@ -56,15 +56,20 @@
     --ifm-hover-overlay: rgba(0, 0, 0, 0.05);
 
     .navbar {
-        border-bottom: 1px solid #e2e8f0;
-        box-shadow: none;
+        border-bottom: 1px solid #dbe4f5;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+        // Frosted header: a brand tint that content passes softly under on
+        // scroll, so the bar reads as its own surface rather than the page.
+        background: rgba(230, 237, 252, 0.9);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
     }
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 :root[data-theme='dark'] {
-    --ifm-background-color: #0c0c0e;
-    --ifm-background-surface-color: #18181b;
+    --ifm-background-color: #171d29;
+    --ifm-background-surface-color: #222a39;
 
     --ifm-color-primary: #38bdf8;
     --ifm-color-primary-dark: #0ea5e9;
@@ -74,20 +79,20 @@
     --ifm-color-primary-lighter: #bae6fd;
     --ifm-color-primary-lightest: #e0f2fe;
 
-    --ifm-code-background: #18181b;
+    --ifm-code-background: #222a39;
 
     --docusaurus-highlighted-code-line-bg: rgba(96, 165, 250, 0.1);
 
-    --ifm-navbar-background-color: #0c0c0e;
+    --ifm-navbar-background-color: #1c2333;
     --ifm-navbar-link-color: #e4e4e7;
     --ifm-navbar-link-hover-color: #38bdf8;
 
-    --ifm-dropdown-background-color: #18181b;
-    --ifm-dropdown-border: 1px solid #27272a;
+    --ifm-dropdown-background-color: #222a39;
+    --ifm-dropdown-border: 1px solid #30384a;
 
-    --ifm-toc-border-color: #27272a;
-    --ifm-hr-border-color: #27272a;
-    --ifm-table-border-color: #27272a;
+    --ifm-toc-border-color: #30384a;
+    --ifm-hr-border-color: #30384a;
+    --ifm-table-border-color: #30384a;
 
     --dv-docs-markdown-text-color: #d4d4d8;
 
@@ -96,8 +101,11 @@
     --ifm-hover-overlay: rgba(255, 255, 255, 0.06);
 
     .navbar {
-        border-bottom: 1px solid #27272a;
-        box-shadow: none;
+        border-bottom: 1px solid #2b3242;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        background: rgba(28, 35, 51, 0.82);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
     }
 }
 
@@ -461,32 +469,38 @@
 .enterprise-badge {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    color: #c8961e; /* amber accent */
     vertical-align: middle;
-    line-height: 0;
-
-    svg {
-        fill: currentColor;
-    }
+    padding: 0.15em 0.55em;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: #8a6410; /* amber accent, tuned for contrast on the tint */
+    background-color: rgba(200, 150, 30, 0.14);
+    border: 1px solid rgba(200, 150, 30, 0.4);
 }
 
 [data-theme='dark'] .enterprise-badge {
     color: #e2b23c;
+    background-color: rgba(226, 178, 60, 0.16);
+    border-color: rgba(226, 178, 60, 0.42);
 }
 
 /* next to a page title */
 .enterprise-badge--title {
-    margin-left: 0.45em;
-    font-size: 0.62em;
+    margin-left: 0.55em;
+    font-size: 0.6rem;
     position: relative;
-    top: -0.08em;
+    top: -0.15em;
 }
 
 /* on a sidebar item — push to the right edge of the link */
 .menu__link .enterprise-badge--sidebar {
     margin-left: auto;
-    padding-left: 0.4rem;
-    font-size: 0.72rem;
+    font-size: 0.58rem;
+    padding: 0.1em 0.45em;
     flex: 0 0 auto;
 }

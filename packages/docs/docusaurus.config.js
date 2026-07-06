@@ -62,6 +62,31 @@ const config = {
     ],
     plugins: [
         'docusaurus-plugin-sass',
+        [
+            '@docusaurus/plugin-client-redirects',
+            {
+                // Pages consolidated during the v8 docs restructure. Keep these
+                // so existing bookmarks and inbound links don't 404.
+                redirects: [
+                    {
+                        from: '/docs/core/groups/resizing',
+                        to: '/docs/core/panels/resizing',
+                    },
+                    {
+                        from: '/docs/core/groups/locked',
+                        to: '/docs/core/locked',
+                    },
+                    {
+                        from: '/docs/core/groups/hiddenHeader',
+                        to: '/docs/core/groups/controls',
+                    },
+                    {
+                        from: '/docs/other/tabview',
+                        to: '/docs/core/dnd/disable',
+                    },
+                ],
+            },
+        ],
         (context, options) => {
             return {
                 name: 'custom-webpack',
@@ -281,6 +306,15 @@ const config = {
                         position: 'right',
                     },
                     { to: '/demo', label: 'Demo', position: 'right' },
+                    {
+                        // Served by the separate marketing/pricing deployment,
+                        // not a page in this Docusaurus site — use `href` (a raw
+                        // link) so it isn't resolved or link-checked as an
+                        // internal route.
+                        href: '/enterprise',
+                        label: 'Pricing',
+                        position: 'right',
+                    },
                     {
                         href: 'https://github.com/mathuo/dockview',
                         position: 'right',

@@ -1,7 +1,7 @@
 ---
 title: Pinned tabs
 description: Pin tabs so they render first, never overflow, and resist reordering — modelled on VS Code and Chrome.
-sidebar_position: 8
+sidebar_position: 10
 enterprise: true
 sidebar_custom_props:
     enterprise: true
@@ -16,6 +16,8 @@ Pinned tabs let you mark the tabs that matter so they stay put. Modelled on VS C
 - **resists reordering** — you cannot drag an unpinned tab to the left of a pinned one (the pin boundary is enforced).
 
 The pinned order is stable: pinning appends a tab to the end of the pinned block, and unpinning returns it to the front of the unpinned block.
+
+<CodeRunner id="dockview/pinned-tabs" />
 
 ## Enabling pinned tabs
 
@@ -127,10 +129,6 @@ api.fromJSON(state); // pinned tabs are restored, in their pinned order
 :::info
 Layouts saved before pinning was enabled — or restored into a component with `pinnedTabs` disabled — load as a normal, unpinned strip. The `pinned` key is simply ignored when pinning is off.
 :::
-
-## Live example
-
-<CodeRunner id="dockview/pinned-tabs" height={300} />
 
 ## See also
 

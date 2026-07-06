@@ -1,6 +1,6 @@
 ---
 title: Sizing and layout
-sidebar_position: 3
+sidebar_position: 5
 description: How to control the initial size and proportional layout of panels and groups in Dockview.
 ---
 
@@ -97,41 +97,7 @@ You can read the current dimensions at any time via `api.width` and `api.height`
 
 ## Hiding borders
 
-By default, Dockview renders thin borders between groups in the grid. Set `hideBorders` to remove them:
-
-<FrameworkSpecific framework='JavaScript'>
-```ts
-const api = createDockview(element, {
-    theme: themeAbyss,
-    hideBorders: true,
-    createComponent: (options) => new MyPanel(),
-});
-````
-
-</FrameworkSpecific>
-
-<FrameworkSpecific framework="React">
-    ```tsx
-    <DockviewReact
-        hideBorders={true}
-        onReady={onReady}
-        components={components}
-    />
-    ```
-</FrameworkSpecific>
-
-<FrameworkSpecific framework='Vue'>
-```ts
-template: `<dockview-vue :hideBorders="true" @ready="onReady" />`
-```
-</FrameworkSpecific>
-
-<FrameworkSpecific framework='Angular'>
-```ts
-// In template:
-<dv-dockview [hideBorders]="true" (ready)="onReady($event)" />
-```
-</FrameworkSpecific>
+By default, Dockview renders thin borders between groups in the grid. The `hideBorders` option removes them — see [Hiding borders](/docs/core/theming#hiding-borders) on the theming page for the full example.
 
 ## Updating options at runtime
 
@@ -147,5 +113,5 @@ api.updateOptions({
 
 ## See also
 
-- [Resizing](/docs/core/groups/resizing) — set a group's exact height and width programmatically
+- [Resizing](/docs/core/panels/resizing) — set a panel or group's exact height and width programmatically
 - [Constraints](/docs/core/groups/constraints) — set minimum and maximum group sizes

@@ -1,6 +1,7 @@
 ---
 title: Watermark
 description: How to customize the empty-state watermark shown when there are no panels in Dockview.
+sidebar_position: 11
 ---
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
@@ -9,6 +10,8 @@ When there is nothing else to display.
 
 When Dockview is empty or a group has no panels (an empty group) you can render some fallback
 content which is referred to as a `watermark`. Both are controlled through the same provided component.
+
+<CodeRunner id="dockview/watermark" />
 
 ## Empty state behaviour
 
@@ -84,7 +87,3 @@ The following properties can be set to configure the watermark component.
         methods={['watermarkComponent']}
     />
 </FrameworkSpecific>
-
-## Live examples
-
-<CodeRunner id="dockview/watermark" />

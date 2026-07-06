@@ -41,6 +41,7 @@
         "source-map-loader": "^5.0.0"
     },
     "devDependencies": {
+        "@docusaurus/plugin-client-redirects": "^3.10.1",
         "@tsconfig/docusaurus": "^2.0.9",
         "docusaurus-plugin-sass": "^0.2.6"
     }
