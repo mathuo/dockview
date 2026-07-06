@@ -802,6 +802,7 @@ const DockviewDemo = (props: {
                                             autoEdgeGroups
                                             pinnedTabs={{ enabled: true }}
                                             floatingGroupDragHandle="titlebar"
+                                            dndGuide={true}
                                             smartGuides={{ snapDistance: 8 }}
                                             getTabContextMenuItems={
                                                 getTabContextMenuItems
