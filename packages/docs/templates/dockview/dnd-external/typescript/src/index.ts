@@ -17,34 +17,33 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.padding = '20px';
+        this._element.className = 'example-panel';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
-        const inner = document.createElement('div');
-        inner.textContent = parameters.params.title ?? '';
-        this._element.appendChild(inner);
+        this._element.textContent = parameters.params.title ?? '';
     }
 }
 
 const root = document.getElementById('app')!;
-root.style.display = 'flex';
-root.style.flexDirection = 'column';
-root.style.height = '100%';
+root.className = 'example-layout';
 
 // A native (non-dockview) draggable element that can be dropped into the dock.
 const controls = document.createElement('div');
-controls.style.margin = '2px 0px';
+controls.className = 'example-controls';
 
 const draggable = document.createElement('span');
 draggable.tabIndex = -1;
 draggable.draggable = true;
 draggable.textContent = 'Drag me into the dock';
-draggable.style.backgroundColor = 'orange';
-draggable.style.padding = '0px 8px';
+draggable.style.padding = '4px 12px';
 draggable.style.borderRadius = '4px';
-draggable.style.width = '100px';
-draggable.style.cursor = 'pointer';
+draggable.style.cursor = 'grab';
+draggable.style.userSelect = 'none';
+draggable.style.color = 'var(--dv-activegroup-visiblepanel-tab-color)';
+draggable.style.background =
+    'var(--dv-activegroup-visiblepanel-tab-background-color)';
+draggable.style.border = '1px solid var(--dv-separator-border)';
 draggable.addEventListener('dragstart', (event) => {
     if (event.dataTransfer) {
         event.dataTransfer.effectAllowed = 'move';
@@ -56,33 +55,53 @@ draggable.addEventListener('dragstart', (event) => {
 const dropZone = document.createElement('div');
 dropZone.textContent =
     'Drop a tab or group here to inspect the attached metadata';
-dropZone.style.padding = '0px 4px';
-dropZone.style.backgroundColor = 'black';
-dropZone.style.borderRadius = '2px';
-dropZone.style.color = 'white';
+dropZone.style.flex = '1';
+dropZone.style.minWidth = '0';
+dropZone.style.padding = '4px 12px';
+dropZone.style.borderRadius = '4px';
+dropZone.style.border = '1px dashed var(--dv-separator-border)';
+dropZone.style.color = 'var(--dv-inactivegroup-visiblepanel-tab-color)';
+
+// An inline status area that reports the dropped dataTransfer metadata.
+const status = document.createElement('div');
+status.className = 'example-controls';
+status.style.display = 'none';
+status.style.fontSize = '12px';
+
 dropZone.addEventListener('drop', (event) => {
     const dataTransfer = event.dataTransfer;
     if (!dataTransfer) {
         return;
     }
 
-    let text = 'The following dataTransfer data was found:\n';
+    status.replaceChildren();
+    status.style.display = 'block';
+
+    if (dataTransfer.items.length === 0) {
+        const span = document.createElement('span');
+        span.textContent = 'No dataTransfer data was found.';
+        status.appendChild(span);
+        return;
+    }
 
     for (let i = 0; i < dataTransfer.items.length; i++) {
         const item = dataTransfer.items[i];
         const value = dataTransfer.getData(item.type);
-        text += `type=${item.type},data=${value}\n`;
-    }
 
-    alert(text);
+        const row = document.createElement('div');
+        const code = document.createElement('code');
+        code.textContent = item.type;
+        row.append(code, document.createTextNode(`: ${value}`));
+        status.appendChild(row);
+    }
 });
 
 controls.append(draggable, dropZone);
 
 const dockElement = document.createElement('div');
-dockElement.style.flexGrow = '1';
+dockElement.className = 'example-dock';
 
-root.append(controls, dockElement);
+root.append(controls, status, dockElement);
 
 const api: DockviewApi = createDockview(dockElement, {
     theme: themeAbyss,

@@ -22,9 +22,7 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.height = '100%';
-        this._element.style.padding = '20px';
-        this._element.style.color = 'white';
+        this._element.className = 'example-panel';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
@@ -33,13 +31,10 @@ class Panel implements IContentRenderer {
 }
 
 const root = document.getElementById('app')!;
-root.style.display = 'flex';
-root.style.flexDirection = 'column';
+root.className = 'example-layout';
 
 const toolbar = document.createElement('div');
-toolbar.style.height = '25px';
-toolbar.style.display = 'flex';
-toolbar.style.gap = '4px';
+toolbar.className = 'example-controls';
 
 const undoButton = document.createElement('button');
 undoButton.textContent = 'Undo';
@@ -50,7 +45,7 @@ addButton.textContent = 'Add Panel';
 toolbar.append(undoButton, redoButton, addButton);
 
 const dockElement = document.createElement('div');
-dockElement.style.flexGrow = '1';
+dockElement.className = 'example-dock';
 
 root.append(toolbar, dockElement);
 

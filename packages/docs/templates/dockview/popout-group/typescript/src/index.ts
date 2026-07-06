@@ -14,12 +14,20 @@ import {
 
 const STORAGE_KEY = 'floating.layout';
 
+const MENU_ITEMS = [
+    'New tab',
+    'Duplicate panel',
+    'Rename panel',
+    'Close panel',
+];
+
 // A show/hide popover menu, closing when clicking outside. The active document
 // is provided lazily so the outside-click handler follows the panel's window
 // when the group is popped out.
 class PopoverMenu {
     private readonly _element: HTMLElement;
     private readonly _button: HTMLButtonElement;
+    private readonly _label: Text;
     private readonly _menu: HTMLUListElement;
     private _open = false;
     private _outsideHandler?: (event: Event) => void;
@@ -33,7 +41,9 @@ class PopoverMenu {
 
         this._button = document.createElement('button');
         this._button.style.position = 'relative';
-        this._button.textContent = 'Show';
+        this._button.style.alignSelf = 'flex-start';
+        this._label = document.createTextNode('Show menu');
+        this._button.appendChild(this._label);
 
         this._menu = this.createMenu();
         this._menu.style.display = 'none';
@@ -47,32 +57,35 @@ class PopoverMenu {
         const menu = document.createElement('ul');
         Object.assign(menu.style, {
             position: 'absolute',
-            top: '-120px',
-            right: '0',
-            backgroundColor: 'white',
-            color: 'black',
-            border: '1px solid #ccc',
+            top: 'calc(100% + 4px)',
+            left: '0',
+            background: 'var(--dv-group-view-background-color)',
+            color: 'var(--dv-activegroup-visiblepanel-tab-color)',
+            border: '1px solid var(--dv-separator-border)',
             borderRadius: '4px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.35)',
             listStyle: 'none',
-            padding: '8px 0',
+            padding: '4px 0',
             margin: '0',
-            minWidth: '120px',
+            minWidth: '160px',
+            textAlign: 'left',
             zIndex: '1000',
-        } as CSSStyleDeclaration);
+        } as Partial<CSSStyleDeclaration>);
 
-        for (let i = 1; i <= 4; i++) {
+        for (const label of MENU_ITEMS) {
             const item = document.createElement('li');
-            item.style.padding = '8px 16px';
+            item.style.padding = '6px 16px';
             item.style.cursor = 'pointer';
-            item.textContent = `Item ${i}`;
+            item.textContent = label;
             item.addEventListener(
                 'mouseenter',
-                () => (item.style.backgroundColor = '#f5f5f5')
+                () =>
+                    (item.style.background =
+                        'var(--dv-activegroup-visiblepanel-tab-background-color)')
             );
             item.addEventListener(
                 'mouseleave',
-                () => (item.style.backgroundColor = 'transparent')
+                () => (item.style.background = 'transparent')
             );
             menu.appendChild(item);
         }
@@ -86,7 +99,7 @@ class PopoverMenu {
 
     private open(): void {
         this._open = true;
-        this._button.firstChild!.textContent = 'Hide';
+        this._label.textContent = 'Hide menu';
         this._menu.style.display = '';
 
         const doc = this.getWindow()?.document ?? document;
@@ -103,7 +116,7 @@ class PopoverMenu {
             return;
         }
         this._open = false;
-        this._button.firstChild!.textContent = 'Show';
+        this._label.textContent = 'Show menu';
         this._menu.style.display = 'none';
 
         if (this._outsideHandler) {
@@ -125,10 +138,10 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.height = '100%';
-        this._element.style.padding = '20px';
-        this._element.style.background =
-            'var(--dv-group-view-background-color)';
+        this._element.className = 'example-panel';
+        this._element.style.display = 'flex';
+        this._element.style.flexDirection = 'column';
+        this._element.style.gap = '8px';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
@@ -140,29 +153,16 @@ class Panel implements IContentRenderer {
         });
         this._disposables.push(() => locationDisposable.dispose());
 
-        const printButton = document.createElement('button');
-        printButton.textContent = 'Print';
-
-        const popover = new PopoverMenu(() => this._window);
-
-        printButton.addEventListener('click', () => {
-            console.log(this._window);
-            // Briefly hide the popover, mirroring the React `reset` behaviour.
-            popover.close();
-            popover.element.style.display = 'none';
-            setTimeout(() => {
-                popover.element.style.display = '';
-            }, 2000);
-        });
-
-        const title = document.createElement('span');
+        const title = document.createElement('div');
         title.textContent = api.title ?? '';
         const titleDisposable = api.onDidTitleChange(() => {
             title.textContent = api.title ?? '';
         });
         this._disposables.push(() => titleDisposable.dispose());
 
-        this._element.append(printButton, popover.element, title);
+        const popover = new PopoverMenu(() => this._window);
+
+        this._element.append(title, popover.element);
     }
 
     dispose(): void {
@@ -179,9 +179,8 @@ class Watermark implements IWatermarkRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.color = 'white';
         this._element.style.padding = '8px';
-        this._element.textContent = 'watermark';
+        this._element.textContent = 'Empty group';
     }
 
     init(): void {
@@ -190,10 +189,14 @@ class Watermark implements IWatermarkRenderer {
 }
 
 // Renders a single clickable material-symbols icon, mirroring the React `Icon`.
-function createIcon(icon: string, onClick: () => void): HTMLElement {
+function createIcon(
+    icon: string,
+    title: string,
+    onClick: () => void
+): HTMLElement {
     const container = document.createElement('div');
+    container.title = title;
     container.style.height = '100%';
-    container.style.color = 'white';
     container.style.padding = '0px 4px';
 
     const button = document.createElement('div');
@@ -228,7 +231,7 @@ class LeftHeaderActions implements IHeaderActionsRenderer {
     }
 
     init(parameters: IGroupHeaderProps): void {
-        const icon = createIcon('add', () => {
+        const icon = createIcon('add', 'Add panel', () => {
             parameters.containerApi.addPanel({
                 id: (++panelCount).toString(),
                 title: `Tab ${panelCount}`,
@@ -259,6 +262,9 @@ class RightHeaderActions implements IHeaderActionsRenderer {
             this._element.innerHTML = '';
             const icon = createIcon(
                 popout ? 'jump_to_element' : 'back_to_tab',
+                popout
+                    ? 'Return group to dock'
+                    : 'Open group in new window',
                 () => {
                     if (parameters.api.location.type === 'popout') {
                         const group = parameters.containerApi.addGroup();
@@ -293,6 +299,20 @@ function loadDefaultLayout(api: DockviewApi): void {
     api.addPanel({
         id: 'panel_1',
         component: 'default',
+        title: 'Panel 1',
+    });
+
+    api.addPanel({
+        id: 'panel_2',
+        component: 'default',
+        title: 'Panel 2',
+    });
+
+    api.addPanel({
+        id: 'panel_3',
+        component: 'default',
+        title: 'Panel 3',
+        position: { direction: 'right' },
     });
 }
 
@@ -313,12 +333,10 @@ function load(api: DockviewApi): void {
 }
 
 const root = document.getElementById('app')!;
-root.style.display = 'flex';
-root.style.flexDirection = 'column';
-root.style.height = '100%';
+root.className = 'example-layout';
 
 const toolbar = document.createElement('div');
-toolbar.style.height = '25px';
+toolbar.className = 'example-controls';
 
 const saveButton = document.createElement('button');
 saveButton.textContent = 'Save';
@@ -329,7 +347,7 @@ clearButton.textContent = 'Clear';
 toolbar.append(saveButton, loadButton, clearButton);
 
 const dockElement = document.createElement('div');
-dockElement.style.flexGrow = '1';
+dockElement.className = 'example-dock';
 
 root.append(toolbar, dockElement);
 

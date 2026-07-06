@@ -2,11 +2,19 @@ import { LicenseManager } from 'dockview-enterprise';
 import 'zone.js';
 import '@angular/compiler';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { Component, NgModule, Input, Type } from '@angular/core';
+import {
+    Component,
+    NgModule,
+    Input,
+    Type,
+    OnInit,
+    OnDestroy,
+} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import {
     DockviewAngularModule,
     DockviewApi,
+    DockviewGroupPanel,
     DockviewPanelApi,
     DockviewReadyEvent,
 } from 'dockview-angular';
@@ -19,30 +27,100 @@ LicenseManager.setLicenseKey(
 
 @Component({
     selector: 'default-panel',
-    template: `
-        <div
-            style="height: 100%; padding: 20px; background: var(--dv-group-view-background-color);"
-        >
-            {{ params?.title }}
-        </div>
-    `,
+    template: `<div class="example-panel">{{ params?.title }}</div>`,
 })
 export class DefaultPanelComponent {
     @Input() api!: DockviewPanelApi;
     @Input() params!: { title: string };
 }
 
+// Right header action: a pin/unpin toggle for the group's active tab.
+@Component({
+    selector: 'pin-header-action',
+    template: `
+        <div style="height: 100%; padding: 0px 4px;">
+            <div
+                class="pin-icon"
+                [title]="pinned ? 'Unpin tab' : 'Pin tab'"
+                (click)="onClick()"
+            >
+                <span class="material-symbols-outlined">{{
+                    pinned ? 'keep_off' : 'keep'
+                }}</span>
+            </div>
+        </div>
+    `,
+    styles: [
+        `
+            .pin-icon {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 30px;
+                height: 100%;
+                font-size: 18px;
+            }
+            .pin-icon .material-symbols-outlined {
+                font-size: inherit;
+                cursor: pointer;
+            }
+        `,
+    ],
+})
+export class PinHeaderActionComponent implements OnInit, OnDestroy {
+    @Input() group!: DockviewGroupPanel;
+
+    pinned = false;
+
+    private activePanelDisposable?: { dispose(): void };
+    private pinnedDisposable?: { dispose(): void };
+
+    ngOnInit(): void {
+        this.updateActivePanel();
+        this.activePanelDisposable = this.group.model.onDidActivePanelChange(
+            () => this.updateActivePanel()
+        );
+    }
+
+    onClick(): void {
+        this.group.activePanel?.api.setPinned(!this.pinned);
+    }
+
+    ngOnDestroy(): void {
+        this.activePanelDisposable?.dispose();
+        this.pinnedDisposable?.dispose();
+    }
+
+    private updateActivePanel(): void {
+        this.pinnedDisposable?.dispose();
+
+        const panel = this.group.activePanel;
+        if (!panel) {
+            this.pinned = false;
+            return;
+        }
+
+        this.pinned = panel.api.isPinned;
+        this.pinnedDisposable = panel.api.onDidChangePinned((event) => {
+            this.pinned = event.isPinned;
+        });
+    }
+}
+
 @Component({
     selector: 'app-root',
     template: `
-        <div style="height: 100%;">
-            <dv-dockview
-                [components]="components"
-                [pinnedTabs]="pinnedTabs"
-                className="dockview-theme-abyss"
-                (ready)="onReady($event)"
-            >
-            </dv-dockview>
+        <div class="example-layout">
+            <div class="example-dock">
+                <dv-dockview
+                    [components]="components"
+                    [pinnedTabs]="pinnedTabs"
+                    [rightHeaderActionsComponent]="rightHeaderActionsComponent"
+                    className="dockview-theme-abyss"
+                    (ready)="onReady($event)"
+                >
+                </dv-dockview>
+            </div>
         </div>
     `,
 })
@@ -50,6 +128,8 @@ export class AppComponent {
     components: Record<string, Type<any>> = {
         default: DefaultPanelComponent,
     };
+
+    rightHeaderActionsComponent = PinHeaderActionComponent;
 
     // Enable pinned tabs, which stay ahead of the other tabs and never overflow.
     pinnedTabs = { enabled: true };
@@ -94,7 +174,11 @@ export class AppComponent {
 }
 
 @NgModule({
-    declarations: [AppComponent, DefaultPanelComponent],
+    declarations: [
+        AppComponent,
+        DefaultPanelComponent,
+        PinHeaderActionComponent,
+    ],
     imports: [BrowserModule, DockviewAngularModule],
     bootstrap: [AppComponent],
 })

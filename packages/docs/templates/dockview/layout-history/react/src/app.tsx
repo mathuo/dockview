@@ -8,17 +8,7 @@ import React from 'react';
 
 const components = {
     default: (props: IDockviewPanelProps) => {
-        return (
-            <div
-                style={{
-                    height: '100%',
-                    padding: '20px',
-                    background: 'var(--dv-group-view-background-color)',
-                }}
-            >
-                {props.api.title}
-            </div>
-        );
+        return <div className="example-panel">{props.api.title}</div>;
     },
 };
 
@@ -66,14 +56,8 @@ const App = () => {
     }, [api]);
 
     return (
-        <div
-            style={{
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-            }}
-        >
-            <div style={{ height: '25px', display: 'flex', gap: '4px' }}>
+        <div className="example-layout">
+            <div className="example-controls">
                 <button disabled={!canUndo} onClick={() => api?.undo()}>
                     Undo
                 </button>
@@ -92,7 +76,7 @@ const App = () => {
                     Add Panel
                 </button>
             </div>
-            <div style={{ flexGrow: 1 }}>
+            <div className="example-dock">
                 <DockviewReact
                     onReady={onReady}
                     components={components}

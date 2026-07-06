@@ -1,8 +1,11 @@
 import 'dockview/dist/styles/dockview.css';
 import {
     createDockview,
+    DockviewGroupPanel,
     GroupPanelPartInitParameters,
     IContentRenderer,
+    IGroupHeaderProps,
+    IHeaderActionsRenderer,
     themeAbyss,
 } from 'dockview';
 
@@ -15,12 +18,66 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.padding = '10px';
-        this._element.style.color = 'white';
+        this._element.className = 'example-panel';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
         this._element.textContent = parameters.title ?? 'Panel';
+    }
+}
+
+class RightHeaderAction implements IHeaderActionsRenderer {
+    private readonly _element: HTMLElement;
+    private readonly _group: DockviewGroupPanel;
+    private _disposable: { dispose(): void } | undefined;
+
+    get element(): HTMLElement {
+        return this._element;
+    }
+
+    constructor(group: DockviewGroupPanel) {
+        this._group = group;
+        this._element = document.createElement('div');
+    }
+
+    init(parameters: IGroupHeaderProps): void {
+        if (this._group.api.location.type !== 'edge') {
+            return;
+        }
+
+        const button = document.createElement('button');
+        button.style.cursor = 'pointer';
+        button.style.background = 'none';
+        button.style.border = 'none';
+        button.style.color = 'inherit';
+        button.style.padding = '0 4px';
+
+        const render = (): void => {
+            const collapsed = this._group.api.isCollapsed();
+            button.textContent = collapsed ? '+' : '-';
+            button.title = collapsed ? 'Expand group' : 'Collapse group';
+            button.setAttribute(
+                'aria-label',
+                collapsed ? 'Expand group' : 'Collapse group'
+            );
+        };
+
+        button.addEventListener('click', () => {
+            if (this._group.api.isCollapsed()) {
+                this._group.api.expand();
+            } else {
+                this._group.api.collapse();
+            }
+        });
+
+        render();
+        this._disposable = this._group.api.onDidCollapsedChange(() => render());
+
+        this._element.appendChild(button);
+    }
+
+    dispose(): void {
+        this._disposable?.dispose();
     }
 }
 
@@ -32,6 +89,7 @@ const api = createDockview(document.getElementById('app'), {
                 return new Panel();
         }
     },
+    createRightHeaderActionComponent: (group) => new RightHeaderAction(group),
 });
 
 api.addEdgeGroup('left', {

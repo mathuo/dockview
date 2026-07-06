@@ -38,9 +38,7 @@ const Panel = defineComponent({
         };
     },
     template: `
-      <div style="height:100%;padding:20px;color:white;">
-        <div>{{title}}</div>
-      </div>`,
+      <div class="example-panel">{{title}}</div>`,
 });
 
 let panelCount = 5;
@@ -114,20 +112,18 @@ const App = defineComponent({
         },
     },
     template: `
-      <div style="height:100%;display:flex;flex-direction:column;">
-        <div style="height:25px;display:flex;gap:4px;">
+      <div class="example-layout">
+        <div class="example-controls">
           <button :disabled="!canUndo" @click="undo">Undo</button>
           <button :disabled="!canRedo" @click="redo">Redo</button>
           <button @click="addPanel">Add Panel</button>
         </div>
-        <div style="flex-grow:1;">
-          <dockview-vue
-            style="width:100%;height:100%"
-            class="dockview-theme-abyss"
-            :layoutHistory="{ enabled: true, undoableProgrammaticMutations: true }"
-            @ready="onReady"
-          </dockview-vue>
-        </div>
+        <dockview-vue
+          class="example-dock dockview-theme-abyss"
+          :layoutHistory="{ enabled: true, undoableProgrammaticMutations: true }"
+          @ready="onReady"
+        >
+        </dockview-vue>
       </div>`,
 });
 

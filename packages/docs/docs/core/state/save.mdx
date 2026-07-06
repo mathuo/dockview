@@ -9,6 +9,8 @@ import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 This section describes how to serialize a Dockview instance.
 
+<CodeRunner id="dockview/layout" />
+
 <DocRef declaration="DockviewApi" methods={['toJSON', 'onDidLayoutChange']} />
 
 To retrieve the current state of Dockview call `toJSON()`.
@@ -115,10 +117,6 @@ const disposable = api.onDidLayoutChange(() => {
 ````
 
 </FrameworkSpecific>
-
-## Live example
-
-<CodeRunner id="dockview/layout" />
 
 ## See also
 

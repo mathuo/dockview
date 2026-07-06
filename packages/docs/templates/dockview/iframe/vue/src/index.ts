@@ -51,8 +51,8 @@ const IframePanel = defineComponent({
 const BasicPanel = defineComponent({
     name: 'BasicPanel',
     template: `
-      <div style="padding:20px;color:white;">
-        This panel is just a usual component
+      <div class="example-panel">
+        This panel is just a usual component.
       </div>`,
 });
 

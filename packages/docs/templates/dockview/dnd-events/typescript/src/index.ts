@@ -16,22 +16,19 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.height = '100%';
+        this._element.className = 'example-panel';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
-        const inner = document.createElement('div');
-        inner.textContent = parameters.api.title ?? '';
-        this._element.appendChild(inner);
+        this._element.textContent = parameters.api.title ?? '';
     }
 }
 
 const root = document.getElementById('app')!;
-root.style.display = 'flex';
-root.style.flexDirection = 'column';
-root.style.height = '100%';
+root.className = 'example-layout';
 
 const toolbar = document.createElement('div');
+toolbar.className = 'example-controls';
 
 let disablePanelDrag = false;
 let disableGroupDrag = false;
@@ -70,7 +67,7 @@ syncButtons();
 toolbar.append(panelDragButton, groupDragButton, overlayButton);
 
 const dockElement = document.createElement('div');
-dockElement.style.flexGrow = '1';
+dockElement.className = 'example-dock';
 
 root.append(toolbar, dockElement);
 
@@ -119,11 +116,13 @@ api.onDidDrop((e) => {
 api.addPanel({
     id: 'panel_1',
     component: 'default',
+    title: 'Panel 1',
 });
 
 api.addPanel({
     id: 'panel_2',
     component: 'default',
+    title: 'Panel 2',
     position: {
         direction: 'right',
         referencePanel: 'panel_1',
@@ -133,6 +132,7 @@ api.addPanel({
 api.addPanel({
     id: 'panel_3',
     component: 'default',
+    title: 'Panel 3',
     position: {
         direction: 'below',
         referencePanel: 'panel_1',
@@ -142,9 +142,11 @@ api.addPanel({
 api.addPanel({
     id: 'panel_4',
     component: 'default',
+    title: 'Panel 4',
 });
 
 api.addPanel({
     id: 'panel_5',
     component: 'default',
+    title: 'Panel 5',
 });

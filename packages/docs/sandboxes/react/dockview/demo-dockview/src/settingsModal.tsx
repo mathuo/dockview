@@ -22,17 +22,74 @@ const Section = (props: { title: string; children: React.ReactNode }) => (
     </div>
 );
 
+const Kbd = (props: { children: React.ReactNode }) => (
+    <kbd
+        style={{
+            display: 'inline-block',
+            padding: '1px 6px',
+            fontSize: 10,
+            fontFamily: 'inherit',
+            lineHeight: '16px',
+            border: '1px solid rgba(255,255,255,0.18)',
+            borderBottomWidth: 2,
+            borderRadius: 4,
+            background: 'rgba(255,255,255,0.06)',
+            color: 'rgba(255,255,255,0.85)',
+            whiteSpace: 'nowrap',
+        }}
+    >
+        {props.children}
+    </kbd>
+);
+
+// Read-only reference. Mirrors the enabled `keyboardNavigation` bindings —
+// KeyboardNavigation (nav) + KeyboardDocking (move). Keep in sync with
+// DEFAULT_KEYMAP in dockview-enterprise if the defaults change.
+const SHORTCUTS: { label: string; keys: string[] }[] = [
+    { label: 'Focus next / previous group', keys: ['F6', '⇧ F6'] },
+    { label: 'Focus group by direction', keys: ['Ctrl ⇧ ←↑↓→'] },
+    { label: 'Next / previous tab in group', keys: ['Ctrl ]', 'Ctrl ['] },
+    { label: 'Focus the tab strip', keys: ['Ctrl ⇧ \\'] },
+    { label: 'Move panel — arm', keys: ['Ctrl M'] },
+    { label: '…then pick target / edge', keys: ['←↑↓→'] },
+    { label: '…tab into group (centre)', keys: ['Space', 'C'] },
+    { label: '…commit / cancel', keys: ['Enter', 'Esc'] },
+    { label: '…float instead of dock', keys: ['Ctrl ⇧ F'] },
+];
+
+const KeyboardShortcuts = () => (
+    <div style={{ padding: '4px 16px 10px' }}>
+        {SHORTCUTS.map((row) => (
+            <div
+                key={row.label}
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                    padding: '3px 0',
+                    fontSize: 11,
+                    color: 'rgba(255,255,255,0.7)',
+                }}
+            >
+                <span>{row.label}</span>
+                <span style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                    {row.keys.map((k) => (
+                        <Kbd key={k}>{k}</Kbd>
+                    ))}
+                </span>
+            </div>
+        ))}
+    </div>
+);
+
 const toggleBtn = (active: boolean): React.CSSProperties => ({
     padding: '4px 10px',
     fontSize: 11,
     border: '1px solid rgba(255,255,255,0.12)',
     borderRadius: 4,
-    background: active
-        ? 'rgba(72,100,220,0.25)'
-        : 'rgba(255,255,255,0.04)',
-    borderColor: active
-        ? 'rgba(72,100,220,0.5)'
-        : 'rgba(255,255,255,0.12)',
+    background: active ? 'rgba(72,100,220,0.25)' : 'rgba(255,255,255,0.04)',
+    borderColor: active ? 'rgba(72,100,220,0.5)' : 'rgba(255,255,255,0.12)',
     color: active ? 'white' : 'rgba(255,255,255,0.7)',
     cursor: 'pointer',
     display: 'inline-flex',
@@ -156,6 +213,10 @@ export const ControlsContent = (props: {
                         </button>
                     )}
                 </div>
+            </Section>
+
+            <Section title="Keyboard shortcuts">
+                <KeyboardShortcuts />
             </Section>
         </>
     );

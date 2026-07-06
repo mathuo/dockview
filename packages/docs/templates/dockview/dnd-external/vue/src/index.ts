@@ -13,29 +13,12 @@ const DefaultPanel = defineComponent({
     name: 'DefaultPanel',
     props: {
         params: {
-            type: Object as PropType<IDockviewPanelProps>,
+            type: Object as PropType<IDockviewPanelProps<{ title: string }>>,
             required: true,
         },
     },
-    data() {
-        return {
-            title: '',
-        };
-    },
-    mounted() {
-        const disposable = this.params.api.onDidTitleChange(() => {
-            this.title = this.params.api.title;
-        });
-        this.title = this.params.api.title;
-
-        return () => {
-            disposable.dispose();
-        };
-    },
     template: `
-        <div style="padding: 20px;">
-            <div>{{ title || 'Panel' }}</div>
-        </div>
+        <div class="example-panel">{{ params.params.title }}</div>
     `,
 });
 
@@ -45,7 +28,7 @@ const DraggableElement = defineComponent({
         <span
             tabindex="-1"
             @dragstart="onDragStart"
-            style="background-color: orange; padding: 0px 8px; border-radius: 4px; width: 100px; cursor: pointer;"
+            style="padding: 4px 12px; border-radius: 4px; cursor: grab; user-select: none; color: var(--dv-activegroup-visiblepanel-tab-color); background: var(--dv-activegroup-visiblepanel-tab-background-color); border: 1px solid var(--dv-separator-border);"
             draggable="true">
             Drag me into the dock
         </span>
@@ -69,6 +52,7 @@ const App = defineComponent({
     },
     setup() {
         const api = ref<DockviewApi | null>(null);
+        const dropped = ref<{ type: string; data: string }[] | null>(null);
         const disposables: any[] = [];
 
         const setupDragListeners = () => {
@@ -181,37 +165,49 @@ const App = defineComponent({
             const dataTransfer = event.dataTransfer;
             if (!dataTransfer) return;
 
-            let text = 'The following dataTransfer data was found:\n';
-
+            const entries: { type: string; data: string }[] = [];
             for (let i = 0; i < dataTransfer.items.length; i++) {
                 const item = dataTransfer.items[i];
-                const value = dataTransfer.getData(item.type);
-                text += `type=${item.type},data=${value}\n`;
+                entries.push({
+                    type: item.type,
+                    data: dataTransfer.getData(item.type),
+                });
             }
 
-            alert(text);
+            dropped.value = entries;
         };
 
         return {
             onReady,
             onDidDrop,
             onDrop,
+            dropped,
         };
     },
     template: `
-        <div style="display: flex; flex-direction: column; height: 100%;">
-            <div style="margin: 2px 0px;">
+        <div class="example-layout">
+            <div class="example-controls">
                 <draggable-element />
                 <div
-                    style="padding: 0px 4px; background-color: black; border-radius: 2px; color: white;"
+                    style="flex: 1; min-width: 0; padding: 4px 12px; border-radius: 4px; border: 1px dashed var(--dv-separator-border); color: var(--dv-inactivegroup-visiblepanel-tab-color);"
                     @dragover.prevent
                     @drop="onDrop">
                     Drop a tab or group here to inspect the attached metadata
                 </div>
             </div>
+            <div
+                v-if="dropped"
+                class="example-controls"
+                style="display: block; font-size: 12px;">
+                <span v-if="dropped.length === 0">No dataTransfer data was found.</span>
+                <template v-else>
+                    <div v-for="(entry, index) in dropped" :key="index">
+                        <code>{{ entry.type }}</code>: {{ entry.data }}
+                    </div>
+                </template>
+            </div>
             <dockview-vue
-                style="width: 100%; flex-grow: 1"
-                class="dockview-theme-abyss"
+                class="example-dock dockview-theme-abyss"
                 :dnd-edges="{ size: { value: 100, type: 'pixels' }, activationSize: { value: 5, type: 'percentage' } }"
                 @ready="onReady"
                 @didDrop="onDidDrop">

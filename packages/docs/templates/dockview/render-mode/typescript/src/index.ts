@@ -19,7 +19,6 @@ class Panel implements IContentRenderer {
         this._element = document.createElement('div');
         this._element.style.height = '100%';
         this._element.style.overflow = 'auto';
-        this._element.style.color = 'white';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
@@ -59,16 +58,18 @@ class Panel implements IContentRenderer {
 }
 
 const root = document.getElementById('app')!;
-root.style.height = '100%';
-root.style.display = 'flex';
-root.style.flexDirection = 'column';
+root.className = 'example-layout';
 
 const toolbar = document.createElement('div');
+toolbar.className = 'example-controls';
 
 const saveButton = document.createElement('button');
 saveButton.textContent = 'Save';
 const loadButton = document.createElement('button');
 loadButton.textContent = 'Load';
+
+const sliderLabel = document.createElement('label');
+const sliderText = document.createTextNode('');
 
 const slider = document.createElement('input');
 slider.type = 'range';
@@ -76,20 +77,26 @@ slider.min = '1';
 slider.max = '100';
 slider.value = '100';
 
-toolbar.append(saveButton, loadButton, slider);
+sliderLabel.append(sliderText, slider);
+toolbar.append(saveButton, loadButton, sliderLabel);
 
 // The dock lives inside a wrapper whose size is driven by the slider, so the
 // dock resizes together with its container.
+const dock = document.createElement('div');
+dock.className = 'example-dock';
+
 const dockWrapper = document.createElement('div');
+dock.appendChild(dockWrapper);
 
 const applySize = (value: string): void => {
     slider.value = value;
+    sliderText.textContent = `Container size (${value}%)`;
     dockWrapper.style.height = `${value}%`;
     dockWrapper.style.width = `${value}%`;
 };
 applySize(slider.value);
 
-root.append(toolbar, dockWrapper);
+root.append(toolbar, dock);
 
 const api: DockviewApi = createDockview(dockWrapper, {
     theme: themeAbyss,

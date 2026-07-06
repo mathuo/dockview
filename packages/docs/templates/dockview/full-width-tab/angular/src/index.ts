@@ -19,7 +19,7 @@ interface CustomParams {
     selector: 'default-panel',
     template: `
         <div
-            style="display: flex; justify-content: center; align-items: center; color: white; height: 100%;"
+            style="display: flex; justify-content: center; align-items: center; height: 100%;"
         >
             <span>{{ params?.title }}</span>
             <span *ngIf="params?.x">&nbsp;&nbsp;{{ params?.x }}</span>
@@ -60,15 +60,17 @@ export class DefaultTabComponent {
 @Component({
     selector: 'app-root',
     template: `
-        <div style="height: 100%;">
-            <dv-dockview
-                [components]="components"
-                [tabComponents]="tabComponents"
-                [singleTabMode]="'fullwidth'"
-                className="dockview-theme-abyss"
-                (ready)="onReady($event)"
-            >
-            </dv-dockview>
+        <div class="example-layout">
+            <div class="example-dock">
+                <dv-dockview
+                    [components]="components"
+                    [tabComponents]="tabComponents"
+                    [singleTabMode]="'fullwidth'"
+                    className="dockview-theme-abyss"
+                    (ready)="onReady($event)"
+                >
+                </dv-dockview>
+            </div>
         </div>
     `,
 })

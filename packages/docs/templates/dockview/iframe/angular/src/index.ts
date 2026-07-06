@@ -53,8 +53,8 @@ export class IframePanelComponent implements OnInit, OnDestroy {
 @Component({
     selector: 'basic-panel',
     template: `
-        <div style="padding: 20px; color: white;">
-            This panel is just a usual component
+        <div class="example-panel">
+            This panel is just a usual component.
         </div>
     `,
 })
@@ -63,13 +63,15 @@ export class BasicPanelComponent {}
 @Component({
     selector: 'app-root',
     template: `
-        <div style="height: 100%;">
-            <dv-dockview
-                [components]="components"
-                className="dockview-theme-abyss"
-                (ready)="onReady($event)"
-            >
-            </dv-dockview>
+        <div class="example-layout">
+            <div class="example-dock">
+                <dv-dockview
+                    [components]="components"
+                    className="dockview-theme-abyss"
+                    (ready)="onReady($event)"
+                >
+                </dv-dockview>
+            </div>
         </div>
     `,
 })

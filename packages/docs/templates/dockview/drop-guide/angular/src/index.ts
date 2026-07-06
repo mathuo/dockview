@@ -20,11 +20,7 @@ LicenseManager.setLicenseKey(
 @Component({
     selector: 'default-panel',
     template: `
-        <div
-            style="height: 100%; padding: 20px; background: var(--dv-group-view-background-color);"
-        >
-            {{ params?.title }}
-        </div>
+        <div class="example-panel">{{ params?.title }}</div>
     `,
 })
 export class DefaultPanelComponent {

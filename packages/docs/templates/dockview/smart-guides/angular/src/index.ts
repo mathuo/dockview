@@ -19,13 +19,7 @@ LicenseManager.setLicenseKey(
 
 @Component({
     selector: 'default-panel',
-    template: `
-        <div
-            style="height: 100%; padding: 20px; background: var(--dv-group-view-background-color);"
-        >
-            {{ params?.title }}
-        </div>
-    `,
+    template: `<div class="example-panel">{{ params?.title }}</div>`,
 })
 export class DefaultPanelComponent {
     @Input() api!: DockviewPanelApi;
@@ -35,14 +29,19 @@ export class DefaultPanelComponent {
 @Component({
     selector: 'app-root',
     template: `
-        <div style="height: 100%;">
-            <dv-dockview
-                [components]="components"
-                [smartGuides]="smartGuides"
-                className="dockview-theme-abyss"
-                (ready)="onReady($event)"
-            >
-            </dv-dockview>
+        <div class="example-layout">
+            <div class="example-controls">
+                <button (click)="addFloatingGroup()">Add Floating Group</button>
+            </div>
+            <div class="example-dock">
+                <dv-dockview
+                    [components]="components"
+                    [smartGuides]="smartGuides"
+                    className="dockview-theme-abyss"
+                    (ready)="onReady($event)"
+                >
+                </dv-dockview>
+            </div>
         </div>
     `,
 })
@@ -55,40 +54,54 @@ export class AppComponent {
     // within 8px of an alignment.
     smartGuides = { snapDistance: 8 };
 
+    private api?: DockviewApi;
+    private floatCount = 0;
+
     onReady(event: DockviewReadyEvent) {
         const api: DockviewApi = event.api;
+        this.api = api;
 
-        // A docked base panel to fill the container.
         api.addPanel({
             id: 'panel_1',
             component: 'default',
-            title: 'Panel 1',
             params: { title: 'Panel 1' },
         });
 
-        // Two floating groups so alignment + snapping is demonstrable: drag one
-        // near the other (or towards a container edge) to see the guides.
         api.addPanel({
-            id: 'float_1',
+            id: 'panel_2',
             component: 'default',
-            title: 'Floating 1',
-            params: { title: 'Floating 1' },
-            floating: {
-                width: 220,
-                height: 140,
-                position: { top: 40, left: 60 },
-            },
+            params: { title: 'Panel 2' },
+            position: { direction: 'right' },
         });
 
-        api.addPanel({
-            id: 'float_2',
+        // A couple of floating groups so alignment + snapping is demonstrable:
+        // drag one near the other (or towards a container edge) to see the
+        // guides.
+        this.addFloatingGroupAt({ top: 40, left: 60 });
+        this.addFloatingGroupAt({ top: 220, left: 340 });
+    }
+
+    addFloatingGroup() {
+        this.addFloatingGroupAt({
+            top: 60 + this.floatCount * 10,
+            left: 60 + this.floatCount * 10,
+        });
+    }
+
+    private addFloatingGroupAt(position: { top: number; left: number }) {
+        if (!this.api) {
+            return;
+        }
+
+        this.floatCount++;
+        this.api.addPanel({
+            id: `float_${this.floatCount}`,
             component: 'default',
-            title: 'Floating 2',
-            params: { title: 'Floating 2' },
+            params: { title: `Floating ${this.floatCount}` },
             floating: {
                 width: 220,
                 height: 140,
-                position: { top: 220, left: 340 },
+                position: { top: position.top, left: position.left },
             },
         });
     }

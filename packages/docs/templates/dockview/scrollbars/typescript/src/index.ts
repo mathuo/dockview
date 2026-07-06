@@ -18,7 +18,7 @@ class FixedHeightContainer implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.color = 'white';
+        this._element.className = 'example-panel';
         this._element.style.height = '100%';
         this._element.textContent = [TEXT, '\n\n'].join('').repeat(20);
     }
@@ -37,8 +37,8 @@ class OverflowContainer implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.color = 'white';
-        this._element.style.height = '200px';
+        this._element.className = 'example-panel';
+        this._element.style.height = '2000px';
         this._element.style.overflow = 'auto';
         this._element.textContent = [TEXT, '\n\n'].join('').repeat(20);
     }
@@ -57,12 +57,11 @@ class UserDefinedOverflowContainer implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.color = 'white';
+        this._element.className = 'example-panel';
         this._element.style.height = '100%';
 
         const innerEl = document.createElement('div');
         innerEl.style.height = '100%';
-        innerEl.style.color = 'white';
         innerEl.style.overflow = 'auto';
 
         innerEl.textContent = [TEXT, '\n\n'].join('').repeat(20);

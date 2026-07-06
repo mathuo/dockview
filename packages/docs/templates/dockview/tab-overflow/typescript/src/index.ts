@@ -22,8 +22,7 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.color = 'white';
-        this._element.style.padding = '20px';
+        this._element.className = 'example-panel';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
@@ -31,7 +30,27 @@ class Panel implements IContentRenderer {
     }
 }
 
-const api: DockviewApi = createDockview(document.getElementById('app')!, {
+const layout = document.getElementById('app')!;
+layout.className = 'example-layout';
+
+const controls = document.createElement('div');
+controls.className = 'example-controls';
+
+const addButton = document.createElement('button');
+addButton.textContent = 'Add Tab';
+
+let mode: 'wrap' | 'dropdown' = 'wrap';
+const modeButton = document.createElement('button');
+modeButton.textContent = 'Switch to dropdown mode';
+
+controls.append(addButton, modeButton);
+
+const dockElement = document.createElement('div');
+dockElement.className = 'example-dock';
+
+layout.append(controls, dockElement);
+
+const api: DockviewApi = createDockview(dockElement, {
     theme: themeAbyss,
     // Wrap tabs onto multiple rows when they no longer fit on one row.
     overflow: { mode: 'wrap' },
@@ -43,11 +62,27 @@ const api: DockviewApi = createDockview(document.getElementById('app')!, {
     },
 });
 
-// Open enough panels in a single group that the tabs no longer fit on one row.
-for (let i = 1; i <= 12; i++) {
+let counter = 0;
+
+function addPanel(): void {
+    counter++;
     api.addPanel({
-        id: `panel_${i}`,
+        id: `panel_${counter}`,
         component: 'default',
-        title: `Panel ${i}`,
+        title: `Panel ${counter}`,
     });
+}
+
+addButton.addEventListener('click', () => addPanel());
+
+modeButton.addEventListener('click', () => {
+    mode = mode === 'wrap' ? 'dropdown' : 'wrap';
+    api.updateOptions({ overflow: { mode } });
+    modeButton.textContent =
+        mode === 'wrap' ? 'Switch to dropdown mode' : 'Switch to wrap mode';
+});
+
+// Open enough panels in a single group that the tabs no longer fit on one row.
+for (let i = 0; i < 12; i++) {
+    addPanel();
 }

@@ -1,13 +1,13 @@
 ---
 title: Drop position resolver
 sidebar_position: 6
-description: Override where a pointer location maps to a drop position with a free, pluggable core resolver.
+description: Override where a pointer location maps to a drop position with a pluggable core resolver.
 ---
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 By default Dockview resolves a drop from the quadrant of the target the cursor happens to be over. The
-`dropPositionResolver` option is a free, lower-level core seam that lets you replace how a pointer location maps to a
+`dropPositionResolver` option is a lower-level core seam that lets you replace how a pointer location maps to a
 drop position. It affects the five-way group and whole-layout-edge drop targets (tab and header reorder targets are
 unaffected). When unset, the built-in cursor-quadrant behaviour is used, unchanged.
 

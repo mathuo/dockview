@@ -3,6 +3,7 @@ import {
     createDockview,
     GroupPanelPartInitParameters,
     IContentRenderer,
+    TabAnimation,
     themeAbyss,
 } from 'dockview';
 
@@ -15,15 +16,31 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.color = 'white';
+        this._element.className = 'example-panel';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
-        this._element.textContent = 'Hello World';
+        this._element.textContent = parameters.api.title ?? '';
     }
 }
 
-const api = createDockview(document.getElementById('app'), {
+const layout = document.getElementById('app')!;
+layout.className = 'example-layout';
+
+const controls = document.createElement('div');
+controls.className = 'example-controls';
+
+let tabAnimation: TabAnimation = 'default';
+const modeButton = document.createElement('button');
+modeButton.textContent = `tabAnimation: ${tabAnimation}`;
+controls.append(modeButton);
+
+const dockElement = document.createElement('div');
+dockElement.className = 'example-dock';
+
+layout.append(controls, dockElement);
+
+const api = createDockview(dockElement, {
     theme: themeAbyss,
     createComponent: (options) => {
         switch (options.name) {
@@ -32,6 +49,12 @@ const api = createDockview(document.getElementById('app'), {
         }
     },
     disableFloatingGroups: true,
+});
+
+modeButton.addEventListener('click', () => {
+    tabAnimation = tabAnimation === 'smooth' ? 'default' : 'smooth';
+    api.updateOptions({ theme: { ...themeAbyss, tabAnimation } });
+    modeButton.textContent = `tabAnimation: ${tabAnimation}`;
 });
 
 api.onWillShowOverlay((e) => {
@@ -44,24 +67,29 @@ api.onWillShowOverlay((e) => {
 api.addPanel({
     id: 'panel_1',
     component: 'default',
+    title: 'Panel 1',
 });
 
 api.addPanel({
     id: 'panel_2',
     component: 'default',
+    title: 'Panel 2',
 });
 
 api.addPanel({
     id: 'panel_3',
     component: 'default',
+    title: 'Panel 3',
 });
 
 api.addPanel({
     id: 'panel_4',
     component: 'default',
+    title: 'Panel 4',
 });
 
 api.addPanel({
     id: 'panel_5',
     component: 'default',
+    title: 'Panel 5',
 });

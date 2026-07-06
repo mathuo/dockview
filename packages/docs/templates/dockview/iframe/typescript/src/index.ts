@@ -56,9 +56,8 @@ class BasicPanel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.color = 'white';
-        this._element.style.padding = '20px';
-        this._element.textContent = 'This panel is just a usual component ';
+        this._element.className = 'example-panel';
+        this._element.textContent = 'This panel is just a usual component.';
     }
 
     init(_parameters: GroupPanelPartInitParameters): void {

@@ -21,8 +21,7 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.padding = '20px';
-        this._element.style.color = 'white';
+        this._element.className = 'example-panel';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
@@ -30,7 +29,22 @@ class Panel implements IContentRenderer {
     }
 }
 
-const api = createDockview(document.getElementById('app')!, {
+const root = document.getElementById('app')!;
+root.className = 'example-layout';
+
+const controls = document.createElement('div');
+controls.className = 'example-controls';
+
+const addButton = document.createElement('button');
+addButton.textContent = 'Add Floating Group';
+controls.append(addButton);
+
+const dockElement = document.createElement('div');
+dockElement.className = 'example-dock';
+
+root.append(controls, dockElement);
+
+const api = createDockview(dockElement, {
     theme: themeAbyss,
     // Snap floating groups to each other (and to container edges) when dragged
     // within 8px of an alignment.
@@ -43,21 +57,33 @@ const api = createDockview(document.getElementById('app')!, {
     },
 });
 
+let floatCount = 0;
+
+function addFloatingGroup(position: { top: number; left: number }): void {
+    floatCount++;
+    api.addPanel({
+        id: `float_${floatCount}`,
+        component: 'default',
+        title: `Floating ${floatCount}`,
+        floating: {
+            width: 220,
+            height: 140,
+            position: { top: position.top, left: position.left },
+        },
+    });
+}
+
+addButton.addEventListener('click', () => {
+    addFloatingGroup({
+        top: 60 + floatCount * 10,
+        left: 60 + floatCount * 10,
+    });
+});
+
 // A docked base panel to fill the container.
 api.addPanel({ id: 'panel_1', component: 'default', title: 'Panel 1' });
 
 // Two floating groups so alignment + snapping is demonstrable: drag one near
 // the other (or towards a container edge) to see the guides.
-api.addPanel({
-    id: 'float_1',
-    component: 'default',
-    title: 'Floating 1',
-    floating: { width: 220, height: 140, position: { top: 40, left: 60 } },
-});
-
-api.addPanel({
-    id: 'float_2',
-    component: 'default',
-    title: 'Floating 2',
-    floating: { width: 220, height: 140, position: { top: 220, left: 340 } },
-});
+addFloatingGroup({ top: 40, left: 60 });
+addFloatingGroup({ top: 220, left: 340 });

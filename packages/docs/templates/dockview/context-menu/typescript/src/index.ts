@@ -21,7 +21,7 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.padding = '8px';
+        this._element.className = 'example-panel';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
@@ -45,6 +45,13 @@ const api = createDockview(document.getElementById('app'), {
         {
             label: 'Log panel id',
             action: () => console.log(params.panel.id),
+        },
+        'separator',
+        {
+            // Custom item mirroring the React `FloatMenuItem` component: floats
+            // the panel's tab into its own group.
+            label: 'Float tab',
+            action: () => params.api.addFloatingGroup(params.panel),
         },
     ],
 });

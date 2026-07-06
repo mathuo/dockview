@@ -30,9 +30,7 @@ const Panel = defineComponent({
         this.title = this.params.api.title ?? '';
     },
     template: `
-      <div style="color:white;padding:20px;">
-        <div>{{title}}</div>
-      </div>`,
+      <div class="example-panel">{{ title }}</div>`,
 });
 
 const App = defineComponent({

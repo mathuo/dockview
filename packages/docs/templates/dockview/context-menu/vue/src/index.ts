@@ -4,6 +4,7 @@ import { PropType, createApp, defineComponent } from 'vue';
 import {
     DockviewVue,
     DockviewReadyEvent,
+    IContextMenuItemComponentProps,
     IDockviewPanelProps,
 } from 'dockview-vue';
 
@@ -21,9 +22,29 @@ const Panel = defineComponent({
         },
     },
     template: `
-    <div style="padding:8px;">
-      <p>{{ params.api.title }}</p>
-    </div>`,
+      <div class="example-panel">{{ params.api.title }}</div>`,
+});
+
+/**
+ * A custom context menu item rendered as a Vue component.
+ * Receives panel, group, api, and close via IContextMenuItemComponentProps.
+ */
+const FloatMenuItem = defineComponent({
+    name: 'FloatMenuItem',
+    props: {
+        params: {
+            type: Object as PropType<IContextMenuItemComponentProps>,
+            required: true,
+        },
+    },
+    methods: {
+        onClick() {
+            this.params.api.addFloatingGroup(this.params.panel);
+            this.params.close();
+        },
+    },
+    template: `
+      <div class="dv-context-menu-item" @click="onClick">Float tab</div>`,
 });
 
 const App = defineComponent({
@@ -31,6 +52,7 @@ const App = defineComponent({
     components: {
         'dockview-vue': DockviewVue,
         default: Panel,
+        floatMenuItem: FloatMenuItem,
     },
     methods: {
         onReady(event: DockviewReadyEvent) {
@@ -60,6 +82,8 @@ const App = defineComponent({
                     label: 'Log panel id',
                     action: () => console.log(params.panel.id),
                 },
+                'separator',
+                { component: 'floatMenuItem' },
             ];
         },
     },

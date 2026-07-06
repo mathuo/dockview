@@ -4,6 +4,8 @@ import {
     createDockview,
     GroupPanelPartInitParameters,
     IContentRenderer,
+    IGroupHeaderProps,
+    IHeaderActionsRenderer,
     themeAbyss,
 } from 'dockview';
 
@@ -21,12 +23,92 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.padding = '20px';
-        this._element.style.color = 'white';
+        this._element.className = 'example-panel';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
         this._element.textContent = parameters.api.title ?? '';
+    }
+}
+
+// Renders a single clickable material-symbols icon, mirroring the React `Icon`.
+function createIcon(
+    icon: string,
+    title: string,
+    onClick: () => void
+): HTMLElement {
+    const container = document.createElement('div');
+    container.title = title;
+    container.style.display = 'flex';
+    container.style.justifyContent = 'center';
+    container.style.alignItems = 'center';
+    container.style.width = '30px';
+    container.style.height = '100%';
+    container.style.fontSize = '18px';
+
+    const span = document.createElement('span');
+    span.className = 'material-symbols-outlined';
+    span.style.fontSize = 'inherit';
+    span.style.cursor = 'pointer';
+    span.textContent = icon;
+
+    container.appendChild(span);
+    container.addEventListener('click', onClick);
+
+    return container;
+}
+
+// Right header action: pin/unpin the group's active tab, mirroring the React
+// `RightComponent`.
+class RightHeaderActions implements IHeaderActionsRenderer {
+    private readonly _element: HTMLElement = document.createElement('div');
+    private readonly _disposables: (() => void)[] = [];
+    private _pinnedDisposable: (() => void) | undefined;
+
+    get element(): HTMLElement {
+        return this._element;
+    }
+
+    init(parameters: IGroupHeaderProps): void {
+        this._element.style.height = '100%';
+        this._element.style.padding = '0px 4px';
+
+        const render = () => {
+            this._element.innerHTML = '';
+            const panel = parameters.group.activePanel;
+            if (!panel) {
+                return;
+            }
+            const pinned = panel.api.isPinned;
+            const icon = createIcon(
+                pinned ? 'keep_off' : 'keep',
+                pinned ? 'Unpin tab' : 'Pin tab',
+                () => panel.api.setPinned(!panel.api.isPinned)
+            );
+            this._element.appendChild(icon);
+        };
+
+        const subscribe = () => {
+            this._pinnedDisposable?.();
+            const panel = parameters.group.activePanel;
+            if (panel) {
+                const disposable = panel.api.onDidChangePinned(() => render());
+                this._pinnedDisposable = () => disposable.dispose();
+            }
+            render();
+        };
+
+        subscribe();
+
+        const disposable = parameters.api.onDidActivePanelChange(() =>
+            subscribe()
+        );
+        this._disposables.push(() => disposable.dispose());
+    }
+
+    dispose(): void {
+        this._pinnedDisposable?.();
+        this._disposables.forEach((dispose) => dispose());
     }
 }
 
@@ -40,6 +122,7 @@ const api = createDockview(document.getElementById('app')!, {
                 return new Panel();
         }
     },
+    createRightHeaderActionComponent: () => new RightHeaderActions(),
 });
 
 const home = api.addPanel({ id: 'home', component: 'default', title: 'Home' });

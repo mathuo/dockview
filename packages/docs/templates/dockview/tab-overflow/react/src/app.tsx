@@ -8,17 +8,7 @@ import React from 'react';
 
 const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {
-        return (
-            <div
-                style={{
-                    height: '100%',
-                    padding: '20px',
-                    background: 'var(--dv-group-view-background-color)',
-                }}
-            >
-                {props.params.title}
-            </div>
-        );
+        return <div className="example-panel">{props.params.title}</div>;
     },
 };
 
@@ -56,14 +46,8 @@ export const App = (props: { theme?: string }) => {
     };
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%',
-            }}
-        >
-            <div style={{ height: '25px' }}>
+        <div className="example-layout">
+            <div className="example-controls">
                 <button onClick={() => api && addPanel(api)}>Add Tab</button>
                 <button onClick={toggleMode}>
                     {mode === 'wrap'
@@ -71,7 +55,7 @@ export const App = (props: { theme?: string }) => {
                         : 'Switch to wrap mode'}
                 </button>
             </div>
-            <div style={{ flexGrow: 1 }}>
+            <div className="example-dock">
                 <DockviewReact
                     onReady={onReady}
                     components={components}
