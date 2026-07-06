@@ -209,6 +209,93 @@ describe('EdgeGroupView', () => {
             expect(view.lastExpandedSize).toBe(200);
         });
     });
+
+    describe('tab-strip size tracking', () => {
+        test('a measured tab size wins over the configured collapsed size', () => {
+            const group = makeGroup();
+            const view = new EdgeGroupView(
+                { id: 'test', collapsedSize: 44 },
+                group,
+                'vertical'
+            );
+            expect(view.collapsedSize).toBe(44);
+
+            // Simulate the tab strip growing (as when the
+            // --dv-tabs-and-actions-container-height CSS variable is bumped).
+            (view as any)._applyMeasuredTabSize(60);
+            expect(view.collapsedSize).toBe(60);
+        });
+
+        test('the measured tab size is added to the gap contribution', () => {
+            const group = makeGroup();
+            const view = new EdgeGroupView(
+                { id: 'test', collapsedSize: 44 },
+                group,
+                'vertical',
+                5
+            );
+            expect(view.collapsedSize).toBe(49);
+
+            (view as any)._applyMeasuredTabSize(60);
+            expect(view.collapsedSize).toBe(65);
+        });
+
+        test('when collapsed: a measured tab size resizes via onDidChange', () => {
+            const group = makeGroup();
+            const view = new EdgeGroupView(
+                { id: 'test', collapsedSize: 44 },
+                group,
+                'vertical'
+            );
+            view.setCollapsed(true);
+
+            const sizes: (number | undefined)[] = [];
+            view.onDidChange((e) => sizes.push(e.size));
+
+            (view as any)._applyMeasuredTabSize(60);
+
+            expect(sizes).toEqual([60]);
+            expect(view.minimumSize).toBe(60);
+            expect(view.maximumSize).toBe(60);
+        });
+
+        test('when expanded: a measured tab size does NOT fire onDidChange', () => {
+            const group = makeGroup();
+            const view = new EdgeGroupView(
+                { id: 'test', collapsedSize: 44 },
+                group,
+                'vertical'
+            );
+
+            const sizes: (number | undefined)[] = [];
+            view.onDidChange((e) => sizes.push(e.size));
+
+            (view as any)._applyMeasuredTabSize(60);
+
+            expect(sizes).toEqual([]);
+            // but a later collapse uses the measured size
+            expect(view.collapsedSize).toBe(60);
+        });
+
+        test('a zero or unchanged measurement is ignored', () => {
+            const group = makeGroup();
+            const view = new EdgeGroupView(
+                { id: 'test', collapsedSize: 44 },
+                group,
+                'vertical'
+            );
+            view.setCollapsed(true);
+
+            const sizes: (number | undefined)[] = [];
+            view.onDidChange((e) => sizes.push(e.size));
+
+            (view as any)._applyMeasuredTabSize(0);
+            (view as any)._applyMeasuredTabSize(60);
+            (view as any)._applyMeasuredTabSize(60);
+
+            expect(sizes).toEqual([60]);
+        });
+    });
 });
 
 describe('ShellManager', () => {
