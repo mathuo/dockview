@@ -11915,6 +11915,9 @@ describe('dockviewComponent', () => {
                 const edge = dv.getEdgeGroup('left');
                 expect(edge).toBeDefined();
                 expect(edge!.location.type).toBe('edge');
+                // a newly revealed edge group is created collapsed (the drop
+                // adds a tab to its strip rather than popping it open)
+                expect(edge!.isCollapsed()).toBe(true);
                 const edgePanel = dv.getEdgeGroupPanel('left')!;
                 expect(edgePanel.panels.map((p) => p.id)).toContain('p1');
                 dv.dispose();
@@ -11966,12 +11969,42 @@ describe('dockviewComponent', () => {
                 dv.dispose();
             });
 
-            test('revealing into an existing collapsed edge expands and fills it', () => {
+            test('revealing into an existing edge fills it without changing its toggled state', () => {
                 const c = document.createElement('div');
                 const dv = createFixedDockview(c, ['left'], {
                     left: { id: 'left-group', collapsed: true },
                 });
                 dv.layout(1000, 1000);
+
+                const panel = dv.addPanel({ id: 'p1', component: 'default' });
+                dv.revealEdgeGroupWithData('left', {
+                    groupId: panel.group.id,
+                    panelId: 'p1',
+                });
+
+                const edge = dv.getEdgeGroup('left')!;
+                // collapsed state is left as-is (still collapsed), the panel is
+                // just added to the strip's tabs
+                expect(edge.isCollapsed()).toBe(true);
+                expect(
+                    dv.getEdgeGroupPanel('left')!.panels.map((p) => p.id)
+                ).toContain('p1');
+                dv.dispose();
+            });
+
+            test('revealing into an expanded edge leaves it expanded', () => {
+                const c = document.createElement('div');
+                const dv = createFixedDockview(c, ['left'], {
+                    left: { id: 'left-group' },
+                });
+                dv.layout(1000, 1000);
+                // seed a panel so the edge is non-empty and expanded
+                dv.addPanel({
+                    id: 'seed',
+                    component: 'default',
+                    position: { referenceGroup: 'left-group' },
+                });
+                expect(dv.getEdgeGroup('left')!.isCollapsed()).toBe(false);
 
                 const panel = dv.addPanel({ id: 'p1', component: 'default' });
                 dv.revealEdgeGroupWithData('left', {

@@ -2916,23 +2916,23 @@ export class DockviewComponent
         this.mutation('add', () => {
             let group = service.get(position);
             if (!group) {
+                // A newly revealed edge group is created collapsed — the drop
+                // adds a tab to its strip rather than popping the group open.
                 this.addEdgeGroup(position, {
                     id: this.getNextGroupId(),
                     autoReveal: true,
                     autoHide: options?.autoHide,
+                    collapsed: true,
                 });
                 group = service.get(position);
-            } else {
-                if (options?.autoHide !== undefined) {
-                    service.setAutoHide(group, options.autoHide);
-                }
-                if (this.isEdgeGroupCollapsed(group)) {
-                    this.setEdgeGroupCollapsed(group, false);
-                }
+            } else if (options?.autoHide !== undefined) {
+                service.setAutoHide(group, options.autoHide);
             }
             if (!group) {
                 return;
             }
+            // Add the panel to the edge group's tabs WITHOUT changing its
+            // collapsed/toggled state (leave it as the user last had it).
             this.moveGroupOrPanel({
                 from: {
                     groupId: data.groupId,
