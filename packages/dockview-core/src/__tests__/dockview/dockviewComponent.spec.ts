@@ -12067,6 +12067,64 @@ describe('dockviewComponent', () => {
                 dv2.dispose();
             });
 
+            test('revealing into an existing edge with autoHide fires the change event', () => {
+                const c = document.createElement('div');
+                const dv = createFixedDockview(c, ['left'], {
+                    left: { id: 'left-group' },
+                });
+                dv.layout(1000, 1000);
+                dv.addPanel({
+                    id: 'seed',
+                    component: 'default',
+                    position: { referenceGroup: 'left-group' },
+                });
+
+                const fired: string[] = [];
+                dv.onDidEdgeGroupAutoHideChange((g) => fired.push(g.id));
+
+                const panel = dv.addPanel({ id: 'p1', component: 'default' });
+                dv.revealEdgeGroupWithData(
+                    'left',
+                    { groupId: panel.group.id, panelId: 'p1' },
+                    { autoHide: true }
+                );
+
+                // the reuse path must fire the event so a listener (the
+                // auto-hide controller) can reconcile the group's chrome
+                expect(fired).toContain('left-group');
+                expect(
+                    dv.isEdgeGroupAutoHide(dv.getEdgeGroupPanel('left')!)
+                ).toBe(true);
+                dv.dispose();
+            });
+
+            test('an emptied auto-reveal edge is not serialized before its teardown microtask', () => {
+                const c = document.createElement('div');
+                const dv = new DockviewComponent(c, {
+                    createComponent(options) {
+                        return new PanelContentPartTest(
+                            options.id,
+                            options.name
+                        );
+                    },
+                });
+                dv.layout(1000, 1000);
+
+                const panel = dv.addPanel({ id: 'p1', component: 'default' });
+                dv.revealEdgeGroupWithData('left', {
+                    groupId: panel.group.id,
+                    panelId: 'p1',
+                });
+                // empty it, then serialize SYNCHRONOUSLY (before the deferred
+                // teardown runs) — the transient empty auto-reveal edge must not
+                // be persisted, or it would restore as an edge that never tears
+                // itself down.
+                dv.getEdgeGroupPanel('left')!.panels[0].api.close();
+                const json = dv.toJSON();
+                expect(json.edgeGroups?.left).toBeUndefined();
+                dv.dispose();
+            });
+
             test('revealEdgeGroupWithData is a no-op without the EdgeGroup module', () => {
                 const c = document.createElement('div');
                 const dv = new DockviewComponent(c, {

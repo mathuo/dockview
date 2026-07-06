@@ -124,7 +124,6 @@ import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import { themeAbyss } from './theme';
 import {
     EdgeGroupPosition,
-    EdgeGroupOptions,
     AddEdgeGroupOptions,
     SerializedEdgeGroups,
     ShellManager,
@@ -2895,10 +2894,11 @@ export class DockviewComponent
 
     /**
      * Reveal (create-or-fill) the edge group at `position` and move the dragged
-     * item described by `data` into it. A newly created edge group is flagged
-     * `autoReveal` so it tears down to zero footprint when later emptied. If an
-     * edge group already exists there it is reused (and expanded if collapsed) —
-     * never re-created (`addEdgeGroup` throws on a duplicate position). No-op if
+     * item described by `data` into it. A newly created edge group is created
+     * collapsed and flagged `autoReveal` so it tears down to zero footprint when
+     * later emptied. If an edge group already exists there it is reused — the
+     * panel is added to its tabs and its collapsed/toggled state is left as-is
+     * (never re-created; `addEdgeGroup` throws on a duplicate position). No-op if
      * the EdgeGroup module is absent.
      *
      * This is the primitive behind the drag-revealed edges; the two-band
@@ -2926,7 +2926,10 @@ export class DockviewComponent
                 });
                 group = service.get(position);
             } else if (options?.autoHide !== undefined) {
-                service.setAutoHide(group, options.autoHide);
+                // Route through setEdgeGroupAutoHide (not the raw service) so
+                // onDidEdgeGroupAutoHideChange fires and the auto-hide
+                // controller reconciles the group's chrome.
+                this.setEdgeGroupAutoHide(group, options.autoHide);
             }
             if (!group) {
                 return;
@@ -3248,15 +3251,28 @@ export class DockviewComponent
             // knows geometry/collapse).
             for (const [position, group] of edgeEntries) {
                 const entry = shellSerialized[position];
-                if (entry) {
-                    entry.group = group.toJSON();
-                    if (this._edgeGroupService!.isAutoReveal(group)) {
-                        entry.autoReveal = true;
-                    }
-                    const autoHide = this._edgeGroupService!.isAutoHide(group);
-                    if (autoHide !== undefined) {
-                        entry.autoHide = autoHide;
-                    }
+                if (!entry) {
+                    continue;
+                }
+                // Don't persist a transient empty auto-reveal edge (it's
+                // mid-teardown to zero footprint — the deferred removeEdgeGroup
+                // microtask hasn't run yet). Restoring it would recreate an edge
+                // that can never tear itself down, since nothing is ever removed
+                // from it to fire onDidRemovePanel.
+                if (
+                    this._edgeGroupService!.isAutoReveal(group) &&
+                    group.model.isEmpty
+                ) {
+                    delete shellSerialized[position];
+                    continue;
+                }
+                entry.group = group.toJSON();
+                if (this._edgeGroupService!.isAutoReveal(group)) {
+                    entry.autoReveal = true;
+                }
+                const autoHide = this._edgeGroupService!.isAutoHide(group);
+                if (autoHide !== undefined) {
+                    entry.autoHide = autoHide;
                 }
             }
 
