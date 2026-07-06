@@ -366,6 +366,13 @@ export class DropGuideService
         if (!this._enabled || e.kind !== 'content' || !e.group) {
             return;
         }
+        // An edge-group cell (the true outer edge, when auto edge groups compose
+        // with the compass) is owned by the edge-group affordance — bow out so
+        // the two don't double-render.
+        if (e.edgeGroup) {
+            this._unmount();
+            return;
+        }
         this._mount(e.group, e.nativeEvent);
         if (!this._mounted) {
             return; // no compass mounted (e.g. no content container) — nothing to drive

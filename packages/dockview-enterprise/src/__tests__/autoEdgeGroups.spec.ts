@@ -134,7 +134,7 @@ describe('auto edge groups (two-band drag reveal)', () => {
                 ]),
                 event: { clientX: 5, clientY: 500 } as any,
             })
-        ).toEqual({ position: 'left', edge: true });
+        ).toEqual({ position: 'left', edge: true, edgeGroup: true });
 
         // pointer near the left but past the outer band → normal group split
         expect(
@@ -178,6 +178,7 @@ describe('auto edge groups (two-band drag reveal)', () => {
         expect(service.resolveEdge(args(5))).toEqual({
             position: 'left',
             edge: true,
+            edgeGroup: true,
         });
         expect(service.resolveEdge(args(40))).toBeNull();
         service.dispose();

@@ -155,7 +155,7 @@ export class AutoEdgeGroupService
                 args.zones.has(pos) &&
                 edgeDepth(pos, args.event, rect) <= OUTER_BAND
             ) {
-                return { position: pos, edge: true };
+                return { position: pos, edge: true, edgeGroup: true };
             }
         }
         return null;

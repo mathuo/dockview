@@ -51,6 +51,12 @@ export class DockviewWillShowOverlayLocationEvent implements IDockviewEvent {
         return this.event.edge;
     }
 
+    /** The resolved cell docks as a dedicated edge group (display hint). See
+     *  {@link PositionResolverResult.edgeGroup}. */
+    get edgeGroup(): boolean {
+        return this.event.edgeGroup;
+    }
+
     get defaultPrevented(): boolean {
         return this.event.defaultPrevented;
     }
