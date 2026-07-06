@@ -141,6 +141,8 @@ Collapsed edge groups can auto-hide and peek back on demand — see [Auto-hide E
 
 By default an edge must be created explicitly with `addEdgeGroup`, and an empty edge group collapses to a strip rather than disappearing. Set the `autoEdgeGroups` prop to make edges behave like a VS Code sidebar instead: an edge with no content takes up **zero space**, a drop zone for it appears only **while dragging**, and dropping a panel there reveals an edge group at that position. When its last panel leaves, the edge group tears down and the edge becomes invisible again.
 
+<CodeRunner id="dockview/auto-edge-groups" height={500} />
+
 ```ts
 const dockview = createDockview(element, {
     // ...
