@@ -112,7 +112,9 @@ export class EdgeGroupView implements IView {
 
     get maximumSize(): number {
         // When collapsed, lock size to collapsedSize so sash can't drag it open
-        return this._isCollapsed ? this.collapsedSize : this._expandedMaximumSize;
+        return this._isCollapsed
+            ? this.collapsedSize
+            : this._expandedMaximumSize;
     }
 
     get element(): HTMLElement {
