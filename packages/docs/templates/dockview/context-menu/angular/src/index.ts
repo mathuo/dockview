@@ -19,7 +19,7 @@ LicenseManager.setLicenseKey(
 
 @Component({
     selector: 'default-panel',
-    template: `<div style="padding:8px;">{{ api?.title }}</div>`,
+    template: `<div class="example-panel">{{ api?.title }}</div>`,
 })
 export class DefaultPanelComponent {
     @Input() api: any;
@@ -50,14 +50,17 @@ export class FloatMenuItemComponent implements IContextMenuItemComponentProps {
 @Component({
     selector: 'app-root',
     template: `
-        <dv-dockview
-            style="width:100%;height:100%"
-            className="dockview-theme-abyss"
-            [components]="components"
-            [getTabContextMenuItems]="getTabContextMenuItems"
-            (ready)="onReady($event)"
-        >
-        </dv-dockview>
+        <div class="example-layout">
+            <div class="example-dock">
+                <dv-dockview
+                    className="dockview-theme-abyss"
+                    [components]="components"
+                    [getTabContextMenuItems]="getTabContextMenuItems"
+                    (ready)="onReady($event)"
+                >
+                </dv-dockview>
+            </div>
+        </div>
     `,
 })
 export class AppComponent implements OnInit {
@@ -74,6 +77,8 @@ export class AppComponent implements OnInit {
             label: 'Log panel id',
             action: () => console.log(params.panel.id),
         },
+        'separator' as const,
+        { component: FloatMenuItemComponent },
     ];
 
     ngOnInit() {}

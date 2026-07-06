@@ -14,7 +14,20 @@ LicenseManager.setLicenseKey(
 );
 
 const shortcutStyle =
-    'background-color:lightblue;color:black;padding:2px 4px;border-radius:4px;white-space:nowrap;';
+    'padding:2px 6px;border-radius:4px;border:1px solid;font-family:monospace;white-space:nowrap;';
+
+function createShortcut(text: string): HTMLSpanElement {
+    const span = document.createElement('span');
+    span.setAttribute('style', shortcutStyle);
+    span.textContent = text;
+    return span;
+}
+
+function createText(text: string): HTMLSpanElement {
+    const span = document.createElement('span');
+    span.textContent = text;
+    return span;
+}
 
 class Panel implements IContentRenderer {
     private readonly _element: HTMLElement;
@@ -25,8 +38,7 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.color = 'white';
-        this._element.style.padding = '20px';
+        this._element.className = 'example-panel';
         this._element.style.fontSize = '13px';
     }
 
@@ -37,7 +49,21 @@ class Panel implements IContentRenderer {
 
         const description = document.createElement('div');
         description.style.padding = '10px 0px';
-        description.innerHTML = `<span style="${shortcutStyle}">Ctrl+]</span> <span style="${shortcutStyle}">Ctrl+[</span> switch tabs · <span style="${shortcutStyle}">F6</span> <span style="${shortcutStyle}">Shift+F6</span> move between groups · <span style="${shortcutStyle}">Ctrl+M</span> dock with the keyboard.`;
+        description.style.display = 'flex';
+        description.style.flexWrap = 'wrap';
+        description.style.gap = '6px';
+        description.style.alignItems = 'center';
+
+        description.append(
+            createShortcut('Ctrl+]'),
+            createShortcut('Ctrl+['),
+            createText('switch tabs'),
+            createShortcut('F6'),
+            createShortcut('Shift+F6'),
+            createText('move between groups'),
+            createShortcut('Ctrl+M'),
+            createText('dock with the keyboard')
+        );
 
         this._element.appendChild(title);
         this._element.appendChild(description);

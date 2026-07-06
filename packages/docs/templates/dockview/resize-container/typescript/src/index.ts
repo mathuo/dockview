@@ -16,8 +16,7 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.padding = '20px';
-        this._element.style.color = 'white';
+        this._element.className = 'example-panel';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
@@ -26,21 +25,34 @@ class Panel implements IContentRenderer {
 }
 
 const root = document.getElementById('app')!;
-root.style.height = '100%';
-root.style.display = 'flex';
-root.style.flexDirection = 'column';
+root.className = 'example-layout';
+
+const controls = document.createElement('div');
+controls.className = 'example-controls';
 
 // A slider drives the size of the wrapper the dock lives in. Dockview watches
 // its container and resizes automatically, so the layout tracks the container.
+const sliderLabel = document.createElement('label');
+const sliderPrefix = document.createTextNode('Scale: ');
+const sliderSuffix = document.createTextNode('');
+
 const slider = document.createElement('input');
 slider.type = 'range';
 slider.min = '1';
 slider.max = '100';
 slider.value = '50';
 
+sliderLabel.append(sliderPrefix, slider, sliderSuffix);
+controls.appendChild(sliderLabel);
+
+const dock = document.createElement('div');
+dock.className = 'example-dock';
+
 const dockWrapper = document.createElement('div');
+dock.appendChild(dockWrapper);
 
 const applySize = (value: string): void => {
+    sliderSuffix.textContent = ` ${value}%`;
     dockWrapper.style.height = `${value}%`;
     dockWrapper.style.width = `${value}%`;
 };
@@ -48,7 +60,7 @@ applySize(slider.value);
 
 slider.addEventListener('input', () => applySize(slider.value));
 
-root.append(slider, dockWrapper);
+root.append(controls, dock);
 
 const api: DockviewApi = createDockview(dockWrapper, {
     theme: themeAbyss,

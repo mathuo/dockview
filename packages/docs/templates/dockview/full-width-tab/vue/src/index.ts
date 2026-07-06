@@ -32,7 +32,7 @@ const Panel = defineComponent({
         this.x = this.params.params.x;
     },
     template: `
-      <div style="display:flex;justify-content:center;align-items:center;color:white;height:100%;">
+      <div style="display:flex;justify-content:center;align-items:center;height:100%;">
         <span>{{title}}</span>
         <span v-if="x">&nbsp;&nbsp;{{x}}</span>
       </div>`,

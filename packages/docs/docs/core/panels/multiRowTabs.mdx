@@ -1,7 +1,7 @@
 ---
 title: Multi-row tabs
 description: The multi-row (wrapping) tabs mode, where a group's tab strip wraps onto additional rows so every tab stays visible at once.
-sidebar_position: 7
+sidebar_position: 9
 enterprise: true
 sidebar_custom_props:
     enterprise: true
@@ -14,6 +14,8 @@ default behaviour is to collapse the surplus behind an overflow dropdown. Multi-
 tabs offer an alternative: the strip wraps onto additional rows and the header grows
 to fit, so every tab stays visible at once. The default single-row dropdown behaviour
 is covered in [Tab Overflow](/docs/core/panels/tabOverflow).
+
+<CodeRunner id="dockview/tab-overflow" />
 
 ## Multi-row (wrapping) tabs
 
@@ -115,14 +117,6 @@ These fields are reserved for a not-yet-shipped advanced overflow module and cur
 have **no effect**. They are documented here only as forward-looking API surface —
 setting them today does nothing. Rely on `mode` and (once implemented) `maxRows`.
 :::
-
-## Live example
-
-The example below opens a single group with many panels and `overflow.mode: 'wrap'`,
-so the tabs wrap onto multiple rows. Add more tabs, or toggle back to the dropdown
-mode, to compare the two behaviours.
-
-<CodeRunner id="dockview/tab-overflow" height={300} />
 
 ## See also
 

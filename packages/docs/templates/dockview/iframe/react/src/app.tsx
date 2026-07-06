@@ -34,8 +34,8 @@ const components = {
     },
     basicComponent: () => {
         return (
-            <div style={{ padding: '20px', color: 'white' }}>
-                {'This panel is just a usual component '}
+            <div className="example-panel">
+                This panel is just a usual component.
             </div>
         );
     },

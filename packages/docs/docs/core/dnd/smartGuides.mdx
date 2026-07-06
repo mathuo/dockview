@@ -17,6 +17,10 @@ Smart Guides apply to **floating groups only**. Docked groups in the grid are un
 
 Enable Smart Guides through the `smartGuides` option. Omit it entirely to leave floating-group dragging unchanged.
 
+Drag one of the floating groups towards the other, or towards a container edge, to see the alignment guides appear and the group snap into place. Hold `Alt` while dragging to move freely without snapping.
+
+<CodeRunner id="dockview/smart-guides" />
+
 ## Options
 
 <FrameworkSpecific framework="React">
@@ -153,12 +157,6 @@ api.onDidSnapTogether((event) => {
     );
 });
 ```
-
-## Live example
-
-Drag one of the floating groups towards the other, or towards a container edge, to see the alignment guides appear and the group snap into place. Hold `Alt` while dragging to move freely without snapping.
-
-<CodeRunner id="dockview/smart-guides" height={300} />
 
 ## See also
 

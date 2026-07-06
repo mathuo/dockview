@@ -7,11 +7,7 @@ import {
 import React from 'react';
 
 const Default = (props: IDockviewPanelProps) => {
-    return (
-        <div style={{ padding: '8px' }}>
-            <p>{props.api.title}</p>
-        </div>
-    );
+    return <div className="example-panel">{props.api.title}</div>;
 };
 
 const components = { default: Default };

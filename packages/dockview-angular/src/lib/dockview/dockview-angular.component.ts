@@ -127,6 +127,15 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     )[];
     @Input() tabGroupColors?: DockviewTabGroupColorEntry[];
     @Input() tabGroupAccent?: 'palette' | 'off';
+    // These option keys are in PROPERTY_KEYS_DOCKVIEW but were missing an
+    // @Input(), so bindings like [overflow] raised NG0303 and never reached
+    // dockview-core. Typed via indexed access so they always track the core
+    // option shape.
+    @Input() overflow?: DockviewOptions['overflow'];
+    @Input() pinnedTabs?: DockviewOptions['pinnedTabs'];
+    @Input() smartGuides?: DockviewOptions['smartGuides'];
+    @Input() dndGuide?: DockviewOptions['dndGuide'];
+    @Input() dropPositionResolver?: DockviewOptions['dropPositionResolver'];
 
     @Output() ready = new EventEmitter<DockviewReadyEvent>();
     @Output() didDrop = new EventEmitter<DockviewDidDropEvent>();

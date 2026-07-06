@@ -5,7 +5,7 @@ import BrowserOnly from '@docusaurus/BrowserOnly';
 const BASE_SANDBOX_URL =
     'https://codesandbox.io/s/github/mathuo/dockview/tree/gh-pages';
 
-export const _CodeRunner = (props: { id: string; height: number }) => {
+export const _CodeRunner = (props: { id: string; height?: number }) => {
     const [framework] = useActiveFramework();
 
     let frameworkName = framework.label.toLowerCase();
@@ -21,13 +21,34 @@ export const _CodeRunner = (props: { id: string; height: number }) => {
     return (
         <iframe
             src={path}
-            style={{ width: '100%', height: `${props.height ?? 300}px` }}
+            style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                display: 'block',
+            }}
         />
     );
 };
 
-export const CodeRunner = (props: { id: string; height: number }) => {
-    return <BrowserOnly>{() => <_CodeRunner {...props} />}</BrowserOnly>;
+export const CodeRunner = (props: { id: string; height?: number }) => {
+    // Reserve the height on this server-rendered container so the page doesn't
+    // reflow when the client-only iframe mounts — `BrowserOnly` renders nothing
+    // until hydration, so without a fixed-height box the content below jumps
+    // down once the example appears. The iframe fills this box.
+    return (
+        <div
+            style={{
+                height: `${props.height ?? 500}px`,
+                border: '1px solid var(--ifm-toc-border-color)',
+                borderRadius: '8px',
+                background: 'var(--ifm-background-surface-color)',
+                overflow: 'hidden',
+            }}
+        >
+            <BrowserOnly>{() => <_CodeRunner {...props} />}</BrowserOnly>
+        </div>
+    );
 };
 
 const CodeSandbox = (props: { url: string }) => {

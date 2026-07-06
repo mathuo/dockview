@@ -20,11 +20,7 @@ LicenseManager.setLicenseKey(
 @Component({
     selector: 'default-panel',
     template: `
-        <div
-            style="height: 100%; padding: 20px; background: var(--dv-group-view-background-color);"
-        >
-            {{ params?.title }}
-        </div>
+        <div class="example-panel">{{ params?.title }}</div>
     `,
 })
 export class DefaultPanelComponent {
@@ -35,14 +31,16 @@ export class DefaultPanelComponent {
 @Component({
     selector: 'app-root',
     template: `
-        <div style="height: 100%;">
-            <dv-dockview
-                [components]="components"
-                [autoHideEdgeGroups]="true"
-                className="dockview-theme-abyss"
-                (ready)="onReady($event)"
-            >
-            </dv-dockview>
+        <div class="example-layout">
+            <div class="example-dock">
+                <dv-dockview
+                    [components]="components"
+                    [autoHideEdgeGroups]="true"
+                    className="dockview-theme-abyss"
+                    (ready)="onReady($event)"
+                >
+                </dv-dockview>
+            </div>
         </div>
     `,
 })

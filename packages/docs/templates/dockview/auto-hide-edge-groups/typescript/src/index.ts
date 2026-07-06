@@ -21,12 +21,11 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.padding = '20px';
-        this._element.style.color = 'white';
+        this._element.className = 'example-panel';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
-        this._element.textContent = parameters.title ?? 'Panel';
+        this._element.textContent = parameters.title ?? '';
     }
 }
 

@@ -1,7 +1,16 @@
 ---
 title: Scrolling
 description: How to configure tab header scrollbars and overflow behaviour in Dockview.
+sidebar_position: 9
 ---
+
+The following example contains three views:
+
+- **Panel 1** (`height: 100%`): No scrollbar appears and the content is clipped.
+- **Panel 2** (`height: 2000px`): A scrollbar does appear since a fixed height has been used.
+- **Panel 3**: `height: 100%` and a child component with `overflow: auto` which will enable scrollbars.
+
+<CodeRunner id="dockview/scrollbars" />
 
 ## Tab header scrollbars
 
@@ -99,13 +108,3 @@ It's important to understand how to configure the scrollbar within a panel.
 A panel will appear with a scrollbar if the contents of your view has a fixed height.
 If you are using a relative height such as `100%` you will need a child container
 with the appropriate `overflow` value to allow for scrollbars.
-
-## Live examples
-
-The following example contains three views:
-
-- **Panel 1** (`height: 100%`): No scrollbar appears and the content is clipped.
-- **Panel 2** (`height: 2000px`): A scrollbar does appear since a fixed height has been used.
-- **Panel 3**: `height: 100%` and a child component with `overflow: auto` which will enable scrollbars.
-
-<CodeRunner id="dockview/scrollbars" />

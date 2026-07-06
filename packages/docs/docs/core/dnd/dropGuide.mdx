@@ -13,6 +13,8 @@ By default Dockview resolves a drop from the quadrant of the target the cursor h
 replaces that with an explicit, VS Code-style _compass_: a fixed cross of cells rendered over the group you are dragging
 over. You aim at a cell to choose the drop direction, and only the drops that are actually possible are shown.
 
+<CodeRunner id="dockview/drop-guide" />
+
 ## Compass drop guide
 
 Enable the compass with the `dndGuide` option. With it off (the default) the existing cursor-quadrant behaviour is
@@ -71,12 +73,8 @@ const api = createDockview(element, {
   Defaults to all zones the target accepts.
 - `edges` — include the **outer** whole-layout-edge cells. Defaults to `true`; set `false` for group-only docking.
 
-## Live example
-
-<CodeRunner id="dockview/drop-guide" height={300} />
-
 ## See also
 
 - [Smart Guides](/docs/core/dnd/smartGuides) — alignment snapping for floating groups.
 - [Drop overlay](/docs/core/dnd/overlay) — customise the overlay that previews the resolved drop zone.
-- [Drop Position Resolver](/docs/core/dnd/dropPosition) — a free, lower-level seam to override where a pointer maps to a drop position.
+- [Drop Position Resolver](/docs/core/dnd/dropPosition) — a lower-level seam to override where a pointer maps to a drop position.

@@ -14,7 +14,7 @@ LicenseManager.setLicenseKey(
 );
 
 const shortcutStyle =
-    'background-color:lightblue;color:black;padding:2px 4px;border-radius:4px;white-space:nowrap;';
+    'padding:2px 6px;border-radius:4px;border:1px solid;font-family:monospace;white-space:nowrap;';
 
 const Panel = defineComponent({
     name: 'Panel',
@@ -34,14 +34,17 @@ const Panel = defineComponent({
         this.title = this.params.api.title ?? '';
     },
     template: `
-      <div style="color:white;padding:20px;font-size:13px;">
+      <div class="example-panel" style="font-size:13px;">
         <div style="padding:10px 0px;">{{title}}</div>
-        <div style="padding:10px 0px;">
+        <div style="padding:10px 0px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
           <span :style="shortcutStyle">Ctrl+]</span>
-          <span :style="shortcutStyle">Ctrl+[</span> switch tabs ·
+          <span :style="shortcutStyle">Ctrl+[</span>
+          <span>switch tabs</span>
           <span :style="shortcutStyle">F6</span>
-          <span :style="shortcutStyle">Shift+F6</span> move between groups ·
-          <span :style="shortcutStyle">Ctrl+M</span> dock with the keyboard.
+          <span :style="shortcutStyle">Shift+F6</span>
+          <span>move between groups</span>
+          <span :style="shortcutStyle">Ctrl+M</span>
+          <span>dock with the keyboard</span>
         </div>
       </div>`,
 });

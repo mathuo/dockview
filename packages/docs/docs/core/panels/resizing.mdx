@@ -1,25 +1,24 @@
 ---
 title: Resizing
-sidebar_position: 11
-description: How to programmatically resize a panel in Dockview.
+sidebar_position: 6
+description: How to programmatically resize a panel or group in Dockview.
 ---
 
-Panels are sized indirectly through the group that contains them. The panel API mirrors the group's resize methods, so you can set a panel's height and width — or observe dimension changes — without reaching for the group directly.
+Each Dockview instance contains groups and each group contains panels. Panels are sized indirectly through the group that contains them, so resizing a panel really means resizing the group it lives in. You can drive either from code — set a height and width, or observe dimension changes — and both approaches achieve the same result.
 
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+## Resizing a panel
+
+Logically a user may want to resize a panel, but this translates to resizing the group which contains that panel. The panel API mirrors the group's resize methods, so you can set a panel's height and width — or observe dimension changes — without reaching for the group directly.
 
 <DocRef
     declaration="DockviewPanelApi"
     methods={['height', 'width', 'setSize', 'onDidDimensionsChange']}
 />
 
-## Panel resizing
-
-Each Dockview instance contains groups and each group contains panels.
-Logically a user may want to resize a panel but this really translates to resizing the group which contains that panel.
-
-The panel resize methods are repeats of the same resize methods found on the group.
+Set the size of a panel using `props.api.setSize(...)`.
 
 ```tsx
 // it's mandatory to provide either a height or a width, providing both is optional
@@ -27,11 +26,19 @@ props.api.setSize({
     height: 100,
     width: 200,
 });
+```
 
-/**
- * you could also resize the panels group, although not recommended due to the
- * clunky syntax it does achieve the same result
- */
+## Resizing a group
+
+You can also resize a group directly by setting its height, width, or both. Because every panel lives inside a group, this is the same operation the panel API delegates to. Reaching for the group from a panel is possible but not recommended due to the clunky syntax.
+
+<DocRef
+    declaration="DockviewGroupPanelApi"
+    methods={['height', 'width', 'setSize', 'onDidDimensionsChange']}
+/>
+
+```tsx
+// you could also resize the panel's group, although not recommended it achieves the same result
 props.api.group.api.setSize({
     height: 100,
     width: 200,
@@ -45,4 +52,6 @@ You can see an example invoking both approaches below.
 ## See also
 
 - [Adding panels](/docs/core/panels/add) — set `initialWidth`/`initialHeight` and minimum/maximum size constraints when creating a panel.
+- [Constraints](/docs/core/groups/constraints) — set minimum and maximum group sizes.
+- [Sizing and layout](/docs/core/sizing) — control initial and proportional sizing.
 - [Panel API](/docs/api/dockview/panelApi) — the panel API surface that exposes `setSize`, `height`, `width` and `onDidDimensionsChange`.

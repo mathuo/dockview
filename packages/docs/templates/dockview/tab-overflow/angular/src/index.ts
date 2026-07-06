@@ -19,13 +19,7 @@ LicenseManager.setLicenseKey(
 
 @Component({
     selector: 'default-panel',
-    template: `
-        <div
-            style="height: 100%; padding: 20px; background: var(--dv-group-view-background-color);"
-        >
-            {{ params?.title }}
-        </div>
-    `,
+    template: `<div class="example-panel">{{ params?.title }}</div>`,
 })
 export class DefaultPanelComponent {
     @Input() api!: DockviewPanelApi;
@@ -35,14 +29,26 @@ export class DefaultPanelComponent {
 @Component({
     selector: 'app-root',
     template: `
-        <div style="height: 100%;">
-            <dv-dockview
-                [components]="components"
-                [overflow]="overflow"
-                className="dockview-theme-abyss"
-                (ready)="onReady($event)"
-            >
-            </dv-dockview>
+        <div class="example-layout">
+            <div class="example-controls">
+                <button (click)="addPanel()">Add Tab</button>
+                <button (click)="toggleMode()">
+                    {{
+                        mode === 'wrap'
+                            ? 'Switch to dropdown mode'
+                            : 'Switch to wrap mode'
+                    }}
+                </button>
+            </div>
+            <div class="example-dock">
+                <dv-dockview
+                    [components]="components"
+                    [overflow]="overflow"
+                    className="dockview-theme-abyss"
+                    (ready)="onReady($event)"
+                >
+                </dv-dockview>
+            </div>
         </div>
     `,
 })
@@ -51,21 +57,43 @@ export class AppComponent {
         default: DefaultPanelComponent,
     };
 
+    mode: 'wrap' | 'dropdown' = 'wrap';
+
     // Wrap tabs onto multiple rows when they no longer fit on one row.
-    overflow = { mode: 'wrap' as const };
+    overflow: { mode: 'wrap' | 'dropdown' } = { mode: 'wrap' };
+
+    private api?: DockviewApi;
+    private counter = 0;
 
     onReady(event: DockviewReadyEvent) {
-        const api: DockviewApi = event.api;
+        this.api = event.api;
+        this.counter = 0;
         // Open enough panels in a single group that the tabs no longer fit on
         // one row.
-        for (let i = 1; i <= 12; i++) {
-            api.addPanel({
-                id: `panel_${i}`,
-                component: 'default',
-                title: `Panel ${i}`,
-                params: { title: `Panel ${i}` },
-            });
+        for (let i = 0; i < 12; i++) {
+            this.addPanel();
         }
+    }
+
+    addPanel() {
+        if (!this.api) {
+            return;
+        }
+
+        this.counter++;
+        this.api.addPanel({
+            id: `panel_${this.counter}`,
+            component: 'default',
+            title: `Panel ${this.counter}`,
+            params: { title: `Panel ${this.counter}` },
+        });
+    }
+
+    toggleMode() {
+        this.mode = this.mode === 'wrap' ? 'dropdown' : 'wrap';
+        this.overflow = { mode: this.mode };
+        // Re-apply the option so flipping the mode takes effect immediately.
+        this.api?.updateOptions({ overflow: this.overflow });
     }
 }
 

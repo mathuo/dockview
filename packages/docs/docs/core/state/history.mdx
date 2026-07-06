@@ -16,6 +16,8 @@ reverted with `api.undo()` and re-applied with `api.redo()`.
 
 The feature is **off by default** and records nothing until you opt in.
 
+<CodeRunner id="dockview/layout-history" height={400} />
+
 ## Enabling
 
 Turn history on by setting the `layoutHistory` option with `{ enabled: true }`.
@@ -294,10 +296,6 @@ Browsers only allow `window.open` from within a user gesture. An undo re-opening
 a popout must originate from a trusted user event (a keyboard shortcut or a
 button click); otherwise the popout falls back to an inline group.
 :::
-
-## Live example
-
-<CodeRunner id="dockview/layout-history" height={400} />
 
 ## See also
 

@@ -28,11 +28,7 @@ LicenseManager.setLicenseKey(
 @Component({
     selector: 'default-panel',
     template: `
-        <div
-            style="height: 100%; padding: 20px; background: var(--dv-group-view-background-color);"
-        >
-            {{ api?.title }}
-        </div>
+        <div class="example-panel">{{ api?.title }}</div>
     `,
 })
 export class DefaultPanelComponent {
@@ -43,13 +39,13 @@ export class DefaultPanelComponent {
 @Component({
     selector: 'app-root',
     template: `
-        <div style="height: 100%; display: flex; flex-direction: column;">
-            <div style="height: 25px; display: flex; gap: 4px;">
+        <div class="example-layout">
+            <div class="example-controls">
                 <button [disabled]="!canUndo" (click)="undo()">Undo</button>
                 <button [disabled]="!canRedo" (click)="redo()">Redo</button>
                 <button (click)="addPanel()">Add Panel</button>
             </div>
-            <div style="flex-grow: 1;">
+            <div class="example-dock">
                 <dv-dockview
                     [components]="components"
                     [layoutHistory]="{

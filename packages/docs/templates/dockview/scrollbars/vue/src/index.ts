@@ -13,7 +13,7 @@ const FixedHeightContainer = defineComponent({
         };
     },
     template: `
-      <div style="height:100%;color:white;">
+      <div class="example-panel" style="height:100%">
         {{text}}
       </div>`,
 });
@@ -26,7 +26,7 @@ const OverflowContainer = defineComponent({
         };
     },
     template: `
-      <div style="height:200px;overflow:auto;color:white;">
+      <div class="example-panel" style="height:2000px;overflow:auto">
         {{text}}
       </div>`,
 });
@@ -39,8 +39,8 @@ const UserDefinedOverflowContainer = defineComponent({
         };
     },
     template: `
-      <div style="height:100%;color:white;">
-        <div style="height:100%;overflow:auto;">
+      <div class="example-panel" style="height:100%">
+        <div style="height:100%;overflow:auto">
           {{text}}
         </div>
       </div>`,
@@ -82,8 +82,8 @@ const App = defineComponent({
         style="width:100%;height:100%"
         class="dockview-theme-abyss"
         @ready="onReady"
-        :disableFloatingGroups=true
-      </dockview-vue>`,
+        :disableFloatingGroups="true"
+      ></dockview-vue>`,
 });
 
 const app = createApp(App);

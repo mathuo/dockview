@@ -22,9 +22,7 @@ const Panel = defineComponent({
         },
     },
     template: `
-    <div style="padding: 10px;">
-      {{ params.api.title }}
-    </div>`,
+      <div class="example-panel">{{ params.api.title }}</div>`,
 });
 
 const App = defineComponent({

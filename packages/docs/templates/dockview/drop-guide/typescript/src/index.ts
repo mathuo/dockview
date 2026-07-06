@@ -21,12 +21,11 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.padding = '20px';
-        this._element.style.color = 'white';
+        this._element.className = 'example-panel';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
-        this._element.textContent = parameters.api.title ?? '';
+        this._element.textContent = parameters.params.title ?? '';
     }
 }
 
@@ -48,12 +47,14 @@ const panel1 = api.addPanel({
     id: 'panel_1',
     component: 'default',
     title: 'Panel 1',
+    params: { title: 'Panel 1' },
 });
 
 api.addPanel({
     id: 'panel_2',
     component: 'default',
     title: 'Panel 2',
+    params: { title: 'Panel 2' },
     position: { referencePanel: panel1, direction: 'right' },
 });
 
@@ -61,6 +62,7 @@ api.addPanel({
     id: 'panel_3',
     component: 'default',
     title: 'Panel 3',
+    params: { title: 'Panel 3' },
     position: { referencePanel: panel1, direction: 'below' },
 });
 
@@ -68,5 +70,6 @@ api.addPanel({
     id: 'panel_4',
     component: 'default',
     title: 'Panel 4',
+    params: { title: 'Panel 4' },
     position: { referencePanel: panel1, direction: 'within' },
 });

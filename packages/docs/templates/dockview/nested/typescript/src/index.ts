@@ -16,14 +16,15 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.height = '100%';
-        this._element.style.padding = '20px';
-        this._element.style.background =
-            'var(--dv-group-view-background-color)';
+        this._element.className = 'example-panel';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
-        this._element.textContent = parameters.params.title ?? '';
+        this._element.textContent = parameters.api.title ?? '';
+
+        parameters.api.onDidTitleChange(() => {
+            this._element.textContent = parameters.api.title ?? '';
+        });
     }
 }
 
@@ -54,18 +55,21 @@ class InnerDockview implements IContentRenderer {
         });
 
         this._innerApi.addPanel({
-            id: 'panel_1',
+            id: 'inner_panel_1',
             component: 'default',
+            title: 'Inner 1',
         });
 
         this._innerApi.addPanel({
-            id: 'panel_2',
+            id: 'inner_panel_2',
             component: 'default',
+            title: 'Inner 2',
         });
 
         this._innerApi.addPanel({
-            id: 'panel_3',
+            id: 'inner_panel_3',
             component: 'default',
+            title: 'Inner 3',
         });
     }
 
@@ -89,15 +93,18 @@ const api: DockviewApi = createDockview(document.getElementById('app')!, {
 api.addPanel({
     id: 'panel_1',
     component: 'default',
+    title: 'Panel 1',
 });
 
 api.addPanel({
     id: 'panel_2',
     component: 'default',
+    title: 'Panel 2',
 });
 
 api.addPanel({
     id: 'panel_3',
     component: 'innerDockview',
+    title: 'Nested layout',
     position: { referencePanel: 'panel_2', direction: 'right' },
 });

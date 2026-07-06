@@ -17,14 +17,14 @@ class Panel implements IContentRenderer {
     constructor() {
         this._element = document.createElement('div');
         this._element.style.padding = '10px';
-        this._element.style.color = 'white';
+        this._element.style.height = '100%';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
         const { api } = parameters;
 
         const titleElement = document.createElement('div');
-        titleElement.style.height = '25px';
+        titleElement.style.marginBottom = '8px';
         titleElement.textContent = api.title ?? '';
 
         // Width controls: resize either the whole group or just this panel.
@@ -60,9 +60,10 @@ class Panel implements IContentRenderer {
     } {
         const element = document.createElement('div');
         element.style.display = 'flex';
-        element.style.height = '18px';
-        element.style.lineHeight = '18px';
+        element.style.alignItems = 'center';
+        element.style.gap = '8px';
         element.style.fontSize = '13px';
+        element.style.marginBottom = '6px';
 
         const span = document.createElement('span');
         span.style.width = '60px';
@@ -75,11 +76,9 @@ class Panel implements IContentRenderer {
         input.style.width = '75px';
 
         const groupButton = document.createElement('button');
-        groupButton.style.width = '100px';
         groupButton.textContent = 'Resize Group';
 
         const panelButton = document.createElement('button');
-        panelButton.style.width = '100px';
         panelButton.textContent = 'Resize Panel';
 
         element.append(span, input, groupButton, panelButton);

@@ -17,25 +17,26 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.height = '100%';
-        this._element.style.padding = '20px';
-        this._element.style.background =
-            'var(--dv-group-view-background-color)';
-        this._element.style.color = 'white';
+        this._element.className = 'example-panel';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
+        const controls = document.createElement('div');
+        controls.className = 'example-controls';
+
         const button = document.createElement('button');
-        button.textContent = 'Set';
+        button.textContent = 'Set constraints';
         button.addEventListener('click', () => {
             parameters.api.group.api.setConstraints({
                 maximumWidth: 300,
                 maximumHeight: 300,
             });
         });
+        controls.appendChild(button);
 
         const output = document.createElement('div');
         output.style.fontSize = '13px';
+        output.style.marginTop = '12px';
 
         const render = (constraints: GridConstraintChangeEvent): void => {
             output.replaceChildren();
@@ -44,10 +45,9 @@ class Panel implements IContentRenderer {
                 const container = document.createElement('div');
                 container.style.border = '1px solid grey';
                 container.style.margin = '2px';
-                container.style.padding = '1px';
+                container.style.padding = '4px 6px';
 
                 const key = document.createElement('span');
-                key.style.color = 'grey';
                 key.textContent = `${label}: `;
 
                 const val = document.createElement('span');
@@ -58,16 +58,16 @@ class Panel implements IContentRenderer {
             };
 
             if (typeof constraints.maximumHeight === 'number') {
-                row('Maximum Height', constraints.maximumHeight);
+                row('Maximum height', constraints.maximumHeight);
             }
             if (typeof constraints.minimumHeight === 'number') {
-                row('Minimum Height', constraints.minimumHeight);
+                row('Minimum height', constraints.minimumHeight);
             }
             if (typeof constraints.maximumWidth === 'number') {
-                row('Maximum Width', constraints.maximumWidth);
+                row('Maximum width', constraints.maximumWidth);
             }
             if (typeof constraints.minimumWidth === 'number') {
-                row('Minimum Width', constraints.minimumWidth);
+                row('Minimum width', constraints.minimumWidth);
             }
         };
 
@@ -75,7 +75,7 @@ class Panel implements IContentRenderer {
             render(event);
         });
 
-        this._element.append(button, output);
+        this._element.append(controls, output);
     }
 }
 
@@ -92,11 +92,13 @@ const api: DockviewApi = createDockview(document.getElementById('app')!, {
 const panel1 = api.addPanel({
     id: 'panel_1',
     component: 'default',
+    title: 'Panel 1',
 });
 
 const panel2 = api.addPanel({
     id: 'panel_2',
     component: 'default',
+    title: 'Panel 2',
     position: {
         referencePanel: panel1,
         direction: 'right',
@@ -106,6 +108,7 @@ const panel2 = api.addPanel({
 const panel3 = api.addPanel({
     id: 'panel_3',
     component: 'default',
+    title: 'Panel 3',
     position: {
         referencePanel: panel2,
         direction: 'right',
@@ -115,6 +118,7 @@ const panel3 = api.addPanel({
 const panel4 = api.addPanel({
     id: 'panel_4',
     component: 'default',
+    title: 'Panel 4',
     position: {
         direction: 'below',
     },

@@ -23,7 +23,6 @@ class DefaultPanel implements IContentRenderer {
         this._element.style.display = 'flex';
         this._element.style.justifyContent = 'center';
         this._element.style.alignItems = 'center';
-        this._element.style.color = 'white';
         this._element.style.height = '100%';
 
         this._titleElement = document.createElement('span');

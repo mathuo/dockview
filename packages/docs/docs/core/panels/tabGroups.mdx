@@ -1,0 +1,432 @@
+---
+title: 'Tab groups'
+description: Visually organise tabs within a group using coloured chips, with a custom colour palette, chip renderers, context menus, and serialization.
+sidebar_position: 11
+enterprise: true
+sidebar_custom_props:
+    enterprise: true
+---
+
+import { CodeRunner } from '@site/src/components/ui/codeRunner';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+Tab groups let you visually organise tabs within a panel using coloured chips.
+Tabs can be grouped, collapsed, expanded, recoloured, and reordered via drag and drop.
+Right-click a chip or tab to see available actions.
+
+<CodeRunner id="dockview/tab-groups" height={400} />
+
+## Creating and managing tab groups
+
+Use `DockviewApi` to create tab groups and assign panels to them:
+
+```ts
+// Create a tab group in a specific group panel
+const tabGroup = api.createTabGroup({
+    groupId: 'group-1',
+    label: 'My Group',
+    color: 'blue',
+});
+
+// Add panels to the tab group
+api.addPanelToTabGroup({
+    groupId: 'group-1',
+    tabGroupId: tabGroup.id,
+    panelId: 'panel-1',
+});
+
+// Remove a panel from its tab group
+api.removePanelFromTabGroup({
+    groupId: 'group-1',
+    panelId: 'panel-1',
+});
+
+// Dissolve a tab group (removes all panels from it and destroys it)
+api.dissolveTabGroup({
+    groupId: 'group-1',
+    tabGroupId: tabGroup.id,
+});
+
+// Move a tab group to a new position in the tab bar
+api.moveTabGroup({
+    groupId: 'group-1',
+    tabGroupId: tabGroup.id,
+    index: 0, // move to the beginning
+});
+```
+
+## Querying tab groups
+
+```ts
+// Get all tab groups in a group panel
+const tabGroups = api.getTabGroups({ groupId: 'group-1' });
+
+// Find which tab group a panel belongs to
+const tabGroup = api.getTabGroupForPanel({
+    groupId: 'group-1',
+    panelId: 'panel-1',
+});
+```
+
+## ITabGroup
+
+The `ITabGroup` interface provides methods to read and modify a tab group:
+
+```ts
+tabGroup.id; // readonly string
+tabGroup.label; // readonly string
+tabGroup.color; // readonly string | undefined
+tabGroup.collapsed; // readonly boolean
+tabGroup.panelIds; // readonly string[]
+tabGroup.size; // readonly number (panel count)
+tabGroup.isEmpty; // readonly boolean
+tabGroup.componentParams; // readonly Record<string, unknown> | undefined
+
+// Modify properties
+tabGroup.setLabel('New Label');
+tabGroup.setColor('red'); // palette id
+tabGroup.setColor('#abc123'); // raw CSS literal
+tabGroup.setColor(undefined); // clear
+tabGroup.setComponentParams({ icon: 'star' });
+
+// Collapse and expand
+tabGroup.collapse();
+tabGroup.expand();
+tabGroup.toggle();
+
+// Panel membership
+tabGroup.containsPanel('panel-1');
+tabGroup.indexOfPanel('panel-1');
+```
+
+## Colour palette
+
+`tabGroup.color` is any CSS color string — either an id from the active palette
+or a raw CSS literal (`'#abc123'`, `'rgb(...)'`). Resolution to a concrete value
+is handled by Dockview's color palette.
+
+The default palette ships with 9 named entries:
+
+| Id       | CSS variable                  |
+| -------- | ----------------------------- |
+| `grey`   | `--dv-tab-group-color-grey`   |
+| `blue`   | `--dv-tab-group-color-blue`   |
+| `red`    | `--dv-tab-group-color-red`    |
+| `yellow` | `--dv-tab-group-color-yellow` |
+| `green`  | `--dv-tab-group-color-green`  |
+| `pink`   | `--dv-tab-group-color-pink`   |
+| `purple` | `--dv-tab-group-color-purple` |
+| `cyan`   | `--dv-tab-group-color-cyan`   |
+| `orange` | `--dv-tab-group-color-orange` |
+
+The default palette references these CSS vars, so you can re-skin the defaults
+purely via CSS overrides. The full set is exported as `DEFAULT_TAB_GROUP_COLORS`.
+
+### Custom palette
+
+Replace the default palette with `tabGroupColors`. The list fully replaces the
+defaults — there is no merge. Each entry needs an `id` (stored on `tabGroup.color`
+and serialized) and a `value` (any CSS color expression). An optional `label`
+appears as a tooltip in the context-menu picker.
+
+```ts
+const tabGroupColors = [
+    { id: 'sunset', value: '#ff6b35', label: 'Sunset' },
+    { id: 'ocean', value: '#118ab2', label: 'Ocean' },
+    { id: 'forest', value: '#06d6a0', label: 'Forest' },
+];
+```
+
+<FrameworkSpecific framework="React">
+    ```tsx
+    <DockviewReact tabGroupColors={tabGroupColors} {...rest} />
+    ```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+```vue
+<template>
+    <dockview-vue :tabGroupColors="tabGroupColors" />
+</template>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+```html
+<dv-dockview [tabGroupColors]="tabGroupColors"></dv-dockview>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+```ts
+const api = createDockview(parentElement, { tabGroupColors });
+
+// or swap at runtime
+api.updateOptions({ tabGroupColors: [/* new entries */] });
+
+````
+</FrameworkSpecific>
+
+The active palette is exposed on the api as `api.tabGroupColors` for custom
+chip renderers that want to read from it (e.g. to render their own picker).
+
+### Disabling colour
+
+Set `tabGroupAccent: 'off'` to opt out of the built-in color concept entirely.
+Dockview stops writing the `--dv-tab-group-color` custom property, hides
+the color picker, and applies `dv-tab-group-chip--accent-off` to chips. The
+`tabGroup.color` field is still preserved as data — pair this with a
+`createTabGroupChipComponent` to own the chip visual end-to-end.
+
+<FrameworkSpecific framework="React">
+```tsx
+<DockviewReact
+    tabGroupAccent="off"
+    tabGroupChipComponent={MyCustomChip}
+    {...rest}
+/>
+````
+
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+```vue
+<template>
+    <dockview-vue
+        tabGroupAccent="off"
+        tabGroupChipComponent="MyCustomChip"
+        :components="{ MyCustomChip }"
+    />
+</template>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+```html
+<dv-dockview
+    [tabGroupAccent]="'off'"
+    [tabGroupChipComponent]="MyCustomChip">
+</dv-dockview>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+```ts
+const api = createDockview(parentElement, {
+    tabGroupAccent: 'off',
+    createTabGroupChipComponent: (tabGroup) => new MyChipRenderer(),
+});
+```
+</FrameworkSpecific>
+
+## Component params
+
+Use `componentParams` to attach free-form data to a tab group — typically
+consumed by a custom chip renderer. The value is a `Record<string, unknown>`
+that round-trips through `toJSON` / `fromJSON`, so it must be JSON-serializable.
+
+```ts
+const tabGroup = api.createTabGroup({
+    groupId: 'group-1',
+    label: 'Trading',
+    componentParams: { icon: '📊', priority: 1 },
+});
+
+// Update at runtime — fires onDidChange so a custom chip can re-render
+tabGroup.setComponentParams({ icon: '⭐️', priority: 1 });
+```
+
+## Events
+
+Tab group lifecycle events are available on `DockviewApi`:
+
+```ts
+api.onDidCreateTabGroup((event) => {});
+api.onDidDestroyTabGroup((event) => {});
+api.onDidAddPanelToTabGroup((event) => {});
+api.onDidRemovePanelFromTabGroup((event) => {});
+api.onDidTabGroupChange((event) => {});
+api.onDidTabGroupCollapsedChange((event) => {});
+```
+
+Individual tab groups also expose events:
+
+```ts
+tabGroup.onDidChange(() => {}); // label or color changed
+tabGroup.onDidCollapseChange((collapsed) => {});
+tabGroup.onDidPanelChange(({ panelId, type }) => {}); // 'add' | 'remove'
+tabGroup.onDidDestroy(() => {});
+```
+
+> See [Events](/docs/core/events#tab-groups) for the full event reference.
+
+## Chip context menu
+
+Right-clicking a tab group chip can show a context menu. This is opt-in — no menu is shown unless
+`getTabGroupChipContextMenuItems` is provided. Return an empty array to suppress the menu for specific chips.
+
+<FrameworkSpecific framework="React">
+    <DocRef
+        declaration="IDockviewReactProps"
+        methods={['getTabGroupChipContextMenuItems']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+    <DocRef
+        declaration="IDockviewVueProps"
+        methods={['getTabGroupChipContextMenuItems']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+    <DocRef
+        declaration="DockviewAngularOptions"
+        methods={['getTabGroupChipContextMenuItems']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+    <DocRef
+        declaration="DockviewComponentOptions"
+        methods={['getTabGroupChipContextMenuItems']}
+    />
+</FrameworkSpecific>
+
+### Built-in items
+
+Pass string shortcuts to render standard menu entries without any extra code:
+
+| Value           | Behaviour                                              |
+| --------------- | ------------------------------------------------------ |
+| `'rename'`      | An inline text input to rename the tab group           |
+| `'colorPicker'` | A grid of color swatches to change the tab group color |
+| `'separator'`   | Render a visual divider                                |
+
+### Custom label items
+
+Provide an object with a `label` and `action` to add a simple clickable entry:
+
+```ts
+getTabGroupChipContextMenuItems: (params) => [
+    'rename',
+    'colorPicker',
+    'separator',
+    {
+        label: 'Dissolve group',
+        action: () =>
+            params.api.dissolveTabGroup({
+                groupId: params.group.id,
+                tabGroupId: params.tabGroup.id,
+            }),
+    },
+];
+```
+
+## Custom chip renderer
+
+To fully customize how tab group chips look, provide a `createTabGroupChipComponent` factory. It receives the `ITabGroup` and must return an `ITabGroupChipRenderer`.
+
+<FrameworkSpecific framework="React">
+    <DocRef
+        declaration="IDockviewReactProps"
+        methods={['createTabGroupChipComponent']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+    <DocRef
+        declaration="IDockviewVueProps"
+        methods={['createTabGroupChipComponent']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+    <DocRef
+        declaration="DockviewAngularOptions"
+        methods={['createTabGroupChipComponent']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+    <DocRef
+        declaration="DockviewComponentOptions"
+        methods={['createTabGroupChipComponent']}
+    />
+</FrameworkSpecific>
+
+The renderer must implement:
+
+```ts
+interface ITabGroupChipRenderer {
+    readonly element: HTMLElement; // the chip DOM element
+    init(params: { tabGroup: ITabGroup; api: DockviewApi }): void;
+    update?(params: { tabGroup: ITabGroup }): void; // called when label, color or componentParams change
+    dispose(): void;
+}
+```
+
+Read `tabGroup.componentParams` inside `init` / `update` to access free-form
+data attached to the group, and listen on `tabGroup.onDidChange` to re-render
+when the value mutates.
+
+<FrameworkSpecific framework="JavaScript">
+```ts
+class MyChipRenderer {
+    readonly element = document.createElement('div');
+
+    init({ tabGroup, api }) {
+        this.element.className = 'my-chip';
+        this.element.textContent = tabGroup.label;
+    }
+
+    update({ tabGroup }) {
+        this.element.textContent = tabGroup.label;
+    }
+
+    dispose() {}
+
+}
+
+const api = createDockview(parentElement, {
+createTabGroupChipComponent: (tabGroup) => new MyChipRenderer(),
+});
+
+````
+</FrameworkSpecific>
+
+## Styling
+
+Tab group appearance can be customised through CSS custom properties:
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `--dv-tab-group-color-grey` | `#5f6368` | Color for grey chips |
+| `--dv-tab-group-color-blue` | `#1a73e8` | Color for blue chips |
+| `--dv-tab-group-color-red` | `#d93025` | Color for red chips |
+| `--dv-tab-group-color-yellow` | `#f9ab00` | Color for yellow chips |
+| `--dv-tab-group-color-green` | `#188038` | Color for green chips |
+| `--dv-tab-group-color-pink` | `#d01884` | Color for pink chips |
+| `--dv-tab-group-color-purple` | `#a142f4` | Color for purple chips |
+| `--dv-tab-group-color-cyan` | `#007b83` | Color for cyan chips |
+| `--dv-tab-group-color-orange` | `#e8710a` | Color for orange chips |
+| `--dv-tab-group-chip-padding` | `4px 8px` | Chip padding |
+| `--dv-tab-group-chip-border-radius` | `6px` | Chip border radius |
+| `--dv-tab-group-chip-font-size` | `11px` | Chip font size |
+| `--dv-tab-group-line-height` | `2px` | Height of the colored underline beneath grouped tabs |
+| `--dv-tab-group-line-opacity` | `0.6` | Opacity of the colored underline |
+
+## Serialization
+
+Tab groups are included in `toJSON` / `fromJSON` automatically. Each tab group is serialized as:
+
+```ts
+interface SerializedTabGroup {
+    id: string;
+    label?: string;
+    color?: string;
+    collapsed: boolean;
+    panelIds: string[];
+    componentParams?: Record<string, unknown>;
+}
+````

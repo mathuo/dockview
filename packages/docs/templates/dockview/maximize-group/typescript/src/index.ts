@@ -21,14 +21,11 @@ class Panel implements IContentRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.height = '100%';
-        this._element.style.padding = '20px';
-        this._element.style.background =
-            'var(--dv-group-view-background-color)';
+        this._element.className = 'example-panel';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
-        this._element.textContent = parameters.params.title ?? '';
+        this._element.textContent = parameters.api.title ?? '';
     }
 }
 
@@ -41,9 +38,8 @@ class Watermark implements IWatermarkRenderer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.style.color = 'white';
-        this._element.style.padding = '8px';
-        this._element.textContent = 'watermark';
+        this._element.className = 'example-panel';
+        this._element.textContent = 'This group is empty.';
     }
 
     init(): void {
@@ -55,7 +51,6 @@ class Watermark implements IWatermarkRenderer {
 function createIcon(icon: string, onClick: () => void): HTMLElement {
     const container = document.createElement('div');
     container.style.height = '100%';
-    container.style.color = 'white';
     container.style.padding = '0px 4px';
 
     const button = document.createElement('div');
@@ -149,32 +144,38 @@ function loadDefaultLayout(api: DockviewApi): void {
     api.addPanel({
         id: 'panel_1',
         component: 'default',
+        title: 'Panel 1',
     });
 
     api.addPanel({
         id: 'panel_2',
         component: 'default',
+        title: 'Panel 2',
     });
 
     api.addPanel({
         id: 'panel_3',
         component: 'default',
+        title: 'Panel 3',
     });
 
     api.addPanel({
         id: 'panel_4',
         component: 'default',
+        title: 'Panel 4',
     });
 
     api.addPanel({
         id: 'panel_5',
         component: 'default',
+        title: 'Panel 5',
         position: { direction: 'right' },
     });
 
     api.addPanel({
         id: 'panel_6',
         component: 'default',
+        title: 'Panel 6',
     });
 }
 
@@ -195,12 +196,10 @@ function load(api: DockviewApi): void {
 }
 
 const root = document.getElementById('app')!;
-root.style.display = 'flex';
-root.style.flexDirection = 'column';
-root.style.height = '100%';
+root.className = 'example-layout';
 
 const toolbar = document.createElement('div');
-toolbar.style.height = '25px';
+toolbar.className = 'example-controls';
 
 const saveButton = document.createElement('button');
 saveButton.textContent = 'Save';
@@ -211,7 +210,7 @@ clearButton.textContent = 'Clear';
 toolbar.append(saveButton, loadButton, clearButton);
 
 const dockElement = document.createElement('div');
-dockElement.style.flexGrow = '1';
+dockElement.className = 'example-dock';
 
 root.append(toolbar, dockElement);
 

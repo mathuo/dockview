@@ -14,7 +14,6 @@ const components = {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    color: 'white',
                     height: '100%',
                 }}
             >

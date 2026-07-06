@@ -7,17 +7,17 @@ import {
 import React from 'react';
 
 const shortcutStyle: React.CSSProperties = {
-    backgroundColor: 'lightblue',
-    color: 'black',
-    padding: '2px 4px',
+    padding: '2px 6px',
     borderRadius: '4px',
+    border: '1px solid',
+    fontFamily: 'monospace',
     whiteSpace: 'nowrap',
 };
 
 const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {
         return (
-            <div style={{ padding: '20px', color: 'white', fontSize: '13px' }}>
+            <div className="example-panel" style={{ fontSize: '13px' }}>
                 <div style={{ padding: '10px 0px' }}>{props.api.title}</div>
                 <div
                     style={{

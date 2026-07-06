@@ -37,17 +37,7 @@ const Icon = (props: {
 
 const components = {
     default: (props: IDockviewPanelProps) => {
-        return (
-            <div
-                style={{
-                    height: '100%',
-                    padding: '20px',
-                    background: 'var(--dv-group-view-background-color)',
-                }}
-            >
-                {props.api.title}
-            </div>
-        );
+        return <div className="example-panel">{props.api.title}</div>;
     },
 };
 
@@ -108,8 +98,12 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
     };
 
     return (
-        <div style={{ height: '100%', color: 'white', padding: '0px 4px' }}>
-            <Icon onClick={onClick} icon={pinned ? 'keep_off' : 'keep'} />
+        <div style={{ height: '100%', padding: '0px 4px' }}>
+            <Icon
+                onClick={onClick}
+                icon={pinned ? 'keep_off' : 'keep'}
+                title={pinned ? 'Unpin tab' : 'Pin tab'}
+            />
         </div>
     );
 };

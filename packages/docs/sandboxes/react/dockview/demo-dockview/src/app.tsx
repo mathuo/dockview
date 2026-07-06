@@ -796,6 +796,7 @@ const DockviewDemo = (props: {
                                                     : undefined
                                             }
                                             onReady={onReady}
+                                            keyboardNavigation
                                             theme={effectiveTheme}
                                             autoHideEdgeGroups
                                             pinnedTabs={{ enabled: true }}

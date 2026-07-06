@@ -1,6 +1,6 @@
 ---
 title: Tab header position
-sidebar_position: 9
+sidebar_position: 12
 description: How to configure the position of the tab header bar on a Dockview group (top or bottom).
 ---
 
@@ -8,6 +8,8 @@ import { CodeRunner } from '@site/src/components/ui/codeRunner';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 By default the tab bar sits at the top of each group. You can change this to `bottom`, `left`, or `right`, either as a global default for all groups or per group at runtime.
+
+<CodeRunner id="dockview/header-position" height={400} />
 
 ## Global default
 
@@ -76,10 +78,6 @@ const onReady = (event: DockviewReadyEvent) => {
     const position = panel.group.api.getHeaderPosition(); // 'left'
 };
 ```
-
-## Live example
-
-<CodeRunner id="dockview/header-position" height={400} />
 
 ## See also
 
