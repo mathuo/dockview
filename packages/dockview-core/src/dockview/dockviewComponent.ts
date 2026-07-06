@@ -1067,11 +1067,22 @@ export class DockviewComponent
      * live by the content drop targets; undefined ⇒ default cursor-quadrant.
      */
     getDropPositionResolver(): PositionResolver | undefined {
-        return (
-            this.options.dropPositionResolver ??
-            this._dropGuideService?.resolver ??
-            this._moduleRegistry.services.autoEdgeGroupService?.resolver
-        );
+        if (this.options.dropPositionResolver) {
+            return this.options.dropPositionResolver;
+        }
+        const compass = this._dropGuideService?.resolver;
+        const autoEdge = this._moduleRegistry.services.autoEdgeGroupService;
+        // With both the compass and auto edge groups on, COMPOSE them: the true
+        // outer edge reveals an edge group, everything else (inner split cells,
+        // the compass's grid-edge outer ring) falls through to the compass — so
+        // a drop can target either the layout edge or an edge group.
+        if (compass && autoEdge) {
+            return {
+                resolve: (args) =>
+                    autoEdge.resolveEdge(args) ?? compass.resolve(args),
+            };
+        }
+        return compass ?? autoEdge?.resolver;
     }
 
     /**

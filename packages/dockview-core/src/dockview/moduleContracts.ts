@@ -10,6 +10,8 @@ import {
     DroptargetOverlayModel,
     Position,
     PositionResolver,
+    PositionResolverArgs,
+    PositionResolverResult,
 } from '../dnd/droptarget';
 import { Box } from '../types';
 import { IDragGhostSpec } from '../dnd/backend';
@@ -506,12 +508,16 @@ export interface IAutoEdgeGroupHost {
 }
 
 export interface IAutoEdgeGroupService extends IDisposable {
-    /** The position resolver installed on the group content drop targets: it
-     *  marks the outer band of the content area as an `edge` cell so a drop
-     *  there routes to `dockToLayoutEdge` (→ reveal) instead of splitting the
-     *  group — the mechanism that makes drag-to-edge work over a populated
-     *  layout without the drop-guide compass. `undefined` when disabled. */
+    /** The standalone position resolver installed on the group content drop
+     *  targets: marks the outer band of the content area as an `edge` cell (so a
+     *  drop there routes to `dockToLayoutEdge` → reveal) and otherwise resolves
+     *  the normal cursor quadrant. `undefined` when disabled. */
     readonly resolver: PositionResolver | undefined;
+    /** Edge-band detection only: an `edge` cell when the pointer is in the outer
+     *  band, else `null`. Used to COMPOSE with another resolver (e.g. the
+     *  drop-guide compass) — the outer edge reveals an edge group and everything
+     *  else falls through to the other resolver. */
+    resolveEdge(args: PositionResolverArgs): PositionResolverResult | null;
 }
 
 // --- MultiRowTabs ---

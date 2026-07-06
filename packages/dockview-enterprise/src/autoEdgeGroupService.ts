@@ -138,9 +138,12 @@ export class AutoEdgeGroupService
         return !!this.host.options.autoEdgeGroups;
     }
 
-    private _resolve(
-        args: PositionResolverArgs
-    ): PositionResolverResult | null {
+    /** Edge-band detection only — an `edge` cell in the outer band, else null.
+     *  Composed with another resolver (the compass) by the host. */
+    resolveEdge(args: PositionResolverArgs): PositionResolverResult | null {
+        if (!this._enabled) {
+            return null;
+        }
         const rect = this.host.getDropZoneRect();
         for (const pos of [
             'left',
@@ -155,6 +158,16 @@ export class AutoEdgeGroupService
                 return { position: pos, edge: true };
             }
         }
+        return null;
+    }
+
+    private _resolve(
+        args: PositionResolverArgs
+    ): PositionResolverResult | null {
+        const edge = this.resolveEdge(args);
+        if (edge) {
+            return edge;
+        }
         const quadrant = defaultQuadrant(
             args.zones,
             args.x,
@@ -166,27 +179,19 @@ export class AutoEdgeGroupService
     }
 
     private _onWillShowOverlay(e: DockviewWillShowOverlayLocationEvent): void {
+        // Show the edge-group indicator line iff the pointer is in the true
+        // outer band — purely by depth, so it never lights up for a compass
+        // outer-ring cell (grid-edge dock, further in) or a normal group split.
         if (!this._enabled || !isEdge(e.position)) {
             this._hide();
             return;
         }
-        // A resolver-marked edge cell (group content target, populated layout).
-        if (e.edge) {
+        const rect = this.host.getDropZoneRect();
+        if (edgeDepth(e.position, e.nativeEvent, rect) <= OUTER_BAND) {
             this._show(e.position);
-            return;
+        } else {
+            this._hide();
         }
-        // The root edge target (e.g. an empty grid) — no resolver, so classify
-        // the widened band into the two sub-bands by pointer depth.
-        if (e.kind === 'edge') {
-            const rect = this.host.getDropZoneRect();
-            if (edgeDepth(e.position, e.nativeEvent, rect) <= OUTER_BAND) {
-                this._show(e.position);
-            } else {
-                this._hide();
-            }
-            return;
-        }
-        this._hide();
     }
 
     private _onWillDrop(e: DockviewWillDropEvent): void {

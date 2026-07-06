@@ -163,6 +163,26 @@ describe('auto edge groups (two-band drag reveal)', () => {
         service.dispose();
     });
 
+    test('resolveEdge returns an edge cell only in the outer band (for composition)', () => {
+        const { service } = createHost();
+        const args = (clientX: number) => ({
+            x: clientX,
+            y: 500,
+            width: 1000,
+            height: 1000,
+            zones: new Set<Position>(['left', 'right', 'top', 'bottom']),
+            event: { clientX, clientY: 500 } as any,
+        });
+        // outer band → edge cell; inner → null so a composed resolver (compass)
+        // handles it
+        expect(service.resolveEdge(args(5))).toEqual({
+            position: 'left',
+            edge: true,
+        });
+        expect(service.resolveEdge(args(40))).toBeNull();
+        service.dispose();
+    });
+
     test('a resolver-marked edge overlay (kind content) shows the highlight', () => {
         const { service, overlayRoot, willShow } = createHost();
         willShow.fire({

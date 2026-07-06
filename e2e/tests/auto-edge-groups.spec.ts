@@ -105,4 +105,39 @@ test.describe('auto edge groups (drag reveal)', () => {
             )
         ).toBe(false);
     });
+
+    test('with the compass ALSO on, the far edge still reveals an edge group', async ({
+        page,
+    }) => {
+        await page.goto('/e2e/fixtures/index.html');
+        await page.waitForFunction(() => (window as any).__ready === true);
+        await page.evaluate(() =>
+            (window as any).__dv.setupAutoEdgeGroupsWithCompass()
+        );
+
+        const tab = (await sideTab(page).boundingBox())!;
+        const content = (await mainContent(page).boundingBox())!;
+        const outerX = content.x + 5; // true outer band
+        const midY = content.y + content.height / 2;
+
+        await startDrag(page, tab);
+        await page.mouse.move(outerX, midY, { steps: 20 });
+
+        // the edge-group indicator wins over the compass at the true edge
+        await expect(page.locator('.dv-auto-edge-band')).toBeVisible();
+        await page.mouse.up();
+
+        await expect
+            .poll(() =>
+                page.evaluate(() =>
+                    (window as any).__dv.edgeGroupExists('left')
+                )
+            )
+            .toBe(true);
+        expect(
+            await page.evaluate(() =>
+                (window as any).__dv.edgeGroupPanelIds('left')
+            )
+        ).toContain('side');
+    });
 });

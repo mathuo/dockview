@@ -436,6 +436,27 @@
                             position: { direction: 'right' },
                         });
                     },
+                    // Same as setupAutoEdgeGroups but with the drop-guide compass
+                    // ALSO on, to prove the two compose (edge → edge group, the
+                    // compass rings → split / grid-edge).
+                    setupAutoEdgeGroupsWithCompass: () => {
+                        dockview.api.updateOptions({
+                            autoEdgeGroups: true,
+                            dndGuide: true,
+                            autoHideEdgeGroups: false,
+                        });
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        dockview.addPanel({
+                            id: 'side',
+                            component: 'default',
+                            title: 'side',
+                            position: { direction: 'right' },
+                        });
+                    },
                     edgeGroupExists: (pos) => !!dockview.getEdgeGroup(pos),
                     edgeGroupCollapsed: (pos) => {
                         const g = dockview.getEdgeGroup(pos);
