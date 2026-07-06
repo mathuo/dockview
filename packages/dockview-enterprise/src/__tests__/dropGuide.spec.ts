@@ -115,6 +115,36 @@ describe('drop guide', () => {
         expect(service.resolver!.resolve(args(10, 10))).toBeNull();
     });
 
+    test('fills the gaps between cells so the overlay does not blink out mid-traverse', () => {
+        make(true);
+        const r = service.resolver!;
+        // 200x100: the top cell ends at y=27 and the centre starts at y=31 — a
+        // 4px gap that used to resolve to null (the overlay would disappear). A
+        // pointer in the gap now snaps to whichever cell is nearer, so the
+        // overlay stays on as the cursor crosses between cells.
+        expect(r.resolve(args(100, 28))).toEqual({
+            position: 'top',
+            edge: false,
+        });
+        expect(r.resolve(args(100, 30))).toEqual({
+            position: 'center',
+            edge: false,
+        });
+        // the horizontal gap between left (ends x=77) and centre (starts x=81)
+        expect(r.resolve(args(78, 50))).toEqual({
+            position: 'left',
+            edge: false,
+        });
+        // a corner (off both axes) is still a genuine dead zone
+        expect(r.resolve(args(10, 10))).toBeNull();
+    });
+
+    test('does not snap a pointer more than a gap beyond the outermost cell', () => {
+        make({ edges: false });
+        // the right cell ends at x=161; a pointer well past it stays null
+        expect(service.resolver!.resolve(args(180, 50))).toBeNull();
+    });
+
     test("honours the target's accepted zones", () => {
         make(true);
         // left cell is not offered when the target only accepts center
