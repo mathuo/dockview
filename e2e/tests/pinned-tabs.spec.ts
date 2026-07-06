@@ -143,4 +143,83 @@ test.describe('pinned tabs', () => {
         // …but the pinned panel is never listed there.
         await expect(overflow).not.toContainText('panel-7');
     });
+
+    test('a pinned tab sorts ahead of unpinned tabs', async ({ page }) => {
+        await setup(page);
+        await page.evaluate(() =>
+            (window as any).__dv.setupPinned(['a', 'b', 'c'], [])
+        );
+        // Added in order, nothing pinned yet.
+        expect(
+            await page.evaluate(() => (window as any).__dv.tabTitles())
+        ).toEqual(['a', 'b', 'c']);
+
+        // Pinning the last tab jumps it to the front of the strip; the other
+        // two keep their relative order behind it.
+        await page.evaluate(() => (window as any).__dv.setPinned('c', true));
+        await expect
+            .poll(() => page.evaluate(() => (window as any).__dv.tabTitles()))
+            .toEqual(['c', 'a', 'b']);
+
+        // Unpinning clears the pin marker; the tab keeps its current slot
+        // (unpinning removes pinned status, it does not re-sort the strip).
+        await page.evaluate(() => (window as any).__dv.setPinned('c', false));
+        await expect(page.locator('.dv-tab--pinned')).toHaveCount(0);
+        await expect
+            .poll(() => page.evaluate(() => (window as any).__dv.tabTitles()))
+            .toEqual(['c', 'a', 'b']);
+    });
+
+    test('pinned state round-trips through serialization', async ({ page }) => {
+        await setup(page);
+        await page.evaluate(() =>
+            (window as any).__dv.setupPinned(
+                ['alpha', 'bravo', 'charlie'],
+                ['bravo']
+            )
+        );
+        await expect(page.locator('.dv-tab--pinned')).toContainText('bravo');
+
+        // The serialized layout carries the pinned flag…
+        const json = await page.evaluate(() =>
+            JSON.stringify((window as any).__dv.snapshot())
+        );
+        expect(json).toContain('"pinned":true');
+
+        // …and re-loading that snapshot rebuilds the pinned tab as pinned.
+        await page.evaluate(
+            (state) => (window as any).__dv.restore(JSON.parse(state)),
+            json
+        );
+        await expect(page.locator('.dv-tab--pinned')).toHaveCount(1);
+        await expect(page.locator('.dv-tab--pinned')).toContainText('bravo');
+    });
+
+    test('pinning and unpinning from the tab context menu', async ({ page }) => {
+        // `?pinmenu=1` swaps the harness tab menu to `['pin', 'separator',
+        // 'close']` so the built-in pin item is drivable.
+        await page.goto('/e2e/fixtures/index.html?pinmenu=1');
+        await page.waitForFunction(() => (window as any).__ready === true);
+        await page.evaluate(() =>
+            (window as any).__dv.setupPinned(['alpha', 'bravo'], [])
+        );
+        await expect(page.locator('.dv-tab--pinned')).toHaveCount(0);
+
+        // Right-click "bravo" → the menu offers "Pin tab"; clicking it pins.
+        await page
+            .locator('.dv-tab', { hasText: 'bravo' })
+            .click({ button: 'right' });
+        await expect(page.locator('.dv-context-menu')).toBeVisible();
+        await page
+            .locator('.dv-context-menu-item', { hasText: 'Pin tab' })
+            .click();
+        await expect(page.locator('.dv-tab--pinned')).toContainText('bravo');
+
+        // Right-clicking the now-pinned tab offers "Unpin tab"; clicking unpins.
+        await page.locator('.dv-tab--pinned').click({ button: 'right' });
+        await page
+            .locator('.dv-context-menu-item', { hasText: 'Unpin tab' })
+            .click();
+        await expect(page.locator('.dv-tab--pinned')).toHaveCount(0);
+    });
 });
