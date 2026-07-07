@@ -286,6 +286,8 @@ SplitviewPanelApi
 Tab
 TabAnimation
 TabDragEvent
+TabGroupChipsModule
+TabGroupChipsService
 TabGroupColorPalette
 TabGroupOptions
 TabPartInitParameters
