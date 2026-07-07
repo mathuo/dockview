@@ -29,8 +29,8 @@ const STATS: { value: string; label: string; href?: string }[] = [
         href: 'https://github.com/mathuo/dockview',
     },
     {
-        value: '140k+',
-        label: 'weekly downloads',
+        value: '540k+',
+        label: 'monthly downloads',
         href: 'https://www.npmjs.com/package/dockview-core',
     },
     { value: '0', label: 'dependencies' },
