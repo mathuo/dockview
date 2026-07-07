@@ -799,7 +799,7 @@ const DockviewDemo = (props: {
                                             keyboardNavigation
                                             theme={effectiveTheme}
                                             autoHideEdgeGroups
-                                            autoEdgeGroups
+                                            dockToEdgeGroups
                                             pinnedTabs={{ enabled: true }}
                                             floatingGroupDragHandle="titlebar"
                                             dndGuide={true}

@@ -1,5 +1,5 @@
 ---
-title: Drag-revealed edge groups
+title: Dock to edge groups
 description: Drag a panel to the layout edge to dock it as an edge group that takes up zero space when empty and is revealed on demand.
 sidebar_position: 7
 enterprise: true
@@ -11,16 +11,16 @@ import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
 
-Drag-revealed edge groups make an edge behave like a Visual Studio Code sidebar. An edge with no content takes up **zero space**; a drop zone for it appears only **while dragging**; and dropping a panel on the far edge **reveals an edge group** there. When its last panel leaves, the edge group tears down and the edge becomes invisible again.
+Dock-to-edge groups make an edge behave like a Visual Studio Code sidebar. An edge with no content takes up **zero space**; a drop zone for it appears only **while dragging**; and dropping a panel on the far edge **docks an edge group** there. When its last panel leaves, the edge group tears down and the edge becomes invisible again.
 
 For the basics of creating, sizing, collapsing, and serializing edge groups, see [Edge groups](/docs/core/groups/edgeGroups).
 
-Enable it with the `autoEdgeGroups` option:
+Enable it with the `dockToEdgeGroups` option. Pass `true` to enable all four edges, or an object to opt edges in individually:
 
 <FrameworkSpecific framework="React">
     ```tsx
     <DockviewReact
-        autoEdgeGroups={true}
+        dockToEdgeGroups={true}
         onReady={onReady}
         components={components}
     />
@@ -29,26 +29,36 @@ Enable it with the `autoEdgeGroups` option:
 
 <FrameworkSpecific framework="Vue">
 ```vue
-<dockview-vue :auto-edge-groups="true" @ready="onReady" />
+<dockview-vue :dock-to-edge-groups="true" @ready="onReady" />
 ```
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="Angular">
 ```html
-<dockview-angular [autoEdgeGroups]="true" (ready)="onReady($event)"></dockview-angular>
+<dockview-angular [dockToEdgeGroups]="true" (ready)="onReady($event)"></dockview-angular>
 ```
 </FrameworkSpecific>
 
 <FrameworkSpecific framework="JavaScript">
 ```ts
 const api = createDockview(element, {
-    autoEdgeGroups: true,
+    dockToEdgeGroups: true,
     createComponent,
 });
 ```
 </FrameworkSpecific>
 
-Drag-revealed edges are **off by default** — leaving `autoEdgeGroups` unset (or `false`) keeps the standard behaviour, where an edge must be created explicitly with `addEdgeGroup` and an emptied edge collapses to a strip rather than disappearing.
+To enable dock-to-edge on only some edges, name them individually — `true`/`false` (or an omitted edge) toggles each of `top`, `bottom`, `left`, `right`:
+
+```ts
+const api = createDockview(element, {
+    // only the left and right edges accept a dock-to-edge drop
+    dockToEdgeGroups: { left: true, right: true },
+    createComponent,
+});
+```
+
+Dock-to-edge is **off by default** — leaving `dockToEdgeGroups` unset (or `false`) keeps the standard behaviour, where an edge must be created explicitly with `addEdgeGroup` and an emptied edge collapses to a strip rather than disappearing.
 
 <CodeRunner id="dockview/auto-edge-groups" height={500} />
 
@@ -90,7 +100,7 @@ api.revealEdgeGroupWithData('left', {
 ```
 
 :::info
-Drag-revealed edges require both the edge-group and drag-and-drop overlay functionality; the option is a no-op if either is unavailable. The discoverable two-band affordance and the edge indicator are provided by the `dockview-enterprise` package.
+Dock-to-edge groups require both the edge-group and drag-and-drop overlay functionality; the option is a no-op if either is unavailable. The discoverable two-band affordance and the edge indicator are provided by the `dockview-enterprise` package.
 :::
 
 ## See also

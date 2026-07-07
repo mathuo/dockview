@@ -33,7 +33,7 @@ export class DefaultPanelComponent {
             <div class="example-dock">
                 <dv-dockview
                     [components]="components"
-                    [autoEdgeGroups]="true"
+                    [dockToEdgeGroups]="true"
                     [autoHideEdgeGroups]="true"
                     className="dockview-theme-abyss"
                     (ready)="onReady($event)"

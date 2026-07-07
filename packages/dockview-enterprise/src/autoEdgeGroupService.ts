@@ -3,6 +3,8 @@ import {
     DockviewWillDropEvent,
     DockviewWillShowOverlayLocationEvent,
     EdgeGroupPosition,
+    isAnyEdgeGroupEnabled,
+    isEdgeGroupEnabled,
     Position,
     PositionResolver,
     PositionResolverArgs,
@@ -135,7 +137,7 @@ export class AutoEdgeGroupService
     }
 
     private get _enabled(): boolean {
-        return !!this.host.options.autoEdgeGroups;
+        return isAnyEdgeGroupEnabled(this.host.options.dockToEdgeGroups);
     }
 
     /** Edge-band detection only — an `edge` cell in the outer band, else null.
@@ -153,6 +155,7 @@ export class AutoEdgeGroupService
         ] as EdgeGroupPosition[]) {
             if (
                 args.zones.has(pos) &&
+                isEdgeGroupEnabled(this.host.options.dockToEdgeGroups, pos) &&
                 edgeDepth(pos, args.event, rect) <= OUTER_BAND
             ) {
                 return { position: pos, edge: true, edgeGroup: true };

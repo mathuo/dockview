@@ -482,7 +482,7 @@ export interface IAutoHideEdgeGroupService extends IDisposable {
  * classifies the pointer into an outer "dock as edge group" band and an inner
  * "split the grid" band, drawing its own outer-band highlight and routing an
  * outer-band drop to `revealEdgeGroupWithData`. The presence of this service
- * also disables core's single-band `autoEdgeGroups` fallback so the inner band
+ * also disables core's single-band `dockToEdgeGroups` fallback so the inner band
  * falls through to the default grid split.
  */
 export interface IAutoEdgeGroupHost {

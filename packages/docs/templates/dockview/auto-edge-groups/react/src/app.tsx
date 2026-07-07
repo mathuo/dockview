@@ -43,7 +43,7 @@ const App = () => {
         <DockviewReact
             onReady={onReady}
             components={components}
-            autoEdgeGroups={true}
+            dockToEdgeGroups={true}
             autoHideEdgeGroups={true}
             className="dockview-theme-abyss"
         />

@@ -13,7 +13,6 @@ AdvancedDnDService
 AnchorPosition
 AnchoredBox
 AnnouncementEvent
-AutoHideEdgeGroupOptions
 BaseComponentOptions
 BaseGrid
 BaseGridOptions
@@ -94,7 +93,9 @@ DropOverlayModelParams
 DroptargetOverlayModel
 EdgeGroupModule
 EdgeGroupOptions
+EdgeGroupPeekOptions
 EdgeGroupPosition
+EdgeGroupSet
 ExpansionEvent
 FloatingGroupDragContext
 FloatingGroupModule
@@ -312,7 +313,9 @@ getPanelData
 getRegisteredModules
 getRelativeLocation
 indexInParent
+isAnyEdgeGroupEnabled
 isDockviewPackageLoaded
+isEdgeGroupEnabled
 isGridBranchNode
 isGroupOptionsWithGroup
 isGroupOptionsWithPanel

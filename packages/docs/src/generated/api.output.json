@@ -6065,7 +6065,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "redo",
-                                "target": 7447
+                                "target": 7454
                             },
                             {
                                 "kind": "text",
@@ -6090,7 +6090,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "redo",
-                            "target": 7447
+                            "target": 7454
                         },
                         {
                             "kind": "text",
@@ -6115,7 +6115,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "undo",
-                                "target": 7483
+                                "target": 7490
                             },
                             {
                                 "kind": "text",
@@ -6125,7 +6125,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "onDidChangeHistory",
-                                "target": 7254
+                                "target": 7261
                             },
                             {
                                 "kind": "text",
@@ -6150,7 +6150,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "undo",
-                            "target": 7483
+                            "target": 7490
                         },
                         {
                             "kind": "text",
@@ -6160,7 +6160,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "onDidChangeHistory",
-                            "target": 7254
+                            "target": 7261
                         },
                         {
                             "kind": "text",
@@ -6501,7 +6501,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "DockviewOrigin",
-                                "target": 12425
+                                "target": 12431
                             },
                             {
                                 "kind": "text",
@@ -6558,7 +6558,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewOrigin",
-                            "target": 12425
+                            "target": 12431
                         },
                         {
                             "kind": "text",
@@ -7356,7 +7356,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "onDidAddPopoutGroup",
-                                "target": 7252
+                                "target": 7259
                             },
                             {
                                 "kind": "text",
@@ -7389,7 +7389,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "onDidAddPopoutGroup",
-                            "target": 7252
+                            "target": 7259
                         },
                         {
                             "kind": "text",
@@ -7892,7 +7892,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "undo",
-                                "target": 7483
+                                "target": 7490
                             },
                             {
                                 "kind": "text",
@@ -7902,7 +7902,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "redo",
-                                "target": 7447
+                                "target": 7454
                             },
                             {
                                 "kind": "text",
@@ -7912,7 +7912,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "fromJSON",
-                                "target": 7388
+                                "target": 7395
                             },
                             {
                                 "kind": "text",
@@ -7944,7 +7944,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "undo",
-                            "target": 7483
+                            "target": 7490
                         },
                         {
                             "kind": "text",
@@ -7954,7 +7954,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "redo",
-                            "target": 7447
+                            "target": 7454
                         },
                         {
                             "kind": "text",
@@ -7964,7 +7964,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "fromJSON",
-                            "target": 7388
+                            "target": 7395
                         },
                         {
                             "kind": "text",
@@ -8027,7 +8027,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "setSmartGuidesEnabled",
-                                "target": 7478
+                                "target": 7485
                             },
                             {
                                 "kind": "text",
@@ -8060,7 +8060,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "setSmartGuidesEnabled",
-                            "target": 7478
+                            "target": 7485
                         },
                         {
                             "kind": "text",
@@ -9857,7 +9857,7 @@
                                             "kind": "inline-tag",
                                             "tag": "@link",
                                             "text": "DockviewApi.activateNext",
-                                            "target": 7322
+                                            "target": 7329
                                         },
                                         {
                                             "kind": "text",
@@ -9902,7 +9902,7 @@
                                     "kind": "inline-tag",
                                     "tag": "@link",
                                     "text": "DockviewApi.activateNext",
-                                    "target": 7322
+                                    "target": 7329
                                 },
                                 {
                                     "kind": "text",
@@ -9934,7 +9934,7 @@
                                             "kind": "inline-tag",
                                             "tag": "@link",
                                             "text": "DockviewApi.activatePrevious",
-                                            "target": 7325
+                                            "target": 7332
                                         },
                                         {
                                             "kind": "text",
@@ -9979,7 +9979,7 @@
                                     "kind": "inline-tag",
                                     "tag": "@link",
                                     "text": "DockviewApi.activatePrevious",
-                                    "target": 7325
+                                    "target": 7332
                                 },
                                 {
                                     "kind": "text",
@@ -10138,7 +10138,7 @@
                                     "kind": "inline-tag",
                                     "tag": "@link",
                                     "text": "undo",
-                                    "target": 7483
+                                    "target": 7490
                                 },
                                 {
                                     "kind": "text",
@@ -10166,7 +10166,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "undo",
-                            "target": 7483
+                            "target": 7490
                         },
                         {
                             "kind": "text",
@@ -10391,11 +10391,11 @@
                                 },
                                 {
                                     "kind": "text",
-                                    "text": " into it. A newly created edge group tears down to\nzero footprint when later emptied. Drives the drag-revealed edges behind\nthe "
+                                    "text": " into it. A newly created edge group tears down to\nzero footprint when later emptied. Drives the dock-to-edge groups behind\nthe "
                                 },
                                 {
                                     "kind": "code",
-                                    "text": "`autoEdgeGroups`"
+                                    "text": "`dockToEdgeGroups`"
                                 },
                                 {
                                     "kind": "text",
@@ -10517,11 +10517,11 @@
                         },
                         {
                             "kind": "text",
-                            "text": " into it. A newly created edge group tears down to\nzero footprint when later emptied. Drives the drag-revealed edges behind\nthe "
+                            "text": " into it. A newly created edge group tears down to\nzero footprint when later emptied. Drives the dock-to-edge groups behind\nthe "
                         },
                         {
                             "kind": "code",
-                            "text": "`autoEdgeGroups`"
+                            "text": "`dockToEdgeGroups`"
                         },
                         {
                             "kind": "text",
@@ -13566,7 +13566,7 @@
                                     "kind": "inline-tag",
                                     "tag": "@link",
                                     "text": "DockviewApi",
-                                    "target": 7214
+                                    "target": 7221
                                 },
                                 {
                                     "kind": "text",
@@ -13611,7 +13611,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewApi",
-                            "target": 7214
+                            "target": 7221
                         },
                         {
                             "kind": "text",
@@ -15486,7 +15486,7 @@
                             "summary": [
                                 {
                                     "kind": "text",
-                                    "text": "Resolve whether an edge group should behave as an auto-hide (pinnable)\ntool window: the per-group flag when set, otherwise the global\n"
+                                    "text": "Resolve whether an edge group should behave as an auto-hide (pinnable)\ntool window: the per-group flag when set, otherwise the per-edge\n"
                                 },
                                 {
                                     "kind": "code",
@@ -15494,7 +15494,7 @@
                                 },
                                 {
                                     "kind": "text",
-                                    "text": " option. This is what lets a static edge group and an\nauto-hiding one co-exist in the same layout."
+                                    "text": " option for the group's edge. This is what lets a\nstatic edge group and an auto-hiding one co-exist in the same layout."
                                 }
                             ]
                         },
@@ -15523,7 +15523,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Resolve whether an edge group should behave as an auto-hide (pinnable)\ntool window: the per-group flag when set, otherwise the global\n"
+                            "text": "Resolve whether an edge group should behave as an auto-hide (pinnable)\ntool window: the per-group flag when set, otherwise the per-edge\n"
                         },
                         {
                             "kind": "code",
@@ -15531,7 +15531,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": " option. This is what lets a static edge group and an\nauto-hiding one co-exist in the same layout."
+                            "text": " option for the group's edge. This is what lets a\nstatic edge group and an auto-hiding one co-exist in the same layout."
                         }
                     ]
                 }
@@ -16758,11 +16758,11 @@
                                 },
                                 {
                                     "kind": "text",
-                                    "text": " throws on a duplicate position). No-op if\nthe EdgeGroup module is absent.\n\nThis is the primitive behind the drag-revealed edges; the two-band\ndrag-reveal affordance and the "
+                                    "text": " throws on a duplicate position). No-op if\nthe EdgeGroup module is absent.\n\nThis is the primitive behind the dock-to-edge groups; the two-band\ndrag-reveal affordance and the "
                                 },
                                 {
                                     "kind": "code",
-                                    "text": "`autoEdgeGroups`"
+                                    "text": "`dockToEdgeGroups`"
                                 },
                                 {
                                     "kind": "text",
@@ -16900,11 +16900,11 @@
                         },
                         {
                             "kind": "text",
-                            "text": " throws on a duplicate position). No-op if\nthe EdgeGroup module is absent.\n\nThis is the primitive behind the drag-revealed edges; the two-band\ndrag-reveal affordance and the "
+                            "text": " throws on a duplicate position). No-op if\nthe EdgeGroup module is absent.\n\nThis is the primitive behind the dock-to-edge groups; the two-band\ndrag-reveal affordance and the "
                         },
                         {
                             "kind": "code",
-                            "text": "`autoEdgeGroups`"
+                            "text": "`dockToEdgeGroups`"
                         },
                         {
                             "kind": "text",
@@ -23009,7 +23009,7 @@
                                 "kind": "inline-tag",
                                 "tag": "@link",
                                 "text": "PositionResolverResult.edgeGroup",
-                                "target": 12164
+                                "target": 12170
                             },
                             {
                                 "kind": "text",
@@ -23034,7 +23034,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "PositionResolverResult.edgeGroup",
-                            "target": 12164
+                            "target": 12170
                         },
                         {
                             "kind": "text",
@@ -36876,73 +36876,6 @@
         ],
         "extends": []
     },
-    "AutoHideEdgeGroupOptions": {
-        "kind": "interface",
-        "name": "AutoHideEdgeGroupOptions",
-        "children": [
-            {
-                "name": "animate",
-                "code": "boolean",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "boolean"
-                },
-                "flags": {
-                    "isOptional": true
-                },
-                "comment": {
-                    "summary": [
-                        {
-                            "kind": "text",
-                            "text": "Slide the peek overlay in. Default true; ignored when the OS requests\n reduced motion."
-                        }
-                    ]
-                }
-            },
-            {
-                "name": "closeDelay",
-                "code": "number",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "number"
-                },
-                "flags": {
-                    "isOptional": true
-                },
-                "comment": {
-                    "summary": [
-                        {
-                            "kind": "text",
-                            "text": "ms after the pointer leaves both the strip and the peek overlay before\n the peek closes. Re-entering either cancels it. Default 300."
-                        }
-                    ]
-                }
-            },
-            {
-                "name": "openDelay",
-                "code": "number",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "number"
-                },
-                "flags": {
-                    "isOptional": true
-                },
-                "comment": {
-                    "summary": [
-                        {
-                            "kind": "text",
-                            "text": "ms the pointer must dwell on the collapsed strip before the peek opens.\n Default 250. Keyboard focus opens immediately (no delay)."
-                        }
-                    ]
-                }
-            }
-        ],
-        "extends": []
-    },
     "BaseComponentOptions": {
         "kind": "interface",
         "name": "BaseComponentOptions",
@@ -37805,7 +37738,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "focusOut",
-                            "target": 10003
+                            "target": 10006
                         },
                         {
                             "kind": "text",
@@ -37823,7 +37756,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "elements",
-                            "target": 9999
+                            "target": 10002
                         },
                         {
                             "kind": "text",
@@ -37890,7 +37823,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DismissableLayerOptions.elements",
-                            "target": 9999
+                            "target": 10002
                         },
                         {
                             "kind": "text",
@@ -39071,7 +39004,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewOrigin",
-                            "target": 12425
+                            "target": 12431
                         },
                         {
                             "kind": "text",
@@ -40976,7 +40909,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "AnnouncementEvent",
-                            "target": 9928
+                            "target": 9935
                         },
                         {
                             "kind": "text",
@@ -40994,66 +40927,13 @@
                 }
             },
             {
-                "name": "autoEdgeGroups",
-                "code": "boolean",
-                "kind": "property",
-                "type": {
-                    "type": "intrinsic",
-                    "value": "boolean"
-                },
-                "flags": {
-                    "isOptional": true
-                },
-                "comment": {
-                    "summary": [
-                        {
-                            "kind": "text",
-                            "text": "Let panels dragged to a layout edge create/fill an **edge group** that is\ninvisible when empty (VS Code-style \"drag to the far edge → new sidebar\").\n\nWhen on, dropping a panel on the very outer edge band reveals an edge\ngroup at that position (creating it if needed and dropping the panel in);\nwhen its last panel leaves, the edge group tears down to zero footprint.\n\nRequires both the "
-                        },
-                        {
-                            "kind": "code",
-                            "text": "`RootDropTarget`"
-                        },
-                        {
-                            "kind": "text",
-                            "text": " (drag overlays) and "
-                        },
-                        {
-                            "kind": "code",
-                            "text": "`EdgeGroup`"
-                        },
-                        {
-                            "kind": "text",
-                            "text": "\nmodules; a no-op if either is absent. Distinct from "
-                        },
-                        {
-                            "kind": "code",
-                            "text": "`dndEdges`"
-                        },
-                        {
-                            "kind": "text",
-                            "text": ", which only\nshapes the outer drop overlay (and still splits the grid). Off by default."
-                        }
-                    ]
-                }
-            },
-            {
                 "name": "autoHideEdgeGroups",
-                "code": "AutoHideEdgeGroupOptions | boolean",
+                "code": "EdgeGroupSet",
                 "kind": "property",
                 "type": {
-                    "type": "or",
-                    "values": [
-                        {
-                            "type": "reference",
-                            "value": "AutoHideEdgeGroupOptions",
-                            "source": "dockview-core"
-                        },
-                        {
-                            "type": "intrinsic",
-                            "value": "boolean"
-                        }
-                    ]
+                    "type": "reference",
+                    "value": "EdgeGroupSet",
+                    "source": "dockview-core"
                 },
                 "flags": {
                     "isOptional": true
@@ -41062,7 +40942,39 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "VS Code-style \"auto hide\" for edge groups: render clickable activators in\na collapsed edge group's strip so it can be pinned back. Off by default →\ntoday's baseline (an empty collapsed strip) is unchanged."
+                            "text": "VS Code-style \"auto hide\" for edge groups: render clickable activators in\na collapsed edge group's strip so it can be pinned back. Off by default →\ntoday's baseline (an empty collapsed strip) is unchanged.\n\nA per-edge set: "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`true`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " applies to all four edges, or name edges\nindividually ("
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`{ left: true, bottom: true }`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": "). An edge group at an edge\nnot in the set stays a static collapsing sidebar. A per-group\n"
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`api.setEdgeGroupAutoHide()`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " override wins over this default. Peek\nanimation is tuned globally via "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`edgeGroupPeek`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": "."
                         }
                     ]
                 }
@@ -41442,6 +41354,59 @@
                 }
             },
             {
+                "name": "dockToEdgeGroups",
+                "code": "EdgeGroupSet",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "EdgeGroupSet",
+                    "source": "dockview-core"
+                },
+                "flags": {
+                    "isOptional": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Let panels dragged to a layout edge create/fill an **edge group** that is\ninvisible when empty (VS Code-style \"drag a panel to the far edge → new\nsidebar\"). Created on drop; torn down to zero footprint when its last\npanel leaves.\n\nA per-edge set: "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`true`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " enables dock-to-edge on all four edges, or name\nedges individually. Requires both the "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`RootDropTarget`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " (drag overlays)\nand "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`EdgeGroup`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " modules; a no-op if either is absent. Distinct from\n"
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`dndEdges`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": ", which only shapes the outer drop overlay (and still splits\nthe grid). Off by default."
+                        }
+                    ]
+                }
+            },
+            {
                 "name": "dropOverlayModel",
                 "code": "(params: DropOverlayModelParams): undefined | DroptargetOverlayModel",
                 "kind": "property",
@@ -41524,7 +41489,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DroptargetOverlayModel",
-                            "target": 12431
+                            "target": 12437
                         },
                         {
                             "kind": "text",
@@ -41587,7 +41552,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "Position",
-                            "target": 12473
+                            "target": 12480
                         },
                         {
                             "kind": "text",
@@ -41605,11 +41570,40 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewApi.updateOptions",
-                            "target": 7485
+                            "target": 7492
                         },
                         {
                             "kind": "text",
                             "text": "."
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "edgeGroupPeek",
+                "code": "EdgeGroupPeekOptions",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "EdgeGroupPeekOptions",
+                    "source": "dockview-core"
+                },
+                "flags": {
+                    "isOptional": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Peek interaction tuning for "
+                        },
+                        {
+                            "kind": "code",
+                            "text": "`autoHideEdgeGroups`"
+                        },
+                        {
+                            "kind": "text",
+                            "text": " (global, not per-edge)."
                         }
                     ]
                 }
@@ -42294,7 +42288,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewMessages",
-                            "target": 10177
+                            "target": 10180
                         },
                         {
                             "kind": "text",
@@ -44880,6 +44874,33 @@
         ],
         "extends": []
     },
+    "EdgeGroupPeekOptions": {
+        "kind": "interface",
+        "name": "EdgeGroupPeekOptions",
+        "children": [
+            {
+                "name": "animate",
+                "code": "boolean",
+                "kind": "property",
+                "type": {
+                    "type": "intrinsic",
+                    "value": "boolean"
+                },
+                "flags": {
+                    "isOptional": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Slide the peek overlay in. Default true; ignored when the OS requests\n reduced motion."
+                        }
+                    ]
+                }
+            }
+        ],
+        "extends": []
+    },
     "ExpansionEvent": {
         "kind": "interface",
         "name": "ExpansionEvent",
@@ -45068,7 +45089,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewOptions.smartGuides",
-                            "target": 10303
+                            "target": 10307
                         },
                         {
                             "kind": "text",
@@ -45115,7 +45136,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewOptions.floatingGroupDragHandle",
-                            "target": 10278
+                            "target": 10282
                         },
                         {
                             "kind": "text",
@@ -63373,7 +63394,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "DockviewKeybindings",
-                            "target": 10165
+                            "target": 10168
                         },
                         {
                             "kind": "text",
@@ -64994,7 +65015,7 @@
                             "kind": "inline-tag",
                             "tag": "@link",
                             "text": "PositionResolver",
-                            "target": 12151
+                            "target": 12157
                         },
                         {
                             "kind": "text",
@@ -70198,7 +70219,7 @@
                     "kind": "inline-tag",
                     "tag": "@link",
                     "text": "DockviewApi",
-                    "target": 7214
+                    "target": 7221
                 },
                 {
                     "kind": "text",
@@ -70452,6 +70473,68 @@
                 {
                     "type": "literal",
                     "value": "top"
+                }
+            ]
+        },
+        "kind": "typeAlias"
+    },
+    "EdgeGroupSet": {
+        "name": "EdgeGroupSet",
+        "comment": {
+            "summary": [
+                {
+                    "kind": "text",
+                    "text": "A per-edge on/off set for edge-group options. A "
+                },
+                {
+                    "kind": "code",
+                    "text": "`boolean`"
+                },
+                {
+                    "kind": "text",
+                    "text": " applies to all\nfour edges; an object opts edges in individually (an omitted or "
+                },
+                {
+                    "kind": "code",
+                    "text": "`false`"
+                },
+                {
+                    "kind": "text",
+                    "text": "\nedge is off)."
+                }
+            ]
+        },
+        "code": "Partial<Record<EdgeGroupPosition, boolean>> | boolean",
+        "typeParameters": [],
+        "type": {
+            "type": "or",
+            "values": [
+                {
+                    "type": "reference",
+                    "value": "Partial",
+                    "source": "typescript",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "Record",
+                            "source": "typescript",
+                            "typeArguments": [
+                                {
+                                    "type": "reference",
+                                    "value": "EdgeGroupPosition",
+                                    "source": "dockview-core"
+                                },
+                                {
+                                    "type": "intrinsic",
+                                    "value": "boolean"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "intrinsic",
+                    "value": "boolean"
                 }
             ]
         },
@@ -72160,6 +72243,60 @@
         },
         "kind": "function"
     },
+    "isAnyEdgeGroupEnabled": {
+        "name": "isAnyEdgeGroupEnabled",
+        "code": "(set: undefined | EdgeGroupSet): boolean",
+        "signature": {
+            "name": "isAnyEdgeGroupEnabled",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Whether any edge is enabled in a per-edge "
+                    },
+                    {
+                        "kind": "inline-tag",
+                        "tag": "@link",
+                        "text": "EdgeGroupSet",
+                        "target": 12443
+                    },
+                    {
+                        "kind": "text",
+                        "text": "."
+                    }
+                ]
+            },
+            "typeParameters": [],
+            "parameters": [
+                {
+                    "name": "set",
+                    "code": "set: undefined | EdgeGroupSet",
+                    "type": {
+                        "type": "or",
+                        "values": [
+                            {
+                                "type": "intrinsic",
+                                "value": "undefined"
+                            },
+                            {
+                                "type": "reference",
+                                "value": "EdgeGroupSet",
+                                "source": "dockview-core"
+                            }
+                        ]
+                    },
+                    "kind": "parameter"
+                }
+            ],
+            "returnType": {
+                "type": "intrinsic",
+                "value": "boolean"
+            },
+            "code": "(set: undefined | EdgeGroupSet): boolean",
+            "kind": "callSignature"
+        },
+        "kind": "function"
+    },
     "isDockviewPackageLoaded": {
         "name": "isDockviewPackageLoaded",
         "code": "(): boolean",
@@ -72188,6 +72325,78 @@
                 "value": "boolean"
             },
             "code": "(): boolean",
+            "kind": "callSignature"
+        },
+        "kind": "function"
+    },
+    "isEdgeGroupEnabled": {
+        "name": "isEdgeGroupEnabled",
+        "code": "(set: undefined | EdgeGroupSet, position: EdgeGroupPosition): boolean",
+        "signature": {
+            "name": "isEdgeGroupEnabled",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Whether "
+                    },
+                    {
+                        "kind": "code",
+                        "text": "`position`"
+                    },
+                    {
+                        "kind": "text",
+                        "text": " is enabled in a per-edge "
+                    },
+                    {
+                        "kind": "inline-tag",
+                        "tag": "@link",
+                        "text": "EdgeGroupSet",
+                        "target": 12443
+                    },
+                    {
+                        "kind": "text",
+                        "text": "."
+                    }
+                ]
+            },
+            "typeParameters": [],
+            "parameters": [
+                {
+                    "name": "set",
+                    "code": "set: undefined | EdgeGroupSet",
+                    "type": {
+                        "type": "or",
+                        "values": [
+                            {
+                                "type": "intrinsic",
+                                "value": "undefined"
+                            },
+                            {
+                                "type": "reference",
+                                "value": "EdgeGroupSet",
+                                "source": "dockview-core"
+                            }
+                        ]
+                    },
+                    "kind": "parameter"
+                },
+                {
+                    "name": "position",
+                    "code": "position: EdgeGroupPosition",
+                    "type": {
+                        "type": "reference",
+                        "value": "EdgeGroupPosition",
+                        "source": "dockview-core"
+                    },
+                    "kind": "parameter"
+                }
+            ],
+            "returnType": {
+                "type": "intrinsic",
+                "value": "boolean"
+            },
+            "code": "(set: undefined | EdgeGroupSet, position: EdgeGroupPosition): boolean",
             "kind": "callSignature"
         },
         "kind": "function"

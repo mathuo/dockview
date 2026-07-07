@@ -33,13 +33,13 @@ describe('auto edge groups (two-band drag reveal)', () => {
         height: 1000,
     } as DOMRect;
 
-    function createHost(autoEdgeGroups = true) {
+    function createHost(dockToEdgeGroups = true) {
         const overlayRoot = document.createElement('div');
         const willShow = new Emitter<any>();
         const willDrop = new Emitter<any>();
         const reveal = jest.fn();
         const host = {
-            options: { autoEdgeGroups },
+            options: { dockToEdgeGroups },
             overlayRoot,
             getDropZoneRect: () => rect,
             onWillShowOverlay: willShow.event,
@@ -157,7 +157,7 @@ describe('auto edge groups (two-band drag reveal)', () => {
         service.dispose();
     });
 
-    test('resolver is undefined when autoEdgeGroups is off', () => {
+    test('resolver is undefined when dockToEdgeGroups is off', () => {
         const { service } = createHost(false);
         expect(service.resolver).toBeUndefined();
         service.dispose();
@@ -196,7 +196,7 @@ describe('auto edge groups (two-band drag reveal)', () => {
         service.dispose();
     });
 
-    test('does nothing when autoEdgeGroups is off', () => {
+    test('does nothing when dockToEdgeGroups is off', () => {
         const { service, overlayRoot, willShow, willDrop, reveal } =
             createHost(false);
         const preventDefault = jest.fn();
