@@ -35,6 +35,7 @@ import {
     MovementOptions,
     DockviewHeaderPosition,
     SmartGuidesOptions,
+    isEdgeGroupEnabled,
 } from './options';
 import {
     BaseGrid,
@@ -1117,11 +1118,14 @@ export class DockviewComponent
         if (
             data &&
             position !== 'center' &&
-            this.options.autoEdgeGroups &&
+            isEdgeGroupEnabled(
+                this.options.dockToEdgeGroups,
+                position as EdgeGroupPosition
+            ) &&
             this._edgeGroupService &&
             !this._moduleRegistry.services.autoEdgeGroupService
         ) {
-            // `autoEdgeGroups` baseline (single band): a root-edge drop reveals
+            // `dockToEdgeGroups` baseline (single band): a root-edge drop reveals
             // an edge group instead of splitting the grid. When the two-band
             // drag-reveal affordance is registered it owns edge-drop routing —
             // it preempts the outer band via `onWillDrop.preventDefault` and lets
@@ -2912,8 +2916,8 @@ export class DockviewComponent
      * (never re-created; `addEdgeGroup` throws on a duplicate position). No-op if
      * the EdgeGroup module is absent.
      *
-     * This is the primitive behind the drag-revealed edges; the two-band
-     * drag-reveal affordance and the `autoEdgeGroups` baseline both route here.
+     * This is the primitive behind the dock-to-edge groups; the two-band
+     * drag-reveal affordance and the `dockToEdgeGroups` baseline both route here.
      */
     revealEdgeGroupWithData(
         position: EdgeGroupPosition,
@@ -3124,16 +3128,20 @@ export class DockviewComponent
 
     /**
      * Resolve whether an edge group should behave as an auto-hide (pinnable)
-     * tool window: the per-group flag when set, otherwise the global
-     * `autoHideEdgeGroups` option. This is what lets a static edge group and an
-     * auto-hiding one co-exist in the same layout.
+     * tool window: the per-group flag when set, otherwise the per-edge
+     * `autoHideEdgeGroups` option for the group's edge. This is what lets a
+     * static edge group and an auto-hiding one co-exist in the same layout.
      */
     isEdgeGroupAutoHide(group: DockviewGroupPanel): boolean {
         const perGroup = this._edgeGroupService?.isAutoHide(group);
         if (perGroup !== undefined) {
             return perGroup;
         }
-        return !!this.options.autoHideEdgeGroups;
+        const position = this._edgeGroupService?.findPositionOf(group);
+        if (position === undefined) {
+            return false;
+        }
+        return isEdgeGroupEnabled(this.options.autoHideEdgeGroups, position);
     }
 
     /**
@@ -3603,8 +3611,8 @@ export class DockviewComponent
                 const id = groupState?.id ?? `${_position}-group`;
                 // Trust the serialized per-group flags. Absent → unset (a
                 // static edge collapses to a strip; auto-hide inherits the
-                // global option). We deliberately do NOT fall back to the
-                // `autoEdgeGroups` option here, so a static edge group in a
+                // per-edge option). We deliberately do NOT fall back to the
+                // `dockToEdgeGroups` option here, so a static edge group in a
                 // saved layout is never silently turned into a self-tearing-
                 // down one just because the option is on this session.
                 this.addEdgeGroup(_position, {

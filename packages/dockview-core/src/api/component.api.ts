@@ -1202,8 +1202,8 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     /**
      * Reveal (create-or-fill) the edge group at `position` and move the dragged
      * item described by `data` into it. A newly created edge group tears down to
-     * zero footprint when later emptied. Drives the drag-revealed edges behind
-     * the `autoEdgeGroups` option; a no-op if edge groups are unavailable.
+     * zero footprint when later emptied. Drives the dock-to-edge groups behind
+     * the `dockToEdgeGroups` option; a no-op if edge groups are unavailable.
      */
     revealEdgeGroupWithData(
         position: EdgeGroupPosition,

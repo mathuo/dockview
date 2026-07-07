@@ -10,7 +10,7 @@ import {
 } from '../dnd/droptarget';
 import { html5Backend, pointerBackend } from '../dnd/backend';
 import { getPanelData } from '../dnd/dataTransfer';
-import { DockviewComponentOptions } from './options';
+import { DockviewComponentOptions, isAnyEdgeGroupEnabled } from './options';
 import { defineModule } from './modules';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
@@ -18,21 +18,23 @@ const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     size: { type: 'pixels', value: 20 },
 };
 
-// When `autoEdgeGroups` is on we widen the edge activation band so the two-band
-// drag-reveal affordance has room for a distinct outer ("dock as edge group")
-// and inner ("split the grid") sub-band within it.
+// When `dockToEdgeGroups` is on for any edge we widen the edge activation band
+// so the two-band drag-reveal affordance has room for a distinct outer ("dock
+// as edge group") and inner ("split the grid") sub-band within it. The band is
+// uniform across edges; per-edge gating of the actual dock happens in the drop
+// handler and the (enterprise) edge resolver.
 const AUTO_EDGE_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     activationSize: { type: 'pixels', value: 32 },
     size: { type: 'pixels', value: 20 },
 };
 
 function resolveRootOverlayModel(
-    options: Pick<DockviewComponentOptions, 'dndEdges' | 'autoEdgeGroups'>
+    options: Pick<DockviewComponentOptions, 'dndEdges' | 'dockToEdgeGroups'>
 ): DroptargetOverlayModel {
     if (typeof options.dndEdges === 'object' && options.dndEdges !== null) {
         return options.dndEdges;
     }
-    return options.autoEdgeGroups
+    return isAnyEdgeGroupEnabled(options.dockToEdgeGroups)
         ? AUTO_EDGE_ROOT_OVERLAY_MODEL
         : DEFAULT_ROOT_OVERLAY_MODEL;
 }
@@ -145,19 +147,19 @@ export class RootDropTargetService implements IRootDropTargetService {
         }
 
         // Recompute the overlay band when either the edge overlay model or the
-        // autoEdgeGroups mode (which widens the band for the two sub-bands)
+        // dockToEdgeGroups set (which widens the band for the two sub-bands)
         // changes. Prefer the incoming partial for a changed key, falling back
         // to the current host options for the other.
-        if ('dndEdges' in options || 'autoEdgeGroups' in options) {
+        if ('dndEdges' in options || 'dockToEdgeGroups' in options) {
             const model = resolveRootOverlayModel({
                 dndEdges:
                     'dndEdges' in options
                         ? options.dndEdges
                         : this._host.options.dndEdges,
-                autoEdgeGroups:
-                    'autoEdgeGroups' in options
-                        ? options.autoEdgeGroups
-                        : this._host.options.autoEdgeGroups,
+                dockToEdgeGroups:
+                    'dockToEdgeGroups' in options
+                        ? options.dockToEdgeGroups
+                        : this._host.options.dockToEdgeGroups,
             });
             this._html5Target.setOverlayModel(model);
             this._pointerTarget.setOverlayModel(model);

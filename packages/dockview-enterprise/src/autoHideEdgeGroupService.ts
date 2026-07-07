@@ -2,7 +2,7 @@ import { DockviewCompositeDisposable as CompositeDisposable } from 'dockview';
 import { DockviewGroupPanel } from 'dockview';
 import { IDockviewPanel } from 'dockview';
 import { EdgeGroupPosition } from 'dockview';
-import { AutoHideEdgeGroupOptions } from 'dockview';
+import { EdgeGroupPeekOptions } from 'dockview';
 import { defineModule, EdgeGroupModule } from 'dockview';
 import {
     createCloseButton,
@@ -18,14 +18,11 @@ import { IAutoHideEdgeGroupHost, IAutoHideEdgeGroupService } from 'dockview';
  *  this value, so it's the single source of truth (no theme var). */
 const TITLEBAR_HEIGHT = 28;
 
-function resolveOptions(o: boolean | AutoHideEdgeGroupOptions | undefined): {
-    enabled: boolean;
+function resolveOptions(o: EdgeGroupPeekOptions | undefined): {
     animate: boolean;
 } {
-    const obj = typeof o === 'object' ? o : {};
     return {
-        enabled: !!o,
-        animate: obj.animate ?? true,
+        animate: o?.animate ?? true,
     };
 }
 
@@ -161,7 +158,7 @@ class EdgeGroupController extends CompositeDisposable {
     }
 
     private get _opts() {
-        return resolveOptions(this.host.options.autoHideEdgeGroups);
+        return resolveOptions(this.host.options.edgeGroupPeek);
     }
 
     /** Whether this specific edge group is opted into auto-hide — the per-group

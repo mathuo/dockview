@@ -15,6 +15,7 @@ import {
     PositionResolver,
 } from '../dnd/droptarget';
 import { GroupOptions } from './dockviewGroupPanelModel';
+import { EdgeGroupPosition } from './dockviewShell';
 import { DockviewGroupDropLocation } from './events';
 import { IDockviewPanel } from './dockviewPanel';
 import { DockviewPanelRenderer } from '../overlay/overlayRenderContainer';
@@ -531,21 +532,31 @@ export interface DockviewOptions {
      * VS Code-style "auto hide" for edge groups: render clickable activators in
      * a collapsed edge group's strip so it can be pinned back. Off by default →
      * today's baseline (an empty collapsed strip) is unchanged.
+     *
+     * A per-edge set: `true` applies to all four edges, or name edges
+     * individually (`{ left: true, bottom: true }`). An edge group at an edge
+     * not in the set stays a static collapsing sidebar. A per-group
+     * `api.setEdgeGroupAutoHide()` override wins over this default. Peek
+     * animation is tuned globally via `edgeGroupPeek`.
      */
-    autoHideEdgeGroups?: boolean | AutoHideEdgeGroupOptions;
+    autoHideEdgeGroups?: EdgeGroupSet;
     /**
      * Let panels dragged to a layout edge create/fill an **edge group** that is
-     * invisible when empty (VS Code-style "drag to the far edge → new sidebar").
+     * invisible when empty (VS Code-style "drag a panel to the far edge → new
+     * sidebar"). Created on drop; torn down to zero footprint when its last
+     * panel leaves.
      *
-     * When on, dropping a panel on the very outer edge band reveals an edge
-     * group at that position (creating it if needed and dropping the panel in);
-     * when its last panel leaves, the edge group tears down to zero footprint.
-     *
-     * Requires both the `RootDropTarget` (drag overlays) and `EdgeGroup`
-     * modules; a no-op if either is absent. Distinct from `dndEdges`, which only
-     * shapes the outer drop overlay (and still splits the grid). Off by default.
+     * A per-edge set: `true` enables dock-to-edge on all four edges, or name
+     * edges individually. Requires both the `RootDropTarget` (drag overlays)
+     * and `EdgeGroup` modules; a no-op if either is absent. Distinct from
+     * `dndEdges`, which only shapes the outer drop overlay (and still splits
+     * the grid). Off by default.
      */
-    autoEdgeGroups?: boolean;
+    dockToEdgeGroups?: EdgeGroupSet;
+    /**
+     * Peek interaction tuning for `autoHideEdgeGroups` (global, not per-edge).
+     */
+    edgeGroupPeek?: EdgeGroupPeekOptions;
     /**
      * Replace the built-in tab group color palette with a user-defined list.
      *
@@ -622,16 +633,41 @@ export interface LayoutHistoryOptions {
     coalesceMs?: number;
 }
 
-export interface AutoHideEdgeGroupOptions {
-    /** ms the pointer must dwell on the collapsed strip before the peek opens.
-     *  Default 250. Keyboard focus opens immediately (no delay). */
-    openDelay?: number;
-    /** ms after the pointer leaves both the strip and the peek overlay before
-     *  the peek closes. Re-entering either cancels it. Default 300. */
-    closeDelay?: number;
+export interface EdgeGroupPeekOptions {
     /** Slide the peek overlay in. Default true; ignored when the OS requests
      *  reduced motion. */
     animate?: boolean;
+}
+
+/**
+ * A per-edge on/off set for edge-group options. A `boolean` applies to all
+ * four edges; an object opts edges in individually (an omitted or `false`
+ * edge is off).
+ */
+export type EdgeGroupSet =
+    | boolean
+    | Partial<Record<EdgeGroupPosition, boolean>>;
+
+/** Whether `position` is enabled in a per-edge {@link EdgeGroupSet}. */
+export function isEdgeGroupEnabled(
+    set: EdgeGroupSet | undefined,
+    position: EdgeGroupPosition
+): boolean {
+    if (typeof set === 'boolean') {
+        return set;
+    }
+    return !!set?.[position];
+}
+
+/** Whether any edge is enabled in a per-edge {@link EdgeGroupSet}. */
+export function isAnyEdgeGroupEnabled(set: EdgeGroupSet | undefined): boolean {
+    if (typeof set === 'boolean') {
+        return set;
+    }
+    if (!set) {
+        return false;
+    }
+    return Object.values(set).some(Boolean);
 }
 
 export type TabAnimation = 'smooth' | 'default';
@@ -703,7 +739,8 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         keyboardNavigation: undefined,
         layoutHistory: undefined,
         autoHideEdgeGroups: undefined,
-        autoEdgeGroups: undefined,
+        dockToEdgeGroups: undefined,
+        edgeGroupPeek: undefined,
         tabGroupColors: undefined,
         tabGroupAccent: undefined,
         pinnedTabs: undefined,

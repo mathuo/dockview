@@ -415,12 +415,12 @@
                         }
                         dockview.autoHideEdgeGroup('left');
                     },
-                    // Drag-revealed edges: enable `autoEdgeGroups` (and turn the
+                    // Drag-revealed edges: enable `dockToEdgeGroups` (and turn the
                     // compass off so its own resolver drives edge routing), then
                     // two side-by-side groups so a tab can be dragged to the edge.
                     setupAutoEdgeGroups: () => {
                         dockview.api.updateOptions({
-                            autoEdgeGroups: true,
+                            dockToEdgeGroups: true,
                             dndGuide: false,
                             autoHideEdgeGroups: false,
                         });
@@ -441,7 +441,7 @@
                     // compass rings → split / grid-edge).
                     setupAutoEdgeGroupsWithCompass: () => {
                         dockview.api.updateOptions({
-                            autoEdgeGroups: true,
+                            dockToEdgeGroups: true,
                             dndGuide: true,
                             autoHideEdgeGroups: false,
                         });
