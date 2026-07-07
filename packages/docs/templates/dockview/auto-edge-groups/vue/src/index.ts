@@ -66,7 +66,7 @@ const App = defineComponent({
       <dockview-vue
         style="width:100%;height:100%"
         class="dockview-theme-abyss"
-        :autoEdgeGroups="true"
+        :dockToEdgeGroups="true"
         :autoHideEdgeGroups="true"
         @ready="onReady"
       >

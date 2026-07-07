@@ -15,9 +15,9 @@ Auto-hide turns a collapsed edge group into a **Visual Studio-style pinnable too
 
 For the basics of creating, sizing, collapsing, and serializing edge groups, see [Edge Groups](/docs/core/groups/edgeGroups).
 
-The `autoHideEdgeGroups` option sets the default for every edge group, but auto-hide is resolved **per group**: pass `autoHide` to `addEdgeGroup`, or call `api.setAutoHide` at runtime, to opt a single edge group in or out. This lets a static always-docked edge group and an auto-hiding one co-exist in the same layout.
+The `autoHideEdgeGroups` option sets the per-edge default, but auto-hide is also resolved **per group**: pass `autoHide` to `addEdgeGroup`, or call `api.setAutoHide` at runtime, to opt a single edge group in or out. This lets a static always-docked edge group and an auto-hiding one co-exist in the same layout.
 
-Enable it with the `autoHideEdgeGroups` option — pass `true`, or an options object to tune the behaviour:
+Enable it with the `autoHideEdgeGroups` option — pass `true` for all four edges, or an object to enable specific edges:
 
 <FrameworkSpecific framework="React">
     ```tsx
@@ -50,6 +50,16 @@ const api = createDockview(element, {
 ```
 </FrameworkSpecific>
 
+To enable auto-hide on only some edges, name them individually — `true`/`false` (or an omitted edge) toggles each of `top`, `bottom`, `left`, `right`:
+
+```ts
+const api = createDockview(element, {
+    // only edge groups on the left and bottom auto-hide
+    autoHideEdgeGroups: { left: true, bottom: true },
+    createComponent,
+});
+```
+
 Auto-hide is **off by default** — leaving `autoHideEdgeGroups` unset (or `false`) keeps the plain collapse/expand behaviour, with no peek overlay.
 
 <CodeRunner id="dockview/auto-hide-edge-groups" height={400} />
@@ -66,23 +76,22 @@ Auto-hide is entirely **click-driven** — there is no hover interaction. Once a
 
 Peeking is a transient interaction and is never serialized: a layout saved during a peek restores as a collapsed (auto-hidden) group.
 
-## Options
+## Peek animation
 
-<DocRef declaration="AutoHideEdgeGroupOptions" />
+Peek behaviour is tuned globally with the `edgeGroupPeek` option (separate from the per-edge `autoHideEdgeGroups` set):
+
+<DocRef declaration="EdgeGroupPeekOptions" />
 
 ```ts
 const api = createDockview(element, {
-    autoHideEdgeGroups: {
-        openDelay: 250,
-        closeDelay: 300,
+    autoHideEdgeGroups: true,
+    edgeGroupPeek: {
         animate: true,
     },
     createComponent,
 });
 ```
 
-- `openDelay` — milliseconds the pointer must dwell on the strip before the peek opens (keyboard focus opens immediately). Default `250`.
-- `closeDelay` — milliseconds after leaving both the strip and the peek overlay before it closes; re-entering either cancels it. Default `300`.
 - `animate` — slide the peek overlay in. Default `true`; ignored when the OS requests reduced motion.
 
 ## API

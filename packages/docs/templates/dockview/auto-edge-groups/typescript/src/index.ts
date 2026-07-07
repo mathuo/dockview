@@ -33,7 +33,7 @@ const api = createDockview(document.getElementById('app'), {
     theme: themeAbyss,
     // Drag a tab to the far edge to dock it as an edge group; the edge is
     // invisible when empty and revealed on demand.
-    autoEdgeGroups: true,
+    dockToEdgeGroups: true,
     autoHideEdgeGroups: true,
     createComponent: (options) => {
         switch (options.name) {

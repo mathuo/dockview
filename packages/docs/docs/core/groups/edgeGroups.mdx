@@ -137,16 +137,16 @@ When an edge group loses all of its panels it is automatically collapsed. Adding
 
 Collapsed edge groups can auto-hide and peek back on demand — see [Auto-hide Edge Groups](/docs/core/groups/autoHideEdgeGroups).
 
-## Drag-revealed edges
+## Dock to edge groups
 
-With the `autoEdgeGroups` option an edge takes up **zero space** when empty and is revealed by dragging a panel to it, like a VS Code sidebar — see [Drag-revealed edge groups](/docs/core/groups/autoEdgeGroups).
+With the `dockToEdgeGroups` option an edge takes up **zero space** when empty and is revealed by dragging a panel to it, like a VS Code sidebar — see [Dock to edge groups](/docs/core/groups/autoEdgeGroups).
 
 ## Auto-hide co-existence
 
-Auto-hide (the pinnable tool-window behaviour) is opt-in **per edge group**, so a static always-docked edge group and an auto-hiding one can co-exist in the same layout. Pass `autoHide` to `addEdgeGroup`, or toggle it at runtime with `api.setAutoHide`; either overrides the global `autoHideEdgeGroups` option for that group.
+Auto-hide (the pinnable tool-window behaviour) is opt-in **per edge group**, so a static always-docked edge group and an auto-hiding one can co-exist in the same layout. Pass `autoHide` to `addEdgeGroup`, or toggle it at runtime with `api.setAutoHide`; either overrides the per-edge `autoHideEdgeGroups` option for that group.
 
 ```ts
-// this edge group auto-hides; others follow the global option
+// this edge group auto-hides; others follow the per-edge option
 api.addEdgeGroup('left', { id: 'left-group', autoHide: true });
 
 // toggle at runtime
