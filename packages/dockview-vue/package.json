@@ -64,7 +64,8 @@
     "author": "https://github.com/mathuo",
     "files": [
         "dist",
-        "README.md"
+        "README.md",
+        "LICENCE.md"
     ],
     "scripts": {
         "build:bundle": "echo 'noop'",
