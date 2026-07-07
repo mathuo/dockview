@@ -18,8 +18,8 @@ This page covers the headline additions. For the upgrade notes and the single
 v8 introduces `dockview-enterprise`, a separately-licensed package for the
 features marked **Enterprise** in [Features](/docs/overview/features) — pinned
 tabs, multi-row tabs, the drop guide compass, smart guides, layout history,
-auto-hide edge groups, and keyboard docking. The free, open-source `dockview`
-packages are unchanged.
+auto-hide edge groups, dock-to-edge groups, and keyboard docking. The free,
+open-source `dockview` packages are unchanged.
 :::
 
 ## Highlights
@@ -73,8 +73,23 @@ windows. See [Layout history](/docs/core/state/history).
 Groups docked against an edge of the layout can now collapse to a strip and peek
 back into view on demand, VS Code tool-window style. Enable it with the new
 [`autoHideEdgeGroups`](/docs/core/groups/autoHideEdgeGroups) option; clicking a collapsed
-tab peeks the group, and you can pin it back to a docked group or dismiss it. See
+tab peeks the group, and you can pin it back to a docked group or dismiss it.
+Auto-hide is resolved **per edge** (and can be toggled per group via
+`addEdgeGroup({ autoHide })` / `api.setAutoHide`), so a static and an auto-hiding
+edge group can co-exist; peek animation is tuned globally through the new
+`edgeGroupPeek` option. See
 [Auto-hide edge groups](/docs/core/groups/autoHideEdgeGroups).
+
+### Dock to edge groups
+
+The new [`dockToEdgeGroups`](/docs/core/groups/autoEdgeGroups) option makes an edge
+behave like a VS Code sidebar: an edge with no content takes up **zero space**, a
+drop zone for it appears only **while dragging**, and dropping a panel on the far
+edge **docks an edge group** there. A newly revealed edge is created collapsed,
+and when its last panel leaves it tears down to zero footprint again. It composes
+with the drop guide compass (outer ring docks to the grid edge; the true outer band
+docks an edge group) and with auto-hide, and can be driven programmatically via
+`api.revealEdgeGroupWithData`. See [Dock to edge groups](/docs/core/groups/autoEdgeGroups).
 
 ### Keyboard docking across popout windows & refreshed a11y
 
@@ -88,10 +103,16 @@ and [Accessibility](/docs/advanced/accessibility).
 ## Breaking changes
 
 v8 is additive — every new feature above is opt-in and off by default. There is
-a single behavioural change to be aware of, covered in full in
-[Migrating to v8](/docs/releases/migrating/migrating-to-v8):
+one behavioural change and one method rename to be aware of, both covered in full
+in [Migrating to v8](/docs/releases/migrating/migrating-to-v8):
 
 - **Reported panel dimensions** — `onDidDimensionsChange` (and the height passed
   to renderers) now report the **content area** (the group box minus the header)
   instead of the header-inclusive group box. CSS-fill renderers are unaffected;
   only consumers that read the numeric dimensions need to check this.
+- **`api.moveToNext` / `api.moveToPrevious` renamed** to
+  [`activateNext` / `activatePrevious`](/docs/advanced/focus-navigation) — the
+  new names make clear they advance the active panel/group (focus) rather than
+  relocating a panel. The old names still work as **deprecated aliases**, so no
+  code breaks today; update at your convenience before they are removed in a
+  future major.

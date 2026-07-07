@@ -1,13 +1,14 @@
 ---
 title: Migrating to v8
 sidebar_position: 1
-description: How to upgrade from Dockview v7 to v8 — an additive release with a single behavioural change to reported panel dimensions.
+description: How to upgrade from Dockview v7 to v8 — an additive release with one behavioural change to reported panel dimensions and one deprecating method rename.
 ---
 
 **v8 is additive.** Every new feature ships as an opt-in `DockviewOptions` field
 that is off by default, so most projects upgrade with no code changes. There are
-no package renames, no removed options, and no renamed public exports. The one
-thing to check is a behavioural change to the dimensions reported to panels.
+no package renames and no removed options. Two things are worth checking: a
+behavioural change to the dimensions reported to panels, and a method rename that
+keeps the old names as deprecated aliases (so nothing breaks today).
 
 ## Behavioural change — reported panel dimensions
 
@@ -34,6 +35,31 @@ themselves from the reported dimensions, such as **canvas**, **virtualised**, or
 is no longer double-counted); adjust any code that compensated for the header.
 :::
 
+## Renamed methods — `moveToNext` / `moveToPrevious` {#renamed-methods}
+
+`api.moveToNext` and `api.moveToPrevious` are renamed to
+[`api.activateNext` / `api.activatePrevious`](/docs/advanced/focus-navigation).
+They advance the **active** panel/group (they move focus); they never relocate a
+panel, and the old names misread as panel-moving — especially now that keyboard
+docking offers a genuine "move panel" action.
+
+```diff
+- api.moveToNext({ includePanel: true });
++ api.activateNext({ includePanel: true });
+
+- api.moveToPrevious({ includePanel: true });
++ api.activatePrevious({ includePanel: true });
+```
+
+:::info Nothing breaks today
+The old names remain as **deprecated aliases** that delegate to the new ones, so
+existing code keeps working. Removal is planned for a future major release —
+rename at your convenience.
+:::
+
+The group-model `moveToNext` / `moveToPrevious` (active-panel cycling _within_ a
+single group) are a different concept and are unchanged.
+
 ## No other breaking changes
 
 For clarity, none of the following changed in v8:
@@ -44,7 +70,9 @@ For clarity, none of the following changed in v8:
   applies if you are coming from v6.
 - **No removed or renamed options.** Every v7 `DockviewOptions` field keeps its
   name and meaning.
-- **No removed or renamed public exports.** The v8 surface only _adds_ exports.
+- **No removed public exports.** The v8 surface only _adds_ exports. The single
+  method rename above ([`moveToNext` / `moveToPrevious`](#renamed-methods))
+  keeps the old names as deprecated aliases, so nothing is removed yet.
 
 ## New opt-in options
 
@@ -60,6 +88,12 @@ They are off by default; set the ones you want:
 | `smartGuides`          | [Smart guides — floating-group snapping](/docs/core/dnd/smartGuides)   |
 | `layoutHistory`        | [Layout history (undo/redo)](/docs/core/state/history)                 |
 | `autoHideEdgeGroups`   | [Auto-hide edge groups](/docs/core/groups/autoHideEdgeGroups)          |
+| `dockToEdgeGroups`     | [Dock to edge groups — drag-revealed edges](/docs/core/groups/autoEdgeGroups) |
+| `edgeGroupPeek`        | Peek animation tuning for [auto-hide edge groups](/docs/core/groups/autoHideEdgeGroups) |
+
+`autoHideEdgeGroups` and `dockToEdgeGroups` accept an `EdgeGroupSet` — pass
+`true` to enable all four edges, or an object such as `{ left: true, right: true }`
+to opt edges in individually.
 
 The tab context menu also gains a `'pin'` built-in item for toggling a panel's
 pinned state; it is a no-op when pinning is not enabled.
