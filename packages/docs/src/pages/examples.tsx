@@ -1,6 +1,7 @@
 import React from 'react';
 import Layout from '@theme/Layout';
 import useBaseUrl from '@docusaurus/useBaseUrl';
+import { EnterpriseBadge } from '@site/src/components/ui/enterprise/enterpriseBadge';
 import './examples.scss';
 
 type Framework = 'react' | 'vue' | 'angular' | 'typescript';
@@ -8,6 +9,8 @@ type Framework = 'react' | 'vue' | 'angular' | 'typescript';
 interface Example {
     name: string;
     frameworks: Framework[];
+    /** Requires a `dockview-enterprise` feature — marked with the Enterprise pill. */
+    enterprise?: boolean;
 }
 
 interface ComponentGroup {
@@ -45,6 +48,7 @@ const COMPONENTS: ComponentGroup[] = [
             {
                 name: 'auto-hide-edge-groups',
                 frameworks: ['react', 'vue', 'angular', 'typescript'],
+                enterprise: true,
             },
             {
                 name: 'basic',
@@ -62,7 +66,11 @@ const COMPONENTS: ComponentGroup[] = [
                 name: 'custom-header',
                 frameworks: ['react', 'vue', 'angular', 'typescript'],
             },
-            { name: 'demo-dockview', frameworks: ['react', 'angular'] },
+            {
+                name: 'demo-dockview',
+                frameworks: ['react', 'angular'],
+                enterprise: true,
+            },
             {
                 name: 'dnd-events',
                 frameworks: ['react', 'vue', 'angular', 'typescript'],
@@ -74,6 +82,7 @@ const COMPONENTS: ComponentGroup[] = [
             {
                 name: 'drop-guide',
                 frameworks: ['react', 'vue', 'angular', 'typescript'],
+                enterprise: true,
             },
             {
                 name: 'edge-groups',
@@ -98,6 +107,7 @@ const COMPONENTS: ComponentGroup[] = [
             {
                 name: 'keyboard',
                 frameworks: ['react', 'vue', 'angular', 'typescript'],
+                enterprise: true,
             },
             {
                 name: 'layout',
@@ -106,6 +116,7 @@ const COMPONENTS: ComponentGroup[] = [
             {
                 name: 'layout-history',
                 frameworks: ['react', 'vue', 'angular', 'typescript'],
+                enterprise: true,
             },
             {
                 name: 'locked',
@@ -122,6 +133,7 @@ const COMPONENTS: ComponentGroup[] = [
             {
                 name: 'pinned-tabs',
                 frameworks: ['react', 'vue', 'angular', 'typescript'],
+                enterprise: true,
             },
             {
                 name: 'popout-group',
@@ -146,14 +158,17 @@ const COMPONENTS: ComponentGroup[] = [
             {
                 name: 'smart-guides',
                 frameworks: ['react', 'vue', 'angular', 'typescript'],
+                enterprise: true,
             },
             {
                 name: 'tab-groups',
                 frameworks: ['react', 'vue', 'angular', 'typescript'],
+                enterprise: true,
             },
             {
                 name: 'tab-overflow',
                 frameworks: ['react', 'vue', 'angular', 'typescript'],
+                enterprise: true,
             },
             {
                 name: 'tabview',
@@ -230,6 +245,7 @@ function ExampleCard({
                 <h3 className="example-card-title" id={`${anchorId}-title`}>
                     {formatName(example.name)}
                 </h3>
+                {example.enterprise && <EnterpriseBadge variant="title" />}
             </div>
             <div className="example-card-frameworks">
                 {example.frameworks.map((fw) => {
