@@ -1,8 +1,6 @@
-import {
-    DockviewComponent,
-    IContentRenderer,
-    DockviewCompositeDisposable as CompositeDisposable,
-} from 'dockview-core';
+import { DockviewComponent } from '../../dockview/dockviewComponent';
+import { IContentRenderer } from '../../dockview/types';
+import { CompositeDisposable } from '../../lifecycle';
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');

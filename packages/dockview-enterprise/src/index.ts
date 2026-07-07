@@ -1,5 +1,4 @@
 import { DockviewModule, registerModules } from 'dockview';
-import { TabGroupChipsModule } from './tabGroupChipsService';
 import { ContextMenuModule } from './contextMenu';
 import { KeyboardNavigationModule } from './keyboardNavigationService';
 import { LayoutHistoryModule } from './layoutHistoryService';
@@ -17,10 +16,9 @@ import { LicenseModule } from './licenseService';
 // (e.g. markDockviewPackageLoaded) via the re-exported module.
 export * from 'dockview';
 
-export {
-    TabGroupChipsService,
-    TabGroupChipsModule,
-} from './tabGroupChipsService';
+// TabGroupChipsModule / TabGroupChipsService are now FREE and live in
+// dockview-core; they remain re-exported here via `export * from 'dockview'`
+// above so `dockview-enterprise` stays a drop-in superset.
 export { ContextMenuController, ContextMenuModule } from './contextMenu';
 export {
     KeyboardNavigationService,
@@ -66,7 +64,6 @@ export type { LicenseState } from './licenseValidator';
  * for every component in the process.
  */
 export const Modules: DockviewModule<any>[] = [
-    TabGroupChipsModule,
     ContextMenuModule,
     KeyboardNavigationModule,
     LayoutHistoryModule,

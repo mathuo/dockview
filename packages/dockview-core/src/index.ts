@@ -241,6 +241,10 @@ export {
     AdvancedDnDModule,
     AdvancedDnDService,
 } from './dockview/advancedDnDService';
+export {
+    TabGroupChipsModule,
+    TabGroupChipsService,
+} from './dockview/tabGroupChipsService';
 export { FloatingGroupModule } from './dockview/floatingGroupService';
 export { EdgeGroupModule } from './dockview/edgeGroupService';
 export { createCloseButton, createPinButton } from './svg';
