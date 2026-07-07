@@ -56,7 +56,8 @@
     "sideEffects": true,
     "files": [
         "dist",
-        "README.md"
+        "README.md",
+        "LICENCE.md"
     ],
     "scripts": {
         "build:bundle": "rollup -c",

@@ -45,7 +45,8 @@
     "author": "https://github.com/mathuo",
     "files": [
         "dist",
-        "README.md"
+        "README.md",
+        "LICENCE.md"
     ],
     "module": "./dist/fesm2022/dockview-angular.mjs",
     "typings": "./dist/types/dockview-angular.d.ts",

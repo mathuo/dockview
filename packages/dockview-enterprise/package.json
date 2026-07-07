@@ -17,7 +17,7 @@
         "type": "git",
         "url": "git+https://github.com/mathuo/dockview.git"
     },
-    "license": "MIT",
+    "license": "SEE LICENSE IN LICENCE.md",
     "author": "https://github.com/mathuo",
     "main": "./dist/package/main.cjs.js",
     "module": "./dist/package/main.esm.mjs",
@@ -33,7 +33,8 @@
     "sideEffects": true,
     "files": [
         "dist",
-        "README.md"
+        "README.md",
+        "LICENCE.md"
     ],
     "scripts": {
         "build:bundle": "rollup -c",
