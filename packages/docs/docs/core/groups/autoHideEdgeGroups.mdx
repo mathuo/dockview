@@ -15,6 +15,8 @@ Auto-hide turns a collapsed edge group into a **Visual Studio-style pinnable too
 
 For the basics of creating, sizing, collapsing, and serializing edge groups, see [Edge Groups](/docs/core/groups/edgeGroups).
 
+The `autoHideEdgeGroups` option sets the default for every edge group, but auto-hide is resolved **per group**: pass `autoHide` to `addEdgeGroup`, or call `api.setAutoHide` at runtime, to opt a single edge group in or out. This lets a static always-docked edge group and an auto-hiding one co-exist in the same layout.
+
 Enable it with the `autoHideEdgeGroups` option — pass `true`, or an options object to tune the behaviour:
 
 <FrameworkSpecific framework="React">

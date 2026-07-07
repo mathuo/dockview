@@ -21,6 +21,7 @@ import {
     IKeyboardNavigationService,
     IAdvancedDnDService,
     IAutoHideEdgeGroupService,
+    IAutoEdgeGroupService,
     IContextMenuService,
     IDropGuideService,
     IKeyboardDockingService,
@@ -48,6 +49,7 @@ export interface ServiceCollection {
     dropGuideService?: IDropGuideService;
     smartGuidesService?: ISmartGuidesService;
     autoHideEdgeGroupService?: IAutoHideEdgeGroupService;
+    autoEdgeGroupService?: IAutoEdgeGroupService;
     multiRowTabsService?: IMultiRowTabsService;
     pinnedTabsService?: IPinnedTabsService;
 }

@@ -104,6 +104,7 @@ export {
 export * from './dockview/dockviewComponent';
 export {
     EdgeGroupOptions,
+    AddEdgeGroupOptions,
     EdgeGroupPosition,
     SerializedEdgeGroups,
 } from './dockview/dockviewShell';
@@ -201,6 +202,8 @@ export {
     IAdvancedDnDService,
     IAutoHideEdgeGroupHost,
     IAutoHideEdgeGroupService,
+    IAutoEdgeGroupHost,
+    IAutoEdgeGroupService,
     IContextMenuHost,
     IContextMenuService,
     IDropGuideHost,

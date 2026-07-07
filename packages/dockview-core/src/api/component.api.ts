@@ -81,7 +81,10 @@ import {
 } from '../paneview/options';
 import { SplitviewComponentOptions } from '../splitview/options';
 import { GridviewComponentOptions } from '../gridview/options';
-import { EdgeGroupPosition, EdgeGroupOptions } from '../dockview/dockviewShell';
+import {
+    EdgeGroupPosition,
+    AddEdgeGroupOptions,
+} from '../dockview/dockviewShell';
 import { DockviewGroupPanelApi } from './dockviewGroupPanelApi';
 
 export interface CommonApi<T = any> {
@@ -1191,9 +1194,23 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     addEdgeGroup(
         position: EdgeGroupPosition,
-        options: EdgeGroupOptions
+        options: AddEdgeGroupOptions
     ): DockviewGroupPanelApi {
         return this.component.addEdgeGroup(position, options);
+    }
+
+    /**
+     * Reveal (create-or-fill) the edge group at `position` and move the dragged
+     * item described by `data` into it. A newly created edge group tears down to
+     * zero footprint when later emptied. Drives the drag-revealed edges behind
+     * the `autoEdgeGroups` option; a no-op if edge groups are unavailable.
+     */
+    revealEdgeGroupWithData(
+        position: EdgeGroupPosition,
+        data: { groupId: string; panelId?: string | null },
+        options?: { autoHide?: boolean }
+    ): void {
+        this.component.revealEdgeGroupWithData(position, data, options);
     }
 
     /**

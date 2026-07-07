@@ -6,6 +6,7 @@ import { LayoutHistoryModule } from './layoutHistoryService';
 import { DropGuideModule } from './dropGuideService';
 import { SmartGuidesModule } from './smartGuidesService';
 import { AutoHideEdgeGroupModule } from './autoHideEdgeGroupService';
+import { AutoEdgeGroupModule } from './autoEdgeGroupService';
 import { MultiRowTabsModule } from './multiRowTabsService';
 import { PinnedTabsModule } from './pinnedTabsService';
 import { KeyboardDockingModule } from './keyboardDockingService';
@@ -35,6 +36,10 @@ export {
     AutoHideEdgeGroupService,
     AutoHideEdgeGroupModule,
 } from './autoHideEdgeGroupService';
+export {
+    AutoEdgeGroupService,
+    AutoEdgeGroupModule,
+} from './autoEdgeGroupService';
 export { MultiRowTabsService, MultiRowTabsModule } from './multiRowTabsService';
 export {
     PinnedTabsService,
@@ -68,6 +73,7 @@ export const Modules: DockviewModule<any>[] = [
     DropGuideModule,
     SmartGuidesModule,
     AutoHideEdgeGroupModule,
+    AutoEdgeGroupModule,
     MultiRowTabsModule,
     PinnedTabsModule,
     KeyboardDockingModule,

@@ -415,6 +415,57 @@
                         }
                         dockview.autoHideEdgeGroup('left');
                     },
+                    // Drag-revealed edges: enable `autoEdgeGroups` (and turn the
+                    // compass off so its own resolver drives edge routing), then
+                    // two side-by-side groups so a tab can be dragged to the edge.
+                    setupAutoEdgeGroups: () => {
+                        dockview.api.updateOptions({
+                            autoEdgeGroups: true,
+                            dndGuide: false,
+                            autoHideEdgeGroups: false,
+                        });
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        dockview.addPanel({
+                            id: 'side',
+                            component: 'default',
+                            title: 'side',
+                            position: { direction: 'right' },
+                        });
+                    },
+                    // Same as setupAutoEdgeGroups but with the drop-guide compass
+                    // ALSO on, to prove the two compose (edge → edge group, the
+                    // compass rings → split / grid-edge).
+                    setupAutoEdgeGroupsWithCompass: () => {
+                        dockview.api.updateOptions({
+                            autoEdgeGroups: true,
+                            dndGuide: true,
+                            autoHideEdgeGroups: false,
+                        });
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        dockview.addPanel({
+                            id: 'side',
+                            component: 'default',
+                            title: 'side',
+                            position: { direction: 'right' },
+                        });
+                    },
+                    edgeGroupExists: (pos) => !!dockview.getEdgeGroup(pos),
+                    edgeGroupCollapsed: (pos) => {
+                        const g = dockview.getEdgeGroup(pos);
+                        return g ? g.isCollapsed() : null;
+                    },
+                    edgeGroupPanelIds: (pos) => {
+                        const g = dockview.getEdgeGroupPanel(pos);
+                        return g ? g.panels.map((p) => p.id) : [];
+                    },
                 };
                 window.__ready = true;
             })();

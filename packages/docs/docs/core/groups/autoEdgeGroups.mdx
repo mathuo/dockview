@@ -1,0 +1,100 @@
+---
+title: Drag-revealed edge groups
+description: Drag a panel to the layout edge to dock it as an edge group that takes up zero space when empty and is revealed on demand.
+sidebar_position: 7
+enterprise: true
+sidebar_custom_props:
+    enterprise: true
+---
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+import { CodeRunner } from '@site/src/components/ui/codeRunner';
+
+Drag-revealed edge groups make an edge behave like a Visual Studio Code sidebar. An edge with no content takes up **zero space**; a drop zone for it appears only **while dragging**; and dropping a panel on the far edge **reveals an edge group** there. When its last panel leaves, the edge group tears down and the edge becomes invisible again.
+
+For the basics of creating, sizing, collapsing, and serializing edge groups, see [Edge groups](/docs/core/groups/edgeGroups).
+
+Enable it with the `autoEdgeGroups` option:
+
+<FrameworkSpecific framework="React">
+    ```tsx
+    <DockviewReact
+        autoEdgeGroups={true}
+        onReady={onReady}
+        components={components}
+    />
+    ```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+```vue
+<dockview-vue :auto-edge-groups="true" @ready="onReady" />
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+```html
+<dockview-angular [autoEdgeGroups]="true" (ready)="onReady($event)"></dockview-angular>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+```ts
+const api = createDockview(element, {
+    autoEdgeGroups: true,
+    createComponent,
+});
+```
+</FrameworkSpecific>
+
+Drag-revealed edges are **off by default** — leaving `autoEdgeGroups` unset (or `false`) keeps the standard behaviour, where an edge must be created explicitly with `addEdgeGroup` and an emptied edge collapses to a strip rather than disappearing.
+
+<CodeRunner id="dockview/auto-edge-groups" height={500} />
+
+## Two drop bands
+
+While dragging a panel toward the layout edge there are two drop zones:
+
+- The **outer band**, hugging the true edge (marked by a coloured indicator line), docks the panel as a dedicated **edge group**.
+- Just **inside** it, the panel splits the primary grid as usual — the standard `dndEdges` behaviour.
+
+A newly revealed edge group is created **collapsed**: the drop adds a tab to its strip rather than popping the group open. Dropping onto an edge that already exists simply adds the panel to its tabs and leaves the group's collapsed/expanded state untouched. Combine with [auto-hide edge groups](/docs/core/groups/autoHideEdgeGroups) so a revealed edge peeks open on click.
+
+## Zero footprint when empty
+
+An edge group created by a drag reveal is flagged to **tear down to zero footprint** once its last panel leaves — the edge occupies no space and shows no strip until something is dragged back to it. This is the difference from a normal edge group, which collapses to a persistent strip when emptied.
+
+Revealed edges still serialize and restore like any other edge group; a transient empty edge (mid-teardown) is never persisted.
+
+## Composing with the drop guide
+
+If the [drop guide](/docs/core/dnd/dropGuide) compass is also enabled, the two compose rather than conflict. A drop can target **either**:
+
+- the **grid layout edge** — the compass's outer ring, or
+- an **edge group** — the true outer edge band (drag-reveal).
+
+The distinction is by pointer depth: the compass's outer ring sits well inside the edge band, and the edge-group indicator takes over at the very edge.
+
+## Revealing programmatically
+
+Reveal (create-or-fill) an edge group and move a dragged item into it — the primitive the drag affordance is built on:
+
+<DocRef declaration="DockviewApi" methods={['revealEdgeGroupWithData']} />
+
+```ts
+api.revealEdgeGroupWithData('left', {
+    groupId: draggedGroupId,
+    panelId: draggedPanelId,
+});
+```
+
+:::info
+Drag-revealed edges require both the edge-group and drag-and-drop overlay functionality; the option is a no-op if either is unavailable. The discoverable two-band affordance and the edge indicator are provided by the `dockview-enterprise` package.
+:::
+
+## See also
+
+- [Edge groups](/docs/core/groups/edgeGroups) — creating, sizing, collapsing, and serializing edge groups
+- [Auto-hide edge groups](/docs/core/groups/autoHideEdgeGroups) — peek a collapsed edge group open on click
+- [Drag and drop](/docs/core/dnd/overview) — the `dndEdges` layout-edge drop zones

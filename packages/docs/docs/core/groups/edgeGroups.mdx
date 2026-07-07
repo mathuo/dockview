@@ -65,7 +65,7 @@ Calling `addEdgeGroup` for a position that is already registered throws an error
 
 ## Edge group options
 
-<DocRef declaration="EdgeGroupOptions" />
+<DocRef declaration="AddEdgeGroupOptions" />
 
 ## Adding panels into an edge group
 
@@ -91,6 +91,7 @@ api.addPanel({
     declaration="DockviewApi"
     methods={[
         'addEdgeGroup',
+        'revealEdgeGroupWithData',
         'getEdgeGroup',
         'setEdgeGroupVisible',
         'isEdgeGroupVisible',
@@ -135,6 +136,22 @@ When an edge group loses all of its panels it is automatically collapsed. Adding
 :::
 
 Collapsed edge groups can auto-hide and peek back on demand — see [Auto-hide Edge Groups](/docs/core/groups/autoHideEdgeGroups).
+
+## Drag-revealed edges
+
+With the `autoEdgeGroups` option an edge takes up **zero space** when empty and is revealed by dragging a panel to it, like a VS Code sidebar — see [Drag-revealed edge groups](/docs/core/groups/autoEdgeGroups).
+
+## Auto-hide co-existence
+
+Auto-hide (the pinnable tool-window behaviour) is opt-in **per edge group**, so a static always-docked edge group and an auto-hiding one can co-exist in the same layout. Pass `autoHide` to `addEdgeGroup`, or toggle it at runtime with `api.setAutoHide`; either overrides the global `autoHideEdgeGroups` option for that group.
+
+```ts
+// this edge group auto-hides; others follow the global option
+api.addEdgeGroup('left', { id: 'left-group', autoHide: true });
+
+// toggle at runtime
+api.getEdgeGroup('right')?.setAutoHide(true);
+```
 
 ## Custom header actions
 

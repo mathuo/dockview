@@ -10,6 +10,8 @@ import {
     DroptargetOverlayModel,
     Position,
     PositionResolver,
+    PositionResolverArgs,
+    PositionResolverResult,
 } from '../dnd/droptarget';
 import { Box } from '../types';
 import { IDragGhostSpec } from '../dnd/backend';
@@ -427,6 +429,14 @@ export interface IAutoHideEdgeGroupHost {
     /** Collapse/expand an edge group — the single mutate path (fires
      *  `onDidCollapsedChange`, no-op guarded). */
     setEdgeGroupCollapsed(group: DockviewGroupPanel, collapsed: boolean): void;
+    /** Whether this edge group should behave as an auto-hide (pinnable) tool
+     *  window — the per-group flag resolved against the global
+     *  `autoHideEdgeGroups` option. Lets static and auto-hiding edge groups
+     *  co-exist. */
+    isEdgeGroupAutoHide(group: DockviewGroupPanel): boolean;
+    /** Fires when a group's resolved auto-hide state changes at runtime
+     *  (per-group `setAutoHide`), so a controller can dock/undock retroactively. */
+    readonly onDidEdgeGroupAutoHideChange: Event<DockviewGroupPanel>;
     /** The element the slide-out peek mounts on — the shell, which is also the
      *  `OverlayRenderContainer` root, so `always`-rendered content anchors in
      *  the same coordinate space as the peek. */
@@ -461,6 +471,53 @@ export interface IAutoHideEdgeGroupService extends IDisposable {
     pin(position: EdgeGroupPosition): void;
     /** Auto-hide (collapse to strip) the edge group at `position`. */
     autoHide(position: EdgeGroupPosition): void;
+}
+
+// --- AutoEdgeGroup (drag-revealed two-band affordance) ---
+
+/**
+ * The narrow surface the two-band drag-reveal affordance needs from the host
+ * (`DockviewComponent`). It reuses the existing `onWillShowOverlay` /
+ * `onWillDrop` seams (no new core overlay code): on a layout-edge drag it
+ * classifies the pointer into an outer "dock as edge group" band and an inner
+ * "split the grid" band, drawing its own outer-band highlight and routing an
+ * outer-band drop to `revealEdgeGroupWithData`. The presence of this service
+ * also disables core's single-band `autoEdgeGroups` fallback so the inner band
+ * falls through to the default grid split.
+ */
+export interface IAutoEdgeGroupHost {
+    readonly options: DockviewComponentOptions;
+    /** Fires before an edge drop overlay is shown — the affordance draws its
+     *  outer-band highlight (or lets the inner band render the core overlay). */
+    readonly onWillShowOverlay: Event<DockviewWillShowOverlayLocationEvent>;
+    /** Fires before a layout-edge drop commits — the affordance preempts the
+     *  outer band and reveals an edge group. */
+    readonly onWillDrop: Event<DockviewWillDropEvent>;
+    /** The element the outer-band highlight mounts on (the shell / overlay root). */
+    readonly overlayRoot: HTMLElement;
+    /** Viewport rect of the docked content area (the drop-target element), to
+     *  classify a pointer's edge band and position the highlight. */
+    getDropZoneRect(): DOMRect;
+    /** Reveal (create-or-fill) the edge group at `position` and drop the dragged
+     *  item into it. The primitive behind drag-revealed edges. */
+    revealEdgeGroupWithData(
+        position: EdgeGroupPosition,
+        data: { groupId: string; panelId?: string | null },
+        options?: { autoHide?: boolean }
+    ): void;
+}
+
+export interface IAutoEdgeGroupService extends IDisposable {
+    /** The standalone position resolver installed on the group content drop
+     *  targets: marks the outer band of the content area as an `edge` cell (so a
+     *  drop there routes to `dockToLayoutEdge` → reveal) and otherwise resolves
+     *  the normal cursor quadrant. `undefined` when disabled. */
+    readonly resolver: PositionResolver | undefined;
+    /** Edge-band detection only: an `edge` cell when the pointer is in the outer
+     *  band, else `null`. Used to COMPOSE with another resolver (e.g. the
+     *  drop-guide compass) — the outer edge reveals an edge group and everything
+     *  else falls through to the other resolver. */
+    resolveEdge(args: PositionResolverArgs): PositionResolverResult | null;
 }
 
 // --- MultiRowTabs ---

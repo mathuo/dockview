@@ -29,6 +29,22 @@ export interface IEdgeGroupService extends IDisposable {
     includes(group: DockviewGroupPanel): boolean;
     findPositionOf(group: DockviewGroupPanel): EdgeGroupPosition | undefined;
 
+    /**
+     * Per-group auto-hide opt-in. `undefined` means "unset" — callers should
+     * fall back to the global `autoHideEdgeGroups` option. This lets a static
+     * edge group and an auto-hiding one co-exist in the same layout.
+     */
+    setAutoHide(group: DockviewGroupPanel, value: boolean | undefined): void;
+    isAutoHide(group: DockviewGroupPanel): boolean | undefined;
+
+    /**
+     * Per-group "auto-reveal" flag. When set, an edge group tears itself down
+     * to zero footprint when emptied (instead of collapsing to a strip) — the
+     * state used by drag-revealed edges.
+     */
+    setAutoReveal(group: DockviewGroupPanel, value: boolean): void;
+    isAutoReveal(group: DockviewGroupPanel): boolean;
+
     disposeAll(): void;
 }
 
@@ -41,6 +57,10 @@ export class EdgeGroupService implements IEdgeGroupService {
         EdgeGroupPosition,
         IDisposable
     >();
+    // Per-group presentation flags, keyed by the group so they survive the
+    // position bookkeeping and are dropped when the group is GC'd.
+    private readonly _autoHide = new WeakMap<DockviewGroupPanel, boolean>();
+    private readonly _autoReveal = new WeakMap<DockviewGroupPanel, boolean>();
 
     // No constructor needed — the host is currently unused. The
     // IEdgeGroupServiceHost slot stays for symmetry with the other modules
@@ -93,6 +113,26 @@ export class EdgeGroupService implements IEdgeGroupService {
             }
         }
         return undefined;
+    }
+
+    setAutoHide(group: DockviewGroupPanel, value: boolean | undefined): void {
+        if (value === undefined) {
+            this._autoHide.delete(group);
+        } else {
+            this._autoHide.set(group, value);
+        }
+    }
+
+    isAutoHide(group: DockviewGroupPanel): boolean | undefined {
+        return this._autoHide.get(group);
+    }
+
+    setAutoReveal(group: DockviewGroupPanel, value: boolean): void {
+        this._autoReveal.set(group, value);
+    }
+
+    isAutoReveal(group: DockviewGroupPanel): boolean {
+        return this._autoReveal.get(group) ?? false;
     }
 
     disposeAll(): void {

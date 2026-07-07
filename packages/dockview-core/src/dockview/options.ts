@@ -534,6 +534,19 @@ export interface DockviewOptions {
      */
     autoHideEdgeGroups?: boolean | AutoHideEdgeGroupOptions;
     /**
+     * Let panels dragged to a layout edge create/fill an **edge group** that is
+     * invisible when empty (VS Code-style "drag to the far edge → new sidebar").
+     *
+     * When on, dropping a panel on the very outer edge band reveals an edge
+     * group at that position (creating it if needed and dropping the panel in);
+     * when its last panel leaves, the edge group tears down to zero footprint.
+     *
+     * Requires both the `RootDropTarget` (drag overlays) and `EdgeGroup`
+     * modules; a no-op if either is absent. Distinct from `dndEdges`, which only
+     * shapes the outer drop overlay (and still splits the grid). Off by default.
+     */
+    autoEdgeGroups?: boolean;
+    /**
      * Replace the built-in tab group color palette with a user-defined list.
      *
      * Each entry has an `id` (stored on `tabGroup.color` and serialized),
@@ -690,6 +703,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         keyboardNavigation: undefined,
         layoutHistory: undefined,
         autoHideEdgeGroups: undefined,
+        autoEdgeGroups: undefined,
         tabGroupColors: undefined,
         tabGroupAccent: undefined,
         pinnedTabs: undefined,

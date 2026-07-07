@@ -20,6 +20,8 @@ calls `registerModules(Modules)` at import (a side effect — hence
 - `DropGuideModule` (`dropGuideService.ts`) — `dependsOn` `AdvancedDnDModule` (core)
 - `SmartGuidesModule` (`smartGuidesService.ts`) — `dependsOn` `FloatingGroupModule` (core)
 - `AutoHideEdgeGroupModule` (`autoHideEdgeGroupService.ts`) — `dependsOn` `EdgeGroupModule` (core)
+- `AutoEdgeGroupModule` (`autoEdgeGroupService.ts`) — drag-revealed, zero-footprint
+  edge groups (two-band edge drop); `dependsOn` `EdgeGroupModule` (core)
 - `MultiRowTabsModule` (`multiRowTabsService.ts`)
 - `PinnedTabsModule` (`pinnedTabsService.ts`)
 - `KeyboardDockingModule` (`keyboardDockingService.ts`) — `dependsOn` `AdvancedDnDModule` + `LiveRegionModule` (core)

@@ -214,7 +214,15 @@ export function setupEdgeGroups(api: DockviewApi) {
     }
 
     for (const { pos, options } of EDGE_GROUP_DEFS) {
-        api.addEdgeGroup(pos, { ...options, collapsed: true });
+        // `autoReveal` pairs with the `autoEdgeGroups` prop: an edge group that
+        // loses its last panel tears down to zero footprint (rather than
+        // collapsing to a strip), and dragging a panel back to that edge
+        // reveals it again.
+        api.addEdgeGroup(pos, {
+            ...options,
+            collapsed: true,
+            autoReveal: true,
+        });
     }
 }
 

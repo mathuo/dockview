@@ -127,6 +127,18 @@ class EdgeGroupController extends CompositeDisposable {
                     this._docked.title.textContent = next.title ?? '';
                 }
             }),
+            // Runtime per-group auto-hide toggle: reconcile the chrome. Turning
+            // it off while peeking/docked closes the peek and restores the
+            // group's normal header (via _updateDocked → _teardownDocked).
+            this.host.onDidEdgeGroupAutoHideChange((group) => {
+                if (group !== this.group) {
+                    return;
+                }
+                if (!this._enabled()) {
+                    this._closePeek();
+                }
+                this._updateDocked();
+            }),
             {
                 dispose: () => {
                     strip.removeEventListener('click', onClick, true);
@@ -152,9 +164,16 @@ class EdgeGroupController extends CompositeDisposable {
         return resolveOptions(this.host.options.autoHideEdgeGroups);
     }
 
+    /** Whether this specific edge group is opted into auto-hide — the per-group
+     *  flag resolved against the global option by the host, so a static and an
+     *  auto-hiding edge group can co-exist. */
+    private _enabled(): boolean {
+        return this.host.isEdgeGroupAutoHide(this.group);
+    }
+
     /** Enabled + collapsed — the precondition for peeking. */
     private _gate(): boolean {
-        return this._opts.enabled && this.group.api.isCollapsed();
+        return this._enabled() && this.group.api.isCollapsed();
     }
 
     private get _position(): EdgeGroupPosition | undefined {
@@ -249,7 +268,7 @@ class EdgeGroupController extends CompositeDisposable {
      *  (pinned) edge group renders as a tool window (title bar top + tabs
      *  bottom); a collapsed one is just the strip. */
     private _updateDocked(): void {
-        const shouldDock = this._opts.enabled && !this.group.api.isCollapsed();
+        const shouldDock = this._enabled() && !this.group.api.isCollapsed();
         if (shouldDock && !this._docked) {
             this._setupDocked();
         } else if (!shouldDock && this._docked) {

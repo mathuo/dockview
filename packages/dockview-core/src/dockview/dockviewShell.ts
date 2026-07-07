@@ -19,31 +19,42 @@ export interface EdgeGroupOptions {
     collapsed?: boolean;
 }
 
+/**
+ * Options accepted by `api.addEdgeGroup`. Extends the shell's geometry options
+ * with per-group presentation flags the component (not the shell) owns.
+ */
+export interface AddEdgeGroupOptions extends EdgeGroupOptions {
+    /**
+     * Opt this edge group in/out of auto-hide (pinnable tool-window) behaviour,
+     * overriding the global `autoHideEdgeGroups` option. Requires the
+     * auto-hide module to have any effect. Leave unset to inherit the global.
+     */
+    autoHide?: boolean;
+    /**
+     * When true, this edge group tears itself down to zero footprint once
+     * emptied (instead of collapsing to a strip) — the behaviour used by
+     * drag-revealed edges.
+     */
+    autoReveal?: boolean;
+}
+
+export interface SerializedEdgeGroup {
+    size: number;
+    visible: boolean;
+    collapsed?: boolean;
+    group?: unknown;
+    /** Per-group auto-hide override (drag-revealed / co-existence). Absent =
+     *  inherit the global `autoHideEdgeGroups` option. */
+    autoHide?: boolean;
+    /** Per-group "tear down to zero footprint when emptied" flag. */
+    autoReveal?: boolean;
+}
+
 export interface SerializedEdgeGroups {
-    top?: {
-        size: number;
-        visible: boolean;
-        collapsed?: boolean;
-        group?: unknown;
-    };
-    bottom?: {
-        size: number;
-        visible: boolean;
-        collapsed?: boolean;
-        group?: unknown;
-    };
-    left?: {
-        size: number;
-        visible: boolean;
-        collapsed?: boolean;
-        group?: unknown;
-    };
-    right?: {
-        size: number;
-        visible: boolean;
-        collapsed?: boolean;
-        group?: unknown;
-    };
+    top?: SerializedEdgeGroup;
+    bottom?: SerializedEdgeGroup;
+    left?: SerializedEdgeGroup;
+    right?: SerializedEdgeGroup;
 }
 
 /**

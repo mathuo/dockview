@@ -37,11 +37,18 @@ export class WillShowOverlayEvent
         return !!this.options.edge;
     }
 
+    /** See {@link PositionResolverResult.edgeGroup}. A display hint — a consumer
+     *  (e.g. the drop-guide compass) can bow out of this cell. */
+    get edgeGroup(): boolean {
+        return !!this.options.edgeGroup;
+    }
+
     constructor(
         private readonly options: {
             nativeEvent: DragEvent | PointerEvent;
             position: Position;
             edge?: boolean;
+            edgeGroup?: boolean;
         }
     ) {
         super();
@@ -105,6 +112,13 @@ export interface PositionResolverResult {
      * reads `position`; consumers that route edge cells differently can read this.
      */
     readonly edge?: boolean;
+    /**
+     * Display hint: this cell docks as a dedicated edge group (not a grid-edge
+     * split). Purely advisory — a co-installed resolver's UI (e.g. the drop-guide
+     * compass) can suppress its own overlay for these cells so they don't
+     * double-render with the edge-group affordance.
+     */
+    readonly edgeGroup?: boolean;
 }
 
 /**
@@ -298,6 +312,7 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
                     nativeEvent: e,
                     position: quadrant,
                     edge: resolved.edge,
+                    edgeGroup: resolved.edgeGroup,
                 });
 
                 /**
@@ -468,7 +483,7 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
         width: number,
         height: number,
         event: DragEvent | PointerEvent
-    ): { position: Position; edge: boolean } | null {
+    ): { position: Position; edge: boolean; edgeGroup: boolean } | null {
         const resolver = this.options.getPositionResolver?.();
         if (resolver) {
             const result = resolver.resolve({
@@ -480,7 +495,11 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
                 event,
             });
             return result
-                ? { position: result.position, edge: !!result.edge }
+                ? {
+                      position: result.position,
+                      edge: !!result.edge,
+                      edgeGroup: !!result.edgeGroup,
+                  }
                 : null;
         }
         const position = this.calculateQuadrant(
@@ -490,7 +509,7 @@ export class Droptarget extends CompositeDisposable implements IDropTarget {
             width,
             height
         );
-        return position ? { position, edge: false } : null;
+        return position ? { position, edge: false, edgeGroup: false } : null;
     }
 
     private calculateQuadrant(
