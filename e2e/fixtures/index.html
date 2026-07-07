@@ -326,6 +326,27 @@
                         return { groupId, tabGroupId: tabGroup.id };
                     },
                     floatingCount: () => dockview.floatingGroups.length,
+                    // A docked `main` panel plus a `floater` pulled out into a
+                    // floating group at a fixed box — for floating-group
+                    // lifecycle + serialization tests.
+                    setupFloating: () => {
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        const floater = dockview.addPanel({
+                            id: 'floater',
+                            component: 'default',
+                            title: 'floater',
+                        });
+                        dockview.addFloatingGroup(floater, {
+                            x: 150,
+                            y: 100,
+                            width: 240,
+                            height: 180,
+                        });
+                    },
                     peekEdge: (position, on) =>
                         dockview.api.peekEdgeGroup(position, on),
                     // Two floating groups for Smart Guides: a target float on
