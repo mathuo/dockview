@@ -120,16 +120,14 @@ test.describe('cross-window popout lifecycle', () => {
         await expect(restored.locator('.dv-tab')).toHaveText(['alpha', 'beta']);
     });
 
-    // KNOWN BUG: restoring a layout that contains a popout group rebuilds the
-    // popout window and its tab strip, but never creates the panel *content*
-    // components inside it — the popout's content area stays empty. A non-popout
-    // fromJSON restore renders content correctly, so this is specific to the
-    // popout-restoration path. Flip to `test(...)` once the content renders.
-    test.fixme('restored popout renders its active panel content', async ({
+    test('restored popout renders its active panel content', async ({
         page,
         context,
     }) => {
         const restored = await snapshotThenReloadAndRestore(page, context);
+        // The active panel's content must be mounted inside the popout — a
+        // render-container swap on the (already-populated) restored group used
+        // to leave the onlyWhenVisible content detached, so nothing rendered.
         await expect(restored.locator('.dv-test-panel')).toContainText('beta');
     });
 });
