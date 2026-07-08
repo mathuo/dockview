@@ -848,6 +848,56 @@ describe('dockviewGroupPanelModel', () => {
         expect(contentContainer.item(0)).toBe(panel3.view.content.element);
     });
 
+    test('swapping renderContainer keeps the active panel content mounted', () => {
+        // Regression: swapping the render container on an already-populated
+        // group (e.g. restoring a popout group from JSON, where the popout
+        // window gets its own OverlayRenderContainer) used to leave the active
+        // onlyWhenVisible panel's content detached — so nothing rendered.
+        const dockviewComponent = new DockviewComponent(
+            document.createElement('div'),
+            {
+                createComponent(options) {
+                    switch (options.name) {
+                        case 'component':
+                            return new TestContentPart(options.id);
+                        default:
+                            throw new Error(`unsupported`);
+                    }
+                },
+            }
+        );
+
+        const groupviewContainer = document.createElement('div');
+        const cut = new DockviewGroupPanelModel(
+            groupviewContainer,
+            dockviewComponent,
+            'id',
+            {},
+            null as any
+        );
+        const contentContainer = groupviewContainer
+            .getElementsByClassName('dv-content-container')
+            .item(0)!.childNodes;
+
+        const panel1 = new TestPanel('id_1', panelApi);
+        const panel2 = new TestPanel('id_2', panelApi);
+        cut.openPanel(panel1);
+        cut.openPanel(panel2); // panel2 active, its content mounted
+
+        expect(contentContainer).toHaveLength(1);
+        expect(contentContainer.item(0)).toBe(panel2.view.content.element);
+
+        // Swap to a fresh render container (as the popout-restore path does).
+        cut.renderContainer = new OverlayRenderContainer(
+            document.createElement('div'),
+            dockviewComponent
+        );
+
+        // The active panel's content is still mounted, not left detached.
+        expect(contentContainer).toHaveLength(1);
+        expect(contentContainer.item(0)).toBe(panel2.view.content.element);
+    });
+
     test('that should not show drop target is external event', () => {
         const accessor = fromPartial<DockviewComponent>({
             id: 'testcomponentid',

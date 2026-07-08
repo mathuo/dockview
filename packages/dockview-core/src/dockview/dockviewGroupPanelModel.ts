@@ -1233,6 +1233,17 @@ export class DockviewGroupPanelModel
         this.panels.forEach((panel) => {
             this.rerender(panel);
         });
+
+        // rerender() re-attaches each panel with asActive:false; for the default
+        // onlyWhenVisible renderer that loop leaves the active panel's content
+        // detached. Re-show it so swapping the render container on an
+        // already-populated group (e.g. restoring a popout group from JSON)
+        // keeps the active content mounted.
+        if (this._activePanel) {
+            this.contentContainer.renderPanel(this._activePanel, {
+                asActive: true,
+            });
+        }
     }
 
     get renderContainer(): OverlayRenderContainer {
