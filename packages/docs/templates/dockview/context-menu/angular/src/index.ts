@@ -72,12 +72,19 @@ export class AppComponent implements OnInit {
         'close' as const,
         'closeOthers' as const,
         'closeAll' as const,
+        'closeLeft' as const,
+        'closeRight' as const,
+        'separator' as const,
+        'maximize' as const,
+        'popout' as const,
         'separator' as const,
         {
             label: 'Log panel id',
             action: () => console.log(params.panel.id),
         },
         'separator' as const,
+        // A custom component item, shown here as an alternative to the
+        // built-in `'float'` shortcut.
         { component: FloatMenuItemComponent },
     ];
 

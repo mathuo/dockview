@@ -151,6 +151,38 @@ function buildColorPicker(
 export class ContextMenuController implements IContextMenuService {
     constructor(private readonly accessor: IContextMenuHost) {}
 
+    /**
+     * A single maximize/restore toggle whose label and behaviour track the
+     * group's live state: it reads *Restore* + calls `exitMaximized` when the
+     * group is maximized, otherwise *Maximize* + `maximize`. Only grid groups
+     * can be maximized, so the item is disabled for floating / popout panels
+     * that are not already maximized.
+     */
+    private buildMaximizeItem(
+        panel: IDockviewPanel,
+        close: () => void
+    ): HTMLElement {
+        const isMaximized = panel.api.isMaximized();
+        const label = isMaximized ? 'Restore' : 'Maximize';
+        const action = isMaximized
+            ? () => panel.api.exitMaximized()
+            : () => panel.api.maximize();
+        const disabled = !isMaximized && panel.api.location.type !== 'grid';
+        return buildItem(label, close, action, disabled);
+    }
+
+    /**
+     * A single collapse/expand toggle whose label tracks the tab group's live
+     * state: *Expand* when the group is already collapsed, otherwise *Collapse*.
+     */
+    private buildCollapseItem(
+        tabGroup: ITabGroup,
+        close: () => void
+    ): HTMLElement {
+        const label = tabGroup.collapsed ? 'Expand' : 'Collapse';
+        return buildItem(label, close, () => tabGroup.toggle());
+    }
+
     show(
         panel: IDockviewPanel,
         group: DockviewGroupPanel,
@@ -200,6 +232,56 @@ export class ContextMenuController implements IContextMenuService {
                     buildItem('Close All', close, () => {
                         [...group.panels].forEach((p) => p.api.close());
                     })
+                );
+            } else if (item === 'closeLeft') {
+                const index = group.panels.indexOf(panel);
+                menuEl.appendChild(
+                    buildItem(
+                        'Close to the Left',
+                        close,
+                        () => {
+                            group.panels
+                                .filter((_, i) => i < index)
+                                .forEach((p) => p.api.close());
+                        },
+                        index <= 0
+                    )
+                );
+            } else if (item === 'closeRight') {
+                const index = group.panels.indexOf(panel);
+                menuEl.appendChild(
+                    buildItem(
+                        'Close to the Right',
+                        close,
+                        () => {
+                            group.panels
+                                .filter((_, i) => i > index)
+                                .forEach((p) => p.api.close());
+                        },
+                        index === -1 || index >= group.panels.length - 1
+                    )
+                );
+            } else if (item === 'maximize') {
+                menuEl.appendChild(this.buildMaximizeItem(panel, close));
+            } else if (item === 'float') {
+                menuEl.appendChild(
+                    buildItem(
+                        'Float',
+                        close,
+                        () => this.accessor.api.addFloatingGroup(panel),
+                        panel.api.location.type === 'floating'
+                    )
+                );
+            } else if (item === 'popout') {
+                menuEl.appendChild(
+                    buildItem(
+                        'Open in New Window',
+                        close,
+                        () => {
+                            this.accessor.api.addPopoutGroup(panel);
+                        },
+                        panel.api.location.type === 'popout'
+                    )
                 );
             } else if (item === 'pin') {
                 menuEl.appendChild(
@@ -285,6 +367,16 @@ export class ContextMenuController implements IContextMenuService {
                         tabGroup,
                         this.accessor.tabGroupColorPalette
                     )
+                );
+            } else if (item === 'collapse') {
+                menuEl.appendChild(this.buildCollapseItem(tabGroup, close));
+            } else if (item === 'close') {
+                menuEl.appendChild(
+                    buildItem('Close All', close, () => {
+                        group.panels
+                            .filter((p) => tabGroup.containsPanel(p.id))
+                            .forEach((p) => p.api.close());
+                    })
                 );
             } else if (isItemConfig(item) && item.element) {
                 menuEl.appendChild(item.element);

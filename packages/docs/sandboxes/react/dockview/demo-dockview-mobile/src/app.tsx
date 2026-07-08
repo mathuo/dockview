@@ -81,7 +81,9 @@ const WatchlistPanel: React.FC<IDockviewPanelProps> = () => {
                             borderBottom: '1px solid rgba(128,128,128,0.18)',
                         }}
                     >
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div
+                            style={{ display: 'flex', flexDirection: 'column' }}
+                        >
                             <span style={{ fontWeight: 600 }}>{t.symbol}</span>
                             <span style={{ fontSize: 11, opacity: 0.6 }}>
                                 {t.name}
@@ -126,11 +128,13 @@ const ChartPanel: React.FC<IDockviewPanelProps> = () => {
         }
         return pts;
     }, []);
-    const path = points.map((p, i) =>
-        i === 0
-            ? `M${p.x.toFixed(1)},${p.y.toFixed(1)}`
-            : `L${p.x.toFixed(1)},${p.y.toFixed(1)}`
-    ).join(' ');
+    const path = points
+        .map((p, i) =>
+            i === 0
+                ? `M${p.x.toFixed(1)},${p.y.toFixed(1)}`
+                : `L${p.x.toFixed(1)},${p.y.toFixed(1)}`
+        )
+        .join(' ');
 
     return (
         <div style={panelStyle}>
@@ -142,12 +146,7 @@ const ChartPanel: React.FC<IDockviewPanelProps> = () => {
                 preserveAspectRatio="none"
                 style={{ width: '100%', height: 180 }}
             >
-                <path
-                    d={path}
-                    fill="none"
-                    stroke="#3da45e"
-                    strokeWidth={1.5}
-                />
+                <path d={path} fill="none" stroke="#3da45e" strokeWidth={1.5} />
             </svg>
             <div
                 style={{
@@ -180,11 +179,11 @@ const ChartPanel: React.FC<IDockviewPanelProps> = () => {
 };
 
 const ORDERS = [
-    { side: 'BUY', symbol: 'AAPL', qty: 50, price: 192.10, status: 'Filled' },
-    { side: 'SELL', symbol: 'TSLA', qty: 25, price: 250.30, status: 'Filled' },
-    { side: 'BUY', symbol: 'NVDA', qty: 10, price: 480.50, status: 'Open' },
-    { side: 'SELL', symbol: 'MSFT', qty: 30, price: 414.00, status: 'Open' },
-    { side: 'BUY', symbol: 'GOOG', qty: 40, price: 137.60, status: 'Cancelled' },
+    { side: 'BUY', symbol: 'AAPL', qty: 50, price: 192.1, status: 'Filled' },
+    { side: 'SELL', symbol: 'TSLA', qty: 25, price: 250.3, status: 'Filled' },
+    { side: 'BUY', symbol: 'NVDA', qty: 10, price: 480.5, status: 'Open' },
+    { side: 'SELL', symbol: 'MSFT', qty: 30, price: 414.0, status: 'Open' },
+    { side: 'BUY', symbol: 'GOOG', qty: 40, price: 137.6, status: 'Cancelled' },
 ];
 
 const OrdersPanel: React.FC<IDockviewPanelProps> = () => {
@@ -202,7 +201,9 @@ const OrdersPanel: React.FC<IDockviewPanelProps> = () => {
                             borderBottom: '1px solid rgba(128,128,128,0.18)',
                         }}
                     >
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div
+                            style={{ display: 'flex', flexDirection: 'column' }}
+                        >
                             <span
                                 style={{
                                     fontWeight: 600,
@@ -305,7 +306,13 @@ const PositionsPanel: React.FC<IDockviewPanelProps> = () => {
                     >
                         <div>
                             <span style={{ fontWeight: 600 }}>{p.symbol}</span>
-                            <span style={{ marginLeft: 8, opacity: 0.6, fontSize: 11 }}>
+                            <span
+                                style={{
+                                    marginLeft: 8,
+                                    opacity: 0.6,
+                                    fontSize: 11,
+                                }}
+                            >
                                 {p.qty} sh
                             </span>
                         </div>
@@ -317,8 +324,7 @@ const PositionsPanel: React.FC<IDockviewPanelProps> = () => {
                                     color: up ? '#3da45e' : '#d8403a',
                                 }}
                             >
-                                {up ? '+' : ''}
-                                ${fmt(p.pnl, 0)}
+                                {up ? '+' : ''}${fmt(p.pnl, 0)}
                             </div>
                         </div>
                     </div>
@@ -362,7 +368,14 @@ const NewsPanel: React.FC<IDockviewPanelProps> = () => {
                         borderBottom: '1px solid rgba(128,128,128,0.18)',
                     }}
                 >
-                    <div style={{ display: 'flex', gap: 8, fontSize: 11, opacity: 0.6 }}>
+                    <div
+                        style={{
+                            display: 'flex',
+                            gap: 8,
+                            fontSize: 11,
+                            opacity: 0.6,
+                        }}
+                    >
                         <span>{n.time}</span>
                         <span>·</span>
                         <span>{n.source}</span>
@@ -543,6 +556,9 @@ const App: React.FC<AppProps> = (props) => {
                 | 'close'
                 | 'closeOthers'
                 | 'closeAll'
+                | 'closeLeft'
+                | 'closeRight'
+                | 'maximize'
                 | 'separator'
                 | { component: React.FC<IContextMenuItemComponentProps> }
                 | { label: string; action: () => void }
@@ -550,6 +566,10 @@ const App: React.FC<AppProps> = (props) => {
                 'close',
                 'closeOthers',
                 'closeAll',
+                'closeLeft',
+                'closeRight',
+                'separator',
+                'maximize',
                 'separator',
                 { component: FloatMenuItem },
             ];
@@ -617,9 +637,11 @@ const App: React.FC<AppProps> = (props) => {
             const items: (
                 | 'colorPicker'
                 | 'rename'
+                | 'collapse'
+                | 'close'
                 | 'separator'
                 | { label: string; action: () => void }
-            )[] = ['rename', 'colorPicker'];
+            )[] = ['rename', 'colorPicker', 'collapse', 'close'];
 
             if (api) {
                 items.push(
@@ -629,12 +651,6 @@ const App: React.FC<AppProps> = (props) => {
                         action: () => api.addFloatingGroup(group),
                     },
                     'separator',
-                    {
-                        label: tabGroup.collapsed
-                            ? 'Expand group'
-                            : 'Collapse group',
-                        action: () => tabGroup.toggle(),
-                    },
                     {
                         label: 'Dissolve group',
                         action: () =>

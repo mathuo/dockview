@@ -62,12 +62,19 @@ const App = (props: { theme?: string }) => {
                 'close',
                 'closeOthers',
                 'closeAll',
+                'closeLeft',
+                'closeRight',
+                'separator',
+                'maximize',
+                'popout',
                 'separator',
                 {
                     label: 'Log panel id',
                     action: () => console.log(params.panel.id),
                 },
                 'separator',
+                // A custom component item, shown here as an alternative to the
+                // built-in `'float'` shortcut.
                 { component: FloatMenuItem },
             ]}
         />

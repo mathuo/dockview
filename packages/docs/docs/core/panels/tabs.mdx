@@ -424,6 +424,11 @@ Pass string shortcuts to render standard menu entries without any extra code:
 | `'close'` | Close the right-clicked panel |
 | `'closeOthers'` | Close every other panel in the same group |
 | `'closeAll'` | Close all panels in the group |
+| `'closeLeft'` | Close the panels to the left of the right-clicked panel (disabled when it is the first tab) |
+| `'closeRight'` | Close the panels to the right of the right-clicked panel (disabled when it is the last tab) |
+| `'maximize'` | Maximize the group. Renders as `Restore` when the group is already maximized, and is disabled for floating / popout panels that cannot be maximized |
+| `'float'` | Move the panel into a floating window (disabled when it is already floating) |
+| `'popout'` | Move the panel into a new browser window (disabled when it is already popped out) |
 | `'separator'` | Render a visual divider |
 
 ### Custom label items
