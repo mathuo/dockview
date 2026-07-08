@@ -720,3 +720,13 @@ div[class^='announcementBar_'] {
     padding: 0.1em 0.45em;
     flex: 0 0 auto;
 }
+
+/* Footer: use the page background for each theme rather than a distinct colour */
+.footer {
+    --ifm-footer-background-color: var(--ifm-background-color);
+    --ifm-footer-color: var(--ifm-font-color-base);
+    --ifm-footer-link-color: var(--ifm-color-content-secondary);
+    --ifm-footer-link-hover-color: var(--ifm-color-primary);
+    --ifm-footer-title-color: var(--ifm-heading-color);
+    border-top: 1px solid var(--ifm-color-emphasis-200);
+}
