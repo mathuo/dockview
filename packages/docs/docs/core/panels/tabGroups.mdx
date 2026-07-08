@@ -101,7 +101,7 @@ tabGroup.indexOfPanel('panel-1');
 
 ## Colour palette
 
-`tabGroup.color` is any CSS color string — either an id from the active palette
+`tabGroup.color` is any CSS color string: either an id from the active palette
 or a raw CSS literal (`'#abc123'`, `'rgb(...)'`). Resolution to a concrete value
 is handled by Dockview's color palette.
 
@@ -125,7 +125,7 @@ purely via CSS overrides. The full set is exported as `DEFAULT_TAB_GROUP_COLORS`
 ### Custom palette
 
 Replace the default palette with `tabGroupColors`. The list fully replaces the
-defaults — there is no merge. Each entry needs an `id` (stored on `tabGroup.color`
+defaults; there is no merge. Each entry needs an `id` (stored on `tabGroup.color`
 and serialized) and a `value` (any CSS color expression). An optional `label`
 appears as a tooltip in the context-menu picker.
 
@@ -175,7 +175,7 @@ chip renderers that want to read from it (e.g. to render their own picker).
 Set `tabGroupAccent: 'off'` to opt out of the built-in color concept entirely.
 Dockview stops writing the `--dv-tab-group-color` custom property, hides
 the color picker, and applies `dv-tab-group-chip--accent-off` to chips. The
-`tabGroup.color` field is still preserved as data — pair this with a
+`tabGroup.color` field is still preserved as data, so pair this with a
 `createTabGroupChipComponent` to own the chip visual end-to-end.
 
 <FrameworkSpecific framework="React">
@@ -221,7 +221,7 @@ const api = createDockview(parentElement, {
 
 ## Component params
 
-Use `componentParams` to attach free-form data to a tab group — typically
+Use `componentParams` to attach free-form data to a tab group, typically
 consumed by a custom chip renderer. The value is a `Record<string, unknown>`
 that round-trips through `toJSON` / `fromJSON`, so it must be JSON-serializable.
 
@@ -232,7 +232,7 @@ const tabGroup = api.createTabGroup({
     componentParams: { icon: '📊', priority: 1 },
 });
 
-// Update at runtime — fires onDidChange so a custom chip can re-render
+// Update at runtime, fires onDidChange so a custom chip can re-render
 tabGroup.setComponentParams({ icon: '⭐️', priority: 1 });
 ```
 
@@ -262,7 +262,7 @@ tabGroup.onDidDestroy(() => {});
 
 ## Chip context menu
 
-Right-clicking a tab group chip can show a context menu. This is opt-in — no menu is shown unless
+Right-clicking a tab group chip can show a context menu. This is opt-in; no menu is shown unless
 `getTabGroupChipContextMenuItems` is provided. Return an empty array to suppress the menu for specific chips.
 
 <FrameworkSpecific framework="React">

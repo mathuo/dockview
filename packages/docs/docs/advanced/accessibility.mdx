@@ -1,15 +1,15 @@
 ---
 title: Accessibility
-description: The ARIA semantics, keyboard support and screen-reader announcements Dockview ships out of the box.
+description: The ARIA semantics, keyboard support and screen-reader announcements Dockview provides by default.
 sidebar_position: 1
 ---
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-Dockview ships a baseline of accessibility in core — WAI-ARIA roles and labels,
+Dockview ships a baseline of accessibility in core: WAI-ARIA roles and labels,
 roving-tabindex navigation within the tab strip, screen-reader announcements of
-layout changes, and keyboard-only focus indicators — included out of the box in
-the `dockview` package and the framework packages. No configuration is required
+layout changes, and keyboard-only focus indicators. These come with the
+`dockview` package and the framework packages. No configuration is required
 for the semantics below; the options on this page tune the announcements and the
 opt-in keymap.
 
@@ -28,7 +28,7 @@ technology can describe the layout:
 - Close buttons expose an accessible name that includes the panel title (e.g.
   "Close Orders").
 
-These roles are reactive — activating a tab, floating a group or calling
+These roles are reactive: activating a tab, floating a group or calling
 `setTitle` updates the relevant attributes.
 
 ## Keyboard navigation
@@ -38,8 +38,8 @@ stop, and the arrow keys move between tabs once the strip has focus. `Home` /
 `End` jump to the first / last tab, and `Enter` / `Space` activate the focused
 tab. This within-strip navigation is always on.
 
-Broader keyboard operability — switching tabs, cycling groups with `F6`, jumping
-focus to the tab strip, and keyboard-driven docking — is enabled with the
+Broader keyboard operability (switching tabs, cycling groups with `F6`, jumping
+focus to the tab strip, and keyboard-driven docking) is enabled with the
 `keyboardNavigation` option and is documented in full on the
 [Keyboard](/docs/advanced/keyboard) page, including the rebindable keymap.
 
@@ -59,8 +59,8 @@ focused by keyboard.
 
 ## Screen-reader announcements
 
-Dockview narrates layout changes — panels opening/closing, groups floating,
-docking, popping out, maximising/restoring — through visually-hidden ARIA live
+Dockview narrates layout changes (panels opening/closing, groups floating,
+docking, popping out, maximising/restoring) through visually-hidden ARIA live
 regions (a polite region for routine status and an assertive one for
 cancellations). This is on by default.
 
@@ -126,7 +126,7 @@ const options = {
 
 For full translations, provide a `messages` catalog. Each entry is a function
 that builds the string from the relevant context (e.g. the panel title); supply
-any subset — unset entries keep the English defaults:
+any subset; unset entries keep the English defaults:
 
 ```ts
 const options = {
@@ -154,5 +154,5 @@ const options = {
 
 ## See also
 
-- [Focus navigation](/docs/advanced/focus-navigation) — `DockviewApi` methods for moving focus between panels and groups
-- [Keyboard](/docs/advanced/keyboard) — the opt-in keymap, `F6` group cycling and keyboard-driven docking
+- [Focus navigation](/docs/advanced/focus-navigation): `DockviewApi` methods for moving focus between panels and groups
+- [Keyboard](/docs/advanced/keyboard): the opt-in keymap, `F6` group cycling and keyboard-driven docking

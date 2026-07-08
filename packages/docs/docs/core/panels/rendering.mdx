@@ -1,7 +1,7 @@
 ---
 title: Rendering panels
 sidebar_position: 5
-description: How Dockview renders panels — lazy rendering, deferred mounting, and visibility behaviour.
+description: How Dockview renders panels: lazy rendering, deferred mounting, and visibility behaviour.
 ---
 
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
@@ -9,7 +9,7 @@ import { CodeRunner } from '@site/src/components/ui/codeRunner';
 Rendering type is an important consideration when creating your application and whether your panels should be destroyed when hidden.
 
 :::tip
-Hosting an **iframe** in a panel needs `renderer: 'always'` — see [iframes](#iframes) below.
+Hosting an **iframe** in a panel needs `renderer: 'always'`. See [iframes](#iframes) below.
 :::
 
 When a panel is selected all other panels in that group are not visible. The API does expose methods to determine whether your panel is visible or not
@@ -71,7 +71,7 @@ api.addPanel({
 
 When a panel uses `always` render mode, the panel component instance is kept alive even when the panel is not visible. This means reactive state, subscriptions, and lifecycle hooks continue to run in the background.
 
-Hidden panels are hidden via `visibility: hidden` rather than being removed from layout, so browser-driven work — CSS animations, `requestAnimationFrame` loops, autoplay `<video>` elements, and embedded `<iframe>` documents — also continues while the panel is hidden. If you need to pause that work, listen to `onDidVisibilityChange` and stop it explicitly; you can also conditionally render inner content only when the panel is visible.
+Hidden panels are hidden via `visibility: hidden` rather than being removed from layout, so browser-driven work (CSS animations, `requestAnimationFrame` loops, autoplay `<video>` elements, and embedded `<iframe>` documents) also continues while the panel is hidden. If you need to pause that work, listen to `onDidVisibilityChange` and stop it explicitly; you can also conditionally render inner content only when the panel is visible.
 
 <FrameworkSpecific framework='React'>
 ```tsx title="Only rendering the React Component when the panel is visible, otherwise rendering a null React Component"
@@ -136,7 +136,7 @@ disposable.dispose();
 
 <template>
     <template v-if="visible">
-        <!-- expensive panel content — only mounted when panel is visible -->
+        <!-- expensive panel content, only mounted when panel is visible -->
     </template>
 </template>
 ```
@@ -150,7 +150,7 @@ import type { DockviewPanelApi } from 'dockview-angular';
 @Component({
 selector: 'my-panel',
 template: `         <ng-container *ngIf="visible">
-            <!-- expensive panel content — only rendered when panel is visible -->
+            <!-- expensive panel content, only rendered when panel is visible -->
         </ng-container>
     `,
 })
@@ -192,9 +192,9 @@ class MyPanel implements IContentRenderer {
     init(parameters: GroupviewPanelState): void {
         parameters.api.onDidVisibilityChange((event) => {
             if (event.isVisible) {
-                // panel is now visible — start expensive work
+                // panel is now visible, start expensive work
             } else {
-                // panel is hidden — pause expensive work
+                // panel is hidden, pause expensive work
             }
         });
     }
@@ -213,8 +213,8 @@ Toggling the checkbox in the live example shows the panel component being destro
 
 When you implement a custom `IContentRenderer` (typically only relevant for JavaScript consumers), you can opt into two optional lifecycle hooks that fire when a panel transitions between hidden and visible. These hooks complement `api.onDidVisibilityChange` and run regardless of which `renderer` mode is in use:
 
-- `onShow()` — fires when the panel becomes visible (active in its group, or when its group is unhidden).
-- `onHide()` — fires when the panel becomes hidden (another tab in the group is selected, or the group is hidden).
+- `onShow()`: fires when the panel becomes visible (active in its group, or when its group is unhidden).
+- `onHide()`: fires when the panel becomes hidden (another tab in the group is selected, or the group is hidden).
 
 ```ts
 import { IContentRenderer, GroupPanelPartInitParameters } from 'dockview';
@@ -244,11 +244,11 @@ class MyPanel implements IContentRenderer {
 }
 ```
 
-Both hooks are optional. The framework wrappers (React, Vue, Angular) handle visibility internally — these hooks are primarily intended for JavaScript `IContentRenderer` implementations and for framework adapters that need to detach/reattach DOM (for example, the Angular adapter uses them to detach and reattach `TemplateRef` views).
+Both hooks are optional. The framework wrappers (React, Vue, Angular) handle visibility internally; these hooks are primarily intended for JavaScript `IContentRenderer` implementations and for framework adapters that need to detach/reattach DOM (for example, the Angular adapter uses them to detach and reattach `TemplateRef` views).
 
 ## iframes
 
-iframes need special attention because of how browsers render them: **re-parenting an iframe within the DOM reloads its contents.** Since docking moves a panel's element between groups, an iframe-hosting panel rendered the default way would reload every time it is moved. This is a documented browser behaviour — see the discussions [here](https://bugzilla.mozilla.org/show_bug.cgi?id=254144) and [here](https://github.com/whatwg/html/issues/5484).
+iframes need special attention because of how browsers render them: **re-parenting an iframe within the DOM reloads its contents.** Since docking moves a panel's element between groups, an iframe-hosting panel rendered the default way would reload every time it is moved. This is a documented browser behaviour. See the discussions [here](https://bugzilla.mozilla.org/show_bug.cgi?id=254144) and [here](https://github.com/whatwg/html/issues/5484).
 
 To keep an iframe alive, render its panel with `renderer: 'always'` so the element is never removed from the DOM (or set Dockview's `defaultRenderer` to `'always'`):
 
@@ -264,5 +264,5 @@ api.addPanel({
 
 ## See also
 
-- [Adding panels](/docs/core/panels/add) — set a panel's `renderer` mode when it is created.
-- [Update panel](/docs/core/panels/update) — how parameter changes drive a panel to re-render.
+- [Adding panels](/docs/core/panels/add): set a panel's `renderer` mode when it is created.
+- [Update panel](/docs/core/panels/update): how parameter changes drive a panel to re-render.

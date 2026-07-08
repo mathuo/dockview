@@ -2,6 +2,25 @@
 
 Documentation website built with Docusaurus v3.
 
+## Writing Style
+
+Documentation prose should read as though a person wrote it, not a language
+model. When writing or editing docs:
+
+- Do not use em dashes (`—`). Rewrite the sentence with a comma, colon,
+  semicolon, parentheses, or a full stop, whichever fits. This is the single
+  most common tell; avoid it everywhere, including frontmatter `description`
+  fields, tables, and code comments.
+- Drop filler and marketing words. Avoid "comprehensive", "a wide variety of",
+  "out of the box", "seamlessly", "powerful", "robust", "unlocks", "leverage",
+  "delve into", "first-class", "it's worth noting", "keep in mind". State the
+  concrete thing instead.
+- Prefer short, direct sentences. Cut words that carry no meaning; don't hedge
+  or pad.
+- Keep British spelling (behaviour, colour, localise) to match the existing
+  docs.
+- An en dash in a numeric range (`v5.0–5.2`) is correct and fine to keep.
+
 ## Build Commands
 
 - `build` - Build templates then build Docusaurus site

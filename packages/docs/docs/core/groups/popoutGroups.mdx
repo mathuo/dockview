@@ -5,7 +5,7 @@ description: How to pop out a Dockview group into a separate browser window and 
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-Popout groups open a group in a separate native browser window while it stays part of the same Dockview layout — useful for spreading panels across multiple monitors. The group can be docked back into the grid at any time.
+Popout groups open a group in a separate native browser window while it stays part of the same Dockview layout, useful for spreading panels across multiple monitors. The group can be docked back into the grid at any time.
 
 :::info
 Popout groups **cannot** be maximized. Calling maximize function on groups in these states will have no effect.
@@ -20,7 +20,7 @@ as needed.
 
 The popout lifecycle is observable: `onDidAddPopoutGroup` /
 `onDidRemovePopoutGroup` fire as windows open and close (or dock back), and
-`api.getPopouts()` enumerates the open popout windows — see
+`api.getPopouts()` enumerates the open popout windows. See
 [Events](/docs/core/events#popout-window).
 
 Popout windows require your website to have a blank `.html` page that can be used, by default this is set to `/popout.html` but
@@ -42,7 +42,7 @@ api.addPopoutGroup(
 
 :::warning Security: same-origin only
 
-`popoutUrl` must point to a same-origin `http(s)` location. Dockview rejects `javascript:`, `data:`, `blob:`, and cross-origin URLs to prevent a malicious value — for example, from a layout JSON loaded from an untrusted source — from executing script in a context the browser still associates with your application via `window.opener`. The guard runs automatically when the popout is opened, including on layouts restored via `fromJSON()`.
+`popoutUrl` must point to a same-origin `http(s)` location. Dockview rejects `javascript:`, `data:`, `blob:`, and cross-origin URLs to prevent a malicious value (for example, from a layout JSON loaded from an untrusted source) from executing script in a context the browser still associates with your application via `window.opener`. The guard runs automatically when the popout is opened, including on layouts restored via `fromJSON()`.
 :::
 
 From within a panel you may say
@@ -72,11 +72,11 @@ choose a new location.
 
 ## Overlays inside popout windows
 
-Floating overlays — including drag-target indicators, the tab context menu, and tab group chip popovers (color picker, rename) — render inside the DOM of the window that hosts them. When a group lives in a popout window, those overlays render in the popout window's document, not the parent. This means:
+Floating overlays, including drag-target indicators, the tab context menu, and tab group chip popovers (color picker, rename), render inside the DOM of the window that hosts them. When a group lives in a popout window, those overlays render in the popout window's document, not the parent. This means:
 
 - Custom chip components and context menu components are mounted in the popout window's DOM tree.
 - CSS that you load into the main page is automatically copied into popout windows; if you ship custom styles outside the standard import pipeline (for example, lazily injected stylesheets), make sure they are also available in the popout window.
-- Event handlers and portals inside custom components should not assume the document is the main window — use the element's `ownerDocument` when you need a reference.
+- Event handlers and portals inside custom components should not assume the document is the main window; use the element's `ownerDocument` when you need a reference.
 
 ## Popout window events
 
@@ -101,6 +101,6 @@ api.onDidOpenPopoutWindowFail(() => {
 
 ## See also
 
-- [Floating groups](/docs/core/groups/floatingGroups) — float a group above the grid without a separate window
-- [Events](/docs/core/events#popout-window) — observe the popout window lifecycle
-- [Security](/docs/core/security) — same-origin requirements and CSP for popout windows
+- [Floating groups](/docs/core/groups/floatingGroups): float a group above the grid without a separate window
+- [Events](/docs/core/events#popout-window): observe the popout window lifecycle
+- [Security](/docs/core/security): same-origin requirements and CSP for popout windows

@@ -75,7 +75,7 @@ const api = createDockview(parentElement, {
 
 For interaction with the drag events directly the component exposes some methods to help determine whether external drag events should be interacted with or not.
 
-The `onDidDrop` handler and `onUnhandledDragOver` registration use the same API across all frameworks — only the component wiring differs.
+The `onDidDrop` handler and `onUnhandledDragOver` registration use the same API across all frameworks; only the component wiring differs.
 
 ```ts
 /**
@@ -142,7 +142,7 @@ parentElement.addEventListener('drop', (e) => onDidDrop(e));
 
 ## Customising the group drag ghost
 
-When the user drags a whole group of panels by its empty header area, Dockview shows a small floating ghost that follows the cursor. By default it renders the text `Multiple Panels (N)` — to localise the label or replace the visual entirely, supply a `createGroupDragGhostComponent` factory. It receives the `DockviewGroupPanel` being dragged and must return an `IGroupDragGhostRenderer`.
+When the user drags a whole group of panels by its empty header area, Dockview shows a small floating ghost that follows the cursor. By default it renders the text `Multiple Panels (N)`. To localise the label or replace the visual entirely, supply a `createGroupDragGhostComponent` factory. It receives the `DockviewGroupPanel` being dragged and must return an `IGroupDragGhostRenderer`.
 
 <FrameworkSpecific framework="React">
   <DocRef declaration="IDockviewReactProps" methods={['groupDragGhostComponent']} />
@@ -170,7 +170,7 @@ interface IGroupDragGhostRenderer {
 }
 ````
 
-The ghost is captured by the browser at drag start and removed shortly after, so the component is short-lived — render synchronously enough to be painted before the browser snapshots the element.
+The ghost is captured by the browser at drag start and removed shortly after, so the component is short-lived; render synchronously enough to be painted before the browser snapshots the element.
 
 <FrameworkSpecific framework="React">
 ```tsx
@@ -233,8 +233,8 @@ createGroupDragGhostComponent: (group) => new MyGroupDragGhost(),
 
 ## See also
 
-- [External drag and drop events](/docs/core/dnd/external) — intercept drops that originate outside Dockview.
-- [Drag and drop strategy](/docs/core/dnd/strategy) — choose the HTML5 or pointer backend and tune touch gestures.
-- [Third-party libraries](/docs/core/dnd/thirdParty) — using other drag and drop libraries inside a panel.
-- [Disable drag and drop](/docs/core/dnd/disable) — turn dragging off for a fixed layout.
+- [External drag and drop events](/docs/core/dnd/external): intercept drops that originate outside Dockview.
+- [Drag and drop strategy](/docs/core/dnd/strategy): choose the HTML5 or pointer backend and tune touch gestures.
+- [Third-party libraries](/docs/core/dnd/thirdParty): using other drag and drop libraries inside a panel.
+- [Disable drag and drop](/docs/core/dnd/disable): turn dragging off for a fixed layout.
 ```

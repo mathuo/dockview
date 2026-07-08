@@ -1,6 +1,6 @@
 ---
 title: Layout history
-description: Undo and redo layout mutations — close, move, float, popout, maximize and resize — with a bounded history stack.
+description: Undo and redo layout mutations (close, move, float, popout, maximize and resize) with a bounded history stack.
 sidebar_position: 3
 enterprise: true
 sidebar_custom_props:
@@ -90,17 +90,17 @@ layoutHistory: { enabled: true },
 ## What gets recorded
 
 Each undoable step is a full snapshot of the layout captured before and after
-the mutation, so an undo restores the whole layout — including a closed panel's
+the mutation, so an undo restores the whole layout, including a closed panel's
 `params` and `title`.
 
 The following **structural mutations** each record one undo step:
 
--   `add` / `remove` — adding and closing panels or groups
--   `move` — dragging or moving a panel or group to a new location
--   `float` — floating a group
--   `popout` — opening a group in a popout window
--   `maximize` — maximizing / restoring a group
--   `tab-group` — tab-group changes (such as recolouring)
+-   `add` / `remove`: adding and closing panels or groups
+-   `move`: dragging or moving a panel or group to a new location
+-   `float`: floating a group
+-   `popout`: opening a group in a popout window
+-   `maximize`: maximizing / restoring a group
+-   `tab-group`: tab-group changes (such as recolouring)
 
 **Resize** (dragging a sash) has no discrete mutation boundary, so it is caught
 separately and a continuous drag is coalesced into a single entry. It is
@@ -110,7 +110,7 @@ debounce window with `coalesceMs` (default `400`ms).
 :::info
 A panel's state is only restorable on undo if it is serialized into the panel's
 `params`. State held imperatively outside `params` (for example a chart's zoom
-kept in a closure) is not captured by the snapshot — this is the same constraint
+kept in a closure) is not captured by the snapshot; this is the same constraint
 that [`fromJSON`](/docs/core/state/load) already imposes.
 :::
 
@@ -122,7 +122,7 @@ retained; pushing past the limit drops the oldest entry.
 ### User vs programmatic mutations
 
 By default only **user gestures** (drag-dock, tab close button, sash resize)
-enter the stack — a programmatic `DockviewApi` call such as `api.addPanel(...)`
+enter the stack. A programmatic `DockviewApi` call such as `api.addPanel(...)`
 is treated as the app's own state management and is not something the end user
 expects `Ctrl+Z` to revert. Set `undoableProgrammaticMutations: true` to record
 those too.
@@ -136,7 +136,7 @@ a full restore.
 
 ## Driving undo / redo
 
-Dockview binds no keyboard shortcuts itself — wiring `Ctrl+Z` / `Ctrl+Shift+Z`
+Dockview binds no keyboard shortcuts itself; wiring `Ctrl+Z` / `Ctrl+Shift+Z`
 (or toolbar buttons) to `api.undo()` / `api.redo()` is the host app's call. Use
 `canUndo` / `canRedo` to drive the disabled state of your controls, and listen
 to `onDidChangeHistory` to keep them in sync as the stacks change.
@@ -284,7 +284,7 @@ redoButton.addEventListener('click', () => api.redo());
 ## Cross-window support
 
 Undo and redo restore the whole layout, including floating groups and popout
-windows — a mutation made _inside_ a popout window is still a mutation of the
+windows. A mutation made _inside_ a popout window is still a mutation of the
 same dock and records a single step on the shared stack.
 
 Floating groups restore synchronously, but popout **windows** re-open
@@ -299,5 +299,5 @@ button click); otherwise the popout falls back to an inline group.
 
 ## See also
 
-- [Saving state](/docs/core/state/save) — persist a layout snapshot with `toJSON`.
-- [Loading state](/docs/core/state/load) — restore a serialized layout with `fromJSON`.
+- [Saving state](/docs/core/state/save): persist a layout snapshot with `toJSON`.
+- [Loading state](/docs/core/state/load): restore a serialized layout with `fromJSON`.

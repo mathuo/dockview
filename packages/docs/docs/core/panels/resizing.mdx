@@ -4,14 +4,14 @@ sidebar_position: 6
 description: How to programmatically resize a panel or group in Dockview.
 ---
 
-Each Dockview instance contains groups and each group contains panels. Panels are sized indirectly through the group that contains them, so resizing a panel really means resizing the group it lives in. You can drive either from code — set a height and width, or observe dimension changes — and both approaches achieve the same result.
+Each Dockview instance contains groups and each group contains panels. Panels are sized indirectly through the group that contains them, so resizing a panel really means resizing the group it lives in. You can drive either from code (set a height and width, or observe dimension changes), and both approaches achieve the same result.
 
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 ## Resizing a panel
 
-Logically a user may want to resize a panel, but this translates to resizing the group which contains that panel. The panel API mirrors the group's resize methods, so you can set a panel's height and width — or observe dimension changes — without reaching for the group directly.
+Logically a user may want to resize a panel, but this translates to resizing the group which contains that panel. The panel API mirrors the group's resize methods, so you can set a panel's height and width (or observe dimension changes) without reaching for the group directly.
 
 <DocRef
     declaration="DockviewPanelApi"
@@ -51,7 +51,7 @@ You can see an example invoking both approaches below.
 
 ## See also
 
-- [Adding panels](/docs/core/panels/add) — set `initialWidth`/`initialHeight` and minimum/maximum size constraints when creating a panel.
-- [Constraints](/docs/core/groups/constraints) — set minimum and maximum group sizes.
-- [Sizing and layout](/docs/core/sizing) — control initial and proportional sizing.
-- [Panel API](/docs/api/dockview/panelApi) — the panel API surface that exposes `setSize`, `height`, `width` and `onDidDimensionsChange`.
+- [Adding panels](/docs/core/panels/add): set `initialWidth`/`initialHeight` and minimum/maximum size constraints when creating a panel.
+- [Constraints](/docs/core/groups/constraints): set minimum and maximum group sizes.
+- [Sizing and layout](/docs/core/sizing): control initial and proportional sizing.
+- [Panel API](/docs/api/dockview/panelApi): the panel API surface that exposes `setSize`, `height`, `width` and `onDidDimensionsChange`.

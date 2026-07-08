@@ -54,7 +54,7 @@ const api = createDockview(element, {
 ### How snapping works
 
 - **Alignment.** As a floating group is dragged, its leading edge, center, and trailing edge on each axis are compared against the alignment lines contributed by the other floating groups and the container. When a probe lands within `snapDistance` of a line, the group snaps so the two align exactly, and a guide line is drawn.
-- **Independent X and Y.** The horizontal and vertical axes are resolved independently — a group can snap horizontally to one neighbour and vertically to another at the same time, drawing a guide for each alignment.
+- **Independent X and Y.** The horizontal and vertical axes are resolved independently; a group can snap horizontally to one neighbour and vertically to another at the same time, drawing a guide for each alignment.
 - **Hysteresis.** To avoid the group "sticking then jumping" at the snap boundary, a snap engages at `snapDistance` but only releases once the pointer moves past `snapDistance + releaseDistance`. This asymmetric threshold keeps snapping stable and stops oscillation.
 - **Guides.** Set `showGuides: false` to keep the magnetic snapping behaviour but hide the alignment lines.
 
@@ -64,9 +64,9 @@ Choose which sources a dragged floating group aligns against with `snapTargets`:
 
 <DocRef declaration="SmartGuidesSnapTargets" />
 
-- `floats` (default `true`) — align to the other floating groups' edges and centers.
-- `container` (default `true`) — align to the container's edges and center. Set `containerInset` to also emit guide lines a fixed number of pixels inside the container edges (e.g. a content margin).
-- `splitters` (default `false`) — align to the underlying grid's splitter (sash) positions, so a floating group can line up with the docked layout behind it.
+- `floats` (default `true`): align to the other floating groups' edges and centers.
+- `container` (default `true`): align to the container's edges and center. Set `containerInset` to also emit guide lines a fixed number of pixels inside the container edges (e.g. a content margin).
+- `splitters` (default `false`): align to the underlying grid's splitter (sash) positions, so a floating group can line up with the docked layout behind it.
 
 ```ts
 const api = createDockview(element, {
@@ -92,7 +92,7 @@ A drop preview is shown during the drag, and the dock/merge is committed on drop
 
 ### Disabling snapping mid-drag
 
-Hold the configured modifier key while dragging to temporarily suspend snapping and hide the guides — the floating group then follows the pointer freely (Figma / Keynote parity). Snapping re-engages as soon as the modifier is released.
+Hold the configured modifier key while dragging to temporarily suspend snapping and hide the guides; the floating group then follows the pointer freely (Figma / Keynote parity). Snapping re-engages as soon as the modifier is released.
 
 The modifier defaults to `Alt` and is configured via `disableSnapModifier` (`'alt' | 'ctrl' | 'meta' | 'shift'`, or `false` to remove the gate entirely).
 
@@ -139,8 +139,8 @@ Two events fire when a drag commits on drop:
     methods={['onDidSnapFloat', 'onDidSnapTogether']}
 />
 
-- `onDidSnapFloat` — fires when a dragged floating group commits an **alignment** snap on drop, reporting which axes (`'x'` / `'y'`) were snapped.
-- `onDidSnapTogether` — fires when a dragged floating group **docks or merges** into another on drop, reporting the `target` group and the `position` (`'left' | 'right' | 'top' | 'bottom' | 'center'`).
+- `onDidSnapFloat`: fires when a dragged floating group commits an **alignment** snap on drop, reporting which axes (`'x'` / `'y'`) were snapped.
+- `onDidSnapTogether`: fires when a dragged floating group **docks or merges** into another on drop, reporting the `target` group and the `position` (`'left' | 'right' | 'top' | 'bottom' | 'center'`).
 
 ```ts
 api.onDidSnapFloat((event) => {
@@ -160,6 +160,6 @@ api.onDidSnapTogether((event) => {
 
 ## See also
 
-- [Drop guide](/docs/core/dnd/dropGuide) — aim-at-a-cell compass for docking into groups.
-- [Drop overlay](/docs/core/dnd/overlay) — shape the drop-preview overlay.
-- [Floating groups](/docs/core/groups/floatingGroups) — the floating groups Smart Guides align and snap.
+- [Drop guide](/docs/core/dnd/dropGuide): aim-at-a-cell compass for docking into groups.
+- [Drop overlay](/docs/core/dnd/overlay): shape the drop-preview overlay.
+- [Floating groups](/docs/core/groups/floatingGroups): the floating groups Smart Guides align and snap.

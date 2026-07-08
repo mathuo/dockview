@@ -6,7 +6,7 @@ description: Shape the drag-and-drop overlay per target with the dropOverlayMode
 
 When you drag a panel or group over Dockview, a highlighted overlay previews
 where it will land. The `dropOverlayModel` option lets you shape that overlay
-**per drop target** — its size, the activation threshold, and the small-element
+**per drop target**: its size, the activation threshold, and the small-element
 boundaries.
 
 :::info
@@ -46,13 +46,13 @@ The returned model accepts:
 
 ## The outer edge overlay
 
-`dropOverlayModel` does **not** dispatch the `'edge'` target — the overlay shown
+`dropOverlayModel` does **not** dispatch the `'edge'` target, the overlay shown
 when dragging to the outer edges of the whole layout. That is configured
 separately via the `dndEdges` option. If you were using `rootOverlayModel`
 purely to size the outer edge overlay, use `dndEdges` instead.
 
 ## See also
 
-- [Drop position resolver](/docs/core/dnd/dropPosition) — override where a pointer location maps to a drop position.
-- [Drop guide](/docs/core/dnd/dropGuide) — the VS Code-style aim-at-a-cell compass overlay.
-- [Smart guides](/docs/core/dnd/smartGuides) — alignment snapping and guides for floating groups.
+- [Drop position resolver](/docs/core/dnd/dropPosition): override where a pointer location maps to a drop position.
+- [Drop guide](/docs/core/dnd/dropGuide): the VS Code-style aim-at-a-cell compass overlay.
+- [Smart guides](/docs/core/dnd/smartGuides): alignment snapping and guides for floating groups.

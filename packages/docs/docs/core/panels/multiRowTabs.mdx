@@ -20,7 +20,7 @@ is covered in [Tab Overflow](/docs/core/panels/tabOverflow).
 ## Multi-row (wrapping) tabs
 
 Set `overflow.mode: 'wrap'` and, instead of clipping the surplus tabs into the
-dropdown, the tab strip wraps onto additional rows and the header grows to fit — a
+dropdown, the tab strip wraps onto additional rows and the header grows to fit, a
 JetBrains-style layout where every tab stays visible at once. As tabs are added or
 removed, the header grows and shrinks by whole rows, and the panel content area
 resizes to match.
@@ -79,7 +79,7 @@ api.updateOptions({ overflow: { mode: 'wrap' } });
 `overflow.mode: 'wrap'` is provided by the multi-row tabs module, which is included
 in the default `dockview` bundle. If you assemble your own set of modules and omit
 it, `mode: 'wrap'` is ignored and the standard single-row strip with the dropdown is
-used instead — no error, no regression.
+used instead; no error, no regression.
 :::
 
 ### `maxRows`
@@ -114,13 +114,13 @@ switcher.
 
 :::warning
 These fields are reserved for a not-yet-shipped advanced overflow module and currently
-have **no effect**. They are documented here only as forward-looking API surface —
+have **no effect**. They are documented here only as forward-looking API surface;
 setting them today does nothing. Rely on `mode` and (once implemented) `maxRows`.
 :::
 
 ## See also
 
-- [Tab overflow](/docs/core/panels/tabOverflow) — the default single-row dropdown this mode replaces.
-- [Pinned tabs](/docs/core/panels/pinnedTabs) — another way to keep important tabs visible.
-- [Tab header position](/docs/core/panels/headerPosition) — wrapping applies to horizontal headers only.
+- [Tab overflow](/docs/core/panels/tabOverflow): the default single-row dropdown this mode replaces.
+- [Pinned tabs](/docs/core/panels/pinnedTabs): another way to keep important tabs visible.
+- [Tab header position](/docs/core/panels/headerPosition): wrapping applies to horizontal headers only.
 ```

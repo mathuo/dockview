@@ -1,12 +1,12 @@
 ---
 title: Floating groups
-description: How to create and manage floating groups in Dockview — groups that float freely over the layout.
+description: How to create and manage floating groups in Dockview: groups that float freely over the layout.
 ---
 
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-Floating groups sit above the grid in a free-floating, draggable container instead of being docked into it — useful for tool palettes, inspectors, or any panel you want to keep visible over the rest of the layout.
+Floating groups sit above the grid in a free-floating, draggable container instead of being docked into it, useful for tool palettes, inspectors, or any panel you want to keep visible over the rest of the layout.
 
 :::info
 Floating groups **cannot** be maximized. Calling maximize function on groups in these states will have no effect.
@@ -60,7 +60,7 @@ You can control the bounding box of floating groups through the optional `floati
 `floatingGroupDragHandle` selects which element moves a floating group when dragged:
 
 - `'titlebar'` (default): a dedicated, blank drag-handle bar is rendered above the group's tab bar. Dragging it moves the floating window; shift+drag (mouse) or long-press (touch) redocks the group back into the grid. Style it with the `--dv-floating-titlebar-*` theme variables.
-- `'tabbar'`: the legacy behaviour — the empty space in the tab bar (the "void container") doubles as the move handle, with no dedicated bar rendered.
+- `'tabbar'`: the legacy behaviour, where the empty space in the tab bar (the "void container") doubles as the move handle, with no dedicated bar rendered.
 
 ```ts
 const api = createDockview(element, {
@@ -70,7 +70,7 @@ const api = createDockview(element, {
 
 ### Customising drag behaviour
 
-`transformFloatingGroupDrag` lets you adjust a floating group's position while it is being dragged — for snapping to a grid, aligning to other floating groups, or constraining a group to a region. It runs on every pointer-move frame with the proposed top-left (before Dockview's container clamp) and returns an adjusted top-left, or nothing to leave it unchanged. It affects moving only — resizing is unaffected.
+`transformFloatingGroupDrag` lets you adjust a floating group's position while it is being dragged, for snapping to a grid, aligning to other floating groups, or constraining a group to a region. It runs on every pointer-move frame with the proposed top-left (before Dockview's container clamp) and returns an adjusted top-left, or nothing to leave it unchanged. It affects moving only; resizing is unaffected.
 
 ```ts
 const api = createDockview(element, {
@@ -142,5 +142,5 @@ You can check whether a group is floating via the `group.api.location` property.
 
 ## See also
 
-- [Popout windows](/docs/core/groups/popoutGroups) — move a group into a separate browser window
-- [Maximized groups](/docs/core/groups/maximizedGroups) — expand a group to fill the viewport
+- [Popout windows](/docs/core/groups/popoutGroups): move a group into a separate browser window
+- [Maximized groups](/docs/core/groups/maximizedGroups): expand a group to fill the viewport

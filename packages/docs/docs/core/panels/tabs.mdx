@@ -7,7 +7,7 @@ description: How to customize tab appearance and behaviour in Dockview, includin
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-Each panel is represented by a tab in its group's header. Dockview ships a default tab renderer, and this page covers replacing or extending it — custom tab components, accessing panel parameters, context menus, full-width and reorder behaviour, and tab groups.
+Each panel is represented by a tab in its group's header. Dockview ships a default tab renderer, and this page covers replacing or extending it: custom tab components, accessing panel parameters, context menus, full-width and reorder behaviour, and tab groups.
 
 ## Register a tab component
 
@@ -396,7 +396,7 @@ The example below shows a custom tab renderer that displays the panel title alon
 
 ## Tab context menu
 
-Right-clicking a tab can show a context menu. This is opt-in — no menu is shown unless
+Right-clicking a tab can show a context menu. This is opt-in; no menu is shown unless
 `getTabContextMenuItems` is provided. Return an empty array to suppress the menu for specific panels.
 
 <FrameworkSpecific framework="React">
@@ -595,7 +595,7 @@ Controls how tabs animate when reordered via drag and drop.
 
 | Mode        | Behaviour                                                                       |
 | ----------- | ------------------------------------------------------------------------------- |
-| `'default'` | Tabs swap positions instantly on drop — the original behaviour.                 |
+| `'default'` | Tabs swap positions instantly on drop; the original behaviour.                 |
 | `'smooth'`  | Tabs slide smoothly to open a gap for the dragged tab, similar to browser tabs. |
 
 <CodeRunner id="dockview/tabview" />
@@ -678,7 +678,7 @@ Tab height can be controlled through CSS.
 
 ## See also
 
-- [Tab overflow & multi-row tabs](/docs/core/panels/tabOverflow) — how Dockview handles more tabs than fit across the header, and the wrapping multi-row layout.
-- [Pinned tabs](/docs/core/panels/pinnedTabs) — pin tabs so they render first and never overflow.
-- [Tab groups](/docs/core/panels/tabGroups) — organise tabs into coloured, collapsible chips.
+- [Tab overflow & multi-row tabs](/docs/core/panels/tabOverflow): how Dockview handles more tabs than fit across the header, and the wrapping multi-row layout.
+- [Pinned tabs](/docs/core/panels/pinnedTabs): pin tabs so they render first and never overflow.
+- [Tab groups](/docs/core/panels/tabGroups): organise tabs into coloured, collapsible chips.
 

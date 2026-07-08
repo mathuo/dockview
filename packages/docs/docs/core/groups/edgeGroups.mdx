@@ -1,13 +1,13 @@
 ---
 title: Edge groups
-description: How to create and manage edge groups in Dockview — groups that are pinned to the edges of the layout, like a VS Code sidebar or panel.
+description: How to create and manage edge groups in Dockview: groups that are pinned to the edges of the layout, like a VS Code sidebar or panel.
 ---
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 import { CodeRunner } from '@site/src/components/ui/codeRunner';
 
-Edge groups are `DockviewGroupPanel` instances pinned to one of the four edges of the layout (`'left'`, `'right'`, `'top'`, `'bottom'`). They support tabs, drag-and-drop, overflow, and the full group panel API — and their state is included in `toJSON` / `fromJSON`.
+Edge groups are `DockviewGroupPanel` instances pinned to one of the four edges of the layout (`'left'`, `'right'`, `'top'`, `'bottom'`). They support tabs, drag-and-drop, overflow, and the full group panel API, and their state is included in `toJSON` / `fromJSON`.
 
 <CodeRunner id="dockview/edge-groups" height={500} />
 
@@ -135,11 +135,11 @@ Themes that set a custom `edgeGroupCollapsedSize`:
 When an edge group loses all of its panels it is automatically collapsed. Adding a new panel to it will expand it again.
 :::
 
-Collapsed edge groups can auto-hide and peek back on demand — see [Auto-hide Edge Groups](/docs/core/groups/autoHideEdgeGroups).
+Collapsed edge groups can auto-hide and peek back on demand. See [Auto-hide Edge Groups](/docs/core/groups/autoHideEdgeGroups).
 
 ## Dock to edge groups
 
-With the `dockToEdgeGroups` option an edge takes up **zero space** when empty and is revealed by dragging a panel to it, like a VS Code sidebar — see [Dock to edge groups](/docs/core/groups/autoEdgeGroups).
+With the `dockToEdgeGroups` option an edge takes up **zero space** when empty and is revealed by dragging a panel to it, like a VS Code sidebar. See [Dock to edge groups](/docs/core/groups/autoEdgeGroups).
 
 ## Auto-hide co-existence
 
@@ -254,5 +254,5 @@ api.fromJSON(state); // auto-creates and restores edge groups
 
 ## See also
 
-- [Auto-hide edge groups](/docs/core/groups/autoHideEdgeGroups) — turn a collapsed edge group into a pinnable tool window
-- [Group controls](/docs/core/groups/controls) — render controls specific to edge groups via the `location` prop
+- [Auto-hide edge groups](/docs/core/groups/autoHideEdgeGroups): turn a collapsed edge group into a pinnable tool window
+- [Group controls](/docs/core/groups/controls): render controls specific to edge groups via the `location` prop
