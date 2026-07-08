@@ -353,6 +353,10 @@
                         a.api.maximize();
                         return a.group.id;
                     },
+                    // Lock/unlock a panel's group (boolean or
+                    // 'no-drop-target') for locked-group DnD tests.
+                    setGroupLocked: (id, value) =>
+                        panels[id] && (panels[id].group.api.locked = value),
                     // A docked `main` panel plus a `floater` pulled out into a
                     // floating group at a fixed box — for floating-group
                     // lifecycle + serialization tests.
