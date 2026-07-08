@@ -76,6 +76,41 @@ test.describe('cross-window popout lifecycle', () => {
         await expect(page.locator('.dv-test-panel')).toHaveCount(0);
     });
 
+    test('closing a popout with a nested split re-docks both groups', async ({
+        page,
+        context,
+    }) => {
+        const win = await twoPanelPopout(page, context);
+        // Split a second group into the popout, so it hosts two groups.
+        await page.evaluate(() =>
+            (window as any).__dv.splitIntoPopout('delta')
+        );
+        await win.locator('.dv-sash').first().waitFor();
+        await expect(win.locator('.dv-groupview')).toHaveCount(2);
+
+        // Close the popout window → both of its groups return to the opener.
+        await win.close({ runBeforeUnload: true });
+
+        await expect
+            .poll(() => page.evaluate(() => (window as any).__dv.popoutCount()))
+            .toBe(0);
+        // Two groups re-docked, all three tabs present, active content rendered.
+        await expect
+            .poll(() => page.evaluate(() => (window as any).__dv.groupCount()))
+            .toBe(2);
+        await expect(page.locator('.dv-tab')).toHaveText([
+            'delta',
+            'alpha',
+            'beta',
+        ]);
+        await expect(
+            page.locator('.dv-test-panel', { hasText: 'delta' })
+        ).toBeVisible();
+        await expect(
+            page.locator('.dv-test-panel', { hasText: 'beta' })
+        ).toBeVisible();
+    });
+
     // Capture a snapshot that contains a live popout, then simulate an app
     // reload (fresh component with no panels) and restore that snapshot — the
     // canonical "persist layout, reload the app, restore it" flow.
