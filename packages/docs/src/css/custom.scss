@@ -70,14 +70,9 @@
     --dv-accent: var(--ifm-color-primary);
     --dv-accent-strong: #6d5cf6;
     --dv-accent-contrast: #ffffff;
-    --dv-accent-soft: rgba(79, 70, 229, 0.08);
-    --dv-accent-soft-hover: rgba(79, 70, 229, 0.13);
-    --dv-accent-gradient: linear-gradient(
-        120deg,
-        #4f46e5 0%,
-        #6d5cf6 55%,
-        #8b5cf6 100%
-    );
+    // Solid block tints (no transparency) so they read as flat colour fields.
+    --dv-accent-soft: #ecebfb;
+    --dv-accent-soft-hover: #e0defa;
 
     --ifm-link-color: var(--ifm-color-primary);
     --ifm-link-hover-color: var(--ifm-color-primary-dark);
@@ -141,14 +136,9 @@
     --dv-accent: var(--ifm-color-primary);
     --dv-accent-strong: #a5a0ff;
     --dv-accent-contrast: #0b0b12;
-    --dv-accent-soft: rgba(139, 131, 255, 0.14);
-    --dv-accent-soft-hover: rgba(139, 131, 255, 0.2);
-    --dv-accent-gradient: linear-gradient(
-        120deg,
-        #6d5cf6 0%,
-        #8b83ff 55%,
-        #a78bfa 100%
-    );
+    // Solid block tints (no transparency) so they read as flat colour fields.
+    --dv-accent-soft: #211e3d;
+    --dv-accent-soft-hover: #2b2752;
 
     --ifm-code-background: #17171f;
 
@@ -208,8 +198,8 @@
 
     .navbar__inner .DocSearch-Button,
     .navbar__inner .navbar__search-input {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(255, 255, 255, 0.16);
+        background: #323059;
+        border-color: #403d6b;
         color: var(--dv-header-fg);
     }
 }
@@ -337,17 +327,14 @@ div[class^='announcementBar_'] {
 }
 
 .button.button--primary {
-    background: var(--dv-accent-gradient);
+    background: var(--ifm-color-primary);
     border: none;
     color: #ffffff;
-    box-shadow: 0 1px 2px rgba(49, 46, 129, 0.2),
-        0 6px 16px -6px rgba(79, 70, 229, 0.5);
 
     &:hover {
+        background: var(--ifm-color-primary-dark);
         color: #ffffff;
-        filter: brightness(1.05);
-        box-shadow: 0 2px 4px rgba(49, 46, 129, 0.24),
-            0 10px 24px -6px rgba(79, 70, 229, 0.55);
+        box-shadow: var(--dv-shadow-md);
     }
 }
 

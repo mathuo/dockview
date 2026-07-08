@@ -16,7 +16,7 @@
         width: 18px;
         height: 2px;
         border-radius: 2px;
-        background: var(--dv-accent-gradient);
+        background: var(--ifm-color-primary);
     }
 }
 
@@ -27,31 +27,6 @@
     padding: 96px 0 72px;
     background: var(--ifm-background-color);
     border-bottom: 1px solid var(--ifm-toc-border-color);
-    overflow: hidden;
-
-    // soft accent glow behind the hero
-    &::before {
-        content: '';
-        position: absolute;
-        top: -180px;
-        left: 50%;
-        width: 900px;
-        height: 520px;
-        transform: translateX(-50%);
-        background: radial-gradient(
-            ellipse at center,
-            rgba(109, 92, 246, 0.16) 0%,
-            rgba(79, 70, 229, 0.08) 35%,
-            transparent 70%
-        );
-        pointer-events: none;
-        z-index: 0;
-    }
-
-    .container {
-        position: relative;
-        z-index: 1;
-    }
 }
 
 .hero-text {
