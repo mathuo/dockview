@@ -35,7 +35,7 @@ const App = defineComponent({
         return {
             theme: { ...themeAbyss, tabAnimation: 'smooth' as const },
             getTabGroupChipContextMenuItems: () =>
-                ['rename', 'colorPicker'] as const,
+                ['rename', 'colorPicker', 'collapse', 'close'] as const,
         };
     },
     methods: {

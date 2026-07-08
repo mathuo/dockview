@@ -13,6 +13,7 @@ function makeAccessor(
         getTabContextMenuItems?: jest.Mock;
         getTabGroupChipContextMenuItems?: jest.Mock;
         createContextMenuItemComponent?: jest.Mock;
+        api?: any;
     } = {}
 ) {
     const openPopover = jest.fn();
@@ -27,7 +28,7 @@ function makeAccessor(
             createContextMenuItemComponent:
                 overrides.createContextMenuItemComponent,
         },
-        api: {} as any,
+        api: overrides.api ?? ({} as any),
         popupService,
         getPopupServiceForGroup: () => popupService,
     });
@@ -37,6 +38,28 @@ function makeAccessor(
 
 function makePanel(closeFn = jest.fn()) {
     return fromPartial<IDockviewPanel>({ api: { close: closeFn } });
+}
+
+function makeRichPanel(
+    overrides: {
+        close?: jest.Mock;
+        maximize?: jest.Mock;
+        exitMaximized?: jest.Mock;
+        isMaximized?: boolean;
+        location?: 'grid' | 'floating' | 'popout';
+        id?: string;
+    } = {}
+) {
+    return fromPartial<IDockviewPanel>({
+        id: overrides.id,
+        api: {
+            close: overrides.close ?? jest.fn(),
+            maximize: overrides.maximize ?? jest.fn(),
+            exitMaximized: overrides.exitMaximized ?? jest.fn(),
+            isMaximized: () => overrides.isMaximized ?? false,
+            location: { type: overrides.location ?? 'grid' },
+        },
+    });
 }
 
 function makeGroup(panels: IDockviewPanel[] = []) {
@@ -452,6 +475,285 @@ describe('ContextMenuController', () => {
         });
     });
 
+    describe("built-in 'closeLeft' item", () => {
+        test('closes only the panels before the target panel', () => {
+            const close1 = jest.fn();
+            const close2 = jest.fn();
+            const close3 = jest.fn();
+            const panel1 = makePanel(close1);
+            const panel2 = makePanel(close2);
+            const panel3 = makePanel(close3);
+
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest
+                    .fn()
+                    .mockReturnValue(['closeLeft']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                panel2,
+                makeGroup([panel1, panel2, panel3]),
+                new MouseEvent('contextmenu')
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            fireEvent.click(menuEl.querySelector('.dv-context-menu-item')!);
+
+            expect(close1).toHaveBeenCalled();
+            expect(close2).not.toHaveBeenCalled();
+            expect(close3).not.toHaveBeenCalled();
+        });
+
+        test('is disabled when the panel is the first tab', () => {
+            const panel1 = makePanel();
+            const panel2 = makePanel();
+
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest
+                    .fn()
+                    .mockReturnValue(['closeLeft']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                panel1,
+                makeGroup([panel1, panel2]),
+                new MouseEvent('contextmenu')
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const item = menuEl.querySelector('.dv-context-menu-item')!;
+            expect(item.getAttribute('aria-disabled')).toBe('true');
+        });
+    });
+
+    describe("built-in 'closeRight' item", () => {
+        test('closes only the panels after the target panel', () => {
+            const close1 = jest.fn();
+            const close2 = jest.fn();
+            const close3 = jest.fn();
+            const panel1 = makePanel(close1);
+            const panel2 = makePanel(close2);
+            const panel3 = makePanel(close3);
+
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest
+                    .fn()
+                    .mockReturnValue(['closeRight']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                panel2,
+                makeGroup([panel1, panel2, panel3]),
+                new MouseEvent('contextmenu')
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            fireEvent.click(menuEl.querySelector('.dv-context-menu-item')!);
+
+            expect(close1).not.toHaveBeenCalled();
+            expect(close2).not.toHaveBeenCalled();
+            expect(close3).toHaveBeenCalled();
+        });
+
+        test('is disabled when the panel is the last tab', () => {
+            const panel1 = makePanel();
+            const panel2 = makePanel();
+
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest
+                    .fn()
+                    .mockReturnValue(['closeRight']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                panel2,
+                makeGroup([panel1, panel2]),
+                new MouseEvent('contextmenu')
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const item = menuEl.querySelector('.dv-context-menu-item')!;
+            expect(item.getAttribute('aria-disabled')).toBe('true');
+        });
+    });
+
+    describe("built-in 'maximize' item", () => {
+        test('renders "Maximize" and calls maximize() when not maximized', () => {
+            const maximize = jest.fn();
+            const panel = makeRichPanel({ maximize, isMaximized: false });
+
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['maximize']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                panel,
+                makeGroup([panel]),
+                new MouseEvent('contextmenu')
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const item = menuEl.querySelector(
+                '.dv-context-menu-item'
+            ) as HTMLElement;
+            expect(item.textContent).toBe('Maximize');
+
+            fireEvent.click(item);
+            expect(maximize).toHaveBeenCalled();
+        });
+
+        test('renders "Restore" and calls exitMaximized() when maximized', () => {
+            const exitMaximized = jest.fn();
+            const panel = makeRichPanel({
+                exitMaximized,
+                isMaximized: true,
+            });
+
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['maximize']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                panel,
+                makeGroup([panel]),
+                new MouseEvent('contextmenu')
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const item = menuEl.querySelector(
+                '.dv-context-menu-item'
+            ) as HTMLElement;
+            expect(item.textContent).toBe('Restore');
+
+            fireEvent.click(item);
+            expect(exitMaximized).toHaveBeenCalled();
+        });
+
+        test('is disabled for a floating panel that is not maximized', () => {
+            const panel = makeRichPanel({
+                location: 'floating',
+                isMaximized: false,
+            });
+
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['maximize']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                panel,
+                makeGroup([panel]),
+                new MouseEvent('contextmenu')
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const item = menuEl.querySelector('.dv-context-menu-item')!;
+            expect(item.getAttribute('aria-disabled')).toBe('true');
+        });
+    });
+
+    describe("built-in 'float' item", () => {
+        test('calls api.addFloatingGroup() with the panel', () => {
+            const addFloatingGroup = jest.fn();
+            const panel = makeRichPanel({ location: 'grid' });
+
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['float']),
+                api: { addFloatingGroup },
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                panel,
+                makeGroup([panel]),
+                new MouseEvent('contextmenu')
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const item = menuEl.querySelector(
+                '.dv-context-menu-item'
+            ) as HTMLElement;
+            expect(item.textContent).toBe('Float');
+            fireEvent.click(item);
+
+            expect(addFloatingGroup).toHaveBeenCalledWith(panel);
+        });
+
+        test('is disabled when the panel is already floating', () => {
+            const panel = makeRichPanel({ location: 'floating' });
+
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['float']),
+                api: { addFloatingGroup: jest.fn() },
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                panel,
+                makeGroup([panel]),
+                new MouseEvent('contextmenu')
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const item = menuEl.querySelector('.dv-context-menu-item')!;
+            expect(item.getAttribute('aria-disabled')).toBe('true');
+        });
+    });
+
+    describe("built-in 'popout' item", () => {
+        test('calls api.addPopoutGroup() with the panel', () => {
+            const addPopoutGroup = jest.fn().mockResolvedValue(true);
+            const panel = makeRichPanel({ location: 'grid' });
+
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['popout']),
+                api: { addPopoutGroup },
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                panel,
+                makeGroup([panel]),
+                new MouseEvent('contextmenu')
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const item = menuEl.querySelector(
+                '.dv-context-menu-item'
+            ) as HTMLElement;
+            expect(item.textContent).toBe('Open in New Window');
+            fireEvent.click(item);
+
+            expect(addPopoutGroup).toHaveBeenCalledWith(panel);
+        });
+
+        test('is disabled when the panel is already popped out', () => {
+            const panel = makeRichPanel({ location: 'popout' });
+
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['popout']),
+                api: { addPopoutGroup: jest.fn() },
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                panel,
+                makeGroup([panel]),
+                new MouseEvent('contextmenu')
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const item = menuEl.querySelector('.dv-context-menu-item')!;
+            expect(item.getAttribute('aria-disabled')).toBe('true');
+        });
+    });
+
     describe("built-in 'separator' item", () => {
         test('renders a separator element', () => {
             const { accessor, openPopover } = makeAccessor({
@@ -798,6 +1100,101 @@ describe('ContextMenuController', () => {
             expect(
                 picker.querySelectorAll('.dv-context-menu-color-swatch')
             ).toHaveLength(0);
+        });
+    });
+
+    describe("built-in chip 'collapse' item", () => {
+        function makeChipAccessor(items: unknown[]) {
+            const openPopover = jest.fn();
+            const close = jest.fn();
+            const popupService = fromPartial<PopupService>({
+                openPopover,
+                close,
+            });
+            const accessor = fromPartial<DockviewComponent>({
+                options: {
+                    getTabGroupChipContextMenuItems: jest
+                        .fn()
+                        .mockReturnValue(items),
+                },
+                api: {} as any,
+                popupService,
+                getPopupServiceForGroup: () => popupService,
+            });
+            return { accessor, openPopover };
+        }
+
+        test('renders "Collapse" and toggles when expanded', () => {
+            const toggle = jest.fn();
+            const { accessor, openPopover } = makeChipAccessor(['collapse']);
+            const controller = new ContextMenuController(accessor);
+
+            const tabGroup = fromPartial<ITabGroup>({
+                collapsed: false,
+                toggle,
+            });
+            controller.showForChip(
+                tabGroup,
+                makeGroup(),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const item = menuEl.querySelector(
+                '.dv-context-menu-item'
+            ) as HTMLElement;
+            expect(item.textContent).toBe('Collapse');
+            fireEvent.click(item);
+            expect(toggle).toHaveBeenCalled();
+        });
+
+        test('renders "Expand" when the tab group is collapsed', () => {
+            const { accessor, openPopover } = makeChipAccessor(['collapse']);
+            const controller = new ContextMenuController(accessor);
+
+            const tabGroup = fromPartial<ITabGroup>({
+                collapsed: true,
+                toggle: jest.fn(),
+            });
+            controller.showForChip(
+                tabGroup,
+                makeGroup(),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const item = menuEl.querySelector(
+                '.dv-context-menu-item'
+            ) as HTMLElement;
+            expect(item.textContent).toBe('Expand');
+        });
+
+        test("'close' closes only the panels belonging to the tab group", () => {
+            const close1 = jest.fn();
+            const close2 = jest.fn();
+            const close3 = jest.fn();
+            const panel1 = makeRichPanel({ close: close1, id: 'p1' });
+            const panel2 = makeRichPanel({ close: close2, id: 'p2' });
+            const panel3 = makeRichPanel({ close: close3, id: 'p3' });
+
+            const { accessor, openPopover } = makeChipAccessor(['close']);
+            const controller = new ContextMenuController(accessor);
+
+            const tabGroup = fromPartial<ITabGroup>({
+                containsPanel: (id: string) => id === 'p1' || id === 'p3',
+            });
+            controller.showForChip(
+                tabGroup,
+                makeGroup([panel1, panel2, panel3]),
+                new MouseEvent('contextmenu', { cancelable: true })
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            fireEvent.click(menuEl.querySelector('.dv-context-menu-item')!);
+
+            expect(close1).toHaveBeenCalled();
+            expect(close2).not.toHaveBeenCalled();
+            expect(close3).toHaveBeenCalled();
         });
     });
 

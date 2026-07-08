@@ -27,9 +27,7 @@ export default () => {
     const [headerPosition, setHeaderPosition] =
         React.useState<DockviewHeaderPosition>('top');
 
-    const onHeaderPositionChange = (
-        position: DockviewHeaderPosition
-    ) => {
+    const onHeaderPositionChange = (position: DockviewHeaderPosition) => {
         setHeaderPosition(position);
         if (!api) return;
         for (const group of api.groups) {
@@ -152,6 +150,8 @@ export default () => {
             return [
                 'rename' as const,
                 'colorPicker' as const,
+                'collapse' as const,
+                'close' as const,
                 'separator' as const,
                 ...items.map((item) => ({
                     label: item.label,
@@ -181,7 +181,11 @@ export default () => {
                     className={'dockview-theme-abyss'}
                     onReady={onReady}
                     components={components}
-                    theme={{ ...themeAbyss, tabAnimation: 'smooth', tabGroupIndicator: 'wrap' }}
+                    theme={{
+                        ...themeAbyss,
+                        tabAnimation: 'smooth',
+                        tabGroupIndicator: 'wrap',
+                    }}
                     disableFloatingGroups={true}
                     getTabContextMenuItems={getTabContextMenuItems}
                     getTabGroupChipContextMenuItems={
@@ -192,4 +196,3 @@ export default () => {
         </div>
     );
 };
-

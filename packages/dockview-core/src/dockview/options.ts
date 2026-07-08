@@ -42,12 +42,22 @@ export type BuiltInContextMenuItem =
     | 'close'
     | 'closeOthers'
     | 'closeAll'
+    | 'closeLeft'
+    | 'closeRight'
+    | 'maximize'
+    | 'float'
+    | 'popout'
     | 'separator'
     // Toggle the panel's pinned state (PinnedTabs module). Renders as
     // "Pin tab" / "Unpin tab"; a no-op when pinning is not enabled.
     | 'pin';
 
-export type BuiltInChipContextMenuItem = 'separator' | 'colorPicker' | 'rename';
+export type BuiltInChipContextMenuItem =
+    | 'separator'
+    | 'colorPicker'
+    | 'rename'
+    | 'collapse'
+    | 'close';
 
 export interface ContextMenuItemConfig {
     label?: string;
@@ -418,8 +428,21 @@ export interface DockviewOptions {
     /**
      * Return the items to display in the tab context menu on right-click.
      *
-     * Use built-in string shortcuts (`'close'`, `'closeOthers'`, `'closeAll'`, `'separator'`)
-     * or provide a `ContextMenuItemConfig` object for custom items.
+     * Use built-in string shortcuts or provide a `ContextMenuItemConfig`
+     * object for custom items. The available shortcuts are:
+     * - `'close'` — close this panel
+     * - `'closeOthers'` — close every other panel in the group
+     * - `'closeAll'` — close every panel in the group
+     * - `'closeLeft'` / `'closeRight'` — close the panels before / after this
+     *   one in the tab strip
+     * - `'maximize'` — maximize the group (renders as *Restore* and disables
+     *   for non-grid panels, tracking the group's live maximized state)
+     * - `'float'` — move the panel into a floating window (disabled when
+     *   already floating)
+     * - `'popout'` — move the panel into a new browser window (disabled when
+     *   already popped out)
+     * - `'pin'` — toggle the panel's pinned state (PinnedTabs module)
+     * - `'separator'` — a divider line
      *
      * If omitted, no context menu is shown.
      * Return an empty array to suppress the menu for specific cases.
@@ -430,10 +453,14 @@ export interface DockviewOptions {
     /**
      * Return the items to display in the tab group chip context menu on right-click.
      *
-     * Use built-in string shortcuts (`'separator'`, `'colorPicker'`, `'rename'`) or provide a
-     * `ContextMenuItemConfig` object for custom items.
-     * `'colorPicker'` renders a native grid of color swatches for the tab group.
-     * `'rename'` renders an inline text input to rename the tab group.
+     * Use built-in string shortcuts or provide a `ContextMenuItemConfig`
+     * object for custom items. The available shortcuts are:
+     * - `'rename'` — renders an inline text input to rename the tab group
+     * - `'colorPicker'` — renders a grid of color swatches for the tab group
+     * - `'collapse'` — collapse the tab group (renders as *Expand* when the
+     *   group is already collapsed)
+     * - `'close'` — close every panel belonging to the tab group
+     * - `'separator'` — a divider line
      *
      * If omitted, no context menu is shown on chip right-click.
      * Return an empty array to suppress the menu for specific cases.

@@ -104,6 +104,8 @@ export class AppComponent {
         const result: (BuiltInChipContextMenuItem | ContextMenuItemConfig)[] = [
             'rename',
             'colorPicker',
+            'collapse',
+            'close',
             'separator',
         ];
         if (this.api) {

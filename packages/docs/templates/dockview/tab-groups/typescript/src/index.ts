@@ -81,7 +81,12 @@ const api = createDockview(dockElement, {
                 return new Panel();
         }
     },
-    getTabGroupChipContextMenuItems: () => ['rename', 'colorPicker'],
+    getTabGroupChipContextMenuItems: () => [
+        'rename',
+        'colorPicker',
+        'collapse',
+        'close',
+    ],
 });
 
 const titles = [

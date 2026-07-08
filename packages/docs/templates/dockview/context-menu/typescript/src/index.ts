@@ -41,6 +41,11 @@ const api = createDockview(document.getElementById('app'), {
         'close',
         'closeOthers',
         'closeAll',
+        'closeLeft',
+        'closeRight',
+        'separator',
+        'maximize',
+        'popout',
         'separator',
         {
             label: 'Log panel id',
@@ -49,7 +54,8 @@ const api = createDockview(document.getElementById('app'), {
         'separator',
         {
             // Custom item mirroring the React `FloatMenuItem` component: floats
-            // the panel's tab into its own group.
+            // the panel's tab into its own group. Shown as an alternative to
+            // the built-in `'float'` shortcut.
             label: 'Float tab',
             action: () => params.api.addFloatingGroup(params.panel),
         },
