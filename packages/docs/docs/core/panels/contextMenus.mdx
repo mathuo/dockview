@@ -1,0 +1,300 @@
+---
+title: 'Context menus'
+description: Right-click menus for tabs and tab group chips, with built-in item shortcuts, custom label and component items, and per-case suppression.
+sidebar_position: 13
+enterprise: true
+sidebar_custom_props:
+    enterprise: true
+---
+
+import { CodeRunner } from '@site/src/components/ui/codeRunner';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+Dockview can show a context menu when you right-click a tab or a tab group chip.
+Menus are opt-in: nothing is shown unless you supply a builder function. Each
+builder returns a list mixing built-in string shortcuts with your own custom
+items.
+
+:::info Enterprise feature
+Context menus are provided by the `ContextMenuModule` in the
+[`dockview-enterprise`](/docs/overview/editions) package. Importing
+`dockview-enterprise` registers the module for every Dockview instance in the
+process. Without it, `getTabContextMenuItems` and
+`getTabGroupChipContextMenuItems` are ignored and no menu appears.
+:::
+
+<CodeRunner id="dockview/context-menu" height={400} />
+
+## Tab context menu
+
+Provide `getTabContextMenuItems` to build the menu shown when a tab is
+right-clicked. It receives the panel, its group, the `DockviewApi` and the
+originating `MouseEvent`, and returns the items to render. Return an empty array
+to suppress the menu for a specific tab.
+
+<FrameworkSpecific framework="React">
+    <DocRef
+        declaration="IDockviewReactProps"
+        methods={['getTabContextMenuItems']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+    <DocRef
+        declaration="IDockviewVueProps"
+        methods={['getTabContextMenuItems']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+    <DocRef
+        declaration="DockviewAngularOptions"
+        methods={['getTabContextMenuItems']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+    <DocRef
+        declaration="DockviewComponentOptions"
+        methods={['getTabContextMenuItems']}
+    />
+</FrameworkSpecific>
+
+### Built-in items
+
+Pass string shortcuts to render standard entries without writing any handlers.
+Each item wires itself to the panel and group from the builder's params:
+
+| Value          | Behaviour                                                                                          |
+| -------------- | -------------------------------------------------------------------------------------------------- |
+| `'close'`      | Close this panel                                                                                   |
+| `'closeOthers'`| Close every other panel in the group                                                               |
+| `'closeAll'`   | Close every panel in the group                                                                     |
+| `'closeLeft'`  | Close the panels before this one in the tab strip                                                  |
+| `'closeRight'` | Close the panels after this one in the tab strip                                                   |
+| `'maximize'`   | Maximize the group. Renders as `Restore` and disables for non-grid panels, tracking the live state |
+| `'float'`      | Move the panel into a floating group. Disabled when the panel is already floating                  |
+| `'popout'`     | Move the panel into a new browser window. Disabled when already popped out                         |
+| `'pin'`        | Toggle the panel's pinned state. Renders as `Pin tab` / `Unpin tab` (see [Pinned tabs](/docs/core/panels/pinnedTabs)) |
+| `'separator'`  | Render a visual divider                                                                             |
+
+```ts
+getTabContextMenuItems: (params) => [
+    'close',
+    'closeOthers',
+    'closeAll',
+    'separator',
+    'maximize',
+    'popout',
+];
+```
+
+### Custom label items
+
+Return an object with a `label` and an `action` for a simple clickable entry.
+The `action` runs when the item is chosen; the menu then closes on its own.
+
+```ts
+getTabContextMenuItems: (params) => [
+    'close',
+    'separator',
+    {
+        label: 'Log panel id',
+        action: () => console.log(params.panel.id),
+    },
+    {
+        label: 'Float tab',
+        action: () => params.api.addFloatingGroup(params.panel),
+    },
+];
+```
+
+Set `disabled: true` to render an item greyed out and non-interactive:
+
+```ts
+{
+    label: 'Close',
+    action: () => params.panel.api.close(),
+    disabled: params.api.panels.length === 1,
+}
+```
+
+### Custom component items
+
+For richer entries, render your own framework component instead of a plain
+label. The component receives the panel, group, api and a `close` callback
+through `IContextMenuItemComponentProps`; call `close()` when you are done to
+dismiss the menu.
+
+<DocRef declaration="IContextMenuItemComponentProps" />
+
+<FrameworkSpecific framework="React">
+```tsx
+const FloatMenuItem = ({ panel, api, close }: IContextMenuItemComponentProps) => (
+    <div
+        className="dv-context-menu-item"
+        onClick={() => {
+            api.addFloatingGroup(panel);
+            close();
+        }}
+    >
+        Float tab
+    </div>
+);
+
+// then reference it as a component item
+getTabContextMenuItems={(params) => [
+    'close',
+    'separator',
+    { component: FloatMenuItem },
+]}
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+```ts
+const FloatMenuItem = defineComponent({
+    name: 'FloatMenuItem',
+    props: {
+        params: {
+            type: Object as PropType<IContextMenuItemComponentProps>,
+            required: true,
+        },
+    },
+    methods: {
+        onClick() {
+            this.params.api.addFloatingGroup(this.params.panel);
+            this.params.close();
+        },
+    },
+    template: `<div class="dv-context-menu-item" @click="onClick">Float tab</div>`,
+});
+
+// reference the registered component by name
+getTabContextMenuItems(params) {
+    return ['close', 'separator', { component: 'floatMenuItem' }];
+}
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+```ts
+getTabContextMenuItems = (params: GetTabContextMenuItemsParams) => [
+    'close',
+    'separator',
+    { component: FloatMenuItemComponent },
+];
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+With vanilla TypeScript there is no framework component layer, so use a `label`
+plus `action`, or embed a raw DOM node with the `element` field:
+
+```ts
+getTabContextMenuItems: (params) => [
+    'close',
+    'separator',
+    {
+        label: 'Float tab',
+        action: () => params.api.addFloatingGroup(params.panel),
+    },
+];
+```
+</FrameworkSpecific>
+
+Pass extra data to a component item with `componentProps`; it is forwarded to
+the component as `props.componentProps`.
+
+### Raw element items
+
+To render custom content without a framework component, hand over a DOM node
+with the `element` field. Dockview embeds it as-is:
+
+```ts
+const el = document.createElement('div');
+el.className = 'dv-context-menu-item';
+el.textContent = 'Custom item';
+
+getTabContextMenuItems: (params) => ['close', 'separator', { element: el }];
+```
+
+## Chip context menu
+
+Provide `getTabGroupChipContextMenuItems` to build the menu shown when a
+[tab group chip](/docs/core/panels/tabGroups) is right-clicked. It receives the
+tab group, its group, the `DockviewApi` and the `MouseEvent`, and returns the
+items. As with tabs, return an empty array to suppress the menu for a specific
+chip.
+
+<FrameworkSpecific framework="React">
+    <DocRef
+        declaration="IDockviewReactProps"
+        methods={['getTabGroupChipContextMenuItems']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+    <DocRef
+        declaration="IDockviewVueProps"
+        methods={['getTabGroupChipContextMenuItems']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+    <DocRef
+        declaration="DockviewAngularOptions"
+        methods={['getTabGroupChipContextMenuItems']}
+    />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+    <DocRef
+        declaration="DockviewComponentOptions"
+        methods={['getTabGroupChipContextMenuItems']}
+    />
+</FrameworkSpecific>
+
+### Built-in chip items
+
+| Value           | Behaviour                                                          |
+| --------------- | ------------------------------------------------------------------ |
+| `'rename'`      | An inline text input to rename the tab group                       |
+| `'colorPicker'` | A grid of colour swatches to change the tab group colour           |
+| `'collapse'`    | Collapse the tab group. Renders as `Expand` when already collapsed |
+| `'close'`       | Close every panel belonging to the tab group                       |
+| `'separator'`   | Render a visual divider                                            |
+
+Custom label, component and element items work the same way as for tabs:
+
+```ts
+getTabGroupChipContextMenuItems: (params) => [
+    'rename',
+    'colorPicker',
+    'separator',
+    {
+        label: 'Dissolve group',
+        action: () =>
+            params.api.dissolveTabGroup({
+                groupId: params.group.id,
+                tabGroupId: params.tabGroup.id,
+            }),
+    },
+];
+```
+
+See [Tab groups](/docs/core/panels/tabGroups#chip-context-menu) for the full
+chip API.
+
+## Suppressing the menu
+
+Both builders are called on every right-click. Return an empty array to skip the
+menu in specific cases while keeping it for the rest:
+
+```ts
+getTabContextMenuItems: (params) =>
+    params.panel.api.isActive ? ['close', 'separator', 'maximize'] : [];
+```
+
+Omitting the builder entirely disables the menu everywhere and lets the native
+browser context menu through.
