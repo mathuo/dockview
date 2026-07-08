@@ -598,6 +598,9 @@ const DockviewDemo = (props: {
                 | 'close'
                 | 'closeOthers'
                 | 'closeAll'
+                | 'closeLeft'
+                | 'closeRight'
+                | 'maximize'
                 | 'separator'
                 | 'pin'
                 | { component: React.FC<IContextMenuItemComponentProps> }
@@ -608,7 +611,14 @@ const DockviewDemo = (props: {
                 'close',
                 'closeOthers',
                 'closeAll',
+                'closeLeft',
+                'closeRight',
                 'separator',
+                'maximize',
+                'separator',
+                // Float / popout are shown here as custom component items (with
+                // icons); the `'float'` and `'popout'` built-in shortcuts do the
+                // same thing without custom rendering.
                 { component: FloatMenuItem },
                 { component: PopoutMenuItem },
             ];
@@ -676,11 +686,16 @@ const DockviewDemo = (props: {
             const items: (
                 | 'colorPicker'
                 | 'rename'
+                | 'collapse'
+                | 'close'
                 | 'separator'
                 | { label: string; action: () => void }
-            )[] = ['rename', 'colorPicker'];
+            )[] = ['rename', 'colorPicker', 'collapse', 'close'];
 
             if (api) {
+                // Float / popout operate on the whole containing group, so they
+                // stay custom items — the built-in chip shortcuts are scoped to
+                // the tab group (`'collapse'` / `'close'`, used above).
                 items.push(
                     'separator',
                     {
@@ -694,12 +709,6 @@ const DockviewDemo = (props: {
                         },
                     },
                     'separator',
-                    {
-                        label: tabGroup.collapsed
-                            ? 'Expand group'
-                            : 'Collapse group',
-                        action: () => tabGroup.toggle(),
-                    },
                     {
                         label: 'Dissolve group',
                         action: () =>
