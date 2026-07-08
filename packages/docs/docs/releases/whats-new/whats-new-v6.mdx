@@ -1,7 +1,7 @@
 ---
 title: What's new in v6
 sidebar_position: 3
-description: Highlights and breaking changes in Dockview 6.0 — Tab Groups, Edge Groups, theme system overhaul, and more.
+description: Highlights and breaking changes in Dockview 6.0: Tab Groups, Edge Groups, theme system overhaul, and more.
 ---
 
 Dockview 6.0 is the largest release since 4.0. It introduces two new structural features
@@ -39,7 +39,7 @@ See [Tab groups](/docs/core/panels/tabs#tab-groups) for the full reference.
 ### Edge groups
 
 Edge groups are persistent, single-purpose panels anchored to one edge of the
-Dockview shell — useful for activity bars, status panels, or output panes that
+Dockview shell, useful for activity bars, status panels, or output panes that
 shouldn't participate in normal layout drag-and-drop. They support collapse /
 expand with size memory and survive `toJSON` / `fromJSON`.
 ([#1122](https://github.com/mathuo/dockview/pull/1122),
@@ -91,7 +91,7 @@ chips, with `'colorPicker'` and `'rename'` shortcuts on top of the standard
 
 `IContentRenderer` gained optional `onShow()` / `onHide()` hooks that fire as
 panels are attached to / detached from the DOM under
-`renderer: 'onlyWhenVisible'`. This unlocks correct behaviour for renderers
+`renderer: 'onlyWhenVisible'`. This matters for renderers
 that need to detach from a host framework's lifecycle (notably Angular
 `TemplateRef` views). ([#1158](https://github.com/mathuo/dockview/pull/1158))
 
@@ -116,10 +116,10 @@ control without touching SCSS:
 
 | Property                 | Purpose                                                     |
 | ------------------------ | ----------------------------------------------------------- |
-| `colorScheme`            | `'light' \| 'dark'` — lets panel content adapt              |
-| `tabAnimation`           | `'smooth' \| 'default'` — moved here from `DockviewOptions` |
-| `tabGroupIndicator`      | `'wrap' \| 'none'` — Chrome-style underline vs. flat bar    |
-| `dndTabIndicator`        | `'line' \| 'fill'` — drop-target style                      |
+| `colorScheme`            | `'light' | 'dark'`, lets panel content adapt              |
+| `tabAnimation`           | `'smooth' | 'default'`, moved here from `DockviewOptions` |
+| `tabGroupIndicator`      | `'wrap' | 'none'`, Chrome-style underline vs. flat bar    |
+| `dndTabIndicator`        | `'line' | 'fill'`, drop-target style                      |
 | `dndOverlayBorder`       | CSS expression for `--dv-drag-over-border`                  |
 | `edgeGroupCollapsedSize` | px override for collapsed edge group size                   |
 
@@ -143,7 +143,7 @@ Seven new themes ship in v6:
 
 ### `tabAnimation` moved to the theme object
 
-`tabAnimation` is no longer a top-level `DockviewOptions` property — it now
+`tabAnimation` is no longer a top-level `DockviewOptions` property; it now
 lives on the `DockviewTheme` object alongside `gap`, `dndPanelOverlay`, etc.
 ([#1181](https://github.com/mathuo/dockview/pull/1181))
 
@@ -160,7 +160,7 @@ const options: DockviewOptions = {
 };
 ```
 
-The `DEFAULT_TAB_ANIMATION` constant has also been removed — read
+The `DEFAULT_TAB_ANIMATION` constant has also been removed; read
 `theme.tabAnimation` directly if you need the active value.
 
 ### `dockview.css` is no longer auto-injected

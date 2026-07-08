@@ -17,7 +17,7 @@ For the basics of creating, sizing, collapsing, and serializing edge groups, see
 
 The `autoHideEdgeGroups` option sets the per-edge default, but auto-hide is also resolved **per group**: pass `autoHide` to `addEdgeGroup`, or call `api.setAutoHide` at runtime, to opt a single edge group in or out. This lets a static always-docked edge group and an auto-hiding one co-exist in the same layout.
 
-Enable it with the `autoHideEdgeGroups` option — pass `true` for all four edges, or an object to enable specific edges:
+Enable it with the `autoHideEdgeGroups` option: pass `true` for all four edges, or an object to enable specific edges:
 
 <FrameworkSpecific framework="React">
     ```tsx
@@ -50,7 +50,7 @@ const api = createDockview(element, {
 ```
 </FrameworkSpecific>
 
-To enable auto-hide on only some edges, name them individually — `true`/`false` (or an omitted edge) toggles each of `top`, `bottom`, `left`, `right`:
+To enable auto-hide on only some edges, name them individually; `true`/`false` (or an omitted edge) toggles each of `top`, `bottom`, `left`, `right`:
 
 ```ts
 const api = createDockview(element, {
@@ -60,15 +60,15 @@ const api = createDockview(element, {
 });
 ```
 
-Auto-hide is **off by default** — leaving `autoHideEdgeGroups` unset (or `false`) keeps the plain collapse/expand behaviour, with no peek overlay.
+Auto-hide is **off by default**; leaving `autoHideEdgeGroups` unset (or `false`) keeps the plain collapse/expand behaviour, with no peek overlay.
 
 <CodeRunner id="dockview/auto-hide-edge-groups" height={400} />
 
 ## The click-to-peek model
 
-Auto-hide is entirely **click-driven** — there is no hover interaction. Once an edge group is auto-hidden (collapsed) it renders a strip of its tabs along the edge, and:
+Auto-hide is entirely **click-driven**; there is no hover interaction. Once an edge group is auto-hidden (collapsed) it renders a strip of its tabs along the edge, and:
 
-- **Click a tab** → that tab's panel **peeks** out as an overlay anchored to the strip's inner edge. The group stays logically collapsed, so **the grid is not reflowed** — the panel simply floats over your content. The overlay carries a **title bar** (the active panel's title on the left; a **pin** and a **close** button on the right).
+- **Click a tab** → that tab's panel **peeks** out as an overlay anchored to the strip's inner edge. The group stays logically collapsed, so **the grid is not reflowed**; the panel simply floats over your content. The overlay carries a **title bar** (the active panel's title on the left; a **pin** and a **close** button on the right).
 - **Click the same tab again**, **click anywhere outside** the strip and peek, or press **Escape** → the peek hides. Clicking empty space inside the strip does nothing.
 - **Click a different tab** while peeking → the peek switches to that panel and retitles.
 - **Pin** → the group **docks** (expands) permanently. A docked group renders as a tool window: the title bar sits on top and the tab strip moves to the bottom. Pinning again auto-hides it back to the strip.
@@ -92,7 +92,7 @@ const api = createDockview(element, {
 });
 ```
 
-- `animate` — slide the peek overlay in. Default `true`; ignored when the OS requests reduced motion.
+- `animate`: slide the peek overlay in. Default `true`; ignored when the OS requests reduced motion.
 
 ## API
 
@@ -144,5 +144,5 @@ The peek overlay shares the same stacking context as floating and popout groups,
 
 ## See also
 
-- [Edge groups](/docs/core/groups/edgeGroups) — creating, sizing, collapsing, and serializing edge groups
-- [Group controls](/docs/core/groups/controls) — render controls specific to edge groups via the `location` prop
+- [Edge groups](/docs/core/groups/edgeGroups): creating, sizing, collapsing, and serializing edge groups
+- [Group controls](/docs/core/groups/controls): render controls specific to edge groups via the `location` prop

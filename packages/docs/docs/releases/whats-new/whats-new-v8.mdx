@@ -1,7 +1,7 @@
 ---
 title: What's new in v8
 sidebar_position: 1
-description: Highlights and breaking changes in Dockview 8.0 — pinned tabs, multi-row tabs, smarter drag-and-drop, layout history, and more.
+description: Highlights and breaking changes in Dockview 8.0: pinned tabs, multi-row tabs, smarter drag-and-drop, layout history, and more.
 ---
 
 Dockview 8.0 is an additive release focused on the tab header and drag-and-drop:
@@ -16,7 +16,7 @@ This page covers the headline additions. For the upgrade notes and the single
 
 :::info The `dockview-enterprise` package
 v8 introduces `dockview-enterprise`, a separately-licensed package for the
-features marked **Enterprise** in [Features](/docs/overview/features) — pinned
+features marked **Enterprise** in [Features](/docs/overview/features): pinned
 tabs, multi-row tabs, the drop guide compass, smart guides, layout history,
 auto-hide edge groups, dock-to-edge groups, and keyboard docking. The free,
 open-source `dockview` packages are unchanged.
@@ -64,8 +64,8 @@ snap together into a docked or merged group. See
 ### Layout history (undo/redo)
 
 The new [`layoutHistory`](/docs/core/state/history) option records structural
-layout mutations and lets you undo and redo them — move, float, popout,
-maximize, add, and remove — coalescing resize gestures and spanning popout
+layout mutations and lets you undo and redo them (move, float, popout,
+maximize, add, and remove) coalescing resize gestures and spanning popout
 windows. See [Layout history](/docs/core/state/history).
 
 ### Auto-hide edge groups
@@ -95,23 +95,23 @@ docks an edge group) and with auto-hide, and can be driven programmatically via
 
 Keyboard docking now works across popout windows, so you can move a group into or
 out of a popout entirely from the keyboard, with a dedicated "float" terminal
-action. It builds on refreshed accessibility work — per-window live regions with
+action. It builds on refreshed accessibility work: per-window live regions with
 focus-aware routing, `:focus-visible` focus indicators, and honest, localised
 accessible names on tab controls. See [Keyboard navigation](/docs/advanced/keyboard)
 and [Accessibility](/docs/advanced/accessibility).
 
 ## Breaking changes
 
-v8 is additive — every new feature above is opt-in and off by default. There is
+v8 is additive; every new feature above is opt-in and off by default. There is
 one behavioural change and one method rename to be aware of, both covered in full
 in [Migrating to v8](/docs/releases/migrating/migrating-to-v8):
 
-- **Reported panel dimensions** — `onDidDimensionsChange` (and the height passed
+- **Reported panel dimensions**: `onDidDimensionsChange` (and the height passed
   to renderers) now report the **content area** (the group box minus the header)
   instead of the header-inclusive group box. CSS-fill renderers are unaffected;
   only consumers that read the numeric dimensions need to check this.
 - **`api.moveToNext` / `api.moveToPrevious` renamed** to
-  [`activateNext` / `activatePrevious`](/docs/advanced/focus-navigation) — the
+  [`activateNext` / `activatePrevious`](/docs/advanced/focus-navigation): the
   new names make clear they advance the active panel/group (focus) rather than
   relocating a panel. The old names still work as **deprecated aliases**, so no
   code breaks today; update at your convenience before they are removed in a

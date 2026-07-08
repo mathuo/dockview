@@ -1,12 +1,12 @@
 ---
 title: Events
 sidebar_position: 7
-description: Reference for Dockview events — subscribe to layout changes, panel lifecycle, focus changes, and more.
+description: Reference for Dockview events: subscribe to layout changes, panel lifecycle, focus changes, and more.
 ---
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-`DockviewApi` exposes a comprehensive set of events so your application can react to layout changes. All events follow the same subscription pattern and return a disposable that you should call when you no longer need the listener.
+`DockviewApi` exposes events so your application can react to layout changes. All events follow the same subscription pattern and return a disposable that you should call when you no longer need the listener.
 
 ```ts
 const disposable = api.onDidAddPanel((panel) => {
@@ -77,7 +77,7 @@ api.onDidMaximizedGroupChange((event: DockviewMaximizedGroupChangeEvent) => {});
 
 ### Mutation boundary
 
-`onWillMutateLayout` and `onDidMutateLayout` bracket each top-level structural change to the layout. Unlike `onDidLayoutChange` — which is coalesced and only fires _after_ a change — these provide an explicit before/after pair, so you can capture a snapshot of the layout _before_ the mutation runs. This makes them the right hook for autosave, dirty-tracking and undo/redo.
+`onWillMutateLayout` and `onDidMutateLayout` bracket each top-level structural change to the layout. Unlike `onDidLayoutChange` (which is coalesced and only fires _after_ a change), these provide an explicit before/after pair, so you can capture a snapshot of the layout _before_ the mutation runs. This makes them the right hook for autosave, dirty-tracking and undo/redo.
 
 ```ts
 // Fires immediately before a structural mutation
@@ -94,7 +94,7 @@ api.onDidMutateLayout((event: DockviewLayoutMutationEvent) => {});
 
 A compound operation brackets as a **single** transaction: dragging a panel to a new group, or restoring a whole layout via `fromJSON`, fires exactly one before/after pair rather than one per internal step.
 
-`event.origin` distinguishes _who_ caused the change — `'user'` for direct interaction (drag-and-drop, tab UI), `'api'` for a programmatic `DockviewApi` call made by your own code — so consumers such as an undo stack can choose to ignore the app's own programmatic mutations.
+`event.origin` distinguishes _who_ caused the change: `'user'` for direct interaction (drag-and-drop, tab UI), `'api'` for a programmatic `DockviewApi` call made by your own code. Consumers such as an undo stack can use this to ignore the app's own programmatic mutations.
 
 ## Drag and drop
 
@@ -141,7 +141,7 @@ api.onDidAddPopoutGroup((event: PopoutGroup) => {
     event.window.focus();
 });
 
-// Fires when a popout group is removed — the user closed its window or it was
+// Fires when a popout group is removed: the user closed its window or it was
 // docked back programmatically. Not fired during component disposal.
 api.onDidRemovePopoutGroup((event: PopoutGroup) => {
     // event.id, event.group

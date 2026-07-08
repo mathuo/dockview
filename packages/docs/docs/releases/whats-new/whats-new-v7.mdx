@@ -1,7 +1,7 @@
 ---
 title: What's new in v7
 sidebar_position: 2
-description: Highlights and breaking changes in Dockview 7.0 — package realignment, the accessibility pack, and more.
+description: Highlights and breaking changes in Dockview 7.0: package realignment, the accessibility pack, and more.
 ---
 
 Dockview 7.0 realigns the package names so the ecosystem is consistent
@@ -19,14 +19,14 @@ This page covers the headline additions. For the upgrade steps and the
 `dockview` is now the **framework-agnostic** JavaScript package (a re-export of
 `dockview-core`), and the **React bindings moved to `dockview-react`**. Every
 framework package (`dockview-react` / `-vue` / `-angular`) consumes `dockview`.
-React users must switch their imports — see
-[Migrating to v7](/docs/releases/migrating/migrating-to-v7#react-users--action-required).
+React users must switch their imports. See
+[Migrating to v7](/docs/releases/migrating/migrating-to-v7#react-users-action-required).
 
 ### Keyboard navigation & announcements
 
 A new [`keyboardNavigation`](/docs/advanced/accessibility#keyboard-navigation)
-option enables a rebindable keymap for moving around the layout — tab switching,
-F6 group cycling, and jumping to the tab strip — alongside focus management
+option enables a rebindable keymap for moving around the layout (tab switching,
+F6 group cycling, and jumping to the tab strip) alongside focus management
 (focus restore on close, floating-group focus containment). Layout changes can
 also be narrated to screen readers via a built-in live region, with hooks
 ([`announcements`](/docs/advanced/accessibility#screen-reader-announcements),
@@ -69,15 +69,15 @@ gesture or an API call via `event.origin`. This is a
 v7's breaking changes are covered in full, with codemods, in
 [Migrating to v7](/docs/releases/migrating/migrating-to-v7):
 
-- **Package realignment** — React bindings moved from `dockview` to
+- **Package realignment**: React bindings moved from `dockview` to
   `dockview-react`; `dockview` is now JavaScript core.
-- **`rootOverlayModel` removed** — use [`dropOverlayModel`](/docs/core/dnd/overlay)
+- **`rootOverlayModel` removed**: use [`dropOverlayModel`](/docs/core/dnd/overlay)
   / `dndEdges` instead.
-- **`onDidActivePanelChange` payload** — now emits `{ panel, origin }` instead of
+- **`onDidActivePanelChange` payload**: now emits `{ panel, origin }` instead of
   the panel directly.
-- **`dockview-core` no longer bundles every feature** — use `dockview` (or a
+- **`dockview-core` no longer bundles every feature**: use `dockview` (or a
   framework package).
-- **API naming cleanups** — a few public types/events were renamed for
+- **API naming cleanups**: a few public types/events were renamed for
   consistency (e.g. `onUnhandledDragOverEvent` → `onUnhandledDragOver`,
   `PaneviewDropEvent` → `PaneviewDidDropEvent`) and some dead/deprecated members
   were removed. See [Migrating to v7](/docs/releases/migrating/migrating-to-v7) for the

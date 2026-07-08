@@ -12,7 +12,7 @@ import { DocRef } from '@site/src/components/ui/reference/docRef';
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `'auto'` (default) | HTML5 drives mouse drags; pointer events drive touch and pen drags.                                                                                                                                                                                |
 | `'pointer'`        | Pointer events drive every input type. Useful where HTML5 drag-and-drop is unreliable (some Linux browsers, certain Safari versions, embedded webviews). Cross-window HTML5 drag and the native browser drag image are not available in this mode. |
-| `'html5'`          | HTML5 drag-and-drop only — touch and pen drags are disabled.                                                                                                                                                                                       |
+| `'html5'`          | HTML5 drag-and-drop only; touch and pen drags are disabled.                                                                                                                                                                                       |
 
 `disableDnd: true` overrides every strategy. The strategy can also be changed at runtime via `api.updateOptions({ dndStrategy: ... })`; the change propagates to every existing drag source.
 
@@ -46,6 +46,6 @@ Under `'auto'` and `'pointer'`, touch drags use a long-press-then-drag gesture s
 
 ## See also
 
-- [Drag and drop](/docs/core/dnd/dragAndDrop) — the drag events and hooks the backend drives.
-- [External drag and drop events](/docs/core/dnd/external) — narrowing `nativeEvent` across the two backends.
-- [Disable drag and drop](/docs/core/dnd/disable) — `disableDnd` overrides every strategy.
+- [Drag and drop](/docs/core/dnd/dragAndDrop): the drag events and hooks the backend drives.
+- [External drag and drop events](/docs/core/dnd/external): narrowing `nativeEvent` across the two backends.
+- [Disable drag and drop](/docs/core/dnd/disable): `disableDnd` overrides every strategy.

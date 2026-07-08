@@ -85,7 +85,7 @@ const api = createDockview(parentElement, {
 <FrameworkSpecific framework='Vue'>
 
 Pass your panel components directly to `<DockviewVue>` via the `components`
-prop. This is the recommended pattern and works with `<script setup>` — no
+prop. This is the recommended pattern and works with `<script setup>`; no
 global `app.component(...)` registration is required.
 
 ```vue
@@ -108,7 +108,7 @@ function onReady(event: DockviewReadyEvent) {
 </template>
 ```
 
-Legacy Options-API style is still supported — components registered on any
+Legacy Options-API style is still supported; components registered on any
 ancestor via `components: { ... }` (or globally via `app.component(...)`) are
 resolved by name as before.
 
@@ -123,7 +123,7 @@ updated in place when you call `panel.api.updateParameters(...)`. `api`,
 ```tsx
 @Component({
     selector: 'panel-component-1',
-    template: `<div>Panel Content 1 — {{ params?.myCustomKey }}</div>`,
+    template: `<div>Panel Content 1: {{ params?.myCustomKey }}</div>`,
 })
 export class PanelComponent1 {
     @Input() params: { myCustomKey?: string };

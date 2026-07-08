@@ -45,9 +45,9 @@ const api = createDockview(element, {
 
 While dragging over an accepting group the compass shows:
 
-- **Inner cells** (`top` / `bottom` / `left` / `right` / `center`) — split this group on that edge, or `center` to
+- **Inner cells** (`top` / `bottom` / `left` / `right` / `center`): split this group on that edge, or `center` to
   tab into the group. These have the same result as today's cursor quadrants.
-- **Outer cells** (`top` / `bottom` / `left` / `right`) — dock against the **whole layout** edge, even though the
+- **Outer cells** (`top` / `bottom` / `left` / `right`): dock against the **whole layout** edge, even though the
   cursor is over a group.
 
 A cell is only shown when a drop there is actually possible, so the compass reflects exactly the legal drops for the
@@ -69,12 +69,12 @@ const api = createDockview(element, {
 });
 ```
 
-- `zones` — restrict which **inner** cells appear. For example `['center']` allows reorder / merge only.
+- `zones`: restrict which **inner** cells appear. For example `['center']` allows reorder / merge only.
   Defaults to all zones the target accepts.
-- `edges` — include the **outer** whole-layout-edge cells. Defaults to `true`; set `false` for group-only docking.
+- `edges`: include the **outer** whole-layout-edge cells. Defaults to `true`; set `false` for group-only docking.
 
 ## See also
 
-- [Smart Guides](/docs/core/dnd/smartGuides) — alignment snapping for floating groups.
-- [Drop overlay](/docs/core/dnd/overlay) — customise the overlay that previews the resolved drop zone.
-- [Drop Position Resolver](/docs/core/dnd/dropPosition) — a lower-level seam to override where a pointer maps to a drop position.
+- [Smart Guides](/docs/core/dnd/smartGuides): alignment snapping for floating groups.
+- [Drop overlay](/docs/core/dnd/overlay): customise the overlay that previews the resolved drop zone.
+- [Drop Position Resolver](/docs/core/dnd/dropPosition): a lower-level seam to override where a pointer maps to a drop position.

@@ -48,7 +48,7 @@ const api = createDockview(element, {
 ```
 </FrameworkSpecific>
 
-To enable dock-to-edge on only some edges, name them individually — `true`/`false` (or an omitted edge) toggles each of `top`, `bottom`, `left`, `right`:
+To enable dock-to-edge on only some edges, name them individually; `true`/`false` (or an omitted edge) toggles each of `top`, `bottom`, `left`, `right`:
 
 ```ts
 const api = createDockview(element, {
@@ -58,7 +58,7 @@ const api = createDockview(element, {
 });
 ```
 
-Dock-to-edge is **off by default** — leaving `dockToEdgeGroups` unset (or `false`) keeps the standard behaviour, where an edge must be created explicitly with `addEdgeGroup` and an emptied edge collapses to a strip rather than disappearing.
+Dock-to-edge is **off by default**; leaving `dockToEdgeGroups` unset (or `false`) keeps the standard behaviour, where an edge must be created explicitly with `addEdgeGroup` and an emptied edge collapses to a strip rather than disappearing.
 
 <CodeRunner id="dockview/auto-edge-groups" height={500} />
 
@@ -67,13 +67,13 @@ Dock-to-edge is **off by default** — leaving `dockToEdgeGroups` unset (or `fal
 While dragging a panel toward the layout edge there are two drop zones:
 
 - The **outer band**, hugging the true edge (marked by a coloured indicator line), docks the panel as a dedicated **edge group**.
-- Just **inside** it, the panel splits the primary grid as usual — the standard `dndEdges` behaviour.
+- Just **inside** it, the panel splits the primary grid as usual, the standard `dndEdges` behaviour.
 
 A newly revealed edge group is created **collapsed**: the drop adds a tab to its strip rather than popping the group open. Dropping onto an edge that already exists simply adds the panel to its tabs and leaves the group's collapsed/expanded state untouched. Combine with [auto-hide edge groups](/docs/core/groups/autoHideEdgeGroups) so a revealed edge peeks open on click.
 
 ## Zero footprint when empty
 
-An edge group created by a drag reveal is flagged to **tear down to zero footprint** once its last panel leaves — the edge occupies no space and shows no strip until something is dragged back to it. This is the difference from a normal edge group, which collapses to a persistent strip when emptied.
+An edge group created by a drag reveal is flagged to **tear down to zero footprint** once its last panel leaves: the edge occupies no space and shows no strip until something is dragged back to it. This is the difference from a normal edge group, which collapses to a persistent strip when emptied.
 
 Revealed edges still serialize and restore like any other edge group; a transient empty edge (mid-teardown) is never persisted.
 
@@ -81,14 +81,14 @@ Revealed edges still serialize and restore like any other edge group; a transien
 
 If the [drop guide](/docs/core/dnd/dropGuide) compass is also enabled, the two compose rather than conflict. A drop can target **either**:
 
-- the **grid layout edge** — the compass's outer ring, or
-- an **edge group** — the true outer edge band (drag-reveal).
+- the **grid layout edge**, the compass's outer ring, or
+- an **edge group**, the true outer edge band (drag-reveal).
 
 The distinction is by pointer depth: the compass's outer ring sits well inside the edge band, and the edge-group indicator takes over at the very edge.
 
 ## Revealing programmatically
 
-Reveal (create-or-fill) an edge group and move a dragged item into it — the primitive the drag affordance is built on:
+Reveal (create-or-fill) an edge group and move a dragged item into it, the primitive the drag affordance is built on:
 
 <DocRef declaration="DockviewApi" methods={['revealEdgeGroupWithData']} />
 
@@ -105,6 +105,6 @@ Dock-to-edge groups require both the edge-group and drag-and-drop overlay functi
 
 ## See also
 
-- [Edge groups](/docs/core/groups/edgeGroups) — creating, sizing, collapsing, and serializing edge groups
-- [Auto-hide edge groups](/docs/core/groups/autoHideEdgeGroups) — peek a collapsed edge group open on click
-- [Drag and drop](/docs/core/dnd/overview) — the `dndEdges` layout-edge drop zones
+- [Edge groups](/docs/core/groups/edgeGroups): creating, sizing, collapsing, and serializing edge groups
+- [Auto-hide edge groups](/docs/core/groups/autoHideEdgeGroups): peek a collapsed edge group open on click
+- [Drag and drop](/docs/core/dnd/overview): the `dndEdges` layout-edge drop zones

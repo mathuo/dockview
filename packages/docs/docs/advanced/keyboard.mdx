@@ -9,7 +9,7 @@ sidebar_custom_props:
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-Dockview can be driven entirely from the keyboard — switching tabs, moving focus
+Dockview can be driven entirely from the keyboard: switching tabs, moving focus
 between groups, and even docking a panel into a new position, all without a
 mouse. This page covers the built-in keymap and keyboard docking. For the
 accessibility semantics that back it (ARIA roles, screen-reader announcements,
@@ -54,7 +54,7 @@ const options = {
 };
 ```
 
-The keymap is rebindable — pass an object with a `keymap` to override individual
+The keymap is rebindable: pass an object with a `keymap` to override individual
 keys. Unset keys keep their defaults:
 
 ```ts
@@ -71,7 +71,7 @@ const options = {
 Each binding is a `+`-separated string, modifiers first. Recognised modifiers
 are `ctrl`, `shift`, `alt`, and `meta` (alias `cmd`); the final part is the
 [`KeyboardEvent.key`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key)
-to match, case-insensitively — e.g. `'ctrl+]'`, `'shift+f6'`, `'ctrl+tab'`.
+to match, case-insensitively, for example `'ctrl+]'`, `'shift+f6'`, `'ctrl+tab'`.
 
 ## Moving between tabs and groups
 
@@ -85,11 +85,11 @@ to match, case-insensitively — e.g. `'ctrl+]'`, `'shift+f6'`, `'ctrl+tab'`.
 | Move focus to the group in a direction          | `Ctrl+Shift+←/→/↑/↓` | `focusGroup{Left,Right,Up,Down}` |
 
 `F6` / `Shift+F6` cycle the groups in list order. `Ctrl+Shift+Arrows` jump to
-the visually adjacent group instead — the same geometry used by the
+the visually adjacent group instead, the same geometry used by the
 [`adjacentGroupInDirection`](/docs/advanced/focus-navigation) API, so mouse and
 keyboard agree on what "the group to the left" is. Once focus lands on the tab
 strip (via `Ctrl+Shift+\` or `F6`),
-the strip's own arrow-key navigation takes over — see
+the strip's own arrow-key navigation takes over. See
 [Accessibility](/docs/advanced/accessibility#keyboard-navigation).
 
 ## Keyboard docking
@@ -98,9 +98,9 @@ Press `Ctrl+M` to dock the active panel somewhere new without dragging. A live
 drop preview follows the current selection, and each step is announced to screen
 readers:
 
-1. **Pick a target group** — arrow keys cycle through the groups (including the
+1. **Pick a target group**: arrow keys cycle through the groups (including the
    panel's own, so you can split a tab out of its group); `Enter` selects one.
-2. **Pick an edge** — arrow keys choose a split edge (left / right / top /
+2. **Pick an edge**: arrow keys choose a split edge (left / right / top /
    bottom), or the centre to tab into the group; `Enter` commits the move.
 
 `Esc` steps back a phase, or cancels the move entirely from the first phase.

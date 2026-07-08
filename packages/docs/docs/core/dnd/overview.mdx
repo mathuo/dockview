@@ -1,12 +1,12 @@
 ---
 title: 'Overview'
 sidebar_position: 0
-description: Overview of built-in drag and drop capabilities in Dockview — tab reordering, group merging, and edge drop positions.
+description: Overview of built-in drag and drop capabilities in Dockview: tab reordering, group merging, and edge drop positions.
 ---
 
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-Dockview supports a wide variety of built-in Drag and Drop possibilities.
+Dockview supports a range of built-in drag and drop behaviours.
 
 #### Position a tab between two other tabs
 
@@ -60,13 +60,13 @@ Dockview supports a wide variety of built-in Drag and Drop possibilities.
 
 ## Touch and pen input
 
-Mouse drags use the browser's HTML5 drag-and-drop. Touch and pen drags are driven by a pointer-events backend with a long-press-to-drag gesture, so taps and native scroll still work on mobile. The backend is selected automatically and can be overridden — see [Dnd Strategy](./strategy) for the `dndStrategy` option and the full gesture table.
+Mouse drags use the browser's HTML5 drag-and-drop. Touch and pen drags are driven by a pointer-events backend with a long-press-to-drag gesture, so taps and native scroll still work on mobile. The backend is selected automatically and can be overridden. See [Dnd Strategy](./strategy) for the `dndStrategy` option and the full gesture table.
 
 ## Advanced drag-and-drop hooks
 
-Dockview exposes advanced drag-and-drop hooks — `onWillDragPanel`, `onWillDragGroup`, `onWillDrop` and `onWillShowOverlay` — for attaching metadata to drags, cancelling a drag, or customising the drop overlay. See [Dnd](./dragAndDrop) and [External Dnd Events](./external) for details.
+Dockview exposes advanced drag-and-drop hooks (`onWillDragPanel`, `onWillDragGroup`, `onWillDrop` and `onWillShowOverlay`) for attaching metadata to drags, cancelling a drag, or customising the drop overlay. See [Dnd](./dragAndDrop) and [External Dnd Events](./external) for details.
 
 ## Going further
 
-- [Drop Guide](./dropGuide) — show a VS Code-style aim-at-a-cell compass while dragging, or override where a drop lands with a pluggable position resolver.
-- [Smart Guides](./smartGuides) — alignment snapping and guide overlays for floating groups.
+- [Drop Guide](./dropGuide): show a VS Code-style aim-at-a-cell compass while dragging, or override where a drop lands with a pluggable position resolver.
+- [Smart Guides](./smartGuides): alignment snapping and guide overlays for floating groups.

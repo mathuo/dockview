@@ -6,7 +6,7 @@ sidebar_position: 2
 
 `DockviewApi` exposes a small set of framework-agnostic methods for moving
 focus between panels and groups programmatically. They work in every framework
-binding — useful for wiring up your own keyboard shortcut handlers. The rebindable keymap and keyboard docking are a separate,
+binding, useful for wiring up your own keyboard shortcut handlers. The rebindable keymap and keyboard docking are a separate,
 enterprise feature covered in [Keyboard Navigation](/docs/advanced/keyboard).
 
 ## Programmatic focus navigation
@@ -24,7 +24,7 @@ api.activatePrevious({ includePanel: true });
 :::info Renamed in v8
 These methods were previously called `moveToNext` / `moveToPrevious`. The old
 names still work as deprecated aliases but will be removed in a future major
-release — the new names make it clear they advance the active panel/group
+release; the new names make it clear they advance the active panel/group
 (focus) rather than relocating a panel.
 :::
 
@@ -65,5 +65,5 @@ const layout = api.groups.map((group) => ({
 
 ## See also
 
-- [Keyboard](/docs/advanced/keyboard) — the rebindable keymap and keyboard-driven docking built on top of these primitives
-- [Accessibility](/docs/advanced/accessibility) — the ARIA semantics and within-strip keyboard navigation Dockview ships by default
+- [Keyboard](/docs/advanced/keyboard): the rebindable keymap and keyboard-driven docking built on top of these primitives
+- [Accessibility](/docs/advanced/accessibility): the ARIA semantics and within-strip keyboard navigation Dockview ships by default

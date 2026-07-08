@@ -1,7 +1,7 @@
 ---
 title: Migrating to v7
 sidebar_position: 2
-description: How to upgrade from Dockview v6 to v7 — the package realignment and the breaking API changes.
+description: How to upgrade from Dockview v6 to v7: the package realignment and the breaking API changes.
 ---
 
 v7 realigns the package names so that **`dockview` is the framework-agnostic
@@ -11,20 +11,20 @@ consumer.
 
 | Package            | v6                       | v7                                                          |
 | ------------------ | ------------------------ | ----------------------------------------------------------- |
-| `dockview-core`    | JavaScript core (public) | JavaScript core — **internal implementation detail**        |
-| `dockview`         | **React bindings**       | JavaScript (re-export of `dockview-core`) — **recommended** |
+| `dockview-core`    | JavaScript core (public) | JavaScript core (**internal implementation detail**)        |
+| `dockview`         | **React bindings**       | JavaScript (re-export of `dockview-core`), **recommended** |
 | `dockview-react`   | Re-export of `dockview`  | **React bindings**                                          |
 | `dockview-vue`     | Vue bindings             | Vue bindings (now consume `dockview`)                       |
 | `dockview-angular` | Angular bindings         | Angular bindings (now consume `dockview`)                   |
 
-## React users — action required
+## React users: action required
 
 The React bindings **moved from `dockview` to `dockview-react`**. In v7 the
 `dockview` package is the JavaScript library (a re-export of
 `dockview-core`), so it no longer exports the React components.
 
 :::warning Symptoms if you don't migrate
-The React names are simply gone — core names like `DockviewComponent` still
+The React names are simply gone; core names like `DockviewComponent` still
 resolve from `dockview`, but the React components do not:
 
 - **TypeScript:** `error TS2305: Module '"dockview"' has no exported member 'DockviewReact'`
@@ -50,16 +50,16 @@ Install and import from `dockview-react`:
 ```
 
 A one-shot codemod for a source tree (uses `perl` for cross-platform in-place
-editing — works on macOS and Linux):
+editing; works on macOS and Linux):
 
 ```sh
 grep -rl "from 'dockview'" src | xargs perl -pi -e "s/from 'dockview'/from 'dockview-react'/g"
 ```
 
-## JavaScript users — recommended
+## JavaScript users: recommended
 
 `dockview-core` is now considered an internal implementation detail. Install the
-`dockview` package instead — it re-exports the entire core API.
+`dockview` package instead; it re-exports the entire core API.
 
 ```diff
 - npm install dockview-core
@@ -92,10 +92,10 @@ built-in features are no longer part of bare `dockview-core`:
   navigation / focus management / screen-reader announcements)
 
 These now live in the `dockview` package, which enables them automatically.
-**`dockview-core` is an internal package — use `dockview`** (or a framework
-package — `dockview-react` / `-vue` / `-angular`, which all consume `dockview`).
-Nothing throws if you stay on bare `dockview-core` — the affected features
-simply do nothing — and a one-time `console.warn` steers you to `dockview`.
+**`dockview-core` is an internal package; use `dockview`** (or a framework
+package: `dockview-react` / `-vue` / `-angular`, which all consume `dockview`).
+Nothing throws if you stay on bare `dockview-core` (the affected features
+simply do nothing) and a one-time `console.warn` steers you to `dockview`.
 
 ## Removed and changed APIs
 
@@ -117,7 +117,7 @@ model applied to the root drop target. Drop-overlay shaping is now driven by
 ```
 
 `dropOverlayModel` shapes the overlay **per drop target**; return `undefined` to
-keep the default for that target. It does **not** dispatch the `'edge'` target —
+keep the default for that target. It does **not** dispatch the `'edge'` target;
 if you used `rootOverlayModel` purely to size the outer edge overlay, use
 `dndEdges` instead.
 
@@ -153,19 +153,19 @@ The handler argument is now an object, so `panel.id` / `panel.api` read as
 
 The group-level `group.api.onDidActivePanelChange` is scoped to a single group;
 it keeps emitting the panel and additionally carries `origin` (its payload type
-is `DockviewGroupActivePanelChangeEvent`). This is additive — handlers reading
+is `DockviewGroupActivePanelChangeEvent`). This is additive; handlers reading
 `event.panel` keep working.
 
 ### Renamed types and events
 
-These are pure renames — the shape is unchanged, only the identifier moved.
+These are pure renames; the shape is unchanged, only the identifier moved.
 
 | v6                                      | v7                                      | Notes                                                                       |
 | --------------------------------------- | --------------------------------------- | --------------------------------------------------------------------------- |
-| `onUnhandledDragOverEvent`              | `onUnhandledDragOver`                   | Event on the Dockview / Paneview API — dropped the redundant `Event` suffix |
+| `onUnhandledDragOverEvent`              | `onUnhandledDragOver`                   | Event on the Dockview / Paneview API; dropped the redundant `Event` suffix |
 | `PaneviewDropEvent`                     | `PaneviewDidDropEvent`                  | Now matches `DockviewDidDropEvent`                                          |
 | `DockviewMaximizedGroupChanged`         | `DockviewMaximizedGroupChangeEvent`     | Now matches every other `…ChangeEvent` payload type                         |
-| `DockviewGroupPanelFloatingChangeEvent` | `DockviewGroupPanelLocationChangeEvent` | Payload of `onDidLocationChange` — name now reflects the event              |
+| `DockviewGroupPanelFloatingChangeEvent` | `DockviewGroupPanelLocationChangeEvent` | Payload of `onDidLocationChange`; name now reflects the event              |
 | `AddComponentOptions`                   | `AddGridviewComponentOptions`           | Now matches `AddSplitviewComponentOptions` / `AddPaneviewComponentOptions`  |
 | `Contraints`                            | `Constraints`                           | Typo fix (this type also feeds `AddPanelOptions`)                           |
 
@@ -185,7 +185,7 @@ These are pure renames — the shape is unchanged, only the identifier moved.
 
 ## Vue / Angular users
 
-No source changes required — keep installing `dockview-vue` / `dockview-angular`
+No source changes required; keep installing `dockview-vue` / `dockview-angular`
 and importing from them. Internally these now depend on `dockview` rather than
 `dockview-core`; this is transparent to consumers.
 

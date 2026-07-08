@@ -6,7 +6,7 @@ description: How to pass updated parameters to an existing panel in Dockview.
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-A panel's `params` can be changed after it has been created, and the panel and its tab re-render with the new values. Use this for small amounts of static view data — not application or dynamic panel state.
+A panel's `params` can be changed after it has been created, and the panel and its tab re-render with the new values. Use this for small amounts of static view data, not application or dynamic panel state.
 
 :::warning
 **Use this feature sparingly**: Anything you assign to the `params` options of a panel will be saved when calling `api.toJSON()`.
@@ -45,6 +45,6 @@ panel.api.updateParameters({
 
 ## See also
 
-- [Adding panels](/docs/core/panels/add) — set the initial `params` when the panel is first created.
-- [Rendering panels](/docs/core/panels/rendering) — how a panel re-renders in response to parameter changes.
-- [Panel API](/docs/api/dockview/panelApi) — the panel API surface that exposes `updateParameters`.
+- [Adding panels](/docs/core/panels/add): set the initial `params` when the panel is first created.
+- [Rendering panels](/docs/core/panels/rendering): how a panel re-renders in response to parameter changes.
+- [Panel API](/docs/api/dockview/panelApi): the panel API surface that exposes `updateParameters`.
