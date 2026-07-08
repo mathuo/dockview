@@ -58,21 +58,21 @@
     --ifm-color-content: #33384a;
     --ifm-color-content-secondary: #6b7186;
 
-    // ── Accent: ocean blue ────────────────────────────────────────
-    --ifm-color-primary: #2563eb;
-    --ifm-color-primary-dark: #1d4ed8;
-    --ifm-color-primary-darker: #1e40af;
-    --ifm-color-primary-darkest: #1e3a8a;
-    --ifm-color-primary-light: #3b82f6;
-    --ifm-color-primary-lighter: #60a5fa;
-    --ifm-color-primary-lightest: #93c5fd;
+    // ── Accent: brand blue (#2E74F0) ──────────────────────────────
+    --ifm-color-primary: #2e74f0;
+    --ifm-color-primary-dark: #1f6bef;
+    --ifm-color-primary-darker: #1565ef;
+    --ifm-color-primary-darkest: #0f5adb;
+    --ifm-color-primary-light: #3b7ef1;
+    --ifm-color-primary-lighter: #4584f2;
+    --ifm-color-primary-lightest: #6297f4;
 
     --dv-accent: var(--ifm-color-primary);
-    --dv-accent-strong: #3b82f6;
+    --dv-accent-strong: #3b7ef1;
     --dv-accent-contrast: #ffffff;
     // Solid block tints (no transparency) so they read as flat colour fields.
-    --dv-accent-soft: #e8eefc;
-    --dv-accent-soft-hover: #d8e3fb;
+    --dv-accent-soft: #e7effd;
+    --dv-accent-soft-hover: #d5e3fb;
 
     --ifm-link-color: var(--ifm-color-primary);
     --ifm-link-hover-color: var(--ifm-color-primary-dark);
@@ -81,7 +81,7 @@
     --ifm-code-background: #eef2fb;
     --ifm-code-border-radius: 6px;
 
-    --docusaurus-highlighted-code-line-bg: rgba(37, 99, 235, 0.08);
+    --docusaurus-highlighted-code-line-bg: rgba(46, 116, 240, 0.08);
 
     --dv-border: #e8e9f2;
     --dv-border-strong: #dcdeeb;
@@ -93,10 +93,10 @@
     --ifm-navbar-link-hover-color: var(--ifm-color-primary);
     --ifm-navbar-height: 4rem;
 
-    // Coloured header (ink) tokens
-    --dv-header-bg: #1b2547;
-    --dv-header-border: #2c3a6b;
-    --dv-header-fg: #cfd0e6;
+    // Coloured header (ink) tokens — brand navy (#0A1440)
+    --dv-header-bg: #0a1440;
+    --dv-header-border: #1c2a5e;
+    --dv-header-fg: #c8cbe4;
     --dv-header-fg-hover: #ffffff;
 
     --ifm-dropdown-background-color: #ffffff;
@@ -112,7 +112,7 @@
 
     --dv-docs-markdown-text-color: #474d61;
 
-    --ifm-hover-overlay: rgba(37, 99, 235, 0.06);
+    --ifm-hover-overlay: rgba(46, 116, 240, 0.06);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -125,24 +125,24 @@
     --ifm-color-content: #c7c9d6;
     --ifm-color-content-secondary: #9296ab;
 
-    --ifm-color-primary: #60a5fa;
-    --ifm-color-primary-dark: #3b82f6;
-    --ifm-color-primary-darker: #2563eb;
-    --ifm-color-primary-darkest: #1d4ed8;
-    --ifm-color-primary-light: #93c5fd;
-    --ifm-color-primary-lighter: #bfdbfe;
-    --ifm-color-primary-lightest: #dbeafe;
+    --ifm-color-primary: #5d94f4;
+    --ifm-color-primary-dark: #4f8bf3;
+    --ifm-color-primary-darker: #4584f2;
+    --ifm-color-primary-darkest: #2d75f0;
+    --ifm-color-primary-light: #6b9ef5;
+    --ifm-color-primary-lighter: #75a4f5;
+    --ifm-color-primary-lightest: #91b7f7;
 
     --dv-accent: var(--ifm-color-primary);
-    --dv-accent-strong: #93c5fd;
+    --dv-accent-strong: #91b7f7;
     --dv-accent-contrast: #0b0b12;
     // Solid block tints (no transparency) so they read as flat colour fields.
-    --dv-accent-soft: #17233f;
-    --dv-accent-soft-hover: #1f3050;
+    --dv-accent-soft: #16233f;
+    --dv-accent-soft-hover: #1d3054;
 
     --ifm-code-background: #17171f;
 
-    --docusaurus-highlighted-code-line-bg: rgba(96, 165, 250, 0.12);
+    --docusaurus-highlighted-code-line-bg: rgba(93, 148, 244, 0.12);
 
     --dv-border: #262636;
     --dv-border-strong: #33334a;
@@ -167,7 +167,7 @@
 
     --dv-docs-markdown-text-color: #a7abbd;
 
-    --ifm-hover-overlay: rgba(96, 165, 250, 0.1);
+    --ifm-hover-overlay: rgba(93, 148, 244, 0.1);
 
     .navbar {
         border-bottom: 1px solid var(--dv-border);
@@ -198,9 +198,23 @@
 
     .navbar__inner .DocSearch-Button,
     .navbar__inner .navbar__search-input {
-        background: #263157;
-        border-color: #34416f;
+        background: #16224e;
+        border-color: #28376e;
         color: var(--dv-header-fg);
+    }
+
+    // Colour-mode toggle: its icon path is filled with `currentColor`, which
+    // resolves to the near-black base font colour rather than the navbar link
+    // colour, so on the navy ink header it reads dark and mismatched. Set
+    // `color` (not `fill`) so currentColor picks up the header foreground and
+    // the icon matches the GitHub icon and links.
+    .navbar__inner button.clean-btn {
+        color: var(--dv-header-fg);
+    }
+
+    .navbar__inner button.clean-btn:hover {
+        color: var(--dv-header-fg-hover);
+        background: rgba(255, 255, 255, 0.08);
     }
 }
 
@@ -448,7 +462,7 @@ div[class^='announcementBar_'] {
                 color: #9333ea;
             }
             &.keyword {
-                color: #2563eb;
+                color: #2e74f0;
             }
         }
     }
@@ -466,7 +480,7 @@ div[class^='announcementBar_'] {
         color: #c084fc;
     }
     &.keyword {
-        color: #93c5fd;
+        color: #91b7f7;
     }
 }
 
