@@ -325,7 +325,7 @@ function TrialForm() {
 
             <button
                 type="submit"
-                className="button button--primary button--lg"
+                className="button button--primary"
                 disabled={status === 'submitting'}
                 style={{ width: '100%' }}
             >
@@ -370,7 +370,7 @@ export default function Trial(): JSX.Element {
                         }}
                     >
                         Evaluate Dockview&rsquo;s enterprise features for 30
-                        days — no payment required. Enter your details and
+                        days, no payment required. Enter your details and
                         we&rsquo;ll email you a licence key.
                     </p>
                     <TrialForm />
