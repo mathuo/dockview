@@ -37,7 +37,7 @@ const config = {
     baseUrl: process.env.CI ? `/` : '/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
-    favicon: 'img/dockview_logo.ico',
+    favicon: 'img/brand/dockview-favicon.svg',
 
     // GitHub pages deployment config.
     // If you aren't using GitHub pages, you don't need these.
@@ -180,6 +180,40 @@ const config = {
 
     headTags: [
         {
+            tagName: 'link',
+            attributes: {
+                rel: 'icon',
+                type: 'image/svg+xml',
+                href: '/img/brand/dockview-favicon.svg',
+            },
+        },
+        {
+            tagName: 'link',
+            attributes: {
+                rel: 'icon',
+                type: 'image/png',
+                sizes: '32x32',
+                href: '/img/brand/favicon-32.png',
+            },
+        },
+        {
+            tagName: 'link',
+            attributes: {
+                rel: 'icon',
+                type: 'image/png',
+                sizes: '16x16',
+                href: '/img/brand/favicon-16.png',
+            },
+        },
+        {
+            tagName: 'link',
+            attributes: {
+                rel: 'apple-touch-icon',
+                sizes: '180x180',
+                href: '/img/brand/apple-touch-icon-180.png',
+            },
+        },
+        {
             tagName: 'script',
             attributes: {
                 type: 'application/ld+json',
@@ -221,7 +255,7 @@ const config = {
     themeConfig:
         /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
         ({
-            image: 'img/splashscreenv2.png',
+            image: 'img/brand/og-image-1200x630.png',
             metadata: [
                 {
                     name: 'keywords',
@@ -274,8 +308,13 @@ const config = {
             navbar: {
                 title: 'Dockview',
                 logo: {
-                    alt: 'Dockview Logo',
-                    src: 'img/dockview_logo.svg',
+                    alt: 'Dockview logo',
+                    // Single constant-colour mark (teal/blue/rose/purple) that
+                    // reads on light, cream and navy alike, so the same file is
+                    // used in both themes. srcDark is set explicitly so
+                    // Docusaurus doesn't hide the (light-only) logo in dark mode.
+                    src: 'img/brand/dockview-mark.svg',
+                    srcDark: 'img/brand/dockview-mark.svg',
                 },
                 items: [
                     {

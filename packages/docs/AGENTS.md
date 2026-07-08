@@ -10,6 +10,8 @@ Documentation website built with Docusaurus v3.
 - `build-templates:local` - Generate templates using local package references
 - `typecheck` - Run TypeScript type checking
 
+**Do NOT format the docs package.** It is deliberately excluded from Prettier / `nx format` / `format:check`. Don't run Prettier on files under `packages/docs/` and don't "fix" formatting warnings here — CI does not check it.
+
 ## Documentation Structure
 
 ### Auto-Generated Content
