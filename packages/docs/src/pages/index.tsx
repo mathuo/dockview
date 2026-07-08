@@ -454,6 +454,12 @@ function CallToAction() {
                     >
                         Live demo
                     </Link>
+                    <Link
+                        to="/trial"
+                        className="button button--secondary button--lg"
+                    >
+                        Start free trial
+                    </Link>
                 </div>
             </div>
         </section>
