@@ -23,6 +23,7 @@ const sidebars = {
             items: [
                 'overview/introduction',
                 'overview/features',
+                'overview/editions',
                 'overview/quickstart',
                 'overview/installation',
                 {
