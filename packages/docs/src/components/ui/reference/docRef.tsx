@@ -1,5 +1,7 @@
 import * as React from 'react';
-import CodeBlock from '@theme/CodeBlock';
+import clsx from 'clsx';
+import { Highlight } from 'prism-react-renderer';
+import { usePrismTheme } from '@docusaurus/theme-common';
 import './docRef.scss';
 
 export interface DocRefProps {
@@ -43,6 +45,125 @@ type DocsJson = {
 
 const newJson = docsJson_ as ExportedTypeFile;
 
+// The set of declaration names that have their own entry in the generated docs
+// and can therefore be linked/expanded when they appear inside a type.
+const LINKABLE_TYPES = new Set(Object.keys(newJson));
+
+// Guard against runaway nesting when a type transitively references itself.
+const MAX_EXPANSION_DEPTH = 6;
+
+const humanKind: Record<string, string> = {
+    interface: 'interface',
+    class: 'class',
+    typeAlias: 'type',
+    enum: 'enum',
+    function: 'function',
+};
+
+/**
+ * Render a codified type signature with syntax highlighting, turning any
+ * reference to another documented dockview type into a clickable token. Clicking
+ * a token expands that type's definition inline so the underlying representation
+ * can be inspected (and drilled into) without leaving the page.
+ */
+const TypeCode = (props: { code: string; depth?: number }) => {
+    const depth = props.depth ?? 0;
+    const prismTheme = usePrismTheme();
+    const [expanded, setExpanded] = React.useState<string[]>([]);
+
+    const toggle = React.useCallback((name: string) => {
+        setExpanded((prev) =>
+            prev.includes(name)
+                ? prev.filter((n) => n !== name)
+                : [...prev, name]
+        );
+    }, []);
+
+    return (
+        <div className="doc-code-block">
+            <Highlight
+                theme={prismTheme}
+                code={props.code}
+                language="tsx"
+            >
+                {({ className, style, tokens, getLineProps, getTokenProps }) => (
+                    <pre className={clsx(className, 'doc-code')} style={style}>
+                        {tokens.map((line, i) => (
+                            <div {...getLineProps({ line })} key={i}>
+                                {line.map((token, key) => {
+                                    const tokenProps = getTokenProps({ token });
+                                    const name = token.content.trim();
+                                    const isLinkable =
+                                        depth < MAX_EXPANSION_DEPTH &&
+                                        LINKABLE_TYPES.has(name) &&
+                                        !token.types.includes('string') &&
+                                        !token.types.includes('comment');
+
+                                    if (!isLinkable) {
+                                        return <span {...tokenProps} key={key} />;
+                                    }
+
+                                    return (
+                                        <span
+                                            {...tokenProps}
+                                            key={key}
+                                            className={clsx(
+                                                tokenProps.className,
+                                                'doc-type-link',
+                                                expanded.includes(name) &&
+                                                    'doc-type-link--active'
+                                            )}
+                                            role="button"
+                                            tabIndex={0}
+                                            title={`Show ${name}`}
+                                            onClick={() => toggle(name)}
+                                            onKeyDown={(e) => {
+                                                if (
+                                                    e.key === 'Enter' ||
+                                                    e.key === ' '
+                                                ) {
+                                                    e.preventDefault();
+                                                    toggle(name);
+                                                }
+                                            }}
+                                        />
+                                    );
+                                })}
+                            </div>
+                        ))}
+                    </pre>
+                )}
+            </Highlight>
+            {expanded.map((name) => {
+                const target = newJson[name];
+                const targetCode = target ? codify(target) : null;
+                return (
+                    <div className="doc-type-expansion" key={name}>
+                        <div className="doc-type-expansion__header">
+                            <span className="doc-type-expansion__title">
+                                {humanKind[target?.kind] ?? 'type'} {name}
+                            </span>
+                            <button
+                                type="button"
+                                className="doc-type-expansion__close"
+                                onClick={() => toggle(name)}
+                                aria-label={`Hide ${name}`}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        {targetCode ? (
+                            <TypeCode code={targetCode} depth={depth + 1} />
+                        ) : (
+                            <span>{`No definition available for '${name}'`}</span>
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
+
 export const DocumentRef = (props: { value: TypeSystem.Type }) => {
     const code = React.useMemo(() => {
         if (!props.value) {
@@ -67,7 +188,7 @@ export const DocumentRef = (props: { value: TypeSystem.Type }) => {
         return null;
     }
 
-    return <CodeBlock language="tsx">{code}</CodeBlock>;
+    return <TypeCode code={code} />;
 };
 
 export const Text = (props: { content: DocsContent[] }) => {
@@ -181,7 +302,7 @@ const Row = (props: { doc: TypeSystem.Type }) => {
                 {/* <div>{'-'}</div> */}
                 <div>
                     <div>{comment && <Summary summary={comment} />}</div>
-                    <CodeBlock language="tsx">{codify(props.doc)}</CodeBlock>
+                    <TypeCode code={codify(props.doc) ?? ''} />
                 </div>
             </th>
         </tr>
@@ -224,10 +345,20 @@ export const DocRef = (props: DocRefProps) => {
         [props.declaration]
     );
 
-    const filteredDocs = React.useMemo(
-        () => (docs ? filter(docs, props.methods) : []),
-        [docs]
-    );
+    const filteredDocs = React.useMemo(() => {
+        if (!docs) {
+            return [];
+        }
+        // A type can surface the same member more than once. TypeDoc sometimes
+        // inlines inherited members into an interface that also records an
+        // `extends`, so a member appears via both paths. Collapse by name,
+        // letting the most-derived declaration win.
+        const byName = new Map<string, TypeSystem.Type>();
+        for (const row of filter(docs, props.methods)) {
+            byName.set((row as any).name, row);
+        }
+        return Array.from(byName.values());
+    }, [docs]);
 
     if (!docs) {
         return <span>{`Failed to find docs for '${props.declaration}'`}</span>;
