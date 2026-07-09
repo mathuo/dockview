@@ -17,7 +17,7 @@
 
 # Dockview Software Licence Agreement
 
-**Version 1.3 · Effective 2026-07-07**
+**Version 1.4 · Effective 2026-07-09**
 
 This Software Licence Agreement ("Agreement") is entered into between Dockview Ltd (registered in England and Wales under company number 17326398, with registered office at 8 Weald Close, Bromley, England, BR2 8PD) ("Licensor") and the individual or entity identified at the point of purchase ("Licensee"). By completing checkout and accepting these terms, or by signing an order form that references this Agreement, Licensee agrees to be bound by this Agreement.
 
@@ -27,8 +27,8 @@ This Software Licence Agreement ("Agreement") is entered into between Dockview L
 
 - **"Dockview"** means the dockview software library, including the enterprise features made available under this Agreement.
 - **"Enterprise Features"** means the components, modules, and functionality of Dockview that require a paid licence to access or use, as distinguished from any portions of Dockview that Licensor makes available under a separate open-source licence.
-- **"Licensed Application"** means the single software application or team identified by the app or team name provided by Licensee at the point of purchase. The Licensed Application covers all environments of that application (including development, staging, and production), all subdomains and deployments operated by Licensee for that application, and use of the application by its end-users in the ordinary course.
-- **"Licensed Developers"** means the number of individual developers, specified by Licensee at the point of purchase, who are authorised to use the Enterprise Features in the Licensed Application under this Agreement.
+- **"Licence Name"** means the name provided by Licensee at the point of purchase to identify this licence. The Licence Name is an administrative label, used by Licensee to distinguish this licence from its others; it does not limit or define the applications, projects, or environments in which the Enterprise Features may be used.
+- **"Licensed Developers"** means the number of individual developers, specified by Licensee at the point of purchase, who are authorised to use the Enterprise Features under this Agreement.
 - **"Annual Term"** means the twelve (12) month period beginning on the date of purchase and ending on the corresponding date in the following calendar year, and each subsequent twelve (12) month period for which Licensee has paid the applicable renewal fee.
 - **"Updates"** means any new versions of Dockview made generally available by Licensor, including patch releases, minor versions, and major version releases.
 - **"Documentation"** means the usage documentation for Dockview that Licensor makes generally available to licensees, as updated from time to time.
@@ -36,13 +36,13 @@ This Software Licence Agreement ("Agreement") is entered into between Dockview L
 
 ## 2. Grant of Licence
 
-Subject to the terms of this Agreement and payment of the applicable fees, Licensor grants Licensee a non-exclusive, non-transferable (except as permitted under Section 15) licence, for the duration of the Annual Term, for use by up to the number of Licensed Developers, to use the Enterprise Features in the Licensed Application. The licence is granted per developer and is scoped to the Licensed Application; use of Dockview's Enterprise Features by more developers than the number of Licensed Developers, or in any application or team other than the Licensed Application, requires a separate or expanded licence.
+Subject to the terms of this Agreement and payment of the applicable fees, Licensor grants Licensee a non-exclusive, non-transferable (except as permitted under Section 15) licence, for the duration of the Annual Term, for use by up to the number of Licensed Developers, to use the Enterprise Features in any number of software applications developed by or for Licensee. The licence is granted per developer: it is limited by the number of Licensed Developers and is not limited by the number of applications, projects, environments, or deployments in which the Enterprise Features are used. Use of Dockview's Enterprise Features by more developers than the number of Licensed Developers requires an expanded licence.
 
-The licence extends to Licensee and its Affiliates solely in connection with the Licensed Application. Any Licensed Developer employed or engaged by Licensee or an Affiliate may exercise the licence regardless of the country in which they are located, provided that the number of Licensed Developers is not exceeded. Licensee is responsible for the acts and omissions of its Affiliates under this Agreement as if they were Licensee's own.
+The licence extends to Licensee and its Affiliates. Any Licensed Developer employed or engaged by Licensee or an Affiliate may exercise the licence regardless of the country in which they are located, provided that the number of Licensed Developers is not exceeded. Licensee is responsible for the acts and omissions of its Affiliates under this Agreement as if they were Licensee's own.
 
 ## 3. Fees, Taxes, Renewal, and Refunds
 
-Fees are payable in advance for each Annual Term and are charged per Licensed Developer. The licence does not auto-renew; renewal is at Licensee's option at the then-current rate published by Licensor at the time of renewal. Subject to applicable law, Licensee may request a full refund within fourteen (14) days of the original purchase date by emailing enterprise@dockview.dev, provided that the Licensed Application is not used in production with the Enterprise Features after the refund is requested. No refunds are offered after the fourteen-day window, on renewals, or for partial Annual Terms.
+Fees are payable in advance for each Annual Term and are charged per Licensed Developer. The licence does not auto-renew; renewal is at Licensee's option at the then-current rate published by Licensor at the time of renewal. Subject to applicable law, Licensee may request a full refund within fourteen (14) days of the original purchase date by emailing enterprise@dockview.dev, provided that the Enterprise Features are not used in production after the refund is requested. No refunds are offered after the fourteen-day window, on renewals, or for partial Annual Terms.
 
 All fees are stated and payable in US dollars unless Licensor agrees otherwise in writing.
 
@@ -52,23 +52,20 @@ Licensee shall pay each invoiced amount in full and may not reduce it by any set
 
 ## 4. Perpetual Right to Versions Released During the Term
 
-Notwithstanding the expiry or non-renewal of the Annual Term, Licensee retains an irrevocable, perpetual, non-transferable (except as permitted under Section 15) right to continue using, in the Licensed Application, any version of Dockview — including any major version release — that was generally available during an Annual Term for which Licensee had paid in full. Renewal is required only to access Updates, new features, and support released after the Annual Term ends. The rights granted under this Section 4 do not survive termination of this Agreement by Licensor for material breach (see Section 8).
+Notwithstanding the expiry or non-renewal of the Annual Term, Licensee retains an irrevocable, perpetual, non-transferable (except as permitted under Section 15) right to continue using, in its software applications, any version of Dockview — including any major version release — that was generally available during an Annual Term for which Licensee had paid in full. Renewal is required only to access Updates, new features, and support released after the Annual Term ends. The rights granted under this Section 4 do not survive termination of this Agreement by Licensor for material breach (see Section 8).
 
 ## 5. Permitted Use and Restrictions
 
-Licensee may incorporate Dockview into the Licensed Application, distribute the Licensed Application to its end-users in compiled or bundled form as part of the application's normal operation, and permit those end-users to interact with the Licensed Application in the ordinary course. Licensee shall not:
+Licensee may incorporate Dockview into its software applications, distribute those applications to its end-users in compiled or bundled form as part of each application's normal operation, and permit those end-users to interact with those applications in the ordinary course. Licensee shall not:
 
-- Use the Enterprise Features in, or as part of, any software application other than the Licensed Application.
-- Redistribute, republish, sublicence, sell, rent, lease, or otherwise make the Enterprise Features available to third parties as a standalone library, component, framework, or service, or in any form that allows extraction or re-use independent of the Licensed Application.
+- Redistribute, republish, sublicence, sell, rent, lease, or otherwise make the Enterprise Features available to third parties as a standalone library, component, framework, or service, or in any form that allows a third party to extract or re-use the Enterprise Features independently of an application developed by or for Licensee.
 - Remove, alter, obscure, or circumvent any proprietary notices, copyright notices, or licence validation mechanisms contained in Dockview.
 - Reverse engineer, decompile, or disassemble Dockview except to the extent expressly permitted by applicable law.
 - Use Dockview or the Enterprise Features to build, distribute, or make available a software product, library, component, or service that is substantially similar in functionality or purpose to Dockview, or that is marketed as a dock layout, panel management, or window arrangement toolkit for other developers.
 
-If Licensee renames the Licensed Application or migrates it to a successor application performing substantially the same function, Licensee may continue to use the licence in the renamed or successor application by notifying Licensor in writing under Section 16.
-
 ## 6. Licence Validation
 
-Dockview may include a mechanism that verifies the validity of a licence key. Any such check is performed locally, using a licence key issued by Licensor, and does not require Dockview or the Licensed Application to contact Licensor's servers at runtime. Licence validation will not disable, degrade, time-limit, or otherwise interfere with the operation of the Licensed Application, and Licensor does not collect usage telemetry from the Licensed Application through it. This Section does not permit Licensee to remove or circumvent the validation mechanism, which remains subject to Section 5.
+Dockview may include a mechanism that verifies the validity of a licence key. Any such check is performed locally, using a licence key issued by Licensor, and does not require Dockview or the applications into which it is incorporated to contact Licensor's servers at runtime. Licence validation will not disable, degrade, time-limit, or otherwise interfere with the operation of those applications, and Licensor does not collect usage telemetry from them through it. This Section does not permit Licensee to remove or circumvent the validation mechanism, which remains subject to Section 5.
 
 ## 7. Updates and Support
 
@@ -86,7 +83,7 @@ Licensor warrants that:
 
 - it has the right and authority to grant the licence and to enter into this Agreement;
 - it has used commercially reasonable efforts to ensure that Dockview, as supplied by Licensor, does not contain any virus, worm, back door, disabling routine, or other code designed to disrupt, disable, damage, or provide unauthorised access to a system or its data;
-- Dockview, as supplied by Licensor, does not incorporate any open-source or other third-party component whose licence terms would require the Licensed Application, or any part of it, to be disclosed in source form, made available for the creation of derivative works, or redistributed at no charge; and
+- Dockview, as supplied by Licensor, does not incorporate any open-source or other third-party component whose licence terms would require any application into which Dockview is incorporated, or any part of it, to be disclosed in source form, made available for the creation of derivative works, or redistributed at no charge; and
 - Dockview will, when properly installed and used in accordance with the Documentation, perform materially in accordance with the Documentation.
 
 Licensee's sole and exclusive remedy, and Licensor's entire liability, for a breach of the final warranty above is for Licensor to correct or replace the affected part of Dockview within a reasonable time or, if Licensor cannot do so using reasonable efforts, to refund a pro-rata portion of the fees paid for the then-current Annual Term. These warranties do not apply to any failure caused by modification of Dockview by anyone other than Licensor, by use of Dockview other than in accordance with the Documentation, or by hardware, software, or data not supplied by Licensor.
@@ -123,11 +120,11 @@ The Receiving Party shall use the Disclosing Party's Confidential Information on
 
 Each party shall comply with the data protection laws applicable to it, including, where applicable, the UK GDPR and the Data Protection Act 2018. Licensor processes the limited personal data Licensee provides in connection with the purchase and administration of the licence (such as contact name, email address, and company name) as a controller, in accordance with its Privacy Policy, available at https://dockview.dev/enterprise/privacy.
 
-Dockview is a client-side software library supplied to Licensee. In the ordinary course, Licensor does not access or process personal data contained in or handled by the Licensed Application, and Licensee shall not supply such personal data to Licensor except as expressly agreed. Where the parties agree that Licensor will process personal data on Licensee's behalf, or where Licensee's procurement requirements call for it, the parties will enter into a data processing agreement incorporating the terms required by Article 28 of the UK GDPR and, for any restricted international transfer, the UK International Data Transfer Addendum and/or the European Commission's Standard Contractual Clauses. Licensor will make its standard data processing agreement available on request to enterprise@dockview.dev.
+Dockview is a client-side software library supplied to Licensee. In the ordinary course, Licensor does not access or process personal data contained in or handled by the applications into which Licensee incorporates Dockview, and Licensee shall not supply such personal data to Licensor except as expressly agreed. Where the parties agree that Licensor will process personal data on Licensee's behalf, or where Licensee's procurement requirements call for it, the parties will enter into a data processing agreement incorporating the terms required by Article 28 of the UK GDPR and, for any restricted international transfer, the UK International Data Transfer Addendum and/or the European Commission's Standard Contractual Clauses. Licensor will make its standard data processing agreement available on request to enterprise@dockview.dev.
 
 ## 15. Assignment
 
-Licensee may not assign or transfer this Agreement, or any rights granted under it, without Licensor's prior written consent, except that Licensee may assign this Agreement in its entirety, without consent, to a successor in interest in connection with a merger, acquisition, corporate reorganisation, or sale of all or substantially all of the assets associated with the Licensed Application, provided that Licensee gives Licensor written notice of the assignment under Section 16 within thirty (30) days. Licensor may assign this Agreement, in whole or in part, at its discretion.
+Licensee may not assign or transfer this Agreement, or any rights granted under it, without Licensor's prior written consent, except that Licensee may assign this Agreement in its entirety, without consent, to a successor in interest in connection with a merger, acquisition, corporate reorganisation, or sale of all or substantially all of Licensee's assets or business to which this Agreement relates, provided that Licensee gives Licensor written notice of the assignment under Section 16 within thirty (30) days. Licensor may assign this Agreement, in whole or in part, at its discretion.
 
 ## 16. Notices
 
