@@ -250,9 +250,18 @@ export class OverlayRenderContainer extends CompositeDisposable {
                     focusContainer.style.pointerEvents = 'none';
                 }
                 // When force-shown for an auto-hide peek, lift the overlay above
-                // the peek's own (opaque) backdrop so the content is visible;
-                // otherwise leave the default stacking.
-                focusContainer.style.zIndex = forceVisible ? '1000' : '';
+                // the peek's own (opaque) backdrop so the content is visible.
+                // For a floating panel the stacking is owned by
+                // `correctLayerPosition()` (tracks the window's aria-level and
+                // lifts the overlay above the floating window); leave it alone
+                // here so we don't clobber it back to the default and drop the
+                // content behind the window. Only reset to the default for a
+                // plain grid-docked overlay.
+                if (forceVisible) {
+                    focusContainer.style.zIndex = '1000';
+                } else if (panel.api.location.type !== 'floating') {
+                    focusContainer.style.zIndex = '';
+                }
 
                 // Clip to the peek's reveal window so an `always` panel emerges
                 // from the strip's inner edge as the container slides, rather

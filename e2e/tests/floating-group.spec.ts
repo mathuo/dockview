@@ -41,6 +41,63 @@ test.describe('floating groups', () => {
         expect(box.y).toBeGreaterThan(20);
     });
 
+    test('a floated always-rendered panel paints its content above the floating window', async ({
+        page,
+    }) => {
+        // Regression for the "blank floating window" bug: floating an
+        // `always`-rendered panel (its content lives in the overlay render
+        // container) mounted the overlay but dropped it *behind* the floating
+        // window's opaque background, so the content was invisible until the
+        // window was dragged (which re-applied the stacking via the aria-level
+        // observer). Existing float tests use the default `onlyWhenVisible`
+        // renderer, which mounts content inline and so never exercised this.
+        await page.goto('/e2e/fixtures/index.html');
+        await page.waitForFunction(() => (window as any).__ready === true);
+        await page.evaluate(() => (window as any).__dv.setupFloatingAlways());
+
+        // Content renders in the overlay container, not inline in the group.
+        const overlay = page.locator('.dv-render-overlay', {
+            hasText: 'floater',
+        });
+        await expect(overlay).toHaveCount(1);
+
+        // Hit-test the centre of the float: the topmost painted element there
+        // must be the overlay content, not the floating window's own (empty)
+        // content container occluding it. Playwright's `toBeVisible()` ignores
+        // z-index occlusion, so an `elementFromPoint` probe is required to catch
+        // this — it fails when `resize()` clobbers the overlay's floating
+        // z-index back to the grid default.
+        const probe = await page.evaluate(() => {
+            const ov = Array.from(
+                document.querySelectorAll('.dv-render-overlay')
+            ).find((el) => /floater/.test(el.textContent || ''));
+            if (!ov) {
+                return { hit: false, overlayZ: null as string | null };
+            }
+            const r = ov.getBoundingClientRect();
+            const top = document.elementFromPoint(
+                r.left + r.width / 2,
+                r.top + r.height / 2
+            );
+            return {
+                hit: !!top && ov.contains(top),
+                overlayZ: getComputedStyle(ov).zIndex,
+            };
+        });
+        expect(probe.hit).toBe(true);
+
+        // The overlay's resolved stacking must sit above the floating window
+        // itself (the `.dv-resize-container`, z 999) — the `+1` that lifts a
+        // float's content over its own window.
+        const windowZ = await page.evaluate(
+            () =>
+                getComputedStyle(
+                    document.querySelector('.dv-resize-container')!
+                ).zIndex
+        );
+        expect(Number(probe.overlayZ)).toBeGreaterThan(Number(windowZ));
+    });
+
     test('a floating group survives a serialization round-trip', async ({
         page,
     }) => {
