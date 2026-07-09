@@ -486,6 +486,32 @@ div[class^='announcementBar_'] {
 
 @import '~dockview/dist/styles/dockview.css';
 
+// ── Full-bleed /demo route ────────────────────────────────────────────────────
+// The demo is a full-viewport app. A plain `height: 100vh` container overflows
+// because the announcement bar (and newsletter widget) sit above/below it inside
+// #__docusaurus, so the page grows past the viewport and shows a scrollbar.
+// Make #__docusaurus a viewport-height flex column and let the main content fill
+// the remaining space, with no page scroll. Toggled by a class on <html> that
+// the demo page adds while mounted.
+html.dv-demo-route,
+html.dv-demo-route body {
+    overflow: hidden;
+}
+
+html.dv-demo-route #__docusaurus {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+html.dv-demo-route .main-wrapper {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
 // ── Docs sidebar ──────────────────────────────────────────────────────────────
 
 .menu {

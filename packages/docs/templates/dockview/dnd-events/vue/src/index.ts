@@ -172,7 +172,7 @@ const App = defineComponent({
                 </button>
             </div>
             <dockview-vue
-                class="example-dock dockview-theme-abyss"
+                class="example-dock ${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
                 @ready="onReady">
             </dockview-vue>
         </div>

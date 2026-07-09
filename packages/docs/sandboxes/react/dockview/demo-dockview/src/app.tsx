@@ -13,12 +13,10 @@ import {
     GetTabGroupChipContextMenuItemsParams,
     DEFAULT_TAB_GROUP_COLORS,
 } from 'dockview-react';
-// Side-effect import: registers the `dockview-enterprise` modules (pinned tabs,
-// smart guides, drop guide, auto-hide, context menu, tab-group chips, …) and
-// the license check into the global registry. Required now that the free
-// `dockview`/`dockview-react` packages no longer bundle them. The docs license
-// key is set in `index.tsx` so the demo isn't watermarked.
-import 'dockview-enterprise';
+// Registers the `dockview-enterprise` modules (pinned tabs, smart guides, drop
+// guide, auto-hide, context menu, tab-group chips, …) and the license check into
+// the global registry (a side effect of importing the package).
+import { LicenseManager } from 'dockview-enterprise';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import './app.scss';
@@ -38,7 +36,19 @@ import { MarketProvider } from './marketContext';
 import { WatchlistPanel } from './watchlistPanel';
 import { PriceAlertPanel } from './priceAlertPanel';
 import { PositionSummaryPanel } from './positionSummaryPanel';
-import { PanelColorsContext, DARK_COLORS, LIGHT_COLORS } from './panelTheme';
+import { ChartPanel } from './chartPanel';
+import { NewsPanel } from './newsPanel';
+import { FxTilesPanel } from './fxTilesPanel';
+import { SignalsPanel } from './signalsPanel';
+import { CorrelationPanel } from './correlationPanel';
+import { VolSurfacePanel } from './volSurfacePanel';
+import { MONO, VisibilityGate } from './panelKit';
+import {
+    PanelColorsContext,
+    DARK_COLORS,
+    LIGHT_COLORS,
+    usePanelColors,
+} from './panelTheme';
 import {
     ThemeBuilderState,
     ThemeCssOverrides,
@@ -46,6 +56,15 @@ import {
     getInitialStateFromTheme,
 } from './themeBuilder';
 import { Sidebar } from './themeBuilderModal';
+
+// Set the docs license key HERE (not only in index.tsx): the docs /demo page
+// loads this module (app.tsx) directly via ExampleFrame, never index.tsx, so
+// otherwise every dockview instance — including the nested FX Rates dockview —
+// renders the "Unlicensed" watermark. Runs at module load, before any dockview
+// is created; harmless if index.tsx also sets it (standalone/CodeSandbox).
+LicenseManager.setLicenseKey(
+    '[KeyId:DOCKVIEW-DOCS]_[Company:Dockview]_[Plan:team]_[AppName:Dockview_Docs]_[Email:enterprise@dockview.dev]_[ValidFrom:01_Jan_2025]_[ValidUntil:01_Jan_2099]__aaa294ecec1eed47'
+);
 
 export const ApiContext = React.createContext<DockviewApi | undefined>(
     undefined
@@ -84,56 +103,91 @@ const components = {
     default: (props: IDockviewPanelProps) => {
         const isDebug = React.useContext(DebugContext);
         const metadata = usePanelApiMetadata(props.api);
+        const c = usePanelColors();
 
-        const [firstRender, setFirstRender] = React.useState<string>('');
+        if (isDebug) {
+            return (
+                <div
+                    style={{
+                        height: '100%',
+                        overflow: 'auto',
+                        background: c.bg,
+                        color: c.text,
+                        border: '2px dashed orange',
+                        padding: 8,
+                        fontSize: '0.8em',
+                    }}
+                >
+                    <Option
+                        title="Panel Rendering Mode"
+                        value={metadata.renderer.value}
+                        onClick={() =>
+                            props.api.setRenderer(
+                                props.api.renderer === 'always'
+                                    ? 'onlyWhenVisible'
+                                    : 'always'
+                            )
+                        }
+                    />
+                    <Table data={metadata} />
+                </div>
+            );
+        }
 
-        React.useEffect(() => {
-            setFirstRender(new Date().toISOString());
-        }, []);
-
+        // Clean, theme-aware placeholder for generic / user-added panels: a
+        // faint dotted field with the panel title and an idle status line.
         return (
             <div
                 style={{
                     height: '100%',
-                    overflow: 'auto',
-                    position: 'relative',
-                    padding: 5,
-                    border: isDebug ? '2px dashed orange' : '',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                    background: c.bg,
+                    color: c.text,
+                    border: `1px solid ${c.border}`,
+                    backgroundImage: `radial-gradient(${c.border} 1px, transparent 1px)`,
+                    backgroundSize: '16px 16px',
                 }}
             >
                 <span
+                    className="material-symbols-outlined"
+                    style={{ fontSize: 26, color: c.textFaint }}
+                >
+                    monitoring
+                </span>
+                <div
                     style={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%,-50%)',
-                        pointerEvents: 'none',
-                        fontSize: '42px',
-                        opacity: 0.5,
+                        fontFamily: MONO,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: c.textSecondary,
                     }}
                 >
                     {props.api.title}
-                </span>
-
-                <div>{firstRender}</div>
-
-                {isDebug && (
-                    <div style={{ fontSize: '0.8em' }}>
-                        <Option
-                            title="Panel Rendering Mode"
-                            value={metadata.renderer.value}
-                            onClick={() =>
-                                props.api.setRenderer(
-                                    props.api.renderer === 'always'
-                                        ? 'onlyWhenVisible'
-                                        : 'always'
-                                )
-                            }
-                        />
-
-                        <Table data={metadata} />
-                    </div>
-                )}
+                </div>
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        fontSize: 10.5,
+                        color: c.textFaint,
+                    }}
+                >
+                    <span
+                        style={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: 6,
+                            background: c.green,
+                            boxShadow: `0 0 4px ${c.green}`,
+                        }}
+                    />
+                    Connected · idle
+                </div>
             </div>
         );
     },
@@ -159,19 +213,26 @@ const components = {
         );
     },
     fixedPlaceholder: (props: IDockviewPanelProps) => {
+        const c = usePanelColors();
         return (
             <div
                 style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    gap: 7,
                     height: '100%',
-                    color: 'rgba(255,255,255,0.6)',
-                    fontFamily: 'monospace',
-                    fontSize:
-                        props.params?.position === 'top' ? '13px' : '14px',
+                    color: c.textMuted,
+                    fontFamily: MONO,
+                    fontSize: props.params?.position === 'top' ? '13px' : '14px',
                 }}
             >
+                <span
+                    className="material-symbols-outlined"
+                    style={{ fontSize: 16, color: c.textFaint }}
+                >
+                    folder_open
+                </span>
                 <span>{props.params?.label as string}</span>
             </div>
         );
@@ -217,11 +278,56 @@ const components = {
         );
     },
     debuginfo: (props: IDockviewPanelProps) => <PanelDebugPanel {...props} />,
+    // Live-ticking panels are wrapped so they only re-render while visible
+    // (renderer:'always' keeps inactive tabs mounted). The blotter and news are
+    // static so they don't need gating.
     orders: () => <OrdersPanel />,
-    orderbook: () => <OrderBookPanel />,
-    watchlist: () => <WatchlistPanel />,
-    pricealert: () => <PriceAlertPanel />,
-    positionsummary: () => <PositionSummaryPanel />,
+    orderbook: (props: IDockviewPanelProps) => (
+        <VisibilityGate api={props.api}>
+            <OrderBookPanel />
+        </VisibilityGate>
+    ),
+    watchlist: (props: IDockviewPanelProps) => (
+        <VisibilityGate api={props.api}>
+            <WatchlistPanel />
+        </VisibilityGate>
+    ),
+    pricealert: (props: IDockviewPanelProps) => (
+        <VisibilityGate api={props.api}>
+            <PriceAlertPanel />
+        </VisibilityGate>
+    ),
+    positionsummary: (props: IDockviewPanelProps) => (
+        <VisibilityGate api={props.api}>
+            <PositionSummaryPanel />
+        </VisibilityGate>
+    ),
+    chart: (props: IDockviewPanelProps) => (
+        <VisibilityGate api={props.api}>
+            <ChartPanel />
+        </VisibilityGate>
+    ),
+    news: () => <NewsPanel />,
+    fxtiles: (props: IDockviewPanelProps) => (
+        <VisibilityGate api={props.api}>
+            <FxTilesPanel />
+        </VisibilityGate>
+    ),
+    signals: (props: IDockviewPanelProps) => (
+        <VisibilityGate api={props.api}>
+            <SignalsPanel />
+        </VisibilityGate>
+    ),
+    correlation: (props: IDockviewPanelProps) => (
+        <VisibilityGate api={props.api}>
+            <CorrelationPanel />
+        </VisibilityGate>
+    ),
+    volsurface: (props: IDockviewPanelProps) => (
+        <VisibilityGate api={props.api}>
+            <VolSurfacePanel />
+        </VisibilityGate>
+    ),
     eventlog: () => {
         const api = React.useContext(ApiContext);
         if (!api) return null;
@@ -387,13 +493,16 @@ const GroupDragGhost = (props: IDockviewGroupDragGhostProps) => {
     );
 };
 
-const ThemeContext = React.createContext<DockviewTheme | undefined>(undefined);
+export const ThemeContext = React.createContext<DockviewTheme | undefined>(
+    undefined
+);
 
 const DockviewDemo = (props: {
     theme?: DockviewTheme;
     showSidebar?: boolean;
     onCloseSidebar?: () => void;
     onChangeTheme?: (theme: DockviewTheme) => void;
+    onReady?: () => void;
 }) => {
     const [logLines, setLogLines] = React.useState<
         { text: string; timestamp?: Date; backgroundColor?: string }[]
@@ -499,7 +608,7 @@ const DockviewDemo = (props: {
         ];
 
         const loadLayout = () => {
-            const state = localStorage.getItem('dv-demo-state-v6');
+            const state = localStorage.getItem('dv-demo-state-v9');
 
             if (state) {
                 try {
@@ -508,13 +617,14 @@ const DockviewDemo = (props: {
                     setLayoutReady(true);
                     return;
                 } catch {
-                    localStorage.removeItem('dv-demo-state-v6');
+                    localStorage.removeItem('dv-demo-state-v9');
                 }
                 return;
             }
 
+            // The default layout is a serialized snapshot (fromJSON) that
+            // already includes the edge groups, so no populateEdgeGroups here.
             defaultConfig(api);
-            populateEdgeGroups(api);
 
             setLayoutReady(true);
         };
@@ -530,6 +640,17 @@ const DockviewDemo = (props: {
         setupEdgeGroups(event.api);
         setApi(event.api);
     };
+
+    // Signal the host once the layout is loaded and the dock becomes visible,
+    // so a loading overlay can fade out at the right moment rather than while
+    // the grid is still hidden.
+    const hasSignalledReady = React.useRef(false);
+    React.useEffect(() => {
+        if (layoutReady && !hasSignalledReady.current) {
+            hasSignalledReady.current = true;
+            props.onReady?.();
+        }
+    }, [layoutReady, props]);
 
     const [builderState, setBuilderState] = React.useState<ThemeBuilderState>(
         () => getInitialStateFromTheme(props.theme ?? themeAbyss)
@@ -591,6 +712,28 @@ const DockviewDemo = (props: {
             effectiveTheme.colorScheme === 'light' ? LIGHT_COLORS : DARK_COLORS,
         [effectiveTheme]
     );
+
+    // Briefly enable colour transitions when the light/dark scheme flips, so the
+    // dock crossfades between modes instead of hard-cutting. Scoped to the
+    // switch moment (a temporary class) so it never interferes with dragging,
+    // resizing or tab changes, and skipped under reduced-motion.
+    const [themeAnimating, setThemeAnimating] = React.useState(false);
+    const prevScheme = React.useRef(effectiveTheme.colorScheme);
+    React.useEffect(() => {
+        if (prevScheme.current === effectiveTheme.colorScheme) {
+            return;
+        }
+        prevScheme.current = effectiveTheme.colorScheme;
+        if (
+            typeof window !== 'undefined' &&
+            window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+        ) {
+            return;
+        }
+        setThemeAnimating(true);
+        const handle = window.setTimeout(() => setThemeAnimating(false), 350);
+        return () => window.clearTimeout(handle);
+    }, [effectiveTheme.colorScheme]);
 
     const getTabContextMenuItems = React.useCallback(
         ({ panel, group }: GetTabContextMenuItemsParams) => {
@@ -745,13 +888,20 @@ const DockviewDemo = (props: {
     const [debug, setDebug] = React.useState<boolean>(false);
     return (
         <div
-            className="dockview-demo"
+            className={`dockview-demo${
+                effectiveTheme.colorScheme === 'light'
+                    ? ' dockview-demo--light'
+                    : ''
+            }${themeAnimating ? ' dv-theme-animating' : ''}`}
             style={{
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
                 flexGrow: 1,
-                backgroundColor: 'rgba(0,0,50,0.25)',
+                backgroundColor:
+                    effectiveTheme.colorScheme === 'light'
+                        ? 'rgba(0,0,0,0.03)'
+                        : 'rgba(0,0,50,0.25)',
                 borderRadius: '8px',
                 position: 'relative',
                 ...css,
@@ -831,8 +981,14 @@ const DockviewDemo = (props: {
                     <div
                         style={{
                             width: '400px',
-                            backgroundColor: 'black',
-                            color: 'white',
+                            backgroundColor:
+                                effectiveTheme.colorScheme === 'light'
+                                    ? '#f6f8fa'
+                                    : 'black',
+                            color:
+                                effectiveTheme.colorScheme === 'light'
+                                    ? '#1f2328'
+                                    : 'white',
                             overflow: 'hidden',
                             fontFamily: 'monospace',
                             marginLeft: '10px',

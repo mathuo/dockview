@@ -27,7 +27,7 @@ function loadDefaultLayout(api: DockviewApi) {
     api.addPanel({ id: 'panel_5', component: 'default', title: 'Panel 5' });
 }
 
-const App = () => {
+const App = (props: { theme?: string }) => {
     const [api, setApi] = React.useState<DockviewApi>();
     const [canUndo, setCanUndo] = React.useState(false);
     const [canRedo, setCanRedo] = React.useState(false);
@@ -84,7 +84,7 @@ const App = () => {
                         enabled: true,
                         undoableProgrammaticMutations: true,
                     }}
-                    className="dockview-theme-abyss"
+                    className={props.theme || 'dockview-theme-abyss'}
                 />
             </div>
         </div>

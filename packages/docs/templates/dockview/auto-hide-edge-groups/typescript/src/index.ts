@@ -5,6 +5,7 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
     themeAbyss,
+    themeLight,
 } from 'dockview';
 
 // dockview.dev docs license key — replace with your own key in production.
@@ -30,7 +31,7 @@ class Panel implements IContentRenderer {
 }
 
 const api = createDockview(document.getElementById('app'), {
-    theme: themeAbyss,
+    theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
     // Enable Visual Studio-style pinnable tool windows on edge groups.
     autoHideEdgeGroups: true,
     createComponent: (options) => {

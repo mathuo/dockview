@@ -59,7 +59,7 @@ export class DefaultPanelComponent {
                 <dv-dockview
                     [components]="components"
                     [dndEdges]="dndEdges"
-                    className="dockview-theme-abyss"
+                    className="${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
                     (ready)="onReady($event)"
                     (didDrop)="onDidDrop($event)"
                 >

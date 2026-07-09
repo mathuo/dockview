@@ -6,6 +6,7 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
     themeAbyss,
+    themeLight,
 } from 'dockview';
 
 // dockview.dev docs license key — replace with your own key in production.
@@ -73,7 +74,12 @@ dockElement.className = 'example-dock';
 root.append(controls, dockElement);
 
 const api = createDockview(dockElement, {
-    theme: { ...themeAbyss, tabAnimation: 'smooth' },
+    theme: {
+        ...((window as any).__dockviewColorMode === 'light'
+            ? themeLight
+            : themeAbyss),
+        tabAnimation: 'smooth',
+    },
     disableFloatingGroups: true,
     createComponent: (options) => {
         switch (options.name) {

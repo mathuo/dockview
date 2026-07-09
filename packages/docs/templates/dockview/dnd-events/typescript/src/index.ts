@@ -5,6 +5,7 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
     themeAbyss,
+    themeLight,
 } from 'dockview';
 
 class Panel implements IContentRenderer {
@@ -72,7 +73,7 @@ dockElement.className = 'example-dock';
 root.append(toolbar, dockElement);
 
 const api: DockviewApi = createDockview(dockElement, {
-    theme: themeAbyss,
+    theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
     createComponent: (options) => {
         switch (options.name) {
             case 'default':

@@ -11,7 +11,7 @@ const components = {
     },
 };
 
-const App = () => {
+const App = (props: { theme?: string }) => {
     const onReady = (event: DockviewReadyEvent) => {
         const api = event.api;
 
@@ -45,7 +45,7 @@ const App = () => {
             components={components}
             dockToEdgeGroups={true}
             autoHideEdgeGroups={true}
-            className="dockview-theme-abyss"
+            className={props.theme || 'dockview-theme-abyss'}
         />
     );
 };

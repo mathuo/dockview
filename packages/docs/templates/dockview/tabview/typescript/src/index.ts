@@ -5,6 +5,7 @@ import {
     IContentRenderer,
     TabAnimation,
     themeAbyss,
+    themeLight,
 } from 'dockview';
 
 class Panel implements IContentRenderer {
@@ -41,7 +42,7 @@ dockElement.className = 'example-dock';
 layout.append(controls, dockElement);
 
 const api = createDockview(dockElement, {
-    theme: themeAbyss,
+    theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
     createComponent: (options) => {
         switch (options.name) {
             case 'default':

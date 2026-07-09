@@ -1,174 +1,204 @@
 import * as React from 'react';
 import { useMarket, useMarketDispatch, WATCHLIST_TICKERS } from './marketContext';
 import { usePanelColors } from './panelTheme';
+import {
+    PanelShell,
+    PanelHeader,
+    Chip,
+    Sparkline,
+    RangeBar,
+    useFlash,
+    tnum,
+    fmtPrice,
+    fmtNum,
+    fmtSigned,
+    fmtCompact,
+} from './panelKit';
 
-const Sparkline: React.FC<{ prices: number[]; color: string }> = ({ prices, color }) => {
-    const W = 56;
-    const H = 20;
-    if (prices.length < 2) return <div style={{ width: W, height: H }} />;
-    const min = Math.min(...prices);
-    const max = Math.max(...prices);
-    const range = max - min || 1;
-    const pts = prices
-        .map((p, i) => {
-            const x = (i / (prices.length - 1)) * W;
-            const y = H - ((p - min) / range) * (H - 4) - 2;
-            return `${x.toFixed(1)},${y.toFixed(1)}`;
-        })
-        .join(' ');
-    return (
-        <svg width={W} height={H} style={{ flexShrink: 0 }}>
-            <polyline
-                points={pts}
-                fill="none"
-                stroke={color}
-                strokeWidth="1.5"
-                strokeLinejoin="round"
-            />
-        </svg>
-    );
+const META: Record<string, { name: string; vol: number }> = {
+    'BTC/USD': { name: 'Bitcoin', vol: 2.4e10 },
+    AAPL: { name: 'Apple Inc.', vol: 5.1e10 },
+    MSFT: { name: 'Microsoft', vol: 3.3e10 },
+    NVDA: { name: 'NVIDIA Corp.', vol: 4.7e10 },
+    TSLA: { name: 'Tesla Inc.', vol: 2.9e10 },
 };
 
-function fmtPrice(price: number): string {
-    const decimals = price > 1000 ? 1 : 2;
-    return price.toLocaleString('en-US', {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals,
-    });
-}
-
-export const WatchlistPanel: React.FC = () => {
+const WatchRow: React.FC<{ ticker: string }> = ({ ticker }) => {
     const c = usePanelColors();
     const { selectedTicker, prices, histories } = useMarket();
     const dispatch = useMarketDispatch();
 
+    const price = prices[ticker] ?? 0;
+    const history = histories[ticker] ?? [price];
+    const open = history[0] ?? price;
+    const change = price - open;
+    const changePct = open > 0 ? (change / open) * 100 : 0;
+    const up = change >= 0;
+    const isSel = ticker === selectedTicker;
+    const low = Math.min(...history);
+    const high = Math.max(...history);
+    const flash = useFlash(price);
+
+    const [hover, setHover] = React.useState(false);
+    const meta = META[ticker] ?? { name: ticker, vol: 0 };
+
     return (
         <div
+            onClick={() => dispatch({ type: 'SELECT_TICKER', ticker })}
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
             style={{
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                background: c.bg,
-                color: c.text,
-                userSelect: 'none',
+                padding: '7px 10px 6px',
+                cursor: 'pointer',
+                borderBottom: `1px solid ${c.borderSubtle}`,
+                borderLeft: `2px solid ${isSel ? c.accent : 'transparent'}`,
+                background: isSel
+                    ? c.accentBg
+                    : hover
+                    ? c.surface
+                    : 'transparent',
             }}
         >
-            {/* Header */}
-            <div
-                style={{
-                    padding: '6px 12px',
-                    borderBottom: `1px solid ${c.border}`,
-                    fontSize: 11,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    color: c.textMuted,
-                    flexShrink: 0,
-                }}
-            >
-                Watchlist
-            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                    <div
+                        style={{
+                            ...tnum,
+                            fontSize: 12,
+                            fontWeight: 600,
+                            color: isSel ? c.accent : c.text,
+                        }}
+                    >
+                        {ticker}
+                    </div>
+                    <div
+                        style={{
+                            fontSize: 9.5,
+                            color: c.textFaint,
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                        }}
+                    >
+                        {meta.name}
+                    </div>
+                </div>
 
-            {/* Column headers */}
-            <div
-                style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr auto auto auto',
-                    gap: '0 8px',
-                    padding: '4px 12px',
-                    fontSize: 10,
-                    color: c.textFaint,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.06em',
-                    borderBottom: `1px solid ${c.borderSubtle}`,
-                    flexShrink: 0,
-                }}
-            >
-                <span>Symbol</span>
-                <span style={{ textAlign: 'right' }}>Price</span>
-                <span style={{ textAlign: 'right' }}>Chg%</span>
-                <span />
-            </div>
+                <Sparkline
+                    prices={history.slice(-40)}
+                    color={up ? c.green : c.red}
+                    width={54}
+                    height={22}
+                    fill
+                />
 
-            {/* Rows */}
-            <div style={{ flex: 1, overflow: 'auto' }}>
-                {WATCHLIST_TICKERS.map((ticker) => {
-                    const price = prices[ticker] ?? 0;
-                    const history = histories[ticker] ?? [price];
-                    const open = history[0] ?? price;
-                    const change = price - open;
-                    const changePct = open > 0 ? ((change / open) * 100) : 0;
-                    const up = change >= 0;
-                    const isSelected = ticker === selectedTicker;
-
-                    return (
-                        <div
-                            key={ticker}
-                            onClick={() => dispatch({ type: 'SELECT_TICKER', ticker })}
-                            style={{
-                                display: 'grid',
-                                gridTemplateColumns: '1fr auto auto auto',
-                                gap: '0 8px',
-                                padding: '7px 12px',
-                                alignItems: 'center',
-                                cursor: 'pointer',
-                                borderBottom: `1px solid ${c.bgSubtle}`,
-                                background: isSelected
-                                    ? c.blueBg
+                <div style={{ textAlign: 'right', minWidth: 74 }}>
+                    <div
+                        style={{
+                            ...tnum,
+                            fontSize: 12,
+                            fontWeight: 600,
+                            color: up ? c.green : c.red,
+                            padding: '0 3px',
+                            borderRadius: 3,
+                            display: 'inline-block',
+                            background:
+                                flash === 'up'
+                                    ? c.posStrong
+                                    : flash === 'down'
+                                    ? c.negStrong
                                     : 'transparent',
-                                borderLeft: isSelected
-                                    ? `2px solid ${c.blue}`
-                                    : '2px solid transparent',
-                                transition: 'background 0.15s',
-                            }}
-                            onMouseEnter={(e) => {
-                                if (!isSelected) {
-                                    (e.currentTarget as HTMLElement).style.background =
-                                        c.surface;
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (!isSelected) {
-                                    (e.currentTarget as HTMLElement).style.background =
-                                        'transparent';
-                                }
-                            }}
-                        >
-                            <span
-                                style={{
-                                    fontSize: 12,
-                                    fontWeight: 600,
-                                    fontFamily: 'monospace',
-                                    color: isSelected ? c.blue : c.text,
-                                }}
-                            >
-                                {ticker}
-                            </span>
-                            <span
-                                style={{
-                                    fontSize: 12,
-                                    fontFamily: 'monospace',
-                                    color: up ? c.green : c.red,
-                                    textAlign: 'right',
-                                }}
-                            >
-                                {fmtPrice(price)}
-                            </span>
-                            <span
-                                style={{
-                                    fontSize: 11,
-                                    fontFamily: 'monospace',
-                                    color: up ? c.green : c.red,
-                                    textAlign: 'right',
-                                    minWidth: 52,
-                                }}
-                            >
-                                {up ? '+' : ''}{changePct.toFixed(2)}%
-                            </span>
-                            <Sparkline prices={history.slice(-30)} color={up ? c.green : c.red} />
-                        </div>
-                    );
-                })}
+                            transition: 'background 0.3s ease',
+                        }}
+                    >
+                        {fmtPrice(price)}
+                    </div>
+                    <div style={{ ...tnum, fontSize: 10, color: up ? c.green : c.red }}>
+                        {fmtSigned(changePct)}%
+                    </div>
+                </div>
+            </div>
+
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    marginTop: 5,
+                }}
+            >
+                <span style={{ fontSize: 8.5, color: c.textFaint, width: 26 }}>
+                    {fmtNum(low, low >= 1000 ? 0 : 2)}
+                </span>
+                <div style={{ flex: 1 }}>
+                    <RangeBar
+                        low={low}
+                        high={high}
+                        value={price}
+                        color={up ? c.green : c.red}
+                    />
+                </div>
+                <span
+                    style={{
+                        fontSize: 8.5,
+                        color: c.textFaint,
+                        width: 26,
+                        textAlign: 'right',
+                    }}
+                >
+                    {fmtNum(high, high >= 1000 ? 0 : 2)}
+                </span>
+                <span
+                    style={{
+                        ...tnum,
+                        fontSize: 8.5,
+                        color: c.textFaint,
+                        width: 40,
+                        textAlign: 'right',
+                    }}
+                >
+                    ${fmtCompact(meta.vol)}
+                </span>
             </div>
         </div>
+    );
+};
+
+export const WatchlistPanel: React.FC = () => {
+    const c = usePanelColors();
+    const { prices, histories } = useMarket();
+
+    let adv = 0;
+    let dec = 0;
+    for (const t of WATCHLIST_TICKERS) {
+        const h = histories[t] ?? [prices[t] ?? 0];
+        if ((prices[t] ?? 0) >= (h[0] ?? 0)) {
+            adv++;
+        } else {
+            dec++;
+        }
+    }
+
+    return (
+        <PanelShell>
+            <PanelHeader pad="8px 12px 7px">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 11, fontWeight: 600 }}>Watchlist</span>
+                    <span style={{ ...tnum, fontSize: 10, color: c.textFaint }}>
+                        {WATCHLIST_TICKERS.length} symbols
+                    </span>
+                    <div style={{ marginLeft: 'auto', display: 'flex', gap: 5 }}>
+                        <Chip tone="green">▲ {adv}</Chip>
+                        <Chip tone="red">▼ {dec}</Chip>
+                    </div>
+                </div>
+            </PanelHeader>
+
+            <div className="dv-trade-scroll" style={{ flex: 1, overflow: 'auto' }}>
+                {WATCHLIST_TICKERS.map((ticker) => (
+                    <WatchRow key={ticker} ticker={ticker} />
+                ))}
+            </div>
+        </PanelShell>
     );
 };

@@ -6,6 +6,7 @@ import {
     IContentRenderer,
     IWatermarkRenderer,
     themeAbyss,
+    themeLight,
 } from 'dockview';
 
 const STORAGE_KEY = 'dockview_persistence_layout';
@@ -81,7 +82,7 @@ dockElement.className = 'example-dock';
 root.append(toolbar, dockElement);
 
 const api: DockviewApi = createDockview(dockElement, {
-    theme: themeAbyss,
+    theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
     createComponent: (options) => {
         switch (options.name) {
             case 'default':

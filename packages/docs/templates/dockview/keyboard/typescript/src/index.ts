@@ -6,6 +6,7 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
     themeAbyss,
+    themeLight,
 } from 'dockview';
 
 // dockview.dev docs license key — replace with your own key in production.
@@ -73,7 +74,7 @@ class Panel implements IContentRenderer {
 const container = document.getElementById('app')!;
 
 const api: DockviewApi = createDockview(container, {
-    theme: themeAbyss,
+    theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
     // Enable the built-in enterprise keymap: Ctrl+]/Ctrl+[ to switch tabs,
     // F6/Shift+F6 to move between groups, Ctrl+M to dock.
     keyboardNavigation: true,

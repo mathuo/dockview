@@ -6,6 +6,7 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
     themeAbyss,
+    themeLight,
 } from 'dockview';
 
 const positions: DockviewHeaderPosition[] = ['top', 'bottom', 'left', 'right'];
@@ -58,7 +59,7 @@ class Panel implements IContentRenderer {
 }
 
 const api: DockviewApi = createDockview(document.getElementById('app')!, {
-    theme: themeAbyss,
+    theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
     defaultHeaderPosition: 'bottom',
     createComponent: (options) => {
         switch (options.name) {

@@ -6,6 +6,7 @@ import {
     IContentRenderer,
     SerializedDockview,
     themeAbyss,
+    themeLight,
 } from 'dockview';
 
 class Panel implements IContentRenderer {
@@ -99,7 +100,7 @@ applySize(slider.value);
 root.append(toolbar, dock);
 
 const api: DockviewApi = createDockview(dockWrapper, {
-    theme: themeAbyss,
+    theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
     createComponent: (options) => {
         switch (options.name) {
             case 'default':

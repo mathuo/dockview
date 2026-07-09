@@ -6,6 +6,7 @@ import {
     IContentRenderer,
     positionToDirection,
     themeAbyss,
+    themeLight,
 } from 'dockview';
 
 class Panel implements IContentRenderer {
@@ -104,7 +105,7 @@ dockElement.className = 'example-dock';
 root.append(controls, status, dockElement);
 
 const api: DockviewApi = createDockview(dockElement, {
-    theme: themeAbyss,
+    theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
     dndEdges: {
         size: { value: 100, type: 'pixels' },
         activationSize: { value: 5, type: 'percentage' },

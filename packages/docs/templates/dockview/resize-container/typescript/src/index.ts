@@ -5,6 +5,7 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
     themeAbyss,
+    themeLight,
 } from 'dockview';
 
 class Panel implements IContentRenderer {
@@ -63,7 +64,7 @@ slider.addEventListener('input', () => applySize(slider.value));
 root.append(controls, dock);
 
 const api: DockviewApi = createDockview(dockWrapper, {
-    theme: themeAbyss,
+    theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
     createComponent: (options) => {
         switch (options.name) {
             case 'default':

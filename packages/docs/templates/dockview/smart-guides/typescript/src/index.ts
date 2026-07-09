@@ -5,6 +5,7 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
     themeAbyss,
+    themeLight,
 } from 'dockview';
 
 // dockview.dev docs license key — replace with your own key in production.
@@ -45,7 +46,7 @@ dockElement.className = 'example-dock';
 root.append(controls, dockElement);
 
 const api = createDockview(dockElement, {
-    theme: themeAbyss,
+    theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
     // Snap floating groups to each other (and to container edges) when dragged
     // within 8px of an alignment.
     smartGuides: { snapDistance: 8 },

@@ -1,10 +1,11 @@
 import React from 'react';
 import Layout from '@theme/Layout';
-import Head from '@docusaurus/Head';
+import { useColorMode } from '@docusaurus/theme-common';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import { themeConfig } from '../config/theme.config';
 import ExampleFrame from '../components/ui/exampleFrame';
 import BrowserOnly from '@docusaurus/BrowserOnly';
-import { DockviewTheme, themeAbyss } from 'dockview-react';
+import { DockviewTheme, themeAbyss, themeLight } from 'dockview-react';
 import styles from './demo.module.css';
 
 const CODESANDBOX_URL =
@@ -15,6 +16,21 @@ const updateTheme = (theme: DockviewTheme) => {
     urlParams.set('theme', theme.name);
     const newUrl = window.location.pathname + '?' + urlParams.toString();
     window.history.pushState({ path: newUrl }, '', newUrl);
+};
+
+// The dock theme tracks the site's light/dark mode. Abyss is the flagship dark
+// look used across the site; themeLight is its clean light counterpart.
+const pairedTheme = (colorMode: 'light' | 'dark'): DockviewTheme =>
+    colorMode === 'dark' ? themeAbyss : themeLight;
+
+// Drop an explicit ?theme= choice when we revert to following the site mode, so
+// the URL reflects "following the switch" rather than a stale manual pick.
+const clearThemeParam = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.delete('theme');
+    const query = urlParams.toString();
+    const newUrl = window.location.pathname + (query ? '?' + query : '');
+    window.history.replaceState({ path: newUrl }, '', newUrl);
 };
 
 // `variant` is locked at mount so rotating mid-session doesn't yank the
@@ -31,18 +47,36 @@ const resolveVariant = (): 'mobile' | 'desktop' => {
 };
 
 const DemoPage: React.FC = () => {
-    const [theme, setTheme] = React.useState<DockviewTheme>(themeAbyss);
-    const [showSidebar, setShowSidebar] = React.useState(false);
-    const variant = React.useMemo(resolveVariant, []);
-
-    React.useEffect(() => {
+    const { colorMode } = useColorMode();
+    const markSrc = useBaseUrl('/img/brand/dockview-mark.svg');
+    const [theme, setTheme] = React.useState<DockviewTheme>(() => {
+        // Honour a ?theme= deep link on first load, otherwise start from the
+        // theme paired with the current site colour mode.
         const urlParams = new URLSearchParams(window.location.search);
         const themeName = urlParams.get('theme');
-        const newTheme =
-            themeConfig.find((c) => c.id.name === themeName)?.id ?? themeAbyss;
-        setTheme(newTheme);
-        updateTheme(newTheme);
-    }, []);
+        return (
+            themeConfig.find((c) => c.id.name === themeName)?.id ??
+            pairedTheme(colorMode)
+        );
+    });
+    const [showSidebar, setShowSidebar] = React.useState(false);
+    const [ready, setReady] = React.useState(false);
+    const variant = React.useMemo(resolveVariant, []);
+
+    // Full-follow: after mount, toggling the site light/dark switch re-syncs the
+    // dock theme to the paired theme and drops any explicit ?theme= pick. The
+    // mount run is skipped so a deep link survives first load; the picker and
+    // theme builder still override freely between toggles.
+    const isFirstRender = React.useRef(true);
+    React.useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+        const next = pairedTheme(colorMode);
+        setTheme(next);
+        clearThemeParam();
+    }, [colorMode]);
 
     if (variant === 'mobile') {
         return (
@@ -59,20 +93,19 @@ const DemoPage: React.FC = () => {
     return (
         <>
             <div className={styles.header}>
-                <a href="/" className={styles.backLink}>
-                    <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    >
-                        <path d="M19 12H5M12 5l-7 7 7 7" />
-                    </svg>
-                    dockview.dev
+                <a
+                    href="/"
+                    className={styles.backLink}
+                    title="Back to dockview.dev"
+                >
+                    <img
+                        className={styles.brandMark}
+                        src={markSrc}
+                        alt=""
+                        width={20}
+                        height={20}
+                    />
+                    <span className={styles.wordmark}>dockview</span>
                 </a>
                 <div className={styles.spacer} />
                 <div className={styles.tip}>
@@ -137,28 +170,69 @@ const DemoPage: React.FC = () => {
                     className={`${styles.toggleButton} ${
                         showSidebar ? styles.toggleButtonActive : ''
                     }`}
-                    title={showSidebar ? 'Close sidebar' : 'Open sidebar'}
+                    title={showSidebar ? 'Close panel' : 'Open controls & theme'}
                     aria-pressed={showSidebar}
                     onClick={() => setShowSidebar((v) => !v)}
                 >
-                    Controls & Theme
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                    >
+                        <line x1="4" y1="21" x2="4" y2="14" />
+                        <line x1="4" y1="10" x2="4" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="12" />
+                        <line x1="12" y1="8" x2="12" y2="3" />
+                        <line x1="20" y1="21" x2="20" y2="16" />
+                        <line x1="20" y1="12" x2="20" y2="3" />
+                        <line x1="1" y1="14" x2="7" y2="14" />
+                        <line x1="9" y1="8" x2="15" y2="8" />
+                        <line x1="17" y1="16" x2="23" y2="16" />
+                    </svg>
+                    Controls &amp; Theme
                 </button>
             </div>
-            <ExampleFrame
-                theme={theme}
-                framework="react"
-                height="100%"
-                id="dockview/demo-dockview"
-                extraProps={{
-                    showSidebar,
-                    onCloseSidebar: () => setShowSidebar(false),
-                    onChangeTheme: (t: DockviewTheme) => {
-                        setTheme(t);
-                        updateTheme(t);
-                    },
-                }}
-            />
+            <div className={styles.demoBody}>
+                <ExampleFrame
+                    theme={theme}
+                    framework="react"
+                    height="100%"
+                    id="dockview/demo-dockview"
+                    extraProps={{
+                        showSidebar,
+                        onCloseSidebar: () => setShowSidebar(false),
+                        onChangeTheme: (t: DockviewTheme) => {
+                            setTheme(t);
+                            updateTheme(t);
+                        },
+                        onReady: () => setReady(true),
+                    }}
+                />
+                <DemoLoader visible={!ready} />
+            </div>
         </>
+    );
+};
+
+const DemoLoader: React.FC<{ visible: boolean }> = ({ visible }) => {
+    const src = useBaseUrl('/img/brand/dockview-loader-dock.svg');
+    return (
+        <div
+            className={`${styles.loader}${
+                visible ? '' : ' ' + styles.loaderHidden
+            }`}
+            role="status"
+            aria-label="Loading demo"
+            aria-hidden={!visible}
+        >
+            <img src={src} alt="" width={96} height={96} />
+        </div>
     );
 };
 
@@ -167,6 +241,7 @@ const MobileDemo: React.FC<{
     onChangeTheme: (theme: DockviewTheme) => void;
 }> = ({ theme, onChangeTheme }) => {
     const [sheetOpen, setSheetOpen] = React.useState(false);
+    const [ready, setReady] = React.useState(false);
 
     return (
         <>
@@ -237,12 +312,16 @@ const MobileDemo: React.FC<{
                     </svg>
                 </button>
             </div>
-            <ExampleFrame
-                theme={theme}
-                framework="react"
-                height="100%"
-                id="dockview/demo-dockview-mobile"
-            />
+            <div className={styles.demoBody}>
+                <ExampleFrame
+                    theme={theme}
+                    framework="react"
+                    height="100%"
+                    id="dockview/demo-dockview-mobile"
+                    extraProps={{ onReady: () => setReady(true) }}
+                />
+                <DemoLoader visible={!ready} />
+            </div>
             {sheetOpen && (
                 <ThemeBottomSheet
                     activeTheme={theme}
@@ -325,15 +404,23 @@ const ThemeBottomSheet: React.FC<{
 };
 
 export default function Demo() {
+    // The site navbar is removed for this route by the Navbar swizzle
+    // (src/theme/Navbar), so /demo is a full-bleed application shell. The
+    // dv-demo-route class (see custom.scss) makes #__docusaurus a viewport-height
+    // flex column so this fills the space left by the announcement bar without a
+    // page scrollbar.
+    React.useEffect(() => {
+        document.documentElement.classList.add('dv-demo-route');
+        return () =>
+            document.documentElement.classList.remove('dv-demo-route');
+    }, []);
+
     return (
         <Layout noFooter={true}>
-            <Head>
-                <style>{'.navbar { display: none !important; }'}</style>
-            </Head>
             <div
                 style={{
-                    height: '100vh',
                     flexGrow: 1,
+                    minHeight: 0,
                     display: 'flex',
                     flexDirection: 'column',
                 }}
@@ -349,6 +436,7 @@ import {
     DropdownMenuItem,
     DropdownMenuContent,
     DropdownMenuTrigger,
+    DropdownMenuPortal,
 } from '@radix-ui/react-dropdown-menu';
 
 const ThemeSelector = (props: {
@@ -388,31 +476,41 @@ const ThemeSelector = (props: {
                         {selectedLabel}
                     </div>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent
-                    side="bottom"
-                    align="end"
-                    sideOffset={10}
-                    className="DropdownMenuContent"
-                >
-                    {props.options.map((option) => {
-                        return (
-                            <DropdownMenuItem
-                                data-dropdown-menu-value={option.value}
-                                onClick={() => props.onChanged(option.value)}
-                                className="DropdownMenuItem"
-                            >
-                                <div className="framework-menu-item">
-                                    <span>{option.label}</span>
-                                    <span>
-                                        {option.value === props.value
-                                            ? '✓'
-                                            : ''}
-                                    </span>
-                                </div>
-                            </DropdownMenuItem>
-                        );
-                    })}
-                </DropdownMenuContent>
+                {/* Portal to document.body so the fixed popper wrapper lands
+                    in the root stacking context. Without it the wrapper is
+                    trapped in an ancestor context the dockview paints above, so
+                    the menu appears behind the resize sashes despite its high
+                    z-index. */}
+                <DropdownMenuPortal>
+                    <DropdownMenuContent
+                        side="bottom"
+                        align="end"
+                        sideOffset={10}
+                        className="DropdownMenuContent"
+                        style={{ zIndex: 100000 }}
+                    >
+                        {props.options.map((option) => {
+                            return (
+                                <DropdownMenuItem
+                                    data-dropdown-menu-value={option.value}
+                                    onClick={() =>
+                                        props.onChanged(option.value)
+                                    }
+                                    className="DropdownMenuItem"
+                                >
+                                    <div className="framework-menu-item">
+                                        <span>{option.label}</span>
+                                        <span>
+                                            {option.value === props.value
+                                                ? '✓'
+                                                : ''}
+                                        </span>
+                                    </div>
+                                </DropdownMenuItem>
+                            );
+                        })}
+                    </DropdownMenuContent>
+                </DropdownMenuPortal>
             </DropdownMenu>
         </div>
     );

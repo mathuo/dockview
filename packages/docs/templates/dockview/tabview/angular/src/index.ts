@@ -34,7 +34,7 @@ export class DefaultPanelComponent {
                     [components]="components"
                     [theme]="theme"
                     [disableFloatingGroups]="true"
-                    className="dockview-theme-abyss"
+                    className="${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
                     (ready)="onReady($event)">
                 </dv-dockview>
             </div>

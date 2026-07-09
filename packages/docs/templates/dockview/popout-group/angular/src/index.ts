@@ -224,7 +224,7 @@ export class RightHeaderActionsComponent implements OnInit, OnDestroy {
                     [watermarkComponent]="watermarkComponent"
                     [leftHeaderActionsComponent]="leftHeaderActionsComponent"
                     [rightHeaderActionsComponent]="rightHeaderActionsComponent"
-                    className="dockview-theme-abyss"
+                    className="${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
                     (ready)="onReady($event)">
                 </dv-dockview>
             </div>

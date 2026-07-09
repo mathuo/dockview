@@ -7,6 +7,7 @@ import {
     PanelUpdateEvent,
     Parameters,
     themeAbyss,
+    themeLight,
 } from 'dockview';
 
 class DefaultPanel implements IContentRenderer {
@@ -113,7 +114,7 @@ class DefaultTab implements ITabRenderer {
 }
 
 const api = createDockview(document.getElementById('app')!, {
-    theme: themeAbyss,
+    theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
     // A lone tab in a group fills the entire header width.
     singleTabMode: 'fullwidth',
     createComponent: (options) => {

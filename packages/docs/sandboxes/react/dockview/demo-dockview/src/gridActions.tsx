@@ -6,31 +6,8 @@ import {
     populateEdgeGroups,
     setupEdgeGroups,
 } from './defaultLayout';
-
-const btnStyle: React.CSSProperties = {
-    padding: '4px 10px',
-    fontSize: 11,
-    border: '1px solid rgba(255,255,255,0.12)',
-    borderRadius: 4,
-    background: 'rgba(255,255,255,0.04)',
-    color: 'rgba(255,255,255,0.7)',
-    cursor: 'pointer',
-};
-
-const btnActiveStyle: React.CSSProperties = {
-    ...btnStyle,
-    background: 'rgba(72,100,220,0.25)',
-    borderColor: 'rgba(72,100,220,0.5)',
-    color: 'white',
-};
-
-const iconBtnStyle: React.CSSProperties = {
-    ...btnStyle,
-    padding: '3px 6px',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-};
+import { SB } from './sidebarTheme';
+import { Btn, IconBtn } from './sidebarKit';
 
 const Row = (props: {
     label?: string;
@@ -42,7 +19,7 @@ const Row = (props: {
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            padding: '4px 16px',
+            padding: '5px 0',
             minHeight: 30,
             ...props.style,
         }}
@@ -51,8 +28,9 @@ const Row = (props: {
             <span
                 style={{
                     flex: 1,
-                    fontSize: 11,
-                    color: 'rgba(255,255,255,0.5)',
+                    fontSize: 12,
+                    color: SB.text,
+                    fontFamily: SB.ui,
                 }}
             >
                 {props.label}
@@ -107,10 +85,11 @@ const EdgeGroupToggles = (props: { api: DockviewApi }) => {
             <div
                 style={{
                     display: 'flex',
-                    background: 'rgba(255,255,255,0.05)',
-                    borderRadius: 4,
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    overflow: 'hidden',
+                    background: SB.surface,
+                    borderRadius: SB.radiusSm,
+                    border: `1px solid ${SB.border}`,
+                    padding: 3,
+                    gap: 3,
                 }}
             >
                 {EDGE_POSITIONS.map((pos) => (
@@ -118,16 +97,17 @@ const EdgeGroupToggles = (props: { api: DockviewApi }) => {
                         key={pos}
                         onClick={() => toggle(pos)}
                         style={{
-                            padding: '3px 8px',
+                            padding: '3px 9px',
                             fontSize: 11,
+                            fontWeight: active[pos] ? 600 : 500,
+                            fontFamily: SB.ui,
                             border: 'none',
+                            borderRadius: 5,
                             cursor: 'pointer',
-                            background: active[pos]
-                                ? 'rgba(255,255,255,0.15)'
-                                : 'transparent',
-                            color: active[pos]
-                                ? 'white'
-                                : 'rgba(255,255,255,0.5)',
+                            background: active[pos] ? SB.accent : 'transparent',
+                            color: active[pos] ? SB.accentContrast : SB.muted,
+                            boxShadow: active[pos] ? SB.glow : 'none',
+                            transition: 'background 0.12s, color 0.12s',
                         }}
                     >
                         {pos}
@@ -194,11 +174,13 @@ const PopoverComponent = (props: {
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%,-50%)',
-                    backgroundColor: '#161b22',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: 8,
-                    color: 'white',
+                    background: SB.bg,
+                    border: `1px solid ${SB.border}`,
+                    borderRadius: SB.radius,
+                    color: SB.text,
+                    fontFamily: SB.ui,
                     padding: 16,
+                    boxShadow: SB.shadowLg,
                 }}
             >
                 <props.component close={props.close} />
@@ -233,13 +215,13 @@ export const GridActions = (props: { api?: DockviewApi }) => {
     };
 
     const onLoad = () => {
-        const state = localStorage.getItem('dv-demo-state-v6');
+        const state = localStorage.getItem('dv-demo-state-v9');
         if (state) {
             try {
                 props.api?.fromJSON(JSON.parse(state));
             } catch (err) {
                 console.error('failed to load state', err);
-                localStorage.removeItem('dv-demo-state-v6');
+                localStorage.removeItem('dv-demo-state-v9');
             }
         }
     };
@@ -248,13 +230,13 @@ export const GridActions = (props: { api?: DockviewApi }) => {
         if (props.api) {
             const state = props.api.toJSON();
             console.log(state);
-            localStorage.setItem('dv-demo-state-v6', JSON.stringify(state));
+            localStorage.setItem('dv-demo-state-v9', JSON.stringify(state));
         }
     };
 
     const onReset = () => {
         if (props.api) {
-            localStorage.removeItem('dv-demo-state-v6');
+            localStorage.removeItem('dv-demo-state-v9');
             try {
                 props.api.clear();
                 setupEdgeGroups(props.api);
@@ -286,50 +268,43 @@ export const GridActions = (props: { api?: DockviewApi }) => {
     };
 
     return (
-        <div style={{ padding: '4px 0' }}>
+        <div style={{ padding: '2px 0' }}>
             <Row>
-                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                    <button style={btnStyle} onClick={onLoad}>
+                <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+                    <Btn onClick={onLoad} icon="folder_open">
                         Load
-                    </button>
-                    <button style={btnStyle} onClick={onSave}>
+                    </Btn>
+                    <Btn onClick={onSave} icon="save">
                         Save
-                    </button>
-                    <button style={btnStyle} onClick={onClear}>
+                    </Btn>
+                    <Btn onClick={onClear} icon="clear_all">
                         Clear
-                    </button>
-                    <button style={btnStyle} onClick={onReset}>
+                    </Btn>
+                    <Btn onClick={onReset} icon="restart_alt">
                         Reset
-                    </button>
+                    </Btn>
                 </div>
             </Row>
             {props.api && <EdgeGroupToggles api={props.api} />}
             <Row>
-                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                    <button style={btnStyle} onClick={() => onAddPanel()}>
+                <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+                    <Btn onClick={() => onAddPanel()} icon="add">
                         Add Panel
-                    </button>
-                    <button
-                        style={iconBtnStyle}
+                    </Btn>
+                    <IconBtn
                         onClick={() => onAddPanel({ advanced: true })}
+                        icon="tune"
                         title="Advanced panel options"
-                    >
-                        <span
-                            className="material-symbols-outlined"
-                            style={{ fontSize: 14 }}
-                        >
-                            tune
-                        </span>
-                    </button>
-                    <button
-                        style={btnStyle}
+                    />
+                    <Btn
                         onClick={() => onAddPanel({ nested: true })}
+                        icon="dashboard"
                     >
                         Nested
-                    </button>
-                    <button style={btnStyle} onClick={onAddGroup}>
+                    </Btn>
+                    <Btn onClick={onAddGroup} icon="add_box">
                         Add Group
-                    </button>
+                    </Btn>
                 </div>
             </Row>
         </div>

@@ -6,6 +6,7 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
     themeAbyss,
+    themeLight,
 } from 'dockview';
 
 // dockview.dev docs license key — replace with your own key in production.
@@ -51,7 +52,7 @@ dockElement.className = 'example-dock';
 layout.append(controls, dockElement);
 
 const api: DockviewApi = createDockview(dockElement, {
-    theme: themeAbyss,
+    theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
     // Wrap tabs onto multiple rows when they no longer fit on one row.
     overflow: { mode: 'wrap' },
     createComponent: (options) => {

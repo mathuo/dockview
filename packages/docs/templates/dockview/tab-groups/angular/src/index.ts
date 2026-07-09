@@ -65,7 +65,7 @@ export class DefaultPanelComponent {
                     [getTabGroupChipContextMenuItems]="
                         getTabGroupChipContextMenuItems
                     "
-                    className="dockview-theme-abyss"
+                    className="${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
                     (ready)="onReady($event)"
                 >
                 </dv-dockview>

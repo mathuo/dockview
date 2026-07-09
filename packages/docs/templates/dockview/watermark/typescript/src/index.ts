@@ -7,6 +7,7 @@ import {
     IDockviewGroupPanel,
     IWatermarkRenderer,
     themeAbyss,
+    themeLight,
     WatermarkRendererInitParameters,
 } from 'dockview';
 
@@ -112,7 +113,7 @@ const app = document.getElementById('app');
 app.append(root);
 
 const api = createDockview(container, {
-    theme: themeAbyss,
+    theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
     createComponent: (options) => {
         switch (options.name) {
             case 'default':

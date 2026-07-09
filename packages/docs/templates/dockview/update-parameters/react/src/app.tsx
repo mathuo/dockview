@@ -57,7 +57,7 @@ const tabComponents = {
     },
 };
 
-export const App: React.FC = (props: { theme?: string }) => {
+export const App: React.FC<{ theme?: string }> = (props) => {
     const onReady = (event: DockviewReadyEvent) => {
         event.api.addPanel({
             id: 'panel_1',

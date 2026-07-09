@@ -7,6 +7,7 @@ import {
     IGroupHeaderProps,
     IHeaderActionsRenderer,
     themeAbyss,
+    themeLight,
 } from 'dockview';
 
 // dockview.dev docs license key — replace with your own key in production.
@@ -113,7 +114,7 @@ class RightHeaderActions implements IHeaderActionsRenderer {
 }
 
 const api = createDockview(document.getElementById('app')!, {
-    theme: themeAbyss,
+    theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
     // Enable pinned tabs, which stay ahead of the other tabs and never overflow.
     pinnedTabs: { enabled: true },
     createComponent: (options) => {

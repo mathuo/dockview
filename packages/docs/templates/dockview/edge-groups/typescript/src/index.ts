@@ -7,6 +7,7 @@ import {
     IGroupHeaderProps,
     IHeaderActionsRenderer,
     themeAbyss,
+    themeLight,
 } from 'dockview';
 
 class Panel implements IContentRenderer {
@@ -82,7 +83,7 @@ class RightHeaderAction implements IHeaderActionsRenderer {
 }
 
 const api = createDockview(document.getElementById('app'), {
-    theme: themeAbyss,
+    theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
     createComponent: (options) => {
         switch (options.name) {
             case 'default':
