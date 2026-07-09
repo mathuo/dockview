@@ -22,7 +22,7 @@ const components = {
     default: Default,
 };
 
-export default () => {
+export default (props: { theme?: string }) => {
     const [api, setApi] = React.useState<DockviewApi>();
     const [headerPosition, setHeaderPosition] =
         React.useState<DockviewHeaderPosition>('top');
@@ -178,7 +178,7 @@ export default () => {
             </div>
             <div className="example-dock">
                 <DockviewReact
-                    className={'dockview-theme-abyss'}
+                    className={props.theme || 'dockview-theme-abyss'}
                     onReady={onReady}
                     components={components}
                     theme={{

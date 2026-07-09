@@ -34,7 +34,7 @@ const components = {
     },
 };
 
-export const App: React.FC = (props: { theme?: string }) => {
+export const App: React.FC<{ theme?: string }> = (props) => {
     const onReady = (event: DockviewReadyEvent) => {
         const panel = event.api.addPanel({
             id: 'panel_1',

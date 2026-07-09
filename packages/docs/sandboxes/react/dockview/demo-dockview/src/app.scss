@@ -1,4 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
+
+// Thin, unobtrusive scrollbars for the trading panels' scroll areas.
+.dv-trade-scroll {
+    scrollbar-width: thin;
+}
+.dv-trade-scroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+.dv-trade-scroll::-webkit-scrollbar-thumb {
+    background: rgba(128, 128, 128, 0.35);
+    border-radius: 4px;
+}
+.dv-trade-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(128, 128, 128, 0.55);
+}
+.dv-trade-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+// ── "Controls & Theme" side panel ─────────────────────────────────────────────
+// Custom range slider (thin track with an accent fill + a clean thumb), input
+// focus ring, and the panel slide-in. Pseudo-elements / keyframes can't be inline.
+.dv-sb-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 5px;
+    border-radius: 999px;
+    outline: none;
+    cursor: pointer;
+    background: linear-gradient(
+        to right,
+        var(--ifm-color-primary, #5d94f4) 0 var(--fill, 0%),
+        var(--dv-border, rgba(255, 255, 255, 0.14)) var(--fill, 0%) 100%
+    );
+}
+.dv-sb-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    background: var(--ifm-color-primary, #5d94f4);
+    border: 2px solid var(--ifm-background-surface-color, #14141d);
+    box-shadow: var(--dv-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.4));
+    cursor: pointer;
+}
+.dv-sb-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--ifm-background-surface-color, #14141d);
+    border-radius: 999px;
+    background: var(--ifm-color-primary, #5d94f4);
+    box-shadow: var(--dv-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.4));
+    cursor: pointer;
+}
+.dv-sb-slider:focus-visible::-webkit-slider-thumb {
+    outline: 2px solid var(--ifm-color-primary, #5d94f4);
+    outline-offset: 2px;
+}
+
+.dv-sb-input:focus {
+    border-color: var(--ifm-color-primary, #5d94f4) !important;
+    box-shadow: 0 0 0 3px
+        color-mix(in srgb, var(--ifm-color-primary, #5d94f4) 18%, transparent);
+}
+
+.dv-sb-panel {
+    animation: dvSbSlideIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes dvSbSlideIn {
+    from {
+        transform: translateX(18px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .dv-sb-panel {
+        animation: none;
+    }
+    .dv-sb-slider::-webkit-slider-thumb,
+    .dv-sb-slider::-moz-range-thumb {
+        transition: none;
+    }
+}
+
+// The demo chrome puts a permanent accent `outline` on every button/input
+// (see `.dockview-demo button/input` further down). The side panel styles its
+// own controls via the kit, so strip that leaked outline here and use a clean
+// focus-visible ring for keyboard users instead.
+.dockview-demo .dv-sb-panel {
+    button,
+    input,
+    select,
+    input:focus,
+    select:focus {
+        outline: none !important;
+    }
+
+    button:focus-visible,
+    select:focus-visible,
+    input[type='text']:focus-visible,
+    input[type='color']:focus-visible {
+        outline: 2px solid var(--ifm-color-primary, #5d94f4) !important;
+        outline-offset: 1px;
+    }
+}
+
 .dockview-demo {
+    // Control colours are tokenised so the demo chrome tracks the dockview
+    // theme. Defaults suit the dark themes; the light modifier below swaps them
+    // for legible values on light dockview themes. The indigo accent is the
+    // brand colour and reads on both.
+    --demo-btn-bg: #1c254a;
+    --demo-btn-bg-hover: #222e62;
+    --demo-btn-color: #ffffff;
+    --demo-accent: #4c65d4;
+    --demo-accent-selected: #4864dc;
+
+    &.dockview-demo--light {
+        --demo-btn-bg: #e9edfb;
+        --demo-btn-bg-hover: #dbe1f7;
+        --demo-btn-color: #1c254a;
+    }
+
+    // Brief crossfade applied only while the light/dark scheme flips (toggled by
+    // a timer in app.tsx), so colour transitions never interfere with dragging,
+    // resizing or tab changes.
+    &.dv-theme-animating,
+    &.dv-theme-animating * {
+        transition: background-color 0.3s ease, color 0.3s ease,
+            border-color 0.3s ease, outline-color 0.3s ease, fill 0.3s ease;
+    }
+
     .group-control {
         .action {
             padding: 4px;
@@ -31,29 +169,29 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: #1c254a;
-        color: white;
+        background-color: var(--demo-btn-bg);
+        color: var(--demo-btn-color);
         border: none;
         cursor: pointer;
-        outline: 1px solid #4c65d4;
+        outline: 1px solid var(--demo-accent);
 
         &:focus {
-            outline: 1px solid #4c65d4 !important;
+            outline: 1px solid var(--demo-accent) !important;
         }
 
         &:hover {
-            background-color: #222e62;
+            background-color: var(--demo-btn-bg-hover);
         }
     }
 
     input {
-        outline: 1px solid #4c65d4;
+        outline: 1px solid var(--demo-accent);
         border: none;
         margin: 0px;
         height: 25px;
 
         &:focus {
-            outline: 1px solid #4c65d4 !important;
+            outline: 1px solid var(--demo-accent) !important;
         }
     }
 
@@ -80,7 +218,7 @@
             // display: flex;
 
             .selected {
-                background-color: #4864dc;
+                background-color: var(--demo-accent-selected);
             }
         }
 
@@ -97,11 +235,11 @@
             display: flex;
             flex-grow: 1;
             align-items: center;
-            outline: 1px solid #4c65d4;
+            outline: 1px solid var(--demo-accent);
         }
 
         .demo-icon-button {
-            outline: 1px solid #4c65d4;
+            outline: 1px solid var(--demo-accent);
             flex-grow: 1;
             display: flex;
             align-items: center;

@@ -9,7 +9,9 @@
   animation-duration: 200ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
-  z-index: 99;
+  /* Above the dockview's resize sashes / drag overlays (which go up to ~9999)
+     so the demo's theme dropdown isn't clipped behind them. */
+  z-index: 100000;
 }
 .DropdownMenuContent[data-side='top'],
 .DropdownMenuSubContent[data-side='top'] {

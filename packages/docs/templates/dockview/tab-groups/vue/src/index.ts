@@ -6,6 +6,7 @@ import {
     DockviewReadyEvent,
     IDockviewPanelProps,
     themeAbyss,
+    themeLight,
 } from 'dockview-vue';
 
 // dockview.dev docs license key — replace with your own key in production.
@@ -33,7 +34,12 @@ const App = defineComponent({
     },
     data() {
         return {
-            theme: { ...themeAbyss, tabAnimation: 'smooth' as const },
+            theme: {
+                ...((window as any).__dockviewColorMode === 'light'
+                    ? themeLight
+                    : themeAbyss),
+                tabAnimation: 'smooth' as const,
+            },
             getTabGroupChipContextMenuItems: () =>
                 ['rename', 'colorPicker', 'collapse', 'close'] as const,
         };

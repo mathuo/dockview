@@ -53,7 +53,7 @@ export class FloatMenuItemComponent implements IContextMenuItemComponentProps {
         <div class="example-layout">
             <div class="example-dock">
                 <dv-dockview
-                    className="dockview-theme-abyss"
+                    className="${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
                     [components]="components"
                     [getTabContextMenuItems]="getTabContextMenuItems"
                     (ready)="onReady($event)"

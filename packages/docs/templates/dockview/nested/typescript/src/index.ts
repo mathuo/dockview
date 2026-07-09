@@ -5,6 +5,7 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
     themeAbyss,
+    themeLight,
 } from 'dockview';
 
 class Panel implements IContentRenderer {
@@ -45,7 +46,7 @@ class InnerDockview implements IContentRenderer {
 
     init(): void {
         this._innerApi = createDockview(this._element, {
-            theme: themeAbyss,
+            theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
             createComponent: (options) => {
                 switch (options.name) {
                     case 'default':
@@ -79,7 +80,7 @@ class InnerDockview implements IContentRenderer {
 }
 
 const api: DockviewApi = createDockview(document.getElementById('app')!, {
-    theme: themeAbyss,
+    theme: (window as any).__dockviewColorMode === 'light' ? themeLight : themeAbyss,
     createComponent: (options) => {
         switch (options.name) {
             case 'default':

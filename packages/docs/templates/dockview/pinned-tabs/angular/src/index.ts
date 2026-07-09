@@ -116,7 +116,7 @@ export class PinHeaderActionComponent implements OnInit, OnDestroy {
                     [components]="components"
                     [pinnedTabs]="pinnedTabs"
                     [rightHeaderActionsComponent]="rightHeaderActionsComponent"
-                    className="dockview-theme-abyss"
+                    className="${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
                     (ready)="onReady($event)"
                 >
                 </dv-dockview>

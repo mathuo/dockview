@@ -111,7 +111,7 @@ const App = defineComponent({
         <div class="example-dock">
           <dockview-vue
             style="width:100%;height:100%"
-            class="dockview-theme-abyss"
+            class="${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
             @ready="onReady"
             watermarkComponent="watermarkComponent"
           ></dockview-vue>

@@ -13,7 +13,7 @@ const components = {
     default: Default,
 };
 
-export default () => {
+export default (props: { theme?: string }) => {
     const onReady = (event: DockviewReadyEvent) => {
         event.api.addPanel({
             id: 'panel_1',
@@ -54,7 +54,7 @@ export default () => {
 
     return (
         <DockviewReact
-            className={'dockview-theme-abyss'}
+            className={props.theme || 'dockview-theme-abyss'}
             onReady={onReady}
             components={components}
         />

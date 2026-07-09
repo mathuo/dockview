@@ -290,7 +290,7 @@ const App = defineComponent({
         <button @click="onToggleEnabled">{{ (disableFloatingGroups ? 'Enable' : 'Disable') + ' floating groups' }}</button>
       </div>
       <dockview-vue
-        class="example-dock dockview-theme-abyss"
+        class="example-dock ${(window as any).__dockviewThemeClass ?? 'dockview-theme-abyss'}"
         @ready="onReady"
         :floatingGroupBounds="bounds"
         :disableFloatingGroups="disableFloatingGroups"

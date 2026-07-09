@@ -10,7 +10,16 @@ import {
     GetTabGroupChipContextMenuItemsParams,
     DEFAULT_TAB_GROUP_COLORS,
 } from 'dockview-react';
+// Registers the enterprise modules (edge groups, tab-group chips, context menu,
+// …) + sets the docs licence. The docs load this module directly (not
+// index.tsx), so both must happen here or the mobile demo loses enterprise
+// features / shows the "Unlicensed" watermark on a mobile-only load.
+import { LicenseManager } from 'dockview-enterprise';
 import * as React from 'react';
+
+LicenseManager.setLicenseKey(
+    '[KeyId:DOCKVIEW-DOCS]_[Company:Dockview]_[Plan:team]_[AppName:Dockview_Docs]_[Email:enterprise@dockview.dev]_[ValidFrom:01_Jan_2025]_[ValidUntil:01_Jan_2099]__aaa294ecec1eed47'
+);
 
 const FloatMenuItem = ({
     panel,
@@ -448,6 +457,7 @@ const components = {
 
 export interface AppProps {
     theme?: DockviewTheme;
+    onReady?: () => void;
 }
 
 const App: React.FC<AppProps> = (props) => {
@@ -548,6 +558,8 @@ const App: React.FC<AppProps> = (props) => {
         });
 
         api.getPanel('watchlist')?.api.setActive();
+
+        props.onReady?.();
     };
 
     const getTabContextMenuItems = React.useCallback(
@@ -667,14 +679,28 @@ const App: React.FC<AppProps> = (props) => {
         [api]
     );
 
+    // Fill wrapper: the docs load this module directly (not index.tsx, which
+    // wraps it in a height:100% div), so give DockviewReact a sized parent or it
+    // collapses to a ~100px intrinsic height. `height: 0` + `flexGrow: 1` (as the
+    // desktop demo does) gives a *definite* height so DockviewReact's own
+    // `height:100%` root resolves instead of collapsing inside a flex parent.
     return (
-        <DockviewReact
-            components={components}
-            onReady={onReady}
-            getTabContextMenuItems={getTabContextMenuItems}
-            getTabGroupChipContextMenuItems={getTabGroupChipContextMenuItems}
-            theme={props.theme ?? themeAbyss}
-        />
+        <div
+            style={{
+                flexGrow: 1,
+                height: 0,
+                minHeight: 0,
+                display: 'flex',
+            }}
+        >
+            <DockviewReact
+                components={components}
+                onReady={onReady}
+                getTabContextMenuItems={getTabContextMenuItems}
+                getTabGroupChipContextMenuItems={getTabGroupChipContextMenuItems}
+                theme={props.theme ?? themeAbyss}
+            />
+        </div>
     );
 };
 
