@@ -46,7 +46,7 @@ describe('LicenseService', () => {
     test('no key → watermark + one console.error (package presence = enterprise use)', () => {
         const { host, root } = makeHost();
         new LicenseService(host, { releaseDate: () => IN_WINDOW });
-        expect(watermark(root)?.textContent).toBe('dockview — Unlicensed');
+        expect(watermark(root)?.textContent).toBe('Unlicensed');
         expect(errSpy).toHaveBeenCalledTimes(1);
     });
 
@@ -68,7 +68,7 @@ describe('LicenseService', () => {
             releaseDate: () => IN_WINDOW,
         });
         expect(svc.state).toBe('invalid');
-        expect(watermark(root)?.textContent).toBe('dockview — Invalid License');
+        expect(watermark(root)?.textContent).toBe('Invalid License');
         expect(errSpy).toHaveBeenCalledTimes(1);
     });
 
@@ -79,7 +79,7 @@ describe('LicenseService', () => {
             releaseDate: () => AFTER_WINDOW,
         });
         expect(svc.state).toBe('expired');
-        expect(watermark(root)?.textContent).toBe('dockview — License Expired');
+        expect(watermark(root)?.textContent).toBe('License Expired');
         expect(errSpy).toHaveBeenCalledTimes(1);
     });
 
