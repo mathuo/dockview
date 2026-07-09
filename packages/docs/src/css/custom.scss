@@ -756,3 +756,80 @@ html.dv-demo-route .main-wrapper {
     --ifm-footer-title-color: var(--ifm-heading-color);
     border-top: 1px solid var(--ifm-color-emphasis-200);
 }
+
+/* Pricing page: the two editions presented side by side above the feature
+   comparison. No cards or fills, just two plain columns. */
+.pricing-editions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    margin: 1.5rem 0 2.5rem;
+}
+
+@media (max-width: 640px) {
+    .pricing-editions {
+        grid-template-columns: 1fr;
+        gap: 1.75rem;
+    }
+}
+
+.pricing-edition {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.pricing-edition__name {
+    margin: 0 0 0.5rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+/* Price / licence call-out under each edition name. */
+.pricing-edition__price {
+    display: flex;
+    flex-direction: column;
+    margin: 0 0 1rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.pricing-edition__price-note {
+    margin-top: 0.2rem;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--ifm-color-content-secondary);
+}
+
+.pricing-edition__tagline {
+    margin: 0 0 1.15rem;
+    color: var(--ifm-color-content-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    /* push the CTA to the bottom so both columns' buttons line up */
+    flex: 1 1 auto;
+}
+
+/* enterprise CTA: purchase button plus the trial link beneath it */
+.pricing-edition__cta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.pricing-edition__trial {
+    font-size: 0.85rem;
+}
+
+/* Comparison ticks in the feature tables. */
+.feature-check {
+    color: #1a7f37;
+    font-weight: 700;
+}
+
+[data-theme='dark'] .feature-check {
+    color: #3fb950;
+}

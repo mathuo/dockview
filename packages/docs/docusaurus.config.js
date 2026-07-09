@@ -346,12 +346,11 @@ const config = {
                     },
                     { to: '/demo', label: 'Demo', position: 'right' },
                     {
-                        // Served by the separate marketing/pricing deployment,
-                        // not a page in this Docusaurus site — use `href` (a raw
-                        // link) so it isn't resolved or link-checked as an
-                        // internal route.
-                        href: '/enterprise',
-                        label: 'Pricing',
+                        // The in-site licensing / edition-comparison page. Its
+                        // "Purchase a licence" CTA links out to the separate
+                        // marketing deployment at /enterprise.
+                        to: '/docs/overview/features',
+                        label: 'Licensing',
                         position: 'right',
                     },
                     {
