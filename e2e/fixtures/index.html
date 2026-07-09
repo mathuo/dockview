@@ -383,6 +383,31 @@
                             height: 180,
                         });
                     },
+                    // Like setupFloating but the floated panel uses the
+                    // `always` renderer, so its content lives in the overlay
+                    // render container and is positioned/stacked over the
+                    // floating window. Exercises the render-overlay z-index path
+                    // (float via the same `_doAddFloatingGroup` the "Float tab"
+                    // context-menu action uses).
+                    setupFloatingAlways: () => {
+                        dockview.addPanel({
+                            id: 'main',
+                            component: 'default',
+                            title: 'main',
+                        });
+                        const floater = dockview.addPanel({
+                            id: 'floater',
+                            component: 'default',
+                            title: 'floater',
+                            renderer: 'always',
+                        });
+                        dockview.addFloatingGroup(floater, {
+                            x: 150,
+                            y: 100,
+                            width: 240,
+                            height: 180,
+                        });
+                    },
                     peekEdge: (position, on) =>
                         dockview.api.peekEdgeGroup(position, on),
                     // Two floating groups for Smart Guides: a target float on
