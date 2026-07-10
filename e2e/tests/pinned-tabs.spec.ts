@@ -77,6 +77,58 @@ test.describe('pinned tabs', () => {
         ).toBeLessThan(2);
     });
 
+    test('separate-row: dragging a pinned tab reorders the row', async ({
+        page,
+    }) => {
+        await setup(page, { mode: 'separate-row' });
+        await page.evaluate(() =>
+            (window as any).__dv.setupPinned(['a', 'b', 'c'], ['a', 'b', 'c'])
+        );
+
+        const rowTabs = page.locator('.dv-pinned-row .dv-pinned-tab');
+        await expect(rowTabs).toHaveText(['a', 'b', 'c']);
+
+        // Drive the row's HTML5 drag: drag 'a' past 'c' using real geometry.
+        // (The row uses `draggable` + drag events, not the pointer backend, so
+        // synthetic DragEvents at real coordinates exercise the real path.)
+        await page.evaluate(() => {
+            const tabs = Array.from(
+                document.querySelectorAll('.dv-pinned-row .dv-pinned-tab')
+            ) as HTMLElement[];
+            const source = tabs[0];
+            const last = tabs[tabs.length - 1];
+            const rect = last.getBoundingClientRect();
+            const dropX = rect.right + 5; // past the last tab's midpoint
+            const dropY = rect.top + rect.height / 2;
+            source.dispatchEvent(
+                new DragEvent('dragstart', { bubbles: true, cancelable: true })
+            );
+            last.dispatchEvent(
+                new DragEvent('dragover', {
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: dropX,
+                    clientY: dropY,
+                })
+            );
+            last.dispatchEvent(
+                new DragEvent('drop', {
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: dropX,
+                    clientY: dropY,
+                })
+            );
+            source.dispatchEvent(new DragEvent('dragend', { bubbles: true }));
+        });
+
+        // The pinned row (and the pinned block of the strip) reorder to [b,c,a].
+        await expect(rowTabs).toHaveText(['b', 'c', 'a']);
+        await expect
+            .poll(() => page.evaluate(() => (window as any).__dv.tabTitles()))
+            .toEqual(['b', 'c', 'a']);
+    });
+
     test('default: a pinned tab keeps its title and shows a pin glyph', async ({
         page,
     }) => {
@@ -195,7 +247,9 @@ test.describe('pinned tabs', () => {
         await expect(page.locator('.dv-tab--pinned')).toContainText('bravo');
     });
 
-    test('pinning and unpinning from the tab context menu', async ({ page }) => {
+    test('pinning and unpinning from the tab context menu', async ({
+        page,
+    }) => {
         // `?pinmenu=1` swaps the harness tab menu to `['pin', 'separator',
         // 'close']` so the built-in pin item is drivable.
         await page.goto('/e2e/fixtures/index.html?pinmenu=1');
@@ -241,9 +295,9 @@ test.describe('pinned tabs', () => {
         await expect(page.locator('.dv-context-menu')).toBeVisible();
 
         // Pin is prepended ahead of the app's own items.
-        await expect(
-            page.locator('.dv-context-menu-item').first()
-        ).toHaveText('Pin tab');
+        await expect(page.locator('.dv-context-menu-item').first()).toHaveText(
+            'Pin tab'
+        );
 
         await page
             .locator('.dv-context-menu-item', { hasText: 'Pin tab' })

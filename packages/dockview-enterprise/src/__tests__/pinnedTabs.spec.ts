@@ -2,6 +2,7 @@ import { fireEvent } from '@testing-library/dom';
 import { DockviewComponent, IContentRenderer } from 'dockview-core';
 import {
     computePinnedFirstOrder,
+    computePinnedRowDropIndex,
     PinnedTabsService,
 } from '../pinnedTabsService';
 
@@ -70,6 +71,41 @@ describe('pinned tabs — ordering math', () => {
                 'c',
             ])
         ).toEqual(['c', 'a', 'b', 'd']);
+    });
+});
+
+describe('pinned tabs — row reorder index math', () => {
+    // Three tabs, 20px wide, laid out at x = [0, 20, 40] → midpoints [10, 30, 50].
+    const midpoints = [10, 30, 50];
+
+    test('dragging the first tab past the last lands it at the end', () => {
+        // pointer past every midpoint → slot 3; from 0 → target 2.
+        expect(computePinnedRowDropIndex(midpoints, 55, 0)).toBe(2);
+    });
+
+    test('dragging the last tab before the first lands it at the front', () => {
+        // pointer before every midpoint → slot 0; from 2 → target 0.
+        expect(computePinnedRowDropIndex(midpoints, 5, 2)).toBe(0);
+    });
+
+    test('dragging the first tab just past the second midpoint lands it second', () => {
+        // pointer past midpoints [10, 30] → slot 2; from 0 → target 1.
+        expect(computePinnedRowDropIndex(midpoints, 35, 0)).toBe(1);
+    });
+
+    test('a drop that does not cross a midpoint is a no-op (target === from)', () => {
+        // Dragging the middle tab, pointer between tabs 0 and 1 → slot 1; from 1.
+        expect(computePinnedRowDropIndex(midpoints, 15, 1)).toBe(1);
+    });
+
+    test('the result is clamped to the last valid index', () => {
+        // A far-right pointer never exceeds count - 1.
+        expect(computePinnedRowDropIndex(midpoints, 9999, 1)).toBe(2);
+    });
+
+    test('a single tab always maps to index 0', () => {
+        expect(computePinnedRowDropIndex([10], 9999, 0)).toBe(0);
+        expect(computePinnedRowDropIndex([10], -9999, 0)).toBe(0);
     });
 });
 
@@ -676,6 +712,98 @@ describe('pinned tabs — separate-row mode', () => {
         a.api.setPinned(true);
 
         expect(row()).toBeNull();
+    });
+
+    // Give each row tab a fixed geometry (jsdom has no layout): 20px-wide tabs
+    // laid out left-to-right, so midpoints are [10, 30, 50, ...].
+    const mockRowGeometry = () => {
+        rowTabs().forEach((el, i) => {
+            (el as HTMLElement).getBoundingClientRect = () =>
+                ({
+                    left: i * 20,
+                    right: i * 20 + 20,
+                    width: 20,
+                    top: 0,
+                    bottom: 16,
+                    height: 16,
+                    x: i * 20,
+                    y: 0,
+                    toJSON: () => ({}),
+                }) as DOMRect;
+        });
+    };
+
+    const drag = (fromId: string, clientX: number) => {
+        const from = rowTabs().find(
+            (el) => (el as HTMLElement).dataset.panelId === fromId
+        )!;
+        mockRowGeometry();
+        from.dispatchEvent(new MouseEvent('dragstart', { bubbles: true }));
+        from.dispatchEvent(
+            new MouseEvent('dragover', { bubbles: true, clientX })
+        );
+        from.dispatchEvent(new MouseEvent('drop', { bubbles: true, clientX }));
+    };
+
+    const setupThreePinned = (dockview: DockviewComponent) => {
+        const a = dockview.addPanel({ id: 'a', component: 'default' });
+        const b = dockview.addPanel({ id: 'b', component: 'default' });
+        const c = dockview.addPanel({ id: 'c', component: 'default' });
+        a.api.setPinned(true);
+        b.api.setPinned(true);
+        c.api.setPinned(true);
+        const order = () => a.api.group.model.panels.map((p) => p.id);
+        return { a, b, c, order };
+    };
+
+    test('dragging a row tab to the right reorders the pinned block', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const { a, order } = setupThreePinned(dockview);
+        expect(order()).toEqual(['a', 'b', 'c']);
+        expect(rowTabs().map((el) => el.textContent)).toEqual(['a', 'b', 'c']);
+
+        const moveTo = jest.spyOn(a.api, 'moveTo');
+        // Drop 'a' past every midpoint → it should land at index 2.
+        drag('a', 55);
+
+        expect(moveTo).toHaveBeenCalledWith({ index: 2, skipSetActive: true });
+        expect(order()).toEqual(['b', 'c', 'a']);
+        // The row DOM reconciles to the new order after the drop.
+        expect(rowTabs().map((el) => el.textContent)).toEqual(['b', 'c', 'a']);
+    });
+
+    test('dragging a row tab to the front reorders the pinned block', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const { c, order } = setupThreePinned(dockview);
+
+        const moveTo = jest.spyOn(c.api, 'moveTo');
+        // Drop 'c' before every midpoint → index 0.
+        drag('c', 5);
+
+        expect(moveTo).toHaveBeenCalledWith({ index: 0, skipSetActive: true });
+        expect(order()).toEqual(['c', 'a', 'b']);
+    });
+
+    test('a no-op drop (same slot) issues no move', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const { b } = setupThreePinned(dockview);
+
+        const moveTo = jest.spyOn(b.api, 'moveTo');
+        // Drop 'b' between tabs 0 and 1 → target index 1 === its current index.
+        drag('b', 15);
+
+        expect(moveTo).not.toHaveBeenCalled();
+    });
+
+    test('a reorder keeps the active panel active (skipSetActive)', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const { a, b } = setupThreePinned(dockview);
+        b.api.setActive();
+        expect(b.api.isActive).toBe(true);
+
+        drag('a', 55); // reorder unrelated tab
+
+        expect(b.api.isActive).toBe(true);
     });
 
     test('a pinned panel moved into a group renders in that group row', () => {
