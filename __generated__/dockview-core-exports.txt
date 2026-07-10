@@ -10,6 +10,7 @@ AddPaneviewComponentOptions
 AddSplitviewComponentOptions
 AdvancedDnDModule
 AdvancedDnDService
+AdvancedOverflowRenderParams
 AnchorPosition
 AnchoredBox
 AnnouncementEvent
@@ -124,6 +125,9 @@ GroupviewPanelState
 HeaderPartInitParameters
 IAdvancedDnDHost
 IAdvancedDnDService
+IAdvancedOverflowHost
+IAdvancedOverflowRenderContext
+IAdvancedOverflowService
 IAutoEdgeGroupHost
 IAutoEdgeGroupService
 IAutoHideEdgeGroupHost
@@ -164,6 +168,7 @@ ILayoutHistoryService
 IMultiRowTabsHost
 IMultiRowTabsService
 INodeDescriptor
+IOverflowRow
 IPanePart
 IPanel
 IPanelDeserializer

@@ -8,6 +8,7 @@ import { AutoHideEdgeGroupModule } from './autoHideEdgeGroupService';
 import { AutoEdgeGroupModule } from './autoEdgeGroupService';
 import { MultiRowTabsModule } from './multiRowTabsService';
 import { PinnedTabsModule } from './pinnedTabsService';
+import { AdvancedOverflowModule } from './advancedOverflowService';
 import { KeyboardDockingModule } from './keyboardDockingService';
 import { LicenseModule } from './licenseService';
 
@@ -45,6 +46,13 @@ export {
     computePinnedFirstOrder,
 } from './pinnedTabsService';
 export {
+    AdvancedOverflowService,
+    OverflowListView,
+    AdvancedOverflowModule,
+    matchesQuery,
+} from './advancedOverflowService';
+export { MruTracker } from './mruTracker';
+export {
     KeyboardDockingService,
     KeyboardDockingModule,
 } from './keyboardDockingService';
@@ -73,6 +81,7 @@ export const Modules: DockviewModule<any>[] = [
     AutoEdgeGroupModule,
     MultiRowTabsModule,
     PinnedTabsModule,
+    AdvancedOverflowModule,
     KeyboardDockingModule,
     LicenseModule,
 ];

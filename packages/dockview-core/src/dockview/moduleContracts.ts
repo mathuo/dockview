@@ -27,6 +27,7 @@ import {
     SmartGuidesOptions,
 } from './options';
 import {
+    DockviewActivePanelChangeEvent,
     DockviewLayoutMutationEvent,
     DockviewLayoutMutationKind,
     DockviewOrigin,
@@ -627,4 +628,83 @@ export interface IPinnedTabsService extends IDisposable {
         panelId: string,
         index: number
     ): number;
+}
+
+// --- AdvancedOverflow ---
+
+/**
+ * One rendered overflow row: the free `headerOverflow` tab renderer wrapped with
+ * activate-on-click, built by core and reused by the advanced overflow list so
+ * the row DOM + behaviour stay identical to the free dropdown.
+ */
+export interface IOverflowRow {
+    /** The row wrapper (`.dv-tab`). Click-to-activate is already wired. */
+    readonly element: HTMLElement;
+    readonly panel: IDockviewPanel;
+    /**
+     * Expand the panel's tab group if collapsed, activate the panel (origin
+     * `'user'`) and close the popover — identical to clicking the row. Used by
+     * the keyboard controller (Enter).
+     */
+    activate(): void;
+}
+
+/**
+ * Core-provided builders handed to {@link IAdvancedOverflowService.renderOverflow}
+ * so the module can rebuild the free dropdown body (rows + group headers) in a
+ * custom order — search-filtered, MRU-ordered — without re-implementing the row
+ * DOM, the group-header DOM, or the window-bound popover open/close. The popover
+ * control stays in core so it renders in the correct document for popped-out
+ * groups (a `getPopupServiceForGroup(group)`-bound `PopupService`).
+ */
+export interface IAdvancedOverflowRenderContext {
+    /** Build a single overflow row for a panel id, or `undefined` if the panel
+     *  no longer exists in the group. */
+    buildRow(panelId: string): IOverflowRow | undefined;
+    /** Build the group-header element for an overflow tab-group id, or
+     *  `undefined` when it is not an overflow group. */
+    buildGroupHeader(tabGroupId: string): HTMLElement | undefined;
+    /** The overflow tab-group id a panel belongs to, or `undefined`. Used to
+     *  interleave group headers against the filtered set (same rule as free). */
+    overflowGroupIdForPanel(panelId: string): string | undefined;
+    /** Open `body` in the group's window-bound popover at the chevron anchor. */
+    open(body: HTMLElement): void;
+    /** Close the popover. */
+    close(): void;
+    /** Restore focus to the chevron trigger (Esc). */
+    focusTrigger(): void;
+}
+
+/** The argument to {@link IAdvancedOverflowService.renderOverflow}. */
+export interface AdvancedOverflowRenderParams {
+    readonly group: DockviewGroupPanel;
+    /** Overflow panel ids in free (tab DOM) order. */
+    readonly overflowTabs: string[];
+    /** Overflow tab-group ids. */
+    readonly overflowTabGroups: string[];
+    /** Core row/header builders + popover control (see the context type). */
+    readonly context: IAdvancedOverflowRenderContext;
+}
+
+/**
+ * The narrow surface the advanced overflow service reads from the host
+ * (`DockviewComponent`). The service self-wires MRU tracking off these events;
+ * the component never calls into it except through the rendering seam
+ * (`renderOverflow`).
+ */
+export interface IAdvancedOverflowHost {
+    readonly options: DockviewComponentOptions;
+    readonly onDidAddGroup: Event<DockviewGroupPanel>;
+    readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
+    readonly onDidActivePanelChange: Event<DockviewActivePanelChangeEvent>;
+}
+
+/**
+ * Advanced overflow module service. When registered, the tab-overflow dropdown
+ * upgrades in place into a command-palette tab switcher (search + MRU +
+ * keyboard). Absent, core renders the free flat list unchanged.
+ */
+export interface IAdvancedOverflowService extends IDisposable {
+    /** Build AND open the advanced overflow popover for a group. */
+    renderOverflow(params: AdvancedOverflowRenderParams): void;
 }
