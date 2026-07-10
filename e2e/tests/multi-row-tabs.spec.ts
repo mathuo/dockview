@@ -324,4 +324,56 @@ test.describe('multi-row tabs (wrap mode)', () => {
     }) => {
         await reorderAcrossRows(page, 'overflow=wrap&smooth=1');
     });
+
+    // Arrow Up/Down move the roving focus between wrapped rows (core keeps
+    // Left/Right within a row). Real geometry: the target is the tab in the
+    // adjacent row whose horizontal centre is nearest the focused tab's.
+    test('Arrow Up/Down move focus between wrapped rows', async ({ page }) => {
+        await setup(page);
+
+        // Focus a tab on the first row and compute the geometrically-expected
+        // neighbour one row below (nearest horizontal centre).
+        const plan = await page.evaluate(() => {
+            const tabs = Array.from(
+                document.querySelectorAll<HTMLElement>(
+                    '.dv-tabs-container .dv-tab'
+                )
+            );
+            const geo = tabs.map((el) => ({
+                el,
+                top: el.offsetTop,
+                centre: el.offsetLeft + el.offsetWidth / 2,
+                text: el.innerText.trim(),
+            }));
+            const tops = Array.from(new Set(geo.map((g) => g.top))).sort(
+                (a, b) => a - b
+            );
+            const row0 = geo.filter((g) => g.top === tops[0]);
+            const row1 = geo.filter((g) => g.top === tops[1]);
+            const focused = row0[Math.floor(row0.length / 2)];
+            let expected = row1[0];
+            for (const g of row1) {
+                if (
+                    Math.abs(g.centre - focused.centre) <
+                    Math.abs(expected.centre - focused.centre)
+                ) {
+                    expected = g;
+                }
+            }
+            focused.el.focus();
+            return { focusedText: focused.text, expectedText: expected.text };
+        });
+
+        const activeText = () =>
+            page.evaluate(() =>
+                (document.activeElement as HTMLElement).innerText.trim()
+            );
+
+        await page.keyboard.press('ArrowDown');
+        expect(await activeText()).toBe(plan.expectedText);
+
+        // ArrowUp returns to the aligned tab on the row above.
+        await page.keyboard.press('ArrowUp');
+        expect(await activeText()).toBe(plan.focusedText);
+    });
 });

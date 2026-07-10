@@ -1409,9 +1409,9 @@ export class DockviewComponent
         return this._moduleRegistry.services.contextMenuService;
     }
 
-    private get _pinnedTabsService(): IPinnedTabsService | undefined {
-        // Owned by PinnedTabsModule. Undefined when the module is not
-        // registered.
+    get pinnedTabsService(): IPinnedTabsService | undefined {
+        // Owned by PinnedTabsModule — undefined when the module is not
+        // registered, so callers must `?.`-guard.
         return this._moduleRegistry.services.pinnedTabsService;
     }
 
@@ -1435,7 +1435,7 @@ export class DockviewComponent
         }
 
         const service = assertModule(
-            this._pinnedTabsService,
+            this.pinnedTabsService,
             'PinnedTabs',
             'setPinned'
         );

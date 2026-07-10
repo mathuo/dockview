@@ -1,5 +1,7 @@
+import { fireEvent } from '@testing-library/dom';
 import { DockviewComponent } from 'dockview-core';
 import { IContentRenderer } from 'dockview-core';
+import { findVerticalNeighbour } from '../multiRowTabsService';
 
 class TestPanel implements IContentRenderer {
     element = document.createElement('div');
@@ -277,6 +279,215 @@ describe('multi-row tabs (wrap mode)', () => {
         expect(
             b.group.model.tabsListElement.classList.contains(WRAP_CLASS)
         ).toBe(true);
+
+        dockview.dispose();
+    });
+});
+
+/** Mock a tab's layout geometry — jsdom reports 0 for every offset. */
+function setGeometry(
+    el: HTMLElement,
+    top: number,
+    left: number,
+    width: number
+): void {
+    Object.defineProperty(el, 'offsetTop', { value: top, configurable: true });
+    Object.defineProperty(el, 'offsetLeft', {
+        value: left,
+        configurable: true,
+    });
+    Object.defineProperty(el, 'offsetWidth', {
+        value: width,
+        configurable: true,
+    });
+}
+
+/**
+ * The pure row-geometry resolver behind Arrow Up/Down. Bucket tabs into rows by
+ * `offsetTop`, then within the target row pick the tab whose horizontal centre
+ * is nearest.
+ */
+describe('findVerticalNeighbour', () => {
+    const tabAt = (top: number, left: number, width: number): HTMLElement => {
+        const el = document.createElement('div');
+        el.className = 'dv-tab';
+        setGeometry(el, top, left, width);
+        return el;
+    };
+
+    test('steps down to the horizontally-nearest tab in the row below', () => {
+        // row 0: centres 25 / 75 / 125 ; row 1: centres 25 / 75 / 125
+        const t0 = tabAt(0, 0, 50);
+        const t1 = tabAt(0, 50, 50);
+        const t2 = tabAt(0, 100, 50);
+        const t3 = tabAt(30, 0, 50);
+        const t4 = tabAt(30, 50, 50);
+        const t5 = tabAt(30, 100, 50);
+        const tabs = [t0, t1, t2, t3, t4, t5];
+
+        expect(findVerticalNeighbour(tabs, t1, 'down')).toBe(t4);
+    });
+
+    test('steps up to the horizontally-nearest tab in the row above', () => {
+        const t0 = tabAt(0, 0, 50);
+        const t1 = tabAt(0, 50, 50);
+        const t2 = tabAt(30, 0, 50);
+        const t3 = tabAt(30, 50, 50);
+        const tabs = [t0, t1, t2, t3];
+
+        expect(findVerticalNeighbour(tabs, t3, 'up')).toBe(t1);
+    });
+
+    test('picks the nearest centre when rows are misaligned', () => {
+        // top row has two wide tabs; bottom row has three narrow tabs.
+        const top0 = tabAt(0, 0, 90); // centre 45
+        const top1 = tabAt(0, 90, 90); // centre 135
+        const bot0 = tabAt(30, 0, 40); // centre 20
+        const bot1 = tabAt(30, 40, 40); // centre 60
+        const bot2 = tabAt(30, 80, 40); // centre 100
+        const tabs = [top0, top1, bot0, bot1, bot2];
+
+        // top1 centre 135 → nearest bottom centre is bot2 (100)
+        expect(findVerticalNeighbour(tabs, top1, 'down')).toBe(bot2);
+        // top0 centre 45 → nearest bottom centre is bot1 (60)
+        expect(findVerticalNeighbour(tabs, top0, 'down')).toBe(bot1);
+    });
+
+    test('returns undefined at the edges (top row up / bottom row down)', () => {
+        const top = tabAt(0, 0, 50);
+        const bottom = tabAt(30, 0, 50);
+        const tabs = [top, bottom];
+
+        expect(findVerticalNeighbour(tabs, top, 'up')).toBeUndefined();
+        expect(findVerticalNeighbour(tabs, bottom, 'down')).toBeUndefined();
+    });
+});
+
+/**
+ * Cross-row keyboard navigation — Arrow Up/Down move the roving focus between
+ * wrapped rows. Only active while the strip is wrapping a horizontal header;
+ * jsdom has no layout, so tab geometry is mocked (real wrapping is e2e).
+ */
+describe('multi-row tabs: cross-row keyboard navigation', () => {
+    let container: HTMLElement;
+
+    const make = (
+        overflow?: DockviewComponent['options']['overflow'],
+        headerPosition?: 'top' | 'left'
+    ): DockviewComponent => {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+        const dockview = new DockviewComponent(container, {
+            createComponent: () => new TestPanel(),
+            overflow,
+            defaultHeaderPosition: headerPosition,
+        });
+        dockview.layout(1000, 1000);
+        return dockview;
+    };
+
+    afterEach(() => {
+        container?.remove();
+    });
+
+    /** Six tabs laid out as two rows of three (centres 25 / 75 / 125). */
+    const sixTabsTwoRows = (dockview: DockviewComponent): HTMLElement[] => {
+        for (const id of ['p1', 'p2', 'p3', 'p4', 'p5', 'p6']) {
+            dockview.addPanel({ id, component: 'default' });
+        }
+        const list = dockview.activeGroup!.model.tabsListElement;
+        const tabs = Array.from(list.querySelectorAll<HTMLElement>('.dv-tab'));
+        setGeometry(tabs[0], 0, 0, 50);
+        setGeometry(tabs[1], 0, 50, 50);
+        setGeometry(tabs[2], 0, 100, 50);
+        setGeometry(tabs[3], 30, 0, 50);
+        setGeometry(tabs[4], 30, 50, 50);
+        setGeometry(tabs[5], 30, 100, 50);
+        return tabs;
+    };
+
+    test('ArrowDown moves roving focus to the aligned tab one row below', () => {
+        const dockview = make({ mode: 'wrap' });
+        const tabs = sixTabsTwoRows(dockview);
+
+        tabs[1].focus();
+        fireEvent.keyDown(tabs[1], { key: 'ArrowDown' });
+
+        expect(document.activeElement).toBe(tabs[4]);
+        expect(tabs[4].tabIndex).toBe(0);
+        expect(tabs[1].tabIndex).toBe(-1);
+
+        dockview.dispose();
+    });
+
+    test('ArrowUp moves roving focus to the aligned tab one row above', () => {
+        const dockview = make({ mode: 'wrap' });
+        const tabs = sixTabsTwoRows(dockview);
+
+        tabs[5].focus();
+        fireEvent.keyDown(tabs[5], { key: 'ArrowUp' });
+
+        expect(document.activeElement).toBe(tabs[2]);
+
+        dockview.dispose();
+    });
+
+    test('ArrowUp on the top row is a no-op', () => {
+        const dockview = make({ mode: 'wrap' });
+        const tabs = sixTabsTwoRows(dockview);
+
+        tabs[0].focus();
+        fireEvent.keyDown(tabs[0], { key: 'ArrowUp' });
+
+        expect(document.activeElement).toBe(tabs[0]);
+
+        dockview.dispose();
+    });
+
+    test('is inert when the strip is not wrapping (no cross-row jump)', () => {
+        const dockview = make(); // dropdown overflow — no wrap class, no listener
+        const tabs = sixTabsTwoRows(dockview);
+        expect(
+            dockview.activeGroup!.model.tabsListElement.classList.contains(
+                WRAP_CLASS
+            )
+        ).toBe(false);
+
+        tabs[1].focus();
+        fireEvent.keyDown(tabs[1], { key: 'ArrowDown' });
+
+        // core owns Left/Right for a horizontal strip and ignores Up/Down, so
+        // focus stays put — our cross-row handler never ran.
+        expect(document.activeElement).toBe(tabs[1]);
+
+        dockview.dispose();
+    });
+
+    test('is inert on a vertical header (wrap gate stays closed)', () => {
+        const dockview = make({ mode: 'wrap' }, 'left');
+        dockview.addPanel({ id: 'p1', component: 'default' });
+        const list = dockview.activeGroup!.model.tabsListElement;
+
+        expect(list.classList.contains('dv-tabs-container-vertical')).toBe(
+            true
+        );
+        // wrap (and therefore the cross-row listener) never activates vertically
+        expect(list.classList.contains(WRAP_CLASS)).toBe(false);
+
+        dockview.dispose();
+    });
+
+    test('detaches the listener when wrap is turned off at runtime', () => {
+        const dockview = make({ mode: 'wrap' });
+        const tabs = sixTabsTwoRows(dockview);
+
+        // turn wrap off — the capture listener must be removed
+        dockview.updateOptions({ overflow: { mode: 'dropdown' } });
+
+        tabs[1].focus();
+        fireEvent.keyDown(tabs[1], { key: 'ArrowDown' });
+
+        expect(document.activeElement).toBe(tabs[1]);
 
         dockview.dispose();
     });

@@ -222,4 +222,59 @@ test.describe('pinned tabs', () => {
             .click();
         await expect(page.locator('.dv-tab--pinned')).toHaveCount(0);
     });
+
+    test('auto-injects the Pin item into the tab menu without app wiring', async ({
+        page,
+    }) => {
+        // `?pinautoinject=1` leaves the app's `getTabContextMenuItems` returning
+        // only its close items — the module injects the Pin item itself.
+        await page.goto('/e2e/fixtures/index.html?pinautoinject=1');
+        await page.waitForFunction(() => (window as any).__ready === true);
+        await page.evaluate(() =>
+            (window as any).__dv.setupPinned(['alpha', 'bravo'], [])
+        );
+        await expect(page.locator('.dv-tab--pinned')).toHaveCount(0);
+
+        await page
+            .locator('.dv-tab', { hasText: 'bravo' })
+            .click({ button: 'right' });
+        await expect(page.locator('.dv-context-menu')).toBeVisible();
+
+        // Pin is prepended ahead of the app's own items.
+        await expect(
+            page.locator('.dv-context-menu-item').first()
+        ).toHaveText('Pin tab');
+
+        await page
+            .locator('.dv-context-menu-item', { hasText: 'Pin tab' })
+            .click();
+        await expect(page.locator('.dv-tab--pinned')).toContainText('bravo');
+    });
+
+    test('toggles the active tab pinned with the keyboard (Ctrl+Shift+Enter)', async ({
+        page,
+    }) => {
+        await page.goto('/e2e/fixtures/index.html');
+        await page.waitForFunction(() => (window as any).__ready === true);
+        await page.evaluate(() =>
+            (window as any).__dv.setupPinned(['alpha', 'bravo'], [])
+        );
+        // bravo was added last → the active panel.
+        await expect(page.locator('.dv-tab--pinned')).toHaveCount(0);
+
+        // Put focus inside the dock so the binding fires (it acts on the active
+        // panel, whichever tab holds focus).
+        await page.evaluate(() =>
+            document.querySelector<HTMLElement>('.dv-tab')?.focus()
+        );
+        await page.keyboard.press('Control+Shift+Enter');
+        await expect(page.locator('.dv-tab--pinned')).toContainText('bravo');
+
+        // Pressing again unpins.
+        await page.evaluate(() =>
+            document.querySelector<HTMLElement>('.dv-tab')?.focus()
+        );
+        await page.keyboard.press('Control+Shift+Enter');
+        await expect(page.locator('.dv-tab--pinned')).toHaveCount(0);
+    });
 });
