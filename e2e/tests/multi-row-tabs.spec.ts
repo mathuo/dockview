@@ -156,6 +156,68 @@ test.describe('multi-row tabs (wrap mode)', () => {
         ).toBeVisible();
     });
 
+    test('the overflow dropdown lists the surplus tabs (a suffix of the strip)', async ({
+        page,
+    }) => {
+        await page.goto('/e2e/fixtures/index.html?overflow=wrap&maxRows=2');
+        await page.waitForFunction(() => (window as any).__ready === true);
+        await page.evaluate(() => (window as any).__dv.setupWrapTabs(20));
+
+        // Open the chevron dropdown.
+        const handle = page.locator('.dv-tabs-overflow-dropdown-default');
+        await expect(handle).toBeVisible();
+        await handle.click();
+
+        const overflow = page.locator('.dv-tabs-overflow-container');
+        await expect(overflow).toBeVisible();
+
+        const listed = await overflow
+            .locator('.dv-tab')
+            .allInnerTexts()
+            .then((texts) => texts.map((t) => t.trim()));
+
+        // The surplus is a suffix: the last tab spilled, the first did not.
+        expect(listed).toContain('wrap-tab-long-title-19');
+        expect(listed).not.toContain('wrap-tab-long-title-0');
+
+        // Picking a spilled tab activates it and closes the dropdown.
+        await overflow
+            .locator('.dv-tab', { hasText: 'wrap-tab-long-title-19' })
+            .click();
+        await expect(page.locator('.dv-active-tab')).toHaveText(
+            'wrap-tab-long-title-19'
+        );
+        await expect(overflow).toHaveCount(0);
+    });
+
+    test('closing the surplus tabs reflows the cap away (dropdown disappears)', async ({
+        page,
+    }) => {
+        await page.goto('/e2e/fixtures/index.html?overflow=wrap&maxRows=2');
+        await page.waitForFunction(() => (window as any).__ready === true);
+        await page.evaluate(() => (window as any).__dv.setupWrapTabs(20));
+
+        // Surplus present → dropdown shown.
+        await expect(
+            page.locator('.dv-tabs-overflow-dropdown-root').first()
+        ).toBeVisible();
+
+        // Close most panels so the remainder fits within the 2-row cap.
+        await page.evaluate(() => {
+            for (let i = 4; i < 20; i++) {
+                (window as any).__dv.closePanel('wrap-tab-' + i);
+            }
+        });
+
+        // No surplus left → the dropdown is gone, but wrap is still active.
+        await expect(
+            page.locator('.dv-tabs-overflow-dropdown-root')
+        ).toHaveCount(0);
+        await expect(page.locator('.dv-tabs-container').first()).toHaveClass(
+            /dv-tabs-container--wrap-capped/
+        );
+    });
+
     test('raising maxRows re-admits the surplus rows and grows the header', async ({
         page,
     }) => {
