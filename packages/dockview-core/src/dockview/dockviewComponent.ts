@@ -1055,6 +1055,15 @@ export class DockviewComponent
         group.relayout();
     }
 
+    /** IMultiRowTabsHost — force the wrap controller's surplus set (rows beyond
+     *  `overflow.maxRows`) into the group's overflow dropdown. */
+    setForcedOverflow(
+        group: DockviewGroupPanel,
+        fn: (panelId: string) => boolean
+    ): void {
+        group.model.header.setForcedOverflow(fn);
+    }
+
     /** IDropGuideHost — the layout root (`.dv-dockview`, a positioned element),
      *  the surface the outer-cell landing preview is drawn over. */
     getLayoutElement(): HTMLElement {

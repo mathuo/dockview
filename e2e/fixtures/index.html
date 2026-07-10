@@ -52,9 +52,17 @@
                 const params = new URLSearchParams(location.search);
                 // Opt-in multi-row (wrapping) tabs via `?overflow=wrap` so the
                 // wrap behaviour is exercised without affecting other specs.
+                // `?maxRows=N` caps the header at N rows (surplus spills to the
+                // dropdown).
+                const maxRowsParam = params.get('maxRows');
                 const overflow =
                     params.get('overflow') === 'wrap'
-                        ? { mode: 'wrap' }
+                        ? {
+                              mode: 'wrap',
+                              ...(maxRowsParam
+                                  ? { maxRows: Number(maxRowsParam) }
+                                  : {}),
+                          }
                         : undefined;
                 // `?smooth=1` turns on the smooth tab reorder animation (needed
                 // to exercise the 2-D cross-row wrap reorder path).
@@ -195,6 +203,10 @@
                             });
                         }
                     },
+                    // Change the overflow options at runtime (e.g. raise
+                    // `maxRows`) so the multi-row cap reflow can be exercised.
+                    setOverflow: (overflow) =>
+                        dockview.updateOptions({ overflow }),
                     closePanel: (id) => panels[id] && panels[id].api.close(),
                     // Add a panel, optionally splitting a new group off in a
                     // direction (records an 'add' mutation for layout history).

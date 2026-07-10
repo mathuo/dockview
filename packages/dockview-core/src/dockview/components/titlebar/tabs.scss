@@ -30,6 +30,20 @@
             height: var(--dv-tabs-and-actions-container-height);
         }
 
+        // `overflow.maxRows` cap. The MultiRowTabsModule adds
+        // `.dv-tabs-container--wrap-capped` and sets `--dv-max-tab-rows` to the
+        // cap: clip the strip to that many rows so the header stops growing,
+        // while the surplus rows (still laid out below, hence measurable by the
+        // controller) are routed into the overflow dropdown. Uncapped wrap keeps
+        // `overflow: visible` above and grows unbounded.
+        &.dv-tabs-container--wrap-capped {
+            max-height: calc(
+                var(--dv-tabs-and-actions-container-height) *
+                    var(--dv-max-tab-rows)
+            );
+            overflow: hidden;
+        }
+
         // Discrete drop indicator for 2-D cross-row reorder (the 1-D gap
         // animation is suppressed in wrap). A bar on the leading/trailing edge
         // of the tab the drop would land before/after.

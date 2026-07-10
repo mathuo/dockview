@@ -172,6 +172,10 @@ export interface IHeader {
     /** Register a predicate that keeps matching panels out of the overflow
      *  dropdown (used by the PinnedTabs module). No-op default. */
     setOverflowExclude(fn: (panelId: string) => boolean): void;
+    /** Register a predicate that forces matching panels into the overflow
+     *  dropdown regardless of horizontal fit (used by the MultiRowTabs module
+     *  for the surplus rows beyond `overflow.maxRows`). No-op default. */
+    setForcedOverflow(fn: (panelId: string) => boolean): void;
     /** Re-evaluate the overflow dropdown now (e.g. after the exclusion set
      *  changed). */
     refreshOverflow(): void;

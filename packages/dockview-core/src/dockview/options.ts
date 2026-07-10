@@ -274,6 +274,22 @@ export type OverflowThumbnailRenderer = (
 export const OVERFLOW_WRAP_TABS_CLASS = 'dv-tabs-container--wrap';
 
 /**
+ * The CSS class the `MultiRowTabsModule` adds alongside
+ * {@link OVERFLOW_WRAP_TABS_CLASS} once `overflow.maxRows` is set. It clips the
+ * wrapped strip to `--dv-max-tab-rows` rows (the surplus rows spill to the
+ * dropdown) so the header stops growing at the cap. Shared here so core (SCSS)
+ * and the module agree on the one string.
+ */
+export const OVERFLOW_WRAP_TABS_CAPPED_CLASS = 'dv-tabs-container--wrap-capped';
+
+/**
+ * The custom property the `MultiRowTabsModule` sets on a capped wrapped strip to
+ * carry the `overflow.maxRows` value into the SCSS `max-height` calc. Shared for
+ * the same reason as the class names above.
+ */
+export const OVERFLOW_MAX_TAB_ROWS_VARIABLE = '--dv-max-tab-rows';
+
+/**
  * Tab-header overflow behaviour. One shared block across the overflow axis:
  * `mode` chooses dropdown vs wrap; the remaining fields enrich the dropdown.
  * Each capability names the module it needs — without that module the field is
@@ -286,11 +302,10 @@ export interface DockviewOverflowOptions {
      */
     mode?: 'dropdown' | 'wrap';
     /**
-     * Wrap mode only: cap the number of header rows; the surplus tabs spill to
-     * the dropdown.
-     *
-     * NOT YET IMPLEMENTED — reserved for a follow-up. Wrap is currently
-     * unbounded regardless of this value; setting it has no effect today.
+     * Wrap mode only: cap the number of header rows. The strip grows to at most
+     * `maxRows` rows; tabs that would land on a row beyond the cap spill into the
+     * overflow dropdown instead. Requires the `MultiRowTabsModule`. Default:
+     * unbounded (wrap grows to fit every tab).
      */
     maxRows?: number;
     /**

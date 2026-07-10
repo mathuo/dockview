@@ -86,6 +86,12 @@ export class Tab extends CompositeDisposable {
         this._element.id = nextTabId();
         this._element.setAttribute('role', 'tab');
         this._element.setAttribute('aria-selected', 'false');
+        // Panel identity on the tab element so the multi-row wrap controller can
+        // map a wrapped tab (read for its `offsetTop` row) back to its panel id
+        // when computing the surplus set that spills to the overflow dropdown.
+        // Tab-specific attribute name so it doesn't collide with generic
+        // `[data-panel-id]` lookups elsewhere (e.g. the overlay render container).
+        this._element.setAttribute('data-tab-panel-id', this.panel.id);
         const contentContainerId = this.group?.model?.contentContainerId;
         if (contentContainerId) {
             this._element.setAttribute('aria-controls', contentContainerId);

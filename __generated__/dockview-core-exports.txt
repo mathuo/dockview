@@ -205,6 +205,8 @@ MeasuredValue
 MovePanelEvent
 MovementOptions
 MovementOptions2
+OVERFLOW_MAX_TAB_ROWS_VARIABLE
+OVERFLOW_WRAP_TABS_CAPPED_CLASS
 OVERFLOW_WRAP_TABS_CLASS
 Orientation
 OverflowThumbnailRenderer
