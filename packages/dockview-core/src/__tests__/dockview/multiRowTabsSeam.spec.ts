@@ -98,4 +98,40 @@ describe('multi-row tabs seam', () => {
 
         cut.dispose();
     });
+
+    test('tab elements carry their panel id (surplus-set lookup)', () => {
+        const cut = createComponent();
+        const panel = cut.addPanel({ id: 'panel1', component: 'component' });
+
+        const tab =
+            panel.group.model.tabsListElement.querySelector<HTMLElement>(
+                '.dv-tab'
+            )!;
+        expect(tab.getAttribute('data-tab-panel-id')).toBe('panel1');
+
+        cut.dispose();
+    });
+
+    test('host setForcedOverflow routes a panel into the dropdown even when nothing clips', () => {
+        const cut = createComponent();
+        const a = cut.addPanel({ id: 'a', component: 'component' });
+        cut.addPanel({ id: 'b', component: 'component' });
+
+        const dropdown = (): Element | null =>
+            a.group.element.querySelector('.dv-tabs-overflow-dropdown-root');
+
+        // jsdom has no layout, so nothing clips → no dropdown by default.
+        expect(dropdown()).toBeNull();
+
+        // Force 'b' into overflow (the wrap surplus set) — the dropdown appears
+        // although 'b' is not horizontally clipped.
+        cut.setForcedOverflow(a.group, (id) => id === 'b');
+        expect(dropdown()).not.toBeNull();
+
+        // Clearing the forcing removes it again.
+        cut.setForcedOverflow(a.group, () => false);
+        expect(dropdown()).toBeNull();
+
+        cut.dispose();
+    });
 });

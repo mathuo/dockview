@@ -550,6 +550,18 @@ export interface IMultiRowTabsHost {
      * the free `DockviewGroupPanel.relayout()`.
      */
     relayoutGroup(group: DockviewGroupPanel): void;
+    /**
+     * Force a set of the group's panels into the overflow dropdown regardless of
+     * horizontal fit — the wrap controller's surplus set (the tabs on rows
+     * beyond `overflow.maxRows`). In wrap mode nothing clips horizontally, so the
+     * free `OverflowObserver` never surfaces these; this seam routes them to the
+     * dropdown and re-evaluates it immediately. Passing `() => false` clears the
+     * forcing.
+     */
+    setForcedOverflow(
+        group: DockviewGroupPanel,
+        fn: (panelId: string) => boolean
+    ): void;
 }
 
 export interface IMultiRowTabsService extends IDisposable {

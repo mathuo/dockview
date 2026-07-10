@@ -55,6 +55,16 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
      * resize.
      */
     private _overflowExclude: (panelId: string) => boolean = () => false;
+    /**
+     * Predicate that forces a panel's tab INTO the overflow dropdown regardless
+     * of horizontal fit — the complement of {@link _overflowExclude}. Wired by
+     * the MultiRowTabs module: in wrap mode tabs never clip horizontally (they
+     * wrap), so the `OverflowObserver` detects nothing; this routes the surplus
+     * rows beyond `overflow.maxRows` into the dropdown. Defaults to a no-op so
+     * behaviour is unchanged when the module is absent. Must stay a pure lookup
+     * (no DOM reads) — it runs inside the overflow filter.
+     */
+    private _forcedOverflow: (panelId: string) => boolean = () => false;
     private _direction: DockviewHeaderDirection = 'horizontal';
     private _voidContainerListeners: IDisposable | null = null;
 
@@ -125,6 +135,17 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
      */
     setOverflowExclude(fn: (panelId: string) => boolean): void {
         this._overflowExclude = fn;
+        this.refreshOverflow();
+    }
+
+    /**
+     * Register a predicate that forces matching panels into the overflow
+     * dropdown regardless of horizontal fit (the MultiRowTabs surplus set —
+     * rows beyond `overflow.maxRows`). Re-evaluates the dropdown immediately.
+     * Passing `() => false` restores default behaviour.
+     */
+    setForcedOverflow(fn: (panelId: string) => boolean): void {
+        this._forcedOverflow = fn;
         this.refreshOverflow();
     }
 
@@ -1039,7 +1060,16 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
     }
 
     private toggleDropdown(options: { reset: boolean }): void {
-        if (options.reset) {
+        // Surplus tabs forced past the wrap row cap must land in the dropdown
+        // even on a reset: in wrap mode nothing clips horizontally, so the
+        // `OverflowObserver` reports no overflow and asks for a reset every time.
+        const hasForced = this._tabs.some(
+            (tab) =>
+                !this._overflowExclude(tab.value.panel.id) &&
+                this._forcedOverflow(tab.value.panel.id)
+        );
+
+        if (options.reset && !hasForced) {
             this._onOverflowTabsChange.fire({
                 tabs: [],
                 tabGroups: [],
@@ -1052,10 +1082,12 @@ export class Tabs extends CompositeDisposable implements ITabReorderHost {
             .filter(
                 (tab) =>
                     !this._overflowExclude(tab.value.panel.id) &&
-                    !isChildEntirelyVisibleWithinParent(
-                        tab.value.element,
-                        this._tabsList
-                    )
+                    (this._forcedOverflow(tab.value.panel.id) ||
+                        (!options.reset &&
+                            !isChildEntirelyVisibleWithinParent(
+                                tab.value.element,
+                                this._tabsList
+                            )))
             )
             .map((x) => x.value.panel.id);
 

@@ -112,6 +112,145 @@ test.describe('multi-row tabs (wrap mode)', () => {
         );
     });
 
+    // `overflow.maxRows` caps the header height; the surplus rows spill into the
+    // chevron dropdown. Real-browser only (row count is a layout fact).
+    test('maxRows caps the header and spills the surplus into the dropdown', async ({
+        page,
+    }) => {
+        await page.goto('/e2e/fixtures/index.html?overflow=wrap&maxRows=2');
+        await page.waitForFunction(() => (window as any).__ready === true);
+        await page.evaluate(() => (window as any).__dv.setupWrapTabs(20));
+
+        const tabsList = page.locator('.dv-tabs-container').first();
+        await expect(tabsList).toHaveClass(/dv-tabs-container--wrap-capped/);
+
+        const m = await page.evaluate(() => {
+            const list = document.querySelector(
+                '.dv-tabs-container'
+            ) as HTMLElement;
+            const header = document.querySelector(
+                '.dv-tabs-and-actions-container'
+            ) as HTMLElement;
+            const rowH = parseFloat(
+                getComputedStyle(header).getPropertyValue(
+                    '--dv-tabs-and-actions-container-height'
+                )
+            );
+            return {
+                rowH,
+                headerH: header.offsetHeight,
+                clientH: list.clientHeight,
+                scrollH: list.scrollHeight,
+            };
+        });
+
+        // The header grew past a single row but is capped at two.
+        expect(m.headerH).toBeGreaterThan(m.rowH);
+        expect(m.headerH).toBeLessThanOrEqual(m.rowH * 2 + 1);
+        // The strip clips the surplus rows (natural content is taller than the
+        // capped client box).
+        expect(m.scrollH).toBeGreaterThan(m.clientH);
+        // The surplus tabs appear in the overflow dropdown chevron.
+        await expect(
+            page.locator('.dv-tabs-overflow-dropdown-root').first()
+        ).toBeVisible();
+    });
+
+    test('the overflow dropdown lists the surplus tabs (a suffix of the strip)', async ({
+        page,
+    }) => {
+        await page.goto('/e2e/fixtures/index.html?overflow=wrap&maxRows=2');
+        await page.waitForFunction(() => (window as any).__ready === true);
+        await page.evaluate(() => (window as any).__dv.setupWrapTabs(20));
+
+        // Open the chevron dropdown.
+        const handle = page.locator('.dv-tabs-overflow-dropdown-default');
+        await expect(handle).toBeVisible();
+        await handle.click();
+
+        const overflow = page.locator('.dv-tabs-overflow-container');
+        await expect(overflow).toBeVisible();
+
+        const listed = await overflow
+            .locator('.dv-tab')
+            .allInnerTexts()
+            .then((texts) => texts.map((t) => t.trim()));
+
+        // The surplus is a suffix: the last tab spilled, the first did not.
+        expect(listed).toContain('wrap-tab-long-title-19');
+        expect(listed).not.toContain('wrap-tab-long-title-0');
+
+        // Picking a spilled tab activates it and closes the dropdown.
+        await overflow
+            .locator('.dv-tab', { hasText: 'wrap-tab-long-title-19' })
+            .click();
+        await expect(page.locator('.dv-active-tab')).toHaveText(
+            'wrap-tab-long-title-19'
+        );
+        await expect(overflow).toHaveCount(0);
+    });
+
+    test('closing the surplus tabs reflows the cap away (dropdown disappears)', async ({
+        page,
+    }) => {
+        await page.goto('/e2e/fixtures/index.html?overflow=wrap&maxRows=2');
+        await page.waitForFunction(() => (window as any).__ready === true);
+        await page.evaluate(() => (window as any).__dv.setupWrapTabs(20));
+
+        // Surplus present → dropdown shown.
+        await expect(
+            page.locator('.dv-tabs-overflow-dropdown-root').first()
+        ).toBeVisible();
+
+        // Close most panels so the remainder fits within the 2-row cap.
+        await page.evaluate(() => {
+            for (let i = 4; i < 20; i++) {
+                (window as any).__dv.closePanel('wrap-tab-' + i);
+            }
+        });
+
+        // No surplus left → the dropdown is gone, but wrap is still active.
+        await expect(
+            page.locator('.dv-tabs-overflow-dropdown-root')
+        ).toHaveCount(0);
+        await expect(page.locator('.dv-tabs-container').first()).toHaveClass(
+            /dv-tabs-container--wrap-capped/
+        );
+    });
+
+    test('raising maxRows re-admits the surplus rows and grows the header', async ({
+        page,
+    }) => {
+        await page.goto('/e2e/fixtures/index.html?overflow=wrap&maxRows=2');
+        await page.waitForFunction(() => (window as any).__ready === true);
+        await page.evaluate(() => (window as any).__dv.setupWrapTabs(20));
+
+        const cappedHeader = (await page
+            .locator('.dv-tabs-and-actions-container')
+            .first()
+            .boundingBox())!;
+
+        // Raise the cap high enough to fit every row.
+        await page.evaluate(() =>
+            (window as any).__dv.setOverflow({ mode: 'wrap', maxRows: 20 })
+        );
+
+        // The header grew (more rows now fit) and the dropdown emptied.
+        await expect
+            .poll(async () => {
+                const box = await page
+                    .locator('.dv-tabs-and-actions-container')
+                    .first()
+                    .boundingBox();
+                return box!.height;
+            })
+            .toBeGreaterThan(cappedHeader.height);
+
+        await expect(
+            page.locator('.dv-tabs-overflow-dropdown-root')
+        ).toHaveCount(0);
+    });
+
     test('no wrap class without the opt-in', async ({ page }) => {
         await page.goto('/e2e/fixtures/index.html');
         await page.waitForFunction(() => (window as any).__ready === true);

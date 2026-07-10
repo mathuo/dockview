@@ -3,6 +3,8 @@ import {
     DockviewGroupPanel,
     DockviewOverflowOptions,
     OVERFLOW_WRAP_TABS_CLASS as WRAP_CLASS,
+    OVERFLOW_WRAP_TABS_CAPPED_CLASS as CAPPED_CLASS,
+    OVERFLOW_MAX_TAB_ROWS_VARIABLE as MAX_ROWS_VAR,
     defineModule,
 } from 'dockview';
 import { IMultiRowTabsHost, IMultiRowTabsService } from 'dockview';
@@ -12,29 +14,108 @@ function isWrapMode(overflow: DockviewOverflowOptions | undefined): boolean {
 }
 
 /**
- * The number of wrapped rows in a tab list — the count of distinct tab
- * `offsetTop` values. Zero for an empty strip. (jsdom reports `offsetTop` 0 for
- * every tab, so this is 1 there regardless of width — real wrapping is e2e.)
+ * The row cap from `overflow.maxRows`, normalised to a positive integer, or
+ * `undefined` for unbounded wrap (the default, and any non-positive / non-finite
+ * value). Only meaningful in wrap mode.
  */
-function countRows(list: HTMLElement): number {
+function resolveMaxRows(
+    overflow: DockviewOverflowOptions | undefined
+): number | undefined {
+    const maxRows = overflow?.maxRows;
+    if (
+        typeof maxRows !== 'number' ||
+        !Number.isFinite(maxRows) ||
+        maxRows < 1
+    ) {
+        return undefined;
+    }
+    return Math.floor(maxRows);
+}
+
+interface RowMeasurement {
+    /**
+     * The number of wrapped rows the tabs occupy in their natural (uncapped)
+     * layout — the count of distinct tab `offsetTop` values. Zero for an empty
+     * strip. Capped tabs stay in flow (clipped, not removed), so this is always
+     * the natural count. (jsdom reports `offsetTop` 0 for every tab, so this is
+     * 1 there regardless of width — real wrapping is e2e.)
+     */
+    rows: number;
+    /**
+     * Panel ids of the tabs that wrapped onto a row at/after the `maxRows` cap —
+     * the surplus set routed to the overflow dropdown. Empty when uncapped or
+     * when the natural layout already fits within the cap.
+     */
+    surplus: string[];
+}
+
+/**
+ * Bucket a tab list's tabs by `offsetTop` (each distinct value is one wrapped
+ * row) to derive the natural row count and, given a cap, the surplus set of
+ * panel ids on rows beyond it.
+ */
+function measureRows(
+    list: HTMLElement,
+    maxRows: number | undefined
+): RowMeasurement {
     const tabs = Array.from(list.querySelectorAll<HTMLElement>('.dv-tab'));
     if (tabs.length === 0) {
-        return 0;
+        return { rows: 0, surplus: [] };
     }
-    const tops = new Set<number>();
+
+    // Distinct row offsets, ascending — one entry per wrapped row.
+    const tops = Array.from(new Set(tabs.map((tab) => tab.offsetTop))).sort(
+        (a, b) => a - b
+    );
+    const rows = tops.length;
+
+    if (maxRows === undefined || rows <= maxRows) {
+        return { rows, surplus: [] };
+    }
+
+    // The first surplus row is the one at index `maxRows`; every tab at or below
+    // it (offsetTop >= that row's top) spills to the dropdown.
+    const capTop = tops[maxRows];
+    const surplus: string[] = [];
     for (const tab of tabs) {
-        tops.add(tab.offsetTop);
+        if (tab.offsetTop >= capTop) {
+            // `dataset.tabPanelId` maps to the `data-tab-panel-id` attribute.
+            const id = tab.dataset.tabPanelId;
+            if (id !== undefined) {
+                surplus.push(id);
+            }
+        }
     }
-    return tops.size;
+    return { rows, surplus };
+}
+
+function sameSet(a: ReadonlySet<string>, b: ReadonlySet<string>): boolean {
+    if (a.size !== b.size) {
+        return false;
+    }
+    for (const value of a) {
+        if (!b.has(value)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 /**
  * Drives wrap layout for one group. The wrap itself is CSS (the inert
- * `.dv-tabs-container--wrap` rules in core); this controller only toggles that
- * class on the group's tab list and, when the wrapped row count changes, asks
- * the host to relayout so the now-taller header shrinks the content area (the
- * free header-aware content-sizing seam does the subtraction). v1 wraps only
- * horizontal headers — a hidden or vertical header is a no-op.
+ * `.dv-tabs-container--wrap` rules in core); this controller toggles that class
+ * on the group's tab list and, when the wrapped row count changes, asks the host
+ * to relayout so the now-taller header shrinks the content area (the free
+ * header-aware content-sizing seam does the subtraction).
+ *
+ * With `overflow.maxRows` set it also caps growth: it adds the capped class +
+ * `--dv-max-tab-rows` var (so CSS clips the strip to the cap), measures the
+ * natural row count from per-tab `offsetTop` buckets, and hands the surplus set
+ * (tabs on rows beyond the cap) to the free forced-overflow seam so those tabs
+ * spill into the dropdown. Detection is a row-count test, not the free path's
+ * horizontal-clip test — nothing clips horizontally when tabs wrap.
+ *
+ * v1 wraps only horizontal headers — a hidden or vertical header is a no-op.
  *
  * Wrap is (re)evaluated on construction and on `overflow` option changes. A
  * runtime header-direction flip (`setHeaderPosition` horizontal↔vertical) is
@@ -44,7 +125,10 @@ function countRows(list: HTMLElement): number {
  */
 class WrapController extends CompositeDisposable {
     private _wrapped = false;
+    /** The effective (capped) row count last propagated via relayout. */
     private _rowCount = 0;
+    private _maxRows: number | undefined;
+    private _forcedIds: ReadonlySet<string> = new Set();
     private _observer: ResizeObserver | undefined;
     private _pendingMeasure: { win: Window; handle: number } | undefined;
 
@@ -72,24 +156,41 @@ class WrapController extends CompositeDisposable {
             !!list &&
             !list.classList.contains('dv-tabs-container-vertical');
 
-        if (wrap === this._wrapped) {
-            return;
-        }
-        this._wrapped = wrap;
-
         if (wrap && list) {
+            const first = !this._wrapped;
+            this._wrapped = true;
             list.classList.add(WRAP_CLASS);
-            // Mutating layout synchronously inside the ResizeObserver callback
-            // trips the browser's "ResizeObserver loop" warning, so the RO
-            // schedules the measure on the next frame. The initial measure runs
-            // synchronously (it's not inside an RO callback).
-            this._observer = new ResizeObserver(() =>
-                this.scheduleMeasure(list)
-            );
-            this._observer.observe(list);
+
+            // Sync the row cap (may change without a wrap on/off transition, e.g.
+            // a runtime `overflow.maxRows` update).
+            this._maxRows = resolveMaxRows(this.host.options.overflow);
+            this.applyCap(list);
+
+            if (first) {
+                // Mutating layout synchronously inside the ResizeObserver
+                // callback trips the browser's "ResizeObserver loop" warning, so
+                // the RO schedules the measure on the next frame. The initial
+                // measure runs synchronously (it's not inside an RO callback).
+                this._observer = new ResizeObserver(() =>
+                    this.scheduleMeasure(list)
+                );
+                this._observer.observe(list);
+            }
             this.measure();
-        } else {
+        } else if (this._wrapped) {
             this.teardown();
+        }
+    }
+
+    /** Toggle the capped class + `--dv-max-tab-rows` var so CSS clips the strip
+     *  to the cap (or removes the clip when unbounded). */
+    private applyCap(list: HTMLElement): void {
+        if (this._maxRows === undefined) {
+            list.classList.remove(CAPPED_CLASS);
+            list.style.removeProperty(MAX_ROWS_VAR);
+        } else {
+            list.classList.add(CAPPED_CLASS);
+            list.style.setProperty(MAX_ROWS_VAR, String(this._maxRows));
         }
     }
 
@@ -119,9 +220,24 @@ class WrapController extends CompositeDisposable {
         if (!list) {
             return;
         }
-        const rows = countRows(list);
-        if (rows !== this._rowCount) {
-            this._rowCount = rows;
+
+        const { rows, surplus } = measureRows(list, this._maxRows);
+
+        // Only the visible (capped) rows drive header height, so relayout keys
+        // off the effective count, not the natural one.
+        const effectiveRows =
+            this._maxRows === undefined ? rows : Math.min(rows, this._maxRows);
+
+        // Route the surplus set to the dropdown (idempotent: skip when unchanged
+        // so we don't rebuild the dropdown, which would loop via the observer).
+        const forced = new Set(surplus);
+        if (!sameSet(forced, this._forcedIds)) {
+            this._forcedIds = forced;
+            this.host.setForcedOverflow(this.group, (id) => forced.has(id));
+        }
+
+        if (effectiveRows !== this._rowCount) {
+            this._rowCount = effectiveRows;
             this.host.relayoutGroup(this.group);
         }
     }
@@ -134,7 +250,17 @@ class WrapController extends CompositeDisposable {
         this._observer?.disconnect();
         this._observer = undefined;
         this._rowCount = 0;
-        this.host.getTabsListElement(this.group)?.classList.remove(WRAP_CLASS);
+        this._maxRows = undefined;
+        this._wrapped = false;
+        if (this._forcedIds.size > 0) {
+            this._forcedIds = new Set();
+            this.host.setForcedOverflow(this.group, () => false);
+        }
+        const list = this.host.getTabsListElement(this.group);
+        if (list) {
+            list.classList.remove(WRAP_CLASS, CAPPED_CLASS);
+            list.style.removeProperty(MAX_ROWS_VAR);
+        }
     }
 }
 
