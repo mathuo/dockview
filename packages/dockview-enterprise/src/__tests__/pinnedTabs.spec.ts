@@ -806,6 +806,80 @@ describe('pinned tabs — separate-row mode', () => {
         expect(b.api.isActive).toBe(true);
     });
 
+    // The hidden main-strip tab element for a panel (still present under the
+    // row in separate-row mode).
+    const mainTabEl = (panel: { api: any }): HTMLElement => {
+        const id = panel.api.group.model.header.getTabId(panel.id)!;
+        return document.getElementById(id)!;
+    };
+
+    // Drive the main strip's HTML5 drag source: a native dragstart on a tab
+    // populates the shared PanelTransfer that `getPanelData()` reads.
+    const dragMainTabIntoRow = (panel: { api: any }, clientX: number) => {
+        mockRowGeometry();
+        mainTabEl(panel).dispatchEvent(
+            new MouseEvent('dragstart', { bubbles: true })
+        );
+        const row = container.querySelector('.dv-pinned-row')!;
+        row.dispatchEvent(
+            new MouseEvent('dragover', { bubbles: true, clientX })
+        );
+        row.dispatchEvent(new MouseEvent('drop', { bubbles: true, clientX }));
+        // Release the transfer (mirrors dragend) so it can't leak across tests.
+        mainTabEl(panel).dispatchEvent(
+            new MouseEvent('dragend', { bubbles: true })
+        );
+    };
+
+    test('dragging an unpinned main-strip tab into the row pins it', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const a = dockview.addPanel({ id: 'a', component: 'default' });
+        dockview.addPanel({ id: 'b', component: 'default' });
+        const c = dockview.addPanel({ id: 'c', component: 'default' });
+        a.api.setPinned(true); // row [a]; b, c unpinned
+        const order = () => a.api.group.model.panels.map((p) => p.id);
+
+        // Drop 'c' at the far right of the row → after the pinned block.
+        dragMainTabIntoRow(c, 999);
+
+        expect(c.api.isPinned).toBe(true);
+        // Pinned block is now [a, c]; the unpinned 'b' stays behind it.
+        expect(order()).toEqual(['a', 'c', 'b']);
+        expect(rowTabs().map((el) => el.textContent)).toEqual(['a', 'c']);
+    });
+
+    test('pin-by-drag-in honours the drop slot within the pinned block', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const a = dockview.addPanel({ id: 'a', component: 'default' });
+        const b = dockview.addPanel({ id: 'b', component: 'default' });
+        const c = dockview.addPanel({ id: 'c', component: 'default' });
+        a.api.setPinned(true);
+        b.api.setPinned(true); // row [a, b]; c unpinned
+        const order = () => a.api.group.model.panels.map((p) => p.id);
+
+        // Drop 'c' at the far left → slot 0, ahead of the pinned block.
+        dragMainTabIntoRow(c, -5);
+
+        expect(c.api.isPinned).toBe(true);
+        expect(order()).toEqual(['c', 'a', 'b']);
+    });
+
+    test('a pinned main-strip tab dragged into the row is not re-pinned/moved', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const a = dockview.addPanel({ id: 'a', component: 'default' });
+        const b = dockview.addPanel({ id: 'b', component: 'default' });
+        a.api.setPinned(true);
+        b.api.setPinned(true); // both pinned
+        const order = () => a.api.group.model.panels.map((p) => p.id);
+
+        // 'b' is already pinned — dropping its (hidden) main tab is a no-op.
+        const moveTo = jest.spyOn(b.api, 'moveTo');
+        dragMainTabIntoRow(b, 999);
+
+        expect(moveTo).not.toHaveBeenCalled();
+        expect(order()).toEqual(['a', 'b']);
+    });
+
     test('a pinned panel moved into a group renders in that group row', () => {
         const dockview = make({ enabled: true, mode: 'separate-row' });
         const a = dockview.addPanel({ id: 'a', component: 'default' });
