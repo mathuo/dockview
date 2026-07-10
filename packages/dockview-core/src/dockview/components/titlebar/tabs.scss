@@ -344,6 +344,37 @@
             opacity: 1;
         }
     }
+
+    // The tab being dragged for a reorder.
+    &.dv-pinned-tab--dragging {
+        opacity: 0.5;
+    }
+
+    // Drop indicator: a bar on the side the dragged tab would land, mirroring
+    // the main strip's wrap-reorder indicator.
+    &.dv-pinned-tab--drop-before,
+    &.dv-pinned-tab--drop-after {
+        position: relative;
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            z-index: 10;
+            pointer-events: none;
+            background-color: var(--dv-drag-over-border-color);
+        }
+    }
+
+    &.dv-pinned-tab--drop-before::after {
+        left: 0;
+    }
+
+    &.dv-pinned-tab--drop-after::after {
+        right: 0;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,7 +1,12 @@
 import { fireEvent } from '@testing-library/dom';
-import { DockviewComponent, IContentRenderer } from 'dockview-core';
+import {
+    DockviewComponent,
+    getPanelData,
+    IContentRenderer,
+} from 'dockview-core';
 import {
     computePinnedFirstOrder,
+    computePinnedRowDropIndex,
     PinnedTabsService,
 } from '../pinnedTabsService';
 
@@ -70,6 +75,41 @@ describe('pinned tabs — ordering math', () => {
                 'c',
             ])
         ).toEqual(['c', 'a', 'b', 'd']);
+    });
+});
+
+describe('pinned tabs — row reorder index math', () => {
+    // Three tabs, 20px wide, laid out at x = [0, 20, 40] → midpoints [10, 30, 50].
+    const midpoints = [10, 30, 50];
+
+    test('dragging the first tab past the last lands it at the end', () => {
+        // pointer past every midpoint → slot 3; from 0 → target 2.
+        expect(computePinnedRowDropIndex(midpoints, 55, 0)).toBe(2);
+    });
+
+    test('dragging the last tab before the first lands it at the front', () => {
+        // pointer before every midpoint → slot 0; from 2 → target 0.
+        expect(computePinnedRowDropIndex(midpoints, 5, 2)).toBe(0);
+    });
+
+    test('dragging the first tab just past the second midpoint lands it second', () => {
+        // pointer past midpoints [10, 30] → slot 2; from 0 → target 1.
+        expect(computePinnedRowDropIndex(midpoints, 35, 0)).toBe(1);
+    });
+
+    test('a drop that does not cross a midpoint is a no-op (target === from)', () => {
+        // Dragging the middle tab, pointer between tabs 0 and 1 → slot 1; from 1.
+        expect(computePinnedRowDropIndex(midpoints, 15, 1)).toBe(1);
+    });
+
+    test('the result is clamped to the last valid index', () => {
+        // A far-right pointer never exceeds count - 1.
+        expect(computePinnedRowDropIndex(midpoints, 9999, 1)).toBe(2);
+    });
+
+    test('a single tab always maps to index 0', () => {
+        expect(computePinnedRowDropIndex([10], 9999, 0)).toBe(0);
+        expect(computePinnedRowDropIndex([10], -9999, 0)).toBe(0);
     });
 });
 
@@ -487,6 +527,64 @@ describe('pinned tabs — reorder guard', () => {
             expect(setPinned).toHaveBeenCalledWith(false);
         });
     });
+
+    // A drag that originated in the pinned second row always flips (unpins) a
+    // drop past the boundary — the row is the only handle on the tab, so a
+    // drag-out is a deliberate unpin regardless of the clamp/flip option.
+    describe('row-originated drag (unpin-by-drag-out)', () => {
+        test('a drag out of the row unpins even in clamp mode', async () => {
+            const svc = makeService({
+                enabled: true,
+                togglePinOnCrossBoundaryDrag: false,
+            });
+            const setPinned = jest.fn();
+            const g = grp([
+                { id: 'p', pinned: true, setPinned },
+                { id: 'a', pinned: false },
+            ]);
+
+            svc.beginRowDrag('p');
+            // Not clamped back to the boundary — the drop index is honoured…
+            expect(svc.resolveDropIndex(g, 'p', 1)).toBe(1);
+            await Promise.resolve();
+            // …and the panel unpins.
+            expect(setPinned).toHaveBeenCalledWith(false);
+        });
+
+        test('the forced flip ends with the drag (clamp restored)', () => {
+            const svc = makeService({
+                enabled: true,
+                togglePinOnCrossBoundaryDrag: false,
+            });
+            const setPinned = jest.fn();
+            const g = grp([
+                { id: 'p', pinned: true, setPinned },
+                { id: 'a', pinned: false },
+            ]);
+
+            svc.beginRowDrag('p');
+            svc.endRowDrag();
+            // Back to clamp — a pinned tab is pinned-clamped to the boundary.
+            expect(svc.resolveDropIndex(g, 'p', 1)).toBe(0);
+            expect(setPinned).not.toHaveBeenCalled();
+        });
+
+        test('the forced flip is scoped to the row-dragged panel only', () => {
+            const svc = makeService({
+                enabled: true,
+                togglePinOnCrossBoundaryDrag: false,
+            });
+            const g = grp([
+                { id: 'p1', pinned: true },
+                { id: 'p2', pinned: true },
+                { id: 'a', pinned: false },
+            ]);
+
+            svc.beginRowDrag('p1');
+            // p2 is not the row-dragged panel → still clamped to its boundary.
+            expect(svc.resolveDropIndex(g, 'p2', 2)).toBe(1);
+        });
+    });
 });
 
 describe('pinned tabs — serialization', () => {
@@ -676,6 +774,193 @@ describe('pinned tabs — separate-row mode', () => {
         a.api.setPinned(true);
 
         expect(row()).toBeNull();
+    });
+
+    // Give each row tab a fixed geometry (jsdom has no layout): 20px-wide tabs
+    // laid out left-to-right, so midpoints are [10, 30, 50, ...].
+    const mockRowGeometry = () => {
+        rowTabs().forEach((el, i) => {
+            (el as HTMLElement).getBoundingClientRect = () =>
+                ({
+                    left: i * 20,
+                    right: i * 20 + 20,
+                    width: 20,
+                    top: 0,
+                    bottom: 16,
+                    height: 16,
+                    x: i * 20,
+                    y: 0,
+                    toJSON: () => ({}),
+                }) as DOMRect;
+        });
+    };
+
+    const drag = (fromId: string, clientX: number) => {
+        const from = rowTabs().find(
+            (el) => (el as HTMLElement).dataset.panelId === fromId
+        )!;
+        mockRowGeometry();
+        from.dispatchEvent(new MouseEvent('dragstart', { bubbles: true }));
+        from.dispatchEvent(
+            new MouseEvent('dragover', { bubbles: true, clientX })
+        );
+        from.dispatchEvent(new MouseEvent('drop', { bubbles: true, clientX }));
+    };
+
+    const setupThreePinned = (dockview: DockviewComponent) => {
+        const a = dockview.addPanel({ id: 'a', component: 'default' });
+        const b = dockview.addPanel({ id: 'b', component: 'default' });
+        const c = dockview.addPanel({ id: 'c', component: 'default' });
+        a.api.setPinned(true);
+        b.api.setPinned(true);
+        c.api.setPinned(true);
+        const order = () => a.api.group.model.panels.map((p) => p.id);
+        return { a, b, c, order };
+    };
+
+    test('dragging a row tab to the right reorders the pinned block', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const { a, order } = setupThreePinned(dockview);
+        expect(order()).toEqual(['a', 'b', 'c']);
+        expect(rowTabs().map((el) => el.textContent)).toEqual(['a', 'b', 'c']);
+
+        const moveTo = jest.spyOn(a.api, 'moveTo');
+        // Drop 'a' past every midpoint → it should land at index 2.
+        drag('a', 55);
+
+        expect(moveTo).toHaveBeenCalledWith({ index: 2, skipSetActive: true });
+        expect(order()).toEqual(['b', 'c', 'a']);
+        // The row DOM reconciles to the new order after the drop.
+        expect(rowTabs().map((el) => el.textContent)).toEqual(['b', 'c', 'a']);
+    });
+
+    test('dragging a row tab to the front reorders the pinned block', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const { c, order } = setupThreePinned(dockview);
+
+        const moveTo = jest.spyOn(c.api, 'moveTo');
+        // Drop 'c' before every midpoint → index 0.
+        drag('c', 5);
+
+        expect(moveTo).toHaveBeenCalledWith({ index: 0, skipSetActive: true });
+        expect(order()).toEqual(['c', 'a', 'b']);
+    });
+
+    test('a no-op drop (same slot) issues no move', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const { b } = setupThreePinned(dockview);
+
+        const moveTo = jest.spyOn(b.api, 'moveTo');
+        // Drop 'b' between tabs 0 and 1 → target index 1 === its current index.
+        drag('b', 15);
+
+        expect(moveTo).not.toHaveBeenCalled();
+    });
+
+    test('a reorder keeps the active panel active (skipSetActive)', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const { a, b } = setupThreePinned(dockview);
+        b.api.setActive();
+        expect(b.api.isActive).toBe(true);
+
+        drag('a', 55); // reorder unrelated tab
+
+        expect(b.api.isActive).toBe(true);
+    });
+
+    // The hidden main-strip tab element for a panel (still present under the
+    // row in separate-row mode).
+    const mainTabEl = (panel: { api: any }): HTMLElement => {
+        const id = panel.api.group.model.header.getTabId(panel.id)!;
+        return document.getElementById(id)!;
+    };
+
+    // Drive the main strip's HTML5 drag source: a native dragstart on a tab
+    // populates the shared PanelTransfer that `getPanelData()` reads.
+    const dragMainTabIntoRow = (panel: { api: any }, clientX: number) => {
+        mockRowGeometry();
+        mainTabEl(panel).dispatchEvent(
+            new MouseEvent('dragstart', { bubbles: true })
+        );
+        const row = container.querySelector('.dv-pinned-row')!;
+        row.dispatchEvent(
+            new MouseEvent('dragover', { bubbles: true, clientX })
+        );
+        row.dispatchEvent(new MouseEvent('drop', { bubbles: true, clientX }));
+        // Release the transfer (mirrors dragend) so it can't leak across tests.
+        mainTabEl(panel).dispatchEvent(
+            new MouseEvent('dragend', { bubbles: true })
+        );
+    };
+
+    test('dragging an unpinned main-strip tab into the row pins it', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const a = dockview.addPanel({ id: 'a', component: 'default' });
+        dockview.addPanel({ id: 'b', component: 'default' });
+        const c = dockview.addPanel({ id: 'c', component: 'default' });
+        a.api.setPinned(true); // row [a]; b, c unpinned
+        const order = () => a.api.group.model.panels.map((p) => p.id);
+
+        // Drop 'c' at the far right of the row → after the pinned block.
+        dragMainTabIntoRow(c, 999);
+
+        expect(c.api.isPinned).toBe(true);
+        // Pinned block is now [a, c]; the unpinned 'b' stays behind it.
+        expect(order()).toEqual(['a', 'c', 'b']);
+        expect(rowTabs().map((el) => el.textContent)).toEqual(['a', 'c']);
+    });
+
+    test('pin-by-drag-in honours the drop slot within the pinned block', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const a = dockview.addPanel({ id: 'a', component: 'default' });
+        const b = dockview.addPanel({ id: 'b', component: 'default' });
+        const c = dockview.addPanel({ id: 'c', component: 'default' });
+        a.api.setPinned(true);
+        b.api.setPinned(true); // row [a, b]; c unpinned
+        const order = () => a.api.group.model.panels.map((p) => p.id);
+
+        // Drop 'c' at the far left → slot 0, ahead of the pinned block.
+        dragMainTabIntoRow(c, -5);
+
+        expect(c.api.isPinned).toBe(true);
+        expect(order()).toEqual(['c', 'a', 'b']);
+    });
+
+    test('a pinned main-strip tab dragged into the row is not re-pinned/moved', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const a = dockview.addPanel({ id: 'a', component: 'default' });
+        const b = dockview.addPanel({ id: 'b', component: 'default' });
+        a.api.setPinned(true);
+        b.api.setPinned(true); // both pinned
+        const order = () => a.api.group.model.panels.map((p) => p.id);
+
+        // 'b' is already pinned — dropping its (hidden) main tab is a no-op.
+        const moveTo = jest.spyOn(b.api, 'moveTo');
+        dragMainTabIntoRow(b, 999);
+
+        expect(moveTo).not.toHaveBeenCalled();
+        expect(order()).toEqual(['a', 'b']);
+    });
+
+    test('a row tab drag exposes the panel payload for the main strip, then clears it', () => {
+        const dockview = make({ enabled: true, mode: 'separate-row' });
+        const { a } = setupThreePinned(dockview);
+        mockRowGeometry();
+        const rowTab = rowTabs().find(
+            (el) => (el as HTMLElement).dataset.panelId === 'a'
+        )!;
+
+        // dragstart mirrors the main tab's payload so the main strip's drop
+        // targets accept the drag (viewId/groupId/panelId all match).
+        rowTab.dispatchEvent(new MouseEvent('dragstart', { bubbles: true }));
+        const data = getPanelData();
+        expect(data?.panelId).toBe('a');
+        expect(data?.groupId).toBe(a.api.group.id);
+        expect(data?.viewId).toBe(dockview.id);
+
+        // dragend releases the shared payload so it can't leak past the drag.
+        rowTab.dispatchEvent(new MouseEvent('dragend', { bubbles: true }));
+        expect(getPanelData()).toBeUndefined();
     });
 
     test('a pinned panel moved into a group renders in that group row', () => {

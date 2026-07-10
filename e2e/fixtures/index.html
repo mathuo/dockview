@@ -122,8 +122,12 @@
                     popoutUrl: '/e2e/fixtures/popout.html',
                     // Drop Guide ("compass") + pointer DnD so a panel drag is
                     // drivable in the harness. Inert unless a drag occurs.
+                    // `?dnd=html5` swaps in the native HTML5 backend (needed to
+                    // exercise the pinned row's pin-by-drag-in path, which reads
+                    // the drag payload the main strip's HTML5 source populates).
                     dndGuide: true,
-                    dndStrategy: 'pointer',
+                    dndStrategy:
+                        params.get('dnd') === 'html5' ? 'html5' : 'pointer',
                     // Custom drop-position resolver (opt-in via `?resolver=`),
                     // which takes precedence over the compass at the same seam.
                     dropPositionResolver,

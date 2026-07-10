@@ -587,6 +587,10 @@ export interface IMultiRowTabsService extends IDisposable {
  * layout or sizing is touched.
  */
 export interface IPinnedTabsHost {
+    /** The owning component's id — the `viewId` a within-component drag payload
+     *  (`PanelTransfer`) carries, so the pinned second row can originate a drag
+     *  the main strip's drop targets accept. */
+    readonly id: string;
     readonly options: DockviewComponentOptions;
     readonly onDidAddGroup: Event<DockviewGroupPanel>;
     readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
